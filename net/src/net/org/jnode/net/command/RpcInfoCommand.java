@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcPortmapClient;
@@ -32,11 +33,8 @@ import org.acplt.oncrpc.OncRpcProtocols;
 import org.acplt.oncrpc.OncRpcServerIdent;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.HostNameArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.HostNameArgument;
 
 /**
  * rpcinfo command makes an RPC call to an RPC server and reports what it finds.
@@ -47,36 +45,23 @@ public class RpcInfoCommand extends AbstractCommand {
 
     private static final String LIST_SERVICES_FORMAT = "%1$10s %2$10s %3$10s %4$10s %5$10s";
 
-    static final HostNameArgument HOST = new HostNameArgument("host", "host");
-
-    public static Help.Info HELP_INFO = new Help.Info("rpcinfo", new Syntax[]{new Syntax(
-            "Probe the portmapper on host, and print a list of all registered RPC programs.",
-            new Parameter[]{new Parameter(HOST)})});
-
-    public static void main(String[] args) throws Exception {
-
-        new RpcInfoCommand().execute(args);
-
-    }
+    private final HostNameArgument ARG_HOST =
+        new HostNameArgument("host", Argument.MANDATORY, "the host to be probed");
 
     public RpcInfoCommand() {
+        super("Probe the portmapper on host, and print a list of all registered RPC programs.");
+        registerArguments(ARG_HOST);
+    }
+        
+    public static void main(String[] args) throws Exception {
+        new RpcInfoCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-
-        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
-
-        InetAddress host = HOST.getAddress(parsedArguments);
-
-        listServices(host, out, err);
-
-    }
-
-    private void listServices(InetAddress host, PrintStream out, PrintStream err) {
-
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
         OncRpcPortmapClient client = null;
+        String hostname = ARG_HOST.getValue();
         try {
-
+            InetAddress host = InetAddress.getByName(hostname);
             client = new OncRpcPortmapClient(host, OncRpcProtocols.ONCRPC_UDP);
 
             OncRpcServerIdent[] servers = client.listServers();
@@ -86,31 +71,32 @@ public class RpcInfoCommand extends AbstractCommand {
 
             for (int i = 0; i < servers.length; i++) {
                 OncRpcServerIdent server = servers[i];
-
-                out.printf(LIST_SERVICES_FORMAT, server.program, server.version, server.protocol == 6 ? "tcp" : "udp",
-                        server.port, getName(server.program));
-
+                out.printf(LIST_SERVICES_FORMAT, server.program, server.version, 
+                        server.protocol == 6 ? "tcp" : "udp",
+                                server.port, getName(server.program));
                 out.println();
             }
         } catch (OncRpcException e) {
-            err.println("Can not make the rpc call to the host " + host.getHostAddress());
+            err.println("Cannot make the rpc call to host " + hostname);
+            exit(1);
+        } catch (UnknownHostException e) {
+            err.println("Unknown hostname " + hostname);
             exit(1);
         } catch (IOException e) {
-            err.println("Can not connect to  the host " + host.getHostAddress());
+            err.println("Cannot connect to host " + hostname);
             exit(1);
         } finally {
             if (client != null) {
                 try {
                     client.close();
-                } catch (Exception e) {
+                } catch (OncRpcException e) {
+                    // Ignore exception on close
                 }
             }
         }
-
     }
 
     private String getName(int program) {
-
         switch (program) {
             case 100000:
                 return "portmapper";
@@ -123,8 +109,7 @@ public class RpcInfoCommand extends AbstractCommand {
             case 100024:
                 return "status";
             default:
-                return "unknown";
+                return "unknown service (" + program + ")";
         }
-
     }
 }
