@@ -21,51 +21,42 @@
 
 package org.jnode.net.command;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.tftp.TFTPClient;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.HostNameArgument;
 
 /**
+ * This Command class does a batch mode TFTP get or put, or starts a simple TFTP client.
+ * 
  * @author markhale
+ * @author crawley
  */
 public class TftpCommand extends AbstractCommand {
 
-    private static final OptionArgument.Option[] COMMAND_OPTIONS = new OptionArgument.Option[] {
-        new OptionArgument.Option("put", "transfer a file to a server"),
-        new OptionArgument.Option("get", "transfer a file from a server")
-    };
-    private static final HostArgument ARG_SERVER = new HostArgument("hostname", "the hostname of the TFTP server");
-    private static final OptionArgument ARG_COMMAND = new OptionArgument("command", "must be either PUT or GET", COMMAND_OPTIONS);
-    private static final Argument ARG_FILENAME = new Argument("filename", "the file to transfer");
+    private final FlagArgument FLAG_PUT = 
+        new FlagArgument("put", Argument.OPTIONAL, "if set, transfer a file to the TFTP server");
 
-    public static Help.Info HELP_INFO = new Help.Info(
-            "tftp",
-            new Syntax[] {
-                    new Syntax(
-                            "Start the TFTP client as an interactive session",
-                            new Parameter[] {
-                                    new Parameter(ARG_SERVER, Parameter.OPTIONAL)
-                            }
-                    ),
-                    new Syntax(
-                            "Execute the TFTP client non-interactively",
-                            new Parameter[] {
-                                    new Parameter(ARG_SERVER, Parameter.MANDATORY),
-                                    new Parameter(ARG_COMMAND, Parameter.MANDATORY),
-                                    new Parameter(ARG_FILENAME, Parameter.MANDATORY)
-                            }
-                    )
-            }
-    );
+    private final FlagArgument FLAG_GET = 
+        new FlagArgument("get", Argument.OPTIONAL, "if set, fetch a file from the TFTP server");
+    
+    private final HostNameArgument ARG_SERVER =
+        new HostNameArgument("host", Argument.OPTIONAL, "the hostname of the TFTP server");
+    
+    private final FileArgument ARG_FILENAME = 
+        new FileArgument("filename", Argument.OPTIONAL, "the file to transfer");
+
+    public TftpCommand() {
+        super("Do a TFTP get or put, or run an interactive TFTP client");
+        registerArguments(FLAG_GET, FLAG_PUT, ARG_FILENAME, ARG_SERVER);
+    }
 
     public static void main(String[] args) throws Exception {
         new TftpCommand().execute(args);		
@@ -73,8 +64,37 @@ public class TftpCommand extends AbstractCommand {
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
     throws Exception {
-        TFTPClient.main(commandLine.getArguments());
-        System.out.println();
+        TFTPClient client = new TFTPClient(out);
+        String host = ARG_SERVER.getValue();
+        File file = ARG_FILENAME.getValue();
+        if (FLAG_PUT.isSet()) {
+            if (client.executeCommand(new String[] {TFTPClient.CONNECT_CMD, host})) {
+                if (!client.executeCommand(new String[] {TFTPClient.PUT_CMD, file.toString()})) {
+                    exit(1);
+                }
+            }
+            else {
+                exit(2);
+            }
+        }
+        else if (FLAG_GET.isSet()) {
+            if (client.executeCommand(new String[] {TFTPClient.CONNECT_CMD, host})) {
+                if (!client.executeCommand(new String[] {TFTPClient.GET_CMD, file.toString()})) {
+                    exit(1);
+                }
+            }
+            else {
+                exit(2);
+            }
+        } 
+        else {
+            if (host != null) {
+                if (!client.executeCommand(new String[] {TFTPClient.CONNECT_CMD, host})) {
+                    exit(2);
+                }
+            }
+            client.run(in);
+        }
     }
 }
 

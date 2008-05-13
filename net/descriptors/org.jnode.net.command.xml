@@ -99,6 +99,17 @@
           <argument argLabel="port"/>
         </sequence>
       </syntax>
+      <syntax alias="tftp">
+        <optional description="Run an interactive TFTP client"><argument argLabel="host"/></optional>
+        <sequence description="Do a non-interactive TFTP 'get' or 'put'">
+          <alternatives>
+            <option argLabel="get" longName="get"/>
+            <option argLabel="put" longName="put"/>
+          </alternatives>
+          <argument argLabel="host"/>
+          <argument argLabel="filename"/>
+        </sequence>
+      </syntax>
     </extension>
   
     <extension point="org.jnode.security.permissions">
@@ -108,6 +119,7 @@
         <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen,connect"/>
         <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
         <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
+        <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
         <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
         <permission class="org.jnode.net.NetPermission" name="dhcpClient"/>
         <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
