@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.command;
 
 import java.io.InputStream;
@@ -38,42 +38,43 @@ import org.jnode.shell.help.argument.OptionArgument;
  * @author markhale
  */
 public class TftpCommand extends AbstractCommand {
-	
-	private static final OptionArgument.Option[] COMMAND_OPTIONS = new OptionArgument.Option[] {
-		new OptionArgument.Option("put", "transfer a file to a server"),
-		new OptionArgument.Option("get", "transfer a file from a server")
-	};
-	private static final HostArgument ARG_SERVER = new HostArgument("hostname", "the hostname of the TFTP server");
-	private static final OptionArgument ARG_COMMAND = new OptionArgument("command", "must be either PUT or GET", COMMAND_OPTIONS);
-	private static final Argument ARG_FILENAME = new Argument("filename", "the file to transfer");
-	
-	public static Help.Info HELP_INFO = new Help.Info(
-		"tftp",
-		new Syntax[] {
-			new Syntax(
-				"Start the TFTP client as an interactive session",
-				new Parameter[] {
-					new Parameter(ARG_SERVER, Parameter.OPTIONAL)
-				}
-			),
-			new Syntax(
-				"Execute the TFTP client non-interactively",
-				new Parameter[] {
-					new Parameter(ARG_SERVER, Parameter.MANDATORY),
-					new Parameter(ARG_COMMAND, Parameter.MANDATORY),
-					new Parameter(ARG_FILENAME, Parameter.MANDATORY)
-				}
-			)
-		}
-	);
-	
-	public static void main(String[] args) throws Exception {
-		new TftpCommand().execute(args);		
-	}
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		TFTPClient.main(commandLine.getArguments());
-		System.out.println();
-	}
+    private static final OptionArgument.Option[] COMMAND_OPTIONS = new OptionArgument.Option[] {
+        new OptionArgument.Option("put", "transfer a file to a server"),
+        new OptionArgument.Option("get", "transfer a file from a server")
+    };
+    private static final HostArgument ARG_SERVER = new HostArgument("hostname", "the hostname of the TFTP server");
+    private static final OptionArgument ARG_COMMAND = new OptionArgument("command", "must be either PUT or GET", COMMAND_OPTIONS);
+    private static final Argument ARG_FILENAME = new Argument("filename", "the file to transfer");
+
+    public static Help.Info HELP_INFO = new Help.Info(
+            "tftp",
+            new Syntax[] {
+                    new Syntax(
+                            "Start the TFTP client as an interactive session",
+                            new Parameter[] {
+                                    new Parameter(ARG_SERVER, Parameter.OPTIONAL)
+                            }
+                    ),
+                    new Syntax(
+                            "Execute the TFTP client non-interactively",
+                            new Parameter[] {
+                                    new Parameter(ARG_SERVER, Parameter.MANDATORY),
+                                    new Parameter(ARG_COMMAND, Parameter.MANDATORY),
+                                    new Parameter(ARG_FILENAME, Parameter.MANDATORY)
+                            }
+                    )
+            }
+    );
+
+    public static void main(String[] args) throws Exception {
+        new TftpCommand().execute(args);		
+    }
+
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws Exception {
+        TFTPClient.main(commandLine.getArguments());
+        System.out.println();
+    }
 }
 
