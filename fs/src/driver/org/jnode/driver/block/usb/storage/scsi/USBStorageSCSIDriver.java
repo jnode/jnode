@@ -35,13 +35,13 @@ import org.jnode.driver.RemovableDeviceAPI;
 import org.jnode.driver.block.FSBlockAlignmentSupport;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.driver.block.usb.storage.USBStorageConstants;
+import org.jnode.driver.block.usb.storage.USBStorageSCSIHostDriver.USBStorageSCSIDevice;
 import org.jnode.driver.bus.scsi.SCSIDevice;
 import org.jnode.driver.bus.scsi.SCSIDeviceAPI;
 import org.jnode.driver.bus.scsi.SCSIException;
 import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
 import org.jnode.driver.bus.scsi.cdb.mmc.CapacityData;
 import org.jnode.driver.bus.scsi.cdb.mmc.MMCUtils;
-import org.jnode.driver.bus.usb.USBConstants;
 import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
 import org.jnode.partitions.PartitionTableEntry;
@@ -176,7 +176,7 @@ public class USBStorageSCSIDriver extends Driver implements FSBlockDeviceAPI, Re
 	private void processChanged() throws IOException {
 		if (changed) {
 			this.capacity = null;
-			final SCSIDevice dev = (SCSIDevice) getDevice();
+			final USBStorageSCSIDevice dev = (USBStorageSCSIDevice) getDevice();
 			try {
 				// Gets the capacity.
 				this.capacity = MMCUtils.readCapacity(dev);

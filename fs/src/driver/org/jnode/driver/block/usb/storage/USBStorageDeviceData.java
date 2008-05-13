@@ -18,16 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.usb.storage;
 
+import org.apache.log4j.Logger;
+import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.usb.InterfaceDescriptor;
 import org.jnode.driver.bus.usb.USBDataPipe;
+import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBEndPoint;
+import org.jnode.driver.bus.usb.USBInterface;
 
-final class USBStorageDeviceData {
-    /** */
-	private InterfaceDescriptor intf;
+final class USBStorageDeviceData implements USBStorageConstants {
+	/** My logger */
+	private static final Logger log = Logger.getLogger(USBStorageDeviceData.class);
+	/** */
+	private USBDevice device;
+	/** */
+	private USBInterface usbInterface;
 	/** */
 	private int protocol;
 	/** */
@@ -51,14 +59,56 @@ final class USBStorageDeviceData {
 	/** */
 	private byte maxLun;
 
-	
-	public USBStorageDeviceData(InterfaceDescriptor intf) {
-		this.intf = intf;
+	/**
+	 * 
+	 * @param device
+	 * @throws DriverException
+	 */
+	public USBStorageDeviceData(USBDevice device) throws DriverException {
+		this.device = device;
+		this.usbInterface = this.device.getConfiguration(0).getInterface(0);
+		InterfaceDescriptor intf = this.usbInterface.getDescriptor(); 
 		this.maxLun = 0;
 		this.protocol = intf.getInterfaceProtocol();
 		this.subClass = intf.getInterfaceSubClass();
+
+		switch (this.protocol) {
+		case US_PR_CBI:
+			log.info("*** Set transport protocol to CONTROL/BULK/INTERRUPT");
+			break;
+		case US_PR_BULK:
+			log.info("*** Set transport protocol to BULK ONLY");
+			this.transport = new USBStorageBulkTransport(this);
+			//((USBStorageBulkTransport)USBMassStorage.getTransport()).getMaxLun(usbDev);
+			break;
+		case US_PR_SCM_ATAPI:
+			log.info("*** Set transport protocol to SCM ATAPI");
+		default:
+			throw new DriverException("Transport protocol not implemented.");
+		}
+
+		USBEndPoint ep;
+		for (int i = 0; i < intf.getNumEndPoints(); i++) {
+			ep = this.usbInterface.getEndPoint(i);
+			// Is it a bulk endpoint ?
+			if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_BULK) {
+				// In or Out ?
+				if ((ep.getDescriptor().getEndPointAddress() & USB_DIR_IN) == 0) {
+					this.bulkInEndPoint = ep;
+					log.info("*** Set bulk in endpoint");
+				} else {
+					this.bulkOutEndPoint = ep;
+					log.info("*** Set bulk out endpoint");
+				}
+			} else if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT) {
+				this.intrEndPoint = ep;
+				log.info("*** Set interrupt endpoint");
+			}
+		}
+		
+
 	}
-	
+
 	/**
 	 * @return Returns the receiveBulkPipe.
 	 */
@@ -119,7 +169,7 @@ final class USBStorageDeviceData {
 	 * 
 	 * @param dev
 	 */
-	
+
 
 	/**
 	 * @return Returns the bulkInEndPoint.
@@ -205,6 +255,14 @@ final class USBStorageDeviceData {
 
 	public void setSubClass(int subClass) {
 		this.subClass = subClass;
+	}
+
+	public USBDevice getDevice() {
+		return device;
+	}
+
+	public void setDevice(USBDevice device) {
+		this.device = device;
 	}
 
 }

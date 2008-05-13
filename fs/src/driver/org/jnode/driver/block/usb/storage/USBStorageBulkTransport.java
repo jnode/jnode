@@ -29,42 +29,29 @@ import org.jnode.driver.bus.usb.USBDataPipe;
 import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBException;
 import org.jnode.driver.bus.usb.USBPacket;
-import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
 import org.jnode.util.NumberUtils;
 
-final class USBStorageBulkTransport implements ITransport, USBPipeListener,
-        USBStorageConstants {
+final class USBStorageBulkTransport implements ITransport, USBStorageConstants {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(USBStorageBulkTransport.class);
-
-    /** The device */
-    private final USBDevice device;
-    
-    /* */
-    private final USBStorageDeviceData devData;
-    
-    USBDataPipe pipe;
-    
-    
+    /** */
+    private final USBStorageDeviceData storageDeviceData;
 
     /**
      * 
-     * @param dev
+     * @param storageDeviceData
      */
-    public USBStorageBulkTransport(USBDevice device, USBStorageDeviceData devData) {
-        this.device = device;
-        this.devData = devData;
+    public USBStorageBulkTransport(USBStorageDeviceData storageDeviceData) {
+        this.storageDeviceData = storageDeviceData;
     }
 
-    /**
-     * Bulk only transport workflow.
-     * 
-     * @param cdb
-     *  
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.driver.block.usb.storage.ITransport#transport(org.jnode.driver.bus.scsi.CDB, int)
      */
-    public void transport(CDB cdb) {
+    public void transport(CDB cdb, long timeout) {
         try {
             byte[] scsiCmd = cdb.toByteArray();
             // Setup command wrapper 
@@ -78,23 +65,33 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
             cbw.setCdb(scsiCmd);
             log.debug(cbw.toString());
             // Sent CBW to device
-            pipe = (USBDataPipe) devData.getBulkOutEndPoint().getPipe();
-            pipe.addListener(this);
-			pipe.open();
-            USBRequest req = pipe.createRequest(cbw);
-            log.debug("*** Request data     : " + req.toString());
-            log.debug("*** Request status   : 0x" + NumberUtils.hex(req.getStatus(),4));
-            pipe.asyncSubmit(req);
+            USBDataPipe outPipe = ((USBDataPipe)storageDeviceData.getBulkOutEndPoint().getPipe());
+            USBRequest req =  outPipe.createRequest(cbw);
+            if(timeout <= 0){
+            	outPipe.asyncSubmit(req);
+            } else {
+            	outPipe.syncSubmit(req, timeout);
+            }
+            //
+            CSW csw = new CSW();
+            csw.setSignature(US_BULK_CS_SIGN);
+            USBDataPipe inPipe = ((USBDataPipe)storageDeviceData.getBulkInEndPoint().getPipe());
+            USBRequest resp =  inPipe.createRequest(csw);
+            if(timeout <= 0){
+            	inPipe.asyncSubmit(resp);
+            } else {
+            	inPipe.syncSubmit(resp,timeout);
+            }
         } catch (USBException e) {
             e.printStackTrace();
         }
     }
-
+    
     /**
      * Bulk-Only mass storage reset.
      */
     public void reset() throws USBException {
-        final USBControlPipe pipe = device.getDefaultControlPipe();
+        final USBControlPipe pipe = storageDeviceData.getDevice().getDefaultControlPipe();
         final USBRequest req = pipe.createRequest(new SetupPacket(USB_DIR_OUT
                 | USB_TYPE_CLASS | USB_RECIP_INTERFACE, 0xFF, 0, 0, 0), null);
         pipe.syncSubmit(req, GET_TIMEOUT);
@@ -116,27 +113,11 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
         log.debug("*** Request data     : " + req.toString());
         log.debug("*** Request status   : 0x" + NumberUtils.hex(req.getStatus(),4));
         if(req.getStatus() == USBREQ_ST_COMPLETED){
-        	devData.setMaxLun(packet.getData()[0]);
+        	storageDeviceData.setMaxLun(packet.getData()[0]);
         } else if (req.getStatus() == USBREQ_ST_STALLED){
-        	devData.setMaxLun((byte)0);
+        	storageDeviceData.setMaxLun((byte)0);
         } else {
         	throw new USBException("Request status   : 0x" + NumberUtils.hex(req.getStatus(),4));
         }
-    }
-    
-
-    public void requestCompleted(USBRequest request) {
-    	log.debug("*** Request Completed ***");
-    	log.debug("*** Request data     : " + request.toString());
-		log.debug("USBStorageBulkTransport completed with status : 0x" + NumberUtils.hex(request.getStatus(),4));
-		
-		CSW csw = (CSW) request;
-		log.debug(csw.toString());
-    }
-        
-    public void requestFailed(USBRequest request) {
-    	log.debug("*** Request data     : " + request.toString());
-        log.debug("USBStorageBulkTransport failed with status : 0x" + NumberUtils.hex(request.getStatus(),4));
-        pipe.close();
     }
 }

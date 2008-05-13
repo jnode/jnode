@@ -25,6 +25,16 @@ import org.jnode.driver.bus.scsi.CDB;
 import org.jnode.driver.bus.usb.USBException;
 
 public interface ITransport {
-	public void transport(CDB cdb);
+	/**
+	 * 
+	 * @param cdb
+	 * @param timeout
+	 */
+	public void transport(CDB cdb, long timeout);
+	
+	/**
+	 * 
+	 * @throws USBException
+	 */
 	public void reset()throws USBException;
 }
