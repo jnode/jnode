@@ -24,86 +24,53 @@ package org.jnode.net.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.WirelessNetDeviceAPI;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.DeviceArgument;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
 public class WLanCtlCommand extends AbstractCommand {
 
-    private static final String FUNC_SETESSID = "setessid";
+    private final FlagArgument FLAG_SET_ESSID = new FlagArgument(
+            "setEssid", Argument.OPTIONAL, "if set, set the ESSID");
 
-    private static final OptionArgument ARG_FUNCTION = new OptionArgument(
-            "function", "the function to perform",
-            new OptionArgument.Option[] { new OptionArgument.Option(
-                    FUNC_SETESSID, "Set the ESSID"), });
+    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
+            "device", Argument.MANDATORY, "the device to be operated on", WirelessNetDeviceAPI.class);
 
-    private static final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", "the device to control", WirelessNetDeviceAPI.class);
+    private final StringArgument ARG_VALUE = new StringArgument(
+            "value", Argument.OPTIONAL, "the value to use in the operation");
+    
+    
+    public WLanCtlCommand() {
+        super("Manage a WLan device");
+        registerArguments(FLAG_SET_ESSID, ARG_DEVICE, ARG_VALUE);
+    }
 
-    private static final Argument ARG_VALUE = new Argument("value",
-            "Value of the function");
-
-    public static Help.Info HELP_INFO = new Help.Info("wlanctl",
-            "Try to configure the given device using BOOTP", new Parameter[] {
-                    new Parameter(ARG_FUNCTION, Parameter.MANDATORY),
-                    new Parameter(ARG_DEVICE, Parameter.MANDATORY),
-                    new Parameter(ARG_VALUE, Parameter.OPTIONAL) });
-
-    private static final Logger log = Logger.getLogger(HELP_INFO.getName());
-
-    public static void main(String[] args) throws Exception, SyntaxErrorException {
+    public static void main(String[] args) throws Exception {
     	new WLanCtlCommand().execute(args);
     }
 
-    private static void setESSID(Device dev, WirelessNetDeviceAPI api,
-            ParsedArguments cmdLine) throws NetworkException {
-        final String essid = ARG_VALUE.getValue(cmdLine);
-        System.out.println("Setting ESSID on " + dev.getId() + " to " + essid);
-        api.setESSID(essid);
-    }
-
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-
-        final Device dev = ARG_DEVICE.getDevice(cmdLine);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws ApiNotFoundException, NetworkException {
+        final Device dev = ARG_DEVICE.getValue();
         final WirelessNetDeviceAPI api;
-        try {
-            api = (WirelessNetDeviceAPI) dev.getAPI(WirelessNetDeviceAPI.class);
-        } catch (ApiNotFoundException e) {
-            System.err.println("Device " + dev.getId()
-                    + " is not a wireless network device");
-            exit(2);
-            return;  // not reached
-        }
+        api = (WirelessNetDeviceAPI) dev.getAPI(WirelessNetDeviceAPI.class);
 
-        // Get the function
-        final String function = ARG_FUNCTION.getValue(cmdLine);
-        try {
-            if (function.equals(FUNC_SETESSID)) {
-                setESSID(dev, api, cmdLine);
-            } else {
-                System.err.println("Unknown function " + function);
-                exit(3);
-            }
-        } catch (NetworkException ex) {
-            System.err.println("Function " + function + " failed: "
-                    + ex.getMessage());
-            log.debug("Function " + function + " failed", ex);
-            exit(1);
+        // Perform the selected operation
+        if (FLAG_SET_ESSID.isSet()) {
+            final String essid = ARG_VALUE.getValue();
+            out.println("Setting ESSID on " + dev.getId() + " to " + essid);
+            api.setESSID(essid);
         }
 	}
 }
