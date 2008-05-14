@@ -41,15 +41,13 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 	 * @param parent
 	 * @param name
 	 */
-	public RAMDirectory(RAMFileSystem fs, RAMDirectory parent, String name) {
+	public RAMDirectory(final RAMFileSystem fs, final RAMDirectory parent, final String name) {
 		
 		this.filesystem = fs;
-		
-		if (parent == null)
-			parent = this;
-		else
-			this.parent = parent;
-		
+		this.parent = parent;
+		if (this.parent == null){
+			this.parent = this;
+		}
 		this.directoryName = name;
 		this.lastModified = System.currentTimeMillis();
 		
