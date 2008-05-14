@@ -110,6 +110,13 @@
           <argument argLabel="filename"/>
         </sequence>
       </syntax>
+      <syntax alias="wlanctl">
+        <sequence description="Set the ESSID for a WLan device">
+          <option argLabel="setEssid" longName="setessid"/>
+          <argument argLabel="device"/>
+          <argument argLabel="value"/>
+        </sequence>
+      </syntax>
     </extension>
   
     <extension point="org.jnode.security.permissions">
