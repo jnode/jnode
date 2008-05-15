@@ -22,7 +22,6 @@
 package org.jnode.partitions.ibm;
 
 import org.jnode.driver.block.CHS;
-import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
