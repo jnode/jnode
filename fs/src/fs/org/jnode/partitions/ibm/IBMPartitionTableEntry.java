@@ -31,9 +31,7 @@ import org.jnode.util.NumberUtils;
  * @author epr
  */
 public class IBMPartitionTableEntry implements PartitionTableEntry {
-	
 
-	//private final int partNr;
 	private final byte[] bs;
 	private final int ofs;
     private final IBMPartitionTable parent;
@@ -41,10 +39,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 	public IBMPartitionTableEntry(IBMPartitionTable parent, byte[] bs, int partNr) {
         this.parent = parent;
 		this.bs = bs;
-		//this.partNr = partNr;
 		this.ofs = 446 + (partNr*16);
-		// THIS CHANGE BROKE THE BUILD. RUNNING IN VMWARE BROKE!
-		//this.ofs = 494 - (partNr*16);
 	}
 	
 	public boolean isValid() {
@@ -166,27 +161,17 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 	 */
 	public String toString() {
         StringBuilder b = new StringBuilder(32);
-		
-		b.append('[');
-		
-		b.append(getBootIndicator() ? 'A' : ' ');
-		b.append(' ');
-		b.append(NumberUtils.hex(getSystemIndicator().getCode(), 2));
-		b.append(' ');
-		b.append("s:"+getStartLba());
-		b.append(' ');
-		long tmp = getStartLba() + getNrSectors() - 1;
-		b.append("e:"+ tmp);
-		//b.append(NumberUtils.hex(getStartLba(), 8));
-		//b.append('+');
-		//b.append(NumberUtils.hex(getNrSectors(), 8));
-		//b.append(' ');
-		//b.append(getStartCHS());
-		//b.append('-');
-		//b.append(getEndCHS());
-		
-		b.append(']');
-		
+		b.append('[')
+		.append(getBootIndicator() ? 'A' : ' ')
+		.append(' ')
+		.append(NumberUtils.hex(getSystemIndicator().getCode(), 2))
+		.append(' ')
+		.append("s:")
+		.append(getStartLba())
+		.append(' ')
+		.append("e:")
+		.append(getStartLba() + getNrSectors() - 1)
+		.append(']');
 		return b.toString();
 	}
 
