@@ -21,9 +21,12 @@
  
 package org.jnode.driver.video.vesa;
 
+import javax.naming.NameNotFoundException;
+
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.x86.UnsafeX86;
@@ -58,6 +61,12 @@ public class VESAPlugin extends Plugin {
  */
 		Unsafe.debug("\nstartPlugin. address=");
 		Address vbeInfos = UnsafeX86.getVbeInfos();
+		if(vbeInfos.isZero())
+		{
+			Unsafe.debug("No vbeInfos, VESA plugin won't start");
+			return;
+		}
+		
 		Unsafe.debug(vbeInfos);
 		
 		dump("vbeInfos bytes", vbeInfos, 32);
@@ -100,7 +109,17 @@ public class VESAPlugin extends Plugin {
 			addr = addr.add(2);
 		}
 */		
-		Unsafe.debug("\nend\n");		
+		Unsafe.debug("\nend\n");	
+		
+		try {
+			System.out.println("VESA detected : "+VESACommand.detect());
+		} catch (NameNotFoundException e) {
+			Unsafe.debugStackTrace();
+			Unsafe.debug("error : "+e.getMessage());
+		} catch (ResourceNotFreeException e) {
+			Unsafe.debugStackTrace();
+			Unsafe.debug("error : "+e.getMessage());
+		}		
 	}
 
 	/**
@@ -114,17 +133,27 @@ public class VESAPlugin extends Plugin {
 	private void dump(String message, Address address, int size)
 	{
 		StringBuilder sb = new StringBuilder("\n");
-		sb.append(message).append(" at address ").append(NumberUtils.hex(address.toInt())).append(" :\n");
+		sb.append(message).append(" at address ");
 		
-		Address addr = address;
-		for(int i = 0 ; i < size ; i++) {			
-			String str = NumberUtils.hex((byte) (addr.loadByte() & 0xFF) );
-			str = str.substring(str.length() - 2);
-			sb.append(str).append(' ');
-			if((i%16) == 0) sb.append('\n');
-			
-			addr = addr.add(1);
+		if(address.isZero())
+		{
+			sb.append("NULL");
 		}
+		else
+		{
+			sb.append(NumberUtils.hex(address.toInt())).append(" :\n");
+			
+			Address addr = address;
+			for(int i = 0 ; i < size ; i++) {			
+				String str = NumberUtils.hex((byte) (addr.loadByte() & 0xFF) );
+				str = str.substring(str.length() - 2);
+				sb.append(str).append(' ');
+				if((i%16) == 0) sb.append('\n');
+				
+				addr = addr.add(1);
+			}
+		}
+		
 		Unsafe.debug(sb.append("\n").toString());		
 	}
 }
