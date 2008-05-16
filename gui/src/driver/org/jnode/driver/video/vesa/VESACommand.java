@@ -26,8 +26,23 @@ public class VESACommand {
 	private static ResourceManager manager;
 	private static ResourceOwner owner = new SimpleResourceOwner("VESACommand");
 	
+	private static void print(String message)
+	{
+		Unsafe.debug(message);
+	}
+	
+	private static void println(String message)
+	{
+		print(message+"\n");
+	}
+	
+	private static void printError(String message)
+	{
+		println(message);
+	}
+	
 	public static void main(String[] args) throws NameNotFoundException, ResourceNotFreeException {
-		System.out.println("VESA detected : "+detect());
+		println("VESA detected : "+detect());
 	}
 	
 	public static ByteBuffer getBiosMemory() throws NameNotFoundException, ResourceNotFreeException
@@ -35,7 +50,8 @@ public class VESACommand {
 		// steps 1 & 2 : allocate new buffer and copy the bios image to it 
 		manager = InitialNaming.lookup(ResourceManager.NAME);
 		Address start = Address.fromInt(0xC0000);
-		int size = 0x7FFF; // 32 Kb
+		//int size = 0x8000; // 32 Kb
+		int size = 0x10000; // 64 Kb
 		int mode = ResourceManager.MEMMODE_NORMAL; 
 		MemoryResource resource = manager.claimMemoryResource(owner, start, size, mode);
 		ByteBuffer buffer = ByteBuffer.allocate(size);
@@ -78,32 +94,32 @@ public class VESACommand {
 */			
 			if(p)
 			{
-				//System.out.println("offset="+NumberUtils.hex(offset)+" value="+b+" p="+p+" m="+m+" i="+i+" d="+d);
-				System.out.println("offset="+NumberUtils.hex(offset)+" p="+p+" m="+m+" i="+i+" d="+d);
+				//println("offset="+NumberUtils.hex(offset)+" value="+b+" p="+p+" m="+m+" i="+i+" d="+d);
+				println("offset="+NumberUtils.hex(offset)+" p="+p+" m="+m+" i="+i+" d="+d);
 			}
 			
 			if(p && m && i && d)
 			{
-				System.out.println("signature detected at offset "+NumberUtils.hex(offset));
+				println("signature detected at offset "+NumberUtils.hex(offset));
 				byte checksum = (byte) (((byte)'P') + ((byte)'M') + ((byte)'I') + ((byte)'D'));
 				//int size = 7 * 4 + 2 * 1;
 				int size = 7 * 2 + 2 * 1;
 				for(int offs = 0 ; offs < size ; offs++)
 				{
 					checksum += (byte) biosMemory.get();
-					System.out.println("at offset "+NumberUtils.hex(offs)+" checksum="+checksum);
+					println("at offset "+NumberUtils.hex(offs)+" checksum="+checksum);
 				}
 				
 				if(checksum == 0)
 				{
-					System.out.println("found correct checksum");
+					println("found correct checksum");
 					biosMemory.position(pos + 3).limit();
 					pmInfoBlock = new PMInfoBlock(biosMemory);
 					break;
 				}
 				else
 				{
-					System.err.println("bad checksum");
+					printError("bad checksum");
 				}
 			}
 			
@@ -117,25 +133,25 @@ public class VESACommand {
 	    	System.out.println("step4");		
 			// step 4 
 			byte[] biosDataSel = new byte[0x600]; // should be filled with zeros by the VM
-	    	System.out.println("step4.1");		
+	    	println("step4.1");		
 	    	short selector = getSelector(biosDataSel);
-	    	System.out.println("step4.2");		
+	    	println("step4.2");		
 			pmInfoBlock.setBiosDataSel(selector);
 						
-	    	System.out.println("step5");		
+	    	println("step5");		
 			// step 5
 			int size = 0x7FFF; // 32 Kb
 			int mode = ResourceManager.MEMMODE_NORMAL;
 			int address = 0xA0000;
 			MemoryResource resource = manager.claimMemoryResource(owner, Address.fromInt(address), size, mode);
 
-			System.err.println("....");
-			System.err.println("....");
-			System.err.println("before call to vbe function");
+			println("....");
+			println("....");
+			println("before call to vbe function");
 			int codePtr = pmInfoBlock.getEntryPoint();
-			System.err.println("codePtr="+NumberUtils.hex(codePtr));
+			println("codePtr="+NumberUtils.hex(codePtr));
 			int result = Unsafe.callVbeFunction(Address.fromInt(codePtr), 0, Address.fromInt(address));
-			System.err.println("codePtr="+result);
+			println("codePtr="+result);
 		}
 		
 		return pmInfoBlock;
@@ -143,116 +159,116 @@ public class VESACommand {
 	
 	public static short getSelector(Address address)
 	{
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.println("getSelector point 1");				
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	println("getSelector point 1");				
 		long addr = address.toLong();
-    	System.out.println("getSelector point 2");				
+    	println("getSelector point 2");				
 		short result = (short) ((addr & 0xFFFFFFFF00000000L) >> 32);
-    	System.out.println("getSelector point 3");				
+    	println("getSelector point 3");				
 		return result;
 	}
 	
 	private static short getSelector(Object obj)
 	{
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
-    	System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");System.out.print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
+    	print(".");print(".");print(".");print(".");print(".");print(".");
 		
-    	System.out.println("getSelector point A");				
+    	println("getSelector point A");				
 		if(obj == null) return -1;
 		
-    	System.out.println("getSelector point B");				
+    	println("getSelector point B");				
 		ObjectReference objRef = ObjectReference.fromObject(obj);
 		
-    	System.out.println("getSelector point C");				
+    	println("getSelector point C");				
 		return (objRef == null) ? null : getSelector(objRef.toAddress());
 	}
 }
