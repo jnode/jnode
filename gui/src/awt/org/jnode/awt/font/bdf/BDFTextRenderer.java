@@ -65,7 +65,7 @@ public class BDFTextRenderer implements TextRenderer {
      * @see java.awt.Graphics
      */
     final public void render(Surface surface, Shape clip, AffineTransform tx,
-            String str, int x, int y, Color color) {   
+    		CharSequence str, int x, int y, Color color) {   
         if (str == null || str.length() == 0)
             return;
 

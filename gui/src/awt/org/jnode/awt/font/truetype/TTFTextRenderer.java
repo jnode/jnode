@@ -68,7 +68,7 @@ public class TTFTextRenderer extends AbstractTextRenderer {
      * @param y
      */    
     public void render(Surface surface, Shape clip, AffineTransform tx,
-            String text, int x, int y, Color color) {
+    		CharSequence text, int x, int y, Color color) {
         try {
         	final TTFFontData fd = (TTFFontData) fontData;
         	final int fontSize = fontMetrics.getFont().getSize();

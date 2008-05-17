@@ -148,7 +148,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param x
      * @param y
      */
-    public void drawText(Surface g, Shape clip, AffineTransform tx, String text, Font font, int x, int y, Color color) {
+    public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y, Color color) {
         FontProvider prv = getProvider(font);
         Font txFont = font;
         if (prv == null) {

@@ -96,7 +96,7 @@ abstract public class AbstractTextRenderer implements TextRenderer {
      * @param y
      */
     public void render(Surface surface, Shape clip, AffineTransform tx,
-            String text, int x, int y, Color color) {
+    		CharSequence text, int x, int y, Color color) {
         try {
             final double ascent = fontMetrics.getAscent();
             final int fontSize = fontMetrics.getFont().getSize();
