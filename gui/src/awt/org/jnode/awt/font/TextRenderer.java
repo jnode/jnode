@@ -39,6 +39,6 @@ public interface TextRenderer {
 	 * @param x
 	 * @param y
 	 */
-	public void render(Surface g, Shape clip, AffineTransform tx, String text, int x, int y, Color color);
+	public void render(Surface g, Shape clip, AffineTransform tx, CharSequence text, int x, int y, Color color);
 
 }

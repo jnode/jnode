@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.io.CharConversionException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -67,7 +68,7 @@ public class TTFSimpleTextRenderer implements TextRenderer {
      * @param x
      * @param y
      */
-    public void render(Surface sf, Shape clip, AffineTransform tx2, String text, int x, int y, Color c) {
+    public void render(Surface sf, Shape clip, AffineTransform tx2, CharSequence text, int x, int y, Color c) {
         try {
             final GeneralPath gp = new GeneralPath();
             gp.moveTo(x, y);
@@ -98,11 +99,13 @@ public class TTFSimpleTextRenderer implements TextRenderer {
 
             for (int i = 0; i < text.length(); i++) {
                 // get the index for the needed glyph
-                final int index = encTable.getTableFormat().getGlyphIndex(
-                        text.charAt(i));
-                Shape shape = ((ShapedGlyph) glyphTable.getGlyph(index)).getShape();
-                if (text.charAt(i) != ' ')
+            	final char character = text.charAt(i); 
+                final int index = encTable.getTableFormat().getGlyphIndex(character);
+                if (character != ' ')
+                {
+                    Shape shape = ((ShapedGlyph) glyphTable.getGlyph(index)).getShape();
                     gp.append(shape.getPathIterator(tx), false);
+                }
                 tx.translate(hmTable.getAdvanceWidth(index), 0);
             }
             sf.draw(gp, clip, tx2, c, Surface.PAINT_MODE);

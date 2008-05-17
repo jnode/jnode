@@ -76,7 +76,7 @@ public interface FontManager {
 	 * @param x
 	 * @param y
 	 */
-	public void drawText(Surface g, Shape clip, AffineTransform tx, String text, Font font, int x, int y, Color color);
+	public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y, Color color);
 	
 	/**
 	 * 
