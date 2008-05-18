@@ -143,9 +143,10 @@ public class OptionSetSyntax extends GroupSyntax {
             };
         }
         String label = this.label == null ? MuSyntax.genLabel() : this.label;
-        MuSyntax res = new MuAlternation(label, null, 
+        MuSyntax res = new MuAlternation(label, 
                 new MuSequence(new MuAlternation((String) null, childMuSyntaxes),
-                        new MuBackReference(label)));
+                        new MuBackReference(label)),
+                null);
         res.resolveBackReferences();
         return res;
     }
