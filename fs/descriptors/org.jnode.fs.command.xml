@@ -48,6 +48,19 @@
         <argument argLabel="file"/>
       </repeat>
     </syntax>
+    <syntax alias="cp">
+      <sequence description="copy files or directories">
+        <optionSet>
+          <option argLabel="force" shortName="f" longName="force"/>
+          <option argLabel="update" shortName="u" longName="update"/>
+          <option argLabel="interactive" shortName="i" longName="interactive"/>
+          <option argLabel="recursive" shortName="r" longName="recursive"/>
+          <option argLabel="verbose" shortName="v" longName="verbose"/>
+        </optionSet>
+        <repeat minCount="1"><argument argLabel="source"/></repeat>
+        <argument argLabel="target"/>
+      </sequence>
+    </syntax>
     <syntax alias="del">
       <sequence description="delete a file or directory">
         <optional>
