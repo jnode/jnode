@@ -24,19 +24,18 @@ package org.jnode.fs.command;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
 
 /**
  * File copy utility.  This utility copies one file to another file, or multiple files or directories
