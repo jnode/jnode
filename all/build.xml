@@ -100,6 +100,7 @@
     <property name="jnode-x86_64-lite.iso" value="${cdroms.dir}/jnode-x86_64-lite.iso"/>
 
     <path id="cp">
+        <pathelement location="${mmtk.jar}"/>
         <pathelement location="${ant.jar}"/>
         <pathelement location="${junit.jar}"/>
         <pathelement location="${jmock.jar}"/>
@@ -450,6 +451,13 @@ clean             Remove all intermediate build results.
             <sourcepath>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
+                <pathelement location="${root.dir}/core/src/core"/>
+                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
+                <pathelement location="${root.dir}/core/src/classpath/ext"/>
+                <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
+                <pathelement location="${root.dir}/core/src/openjdk/vm"/>
+                <pathelement location="${root.dir}/core/src/nanoxml"/>
             </sourcepath>
             <package name="org.mmtk.*"/>
             <package name="org.jnode.vm.memmgr.mmtk.*"/>
