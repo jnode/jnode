@@ -384,18 +384,21 @@ clean             Remove all intermediate build results.
         <tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**"/>
         <x86-build bits="32" target="java-image"/>
         <x86-build bits="64" target="java-image"/>
+        <property name="jnode.bits" value="32" />
         <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom"/>
     </target>
 
     <!-- Create a bootable CDROM image for x86 32-bits -->
     <target name="cd-x86-lite" depends="assemble">
         <x86-build bits="32" target="java-image"/>
+        <property name="jnode.bits" value="32" />
         <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite"/>
     </target>
 
     <!-- Create a bootable CDROM image for x86 64-bits -->
     <target name="cd-x86_64-lite" depends="assemble">
         <x86-build bits="64" target="java-image"/>
+        <property name="jnode.bits" value="64" />
         <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom_64-lite"/>
     </target>
 
