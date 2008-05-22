@@ -65,7 +65,7 @@ public final class Address implements UnboxedObject {
 
     /**
      * Size of an address in bytes (typically 4 or 8)
-     * @return
+     * @return the address size in bytes
      */
     public static int size() {
         throw new RuntimeException("Not supported at buildtime");

@@ -28,13 +28,13 @@ public interface UnboxedObject {
 
     /**
      * Convert to an integer.
-     * @return
+     * @return the integer value
      */
     public int toInt();
 
     /**
      * Convert to a long.
-     * @return
+     * @return the long value
      */
     public long toLong();
 }

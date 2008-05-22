@@ -36,7 +36,7 @@ public final class MagicUtils {
     /**
      * Convert to a String representation.
      * @param v
-     * @return
+     * @return the String value of the Address
      */
     public static String toString(Address v) {
         if (getRefSize() == 4) {
@@ -49,7 +49,7 @@ public final class MagicUtils {
     /**
      * Convert to a String representation.
      * @param v
-     * @return
+     * @return  the String value of the Extent
      */
     public static String toString(Extent v) {
         if (getRefSize() == 4) {
@@ -62,7 +62,7 @@ public final class MagicUtils {
     /**
      * Convert to a String representation.
      * @param v
-     * @return
+     * @return the String value of the Offset
      */
     public static String toString(Offset v) {
         if (getRefSize() == 4) {
@@ -75,7 +75,7 @@ public final class MagicUtils {
     /**
      * Convert to a String representation.
      * @param v
-     * @return
+     * @return the String value of the Word
      */
     public static String toString(Word v) {
         if (getRefSize() == 4) {
