@@ -32,13 +32,13 @@ public interface RemovableDeviceAPI extends DeviceAPI {
 
     /**
      * Can this device be locked.
-     * @return
+     * @return <code>true</code> if this device can be locked, <code>false</code> otherwise
      */
     public boolean canLock();
     
     /**
      * Can this device be ejected.
-     * @return
+     * @return <code>true</code> if this device can be ejected, <code>false</code> otherwise
      */
     public boolean canEject();
     
@@ -58,7 +58,7 @@ public interface RemovableDeviceAPI extends DeviceAPI {
     
     /**
      * Is this device locked.
-     * @return
+     * @return <code>true</code> if this device is locked, <code>false</code> otherwise
      */
     public boolean isLocked();
     

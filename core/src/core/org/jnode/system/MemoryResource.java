@@ -39,7 +39,7 @@ public interface MemoryResource extends Resource {
 	
     /**
      * Create a bytebuffer that has the same content as this resource.
-     * @return
+     * @return the byte buffer
      */
     public abstract ByteBuffer asByteBuffer();
     
@@ -563,7 +563,7 @@ public interface MemoryResource extends Resource {
 	 * 
 	 * @param size Length of the returned resource in bytes.
 	 * @param align Align of this boundary. Align must be a multiple of 2.
-	 * @return
+	 * @return the child memory resource
 	 */
 	public abstract MemoryResource claimChildResource(Extent size, int align)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
@@ -578,7 +578,7 @@ public interface MemoryResource extends Resource {
 	 * 
 	 * @param size Length of the returned resource in bytes.
 	 * @param align Align of this boundary. Align must be a multiple of 2.
-	 * @return
+	 * @return the child memory resource
 	 */
 	public MemoryResource claimChildResource(int size, int align)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
@@ -591,7 +591,7 @@ public interface MemoryResource extends Resource {
 	 * @param offset Offset relative to the start of this resource.
 	 * @param size Length of the returned resource in bytes.
 	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
-	 * @return
+	 * @return the child memory resource
 	 */
 	public abstract MemoryResource claimChildResource(Offset offset, Extent size, boolean allowOverlaps)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
@@ -604,7 +604,7 @@ public interface MemoryResource extends Resource {
 	 * @param offset Offset relative to the start of this resource.
 	 * @param size Length of the returned resource in bytes.
 	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
-	 * @return
+	 * @return the child memory resource
 	 */
 	public abstract MemoryResource claimChildResource(int offset, int size, boolean allowOverlaps)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
