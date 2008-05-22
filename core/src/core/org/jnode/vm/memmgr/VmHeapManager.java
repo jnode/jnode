@@ -345,7 +345,6 @@ public abstract class VmHeapManager extends VmSystemObject {
      * Create a per processor data structure for use by the heap manager.
      * 
      * @param cpu
-     * @return
      */
     public abstract Object createProcessorHeapData(VmProcessor cpu);
 

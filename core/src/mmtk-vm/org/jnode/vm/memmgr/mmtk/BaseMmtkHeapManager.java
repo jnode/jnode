@@ -347,7 +347,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
      * @param align
      * @param offset
      * @param allocator
-     * @return
+     * @return the start address of the allocated memory region
      */
     protected abstract Address alloc(int bytes, int align, int offset,
             int allocator);
@@ -369,7 +369,6 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
      * @param bytes
      * @param align
      * @param allocator
-     * @return
      */
     protected abstract int checkAllocator(int bytes, int align, int allocator);
 
