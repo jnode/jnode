@@ -39,7 +39,7 @@ import org.vmmagic.unboxed.ObjectReference;
  * Finalizer.java
  * 
  * @author Chris Hoffmann
- * @modified Andrew Gray
+ * Modified by Andrew Gray
  */
 public class ReferenceGlue {
     /**

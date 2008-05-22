@@ -25,7 +25,6 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author <a href="http://www-ali.cs.umass.edu/~hertz">Matthew Hertz</a>
  * @version $Revision$
- * @date $Date$
  */
 public final class TraceInterface {
 

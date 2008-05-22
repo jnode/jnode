@@ -23,7 +23,6 @@ import org.vmmagic.pragma.UninterruptiblePragma;
  * @author <a href="http://cs.anu.edu.au/~Steve.Blackburn">Steve Blackburn</a>
  * @author Perry Cheng
  * @version $Revision$
- * @date $Date$
  */
 public final class Strings {
     

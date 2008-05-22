@@ -27,7 +27,6 @@ import org.vmmagic.unboxed.Word;
  * @author <a href="http://cs.anu.edu.au/~Steve.Blackburn">Steve Blackburn</a>
  * @author Perry Cheng
  * @version $Revision$
- * @date $Date$
  */
 public class ObjectModel {
     /**
@@ -114,7 +113,7 @@ public class ObjectModel {
      * Gets the length of the given array.
      * 
      * @param object
-     * @return
+     * @return the array length
      */
     @Inline
     public static int getArrayLength(ObjectReference object) {
