@@ -59,7 +59,7 @@ public abstract class PluginLoader {
      * Gets the filename of a plugin with a given id and version.
      * @param pluginId
      * @param pluginVersion
-     * @return
+     * @return the filename of the plugin
      */
     public static String getPluginFileName(String pluginId, String pluginVersion) {
         return pluginId + "_" + pluginVersion + ".jar";

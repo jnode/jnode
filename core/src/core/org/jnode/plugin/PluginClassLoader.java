@@ -40,6 +40,8 @@ public abstract class PluginClassLoader extends ClassLoader {
     /**
      * Wrap this classloader around the given vmClassLoader.
      * Requires special permission.
+     * @param parent
+     * @param vmClassLoader
      */
     protected PluginClassLoader(ClassLoader parent, VmClassLoader vmClassLoader) {
         super(parent, vmClassLoader);
@@ -53,8 +55,8 @@ public abstract class PluginClassLoader extends ClassLoader {
     public abstract PluginDescriptor getDeclaringPluginDescriptor();
 
     /**
-     * Gets the names of the classes contained in this plugin
-     * @return
+     * Gets the names of the classes contained in this plugin.
+     * @return the set of contained classnames
      */
     public abstract Set<String> getClassNames();
     

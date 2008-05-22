@@ -44,7 +44,7 @@ public class URLPluginLoader extends PluginLoader {
     }
 
     /**
-     * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
+     * @see org.jnode.plugin.PluginLoader#getPluginBuffer(String, String) 
      */
     public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
         try {
