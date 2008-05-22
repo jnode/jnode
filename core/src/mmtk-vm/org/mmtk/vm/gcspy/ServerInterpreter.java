@@ -23,7 +23,6 @@ import org.vmmagic.pragma.Uninterruptible;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author <a href="http://www.ukc.ac.uk/people/staff/rej">Richard Jones</a>
  * @version $Revision$
- * @date $Date$
  */
 public class ServerInterpreter implements Uninterruptible {
     public static void init(String name, int port, String[] eventNames,

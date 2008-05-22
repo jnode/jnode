@@ -30,7 +30,6 @@ import org.vmmagic.unboxed.ObjectReference;
  * @author <a href="http://cs.anu.edu.au/~Steve.Blackburn">Steve Blackburn</a>
  * @author Perry Cheng
  * @version $Revision$
- * @date $Date$
  */
 public final class Scanning implements Constants {
 
@@ -66,7 +65,7 @@ public final class Scanning implements Constants {
      * 
      * @param object
      *            The object to be scanned.
-     * @param enum
+     * @param e
      *            the Enumerate object through which the callback is made
      */
     public static void enumeratePointers(ObjectReference object, Enumerator e) {

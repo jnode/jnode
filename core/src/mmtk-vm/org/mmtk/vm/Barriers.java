@@ -26,7 +26,6 @@ import org.vmmagic.unboxed.Offset;
  * @author Perry Cheng
  * 
  * @version $Revision$
- * @date $Date$
  */
 public class Barriers {
     /**

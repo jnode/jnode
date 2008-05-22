@@ -23,7 +23,6 @@ import org.vmmagic.unboxed.Address;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author <a href="http://www.ukc.ac.uk/people/staff/rej">Richard Jones</a>
  * @version $Revision$
- * @date $Date$
  */
 public class Util implements Uninterruptible {
     public static final Address malloc(int size) {
