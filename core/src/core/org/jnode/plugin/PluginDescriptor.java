@@ -34,50 +34,50 @@ public interface PluginDescriptor {
     public static final int DEFAULT_PRIORITY = 5;
 	
 	/**
-	 * Gets the unique identifier of this plugin
+	 * Gets the unique identifier of this plugin.
 	 * @return the unique id
 	 */
 	public abstract String getId();
 	
 	/**
-	 * Gets the human readable name of this plugin
+	 * Gets the human readable name of this plugin.
 	 * @return The name
 	 */
 	public abstract String getName();
 	
 	/**
-	 * Gets the name of the provider of this plugin
+	 * Gets the name of the provider of this plugin.
 	 * @return The name of the provider
 	 */
 	public abstract String getProviderName();
 	
     /**
-     * Gets the url of the provider of this plugin
+     * Gets the url of the provider of this plugin.
      * @return The url of the provider (can be null for no url)
      */
     public abstract String getProviderUrl();
     
     /**
-     * Gets the name of the license that this plugin is using
+     * Gets the name of the license that this plugin is using.
      * @return The name of the license
      */
     public abstract String getLicenseName();
     
     /**
-     * Gets the url of the license that this plugin is using
+     * Gets the url of the license that this plugin is using.
      * @return The url of the license (can be null for no url)
      */
     public abstract String getLicenseUrl();
     
 	/**
-	 * Gets the version of this plugin
-	 * @return The version
+	 * Gets the version of this plugin.
+	 * @return the version
 	 */
 	public abstract String getVersion();
 	
 	/**
-	 * Gets the required imports
-	 * @return The required imports
+	 * Gets the required imports.
+	 * @return the required imports
 	 */
 	public abstract PluginPrerequisite[] getPrerequisites();
 	
@@ -145,7 +145,7 @@ public interface PluginDescriptor {
     
 	/**
 	 * Does this plugin have a custom plugin class specified?
-	 * @return
+	 * @return <code>true</code> if the plugin has a custom plugin class, <code>false</code> otherwise 
 	 */
 	public boolean hasCustomPluginClass();
 	
@@ -158,14 +158,14 @@ public interface PluginDescriptor {
 	/**
 	 * Has this plugin the auto-start flag set.
 	 * If true, the plugin will be started automatically at boot/load time.
-	 * @return
+	 * @return <code>true</code> if the autoStart flag is set, <code>false</code> otherwise
 	 */
 	public boolean isAutoStart();
     
     /**
      * Gets the priority of this plugin.
      * Plugins are loaded by increasing priority. 
-     * @return
+     * @return the priority of the plugin
      */
     public int getPriority();
 	

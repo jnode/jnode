@@ -88,7 +88,7 @@ public final class PluginReference implements Comparable<PluginReference> {
     }
 
     /**
-     * @see java.lang.Comparable#compareTo(T)
+     * @see java.lang.Comparable#compareTo(Object) 
      */
     public int compareTo(PluginReference o) {
         int rc = id.compareTo(o.id);

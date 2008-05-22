@@ -31,27 +31,27 @@ import java.util.Set;
 public interface ConfigurationElement {
 
 	/**
-	 * Gets the name of this element
-	 * @return The name
+	 * Gets the name of this element.
+	 * @return the name
 	 */
 	public String getName();
 
 	/**
-	 * Gets all child elements
-	 * @return The child elements
+	 * Gets all child elements.
+	 * @return the child elements
 	 */
 	public ConfigurationElement[] getElements();
 
 	/**
-	 * Gets the value of an attribute with a given name
-	 * @param name
+	 * Gets the value of an attribute with a given name.
+	 * @param name the attribute name
 	 * @return The attribute value, or null if not found
 	 */
 	public String getAttribute(String name);
 
     /**
      * Gets the names of all attributes in this element.
-     * @return
+     * @return the set of attribute names
      */
     public Set<String> attributeNames();
     

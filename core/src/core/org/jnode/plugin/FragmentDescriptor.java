@@ -28,13 +28,13 @@ public interface FragmentDescriptor extends PluginDescriptor {
 
     /**
      * Gets the identifier of the plugin to which this fragment belongs.
-     * @return
+     * @return the related plugin identifier
      */
     public String getPluginId();
 
     /**
      * Gets the version of the plugin to which this fragment belongs.
-     * @return
+     * @return the related plugin version
      */
     public String getPluginVersion();
 }
