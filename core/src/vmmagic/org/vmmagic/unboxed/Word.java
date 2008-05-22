@@ -54,7 +54,7 @@ public final class Word implements UnboxedObject {
 
     /**
      * Size of an address in bytes (typically 4 or 8)
-     * @return
+     * @return the size in bytes
      */
     @Uninterruptible
     public static int size() {
