@@ -20,77 +20,64 @@
  */
 package org.jnode.fs.jfat.command;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.jnode.fs.command.AbstractFormatCommand;
-import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.jfat.ClusterSize;
 import org.jnode.fs.jfat.FatFileSystem;
 import org.jnode.fs.jfat.FatFileSystemFormatter;
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.EnumOptionArgument;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.MappedArgument;
 
 /**
- * @author Tango
- *         <p>
- *         The FAT32 formating command.
+ * This command formats a FAT32 file system.
  * 
+ * @author Tango
+ * @author crawley@jnode.org
  */
 public class FatFormatCommand extends AbstractFormatCommand<FatFileSystem> {
     private static final Logger log = Logger.getLogger(FatFormatCommand.class);
+    
+    private static class ClusterSizeArgument extends MappedArgument<ClusterSize> {
+        private static final Map<String, ClusterSize> MAP = new HashMap<String, ClusterSize> ();
+        static {
+            MAP.put("1k", ClusterSize._1Kb);
+            MAP.put("2k", ClusterSize._2Kb);
+            MAP.put("4k", ClusterSize._4Kb);
+            MAP.put("8k", ClusterSize._8Kb);
+            MAP.put("16k", ClusterSize._16Kb);
+            MAP.put("32k", ClusterSize._32Kb);
+            // FIXME - should we enable this?
+            // MAP.put("64k", ClusterSize._64Kb);
+        }
+        public ClusterSizeArgument() {
+            super("clusterSize", Argument.OPTIONAL, new ClusterSize[0],
+                    MAP, true, "cluster size for FAT32 filesystem (default 4k)");
+        }
 
-    static final OptionArgument TYPE =
-            new OptionArgument("action", "Type parameter",
-                    new OptionArgument.Option[] { new OptionArgument.Option(
-                            "-c", "Specify Sector Per Cluster Value") });
-    static final Parameter PARAM_TYPE = new Parameter(TYPE, Parameter.OPTIONAL);
+        @Override
+        protected String argumentKind() {
+            return "cluster size";
+        }
+    }
 
-    static final EnumOptionArgument<ClusterSize> BS_VAL =
-            new EnumOptionArgument<ClusterSize>("clusterSize",
-                    "cluster size for fat filesystem",
-                    new EnumOptionArgument.EnumOption<ClusterSize>("1", "1Kb",
-                            ClusterSize._1Kb),
-                    new EnumOptionArgument.EnumOption<ClusterSize>("2", "2Kb",
-                            ClusterSize._2Kb),
-                    new EnumOptionArgument.EnumOption<ClusterSize>("4", "4Kb",
-                            ClusterSize._4Kb),
-                    new EnumOptionArgument.EnumOption<ClusterSize>("8", "8Kb",
-                            ClusterSize._8Kb),
-                    new EnumOptionArgument.EnumOption<ClusterSize>("16",
-                            "16Kb", ClusterSize._16Kb),
-                    new EnumOptionArgument.EnumOption<ClusterSize>("32",
-                            "32Kb", ClusterSize._32Kb),
-                    new EnumOptionArgument.EnumOption<ClusterSize>("32",
-                            "64Kb", ClusterSize._64Kb));
-
-    static final Parameter PARAM_BS_VAL =
-            new Parameter(BS_VAL, Parameter.OPTIONAL);
-
-    public static Help.Info HELP_INFO =
-            new Help.Info(
-                    "mkjfat",
-                    new Syntax[] { new Syntax(
-                            "Format a block device with a specified type.Enter the Cluster Size as 1 for 1KB. ",
-                            new Parameter[] { PARAM_TYPE, PARAM_BS_VAL,
-                                    PARAM_DEVICE }) });
+    private final ClusterSizeArgument ARG_CLUSTER_SIZE = new ClusterSizeArgument();
+    
+    public FatFormatCommand() {
+        super("Format a FAT32 file system");
+        registerArguments(ARG_CLUSTER_SIZE);
+    }
 
     public static void main(String[] args) throws Exception {
         new FatFormatCommand().execute(args);
     }
-
-    protected ParsedArguments parse(CommandLine commandLine)
-            throws SyntaxErrorException {
-        return HELP_INFO.parse(commandLine);
-    }
-
-    protected FatFileSystemFormatter getFormatter(ParsedArguments cmdLine) {
-        ClusterSize bsize = BS_VAL.getEnum(cmdLine, ClusterSize.class);
-        return new FatFileSystemFormatter(bsize);
+    
+    protected FatFileSystemFormatter getFormatter() {
+        ClusterSize clusterSize = ARG_CLUSTER_SIZE.isSet() ? 
+                ARG_CLUSTER_SIZE.getValue() : ClusterSize._4Kb;
+        return new FatFileSystemFormatter(clusterSize);
     }
 }
 

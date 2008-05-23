@@ -37,56 +37,35 @@ import org.jnode.fs.Formatter;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
 
 /**
  * @author Fabien DUMINY (fduminy at jnode.org)
- *
+ * @author crawley@jnode.org
  */
-abstract public class AbstractFormatCommand<T extends FileSystem<?>> extends AbstractCommand {
-    private static final DeviceArgument ARG_DEVICE = new DeviceArgument("device-id",
-    	"the device to format");
+public abstract class AbstractFormatCommand<T extends FileSystem<?>> extends AbstractCommand {
+    
+    protected final DeviceArgument ARG_DEVICE = 
+        new DeviceArgument("device", Argument.MANDATORY, "the device to format", FSBlockDeviceAPI.class);
+    
+    public AbstractFormatCommand(String description) {
+        super(description);
+        registerArguments(ARG_DEVICE);
+    }
 
-    protected static final Parameter PARAM_DEVICE = new Parameter(ARG_DEVICE,
-    		Parameter.MANDATORY);
+    abstract protected Formatter<T> getFormatter();
 
-    abstract protected ParsedArguments parse(CommandLine commandLine) throws SyntaxErrorException;
-    abstract protected Formatter<T> getFormatter(ParsedArguments cmdLine);
+    final public void execute(CommandLine commandLine, InputStream in, 
+            PrintStream out, PrintStream err) 
+    throws FileSystemException, NameNotFoundException, DeviceNotFoundException, DriverException {
+        Device dev = ARG_DEVICE.getValue();
+        Formatter<T> formatter = getFormatter();
+        formatter.format(dev);
 
-	final public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		try {
-            ParsedArguments cmdLine = parse(commandLine);
-
-            String device = ARG_DEVICE.getValue(cmdLine);
-            Formatter<T> formatter = getFormatter(cmdLine);
-
-            DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-
-            Device dev = dm.getDevice(device);
-			if(!(dev.getDriver() instanceof FSBlockDeviceAPI)){
-				throw new FileSystemException(
-                	"device unsupported by format command");
-			}
-            formatter.format(dev);
-
-            // restart the device
-            dm.stop(dev);
-            dm.start(dev);
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-            exit(1);
-        } catch (DeviceNotFoundException e) {
-            e.printStackTrace();
-            exit(2);
-        } catch (DriverException e) {
-            e.printStackTrace();
-            exit(3);
-        } catch (FileSystemException e) {
-            e.printStackTrace();
-            exit(4);
-        }
-	}
+        // restart the device
+        final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+        dm.stop(dev);
+        dm.start(dev);
+    }
 }

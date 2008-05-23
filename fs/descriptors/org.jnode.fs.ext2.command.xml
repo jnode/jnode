@@ -22,4 +22,13 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="formatExt2" class="org.jnode.fs.ext2.command.FormatExt2Command"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="formatExt2">
+      <sequence description="format an EXT2 file system">
+        <optional><option argLabel="blockSize" shortName="b" longName="blocksize"/></optional>
+        <argument argLabel="device"/>
+      </sequence>
+    </syntax>
+  </extension>
 </plugin>

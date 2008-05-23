@@ -21,59 +21,54 @@
 
 package org.jnode.fs.fat.command;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jnode.fs.command.AbstractFormatCommand;
-import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFileSystem;
 import org.jnode.fs.fat.FatFileSystemFormatter;
 import org.jnode.fs.fat.FatType;
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.MappedArgument;
 
 /**
+ * This command formats a FAT12 or FAT16 filesystem.
+ * 
  * @author gbin
+ * @author crawley@jnode.org
  */
 public class FormatFatCommand extends AbstractFormatCommand<FatFileSystem> {
+    
+    private static class FatTypeArgument extends MappedArgument<FatType> {
+        private static final Map<String, FatType> MAP = new HashMap<String, FatType>();
+        static {
+            MAP.put("fat12", FatType.FAT12);
+            MAP.put("fat16", FatType.FAT16);
+        }
+        
+        public FatTypeArgument() {
+            super("fsType", Argument.MANDATORY, new FatType[0], MAP, 
+                    true, "the kind of FAT filesystem to create");
+        }
+        @Override
+        protected String argumentKind() {
+            return "fat type";
+        }
+    }
+    
+    private final FatTypeArgument ARG_FS_TYPE = new FatTypeArgument();
 
-    static final OptionArgument FS = new OptionArgument("fstype",
-            "FAT type", new OptionArgument.Option[] {
-                    new OptionArgument.Option("fat16", "FAT 16 filesystem"),
-                    new OptionArgument.Option("fat12", "FAT 12 filesystem")});
-
-    static final Parameter PARAM_FS = new Parameter(FS, Parameter.MANDATORY);
-
-    public static Help.Info HELP_INFO = new Help.Info("format",
-            new Syntax[] { new Syntax(
-                    "Format a block device with fat filesystem",
-                    new Parameter[] { PARAM_DEVICE, PARAM_FS}) });
+    public FormatFatCommand() {
+        super("Format a block device with a FAT12 or FAT16 filesystem");
+        registerArguments(ARG_FS_TYPE);
+    }
 
     public static void main(String[] args) throws Exception {
     	new FormatFatCommand().execute(args);
     }
 
 	@Override
-	protected FatFileSystemFormatter getFormatter(ParsedArguments cmdLine) {
-        String FSType = FS.getValue(cmdLine).intern();
-
-        FatFileSystemFormatter formatter = null;
-        if (FSType == "fat16") {
-            formatter = new FatFileSystemFormatter(FatType.FAT16);
-        } else if (FSType == "fat12") {
-            formatter = new FatFileSystemFormatter(FatType.FAT32);
-        } else
-            throw new IllegalArgumentException(
-                    "invalid fat type");
-
-        return formatter;
-	}
-
-	@Override
-	protected ParsedArguments parse(CommandLine commandLine)
-			throws SyntaxErrorException {
-		return HELP_INFO.parse(commandLine);
+	protected FatFileSystemFormatter getFormatter() {
+        return new FatFileSystemFormatter(ARG_FS_TYPE.getValue());
 	}
 }

@@ -22,4 +22,13 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="formatFat" class="org.jnode.fs.fat.command.FormatFatCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="formatFat">
+      <sequence description="format a FAT32 file system">
+        <optional><option argLabel="fsType" shortName="t" longName="fstype"/></optional>
+        <argument argLabel="device"/>
+      </sequence>
+    </syntax>
+  </extension>
 </plugin>
