@@ -24,6 +24,15 @@
     <alias name="grub"  class="org.jnode.fs.jfat.command.JGrubInstallCommand"/>
     <alias name="formatJFat" class="org.jnode.fs.jfat.command.FatFormatCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="formatJFat">
+      <sequence description="format a JFat file system">
+        <optional><option argLabel="clusterSize" shortName="c" longName="clustersize"/></optional>
+        <argument argLabel="device"/>
+      </sequence>
+    </syntax>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
