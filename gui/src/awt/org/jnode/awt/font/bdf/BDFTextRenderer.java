@@ -79,12 +79,8 @@ public class BDFTextRenderer implements TextRenderer {
 
             final int bdfFontDepth = bdfFont.getDepth();
 
-            int max = (1 << bdfFontDepth) - 1;
-            //todo take into accunt font depth, the current solution works for 8 bits
-            max = 255;
-
-            float f_max = (float ) max, f_limit = f_max - 15;
-
+            float f_max = (1 << bdfFontDepth) - 1;
+            if(f_max == 0) f_max = 1;
 
             BDFParser.Rectangle b_rect = new BDFParser.Rectangle();
             final Point2D src = new Point2D.Double();
@@ -135,7 +131,7 @@ public class BDFTextRenderer implements TextRenderer {
 
                             //todo improve this pixel composition
                             
-                            float alpha = (fPixel > f_limit) ? 1.0f : fPixel / f_max;
+                            float alpha = fPixel / f_max;
 
                             int r = bg_r +  ((int) ((fg_r - bg_r) * alpha)) & 0xFF;
                             int g = bg_g + ((int) ((fg_g - bg_g) * alpha)) & 0xFF;
