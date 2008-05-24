@@ -44,41 +44,41 @@ import java.io.PrintStream;
  */
 public class DeleteCommand extends AbstractCommand {
 
-  private final FileArgument ARG_DIR;
-  private final FlagArgument ARG_OPTION;
+    private final FileArgument ARG_DIR;
+    private final FlagArgument ARG_OPTION;
 
 
-  public DeleteCommand() {
-    super("delete files or directories");
+    public DeleteCommand() {
+        super("delete files or directories");
 
-    ARG_DIR = new FileArgument("file/dir", Argument.MANDATORY, 
-            "the file or directory to be deleted");
-    ARG_OPTION = new FlagArgument("recursive", Argument.OPTIONAL,
-            "if set, any directories are deleted recursively");
+        ARG_DIR = new FileArgument(
+                "file/dir", Argument.MANDATORY, "the file or directory to be deleted");
+        ARG_OPTION = new FlagArgument(
+                "recursive", Argument.OPTIONAL, "if set, any directories are deleted recursively");
+        
+        registerArguments(ARG_DIR, ARG_OPTION);
+    }
 
-    registerArguments(ARG_DIR, ARG_OPTION);
-  }
-
-  public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         new DeleteCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) throws Exception {
+            PrintStream out, PrintStream err) throws Exception {
 
-      boolean recursive = ARG_OPTION.isSet();
+        boolean recursive = ARG_OPTION.isSet();
 
-      File[] file_arr = ARG_DIR.getValues();
+        File[] file_arr = ARG_DIR.getValues();
 
-      boolean ok = true;
-      for (File file : file_arr) {
-          boolean tmp = deleteFile(file, err, recursive);
-          ok &= tmp;
-      }
+        boolean ok = true;
+        for (File file : file_arr) {
+            boolean tmp = deleteFile(file, err, recursive);
+            ok &= tmp;
+        }
 
-      if (!ok) {
-          exit(1);
-      }
+        if (!ok) {
+            exit(1);
+        }
     }
 
     private boolean deleteFile(File file, PrintStream err, boolean recursive) throws NameNotFoundException {
@@ -96,18 +96,18 @@ public class DeleteCommand extends AbstractCommand {
                 final File[] subFiles = file.listFiles();
 
                 for (File f : subFiles) {
-                  final String name = f.getName();
+                    final String name = f.getName();
 
-                  if (!name.equals(".") && !name.equals("..")) {
-                    if (!recursive) {
-                      err.println("Directory is not empty " + file);
-                      deleteOk = false;
-                      break;
+                    if (!name.equals(".") && !name.equals("..")) {
+                        if (!recursive) {
+                            err.println("Directory is not empty " + file);
+                            deleteOk = false;
+                            break;
+                        }
+                        else {
+                            deleteFile(f, err, recursive);
+                        }
                     }
-                    else {
-                      deleteFile(f, err, recursive);
-                    }
-                  }
                 }
             }
         } catch (Exception e) {
@@ -116,16 +116,16 @@ public class DeleteCommand extends AbstractCommand {
             System.err.println("Trying to delete it directly");
         }
 
-      try {
-        if (deleteOk) {
-            deleteOk = file.delete();
-            if (!deleteOk) {
-                err.println(file + " was not deleted");
+        try {
+            if (deleteOk) {
+                deleteOk = file.delete();
+                if (!deleteOk) {
+                    err.println(file + " was not deleted");
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-      } catch (Exception e) {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-      return deleteOk;
+        return deleteOk;
     }
 }
