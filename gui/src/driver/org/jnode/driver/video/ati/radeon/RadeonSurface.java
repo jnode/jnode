@@ -22,6 +22,7 @@
 package org.jnode.driver.video.ati.radeon;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -122,5 +123,15 @@ public class RadeonSurface extends AbstractSurface {
      */
     public ColorModel getColorModel() {
         return colorModel;
+    }
+
+    @Override
+    public int getRGBPixel(int x, int y) {
+        return bitmapGraphics.doGetPixel(x, y);
+    }
+
+    @Override
+    public int[] getRGBPixels(Rectangle region) {
+        return bitmapGraphics.doGetPixels(region);
     }
 }

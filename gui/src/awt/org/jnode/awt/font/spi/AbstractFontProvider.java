@@ -196,7 +196,7 @@ abstract public class AbstractFontProvider implements FontProvider {
 		if(log.isDebugEnabled()) log.debug("loadFonts for "+getClass().getName()+" ("+fontNames.length+" fonts)");
 		final int max = fontNames.length;
 		for (int i = 0; i < max; i++) {
-			loadFont("/" + fontNames[i]);
+			loadFont(fontNames[i]);
 		}
 		fontsLoaded = true;
 		log.debug("<<< END loadFonts >>>");

@@ -36,6 +36,7 @@ import org.jnode.font.bdf.BDFParser;
 /**
  * @author Stephane Meslin-Weber
  * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author Levente S\u00e1ntha
  */
 public class BDFTextRenderer implements TextRenderer {
 	private BDFFontContainer bdfFont;
@@ -75,7 +76,15 @@ public class BDFTextRenderer implements TextRenderer {
 
         if ((bdfFont != null) && (charsCount > 0)) {
             int offset = 0;
+
             final int bdfFontDepth = bdfFont.getDepth();
+
+            int max = (1 << bdfFontDepth) - 1;
+            //todo take into accunt font depth, the current solution works for 8 bits
+            max = 255;
+
+            float f_max = (float ) max, f_limit = f_max - 15;
+
 
             BDFParser.Rectangle b_rect = new BDFParser.Rectangle();
             final Point2D src = new Point2D.Double();
@@ -93,49 +102,49 @@ public class BDFTextRenderer implements TextRenderer {
 //                final int bdfFontBbxHeight = bdfFont.getBoundingBox().height;
                 final int[] fData = glyph.getData();
                 final int scan = fData.length/fHeight;
-                
-//                if(i == 0)
-//                {
-//                    System.out.println("BDF:x="+x+" y="+y+" fHeight="+fHeight+
-//                    		" fData.length="+fData.length+" scan="+scan+
-//                    		" bdfFontBbxHeight="+bdfFontBbxHeight+
-//                    		" glyphBbxY="+glyphBbxY+" base="+base);
-//                    Rectangle r = clip.getBounds();
-//                    System.out.println("bounds:x="+r.x+" y="+r.y+
-//                    			" width="+r.width+" height="+r.height);
-//                    src.setLocation(x, y);
-//                    tx.transform(src, dst);                    
-//                    System.out.println("newX="+dst.getX()+" newY="+dst.getY());
-//                    
-//                    double[] d = new double[9];
-//                    tx.getMatrix(d);
-//                    for(int j = 0 ; j  < d.length ; j++) System.out.print(d[j] + " ");
-//                    System.out.println();
-//                }
-                
+
+                int fg_r = color.getRed();
+                int fg_g = color.getGreen();
+                int fg_b = color.getBlue();
+
                 for(int k=0;k<fHeight;k++) {
                 	final int offsetLine = k*scan;
                     for(int j=0;j<scan;j++) {
                         int fPixel = fData[offsetLine+j];
                         if(fPixel!=0) {
-                            int r = color.getRed(); //(color & 0x00FF0000) >> 16;
-                            int g = color.getGreen(); //(color & 0x0000FF00) >> 8;
-                            int b = color.getBlue(); //(color & 0x000000FF);
-                            
-                            r = ((r * fPixel)>>bdfFontDepth) & 0xFF;
-                            g = ((g * fPixel)>>bdfFontDepth) & 0xFF;
-                            b = ((b * fPixel)>>bdfFontDepth) & 0xFF;
-                            
-                            fPixel = (((r << 16)+ (g << 8) +  b )| 0xFF000000);
-    
+
+                            //compute location
                             int px = x+offset+j;
                             //int py = y+(bdfFontBbxHeight+base-fHeight)+k-glyphBbxY;
                             int py = y+(base-fHeight)+k-glyphBbxY;
-                            
+
+
                             src.setLocation(px, py);
-                            tx.transform(src, dst);
-                            //if(clip.contains(dst))
-                            //{
+                            if(tx != null)
+                                tx.transform(src, dst);
+                            else {
+                                dst.setLocation(src);
+                            }
+
+                            //compute color
+                            int bg_color = surface.getRGBPixel(px, py);
+
+                            int bg_r = (bg_color & 0x00FF0000) >> 16;
+                            int bg_g = (bg_color & 0x0000FF00) >> 8;
+                            int bg_b = (bg_color & 0x000000FF);
+
+                            //todo improve this pixel composition
+                            
+                            float alpha = (fPixel > f_limit) ? 1.0f : fPixel / f_max;
+
+                            int r = bg_r +  ((int) ((fg_r - bg_r) * alpha)) & 0xFF;
+                            int g = bg_g + ((int) ((fg_g - bg_g) * alpha)) & 0xFF;
+                            int b = bg_b + ((int) ((fg_b - bg_b) * alpha)) & 0xFF;
+
+                            fPixel = (((r << 16)+ (g << 8) +  b )| 0xFF000000);
+    
+                            //clip
+                            //if(clip == null || clip.contains(dst)) {
 	                            px = (int) dst.getX();
 	                            py = (int) dst.getY();
 	                            	
@@ -144,10 +153,9 @@ public class BDFTextRenderer implements TextRenderer {
                         }
                     }
                 }
-                
-                offset+=glyph.getDWidth().width-glyph.getBbx(b_rect).x;
+                offset+=glyph.getDWidth().width - glyph.getBbx(b_rect).x;
             }
         }
-    }    
+    }
 }
 	

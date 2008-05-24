@@ -645,10 +645,12 @@ public class VESACore extends AbstractSurface implements VESAConstants, PCI_IDs,
         bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
     }
 
+    @Override
     public int getRGBPixel(int x, int y) {
         return bitmapGraphics.doGetPixel(x, y);
     }
 
+    @Override
     public int[] getRGBPixels(Rectangle region) {
         return bitmapGraphics.doGetPixels(region);
     }

@@ -22,6 +22,7 @@
 package org.jnode.driver.video.nvidia;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -742,5 +743,15 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
             int dstY, int width, int height, Color color) {
         bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
+    }
+
+    @Override
+    public int getRGBPixel(int x, int y) {
+        return bitmapGraphics.doGetPixel(x, y);
+    }
+
+    @Override
+    public int[] getRGBPixels(Rectangle region) {
+        return bitmapGraphics.doGetPixels(region);
     }
 }

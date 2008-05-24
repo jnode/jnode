@@ -22,6 +22,7 @@
 package org.jnode.driver.video.ati.mach64;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -100,4 +101,14 @@ final class Mach64Surface extends AbstractSurface {
 	public ColorModel getColorModel() {
 		return colorModel;
 	}
+
+    @Override
+    public int getRGBPixel(int x, int y) {
+        return bitmapGraphics.doGetPixel(x, y);
+    }
+    
+    @Override
+    public int[] getRGBPixels(Rectangle region) {
+        return bitmapGraphics.doGetPixels(region);
+    }
 }
