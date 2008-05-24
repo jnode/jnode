@@ -21,61 +21,52 @@
 
 package org.jnode.driver.block.ramdisk.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import javax.naming.NameNotFoundException;
+
+import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
+import org.jnode.driver.DriverException;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.DeviceArgument;
-import org.jnode.shell.help.argument.IntegerArgument;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.IntegerArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class RamDiskCommand {
+public class RamDiskCommand extends AbstractCommand {
+	private final FlagArgument FLAG_CREATE = new FlagArgument(
+			"create", Argument.MANDATORY, "if set, create the ramdisk");
+	private final IntegerArgument ARG_SIZE = new IntegerArgument(
+	        "size", Argument.OPTIONAL, "the size of the ramdisk");
 
-	static final OptionArgument ARG_ACTION =
-		new OptionArgument(
-			"action",
-			"action to do on the ramdisk",
-			new OptionArgument.Option[] {
-				new OptionArgument.Option("create", "Create a ramdisk"),
-				});
+	public RamDiskCommand() {
+        super("Manage RAM 'disks'");
+        registerArguments(FLAG_CREATE, ARG_SIZE);
+    }
 
-	static final IntegerArgument ARG_SIZE = new IntegerArgument("size", "the size of the ramdisk");
-
-	static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION, Parameter.MANDATORY);
-	static final Parameter PARAM_SIZE = new Parameter(ARG_SIZE, Parameter.OPTIONAL);
-
-	public static Help.Info HELP_INFO =
-		new Help.Info(
-			"ramdisk",
-			new Syntax[] {
-				new Syntax("Create a ramdisk", new Parameter[] { PARAM_ACTION, PARAM_SIZE })
-	});
-
-	public static void main(String[] args)
-	throws Exception {
-		final ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-		if (PARAM_ACTION.isSet(cmdLine)) {
+	public static void main(String[] args) throws Exception {
+	    new RamDiskCommand().execute(args);
+	}
+	
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) 
+    throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException {
+        final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+		if (FLAG_CREATE.isSet()) {
 			// Create
-			final int size;
-			if (PARAM_SIZE.isSet(cmdLine)) {
-				size = ARG_SIZE.getInteger(cmdLine);
-			} else {
-				size = 4*4096;
-			}
+			final int size = ARG_SIZE.isSet() ? ARG_SIZE.getValue() : 4 * 4096;
 			RamDiskDevice dev = new RamDiskDevice(null, "dummy", size);
 			dev.setDriver(new RamDiskDriver(null));
 			dm.register(dev);
 		}
-
 	}
 
 }
