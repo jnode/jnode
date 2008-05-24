@@ -38,7 +38,7 @@
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="cat">
       <empty description="copy standard input to standard output"/>
-      <sequence description="concatenate urls to standard output">
+      <sequence description="fetch and concatenate urls to standard output">
         <option argLabel="urls" shortName="u" longName="urls"/>
         <repeat minCount="1">
           <argument argLabel="url"/>
@@ -62,11 +62,11 @@
       </sequence>
     </syntax>
     <syntax alias="del">
-      <sequence description="delete a file or directory">
-        <optional>
-          <option argLabel="recursive" shortName="r" description="recursively delete a directory's contents" />
-        </optional>
-        <argument argLabel="file/dir"/>
+      <sequence description="delete files and directories">
+        <optionSet>
+          <option argLabel="recursive" shortName="r" longName="recursive"/>
+        </optionSet>
+        <repeat minCount="1"><argument argLabel="paths"/></repeat>
       </sequence>
     </syntax>
   </extension>

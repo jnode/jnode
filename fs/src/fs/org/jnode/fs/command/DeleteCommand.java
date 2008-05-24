@@ -41,22 +41,25 @@ import java.io.PrintStream;
  * @author Andreas H\u00e4nel
  * @author Levente S\u00e1ntha
  * @author Martin Husted Hartvig (hagar at jnode.org)
+ * @author crawley@jnode.org
  */
 public class DeleteCommand extends AbstractCommand {
 
-    private final FileArgument ARG_DIR;
-    private final FlagArgument ARG_OPTION;
-
+    private final FileArgument ARG_PATHS = new FileArgument(
+            "paths", Argument.MANDATORY | Argument.MULTIPLE, 
+            "the files or directories to be deleted");
+    private final FlagArgument FLAG_RECURSIVE = new FlagArgument(
+            "recursive", Argument.OPTIONAL, 
+            "if set, any directories are deleted recursively");
+    
+    private FileSystemService fss;
+    private boolean recursive;
+    private PrintStream err;
+    
 
     public DeleteCommand() {
         super("delete files or directories");
-
-        ARG_DIR = new FileArgument(
-                "file/dir", Argument.MANDATORY, "the file or directory to be deleted");
-        ARG_OPTION = new FlagArgument(
-                "recursive", Argument.OPTIONAL, "if set, any directories are deleted recursively");
-        
-        registerArguments(ARG_DIR, ARG_OPTION);
+        registerArguments(ARG_PATHS, FLAG_RECURSIVE);
     }
 
     public static void main(String[] args) throws Exception {
@@ -64,67 +67,58 @@ public class DeleteCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
-
-        boolean recursive = ARG_OPTION.isSet();
-
-        File[] file_arr = ARG_DIR.getValues();
-
+            PrintStream out, PrintStream err) throws NameNotFoundException {
+        // Lookup the Filesystem service
+        fss = InitialNaming.lookup(FileSystemService.NAME);
+        recursive = FLAG_RECURSIVE.isSet();
+        File[] paths = ARG_PATHS.getValues();
+        this.err = err;
         boolean ok = true;
-        for (File file : file_arr) {
-            boolean tmp = deleteFile(file, err, recursive);
-            ok &= tmp;
+        for (File file : paths) {
+            ok &= deleteFile(file);
         }
-
         if (!ok) {
             exit(1);
         }
     }
 
-    private boolean deleteFile(File file, PrintStream err, boolean recursive) throws NameNotFoundException {
+    private boolean deleteFile(File file) {
+        if (!file.exists()) {
+            err.println(file + " does not exist");
+            return false;
+        }
         boolean deleteOk = true;
-        try {
-            if (!file.exists()) {
-                err.println(file + " does not exist");
-                return false;
-            }
 
-            // Lookup the Filesystem service
-            final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+        // FIXME the following doesn't handle mounted filesystems correctly (I think).
+        // Recursive delete should not recurse >>into<< a mounted filesystem, but should
+        // give an error message and then refuse to delete the parent directory because
+        // it cannot be emptied.
+        if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
+            for (File f : file.listFiles()) {
+                final String name = f.getName();
 
-            if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
-                final File[] subFiles = file.listFiles();
-
-                for (File f : subFiles) {
-                    final String name = f.getName();
-
-                    if (!name.equals(".") && !name.equals("..")) {
-                        if (!recursive) {
-                            err.println("Directory is not empty " + file);
-                            deleteOk = false;
-                            break;
-                        }
-                        else {
-                            deleteFile(f, err, recursive);
-                        }
+                if (!name.equals(".") && !name.equals("..")) {
+                    if (!recursive) {
+                        err.println("Directory is not empty " + file);
+                        deleteOk = false;
+                        break;
+                    }
+                    else {
+                        deleteOk &= deleteFile(f);
                     }
                 }
             }
-        } catch (Exception e) {
-            System.err.println("Failed to check file properties");
-            e.printStackTrace();
-            System.err.println("Trying to delete it directly");
         }
 
-        try {
-            if (deleteOk) {
-                deleteOk = file.delete();
-                if (!deleteOk) {
-                    err.println(file + " was not deleted");
-                }
+        if (deleteOk) {
+            // FIXME ... this is going to attempt to delete "directories" that are 
+            // mounted filesystems.  Is this right?  What will it do?
+            // FIXME ... this does not report the reason that the delete failed.
+            // How should we do that?
+            deleteOk = file.delete();
+            if (!deleteOk) {
+                err.println(file + " was not deleted");
             }
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return deleteOk;
     }
