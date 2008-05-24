@@ -312,9 +312,5 @@
       <jarDirectory url="file://$PROJECT_DIR$/distr/lib" recursive="false" />
     </library>
   </component>
-  <component name="uidesigner-configuration">
-    <option name="INSTRUMENT_CLASSES" value="true" />
-    <option name="COPY_FORMS_RUNTIME_TO_OUTPUT" value="true" />
-  </component>
 </project>
 

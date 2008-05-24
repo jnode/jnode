@@ -137,4 +137,14 @@ public class BufferedImageSurface extends AbstractSurface {
             throw new AWTError("Not implemented");
         }
     }
+
+    @Override
+    public int getRGBPixel(int x, int y) {
+        return bitmapGraphics.doGetPixel(x, y);
+    }
+
+    @Override
+    public int[] getRGBPixels(Rectangle region) {
+        return bitmapGraphics.doGetPixels(region);
+    }
 }

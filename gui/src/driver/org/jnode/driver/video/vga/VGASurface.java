@@ -23,6 +23,7 @@ package org.jnode.driver.video.vga;
 
 import java.awt.Color;
 import java.awt.Shape;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
@@ -151,5 +152,15 @@ public class VGASurface extends AbstractSurface implements VgaConstants {
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
             int dstY, int width, int height, Color color) {
         bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
+    }
+
+    @Override
+    public int getRGBPixel(int x, int y) {
+        return bitmapGraphics.doGetPixel(x, y);
+    }
+
+    @Override
+    public int[] getRGBPixels(Rectangle region) {
+        return bitmapGraphics.doGetPixels(region);
     }
 }

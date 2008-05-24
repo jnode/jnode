@@ -933,7 +933,6 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         } catch (Exception ex) {
             throw new DriverException("Unknown exception", ex);
         }
-	    
 	}
 	
     /**
@@ -944,10 +943,12 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
     }
 
+    @Override
     public int getRGBPixel(int x, int y) {
         return bitmapGraphics.doGetPixel(x, y);
     }
 
+    @Override
     public int[] getRGBPixels(Rectangle region) {
         return bitmapGraphics.doGetPixels(region);
     }
