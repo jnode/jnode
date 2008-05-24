@@ -69,6 +69,10 @@
         <repeat minCount="1"><argument argLabel="paths"/></repeat>
       </sequence>
     </syntax>
+    <syntax alias="df">
+      <empty description="display disk usage for all filesystems"/>
+      <argument argLabel="device" description="display disk usage for the filesystem on a device"/>
+    </syntax>
   </extension>
 
 
