@@ -21,5 +21,14 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="ramdisk"  class="org.jnode.driver.block.ramdisk.command.RamDiskCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="ramdisk">
+      <sequence description="create a ramdisk">
+        <option argLabel="create" shortName="c" longName="create"/>
+        <optional><option argLabel="size" shortName="s" longName="size"/></optional>
+      </sequence>
+    </syntax>
+  </extension>
 
 </plugin>
