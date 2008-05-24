@@ -42,8 +42,8 @@ import org.jnode.fs.FileSystem;
 import org.jnode.java.io.VMFileHandle;
 
 /**
- * @modif add mkDir mkFile Yves Galante (yves.galante@jmob.net) 01.04.2004
  * @author epr
+ * @author Yves Galante (yves.galante@jmob.net)
  */
 final class FileSystemAPIImpl implements VMFileSystemAPI {
 
