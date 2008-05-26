@@ -29,6 +29,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
@@ -162,7 +163,21 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     {
     	return api.getMountPoints();
     }
-
+    
+    /*
+    * (non-Javadoc)
+    * @see org.jnode.fs.service.FileSystemService#getDeviceMountPoints()
+    */
+    public Map<String, String> getDeviceMountPoints(){
+    	Map<String, FileSystem<?>> mounts = api.getMountPoints();
+    	Map<String, String> result = new TreeMap<String, String>();
+    	for(String path: mounts.keySet()){
+    		FileSystem fs = (FileSystem)mounts.get(path);
+    		result.put(fs.getDevice().getId(), path);
+    	}
+    	return result;
+    } 
+    
     /**
      * Is the given directory a mount.
      * @param fullPath
