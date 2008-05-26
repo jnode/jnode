@@ -22,54 +22,56 @@
 package org.jnode.fs.command;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.test.AnnotationTest.A;
 
 /**
+ * The CdCommand class changes the current directory as given by the "user.dir" property.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Andreas H\u00e4nel
+ * @author crawley@jnode.org
  */
 public class CdCommand extends AbstractCommand {
 
-	static final FileArgument ARG_DIR = new FileArgument("directory", "the directory to switch to");
-	public static Help.Info HELP_INFO = new Help.Info("cd", "Go to the given directory", 
-			new Parameter[] { new Parameter(ARG_DIR, Parameter.MANDATORY)});
+	private final FileArgument ARG_DIR = new FileArgument(
+	        "directory", Argument.OPTIONAL, "the directory to change to");
 
+	public CdCommand() {
+        super("Change the current directory");
+        registerArguments(ARG_DIR);
+    }
+	
 	public static void main(String[] args) throws Exception {
 		new CdCommand().execute(args);
 	}
 	
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-	throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-		String dir_str = ARG_DIR.getValue(cmdLine);
-		
-		// FIXME the following seems to cater for an optional <directory> argument, but the
-		// HELP_INFO syntax declares it as mandatoty.
-		if ((dir_str == null && System.getProperty("user.dir").equals("/")) ||
-			(dir_str != null && dir_str.equals("/"))) {
-			System.setProperty("user.dir", "/");
-		} else {
-			File dir = ARG_DIR.getFile(cmdLine);
-			if (dir == null) {
-				dir = new File(System.getProperty("user.dir"));
-			}
-			if (dir.exists() && dir.isDirectory()) {
-				System.setProperty("user.dir", dir.getAbsoluteFile().getCanonicalPath());
-			} else {
-				System.err.println(dir + " is not a valid directory");
-				exit(1);
-			}
-		}
-			
+	throws IOException {
+	    File dir = ARG_DIR.getValue();
+
+	    if (dir == null) {
+	        // If no directory argument was given, change to the "user.home" directory.
+	        String home = System.getProperty("user.home");
+	        if (home == null || home.isEmpty()) {
+	            err.println("user.home is not set");
+	            exit(1);
+	        }
+	        dir = new File(home);
+	    }
+	    if (dir.exists() && dir.isDirectory()) {
+	        System.setProperty("user.dir", dir.getAbsoluteFile().getCanonicalPath());
+	    } else {
+	        err.println(dir + " is not a valid directory");
+	        exit(1);
+	    }	
 	}
 
 }
