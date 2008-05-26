@@ -23,6 +23,7 @@ package org.jnode.fs.command;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Map;
 
 import javax.naming.NameNotFoundException;
 
@@ -53,11 +54,15 @@ public class DFCommand extends AbstractCommand {
         super("Print file system usage information");
         registerArguments(ARG_DEVICE);
     }
-
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.shell.Command#execute(org.jnode.shell.CommandLine, java.io.InputStream, java.io.PrintStream, java.io.PrintStream)
+     */
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws NameNotFoundException {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        out.println("ID\tTotal\tUse\tFree");
+        final Map mountPoints = fss.getDeviceMountPoints();
+        out.println("ID\tTotal\tUse\tFree\tMount");
         if (ARG_DEVICE.isSet()) {
             final Device dev = ARG_DEVICE.getValue();
             FileSystem fs = fss.getFileSystem(dev);
@@ -65,7 +70,7 @@ public class DFCommand extends AbstractCommand {
                 out.println("No filesystem on device");
             }
             else {
-                displayInfo(out, dev, fs);
+                displayInfo(out, dev, fs,(String)mountPoints.get(fs.getDevice().getId()));
             }
         }
         else {
@@ -73,19 +78,25 @@ public class DFCommand extends AbstractCommand {
             for (Device dev : dm.getDevices()) {
                 FileSystem fs = fss.getFileSystem(dev);
                 if (fs != null) {
-                    displayInfo(out, dev, fs);
+                    displayInfo(out, dev, fs, (String)mountPoints.get(fs.getDevice().getId()));
                 }
             }
         }
     }
-
-    private void displayInfo(PrintStream out, Device dev, FileSystem fs) {
+    /**
+     * 
+     * @param out
+     * @param dev
+     * @param fs
+     * @param mountPoint
+     */
+    private void displayInfo(PrintStream out, Device dev, FileSystem fs, String mountPoint) {
         try {
             long total = fs.getTotalSpace();
             if (total > 0) {
                 long free = fs.getFreeSpace();
                 long use = total - free;
-                out.println(dev.getId() + "\t" + total + "\t" + use + "\t" + free);
+                out.println(dev.getId() + "\t" + total + "\t" + use + "\t" + free + "\t" + mountPoint);
             }
         } catch (IOException ex) {
             out.println("\tError getting disk usage information: " + ex.getLocalizedMessage());
