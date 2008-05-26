@@ -48,6 +48,10 @@
         <argument argLabel="file"/>
       </repeat>
     </syntax>
+    <syntax alias="cd">
+      <empty description="change the current directory to the 'user.home' directory"/>
+      <argument argLabel="directory" description="change the current directory to 'directory'"/>
+    </syntax>
     <syntax alias="cp">
       <sequence description="copy files or directories">
         <optionSet>
