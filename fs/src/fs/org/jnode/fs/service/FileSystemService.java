@@ -103,6 +103,12 @@ public interface FileSystemService {
     public Map<String, FileSystem<?>> getMountPoints();
 
     /**
+     * Return a map of devices and their mount points.
+     * @return
+     */
+    public Map<String, String> getDeviceMountPoints();
+    
+    /**
      * Is the given directory a mount.
      * @param fullPath
      * @return
