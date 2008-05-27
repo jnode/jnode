@@ -21,6 +21,9 @@
  
 package org.jnode.vm;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.annotation.Inline;
@@ -729,6 +732,22 @@ public final class Unsafe {
     public static final void debugStackTrace() throws UninterruptiblePragma {
         VmProcessor.current().getArchitecture().getStackReader()
                 .debugStackTrace();
+    }
+
+
+    /**
+     * List the current stacktrace on the kernel debug output.
+     * 
+     * @throws UninterruptiblePragma
+     */
+    @Inline
+    public static final void debugStackTrace(Throwable t) throws UninterruptiblePragma {
+    	Unsafe.debug(t.getMessage());
+    	Unsafe.debug("\n");
+    	
+    	StringWriter w = new StringWriter();
+    	t.printStackTrace(new PrintWriter(w));
+    	Unsafe.debug(w.toString());
     }
 
     /**
