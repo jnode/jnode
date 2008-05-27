@@ -81,6 +81,9 @@
       <empty description="list the current directory"/>
       <argument argLabel="path" description="list a file or directory"/>
     </syntax>
+    <syntax alias="eject">
+      <argument argLabel="device" description="eject a device with a removable medium"/>
+    </syntax>
     <syntax alias="ls">
       <empty description="list the current directory"/>
       <repeat><argument argLabel="path" description="list files or directories"/></repeat>

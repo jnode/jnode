@@ -21,18 +21,17 @@
  
 package org.jnode.fs.command;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.RemovableDeviceAPI;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
 
 
 /**
@@ -40,18 +39,29 @@ import org.jnode.shell.help.argument.DeviceArgument;
  */
 public class EjectCommand extends AbstractCommand {
 
-	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "device to eject the medium from");
-	public static Help.Info HELP_INFO = new Help.Info("eject", "Eject the medium from a given device", new Parameter[] { new Parameter(ARG_DEVICE, Parameter.MANDATORY)});
-
+	private final DeviceArgument ARG_DEVICE = new DeviceArgument(
+	        "device", Argument.MANDATORY, "device to eject the medium from",
+	        RemovableDeviceAPI.class);
+	
+	public EjectCommand() {
+        super("Eject the medium from a given device");
+        registerArguments(ARG_DEVICE);
+	}
+        
 	public static void main(String[] args) throws Exception {
 		new EjectCommand().execute(args);
 	}
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-
-		final Device dev = ARG_DEVICE.getDevice(cmdLine);
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+	throws ApiNotFoundException, IOException {
+		final Device dev = ARG_DEVICE.getValue();
 		final RemovableDeviceAPI api = dev.getAPI(RemovableDeviceAPI.class);
-		api.eject();
+		try {
+		    api.eject();
+		}
+		catch (IOException ex) {
+		    err.println("eject failed for " + dev.getId() + ": " + ex.getMessage());
+		    exit(1);
+		}
 	}
 }
