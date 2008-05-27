@@ -84,6 +84,11 @@
     <syntax alias="eject">
       <argument argLabel="device" description="eject a device with a removable medium"/>
     </syntax>
+    <syntax alias="hexdump">
+      <empty description="print a hex dump of standard input"/>
+      <argument argLabel="file" description="print a hex dump of a file"/>
+      <option argLabel="url" shortName="u" longName="url" description="print a hex dump of a URL"/>
+    </syntax>
     <syntax alias="ls">
       <empty description="list the current directory"/>
       <repeat><argument argLabel="path" description="list files or directories"/></repeat>
