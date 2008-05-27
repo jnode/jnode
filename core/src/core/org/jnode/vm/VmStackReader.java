@@ -189,6 +189,35 @@ public abstract class VmStackReader extends VmSystemObject {
      */ 
     @KernelSpace
     public final void debugStackTrace(int max) {
+        Address f = VmMagic.getCurrentFrame();
+        Unsafe.debug("Debug stacktrace: ");
+        boolean first = true;
+        while (isValid(f) && (max > 0)) {
+            if (first) {
+                first = false;
+            } else {
+                Unsafe.debug(", ");
+            }
+            final VmMethod method = getMethod(f);
+            final VmType<?> vmClass = method.getDeclaringClass();
+            Unsafe.debug(vmClass.getName());
+            Unsafe.debug("::");
+            Unsafe.debug(method.getName()); 
+            Unsafe.debug('\n');
+            f = getPrevious(f);
+            max--;
+        }
+        if (isValid(f)) {
+            Unsafe.debug("...");
+        }
+    }
+    
+    /**
+     * Show the current stacktrace using Screen.debug.
+     * TODO that method only exist to have line numbers : find a way to add line numbers to debugStackTrace(max)
+     */ 
+    @KernelSpace
+    public final void debugStackTraceWithLineNumbers(int max) {
     	final VmThread current = VmThread.currentThread();
     	final VmStackFrame[] frames = (VmStackFrame[]) VmThread.getStackTrace(current);
     	if(frames == null)
@@ -209,7 +238,7 @@ public abstract class VmStackReader extends VmSystemObject {
                 Unsafe.debug('\n');
         	}    	
     	}
-    }
+    }    
     
 	/**
 	 * Show the stacktrace of the given thread using Screen.debug.
