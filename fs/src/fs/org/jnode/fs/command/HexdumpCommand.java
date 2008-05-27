@@ -4,46 +4,77 @@
 
 package org.jnode.fs.command;
 
-import org.jnode.shell.AbstractCommand; 
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.util.NumberUtils;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.URLArgument;
+import org.jnode.util.NumberUtils;
+
 /**
  * @author gvt
+ * @author crawley@jnode.org
  */
 public class HexdumpCommand extends AbstractCommand {
-    static final Argument ARG_FILE = new FileArgument("file",
-            "the file (or URL) to print out");
+    private final FileArgument ARG_FILE = new FileArgument(
+            "file", Argument.OPTIONAL, "the file to print out");
 
-    public static Help.Info HELP_INFO = new Help.Info("hexdump",
-            "hexadecimal dump of the given file (or URL)",
-            new Parameter[]{new Parameter(ARG_FILE, Parameter.MANDATORY)});
+    private final URLArgument ARG_URL = new URLArgument(
+            "url", Argument.OPTIONAL, "the url to print out");
+
+    public HexdumpCommand() {
+        super("Print a hexadecimal dump of a given file (or URL)");
+        registerArguments(ARG_FILE, ARG_URL);
+    }
 
     public static void main(String[] args) throws Exception {
         new HexdumpCommand().execute(args);
     }
 
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws IOException {
+        InputStream is = null;
+        try {
+            // Set up the stream to be dumped.
+            File file = ARG_FILE.getValue();
+            if (ARG_FILE.isSet()) {
+                try {
+                    is = new FileInputStream(file);
+                }
+                catch (FileNotFoundException ex) {
+                    err.println("Cannot open " + file + ": " + ex.getMessage());
+                    exit(1);
+                }
+            }
+            else if (ARG_URL.isSet()) {
+                String urlStr = ARG_URL.getValue();
+                try {
+                    URL url = new URL(urlStr);
+                    is = url.openStream();
+                }
+                catch (MalformedURLException ex) {
+                    err.println("Malformed URL '" + urlStr + "': " + ex.getMessage());
+                    exit(1);
+                }
+                catch (IOException ex) {
+                    err.println("Cannot access URL '" + urlStr + "': " + ex.getMessage());
+                    exit(1);
+                }
+            }
+            else {
+                is = in;
+            }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-        URL url = openURL(ARG_FILE.getValue(cmdLine));
-        InputStream is = url.openStream();
-
-        if (is == null) {
-            err.println("Not found " + ARG_FILE.getValue(cmdLine));
-            exit(1);
-        } else {
+            // Now do the work
             final int rowlen = 16;
             int prt = 0;
             int len;
@@ -61,14 +92,17 @@ public class HexdumpCommand extends AbstractCommand {
                     sb.append(NumberUtils.hex(prt, 8)).append("  ");
 
                     for (int i = 0; i < rowlen; i++) {
-                        if (ofs + i < len)
+                        if (ofs + i < len) {
                             sb.append(NumberUtils.hex(buf[ofs + i], 2));
-                        else
+                        } else {
                             sb.append("  ");
-                        if ((i + 1) < rowlen)
+                        }
+                        if ((i + 1) < rowlen) {
                             sb.append(" ");
-                        if ((i + 1) == rowlen / 2)
+                        }
+                        if ((i + 1) == rowlen / 2) {
                             sb.append(" ");
+                        }
                     }
 
                     sb.append("  |");
@@ -76,12 +110,14 @@ public class HexdumpCommand extends AbstractCommand {
                     for (int i = 0; i < rowlen; i++) {
                         if (ofs + i < len) {
                             char c = (char) buf[ofs + i];
-                            if ((c >= ' ') && (c < (char) 0x7f))
+                            if ((c >= ' ') && (c < (char) 0x7f)) {
                                 sb.append(c);
-                            else
+                            } else {
                                 sb.append(".");
-                        } else
+                            }
+                        } else {
                             sb.append(" ");
+                        }
                     }
 
                     sb.append("|");
@@ -94,18 +130,17 @@ public class HexdumpCommand extends AbstractCommand {
                     out.flush();
                 }
             }
-
             out.flush();
-            is.close();
+        }
+        finally {
+            if (is != null && is != in) {
+                try {
+                    is.close();
+                }
+                catch (IOException ex) {
+                    /* ignore */
+                }
+            }
         }
     }
-
-    private URL openURL(String fname) throws MalformedURLException {
-        try {
-            return new URL(fname);
-        } catch (MalformedURLException ex) {
-            return new File(fname).toURL();
-        }
-    }
-
 }
