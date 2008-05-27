@@ -96,9 +96,11 @@ multiboot_mmap_copy:
 multiboot_mmap_done:
 
 %ifdef SETUP_VBE
-	; Copy vbe infos (if any)
+	; Are vbe informations available ? 
 	test dword [multiboot_info+MBI_FLAGS],MBF_VBE
-	jz vbe_info_done
+	jz vbe_info_done ; no vbe info, jump to end
+	
+	; Copy vbe infos
 	; Get start address
 	mov esi,[multiboot_info+MBI_VBECTRLINFO]
 	; Get destination address
