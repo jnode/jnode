@@ -77,6 +77,14 @@
       <empty description="display disk usage for all filesystems"/>
       <argument argLabel="device" description="display disk usage for the filesystem on a device"/>
     </syntax>
+    <syntax alias="dir">
+      <empty description="list the current directory"/>
+      <argument argLabel="path" description="list a file or directory"/>
+    </syntax>
+    <syntax alias="ls">
+      <empty description="list the current directory"/>
+      <repeat><argument argLabel="path" description="list files or directories"/></repeat>
+    </syntax>
   </extension>
 
 

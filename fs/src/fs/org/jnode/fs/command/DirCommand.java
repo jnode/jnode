@@ -21,15 +21,8 @@
  
 package org.jnode.fs.command;
 
-import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
-
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -37,41 +30,55 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+
 /**
  * @author epr
  * @author Andreas H\u00e4nel
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
 public class DirCommand extends AbstractCommand {
     private static final int LEFT_MARGIN = 14;
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
 
-
-    static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
-    public static Help.Info HELP_INFO =
-            new Help.Info(
-                    "dir",
-                    "List the entries of the given path",
-                    new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
+    private final FileArgument ARG_PATH = new FileArgument(
+            "path", Argument.OPTIONAL + Argument.MULTIPLE, "the file or directory to list");
+    
+    public DirCommand() {
+        super("List files or directories");
+        registerArguments(ARG_PATH);
+    }
 
     public static void main(String[] args) throws Exception {
         new DirCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-        String userDir = System.getProperty("user.dir");
-        File path = ARG_PATH.getFile(cmdLine);
-        if (path == null) path = new File(userDir);
-        if (path.exists() && path.isDirectory()) {
-            final File[] list = path.listFiles();
-            this.printList(list, out);
-        } else if (path.exists() && path.isFile()) {
-            this.printList(new File[]{path}, out);
-        } else {
-            err.println("No such path " + path);
-            exit(1);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws IOException {
+        File[] paths = ARG_PATH.getValues();
+        if (paths.length == 0) {
+            paths = new File[] {new File(System.getProperty("user.dir"))};
+        }
+        for (File path : paths) {
+            if (!path.exists()) {
+                err.println("No such path: " + path);
+            }
+            else {
+                if (paths.length > 1) {
+                    out.println(path + ":");
+                }
+                if (path.isDirectory()) {
+                    final File[] list = path.listFiles();
+                    printList(list, out);
+                } else if (path.isFile()) {
+                    printList(new File[]{path}, out);
+                }
+            }
         }
     }
 
