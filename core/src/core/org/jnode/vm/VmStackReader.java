@@ -189,27 +189,26 @@ public abstract class VmStackReader extends VmSystemObject {
      */ 
     @KernelSpace
     public final void debugStackTrace(int max) {
-        Address f = VmMagic.getCurrentFrame();
-        Unsafe.debug("Debug stacktrace: ");
-        boolean first = true;
-        while (isValid(f) && (max > 0)) {
-            if (first) {
-                first = false;
-            } else {
-                Unsafe.debug(", ");
-            }
-            final VmMethod method = getMethod(f);
-            final VmType<?> vmClass = method.getDeclaringClass();
-            Unsafe.debug(vmClass.getName());
-            Unsafe.debug("::");
-            Unsafe.debug(method.getName()); 
-            Unsafe.debug('\n');
-            f = getPrevious(f);
-            max--;
-        }
-        if (isValid(f)) {
-            Unsafe.debug("...");
-        }
+    	final VmThread current = VmThread.currentThread();
+    	final VmStackFrame[] frames = (VmStackFrame[]) VmThread.getStackTrace(current);
+    	if(frames == null)
+    	{
+        	Unsafe.debug("Debug stacktrace:<no stack trace>\n");    		
+    	}
+    	else
+    	{
+        	Unsafe.debug("Debug stacktrace: ");
+        	for(int i = 0 ; i < frames.length ; i++)
+        	{
+        		final VmStackFrame s = (VmStackFrame) frames[i];	    		
+                Unsafe.debug(s.getMethod().getDeclaringClass().getName());
+                Unsafe.debug("::");
+                Unsafe.debug(s.getMethod().getName()); 
+                Unsafe.debug(":");
+                Unsafe.debug(s.getLocationInfo()); 
+                Unsafe.debug('\n');
+        	}    	
+    	}
     }
     
 	/**
