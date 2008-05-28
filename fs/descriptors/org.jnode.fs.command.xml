@@ -93,6 +93,9 @@
       <empty description="list the current directory"/>
       <repeat><argument argLabel="path" description="list files or directories"/></repeat>
     </syntax>
+    <syntax alias="mkdir">
+      <argument argLabel="directory" description="create a new directory"/>
+    </syntax>
   </extension>
 
 

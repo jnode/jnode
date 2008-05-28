@@ -27,10 +27,7 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.*;
 
 /**
  * @author Guillaume BINET (gbin@users.sourceforge.net)
@@ -38,21 +35,24 @@ import org.jnode.shell.help.argument.FileArgument;
  */
 public class MkdirCommand extends AbstractCommand {
 
-    static final FileArgument ARG_DIR = new FileArgument("directory", "the directory to create");
-    public static Help.Info HELP_INFO =
-        new Help.Info(
-                "dir",
-                "create a directory",
-                new Parameter[] { new Parameter(ARG_DIR, Parameter.MANDATORY)});
+    private final FileArgument ARG_DIR = new FileArgument(
+            "directory", Argument.MANDATORY, "the directory to create");
+   
+    public MkdirCommand() {
+        super("Create a new directory");
+        registerArguments(ARG_DIR);
+    }
 
     public static void main(String[] args) throws Exception {
     	new MkdirCommand().execute(args);
     }
     
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-    	ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-        File dir = ARG_DIR.getFile(cmdLine);
-        
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+    	File dir = ARG_DIR.getValue();
+        if (dir.exists()) {
+            err.println(dir.getPath() + " already exists.");
+            exit(1);
+        }
         if (!dir.mkdir()) {
         	err.println("Can't create directory.");
         	exit(1);
