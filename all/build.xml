@@ -869,7 +869,16 @@ clean             Remove all intermediate build results.
 
     </target>
 
-	<!-- Create a patch -->
+    <target name="checkstyle" description="Generates a report of code convention violations.">
+        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
+        <checkstyle config="jnode_checks.xml">
+            <fileset dir="../gui/src/test" includes="**/*.java"/>
+            <fileset dir="../gui/src/desktop" includes="**/*.java"/>
+            <fileset dir="../gui/src/awt" includes="**/*.java"/>
+        </checkstyle>
+    </target>
+
+    <!-- Create a patch -->
     <!-- TODO create replacement SVN task
     <target name="create-patch">
         <property name="patch.file" value="${root.dir}/patch.txt"/>             
