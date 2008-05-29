@@ -168,7 +168,15 @@
     	    </and>
     	  </condition>
     	</fail>
-    	
+
+        <fail message="Java Runtime version 1.6 needed. You version is ${java.runtime.version}">
+            <condition>
+                <not>
+                    <contains string="${java.runtime.version}" substring="1.6" casesensitive="false"/>
+                </not>
+            </condition>
+        </fail>
+
         <!-- Initialize all project directories -->
         <property file="${root.dir}/jnode.properties"/>
         <!-- Set overwritable properties -->
