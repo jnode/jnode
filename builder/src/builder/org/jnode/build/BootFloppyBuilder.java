@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -46,7 +46,7 @@ import org.jnode.util.FileUtils;
 
 /**
  * <description>
- * 
+ *
  * @author epr
  */
 public class BootFloppyBuilder extends Task {
@@ -61,7 +61,7 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Build the boot floppy
-     * 
+     *
      * @throws BuildException
      */
     public void execute() throws BuildException {
@@ -83,13 +83,13 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Create the actual bootfloppy
-     * 
+     *
      * @throws IOException
      * @throws DriverException
      * @throws FileSystemException
      */
     public void createImage() throws IOException, DriverException,
-            FileSystemException {
+        FileSystemException {
 
         final FileDevice newFd = new FileDevice(destFile, "rw");
         try {
@@ -97,13 +97,13 @@ public class BootFloppyBuilder extends Task {
             formatDevice(newFd);
             final Device sysDev = getSystemDevice(newFd);
             final BlockDeviceAPI sysDevApi = sysDev
-                    .getAPI(BlockDeviceAPI.class);
+                .getAPI(BlockDeviceAPI.class);
             copySystemFiles(sysDev);
             sysDevApi.flush();
         } catch (ApiNotFoundException ex) {
-			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+            ioe.initCause(ex);
+            throw ioe;
         } finally {
             newFd.close();
         }
@@ -111,7 +111,7 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Format the given device
-     * 
+     *
      * @param dev
      * @throws IOException
      */
@@ -120,16 +120,16 @@ public class BootFloppyBuilder extends Task {
         try {
             ff.format(dev.getAPI(BlockDeviceAPI.class));
         } catch (ApiNotFoundException ex) {
-			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+            ioe.initCause(ex);
+            throw ioe;
         }
     }
 
     /**
      * Gets the device the system files must be copied onto. This enabled a
      * disk to be formatted with partitions.
-     * 
+     *
      * @param rootDevice
      * @return BlockDevice
      */
@@ -139,13 +139,13 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Copy the system files to the given device
-     * 
+     *
      * @param device
      * @throws IOException
      * @throws FileSystemException
      */
     protected void copySystemFiles(Device device) throws IOException,
-            FileSystemException {
+        FileSystemException {
         final FatFileSystem fs = new FatFileSystem(device, false, new FatFileSystemType());
 
         for (FileSet fset : fileSets) {
@@ -163,7 +163,7 @@ public class BootFloppyBuilder extends Task {
         }
         final String[] files = ds.getIncludedFiles();
         for (int i = 0; i < files.length; i++) {
-            final String fn = files[ i];
+            final String fn = files[i];
             final int idx = fn.lastIndexOf(File.separatorChar);
             final FSDirectory dir;
             final String name;
@@ -178,9 +178,10 @@ public class BootFloppyBuilder extends Task {
             addFile(dir, f, name);
         }
     }
-    
+
     /**
      * Gets the last modification date of all parameters.
+     *
      * @return
      */
     protected long getLastModified() {
@@ -188,7 +189,7 @@ public class BootFloppyBuilder extends Task {
         for (FileSet fset : fileSets) {
             lm = Math.max(lm, getLastModified(fset));
         }
-        return lm;        
+        return lm;
     }
 
     private long getLastModified(FileSet fset) {
@@ -204,11 +205,11 @@ public class BootFloppyBuilder extends Task {
             lm = Math.max(lm, new File(baseDir, files[i]).lastModified());
         }
         return lm;
-        
+
     }
 
     private FSDirectory getOrCreateDir(FatFileSystem fs, String dirName)
-            throws IOException {
+        throws IOException {
         FSDirectory dir = fs.getRootDir();
         while (dirName.length() > 0) {
             final int idx = dirName.indexOf(File.separatorChar);
@@ -228,7 +229,7 @@ public class BootFloppyBuilder extends Task {
                 entry = null;
             }
             if (entry == null) {
-                entry = dir.addDirectory(part);                
+                entry = dir.addDirectory(part);
             }
             dir = entry.getDirectory();
         }
@@ -237,14 +238,14 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Add a given file to a given directory with a given filename.
-     * 
+     *
      * @param dir
      * @param src
      * @param fname
      * @throws IOException
      */
     private void addFile(FSDirectory dir, File src, String fname)
-            throws IOException {
+        throws IOException {
 
         long size = src.length();
         /*
@@ -268,7 +269,7 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Returns the destFile.
-     * 
+     *
      * @return File
      */
     public File getDestFile() {
@@ -277,9 +278,8 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Sets the destFile.
-     * 
-     * @param destFile
-     *            The destFile to set
+     *
+     * @param destFile The destFile to set
      */
     public void setDestFile(File destFile) {
         this.destFile = destFile;
@@ -301,8 +301,7 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * @param stage1ResourceName
-     *            The stage1ResourceName to set.
+     * @param stage1ResourceName The stage1ResourceName to set.
      */
     public final void setStage1ResourceName(String stage1ResourceName) {
         this.stage1ResourceName = stage1ResourceName;
@@ -316,8 +315,7 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * @param stage2ResourceName
-     *            The stage2ResourceName to set.
+     * @param stage2ResourceName The stage2ResourceName to set.
      */
     public final void setStage2ResourceName(String stage2ResourceName) {
         this.stage2ResourceName = stage2ResourceName;
@@ -325,7 +323,7 @@ public class BootFloppyBuilder extends Task {
 
     /**
      * Add a fileset to this task.
-     * 
+     *
      * @return
      */
     public FileSet createFileset() {

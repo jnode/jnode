@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.documentation;
 
 /**
@@ -28,6 +28,7 @@ final class PackageData implements Comparable<PackageData> {
 
     private final String packageName;
     private final PluginData plugin;
+
     /**
      * @param name
      * @param plugin
@@ -37,23 +38,25 @@ final class PackageData implements Comparable<PackageData> {
         packageName = name;
         this.plugin = plugin;
     }
+
     /**
      * @return Returns the packageName.
      */
     public final String getPackageName() {
         return packageName;
     }
+
     /**
      * @return Returns the plugin.
      */
     public final PluginData getPlugin() {
         return plugin;
     }
-    
+
     /**
      * @see java.lang.Comparable#compareTo(T)
      */
     public int compareTo(PackageData o) {
         return this.packageName.compareTo(o.packageName);
-    }       
+    }
 }

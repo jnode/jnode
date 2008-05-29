@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler.x86;
 
 import java.util.List;
@@ -121,7 +121,7 @@ public class MMX extends AbstractX86Module {
     }
 
     private void emitEMMS() {
-            stream.writeEMMS();
+        stream.writeEMMS();
     }
 
     private void emitMOVD() {

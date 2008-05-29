@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler;
 
 import java.io.IOException;
@@ -30,8 +30,12 @@ import org.jnode.assembler.NativeStream;
  */
 public abstract class HardwareSupport {
     public abstract void assemble(int baseAddress);
+
     public abstract void assemble(NativeStream asm);
+
     public abstract void writeTo(OutputStream out) throws IOException;
+
     public abstract void setPass(int pass);
+
     public abstract boolean isRegister(String str);
 }

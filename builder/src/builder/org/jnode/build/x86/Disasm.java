@@ -18,76 +18,80 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.x86;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class Disasm {
 
-	private static final String NDISASM = (System.getProperty("os.name")
-			.toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
+    private static final String NDISASM = (System.getProperty("os.name")
+        .toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
 
-	private static final String UDIS86 = "udis86";
+    private static final String UDIS86 = "udis86";
 
-	public static void main(String[] args) throws IllegalArgumentException,
-			SecurityException, IOException, InterruptedException {
-		final File f = File.createTempFile("disasm", "jnode");
-		int firstByteArg = 0;
-		final String disasm;
-		if ((args.length > 0) && (args[0].equals("x86_64"))) {
-			firstByteArg++;
-			disasm = UDIS86 + " --code64 --offset ";
-		} else {
-			disasm = NDISASM + " -u ";
-		}
-		FileOutputStream os = new FileOutputStream(f);
-		try {
-			for (int i = firstByteArg; i < args.length; i++) {
-				os.write(Integer.parseInt(args[i], 16));
-			}
-		} finally {
-			os.close();
-		}
+    public static void main(String[] args) throws IllegalArgumentException,
+        SecurityException, IOException, InterruptedException {
+        final File f = File.createTempFile("disasm", "jnode");
+        int firstByteArg = 0;
+        final String disasm;
+        if ((args.length > 0) && (args[0].equals("x86_64"))) {
+            firstByteArg++;
+            disasm = UDIS86 + " --code64 --offset ";
+        } else {
+            disasm = NDISASM + " -u ";
+        }
+        FileOutputStream os = new FileOutputStream(f);
+        try {
+            for (int i = firstByteArg; i < args.length; i++) {
+                os.write(Integer.parseInt(args[i], 16));
+            }
+        } finally {
+            os.close();
+        }
 
-		final String cmdLine = disasm + f.getAbsolutePath();
-		exec(cmdLine);
+        final String cmdLine = disasm + f.getAbsolutePath();
+        exec(cmdLine);
 
-	}
+    }
 
-	private static void exec(String cmdLine) throws IOException,
-			InterruptedException {
-		Process proc = Runtime.getRuntime().exec(cmdLine);
-		CopyThread stderr = new CopyThread(proc.getErrorStream(), System.out);
-		CopyThread stdout = new CopyThread(proc.getInputStream(), System.out);
-		stderr.start();
-		stdout.start();
-		proc.waitFor();
-	}
+    private static void exec(String cmdLine) throws IOException,
+        InterruptedException {
+        Process proc = Runtime.getRuntime().exec(cmdLine);
+        CopyThread stderr = new CopyThread(proc.getErrorStream(), System.out);
+        CopyThread stdout = new CopyThread(proc.getInputStream(), System.out);
+        stderr.start();
+        stdout.start();
+        proc.waitFor();
+    }
 
-	static class CopyThread extends Thread {
+    static class CopyThread extends Thread {
 
-		private final InputStream is;
+        private final InputStream is;
 
-		private final OutputStream out;
+        private final OutputStream out;
 
-		public CopyThread(InputStream is, OutputStream out) {
-			this.is = is;
-			this.out = out;
-		}
+        public CopyThread(InputStream is, OutputStream out) {
+            this.is = is;
+            this.out = out;
+        }
 
-		public void run() {
-			int ch;
-			try {
-				while ((ch = is.read()) >= 0) {
-					out.write(ch);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+        public void run() {
+            int ch;
+            try {
+                while ((ch = is.read()) >= 0) {
+                    out.write(ch);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

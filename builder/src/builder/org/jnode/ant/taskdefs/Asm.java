@@ -18,12 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.ant.taskdefs;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
@@ -33,7 +37,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
  * Description of the Class
- * 
+ *
  * @author epr
  * @version $Revision$
  */
@@ -51,7 +55,7 @@ public class Asm extends MatchingTask {
 
         /**
          * Returns the dir.
-         * 
+         *
          * @return File
          */
         public File getDir() {
@@ -60,9 +64,8 @@ public class Asm extends MatchingTask {
 
         /**
          * Sets the dir.
-         * 
-         * @param dir
-         *            The dir to set
+         *
+         * @param dir The dir to set
          */
         public void setDir(File dir) {
             this.dir = dir;
@@ -92,38 +95,35 @@ public class Asm extends MatchingTask {
     private File srcdir;
 
     private boolean enableJNasm;
-    
+
     private String version;
-    
+
     private boolean setVbe;
-    
+
     /**
      * Add an includedir
-     * 
+     *
      * @param dir
      */
     public void addConfiguredIncludeDir(IncludeDir dir) {
         includeDirs.add(dir);
     }
-    
-    public void setVbeMode(String vbeMode)
-    {
-    	System.err.println("setVbeMode");
-    	this.setVbe = (vbeMode != null) && (vbeMode.trim().length() > 0);
+
+    public void setVbeMode(String vbeMode) {
+        System.err.println("setVbeMode");
+        this.setVbe = (vbeMode != null) && (vbeMode.trim().length() > 0);
     }
 
     /**
      * Description of the Method
-     * 
+     *
      * @param srcFile
      * @param dstFile
-     * @throws BuildException
-     *             Description of Exception
-     * @throws IOException
-     *             Description of the Exception
+     * @throws BuildException Description of Exception
+     * @throws IOException    Description of the Exception
      */
     private void doNasm(File srcFile, File dstFile) throws BuildException,
-            IOException {
+        IOException {
 
         Execute exec = new Execute();
         ArrayList<String> cmdLine = new ArrayList<String>();
@@ -136,26 +136,25 @@ public class Asm extends MatchingTask {
         }
 
         cmdLine.add("-o");
-        cmdLine.add(dstFile.toString());        
+        cmdLine.add(dstFile.toString());
 
         if (bits == 64) {
-        	cmdLine.add("-m");
-        	cmdLine.add("amd64");
+            cmdLine.add("-m");
+            cmdLine.add("amd64");
             // Set preprocessor
             cmdLine.add("-r");
             cmdLine.add("nasm");
         }
-        
-        if(setVbe)
-        {
-        	System.err.println("setVbeMode : add property");
-    		cmdLine.add("-D");
-    		cmdLine.add("SETUP_VBE");        		
+
+        if (setVbe) {
+            System.err.println("setVbeMode : add property");
+            cmdLine.add("-D");
+            cmdLine.add("SETUP_VBE");
         }
-        
-		cmdLine.add("-D");
-		cmdLine.add("BITS" + bits);
-        
+
+        cmdLine.add("-D");
+        cmdLine.add("BITS" + bits);
+
         if (version != null) {
             cmdLine.add("-D");
             cmdLine.add("JNODE_VERSION='" + version + "'");
@@ -181,7 +180,7 @@ public class Asm extends MatchingTask {
         log("cmdLine=" + cmdLine, Project.MSG_VERBOSE);
 
         exec.setCommandline(cmdLine.toArray(new String[cmdLine
-                .size()]));
+            .size()]));
 
         dstFile.getParentFile().mkdirs();
         int rc = exec.execute();
@@ -189,32 +188,31 @@ public class Asm extends MatchingTask {
         if (rc != 0) {
             destdir.delete();
             throw new BuildException("Asm failed on "
-                    + srcFile.getAbsolutePath());
+                + srcFile.getAbsolutePath());
         }
     }
 
     /**
      * Description of the Method
-     * 
-     * @throws BuildException
-     *             Description of Exception
+     *
+     * @throws BuildException Description of Exception
      */
     public void execute() throws BuildException {
 
         if (srcdir == null) {
             throw new BuildException("Error: srcdir attribute must be set!",
-                    getLocation());
+                getLocation());
         } else if (!srcdir.isDirectory()) {
             throw new BuildException("Error: srcdir directory is not valid!",
-                    getLocation());
+                getLocation());
         }
 
         if (destdir == null) {
             throw new BuildException("Error: destdir attribute must be set!",
-                    getLocation());
+                getLocation());
         } else if (!destdir.isDirectory()) {
             throw new BuildException("Error: destdir directory is not valid!",
-                    getLocation());
+                getLocation());
         }
 
         try {
@@ -228,11 +226,9 @@ public class Asm extends MatchingTask {
 
     /**
      * Description of the Method
-     * 
-     * @throws BuildException
-     *             Description of Exception
-     * @throws IOException
-     *             Description of the Exception
+     *
+     * @throws BuildException Description of Exception
+     * @throws IOException    Description of the Exception
      */
     protected void executeAsm() throws BuildException, IOException {
 
@@ -243,7 +239,7 @@ public class Asm extends MatchingTask {
 
         if (compileMap.size() > 0) {
             log("Compiling " + compileMap.size() + " source files to "
-                    + destdir);
+                + destdir);
 
             for (File srcFile : compileMap.keySet()) {
                 File dstFile = compileMap.get(srcFile);
@@ -254,7 +250,7 @@ public class Asm extends MatchingTask {
 
     /**
      * Gets the number of bits of the target platform.
-     * 
+     *
      * @return 32/64
      */
     public final int getBits() {
@@ -263,7 +259,7 @@ public class Asm extends MatchingTask {
 
     /**
      * Returns the destdir.
-     * 
+     *
      * @return File
      */
     public File getDestdir() {
@@ -272,7 +268,7 @@ public class Asm extends MatchingTask {
 
     /**
      * Returns the ext.
-     * 
+     *
      * @return String
      */
     public String getExtension() {
@@ -281,7 +277,7 @@ public class Asm extends MatchingTask {
 
     /**
      * Returns the listFile.
-     * 
+     *
      * @return File
      */
     public File getListFile() {
@@ -290,7 +286,7 @@ public class Asm extends MatchingTask {
 
     /**
      * Returns the outputFormat.
-     * 
+     *
      * @return String
      */
     public String getOutputFormat() {
@@ -299,7 +295,7 @@ public class Asm extends MatchingTask {
 
     /**
      * Returns the srcdir.
-     * 
+     *
      * @return File
      */
     public File getSrcdir() {
@@ -309,19 +305,15 @@ public class Asm extends MatchingTask {
     /**
      * Scans the directory looking for source files to be compiled. The results
      * are returned in the class variable compileList
-     * 
-     * @param srcDir
-     *            Description of Parameter
-     * @param destDir
-     *            Description of Parameter
-     * @param files
-     *            Description of Parameter
+     *
+     * @param srcDir     Description of Parameter
+     * @param destDir    Description of Parameter
+     * @param files      Description of Parameter
      * @param compileMap
-     * @throws IOException
-     *             Description of the Exception
+     * @throws IOException Description of the Exception
      */
     protected void scanDir(File srcDir, File destDir, String[] files,
-            Map<File, File> compileMap) throws IOException {
+                           Map<File, File> compileMap) throws IOException {
         long now = System.currentTimeMillis();
 
         for (int c = 0; c < files.length; c++) {
@@ -333,33 +325,33 @@ public class Asm extends MatchingTask {
 
             int diff = fileDirString.compareTo(rootDirString);
             String destSubDir = fileDirString.substring(
-                    fileDirString.length() - diff, fileDirString.length())
-                    .replace('\\', '/');
+                fileDirString.length() - diff, fileDirString.length())
+                .replace('\\', '/');
 
             // log(destSubDir);
             File fileDir = new File(destDir.toString() + destSubDir);
 
             String objName = aFile.getName().substring(0,
-                    aFile.getName().indexOf(".asm"))
-                    + "." + ext;
+                aFile.getName().indexOf(".asm"))
+                + "." + ext;
             File objFile = new File(fileDir, objName);
 
             // check if the file has been modified in the future, error?
             if (aFile.lastModified() > now) {
                 log("Warning: file modified in the future: " + aFile.getName(),
-                        Project.MSG_WARN);
+                    Project.MSG_WARN);
             }
 
             if (!objFile.exists()
-                    || aFile.lastModified() > objFile.lastModified()) {
+                || aFile.lastModified() > objFile.lastModified()) {
                 if (!objFile.exists()) {
                     log("Compiling " + aFile.getPath() + " because class file "
-                            + objFile.getPath() + " does not exist",
-                            Project.MSG_VERBOSE);
+                        + objFile.getPath() + " does not exist",
+                        Project.MSG_VERBOSE);
                 } else {
                     log("Compiling " + aFile.getPath()
-                            + " because it is out of date with respect to "
-                            + objFile.getPath(), Project.MSG_VERBOSE);
+                        + " because it is out of date with respect to "
+                        + objFile.getPath(), Project.MSG_VERBOSE);
                 }
 
                 compileMap.put(aFile, objFile);
@@ -370,9 +362,8 @@ public class Asm extends MatchingTask {
 
     /**
      * Sets the number of bits of the target platform.
-     * 
-     * @param bits
-     *            32/64
+     *
+     * @param bits 32/64
      */
     public final void setBits(int bits) {
         if ((bits != 32) && (bits != 64)) {
@@ -383,9 +374,8 @@ public class Asm extends MatchingTask {
 
     /**
      * Sets the Destdir attribute of the JspC object
-     * 
-     * @param destDir
-     *            The new Destdir value
+     *
+     * @param destDir The new Destdir value
      */
     public void setDestdir(File destDir) {
         this.destdir = destDir;
@@ -393,9 +383,8 @@ public class Asm extends MatchingTask {
 
     /**
      * Sets the ext.
-     * 
-     * @param ext
-     *            The ext to set
+     *
+     * @param ext The ext to set
      */
     public void setExtension(String ext) {
         this.ext = ext;
@@ -403,9 +392,8 @@ public class Asm extends MatchingTask {
 
     /**
      * Sets the listFile.
-     * 
-     * @param listFile
-     *            The listFile to set
+     *
+     * @param listFile The listFile to set
      */
     public void setListFile(File listFile) {
         this.listFile = listFile;
@@ -413,9 +401,8 @@ public class Asm extends MatchingTask {
 
     /**
      * Sets the outputFormat.
-     * 
-     * @param outputFormat
-     *            The outputFormat to set
+     *
+     * @param outputFormat The outputFormat to set
      */
     public void setOutputFormat(String outputFormat) {
         this.outputFormat = outputFormat;
@@ -423,9 +410,8 @@ public class Asm extends MatchingTask {
 
     /**
      * Sets the srcdir.
-     * 
-     * @param srcdir
-     *            The srcdir to set
+     *
+     * @param srcdir The srcdir to set
      */
     public void setSrcdir(File srcdir) {
         this.srcdir = srcdir;

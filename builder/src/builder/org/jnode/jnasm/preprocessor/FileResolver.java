@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.preprocessor;
 
 import java.io.File;
@@ -36,9 +36,9 @@ public class FileResolver {
     }
 
     public File resolveFile(String fileName) throws FileNotFoundException {
-        if (directoryList == null){
+        if (directoryList == null) {
             File file = new File(fileName);
-            if(file.exists()) {
+            if (file.exists()) {
                 return file;
             } else {
                 throw new FileNotFoundException(fileName);
@@ -47,7 +47,7 @@ public class FileResolver {
             File resolved;
             for (File directory : directoryList) {
                 resolved = new File(directory, fileName);
-                if (resolved.exists()){
+                if (resolved.exists()) {
                     return resolved;
                 }
             }

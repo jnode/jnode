@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler;
 
 import java.util.List;
@@ -63,7 +63,7 @@ public class Instruction {
         this.operands = operands;
     }
 
-    public String getLabel(){
+    public String getLabel() {
         return label;
     }
 
@@ -92,7 +92,7 @@ public class Instruction {
     }
 
     public void addPrefix(int prefix) {
-        if(prefix == LOCK_PREFIX || prefix == REP_PREFIX){
+        if (prefix == LOCK_PREFIX || prefix == REP_PREFIX) {
             this.prefix |= prefix;
         } else {
             throw new RuntimeException("Invalid prefix: " + prefix);

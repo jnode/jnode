@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.documentation;
 
 import java.io.File;
@@ -35,7 +35,7 @@ final class DotBuilder {
     private final File pngFile;
     private final File dotFile;
     private final PrintWriter dot;
-    
+
     public DotBuilder(File dotFile, File pngFile) throws IOException {
         this.pngFile = pngFile;
         this.dotFile = dotFile;
@@ -43,7 +43,7 @@ final class DotBuilder {
         dot.println("digraph G {");
         dot.println("  rankdir=RL;");
     }
-    
+
     public void add(PluginData data) {
         final String id = data.getDescriptor().getId();
         // Set attributes
@@ -52,7 +52,7 @@ final class DotBuilder {
             dot.print(" shape=box");
         }
         dot.println("]");
-        
+
         // Set dependencies
         PluginPrerequisite[] prereqs = data.getDescriptor().getPrerequisites();
         if (prereqs != null) {
@@ -61,7 +61,7 @@ final class DotBuilder {
             }
         }
     }
-    
+
     private final String fixId(String id) {
         return id.replace('.', '_').replace('-', '_').replace(' ', '_');
     }
@@ -69,14 +69,14 @@ final class DotBuilder {
     public void close() throws IOException {
         dot.println("}");
         dot.close();
-        
+
         // Run dot
-        String[] cmd = { "dot", "-Tpng", "-o", pngFile.getAbsolutePath(), dotFile.getAbsolutePath() };
+        String[] cmd = {"dot", "-Tpng", "-o", pngFile.getAbsolutePath(), dotFile.getAbsolutePath()};
         try {
 //            System.out.println("Running dot");
             Runtime.getRuntime().exec(cmd).waitFor();
         } catch (InterruptedException ex) {
-            throw (IOException)new IOException("dot interrupted").initCause(ex);
+            throw (IOException) new IOException("dot interrupted").initCause(ex);
         }
     }
 }

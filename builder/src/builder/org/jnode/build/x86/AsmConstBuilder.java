@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.x86;
 
 import org.jnode.build.AbstractAsmConstBuilder;
@@ -31,34 +31,34 @@ import org.jnode.vm.x86.VmX86Architecture64;
  */
 public class AsmConstBuilder extends AbstractAsmConstBuilder {
 
-	private int bits = 32;
+    private int bits = 32;
 
-	private VmArchitecture arch;
+    private VmArchitecture arch;
 
-	protected VmArchitecture getArchitecture() {
-		if (arch == null) {
-			switch (bits) {
-			case 32:
-				arch = new VmX86Architecture32();
-				break;
-			case 64:
-				arch = new VmX86Architecture64();
-				break;
-			default:
-				throw new IllegalArgumentException("Invalid bits " + bits);
-			}
-		}
-		return arch;
-	}
+    protected VmArchitecture getArchitecture() {
+        if (arch == null) {
+            switch (bits) {
+                case 32:
+                    arch = new VmX86Architecture32();
+                    break;
+                case 64:
+                    arch = new VmX86Architecture64();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid bits " + bits);
+            }
+        }
+        return arch;
+    }
 
-	public final int getBits() {
-		return bits;
-	}
+    public final int getBits() {
+        return bits;
+    }
 
-	public final void setBits(int bits) {
-		if ((bits != 32) && (bits != 64)) {
-			throw new IllegalArgumentException("Invalid bits " + bits);
-		}
-		this.bits = bits;
-	}
+    public final void setBits(int bits) {
+        if ((bits != 32) && (bits != 64)) {
+            throw new IllegalArgumentException("Invalid bits " + bits);
+        }
+        this.bits = bits;
+    }
 }

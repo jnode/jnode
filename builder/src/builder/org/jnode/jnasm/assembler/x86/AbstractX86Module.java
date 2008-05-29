@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler.x86;
 
 import java.util.List;
@@ -34,7 +34,7 @@ import org.jnode.jnasm.assembler.Register;
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-public abstract class AbstractX86Module extends AssemblerModule{
+public abstract class AbstractX86Module extends AssemblerModule {
     static final int NUL_ARG = 0;
     static final int CON_ARG = 1;
     static final int REG_ARG = 2;
@@ -43,7 +43,9 @@ public abstract class AbstractX86Module extends AssemblerModule{
     static final int SCL_ARG = 5;
     static final int ZSC_ARG = 6;
     static final int SEG_ARG = 7;
-    static final String[] ARG_TYPES = {"noargument", "constant", "register", "relative", "absolute", "scaled", "simplescaled", "segment"};
+    static final String[] ARG_TYPES = {
+        "noargument", "constant", "register", "relative", "absolute", "scaled", "simplescaled", "segment"
+    };
     static final int DISP = 3;
     static final int DISP_MASK = ((2 << (DISP - 1)) - 1);
     static final int N_ADDR = NUL_ARG;
@@ -103,7 +105,7 @@ public abstract class AbstractX86Module extends AssemblerModule{
                     ret |= REG_ARG << DISP * i;
                 } else if (o instanceof Address) {
                     Address ind = (Address) o;
-                    if (ind.segment){
+                    if (ind.segment) {
                         ret |= SEG_ARG << DISP * i;
                     } else if (ind.reg != null && ind.sreg != null) {
                         ret |= SCL_ARG << DISP * i;
@@ -149,7 +151,8 @@ public abstract class AbstractX86Module extends AssemblerModule{
             ad >>= DISP;
         } while (ad != 0);
 
-        throw new IllegalArgumentException("Unknown addressing mode " + addressing + " (" + err + " ) for " + getMnemonics()[instruction]);
+        throw new IllegalArgumentException(
+            "Unknown addressing mode " + addressing + " (" + err + " ) for " + getMnemonics()[instruction]);
     }
 
     static final X86Register.GPR getRegister(String name) {

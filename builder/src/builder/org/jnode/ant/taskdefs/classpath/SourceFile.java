@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.ant.taskdefs.classpath;
 
 import java.io.File;
@@ -28,7 +28,7 @@ import java.io.File;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class SourceFile implements Comparable {
-    
+
     private final File baseDir;
     private final String fileName;
     private final String target;
@@ -41,14 +41,14 @@ final class SourceFile implements Comparable {
         this.target = target;
         this.ignoreMissing = ignoreMissing;
     }
-    
+
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(Object obj) {
-        return fileName.compareTo(((SourceFile)obj).fileName);
+        return fileName.compareTo(((SourceFile) obj).fileName);
     }
-    
+
     public File getFile() {
         return new File(baseDir, fileName);
     }
@@ -60,7 +60,7 @@ final class SourceFile implements Comparable {
     public String getClassName() {
         return fileName.substring(0, fileName.length() - ".java".length()).replace(File.separatorChar, '.');
     }
-    
+
     public String getReportName() {
         if (isJavaFile()) {
             return getClassName();
@@ -68,11 +68,11 @@ final class SourceFile implements Comparable {
             return getFileName().replace(File.separatorChar, '.');
         }
     }
-    
+
     public boolean isJavaFile() {
         return fileName.endsWith(".java");
     }
-    
+
     public String getPackageName() {
         final String clsName = getClassName();
         final int idx = clsName.lastIndexOf('.');
@@ -82,25 +82,25 @@ final class SourceFile implements Comparable {
             return "";
         }
     }
-    
+
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
         if (obj instanceof SourceFile) {
-            return ((SourceFile)obj).fileName.equals(fileName);
+            return ((SourceFile) obj).fileName.equals(fileName);
         } else {
             return fileName.equals(obj);
         }
     }
-        
+
     /**
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
         return fileName.hashCode();
     }
-    
+
     /**
      * @return Returns the baseDir.
      */
@@ -121,7 +121,7 @@ final class SourceFile implements Comparable {
     public final boolean isIgnoreMissing() {
         return ignoreMissing;
     }
-    
+
     public final SourceFile getBestFileForTarget(String target) {
         if (!this.target.equals(target)) {
             if (next != null) {
@@ -130,10 +130,10 @@ final class SourceFile implements Comparable {
         }
         return this;
     }
-    
+
     final void append(SourceFile jf) {
         if (this.next == null) {
-            this.next = jf;            
+            this.next = jf;
         } else {
             this.next.append(jf);
         }
