@@ -872,6 +872,7 @@ clean             Remove all intermediate build results.
     <target name="checkstyle" description="Generates a report of code convention violations.">
         <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
         <checkstyle config="jnode_checks.xml">
+            <fileset dir="../builder/src/builder" includes="**/*.java"/>
             <fileset dir="../gui/src/test" includes="**/*.java"/>
             <fileset dir="../gui/src/desktop" includes="**/*.java"/>
             <fileset dir="../gui/src/awt" includes="**/*.java"/>
