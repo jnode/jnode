@@ -169,7 +169,7 @@
     	  </condition>
     	</fail>
 
-        <fail message="Java Runtime version 1.6 needed. You version is ${java.runtime.version}">
+        <fail message="Java Runtime version 1.6 needed. Your version is: ${java.runtime.version}">
             <condition>
                 <not>
                     <contains string="${java.runtime.version}" substring="1.6" casesensitive="false"/>
