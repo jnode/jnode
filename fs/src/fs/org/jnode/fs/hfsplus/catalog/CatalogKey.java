@@ -14,7 +14,7 @@ public class CatalogKey extends AbstractKey {
 	 * @param src
 	 * @param offset
 	 */
-	public CatalogKey(byte[] src, int offset){
+	public CatalogKey(final byte[] src, final int offset){
 		byte[] ck = new byte[2];
 		System.arraycopy(src, offset, ck, 0, 2);
 		keyLength = BigEndian.getInt16(ck, 0);
@@ -30,42 +30,43 @@ public class CatalogKey extends AbstractKey {
 	 * @param parentID
 	 * @param name
 	 */
-	public CatalogKey(CatalogNodeId parentID, HFSUnicodeString name){
+	public CatalogKey(final CatalogNodeId parentID, final HFSUnicodeString name){
 		this.parentID = parentID;
 		this.nodeName = name;
 	}
 	
-	public int getKeyLength(){
+	public final int getKeyLength(){
 		return keyLength;
 	}
 	
-	public int getLength(){
+	public final int getLength(){
 		return keyLength;
 	}
 	
-	public CatalogNodeId getParentId(){
+	public final CatalogNodeId getParentId(){
 		return parentID;
 	}
 	
-	public HFSUnicodeString getNodeName(){
+	public final HFSUnicodeString getNodeName(){
 		return nodeName;
 	}
 	
-	public int compareTo(Key o) {
+	public final int compareTo(final Key o) {
 		if(o instanceof CatalogKey) {
 			CatalogKey ck = (CatalogKey) o;
-			if(getParentId().getId() == ck.getParentId().getId())
+			if(getParentId().getId() == ck.getParentId().getId()) {
 				return nodeName.getUnicodeString().compareTo(ck.getNodeName().getUnicodeString());
-			else if(getParentId().getId() < ck.getParentId().getId())
+			} else if(getParentId().getId() < ck.getParentId().getId()) {
 				return -1;
-			else
+			} else {
 				return 1;
+			}
 		} else {
 			return -1;
 		}
 	}
 	
-	public String toString(){
+	public final String toString(){
 		StringBuffer s = new StringBuffer();
 		s.append("Key length:").append(getKeyLength()).append(" ");
 		s.append("Parent ID :").append(getParentId().getId()).append(" ");

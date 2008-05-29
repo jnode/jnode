@@ -13,7 +13,7 @@ public class HFSPlusFile extends AbstractFSFile {
 	private LeafRecord record;
 	private CatalogFile file;
 	
-	public HFSPlusFile(HFSPlusEntry e){
+	public HFSPlusFile(final HFSPlusEntry e){
 		super((HfsPlusFileSystem)e.getFileSystem());
 		this.record = e.getRecord();
 		this.file = new CatalogFile(record.getRecordData());
@@ -26,12 +26,12 @@ public class HFSPlusFile extends AbstractFSFile {
 	}
 
 	@Override
-	public long getLength() {
+	public final long getLength() {
 		return file.getDataFork().getTotalSize();
 	}
 
 	@Override
-	public void read(long fileOffset, ByteBuffer dest) throws IOException {
+	public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
 		HfsPlusFileSystem fs = (HfsPlusFileSystem)getFileSystem();
 		ExtentDescriptor d  = file.getDataFork().getExtents()[0];
 		if(d.getStartBlock() != 0 && d.getBlockCount() != 0){
@@ -41,12 +41,12 @@ public class HFSPlusFile extends AbstractFSFile {
 	}
 
 	@Override
-	public void write(long fileOffset, ByteBuffer src) throws IOException {
+	public void write(final long fileOffset, final ByteBuffer src) throws IOException {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void setLength(long length) throws IOException {
+	public void setLength(final long length) throws IOException {
 		// TODO Auto-generated method stub
 
 	}

@@ -6,7 +6,7 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class ExtentIndexNode extends IndexNode {
-	public ExtentIndexNode(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
+	public ExtentIndexNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize){
 		super(descriptor, nodeData, nodeSize);
 		for(int i = 0; i < records.length; ++i) {
 		    int currentOffset = offsets[i];

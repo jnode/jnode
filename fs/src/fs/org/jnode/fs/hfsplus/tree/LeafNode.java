@@ -8,7 +8,7 @@ public class LeafNode extends Node {
 	 * @param nodeData
 	 * @param nodeSize
 	 */
-	public LeafNode(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
+	public LeafNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize){
 		super(descriptor, nodeData, nodeSize);
 		records = new LeafRecord[offsets.length-1];
 	}
@@ -16,7 +16,7 @@ public class LeafNode extends Node {
 	 * 
 	 * @return
 	 */
-	public LeafRecord[] getRecords() {
+	public final LeafRecord[] getRecords() {
 		return records;
 	}
 }

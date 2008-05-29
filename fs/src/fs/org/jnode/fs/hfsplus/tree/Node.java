@@ -6,7 +6,7 @@ public class Node {
 	protected NodeDescriptor descriptor;
 	protected int[] offsets;
 	
-	public Node(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
+	public Node(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize){
 		this.descriptor = descriptor;
 		offsets = new int[descriptor.getNumRecords()+1];
 		for(int i = 0; i < offsets.length; ++i) {
@@ -14,10 +14,10 @@ public class Node {
 		}
 	}
 	
-	public NodeDescriptor getDescriptor() {
+	public final NodeDescriptor getDescriptor() {
 		return descriptor;
 	}
-	public int[] getOffsets() {
+	public final int[] getOffsets() {
 		return offsets;
 	}
 }

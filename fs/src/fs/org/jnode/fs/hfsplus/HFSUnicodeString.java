@@ -9,7 +9,7 @@ public class HFSUnicodeString {
 	
 	private String string;
 	
-	public HFSUnicodeString(byte[] src, int offset){
+	public HFSUnicodeString(final byte[] src, final int offset){
 		byte[] data = new byte[2];
 		System.arraycopy(src, offset, data, 0, 2);
 		length = BigEndian.getInt16(data, 0);
@@ -22,11 +22,11 @@ public class HFSUnicodeString {
 		string =  new String(result);
 	}
 
-	public int getLength(){
+	public final int getLength(){
 		return length;
 	}
 	
-	public String getUnicodeString(){
+	public final String getUnicodeString(){
 		return string;
 	}
 	

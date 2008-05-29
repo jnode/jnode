@@ -10,7 +10,7 @@ public class HFSUtils {
 	 * @param time time in second since midnight, January 1, 1904, GMT.
 	 * @return
 	 */
-	public static Date decodeDate(int time){
+	public static Date decodeDate(final int time){
 		return new Date(time * 1000 - DIFF_TO_JAVA_DATE_IN_MILLIS);
 	}
 	/**
@@ -19,7 +19,7 @@ public class HFSUtils {
 	 * @param dateFormat
 	 * @return
 	 */
-	public static String printDate(int time, String dateFormat){
+	public static String printDate(final int time, final String dateFormat){
 		Date date = decodeDate(time);
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
 		return sdf.format(date.getTime());

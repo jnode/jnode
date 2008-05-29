@@ -28,7 +28,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	 * @param type
 	 * @throws FileSystemException
 	 */
-	public HfsPlusFileSystem(Device device, boolean readOnly, HfsPlusFileSystemType type) throws FileSystemException {
+	public HfsPlusFileSystem(final Device device, final boolean readOnly, final HfsPlusFileSystemType type) throws FileSystemException {
 		super(device, readOnly, type);
 	}
 	/**
@@ -42,7 +42,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	 * 
 	 * @throws FileSystemException
 	 */
-	public void read() throws FileSystemException {
+	public final void read() throws FileSystemException {
 		sb = new Superblock(this);
 		
 		log.debug("Superblock informations :\n" + sb.toString());
@@ -69,19 +69,19 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	}
 
 	@Override
-	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+	protected final FSDirectory createDirectory(final FSEntry entry) throws IOException {
 		HFSPlusEntry e = (HFSPlusEntry)entry;
 		return new HFSPlusDirectory(e);
 	}
 
 	@Override
-	protected FSFile createFile(FSEntry entry) throws IOException {
+	protected final FSFile createFile(final FSEntry entry) throws IOException {
 		HFSPlusEntry e = (HFSPlusEntry)entry;
 		return new HFSPlusFile(e);
 	}
 
 	@Override
-	protected HFSPlusEntry createRootEntry() throws IOException {
+	protected final HFSPlusEntry createRootEntry() throws IOException {
 		LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
 		if(record != null) {
 			return new HFSPlusEntry(this,null,null,"/",record);
@@ -90,24 +90,24 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 		return null;
 	}
 
-	public long getFreeSpace() {
+	public final long getFreeSpace() {
 		return sb.getFreeBlocks() * sb.getBlockSize();
 	}
 
-	public long getTotalSpace() {
+	public final long getTotalSpace() {
 		return sb.getTotalBlocks() * sb.getBlockSize();
 	}
 
-	public long getUsableSpace() {
+	public final long getUsableSpace() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	public Catalog getCatalog() {
+	public final Catalog getCatalog() {
 		return catalog;
 	}
 
-	public Superblock getVolumeHeader() {
+	public final Superblock getVolumeHeader() {
 		return sb;
 	}
 }

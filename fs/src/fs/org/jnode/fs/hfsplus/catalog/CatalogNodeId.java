@@ -3,13 +3,13 @@ package org.jnode.fs.hfsplus.catalog;
 import org.jnode.util.BigEndian;
 
 public class CatalogNodeId {
-	byte[] cnid;
-	public CatalogNodeId(byte[] src, int offset){
+	private byte[] cnid;
+	public CatalogNodeId(final byte[] src, final int offset){
 			cnid = new byte[4];
 			System.arraycopy(src, offset, cnid, 0, 4);
 	}
 	
-	public CatalogNodeId(int nodeId){
+	public CatalogNodeId(final int nodeId){
 		cnid = new byte[4];
 		BigEndian.setInt32(cnid, 0, nodeId);
 	} 
@@ -25,7 +25,7 @@ public class CatalogNodeId {
 	public static final CatalogNodeId HFSPLUS_EXCH_CNID	=	new CatalogNodeId(15);	/* ExchangeFiles temp id */
 	public static final CatalogNodeId HFSPLUS_FIRSTUSER_CNID	=	new CatalogNodeId(16);	/* first available user id */
 	
-	public int getId(){
+	public final int getId(){
 		return BigEndian.getInt32(cnid, 0);
 	}
 	
