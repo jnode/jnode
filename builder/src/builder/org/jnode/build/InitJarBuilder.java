@@ -18,13 +18,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.GZip;
 import org.apache.tools.ant.taskdefs.Jar;
@@ -99,8 +103,8 @@ public class InitJarBuilder extends AbstractPluginsTask {
                 final BuildPluginJar piJar = new BuildPluginJar(url);
                 if (!piJar.getDescriptor().isSystemPlugin()) {
                     log("Non-system plugin " + piJar.getDescriptor().getId()
-                            + " in plugin-list will be ignored",
-                            Project.MSG_WARN);
+                        + " in plugin-list will be ignored",
+                        Project.MSG_WARN);
                 } else {
                     pluginJars.add(piJar);
                 }
@@ -111,8 +115,8 @@ public class InitJarBuilder extends AbstractPluginsTask {
                 final BuildPluginJar piJar = new BuildPluginJar(url);
                 if (piJar.getDescriptor().isSystemPlugin()) {
                     log("System plugin " + piJar.getDescriptor().getId()
-                            + " in plugin-list will be ignored",
-                            Project.MSG_WARN);
+                        + " in plugin-list will be ignored",
+                        Project.MSG_WARN);
                 } else {
                     pluginJars.add(piJar);
                 }
@@ -121,7 +125,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             final List<PluginJar> sortedPluginJars = sortPlugins(pluginJars);
 
             for (Iterator<PluginJar> i = sortedPluginJars.iterator(); i
-                    .hasNext();) {
+                .hasNext();) {
                 final BuildPluginJar piJar = (BuildPluginJar) i.next();
                 if (!piJar.getDescriptor().isSystemPlugin()) {
 //                    pluginJars.add(piJar);
@@ -171,11 +175,11 @@ public class InitJarBuilder extends AbstractPluginsTask {
 
     /**
      * Ensure that all plugin prerequisites are met.
-     * 
+     *
      * @throws BuildException
      */
     protected void testPluginPrerequisites(List<PluginJar> pluginJars)
-            throws BuildException {
+        throws BuildException {
         final HashSet<String> ids = new HashSet<String>();
 
         for (PluginJar piJar : pluginJars) {
@@ -188,8 +192,8 @@ public class InitJarBuilder extends AbstractPluginsTask {
             for (int j = 0; j < prereqs.length; j++) {
                 if (!ids.contains(prereqs[j].getPluginId())) {
                     throw new BuildException("Cannot find plugin "
-                            + prereqs[j].getPluginId()
-                            + ", which is required by " + descr.getId());
+                        + prereqs[j].getPluginId()
+                        + ", which is required by " + descr.getId());
                 }
             }
         }
@@ -197,15 +201,15 @@ public class InitJarBuilder extends AbstractPluginsTask {
 
     /**
      * Sort the plugins based on dependencies.
-     * 
+     *
      * @param pluginJars
      */
     protected List<PluginJar> sortPlugins(List<PluginJar> pluginJars) {
         final ArrayList<PluginJar> result = new ArrayList<PluginJar>(pluginJars.size());
         final HashSet<String> ids = new HashSet<String>();
         while (!pluginJars.isEmpty()) {
-        	boolean somethingRemoved = false;
-            
+            boolean somethingRemoved = false;
+
             for (Iterator<PluginJar> i = pluginJars.iterator(); i.hasNext();) {
                 final BuildPluginJar piJar = (BuildPluginJar) i.next();
                 if (piJar.hasAllPrerequisitesInSet(ids)) {
@@ -216,12 +220,10 @@ public class InitJarBuilder extends AbstractPluginsTask {
                     somethingRemoved = true;
                 }
             }
-            
-            if(!somethingRemoved)
-            {
-            	StringBuilder sb = new StringBuilder("cycle in plugin dependencies :\n");
-                for (Iterator<PluginJar> i = pluginJars.iterator(); i.hasNext();) 
-                {
+
+            if (!somethingRemoved) {
+                StringBuilder sb = new StringBuilder("cycle in plugin dependencies :\n");
+                for (Iterator<PluginJar> i = pluginJars.iterator(); i.hasNext();) {
                     final BuildPluginJar piJar = (BuildPluginJar) i.next();
                     sb.append(piJar.getDescriptor().getId()).append('\n');
                 }
@@ -263,7 +265,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             return true;
         }
     }
-    
+
 
     /**
      * @return Returns the destDir.
@@ -271,11 +273,10 @@ public class InitJarBuilder extends AbstractPluginsTask {
     public final File getDestDir() {
         return destDir;
     }
-    
+
 
     /**
-     * @param destDir
-     *            The destDir to set.
+     * @param destDir The destDir to set.
      */
     public final void setDestDir(File destDir) {
         this.destDir = destDir;

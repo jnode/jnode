@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.ant.taskdefs.classpath;
 
 import org.apache.tools.ant.types.FileSet;
@@ -32,15 +32,16 @@ public final class TargetedFileSet extends ZipFileSet {
     static final String DEFAULT_TARGET = "1.4";
     private String target = DEFAULT_TARGET;
     private boolean ignoreMissing = false;
-    
+
     /**
-     * Initialize this instance 
+     * Initialize this instance
      */
     public TargetedFileSet() {
     }
 
     /**
-     * Initialize this instance 
+     * Initialize this instance
+     *
      * @param arg0
      */
     public TargetedFileSet(FileSet arg0) {
@@ -48,7 +49,8 @@ public final class TargetedFileSet extends ZipFileSet {
     }
 
     /**
-     * Initialize this instance 
+     * Initialize this instance
+     *
      * @param arg0
      */
     public TargetedFileSet(ZipFileSet arg0) {

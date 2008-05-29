@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import org.apache.tools.ant.Task;
 
 public class VMwareBuilderTask extends Task {
 
-	private String logFile; // log file use for kernel debugger messages
+    private String logFile; // log file use for kernel debugger messages
     private String isoFile;
     private int memorySize;
 
@@ -61,7 +61,7 @@ public class VMwareBuilderTask extends Task {
     public final void setLogFile(String logFile) {
         this.logFile = logFile;
     }
-    
+
     /**
      * @see org.apache.tools.ant.Task#execute()
      */
@@ -71,7 +71,7 @@ public class VMwareBuilderTask extends Task {
             FileWriter out = new FileWriter(new File(isoFile + ".vmx"));
             try {
                 PrintWriter w = new PrintWriter(out);
-                
+
                 put(w, "config.version", "8");
                 put(w, "virtualHW.version", "4");
                 put(w, "memsize", String.valueOf(memorySize));
@@ -87,17 +87,16 @@ public class VMwareBuilderTask extends Task {
                 put(w, "displayName", "JNode");
                 put(w, "guestOS", "dos");
 
-                put(w, "nvram", "JNode.nvram");  
-                put(w, "MemTrimRate", "-1");  
-                put(w, "ide0:0.redo", "");  
-                
-                final String osName = System.getProperty("os.name").toLowerCase(); 
-                if(osName.contains("linux") || osName.contains("unix") || 
-                   osName.contains("bsd"))
-                {
-                	put(w, "ethernet0.connectionType", "bridged");
-                	put(w, "ethernet0.vnet", "/dev/vmnet1");
-            	}
+                put(w, "nvram", "JNode.nvram");
+                put(w, "MemTrimRate", "-1");
+                put(w, "ide0:0.redo", "");
+
+                final String osName = System.getProperty("os.name").toLowerCase();
+                if (osName.contains("linux") || osName.contains("unix") ||
+                    osName.contains("bsd")) {
+                    put(w, "ethernet0.connectionType", "bridged");
+                    put(w, "ethernet0.vnet", "/dev/vmnet1");
+                }
                 put(w, "ethernet0.addressType", "generated");
                 put(w, "ethernet0.generatedAddress", "00:0c:29:2a:96:30");
                 put(w, "ethernet0.generatedAddressOffset", "0");
@@ -107,18 +106,17 @@ public class VMwareBuilderTask extends Task {
                 put(w, "uuid.location", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
                 put(w, "uuid.bios", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
 
-                		
-                if((logFile != null) && (logFile.trim().length() != 0))
-                {
-	                put(w, "serial0.present", "TRUE");
-	                put(w, "serial0.fileType", "file");
-	                put(w, "serial0.fileName", logFile);
+
+                if ((logFile != null) && (logFile.trim().length() != 0)) {
+                    put(w, "serial0.present", "TRUE");
+                    put(w, "serial0.fileType", "file");
+                    put(w, "serial0.fileName", logFile);
                 }
-                
-                put(w, "tools.syncTime", "TRUE");  
-                put(w, "ide1:0.startConnected", "TRUE");  
-                put(w, "uuid.action", "create");  
-                put(w, "checkpoint.vmState", "");  
+
+                put(w, "tools.syncTime", "TRUE");
+                put(w, "ide1:0.startConnected", "TRUE");
+                put(w, "uuid.action", "create");
+                put(w, "checkpoint.vmState", "");
 
             } finally {
                 out.close();
@@ -127,7 +125,7 @@ public class VMwareBuilderTask extends Task {
             throw new BuildException(ex);
         }
     }
-    
+
     private void put(PrintWriter w, String key, String value) {
         w.println(key + " = \"" + value + "\"");
     }
@@ -140,8 +138,7 @@ public class VMwareBuilderTask extends Task {
     }
 
     /**
-     * @param isoFile
-     *            The isoFile to set.
+     * @param isoFile The isoFile to set.
      */
     public final void setIsoFile(String isoFile) {
         this.isoFile = isoFile;

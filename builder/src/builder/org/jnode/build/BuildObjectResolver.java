@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import org.jnode.assembler.NativeStream;
@@ -31,55 +31,55 @@ import org.vmmagic.unboxed.UnboxedObject;
  */
 public class BuildObjectResolver extends ObjectResolver {
 
-	private final NativeStream os;
-	//private final AbstractBootImageBuilder builder;
+    private final NativeStream os;
+    //private final AbstractBootImageBuilder builder;
 
-	public BuildObjectResolver(NativeStream os, AbstractBootImageBuilder builder) {
-		this.os = os;
-		//this.builder = builder;
-	}
+    public BuildObjectResolver(NativeStream os, AbstractBootImageBuilder builder) {
+        this.os = os;
+        //this.builder = builder;
+    }
 
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#addressOf32(java.lang.Object)
-	 */
-	public int addressOf32(Object object) {
+    /**
+     * @see org.jnode.assembler.ObjectResolver#addressOf32(java.lang.Object)
+     */
+    public int addressOf32(Object object) {
         if (object instanceof UnboxedObject) {
             return ((UnboxedObject) object).toInt();
         }
-		final NativeStream.ObjectRef ref = os.getObjectRef(object);
-		try {
-			if (!ref.isResolved()) {
-				throw new RuntimeException("Unresolved object " + object);
-				//builder.emitObject(os, object);
-			}
-			final int offset = (int) os.getBaseAddr() + ref.getOffset();
-			return offset;
-		//} catch (ClassNotFoundException ex) {
-			//throw new RuntimeException("Unresolved object ref", ex);
-		} catch (UnresolvedObjectRefException ex) {
-			throw new RuntimeException("Unresolved object ref", ex);
-		}
-	}
+        final NativeStream.ObjectRef ref = os.getObjectRef(object);
+        try {
+            if (!ref.isResolved()) {
+                throw new RuntimeException("Unresolved object " + object);
+                //builder.emitObject(os, object);
+            }
+            final int offset = (int) os.getBaseAddr() + ref.getOffset();
+            return offset;
+            //} catch (ClassNotFoundException ex) {
+            //throw new RuntimeException("Unresolved object ref", ex);
+        } catch (UnresolvedObjectRefException ex) {
+            throw new RuntimeException("Unresolved object ref", ex);
+        }
+    }
 
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#addressOf64(java.lang.Object)
-	 */
-	public long addressOf64(Object object) {
+    /**
+     * @see org.jnode.assembler.ObjectResolver#addressOf64(java.lang.Object)
+     */
+    public long addressOf64(Object object) {
         if (object instanceof UnboxedObject) {
             return ((UnboxedObject) object).toLong();
         }
-		final NativeStream.ObjectRef ref = os.getObjectRef(object);
-		try {
-			if (!ref.isResolved()) {
-				throw new RuntimeException("Unresolved object " + object);
-				//builder.emitObject(os, object);
-			}
-			final long offset = os.getBaseAddr() + ref.getOffset();
-			return offset;
-		//} catch (ClassNotFoundException ex) {
-			//throw new RuntimeException("Unresolved object ref", ex);
-		} catch (UnresolvedObjectRefException ex) {
-			throw new RuntimeException("Unresolved object ref", ex);
-		}
-	}
+        final NativeStream.ObjectRef ref = os.getObjectRef(object);
+        try {
+            if (!ref.isResolved()) {
+                throw new RuntimeException("Unresolved object " + object);
+                //builder.emitObject(os, object);
+            }
+            final long offset = os.getBaseAddr() + ref.getOffset();
+            return offset;
+            //} catch (ClassNotFoundException ex) {
+            //throw new RuntimeException("Unresolved object ref", ex);
+        } catch (UnresolvedObjectRefException ex) {
+            throw new RuntimeException("Unresolved object ref", ex);
+        }
+    }
 }

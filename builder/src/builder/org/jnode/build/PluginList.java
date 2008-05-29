@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -28,7 +28,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import nanoxml.XMLElement;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
@@ -48,11 +52,11 @@ public final class PluginList {
     private Manifest manifest;
 
     private List<PluginList> includes = new ArrayList<PluginList>();
-    
+
     private final File defaultDir;
 
     public PluginList(File file, File defaultDir, String targetArch)
-            throws PluginException, MalformedURLException {
+        throws PluginException, MalformedURLException {
         this.defaultDir = defaultDir;
         final ArrayList<URL> descrList = new ArrayList<URL>();
         final ArrayList<URL> pluginList = new ArrayList<URL>();
@@ -76,7 +80,7 @@ public final class PluginList {
             throw new PluginException("name attribute is missing in " + file);
         }
 
-        for (Iterator< ? > i = root.getChildren().iterator(); i.hasNext();) {
+        for (Iterator<?> i = root.getChildren().iterator(); i.hasNext();) {
 
             final XMLElement e = (XMLElement) i.next();
             if (e.getName().equals("plugin")) {
@@ -90,12 +94,12 @@ public final class PluginList {
                     descrUrl = new URL("jar:" + pluginUrl + "!/plugin.xml");
                 } else {
                     throw new PluginException("id attribute expected on "
-                            + e.getName());
+                        + e.getName());
                 }
 
                 if (pluginList.contains(pluginUrl)) {
                     throw new PluginException("can't use the same id(" + id
-                            + ") for multiple plugins");
+                        + ") for multiple plugins");
                 }
 
                 descrList.add(descrUrl);
@@ -104,14 +108,14 @@ public final class PluginList {
                 manifest = parseManifest(e);
             } else if (e.getName().equals("include")) {
                 parseInclude(e, file.getParentFile(), defaultDir, targetArch,
-                        descrList, pluginList);
+                    descrList, pluginList);
             } else {
                 throw new PluginException("Unknown element " + e.getName());
             }
         }
         this.descrList = descrList.toArray(new URL[descrList.size()]);
         this.pluginList = pluginList
-                .toArray(new URL[pluginList.size()]);
+            .toArray(new URL[pluginList.size()]);
     }
 
     private File findPlugin(File dir, final String id) {
@@ -124,7 +128,7 @@ public final class PluginList {
 
         if (names.length == 0) {
             throw new IllegalArgumentException("Cannot find plugin " + id
-                    + " in " + dir + " for list "+this.name);
+                + " in " + dir + " for list " + this.name);
         } else {
             Arrays.sort(names);
             return new File(dir, names[names.length - 1]);
@@ -136,7 +140,7 @@ public final class PluginList {
         if (mf == null) {
             mf = new Manifest();
         }
-        for (Iterator< ? > i = me.getChildren().iterator(); i.hasNext();) {
+        for (Iterator<?> i = me.getChildren().iterator(); i.hasNext();) {
             final XMLElement e = (XMLElement) i.next();
             if (e.getName().equals("attribute")) {
                 final String k = e.getStringAttribute("key");
@@ -154,8 +158,8 @@ public final class PluginList {
     }
 
     private void parseInclude(XMLElement e, File curDir, File defaultDir,
-            String targetArch, List<URL> descrList, List<URL> pluginList)
-            throws MalformedURLException, PluginException {
+                              String targetArch, List<URL> descrList, List<URL> pluginList)
+        throws MalformedURLException, PluginException {
         File file = new File(e.getStringAttribute("file"));
         if (!file.isAbsolute()) {
             file = new File(curDir, file.getPath());
@@ -163,7 +167,7 @@ public final class PluginList {
 
         final PluginList inc = new PluginList(file, defaultDir, targetArch);
         includes.add(inc);
-        
+
         if (this.manifest == null) {
             this.manifest = inc.manifest;
         } else if (inc.manifest != null) {
@@ -176,14 +180,14 @@ public final class PluginList {
                 throw new PluginException(ex);
             }
         }
-        
+
         descrList.addAll(Arrays.asList(inc.descrList));
         pluginList.addAll(Arrays.asList(inc.pluginList));
     }
 
     /**
      * Gets the maximum last modification date of all URL's
-     * 
+     *
      * @return last modification date
      * @throws IOException
      */
@@ -201,7 +205,7 @@ public final class PluginList {
 
     /**
      * Gets all URL's to plugin descriptors
-     * 
+     *
      * @return URL[]
      */
     public URL[] getDescriptorUrlList() {
@@ -210,7 +214,7 @@ public final class PluginList {
 
     /**
      * Gets all URL's to the plugin files (jar format)
-     * 
+     *
      * @return URL[]
      */
     public URL[] getPluginList() {

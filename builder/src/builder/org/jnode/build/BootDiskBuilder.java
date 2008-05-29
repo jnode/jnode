@@ -34,7 +34,6 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.Geometry;
 import org.jnode.driver.block.MappedFSBlockDeviceSupport;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatType;
 import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.fs.fat.GrubFatFormatter;
@@ -67,7 +66,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
      * @throws FileSystemException
      */
     public void createImage() throws IOException, DriverException,
-            FileSystemException {
+        FileSystemException {
         super.createImage();
 
         FileWriter fw = new FileWriter(plnFile);
@@ -78,7 +77,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
         pw.println("SECTORS   " + geom.getSectors());
         pw.println("CAPACITY  " + geom.getTotalSectors());
         pw.println("ACCESS    \"" + getDestFile().getCanonicalPath()
-                + "\" 0 102400");
+            + "\" 0 102400");
         pw.flush();
         fw.flush();
         pw.close();
@@ -96,9 +95,9 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
         /* Format the MBR & partitiontable */
         GrubBootSector mbr = (GrubBootSector) (createFormatter()
-                .getBootSector());
+            .getBootSector());
 
-        IBMPartitionTableEntry pte = mbr.initPartitions(geom,IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M);
+        IBMPartitionTableEntry pte = mbr.initPartitions(geom, IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M);
 
         /*
          * System.out.println("partition table:"); for (int i = 0; i < 4; i++) {
@@ -107,7 +106,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
         /* Format partition 0 */
         part0 = new MappedFSBlockDeviceSupport(device, pte.getStartLba()
-                * bytesPerSector, pte.getNrSectors() * bytesPerSector);
+            * bytesPerSector, pte.getNrSectors() * bytesPerSector);
         GrubFatFormatter ff = createFormatter();
         ff.setInstallPartition(0x0000FFFF);
         ff.format(part0);
@@ -118,26 +117,26 @@ public class BootDiskBuilder extends BootFloppyBuilder {
         try {
             mbr.write(device.getAPI(BlockDeviceAPI.class));
         } catch (ApiNotFoundException ex) {
-			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+            ioe.initCause(ex);
+            throw ioe;
         }
         //System.out.println("mbr stage2 sector=" + mbr.getStage2Sector());
     }
 
     /**
-     * @see org.jnode.build.BootFloppyBuilder#createFormatter()
      * @return The formatter
      * @throws IOException
+     * @see org.jnode.build.BootFloppyBuilder#createFormatter()
      */
     protected GrubFatFormatter createFormatter() throws IOException {
         return new GrubFatFormatter(bytesPerSector, spc, geom, FatType.FAT16, 1,
-                getStage1ResourceName(), getStage2ResourceName());
+            getStage1ResourceName(), getStage2ResourceName());
     }
 
     /**
-     * @see org.jnode.build.BootFloppyBuilder#getDeviceLength()
      * @return The device length
+     * @see org.jnode.build.BootFloppyBuilder#getDeviceLength()
      */
     protected long getDeviceLength() {
         return geom.getTotalSectors() * bytesPerSector;
@@ -153,8 +152,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
     /**
      * Sets the plnFile.
      *
-     * @param plnFile
-     *            The plnFile to set
+     * @param plnFile The plnFile to set
      */
     public void setPlnFile(File plnFile) {
         this.plnFile = plnFile;
@@ -162,8 +160,8 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
     /**
      * @param rootDevice
-     * @see org.jnode.build.BootFloppyBuilder#getSystemDevice(Device)
      * @return The device
+     * @see org.jnode.build.BootFloppyBuilder#getSystemDevice(Device)
      */
     protected Device getSystemDevice(Device rootDevice) {
         return part0;
@@ -173,20 +171,20 @@ public class BootDiskBuilder extends BootFloppyBuilder {
      * Used by ant to set the geometry property.
      *
      * @param geometryString String in the format ' <cylinder>/ <heads>/ <sectors>', e.\u00f6g.
-     *            '64/16/32'.
+     *                       '64/16/32'.
      */
     public void setGeometry(String geometryString) {
         try {
             log("Setting bootdisk geometry to " + geometryString, Project.MSG_VERBOSE);
             StringTokenizer tokenizer = new StringTokenizer(geometryString, "/");
             geom = new Geometry(Integer.parseInt(tokenizer.nextToken()),
-                    Integer.parseInt(tokenizer.nextToken()), Integer
-                            .parseInt(tokenizer.nextToken()));
+                Integer.parseInt(tokenizer.nextToken()), Integer
+                .parseInt(tokenizer.nextToken()));
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    "Invalid geometry "
-                            + geometryString
-                            + ". Must correspond to pattern '<cylinders>/<heads>/<sectors>' e.g. '64/16/32'.");
+                "Invalid geometry "
+                    + geometryString
+                    + ". Must correspond to pattern '<cylinders>/<heads>/<sectors>' e.g. '64/16/32'.");
         }
     }
 }

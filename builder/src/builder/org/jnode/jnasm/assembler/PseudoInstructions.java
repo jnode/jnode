@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler;
 
 import java.util.List;
@@ -148,7 +148,7 @@ public class PseudoInstructions extends AssemblerModule {
                 for (int j = 0; j < bln; j++) {
                     stream.write8(0);
                 }
-            } else if (o instanceof Identifier){
+            } else if (o instanceof Identifier) {
                 stream.writeObjectRef(new Label(((Identifier) o).name));
             } else {
                 throw new IllegalArgumentException("Unknown data: " + o);
@@ -157,10 +157,10 @@ public class PseudoInstructions extends AssemblerModule {
     }
 
     private void emitRESB() {
-        for ( int i = ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0) );
+        for (int i = ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0)) ;
     }
 
     private void emitRESD() {
-        for ( int i = 4 * ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0) );
+        for (int i = 4 * ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0)) ;
     }
 }

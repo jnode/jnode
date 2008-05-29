@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -43,25 +43,24 @@ import org.jnode.plugin.model.Factory;
  */
 public abstract class AbstractPluginTask extends Task {
 
-	protected String targetArch;
-	private final LinkedList<LibAlias> aliases = new LinkedList<LibAlias>();
+    protected String targetArch;
+    private final LinkedList<LibAlias> aliases = new LinkedList<LibAlias>();
 
-	/**
-	 * @return The target architecture
-	 */
-	protected String getTargetArch() {
-		return targetArch;
-	}
+    /**
+     * @return The target architecture
+     */
+    protected String getTargetArch() {
+        return targetArch;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setTargetArch(String string) {
-		targetArch = string;
-	}
+    /**
+     * @param string
+     */
+    public void setTargetArch(String string) {
+        targetArch = string;
+    }
 
-    protected PluginDescriptor readDescriptor(File descriptor)
-    {
+    protected PluginDescriptor readDescriptor(File descriptor) {
         final PluginDescriptor descr;
         try {
             final XMLElement root = new XMLElement(new Hashtable(), true, false);
@@ -81,115 +80,115 @@ public abstract class AbstractPluginTask extends Task {
         } catch (PluginException ex) {
             ex.printStackTrace();
             throw new BuildException("Building " + descriptor + " failed", ex);
-        }        
-        
+        }
+
         return descr;
     }
-    
-	protected void processLibrary(Jar jarTask, Library lib, HashMap<File, ZipFileSet> fileSets, File srcDir) {
 
-		final LibAlias libAlias = getAlias(lib.getName());
-		final File f;
-		if (libAlias == null) {
-			f = new File(srcDir, lib.getName());
-            if(!f.exists())
-            {
-                throw new BuildException("file not found "+f.getAbsoluteFile()+" because "+lib.getName()+" has no alias");
+    protected void processLibrary(Jar jarTask, Library lib, HashMap<File, ZipFileSet> fileSets, File srcDir) {
+
+        final LibAlias libAlias = getAlias(lib.getName());
+        final File f;
+        if (libAlias == null) {
+            f = new File(srcDir, lib.getName());
+            if (!f.exists()) {
+                throw new BuildException(
+                    "file not found " + f.getAbsoluteFile() + " because " + lib.getName() + " has no alias");
             }
-		} else {
-			f = libAlias.getAlias();
-		}
+        } else {
+            f = libAlias.getAlias();
+        }
 
-		ZipFileSet fs = fileSets.get(f);
-		if (fs == null) {
-			fs = new ZipFileSet();
-			if (f.isFile()) {
-				fs.setSrc(f);
-			} else {
-				fs.setDir(f);
-			}
-			fileSets.put(f, fs);
-			jarTask.addFileset(fs);
-		}
+        ZipFileSet fs = fileSets.get(f);
+        if (fs == null) {
+            fs = new ZipFileSet();
+            if (f.isFile()) {
+                fs.setSrc(f);
+            } else {
+                fs.setDir(f);
+            }
+            fileSets.put(f, fs);
+            jarTask.addFileset(fs);
+        }
         fs.createExclude().setName("**/package.html");
 
-		final String[] exports = lib.getExports();
-		for (int i = 0; i < exports.length; i++) {
-			final String export = exports[i];
-			if (export.equals("*")) {
-				fs.createInclude().setName("**/*");
-			} else {
-				fs.createInclude().setName(export.replace('.', '/') + ".*");
+        final String[] exports = lib.getExports();
+        for (int i = 0; i < exports.length; i++) {
+            final String export = exports[i];
+            if (export.equals("*")) {
+                fs.createInclude().setName("**/*");
+            } else {
+                fs.createInclude().setName(export.replace('.', '/') + ".*");
                 String exp = export.replace('.', '/');
-                if(!exp.endsWith("*"))
+                if (!exp.endsWith("*"))
                     fs.createInclude().setName(exp + "*");
                 else
                     fs.createInclude().setName(exp);
             }
-		}
-	}
+        }
+    }
 
-	protected File pluginDir;
+    protected File pluginDir;
 
-	/**
-	 * @param file
-	 */
-	public void setPluginDir(File file) {
-		pluginDir = file;
-	}
+    /**
+     * @param file
+     */
+    public void setPluginDir(File file) {
+        pluginDir = file;
+    }
 
-	/**
-	 * @return The plugin directory
-	 */
-	protected File getPluginDir() {
-		return pluginDir;
-	}
+    /**
+     * @return The plugin directory
+     */
+    protected File getPluginDir() {
+        return pluginDir;
+    }
 
-	public LibAlias createLibAlias() {
-		LibAlias a = new LibAlias();
-		aliases.add(a);
-		return a;
-	}
+    public LibAlias createLibAlias() {
+        LibAlias a = new LibAlias();
+        aliases.add(a);
+        return a;
+    }
 
-	public LibAlias getAlias(String name) {
-		for (LibAlias a : aliases) {
-			if (name.equals(a.getName())) {
-				return a;
-			}
-		}
-		return null;
-	}
+    public LibAlias getAlias(String name) {
+        for (LibAlias a : aliases) {
+            if (name.equals(a.getName())) {
+                return a;
+            }
+        }
+        return null;
+    }
 
-	public static class LibAlias {
-		private String name;
-		private File alias;
+    public static class LibAlias {
+        private String name;
+        private File alias;
 
-		/**
-		 * @return The alias
-		 */
-		public final File getAlias() {
-			return this.alias;
-		}
+        /**
+         * @return The alias
+         */
+        public final File getAlias() {
+            return this.alias;
+        }
 
-		/**
-		 * @param alias
-		 */
-		public final void setAlias(File alias) {
-			this.alias = alias;
-		}
+        /**
+         * @param alias
+         */
+        public final void setAlias(File alias) {
+            this.alias = alias;
+        }
 
-		/**
-		 * @return The name
-		 */
-		public final String getName() {
-			return this.name;
-		}
+        /**
+         * @return The name
+         */
+        public final String getName() {
+            return this.name;
+        }
 
-		/**
-		 * @param name
-		 */
-		public final void setName(String name) {
-			this.name = name;
-		}
-	}
+        /**
+         * @param name
+         */
+        public final void setName(String name) {
+            this.name = name;
+        }
+    }
 }

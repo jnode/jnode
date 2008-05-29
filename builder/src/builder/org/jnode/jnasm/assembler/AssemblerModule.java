@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler;
 
 import java.util.List;
@@ -30,19 +30,19 @@ import org.jnode.assembler.NativeStream;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class AssemblerModule {
-    
+
     protected final Map<String, Label> labels;
 
     protected final Map<String, Integer> constants;
 
     protected AssemblerModule(Map<String, Label> labels,
-            Map<String, Integer> constants) {
+                              Map<String, Integer> constants) {
         this.labels = labels;
         this.constants = constants;
     }
 
     public abstract boolean emit(String mnemonic, List<Object> operands,
-            int operandSize);
+                                 int operandSize);
 
     public abstract void setNativeStream(NativeStream stream);
 }

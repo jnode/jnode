@@ -18,10 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Map;
 import org.jnode.assembler.NativeStream;
 import org.jnode.build.AsmSourceInfo;
@@ -33,13 +37,13 @@ import org.jnode.jnasm.preprocessor.Preprocessor;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class JNAsm {
-    public static void main(String[] argv) throws Exception{
+    public static void main(String[] argv) throws Exception {
         InputStream in = System.in;
         if (argv.length > 0) {
             in = new FileInputStream(argv[0]);
         }
         Preprocessor preprocessor = Preprocessor.newInstance(in);
-        preprocessor.defineSymbol("BITS32","");
+        preprocessor.defineSymbol("BITS32", "");
         preprocessor.setFileResolver(new FileResolver(null));
         StringWriter sw = new StringWriter();
         preprocessor.print(sw);
@@ -53,7 +57,8 @@ public class JNAsm {
         out.close();
     }
 
-    public static void assembler(NativeStream asm, AsmSourceInfo sourceInfo, Map<String,String> symbols) throws Exception{
+    public static void assembler(NativeStream asm, AsmSourceInfo sourceInfo, Map<String, String> symbols)
+        throws Exception {
         Preprocessor preprocessor = Preprocessor.newInstance(sourceInfo, symbols);
         StringWriter sw = new StringWriter();
         preprocessor.print(sw);

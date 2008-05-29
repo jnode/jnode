@@ -18,18 +18,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.ant.taskdefs;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.types.FileSet;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -42,13 +39,13 @@ public class Native2AsciiTask extends FileSetTask {
         return update;
     }
 
-	@Override
+    @Override
     protected void processFile(File file) throws IOException {
         if (containsNonAscii(file)) {
             final File tmp = File.createTempFile("jnode", "n2a");
             try {
-                final String[] cmd = { "native2ascii", file.getAbsolutePath(),
-                        tmp.getAbsolutePath() };
+                final String[] cmd = {"native2ascii", file.getAbsolutePath(),
+                    tmp.getAbsolutePath()};
                 final Execute exe = new Execute();
                 exe.setCommandline(cmd);
                 final int rc = exe.execute();

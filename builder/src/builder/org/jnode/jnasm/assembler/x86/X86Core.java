@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler.x86;
 
 import java.util.List;
@@ -438,7 +438,7 @@ public class X86Core extends AbstractX86Module {
     private final void emitALIGN() {
         Object o1 = operands.get(0);
         if (o1 instanceof Integer) {
-            stream.align(((Integer)o1).intValue());
+            stream.align(((Integer) o1).intValue());
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
         }
@@ -737,13 +737,13 @@ public class X86Core extends AbstractX86Module {
         if (o1 instanceof Identifier) {
             String id = ((Identifier) o1).name;
             val = (Integer) constants.get(id);
-        } else if( o1 instanceof Integer){
+        } else if (o1 instanceof Integer) {
             val = (Integer) o1;
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
         }
 
-        if(val != null){
+        if (val != null) {
             stream.writeINT(val.intValue());
         } else {
             throw new IllegalArgumentException("Missing operand for INT");
@@ -892,11 +892,11 @@ public class X86Core extends AbstractX86Module {
     }
 
     private final void emitMOV() {
-        if(operands.size() == 2 &&
-                operands.get(0) instanceof Register &&
-                operands.get(1) instanceof Identifier){
+        if (operands.size() == 2 &&
+            operands.get(0) instanceof Register &&
+            operands.get(1) instanceof Identifier) {
             stream.writeMOV_Const(getRegister(((Register) operands.get(0)).name),
-                    new Label(((Identifier) operands.get(1)).name));
+                new Label(((Identifier) operands.get(1)).name));
             return;
         }
         int addr = getAddressingMode(2);
@@ -907,7 +907,7 @@ public class X86Core extends AbstractX86Module {
                 if (r1 instanceof GPR && r2 instanceof GPR) {
                     int s1 = r1.getSize();
                     int s2 = r2.getSize();
-                    if(s1 != s2){
+                    if (s1 != s2) {
                         throw new IllegalArgumentException("Incompatible register pair: " + r1 + "," + r2);
                     }
                     stream.writeMOV(s1, (GPR) r1, (GPR) r2);
@@ -955,7 +955,7 @@ public class X86Core extends AbstractX86Module {
             case SR_ADDR:
                 ind = getAddress(0);
                 stream.writeMOV(operandSize, getRegister(ind.getImg()), getRegister(ind.sreg),
-                        ind.scale, ind.disp, getReg(1));
+                    ind.scale, ind.disp, getReg(1));
                 break;
             case GR_ADDR:
                 ind = getAddress(0);
@@ -1117,7 +1117,7 @@ public class X86Core extends AbstractX86Module {
     }
 
     private final void emitPUSH() {
-        if(operands.size() == 1 && operands.get(0) instanceof Identifier){
+        if (operands.size() == 1 && operands.get(0) instanceof Identifier) {
             stream.writePUSH_Const(new Label(((Identifier) operands.get(0)).name));
             return;
         }

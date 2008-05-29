@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -33,7 +33,7 @@ import org.apache.tools.ant.types.FileSet;
  * This task needs a "pluginDir" attribute containing the directory that contains
  * all the plugins.
  * This task also needs 1 or more filesets identifying the initjar plugin lists.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class InitJarsBuilder extends Task {
@@ -42,10 +42,10 @@ public class InitJarsBuilder extends Task {
     private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
     private File pluginDir;
     private File systemPluginListFile;
-    
+
     /**
      * Add a fileset to this task.
-     * 
+     *
      * @return
      */
     public FileSet createFileset() {
@@ -64,7 +64,7 @@ public class InitJarsBuilder extends Task {
             final String[] listFiles = ds.getIncludedFiles();
             for (int j = 0; j < listFiles.length; j++) {
                 final File listFile = new File(ds.getBasedir(), listFiles[j]);
-                
+
                 final InitJarBuilder builder = new InitJarBuilder();
                 builder.setProject(getProject());
                 builder.setTaskName(getTaskName());
@@ -72,10 +72,10 @@ public class InitJarsBuilder extends Task {
                 builder.setSystemPluginList(systemPluginListFile);
                 builder.setPluginList(listFile);
                 builder.setDestDir(getDestDir());
-                
+
                 builder.execute();
             }
-            
+
         }
     }
 
@@ -85,7 +85,7 @@ public class InitJarsBuilder extends Task {
     public final File getDestDir() {
         return destDir;
     }
-    
+
     /**
      * @return Returns the pluginDir.
      */

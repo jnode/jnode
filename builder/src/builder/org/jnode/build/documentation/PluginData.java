@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build.documentation;
 
 import java.io.File;
@@ -29,21 +29,29 @@ import org.jnode.plugin.PluginDescriptor;
  */
 public class PluginData {
 
-    /** The descriptor file of this plugin */
+    /**
+     * The descriptor file of this plugin
+     */
     private final File descriptorFile;
-    
-    /** The complete id */
+
+    /**
+     * The complete id
+     */
     private final String fullId;
 
-    /** The html documentation file of this plugin */
+    /**
+     * The html documentation file of this plugin
+     */
     private String htmlFile;
 
-    /** The parsed descriptor */
+    /**
+     * The parsed descriptor
+     */
     private PluginDescriptor descriptor;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param descriptorFile
      */
     public PluginData(File descriptorFile, String fullId) {
@@ -59,8 +67,7 @@ public class PluginData {
     }
 
     /**
-     * @param descriptor
-     *            The descriptor to set.
+     * @param descriptor The descriptor to set.
      */
     public final void setDescriptor(PluginDescriptor descriptor) {
         this.descriptor = descriptor;
@@ -81,8 +88,7 @@ public class PluginData {
     }
 
     /**
-     * @param htmlFile
-     *            The htmlFile to set.
+     * @param htmlFile The htmlFile to set.
      */
     public final void setHtmlFile(String htmlFile) {
         this.htmlFile = htmlFile;

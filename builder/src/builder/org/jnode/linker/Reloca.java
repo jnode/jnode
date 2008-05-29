@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.linker;
 
 import java.io.IOException;
@@ -29,23 +29,23 @@ import java.io.InputStream;
  */
 public class Reloca extends Reloc {
 
-	private final long r_addend;
+    private final long r_addend;
 
-	/**
-	 * @param elf
-	 * @param in
-	 * @throws IOException
-	 */
-	public Reloca(Elf elf, InputStream in) throws IOException {
-		super(elf, in);
-		this.r_addend = LoadUtil.loadXword(in, elf.e_ident);
-	}
+    /**
+     * @param elf
+     * @param in
+     * @throws IOException
+     */
+    public Reloca(Elf elf, InputStream in) throws IOException {
+        super(elf, in);
+        this.r_addend = LoadUtil.loadXword(in, elf.e_ident);
+    }
 
-	public final boolean hasAddEnd() {
-		return true;
-	}
-	
-	public final long getAddEnd() {
-		return r_addend;
-	}
+    public final boolean hasAddEnd() {
+        return true;
+    }
+
+    public final long getAddEnd() {
+        return r_addend;
+    }
 }

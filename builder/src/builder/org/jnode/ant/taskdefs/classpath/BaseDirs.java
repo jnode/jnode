@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.ant.taskdefs.classpath;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 
 public final class BaseDirs {
-    
+
     private final ArrayList<TargetedFileSet> fileSets = new ArrayList<TargetedFileSet>();
 
     public TargetedFileSet createFileset() {
@@ -37,7 +37,7 @@ public final class BaseDirs {
         fileSets.add(fs);
         return fs;
     }
-    
+
     public Map<String, SourceFile> scanJavaFiles(Project project) {
         final TreeMap<String, SourceFile> map = new TreeMap<String, SourceFile>();
         for (TargetedFileSet fs : fileSets) {
@@ -52,7 +52,7 @@ public final class BaseDirs {
                         throw new BuildException("File " + fName + " already exists");
                     }
                     existingFile.append(jf);
-                } else {                               
+                } else {
                     map.put(fName, jf);
                 }
             }

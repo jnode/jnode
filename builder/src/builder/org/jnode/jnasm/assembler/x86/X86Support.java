@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.assembler.x86;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class X86Support extends HardwareSupport {
     private X86Assembler nativeStream;
 
     public X86Support(Assembler assembler, List<Instruction> instructions,
-            Map<String, Label> labels, Map<String, Integer> constants) {
+                      Map<String, Label> labels, Map<String, Integer> constants) {
         this.modules = new ArrayList<AssemblerModule>();
         this.assembler = assembler;
         this.instructions = instructions;
@@ -63,17 +63,17 @@ public class X86Support extends HardwareSupport {
     public void assemble(int baseAddress) {
         X86CpuID cpuId = X86CpuID.createID("pentium");
         nativeStream = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, baseAddress);
-        ((X86BinaryAssembler)nativeStream).setByteValueEnabled(false);
+        ((X86BinaryAssembler) nativeStream).setByteValueEnabled(false);
         doAssembly();
     }
 
     public void assemble(NativeStream asm) {
         nativeStream = (X86Assembler) asm;
-        if(nativeStream instanceof X86BinaryAssembler){
+        if (nativeStream instanceof X86BinaryAssembler) {
             ((X86BinaryAssembler) nativeStream).setByteValueEnabled(false);
         }
         doAssembly();
-        if(nativeStream instanceof X86BinaryAssembler){
+        if (nativeStream instanceof X86BinaryAssembler) {
             ((X86BinaryAssembler) nativeStream).setByteValueEnabled(true);
         }
     }
@@ -86,9 +86,9 @@ public class X86Support extends HardwareSupport {
         for (Instruction ins : instructions) {
             //handle prefixes
             int prefix = ins.getPrefix();
-            if((prefix & Instruction.LOCK_PREFIX) != 0){
+            if ((prefix & Instruction.LOCK_PREFIX) != 0) {
                 nativeStream.write8(X86Constants.LOCK_PREFIX);
-            } else if ((prefix & Instruction.REP_PREFIX) != 0){
+            } else if ((prefix & Instruction.REP_PREFIX) != 0) {
                 nativeStream.write8(X86Constants.REP_PREFIX);
             }
             String label = ins.getLabel();
@@ -99,17 +99,17 @@ public class X86Support extends HardwareSupport {
             }
             String mnemo = ins.getMnemonic();
             if (mnemo != null) {
-                try{
+                try {
                     int times = ins.getTimes();
-                    if(times > 0){
-                        for(;times-- > 0;){
+                    if (times > 0) {
+                        for (; times-- > 0;) {
                             emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
                         }
                     } else {
                         emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
                     }
-                }catch(IllegalArgumentException x){
-                    if(Assembler.THROW){
+                } catch (IllegalArgumentException x) {
+                    if (Assembler.THROW) {
                         throw x;
                     } else {
                         System.out.println(x.getMessage() + " at line " + ins.getLineNumber());
@@ -119,7 +119,7 @@ public class X86Support extends HardwareSupport {
         }
     }
 
-    public void writeTo(OutputStream out) throws IOException{
+    public void writeTo(OutputStream out) throws IOException {
         nativeStream.writeTo(out);
     }
 
@@ -132,7 +132,7 @@ public class X86Support extends HardwareSupport {
             Label lab = new Label(label);
             labels.put(label, lab);
             NativeStream.ObjectRef ref = asm.setObjectRef(lab);
-            assembler.putConstant(label, ref.getOffset() + (int)asm.getBaseAddr());
+            assembler.putConstant(label, ref.getOffset() + (int) asm.getBaseAddr());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,17 +147,17 @@ public class X86Support extends HardwareSupport {
         throw new IllegalArgumentException("Unknown instruction: " + mnemonic);
     }
 
-    public static int getOperandSize(Instruction ins){
+    public static int getOperandSize(Instruction ins) {
         String size = ins.getSizeInfo();
-        if(size == null){
+        if (size == null) {
             return X86Constants.BITS32;
-        } else if("byte".equals(size)) {
+        } else if ("byte".equals(size)) {
             return X86Constants.BITS8;
-        } else if("word".equals(size)) {
+        } else if ("word".equals(size)) {
             return X86Constants.BITS16;
-        } else if("dword".equals(size)){
+        } else if ("dword".equals(size)) {
             return X86Constants.BITS32;
-        } else if("qword".equals(size)) {
+        } else if ("qword".equals(size)) {
             return X86Constants.BITS64;
         } else {
             throw new IllegalArgumentException("Unknown operand size: " + size);

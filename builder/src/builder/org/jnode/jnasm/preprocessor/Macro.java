@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.jnasm.preprocessor;
 
 /**
@@ -65,32 +65,32 @@ public class Macro {
         this.body = body;
     }
 
-    public String expand(String[] params){
+    public String expand(String[] params) {
         //if(paramCount != params.length) return null;
         String exp = body;
-        for(int i = 0; i < localLabels.length; i++){
-            exp = exp.replaceAll(localLabels[i], "__jnasm_macro_local_label_" + localLabelCount ++);
+        for (int i = 0; i < localLabels.length; i++) {
+            exp = exp.replaceAll(localLabels[i], "__jnasm_macro_local_label_" + localLabelCount++);
         }
 
-        for(int i = 0; i < params.length; i++){
+        for (int i = 0; i < params.length; i++) {
             String par = params[i];
             par = (par == null) ? "" : par.trim();
-            exp = exp.replaceAll("%"+(i + 1), par);
+            exp = exp.replaceAll("%" + (i + 1), par);
         }
 
-        if(maxParamCount > params.length){
-            if(defaultValues == null){
-                for(int i = params.length; i < maxParamCount; i++){
-                    exp = exp.replaceAll("%"+(i + 1), "");
+        if (maxParamCount > params.length) {
+            if (defaultValues == null) {
+                for (int i = params.length; i < maxParamCount; i++) {
+                    exp = exp.replaceAll("%" + (i + 1), "");
                 }
-            }else{
-                for(int i = params.length; i < maxParamCount; i++){
-                    if(defaultValues.length > i - params.length){
+            } else {
+                for (int i = params.length; i < maxParamCount; i++) {
+                    if (defaultValues.length > i - params.length) {
                         String def = defaultValues[i - params.length];
                         def = (def == null) ? "" : def.trim();
-                        exp = exp.replaceAll("%"+(i + 1), def);
-                    }else{
-                        exp = exp.replaceAll("%"+(i + 1), "");
+                        exp = exp.replaceAll("%" + (i + 1), def);
+                    } else {
+                        exp = exp.replaceAll("%" + (i + 1), "");
                     }
                 }
             }
@@ -100,6 +100,6 @@ public class Macro {
     }
 
     public String toString() {
-         return "MACRO " + name + " " + paramCount + "\n" + body + "\n\n";
+        return "MACRO " + name + " " + paramCount + "\n" + body + "\n\n";
     }
 }

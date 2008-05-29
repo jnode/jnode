@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -46,13 +46,13 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
 
     /**
      * Gets the pluginlist
-     * 
+     *
      * @return The list
      * @throws PluginException
      * @throws MalformedURLException
      */
     protected PluginList getPluginList() throws PluginException,
-            MalformedURLException {
+        MalformedURLException {
         if (pluginList == null) {
             pluginList = new PluginList(pluginListFile, pluginDir, targetArch);
         }
@@ -68,35 +68,35 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
 
     /**
      * Get a pluginregistry containing the loaded plugins
-     * 
+     *
      * @return The registry
      * @throws PluginException
      * @throws MalformedURLException
      */
     protected PluginRegistry getPluginRegistry() throws PluginException,
-            MalformedURLException {
+        MalformedURLException {
         final PluginRegistry piRegistry;
         final URL[] plugins = getPluginList().getPluginList();
         final URL[] systemPlugins = getSystemPluginList().getPluginList();
         final URL[] all = new URL[systemPlugins.length + plugins.length];
         System.arraycopy(systemPlugins, 0, all, 0, systemPlugins.length);
-        System.arraycopy(plugins, 0, all, systemPlugins.length, plugins.length);        
+        System.arraycopy(plugins, 0, all, systemPlugins.length, plugins.length);
         piRegistry = Factory.createRegistry(all);
         return piRegistry;
     }
 
     /**
      * Gets the pluginlist
-     * 
+     *
      * @return The list
      * @throws PluginException
      * @throws MalformedURLException
      */
     protected PluginList getSystemPluginList() throws PluginException,
-            MalformedURLException {
+        MalformedURLException {
         if (systemPluginList == null) {
             systemPluginList = new PluginList(systemPluginListFile, pluginDir,
-                    targetArch);
+                targetArch);
         }
         return systemPluginList;
     }
@@ -116,8 +116,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
     }
 
     /**
-     * @param systemPluginListFile
-     *            The systemPluginListFile to set.
+     * @param systemPluginListFile The systemPluginListFile to set.
      */
     public final void setSystemPluginList(File systemPluginListFile) {
         this.systemPluginListFile = systemPluginListFile;
@@ -125,12 +124,12 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
 
     /**
      * Ensure that all plugin prerequisites are met.
-     * 
+     *
      * @param registry
      * @throws BuildException
      */
     protected void testPluginPrerequisites(PluginRegistry registry)
-            throws BuildException {
+        throws BuildException {
 
         for (PluginDescriptor descr : registry) {
             if (!descr.isSystemPlugin()) {
@@ -140,8 +139,8 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
             for (int j = 0; j < prereqs.length; j++) {
                 if (registry.getPluginDescriptor(prereqs[j].getPluginId()) == null) {
                     throw new BuildException("Cannot find plugin "
-                            + prereqs[j].getPluginId()
-                            + ", which is required by " + descr.getId());
+                        + prereqs[j].getPluginId()
+                        + ", which is required by " + descr.getId());
                 }
             }
         }
