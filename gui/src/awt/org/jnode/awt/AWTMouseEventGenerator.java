@@ -18,22 +18,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
-import org.jnode.driver.input.PointerListener;
-import org.jnode.driver.input.PointerEvent;
-import org.jnode.driver.video.HardwareCursorAPI;
-import org.apache.log4j.Logger;
-
-import javax.swing.SwingUtilities;
-import java.awt.EventQueue;
-import java.awt.Dimension;
 import java.awt.Component;
-import java.awt.Window;
+import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
+import javax.swing.SwingUtilities;
+import org.apache.log4j.Logger;
+import org.jnode.driver.input.PointerEvent;
+import org.jnode.driver.input.PointerListener;
+import org.jnode.driver.video.HardwareCursorAPI;
 
 /**
  * @author Levente S\u00e1ntha
@@ -42,7 +41,7 @@ public class AWTMouseEventGenerator implements PointerListener {
     private static final Logger log = Logger.getLogger(AWTMouseEventGenerator.class);
 
     private static final int[] BUTTON_MASK = {
-            PointerEvent.BUTTON_LEFT, PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE
+        PointerEvent.BUTTON_LEFT, PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE
     };
 
     private static final int[] BUTTON_NUMBER = {1, 2, 3};
@@ -68,7 +67,8 @@ public class AWTMouseEventGenerator implements PointerListener {
 
     private int y;
 
-    public AWTMouseEventGenerator(EventQueue eventQueue, Dimension screenSize, HardwareCursorAPI hwCursor, KeyboardHandler keyboardHandler) {
+    public AWTMouseEventGenerator(EventQueue eventQueue, Dimension screenSize, HardwareCursorAPI hwCursor,
+                                  KeyboardHandler keyboardHandler) {
         this.eventQueue = eventQueue;
         this.screenSize = screenSize;
         this.hwCursor = hwCursor;
@@ -123,7 +123,7 @@ public class AWTMouseEventGenerator implements PointerListener {
             }
             // Notify mouse entered
             postEvent(source, MouseEvent.MOUSE_ENTERED, time, 0, MouseEvent.NOBUTTON);
-            for (int i = buttonClickTime.length; --i > 0; buttonClickTime[i] = 0);
+            for (int i = buttonClickTime.length; --i > 0; buttonClickTime[i] = 0) ;
             eventFired = true;
             postClicked = false;
         }
@@ -162,12 +162,12 @@ public class AWTMouseEventGenerator implements PointerListener {
         final Point p = source.getLocationOnScreen();
         final boolean popupTrigger = (button == MouseEvent.BUTTON2);
 
-        final int ex = x - p.x;// - pwo.x;
-        final int ey = y - p.y;// - pwo.y;
+        final int ex = x - p.x; // - pwo.x;
+        final int ey = y - p.y; // - pwo.y;
         final int modifiers = getModifiers();
 
         final MouseEvent event = new MouseEvent(source, id, time, modifiers, ex, ey,
-                clickCount, popupTrigger, button);
+            clickCount, popupTrigger, button);
 
         eventQueue.postEvent(event);
     }
@@ -184,9 +184,9 @@ public class AWTMouseEventGenerator implements PointerListener {
 
     private final int getModifiers() {
         int modifiers = 0;
-        if(buttonPressed[0]) modifiers |= MouseEvent.BUTTON1_MASK;
-        if(buttonPressed[1]) modifiers |= MouseEvent.BUTTON2_MASK;
-        if(buttonPressed[2]) modifiers |= MouseEvent.BUTTON3_MASK;
+        if (buttonPressed[0]) modifiers |= MouseEvent.BUTTON1_MASK;
+        if (buttonPressed[1]) modifiers |= MouseEvent.BUTTON2_MASK;
+        if (buttonPressed[2]) modifiers |= MouseEvent.BUTTON3_MASK;
         return modifiers | keyboardHandler.getModifiers();
     }
 }

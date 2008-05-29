@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -31,7 +31,7 @@ import java.awt.event.ActionListener;
 
 public class DialogTest extends Dialog {
 
-    
+
     /**
      * @param title
      */
@@ -43,11 +43,11 @@ public class DialogTest extends Dialog {
             public void actionPerformed(ActionEvent event) {
                 DialogTest.this.dispose();
             }
-            
+
         });
         add(new TextField(), BorderLayout.CENTER);
         add(ok, BorderLayout.EAST);
-        
+
         setSize(200, 100);
     }
 

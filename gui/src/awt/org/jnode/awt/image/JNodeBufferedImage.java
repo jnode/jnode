@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.image;
 
 import gnu.classpath.SystemProperties;
-
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -35,41 +34,42 @@ import java.util.Hashtable;
  */
 public class JNodeBufferedImage extends BufferedImage {
 
-	/**
-	 * @param colormodel
-	 * @param writableraster
-	 * @param premultiplied
-	 * @param properties
-	 */
-	public JNodeBufferedImage(ColorModel colormodel, WritableRaster writableraster, boolean premultiplied, Hashtable properties) {
-		super(colormodel, writableraster, premultiplied, properties);
-	}
+    /**
+     * @param colormodel
+     * @param writableraster
+     * @param premultiplied
+     * @param properties
+     */
+    public JNodeBufferedImage(ColorModel colormodel, WritableRaster writableraster, boolean premultiplied,
+                              Hashtable properties) {
+        super(colormodel, writableraster, premultiplied, properties);
+    }
 
-	/**
-	 * @param w
-	 * @param h
-	 * @param type
-	 */
-	public JNodeBufferedImage(int w, int h, int type) {
-		super(w, h, type);
-	}
+    /**
+     * @param w
+     * @param h
+     * @param type
+     */
+    public JNodeBufferedImage(int w, int h, int type) {
+        super(w, h, type);
+    }
 
-	/**
-	 * @param w
-	 * @param h
-	 * @param type
-	 * @param indexcolormodel
-	 */
-	public JNodeBufferedImage(int w, int h, int type, IndexColorModel indexcolormodel) {
-		super(w, h, type, indexcolormodel);
-	}
+    /**
+     * @param w
+     * @param h
+     * @param type
+     * @param indexcolormodel
+     */
+    public JNodeBufferedImage(int w, int h, int type, IndexColorModel indexcolormodel) {
+        super(w, h, type, indexcolormodel);
+    }
 
-	/**
-	 * @see java.awt.image.BufferedImage#createGraphics()
-	 * @return The graphics
-	 */
-	public Graphics2D createGraphics() {
+    /**
+     * @return The graphics
+     * @see java.awt.image.BufferedImage#createGraphics()
+     */
+    public Graphics2D createGraphics() {
         return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-        new JNodeBufferedImageGraphics2D(this) : new JNodeBufferedImageGraphics(this);
-	}
+            new JNodeBufferedImageGraphics2D(this) : new JNodeBufferedImageGraphics(this);
+    }
 }

@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font;
 
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-
 import org.jnode.driver.video.Surface;
 
 /**
@@ -32,13 +31,14 @@ import org.jnode.driver.video.Surface;
  */
 public interface TextRenderer {
 
-	/**
-	 * Render a given text to the given graphics at the given location.
-	 * @param g
-	 * @param text
-	 * @param x
-	 * @param y
-	 */
-	public void render(Surface g, Shape clip, AffineTransform tx, CharSequence text, int x, int y, Color color);
+    /**
+     * Render a given text to the given graphics at the given location.
+     *
+     * @param g
+     * @param text
+     * @param x
+     * @param y
+     */
+    public void render(Surface g, Shape clip, AffineTransform tx, CharSequence text, int x, int y, Color color);
 
 }

@@ -18,24 +18,9 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.desktop.classic;
 
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.JNodeAwtContext;
-
-import javax.swing.JButton;
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.JPopupMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JDesktopPane;
-import javax.swing.DesktopManager;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Point;
@@ -46,6 +31,20 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.DesktopManager;
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeAwtContext;
+import org.jnode.awt.JNodeToolkit;
 
 /**
  * @author Levente S\u00e1ntha
@@ -102,7 +101,7 @@ public class WindowBar extends JPanel {
                 public void actionPerformed(ActionEvent event) {
                     try {
                         DesktopManager desktopManager = frame.getDesktopPane().getDesktopManager();
-                        if(frame.isIcon()){
+                        if (frame.isIcon()) {
                             frame.setIcon(false);
                             desktopManager.deiconifyFrame(frame);
                             frame.setSelected(true);
@@ -174,11 +173,11 @@ public class WindowBar extends JPanel {
             minimize.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     try {
-                        if(frame.isMaximum())
+                        if (frame.isMaximum())
                             frame.setMaximum(false);
                         frame.setIcon(true);
                         frame.getDesktopPane().getDesktopManager().iconifyFrame(frame);
-                    }catch(PropertyVetoException e){
+                    } catch (PropertyVetoException e) {
                         //ignore
                     }
                 }
@@ -192,7 +191,7 @@ public class WindowBar extends JPanel {
                             frame.setIcon(false);
                         frame.setMaximum(true);
                         frame.getDesktopPane().getDesktopManager().maximizeFrame(frame);
-                    }catch(PropertyVetoException e){
+                    } catch (PropertyVetoException e) {
                         //ignore
                     }
                 }
@@ -205,11 +204,11 @@ public class WindowBar extends JPanel {
                     try {
                         if (frame.isIcon())
                             frame.setIcon(false);
-                        if(frame.isMaximum())
+                        if (frame.isMaximum())
                             frame.setMaximum(false);
                         frame.setSelected(true);
                         frame.getDesktopPane().getDesktopManager().activateFrame(frame);
-                    }catch(PropertyVetoException e){
+                    } catch (PropertyVetoException e) {
                         //ignore
                     }
                 }
@@ -222,25 +221,25 @@ public class WindowBar extends JPanel {
                     try {
                         frame.setClosed(true);
                         frame.getDesktopPane().getDesktopManager().closeFrame(frame);
-                    }catch(PropertyVetoException e){
+                    } catch (PropertyVetoException e) {
                         //ignore
                     }
                 }
             });
 
             this.addMouseListener(new MouseAdapter() {
-                    public void mousePressed(MouseEvent event) {
-                        if(event.getButton() == MouseEvent.BUTTON2){
-                            if (frameActions .isShowing()) {
-                                frameActions .setVisible(false);
-                            } else {
-                                Point p = FrameWrapper.this.getLocationOnScreen();
-                                int h = frameActions.getPreferredSize().height;
-                                frameActions.show(frame.getDesktopPane(), p.x, p.y - h);
-                            }
+                public void mousePressed(MouseEvent event) {
+                    if (event.getButton() == MouseEvent.BUTTON2) {
+                        if (frameActions.isShowing()) {
+                            frameActions.setVisible(false);
+                        } else {
+                            Point p = FrameWrapper.this.getLocationOnScreen();
+                            int h = frameActions.getPreferredSize().height;
+                            frameActions.show(frame.getDesktopPane(), p.x, p.y - h);
                         }
                     }
-                });
+                }
+            });
         }
 
         public final JInternalFrame getFrame() {

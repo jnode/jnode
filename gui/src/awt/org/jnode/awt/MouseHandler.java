@@ -18,9 +18,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.util.Collection;
+import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -28,20 +38,8 @@ import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
-import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.HardwareCursor;
-
-import javax.swing.SwingUtilities;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.util.Collection;
+import org.jnode.driver.video.HardwareCursorAPI;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -51,7 +49,7 @@ public class MouseHandler implements PointerListener {
     private final PointerAPI pointerAPI;
 
     private static final int[] BUTTON_MASK = {
-            PointerEvent.BUTTON_LEFT, PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE
+        PointerEvent.BUTTON_LEFT, PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE
     };
 
     private static final int[] BUTTON_NUMBER = {1, 2, 3};
@@ -79,10 +77,10 @@ public class MouseHandler implements PointerListener {
     private int x;
 
     private int y;
-    
+
     /**
      * Create a new instance
-     * 
+     *
      * @param fbDevice
      * @param screenSize
      */
@@ -98,16 +96,16 @@ public class MouseHandler implements PointerListener {
             log.info("No hardware-cursor found on device " + fbDevice.getId());
         }
         //if (hwCursor != null) {
-            try {
-                final Collection<Device> pointers = DeviceUtils
-                        .getDevicesByAPI(PointerAPI.class);
-                if (!pointers.isEmpty()) {
-                    pointerDevice = pointers.iterator().next();
-                    pointerAPI = pointerDevice.getAPI(PointerAPI.class);
-                }
-            } catch (ApiNotFoundException ex) {
-                log.error("Strange...", ex);
+        try {
+            final Collection<Device> pointers = DeviceUtils
+                .getDevicesByAPI(PointerAPI.class);
+            if (!pointers.isEmpty()) {
+                pointerDevice = pointers.iterator().next();
+                pointerAPI = pointerDevice.getAPI(PointerAPI.class);
             }
+        } catch (ApiNotFoundException ex) {
+            log.error("Strange...", ex);
+        }
         //}
         this.keyboardHandler = keyboardHandler;
         this.hwCursor = hwCursor;
@@ -115,7 +113,7 @@ public class MouseHandler implements PointerListener {
         this.screenSize = screenSize;
         if (pointerAPI != null) {
             log.debug("Using PointerDevice " + pointerDevice.getId());
-            if(hwCursor != null){
+            if (hwCursor != null) {
                 hwCursor.setCursorImage(JNodeCursors.ARROW);
                 hwCursor.setCursorVisible(true);
                 hwCursor.setCursorPosition(0, 0);
@@ -124,8 +122,8 @@ public class MouseHandler implements PointerListener {
         }
     }
 
-    void setCursorImage(HardwareCursor ci){
-        if(hwCursor != null) {
+    void setCursorImage(HardwareCursor ci) {
+        if (hwCursor != null) {
             hwCursor.setCursorImage(ci);
             hwCursor.setCursorVisible(true);
         }
@@ -139,13 +137,12 @@ public class MouseHandler implements PointerListener {
             pointerAPI.removePointerListener(this);
         }
     }
-    
+
     /**
      * Move the mouse pointer to absolute coordinates (x, y).
      *
      * @param x the destination x coordinate
      * @param y the destination y coordinate
-     * 
      * @see java.awt.peer.RobotPeer#mouseMove(int, int)
      */
     void mouseMove(int x, int y) {
@@ -157,47 +154,44 @@ public class MouseHandler implements PointerListener {
      * Press one or more mouse buttons.
      *
      * @param buttons the buttons to press; a bitmask of one or more of
-     * these {@link InputEvent} fields:
-     *
-     * <ul>
-     *   <li>BUTTON1_MASK</li>
-     *   <li>BUTTON2_MASK</li>
-     *   <li>BUTTON3_MASK</li>
-     * </ul>
-     * 
+     *                these {@link java.awt.event.InputEvent} fields:
+     *                <p/>
+     *                <ul>
+     *                <li>BUTTON1_MASK</li>
+     *                <li>BUTTON2_MASK</li>
+     *                <li>BUTTON3_MASK</li>
+     *                </ul>
      * @see java.awt.peer.RobotPeer#mousePress(int)
      */
     void mousePress(int buttons) {
         // x, y and z unchanged (false means relative values)
-        pointerStateChanged(buttons|lastButtons, 0, 0, 0, false);
+        pointerStateChanged(buttons | lastButtons, 0, 0, 0, false);
     }
 
     /**
      * Release one or more mouse buttons.
      *
      * @param buttons the buttons to release; a bitmask of one or more
-     * of these {@link InputEvent} fields:
-     *
-     * <ul>
-     *   <li>BUTTON1_MASK</li>
-     *   <li>BUTTON2_MASK</li>
-     *   <li>BUTTON3_MASK</li>
-     * </ul>
-     * 
+     *                of these {@link java.awt.event.InputEvent} fields:
+     *                <p/>
+     *                <ul>
+     *                <li>BUTTON1_MASK</li>
+     *                <li>BUTTON2_MASK</li>
+     *                <li>BUTTON3_MASK</li>
+     *                </ul>
      * @see java.awt.peer.RobotPeer#mouseRelease(int)
      */
     void mouseRelease(int buttons) {
         // x, y and z unchanged (false means relative values)
-        pointerStateChanged(lastButtons&(buttons^0xFFFFFFFF), 0, 0, 0, false);
+        pointerStateChanged(lastButtons & (buttons ^ 0xFFFFFFFF), 0, 0, 0, false);
     }
 
     /**
      * Rotate the mouse scroll wheel.
      *
      * @param wheelAmt number of steps to rotate mouse wheel.  negative
-     * to rotate wheel up (away from the user), positive to rotate wheel
-     * down (toward the user). So, this is a relative value. 
-     *
+     *                 to rotate wheel up (away from the user), positive to rotate wheel
+     *                 down (toward the user). So, this is a relative value.
      * @see java.awt.peer.RobotPeer#mouseWheel(int)
      */
     void mouseWheel(int wheelAmt) {
@@ -205,175 +199,176 @@ public class MouseHandler implements PointerListener {
         pointerStateChanged(lastButtons, 0, 0, wheelAmt, false);
     }
 
-    int getX(){ return x;}
-    int getY(){ return y;}
+    int getX() {
+        return x;
+    }
 
-    void setCursor(int x, int y){
+    int getY() {
+        return y;
+    }
+
+    void setCursor(int x, int y) {
         this.x = x;
         this.y = y;
-        if(hwCursor != null)
+        if (hwCursor != null)
             hwCursor.setCursorPosition(x, y);
     }
 
-    public void pointerStateChanged(PointerEvent event) 
-    {
-        pointerStateChanged(event.getButtons(), event.getX(), event.getY(), 
-                event.getZ(), event.isAbsolute());
+    public void pointerStateChanged(PointerEvent event) {
+        pointerStateChanged(event.getButtons(), event.getX(), event.getY(),
+            event.getZ(), event.isAbsolute());
         event.consume();
     }
 
     /**
      * TODO handle wheel mouse events (given by newZ)
+     *
      * @param buttons
-     * @param newX a relative or absolute value for x coordinate
-     * @param newY a relative or absolute value for y coordinate
-     * @param newZ a relative or absolute value for wheel mouse
+     * @param newX     a relative or absolute value for x coordinate
+     * @param newY     a relative or absolute value for y coordinate
+     * @param newZ     a relative or absolute value for wheel mouse
      * @param absolute are newX, newY and newZ relative or absolute values ?
      */
-    void pointerStateChanged(int buttons, int newX, int newY, int newZ, 
-            boolean absolute)        
-    {
-          long time = System.currentTimeMillis();
-          final int newAbsX = absolute ? newX : x + newX;
-          final int newAbsY = absolute ? newY : y + newY;
-          x = Math.min(screenSize.width - 1, Math.max(0, newAbsX));
-          y = Math.min(screenSize.height - 1, Math.max(0, newAbsY));
-          if(hwCursor != null) hwCursor.setCursorPosition(x, y);
-          
+    void pointerStateChanged(int buttons, int newX, int newY, int newZ,
+                             boolean absolute) {
+        long time = System.currentTimeMillis();
+        final int newAbsX = absolute ? newX : x + newX;
+        final int newAbsY = absolute ? newY : y + newY;
+        x = Math.min(screenSize.width - 1, Math.max(0, newAbsX));
+        y = Math.min(screenSize.height - 1, Math.max(0, newAbsY));
+        if (hwCursor != null) hwCursor.setCursorPosition(x, y);
+
         lastButtons = buttons;
-                
-          Component source = findSource();
-          if (source == null || !source.isShowing()) return;
-          if(newZ != 0)
-          {
-              postEvent(source, MouseEvent.MOUSE_WHEEL, time, 0, MouseEvent.NOBUTTON, newZ);
-          }
-          
-          boolean eventFired = false;
-          for (int i = 0; i < 3; i++) {
-              if (time - buttonClickTime[i] > CLICK_REPEAT_DURATION) {
-                  buttonClickTime[i] = 0;
-                  buttonClickCount[i] = 0;
-              } else {
-                  buttonClickTime[i] = time;
-              }
 
-              if ((buttons & BUTTON_MASK[i]) != 0) {
-                  if (!buttonPressed[i]) {
-                      buttonClickCount[i] += 1;
-                      buttonClickTime[i] = time;
-                      postEvent(source, MouseEvent.MOUSE_PRESSED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
-                      dragSource = source;
-                      buttonPressed[i] = true;
-                      eventFired = true;
-                      postClicked = true;
-                      break;
-                  }
-              } else if (buttonPressed[i]) {
-                  postEvent(dragSource, MouseEvent.MOUSE_RELEASED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
-                  if (postClicked || !postClicked && buttonClickCount[i] > 0) {
-                      postEvent(source, MouseEvent.MOUSE_CLICKED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
-                      postClicked = false;
-                  }
-                  buttonPressed[i] = false;
-                  eventFired = true;
-                  break;
-              }
-          }
+        Component source = findSource();
+        if (source == null || !source.isShowing()) return;
+        if (newZ != 0) {
+            postEvent(source, MouseEvent.MOUSE_WHEEL, time, 0, MouseEvent.NOBUTTON, newZ);
+        }
 
-          if (source != lastSource) {
-              if (lastSource != null) {
-                  // Notify mouse exited
-                  postEvent(lastSource, MouseEvent.MOUSE_EXITED, time, 0, MouseEvent.NOBUTTON, 0);
-              }
-              // Notify mouse entered
-              postEvent(source, MouseEvent.MOUSE_ENTERED, time, 0, MouseEvent.NOBUTTON, 0);
-              for (int i = buttonClickTime.length; --i > 0; buttonClickTime[i] = 0);
-              eventFired = true;
-              postClicked = false;
-          }
+        boolean eventFired = false;
+        for (int i = 0; i < 3; i++) {
+            if (time - buttonClickTime[i] > CLICK_REPEAT_DURATION) {
+                buttonClickTime[i] = 0;
+                buttonClickCount[i] = 0;
+            } else {
+                buttonClickTime[i] = time;
+            }
 
-          if (!eventFired) {
-              if (buttonPressed[0]) {
-                  postEvent(dragSource, MouseEvent.MOUSE_DRAGGED, time, buttonClickCount[0], MouseEvent.BUTTON1, 0);
-              } else if (buttonPressed[1]) {
-                  postEvent(dragSource, MouseEvent.MOUSE_DRAGGED, time, buttonClickCount[1], MouseEvent.BUTTON2, 0);
-              } else if (buttonPressed[2]) {
-                  postEvent(dragSource, MouseEvent.MOUSE_DRAGGED, time, buttonClickCount[2], MouseEvent.BUTTON3, 0);
-              } else {
-                  postEvent(source, MouseEvent.MOUSE_MOVED, time, 0, MouseEvent.NOBUTTON, 0);
-              }
-              postClicked = false;
-          }
-          lastSource = source;
-      }
+            if ((buttons & BUTTON_MASK[i]) != 0) {
+                if (!buttonPressed[i]) {
+                    buttonClickCount[i] += 1;
+                    buttonClickTime[i] = time;
+                    postEvent(source, MouseEvent.MOUSE_PRESSED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
+                    dragSource = source;
+                    buttonPressed[i] = true;
+                    eventFired = true;
+                    postClicked = true;
+                    break;
+                }
+            } else if (buttonPressed[i]) {
+                postEvent(dragSource, MouseEvent.MOUSE_RELEASED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
+                if (postClicked || !postClicked && buttonClickCount[i] > 0) {
+                    postEvent(source, MouseEvent.MOUSE_CLICKED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
+                    postClicked = false;
+                }
+                buttonPressed[i] = false;
+                eventFired = true;
+                break;
+            }
+        }
 
-      /**
-       * Post a mouse event with the given id and button.
-       *
-       * @param id
-       * @param button
-       */
-      private void postEvent(Component source, int id, long time, int clickCount, int button, int wheelAmt) {
-          if (!source.isShowing()) return;
-          final Window w = SwingUtilities.getWindowAncestor(source);
-          Point pwo = null;
-          if (w != null && w.isShowing()) {
-              pwo = w.getLocationOnScreen();
-          } else {
-              pwo = new Point(0, 0);
-          }
+        if (source != lastSource) {
+            if (lastSource != null) {
+                // Notify mouse exited
+                postEvent(lastSource, MouseEvent.MOUSE_EXITED, time, 0, MouseEvent.NOBUTTON, 0);
+            }
+            // Notify mouse entered
+            postEvent(source, MouseEvent.MOUSE_ENTERED, time, 0, MouseEvent.NOBUTTON, 0);
+            for (int i = buttonClickTime.length; --i > 0; buttonClickTime[i] = 0) ;
+            eventFired = true;
+            postClicked = false;
+        }
 
-          final Point p = source.getLocationOnScreen();
-          final boolean popupTrigger = (button == MouseEvent.BUTTON2);
+        if (!eventFired) {
+            if (buttonPressed[0]) {
+                postEvent(dragSource, MouseEvent.MOUSE_DRAGGED, time, buttonClickCount[0], MouseEvent.BUTTON1, 0);
+            } else if (buttonPressed[1]) {
+                postEvent(dragSource, MouseEvent.MOUSE_DRAGGED, time, buttonClickCount[1], MouseEvent.BUTTON2, 0);
+            } else if (buttonPressed[2]) {
+                postEvent(dragSource, MouseEvent.MOUSE_DRAGGED, time, buttonClickCount[2], MouseEvent.BUTTON3, 0);
+            } else {
+                postEvent(source, MouseEvent.MOUSE_MOVED, time, 0, MouseEvent.NOBUTTON, 0);
+            }
+            postClicked = false;
+        }
+        lastSource = source;
+    }
 
-          final int ex = x - p.x;// - pwo.x;
-          final int ey = y - p.y;// - pwo.y;
-          final int modifiers = getModifiers();
-          MouseEvent event;
-          if(id == MouseEvent.MOUSE_WHEEL)
-          {
-              event = new MouseWheelEvent(source, id, time, modifiers, ex, ey, 
-                  1, popupTrigger, MouseWheelEvent.WHEEL_UNIT_SCROLL, 
-                  wheelAmt, //TODO check what to put here 
-                  wheelAmt);//TODO check what to put here
-              System.out.println("MouseWheelEvent");
-          }
-          else
-          {
-              event = new MouseEvent(source, id, time, modifiers, ex, ey,
-                  clickCount, popupTrigger, button);
-              //if(id==MouseEvent.MOUSE_PRESSED)
-              //    System.out.println("MouseEvent.MOUSE_PRESSED");
-              //System.out.println("postEvent:"+event);
-          }
+    /**
+     * Post a mouse event with the given id and button.
+     *
+     * @param id
+     * @param button
+     */
+    private void postEvent(Component source, int id, long time, int clickCount, int button, int wheelAmt) {
+        if (!source.isShowing()) return;
+        final Window w = SwingUtilities.getWindowAncestor(source);
+        Point pwo = null;
+        if (w != null && w.isShowing()) {
+            pwo = w.getLocationOnScreen();
+        } else {
+            pwo = new Point(0, 0);
+        }
 
-          //debug
-          if(id == MouseEvent.MOUSE_PRESSED ||
-                  id == MouseEvent.MOUSE_RELEASED ||
-                  id == MouseEvent.MOUSE_CLICKED){
+        final Point p = source.getLocationOnScreen();
+        final boolean popupTrigger = (button == MouseEvent.BUTTON2);
+
+        final int ex = x - p.x; // - pwo.x;
+        final int ey = y - p.y; // - pwo.y;
+        final int modifiers = getModifiers();
+        MouseEvent event;
+        if (id == MouseEvent.MOUSE_WHEEL) {
+            event = new MouseWheelEvent(source, id, time, modifiers, ex, ey,
+                1, popupTrigger, MouseWheelEvent.WHEEL_UNIT_SCROLL,
+                wheelAmt, //TODO check what to put here
+                wheelAmt); //TODO check what to put here
+            System.out.println("MouseWheelEvent");
+        } else {
+            event = new MouseEvent(source, id, time, modifiers, ex, ey,
+                clickCount, popupTrigger, button);
+            //if(id==MouseEvent.MOUSE_PRESSED)
+            //    System.out.println("MouseEvent.MOUSE_PRESSED");
+            //System.out.println("postEvent:"+event);
+        }
+
+        //debug
+        if (id == MouseEvent.MOUSE_PRESSED ||
+            id == MouseEvent.MOUSE_RELEASED ||
+            id == MouseEvent.MOUSE_CLICKED) {
 
 //              org.jnode.vm.Unsafe.debug(event.toString()+"\n");
-//              org.jnode.vm.Unsafe.debug("x="+ x + " y=" + y +" ex="+ ex + " ey=" + ey+ " p.x=" + p.x + " p.y=" + p.y +"\n");
-          }
-          eventQueue.postEvent(event);
-      }
+//              org.jnode.vm.Unsafe.debug("x="+ x + " y=" + y +" ex="+ ex + " ey=" + ey + 
+//                  " p.x=" + p.x + " p.y=" + p.y +"\n");
+        }
+        eventQueue.postEvent(event);
+    }
 
-      private final Component findSource() {
-          final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-          Component source = tk.getTopComponentAt(x, y);
-          if ((source != null) && source.isShowing()) {
-              return source;
-          } else {
-              return null;
-          }
-      }
+    private final Component findSource() {
+        final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
+        Component source = tk.getTopComponentAt(x, y);
+        if ((source != null) && source.isShowing()) {
+            return source;
+        } else {
+            return null;
+        }
+    }
 
-      private final int getModifiers() {
-          int modifiers = 0;
-          if(buttonPressed[0]) modifiers |= MouseEvent.BUTTON1_MASK;
-          if(buttonPressed[1]) modifiers |= MouseEvent.BUTTON2_MASK;
-          if(buttonPressed[2]) modifiers |= MouseEvent.BUTTON3_MASK;
-          return modifiers | keyboardHandler.getModifiers();
-      }
+    private final int getModifiers() {
+        int modifiers = 0;
+        if (buttonPressed[0]) modifiers |= MouseEvent.BUTTON1_MASK;
+        if (buttonPressed[1]) modifiers |= MouseEvent.BUTTON2_MASK;
+        if (buttonPressed[2]) modifiers |= MouseEvent.BUTTON3_MASK;
+        return modifiers | keyboardHandler.getModifiers();
+    }
 }

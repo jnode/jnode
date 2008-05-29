@@ -18,26 +18,42 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.MenuBar;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.VMAwtAPI;
+import java.awt.Window;
+import java.awt.peer.FramePeer;
+import java.awt.peer.WindowPeer;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
-import javax.swing.JComponent;
-import java.awt.*;
-import java.awt.peer.WindowPeer;
-import java.awt.peer.FramePeer;
 
 /**
  * @author Levente S\u00e1ntha
  */
 abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBaseWindow<awtT, swingPeerT>>
-        extends JFrame implements ISwingPeer<awtT> {
+    extends JFrame implements ISwingPeer<awtT> {
 
-    /** The AWT component this is a peer for */
+    /**
+     * The AWT component this is a peer for
+     */
     protected final awtT target;
 
-    /** The swing peer implementation */
+    /**
+     * The swing peer implementation
+     */
     private SwingJBaseWindowPeer<awtT, swingPeerT> swingPeer;
 
     /**
@@ -73,7 +89,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
      */
     protected final void processEvent(AWTEvent event) {
         target.dispatchEvent(SwingToolkit.convertEvent(event,
-                target));
+            target));
     }
 
     /**
@@ -147,7 +163,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
         if (target != null) {
             target.update(g);
         }
-    }    
+    }
 
     private final class ContentPane extends JComponent {
 
@@ -174,12 +190,11 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
             if (!swingPeer.isReshapeInProgress) {
-                Point p = target.isShowing() ? target.getLocationOnScreen()
-                        : new Point();
+                Point p = target.isShowing() ? target.getLocationOnScreen() : new Point();
                 // Point p = awtFrame.getLocationOnScreen();
                 Insets ins = swingPeer.getInsets();
                 target.reshape(p.x + x, p.y, width + ins.left + ins.right,
-                        height + ins.bottom + ins.top);
+                    height + ins.bottom + ins.top);
             }
         }
     }
@@ -211,10 +226,10 @@ final class SwingJFrame extends SwingJBaseWindow<Frame, SwingJFrame> {
 }
 
 abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends SwingJBaseWindow<awtT, swingPeerT>>
-        extends SwingContainerPeer<awtT, swingPeerT> implements WindowPeer {
+    extends SwingContainerPeer<awtT, swingPeerT> implements WindowPeer {
 
     public SwingJBaseWindowPeer(SwingToolkit toolkit, awtT window,
-            swingPeerT jComponent) {
+                                swingPeerT jComponent) {
         super(toolkit, window, jComponent);
         jComponent.initialize(this);
         jComponent.getContentPane().setLayout(new SwingContainerLayout(targetComponent, this));
@@ -276,6 +291,7 @@ abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends Swin
 
     /**
      * Sets the resizable flag of this window.
+     *
      * @param resizeable
      */
     public final void setResizable(boolean resizeable) {
@@ -284,6 +300,7 @@ abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends Swin
 
     /**
      * Sets the title of this window
+     *
      * @param title
      */
     public void setTitle(String title) {
@@ -346,7 +363,7 @@ abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends Swin
  * @author Levente S\u00e1ntha
  */
 final class SwingJFramePeer extends SwingJBaseWindowPeer<Frame, SwingJFrame>
-        implements FramePeer, ISwingContainerPeer {
+    implements FramePeer, ISwingContainerPeer {
 
     /**
      * Initialize this instance.
@@ -385,11 +402,12 @@ final class SwingJFramePeer extends SwingJBaseWindowPeer<Frame, SwingJFrame>
             public void run() {
                 mb.addNotify();
                 peerComponent
-                        .setJMenuBar(((SwingMenuBarPeer) mb.getPeer()).jComponent);
+                    .setJMenuBar(((SwingMenuBarPeer) mb.getPeer()).jComponent);
                 targetComponent.invalidate();
             }
         });
     }
+
     /**
      * @see java.awt.peer.FramePeer#setState(int)
      */

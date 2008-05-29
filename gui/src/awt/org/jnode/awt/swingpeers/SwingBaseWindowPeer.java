@@ -18,14 +18,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.peer.WindowPeer;
 import java.beans.PropertyVetoException;
-
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.SwingUtilities;
@@ -36,12 +41,12 @@ import javax.swing.event.InternalFrameListener;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends SwingBaseWindow<awtT, swingPeerT>>
-        extends SwingContainerPeer<awtT, swingPeerT> implements WindowPeer {
+    extends SwingContainerPeer<awtT, swingPeerT> implements WindowPeer {
 
     private final WindowEventDispatcher eventDispatcher;
 
     public SwingBaseWindowPeer(SwingToolkit toolkit, awtT window,
-            swingPeerT jComponent) {
+                               swingPeerT jComponent) {
         super(toolkit, window, jComponent);
         jComponent.initialize(this);
         jComponent.getContentPane().setLayout(new SwingContainerLayout(targetComponent, this));
@@ -64,13 +69,13 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
                     desktop.getDesktopManager().activateFrame(peerComponent);
                     peerComponent.toFront();
                     desktop.doLayout();
-                } catch (PropertyVetoException x){
-                    log.warn("",x);
+                } catch (PropertyVetoException x) {
+                    log.warn("", x);
                 }
             }
         });
     }
-    
+
     /**
      * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
      *      javax.swing.JComponent)
@@ -125,6 +130,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
 
     /**
      * Sets the resizable flag of this window.
+     *
      * @param resizeable
      */
     public final void setResizable(boolean resizeable) {
@@ -133,12 +139,13 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
 
     /**
      * Sets the title of this window
+     *
      * @param title
      */
     public void setTitle(String title) {
         peerComponent.setTitle(title);
     }
-    
+
     public final void dispose() {
         peerComponent.dispose();
         toolkit.onDisposeFrame(this);
@@ -158,7 +165,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
                 peerComponent.toFront();
                 try {
                     peerComponent.setSelected(true);
-                } catch (PropertyVetoException x){
+                } catch (PropertyVetoException x) {
                     log.warn(x);
                 }
             }

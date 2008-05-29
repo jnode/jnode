@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import javax.swing.JFrame;
@@ -34,14 +34,14 @@ public class JTableTest {
         JFrame f = new JFrame("JTable Test");
         f.setSize(400, 400);
         f.add(new JScrollPane(new JTable(new DefaultTableModel(
-                new Object[][]{
-                        {1, 2, 3, 4},
-                        {'a', 'b', 'c', 'd'},
-                        {5, 6, 7, 8},
-                        {11, 22, 33, 44},
-                        {55, 66, 66, 88},
-                },
-                new Object[]{'A', 'B', 'C', 'D'}))));
+            new Object[][]{
+                {1, 2, 3, 4},
+                {'a', 'b', 'c', 'd'},
+                {5, 6, 7, 8},
+                {11, 22, 33, 44},
+                {55, 66, 66, 88},
+            },
+            new Object[]{'A', 'B', 'C', 'D'}))));
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setVisible(true);
     }

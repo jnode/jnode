@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import org.apache.log4j.Logger;
@@ -29,28 +29,29 @@ import org.apache.log4j.Logger;
  */
 public class StartAwt implements Runnable {
 
-	private static final Logger log = Logger.getLogger(StartAwt.class);
-	
-	public static void main(String[] args) {
-		new StartAwt().run();
-	}
-	
-	/**
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run() {
-        if(JNodeToolkit.isGuiActive()){
-            ((JNodeToolkit)JNodeToolkit.getDefaultToolkit()).joinGUI();
+    private static final Logger log = Logger.getLogger(StartAwt.class);
+
+    public static void main(String[] args) {
+        new StartAwt().run();
+    }
+
+    /**
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+        if (JNodeToolkit.isGuiActive()) {
+            ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).joinGUI();
             JNodeToolkit.waitUntilStopped();
         } else {
             JNodeToolkit.startGui();
             try {
                 final String desktopClassName = System.getProperty("jnode.desktop");
                 if (desktopClassName != null) {
-                    final Class desktopClass = Thread.currentThread().getContextClassLoader().loadClass(desktopClassName);
+                    final Class desktopClass =
+                        Thread.currentThread().getContextClassLoader().loadClass(desktopClassName);
                     final Object desktop = desktopClass.newInstance();
                     if (desktop instanceof Runnable) {
-                        final Thread t = new Thread((Runnable)desktop);
+                        final Thread t = new Thread((Runnable) desktop);
                         t.start();
                     }
                 }

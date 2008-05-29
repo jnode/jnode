@@ -18,30 +18,32 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
+import java.awt.Component;
+import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import java.awt.image.BufferedImage;
-import java.awt.Component;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface JNodeAwtContext {
-	
-	/**
-	 * Gets the desktop pane that holds all the Frames.
-	 * @return
-	 */
-	public JDesktopPane getDesktop();
-	
-	/**
-	 * Gets the root container of the screen, that holds the desktop.
-	 * @return
-	 */
-	public JComponent getAwtRoot();
+
+    /**
+     * Gets the desktop pane that holds all the Frames.
+     *
+     * @return
+     */
+    public JDesktopPane getDesktop();
+
+    /**
+     * Gets the root container of the screen, that holds the desktop.
+     *
+     * @return
+     */
+    public JComponent getAwtRoot();
 
 
     public void adjustDesktopSize(int width, int height);

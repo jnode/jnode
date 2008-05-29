@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import java.awt.image.VMImageUtils;
-
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -32,27 +31,29 @@ import org.jnode.plugin.PluginException;
  */
 public final class AWTPlugin extends Plugin {
 
-	/**
-	 * @param descriptor
-	 */
-	public AWTPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    /**
+     * @param descriptor
+     */
+    public AWTPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Start this plugin
-	 * @throws PluginException
-	 */
-	protected void startPlugin() throws PluginException {
-		VMImageUtils.setAPI(new VMImageAPIImpl(), this);
-	}
+    /**
+     * Start this plugin
+     *
+     * @throws PluginException
+     */
+    protected void startPlugin() throws PluginException {
+        VMImageUtils.setAPI(new VMImageAPIImpl(), this);
+    }
 
-	/**
-	 * Stop this plugin
-	 * @throws PluginException
-	 */
-	protected void stopPlugin() throws PluginException {
-		// GraphicsEnvironment.setLocalGraphicsEnvironment(null);
-		VMImageUtils.resetAPI(this);
-	}
+    /**
+     * Stop this plugin
+     *
+     * @throws PluginException
+     */
+    protected void stopPlugin() throws PluginException {
+        // GraphicsEnvironment.setLocalGraphicsEnvironment(null);
+        VMImageUtils.resetAPI(this);
+    }
 }

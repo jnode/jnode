@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Color;
@@ -34,7 +34,7 @@ import java.net.URL;
  * @author epr
  */
 public class ImageTest {
-    
+
     final static String IMAGE_PATH = "/org/zaval/lw/rs/img/tree.gif";
 
     static class TestComponent extends Component implements ImageObserver {

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.image.IndexColorModel;
@@ -29,7 +29,8 @@ import java.awt.image.IndexColorModel;
 public class ColorModelTest {
     public static void main(String[] args) {
         run(8, 256);
-        System.out.println("Expecting IllegalArgumentException; attempting to pass more than 16 bits to IndexColorModel()");
+        System.out
+            .println("Expecting IllegalArgumentException; attempting to pass more than 16 bits to IndexColorModel()");
         try {
             run(32, 256);
         } catch (IllegalArgumentException e) {

@@ -18,10 +18,8 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.test.gui;
 
-import java.awt.Image;
+package org.jnode.test.gui;
 
 public class Imageutil {
 /*
@@ -29,7 +27,7 @@ public class Imageutil {
  */
 //    public static Image getImage() {
 //        String file = "D:\\java\\spirit.jpg";
-////	Image img1 = Toolkit.getDefaultToolkit().getImage( file );
+//        Image img1 = Toolkit.getDefaultToolkit().getImage( file );
 //        javax.swing.ImageIcon ic = new javax.swing.ImageIcon(file);
 //        Image img1 = ic.getImage();
 //

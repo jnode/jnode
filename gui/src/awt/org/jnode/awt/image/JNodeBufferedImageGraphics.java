@@ -18,67 +18,55 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.image;
 
-import java.awt.AWTError;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
-
-import org.apache.log4j.Logger;
 import org.jnode.awt.util.AbstractSurfaceGraphics;
-import org.jnode.awt.util.BitmapGraphics;
-import org.jnode.driver.video.Surface;
-import org.jnode.driver.video.util.AbstractSurface;
 
 /**
  * @author epr
  */
 public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 
-	private final BufferedImage image;
+    private final BufferedImage image;
 
-	/**
-	 * @param src
-	 */
-	public JNodeBufferedImageGraphics(JNodeBufferedImageGraphics src) {
-		super(src);
-		this.image = src.image;
-	}
+    /**
+     * @param src
+     */
+    public JNodeBufferedImageGraphics(JNodeBufferedImageGraphics src) {
+        super(src);
+        this.image = src.image;
+    }
 
-	/**
-	 * @param image
-	 */
-	public JNodeBufferedImageGraphics(BufferedImage image) {
-		super(new BufferedImageSurface(image), image.getWidth(), image.getHeight());
-		this.image = image;
-	}
+    /**
+     * @param image
+     */
+    public JNodeBufferedImageGraphics(BufferedImage image) {
+        super(new BufferedImageSurface(image), image.getWidth(), image.getHeight());
+        this.image = image;
+    }
 
-	/**
-	 * @see java.awt.Graphics#create()
-	 * @return The graphics
-	 */
-	public Graphics create() {
-		return new JNodeBufferedImageGraphics(this);
-	}
+    /**
+     * @return The graphics
+     * @see java.awt.Graphics#create()
+     */
+    public Graphics create() {
+        return new JNodeBufferedImageGraphics(this);
+    }
 
-	/**
-	 * @see java.awt.Graphics2D#getDeviceConfiguration()
-	 * @return The configuration
-	 */
-	public GraphicsConfiguration getDeviceConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @return The configuration
+     * @see java.awt.Graphics2D#getDeviceConfiguration()
+     */
+    public GraphicsConfiguration getDeviceConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     /**
      * Returns the color model of this Graphics object.

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -51,8 +51,10 @@ public class AWTTest extends Frame {
 
     static class TestComponent extends Component {
 
-        /** My logger */
-//		private static final Logger log = Logger.getLogger(TestComponent.class);
+        /**
+         * My logger
+         */
+//      private static final Logger log = Logger.getLogger(TestComponent.class);
         private final boolean useDoubleBuffer;
 
         public TestComponent(boolean useDoubleBuffer) {
@@ -87,7 +89,7 @@ public class AWTTest extends Frame {
                 g2d.fill(new Ellipse2D.Double(150, 150, 70, 70));
             }
 
-//			Color[] colors = new Color[] { Color.BLACK, Color.RED, Color.CYAN, Color.BLUE, Color.GREEN, Color.GRAY };
+//          Color[] colors = new Color[] { Color.BLACK, Color.RED, Color.CYAN, Color.BLUE, Color.GREEN, Color.GRAY };
             Color[] colors = new Color[]{Color.black, Color.red, Color.cyan, Color.blue, Color.green, Color.gray};
 
             //g.setColor(Color.GREEN);
@@ -156,7 +158,7 @@ public class AWTTest extends Frame {
                         curY = (int) coords[5];
                         break;
                     case PathIterator.SEG_QUADTO:
-//						log.debug("QUADTO not implemented yet");
+//                  log.debug("QUADTO not implemented yet");
                         // Not implemented yet
                         break;
                 }
@@ -164,7 +166,8 @@ public class AWTTest extends Frame {
             }
         }
 
-        protected void drawCurve(Graphics g, double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3) {
+        protected void drawCurve(Graphics g, double x0, double y0, double x1, double y1, double x2, double y2,
+                                 double x3, double y3) {
             double old_x = x0;
             double old_y = y0;
             for (double t = 0.0; t <= 1.0; t += 0.05) {
@@ -182,7 +185,7 @@ public class AWTTest extends Frame {
         }
 
     }
-    
+
     public AWTTest(String title) {
         super(title);
         //wnd.setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
@@ -190,34 +193,35 @@ public class AWTTest extends Frame {
         setLayout(new BorderLayout());
         //wnd.setLocation(75, 50);
         setBackground(Color.GREEN);
-        
+
         final List l = new List();
         l.add("Item 1");
         l.add("Item 2");
         l.add("Item 3");
         //wnd.add(l, BorderLayout.NORTH);
-        
+
         final Button b = new Button("Hello world");
         b.addActionListener(new ActionListener() {
-            int i =0;
+            int i = 0;
+
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Action performed " + e);
-                switch(i){
-                case 0:{
-                    add(new Button(String.valueOf(i)), BorderLayout.WEST);
-                    break;
-                }
-                case 1:{
-                    add(new Button(String.valueOf(i)), BorderLayout.SOUTH);
-                    break;
-                }
-                case 2:{
-                    add(new Button(String.valueOf(i)), BorderLayout.EAST);
-                    break;
-                }
-                default:
-                    b.setLabel(String.valueOf(i));
-                    setVisible(false);
+                switch (i) {
+                    case 0: {
+                        add(new Button(String.valueOf(i)), BorderLayout.WEST);
+                        break;
+                    }
+                    case 1: {
+                        add(new Button(String.valueOf(i)), BorderLayout.SOUTH);
+                        break;
+                    }
+                    case 2: {
+                        add(new Button(String.valueOf(i)), BorderLayout.EAST);
+                        break;
+                    }
+                    default:
+                        b.setLabel(String.valueOf(i));
+                        setVisible(false);
                 }
                 i++;
                 invalidate();
@@ -225,7 +229,7 @@ public class AWTTest extends Frame {
         });
         add(b, BorderLayout.CENTER);
         b.setBackground(Color.YELLOW);
-        
+
         final Button b2 = new Button("Left");
         final Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL);
         final Checkbox cb1 = new Checkbox("Right");
@@ -244,15 +248,15 @@ public class AWTTest extends Frame {
                 }
             }
         });
-        
+
         add(cb1, BorderLayout.EAST);
         cb1.setBackground(Color.WHITE);
-                
+
         final TextField tf = new TextField();
         tf.setText("Let's type here");
         add(tf, BorderLayout.SOUTH);
-        
-        addWindowListener(new WindowAdapter(){
+
+        addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
                 dispose();
             }
@@ -261,11 +265,11 @@ public class AWTTest extends Frame {
 
     public static void main(String[] args) throws InterruptedException {
         boolean useDoubleBuffer = (args.length > 0) && args[0].equals("buffer");
-        
+
         try {
             final AWTTest wnd = new AWTTest("AWTTest");
             wnd.setVisible(true);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import java.awt.Component;
@@ -49,15 +49,21 @@ import org.jnode.driver.input.KeyboardListener;
  * @author Levente S\u00e1ntha
  */
 public class KeyboardHandler implements
-        KeyboardListener {
+    KeyboardListener {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(KeyboardHandler.class);
 
-    /** The queue where to post the events */
+    /**
+     * The queue where to post the events
+     */
     private final EventQueue eventQueue;
 
-    /** The API of the actual keyboard */
+    /**
+     * The API of the actual keyboard
+     */
     private KeyboardAPI keyboardAPI;
 
     private int modifiers;
@@ -65,18 +71,18 @@ public class KeyboardHandler implements
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param eventQueue
      */
     public KeyboardHandler(EventQueue eventQueue) {
         this.eventQueue = eventQueue;
         try {
             final Collection<Device> keyboards = DeviceUtils
-                    .getDevicesByAPI(KeyboardAPI.class);
+                .getDevicesByAPI(KeyboardAPI.class);
             if (!keyboards.isEmpty()) {
                 Device keyboardDevice = (Device) keyboards.iterator().next();
                 keyboardAPI = (KeyboardAPI) keyboardDevice
-                        .getAPI(KeyboardAPI.class);
+                    .getAPI(KeyboardAPI.class);
                 keyboardAPI.addKeyboardListener(this);
                 AccessController.doPrivileged(new PrivilegedAction<Void>() {
                     public Void run() {
@@ -95,7 +101,7 @@ public class KeyboardHandler implements
      */
     public void keyPressed(KeyboardEvent event) {
 
-        if(processSystemKey(event))
+        if (processSystemKey(event))
             return;
 
         int modifiers = event.getModifiers();
@@ -109,7 +115,7 @@ public class KeyboardHandler implements
         char ch = event.getKeyChar();
         if (ch != KeyEvent.CHAR_UNDEFINED && !event.isAltDown() && !event.isControlDown()) {
             postEvent(KeyEvent.KEY_TYPED, event.getTime(),
-                    event.getModifiers(), KeyEvent.VK_UNDEFINED, ch);
+                event.getModifiers(), KeyEvent.VK_UNDEFINED, ch);
         }
 
     }
@@ -122,7 +128,7 @@ public class KeyboardHandler implements
         setModifiers(modifiers);
         event.consume();
 
-        if(pressed){
+        if (pressed) {
             postEvent(KeyEvent.KEY_RELEASED, event.getTime(), modifiers,
                 event.getKeyCode(), event.getKeyChar());
             pressed = false;
@@ -140,27 +146,27 @@ public class KeyboardHandler implements
 
         Component source = null;
         KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        if(kfm != null){
+        if (kfm != null) {
             //Component fo = kfm.getFocusOwner();
             //if(fo == null){
-                Window win = kfm.getActiveWindow();
-                if(win == null){
-                    win = kfm.getFocusedWindow();
-                    if(win != null){
-                        source = win;
-                    }
-                } else {
+            Window win = kfm.getActiveWindow();
+            if (win == null) {
+                win = kfm.getFocusedWindow();
+                if (win != null) {
                     source = win;
                 }
+            } else {
+                source = win;
+            }
             //} else {
-              //  source = fo;
+            //  source = fo;
             //}
         }
 
-        if(source == null){
+        if (source == null) {
             JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
             Frame top = tk.getTop();
-            if(top == null){
+            if (top == null) {
                 //awt is not yet initialized
                 //drop this event
                 return;
@@ -170,7 +176,7 @@ public class KeyboardHandler implements
         }
 
         KeyEvent ke = new KeyEvent(source, id, time, modifiers, keyCode,
-                keyChar);
+            keyChar);
         //org.jnode.vm.Unsafe.debug(ke.toString()+"\n");
         eventQueue.postEvent(ke);
     }
@@ -178,7 +184,7 @@ public class KeyboardHandler implements
     private boolean processSystemKey(KeyboardEvent event) {
         final int key_code = event.getKeyCode();
         if (key_code == KeyEvent.VK_F12 && event.isAltDown() ||
-                key_code == KeyEvent.VK_BACK_SPACE && event.isAltDown() && event.isControlDown()) {
+            key_code == KeyEvent.VK_BACK_SPACE && event.isAltDown() && event.isControlDown()) {
             event.consume();
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 public Void run() {
@@ -205,19 +211,21 @@ public class KeyboardHandler implements
                 }
             });
             return true;
-            
+
         } else if (key_code == KeyEvent.VK_PRINTSCREEN) {
             event.consume();
-            new Thread(new Runnable(){
+            new Thread(new Runnable() {
                 public void run() {
                     try {
                         AccessController.doPrivileged(new PrivilegedAction<Void>() {
                             public Void run() {
                                 try {
                                     log.debug("Taking screenshot");
-                                    File f = File.createTempFile("screen", ".png", new File(System.getProperty("java.io.tmpdir")));
+                                    File f = File.createTempFile("screen", ".png",
+                                        new File(System.getProperty("java.io.tmpdir")));
                                     Dimension ss = JNodeToolkit.getJNodeToolkit().getScreenSize();
-                                    BufferedImage capture = new Robot().createScreenCapture(new Rectangle(0, 0, ss.width , ss.height));
+                                    BufferedImage capture =
+                                        new Robot().createScreenCapture(new Rectangle(0, 0, ss.width, ss.height));
                                     log.debug("Saving screenshot to " + f);
                                     ImageIO.write(capture, "png", f);
                                 } catch (Exception e) {
@@ -231,7 +239,7 @@ public class KeyboardHandler implements
                         log.error("", x);
                     }
                 }
-            },"screenshot").start();
+            }, "screenshot").start();
 
             return true;
         }
@@ -241,8 +249,7 @@ public class KeyboardHandler implements
     /**
      * @return Returns the keyboardAPI.
      */
-    final KeyboardAPI getKeyboardAPI()
-    {
+    final KeyboardAPI getKeyboardAPI() {
         return keyboardAPI;
     }
 

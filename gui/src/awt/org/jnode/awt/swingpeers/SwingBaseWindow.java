@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
@@ -28,26 +28,27 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.VMAwtAPI;
 import java.awt.Window;
-import java.awt.BorderLayout;
-
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
  * Base class for peer implementation that subclass {@link java.awt.Window}.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBaseWindow<awtT, swingPeerT>>
-        extends JInternalFrame implements ISwingPeer<awtT> {
+    extends JInternalFrame implements ISwingPeer<awtT> {
 
-    /** The AWT component this is a peer for */
+    /**
+     * The AWT component this is a peer for
+     */
     protected final awtT target;
 
-    /** The swing peer implementation */
+    /**
+     * The swing peer implementation
+     */
     private SwingBaseWindowPeer<awtT, swingPeerT> swingPeer;
 
     public SwingBaseWindow(awtT target) {
@@ -56,7 +57,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param target
      */
     public SwingBaseWindow(awtT target, String title) {
@@ -83,17 +84,17 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
 
     /**
      * Pass an event onto the AWT component.
-     * 
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         target.dispatchEvent(SwingToolkit.convertEvent(event,
-                target));
+            target));
     }
 
     /**
      * Process an event within this swingpeer
-     * 
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -164,7 +165,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         //when the laf is changed starting from the peer component
         //we enforce the UI update of the target componet
         //this can be dangerous, find a better solution
-        if(target != null)
+        if (target != null)
             SwingUtilities.updateComponentTreeUI(target);
     }
 
@@ -193,12 +194,11 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
             if (!swingPeer.isReshapeInProgress) {
-                Point p = target.isShowing() ? target.getLocationOnScreen()
-                        : new Point();
+                Point p = target.isShowing() ? target.getLocationOnScreen() : new Point();
                 // Point p = awtFrame.getLocationOnScreen();
                 Insets ins = swingPeer.getInsets();
                 target.reshape(p.x + x, p.y, width + ins.left + ins.right,
-                        height + ins.bottom + ins.top);
+                    height + ins.bottom + ins.top);
             }
         }
     }

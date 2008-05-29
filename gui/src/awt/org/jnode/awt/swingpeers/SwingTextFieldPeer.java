@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Dimension;
 import java.awt.TextField;
 import java.awt.peer.TextFieldPeer;
-
 import javax.swing.JTextField;
 
 /**
@@ -33,62 +32,62 @@ import javax.swing.JTextField;
  */
 
 final class SwingTextFieldPeer extends
-        SwingTextComponentPeer<TextField, SwingTextField> implements
-        TextFieldPeer {
+    SwingTextComponentPeer<TextField, SwingTextField> implements
+    TextFieldPeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingTextFieldPeer(SwingToolkit toolkit, TextField textField) {
-		super(toolkit, textField, new SwingTextField(textField));
-		setText(textField.getText());
+    public SwingTextFieldPeer(SwingToolkit toolkit, TextField textField) {
+        super(toolkit, textField, new SwingTextField(textField));
+        setText(textField.getText());
         peerComponent.setColumns(textField.getColumns());
-		setEditable(textField.isEditable());
-	}
+        setEditable(textField.isEditable());
+    }
 
-	/**
-	 * @see java.awt.peer.TextFieldPeer#getMinimumSize(int)
-	 */
-	public Dimension getMinimumSize(int len) {
-		return peerComponent.getMinimumSize();
-	}
+    /**
+     * @see java.awt.peer.TextFieldPeer#getMinimumSize(int)
+     */
+    public Dimension getMinimumSize(int len) {
+        return peerComponent.getMinimumSize();
+    }
 
-	/**
-	 * @see java.awt.peer.TextFieldPeer#getPreferredSize(int)
-	 */
-	public Dimension getPreferredSize(int len) {
-		return peerComponent.getPreferredSize();
-	}
+    /**
+     * @see java.awt.peer.TextFieldPeer#getPreferredSize(int)
+     */
+    public Dimension getPreferredSize(int len) {
+        return peerComponent.getPreferredSize();
+    }
 
-	/**
-	 * @see java.awt.peer.TextFieldPeer#minimumSize(int)
-	 */
-	public Dimension minimumSize(int len) {
-		return getMinimumSize(len);
-	}
+    /**
+     * @see java.awt.peer.TextFieldPeer#minimumSize(int)
+     */
+    public Dimension minimumSize(int len) {
+        return getMinimumSize(len);
+    }
 
-	/**
-	 * @see java.awt.peer.TextFieldPeer#preferredSize(int)
-	 */
-	public Dimension preferredSize(int len) {
-		return getPreferredSize(len);
-	}
+    /**
+     * @see java.awt.peer.TextFieldPeer#preferredSize(int)
+     */
+    public Dimension preferredSize(int len) {
+        return getPreferredSize(len);
+    }
 
-	/**
-	 * @see java.awt.peer.TextFieldPeer#setEchoChar(char)
-	 */
-	public void setEchoChar(char echo_char) {
-		setEchoCharacter(echo_char);
-	}
+    /**
+     * @see java.awt.peer.TextFieldPeer#setEchoChar(char)
+     */
+    public void setEchoChar(char echo_char) {
+        setEchoCharacter(echo_char);
+    }
 
-	/**
-	 * @see java.awt.peer.TextFieldPeer#setEchoCharacter(char)
-	 */
-	public void setEchoCharacter(char echo_char) {
-		// TODO Auto-generated method stub
+    /**
+     * @see java.awt.peer.TextFieldPeer#setEchoCharacter(char)
+     */
+    public void setEchoCharacter(char echo_char) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
 }
 
@@ -105,17 +104,19 @@ final class SwingTextField extends JTextField implements ISwingPeer<TextField> {
     public TextField getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -127,5 +128,5 @@ final class SwingTextField extends JTextField implements ISwingPeer<TextField> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

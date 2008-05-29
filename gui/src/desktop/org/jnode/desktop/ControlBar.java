@@ -18,15 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-
 import javax.swing.JPanel;
-
 import org.jnode.plugin.ExtensionPoint;
 
 /**
@@ -34,23 +32,23 @@ import org.jnode.plugin.ExtensionPoint;
  */
 public class ControlBar extends JPanel {
 
-	private final ApplicationBar appsBar;
-	private final WindowBar windowBar = new WindowBar(); 
-	
-	public ControlBar(ExtensionPoint appsExtensionPoint) {
-		this.appsBar = new ApplicationBar(appsExtensionPoint);
-		setLayout(new BorderLayout());
+    private final ApplicationBar appsBar;
+    private final WindowBar windowBar = new WindowBar();
+
+    public ControlBar(ExtensionPoint appsExtensionPoint) {
+        this.appsBar = new ApplicationBar(appsExtensionPoint);
+        setLayout(new BorderLayout());
         windowBar.setMinimumSize(new Dimension(200, 10));
-		add(appsBar, BorderLayout.CENTER);
-		add(windowBar, BorderLayout.EAST);
+        add(appsBar, BorderLayout.CENTER);
+        add(windowBar, BorderLayout.EAST);
         setBackground(new Color(130, 255, 180));
-	}
-	
-	public ApplicationBar getApplicationBar() {
-		return appsBar;
-	}
-	
-	public WindowBar getWindowBar() {
-		return windowBar;
-	}
+    }
+
+    public ApplicationBar getApplicationBar() {
+        return appsBar;
+    }
+
+    public WindowBar getWindowBar() {
+        return windowBar;
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font;
 
 import java.awt.Font;
@@ -30,50 +30,53 @@ import java.util.Set;
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public interface FontProvider {
-	/**
-	 * Give the name of the font (used for setting the first provider to use
-	 * among all available ones) 
-	 */
-	public String getName();
-	
-	/**
-	 * Does this provides provide the given font?
-	 * @param font
-	 * @return True if this provider provides the given font, false otherwise
-	 */
-	public boolean provides(Font font);
+    /**
+     * Give the name of the font (used for setting the first provider to use
+     * among all available ones)
+     */
+    public String getName();
 
-	/**
-	 * Returns a set containing a one-point size instance of all fonts 
-	 * available in this provider. 
-	 * Typical usage would be to allow a user to select a particular font. 
-	 * Then, the application can size the font and set various font 
-	 * attributes by calling the deriveFont method on the choosen instance.
-	 * This method provides for the application the most precise control 
-	 * over which Font instance is used to render text.
-	 * If a font in this provider has multiple programmable variations,
-	 * only one instance of that Font is returned in the set, 
-	 * and other variations must be derived by the application.
-	 * If a font in this provider has multiple programmable variations, 
-	 * such as Multiple-Master fonts, only one instance of that font 
-	 * is returned in the Font set. 
-	 * The other variations must be derived by the application. 
-	 * 
-	 * @return All fonts this provider can provide
-	 */
-	public Set<Font> getAllFonts();
+    /**
+     * Does this provides provide the given font?
+     *
+     * @param font
+     * @return True if this provider provides the given font, false otherwise
+     */
+    public boolean provides(Font font);
 
-	/**
-	 * Gets a text renderer for the given font.
-	 * @param font
-	 * @return The text renderen for the given font
-	 */
-	public TextRenderer getTextRenderer(Font font);
+    /**
+     * Returns a set containing a one-point size instance of all fonts
+     * available in this provider.
+     * Typical usage would be to allow a user to select a particular font.
+     * Then, the application can size the font and set various font
+     * attributes by calling the deriveFont method on the choosen instance.
+     * This method provides for the application the most precise control
+     * over which Font instance is used to render text.
+     * If a font in this provider has multiple programmable variations,
+     * only one instance of that Font is returned in the set,
+     * and other variations must be derived by the application.
+     * If a font in this provider has multiple programmable variations,
+     * such as Multiple-Master fonts, only one instance of that font
+     * is returned in the Font set.
+     * The other variations must be derived by the application.
+     *
+     * @return All fonts this provider can provide
+     */
+    public Set<Font> getAllFonts();
 
-	/**
-	 * Gets the font metrics for the given font.
-	 * @param font
-	 * @return The font metrics for the given font
-	 */
-	public FontMetrics getFontMetrics(Font font);
+    /**
+     * Gets a text renderer for the given font.
+     *
+     * @param font
+     * @return The text renderen for the given font
+     */
+    public TextRenderer getTextRenderer(Font font);
+
+    /**
+     * Gets the font metrics for the given font.
+     *
+     * @param font
+     * @return The font metrics for the given font
+     */
+    public FontMetrics getFontMetrics(Font font);
 }

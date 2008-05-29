@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.desktop.classic;
 
 import java.awt.AWTError;
@@ -29,7 +29,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -38,8 +37,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.net.URL;
-
+import javax.imageio.ImageIO;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -50,8 +50,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.imageio.ImageIO;
-
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
@@ -94,7 +92,7 @@ public class Desktop implements Runnable {
                 desktopPane = desktopFrame.getDesktop();
                 final Container awtRoot = desktopFrame.getAwtRoot();
 
-                if(desktopFrame instanceof JFrame){
+                if (desktopFrame instanceof JFrame) {
                     ((JFrame) desktopFrame).addWindowListener(new WindowAdapter() {
                         public void windowClosed(WindowEvent e) {
                             taskBar.clock.stop();
@@ -144,36 +142,36 @@ public class Desktop implements Runnable {
 
                     public void actionPerformed(ActionEvent e) {
                         //if (frame == null) {
-                            frame = new JFrame("Desktop color");
-                            colorChooser = new JColorChooser();
-                            frame.add(colorChooser, BorderLayout.CENTER);
-                            JButton ok = new JButton("OK");
-                            ok.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent event) {
-                                    desktopPane.setBackground(colorChooser.getColor());
-                                    frame.setVisible(false);
-                                    frame.dispose();
-                                }
-                            });
-                            JButton apply = new JButton("Apply");
-                            apply.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent event) {
-                                    desktopPane.setBackground(colorChooser.getColor());
-                                }
-                            });
-                            JButton cancel = new JButton("Cancel");
-                            cancel.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent event) {
-                                    desktopPane.setBackground(oldColor);
-                                    frame.setVisible(false);
-                                    frame.dispose();
-                                }
-                            });
-                            JPanel buttons = new JPanel();
-                            buttons.add(ok);
-                            buttons.add(apply);
-                            buttons.add(cancel);
-                            frame.add(buttons, BorderLayout.SOUTH);
+                        frame = new JFrame("Desktop color");
+                        colorChooser = new JColorChooser();
+                        frame.add(colorChooser, BorderLayout.CENTER);
+                        JButton ok = new JButton("OK");
+                        ok.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                desktopPane.setBackground(colorChooser.getColor());
+                                frame.setVisible(false);
+                                frame.dispose();
+                            }
+                        });
+                        JButton apply = new JButton("Apply");
+                        apply.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                desktopPane.setBackground(colorChooser.getColor());
+                            }
+                        });
+                        JButton cancel = new JButton("Cancel");
+                        cancel.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                desktopPane.setBackground(oldColor);
+                                frame.setVisible(false);
+                                frame.dispose();
+                            }
+                        });
+                        JPanel buttons = new JPanel();
+                        buttons.add(ok);
+                        buttons.add(apply);
+                        buttons.add(cancel);
+                        frame.add(buttons, BorderLayout.SOUTH);
                         //}
 
                         oldColor = desktopPane.getBackground();
@@ -195,7 +193,6 @@ public class Desktop implements Runnable {
                 final int w = awtRoot.getWidth();
                 taskBar.setPreferredSize(new Dimension(w, controlBarHeight));
                 awtRoot.add(taskBar, BorderLayout.SOUTH);
-
 
                 //desktopFrame.setBackgroundImage(loadImage());
 
@@ -219,9 +216,9 @@ public class Desktop implements Runnable {
                 desktopMenu.add(taskBar.changeResMI4);
                 desktopPane.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent event) {
-                        if(event.getButton() == MouseEvent.BUTTON2){
-                            if (desktopMenu .isShowing()) {
-                                desktopMenu .setVisible(false);
+                        if (event.getButton() == MouseEvent.BUTTON2) {
+                            if (desktopMenu.isShowing()) {
+                                desktopMenu.setVisible(false);
                             } else {
                                 desktopMenu.show(desktopPane, event.getX(), event.getY());
                             }
@@ -288,8 +285,8 @@ public class Desktop implements Runnable {
         }
     }
 
-    void enableBackgroundImage(boolean b){
-        if(b) desktopFrame.setBackgroundImage(loadImage("background.png"));
+    void enableBackgroundImage(boolean b) {
+        if (b) desktopFrame.setBackgroundImage(loadImage("background.png"));
         else desktopFrame.setBackgroundImage(null);
         desktopPane.repaint();
     }

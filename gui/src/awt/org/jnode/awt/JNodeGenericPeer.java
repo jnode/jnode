@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import java.awt.Toolkit;
@@ -28,13 +28,13 @@ import java.awt.Toolkit;
  */
 public abstract class JNodeGenericPeer<toolkitT extends JNodeToolkit, compT> {
 
-	protected final toolkitT toolkit;
-	protected final compT targetComponent;
+    protected final toolkitT toolkit;
+    protected final compT targetComponent;
 
-	public JNodeGenericPeer(toolkitT toolkit, compT target) {
-		this.toolkit = toolkit;
-		this.targetComponent = target;
-	}
+    public JNodeGenericPeer(toolkitT toolkit, compT target) {
+        this.toolkit = toolkit;
+        this.targetComponent = target;
+    }
 
     /**
      * @return
@@ -43,26 +43,27 @@ public abstract class JNodeGenericPeer<toolkitT extends JNodeToolkit, compT> {
         return this.targetComponent;
     }
 
-	/**
-	 * @see java.awt.peer.ComponentPeer#getToolkit()
-	 * @return The toolkit
-	 */
-	public final Toolkit getToolkit() {
-		return toolkit;
-	}
+    /**
+     * @return The toolkit
+     * @see java.awt.peer.ComponentPeer#getToolkit()
+     */
+    public final Toolkit getToolkit() {
+        return toolkit;
+    }
 
-	/**
-	 * Gets the implementation toolkit
-	 * @return The toolkit
-	 */
-	public final toolkitT getToolkitImpl() {
-		return toolkit;
-	}
+    /**
+     * Gets the implementation toolkit
+     *
+     * @return The toolkit
+     */
+    public final toolkitT getToolkitImpl() {
+        return toolkit;
+    }
 
-	/**
-	 * Destroy the peer and release all resource
-	 */
-	public void dispose() {
-		// Nothing to do
-	}
+    /**
+     * Destroy the peer and release all resource
+     */
+    public void dispose() {
+        // Nothing to do
+    }
 }

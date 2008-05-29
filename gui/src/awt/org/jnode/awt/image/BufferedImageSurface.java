@@ -3,21 +3,30 @@
  */
 package org.jnode.awt.image;
 
-import org.jnode.driver.video.util.AbstractSurface;
-import org.jnode.driver.video.Surface;
-import org.jnode.awt.util.BitmapGraphics;
-import org.apache.log4j.Logger;
-
-import java.awt.image.*;
-import java.awt.*;
+import java.awt.AWTError;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.SampleModel;
+import java.awt.image.SinglePixelPackedSampleModel;
+import java.awt.image.WritableRaster;
+import org.apache.log4j.Logger;
+import org.jnode.awt.util.BitmapGraphics;
+import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.util.AbstractSurface;
 
 /**
  * @author Levente S\u00e1ntha
-*/
+ */
 public class BufferedImageSurface extends AbstractSurface {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(BufferedImageSurface.class);
     private final BufferedImage sImage;
     private final BitmapGraphics bitmapGraphics;
@@ -34,7 +43,8 @@ public class BufferedImageSurface extends AbstractSurface {
             final SinglePixelPackedSampleModel sppSM = (SinglePixelPackedSampleModel) sampleModel;
             final int dataType = dataBuffer.getDataType();
             final int dataTypeSize = DataBuffer.getDataTypeSize(dataType);
-            this.bitmapGraphics = BitmapGraphics.createInstance(dataBuffer, width, height, sppSM.getScanlineStride() * dataTypeSize / 8, model.getTransparency());
+            this.bitmapGraphics = BitmapGraphics.createInstance(dataBuffer, width, height,
+                sppSM.getScanlineStride() * dataTypeSize / 8, model.getTransparency());
         } else {
             this.bitmapGraphics = null;
         }
@@ -51,6 +61,7 @@ public class BufferedImageSurface extends AbstractSurface {
 
     /**
      * Draw a pixel
+     *
      * @param x
      * @param y
      * @param color
@@ -77,11 +88,12 @@ public class BufferedImageSurface extends AbstractSurface {
 
     /**
      * Draw an image to this surface
+     *
      * @param src
      * @param srcX
      * @param srcY
-     * @param x The upper left x coordinate
-     * @param y The upper left y coordinate
+     * @param x       The upper left x coordinate
+     * @param y       The upper left y coordinate
      * @param w
      * @param h
      * @param bgColor
@@ -103,6 +115,7 @@ public class BufferedImageSurface extends AbstractSurface {
 
     /**
      * Draw a line
+     *
      * @param x1
      * @param y1
      * @param x2
@@ -119,18 +132,19 @@ public class BufferedImageSurface extends AbstractSurface {
     }
 
     /**
-     * @see org.jnode.driver.video.Surface#getColorModel()
      * @return the color model
+     * @see org.jnode.driver.video.Surface#getColorModel()
      */
     public ColorModel getColorModel() {
         return model;
     }
 
     /**
-     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, java.awt.geom.AffineTransform, int, int, int, int, int, int, java.awt.Color)
+     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, java.awt.geom.AffineTransform,
+     * int, int, int, int, int, int, java.awt.Color)
      */
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY,
-            int dstX, int dstY, int width, int height, Color color) {
+                                int dstX, int dstY, int width, int height, Color color) {
         if (bitmapGraphics != null) {
             bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
         } else {

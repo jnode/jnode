@@ -18,13 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import java.awt.Frame;
-import java.awt.BorderLayout;
 
 /**
  * @author Levente S?ntha
@@ -37,7 +37,7 @@ public class JDPTest {
             JDesktopPane jdtp = new JDesktopPane();
             JInternalFrame jif = new JInternalFrame("Test");
             jif.setSize(100, 100);
-            jif.setLocation(10,10);
+            jif.setLocation(10, 10);
             jif.setResizable(true);
             jif.setClosable(true);
             jif.setIconifiable(true);
@@ -52,7 +52,7 @@ public class JDPTest {
             Thread.sleep(5000);
 
             wnd.setVisible(false);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
         } finally {
             wnd.dispose();

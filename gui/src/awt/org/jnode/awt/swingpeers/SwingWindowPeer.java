@@ -18,24 +18,22 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
-
-import javax.swing.JComponent;
 import javax.swing.JRootPane;
 
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
- * 
+ *
  * @author Levente S\u00e1ntha
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
-        implements WindowPeer {
+    implements WindowPeer {
 
     public SwingWindowPeer(SwingToolkit toolkit, Window window) {
         super(toolkit, window, new SwingWindow(window));

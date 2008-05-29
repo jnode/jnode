@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.Dialog;
@@ -26,11 +26,12 @@ import java.awt.peer.DialogPeer;
 
 /**
  * AWT dialog peer implemented as a {@link javax.swing.JInternalFrame}.
+ *
  * @author Levente S\u00e1ntha
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
-        implements DialogPeer, ISwingContainerPeer {
+    implements DialogPeer, ISwingContainerPeer {
 
     public SwingDialogPeer(SwingToolkit toolkit, Dialog target) {
         super(toolkit, target, new SwingDialog(target, target.getTitle()));
@@ -54,7 +55,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 }
 
 final class SwingDialog extends SwingBaseWindow<Dialog, SwingDialog> {
-    
+
     public SwingDialog(Dialog target, String title) {
         super(target, title);
     }

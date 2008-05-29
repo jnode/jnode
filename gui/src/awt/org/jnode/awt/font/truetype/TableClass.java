@@ -18,15 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 import gnu.java.security.action.SetAccessibleAction;
-
 import java.lang.reflect.Constructor;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.jnode.awt.font.truetype.tables.CMapTable;
 import org.jnode.awt.font.truetype.tables.GlyphTable;
 import org.jnode.awt.font.truetype.tables.HeadTable;
@@ -41,6 +38,7 @@ import org.jnode.awt.font.truetype.tables.TTFTable;
 
 /**
  * Enumeration of all supported true type table classes.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 enum TableClass {
@@ -54,27 +52,29 @@ enum TableClass {
     MAXP("maxp", MaxPTable.class),
     NAME("name", NameTable.class),
     OS2("OS/2", OS2Table.class),
-    POST("post", PostTable.class)    
-    ;
-    
+    POST("post", PostTable.class);
+
     private final String tag;
     private final Class<? extends TTFTable> clazz;
-    private static final Class[] CONS_TYPES = { TTFFontData.class, TTFInput.class };
+    private static final Class[] CONS_TYPES = {TTFFontData.class, TTFInput.class};
+
     private TableClass(String tag, Class<? extends TTFTable> clazz) {
         this.tag = tag;
         this.clazz = clazz;
     }
-    
+
     /**
      * Gets the tag of this table class.
+     *
      * @return
      */
     public final String getTag() {
         return tag;
     }
-    
+
     /**
      * Gets the table class by its tag.
+     *
      * @param tag
      * @return Null if not found.
      */
@@ -86,9 +86,10 @@ enum TableClass {
         }
         return null;
     }
-    
+
     /**
      * Create a new table of this class.
+     *
      * @param font
      * @param in
      * @return
@@ -111,15 +112,14 @@ enum TableClass {
                 }
             }
         });
-*/  
-    	try
-    	{
-	        final Constructor c = clazz.getDeclaredConstructor(CONS_TYPES);
-	        AccessController.doPrivileged(new SetAccessibleAction(c));
-	        return (TTFTable) c.newInstance(new Object[] { font, in });
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return null;
-		}
+*/
+        try {
+            final Constructor c = clazz.getDeclaredConstructor(CONS_TYPES);
+            AccessController.doPrivileged(new SetAccessibleAction(c));
+            return (TTFTable) c.newInstance(new Object[]{font, in});
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            return null;
+        }
     }
 }

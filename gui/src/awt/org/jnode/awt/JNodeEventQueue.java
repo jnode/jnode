@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import java.awt.EventQueue;
@@ -30,7 +30,7 @@ import java.awt.VMAwtAPI;
 final class JNodeEventQueue extends EventQueue {
 
     private boolean shutdown = false;
-    
+
     /**
      * Shut me down.
      */
@@ -38,11 +38,11 @@ final class JNodeEventQueue extends EventQueue {
         this.shutdown = true;
         VMAwtAPI.shutdown(this);
     }
-    
+
     /**
      * Is this queue still live (is has not been shutdown).
      */
     final boolean isLive() {
         return !shutdown;
-    }    
+    }
 }

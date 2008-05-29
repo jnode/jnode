@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.desktop;
 
 import org.jnode.plugin.ExtensionPoint;
@@ -31,32 +31,33 @@ import org.jnode.plugin.PluginException;
  */
 public class DesktopPlugin extends Plugin {
 
-	/**
-	 * @param descriptor
-	 */
-	public DesktopPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    /**
+     * @param descriptor
+     */
+    public DesktopPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Gets the applications (apps) extensions point
-	 * @return
-	 */
-	public ExtensionPoint getAppsExtensionPoint() {
-		return getDescriptor().getExtensionPoint("apps");
-	}
-	
-	/**
-	 * @see org.jnode.plugin.Plugin#startPlugin()
-	 */
-	protected void startPlugin() throws PluginException {
-		System.setProperty("jnode.desktop", "org.jnode.desktop.classic.Desktop");
-	}
+    /**
+     * Gets the applications (apps) extensions point
+     *
+     * @return
+     */
+    public ExtensionPoint getAppsExtensionPoint() {
+        return getDescriptor().getExtensionPoint("apps");
+    }
 
-	/**
-	 * @see org.jnode.plugin.Plugin#stopPlugin()
-	 */
-	protected void stopPlugin() throws PluginException {
-		// Nothing to do
-	}
+    /**
+     * @see org.jnode.plugin.Plugin#startPlugin()
+     */
+    protected void startPlugin() throws PluginException {
+        System.setProperty("jnode.desktop", "org.jnode.desktop.classic.Desktop");
+    }
+
+    /**
+     * @see org.jnode.plugin.Plugin#stopPlugin()
+     */
+    protected void stopPlugin() throws PluginException {
+        // Nothing to do
+    }
 }

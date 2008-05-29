@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -29,7 +29,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -39,41 +38,59 @@ import javax.swing.SwingUtilities;
  */
 public class Tetris extends JPanel implements KeyListener {
     private static final int[][][][] BLOCKS = {
-            { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 1, 1 } },       // * * *
-                    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, //   *
-                    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
-                    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 } } },
-            { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } },       // * * * *
-                    { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 } },
-                    { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } },
-                    { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 } } },
-            { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 } },       // * * *
-                    { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 1, 2 } }, // *
-                    { { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
-                    { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } } },
-            { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 2, 1 } },       // * * *
-                    { { 1, 0 }, { 1, 1 }, { 0, 2 }, { 1, 2 } }, //     *
-                    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
-                    { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 0, 2 } } },
-            { { { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 } },       // * *
-                    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, //   * *
-                    { { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 } },
-                    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } } },
-            { { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } },       //   * *
-                    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 } }, // * *
-                    { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } },
-                    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 } } },
-            { { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } },       // * *
-                    { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // * *
-                    { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } },
-                    { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } } } };
+        // * * *
+        //   *
+        {{{0, 0}, {1, 0}, {2, 0}, {1, 1}},
+            {{1, 0}, {0, 1}, {1, 1}, {1, 2}},
+            {{1, 0}, {0, 1}, {1, 1}, {2, 1}},
+            {{0, 0}, {0, 1}, {1, 1}, {0, 2}}},
+        // * * * *
+        {{{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+            {{0, 0}, {0, 1}, {0, 2}, {0, 3}},
+            {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+            {{0, 0}, {0, 1}, {0, 2}, {0, 3}}},
+        // * * *
+        // *
+        {{{0, 0}, {1, 0}, {2, 0}, {0, 1}},
+            {{0, 0}, {1, 0}, {1, 1}, {1, 2}},
+            {{2, 0}, {0, 1}, {1, 1}, {2, 1}},
+            {{0, 0}, {0, 1}, {0, 2}, {1, 2}}},
+        // * * *
+        //     *
+        {{{0, 0}, {1, 0}, {2, 0}, {2, 1}},
+            {{1, 0}, {1, 1}, {0, 2}, {1, 2}},
+            {{0, 0}, {0, 1}, {1, 1}, {2, 1}},
+            {{0, 0}, {1, 0}, {0, 1}, {0, 2}}},
+        // * *
+        //   * *
+        {{{1, 0}, {2, 0}, {0, 1}, {1, 1}},
+            {{0, 0}, {0, 1}, {1, 1}, {1, 2}},
+            {{1, 0}, {2, 0}, {0, 1}, {1, 1}},
+            {{0, 0}, {0, 1}, {1, 1}, {1, 2}}},
+        //   * *
+        // * *
+        {{{0, 0}, {1, 0}, {1, 1}, {2, 1}},
+            {{1, 0}, {0, 1}, {1, 1}, {0, 2}},
+            {{0, 0}, {1, 0}, {1, 1}, {2, 1}},
+            {{1, 0}, {0, 1}, {1, 1}, {0, 2}}},
+        // * *
+        // * *
+        {{{0, 0}, {1, 0}, {0, 1}, {1, 1}},
+            {{0, 0}, {1, 0}, {0, 1}, {1, 1}},
+            {{0, 0}, {1, 0}, {0, 1}, {1, 1}},
+            {{0, 0}, {1, 0}, {0, 1}, {1, 1}}}};
 
-    private static final int[][] DIMS = { { 3, 2 }, { 2, 3 }, { 3, 2 },
-            { 2, 3 }, { 4, 1 }, { 1, 4 }, { 4, 1 }, { 1, 4 }, { 3, 2 },
-            { 2, 3 }, { 3, 2 }, { 2, 3 }, { 3, 2 }, { 2, 3 }, { 3, 2 },
-            { 2, 3 }, { 3, 2 }, { 2, 3 }, { 3, 2 }, { 2, 3 }, { 3, 2 },
-            { 2, 3 }, { 3, 2 }, { 2, 3 }, { 2, 2 }, { 2, 2 }, { 2, 2 },
-            { 2, 2 }, };
+    private static final int[][] DIMS = {
+        {3, 2}, {2, 3}, {3, 2},
+        {2, 3}, {4, 1}, {1, 4},
+        {4, 1}, {1, 4}, {3, 2},
+        {2, 3}, {3, 2}, {2, 3},
+        {3, 2}, {2, 3}, {3, 2},
+        {2, 3}, {3, 2}, {2, 3},
+        {3, 2}, {2, 3}, {3, 2},
+        {2, 3}, {3, 2}, {2, 3},
+        {2, 2}, {2, 2}, {2, 2},
+        {2, 2}};
 
     private static final int CELL = 20;
 
@@ -81,9 +98,9 @@ public class Tetris extends JPanel implements KeyListener {
 
     private static final int HEIGHT_C = 20;
 
-    private final static Color[] COLORS = { Color.BLACK, Color.YELLOW,
-            Color.RED, Color.CYAN, Color.BLUE, Color.MAGENTA, Color.ORANGE,
-            Color.LIGHT_GRAY, Color.DARK_GRAY };
+    private final static Color[] COLORS = {Color.BLACK, Color.YELLOW,
+        Color.RED, Color.CYAN, Color.BLUE, Color.MAGENTA, Color.ORANGE,
+        Color.LIGHT_GRAY, Color.DARK_GRAY};
 
     private int[][] WORLD = new int[WIDTH_C + 2][HEIGHT_C + 2];
 
@@ -112,7 +129,7 @@ public class Tetris extends JPanel implements KeyListener {
     private Image img;
 
     private static final Dimension DIM = new Dimension((WIDTH_C + 2) * CELL,
-            (HEIGHT_C + 5 + 2) * CELL);
+        (HEIGHT_C + 5 + 2) * CELL);
 
     private Random si_rnd = new Random();
 
@@ -151,16 +168,14 @@ public class Tetris extends JPanel implements KeyListener {
 
     public void paintBox(Graphics g, int i, int j, Color c) {
         Color dc = new Color(darken(c.getRed()), darken(c.getGreen()), darken(c
-                .getBlue()));
+            .getBlue()));
         Color lc = new Color(lighten(c.getRed()), lighten(c.getGreen()),
-                lighten(c.getBlue()));
+            lighten(c.getBlue()));
         g.setColor(c);
         g.fillRect(i * CELL, j * CELL, CELL - 1, CELL - 1);
         g.setColor(dc);
-        g.drawLine(i * CELL, (j + 1) * CELL - 1, (i + 1) * CELL - 1, (j + 1)
-                * CELL - 1);
-        g.drawLine((i + 1) * CELL - 1, (j + 1) * CELL - 1, (i + 1) * CELL - 1,
-                j * CELL);
+        g.drawLine(i * CELL, (j + 1) * CELL - 1, (i + 1) * CELL - 1, (j + 1) * CELL - 1);
+        g.drawLine((i + 1) * CELL - 1, (j + 1) * CELL - 1, (i + 1) * CELL - 1, j * CELL);
         g.setColor(lc);
         g.drawLine(i * CELL, (j + 1) * CELL - 1, i * CELL, j * CELL);
         g.drawLine(i * CELL, j * CELL, (i + 1) * CELL - 1, j * CELL);
@@ -184,41 +199,39 @@ public class Tetris extends JPanel implements KeyListener {
                     paintBox(g2, i, j, COLORS[ci]);
             }
         }
-        {
-            Color c = COLORS[COLORS.length - 1];
-            for (int i = 0; i < WIDTH_C + 2; i++) {
-                paintBox(g2, i, HEIGHT_C + 6, c);
-            }
-            for (int j = 0; j < 4; j++) {
-                paintBox(g2, 0, HEIGHT_C + 2 + j, c);
-                paintBox(g2, 5, HEIGHT_C + 2 + j, c);
-                // paintBox(g2, 6, HEIGHT_C + 2 +j, c );
-                paintBox(g2, WIDTH_C + 1, HEIGHT_C + 2 + j, c);
-            }
+
+        Color c = COLORS[COLORS.length - 1];
+        for (int i = 0; i < WIDTH_C + 2; i++) {
+            paintBox(g2, i, HEIGHT_C + 6, c);
         }
+        for (int j = 0; j < 4; j++) {
+            paintBox(g2, 0, HEIGHT_C + 2 + j, c);
+            paintBox(g2, 5, HEIGHT_C + 2 + j, c);
+            // paintBox(g2, 6, HEIGHT_C + 2 +j, c );
+            paintBox(g2, WIDTH_C + 1, HEIGHT_C + 2 + j, c);
+        }
+
         if (isUp()) {
             int[][] b = BLOCKS[si][bi];
             for (int i = 0; i < b.length; i++) {
                 paintBox(g2, x + b[i][0], y + b[i][1], COLORS[si + 1]);
             }
-            {
-                g2.setColor(Color.WHITE);
-                g2.drawString("SCORE:", CELL + 2, (HEIGHT_C + 4) * CELL - 4);
-                g2.drawString(String.valueOf(score), 2 * CELL, (HEIGHT_C + 5)
-                        * CELL - 4);
-                b = BLOCKS[next_si][next_bi];
-                for (int i = 0; i < b.length; i++) {
-                    paintBox(g2, 7 + b[i][0], HEIGHT_C + 2 + b[i][1],
-                            COLORS[next_si + 1]);
-                }
+
+            g2.setColor(Color.WHITE);
+            g2.drawString("SCORE:", CELL + 2, (HEIGHT_C + 4) * CELL - 4);
+            g2.drawString(String.valueOf(score), 2 * CELL, (HEIGHT_C + 5) * CELL - 4);
+            b = BLOCKS[next_si][next_bi];
+            for (int i = 0; i < b.length; i++) {
+                paintBox(g2, 7 + b[i][0], HEIGHT_C + 2 + b[i][1],
+                    COLORS[next_si + 1]);
             }
         } else if (end) {
             g2.setColor(Color.BLACK);
             g2.fillRect(2 * CELL, 9 * CELL, 8 * CELL, 4 * CELL);
             g2.setColor(Color.WHITE);
             g2.drawRect(2 * CELL, 9 * CELL, 8 * CELL, 4 * CELL);
-            g2.drawString("GAME OVER! SCORE: " + score, (WIDTH_C - 6) * CELL
-                    / 2 + 2, (HEIGHT_C + 2) * CELL / 2);
+            g2.drawString("GAME OVER! SCORE: " + score, (WIDTH_C - 6) * CELL / 2 + 2,
+                (HEIGHT_C + 2) * CELL / 2);
         }
         g2.dispose();
         g.drawImage(img, 0, 0, this);
@@ -257,29 +270,29 @@ public class Tetris extends JPanel implements KeyListener {
         if (!isUp() || pause)
             return;
         switch (e.getKeyCode()) {
-        case KeyEvent.VK_UP:
-            rot(1);
-            break;
-        case KeyEvent.VK_LEFT:
-            trans(-1);
-            break;
-        case KeyEvent.VK_DOWN:
-            rot(3);
-            break;
-        case KeyEvent.VK_RIGHT:
-            trans(1);
-            break;
-        case KeyEvent.VK_SPACE:
-            fall();
-            break;
-        case KeyEvent.VK_N:
-            newGame();
-            break;
-        case KeyEvent.VK_P:
-            flipPause();
-            break;
-        default:
-            return;
+            case KeyEvent.VK_UP:
+                rot(1);
+                break;
+            case KeyEvent.VK_LEFT:
+                trans(-1);
+                break;
+            case KeyEvent.VK_DOWN:
+                rot(3);
+                break;
+            case KeyEvent.VK_RIGHT:
+                trans(1);
+                break;
+            case KeyEvent.VK_SPACE:
+                fall();
+                break;
+            case KeyEvent.VK_N:
+                newGame();
+                break;
+            case KeyEvent.VK_P:
+                flipPause();
+                break;
+            default:
+                return;
         }
         SwingUtilities.invokeLater(runRepaint);
     }
@@ -293,6 +306,7 @@ public class Tetris extends JPanel implements KeyListener {
             try {
                 thread.join();
             } catch (InterruptedException ignore) {
+                //ignore
             }
         }
         for (int i = 0; i < WIDTH_C + 2; i++) {
@@ -316,7 +330,8 @@ public class Tetris extends JPanel implements KeyListener {
             public void run() {
                 try {
                     long before, after, sleep;
-                    stop: while (isUp()) {
+                stop:
+                    while (isUp()) {
                         before = System.currentTimeMillis();
                         synchronized (Tetris.class) {
                             while (pause) {
@@ -325,6 +340,7 @@ public class Tetris extends JPanel implements KeyListener {
                                     Tetris.class.wait();
                                     System.out.println("back from waiting");
                                 } catch (InterruptedException ignore) {
+                                    //ignore
                                 }
                                 if (!isUp())
                                     break stop;
@@ -347,7 +363,7 @@ public class Tetris extends JPanel implements KeyListener {
                         try {
                             Thread.sleep(sleep);
                         } catch (InterruptedException ignore) {
-
+                            //ignore
                         }
                     }
                 } catch (Throwable ex) {
@@ -441,7 +457,7 @@ public class Tetris extends JPanel implements KeyListener {
                 int delay = 500;
 
                 try {
-                    if(argv.length > 0) delay = Integer.parseInt(argv[0]);
+                    if (argv.length > 0) delay = Integer.parseInt(argv[0]);
                 } catch (Exception e) {
                     // ignore
                 }
@@ -451,7 +467,7 @@ public class Tetris extends JPanel implements KeyListener {
                 tetris.delay = delay;
                 frame.add(tetris, BorderLayout.CENTER);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                frame.setSize(DIM.width + 7, DIM.height + CELL + CELL /2);
+                frame.setSize(DIM.width + 7, DIM.height + CELL + CELL / 2);
                 frame.setVisible(true);
                 tetris.requestFocus();
                 tetris.newGame();

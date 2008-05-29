@@ -18,17 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.test.gui;
 
-import org.jnode.awt.geom.PolyLine;
-import org.jnode.driver.video.util.Curves;
+package org.jnode.test.gui;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
+import org.jnode.awt.geom.PolyLine;
+import org.jnode.driver.video.util.Curves;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -88,7 +87,8 @@ public class PolyLineTest {
             g.setColor(Color.RED);
             final int cnt = linePoints.length;
             for (int i = 0; i < cnt - 2; i += 2) {
-                g.drawLine((int) linePoints[i], (int) linePoints[i + 1], (int) linePoints[i + 2], (int) linePoints[i + 3]);
+                g.drawLine((int) linePoints[i], (int) linePoints[i + 1], (int) linePoints[i + 2], (int) linePoints[i +
+                    3]);
             }
         }
     }

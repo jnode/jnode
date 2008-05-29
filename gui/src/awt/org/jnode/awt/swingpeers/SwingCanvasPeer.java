@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Canvas;
 import java.awt.peer.CanvasPeer;
-
 import javax.swing.JComponent;
 
 /**
@@ -33,11 +32,11 @@ import javax.swing.JComponent;
 
 final class SwingCanvasPeer extends SwingComponentPeer<Canvas, SwingCanvas> implements CanvasPeer {
 
-	public SwingCanvasPeer(SwingToolkit toolkit, Canvas canvas) {
+    public SwingCanvasPeer(SwingToolkit toolkit, Canvas canvas) {
         super(toolkit, canvas, new SwingCanvas(canvas));
-		SwingToolkit.add(canvas, peerComponent);
-		SwingToolkit.copyAwtProperties(canvas, peerComponent);
-	}
+        SwingToolkit.add(canvas, peerComponent);
+        SwingToolkit.copyAwtProperties(canvas, peerComponent);
+    }
 
 }
 
@@ -54,17 +53,19 @@ final class SwingCanvas extends JComponent implements ISwingPeer<Canvas> {
     public Canvas getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -76,5 +77,5 @@ final class SwingCanvas extends JComponent implements ISwingPeer<Canvas> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

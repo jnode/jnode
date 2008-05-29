@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -32,7 +32,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -45,15 +44,15 @@ public class MouseEventTest {
         f.add(createLabel("WEST", Color.GREEN, true), BorderLayout.WEST);
         f.add(createLabel("EAST", Color.BLUE, true), BorderLayout.EAST);
         f.add(createLabel("NORTH", Color.RED, true), BorderLayout.NORTH);
-        f.add(createLabel("CENTER",  Color.WHITE, true), BorderLayout.CENTER);
+        f.add(createLabel("CENTER", Color.WHITE, true), BorderLayout.CENTER);
         //f.add(createLabel("SOUTH", Color.MAGENTA, true), BorderLayout.SOUTH);
-        JTextArea jta = new JTextArea("SOUTH\nThis is a\nscrollable textarea.\nUse mouse wheel\nto see all the text\n"); 
+        JTextArea jta = new JTextArea("SOUTH\nThis is a\nscrollable textarea.\nUse mouse wheel\nto see all the text\n");
         f.add(new JScrollPane(jta), BorderLayout.CENTER);
-        
+
         f.setSize(300, 300);
         f.setLocation(0, 0);
         f.validate();
-        f.addWindowListener(new WindowAdapter(){
+        f.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 f.dispose();
             }

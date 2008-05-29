@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.renderer;
 
 import java.lang.ref.WeakReference;
@@ -27,14 +27,16 @@ import java.util.Map;
 
 /**
  * Class used to hold objects often used in the font render process.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class RenderContext {
 
     private final Map<Object, WeakReference<?>> objects = new HashMap<Object, WeakReference<?>>();
-    
+
     /**
      * Gets an object out of this context with a given key.
+     *
      * @param key
      * @return
      */
@@ -46,9 +48,10 @@ public class RenderContext {
             return null;
         }
     }
-    
+
     /**
      * Gets an object out of this context with a given key.
+     *
      * @param key
      * @return
      */
@@ -57,5 +60,5 @@ public class RenderContext {
         if ((ref == null) || (ref.get() != value)) {
             objects.put(key, new WeakReference<Object>(value));
         }
-    }    
+    }
 }

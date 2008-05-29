@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.peer.MenuBarPeer;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 
 /**
  * AWT menu bar peer implemented as a {@link javax.swing.JMenuBar}.
@@ -34,7 +34,7 @@ import java.awt.peer.MenuBarPeer;
  */
 
 final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
-        implements MenuBarPeer {
+    implements MenuBarPeer {
 
     @SuppressWarnings("deprecation")
     public SwingMenuBarPeer(SwingToolkit toolkit, MenuBar menuBar) {
@@ -57,7 +57,7 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
             jComponent.add(((SwingMenuPeer) menu.getPeer()).jComponent);
         }
         //TODO a better workaround than this
-        if(help_menu != null){
+        if (help_menu != null) {
             help_menu.addNotify();
             jComponent.add(((SwingMenuPeer) help_menu.getPeer()).jComponent);
         }

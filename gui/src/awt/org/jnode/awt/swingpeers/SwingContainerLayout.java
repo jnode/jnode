@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.Component;
@@ -33,25 +33,25 @@ import java.awt.LayoutManager;
 final class SwingContainerLayout implements LayoutManager {
 
     private final Container awtContainer;
-	private final SwingContainerPeer<?, ?> containerPeer;
+    private final SwingContainerPeer<?, ?> containerPeer;
     private boolean layoutBusy = false;
 
-	public SwingContainerLayout(Container awtContainer, SwingContainerPeer containerPeer) {
+    public SwingContainerLayout(Container awtContainer, SwingContainerPeer containerPeer) {
         this.awtContainer = awtContainer;
-		this.containerPeer = containerPeer;
-	}
+        this.containerPeer = containerPeer;
+    }
 
-	/**
-	 * @see java.awt.LayoutManager#addLayoutComponent(java.lang.String,
-	 *      java.awt.Component)
-	 */
-	public void addLayoutComponent(String name, Component component) {
-	}
+    /**
+     * @see java.awt.LayoutManager#addLayoutComponent(java.lang.String,
+     *      java.awt.Component)
+     */
+    public void addLayoutComponent(String name, Component component) {
+    }
 
-	/**
-	 * @see java.awt.LayoutManager#layoutContainer(java.awt.Container)
-	 */
-	public void layoutContainer(Container parent) {
+    /**
+     * @see java.awt.LayoutManager#layoutContainer(java.awt.Container)
+     */
+    public void layoutContainer(Container parent) {
         if (!layoutBusy) {
             layoutBusy = true;
             try {
@@ -60,7 +60,7 @@ final class SwingContainerLayout implements LayoutManager {
                 layoutBusy = false;
             }
         }
-	}
+    }
 
     private final void doLayout(Container parent) {
         awtContainer.doLayout();
@@ -72,31 +72,31 @@ final class SwingContainerLayout implements LayoutManager {
         for (int i = 0; i < cnt; i++) {
             final Component child = parent.getComponent(i);
             if (child instanceof ISwingPeer) {
-                final Component awtComp = ((ISwingPeer< ? >) child)
-                        .getAWTComponent();
+                final Component awtComp = ((ISwingPeer<?>) child)
+                    .getAWTComponent();
                 child.setLocation(awtComp.getX() - dx, awtComp.getY() - dy);
             }
         }
     }
-    
-	/**
-	 * @see java.awt.LayoutManager#minimumLayoutSize(java.awt.Container)
-	 */
-	public Dimension minimumLayoutSize(Container parent) {
-		return parent.getSize();
-	}
 
-	/**
-	 * @see java.awt.LayoutManager#preferredLayoutSize(java.awt.Container)
-	 */
-	public Dimension preferredLayoutSize(Container parent) {
-		return parent.getSize();
-	}
+    /**
+     * @see java.awt.LayoutManager#minimumLayoutSize(java.awt.Container)
+     */
+    public Dimension minimumLayoutSize(Container parent) {
+        return parent.getSize();
+    }
 
-	/**
-	 * @see java.awt.LayoutManager#removeLayoutComponent(java.awt.Component)
-	 */
-	public void removeLayoutComponent(Component component) {
-	}
+    /**
+     * @see java.awt.LayoutManager#preferredLayoutSize(java.awt.Container)
+     */
+    public Dimension preferredLayoutSize(Container parent) {
+        return parent.getSize();
+    }
+
+    /**
+     * @see java.awt.LayoutManager#removeLayoutComponent(java.awt.Component)
+     */
+    public void removeLayoutComponent(Component component) {
+    }
 
 }

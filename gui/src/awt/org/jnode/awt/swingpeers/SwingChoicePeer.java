@@ -18,69 +18,69 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Choice;
 import java.awt.peer.ChoicePeer;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 /**
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
+ *
  * @author Levente S\u00e1ntha
  */
 
 final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> implements ChoicePeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
-		super(toolkit, choice, new SwingChoice(choice));
-		final JComboBox combo = (JComboBox) peerComponent;
+    public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
+        super(toolkit, choice, new SwingChoice(choice));
+        final JComboBox combo = (JComboBox) peerComponent;
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         final int cnt = choice.getItemCount();
         for (int i = 0; i < cnt; i++) {
-			model.addElement(choice.getItem(i));
-		}
-		combo.setModel(model);
-		SwingToolkit.add(choice, combo);
-		SwingToolkit.copyAwtProperties(choice, combo);
-	}
+            model.addElement(choice.getItem(i));
+        }
+        combo.setModel(model);
+        SwingToolkit.add(choice, combo);
+        SwingToolkit.copyAwtProperties(choice, combo);
+    }
 
-	//
-	// ChoicePeer
-	//
+    //
+    // ChoicePeer
+    //
 
-	public void remove(int index) {
-		model().removeElementAt(index);
-	}
+    public void remove(int index) {
+        model().removeElementAt(index);
+    }
 
-	public void removeAll() {
-		model().removeAllElements();
-	}
+    public void removeAll() {
+        model().removeAllElements();
+    }
 
-	public void add(String item, int index) {
-		model().insertElementAt(item, index);
-	}
+    public void add(String item, int index) {
+        model().insertElementAt(item, index);
+    }
 
-	private DefaultComboBoxModel model() {
-		return ((DefaultComboBoxModel) ((JComboBox) peerComponent).getModel());
-	}
+    private DefaultComboBoxModel model() {
+        return ((DefaultComboBoxModel) ((JComboBox) peerComponent).getModel());
+    }
 
-	// Deprecated
+    // Deprecated
 
-	public void addItem(String item, int index) {
-		add(item, index);
-	}
+    public void addItem(String item, int index) {
+        add(item, index);
+    }
 
-	public void select(int index) {
-		((JComboBox) peerComponent).setSelectedIndex(index);
-	}
+    public void select(int index) {
+        ((JComboBox) peerComponent).setSelectedIndex(index);
+    }
 
 }
 
@@ -97,17 +97,19 @@ final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
     public Choice getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -119,6 +121,6 @@ final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }
 

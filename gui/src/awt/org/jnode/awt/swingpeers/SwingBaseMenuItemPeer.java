@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.MenuItem;
 import java.awt.event.PaintEvent;
 import java.awt.peer.MenuItemPeer;
-
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 
@@ -33,8 +32,8 @@ import javax.swing.JMenuItem;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class SwingBaseMenuItemPeer<awtT extends MenuItem, peerT extends JComponent>
-        extends SwingMenuComponentPeer<awtT, peerT> implements
-        MenuItemPeer {
+    extends SwingMenuComponentPeer<awtT, peerT> implements
+    MenuItemPeer {
 
     //
     // Construction

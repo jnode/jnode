@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.renderer;
 
 import java.awt.Dimension;
@@ -47,12 +47,11 @@ public class GlyphRenderer {
 
     private final double minY;
 
-    private static final String BITS_NAME = GlyphRenderer.class.getName()
-            + "#BITS";
+    private static final String BITS_NAME = GlyphRenderer.class.getName() + "#BITS";
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param shape
      */
     public GlyphRenderer(RenderContext ctx, Shape shape, double ascent) {
@@ -60,42 +59,40 @@ public class GlyphRenderer {
         this.minX = master.minX;
         this.minY = master.minY;
         this.sumAreaTable = SummedAreaTable.create(master.bits, master.width,
-                master.height);
+            master.height);
     }
 
     /**
      * Create a raster that can be used in {@link #createGlyphRaster(double)}.
-     * 
+     *
      * @param width
      * @param height
      * @return
      */
     public static final WritableRaster createRaster(int width, int height) {
         final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-        final int[] nBits = { 8 };
+        final int[] nBits = {8};
         final ComponentColorModel cm = new ComponentColorModel(cs, nBits,
-                false, true, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+            false, true, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
         return cm.createCompatibleWritableRaster(width, height);
     }
 
     /**
      * Create a raster for the given at a given font-size.
-     * 
+     *
      * @param fontSize
      * @return The size of the created raster.
      */
     public final Dimension createGlyphRaster(WritableRaster dst, double fontSize) {
         final double scale = MASTER_HEIGHT / fontSize;
-        final int height = (int) ((((double)sumAreaTable.getHeight()) / scale) + 0.5);
-        final int width = (int) ((((double)sumAreaTable.getWidth()) / scale) + 0.5);
+        final int height = (int) ((((double) sumAreaTable.getHeight()) / scale) + 0.5);
+        final int width = (int) ((((double) sumAreaTable.getWidth()) / scale) + 0.5);
 
         if (dst.getWidth() < width) {
-            throw new IllegalArgumentException("Raster width ("
-                    + dst.getWidth() + ") is too small (" + width + ")");
+            throw new IllegalArgumentException("Raster width (" + dst.getWidth() + ") is too small (" + width + ")");
         }
         if (dst.getHeight() < height) {
-            throw new IllegalArgumentException("Raster height ("
-                    + dst.getHeight() + ") is too small (" + height + ")");
+            throw new IllegalArgumentException("Raster height (" + dst.getHeight() + ") is too small (" + height + ")");
         }
 
         final int si = (int) (scale + 0.5);
@@ -115,7 +112,7 @@ public class GlyphRenderer {
     /**
      * Gets the minX, minY location that was removed when the glyph was rendered
      * into the raster.
-     * 
+     *
      * @param fontSize
      * @return
      */
@@ -126,12 +123,12 @@ public class GlyphRenderer {
 
     /**
      * Creates a master shape of the letter.
-     * 
+     *
      * @param shape
      * @return
      */
     private final Master createMaster(RenderContext ctx, Shape shape,
-            double ascent) {
+                                      double ascent) {
         final Area area = new Area(shape);
         final double scale = MASTER_HEIGHT / ascent;
 

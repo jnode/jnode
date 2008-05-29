@@ -18,10 +18,8 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.test.gui;
 
-import org.jnode.driver.video.util.Curves;
+package org.jnode.test.gui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -30,6 +28,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import org.jnode.driver.video.util.Curves;
 
 /**
  * @author epr
@@ -37,7 +36,7 @@ import java.awt.geom.GeneralPath;
 public class QuadCurveTest {
 
     public static void main(String[] args)
-            throws Exception {
+        throws Exception {
         Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);

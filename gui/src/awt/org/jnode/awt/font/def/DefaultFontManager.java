@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.def;
 
 import gnu.java.security.action.GetPropertyAction;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -34,9 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.FontProvider;
@@ -59,11 +56,12 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     private final HashMap<String, FontProvider> providers = new HashMap<String, FontProvider>();
     private FontProvider firstProvider;
 
-	public final Map<Integer, String> fontTypeToProviderName = (Map<Integer, String>)
-								Collections.singletonMap(Font.TRUETYPE_FONT, "ttf");
-    
+    public final Map<Integer, String> fontTypeToProviderName = (Map<Integer, String>)
+        Collections.singletonMap(Font.TRUETYPE_FONT, "ttf");
+
     /**
      * Create a new instance
+     *
      * @param providersEP
      */
     public DefaultFontManager(ExtensionPoint providersEP) {
@@ -72,6 +70,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
 
     /**
      * Start this manager
+     *
      * @throws PluginException
      */
     public void start() throws PluginException {
@@ -120,6 +119,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
 
     /**
      * Gets the font metrics for the given font.
+     *
      * @param font
      * @return The font metrics for the given font
      */
@@ -127,13 +127,13 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         FontProvider prv = getProvider(font);
         Font txFont = font;
         if (prv == null) {
-        	txFont = getTranslatedFont(font);
+            txFont = getTranslatedFont(font);
             prv = getProvider(txFont);
         }
         if (prv != null) {
             return prv.getFontMetrics(txFont);
         } else {
-        	log.error("No provider found for font " + txFont);
+            log.error("No provider found for font " + txFont);
             return new EmptyFontMetrics(txFont);
         }
     }
@@ -148,25 +148,27 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param x
      * @param y
      */
-    public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y, Color color) {
+    public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y,
+                         Color color) {
         FontProvider prv = getProvider(font);
         Font txFont = font;
         if (prv == null) {
-        	txFont = getTranslatedFont(font);
+            txFont = getTranslatedFont(font);
             prv = getProvider(txFont);
         }
         if (prv != null) {
-        	final TextRenderer renderer = prv.getTextRenderer(txFont);
-        	renderer.render(g, clip, tx, text, x, y, color);
+            final TextRenderer renderer = prv.getTextRenderer(txFont);
+            renderer.render(g, clip, tx, text, x, y, color);
         } else {
-        	log.error("No provider found for font " + txFont);
+            log.error("No provider found for font " + txFont);
         }
     }
 
     /**
      * @param point
      * @param extension
-     * @see org.jnode.plugin.ExtensionPointListener#extensionAdded(org.jnode.plugin.ExtensionPoint, org.jnode.plugin.Extension)
+     * @see org.jnode.plugin.ExtensionPointListener#extensionAdded(org.jnode.plugin.ExtensionPoint,
+     * org.jnode.plugin.Extension)
      */
     public void extensionAdded(ExtensionPoint point, Extension extension) {
         updateFontProviders();
@@ -175,7 +177,8 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     /**
      * @param point
      * @param extension
-     * @see org.jnode.plugin.ExtensionPointListener#extensionRemoved(org.jnode.plugin.ExtensionPoint, org.jnode.plugin.Extension)
+     * @see org.jnode.plugin.ExtensionPointListener#extensionRemoved(org.jnode.plugin.ExtensionPoint,
+     * org.jnode.plugin.Extension)
      */
     public void extensionRemoved(ExtensionPoint point, Extension extension) {
         final ConfigurationElement[] elements = extension.getConfigurationElements();
@@ -184,83 +187,83 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
             log.debug("Removed provider: class=" + className);
             if (className != null) {
                 FontProvider prv = providers.remove(className);
-                if(firstProvider == prv)
-                {
-                	firstProvider = null;
-                	
-                	//TODO choose another first provider ?
+                if (firstProvider == prv) {
+                    firstProvider = null;
+
+                    //TODO choose another first provider ?
                 }
             }
         }
     }
 
-	public Font createFont(int format, InputStream stream)
-	{
-		String name = fontTypeToProviderName.get(format);
-		if(name == null) throw new IllegalArgumentException("unknown format "+name);
+    public Font createFont(int format, InputStream stream) {
+        String name = fontTypeToProviderName.get(format);
+        if (name == null) throw new IllegalArgumentException("unknown format " + name);
 
-		if(getFirstProvider().getName().equals(name))
-		{
-			//return firstProvider;
-			return null;
-		}
-		
+        if (getFirstProvider().getName().equals(name)) {
+            //return firstProvider;
+            return null;
+        }
+
         for (FontProvider prv : providers.values()) {
-        	if (prv.getName().equals(name)) {
+            if (prv.getName().equals(name)) {
                 //return prv.;
-        		return null; //TODO
+                return null; //TODO
             }
         }
-        
-        throw new IllegalArgumentException("can't create font with format "+name);        
-	}
+
+        throw new IllegalArgumentException("can't create font with format " + name);
+    }
 
     /**
      * Gets the provider for a given font
+     *
      * @param font
      * @return The provider
      */
     private FontProvider getProvider(Font font) {
-    	FontProvider prov = getFirstProvider();
-    	final String firstProvName = prov.getName();
-    	if (prov.provides(font)) {
+        FontProvider prov = getFirstProvider();
+        final String firstProvName = prov.getName();
+        if (prov.provides(font)) {
             return prov;
-    	}
-      for (FontProvider prv : providers.values()) {
-          if(firstProvName.equals(prv.getName())) continue; // skip the first provider
-        			
-        	if (prv.provides(font)) {
+        }
+        for (FontProvider prv : providers.values()) {
+            if (firstProvName.equals(prv.getName())) continue; // skip the first provider
+
+            if (prv.provides(font)) {
                 return prv;
             }
         }
-        log.debug("font="+font+" NO PROVIDER");
+        log.debug("font=" + font + " NO PROVIDER");
         return null;
     }
-    
-    private FontProvider getFirstProvider()
-    {
+
+    private FontProvider getFirstProvider() {
 // todo fix true type font
-//        final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
-        final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "bdf"));
-        if((firstProvider == null) || ((firstProvider != null) && !firstProviderName.equals(firstProvider.getName())))
-        {
+//        final String firstProviderName = (String)AccessController.
+// doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
+        final String firstProviderName =
+            (String) AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "bdf"));
+        if ((firstProvider == null) ||
+            ((firstProvider != null) && !firstProviderName.equals(firstProvider.getName()))) {
             for (FontProvider prv : providers.values()) {
-            	if (firstProviderName.equals(prv.getName())) {
-            		firstProvider = prv;
-            		break;
+                if (firstProviderName.equals(prv.getName())) {
+                    firstProvider = prv;
+                    break;
                 }
             }
         }
         return firstProvider;
     }
-    
+
     /**
      * Translated the font into a font that is provided by a provider.
+     *
      * @param font
      * @return
      */
     private Font getTranslatedFont(Font font) {
-    	return new Font("Luxi Sans", Font.PLAIN, font.getSize());        	
+        return new Font("Luxi Sans", Font.PLAIN, font.getSize());
     }
 
     private synchronized void updateFontProviders() {

@@ -18,23 +18,22 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Container;
-import java.awt.Insets;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.peer.LightweightPeer;
-
 import javax.swing.JComponent;
 
 /**
  * @author Levente S\u00e1ntha
  */
 final class SwingLightweightContainerPeer extends
-        SwingContainerPeer<Container, SwingLightweightContainer> implements
-        LightweightPeer {
+    SwingContainerPeer<Container, SwingLightweightContainer> implements
+    LightweightPeer {
     private Insets containerInsets;
 
     public SwingLightweightContainerPeer(SwingToolkit toolkit, Container component) {
@@ -60,28 +59,30 @@ final class SwingLightweightContainerPeer extends
 final class SwingLightweightContainer extends JComponent implements ISwingPeer<Container> {
 
     private final Container awtComponent;
-    
+
     public SwingLightweightContainer(Container awtComponent) {
         this.awtComponent = awtComponent;
     }
-    
+
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
     public Container getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -93,5 +94,5 @@ final class SwingLightweightContainer extends JComponent implements ISwingPeer<C
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

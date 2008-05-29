@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 import org.jnode.plugin.Plugin;
@@ -30,30 +30,30 @@ import org.jnode.plugin.PluginException;
  */
 public class TTFPlugin extends Plugin {
 
-	/**
-	 * @param descriptor
-	 */
-	public TTFPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    /**
+     * @param descriptor
+     */
+    public TTFPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Start this plugin
-	 * 
-	 * @throws PluginException
-	 */
-	protected void startPlugin() throws PluginException {
-		// TODO Auto-generated method stub
+    /**
+     * Start this plugin
+     *
+     * @throws PluginException
+     */
+    protected void startPlugin() throws PluginException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/**
-	 * Stop this plugin
-	 * 
-	 * @throws PluginException
-	 */
-	protected void stopPlugin() throws PluginException {
-		// TODO Auto-generated method stub
+    /**
+     * Stop this plugin
+     *
+     * @throws PluginException
+     */
+    protected void stopPlugin() throws PluginException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

@@ -18,35 +18,35 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.peer.PanelPeer;
-
 import javax.swing.JPanel;
 
 /**
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
+ *
  * @author Levente S\u00e1ntha
  */
 
 final class SwingPanelPeer extends SwingContainerPeer<Panel, SwingPanel>
-        implements PanelPeer, ISwingContainerPeer {
+    implements PanelPeer, ISwingContainerPeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
-		super(toolkit, panel, new SwingPanel(panel));
-		final SwingPanel jPanel = (SwingPanel) peerComponent;
-		SwingToolkit.add(panel, jPanel);
-		SwingToolkit.copyAwtProperties(panel, jPanel);
+    public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
+        super(toolkit, panel, new SwingPanel(panel));
+        final SwingPanel jPanel = (SwingPanel) peerComponent;
+        SwingToolkit.add(panel, jPanel);
+        SwingToolkit.copyAwtProperties(panel, jPanel);
         peerComponent.setLayout(new SwingContainerLayout(panel, this));
-	}
+    }
 
 }
 
@@ -71,17 +71,19 @@ final class SwingPanel extends JPanel implements ISwingPeer<Panel> {
         super.paintChildren(g);
         //SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -93,5 +95,5 @@ final class SwingPanel extends JPanel implements ISwingPeer<Panel> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

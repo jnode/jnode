@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import gnu.java.security.action.SetPropertyAction;
-
 import java.security.AccessController;
-
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -35,7 +33,7 @@ import org.jnode.plugin.PluginException;
 public final class SwingPeersPlugin extends Plugin {
 
     private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
-    
+
     /**
      * @param descriptor
      */

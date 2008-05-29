@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Menu;
@@ -46,7 +46,7 @@ public class AWTMenuTest extends AWTTest {
         try {
             final AWTMenuTest wnd = new AWTMenuTest("AWTTest");
             wnd.setVisible(true);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }

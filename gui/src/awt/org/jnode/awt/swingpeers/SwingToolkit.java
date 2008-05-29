@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTError;
@@ -42,6 +42,7 @@ import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.Panel;
+import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.ScrollPane;
@@ -50,8 +51,6 @@ import java.awt.Shape;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.Window;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.peer.ButtonPeer;
@@ -76,30 +75,32 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
-
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
 
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
- * 
+ *
  * @author Levente S\u00e1ntha
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class SwingToolkit extends JNodeToolkit {
 
-    /** An empty border */
+    /**
+     * An empty border
+     */
     static final Border EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
 
-    /** My repaint manager.  Only valid between onInitialize and onClose */
+    /**
+     * My repaint manager.  Only valid between onInitialize and onClose
+     */
     private SwingRepaintManager repaintManager;
 
     public static void add(Component component, JComponent peer) {
@@ -189,7 +190,6 @@ public final class SwingToolkit extends JNodeToolkit {
 
     /**
      * Initialize this instance.
-     *
      */
     public SwingToolkit() {
     }
@@ -210,7 +210,7 @@ public final class SwingToolkit extends JNodeToolkit {
     }
 
     protected CheckboxMenuItemPeer createCheckboxMenuItem(
-            CheckboxMenuItem target) {
+        CheckboxMenuItem target) {
         return new SwingCheckboxMenuItemPeer(this, target);
     }
 
@@ -231,7 +231,7 @@ public final class SwingToolkit extends JNodeToolkit {
     }
 
     public DragSourceContextPeer createDragSourceContextPeer(
-            DragGestureEvent dge) {
+        DragGestureEvent dge) {
         return null;
     }
 
@@ -248,8 +248,8 @@ public final class SwingToolkit extends JNodeToolkit {
             setTop(target);
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
-            return new DesktopFramePeer(this, (DesktopFrame)target);
-        } else /*if (target instanceof JFrame) */{
+            return new DesktopFramePeer(this, (DesktopFrame) target);
+        } else /*if (target instanceof JFrame) */ {
             if (!isGuiActive()) {
                 throw new AWTError("Gui is not active");
             }
@@ -337,32 +337,32 @@ public final class SwingToolkit extends JNodeToolkit {
     }
 
     public Component getTopComponentAt(int x, int y) {
-        if(desktopFrame == null){
+        if (desktopFrame == null) {
             //no AWT yet, drop the event
             return null;
         }
-        Component comp = desktopFrame.getComponentAt(x,y);
-        if(comp instanceof SwingBaseWindow){
+        Component comp = desktopFrame.getComponentAt(x, y);
+        if (comp instanceof SwingBaseWindow) {
             SwingBaseWindow base = (SwingBaseWindow) comp;
-            if(base.isShowing()){
+            if (base.isShowing()) {
                 Window w = base.getAWTComponent();
-                if(w instanceof Frame){
-                    MenuBar mb = ((Frame)w).getMenuBar();
-                    if(mb != null){
-                        JMenuBar jmb = ((SwingMenuBarPeer)mb.getPeer()).jComponent;
-                        Point p = new Point(x,y);
+                if (w instanceof Frame) {
+                    MenuBar mb = ((Frame) w).getMenuBar();
+                    if (mb != null) {
+                        JMenuBar jmb = ((SwingMenuBarPeer) mb.getPeer()).jComponent;
+                        Point p = new Point(x, y);
                         SwingUtilities.convertPointFromScreen(p, jmb);
                         comp = SwingUtilities.getDeepestComponentAt(jmb, p.x, p.y);
-                        if(comp != null && (comp != jmb || comp == jmb && jmb.contains(p.x,p.y))){
+                        if (comp != null && (comp != jmb || comp == jmb && jmb.contains(p.x, p.y))) {
                             return comp;
                         }
                     }
                 }
-                Point p = new Point(x,y);
+                Point p = new Point(x, y);
                 SwingUtilities.convertPointFromScreen(p, w);
                 comp = SwingUtilities.getDeepestComponentAt(w, p.x, p.y);
-                if(comp == w){
-                    p = new Point(x,y);
+                if (comp == w) {
+                    p = new Point(x, y);
                     SwingUtilities.convertPointFromScreen(p, base);
                     comp = SwingUtilities.getDeepestComponentAt(base, p.x, p.y);
                 }
@@ -370,7 +370,7 @@ public final class SwingToolkit extends JNodeToolkit {
         } else {
             comp = super.getTopComponentAt(x, y);
             SwingFrame sfp = (SwingFrame) SwingUtilities.getAncestorOfClass(
-                    SwingFrame.class, comp);
+                SwingFrame.class, comp);
             if (sfp != null) {
                 Rectangle r = sfp.getBounds();
                 Insets ins = sfp.getSwingPeer().getInsets();
@@ -402,11 +402,10 @@ public final class SwingToolkit extends JNodeToolkit {
 
         // sometime when the start of wat has failed, desktopFrame can be null
         // so, we must check it is not null
-        if(desktopFrame != null)
-        {
-	        // Close the desktop
-	        desktopFrame.dispose();
-	        desktopFrame = null;
+        if (desktopFrame != null) {
+            // Close the desktop
+            desktopFrame.dispose();
+            desktopFrame = null;
         }
     }
 
@@ -455,7 +454,7 @@ public final class SwingToolkit extends JNodeToolkit {
         */
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-        } catch (Exception x){
+        } catch (Exception x) {
             log.warn("Look And Feel not found: ", x);
         }
         // Create the desktop

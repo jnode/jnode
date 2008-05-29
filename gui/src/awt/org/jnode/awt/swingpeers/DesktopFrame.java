@@ -18,26 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import java.awt.image.BufferedImage;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.DefaultFocusTraversalPolicy;
-import java.awt.Graphics;
-import java.awt.VMAwtAPI;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.DefaultFocusTraversalPolicy;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.VMAwtAPI;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
-
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 
@@ -46,8 +44,8 @@ import org.jnode.awt.JNodeAwtContext;
  */
 public final class DesktopFrame extends JFrame implements JNodeAwtContext {
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(70, 130, 180);
-	private final JDesktopPane desktop;
-	private static final Logger log = Logger.getLogger(DesktopFrame.class);
+    private final JDesktopPane desktop;
+    private static final Logger log = Logger.getLogger(DesktopFrame.class);
 
 
     private BufferedImage backgroundImage;
@@ -59,45 +57,46 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
     public void repaint(long tm, int x, int y, int width, int height) {
         // TODO Auto-generated method stub
         //log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
-          //      + height);
+        //      + height);
         super.repaint(tm, x, y, width, height);
     }
 
     /**
-	 * Initialize this instance.
-	 * @param screenSize the desktop size
-	 */
-	public DesktopFrame(Dimension screenSize) {
-		super("");
+     * Initialize this instance.
+     *
+     * @param screenSize the desktop size
+     */
+    public DesktopFrame(Dimension screenSize) {
+        super("");
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         setSize(screenSize);
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(new DefaultFocusTraversalPolicy());
-        desktop = new JDesktopPane(){
+        desktop = new JDesktopPane() {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                if(backgroundImage != null){
+                if (backgroundImage != null) {
                     Dimension ds = desktop.getSize();
                     int iw = backgroundImage.getWidth();
                     int ih = backgroundImage.getHeight();
-                    g.drawImage(backgroundImage, (ds.width - iw) /2, (ds.height - ih)/2, desktop);
+                    g.drawImage(backgroundImage, (ds.width - iw) / 2, (ds.height - ih) / 2, desktop);
                 }
             }
         };
         desktop.setBackground(DESKTOP_BACKGROUND_COLOR);
         getContentPane().add(desktop);
-	}
+    }
 
     /**
-	 * @return Returns the desktop.
-	 */
-	public final JDesktopPane getDesktop() {
-		return desktop;
-	}
-	
-	public final JComponent getAwtRoot() {
-		return (JComponent)getContentPane();
-	}
+     * @return Returns the desktop.
+     */
+    public final JDesktopPane getDesktop() {
+        return desktop;
+    }
+
+    public final JComponent getAwtRoot() {
+        return (JComponent) getContentPane();
+    }
 
     public void adjustDesktopSize(int width, int height) {
         setSize(width, height);
@@ -106,23 +105,23 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
     }
 
     /**
-	 * @see javax.swing.JFrame#frameInit()
-	 */
-	protected void frameInit() {
-		super.setLayout(new BorderLayout());
-		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-		setRootPane(createRootPane());
-	}
+     * @see javax.swing.JFrame#frameInit()
+     */
+    protected void frameInit() {
+        super.setLayout(new BorderLayout());
+        enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+        setRootPane(createRootPane());
+    }
 
     public void dispose() {
-        for(JInternalFrame f : desktop.getAllFrames()){
-            try{
-                if(f instanceof SwingBaseWindow){
-                    ((SwingBaseWindow)f).target.dispose();
+        for (JInternalFrame f : desktop.getAllFrames()) {
+            try {
+                if (f instanceof SwingBaseWindow) {
+                    ((SwingBaseWindow) f).target.dispose();
                 } else {
                     f.setClosed(true);
                 }
-            } catch(PropertyVetoException e){
+            } catch (PropertyVetoException e) {
                 log.warn("Failed closing frame: " + f.getTitle(), e);
             }
         }
@@ -130,14 +129,14 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
     }
 
     public void setBackgroundImage(BufferedImage backgroundImage) {
-            this.backgroundImage = backgroundImage;
+        this.backgroundImage = backgroundImage;
     }
 
     public Component getTopLevelRootComponent() {
         return this;
     }
 
-    protected void processKeyEvent(KeyEvent e){
+    protected void processKeyEvent(KeyEvent e) {
         super.processKeyEvent(e);
     }
 }

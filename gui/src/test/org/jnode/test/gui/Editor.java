@@ -18,9 +18,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -32,19 +43,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -200,7 +198,7 @@ public class Editor extends JFrame {
                     JOptionPane.showMessageDialog(Editor.this, "File not found: " + file);
                 } catch (IOException ioe) {
                     JOptionPane.showMessageDialog(Editor.this, "Error saving file: " + file);
-                } catch (Exception x){
+                } catch (Exception x) {
                     String msg = "Unexpected error wile saving file: " + file;
                     logger.error(msg, x);
                     JOptionPane.showMessageDialog(Editor.this, msg);
