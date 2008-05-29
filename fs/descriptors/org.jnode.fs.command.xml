@@ -104,6 +104,9 @@
         <argument argLabel="fsPath" description="the file system's root directory"/>
       </sequence>
     </syntax>
+    <syntax alias="pwd">
+      <empty description="show the pathname for the current directory"/>
+    </syntax>
   </extension>
 
 

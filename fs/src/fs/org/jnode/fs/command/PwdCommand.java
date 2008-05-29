@@ -27,23 +27,22 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class PwdCommand extends AbstractCommand
 {
-  public static Help.Info HELP_INFO = new Help.Info("pwd", "show the name of current working directory");
+    public PwdCommand() {
+        super("show the name of current working directory");
+    }
 
-  public static void main(String[] args) throws Exception
-  {
-    new PwdCommand().execute(args);
-  }
+    public static void main(String[] args) throws Exception {
+        new PwdCommand().execute(args);
+    }
 
-  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
-  {
-    File file = new File("");
-    out.println(file.getAbsolutePath());
-  }
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+        File file = new File("");
+        out.println(file.getAbsolutePath());
+    }
 }
