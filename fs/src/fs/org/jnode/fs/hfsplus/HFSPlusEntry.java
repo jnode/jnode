@@ -8,25 +8,26 @@ public class HFSPlusEntry extends AbstractFSEntry{
 
 	private LeafRecord record;
 	
-	public HFSPlusEntry(HfsPlusFileSystem fs, FSEntryTable table,
-			HFSPlusDirectory parent, String name, LeafRecord record) {
+	public HFSPlusEntry(final HfsPlusFileSystem fs, final FSEntryTable table,
+			final HFSPlusDirectory parent, final String name, final LeafRecord record) {
 		super(fs, table, parent, name, getFSEntryType(name, record));
 		this.record = record;
 	}
 
-	static private int getFSEntryType(String name, LeafRecord record) {
+	private static int getFSEntryType(final String name, final LeafRecord record) {
 		int mode = record.getType();
-		if("/".equals(name))
+		if("/".equals(name)) {
 			return AbstractFSEntry.ROOT_ENTRY;
-		else if(mode == HfsPlusConstants.RECORD_TYPE_FOLDER)
+		} else if(mode == HfsPlusConstants.RECORD_TYPE_FOLDER) {
 			return AbstractFSEntry.DIR_ENTRY;
-		else if(mode == HfsPlusConstants.RECORD_TYPE_FILE)
+		} else if(mode == HfsPlusConstants.RECORD_TYPE_FILE) {
 			return AbstractFSEntry.FILE_ENTRY;
-		else
+		} else {
 			return AbstractFSEntry.OTHER_ENTRY;
+		}
 	}
 
-	public LeafRecord getRecord() {
+	public final LeafRecord getRecord() {
 		return record;
 	}
 }

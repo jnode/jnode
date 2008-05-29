@@ -5,24 +5,24 @@ import org.jnode.util.BigEndian;
 public class CatalogFolder {
 	private byte[] data;
 	
-	public CatalogFolder(byte[] src){
+	public CatalogFolder(final byte[] src){
 		data = new byte[88];
 		System.arraycopy(src, 0, data, 0, 88);
 	}
 	
-	public int getRecordType(){
+	public final int getRecordType(){
 		return BigEndian.getInt16(data, 0);
 	}
 	
-	public int getValence(){
+	public final int getValence(){
 		return BigEndian.getInt32(data, 4);
 	}
 	
-	public CatalogNodeId getFolderId(){
+	public final CatalogNodeId getFolderId(){
 		return new CatalogNodeId(data,8);
 	}
 	
-	public String toString(){
+	public final String toString(){
 		StringBuffer s = new StringBuffer();
 		s.append("Record type:").append(getRecordType()).append("\n");
 		s.append("Valence    :").append(getValence()).append("\n");

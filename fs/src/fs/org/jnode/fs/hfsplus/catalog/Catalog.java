@@ -27,7 +27,7 @@ public class Catalog {
 	/** */
 	private int firstNodeOffset;
 	
-	public Catalog(HfsPlusFileSystem fs) throws IOException {
+	public Catalog(final HfsPlusFileSystem fs) throws IOException {
 		log.debug("Initialize catalog\n");
 		this.fs = fs;
 		Superblock sb = fs.getVolumeHeader();
@@ -54,7 +54,7 @@ public class Catalog {
 	 * @return
 	 * @throws IOException
 	 */
-	public LeafRecord getRecord(CatalogNodeId parentID) throws IOException{
+	public final LeafRecord getRecord(final CatalogNodeId parentID) throws IOException{
 		int currentOffset = firstNodeOffset;
 		int currentNodeNumber = getBTHeaderRecord().getRootNode();
 		int currentNodeSize = getBTHeaderRecord().getNodeSize();
@@ -73,13 +73,13 @@ public class Catalog {
 			currentBtnd = new NodeDescriptor(nodeData.array());
 			log.debug("Current node descriptor :\n" + currentBtnd.toString());
 		}
+		LeafRecord lr = null;
 		if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
 			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(), currentNodeSize);
-		    LeafRecord lr = leaf.find(parentID);
+		    lr = leaf.find(parentID);
 		    log.debug("Leaf record :\n" + lr.toString());
-		    return lr;
 		}
-		return null;
+		return lr;
 	}
 	/**
 	 * 
@@ -87,7 +87,7 @@ public class Catalog {
 	 * @return
 	 * @throws IOException
 	 */
-	public LeafRecord[] getRecords(CatalogNodeId parentID) throws IOException {
+	public final LeafRecord[] getRecords(final CatalogNodeId parentID) throws IOException {
 		return getRecords(parentID,  getBTHeaderRecord().getRootNode());
 	}
 	/**
@@ -97,7 +97,7 @@ public class Catalog {
 	 * @return
 	 * @throws IOException
 	 */
-	public LeafRecord[] getRecords(CatalogNodeId parentID, int nodeNumber) throws IOException {
+	public final LeafRecord[] getRecords(final CatalogNodeId parentID, final int nodeNumber) throws IOException {
 		try {
 			int currentOffset = firstNodeOffset;
 			int currentNodeNumber = nodeNumber;
@@ -139,7 +139,7 @@ public class Catalog {
 	 * @return
 	 * @throws IOException
 	 */
-	public LeafRecord getRecord(CatalogNodeId parentID, HFSUnicodeString nodeName) throws IOException{
+	public final LeafRecord getRecord(final CatalogNodeId parentID, final HFSUnicodeString nodeName) throws IOException{
 		int currentOffset = firstNodeOffset;
 		int currentNodeNumber = getBTHeaderRecord().getRootNode();
 		int currentNodeSize = getBTHeaderRecord().getNodeSize();
@@ -147,29 +147,30 @@ public class Catalog {
 		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), buffer);
 		NodeDescriptor currentBtnd = new NodeDescriptor(buffer.array());
 		log.debug("Current node descriptor :\n" + currentBtnd.toString());
+		CatalogKey cKey= new CatalogKey(parentID, nodeName);
 		while(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
 			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, buffer.array(), currentNodeSize);
-			IndexRecord record = currentIndexNode.find(new CatalogKey(parentID, nodeName));
+			IndexRecord record = currentIndexNode.find(cKey);
 			currentNodeNumber = record.getIndex();
 			currentOffset = currentNodeNumber*currentNodeSize;
 			buffer = ByteBuffer.allocate(currentNodeSize);
 			fs.getApi().read(currentOffset, buffer);
 			currentBtnd = new NodeDescriptor(buffer.array());
 		}
+		LeafRecord lr = null;
 		if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
 			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, buffer.array(), currentNodeSize);
-		    LeafRecord lr = leaf.find(parentID);
+		    lr = leaf.find(parentID);
 		    log.debug("Leaf record :\n" + lr.toString());
-		    return lr;
 		}
-		return null;
+		return lr;
 	}
 	
-	public NodeDescriptor getBTNodeDescriptor() {
+	public final NodeDescriptor getBTNodeDescriptor() {
 		return btnd;
 	}
 
-	public BTHeaderRecord getBTHeaderRecord() {
+	public final BTHeaderRecord getBTHeaderRecord() {
 		return bthr;
 	}
 

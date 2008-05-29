@@ -8,7 +8,7 @@ public class IndexNode extends Node {
 	 * @param nodeData
 	 * @param nodeSize
 	 */
-	public IndexNode(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
+	public IndexNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize){
 		super(descriptor, nodeData, nodeSize);
 		records = new IndexRecord[offsets.length-1];
 	}
@@ -16,7 +16,7 @@ public class IndexNode extends Node {
 	 * 
 	 * @return
 	 */
-	public IndexRecord[] getRecords() {
+	public final IndexRecord[] getRecords() {
 		return records;
 	}
 }

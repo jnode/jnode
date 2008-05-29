@@ -15,7 +15,7 @@ public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
 	}
 
 	@Override
-	public HfsPlusFileSystem format(Device device) throws FileSystemException {
+	public final HfsPlusFileSystem format(final Device device) throws FileSystemException {
 		try {
             FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
             HfsPlusFileSystemType type = fSS.getFileSystemType(HfsPlusFileSystemType.ID);

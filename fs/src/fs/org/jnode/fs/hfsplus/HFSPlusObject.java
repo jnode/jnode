@@ -6,15 +6,15 @@ public class HFSPlusObject implements FSObject {
 
 	private HfsPlusFileSystem fs;
 	
-	public HFSPlusObject(HfsPlusFileSystem fileSystem) {
+	public HFSPlusObject(final HfsPlusFileSystem fileSystem) {
 		this.fs = fileSystem;
 	}
 
-	public HfsPlusFileSystem getFileSystem() {
+	public final HfsPlusFileSystem getFileSystem() {
 		return fs;
 	}
 
-	public boolean isValid() {
+	public final boolean isValid() {
 		return false;
 	}
 }

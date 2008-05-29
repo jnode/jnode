@@ -20,7 +20,7 @@ public class Superblock extends HFSPlusObject {
 	/** */
 	public static final int SUPERBLOCK_LENGTH = 1024;
 	/** Data bytes array that contains superblock informations */
-	private byte data[];
+	private byte[] data;
 	
 	public Superblock(){
 		super(null);
@@ -28,7 +28,7 @@ public class Superblock extends HFSPlusObject {
 		log.setLevel(Level.INFO);
 	}
 	
-	public Superblock(HfsPlusFileSystem fs) throws FileSystemException {
+	public Superblock(final HfsPlusFileSystem fs) throws FileSystemException {
 		super(fs);
 		log.setLevel(Level.INFO);
 		try {
@@ -37,28 +37,29 @@ public class Superblock extends HFSPlusObject {
 			fs.getApi().read(1024, b);
 			data = new byte[SUPERBLOCK_LENGTH];
 			System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
-			if(getMagic() != HfsPlusConstants.HFSPLUS_SUPER_MAGIC)
+			if(getMagic() != HfsPlusConstants.HFSPLUS_SUPER_MAGIC) {
 				throw new FileSystemException("Not hfs+ superblock ("+getMagic()+": bad magic)");
+			}
 		} catch (IOException e) {
 			throw new FileSystemException(e);
 		}
 	}
 	
-	public int getMagic() {
+	public final int getMagic() {
 		return BigEndian.getInt16(data, 0);
 	}
-	public void setMagic(int value){
+	public final void setMagic(final int value){
 		BigEndian.setInt16(data, 0, value);
 	}
 	//
-	public int getVersion() {
+	public final int getVersion() {
 		return BigEndian.getInt16(data, 2);
 	}
-	public void setVersion(int value){
+	public final void setVersion(final int value){
 		BigEndian.setInt16(data, 2, value);
 	}
 	//
-	public int getAttributes(){
+	public final int getAttributes(){
 		return BigEndian.getInt32(data, 4);
 	}
 	/**
@@ -66,7 +67,7 @@ public class Superblock extends HFSPlusObject {
 	 * 
 	 * @return
 	 */
-	public String getAttributesAsString(){
+	public final String getAttributesAsString(){
 		String s = "";
 		s = s + ((isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT))?" kHFSVolumeUnmountedBit":"");
 		s = s + ((isAttribute(HfsPlusConstants.HFSPLUS_VOL_INCNSTNT_BIT))?" kHFSBootVolumeInconsistentBit":"");
@@ -80,157 +81,157 @@ public class Superblock extends HFSPlusObject {
 	 * 
 	 * @return true if attribute is set.
 	 */
-	public boolean isAttribute(int maskBit){
+	public final boolean isAttribute(final int maskBit){
 		return (((getAttributes() >> maskBit) & 0x1) != 0);
 	}
 	//
-	public int getLastMountedVersion(){
+	public final int getLastMountedVersion(){
 		return BigEndian.getInt32(data, 8);
 	}
-	public void setLastMountedVersion(int value){
+	public final void setLastMountedVersion(final int value){
 		BigEndian.setInt32(data, 8, value);
 	}
 	//
-	public int getJournalInfoBlock(){
+	public final int getJournalInfoBlock(){
 		return BigEndian.getInt32(data, 12);
 	}
-	public void setJournalInfoBlock(int value){
+	public final void setJournalInfoBlock(final int value){
 		BigEndian.setInt32(data, 12, value);
 	}
 	//
-	public int getCreateDate(){
+	public final int getCreateDate(){
 		return BigEndian.getInt32(data, 16);
 	}
-	public void setCreateDate(int value){
+	public final void setCreateDate(final int value){
 		BigEndian.setInt32(data, 16, value);
 	}
 	
-	public int getModifyDate(){
+	public final int getModifyDate(){
 		return BigEndian.getInt32(data, 20);
 	}
-	public void setModifyDate(int value){
+	public final void setModifyDate(final int value){
 		BigEndian.setInt32(data, 20, value);
 	}
 	
-	public int getBackupDate(){
+	public final int getBackupDate(){
 		return BigEndian.getInt32(data, 24);
 	}
-	public void setBackupDate(int value){
+	public final void setBackupDate(final int value){
 		BigEndian.setInt32(data, 24, value);
 	}
 	
-	public int getCheckedDate(){
+	public final int getCheckedDate(){
 		return BigEndian.getInt32(data, 28);
 	}
-	public void setCheckedDate(int value){
+	public final void setCheckedDate(final int value){
 		BigEndian.setInt32(data, 28, value);
 	}
 	//
-	public int getFileCount(){
+	public final int getFileCount(){
 		return BigEndian.getInt32(data, 32);
 	}
-	public void setFileCount(int value){
+	public final void setFileCount(final int value){
 		BigEndian.setInt32(data, 32, value);
 	}
 	//
-	public int getFolderCount(){
+	public final int getFolderCount(){
 		return BigEndian.getInt32(data, 36);
 	}
-	public void setFolderCount(int value){
+	public final void setFolderCount(final int value){
 		BigEndian.setInt32(data, 36, value);
 	}
 	//
-	public int getBlockSize(){
+	public final int getBlockSize(){
 		return BigEndian.getInt32(data, 40);
 	}
-	public void setBlockSize(int value){
+	public final void setBlockSize(final int value){
 		BigEndian.setInt32(data, 40, value);
 	}
 	//
-	public int getTotalBlocks(){
+	public final int getTotalBlocks(){
 		return BigEndian.getInt32(data, 44);
 	}
-	public void setTotalBlocks(int value){
+	public final void setTotalBlocks(final int value){
 		BigEndian.setInt32(data, 44,value);
 	}
 	//
-	public int getFreeBlocks(){
+	public final int getFreeBlocks(){
 		return BigEndian.getInt32(data, 48);
 	}
-	public void setFreeBlocks(int value){
+	public final void setFreeBlocks(final int value){
 		BigEndian.setInt32(data, 48, value);
 	}
 	//
-	public int getNextAllocation(){
+	public final int getNextAllocation(){
 		return BigEndian.getInt32(data, 52);
 	}
-	public void setNextAllocation(int value){
+	public final void setNextAllocation(final int value){
 		BigEndian.setInt32(data, 52, value);
 	}
 	
-	public long getRsrcClumpSize(){
+	public final long getRsrcClumpSize(){
 		return BigEndian.getInt32(data, 56);
 	}
-	public void setRsrcClumpSize(int value){
+	public final void setRsrcClumpSize(final int value){
 		BigEndian.setInt32(data, 56, value);
 	}
 	
-	public int getDataClumpSize(){
+	public final int getDataClumpSize(){
 		return BigEndian.getInt32(data, 60);
 	}
-	public void setDataClumpSize(int value){
+	public final void setDataClumpSize(final int value){
 		BigEndian.setInt32(data, 60, value);
 	}
 	
-	public int getNextCatalogId(){
+	public final int getNextCatalogId(){
 		return BigEndian.getInt32(data, 64);
 	}
-	public void setNextCatalogId(int value){
+	public final void setNextCatalogId(final int value){
 		BigEndian.setInt32(data, 64, value);
 	}
 	
-	public int getWriteCount(){
+	public final int getWriteCount(){
 		return BigEndian.getInt32(data, 68);
 	}
-	public void setWriteCount(int value){
+	public final void setWriteCount(final int value){
 		BigEndian.setInt32(data, 68, value);
 	}
 	
-	public long getEncodingsBmp(){
+	public final long getEncodingsBmp(){
 		return BigEndian.getInt64(data, 72);
 	}
-	public void setEncodingsBmp(long value){
+	public final void setEncodingsBmp(final long value){
 		BigEndian.setInt64(data, 72, value);
 	}
 	
-	public byte[] getFinderInfo(){
+	public final byte[] getFinderInfo(){
 		byte[] result=new byte[32];
 		System.arraycopy(data, 80, result, 0, 32);
 		return result;
 	}
 	
-	public HFSPlusForkData getAllocationFile(){
+	public final HFSPlusForkData getAllocationFile(){
 		return new HFSPlusForkData(data,112);
 	}
 	
-	public HFSPlusForkData getExtentsFile(){
+	public final HFSPlusForkData getExtentsFile(){
 		return new HFSPlusForkData(data,192);
 	}
 	
-	public HFSPlusForkData getCatalogFile(){
+	public final HFSPlusForkData getCatalogFile(){
 		return new HFSPlusForkData(data,272);
 	}
 	
-	public HFSPlusForkData getAttributesFile(){
+	public final HFSPlusForkData getAttributesFile(){
 		return new HFSPlusForkData(data,352);
 	}
 	
-	public HFSPlusForkData getStartupFile(){
+	public final HFSPlusForkData getStartupFile(){
 		return new HFSPlusForkData(data,432);
 	}
 	
 	
-	public String toString(){
+	public final String toString(){
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Magic   		:0x").append(NumberUtils.hex(getMagic(),4)).append("\n");
 		buffer.append("Version 		:").append(getVersion()).append("\n").append("\n");

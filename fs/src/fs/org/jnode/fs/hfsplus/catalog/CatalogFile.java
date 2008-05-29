@@ -6,28 +6,28 @@ import org.jnode.util.BigEndian;
 public class CatalogFile {
 	private byte[] data;
 	
-	public CatalogFile(byte[] src){
+	public CatalogFile(final byte[] src){
 		data = new byte[248];
 		System.arraycopy(src, 0, data, 0, 248);
 	}
 	
-	public int getRecordType(){
+	public final int getRecordType(){
 		return BigEndian.getInt16(data, 0);
 	}
 	
-	public CatalogNodeId getFileId(){
+	public final CatalogNodeId getFileId(){
 		return new CatalogNodeId(data,8);
 	}
 	
-	public HFSPlusForkData getDataFork(){
+	public final HFSPlusForkData getDataFork(){
 		return new HFSPlusForkData(data,88);
 	}
 	
-	public HFSPlusForkData getResourceFork(){
+	public final HFSPlusForkData getResourceFork(){
 		return new HFSPlusForkData(data,168);
 	}
 	
-	public String toString(){
+	public final String toString(){
 		StringBuffer s = new StringBuffer();
 		s.append("Record type:").append(getRecordType()).append("\t");
 		s.append("File ID  :").append(getFileId().getId()).append("\n");

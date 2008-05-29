@@ -20,7 +20,7 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 	
 	private CatalogFolder folder;
 	
-	public HFSPlusDirectory(HFSPlusEntry e){
+	public HFSPlusDirectory(final HFSPlusEntry e){
 		super((HfsPlusFileSystem)e.getFileSystem());
 		this.record = e.getRecord();
 		this.folder = new CatalogFolder(record.getRecordData());
@@ -31,19 +31,19 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 	}
 	
 	@Override
-	protected FSEntry createDirectoryEntry(String name) throws IOException {
+	protected final FSEntry createDirectoryEntry(final String name) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected FSEntry createFileEntry(String name) throws IOException {
+	protected final FSEntry createFileEntry(final String name) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected FSEntryTable readEntries() throws IOException {
+	protected final FSEntryTable readEntries() throws IOException {
 			List<FSEntry> pathList = new LinkedList<FSEntry>();
 			LeafRecord[] records = ((HfsPlusFileSystem)getFileSystem()).getCatalog().getRecords(folder.getFolderId());
 			for(LeafRecord rec : records) {
@@ -57,7 +57,7 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 	}
 
 	@Override
-	protected void writeEntries(FSEntryTable entries) throws IOException {
+	protected void writeEntries(final FSEntryTable entries) throws IOException {
 		// TODO Auto-generated method stub
 
 	}

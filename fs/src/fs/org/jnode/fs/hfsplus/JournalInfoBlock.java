@@ -4,24 +4,24 @@ import org.jnode.util.BigEndian;
 
 public class JournalInfoBlock {
 	private byte[] data;
-	public JournalInfoBlock(byte[] src){
+	public JournalInfoBlock(final byte[] src){
 		data = new byte[180];
 		System.arraycopy(src, 0, data, 0, 180);
 	}
 	
-	public int getFlag(){
+	public final int getFlag(){
 		return BigEndian.getInt32(data, 0);
 	}
 	
-	public long getOffset(){
+	public final long getOffset(){
 		return BigEndian.getInt64(data, 36);
 	}
 	
-	public long getSize(){
+	public final long getSize(){
 		return BigEndian.getInt64(data, 44);
 	}
 	
-	public String toString(){
+	public final String toString(){
 		return "Journal : " + getOffset() + "::" + getSize();
 	}
 }
