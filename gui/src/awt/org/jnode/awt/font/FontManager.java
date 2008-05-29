@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font;
 
 import java.awt.Color;
@@ -27,59 +27,58 @@ import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.io.InputStream;
-import java.util.Collections;
-
 import org.jnode.driver.video.Surface;
 
 /**
  * @author epr
- * 
  */
 public interface FontManager {
 
-	public static final Class<FontManager> NAME = FontManager.class;//"FontManager";
-	
-	/**
-	 * Returns an array containing a one-point size instance of all fonts 
-	 * available in this provider. 
-	 * Typical usage would be to allow a user to select a particular font. 
-	 * Then, the application can size the font and set various font 
-	 * attributes by calling the deriveFont method on the choosen instance.
-	 * This method provides for the application the most precise control 
-	 * over which Font instance is used to render text.
-	 * If a font in this provider has multiple programmable variations,
-	 * only one instance of that Font is returned in the set, 
-	 * and other variations must be derived by the application.
-	 * If a font in this provider has multiple programmable variations, 
-	 * such as Multiple-Master fonts, only one instance of that font 
-	 * is returned in the Font array. 
-	 * The other variations must be derived by the application. 
-	 * 
-	 * @return All fonts
-	 */
-	public Font[] getAllFonts();
+    public static final Class<FontManager> NAME = FontManager.class; //"FontManager";
 
-	/**
-	 * Gets the font metrics for the given font.
-	 * @param font
-	 * @return The font metrics for the given font
-	 */
-	public FontMetrics getFontMetrics(Font font);
+    /**
+     * Returns an array containing a one-point size instance of all fonts
+     * available in this provider.
+     * Typical usage would be to allow a user to select a particular font.
+     * Then, the application can size the font and set various font
+     * attributes by calling the deriveFont method on the choosen instance.
+     * This method provides for the application the most precise control
+     * over which Font instance is used to render text.
+     * If a font in this provider has multiple programmable variations,
+     * only one instance of that Font is returned in the set,
+     * and other variations must be derived by the application.
+     * If a font in this provider has multiple programmable variations,
+     * such as Multiple-Master fonts, only one instance of that font
+     * is returned in the Font array.
+     * The other variations must be derived by the application.
+     *
+     * @return All fonts
+     */
+    public Font[] getAllFonts();
 
-	/**
-	 * Draw the given text to the given graphics at the given location,
-	 * using the given font.
-	 * 
-	 * @param g
-	 * @param text
-	 * @param font
-	 * @param x
-	 * @param y
-	 */
-	public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y, Color color);
-	
-	/**
-	 * 
-	 */
-	public Font createFont(int format, InputStream stream);	
+    /**
+     * Gets the font metrics for the given font.
+     *
+     * @param font
+     * @return The font metrics for the given font
+     */
+    public FontMetrics getFontMetrics(Font font);
+
+    /**
+     * Draw the given text to the given graphics at the given location,
+     * using the given font.
+     *
+     * @param g
+     * @param text
+     * @param font
+     * @param x
+     * @param y
+     */
+    public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y,
+                         Color color);
+
+    /**
+     *
+     */
+    public Font createFont(int format, InputStream stream);
 }

@@ -18,17 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype.tables;
 
 import java.io.IOException;
-
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFInput;
 
 /**
  * POST Table.
- * 
+ *
  * @author Simon Fischer
  * @version $Id$
  */
@@ -81,9 +80,9 @@ public final class PostTable extends TTFTable {
     }
 
     public String toString() {
-        String str = super.toString() + " format: " + format + "\n  italic:"
-                + italicAngle + " ulPos:" + underlinePosition + " ulThick:"
-                + underlineThickness + " isFixed:" + isFixedPitch;
+        String str = super.toString() + " format: " + format + "\n  italic:" +
+            italicAngle + " ulPos:" + underlinePosition + " ulThick:" +
+            underlineThickness + " isFixed:" + isFixedPitch;
         if (glyphNameIndex != null) {
             str += "\n  glyphNamesIndex[" + glyphNameIndex.length + "] = {";
             for (int i = 0; i < glyphNameIndex.length; i++) {

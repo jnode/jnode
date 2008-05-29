@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Button;
@@ -32,19 +32,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * @author Levente S\u00e1ntha
  */
 
 public class AWTFrameTest {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         final Frame f = new Frame("Frame test");
-        f.setSize(200,200);
-        f.setLocation(50,50);
+        f.setSize(200, 200);
+        f.setLocation(50, 50);
         final Frame f2 = new Frame("Test");
-        f2.setSize(100,100);
+        f2.setSize(100, 100);
         f2.setLocation(350, 200);
         f.setLayout(new GridLayout(5, 1));
 
@@ -155,9 +154,9 @@ public class AWTFrameTest {
         p_window.add(p_close_mi);
 
         f.add(p_window);
-        f.addMouseListener(new MouseAdapter(){
+        f.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
-                    p_window.show(f, event.getX(), event.getY());
+                p_window.show(f, event.getX(), event.getY());
             }
         });
 

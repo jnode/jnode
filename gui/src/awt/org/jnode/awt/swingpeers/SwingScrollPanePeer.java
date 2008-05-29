@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Adjustable;
 import java.awt.ScrollPane;
 import java.awt.peer.ScrollPanePeer;
-
 import javax.swing.JScrollPane;
 
 /**
@@ -33,68 +32,68 @@ import javax.swing.JScrollPane;
  */
 
 final class SwingScrollPanePeer extends
-        SwingContainerPeer<ScrollPane, SwingScrollPane> implements
-        ScrollPanePeer {
+    SwingContainerPeer<ScrollPane, SwingScrollPane> implements
+    ScrollPanePeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingScrollPanePeer(SwingToolkit toolkit, ScrollPane scrollPane) {
-		super(toolkit, scrollPane, new SwingScrollPane(scrollPane));
+    public SwingScrollPanePeer(SwingToolkit toolkit, ScrollPane scrollPane) {
+        super(toolkit, scrollPane, new SwingScrollPane(scrollPane));
 
-		SwingToolkit.add(scrollPane, peerComponent);
-		SwingToolkit.copyAwtProperties(scrollPane, peerComponent);
-	}
+        SwingToolkit.add(scrollPane, peerComponent);
+        SwingToolkit.copyAwtProperties(scrollPane, peerComponent);
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollPanePeer#childResized(int, int)
-	 */
-	public void childResized(int width, int height) {
-		// TODO Auto-generated method stub
+    /**
+     * @see java.awt.peer.ScrollPanePeer#childResized(int, int)
+     */
+    public void childResized(int width, int height) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollPanePeer#getHScrollbarHeight()
-	 */
-	public int getHScrollbarHeight() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /**
+     * @see java.awt.peer.ScrollPanePeer#getHScrollbarHeight()
+     */
+    public int getHScrollbarHeight() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollPanePeer#getVScrollbarWidth()
-	 */
-	public int getVScrollbarWidth() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /**
+     * @see java.awt.peer.ScrollPanePeer#getVScrollbarWidth()
+     */
+    public int getVScrollbarWidth() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollPanePeer#setScrollPosition(int, int)
-	 */
-	public void setScrollPosition(int h, int v) {
-		// TODO Auto-generated method stub
+    /**
+     * @see java.awt.peer.ScrollPanePeer#setScrollPosition(int, int)
+     */
+    public void setScrollPosition(int h, int v) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollPanePeer#setUnitIncrement(java.awt.Adjustable,
-	 *      int)
-	 */
-	public void setUnitIncrement(Adjustable item, int inc) {
-		// TODO Auto-generated method stub
+    /**
+     * @see java.awt.peer.ScrollPanePeer#setUnitIncrement(java.awt.Adjustable,
+     *      int)
+     */
+    public void setUnitIncrement(Adjustable item, int inc) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollPanePeer#setValue(java.awt.Adjustable, int)
-	 */
-	public void setValue(Adjustable item, int value) {
-		// TODO Auto-generated method stub
+    /**
+     * @see java.awt.peer.ScrollPanePeer#setValue(java.awt.Adjustable, int)
+     */
+    public void setValue(Adjustable item, int value) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
 }
 
@@ -111,17 +110,19 @@ final class SwingScrollPane extends JScrollPane implements ISwingPeer<ScrollPane
     public ScrollPane getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -133,5 +134,5 @@ final class SwingScrollPane extends JScrollPane implements ISwingPeer<ScrollPane
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

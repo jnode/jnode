@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.spi;
 
 import java.awt.Color;
@@ -28,7 +28,6 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.WritableRaster;
-
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.GlyphRenderer;
@@ -43,27 +42,30 @@ import org.jnode.vm.Vm;
  */
 abstract public class AbstractTextRenderer implements TextRenderer {
 
-    /** My logger */
-	protected static final Logger log = Logger.getLogger(AbstractTextRenderer.class);
+    /**
+     * My logger
+     */
+    protected static final Logger log = Logger.getLogger(AbstractTextRenderer.class);
 
     protected final FontMetrics fontMetrics;
 
     protected final RenderCache renderCache;
-    
+
     protected final FontData fontData;
 
-    /** Key of the alpha raster in the render context */
-    protected static final String ALPHA_RASTER = AbstractTextRenderer.class.getName()
-            + "AR";
+    /**
+     * Key of the alpha raster in the render context
+     */
+    protected static final String ALPHA_RASTER = AbstractTextRenderer.class.getName() + "AR";
 
     /**
      * Create a new instance
-     * 
+     *
      * @param fontData
      * @param fontSize
      */
     public AbstractTextRenderer(RenderCache renderCache, FontMetrics fontMetrics,
-            FontData fontData) {
+                                FontData fontData) {
         this.renderCache = renderCache;
         this.fontMetrics = fontMetrics;
         this.fontData = fontData;
@@ -71,15 +73,14 @@ abstract public class AbstractTextRenderer implements TextRenderer {
 
     /**
      * Create/get the alpha raster used for rendering.
-     * 
+     *
      * @return
      */
     final protected WritableRaster createAlphaRaster() {
         final RenderContext ctx = renderCache.getContext();
         WritableRaster r = (WritableRaster) ctx.getObject(ALPHA_RASTER);
         final int fontSizeUp = (int) (fontMetrics.getFont().getSize() + 0.5);
-        if ((r == null) || (r.getWidth() < fontSizeUp)
-                || (r.getHeight() < fontSizeUp)) {
+        if ((r == null) || (r.getWidth() < fontSizeUp) || (r.getHeight() < fontSizeUp)) {
             r = GlyphRenderer.createRaster(fontSizeUp, fontSizeUp);
             ctx.setObject(ALPHA_RASTER, r);
             Vm.getVm().getCounter(ALPHA_RASTER).inc();
@@ -89,14 +90,14 @@ abstract public class AbstractTextRenderer implements TextRenderer {
 
     /**
      * Render a given text to the given graphics at the given location.
-     * 
+     *
      * @param g
      * @param text
      * @param x
      * @param y
      */
     public void render(Surface surface, Shape clip, AffineTransform tx,
-    		CharSequence text, int x, int y, Color color) {
+                       CharSequence text, int x, int y, Color color) {
         try {
             final double ascent = fontMetrics.getAscent();
             final int fontSize = fontMetrics.getFont().getSize();
@@ -107,9 +108,9 @@ abstract public class AbstractTextRenderer implements TextRenderer {
             for (int i = 0; i < textLength; i++) {
                 final char ch = text.charAt(i);
                 if (ch != ' ') {
-                	final Glyph g = fontData.getGlyph(ch);
+                    final Glyph g = fontData.getGlyph(ch);
                     final GlyphRenderer renderer = renderCache.getRenderer(g,
-                            ascent);
+                        ascent);
                     final Dimension d;
                     d = renderer.createGlyphRaster(alphaRaster, fontSize);
 
@@ -118,7 +119,7 @@ abstract public class AbstractTextRenderer implements TextRenderer {
                     final int dstY = y - d.height + (int) minLoc.getY();
 
                     surface.drawAlphaRaster(alphaRaster, tx, 0, 0, dstX, dstY,
-                            d.width, d.height, color);
+                        d.width, d.height, color);
                 }
                 x += fontMetrics.charWidth(ch);
             }

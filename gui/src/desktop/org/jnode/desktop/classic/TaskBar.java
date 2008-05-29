@@ -21,16 +21,7 @@
 
 package org.jnode.desktop.classic;
 
-import org.apache.log4j.Logger;
-import org.jnode.plugin.ExtensionPoint;
-import org.jnode.awt.JNodeToolkit;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
+import gnu.java.security.action.SetPropertyAction;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -38,13 +29,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.security.AccessController;
-
-import gnu.java.security.action.SetPropertyAction;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.plugin.ExtensionPoint;
 
 /**
  * @author Levente S\u00e1ntha
@@ -133,14 +142,14 @@ public class TaskBar extends JPanel {
         changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
         changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
         changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
-        
+
         JMenu lfMenu = new JMenu("Look & Feel");
         settingsMenu.add(lfMenu);
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
         for (int i = 0; i < lafs.length; ++i) {
             final UIManager.LookAndFeelInfo laf = lafs[i];
             String name = laf.getName();
-            if(!"Metal".equals(name)){
+            if (!"Metal".equals(name)) {
                 JMenuItem item = new JMenuItem(name);
                 item.addActionListener(new SetLFAction(laf));
                 lfMenu.add(item);
@@ -148,7 +157,7 @@ public class TaskBar extends JPanel {
         }
         JMenuItem metal_theme = new JMenuItem("Metal Default");
         lfMenu.add(metal_theme);
-        metal_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()){
+        metal_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()) {
             public void actionPerformed(ActionEvent e) {
                 MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
                 super.actionPerformed(e);
@@ -156,7 +165,7 @@ public class TaskBar extends JPanel {
         });
         JMenuItem ocean_theme = new JMenuItem("Metal Ocean");
         lfMenu.add(ocean_theme);
-        ocean_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()){
+        ocean_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()) {
             public void actionPerformed(ActionEvent e) {
                 MetalLookAndFeel.setCurrentTheme(new OceanTheme());
                 super.actionPerformed(e);
@@ -189,7 +198,7 @@ public class TaskBar extends JPanel {
             try {
                 Class c = Thread.currentThread().getContextClassLoader().loadClass(lfInfo.getClassName());
                 this.lf = (LookAndFeel) c.newInstance();
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("Error crating look & feel " + lfInfo, e);
             }
         }
@@ -210,17 +219,17 @@ public class TaskBar extends JPanel {
             //so we try to minimise the effect of a failure
             try {
                 SwingUtilities.updateComponentTreeUI(desktop.desktopFrame.getTopLevelRootComponent());
-            }catch(Exception x){
+            } catch (Exception x) {
                 log.error("", x);
             }
             try {
                 SwingUtilities.updateComponentTreeUI(startMenu);
-            }catch(Exception x){
+            } catch (Exception x) {
                 log.error("", x);
             }
             try {
                 SwingUtilities.updateComponentTreeUI(desktop.desktopMenu);
-            }catch(Exception x){
+            } catch (Exception x) {
                 log.error("", x);
             }
             SwingUtilities.invokeLater(new Runnable() {
@@ -232,21 +241,21 @@ public class TaskBar extends JPanel {
     }
 
     class ChangeScreenResolution implements ActionListener, Runnable {
-                    private String resolution;
+        private String resolution;
 
-                    public ChangeScreenResolution(String resolution) {
-                        this.resolution = resolution;
-                    }
+        public ChangeScreenResolution(String resolution) {
+            this.resolution = resolution;
+        }
 
-                    public void run() {
-                        ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
-                        AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
-                    }
+        public void run() {
+            ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
+            AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
+        }
 
-                    public void actionPerformed(ActionEvent event) {
-                        SwingUtilities.invokeLater(this);
-                    }
-                }
+        public void actionPerformed(ActionEvent event) {
+            SwingUtilities.invokeLater(this);
+        }
+    }
 
     private JMenuItem createMenuItem(final String label, final String classname) {
         final JMenuItem mi = new JMenuItem(label);
@@ -333,7 +342,7 @@ public class TaskBar extends JPanel {
             }, 0, 60 * 1000);
         }
 
-        void stop(){
+        void stop() {
             timer.cancel();
         }
     }

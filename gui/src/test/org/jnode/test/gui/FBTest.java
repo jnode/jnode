@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Color;
@@ -29,7 +29,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
@@ -49,12 +48,12 @@ import org.jnode.shell.help.argument.DeviceArgument;
 public class FBTest {
 
     public static final Help.Info HELP_INFO = new Help.Info(
-            "FBTest",
-            "Performs tests on the FrameBuffer implementation and outputs performance data",
-            new Parameter[]{
-                new Parameter(new DeviceArgument("framebuffer", "the FrameBuffer device to use"), Parameter.OPTIONAL),
-                new Parameter(new Argument("loops", "how many loops each test should perform"), Parameter.OPTIONAL)
-            }
+        "FBTest",
+        "Performs tests on the FrameBuffer implementation and outputs performance data",
+        new Parameter[]{
+            new Parameter(new DeviceArgument("framebuffer", "the FrameBuffer device to use"), Parameter.OPTIONAL),
+            new Parameter(new Argument("loops", "how many loops each test should perform"), Parameter.OPTIONAL)
+        }
     );
 
     private static final Logger log = Logger.getLogger(FBTest.class);
@@ -62,7 +61,8 @@ public class FBTest {
     final Surface g;
     private final int width;
     private final int height;
-    private final Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GRAY, Color.ORANGE, Color.CYAN, Color.MAGENTA};
+    private final Color[] colors =
+        new Color[]{Color.RED, Color.BLUE, Color.GRAY, Color.ORANGE, Color.CYAN, Color.MAGENTA};
     private int cIndex;
     int paintMode;
     private final int count;
@@ -110,16 +110,16 @@ public class FBTest {
         Surface g = null;
         try {
             Device dev = null;
-            if("".equals(devId)){
+            if ("".equals(devId)) {
                 final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
                 int dev_count = devs.size();
-                if(dev_count > 0){
+                if (dev_count > 0) {
                     Device[] dev_a = devs.toArray(new Device[dev_count]);
                     dev = dev_a[0];
                 }
             }
 
-            if(dev == null){
+            if (dev == null) {
                 final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
                 dev = dm.getDevice(devId);
             }
@@ -140,9 +140,9 @@ public class FBTest {
             }
             log.info("End of FBTest");
         }
-                
+
         CurvesTest.compareCubicCurveImpl();
-        
+
         CurvesTest.compareQuadCurveImpl();
     }
 
@@ -156,7 +156,7 @@ public class FBTest {
 
     final Color randomColor() {
         cIndex = (cIndex + 1) % colors.length;
-        return colors[cIndex];	// not too random
+        return colors[cIndex];    // not too random
     }
 
     final long performTest(Test test, int paintMode) {
@@ -177,7 +177,8 @@ public class FBTest {
             final int y1 = randomY();
             final int x2 = randomX();
             final int y2 = randomY();
-            g.draw(new Line2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)), null, tx, randomColor(), paintMode);
+            g.draw(new Line2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(
+                y2 - y1)), null, tx, randomColor(), paintMode);
         }
     }
 
@@ -187,7 +188,8 @@ public class FBTest {
             final int y1 = randomY();
             final int x2 = randomX();
             final int y2 = randomY();
-            g.draw(new Rectangle(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)), null, tx, randomColor(), paintMode);
+            g.draw(new Rectangle(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(
+                y2 - y1)), null, tx, randomColor(), paintMode);
         }
     }
 
@@ -197,7 +199,8 @@ public class FBTest {
             final int y1 = randomY();
             final int x2 = randomX();
             final int y2 = randomY();
-            g.draw(new Ellipse2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)), null, tx, randomColor(), paintMode);
+            g.draw(new Ellipse2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(
+                y2 - y1)), null, tx, randomColor(), paintMode);
         }
     }
 
@@ -219,7 +222,8 @@ public class FBTest {
             final int y1 = randomY();
             final int x2 = randomX();
             final int y2 = randomY();
-            g.draw(new Arc2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1), 40, 300, Arc2D.PIE), null, tx, randomColor(), paintMode);
+            g.draw(new Arc2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(
+                y2 - y1), 40, 300, Arc2D.PIE), null, tx, randomColor(), paintMode);
         }
     }
 

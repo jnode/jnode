@@ -18,18 +18,29 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.JNodeGraphics;
-import org.jnode.awt.JNodeGraphics2D;
-
-import java.awt.*;
+import gnu.classpath.SystemProperties;
+import java.awt.AWTEvent;
+import java.awt.BufferCapabilities;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
-import java.awt.event.PaintEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -37,11 +48,12 @@ import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import gnu.classpath.SystemProperties;
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeGenericPeer;
+import org.jnode.awt.JNodeGraphics;
+import org.jnode.awt.JNodeGraphics2D;
 import sun.awt.CausedFocusEvent;
 
 /**
@@ -49,11 +61,12 @@ import sun.awt.CausedFocusEvent;
  * peers without actually displaying anything (hence, they are virtual) or by
  * delegating to the parent component, under the assumption is that somewhere up
  * in the hierarchy there is a parent who can produce a display.
+ *
  * @author Levente S\u00e1ntha
  */
 
 abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Component>
-        extends JNodeGenericPeer<SwingToolkit, awtT> implements ComponentPeer {
+    extends JNodeGenericPeer<SwingToolkit, awtT> implements ComponentPeer {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
@@ -62,7 +75,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param toolkit
      * @param target
      */
@@ -74,7 +87,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         }
         SwingToolkit.copyAwtProperties(target, swingPeer);
         setBounds(target.getX(), target.getY(), target.getWidth(),
-                target.getHeight());
+            target.getHeight());
     }
 
     public boolean canDetermineObscurity() {
@@ -157,8 +170,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         final int width = peerComponent.getWidth();
         final int height = peerComponent.getHeight();
         Graphics g = SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-                new JNodeGraphics2D(this) : new JNodeGraphics(this);
-        g.translate(x,y);
+            new JNodeGraphics2D(this) : new JNodeGraphics(this);
+        g.translate(x, y);
         g.clipRect(0, 0, width, height);
 
         /*
@@ -182,8 +195,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     /**
-     * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
      * @return The location on screen
+     * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
      */
     public Point getLocationOnScreen() {
         Point p = targetComponent.getLocation();
@@ -230,13 +243,15 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
             case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
                 //processPaintEvent((PaintEvent)event);
-            } break;
+                break;
+            }
             default: {
                 if (event.getSource() == targetComponent) {
                     event.setSource(peerComponent);
                 }
-                ((ISwingPeer<awtT>)peerComponent).processAWTEvent(event);
-            } break;
+                ((ISwingPeer<awtT>) peerComponent).processAWTEvent(event);
+                break;
+            }
         }
     }
 
@@ -245,7 +260,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      */
     protected final void postPaintEvent() {
         if (targetComponent != null) {
-            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT,targetComponent.getBounds()));
+            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent.getBounds()));
         }
     }
 
@@ -304,8 +319,6 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     public final void requestFocus() {
 
 
-
-
         peerComponent.requestFocus();
     }
 
@@ -315,12 +328,12 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
             public Boolean run() {
                 try {
                     Method processSynchronousLightweightTransferMethod =
-                            KeyboardFocusManager.class.getDeclaredMethod("processSynchronousLightweightTransfer",
-                                    new Class[]{Component.class, Component.class,Boolean.TYPE, Boolean.TYPE,Long.TYPE});
+                        KeyboardFocusManager.class.getDeclaredMethod("processSynchronousLightweightTransfer",
+                            new Class[]{Component.class, Component.class, Boolean.TYPE, Boolean.TYPE, Long.TYPE});
                     processSynchronousLightweightTransferMethod.setAccessible(true);
 
-                    Object[] params = new Object[]{targetComponent,peerComponent,Boolean.valueOf(temporary),
-                            Boolean.valueOf(focusedWindowChangeAllowed),Long.valueOf(time)};
+                    Object[] params = new Object[]{targetComponent, peerComponent, Boolean.valueOf(temporary),
+                        Boolean.valueOf(focusedWindowChangeAllowed), Long.valueOf(time)};
                     return ((Boolean) processSynchronousLightweightTransferMethod.invoke(null, params)).booleanValue();
                 } catch (Exception x) {
                     x.printStackTrace();
@@ -332,19 +345,22 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         });
     }
 
-    public boolean requestFocus(final Component lwChild, final boolean temporary, final boolean focusedWindowChangeAllowed, final long time, final CausedFocusEvent.Cause cause) {
+    public boolean requestFocus(final Component lwChild, final boolean temporary,
+                                final boolean focusedWindowChangeAllowed, final long time,
+                                final CausedFocusEvent.Cause cause) {
         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             public Boolean run() {
                 try {
                     Component lightweightChild = lwChild;
                     Method processSynchronousLightweightTransferMethod =
-                            KeyboardFocusManager.class.getDeclaredMethod("processSynchronousLightweightTransfer",
-                                    new Class[]{Component.class, Component.class,Boolean.TYPE, Boolean.TYPE,Long.TYPE});
+                        KeyboardFocusManager.class.getDeclaredMethod("processSynchronousLightweightTransfer",
+                            new Class[]{Component.class, Component.class, Boolean.TYPE, Boolean.TYPE, Long.TYPE});
                     processSynchronousLightweightTransferMethod.setAccessible(true);
 
-                    Object[] params = new Object[]{targetComponent,peerComponent,
-                            Boolean.valueOf(temporary),Boolean.valueOf(focusedWindowChangeAllowed),Long.valueOf(time)};
-                    boolean ret = ((Boolean) processSynchronousLightweightTransferMethod.invoke(null, params)).booleanValue();
+                    Object[] params = new Object[]{targetComponent, peerComponent,
+                        Boolean.valueOf(temporary), Boolean.valueOf(focusedWindowChangeAllowed), Long.valueOf(time)};
+                    boolean ret =
+                        ((Boolean) processSynchronousLightweightTransferMethod.invoke(null, params)).booleanValue();
                     //if(ret)
                     //  return true;
 
@@ -356,8 +372,10 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
                         currentOwner = null;
                     }
 
-                    //if (focusLog.isLoggable(Level.FINER)) focusLog.finer("Simulating transfer from " + currentOwner + " to " + lightweightChild);
-                    FocusEvent fg = new CausedFocusEvent(lightweightChild, FocusEvent.FOCUS_GAINED, false, currentOwner, cause);
+                    //if (focusLog.isLoggable(Level.FINER)) focusLog.finer("Simulating transfer from " + currentOwner +
+                    // " to " + lightweightChild);
+                    FocusEvent fg =
+                        new CausedFocusEvent(lightweightChild, FocusEvent.FOCUS_GAINED, false, currentOwner, cause);
                     FocusEvent fl = null;
                     if (currentOwner != null) {
                         fl = new CausedFocusEvent(currentOwner, FocusEvent.FOCUS_LOST, false, lightweightChild, cause);
@@ -384,6 +402,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     boolean isReshapeInProgress = false;
+
     public final void reshape(int x, int y, int width, int height) {
         if (isReshapeInProgress) {
             return;
@@ -460,6 +479,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     /**
      * Posts a component event to the AWT event queue.
+     *
      * @param what
      */
     protected final void fireComponentEvent(int what) {

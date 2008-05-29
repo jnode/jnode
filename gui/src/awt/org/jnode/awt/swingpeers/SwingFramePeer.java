@@ -18,20 +18,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
+import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MenuBar;
 import java.awt.Rectangle;
-import java.awt.Graphics;
-import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
-import javax.swing.JFrame;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JRootPane;
 
 final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
@@ -66,22 +66,22 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
     public void setIcon(boolean b) throws PropertyVetoException {
         super.setIcon(b);
         target.setBounds(this.getBounds());
-    }        
+    }
 
     @Override
     public void paintAll(Graphics g) {
         super.paintAll(g);
-      //  if(target instanceof JFrame && isVisible())
+        //  if(target instanceof JFrame && isVisible())
         //    ((JFrame)target).getRootPane().paintAll(g);
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        if(target instanceof JFrame && isVisible()){
+        if (target instanceof JFrame && isVisible()) {
             JRootPane rp = ((JFrame) target).getRootPane();
             int x = rp.getX(), y = rp.getY();
-            g.translate(x,y);
+            g.translate(x, y);
             rp.paint(g);
             g.translate(-x, -y);
         }
@@ -102,15 +102,16 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
     @Override
     protected void validateTree() {
         super.validateTree();
-        if(target instanceof JFrame)
-            ((JFrame)target).getRootPane().validate();
+        if (target instanceof JFrame)
+            ((JFrame) target).getRootPane().validate();
     }
 
     boolean requestingFocus = false;
+
     @Override
     public void requestFocus() {
-        if(target instanceof JFrame){
-            if(!requestingFocus){
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
                 requestingFocus = true;
                 target.requestFocus();
                 requestingFocus = false;
@@ -121,21 +122,21 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
 
     @Override
     public boolean requestFocus(boolean temporary) {
-        if(target instanceof JFrame){
-            if(!requestingFocus){
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
                 requestingFocus = true;
                 target.requestFocus();
                 requestingFocus = false;
             }
             return true;
-        }else
+        } else
             return super.requestFocus(temporary);
     }
 
     @Override
     public boolean requestFocusInWindow() {
-        if(target instanceof JFrame) {
-            if(!requestingFocus){
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
                 requestingFocus = true;
                 boolean ret = target.requestFocusInWindow();
                 requestingFocus = false;
@@ -148,8 +149,8 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
 
     @Override
     protected boolean requestFocusInWindow(boolean temporary) {
-        if(target instanceof JFrame) {
-            if(!requestingFocus){
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
                 requestingFocus = true;
                 boolean ret = target.requestFocusInWindow();
                 requestingFocus = false;
@@ -161,10 +162,11 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
     }
 
     boolean settingCursor;
+
     @Override
     public void setCursor(Cursor cursor) {
         super.setCursor(cursor);
-        if(!settingCursor){
+        if (!settingCursor) {
             settingCursor = true;
             target.setCursor(cursor);
             settingCursor = false;
@@ -195,20 +197,20 @@ final class NullContentPane extends JComponent {
 }
 
 final class NoContentRootPane extends JRootPane {
-        /**
-         * @see javax.swing.JRootPane#createContentPane()
-         */
-        protected Container createContentPane() {
-            return new NullContentPane();
-        }
+    /**
+     * @see javax.swing.JRootPane#createContentPane()
+     */
+    protected Container createContentPane() {
+        return new NullContentPane();
     }
+}
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha
  */
 final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
-        implements FramePeer, ISwingContainerPeer {
+    implements FramePeer, ISwingContainerPeer {
 
     /**
      * Initialize this instance.
@@ -222,6 +224,7 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
         try {
             peerComponent.setIcon(target.getState() == Frame.ICONIFIED);
         } catch (PropertyVetoException x) {
+            //ignore
         }
         setState(target.getState());
         peerComponent.setTitle(target.getTitle());
@@ -239,9 +242,9 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
      */
     public int getState() {
         int ret = Frame.NORMAL;
-        if(peerComponent.isIcon())
+        if (peerComponent.isIcon())
             ret = ret | Frame.ICONIFIED;
-        if(peerComponent.isMaximum())
+        if (peerComponent.isMaximum())
             ret = ret | Frame.MAXIMIZED_BOTH;
         return ret;
     }
@@ -267,36 +270,37 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
             public void run() {
                 mb.addNotify();
                 peerComponent
-                        .setJMenuBar(((SwingMenuBarPeer) mb.getPeer()).jComponent);
+                    .setJMenuBar(((SwingMenuBarPeer) mb.getPeer()).jComponent);
                 targetComponent.invalidate();
             }
         });
     }
+
     /**
      * @see java.awt.peer.FramePeer#setState(int)
      */
     public void setState(int state) {
-        if((state & Frame.ICONIFIED) == Frame.ICONIFIED) {
+        if ((state & Frame.ICONIFIED) == Frame.ICONIFIED) {
             try {
                 peerComponent.setIcon(true);
-            } catch (PropertyVetoException x){
+            } catch (PropertyVetoException x) {
                 log.warn(x);
             }
         }
 
-        if((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+        if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
             try {
                 peerComponent.setMaximum(true);
-            } catch (PropertyVetoException x){
+            } catch (PropertyVetoException x) {
                 log.warn(x);
             }
         }
 
-        if(state == Frame.NORMAL) {
+        if (state == Frame.NORMAL) {
             try {
                 peerComponent.setMaximum(false);
                 peerComponent.setIcon(false);
-            } catch (PropertyVetoException x){
+            } catch (PropertyVetoException x) {
                 log.warn(x);
             }
         }

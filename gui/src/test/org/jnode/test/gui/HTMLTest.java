@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.JEditorPane;
 
 /**
  * HTML rendering test.
@@ -31,14 +31,15 @@ import javax.swing.JEditorPane;
  * @author Levente S\u00e1ntha
  */
 public class HTMLTest {
-    public static void main(String[] argv) throws Exception{
+    public static void main(String[] argv) throws Exception {
         JFrame f = new JFrame("HTML test");
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setSize(400, 400);
         JEditorPane ep = new JEditorPane();
         f.add(new JScrollPane(ep));
         if (argv.length == 0) {
-            ep.setText("No arguments found on command line\n\norg.jnode.test.gui.HTMLTest <url>\n\turl\tURL of page to load.");
+            ep.setText(
+                "No arguments found on command line\n\norg.jnode.test.gui.HTMLTest <url>\n\turl\tURL of page to load.");
         } else {
             ep.setPage(argv[0]);
         }

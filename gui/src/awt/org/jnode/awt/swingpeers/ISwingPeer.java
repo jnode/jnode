@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
@@ -29,14 +29,15 @@ import java.awt.Component;
  */
 public interface ISwingPeer<T extends Component> {
 
-	public T getAWTComponent();
-    
+    public T getAWTComponent();
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public void processAWTEvent(AWTEvent event);
-    
+
     /**
      * Validate only this peer, do not validate the AWT component.
      */

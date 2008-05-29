@@ -18,41 +18,39 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.spi;
 
 import java.awt.Rectangle;
-import java.io.IOException;
 
 /**
- * 
  * @author Fabien DUMINY (fduminy@jnode.org)
- *
  */
 public abstract class Glyph {
 
-	private final int xMin;
+    private final int xMin;
     private final int yMin;
     private final int xMax;
     private final int yMax;
 
     /**
      * Initialize this instance;
+     *
      * @param in
-     * @throws IOException
+     * @throws java.io.IOException
      */
     protected Glyph(int xMin, int yMin, int xMax, int yMax) {
-		this.xMin = xMin;
-		this.yMin = yMin;
-		this.xMax = xMax;
-		this.yMax = yMax;
-	}
+        this.xMin = xMin;
+        this.yMin = yMin;
+        this.xMax = xMax;
+        this.yMax = yMax;
+    }
 
-	final public Rectangle getBBox() {
-		return new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
-	}
+    final public Rectangle getBBox() {
+        return new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+    }
 
-	public String toString() {
-		return "(" + xMin + "," + yMin + "):(" + xMax + "," + yMax + ")";
-	}
+    public String toString() {
+        return "(" + xMin + "," + yMin + "):(" + xMax + "," + yMax + ")";
+    }
 }

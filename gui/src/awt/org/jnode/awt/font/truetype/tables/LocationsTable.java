@@ -18,25 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype.tables;
 
 import java.io.IOException;
-
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFInput;
 
 /**
  * LOCA Table.
  *
- *  @author Simon Fischer
- *  @version $Id$
+ * @author Simon Fischer
+ * @version $Id$
  */
 public final class LocationsTable extends TTFTable {
 
-	public long offset[];
+    public long offset[];
 
-	/**
+    /**
      * @param font
      * @param input
      */
@@ -45,26 +44,26 @@ public final class LocationsTable extends TTFTable {
     }
 
     public String getTag() {
-		return "loca";
-	}
+        return "loca";
+    }
 
-	protected void readTable(TTFInput ttf) throws IOException {
-		final TTFFontData font = getFont();
-		final short format = font.getHeaderTable().indexToLocFormat;
-		final int numGlyphs = font.getMaxPTable().numGlyphs + 1;
-		offset = new long[numGlyphs];
-		for (int i = 0; i < numGlyphs; i++) {
-			offset[i] = (format == HeadTable.ITLF_LONG ? ttf.readULong() : ttf.readUShort() * 2);
-		}
-	}
+    protected void readTable(TTFInput ttf) throws IOException {
+        final TTFFontData font = getFont();
+        final short format = font.getHeaderTable().indexToLocFormat;
+        final int numGlyphs = font.getMaxPTable().numGlyphs + 1;
+        offset = new long[numGlyphs];
+        for (int i = 0; i < numGlyphs; i++) {
+            offset[i] = (format == HeadTable.ITLF_LONG ? ttf.readULong() : ttf.readUShort() * 2);
+        }
+    }
 
-	public String toString() {
-		String str = super.toString();
-		for (int i = 0; i < offset.length; i++) {
-			if (i % 16 == 0)
-				str += "\n  ";
-			str += offset[i] + " ";
-		}
-		return str;
-	}
+    public String toString() {
+        String str = super.toString();
+        for (int i = 0; i < offset.length; i++) {
+            if (i % 16 == 0)
+                str += "\n  ";
+            str += offset[i] + " ";
+        }
+        return str;
+    }
 }

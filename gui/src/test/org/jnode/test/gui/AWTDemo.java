@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -97,7 +97,7 @@ public class AWTDemo {
         public Insets getInsets() {
             Insets oldInsets = super.getInsets();
             return new Insets(oldInsets.top + 10, oldInsets.left + 10,
-                    oldInsets.bottom + 10, oldInsets.right + 10);
+                oldInsets.bottom + 10, oldInsets.right + 10);
         }
     }
 
@@ -372,7 +372,7 @@ public class AWTDemo {
                     g.fillRect(0, d.height / 2, d.width, d.height / 2);
                     g.setColor(this.getBackground());
                     g.fillRect(d.width / 3, d.height / 3, d.width / 3,
-                            d.height / 3);
+                        d.height / 3);
                 }
             };
 
@@ -611,7 +611,7 @@ public class AWTDemo {
             final Image img;
             URL imageurl;
             imageurl = this.getClass().getResource(
-                    "/gnu/classpath/examples/icons/big-warning.png");
+                "/gnu/classpath/examples/icons/big-warning.png");
             img = Toolkit.getDefaultToolkit().createImage(imageurl);
 
             final Canvas ch = new Canvas() {

@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.peer.CheckboxPeer;
-
 import javax.swing.JCheckBox;
 
 /**
@@ -33,30 +32,30 @@ import javax.swing.JCheckBox;
  */
 final class SwingCheckboxPeer extends SwingComponentPeer<Checkbox, SwingCheckBox> implements CheckboxPeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingCheckboxPeer(SwingToolkit toolkit, Checkbox checkBox) {
-		super(toolkit, checkBox, new SwingCheckBox(checkBox));
-		final JCheckBox jcb = (JCheckBox) peerComponent;
-		SwingToolkit.add(checkBox, jcb);
-		SwingToolkit.copyAwtProperties(checkBox, jcb);
-		jcb.setText(checkBox.getLabel());
-		setState(checkBox.getState());
+    public SwingCheckboxPeer(SwingToolkit toolkit, Checkbox checkBox) {
+        super(toolkit, checkBox, new SwingCheckBox(checkBox));
+        final JCheckBox jcb = (JCheckBox) peerComponent;
+        SwingToolkit.add(checkBox, jcb);
+        SwingToolkit.copyAwtProperties(checkBox, jcb);
+        jcb.setText(checkBox.getLabel());
+        setState(checkBox.getState());
 
-	}
+    }
 
-	public void setCheckboxGroup(CheckboxGroup g) {
-	}
+    public void setCheckboxGroup(CheckboxGroup g) {
+    }
 
-	public void setState(boolean state) {
-		((JCheckBox) peerComponent).setSelected(state);
-	}
+    public void setState(boolean state) {
+        ((JCheckBox) peerComponent).setSelected(state);
+    }
 
-	public void setLabel(String label) {
-		((JCheckBox) peerComponent).setText(label);
-	}
+    public void setLabel(String label) {
+        ((JCheckBox) peerComponent).setText(label);
+    }
 }
 
 final class SwingCheckBox extends JCheckBox implements ISwingPeer<Checkbox> {
@@ -72,17 +71,19 @@ final class SwingCheckBox extends JCheckBox implements ISwingPeer<Checkbox> {
     public Checkbox getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -94,5 +95,5 @@ final class SwingCheckBox extends JCheckBox implements ISwingPeer<Checkbox> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

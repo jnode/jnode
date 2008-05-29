@@ -18,18 +18,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GraphicsConfiguration;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.Raster;
-
+import java.awt.image.WritableRaster;
 import org.jnode.awt.util.AbstractSurfaceGraphics2D;
 import org.jnode.driver.video.util.AbstractSurface;
 
@@ -38,52 +37,54 @@ import org.jnode.driver.video.util.AbstractSurface;
  */
 public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
 
-	private JNodeGenericPeer component;
-	private JNodeToolkit toolkit;
+    private JNodeGenericPeer component;
+    private JNodeToolkit toolkit;
 
     /**
-	 * Initialize a graphics for the given component
-	 * @param component
-	 */
-	public JNodeGraphics2D(JNodeGenericPeer<?, ?> component) {
-		super((AbstractSurface) component.getToolkitImpl().getGraphics(), 
-			  ((Component)component.getTargetComponent()).getWidth(),
-			  ((Component)component.getTargetComponent()).getHeight());
-		this.component = component;
-		this.toolkit = component.getToolkitImpl();
-		init();
-	}
+     * Initialize a graphics for the given component
+     *
+     * @param component
+     */
+    public JNodeGraphics2D(JNodeGenericPeer<?, ?> component) {
+        super((AbstractSurface) component.getToolkitImpl().getGraphics(),
+            ((Component) component.getTargetComponent()).getWidth(),
+            ((Component) component.getTargetComponent()).getHeight());
+        this.component = component;
+        this.toolkit = component.getToolkitImpl();
+        init();
+    }
 
-	/**
-	 * Initialize a graphics base on the given source.
-	 * @param src
-	 */
-	public JNodeGraphics2D(JNodeGraphics2D src) {
-		super(src);
-		this.component = src.component;
-		this.toolkit = src.toolkit;
-		init();
-	}
-	
-	/**
-	 * @see java.awt.Graphics2D#getDeviceConfiguration()
-	 * @return The configuration
-	 */
-	public GraphicsConfiguration getDeviceConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public final Object clone() {
-		JNodeGraphics2D copy = (JNodeGraphics2D) super.clone();
-		
-		copy.component = component;
-		copy.toolkit = toolkit;
+    /**
+     * Initialize a graphics base on the given source.
+     *
+     * @param src
+     */
+    public JNodeGraphics2D(JNodeGraphics2D src) {
+        super(src);
+        this.component = src.component;
+        this.toolkit = src.toolkit;
+        init();
+    }
 
-		copy.init();
-		
-		return copy;
-	}
+    /**
+     * @return The configuration
+     * @see java.awt.Graphics2D#getDeviceConfiguration()
+     */
+    public GraphicsConfiguration getDeviceConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public final Object clone() {
+        JNodeGraphics2D copy = (JNodeGraphics2D) super.clone();
+
+        copy.component = component;
+        copy.toolkit = toolkit;
+
+        copy.init();
+
+        return copy;
+    }
 
     /**
      * Returns the color model of this Graphics object.
@@ -94,16 +95,16 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
         return toolkit.getColorModel();
     }
 
-	/**
-	 * @param font
-	 * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
-	 * @return The metrics
-	 * 
-	 * FIXME: needed or remove??
-	 */
-	public FontMetrics getFontMetrics(Font font) {
-		return toolkit.getFontMetrics(font);
-	}
+    /**
+     * @param font
+     * @return The metrics
+     *         <p/>
+     *         FIXME: needed or remove??
+     * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
+     */
+    public FontMetrics getFontMetrics(Font font) {
+        return toolkit.getFontMetrics(font);
+    }
 
     /**
      * Returns a WritableRaster that is used by this class to perform the
@@ -114,8 +115,9 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      * @return the destination raster
      */
     protected final WritableRaster getDestinationRaster() {
-        if(image == null)
-            image = new BufferedImage(((Component)component.getTargetComponent()).getWidth(), ((Component)component.getTargetComponent()).getHeight(), BufferedImage.TYPE_INT_ARGB);
+        if (image == null)
+            image = new BufferedImage(((Component) component.getTargetComponent()).getWidth(),
+                ((Component) component.getTargetComponent()).getHeight(), BufferedImage.TYPE_INT_ARGB);
         return image.getRaster();
     }
 
@@ -137,7 +139,7 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      */
     protected void updateRaster(Raster raster, int x, int y, int w, int h) {
         //rawDrawImage(image, 0, 0, null);
-    	System.err.println("JNodeGraphics#updateRaster(...)");
-    	rawUpdateRaster(raster, x, y, w, h);
+        System.err.println("JNodeGraphics#updateRaster(...)");
+        rawUpdateRaster(raster, x, y, w, h);
     }
 }

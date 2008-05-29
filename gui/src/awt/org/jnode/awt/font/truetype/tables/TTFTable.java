@@ -18,31 +18,31 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype.tables;
 
 import java.io.IOException;
-
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFInput;
 
 /**
- *  Concrete instances derived from this class hold data stored in true type tables. 
- *  Right now the data is accessible as public attributes. 
- *  In some cases methods may return more convenient objects 
- *  (such as Shapes instead of point arrays).
+ * Concrete instances derived from this class hold data stored in true type tables.
+ * Right now the data is accessible as public attributes.
+ * In some cases methods may return more convenient objects
+ * (such as Shapes instead of point arrays).
  *
- *  @author Simon Fischer
- *  @version $Id$
+ * @author Simon Fischer
+ * @version $Id$
  */
 public abstract class TTFTable {
 
-	private final TTFFontData font;
+    private final TTFFontData font;
     private final TTFInput input;
-	private boolean isRead = false;
-    
+    private boolean isRead = false;
+
     /**
      * Initialize this instance.
+     *
      * @param font
      * @param input
      */
@@ -53,6 +53,7 @@ public abstract class TTFTable {
 
     /**
      * Read the table.
+     *
      * @throws IOException
      */
     public final void read() throws IOException {
@@ -63,10 +64,11 @@ public abstract class TTFTable {
             isRead = true;
             input.popPos();
         }
-	}
-    
+    }
+
     /**
      * Gets the input handler for this table.
+     *
      * @return
      */
     protected final TTFInput getInput() {
@@ -75,24 +77,26 @@ public abstract class TTFTable {
 
     /**
      * Read the table from the given input.
+     *
      * @throws IOException
      */
-	protected abstract void readTable(TTFInput input) throws IOException;
+    protected abstract void readTable(TTFInput input) throws IOException;
 
     /**
      * Gets the tag of this table.
+     *
      * @return
      */
-	public abstract String getTag();
+    public abstract String getTag();
 
-	public String toString() {
-		return "[" + getTag() + "/" + getClass().getName() + "]";
-	}
+    public String toString() {
+        return "[" + getTag() + "/" + getClass().getName() + "]";
+    }
 
-	/**
-	 * @return The font data this table belongs to
-	 */
-	public final TTFFontData getFont() {
-		return this.font;
-	}
+    /**
+     * @return The font data this table belongs to
+     */
+    public final TTFFontData getFont() {
+        return this.font;
+    }
 }

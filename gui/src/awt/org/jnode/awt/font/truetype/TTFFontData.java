@@ -18,15 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 import java.awt.Font;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.jnode.awt.font.spi.AbstractFontProvider;
 import org.jnode.awt.font.spi.FontData;
 import org.jnode.awt.font.spi.Glyph;
 import org.jnode.awt.font.truetype.tables.CMapTable;
@@ -42,50 +40,54 @@ import org.jnode.awt.font.truetype.tables.TTFTable;
 
 /**
  * TrueType Font with all its tables.
- * 
+ *
  * @author Simon Fischer
  * @version $Id$
  */
 public abstract class TTFFontData implements FontData {
 
-    /** Tables indexed by tag */
+    /**
+     * Tables indexed by tag
+     */
     private final Map<TableClass, TTFTable> tables = new HashMap<TableClass, TTFTable>();
 
     /**
      * Initialize this instance.
+     *
      * @param input
      */
     protected TTFFontData() {
     }
-    
-	public Glyph getGlyph(char c) throws IOException
-	{
-		final GlyphTable glyphTable = getGlyphTable();
-		final CMapTable cmapTable = getCMapTable();
 
-		if (!(cmapTable.getNrEncodingTables() > 0)) {
-			throw new RuntimeException("No Encoding is found!");
-		}
-		
-		final CMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
-		if (encTable.getTableFormat() == null) {
-			throw new RuntimeException("The table is NUll!!");
-		}
-		
-		//get the index for the needed glyph
-		final int index = encTable.getTableFormat().getGlyphIndex(c);
+    public Glyph getGlyph(char c) throws IOException {
+        final GlyphTable glyphTable = getGlyphTable();
+        final CMapTable cmapTable = getCMapTable();
+
+        if (!(cmapTable.getNrEncodingTables() > 0)) {
+            throw new RuntimeException("No Encoding is found!");
+        }
+
+        final CMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
+        if (encTable.getTableFormat() == null) {
+            throw new RuntimeException("The table is NUll!!");
+        }
+
+        //get the index for the needed glyph
+        final int index = encTable.getTableFormat().getGlyphIndex(c);
         return glyphTable.getGlyph(index);
-	}
-	
+    }
+
     /**
      * Gets the version of this font data.
+     *
      * @return
      */
     public abstract int getFontVersion();
 
-    
+
     /**
      * Create a new table with a given table.
+     *
      * @param tag
      * @param input
      * @throws IOException
@@ -105,24 +107,25 @@ public abstract class TTFFontData implements FontData {
         }
     }
 
-    /***************************************************************************
+    /**
+     * ************************************************************************
      * Returns the table with the given tag and reads it if necessary.
-     * 
+     *
      * @param tag
      * @return The table
      * @throws IOException
      */
     private final TTFTable getTable(TableClass tag) throws IOException {
         final TTFTable table = tables.get(tag);
-        
-    	if(table == null) throw new IOException("table is null for tag "+tag.getTag());
+
+        if (table == null) throw new IOException("table is null for tag " + tag.getTag());
         table.read();
         return table;
     }
 
     /**
      * Returns the glyph table and reads it if necessary.
-     * 
+     *
      * @return The glyph table
      * @throws IOException
      */
@@ -132,7 +135,7 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the maximum profile table
-     * 
+     *
      * @return The maximum profile table
      * @throws IOException
      */
@@ -142,7 +145,7 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the name table
-     * 
+     *
      * @return The name table
      * @throws IOException
      */
@@ -152,29 +155,29 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the horizontal header table
-     * 
+     *
      * @return The horizontal header table
      * @throws IOException
      */
     public HorizontalHeaderTable getHorizontalHeaderTable()
-            throws IOException {
+        throws IOException {
         return (HorizontalHeaderTable) getTable(TableClass.HHEA);
     }
 
     /**
      * Gets the horizontal metrics table
-     * 
+     *
      * @return The horizontal metrics table
      * @throws IOException
      */
     public HorizontalMetricsTable getHorizontalMetricsTable()
-            throws IOException {
+        throws IOException {
         return (HorizontalMetricsTable) getTable(TableClass.HMTX);
     }
 
     /**
      * Gets the font header table
-     * 
+     *
      * @return The header table
      * @throws IOException
      */
@@ -184,7 +187,7 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the OS/2 / Windows metrics table
-     * 
+     *
      * @return The OS/2 / Windows metrics table
      * @throws IOException
      */
@@ -194,7 +197,7 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the location table
-     * 
+     *
      * @return The location table
      * @throws IOException
      */
@@ -204,7 +207,7 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the character to glyph mapping table
-     * 
+     *
      * @return The CMap table
      * @throws IOException
      */
@@ -216,7 +219,7 @@ public abstract class TTFFontData implements FontData {
      * Reads all tables. This method does not need to be called since the tables
      * are read on demand ( <tt>getTable()</tt>. It might be useful to call
      * it in order to print out all available information.
-     * 
+     *
      * @throws IOException
      */
     public void readAll() throws IOException {
@@ -232,12 +235,12 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Gets the style (in AWT terms) of this font
-     * 
+     *
      * @return The style
+     * @throws IOException
      * @see Font#BOLD
      * @see Font#ITALIC
      * @see Font#PLAIN
-     * @throws IOException
      */
     public int getStyle() throws IOException {
         final OS2Table t = getOS2Table();

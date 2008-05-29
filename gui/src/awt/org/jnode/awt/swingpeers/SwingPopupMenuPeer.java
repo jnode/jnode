@@ -18,32 +18,33 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.peer.PopupMenuPeer;
+import javax.swing.JPopupMenu;
 
 /**
  * AWT popup menu peer implemented as a {@link javax.swing.JPopupMenu}.
+ *
  * @author Levente S\u00e1ntha
  */
 
 final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
-        implements PopupMenuPeer {
+    implements PopupMenuPeer {
 
     @SuppressWarnings("deprecation")
     public SwingPopupMenuPeer(SwingToolkit toolkit, PopupMenu popupMenu) {
         super(toolkit, popupMenu, new JPopupMenu());
         int item_count = popupMenu.getItemCount();
-        for(int i = 0; i < item_count; i++){
+        for (int i = 0; i < item_count; i++) {
             MenuItem menu_item = popupMenu.getItem(i);
             menu_item.addNotify();
-            jComponent.add(((SwingMenuComponentPeer)menu_item.getPeer()).jComponent);
+            jComponent.add(((SwingMenuComponentPeer) menu_item.getPeer()).jComponent);
         }
     }
 
@@ -57,13 +58,13 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
 
     @SuppressWarnings("deprecation")
     public void show(Component component, int x, int y) {
-        ((JPopupMenu)jComponent).show(((SwingComponentPeer) component.getPeer()).peerComponent, x, y);
+        ((JPopupMenu) jComponent).show(((SwingComponentPeer) component.getPeer()).peerComponent, x, y);
     }
 
     @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
         item.addNotify();
-        jComponent.add(((SwingBaseMenuItemPeer)item.getPeer()).jComponent);
+        jComponent.add(((SwingBaseMenuItemPeer) item.getPeer()).jComponent);
     }
 
     public void delItem(int index) {

@@ -1,33 +1,33 @@
 package org.jnode.test.gui;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
-import org.jnode.driver.video.Surface;
+import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.textscreen.ScrollableTextScreenConsole;
+import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
+import org.jnode.driver.textscreen.ScrollableTextScreen;
+import org.jnode.driver.textscreen.TextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.FrameBufferConfiguration;
-import org.jnode.driver.textscreen.TextScreen;
-import org.jnode.driver.textscreen.ScrollableTextScreen;
-import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
-import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
-import org.jnode.driver.console.textscreen.ScrollableTextScreenConsole;
-import org.jnode.driver.console.ConsoleManager;
-import org.jnode.shell.CommandShell;
+import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
-import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.awt.Color;
-import java.awt.GraphicsEnvironment;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import org.jnode.shell.CommandShell;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class FBConsole {
     private static final Logger log = Logger.getLogger(FBConsole.class);
+
     public static void main(String[] args) throws Exception {
 
         final String devId = (args.length > 0) ? args[0] : "" /*"fb0"*/;
@@ -35,16 +35,16 @@ public class FBConsole {
         Surface g = null;
         try {
             Device dev = null;
-            if("".equals(devId)){
+            if ("".equals(devId)) {
                 final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
                 int dev_count = devs.size();
-                if(dev_count > 0){
+                if (dev_count > 0) {
                     Device[] dev_a = devs.toArray(new Device[dev_count]);
                     dev = dev_a[0];
                 }
             }
 
-            if(dev == null){
+            if (dev == null) {
                 final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
                 dev = dm.getDevice(devId);
             }
@@ -58,10 +58,10 @@ public class FBConsole {
 
             ScrollableTextScreen ts = new FBConsole.FBPcTextScreen(g).createCompatibleScrollableBufferScreen(500);
 
-            ScrollableTextScreenConsole first = 
-            	new ScrollableTextScreenConsole(mgr, "console", ts,
+            ScrollableTextScreenConsole first =
+                new ScrollableTextScreenConsole(mgr, "console", ts,
                     ConsoleManager.CreateOptions.TEXT |
-                    ConsoleManager.CreateOptions.SCROLLABLE);
+                        ConsoleManager.CreateOptions.SCROLLABLE);
 
             mgr.registerConsole(first);
             mgr.focus(first);
@@ -93,7 +93,7 @@ public class FBConsole {
             super(FBConsole.FBPcTextScreen.SCREEN_WIDTH, FBConsole.FBPcTextScreen.SCREEN_HEIGHT);
             buffer = new char[FBConsole.FBPcTextScreen.SCREEN_WIDTH * FBConsole.FBPcTextScreen.SCREEN_HEIGHT];
             screen = new FBScreen(g);
-            for (int i = 0; i < buffer.length; i ++) {
+            for (int i = 0; i < buffer.length; i++) {
                 buffer[i] = ' ';
             }
             for (String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
@@ -118,7 +118,7 @@ public class FBConsole {
 
         public void set(int offset, char[] ch, int chOfs, int length, int color) {
             char[] cha = new char[ch.length];
-            for (int i = 0; i < cha.length; i ++) {
+            for (int i = 0; i < cha.length; i++) {
                 char c = (char) (ch[i] & 0xFF);
                 cha[i] = c == 0 ? ' ' : c;
             }
@@ -128,7 +128,7 @@ public class FBConsole {
 
         public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
             char[] cha = new char[ch.length];
-            for (int i = 0; i < cha.length; i ++) {
+            for (int i = 0; i < cha.length; i++) {
                 char c = (char) (ch[i] & 0xFF);
                 cha[i] = c == 0 ? ' ' : c;
             }
@@ -161,7 +161,7 @@ public class FBConsole {
         /**
          * Copy the content of the given rawData into this screen.
          *
-         * @param rawData the data as a char array
+         * @param rawData       the data as a char array
          * @param rawDataOffset the offset in the data array
          */
         public void copyFrom(char[] rawData, int rawDataOffset) {
@@ -169,7 +169,7 @@ public class FBConsole {
                 //Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
             }
             char[] cha = new char[rawData.length];
-            for (int i = 0; i < cha.length; i ++) {
+            for (int i = 0; i < cha.length; i++) {
                 char c = (char) (rawData[i] & 0xFF);
                 cha[i] = c == 0 ? ' ' : c;
             }
@@ -177,7 +177,7 @@ public class FBConsole {
             sync();
         }
 
-        private class FBScreen  {
+        private class FBScreen {
             private int margin = 5;
             private int w = 7;
             private int h = 18;
@@ -195,7 +195,9 @@ public class FBConsole {
                 sw = w * FBPcTextScreen.SCREEN_WIDTH + 2 * margin;
                 bi = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
                 ig = bi.getGraphics();
-                font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
+                font = new Font(
+                    "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
+                    Font.PLAIN, 12);
 
                 /*
                 try{
@@ -212,16 +214,16 @@ public class FBConsole {
                 */
                 new Thread(new Runnable() {
                     public void run() {
-                        while(true){
-                            try{
+                        while (true) {
+                            try {
                                 paintComponent();
-                                synchronized(FBScreen.this){
-                                    if(!update) {
+                                synchronized (FBScreen.this) {
+                                    if (!update) {
                                         update = false;
                                         FBScreen.this.wait();
                                     }
                                 }
-                            }catch(InterruptedException x ){
+                            } catch (InterruptedException x) {
                                 break;
                             }
                         }
@@ -231,7 +233,7 @@ public class FBConsole {
 
             protected void paintComponent() {
                 ig.setColor(Color.BLACK);
-                ig.fillRect(0,0, sw,sh);
+                ig.fillRect(0, 0, sw, sh);
                 ig.setColor(Color.WHITE);
                 ig.setFont(font);
                 for (int i = 0; i < FBPcTextScreen.SCREEN_HEIGHT; i++) {
@@ -243,7 +245,7 @@ public class FBConsole {
             }
 
             public synchronized void repaint() {
-                if(!update){
+                if (!update) {
                     update = true;
                     notifyAll();
                 }

@@ -1,39 +1,37 @@
 package org.jnode.test.gui;
 
-import org.jnode.plugin.ExtensionPoint;
-import org.jnode.plugin.Extension;
-import org.jnode.plugin.ExtensionPointListener;
-import org.jnode.plugin.PluginDescriptor;
-import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.AbstractDeviceManager;
-import org.jnode.driver.DeviceFinder;
-import org.jnode.driver.DeviceToDriverMapper;
-import org.jnode.driver.Device;
-import org.jnode.driver.DriverException;
-import org.jnode.shell.alias.AliasManager;
-import org.jnode.shell.alias.def.DefaultAliasManager;
-import org.jnode.shell.ShellManager;
-import org.jnode.shell.def.DefaultShellManager;
-import org.apache.log4j.Logger;
-
-import javax.naming.NamingException;
-import javax.naming.NameAlreadyBoundException;
-import javax.naming.NameNotFoundException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.naming.NameAlreadyBoundException;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+import org.apache.log4j.Logger;
+import org.jnode.driver.AbstractDeviceManager;
+import org.jnode.driver.Device;
+import org.jnode.driver.DeviceFinder;
+import org.jnode.driver.DeviceToDriverMapper;
+import org.jnode.driver.DriverException;
+import org.jnode.naming.InitialNaming;
+import org.jnode.naming.NameSpace;
+import org.jnode.plugin.Extension;
+import org.jnode.plugin.ExtensionPoint;
+import org.jnode.plugin.ExtensionPointListener;
+import org.jnode.plugin.PluginDescriptor;
+import org.jnode.shell.ShellManager;
+import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.alias.def.DefaultAliasManager;
+import org.jnode.shell.def.DefaultShellManager;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class Emu {
     protected static void initEnv() throws NamingException {
-        if(true){
+        if (true) {
             InitialNaming.setNameSpace(new NameSpace() {
                 private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 

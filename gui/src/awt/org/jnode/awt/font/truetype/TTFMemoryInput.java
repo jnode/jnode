@@ -18,96 +18,96 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 /**
- *  FIXME: These methods are not really tested yet.
+ * FIXME: These methods are not really tested yet.
  *
- *  @author Simon Fischer
- *  @version $Id$
+ * @author Simon Fischer
+ * @version $Id$
  */
 public class TTFMemoryInput extends TTFInput {
 
-	private final byte[] data;
-	private final int offset;
-	private int pointer;
+    private final byte[] data;
+    private final int offset;
+    private int pointer;
 
-	public TTFMemoryInput(byte[] data, int offset, int length) {
-		this.data = data;
-		this.offset = offset;
-		this.pointer = offset;
-	}
-	
-	public TTFMemoryInput(byte[] data) {
-		this(data, 0, data.length);
-	}
-	
-	private TTFMemoryInput(TTFMemoryInput src, int offset, int length) {
-		this.data = src.data;
-		this.offset = src.offset + offset;
-		//this.length = length;
-	}
+    public TTFMemoryInput(byte[] data, int offset, int length) {
+        this.data = data;
+        this.offset = offset;
+        this.pointer = offset;
+    }
 
-	public TTFInput createSubInput(int offset, int length) {
-		return new TTFMemoryInput(this, offset, length);
-	}
+    public TTFMemoryInput(byte[] data) {
+        this(data, 0, data.length);
+    }
 
-	public void seek(long ofs) {
-		pointer = this.offset + (int)ofs;
-	}
+    private TTFMemoryInput(TTFMemoryInput src, int offset, int length) {
+        this.data = src.data;
+        this.offset = src.offset + offset;
+        //this.length = length;
+    }
 
-	long getPointer() {
-		return pointer - offset;
-	}
+    public TTFInput createSubInput(int offset, int length) {
+        return new TTFMemoryInput(this, offset, length);
+    }
 
-	// ---------- Simple Data Types --------------
+    public void seek(long ofs) {
+        pointer = this.offset + (int) ofs;
+    }
 
-	public byte readChar() {
-		return data[pointer++];
-	}
+    long getPointer() {
+        return pointer - offset;
+    }
 
-	public int readRawByte() {
-		return data[pointer++] & 0x00ff;
-	}
+    // ---------- Simple Data Types --------------
 
-	public int readByte() {
-		return data[pointer++] & 0x00ff;
-	}
+    public byte readChar() {
+        return data[pointer++];
+    }
 
-	public short readShort() {
-		final int v0 = data[pointer++] & 0xFF;
-		final int v1 = data[pointer++] & 0xFF;
-		return (short) ((v0 << 8) | v1);
-	}
+    public int readRawByte() {
+        return data[pointer++] & 0x00ff;
+    }
 
-	public int readUShort() {
-		final int v0 = data[pointer++] & 0xFF;
-		final int v1 = data[pointer++] & 0xFF;
-		return ((v0 << 8) | v1);
-	}
+    public int readByte() {
+        return data[pointer++] & 0x00ff;
+    }
 
-	public int readLong() {
-		final int v0 = data[pointer++] & 0xFF;
-		final int v1 = data[pointer++] & 0xFF;
-		final int v2 = data[pointer++] & 0xFF;
-		final int v3 = data[pointer++] & 0xFF;
-		return ((v0 << 24) | (v1 << 16) | (v2 << 8) | v3);
-	}
+    public short readShort() {
+        final int v0 = data[pointer++] & 0xFF;
+        final int v1 = data[pointer++] & 0xFF;
+        return (short) ((v0 << 8) | v1);
+    }
 
-	public long readULong() {
-		final long v0 = data[pointer++] & 0xFF;
-		final long v1 = data[pointer++] & 0xFF;
-		final long v2 = data[pointer++] & 0xFF;
-		final long v3 = data[pointer++] & 0xFF;
-		return ((v0 << 24) | (v1 << 16) | (v2 << 8) | v3);
-	}
+    public int readUShort() {
+        final int v0 = data[pointer++] & 0xFF;
+        final int v1 = data[pointer++] & 0xFF;
+        return ((v0 << 8) | v1);
+    }
 
-	// ---------------- Arrays -------------------
+    public int readLong() {
+        final int v0 = data[pointer++] & 0xFF;
+        final int v1 = data[pointer++] & 0xFF;
+        final int v2 = data[pointer++] & 0xFF;
+        final int v3 = data[pointer++] & 0xFF;
+        return ((v0 << 24) | (v1 << 16) | (v2 << 8) | v3);
+    }
 
-	public void readFully(byte[] b) {
-		for (int i = 0; i < b.length; i++) {
-			b[i] = data[pointer++];
-		}
-	}
+    public long readULong() {
+        final long v0 = data[pointer++] & 0xFF;
+        final long v1 = data[pointer++] & 0xFF;
+        final long v2 = data[pointer++] & 0xFF;
+        final long v3 = data[pointer++] & 0xFF;
+        return ((v0 << 24) | (v1 << 16) | (v2 << 8) | v3);
+    }
+
+    // ---------------- Arrays -------------------
+
+    public void readFully(byte[] b) {
+        for (int i = 0; i < b.length; i++) {
+            b[i] = data[pointer++];
+        }
+    }
 }

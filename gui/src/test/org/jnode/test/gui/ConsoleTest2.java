@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -26,7 +26,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import javax.naming.NameNotFoundException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,7 +33,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
-
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
@@ -58,22 +56,22 @@ public class ConsoleTest2 {
         private TextConsole console;
 
         public ConsoleFrame() throws ConsoleException, ShellException, NameNotFoundException {
-            super( "System.out" );
-            
-            screen = new JTextAreaTextScreen(80,24);
+            super("System.out");
+
+            screen = new JTextAreaTextScreen(80, 24);
             manager = new TextScreenConsoleManager();
             console = new TextScreenConsole(
-            		manager, "test", screen, ConsoleManager.CreateOptions.TEXT);
+                manager, "test", screen, ConsoleManager.CreateOptions.TEXT);
             manager.focus(console);
 
             CommandShell commandShell = new CommandShell(console);
             new Thread(commandShell).start();
             ShellUtils.getShellManager().registerShell(commandShell);
-            
+
             //textArea = new JTextArea( "System.out:" );
-            
-            getContentPane().setLayout( new BorderLayout() );
-            getContentPane().add( screen.getTextArea(), BorderLayout.CENTER );
+
+            getContentPane().setLayout(new BorderLayout());
+            getContentPane().add(screen.getTextArea(), BorderLayout.CENTER);
             //savedOut = new PrintStream( new TextAreaOutputStream( textArea ) );
         }
 
@@ -82,7 +80,6 @@ public class ConsoleTest2 {
 //            claimPrintStreams();
 //        }
 
-        
 //        private void claimPrintStreams() {
 //            System.out.println( "Claiming print streams." );
 //            AccessController.doPrivileged( new PrivilegedAction() {
@@ -97,25 +94,25 @@ public class ConsoleTest2 {
     }
 
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
         try {
             final ConsoleFrame frame = new ConsoleFrame();
-            frame.getRootPane().setDoubleBuffered( false );
-            frame.setLocation( 100, 100 );
-            frame.setSize( 400, 400 );
-            JButton button = new JButton( "Button" );
-            button.addActionListener( new ActionListener() {
-                public void actionPerformed( ActionEvent event ) {
-                    System.out.println( "Button pressed." );
+            frame.getRootPane().setDoubleBuffered(false);
+            frame.setLocation(100, 100);
+            frame.setSize(400, 400);
+            JButton button = new JButton("Button");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    System.out.println("Button pressed.");
                 }
-            } );
-            frame.getContentPane().add( button, BorderLayout.SOUTH );
+            });
+            frame.getContentPane().add(button, BorderLayout.SOUTH);
             JMenuBar mb = new JMenuBar();
-            JMenu menu = new JMenu( "JMenu test" );
-            JMenuItem mi = new JMenuItem( "JMenuItem test" );
-            mb.add( menu );
-            menu.add( mi );
-            frame.setJMenuBar( mb );
+            JMenu menu = new JMenu("JMenu test");
+            JMenuItem mi = new JMenuItem("JMenuItem test");
+            mb.add(menu);
+            menu.add(mi);
+            frame.setJMenuBar(mb);
             frame.validate();
             frame.show();
 
@@ -127,9 +124,8 @@ public class ConsoleTest2 {
 //            } );
 //            t.start();
 //            comp.requestFocus();
-            System.out.println( "Showed ConsoleTest frame." );
-        }
-        catch( Exception ex ) {
+            System.out.println("Showed ConsoleTest frame.");
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -142,12 +138,12 @@ public class ConsoleTest2 {
 
         private JTextArea textArea;
 
-        public TextAreaOutputStream( JTextArea console ) {
+        public TextAreaOutputStream(JTextArea console) {
             this.textArea = console;
         }
 
-        public void write( int b ) throws IOException {
-            textArea.append( "" + (char)b );
+        public void write(int b) throws IOException {
+            textArea.append("" + (char) b);
             if (b == '\n') {
                 textArea.repaint();
             }

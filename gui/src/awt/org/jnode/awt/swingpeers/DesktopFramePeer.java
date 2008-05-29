@@ -18,32 +18,48 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import java.awt.*;
+import gnu.classpath.SystemProperties;
+import java.awt.AWTEvent;
+import java.awt.AWTException;
+import java.awt.BufferCapabilities;
 import java.awt.BufferCapabilities.FlipContents;
-import java.awt.event.PaintEvent;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.MenuBar;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
-import java.awt.peer.FramePeer;
 import java.awt.peer.ContainerPeer;
-
+import java.awt.peer.FramePeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
 import org.jnode.awt.JNodeGraphics2D;
-import gnu.classpath.SystemProperties;
 import sun.awt.CausedFocusEvent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame> implements
-        FramePeer {
+    FramePeer {
 
     private final SwingToolkit toolkit;
 
@@ -57,7 +73,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
 
     /**
      * Initialize
-     * 
+     *
      * @param toolkit
      * @param frame
      */
@@ -222,7 +238,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      *      java.awt.BufferCapabilities)
      */
     public void createBuffers(int x, BufferCapabilities capabilities)
-            throws AWTException {
+        throws AWTException {
         // TODO Auto-generated method stub
 
     }
@@ -303,7 +319,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      */
     public Graphics getGraphics() {
         return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-        new JNodeGraphics2D(this) : new JNodeGraphics(this);
+            new JNodeGraphics2D(this) : new JNodeGraphics(this);
     }
 
     /**
@@ -358,11 +374,12 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
             case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
                 //processPaintEvent((PaintEvent)event);
-            } break;
+                break;
+            }
             case KeyEvent.KEY_PRESSED:
             case KeyEvent.KEY_RELEASED:
             case KeyEvent.KEY_TYPED: {
-                targetComponent.processKeyEvent((KeyEvent)event);
+                targetComponent.processKeyEvent((KeyEvent) event);
                 break;
             }
         }
@@ -449,8 +466,8 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
         }
 
         toolkit.postEvent(
-                new PaintEvent(awtFrame, PaintEvent.UPDATE, new Rectangle(x,
-                        y, width, height)));
+            new PaintEvent(awtFrame, PaintEvent.UPDATE, new Rectangle(x,
+                y, width, height)));
     }
 
     /**
@@ -622,11 +639,12 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     }
 
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed,
+                                long time, CausedFocusEvent.Cause cause) {
         //TODO implement it
         return false;
     }
-    
+
     //jnode openjdk
     public Rectangle getBoundsPrivate() {
         //TODO implement it
@@ -636,7 +654,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     protected final void paintAWTComponent() {
         if (targetComponent != null) {
             toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent
-                    .getBounds()));
+                .getBounds()));
         }
     }
 }

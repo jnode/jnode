@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Color;
@@ -31,7 +31,7 @@ import java.awt.Graphics;
  */
 public class GraphicsTest {
     public static void main(String[] args)
-            throws Exception {
+        throws Exception {
         Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);
@@ -51,11 +51,11 @@ public class GraphicsTest {
         public void paint(Graphics g) {
             g.setColor(Color.RED);
             g.translate(10, 10);
-            g.drawRect(0, 0, 100,100);
+            g.drawRect(0, 0, 100, 100);
             g.translate(10, 20);
-            g.drawRect(0, 0, 100,100);
+            g.drawRect(0, 0, 100, 100);
             g.translate(20, 10);
-            g.drawRect(0, 0, 100,100);
+            g.drawRect(0, 0, 100, 100);
         }
     }
 }

@@ -39,12 +39,12 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.FontMetrics;
-
 import org.jnode.font.bdf.BDFFontContainer;
 
 /**
  * Represents a FontMetrics for BDF fonts.
  * Delegates to BDFFontContainer and BDFMetrics.
+ *
  * @author Stephane Meslin-Weber
  */
 public class BDFFontMetrics extends FontMetrics {
@@ -56,7 +56,7 @@ public class BDFFontMetrics extends FontMetrics {
         super(font);
         this.container = font.getContainer();
     }
-    
+
     public int getHeight() {
         return container.getFontMetrics().getHeight();
     }
@@ -80,12 +80,12 @@ public class BDFFontMetrics extends FontMetrics {
     public int charWidth(char ch) {
         return container.getFontMetrics().charWidth(ch);
     }
-    
+
     public int[] charsWidths(char[] chars, final int start, final int end) {
         return container.getFontMetrics().charsWidths(chars, start, end);
     }
 
     public int charsWidth(char[] chars, int start, int end) {
         return container.getFontMetrics().charsWidth(chars, start, end);
-    }    
+    }
 }

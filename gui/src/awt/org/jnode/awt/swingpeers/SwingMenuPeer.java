@@ -18,16 +18,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JMenu;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.peer.MenuPeer;
+import javax.swing.JMenu;
 
 /**
  * AWT menu peer implemented as a {@link javax.swing.JMenu}.
+ *
  * @author Levente S\u00e1ntha
  */
 
@@ -37,17 +38,17 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
     public SwingMenuPeer(SwingToolkit toolkit, Menu menu) {
         super(toolkit, menu, new JMenu());
         int item_count = menu.getItemCount();
-        for(int i = 0; i < item_count; i++){
+        for (int i = 0; i < item_count; i++) {
             MenuItem menu_item = menu.getItem(i);
             menu_item.addNotify();
-            jComponent.add(((SwingMenuComponentPeer)menu_item.getPeer()).jComponent);
+            jComponent.add(((SwingMenuComponentPeer) menu_item.getPeer()).jComponent);
         }
     }
 
     @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
         item.addNotify();
-        jComponent.add(((SwingBaseMenuItemPeer)item.getPeer()).jComponent);
+        jComponent.add(((SwingBaseMenuItemPeer) item.getPeer()).jComponent);
     }
 
     public void delItem(int index) {

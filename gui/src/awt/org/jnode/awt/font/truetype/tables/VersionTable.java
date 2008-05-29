@@ -18,26 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype.tables;
 
 import java.io.IOException;
-
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFInput;
 
 /**
  * VERSION Table.
  *
- *  @author Simon Fischer
- *  @version $Id$
+ * @author Simon Fischer
+ * @version $Id$
  */
 abstract class VersionTable extends TTFTable {
 
-	private int minorVersion;
-	private int majorVersion;
+    private int minorVersion;
+    private int majorVersion;
 
-	/**
+    /**
      * @param font
      * @param input
      */
@@ -46,26 +45,26 @@ abstract class VersionTable extends TTFTable {
     }
 
     protected void readVersion(TTFInput ttf) throws IOException {
-		majorVersion = ttf.readUShort();
-		minorVersion = ttf.readUShort();
-	}
+        majorVersion = ttf.readUShort();
+        minorVersion = ttf.readUShort();
+    }
 
-	public String toString() {
-		return super.toString() + " v" + majorVersion + "." + minorVersion;
-	}
+    public String toString() {
+        return super.toString() + " v" + majorVersion + "." + minorVersion;
+    }
 
-	/**
-	 * @return The major version
-	 */
-	public int getMajorVersion() {
-		return this.majorVersion;
-	}
+    /**
+     * @return The major version
+     */
+    public int getMajorVersion() {
+        return this.majorVersion;
+    }
 
-	/**
-	 * @return The minor version
-	 */
-	public int getMinorVersion() {
-		return this.minorVersion;
-	}
+    /**
+     * @return The minor version
+     */
+    public int getMinorVersion() {
+        return this.minorVersion;
+    }
 
 }

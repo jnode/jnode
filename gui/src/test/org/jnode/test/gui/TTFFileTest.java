@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Color;
@@ -33,7 +33,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFFontDataFile;
 import org.jnode.awt.font.truetype.glyph.TTFGlyph;
@@ -43,7 +42,6 @@ import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
 import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 
 /**
- *
  * @author Mark Donszelmann
  * @version $Id$
  */
@@ -183,13 +181,14 @@ public class TTFFileTest {
             final char ch = s.charAt(i);
             System.out.println("Getting index for char: " + ch);
             final int index = encTable.getTableFormat().getGlyphIndex(ch);
-            final TTFGlyph glyph = (TTFGlyph) glyphTable.getGlyph(index); 
+            final TTFGlyph glyph = (TTFGlyph) glyphTable.getGlyph(index);
             final GeneralPath shape = glyph.getShape();
             PathIterator pi = shape.getPathIterator(null);
             final float[] f = new float[6];
             while (!pi.isDone()) {
                 final int type = pi.currentSegment(f);
-                System.out.println(types[type] + ",\t(" + f[0] + "," + f[1] + "),\t(" + f[2] + "," + f[3] + "),\t(" + f[4] + "," + f[5] + ")");
+                System.out.println(types[type] + ",\t(" + f[0] + "," + f[1] + "),\t(" + f[2] + "," + f[3] + "),\t(" +
+                    f[4] + "," + f[5] + ")");
                 pi.next();
             }
         }

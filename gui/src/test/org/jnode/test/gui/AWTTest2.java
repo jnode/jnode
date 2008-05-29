@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -31,12 +31,12 @@ public class AWTTest2 {
 
     public static void main(String[] args) throws InterruptedException {
         int sleep = 5;
-        try{
+        try {
             sleep = Integer.parseInt(args[0]);
-        }catch(Exception e){
+        } catch (Exception e) {
             //ignore
         }
-        
+
         Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);

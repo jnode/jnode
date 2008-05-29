@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Scrollbar;
 import java.awt.peer.ScrollbarPeer;
-
 import javax.swing.JScrollBar;
 
 /**
@@ -32,44 +31,44 @@ import javax.swing.JScrollBar;
  */
 
 final class SwingScrollbarPeer extends SwingComponentPeer<Scrollbar, SwingScrollbar> implements
-		ScrollbarPeer {
+    ScrollbarPeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingScrollbarPeer(SwingToolkit toolkit, Scrollbar sb) {
-		super(toolkit, sb, new SwingScrollbar(sb));
-		SwingToolkit.add(sb, peerComponent);
-		SwingToolkit.copyAwtProperties(sb, peerComponent);
-		final SwingScrollbar jsb = (SwingScrollbar)peerComponent;
-		jsb.setOrientation(sb.getOrientation());
-		jsb.setBlockIncrement(sb.getBlockIncrement());
-		jsb.setUnitIncrement(sb.getUnitIncrement());
-		setValues(sb.getValue(), sb.getVisibleAmount(), sb.getMinimum(), sb
-				.getMaximum());
-	}
+    public SwingScrollbarPeer(SwingToolkit toolkit, Scrollbar sb) {
+        super(toolkit, sb, new SwingScrollbar(sb));
+        SwingToolkit.add(sb, peerComponent);
+        SwingToolkit.copyAwtProperties(sb, peerComponent);
+        final SwingScrollbar jsb = (SwingScrollbar) peerComponent;
+        jsb.setOrientation(sb.getOrientation());
+        jsb.setBlockIncrement(sb.getBlockIncrement());
+        jsb.setUnitIncrement(sb.getUnitIncrement());
+        setValues(sb.getValue(), sb.getVisibleAmount(), sb.getMinimum(), sb
+            .getMaximum());
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollbarPeer#setLineIncrement(int)
-	 */
-	public void setLineIncrement(int inc) {
-		((JScrollBar)peerComponent).setUnitIncrement(inc);
-	}
+    /**
+     * @see java.awt.peer.ScrollbarPeer#setLineIncrement(int)
+     */
+    public void setLineIncrement(int inc) {
+        ((JScrollBar) peerComponent).setUnitIncrement(inc);
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollbarPeer#setPageIncrement(int)
-	 */
-	public void setPageIncrement(int inc) {
-		((JScrollBar)peerComponent).setBlockIncrement(inc);
-	}
+    /**
+     * @see java.awt.peer.ScrollbarPeer#setPageIncrement(int)
+     */
+    public void setPageIncrement(int inc) {
+        ((JScrollBar) peerComponent).setBlockIncrement(inc);
+    }
 
-	/**
-	 * @see java.awt.peer.ScrollbarPeer#setValues(int, int, int, int)
-	 */
-	public void setValues(int value, int visible, int min, int max) {
-		((JScrollBar)peerComponent).setValues(value, visible, min, max);
-	}
+    /**
+     * @see java.awt.peer.ScrollbarPeer#setValues(int, int, int, int)
+     */
+    public void setValues(int value, int visible, int min, int max) {
+        ((JScrollBar) peerComponent).setValues(value, visible, min, max);
+    }
 
 }
 
@@ -86,17 +85,19 @@ final class SwingScrollbar extends JScrollBar implements ISwingPeer<Scrollbar> {
     public Scrollbar getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -108,5 +109,5 @@ final class SwingScrollbar extends JScrollBar implements ISwingPeer<Scrollbar> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }

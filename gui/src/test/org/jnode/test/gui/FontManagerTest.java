@@ -18,22 +18,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-
 import javax.naming.NamingException;
-
 import org.jnode.awt.font.FontManager;
 import org.jnode.naming.InitialNaming;
 
 /**
  * @author Valentin Chira
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ *         <p/>
+ *         To change the template for this generated type comment go to
+ *         Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class FontManagerTest {
 
@@ -41,24 +39,23 @@ public class FontManagerTest {
         // fonts loaded
         Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         FontManager mgr = getFontManager();
-        
+
         System.out.println("" + fonts.length + " available font(s)");
         for (int i = 0; i < fonts.length; i++) {
-        	final Font font = fonts[i];
-            System.out.println("name="+font.getName()+
-            				   " family="+font.getFamily()+"\n"+
-            				   "\tfontName="+font.getFontName()+
-            				   " size="+font.getSize()+"\n"+
-            				   "\tmetrics="+mgr.getFontMetrics(font));
+            final Font font = fonts[i];
+            System.out.println("name=" + font.getName() +
+                " family=" + font.getFamily() + "\n" +
+                "\tfontName=" + font.getFontName() +
+                " size=" + font.getSize() + "\n" +
+                "\tmetrics=" + mgr.getFontMetrics(font));
         }
     }
-    
-    private static FontManager getFontManager()
-    {
-		try {
-			return InitialNaming.lookup(FontManager.NAME);
-		} catch (NamingException ex) {
-			return null;
-		}    	
+
+    private static FontManager getFontManager() {
+        try {
+            return InitialNaming.lookup(FontManager.NAME);
+        } catch (NamingException ex) {
+            return null;
+        }
     }
 }

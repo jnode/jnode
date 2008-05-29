@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 import java.io.ByteArrayOutputStream;
@@ -31,25 +31,25 @@ import java.net.URL;
  */
 public class TTFURLInput extends TTFMemoryInput {
 
-	/**
-	 * @param url
-	 * @throws IOException
-	 */
-	public TTFURLInput(URL url) 
-	throws IOException {
-		super(getData(url));
-	}
+    /**
+     * @param url
+     * @throws IOException
+     */
+    public TTFURLInput(URL url)
+        throws IOException {
+        super(getData(url));
+    }
 
-	private static byte[] getData(URL url) 
-	throws IOException {
-		final ByteArrayOutputStream os = new ByteArrayOutputStream();
-		final InputStream is = url.openStream();
-		final byte[] buf = new byte[4096];
-		int len;
-		while ((len = is.read(buf)) > 0) {
-			os.write(buf, 0, len);
-		}
-		is.close();
-		return os.toByteArray();
-	}
+    private static byte[] getData(URL url)
+        throws IOException {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        final InputStream is = url.openStream();
+        final byte[] buf = new byte[4096];
+        int len;
+        while ((len = is.read(buf)) > 0) {
+            os.write(buf, 0, len);
+        }
+        is.close();
+        return os.toByteArray();
+    }
 }

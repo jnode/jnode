@@ -18,85 +18,85 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Dimension;
 import java.awt.List;
 import java.awt.peer.ListPeer;
-
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
 
 /**
  * AWT list peer implemented as a {@link javax.swing.JList}.
+ *
  * @author Levente S\u00e1ntha
  */
 
 final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements ListPeer {
 
-	//
-	// Construction
-	//
+    //
+    // Construction
+    //
 
-	public SwingListPeer(SwingToolkit toolkit, final List list) {
+    public SwingListPeer(SwingToolkit toolkit, final List list) {
         super(toolkit, list, new SwingList(list));
-		SwingToolkit.add(list, peerComponent);
-		SwingToolkit.copyAwtProperties(list, peerComponent);
-		peerComponent.setModel(new AbstractListModel() {
-			public Object getElementAt(int idx) {
-				return list.getItem(idx);
-			}
+        SwingToolkit.add(list, peerComponent);
+        SwingToolkit.copyAwtProperties(list, peerComponent);
+        peerComponent.setModel(new AbstractListModel() {
+            public Object getElementAt(int idx) {
+                return list.getItem(idx);
+            }
 
-			public int getSize() {
-				return list.getItemCount();
-			}
-		});
-	}
+            public int getSize() {
+                return list.getItemCount();
+            }
+        });
+    }
 
-	public void add(String item, int index) {
+    public void add(String item, int index) {
 
-	}
+    }
 
-	// Deprecated
+    // Deprecated
 
-	public void addItem(String item, int index) {
-		add(item, index);
-	}
+    public void addItem(String item, int index) {
+        add(item, index);
+    }
 
-	public void clear() {
-		removeAll();
-	}
+    public void clear() {
+        removeAll();
+    }
 
     public void removeAll() {
 
     }
 
-	public int[] getSelectedIndexes() {
-		return null;
-	}
+    public int[] getSelectedIndexes() {
+        return null;
+    }
 
-	public void makeVisible(int index) {
-	}
+    public void makeVisible(int index) {
+    }
 
-	public Dimension minimumSize(int rows) {
-		return getMinimumSize(rows);
-	}
+    public Dimension minimumSize(int rows) {
+        return getMinimumSize(rows);
+    }
 
-	public Dimension preferredSize(int rows) {
-		return getPreferredSize(rows);
-	}
+    public Dimension preferredSize(int rows) {
+        return getPreferredSize(rows);
+    }
 
-	public void select(int index) {
-	}
+    public void select(int index) {
+    }
 
-	public void setMultipleMode(boolean b) {
-	}
+    public void setMultipleMode(boolean b) {
+    }
 
-	public void setMultipleSelections(boolean v) {
-		setMultipleMode(v);
-	}
+    public void setMultipleSelections(boolean v) {
+        setMultipleMode(v);
+    }
 
     public void delItems(int start_index, int end_index) {
 
@@ -113,7 +113,7 @@ final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements
     public Dimension getPreferredSize(int s) {
         return getPreferredSize();
     }
-    
+
 
 }
 
@@ -130,17 +130,19 @@ final class SwingList extends JList implements ISwingPeer<List> {
     public List getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     *
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     *
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
@@ -152,6 +154,6 @@ final class SwingList extends JList implements ISwingPeer<List> {
      */
     public final void validatePeerOnly() {
         super.validate();
-    }    
+    }
 }
 

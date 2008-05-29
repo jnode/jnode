@@ -39,11 +39,11 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.Font;
-
 import org.jnode.font.bdf.BDFFontContainer;
 
 /**
- * Represents a font encapsulating a number of BDFGlyphs. 
+ * Represents a font encapsulating a number of BDFGlyphs.
+ *
  * @author Stephane Meslin-Weber
  */
 public class BDFFont extends Font {
@@ -51,17 +51,17 @@ public class BDFFont extends Font {
     private static final long serialVersionUID = -4370213590946582963L;
     private BDFFontContainer bdfContainer;
     private BDFFontMetrics metrics;
-    
+
     public BDFFont(BDFFontContainer container) {
         super(container.getName(), container.getStyle(), container.getSize());
         bdfContainer = container;
         metrics = new BDFFontMetrics(this);
     }
-    
+
     public BDFFontContainer getContainer() {
         return bdfContainer;
     }
-    
+
     public BDFFontMetrics getFontMetrics() {
         return metrics;
     }

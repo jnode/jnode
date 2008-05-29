@@ -18,26 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JCheckBoxMenuItem;
 import java.awt.CheckboxMenuItem;
 import java.awt.peer.CheckboxMenuItemPeer;
+import javax.swing.JCheckBoxMenuItem;
 
 /**
  * AWT checkbox menu item peer implemented as a
  * {@link javax.swing.JCheckBoxMenuItem}.
- * 
+ *
  * @author Levente S\u00e1ntha
  */
 
 final class SwingCheckboxMenuItemPeer extends
-        SwingBaseMenuItemPeer<CheckboxMenuItem, JCheckBoxMenuItem> implements
-        CheckboxMenuItemPeer {
+    SwingBaseMenuItemPeer<CheckboxMenuItem, JCheckBoxMenuItem> implements
+    CheckboxMenuItemPeer {
 
     public SwingCheckboxMenuItemPeer(SwingToolkit toolkit,
-            CheckboxMenuItem checkBoxMenuItem) {
+                                     CheckboxMenuItem checkBoxMenuItem) {
         super(toolkit, checkBoxMenuItem, new JCheckBoxMenuItem());
     }
 

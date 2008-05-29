@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.Color;
@@ -36,10 +36,8 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.net.URL;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import org.jnode.awt.font.renderer.GlyphRenderer;
 import org.jnode.awt.font.renderer.RenderContext;
 import org.jnode.awt.font.spi.ShapedGlyph;
@@ -61,9 +59,9 @@ public class GlyphTest {
 
         frm = new JFrame("GlyphTest - SumAreaTable");
         frm.getContentPane().setBackground(Color.LIGHT_GRAY);
-        
+
         final String text = "Hello world";
-        final RenderContext ctx = new RenderContext(); 
+        final RenderContext ctx = new RenderContext();
         final JPanel scale1 = new JPanel(new FlowLayout());
         final JPanel scale3 = new JPanel(new FlowLayout());
         scale1.setOpaque(false);
@@ -80,15 +78,15 @@ public class GlyphTest {
         frm.setSize(600, 400);
         frm.show();
     }
-    
+
     private static Raster renderChar(char ch, TTFFontData fdata, RenderContext ctx)
-    throws IOException {
+        throws IOException {
         final int idx = fdata.getCMapTable().getEncodingTable(0).getTableFormat().getGlyphIndex(ch);
-        final ShapedGlyph g = (ShapedGlyph) fdata.getGlyphTable().getGlyph(idx); 
+        final ShapedGlyph g = (ShapedGlyph) fdata.getGlyphTable().getGlyph(idx);
         Shape shape = g.getShape();
 //        System.out.println("shape.bounds " + shape.getBounds());
         final HorizontalHeaderTable hheadTable = fdata
-                .getHorizontalHeaderTable();
+            .getHorizontalHeaderTable();
         final double ascent = hheadTable.getAscent();
 
         Area area = new Area(shape);
@@ -103,7 +101,7 @@ public class GlyphTest {
         try {
             // final URL url = ClassLoader.getSystemResource(name);
             final ClassLoader cl = Thread.currentThread()
-                    .getContextClassLoader();
+                .getContextClassLoader();
             final URL url = cl.getResource(resName);
             if (url != null) {
                 return new TTFFontDataFile(url);
@@ -111,8 +109,7 @@ public class GlyphTest {
                 throw new Error("Cannot find font resource " + resName);
             }
         } catch (IOException ex) {
-            throw new Error("Cannot find font " + resName + ": "
-                    + ex.getMessage());
+            throw new Error("Cannot find font " + resName + ": " + ex.getMessage());
         } catch (Throwable ex) {
             throw new Error("Cannot find font " + resName, ex);
         }
@@ -213,14 +210,14 @@ public class GlyphTest {
          * @param image
          */
         public RasterViewer(Raster image) {
-            this(new Raster[] { image });
+            this(new Raster[]{image});
         }
 
         /**
          * @param image
          */
         public RasterViewer(double scale, Raster image) {
-            this(scale, new Raster[] { image });
+            this(scale, new Raster[]{image});
         }
 
         /**
@@ -251,7 +248,7 @@ public class GlyphTest {
             final int h = src.getHeight();
 //            System.out.println("image size " + w + "x" + h);
             final BufferedImage img = new BufferedImage(w, h,
-                    BufferedImage.TYPE_INT_ARGB);
+                BufferedImage.TYPE_INT_ARGB);
             final int c = Color.BLACK.getRGB() & 0xFFFFFF;
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
@@ -270,14 +267,14 @@ public class GlyphTest {
          * @param images
          */
         public MasterViewer(GlyphRenderer.Master master) {
-            super(1.0, new BufferedImage[] { toImage(master) });
+            super(1.0, new BufferedImage[]{toImage(master)});
         }
 
         private static BufferedImage toImage(GlyphRenderer.Master master) {
             final int w = master.width;
             final int h = master.height;
             final BufferedImage img = new BufferedImage(w, h,
-                    BufferedImage.TYPE_INT_RGB);
+                BufferedImage.TYPE_INT_RGB);
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
                     img.setRGB(x, y, master.bits.get(y * w + x) ? 0xFFFFFF : 0);

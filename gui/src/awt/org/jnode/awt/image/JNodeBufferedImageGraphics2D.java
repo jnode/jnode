@@ -18,80 +18,68 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.image;
 
-import java.awt.AWTError;
-import java.awt.Color;
 import java.awt.GraphicsConfiguration;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
-
-import org.apache.log4j.Logger;
-import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.awt.util.AbstractSurfaceGraphics2D;
-import org.jnode.driver.video.Surface;
-import org.jnode.driver.video.util.AbstractSurface;
 
 /**
  * @author epr
  */
 public class JNodeBufferedImageGraphics2D extends AbstractSurfaceGraphics2D {
 
-	private BufferedImage image;
+    private BufferedImage image;
 
-	/**
-	 * @param src
-	 */
-	public JNodeBufferedImageGraphics2D(JNodeBufferedImageGraphics2D src) {
-		super(src);
-		this.image = src.image;
-		init();
-	}
+    /**
+     * @param src
+     */
+    public JNodeBufferedImageGraphics2D(JNodeBufferedImageGraphics2D src) {
+        super(src);
+        this.image = src.image;
+        init();
+    }
 
-	/**
-	 * @param image
-	 */
-	public JNodeBufferedImageGraphics2D(BufferedImage image) {
-		super(new BufferedImageSurface(image), image.getWidth(), image.getHeight());
-		this.image = image;
-		init();
-	}
+    /**
+     * @param image
+     */
+    public JNodeBufferedImageGraphics2D(BufferedImage image) {
+        super(new BufferedImageSurface(image), image.getWidth(), image.getHeight());
+        this.image = image;
+        init();
+    }
 
-	/**
-	 * @see java.awt.Graphics#create()
-	 * @return The graphics
-	 *
-	public Graphics create() {
-		return new JNodeBufferedImageGraphics(this);
-	}*/
-	
-	public final Object clone() {
-		JNodeBufferedImageGraphics2D copy = (JNodeBufferedImageGraphics2D) super.clone();
-		
-		copy.image = image;
+    /**
+     * @return The graphics
+     *         <p/>
+     *         public Graphics create() {
+     *         return new JNodeBufferedImageGraphics(this);
+     *         }
+     * @see java.awt.Graphics#create()
+     */
 
-		copy.init();
-		
-		return copy;
-	}
+    public final Object clone() {
+        JNodeBufferedImageGraphics2D copy = (JNodeBufferedImageGraphics2D) super.clone();
 
-	
+        copy.image = image;
 
-	/**
-	 * @see java.awt.Graphics2D#getDeviceConfiguration()
-	 * @return The configuration
-	 */
-	public GraphicsConfiguration getDeviceConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        copy.init();
+
+        return copy;
+    }
+
+
+    /**
+     * @return The configuration
+     * @see java.awt.Graphics2D#getDeviceConfiguration()
+     */
+    public GraphicsConfiguration getDeviceConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     /**
      * Returns the color model of this Graphics object.
@@ -111,6 +99,6 @@ public class JNodeBufferedImageGraphics2D extends AbstractSurfaceGraphics2D {
      * @return the destination raster
      */
     protected WritableRaster getDestinationRaster() {
-    	return image.getRaster();
-    }    
+        return image.getRaster();
+    }
 }

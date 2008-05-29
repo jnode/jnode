@@ -3,19 +3,19 @@
  */
 package org.jnode.awt.java2d.loops;
 
-import sun.java2d.loops.GraphicsPrimitive;
-import sun.java2d.loops.SurfaceType;
-import sun.java2d.loops.CompositeType;
-import sun.java2d.loops.GraphicsPrimitiveMgr;
-import sun.java2d.loops.Blit;
-import sun.java2d.loops.MaskBlit;
-import sun.java2d.SurfaceData;
-import sun.java2d.pipe.Region;
-import sun.awt.image.BufImgSurfaceData;
-import java.lang.ref.WeakReference;
 import java.awt.Composite;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.lang.ref.WeakReference;
+import sun.awt.image.BufImgSurfaceData;
+import sun.java2d.SurfaceData;
+import sun.java2d.loops.Blit;
+import sun.java2d.loops.CompositeType;
+import sun.java2d.loops.GraphicsPrimitive;
+import sun.java2d.loops.GraphicsPrimitiveMgr;
+import sun.java2d.loops.MaskBlit;
+import sun.java2d.loops.SurfaceType;
+import sun.java2d.pipe.Region;
 
 /**
  * Experimental JNode specific implementation of
@@ -26,27 +26,27 @@ import java.awt.image.Raster;
 public class JNodeMaskBlit extends MaskBlit {
     static {
         GraphicsPrimitive[] primitives = {
-                new JNodeMaskBlit(SurfaceType.IntArgb,
-                        CompositeType.SrcNoEa,
-                        SurfaceType.Any),
-                new JNodeMaskBlit(SurfaceType.IntArgb,
-                        CompositeType.SrcOverNoEa,
-                        SurfaceType.Any),
-                new JNodeMaskBlit(SurfaceType.IntArgb,
-                        CompositeType.SrcOver,
-                        SurfaceType.Any),
-                new JNodeMaskBlit(SurfaceType.IntRgb,
-                        CompositeType.SrcOver,
-                        SurfaceType.Any),
-                new JNodeMaskBlit(SurfaceType.IntRgb,
-                        CompositeType.SrcNoEa,
-                        SurfaceType.Any),
-                new JNodeMaskBlit(SurfaceType.IntBgr,
-                        CompositeType.SrcOver,
-                        SurfaceType.Any),
-                new JNodeMaskBlit(SurfaceType.IntBgr,
-                        CompositeType.SrcNoEa,
-                        SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntArgb,
+                CompositeType.SrcNoEa,
+                SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntArgb,
+                CompositeType.SrcOverNoEa,
+                SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntArgb,
+                CompositeType.SrcOver,
+                SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntRgb,
+                CompositeType.SrcOver,
+                SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntRgb,
+                CompositeType.SrcNoEa,
+                SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntBgr,
+                CompositeType.SrcOver,
+                SurfaceType.Any),
+            new JNodeMaskBlit(SurfaceType.IntBgr,
+                CompositeType.SrcNoEa,
+                SurfaceType.Any),
         };
         GraphicsPrimitiveMgr.register(primitives);
     }
@@ -69,7 +69,7 @@ public class JNodeMaskBlit extends MaskBlit {
     public GraphicsPrimitive makePrimitive(SurfaceType srctype, CompositeType comptype, SurfaceType dsttype) {
         if (CompositeType.Xor.equals(comptype)) {
             throw new InternalError("Cannot construct MaskBlit for " +
-                    "XOR mode");
+                "XOR mode");
         }
 
         return new JNodeMaskBlit(srctype, comptype, dsttype);
@@ -98,13 +98,13 @@ public class JNodeMaskBlit extends MaskBlit {
             BufferedImage sbi = (java.awt.image.BufferedImage) ((BufImgSurfaceData) srcData).getDestination();
             BufferedImage dbi = (java.awt.image.BufferedImage) ((BufImgSurfaceData) dstData).getDestination();
             System.out.println("MaskBlit transfer: \n" +
-                    "Source img size: " + sbi.getWidth() + ", " + sbi.getHeight() + "\n" +
-                    "Destin img size: " + dbi.getWidth() + ", " + dbi.getHeight() + "\n" +
-                    "Params:\n" +
-                    "srcx: " + srcx + " srcy: " + srcy + " dstx: " + dstx + " dsty: " + dsty + "\n" +
-                    "width: " + width + " height: " + height + " offset: " + offset + " scan: " + scan + "\n" +
-                    "mask[]: " + java.util.Arrays.toString(mask) + "\n" +
-                    "Composite: " + comp + " clip: " + clip);
+                "Source img size: " + sbi.getWidth() + ", " + sbi.getHeight() + "\n" +
+                "Destin img size: " + dbi.getWidth() + ", " + dbi.getHeight() + "\n" +
+                "Params:\n" +
+                "srcx: " + srcx + " srcy: " + srcy + " dstx: " + dstx + " dsty: " + dsty + "\n" +
+                "width: " + width + " height: " + height + " offset: " + offset + " scan: " + scan + "\n" +
+                "mask[]: " + java.util.Arrays.toString(mask) + "\n" +
+                "Composite: " + comp + " clip: " + clip);
 
 
             Raster sr = sbi.getRaster();
@@ -121,10 +121,13 @@ public class JNodeMaskBlit extends MaskBlit {
                 if (width > 0 && height > 0) {
                     /*
                     java.awt.image.Raster src = sr.createChild(srcx, srcy, width, height, 0, 0, null);
-                    java.awt.image.WritableRaster dst = dbi.getRaster().createWritableChild(dstx, dsty, width, height, 0, 0, null);
-                    comp.createContext(sbi.getColorModel(), dbi.getColorModel(), new java.awt.RenderingHints(null)).compose(src, dst,dst);
+                    java.awt.image.WritableRaster dst = dbi.getRaster().
+                        createWritableChild(dstx, dsty, width, height, 0, 0, null);
+                    comp.createContext(sbi.getColorModel(), dbi.getColorModel(), new java.awt.RenderingHints(null)).
+                        compose(src, dst,dst);
                     */
-                    dbi.getRaster().setDataElements(dstx, dsty, width, height, sr.getDataElements(srcx, srcy, width, height, null));
+                    dbi.getRaster().setDataElements(dstx, dsty, width, height,
+                        sr.getDataElements(srcx, srcy, width, height, null));
                 }
             } else {
                 dbi.setRGB(dstx, dsty, width, height, sbi.getRGB(srcx, srcy, width, height, null, 0, width), 0, width);

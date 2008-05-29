@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 import java.awt.font.OpenType;
@@ -27,11 +27,11 @@ import java.io.IOException;
 /**
  * Conrete implementation of a TrueType font, attached to a JavaFont which
  * implements the OpenType interface.
- * 
+ * <p/>
  * FIXME: Test as soon as some Java Fonts implements OpenType. Probably
  * TTFMemoryInput won't work. Tag names may be different for OpenType and
  * TrueType.
- * 
+ *
  * @author Simon Fischer
  * @version $Id$
  */

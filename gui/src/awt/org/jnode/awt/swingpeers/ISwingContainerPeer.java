@@ -18,22 +18,23 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.peer.ContainerPeer;
+import javax.swing.JComponent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface ISwingContainerPeer extends ContainerPeer {
 
-	/**
-	 * Add the given peer to this container.
-	 * @param awtComponent
-	 * @param peer
-	 */
-	public void addAWTComponent(Component awtComponent, JComponent peer);
+    /**
+     * Add the given peer to this container.
+     *
+     * @param awtComponent
+     * @param peer
+     */
+    public void addAWTComponent(Component awtComponent, JComponent peer);
 }

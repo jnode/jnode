@@ -18,16 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
-
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 
@@ -38,31 +36,38 @@ final class SwingRepaintManager extends RepaintManager {
 
     private static final Logger log = Logger.getLogger(SwingRepaintManager.class);
 
-    /** The AWT context */
+    /**
+     * The AWT context
+     */
     private final JNodeAwtContext context;
-    
-    /** Should we stop */
+
+    /**
+     * Should we stop
+     */
     private boolean shutdown = false;
-    
-    /** The actual dirty region (on awtRoot coordinate space) */
+
+    /**
+     * The actual dirty region (on awtRoot coordinate space)
+     */
     private Rectangle dirtyRegion = new Rectangle(0, 0, 0, 0);
-    
+
     /**
      * Initialize this instance.
+     *
      * @param context
      */
     public SwingRepaintManager(JNodeAwtContext context) {
         this.context = context;
     }
-    
-    /** 
+
+    /**
      * Stop this repaint manager.
      */
     final void shutdown() {
         this.shutdown = true;
         log.debug("shutdown");
     }
-    
+
     /**
      * @see javax.swing.RepaintManager#addDirtyRegion(javax.swing.JComponent, int, int, int, int)
      */
@@ -128,7 +133,7 @@ final class SwingRepaintManager extends RepaintManager {
 
     private void checkThread() {
         if (!SwingUtilities.isEventDispatchThread()) {
-           // log.debug("Wrong Thread: " + Thread.currentThread(), new Exception("Stacktrace"));
+            // log.debug("Wrong Thread: " + Thread.currentThread(), new Exception("Stacktrace"));
         }
     }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.awt;
 
 import java.awt.Component;
@@ -26,11 +26,10 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.Raster;
-
+import java.awt.image.WritableRaster;
 import org.jnode.awt.util.AbstractSurfaceGraphics;
 
 /**
@@ -38,54 +37,57 @@ import org.jnode.awt.util.AbstractSurfaceGraphics;
  */
 public class JNodeGraphics extends AbstractSurfaceGraphics {
 
-	private final JNodeGenericPeer component;
-	private final JNodeToolkit toolkit;
+    private final JNodeGenericPeer component;
+    private final JNodeToolkit toolkit;
 
     /**
-	 * Initialize a graphics for the given component
-	 * @param component
-	 */
-	public JNodeGraphics(JNodeGenericPeer<?, ?> component) {
-		super(component.getToolkitImpl().getGraphics(), ((Component)component.getTargetComponent()).getWidth(), ((Component)component.getTargetComponent()).getHeight());
-		this.component = component;
-		this.toolkit = component.getToolkitImpl();
-	}
+     * Initialize a graphics for the given component
+     *
+     * @param component
+     */
+    public JNodeGraphics(JNodeGenericPeer<?, ?> component) {
+        super(component.getToolkitImpl().getGraphics(), ((Component) component.getTargetComponent()).getWidth(),
+            ((Component) component.getTargetComponent()).getHeight());
+        this.component = component;
+        this.toolkit = component.getToolkitImpl();
+    }
 
-	/**
-	 * Initialize a graphics base on the given source.
-	 * @param src
-	 */
-	public JNodeGraphics(JNodeGraphics src) {
-		super(src);
-		this.component = src.component;
-		this.toolkit = src.toolkit;
-	}
+    /**
+     * Initialize a graphics base on the given source.
+     *
+     * @param src
+     */
+    public JNodeGraphics(JNodeGraphics src) {
+        super(src);
+        this.component = src.component;
+        this.toolkit = src.toolkit;
+    }
 
-	/**
-	 * @see java.awt.Graphics#create()
-	 * @return The graphics
-	 */
-	public Graphics create() {
-		return new JNodeGraphics(this);
-	}
+    /**
+     * @return The graphics
+     * @see java.awt.Graphics#create()
+     */
+    public Graphics create() {
+        return new JNodeGraphics(this);
+    }
 
-	/**
-	 * @param font
-	 * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
-	 * @return The metrics
-	 */
-	public FontMetrics getFontMetrics(Font font) {
-		return toolkit.getFontMetrics(font);
-	}
+    /**
+     * @param font
+     * @return The metrics
+     * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
+     */
+    public FontMetrics getFontMetrics(Font font) {
+        return toolkit.getFontMetrics(font);
+    }
 
-	/**
-	 * @see java.awt.Graphics2D#getDeviceConfiguration()
-	 * @return The configuration
-	 */
-	public GraphicsConfiguration getDeviceConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @return The configuration
+     * @see java.awt.Graphics2D#getDeviceConfiguration()
+     */
+    public GraphicsConfiguration getDeviceConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     //----- preparing Graphics2D
     /**
@@ -106,8 +108,9 @@ public class JNodeGraphics extends AbstractSurfaceGraphics {
      * @return the destination raster
      */
     protected WritableRaster getDestinationRaster() {
-        if(image == null)
-            image = new BufferedImage(((Component)component.getTargetComponent()).getWidth(), ((Component)component.getTargetComponent()).getHeight(), BufferedImage.TYPE_INT_ARGB);
+        if (image == null)
+            image = new BufferedImage(((Component) component.getTargetComponent()).getWidth(),
+                ((Component) component.getTargetComponent()).getHeight(), BufferedImage.TYPE_INT_ARGB);
         return image.getRaster();
     }
 
