@@ -21,6 +21,7 @@
 
 package org.jnode.fs.command;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Map;
@@ -32,30 +33,26 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.DeviceArgument;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.*;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class MountCommand extends AbstractCommand {
 
-    private static final DeviceArgument ARG_DEV = new DeviceArgument("device",
-            "the device to mount", BlockDeviceAPI.class);
+    private final DeviceArgument ARG_DEV = new DeviceArgument("device",
+            Argument.OPTIONAL, "the device to mount", BlockDeviceAPI.class);
 
-    private static final FileArgument ARG_DIR = new FileArgument("directory",
-            "the mountpoint");
+    private final FileArgument ARG_DIR = new FileArgument("directory",
+            Argument.OPTIONAL, "the mount point");
 
-    private static final FileArgument ARG_FSPATH = new FileArgument("fspath",
-    "the subdirectory within the filesystem to use as root");
+    private final FileArgument ARG_FSPATH = new FileArgument("fsPath",
+            Argument.OPTIONAL, "the subdirectory within the filesystem to use as root");
 
-    static Help.Info HELP_INFO = new Help.Info("mount", "Mount a filesystem",
-            new Parameter[] { new Parameter(ARG_DEV, Parameter.OPTIONAL),
-                    new Parameter(ARG_DIR, Parameter.OPTIONAL),
-                    new Parameter(ARG_FSPATH, Parameter.OPTIONAL) });
+    public MountCommand() {
+        super("Mount a filesystem");
+        registerArguments(ARG_DEV, ARG_DIR, ARG_FSPATH);
+    }
 
     public static void main(String[] args) throws Exception {
         new MountCommand().execute(args);
@@ -63,32 +60,25 @@ public class MountCommand extends AbstractCommand {
 
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
+        // Find the filesystem service
+        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
 
-        if(ARG_DEV.getValue(cmdLine) == null)
-        {
-	        // Find the filesystem service
-	        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-
+        if (!ARG_DEV.isSet()) {
+            // List all mounted file systems
 	        Map<String, FileSystem<?>> filesystems = fss.getMountPoints();
-        	for(String mountPoint : filesystems.keySet())
-        	{
+        	for (String mountPoint : filesystems.keySet()) {
         		FileSystem<?> fs = filesystems.get(mountPoint);
         		Device device = fs.getDevice();
         		String mode = fs.isReadOnly() ? "ro" : "rw";
         		String type = fs.getType().getName();
-        		System.out.println(device.getId() + " on " + mountPoint + " type " + type + " (" + mode + ')');
+        		out.println(device.getId() + " on " + mountPoint + " type " + type + " (" + mode + ')');
         	}
         }
-        else
-        {
+        else {
             // Get the parameters
-            final Device dev = ARG_DEV.getDevice(cmdLine);
-	        final String mountPoint = ARG_DIR.getValue(cmdLine);
-	        final String fsPath = ARG_FSPATH.getValue(cmdLine);
-
-	        // Find the filesystem service
-	        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+            final Device dev = ARG_DEV.getValue();
+	        final File mountPoint = ARG_DIR.getValue();
+	        final File fsPath = ARG_FSPATH.getValue();
 
 	        // Find the filesystem
 	        final FileSystem<?> fs = fss.getFileSystem(dev);
@@ -97,7 +87,7 @@ public class MountCommand extends AbstractCommand {
 	            exit(1);
 	        } else {
 	            // Mount it
-	            fss.mount(mountPoint, fs, fsPath);
+	            fss.mount(mountPoint.toString(), fs, fsPath.toString());
 	        }
         }
     }

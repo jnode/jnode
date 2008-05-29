@@ -96,6 +96,14 @@
     <syntax alias="mkdir">
       <argument argLabel="directory" description="create a new directory"/>
     </syntax>
+    <syntax alias="mount">
+      <empty description="list all mounted filesystems"/>
+      <sequence description="mount a filesystem"> 
+        <argument argLabel="device" description="the device holding the file system"/>
+        <argument argLabel="directory" description="the mountpoint"/>
+        <argument argLabel="fsPath" description="the file system's root directory"/>
+      </sequence>
+    </syntax>
   </extension>
 
 
