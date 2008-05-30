@@ -21,8 +21,8 @@ public class IsolateTest {
         } else {
             mainClass = "org.jnode.test.core.IsolatedHelloWorld";
             isolateArgs = new String[0];
-        }            
-        
+        }
+
         Isolate newIsolate = new Isolate(mainClass, isolateArgs);
         try {
             newIsolate.start();

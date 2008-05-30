@@ -21,15 +21,15 @@
 package org.jnode.test.threads;
 
 /**
- * Test the behaviour of daemon ThreadGroups.  Literally, the javadoc says that 
+ * Test the behaviour of daemon ThreadGroups.  Literally, the javadoc says that
  * a daemon ThreadGroup is destroyed when the last active thread is "stopped".
  * But it really means when it "dies".  There is also the issue of unstarted
  * Threads; do they prevent a daemon ThreadGroup from being destroyed?
- * 
+ *
  * @author crawley@jnode.org
  */
 public class DaemonThreadGroupTest {
-    
+
     public static class BarbieThread extends Thread {
 
         public BarbieThread(ThreadGroup tg) {
@@ -41,24 +41,22 @@ public class DaemonThreadGroupTest {
             // (Don't ask ...)
             try {
                 sleep(3000);
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 System.err.println("Barbie: \"what?\"");
             }
             System.err.println("Barbie: \"I'm a Barbie girl, in a Barbie world\"");
             System.err.println("Barbie: \"zzzzzzz ....\"");
             try {
                 sleep(3000);
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 System.err.println("Barbie: \"what?\"");
             }
             System.err.println("Barbie: \"Made of plastic, life is so fantastic\"");
         }
     }
-    
-    private static void threadGroupTest(ThreadGroup tg1, ThreadGroup tg2, boolean expectDeath) 
-    throws Exception {
+
+    private static void threadGroupTest(ThreadGroup tg1, ThreadGroup tg2, boolean expectDeath)
+        throws Exception {
         if (tg1.isDestroyed() || tg2.isDestroyed()) {
             System.err.println("ERROR: already destroyed");
             return;
@@ -69,13 +67,13 @@ public class DaemonThreadGroupTest {
             System.err.println("ERROR: destroyed too soon");
             return;
         }
-        
+
         bt.join();
-            
+
         System.err.println("Bye bye Barbie");
         if (tg1.isDestroyed() != expectDeath) {
-            System.err.println("ERROR: tg1.isDestroyed() (" + tg1.isDestroyed() + 
-                    ") != expectDeath (" + expectDeath + ")");
+            System.err.println("ERROR: tg1.isDestroyed() (" + tg1.isDestroyed() +
+                ") != expectDeath (" + expectDeath + ")");
         }
     }
 
@@ -87,19 +85,19 @@ public class DaemonThreadGroupTest {
         ThreadGroup tg = new ThreadGroup("test1");
         tg.setDaemon(false);
         threadGroupTest(tg, tg, false);
-        
+
         System.err.println("Second test: daemon group");
         tg = new ThreadGroup("test2");
         tg.setDaemon(true);
         threadGroupTest(tg, tg, true);
-        
+
         System.err.println("Third test: daemon group with child group");
         tg = new ThreadGroup("test3");
         ThreadGroup tg2 = new ThreadGroup(tg, "child");
         tg.setDaemon(true);
         tg2.setDaemon(true);
         threadGroupTest(tg, tg2, true);
-        
+
         System.err.println("Done");
     }
 }

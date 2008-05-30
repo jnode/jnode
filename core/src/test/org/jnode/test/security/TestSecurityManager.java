@@ -18,49 +18,41 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.security;
 
 import java.net.URLClassLoader;
 import java.security.Security;
 
-public class TestSecurityManager
-{
-        static class mytest
-        {
-                mytest()
-                {
-                }
+public class TestSecurityManager {
+    static class mytest {
+        mytest() {
         }
+    }
 
-        static class MySM extends SecurityManager
-        {
-                public void checkPermission(java.security.Permission perm)
-                {
-                        if (perm.getName().equals("aaaaaa"))
-                        {
-                                throw new SecurityException("no exit !");
-                        } else if (!perm.getName().equals("charsetProvider"))
-                        {
-                        System.err.println("perm.getName()=" + perm.getName());
-                        }
-                }
+    static class MySM extends SecurityManager {
+        public void checkPermission(java.security.Permission perm) {
+            if (perm.getName().equals("aaaaaa")) {
+                throw new SecurityException("no exit !");
+            } else if (!perm.getName().equals("charsetProvider")) {
+                System.err.println("perm.getName()=" + perm.getName());
+            }
         }
+    }
 
-        static public void main(String args[]) throws Exception
-        {
-                Class sc = SecurityManager.class;
-                Class sc2 = Security.class;
-                Class sc3 = java.security.Permission.class;
-                Class sc4 = java.lang.StringBuffer.class;
-                Class sc5 = java.io.PrintStream.class;
+    static public void main(String args[]) throws Exception {
+        Class sc = SecurityManager.class;
+        Class sc2 = Security.class;
+        Class sc3 = java.security.Permission.class;
+        Class sc4 = java.lang.StringBuffer.class;
+        Class sc5 = java.io.PrintStream.class;
 
-                System.setSecurityManager(new MySM());
+        System.setSecurityManager(new MySM());
 
-                URLClassLoader cl = (URLClassLoader)TestSecurityManager.class.getClassLoader();
-                URLClassLoader cl2 = new URLClassLoader(cl.getURLs());
-                Class c = Class.forName("org.jnode.test.security.TestSecurityManager$mytest", true, cl2);
+        URLClassLoader cl = (URLClassLoader) TestSecurityManager.class.getClassLoader();
+        URLClassLoader cl2 = new URLClassLoader(cl.getURLs());
+        Class c = Class.forName("org.jnode.test.security.TestSecurityManager$mytest", true, cl2);
 
-                c.newInstance();
-        }
+        c.newInstance();
+    }
 }

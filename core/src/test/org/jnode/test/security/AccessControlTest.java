@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.security;
 
 import java.security.AccessControlContext;
@@ -33,27 +33,29 @@ import java.security.PrivilegedAction;
 public class AccessControlTest implements Runnable {
 
     public static void main(String[] args) {
-        
+
         new AccessControlTest("main").run();
-        AccessController.doPrivileged(new PrivilegedAction() { 
+        AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
-                new AccessControlTest("privileged").run(); return null; }
-            });
+                new AccessControlTest("privileged").run();
+                return null;
+            }
+        });
         new Thread(new AccessControlTest("threaded")).start();
-        
+
     }
-    
+
     private final String name;
-    
+
     public AccessControlTest(String name) {
         this.name = name;
     }
-    
+
     public void run() {
         AccessControlContext acc = AccessController.getContext();
         System.out.println("[" + name + "]");
         System.out.println("AccessControlContext = " + acc);
-        System.out.println("DomainCombiner       = " + acc.getDomainCombiner());        
-        System.out.println("Policy               = " + Policy.getPolicy());        
+        System.out.println("DomainCombiner       = " + acc.getDomainCombiner());
+        System.out.println("Policy               = " + Policy.getPolicy());
     }
 }

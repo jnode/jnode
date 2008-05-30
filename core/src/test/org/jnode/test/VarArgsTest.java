@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -39,7 +39,7 @@ public class VarArgsTest {
         System.out.println("msg=" + msg);
         System.out.println("#args=" + args.length);
         for (int i = 0; i < args.length; i++) {
-            System.out.println("args[" + i + "]=" + args[i] + ", " + args[i].getClass().getName());            
+            System.out.println("args[" + i + "]=" + args[i] + ", " + args[i].getClass().getName());
         }
     }
 }

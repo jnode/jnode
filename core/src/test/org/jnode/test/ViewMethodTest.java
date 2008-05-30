@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import org.jnode.vm.classmgr.VmMethod;
@@ -30,8 +30,8 @@ import org.jnode.vm.classmgr.VmType;
 public class ViewMethodTest {
 
     public static void main(String[] args) throws ClassNotFoundException {
-        final String className = args[ 0];
-        final String mname = (args.length > 1) ? args[ 1] : null;
+        final String className = args[0];
+        final String mname = (args.length > 1) ? args[1] : null;
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         final VmType cls = cl.loadClass(className).getVmClass();

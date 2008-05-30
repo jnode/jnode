@@ -23,7 +23,6 @@ package org.jnode.test.mauve;
 import gnu.testlet.ResourceNotFoundException;
 import gnu.testlet.TestHarness;
 import gnu.testlet.Testlet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,29 +45,29 @@ public class SingleTestHarness extends TestHarness {
 
     public void check(boolean result) {
         String message = (result ? "PASS" : "FAIL") + ": " + className
-                + ((last_check == null) ? "" : (": " + last_check))
-                + " (number " + count++ + ")";
+            + ((last_check == null) ? "" : (": " + last_check))
+            + " (number " + count++ + ")";
         System.out.println(message);
     }
 
     public Reader getResourceReader(String name)
-            throws ResourceNotFoundException {
+        throws ResourceNotFoundException {
         return new BufferedReader(
-                new InputStreamReader(getResourceStream(name)));
+            new InputStreamReader(getResourceStream(name)));
     }
 
     public InputStream getResourceStream(String name)
-            throws ResourceNotFoundException {
+        throws ResourceNotFoundException {
         // The following code assumes File.separator is a single character.
         if (File.separator.length() > 1)
             throw new Error("File.separator length is greater than 1");
         String realName = name.replace('#', File.separator.charAt(0));
         try {
             return new FileInputStream(getSourceDirectory() + File.separator
-                    + realName);
+                + realName);
         } catch (FileNotFoundException ex) {
             throw new ResourceNotFoundException(ex.getLocalizedMessage() + ": "
-                    + getSourceDirectory() + File.separator + realName);
+                + getSourceDirectory() + File.separator + realName);
         }
     }
 
@@ -78,7 +77,7 @@ public class SingleTestHarness extends TestHarness {
 
     /**
      * Provide a directory name for writing temporary files.
-     * 
+     *
      * @return The temporary directory name.
      */
 
@@ -94,8 +93,8 @@ public class SingleTestHarness extends TestHarness {
         File f = new File(getSourceDirectory() + File.separator + realName);
         if (!f.exists()) {
             throw new ResourceNotFoundException(
-                    "cannot find mauve resource file" + ": "
-                            + getSourceDirectory() + File.separator + realName);
+                "cannot find mauve resource file" + ": "
+                    + getSourceDirectory() + File.separator + realName);
         }
         return f;
     }
@@ -145,7 +144,7 @@ public class SingleTestHarness extends TestHarness {
         if (args.length > 0) {
             String name = args[0];
             Class k = Thread.currentThread().getContextClassLoader().loadClass(
-                    name);
+                name);
             Testlet t = (Testlet) k.newInstance();
             TestHarness h = new SingleTestHarness(t);
             t.test(h);

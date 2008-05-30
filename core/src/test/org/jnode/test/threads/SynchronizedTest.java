@@ -18,16 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.threads;
 
+import static org.jnode.test.threads.ThreadingUtils.EXEC_TIME;
 import static org.jnode.test.threads.ThreadingUtils.fork;
 import static org.jnode.test.threads.ThreadingUtils.print;
 import static org.jnode.test.threads.ThreadingUtils.sleep;
 import static org.jnode.test.threads.ThreadingUtils.trackEnter;
 import static org.jnode.test.threads.ThreadingUtils.trackExecute;
 import static org.jnode.test.threads.ThreadingUtils.trackExit;
-import static org.jnode.test.threads.ThreadingUtils.EXEC_TIME;
 
 /**
  * @author Levente S\u00e1ntha

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -27,14 +27,14 @@ package org.jnode.test;
 public class MultiANewArrayTest {
 
     public static void main(String[] args) {
-        
+
         int[][] arr = new int[5][2];
-        
+
 //        for (int x = 0; x < 5; x++) {
 //            for (int y = 0; y < 2; y++) {
 //                arr[x][y] = x + y;
 //            }
 //        }
-        
+
     }
 }

@@ -29,21 +29,27 @@ import java.util.List;
  */
 public class RunResult {
 
-    /** The name of the run. */
+    /**
+     * The name of the run.
+     */
     private String name;
 
-    /** A list containing results for each class in the package. */
+    /**
+     * A list containing results for each class in the package.
+     */
     private List packageResults;
 
-    /** A list containing unfound test-names */
+    /**
+     * A list containing unfound test-names
+     */
     private List missingTests = new ArrayList();
     private List faultyTests = new ArrayList();
-    private boolean sorted=true;
+    private boolean sorted = true;
 
     /**
      * Creates a new result, initially empty.
      *
-     * @param name  the class name.
+     * @param name the class name.
      */
     RunResult(String name) {
         this.name = name;
@@ -62,7 +68,7 @@ public class RunResult {
     /**
      * Sets the run name.
      *
-     * @param name  the name.
+     * @param name the name.
      */
     void setName(String name) {
         this.name = name;
@@ -71,11 +77,11 @@ public class RunResult {
     /**
      * Adds a package result.
      *
-     * @param result  the package result.
+     * @param result the package result.
      */
     void add(PackageResult result) {
         packageResults.add(result);
-        sorted =false;
+        sorted = false;
     }
 
     /**
@@ -114,8 +120,7 @@ public class RunResult {
     /**
      * Returns the number of checks with the specified status.
      *
-     * @param passed  the check status.
-     *
+     * @param passed the check status.
      * @return The number of checks passed or failed.
      */
     public int getCheckCount(boolean passed) {
@@ -131,8 +136,7 @@ public class RunResult {
     /**
      * Returns the index of the specified result, or -1.
      *
-     * @param pr  the package result.
-     *
+     * @param pr the package result.
      * @return The index.
      */
     public int indexOf(PackageResult pr) {
@@ -143,8 +147,7 @@ public class RunResult {
     /**
      * Returns the package result with the specified name.
      *
-     * @param name  the package name.
-     *
+     * @param name the package name.
      * @return The package result, or null when not found.
      */
     public PackageResult getPackageResult(String name) {
@@ -162,14 +165,14 @@ public class RunResult {
     }
 
     void addFaultyTest(String line, String failure) {
-        faultyTests.add(new String[] {line, failure});
+        faultyTests.add(new String[]{line, failure});
     }
 
     /**
      * Sorts the package results.
      */
     private void sortPackages() {
-        if(sorted) return;
+        if (sorted) return;
         Collections.sort(packageResults);
         sorted = true;
     }

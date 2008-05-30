@@ -18,12 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-  
+
 package org.jnode.test.framework;
 
 import org.apache.log4j.Logger;
-import org.jnode.plugin.Extension;
-import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -32,34 +30,35 @@ import org.jnode.system.BootLog;
 /**
  * @author Fabien DUMINY (fduminy at jnode.org)
  */
-public class TestRunnerPlugin extends Plugin  {
+public class TestRunnerPlugin extends Plugin {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(TestRunnerPlugin.class);
-    
+
     private final TestManager manager;
-    
+
     /**
      * Create a new instance
-     *  
      */
     public TestRunnerPlugin(PluginDescriptor descriptor) {
         super(descriptor);
         manager = new TestManager(descriptor.getExtensionPoint("tests"));
-        BootLog.debug("TestRunnerPlugin created : classloader="+descriptor.getPluginClassLoader());
+        BootLog.debug("TestRunnerPlugin created : classloader=" + descriptor.getPluginClassLoader());
     }
 
     /**
      * Start this plugin
      */
     protected void startPlugin() throws PluginException {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Stop this plugin
      */
     protected void stopPlugin() {
-    	// nothing to do
+        // nothing to do
     }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import javax.naming.InitialContext;
@@ -29,10 +29,10 @@ import javax.naming.NamingException;
  */
 public class JNDITest {
 
-	public static void main(String[] args) 
-	throws NamingException {
-		InitialContext ic;
-		ic = new InitialContext();
-		ic.bind("dummy", new Object());
-	}
+    public static void main(String[] args)
+        throws NamingException {
+        InitialContext ic;
+        ic = new InitialContext();
+        ic.bind("dummy", new Object());
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.core;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,8 +31,8 @@ import java.nio.ByteOrder;
 public class CLInitTest {
 
     public static void main(String[] args) throws SecurityException,
-            NoSuchMethodException, IllegalAccessException,
-            InvocationTargetException {
+        NoSuchMethodException, IllegalAccessException,
+        InvocationTargetException {
         final Class<ByteOrder> cls = ByteOrder.class;
         final Method m = cls.getMethod("<clinit>", null);
         m.invoke(null, null);

@@ -29,17 +29,21 @@ import java.util.List;
  */
 public class ClassResult implements Comparable {
 
-    /** The name of the test (usually the class name). */
+    /**
+     * The name of the test (usually the class name).
+     */
     private String name;
 
-    /** A list containing results for each test applied for the class. */
+    /**
+     * A list containing results for each test applied for the class.
+     */
     private List testResults;
     private boolean sorted = true;
 
     /**
      * Creates a new result, initially empty.
      *
-     * @param name  the class name.
+     * @param name the class name.
      */
     ClassResult(String name) {
         this.name = name;
@@ -59,7 +63,7 @@ public class ClassResult implements Comparable {
     /**
      * Sets the test name.
      *
-     * @param name  the name.
+     * @param name the name.
      */
     void setName(String name) {
         this.name = name;
@@ -68,7 +72,7 @@ public class ClassResult implements Comparable {
     /**
      * Adds a test result.
      *
-     * @param result  the test result.
+     * @param result the test result.
      */
     public void add(TestResult result) {
         testResults.add(result);
@@ -82,7 +86,7 @@ public class ClassResult implements Comparable {
      * @return An iterator.
      */
     public Iterator getTestIterator() {
-        if(!sorted) {
+        if (!sorted) {
             Collections.sort(testResults);
             sorted = true;
         }
@@ -97,8 +101,7 @@ public class ClassResult implements Comparable {
     public int getCheckCount() {
         int result = 0;
         Iterator iterator = testResults.iterator();
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             TestResult test = (TestResult) iterator.next();
             result = result + test.getCheckCount();
         }
@@ -108,15 +111,13 @@ public class ClassResult implements Comparable {
     /**
      * Returns the number of checks with the specified status.
      *
-     * @param passed  the check status.
-     *
+     * @param passed the check status.
      * @return The number of checks passed or failed.
      */
     public int getCheckCount(boolean passed) {
         int result = 0;
         Iterator iterator = testResults.iterator();
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             TestResult test = (TestResult) iterator.next();
             result = result + test.getCheckCount(passed);
         }

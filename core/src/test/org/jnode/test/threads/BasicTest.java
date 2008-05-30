@@ -18,20 +18,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.threads;
 
 import static org.jnode.test.threads.ThreadingUtils.print;
+import static org.jnode.test.threads.ThreadingUtils.sleep;
 import static org.jnode.test.threads.ThreadingUtils.trackEnter;
 import static org.jnode.test.threads.ThreadingUtils.trackExecute;
-import static org.jnode.test.threads.ThreadingUtils.sleep;
 import static org.jnode.test.threads.ThreadingUtils.trackExit;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class BasicTest {
-    public static void main(String[] argv) throws Exception{
+    public static void main(String[] argv) throws Exception {
         print("Testing thread creation and starting...");
         ThreadingUtils.Forkable f = new ThreadingUtils.Forkable() {
             public void execute() throws Exception {
@@ -50,10 +50,10 @@ public class BasicTest {
 
     private static void aMethod() {
         trackEnter();
-        try{
+        try {
             trackExecute();
             sleep(3);
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         trackExit();

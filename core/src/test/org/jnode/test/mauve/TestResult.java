@@ -19,8 +19,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package org.jnode.test.mauve;
 
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents the result of running one test.  A test usually contains multiple
@@ -29,16 +33,21 @@ import java.io.*;
  */
 public class TestResult implements Comparable {
 
-    /** The name of the test (usually the method name). */
+    /**
+     * The name of the test (usually the method name).
+     */
     private String name;
 
-    /** A list containing results for each of the checks applied by the test. */
+    /**
+     * A list containing results for each of the checks applied by the test.
+     */
     private List checkResults;
 
     private String error = null;
 
     /**
      * Creates a new result, initially empty.
+     *
      * @param name
      */
     TestResult(String name) {
@@ -59,7 +68,7 @@ public class TestResult implements Comparable {
     /**
      * Sets the test name.
      *
-     * @param name  the name.
+     * @param name the name.
      */
     void setName(String name) {
         this.name = name;
@@ -68,7 +77,7 @@ public class TestResult implements Comparable {
     /**
      * Adds a check result.
      *
-     * @param result  the check result.
+     * @param result the check result.
      */
     void add(CheckResult result) {
         checkResults.add(result);
@@ -95,8 +104,7 @@ public class TestResult implements Comparable {
     /**
      * Returns the number of checks with the specified status.
      *
-     * @param passed  the check status.
-     *
+     * @param passed the check status.
      * @return The number of checks passed or failed.
      */
     public int getCheckCount(boolean passed) {
@@ -107,7 +115,7 @@ public class TestResult implements Comparable {
             if (check.getPassed() == passed)
                 result++;
         }
-        if(!passed && error != null)
+        if (!passed && error != null)
             result++; // count stacktrace as a failure
         return result;
     }
@@ -125,7 +133,7 @@ public class TestResult implements Comparable {
         try {
             out.close();
             error = out.toString();
-        } catch(IOException e) { // this should never happen..
+        } catch (IOException e) { // this should never happen..
         }
     }
 

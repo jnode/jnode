@@ -18,17 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import java.lang.annotation.Annotation;
-import static java.lang.annotation.ElementType.*;
-
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.AnnotatedElement;
 
 public class AnnotationTest {
 
@@ -45,39 +44,41 @@ public class AnnotationTest {
 //        show("Declared annotations for class A", A.class.getDeclaredAnnotations());
 //        show("Declared annotations for class B", B.class.getDeclaredAnnotations());
     }
-    
+
     private static void show(String msg, Annotation[] ann) {
         System.out.println(msg);
         for (Annotation a : ann) {
             System.out.println(a);
-        }        
+        }
         System.out.println();
     }
-    
+
     @Test
     @Test4
     public static class A {
-        
+
     }
 
-    @Test2(name="ewout", descr="programmer")
-    @Test3(name=5, descr={1,2,3,4})
+    @Test2(name = "ewout", descr = "programmer")
+    @Test3(name = 5, descr = {1, 2, 3, 4 })
     public static class B extends A {
-        
+
         @Test
         public void foo() {
-            
+
         }
     }
 
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({TYPE, METHOD})
-    public @interface Test { }
+    @Target({TYPE, METHOD })
+    public @interface Test {
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(TYPE)
     public @interface Test2 {
         String name();
+
         String descr();
     }
 
@@ -85,13 +86,15 @@ public class AnnotationTest {
     @Target(TYPE)
     public @interface Test3 {
         int name();
+
         int[] descr();
     }
-    
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({TYPE, METHOD})
-    @Inherited
-    public @interface Test4 { }
 
-    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({TYPE, METHOD })
+    @Inherited
+    public @interface Test4 {
+    }
+
+
 }

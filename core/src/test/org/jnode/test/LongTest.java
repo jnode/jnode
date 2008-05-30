@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 
@@ -30,14 +30,14 @@ public class LongTest {
     public static void main(String[] args) {
         new LongTest().run();
     }
-    
+
     public void run() {
         long a[] = new long[0x9743];
         a[0] = allocNew();
         System.out.println(a[1]);
         System.out.println(a[0]);
     }
-    
+
     public synchronized long allocNew() {
         int i = 5;
         i++;

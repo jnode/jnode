@@ -4,7 +4,7 @@
 package org.jnode.test;
 
 public class ConvertTest {
-    
+
     public static void main(String[] argv) {
         System.out.println(test1());
         System.out.println(test2());

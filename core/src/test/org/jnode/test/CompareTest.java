@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -26,15 +26,15 @@ package org.jnode.test;
  */
 public class CompareTest {
 
-	public static void main(String[] args) {
-		
-		final int i = 0x80000000;
-		
-		if (i < 0) {
-			System.out.println("i < 0");
-		} else {
-			System.out.println("i >= 0");
-		}
-		
-	}
+    public static void main(String[] args) {
+
+        final int i = 0x80000000;
+
+        if (i < 0) {
+            System.out.println("i < 0");
+        } else {
+            System.out.println("i >= 0");
+        }
+
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -33,25 +33,25 @@ public class InlineTestClass {
         r = f2();
         return r;
     }
-    
+
     public static int f2() {
         int r;
         r = f3();
         return r;
     }
-    
+
     public static int f3() {
         int r;
         r = f4();
         return r;
     }
-    
+
     public static int f4() {
         int r;
-        r = (int)currentTime();
+        r = (int) currentTime();
         return r;
     }
-    
+
     public void foo2() {
         int i = 5;
         int j = -7;
@@ -60,21 +60,21 @@ public class InlineTestClass {
 
     public void foo3(int i) {
         try {
-            int[] a = new int[ 50];
-            foo3(a[ i - 1], a[ i]);
+            int[] a = new int[50];
+            foo3(a[i - 1], a[i]);
         } finally {
             System.out.println("finally");
         }
     }
-    
+
     public long foo4() {
         return currentTime();
     }
-    
+
     public Object foo5() {
         return staticGetObject();
     }
-    
+
     public static Object staticGetObject() {
         return System.out;
     }
@@ -102,7 +102,7 @@ public class InlineTestClass {
     public static int staticGetXai(Object dummy, int i) {
         return i;
     }
-    
+
     public static long currentTime() {
         return System.currentTimeMillis();
     }

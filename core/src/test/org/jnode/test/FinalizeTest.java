@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 
@@ -34,18 +34,18 @@ public class FinalizeTest {
         Runtime.getRuntime().gc();
         System.out.println("Done");
     }
-    
+
     private final int i;
-    
+
     public FinalizeTest(int i) {
         this.i = i;
     }
-    
+
     /**
      * @see java.lang.Object#finalize()
      */
     public void finalize() {
         System.out.println("Finalize called on " + i);
     }
-    
+
 }

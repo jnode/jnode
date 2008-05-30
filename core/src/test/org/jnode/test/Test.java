@@ -18,32 +18,32 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 public class Test {
-	private int m_v;
-	private byte[] ba;
+    private int m_v;
+    private byte[] ba;
 
-	public Test() {
-	}
+    public Test() {
+    }
 
-	public Test(int v) {
-		this.m_v = v << 5;
-	}
+    public Test(int v) {
+        this.m_v = v << 5;
+    }
 
-	public Test(long v) {
-	}
+    public Test(long v) {
+    }
 
-	public int return11() {
-		return 11 + m_v + ba[12];
-	}
+    public int return11() {
+        return 11 + m_v + ba[12];
+    }
 
-	public void trycatch() {
-		try {
-			return11();
-		} catch (RuntimeException ex) {
-			return11();
-		}
-	}
+    public void trycatch() {
+        try {
+            return11();
+        } catch (RuntimeException ex) {
+            return11();
+        }
+    }
 }

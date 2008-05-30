@@ -3,7 +3,6 @@
  */
 package org.jnode.test.core;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -15,7 +14,7 @@ public class ProxyTest {
 
     /**
      * @param args
-     * @throws FileNotFoundException
+     * @throws java.io.FileNotFoundException
      * @throws
      */
     public static void main(String[] args) throws IOException {
@@ -24,13 +23,13 @@ public class ProxyTest {
 
         final ClassLoader loader = ProxyTest.class.getClassLoader();
         IFoo proxy = (IFoo) Proxy.newProxyInstance(loader,
-                new Class[] { IFoo.class }, new Handler<IFoo>(origFoo));
+            new Class[]{IFoo.class}, new Handler<IFoo>(origFoo));
 
         proxy.foo();
 
         if (true) {
             byte[] classData = ProxyBuilder.getProxyClass(loader,
-                    new Class[] { IFoo.class });
+                new Class[]{IFoo.class});
             FileOutputStream os = new FileOutputStream("$Proxy0.class");
             os.write(classData);
             os.close();
@@ -42,7 +41,7 @@ public class ProxyTest {
      *      java.lang.reflect.Method, java.lang.Object[])
      */
     public Object invoke(Object proxy, Method method, Object[] args)
-            throws Throwable {
+        throws Throwable {
         // TODO Auto-generated method stub
         return null;
     }
@@ -51,7 +50,7 @@ public class ProxyTest {
         public void foo();
 
         public int intFoo()
-        throws IOException;
+            throws IOException;
     }
 
     public static class FooImpl implements IFoo {
@@ -64,7 +63,7 @@ public class ProxyTest {
         }
 
         public int intFoo()
-        throws IOException {
+            throws IOException {
             return 5;
         }
 
@@ -83,15 +82,15 @@ public class ProxyTest {
          *      java.lang.reflect.Method, java.lang.Object[])
          */
         public Object invoke(Object proxy, Method method, Object[] args)
-                throws Throwable {
+            throws Throwable {
             return method.invoke(object, args);
         }
     }
-    
+
     public static class MyProxy {
         private static Method[] m;
         private InvocationHandler h;
-        
+
         public void foo() {
             try {
                 h.invoke(this, m[2], null);
@@ -103,6 +102,6 @@ public class ProxyTest {
                 throw new UndeclaredThrowableException(e);
             }
         }
-        
+
     }
 }

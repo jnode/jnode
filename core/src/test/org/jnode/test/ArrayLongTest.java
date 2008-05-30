@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -31,12 +31,12 @@ public class ArrayLongTest {
             new ArrayLongTest().test(i, 63);
         }
     }
-    
+
     private final Object[] arr = new Object[128];
-    
+
     public void test(long l1, long l2) {
-        int group = (int)(l1 / l2);
-        int index = (int)(l1 % l2);
+        int group = (int) (l1 / l2);
+        int index = (int) (l1 % l2);
         Object obj = arr[group];
     }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import org.jnode.driver.DeviceUtils;
@@ -31,26 +31,26 @@ import org.jnode.driver.input.PointerListener;
  */
 public class PointerTest {
 
-	public static void main(String[] args) 
-	throws Exception {
-		
-		final String devId = (args.length > 0) ? args[0] : "ps2mouse";
-		PointerAPI api = (PointerAPI)DeviceUtils.getAPI(devId, PointerAPI.class);
-		api.addPointerListener(new MyListener());
-	}
-	
-	public static class MyListener implements PointerListener {
-		
-		
-		
-			/**
-		 * @see org.jnode.driver.input.PointerListener#pointerStateChanged(org.jnode.driver.input.PointerEvent)
-		 */
-		public void pointerStateChanged(PointerEvent event) {
-			System.out.println("x,y,z abs: " + event.getX() + "," + event.getY() + "," + event.getZ() + " " + event.isAbsolute());
-			// TODO Auto-generated method stub
+    public static void main(String[] args)
+        throws Exception {
 
-		}
+        final String devId = (args.length > 0) ? args[0] : "ps2mouse";
+        PointerAPI api = (PointerAPI) DeviceUtils.getAPI(devId, PointerAPI.class);
+        api.addPointerListener(new MyListener());
+    }
 
-}
+    public static class MyListener implements PointerListener {
+
+
+        /**
+         * @see org.jnode.driver.input.PointerListener#pointerStateChanged(org.jnode.driver.input.PointerEvent)
+         */
+        public void pointerStateChanged(PointerEvent event) {
+            System.out.println(
+                "x,y,z abs: " + event.getX() + "," + event.getY() + "," + event.getZ() + " " + event.isAbsolute());
+            // TODO Auto-generated method stub
+
+        }
+
+    }
 }
