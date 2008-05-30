@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.rtl8139;
 
 /**
  * Driver constants to the RTL8139 ethernet card.
- * 
+ * <p/>
  * Build with help of the donation from WebSprocket LLC
- * 
+ *
  * @author Martin Husted Hartvig
  */
 
@@ -164,7 +164,7 @@ public interface RTL8139Constants {
 
     // accept broadcasts and runt packets, wrap around the buffer
     public int rxConfig = (RX_DMA_BURST << 8) | (RX_FIFO_THRESHOLD << 13)
-            | (RX_RBLEN << 11) | RX_AR | RX_BCAST | RX_MYPHYS;
+        | (RX_RBLEN << 11) | RX_AR | RX_BCAST | RX_MYPHYS;
 
     public static final int INTR_RX_OK = 0x0001;
 
@@ -189,8 +189,8 @@ public interface RTL8139Constants {
     public static final int INTR_SYS_ERR = 0x8000;
 
     public static final int INTR_MASK = (INTR_SYS_ERR | INTR_TIMEOUT
-            | INTR_LEN_CHG | INTR_RX_UNDERRUN | INTR_RX_BUF_OVRFLO
-            | INTR_RX_FIFO_OVRFLO | INTR_RX_ERR | INTR_RX_OK | INTR_TX_ERR | INTR_TX_OK);
+        | INTR_LEN_CHG | INTR_RX_UNDERRUN | INTR_RX_BUF_OVRFLO
+        | INTR_RX_FIFO_OVRFLO | INTR_RX_ERR | INTR_RX_OK | INTR_TX_ERR | INTR_TX_OK);
 
     public static final int CFG1_MMIO = 0x08;
 
@@ -215,7 +215,7 @@ public interface RTL8139Constants {
     public static final int NUM_RX_DESCRIPTORS = 1; // check
 
     public static final int RX_BUF_IDX = 2; // 0 = 8192, 1 = 16384; 2 = 32768,
-                                            // 3 = 65536;
+    // 3 = 65536;
 
     public static final int RX_BUF_SIZE = 8192 << RX_BUF_IDX;
 
@@ -224,7 +224,7 @@ public interface RTL8139Constants {
     public static final int RX_BUF_EXTRA = 16; // extra room
 
     public static final int TOTAL_RX_BUF_SIZE = RX_BUF_SIZE + RX_BUF_EXTRA
-            + RX_BUF_WRAP_PAD;
+        + RX_BUF_WRAP_PAD;
 
     public static final int RX_FRAMES = 32;
 
@@ -301,6 +301,8 @@ public interface RTL8139Constants {
 
     public static final int udpChecksumChecked = (1 << 31);
 
-    /** Timeout for autonegotiate in seconds */
+    /**
+     * Timeout for autonegotiate in seconds
+     */
     public static final int AUTO_NEGOTIATE_TIMEOUT = 15;
 }
