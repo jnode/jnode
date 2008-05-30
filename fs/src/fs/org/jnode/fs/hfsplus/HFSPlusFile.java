@@ -33,10 +33,11 @@ public class HFSPlusFile extends AbstractFSFile {
 	@Override
 	public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
 		HfsPlusFileSystem fs = (HfsPlusFileSystem)getFileSystem();
-		ExtentDescriptor d  = file.getDataFork().getExtents()[0];
-		if(d.getStartBlock() != 0 && d.getBlockCount() != 0){
-			long firstOffset = d.getStartBlock()*fs.getVolumeHeader().getBlockSize();
-			fs.getApi().read(firstOffset, dest);
+		for(ExtentDescriptor d: file.getDataFork().getExtents()){
+			if(d.getStartBlock() != 0 && d.getBlockCount() != 0){
+				long firstOffset = d.getStartBlock()*fs.getVolumeHeader().getBlockSize();
+				fs.getApi().read(firstOffset, dest);
+			}
 		}
 	}
 
