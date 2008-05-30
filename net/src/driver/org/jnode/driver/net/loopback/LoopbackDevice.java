@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.loopback;
 
 import org.jnode.driver.Bus;
@@ -29,13 +29,13 @@ import org.jnode.driver.DriverException;
  * @author epr
  */
 public class LoopbackDevice extends Device {
-	
-	/**
-	 * @param bus
-	 */
-	public LoopbackDevice(Bus bus)
-	throws DriverException {
-		super(bus, "loopback");
-		setDriver(new LoopbackDriver());
-	}
+
+    /**
+     * @param bus
+     */
+    public LoopbackDevice(Bus bus)
+        throws DriverException {
+        super(bus, "loopback");
+        setDriver(new LoopbackDriver());
+    }
 }
