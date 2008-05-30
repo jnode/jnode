@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net;
 
 import java.util.EventListener;
@@ -30,6 +30,7 @@ public interface NetDeviceListener extends EventListener {
 
     /**
      * A net device has fired the given event.
+     *
      * @param event
      */
     public void processEvent(NetDeviceEvent event);
