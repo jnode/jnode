@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.system.MemoryResource;
@@ -39,10 +39,14 @@ import org.vmmagic.unboxed.ObjectReference;
 @MagicPermission
 public final class VmX86Processor32 extends VmX86Processor {
 
-    /** TSS used in this processor */
+    /**
+     * TSS used in this processor
+     */
     private TSS32 tss;
 
-    /** Space of boot code */
+    /**
+     * Space of boot code
+     */
     private MemoryResource bootCode;
 
     /**
@@ -52,13 +56,14 @@ public final class VmX86Processor32 extends VmX86Processor {
      * @param cpuId
      */
     public VmX86Processor32(int id, VmX86Architecture32 arch,
-            VmSharedStatics statics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler, X86CpuID cpuId) {
+                            VmSharedStatics statics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler,
+                            X86CpuID cpuId) {
         super(id, arch, statics, isolatedStatics, scheduler, cpuId);
     }
 
     /**
      * Create a new thread
-     * 
+     *
      * @return The new thread
      */
     protected VmThread createThread(VmIsolatedStatics isolatedStatics) {
@@ -67,7 +72,7 @@ public final class VmX86Processor32 extends VmX86Processor {
 
     /**
      * Create a new thread
-     * 
+     *
      * @param javaThread
      * @return The new thread
      */
@@ -77,7 +82,7 @@ public final class VmX86Processor32 extends VmX86Processor {
 
     /**
      * Create a new thread
-     * 
+     *
      * @param stack
      * @return The new thread
      */
@@ -87,12 +92,12 @@ public final class VmX86Processor32 extends VmX86Processor {
 
     /**
      * Setup the given GDT for use by this processor.
-     * 
+     *
      * @param gdt
      */
     protected void setupGDT(GDT gdt) {
         gdt.setBase(GDT.PROCESSOR_ENTRY, ObjectReference.fromObject(this)
-                .toAddress());
+            .toAddress());
         // Clone TSS
         this.tss = new TSS32();
         gdt.setBase(GDT.TSS_ENTRY, tss.getAddress());
@@ -110,21 +115,21 @@ public final class VmX86Processor32 extends VmX86Processor {
 
     /**
      * Setup a memory region with bootcode for this processor.
-     * 
+     *
      * @param rm
      */
     protected final Address setupBootCode(ResourceManager rm, GDT gdt)
-            throws ResourceNotFreeException {
+        throws ResourceNotFreeException {
         // Setup the AP bootcode
         final int size = UnsafeX86.getAPBootCodeSize();
 
         // Claim the memory
         this.bootCode = rm.claimMemoryResource(ResourceOwner.SYSTEM, null,
-                size, ResourceManager.MEMMODE_ALLOC_DMA);
+            size, ResourceManager.MEMMODE_ALLOC_DMA);
 
         // Initialize the memory
         UnsafeX86.setupBootCode(bootCode.getAddress(), gdt.getGdt(), tss
-                .getTSS());
+            .getTSS());
 
         return bootCode.getAddress();
     }

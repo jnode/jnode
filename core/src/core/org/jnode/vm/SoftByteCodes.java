@@ -38,7 +38,7 @@ import org.jnode.vm.memmgr.VmHeapManager;
 
 /**
  * Class with software implementations of "difficult" java bytecodes.
- * 
+ *
  * @author epr
  */
 @Uninterruptible
@@ -49,7 +49,7 @@ public final class SoftByteCodes {
 
     /**
      * Is the given object instance of the given class.
-     * 
+     *
      * @param object
      * @param T
      * @return boolean
@@ -72,14 +72,14 @@ public final class SoftByteCodes {
     /**
      * Resolve a const reference to a field to the actual field, in the context
      * of the given current method.
-     * 
+     *
      * @param currentMethod
      * @param fieldRef
      * @param isStatic
      * @return VmField
      */
     public static VmField resolveField(VmMethod currentMethod,
-            VmConstFieldRef fieldRef, boolean isStatic) {
+                                       VmConstFieldRef fieldRef, boolean isStatic) {
         if (!fieldRef.getConstClass().isResolved()) {
             resolveClass(fieldRef.getConstClass());
         }
@@ -87,7 +87,7 @@ public final class SoftByteCodes {
         if (fieldRef.isResolved()) {
             result = fieldRef.getResolvedVmField();
         } else {
-            VmType< ? > vmClass = fieldRef.getConstClass().getResolvedVmClass();
+            VmType<?> vmClass = fieldRef.getConstClass().getResolvedVmClass();
             vmClass.link();
             VmField field = vmClass.getField(fieldRef);
             if (field == null) {
@@ -97,7 +97,7 @@ public final class SoftByteCodes {
             fieldRef.setResolvedVmField(field);
             result = field;
         }
-        VmType< ? > declClass = result.getDeclaringClass();
+        VmType<?> declClass = result.getDeclaringClass();
         if ((isStatic) && (!declClass.isAlwaysInitialized())) {
             if (!(result.isPrimitive() && result.isFinal())) {
                 declClass.initialize();
@@ -109,26 +109,26 @@ public final class SoftByteCodes {
     /**
      * Resolve a const reference to a method to the actual method, in the
      * context of the given current method.
-     * 
+     *
      * @param currentMethod
      * @param methodRef
      * @return VmMethod
      */
     public static VmMethod resolveMethod(VmMethod currentMethod,
-            VmConstMethodRef methodRef) {
+                                         VmConstMethodRef methodRef) {
         if (!methodRef.getConstClass().isResolved()) {
             resolveClass(methodRef.getConstClass());
         }
         if (methodRef.isResolved()) {
             return methodRef.getResolvedVmMethod();
         } else {
-            VmType< ? > vmClass = methodRef.getConstClass()
-                    .getResolvedVmClass();
+            VmType<?> vmClass = methodRef.getConstClass()
+                .getResolvedVmClass();
             vmClass.link();
 
             // NEW
             VmClassLoader curLoader = currentMethod.getDeclaringClass()
-                    .getLoader();
+                .getLoader();
             methodRef.resolve(curLoader);
             return methodRef.getResolvedVmMethod();
             // END NEW
@@ -147,7 +147,7 @@ public final class SoftByteCodes {
     /**
      * Resolve a const reference to a class to the actual class, in the context
      * of the given current method.
-     * 
+     *
      * @param classRef
      * @return VmClass
      */
@@ -159,8 +159,8 @@ public final class SoftByteCodes {
             VmClassLoader curLoader = VmSystem.getContextClassLoader();
             String cname = classRef.getClassName();
             try {
-                Class< ? > cls = curLoader.asClassLoader().loadClass(cname);
-                VmType< ? > vmClass = cls.getVmClass();
+                Class<?> cls = curLoader.asClassLoader().loadClass(cname);
+                VmType<?> vmClass = cls.getVmClass();
 
                 /*
                  * VmClass vmClass = curLoader.loadClass(cname, true); //VmClass
@@ -181,12 +181,12 @@ public final class SoftByteCodes {
      * Allocate a new object with a given class and a given size in bytes. If
      * size &lt; 0, the objectsize from the given class is used. The given size
      * does not include the length of the object header.
-     * 
+     *
      * @param vmClass
      * @param size
      * @return Object The new object
      */
-    public static Object allocObject(VmType< ? > vmClass, int size) {
+    public static Object allocObject(VmType<?> vmClass, int size) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -202,7 +202,7 @@ public final class SoftByteCodes {
 
     /**
      * Allocate a multi dimensional array
-     * 
+     *
      * @param vmClass
      * @param dimensions
      * @return The allocated array
@@ -210,29 +210,24 @@ public final class SoftByteCodes {
     public static Object allocMultiArray(VmType vmClass, int[] dimensions) {
         // Syslog.debug("allocMultiArray "); // + vmClass);
         return multinewarray_helper(dimensions, dimensions.length - 1,
-                (VmArrayClass) vmClass);
+            (VmArrayClass) vmClass);
     }
 
     /**
      * Allocates a multidimensional array of type a, with dimensions given in
      * dims[ind] to dims[dims.length-1]. a must be of dimensionality at least
      * dims.length-ind.
-     * 
+     *
+     * @param dims array of dimensions in reverse order
+     * @param ind  start index in array dims
+     * @param a    array type
      * @return allocated array object
-     * @param dims
-     *            array of dimensions in reverse order
-     * @param ind
-     *            start index in array dims
-     * @param a
-     *            array type
-     * @throws NegativeArraySizeException
-     *             if one of the array sizes in dims is negative
-     * @throws OutOfMemoryError
-     *             if there is not enough memory to perform operation
+     * @throws NegativeArraySizeException if one of the array sizes in dims is negative
+     * @throws OutOfMemoryError           if there is not enough memory to perform operation
      */
     public static Object multinewarray_helper(int[] dims, int ind,
-            VmArrayClass< ? > a) throws OutOfMemoryError,
-            NegativeArraySizeException {
+                                              VmArrayClass<?> a) throws OutOfMemoryError,
+        NegativeArraySizeException {
         // Syslog.debug("multinewarray_helper "); //+ " cls=" + a);
         a.initialize();
         final int length = dims[ind];
@@ -241,7 +236,7 @@ public final class SoftByteCodes {
             return o;
         }
         final Object[] o2 = (Object[]) o;
-        final VmArrayClass< ? > a2 = (VmArrayClass< ? >) a.getComponentType();
+        final VmArrayClass<?> a2 = (VmArrayClass<?>) a.getComponentType();
         a2.initialize();
         for (int i = 0; i < length; ++i) {
             o2[i] = multinewarray_helper(dims, ind - 1, a2);
@@ -252,14 +247,14 @@ public final class SoftByteCodes {
     /**
      * Allocate a new array with a given class as component type and a given
      * number of elements.
-     * 
+     *
      * @param vmClass
      * @param elements
      * @return Object The new array
      */
-    public static Object anewarray(VmType< ? > vmClass, int elements) {
+    public static Object anewarray(VmType<?> vmClass, int elements) {
 
-        final VmArrayClass< ? > arrCls = vmClass.getArrayClass();
+        final VmArrayClass<?> arrCls = vmClass.getArrayClass();
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -273,14 +268,14 @@ public final class SoftByteCodes {
     /**
      * Allocate a new primivite array with a given arraytype and a given number
      * of elements.
-	 *
-     * @param currentClass 
+     *
+     * @param currentClass
      * @param atype
      * @param elements
      * @return Object The new array
      */
-    public static Object allocPrimitiveArray(VmType< ? > currentClass,
-            int atype, int elements) {
+    public static Object allocPrimitiveArray(VmType<?> currentClass,
+                                             int atype, int elements) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -294,13 +289,13 @@ public final class SoftByteCodes {
             }
         }
         final Object result = hm.newArray(VmType.getPrimitiveArrayClass(atype),
-                elements);
+            elements);
         return result;
     }
 
     /**
      * Allocate a new array with a given class and a given number of elements.
-     * 
+     *
      * @param vmClass
      * @param elements
      * @return Object The new array
@@ -316,22 +311,23 @@ public final class SoftByteCodes {
 
     /**
      * Throw a classcast exception.
-     * @param object 
-     * @param expected 
+     *
+     * @param object
+     * @param expected
      */
-    public static void classCastFailed(Object object, VmType< ? > expected) {
+    public static void classCastFailed(Object object, VmType<?> expected) {
         if (object == null) {
             throw new ClassCastException("Object is null");
         } else if (true) {
             final Object[] tib = VmMagic.getTIB(object);
             if (tib == null) {
                 throw new ClassCastException(object.getClass().getName()
-                        + " tib==null");
+                    + " tib==null");
             }
             final Object[] superClasses = (Object[]) tib[TIBLayout.SUPERCLASSES_INDEX];
             if (superClasses == null) {
                 throw new ClassCastException(object.getClass().getName()
-                        + " superClasses==null");
+                    + " superClasses==null");
             }
             final StringBuilder sb = new StringBuilder();
             sb.append(object.getClass().getName());
@@ -350,7 +346,8 @@ public final class SoftByteCodes {
 
     /**
      * Gets the Class that corresponds to the given VmType.
-     * @param <T> 
+     *
+     * @param <T>
      * @param type
      * @return the Class that corresponds to the given VmType
      */
@@ -360,7 +357,7 @@ public final class SoftByteCodes {
 
     /**
      * Throw an array index out of bounds exception.
-     * 
+     *
      * @param array
      * @param index
      */
@@ -370,7 +367,7 @@ public final class SoftByteCodes {
 
     /**
      * An unknown CPU opcode is execute.
-     * 
+     *
      * @param opcode
      * @param pc
      */

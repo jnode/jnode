@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.system.MemoryResource;
@@ -34,7 +34,7 @@ public class MPIOInterruptAssignmentEntry extends MPInterruptAssignmentEntry {
     MPIOInterruptAssignmentEntry(MemoryResource mem) {
         super(mem);
     }
-    
+
     /**
      * @see org.jnode.vm.x86.MPEntry#getEntryTypeName()
      */

@@ -6,7 +6,6 @@ package org.jnode.vm;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
-
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.Internal;
@@ -21,7 +20,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
  * Service used to load classes and compile methods.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
@@ -44,25 +43,24 @@ public final class LoadCompileService {
 
     /**
      * Default ctor
-     * 
      */
     public LoadCompileService(ObjectResolver resolver) {
         this.resolver = resolver;
         final VmArchitecture arch = VmMagic.currentProcessor()
-                .getArchitecture();
+            .getArchitecture();
         this.compilers = arch.getCompilers();
         this.testCompilers = arch.getTestCompilers();
     }
 
     /**
      * Recompile the given method with the given optimization level
-     * 
+     *
      * @param method
      * @param optLevel
      * @param enableTestCompilers
      */
     public static final void compile(VmMethod method, int optLevel,
-            boolean enableTestCompilers) {
+                                     boolean enableTestCompilers) {
         if (service == null) {
             service = new LoadCompileService(new Unsafe.UnsafeObjectResolver());
         }
@@ -73,10 +71,10 @@ public final class LoadCompileService {
         } else {
             // Put request in queue
             service.enqueAndWait(new CompileRequest(method, optLevel,
-                    enableTestCompilers));
+                enableTestCompilers));
         }
     }
-    
+
     /**
      * Get the highest supported optimization level for the regular or test compilers.
      */
@@ -92,8 +90,8 @@ public final class LoadCompileService {
      * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String,
      *      ByteBuffer, java.security.ProtectionDomain)
      */
-    public static final VmType< ? > defineClass(String name, ByteBuffer data,
-            ProtectionDomain protDomain, VmClassLoader loader) {
+    public static final VmType<?> defineClass(String name, ByteBuffer data,
+                                              ProtectionDomain protDomain, VmClassLoader loader) {
         initService();
         if ((!started) || (Thread.currentThread() instanceof LoadCompileThread)) {
             // Load now
@@ -101,7 +99,7 @@ public final class LoadCompileService {
         } else {
             // Put request in queue
             LoadRequest request = new LoadRequest(name, data, protDomain,
-                    loader);
+                loader);
             service.enqueAndWait(request);
             return request.getDefinedType();
         }
@@ -116,12 +114,12 @@ public final class LoadCompileService {
             started = true;
             for (int i = 0; i < threadCount; i++) {
                 LoadCompileThread thread = new LoadCompileThread(service,
-                        "LoadCompile-" + i);
+                    "LoadCompile-" + i);
                 thread.start();
             }
         }
     }
-    
+
     @KernelSpace
     @Internal
     public final static void showInfo() {
@@ -141,7 +139,7 @@ public final class LoadCompileService {
 
     /**
      * Put request in queue and wait for request to finish.
-     * 
+     *
      * @param request
      */
     private void enqueAndWait(Request request) {
@@ -182,14 +180,12 @@ public final class LoadCompileService {
 
     /**
      * Compile the given method
-     * 
-     * @param vmMethod
-     *            The method to compile
-     * @param optLevel
-     *            The optimization level
+     *
+     * @param vmMethod The method to compile
+     * @param optLevel The optimization level
      */
     private void doCompile(VmMethod vmMethod, int optLevel,
-            boolean enableTestCompilers) {
+                           boolean enableTestCompilers) {
         final NativeCodeCompiler cmps[];
         int index;
         if (enableTestCompilers) {
@@ -217,8 +213,8 @@ public final class LoadCompileService {
      * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String,
      *      ByteBuffer, java.security.ProtectionDomain)
      */
-    final VmType< ? > doDefineClass(String name, ByteBuffer data,
-            ProtectionDomain protDomain, VmClassLoader loader) {
+    final VmType<?> doDefineClass(String name, ByteBuffer data,
+                                  ProtectionDomain protDomain, VmClassLoader loader) {
         return ClassDecoder.defineClass(name, data, true, loader, protDomain);
     }
 
@@ -247,7 +243,7 @@ public final class LoadCompileService {
             finished = true;
             notifyAll();
         }
-        
+
         final void execute() {
             try {
                 doExecute();
@@ -263,6 +259,7 @@ public final class LoadCompileService {
 
         /**
          * Gets request specific error message.
+         *
          * @return
          */
         abstract String errorMessage();
@@ -282,7 +279,7 @@ public final class LoadCompileService {
          * @param enableTestCompilers
          */
         CompileRequest(final VmMethod method, final int optLevel,
-                final boolean enableTestCompilers) {
+                       final boolean enableTestCompilers) {
             this.method = method;
             this.optLevel = optLevel;
             this.enableTestCompilers = enableTestCompilers;
@@ -290,7 +287,7 @@ public final class LoadCompileService {
 
         /**
          * Execute this request.
-         * 
+         *
          * @see org.jnode.vm.LoadCompileService.Request#execute()
          */
         void doExecute() {
@@ -315,7 +312,7 @@ public final class LoadCompileService {
 
         private final VmClassLoader loader;
 
-        private VmType< ? > definedType;
+        private VmType<?> definedType;
 
         /**
          * @param name
@@ -324,7 +321,7 @@ public final class LoadCompileService {
          * @param loader
          */
         LoadRequest(final String name, final ByteBuffer data,
-                final ProtectionDomain protDomain, final VmClassLoader loader) {
+                    final ProtectionDomain protDomain, final VmClassLoader loader) {
             this.name = name;
             this.data = data;
             this.protDomain = protDomain;
@@ -333,7 +330,7 @@ public final class LoadCompileService {
 
         /**
          * Execute this request.
-         * 
+         *
          * @see org.jnode.vm.LoadCompileService.Request#execute()
          */
         void doExecute() {
@@ -343,7 +340,7 @@ public final class LoadCompileService {
         /**
          * @return the definedType
          */
-        final VmType< ? > getDefinedType() {
+        final VmType<?> getDefinedType() {
             return definedType;
         }
 

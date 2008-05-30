@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -34,23 +34,24 @@ import org.vmmagic.pragma.Uninterruptible;
 @MagicPermission
 final class GCSetWhiteVisitor extends ObjectVisitor implements ObjectFlags, Uninterruptible {
 
-	private final HeapHelper helper;
-	
-	public GCSetWhiteVisitor(DefaultHeapManager heapMgr) {
-		this.helper = heapMgr.getHelper();
-	}
-	
-	/**
-	 * Mark every visited object white.
-	 * @param object
-	 * @return boolean
-	 */
-	public boolean visit(Object object) {
-		final int gcColor = VmMagic.getObjectColor(object);
+    private final HeapHelper helper;
+
+    public GCSetWhiteVisitor(DefaultHeapManager heapMgr) {
+        this.helper = heapMgr.getHelper();
+    }
+
+    /**
+     * Mark every visited object white.
+     *
+     * @param object
+     * @return boolean
+     */
+    public boolean visit(Object object) {
+        final int gcColor = VmMagic.getObjectColor(object);
         if (gcColor != GC_YELLOW) {
             helper.atomicChangeObjectColor(object, gcColor, GC_WHITE);
         }
-		return true;
-	}
+        return true;
+    }
 
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1b;
 
 import org.jnode.vm.JvmType;
@@ -30,20 +30,27 @@ import org.jnode.vm.bytecode.StackException;
  */
 class ItemStack {
 
-    /** Expected item kind */
+    /**
+     * Expected item kind
+     */
     private final int expectedKind;
 
-    /** Maximum stack size */
+    /**
+     * Maximum stack size
+     */
     private final int maxSize;
 
-    /** Actual stack */
+    /**
+     * Actual stack
+     */
     protected Item[] stack;
 
-    /** Top of stack */
+    /**
+     * Top of stack
+     */
     protected int tos;
 
     /**
-     * 
      * Constructor; create and initialize stack with default size
      */
     ItemStack(int expectedKind, int maxSize) {
@@ -65,7 +72,9 @@ class ItemStack {
 //        }
 //        return false;
 //    }
-//
+
+    //
+
     /**
      * Grow the stack capacity.
      */
@@ -81,7 +90,7 @@ class ItemStack {
 
     /**
      * Is there room on the stack for a given number of items.
-     * 
+     *
      * @param items
      * @return
      */
@@ -102,10 +111,12 @@ class ItemStack {
 //        }
 //        return (stack[(tos - 1) - offset] == item);
 //    }
-//
+
+    //
+
     /**
      * Is the top of stack equal to the given item
-     * 
+     *
      * @param item
      * @return
      */
@@ -133,8 +144,8 @@ class ItemStack {
                 i--;
 
             throw new StackException("OperandStack[" + tos + "](" + item
-                    + ") is not the expected element (found at " + i + ", "
-                    + this + ")");
+                + ") is not the expected element (found at " + i + ", "
+                + this + ")");
         }
         stack[tos] = null;
     }
@@ -142,7 +153,7 @@ class ItemStack {
     final void push(Item item) {
         if (Vm.VerifyAssertions)
             Vm._assert(item.getKind() == expectedKind,
-                    "item.getKind() == expectedKind");
+                "item.getKind() == expectedKind");
         if (tos == stack.length) {
             grow();
         }
@@ -159,7 +170,7 @@ class ItemStack {
 
     /**
      * Gets the item at the top of the stack.
-     * 
+     *
      * @return
      */
     final Item tos() {

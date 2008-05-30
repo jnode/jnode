@@ -9,15 +9,16 @@ import org.jnode.vm.classmgr.VmMethod;
 
 /**
  * Verifier
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
-        extends DelegatingCompilerBytecodeVisitor<T> {
+    extends DelegatingCompilerBytecodeVisitor<T> {
 
     private VmMethod currentMethod;
     private boolean currentKernelSpace;
     private boolean currentUninterruptible;
-    
+
     /**
      * @param delegate
      */
@@ -37,7 +38,8 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
     }
 
     /**
-     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
+     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor
+     * #visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
      */
     @Override
     public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
@@ -46,7 +48,8 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
     }
 
     /**
-     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
+     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor
+     * #visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
      */
     @Override
     public void visit_invokespecial(VmConstMethodRef methodRef) {
@@ -55,7 +58,8 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
     }
 
     /**
-     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
+     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor
+     * #visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
      */
     @Override
     public void visit_invokestatic(VmConstMethodRef methodRef) {
@@ -64,15 +68,15 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
     }
 
     /**
-     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
+     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor
+     * #visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
      */
     @Override
     public void visit_invokevirtual(VmConstMethodRef methodRef) {
         verifyInvoke(methodRef);
         super.visit_invokevirtual(methodRef);
     }
-    
-    
+
 
     /**
      * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_monitorenter()
@@ -94,29 +98,30 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
 
     /**
      * Verify the invoke of the given method from the current method.
+     *
      * @param methodRef
      */
     protected final void verifyInvoke(VmConstMethodRef methodRef) {
         if (currentKernelSpace || currentUninterruptible) {
             // May only call methods with kernelspace pragma.
             methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
-            
+
             final VmMethod callee = methodRef.getResolvedVmMethod();
             if (currentKernelSpace) {
                 if (!callee.hasKernelSpacePragma()) {
                     // throw new ClassFormatError("Method '" + currentMethod +
                     // "' calls method outside KernelSpace: " + callee);
-                    System.out.println("Method calls method outside KernelSpace:\n\tcaller: " + 
-                            currentMethod.getFullName() + "\n\tcallee: " +
-                            callee.getFullName());
+                    System.out.println("Method calls method outside KernelSpace:\n\tcaller: " +
+                        currentMethod.getFullName() + "\n\tcallee: " +
+                        callee.getFullName());
                 }
             }
             if (currentUninterruptible) {
                 if (!callee.isUninterruptible()) {
-                    if (currentMethod.getDeclaringClass().getName().startsWith("org.jnode.vm.schedule")) { 
-                    // throw new ClassFormatError("Method '" + currentMethod +
-                    // "' calls interruptible method: " + callee);
-                    System.out.println("Method calls interruptible method:\n\tcaller: " + 
+                    if (currentMethod.getDeclaringClass().getName().startsWith("org.jnode.vm.schedule")) {
+                        // throw new ClassFormatError("Method '" + currentMethod +
+                        // "' calls interruptible method: " + callee);
+                        System.out.println("Method calls interruptible method:\n\tcaller: " +
                             currentMethod.getFullName() + "\n\tcallee: " +
                             callee.getFullName());
                     }
@@ -124,7 +129,8 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
             }
             if (callee.isSynchronized()) {
                 //throw new ClassFormatError("Method '" + currentMethod + "' calls synchronized method: " + callee);
-                System.out.println("Method '" + currentMethod.getFullName() + "' calls synchronized method: " + callee.getFullName());
+                System.out.println(
+                    "Method '" + currentMethod.getFullName() + "' calls synchronized method: " + callee.getFullName());
             }
         }
     }

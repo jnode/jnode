@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.bytecode;
 
 /**
@@ -26,10 +26,10 @@ package org.jnode.vm.bytecode;
  */
 public interface BytecodeFlags {
 
-	public static final byte F_START_OF_BASICBLOCK = 0x01;
-	public static final byte F_START_OF_TRYBLOCK = 0x02;
-	public static final byte F_START_OF_TRYBLOCKEND = 0x04;
-	public static final byte F_START_OF_EXCEPTIONHANDLER = 0x08;
-	public static final byte F_START_OF_INSTRUCTION = 0x10;
-	public static final byte F_YIELDPOINT = 0x20;
+    public static final byte F_START_OF_BASICBLOCK = 0x01;
+    public static final byte F_START_OF_TRYBLOCK = 0x02;
+    public static final byte F_START_OF_TRYBLOCKEND = 0x04;
+    public static final byte F_START_OF_EXCEPTIONHANDLER = 0x08;
+    public static final byte F_START_OF_INSTRUCTION = 0x10;
+    public static final byte F_YIELDPOINT = 0x20;
 }

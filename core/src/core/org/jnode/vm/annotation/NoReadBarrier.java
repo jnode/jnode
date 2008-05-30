@@ -18,26 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
 import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * When a methods throws this exception, no read barriers will
  * be called upon array access.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented
 @Retention(CLASS)
 @Target(METHOD)
-@AllowedPackages({"org.mmtk.vm"})
+@AllowedPackages({"org.mmtk.vm" })
 public @interface NoReadBarrier {
 
 }

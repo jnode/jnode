@@ -25,24 +25,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.util.Properties;
-import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Properties;
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.Link;
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.util.BootableHashMap;
-import org.jnode.util.QueueProcessor;
-import org.jnode.util.QueueProcessorThread;
-import org.jnode.vm.*;
+import org.jnode.vm.IOContext;
+import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
+import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmIOContext;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
@@ -52,7 +54,7 @@ import org.jnode.vm.isolate.link.VmDataLink;
 
 /**
  * VM specific implementation of the Isolate class.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
@@ -101,7 +103,7 @@ public final class VmIsolate {
     /**
      * Mapping between internal VmType and per isolate Class instance.
      */
-    private BootableHashMap<VmType< ? >, Class< ? >> classesMap = new BootableHashMap<VmType< ? >, Class< ? >>();
+    private BootableHashMap<VmType<?>, Class<?>> classesMap = new BootableHashMap<VmType<?>, Class<?>>();
 
     /**
      * Isolated Statics table for this isolate
@@ -112,17 +114,17 @@ public final class VmIsolate {
      * System classloader for this isolate
      */
     private ClassLoader systemClassLoader;
-    
+
     /**
      * Links passed to the start of this isolate
      */
     private VmDataLink[] dataLinks;
-    
+
     /**
      * The isolate-specific default IO context
      */
     private final IOContext vmIoContext = new VmIOContext();
-    
+
     /**
      * The isolate-specific switchable IO context
      */
@@ -132,7 +134,7 @@ public final class VmIsolate {
 
     /**
      * Isolate states.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     @SharedStatics
@@ -140,40 +142,44 @@ public final class VmIsolate {
         CREATED, STARTING, STARTED, EXITED, TERMINATED
     }
 
-    public static boolean walkIsolates(ObjectVisitor visitor){
-        for(int i = 0; i < StaticData.isolates.size(); i ++){
+    public static boolean walkIsolates(ObjectVisitor visitor) {
+        for (int i = 0; i < StaticData.isolates.size(); i++) {
             VmIsolate isolate = StaticData.isolates.get(i);
-            if(!isolate.isolatedStaticsTable.walk(visitor))
+            if (!isolate.isolatedStaticsTable.walk(visitor))
                 return false;
         }
         return true;
     }
 
-    public static Iterator<VmIsolatedStatics> staticsIterator(){
+    public static Iterator<VmIsolatedStatics> staticsIterator() {
         ArrayList<VmIsolatedStatics> l = new ArrayList<VmIsolatedStatics>();
         VmIsolatedStatics ist = StaticData.rootIsolate.getIsolatedStaticsTable();
-        if(ist != null)
+        if (ist != null)
             l.add(ist);
 
-        for(VmIsolate is : StaticData.isolates.toArray(new VmIsolate[StaticData.isolates.size()])){
+        for (VmIsolate is : StaticData.isolates.toArray(new VmIsolate[StaticData.isolates.size()])) {
             ist = is.getIsolatedStaticsTable();
-            if(ist != null)
+            if (ist != null)
                 l.add(ist);
         }
-        
+
         return l.iterator();
     }
 
     /**
      * Static data of the VMIsolate class.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     @SharedStatics
     private static final class StaticData {
-        /** The root (aka system) isolate. */
+        /**
+         * The root (aka system) isolate.
+         */
         private static transient VmIsolate rootIsolate;
-        /** Non-root isolates. */
+        /**
+         * Non-root isolates.
+         */
         private static final ArrayList<VmIsolate> isolates = new ArrayList<VmIsolate>();
 
         static final VmIsolate getRoot() {
@@ -186,15 +192,19 @@ public final class VmIsolate {
 
     /**
      * Isolate specific static data
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     private static class IsolatedStaticData {
-        /** The current isolate. */
+        /**
+         * The current isolate.
+         */
         static VmIsolate current;
 
-        /** Types of the arguments of the main(String[]) method */
-        static final Class[] mainTypes = new Class[] { String[].class };
+        /**
+         * Types of the arguments of the main(String[]) method
+         */
+        static final Class[] mainTypes = new Class[]{String[].class};
     }
 
     /**
@@ -216,7 +226,7 @@ public final class VmIsolate {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param isolate
      * @param mainClass
      * @param args
@@ -224,7 +234,7 @@ public final class VmIsolate {
      * @param properties
      */
     public VmIsolate(Isolate isolate, VmStreamBindings bindings,
-            Properties properties, String mainClass, String[] args) {
+                     Properties properties, String mainClass, String[] args) {
         StaticData.isolates.add(this);
         this.initProperties = properties;
         this.isolate = isolate;
@@ -233,8 +243,8 @@ public final class VmIsolate {
         this.bindings = bindings;
         final VmArchitecture arch = Vm.getArch();
         this.isolatedStaticsTable = new VmIsolatedStatics(VmMagic
-                .currentProcessor().getIsolatedStatics(), arch,
-                new Unsafe.UnsafeObjectResolver());
+            .currentProcessor().getIsolatedStatics(), arch,
+            new Unsafe.UnsafeObjectResolver());
         this.creator = currentIsolate();
     }
 
@@ -258,7 +268,7 @@ public final class VmIsolate {
 
     /**
      * Gets the current isolate.
-     * 
+     *
      * @return
      */
     public static VmIsolate currentIsolate() {
@@ -268,7 +278,7 @@ public final class VmIsolate {
         }
         return result;
     }
-    
+
     /**
      * Gets the isolate specific Class for the given type.
      */
@@ -289,7 +299,7 @@ public final class VmIsolate {
 
     /**
      * Gets the isolate object that this object implements.
-     * 
+     *
      * @return
      */
     public final Isolate getIsolate() {
@@ -298,7 +308,7 @@ public final class VmIsolate {
 
     /**
      * Request normal termination of this isolate.
-     * 
+     *
      * @param status
      */
     public final void exit(Isolate isolate, int status) {
@@ -309,16 +319,16 @@ public final class VmIsolate {
 
     /**
      * Force termination of this isolate.
-     * 
+     *
      * @param status
      */
     @SuppressWarnings("deprecation")
     public final void halt(Isolate isolate, int status) {
         testIsolate(isolate);
         switch (state) {
-        case STARTED:
-            threadGroup.stop();
-            break;
+            case STARTED:
+                threadGroup.stop();
+                break;
         }
 
         this.state = State.TERMINATED;
@@ -327,55 +337,55 @@ public final class VmIsolate {
 
     /**
      * Has this isolate reached the exited state.
-     * 
+     *
      * @return
      */
     public final boolean hasExited() {
         switch (state) {
-        case EXITED:
-        case TERMINATED:
-            return true;
-        default:
-            return false;
+            case EXITED:
+            case TERMINATED:
+                return true;
+            default:
+                return false;
         }
     }
 
     /**
      * Has this isolate reached the terminated state.
-     * 
+     *
      * @return
      */
     public final boolean hasTerminated() {
         switch (state) {
-        case TERMINATED:
-            return true;
-        default:
-            return false;
+            case TERMINATED:
+                return true;
+            default:
+                return false;
         }
     }
 
     /**
      * Has this isolate reached the started state.
-     * 
+     *
      * @return
      */
     public final boolean hasStarted() {
         switch (state) {
-        case STARTED:
-        case EXITED:
-        case TERMINATED:
-            return true;
-        default:
-            return false;
+            case STARTED:
+            case EXITED:
+            case TERMINATED:
+                return true;
+            default:
+                return false;
         }
     }
-    
+
     /**
      * Gets the links passed to the start of the current isolate.
      */
     public final static Link[] getLinks() {
         final VmDataLink[] vmLinks = currentIsolate().dataLinks;
-        
+
         if ((vmLinks == null) || (vmLinks.length == 0)) {
             return new Link[0];
         } else {
@@ -390,32 +400,32 @@ public final class VmIsolate {
 
     /**
      * Start this isolate.
-     * 
+     *
      * @param messages
      * @throws IsolateStartupException
      */
     @PrivilegedActionPragma
     public final void start(Isolate isolate, Link[] links)
-            throws IsolateStartupException {
+        throws IsolateStartupException {
         testIsolate(isolate);
         // The creator of this isolate must be the same as the current isolate
         if (creator != currentIsolate()) {
             throw new IllegalStateException(
-                    "Creator is different from current isolate");
+                "Creator is different from current isolate");
         }
 
         synchronized (this) {
             // The state must be CREATED
             if (state != State.CREATED) {
                 throw new IllegalStateException(
-                        "Isolate has already been started");
+                    "Isolate has already been started");
             }
             this.state = State.STARTING;
         }
 
         // Save starter
         this.starter = currentIsolate();
-        
+
         // Save links
         this.dataLinks = null;
         if (links != null) {
@@ -432,7 +442,7 @@ public final class VmIsolate {
 
         // Create a new ThreadGroup
         this.threadGroup = new ThreadGroup(StaticData.getRoot().threadGroup,
-                mainClass);
+            mainClass);
 
         // Find plugin manager
         PluginManager piManager;
@@ -452,12 +462,12 @@ public final class VmIsolate {
             stdin = bindings.createIsolatedIn();
         } catch (IOException ex) {
             throw new IsolateStartupException("Failed to create I/O streams",
-                    ex);
+                ex);
         }
 
         // Create the main thread
         final IsolateThread mainThread = new IsolateThread(threadGroup, this,
-                piManager, stdout, stderr, stdin);
+            piManager, stdout, stderr, stdin);
 
         // Update the state of this isolate.
         this.state = State.STARTED;
@@ -472,7 +482,7 @@ public final class VmIsolate {
     private Thread executorThread;
     */
 
-    public void invokeAndWait(final Runnable task){
+    public void invokeAndWait(final Runnable task) {
         /*
         if(this == StaticData.rootIsolate){
             task.run();
@@ -547,14 +557,14 @@ public final class VmIsolate {
 
             // Set context classloader
             final ClassLoader loader = thread.getPluginManager().getRegistry()
-                    .getPluginsClassLoader();
+                .getPluginsClassLoader();
             Thread.currentThread().setContextClassLoader(loader);
 
             // Fire started events.
             // TODO implement me
 
             // Load the main class
-            final Class< ? > cls = loader.loadClass(mainClass);
+            final Class<?> cls = loader.loadClass(mainClass);
 
             //start executor
             //executorThread = new Thread(new TaskExecutor(), "isolate-executor");
@@ -562,21 +572,21 @@ public final class VmIsolate {
 
             // Find main method
             final Method mainMethod = cls.getMethod("main",
-                    IsolatedStaticData.mainTypes);
+                IsolatedStaticData.mainTypes);
 
             //inherit properties
             AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     Properties sys_porps = System.getProperties();
-                    for( String prop : initProperties.stringPropertyNames()){
+                    for (String prop : initProperties.stringPropertyNames()) {
                         sys_porps.setProperty(prop, initProperties.getProperty(prop));
-                    }                    
+                    }
                     return null;
                 }
             });
 
             // Run main method.
-            mainMethod.invoke(null, new Object[] { args });
+            mainMethod.invoke(null, new Object[]{args});
         } catch (Throwable ex) {
             try {
                 Unsafe.debug(" exception in isolate.run");
@@ -607,7 +617,7 @@ public final class VmIsolate {
 
     /**
      * Gets the root thread group of the current thread.
-     * 
+     *
      * @return
      */
     private static final ThreadGroup getRootThreadGroup() {
@@ -627,6 +637,7 @@ public final class VmIsolate {
 
     /**
      * Gets the classname of the main class.
+     *
      * @return the main class name
      */
     final String getMainClassName() {
@@ -655,15 +666,15 @@ public final class VmIsolate {
         }
     }
 
-	public IOContext getIOContext() {
-		return ioContext;
-	}
+    public IOContext getIOContext() {
+        return ioContext;
+    }
 
-	public void setIOContext(IOContext context) {
-		ioContext = context;
-	}
+    public void setIOContext(IOContext context) {
+        ioContext = context;
+    }
 
-	public void resetIOContext() {
-		ioContext = vmIoContext;
-	}
+    public void resetIOContext() {
+        ioContext = vmIoContext;
+    }
 }

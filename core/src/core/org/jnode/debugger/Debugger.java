@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debugger;
 
 import java.io.PrintStream;
@@ -27,7 +27,6 @@ import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
@@ -42,7 +41,7 @@ import org.jnode.vm.VmSystem;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class Debugger implements SystemTriggerListener, KeyboardListener,
-        PrivilegedAction<Void> {
+    PrivilegedAction<Void> {
 
     private boolean enabled;
 
@@ -90,7 +89,7 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
 
     /**
      * Perform the actual debugger actions.
-     * 
+     *
      * @see java.security.PrivilegedAction#run()
      */
     public Void run() {
@@ -110,19 +109,19 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
 
         if (!event.isConsumed()) {
             switch (event.getKeyChar()) {
-            case 'p':
-                state.print(out);
-                out.println();
-                break;
-            case '.':
-                out.println("State trace:");
-                out.println(state.getStateTrace());
-                out.println();
-                break;
-            case 'h':
-            case '?':
-            case 'H':
-                help(out);
+                case 'p':
+                    state.print(out);
+                    out.println();
+                    break;
+                case '.':
+                    out.println("State trace:");
+                    out.println(state.getStateTrace());
+                    out.println();
+                    break;
+                case 'h':
+                case '?':
+                case 'H':
+                    help(out);
             }
         }
         return null;
@@ -148,10 +147,10 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
             public Object run() {
                 try {
                     final Collection<Device> devs = DeviceUtils
-                            .getDevicesByAPI(KeyboardAPI.class);
+                        .getDevicesByAPI(KeyboardAPI.class);
                     for (Device dev : devs) {
                         final KeyboardAPI api = (KeyboardAPI) dev
-                                .getAPI(KeyboardAPI.class);
+                            .getAPI(KeyboardAPI.class);
                         api.setPreferredListener(l);
                     }
                 } catch (ApiNotFoundException ex) {

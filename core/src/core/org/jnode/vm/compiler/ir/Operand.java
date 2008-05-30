@@ -18,58 +18,59 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 import org.jnode.vm.JvmType;
 
 /**
  * @author Madhu Siddalingaiah
- *
- * An operand of an intermediate operation
- * This could be a constant, local variable, or stack entry
+ *         <p/>
+ *         An operand of an intermediate operation
+ *         This could be a constant, local variable, or stack entry
  */
 public abstract class Operand<T> {
-	/**
-	 * NOTE: these values *must* be less than 16!!
-	 * @see #getAddressingMode() below
-	 */
-	public static final int UNKNOWN = 0;
-	public static final int BYTE = JvmType.BYTE;
-	public static final int SHORT = JvmType.SHORT;
-	public static final int CHAR = JvmType.CHAR;
-	public static final int INT = JvmType.INT;
-	public static final int LONG = JvmType.LONG;
-	public static final int FLOAT = JvmType.FLOAT;
-	public static final int DOUBLE = JvmType.DOUBLE;
-	public static final int REFERENCE = JvmType.REFERENCE;
-	
-	/*
-	 * Addressing mode bits
-	 */
-    private int type;	// One of the above
-	
-	public Operand(int type) {
-		this.type = type;
-	}
-	
-	public int getType() {
-		return type;
-	}
+    /**
+     * NOTE: these values *must* be less than 16!!
+     *
+     * @see #getAddressingMode() below
+     */
+    public static final int UNKNOWN = 0;
+    public static final int BYTE = JvmType.BYTE;
+    public static final int SHORT = JvmType.SHORT;
+    public static final int CHAR = JvmType.CHAR;
+    public static final int INT = JvmType.INT;
+    public static final int LONG = JvmType.LONG;
+    public static final int FLOAT = JvmType.FLOAT;
+    public static final int DOUBLE = JvmType.DOUBLE;
+    public static final int REFERENCE = JvmType.REFERENCE;
 
-	/**
-	 * @param type
-	 */
-	public void setType(int type) {
-		this.type = type;
-	}
+    /*
+      * Addressing mode bits
+      */
+    private int type;    // One of the above
 
-	public abstract Operand<T> simplify();
-	
-	/**
-	 * One of AddressingMode constants defined above
-	 * 
-	 * @return
-	 */
-	public abstract AddressingMode getAddressingMode();
+    public Operand(int type) {
+        this.type = type;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    /**
+     * @param type
+     */
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public abstract Operand<T> simplify();
+
+    /**
+     * One of AddressingMode constants defined above
+     *
+     * @return
+     */
+    public abstract AddressingMode getAddressingMode();
 }

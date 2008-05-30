@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.protocol;
 
 import java.net.URL;
@@ -27,7 +27,6 @@ import java.net.URLStreamHandlerFactory;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
-
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -39,18 +38,19 @@ import org.jnode.system.BootLog;
 
 /**
  * Plugin that installs itself as an URL Handler Factory.
- * 
+ * <p/>
  * This plugin has a "handlers" extension point which should be used
  * to register protocol handlers.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class ProtocolHandlerFactoryPlugin extends Plugin implements
-        URLStreamHandlerFactory, ExtensionPointListener  {
+    URLStreamHandlerFactory, ExtensionPointListener {
 
     private final ExtensionPoint handlersEp;
-    private final HashMap<String, Class<? extends URLStreamHandler>> handlerClasses = new HashMap<String, Class<? extends URLStreamHandler>>();
-    
+    private final HashMap<String, Class<? extends URLStreamHandler>> handlerClasses =
+        new HashMap<String, Class<? extends URLStreamHandler>>();
+
     /**
      * @param descriptor
      */
@@ -91,30 +91,32 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
         final Class<? extends URLStreamHandler> cls = handlerClasses.get(protocol);
         if (cls != null) {
             try {
-                return (URLStreamHandler)cls.newInstance();
+                return (URLStreamHandler) cls.newInstance();
             } catch (InstantiationException ex) {
                 BootLog.error("Cannot instantiate " + cls.getName());
             } catch (IllegalAccessException ex) {
                 BootLog.error("Illegal access to " + cls.getName());
             }
-        } 
+        }
         return null;
     }
 
     /**
-     * @see org.jnode.plugin.ExtensionPointListener#extensionAdded(org.jnode.plugin.ExtensionPoint, org.jnode.plugin.Extension)
+     * @see org.jnode.plugin.ExtensionPointListener#extensionAdded(org.jnode.plugin.ExtensionPoint,
+     * org.jnode.plugin.Extension)
      */
     public void extensionAdded(ExtensionPoint point, Extension extension) {
         reloadHandlers();
     }
-    
+
     /**
-     * @see org.jnode.plugin.ExtensionPointListener#extensionRemoved(org.jnode.plugin.ExtensionPoint, org.jnode.plugin.Extension)
+     * @see org.jnode.plugin.ExtensionPointListener#extensionRemoved(org.jnode.plugin.ExtensionPoint,
+     * org.jnode.plugin.Extension)
      */
     public void extensionRemoved(ExtensionPoint point, Extension extension) {
         reloadHandlers();
     }
-    
+
     private void setHandlerFactory(final URLStreamHandlerFactory factory) {
         AccessController.doPrivileged(new PrivilegedAction() {
 
@@ -124,7 +126,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
             }
         });
     }
-    
+
     private synchronized void reloadHandlers() {
         handlerClasses.clear();
         final Extension[] exts = handlersEp.getExtensions();
@@ -133,7 +135,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
             loadHandlers(exts[i]);
         }
     }
-    
+
     private void loadHandlers(Extension ext) {
         final ConfigurationElement[] elems = ext.getConfigurationElements();
         final int count = elems.length;

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
@@ -40,7 +40,7 @@ public final class VmX86Thread32 extends VmX86Thread {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param stack
      */
     public VmX86Thread32(VmIsolatedStatics isolatedStatics, byte[] stack) {
@@ -49,7 +49,7 @@ public final class VmX86Thread32 extends VmX86Thread {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param javaThread
      */
     public VmX86Thread32(VmIsolatedStatics isolatedStatics, Thread javaThread) {
@@ -58,20 +58,20 @@ public final class VmX86Thread32 extends VmX86Thread {
 
     /**
      * Gets a human readable representation of the system exception state.
-     * 
+     *
      * @return String
      */
     public String getReadableErrorState() {
         return "EAX " + NumberUtils.hex(exEax.toInt()) + " EBX "
-                + NumberUtils.hex(exEbx.toInt()) + " ECX "
-                + NumberUtils.hex(exEcx.toInt()) + " EDX "
-                + NumberUtils.hex(exEdx.toInt()) + " ESI "
-                + NumberUtils.hex(exEsi.toInt()) + " EDI "
-                + NumberUtils.hex(exEdi.toInt()) + " ESP "
-                + NumberUtils.hex(exEsp.toInt()) + " EIP "
-                + NumberUtils.hex(exEip.toInt()) + " CR2 "
-                + NumberUtils.hex(exCr2.toInt()) + " EFLAGS "
-                + NumberUtils.hex(exEflags.toInt());
+            + NumberUtils.hex(exEbx.toInt()) + " ECX "
+            + NumberUtils.hex(exEcx.toInt()) + " EDX "
+            + NumberUtils.hex(exEdx.toInt()) + " ESI "
+            + NumberUtils.hex(exEsi.toInt()) + " EDI "
+            + NumberUtils.hex(exEdi.toInt()) + " ESP "
+            + NumberUtils.hex(exEsp.toInt()) + " EIP "
+            + NumberUtils.hex(exEip.toInt()) + " CR2 "
+            + NumberUtils.hex(exCr2.toInt()) + " EFLAGS "
+            + NumberUtils.hex(exEflags.toInt());
     }
 
     protected final int getReferenceSize() {

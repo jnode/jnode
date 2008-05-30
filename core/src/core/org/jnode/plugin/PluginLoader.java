@@ -18,23 +18,22 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.security.JNodePermission;
 
 
 /**
  * Loader of plugin files.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class PluginLoader {
 
     private static final JNodePermission CREATE_PERM = new JNodePermission("createPluginLoader");
-    
+
     /**
      * Initialize this instance.
      * A JNodePermission("createPluginLoader") is required to execute
@@ -46,9 +45,10 @@ public abstract class PluginLoader {
             sm.checkPermission(CREATE_PERM);
         }
     }
-    
+
     /**
      * Open an inputstream for a plugin with a given id and version.
+     *
      * @param pluginId
      * @param pluginVersion
      * @return The input stream, of null if not found.
@@ -57,11 +57,12 @@ public abstract class PluginLoader {
 
     /**
      * Gets the filename of a plugin with a given id and version.
+     *
      * @param pluginId
      * @param pluginVersion
      * @return the filename of the plugin
      */
     public static String getPluginFileName(String pluginId, String pluginVersion) {
         return pluginId + "_" + pluginVersion + ".jar";
-    }    
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.io.IOException;
@@ -30,9 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
-
 import nanoxml.XMLElement;
-
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.util.BootableHashMap;
@@ -48,10 +46,14 @@ import org.jnode.vm.Vm;
  */
 public class PluginJar implements BootableObject, ResourceLoader {
 
-    /** The descriptor of this file */
+    /**
+     * The descriptor of this file
+     */
     private final PluginDescriptorModel descriptor;
 
-    /** The resources in the jar file */
+    /**
+     * The resources in the jar file
+     */
     private final Map<String, ByteBuffer> resources;
 
     private ByteBuffer buffer;
@@ -62,18 +64,18 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
     /**
      * Initialize this instance
-     * 
+     *
      * @param registry
      * @param pluginUrl
      */
     public PluginJar(PluginRegistryModel registry, URL pluginUrl)
-            throws PluginException, IOException {
+        throws PluginException, IOException {
         this(registry, FileUtils.loadToBuffer(pluginUrl.openStream(), true), null);
     }
 
     /**
      * Initialize this instance
-     * 
+     *
      * @param registry
      * @param pluginIs
      */
@@ -82,7 +84,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
         try {
             //get a reference to the plugin jar data
-            if(Vm.isWritingImage()){
+            if (Vm.isWritingImage()) {
                 //buildtime
                 initBuffer = pluginIs.array();
             } else {
@@ -100,8 +102,10 @@ public class PluginJar implements BootableObject, ResourceLoader {
         try {
             // Not find the plugin.xml
             final ByteBuffer buf = getResourceAsBuffer("plugin.xml");
-            if (buf == null) { throw new PluginException(
-                    "plugin.xml not found in jar file"); }
+            if (buf == null) {
+                throw new PluginException(
+                    "plugin.xml not found in jar file");
+            }
 
             // Now parse plugin.xml
             root = new XMLElement(new Hashtable(), true, false);
@@ -125,13 +129,13 @@ public class PluginJar implements BootableObject, ResourceLoader {
         if (data == null) {
             return null;
         } else {
-            return (ByteBuffer)data.asReadOnlyBuffer().rewind();
+            return (ByteBuffer) data.asReadOnlyBuffer().rewind();
         }
     }
 
     /**
      * Does this jar-file contain the resource with the given name.
-     * 
+     *
      * @param resourceName
      * @return boolean
      */
@@ -141,6 +145,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
     /**
      * Return the names of all resources in this plugin jar.
+     *
      * @return
      */
     public Collection<String> resourceNames() {
@@ -156,7 +161,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
     /**
      * Does this jar-file contain the resource with the given name.
-     * 
+     *
      * @param resourceName
      * @return boolean
      */
@@ -180,7 +185,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
     /**
      * Gets the descriptor of this plugin-jar file.
-     * 
+     *
      * @return Returns the descriptor.
      */
     final PluginDescriptorModel getDescriptorModel() {
@@ -189,7 +194,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
     /**
      * Gets the descriptor of this plugin-jar file.
-     * 
+     *
      * @return Returns the descriptor.
      */
     public final PluginDescriptor getDescriptor() {
@@ -201,14 +206,14 @@ public class PluginJar implements BootableObject, ResourceLoader {
         final JarBuffer jbuf = new JarBuffer(buffer);
         for (Map.Entry<String, ByteBuffer> entry : jbuf.entries().entrySet()) {
             if (entry.getValue().limit() > 0) {
-            map.put(entry.getKey(), entry.getValue());
+                map.put(entry.getKey(), entry.getValue());
             }
         }
         return map;
     }
 
     public ByteBuffer getBuffer() {
-        if(buffer == null){
+        if (buffer == null) {
             //such plugins were added to the bootimage during the build
             buffer = ByteBuffer.wrap(initBuffer);
         }

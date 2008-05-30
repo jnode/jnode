@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.performance;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.jnode.vm.performance.PerformanceCounterEvent;
 import org.jnode.vm.performance.PresetEvent;
 import org.jnode.vm.x86.MSR;
@@ -36,19 +35,21 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 /**
  * Implementation of PerformanceCounters for models that implement performance
  * monitoring counter using 2 MSR's per counter: a select MSR and a counter MSR.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 class DualMSRPerformanceCounters extends X86PerformanceCounters {
 
     /**
      * Event implementation.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static class DualMSREvent extends PerformanceCounterEvent {
 
-        /** Value for the select MSR used to select this event */
+        /**
+         * Value for the select MSR used to select this event
+         */
         private final long selectValue;
 
         /**
@@ -59,7 +60,7 @@ class DualMSRPerformanceCounters extends X86PerformanceCounters {
             this.selectValue = selectValue;
         }
 
-       /**
+        /**
          * @param id
          * @param selectValue
          */
@@ -96,18 +97,18 @@ class DualMSRPerformanceCounters extends X86PerformanceCounters {
      * @param id
      */
     public DualMSRPerformanceCounters(VmX86Processor cpu,
-            int[] selectMSRIndexes, int[] countMSRIndexes, DualMSREvent[] events) {
+                                      int[] selectMSRIndexes, int[] countMSRIndexes, DualMSREvent[] events) {
         super(cpu, selectMSRIndexes.length);
         if (selectMSRIndexes.length != countMSRIndexes.length) {
             throw new IllegalArgumentException(
-                    "selectMSRs and countMSRs have diffent length");
+                "selectMSRs and countMSRs have diffent length");
         }
         this.selectMSRIndexes = selectMSRIndexes;
         this.countMSRIndexes = countMSRIndexes;
         this.events = events;
         this.eventSet = Collections
-                .unmodifiableSet(new TreeSet<PerformanceCounterEvent>(Arrays
-                        .asList(events)));
+            .unmodifiableSet(new TreeSet<PerformanceCounterEvent>(Arrays
+                .asList(events)));
     }
 
     /**
@@ -132,17 +133,17 @@ class DualMSRPerformanceCounters extends X86PerformanceCounters {
     /**
      * @see org.jnode.vm.x86.performance.X86PerformanceCounters#getCounterValues(long[])
      */
-    protected final void getCounterValues(long[] counters, VmX86Thread thread) 
-    throws UninterruptiblePragma {
+    protected final void getCounterValues(long[] counters, VmX86Thread thread)
+        throws UninterruptiblePragma {
         final MSR[] countMSRs = thread.getReadWriteMSRs();
         if (countMSRs == null) {
             throw new IllegalArgumentException("No active counters");
         }
         final int cnt = counters.length;
         if (cnt > countMSRs.length) {
-            throw new IllegalArgumentException("counters array is too long");            
+            throw new IllegalArgumentException("counters array is too long");
         }
-        
+
         // Get the counters
         for (int i = 0; i < cnt; i++) {
             counters[i] = countMSRs[i].getValue();
@@ -150,10 +151,11 @@ class DualMSRPerformanceCounters extends X86PerformanceCounters {
     }
 
     /**
-     * @see org.jnode.vm.x86.performance.X86PerformanceCounters#startCounters(org.jnode.vm.performance.PerformanceCounterEvent[])
+     * @see org.jnode.vm.x86.performance.X86PerformanceCounters
+     * #startCounters(org.jnode.vm.performance.PerformanceCounterEvent[])
      */
     protected final void startCounters(PerformanceCounterEvent[] events,
-            VmX86Thread thread) throws IllegalArgumentException {
+                                       VmX86Thread thread) throws IllegalArgumentException {
         final int cnt = events.length;
         final MSR[] countMSRs = new MSR[cnt];
         final MSR[] selectMSRs = new MSR[cnt];

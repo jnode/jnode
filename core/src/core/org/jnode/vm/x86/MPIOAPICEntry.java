@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.system.MemoryResource;
@@ -39,7 +39,7 @@ class MPIOAPICEntry extends MPEntry {
     MPIOAPICEntry(MemoryResource mem) {
         super(mem);
     }
-    
+
     public int getApicID() {
         return mem.getByte(1) & 0xFF;
     }
@@ -51,22 +51,22 @@ class MPIOAPICEntry extends MPEntry {
     public int getFlags() {
         return mem.getByte(3) & 0xFF;
     }
-    
+
     public Address getAddress() {
         return Address.fromIntZeroExtend(mem.getInt(4));
     }
-    
-    
+
+
     /**
      * @see org.jnode.vm.x86.MPEntry#toString()
      */
     public String toString() {
         return super.toString() + " ID 0x" + NumberUtils.hex(getApicID(), 2) +
-        	", version " + getApicVersion() +
-        	", flags 0x" + NumberUtils.hex(getFlags(), 2) +
-        	", addr 0x" + NumberUtils.hex(getAddress().toInt());
+            ", version " + getApicVersion() +
+            ", flags 0x" + NumberUtils.hex(getFlags(), 2) +
+            ", addr 0x" + NumberUtils.hex(getAddress().toInt());
     }
-    
+
     /**
      * @see org.jnode.vm.x86.MPEntry#getEntryTypeName()
      */

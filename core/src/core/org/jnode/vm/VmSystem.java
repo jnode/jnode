@@ -28,9 +28,7 @@ import java.io.PrintStream;
 import java.nio.ByteOrder;
 import java.util.Locale;
 import java.util.Properties;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -63,13 +61,12 @@ import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
-import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
-import sun.reflect.annotation.AnnotationType;
 import sun.nio.ch.Interruptible;
+import sun.reflect.annotation.AnnotationType;
 
 /**
  * System support for the Virtual Machine
@@ -127,7 +124,7 @@ public final class VmSystem {
 
             /* Initialize the system classloader */
             VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor
-                    .current()).getLoader());
+                .current()).getLoader());
             systemLoader = loader;
             loader.initialize();
 
@@ -170,7 +167,7 @@ public final class VmSystem {
             // Initialize log4j
             final Logger root = Logger.getRootLogger();
             final ConsoleAppender infoApp = new ConsoleAppender(
-                    new PatternLayout(LAYOUT));
+                new PatternLayout(LAYOUT));
             root.addAppender(infoApp);
 
             initOpenJDKSpeciffics();
@@ -179,24 +176,28 @@ public final class VmSystem {
 
     private static void initOpenJDKSpeciffics() {
         //todo this will be moved to java.lang.System during openjdk integration
-        sun.misc.SharedSecrets.setJavaLangAccess(new sun.misc.JavaLangAccess(){
+        sun.misc.SharedSecrets.setJavaLangAccess(new sun.misc.JavaLangAccess() {
             public sun.reflect.ConstantPool getConstantPool(Class klass) {
                 //return klass.getConstantPool();
                 throw new UnsupportedOperationException();
             }
+
             public void setAnnotationType(Class klass, AnnotationType type) {
                 //klass.setAnnotationType(type);
                 throw new UnsupportedOperationException();
             }
+
             public AnnotationType getAnnotationType(Class klass) {
                 //return klass.getAnnotationType();
                 throw new UnsupportedOperationException();
             }
+
             public <E extends Enum<E>>
-		    E[] getEnumConstantsShared(Class<E> klass) {
+            E[] getEnumConstantsShared(Class<E> klass) {
                 //return klass.getEnumConstantsShared();
                 return klass.getEnumConstants();
             }
+
             public void blockedOn(Thread t, Interruptible b) {
                 //t.blockedOn(b);
                 throw new UnsupportedOperationException();
@@ -215,20 +216,18 @@ public final class VmSystem {
      */
     public static PrintStream getSystemOut() {
 
-		if (bootOut == null) {
-			bootOut = new SystemOutputStream();
-			bootOutStream = new PrintStream(bootOut, true);
-        	IOContext ioContext = getIOContext();
-    		ioContext.setGlobalOutStream(bootOutStream);
-    		ioContext.setGlobalErrStream(bootOutStream);
+        if (bootOut == null) {
+            bootOut = new SystemOutputStream();
+            bootOutStream = new PrintStream(bootOut, true);
+            IOContext ioContext = getIOContext();
+            ioContext.setGlobalOutStream(bootOutStream);
+            ioContext.setGlobalErrStream(bootOutStream);
             return bootOutStream;
-		}
-		else if (VmIsolate.isRoot()) {
+        } else if (VmIsolate.isRoot()) {
             return bootOutStream;
-    	}
-    	else {
-    		return VmIsolate.currentIsolate().getIOContext().getGlobalOutStream();
-    	}
+        } else {
+            return VmIsolate.currentIsolate().getIOContext().getGlobalOutStream();
+        }
     }
 
     /**
@@ -251,7 +250,7 @@ public final class VmSystem {
             try {
                 final ResourceOwner owner = new SimpleResourceOwner("System");
                 return rm.claimMemoryResource(owner, start, size,
-                        ResourceManager.MEMMODE_NORMAL);
+                    ResourceManager.MEMMODE_NORMAL);
             } catch (ResourceNotFreeException ex) {
                 BootLog.error("Cannot claim initjar resource", ex);
                 return null;
@@ -265,6 +264,7 @@ public final class VmSystem {
 
     /**
      * This method adds some default system properties
+     *
      * @param res
      */
     public static void insertSystemProperties(Properties res) {
@@ -328,12 +328,13 @@ public final class VmSystem {
         //internal classpath for javac
         res.put("sun.boot.class.path", ":");
 
-        res.put("swing.handleTopLevelPaint", "false");        
+        res.put("swing.handleTopLevelPaint", "false");
 
     }
 
     /**
      * Returns the commandline appended to the kernel by the bootloader (e.g. grub)
+     *
      * @return the commandline appended to the kernel
      */
     public static String getCmdLine() {
@@ -353,12 +354,11 @@ public final class VmSystem {
      * @return String
      */
     public static String getBootLog() {
-    	if (bootOut != null) {
+        if (bootOut != null) {
             return bootOut.getData();
-    	}
-    	else {
-    		return "";
-    	}
+        } else {
+            return "";
+        }
     }
 
     // ------------------------------------------
@@ -371,7 +371,7 @@ public final class VmSystem {
      * @param obj
      * @return The class
      */
-    public static Class< ? > getClass(Object obj) {
+    public static Class<?> getClass(Object obj) {
         return getVmClass(obj).asClass();
     }
 
@@ -381,7 +381,7 @@ public final class VmSystem {
      * @param obj
      * @return VmClass
      */
-    public static VmType< ? > getVmClass(Object obj) {
+    public static VmType<?> getVmClass(Object obj) {
         if (obj == null) {
             throw new NullPointerException();
         } else {
@@ -431,7 +431,7 @@ public final class VmSystem {
      */
     protected static VmClassLoader getContextClassLoader() {
         final VmStackReader reader = VmProcessor.current().getArchitecture()
-                .getStackReader();
+            .getStackReader();
         final VmSystemClassLoader systemLoader = VmSystem.systemLoader;
         Address f = VmMagic.getCurrentFrame();
         while (reader.isValid(f)) {
@@ -457,9 +457,9 @@ public final class VmSystem {
      */
     public static Class[] getClassContext() {
         final VmStackReader reader = VmProcessor.current().getArchitecture()
-                .getStackReader();
+            .getStackReader();
         final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
-                .getCurrentFrame(), null, VmThread.STACKTRACE_LIMIT);
+            .getCurrentFrame(), null, VmThread.STACKTRACE_LIMIT);
         final int count = stack.length;
         final Class[] result = new Class[count];
 
@@ -478,18 +478,18 @@ public final class VmSystem {
      */
     public static Class[] getRealClassContext() {
         final VmStackReader reader = VmProcessor.current().getArchitecture()
-                .getStackReader();
+            .getStackReader();
         final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
-                .getCurrentFrame(), null, VmThread.STACKTRACE_LIMIT);
+            .getCurrentFrame(), null, VmThread.STACKTRACE_LIMIT);
         final int count = stack.length;
         final Class[] result = new Class[count];
         int real_count = 0;
         for (int i = 0; i < count; i++) {
             VmMethod method = stack[i].getMethod();
             VmType<?> clazz = method.getDeclaringClass();
-            if((method.getName().equals("invoke") && (
-                    clazz.getName().equals("java.lang.reflect.Method") ||
-                            clazz.getName().equals("org.jnode.vm.VmReflection"))))
+            if ((method.getName().equals("invoke") && (
+                clazz.getName().equals("java.lang.reflect.Method") ||
+                    clazz.getName().equals("org.jnode.vm.VmReflection"))))
                 continue;
 
             result[real_count++] = clazz.asClass();
@@ -512,12 +512,12 @@ public final class VmSystem {
     public static final Object allocStack(int size) {
         try {
             return Vm.getHeapManager()
-                    .newInstance(
-                            systemLoader.loadClass(
-                                    "org.jnode.vm.VmSystemObject", true), size);
+                .newInstance(
+                    systemLoader.loadClass(
+                        "org.jnode.vm.VmSystemObject", true), size);
         } catch (ClassNotFoundException ex) {
             throw (NoClassDefFoundError) new NoClassDefFoundError()
-                    .initCause(ex);
+                .initCause(ex);
         }
     }
 
@@ -532,7 +532,7 @@ public final class VmSystem {
      */
     @PrivilegedActionPragma
     public static Address findThrowableHandler(Throwable ex, Address frame,
-            Address address) {
+                                               Address address) {
 
         try {
             debug++;
@@ -547,7 +547,7 @@ public final class VmSystem {
             }
             final VmProcessor proc = VmProcessor.current();
             final VmStackReader reader = proc.getArchitecture()
-                    .getStackReader();
+                .getStackReader();
 
             final VmType exClass = VmMagic.getObjectType(ex);
             final VmMethod method = reader.getMethod(frame);
@@ -591,15 +591,15 @@ public final class VmSystem {
                             SoftByteCodes.resolveClass(catchType);
                         }
                         final VmType handlerClass = catchType
-                                .getResolvedVmClass();
+                            .getResolvedVmClass();
                         if (handlerClass != null) {
                             if (handlerClass.isAssignableFrom(exClass)) {
                                 return Address.fromAddress(ceh.getHandler());
                             }
                         } else {
                             System.err
-                                    .println("Warning: handler class==null in "
-                                            + method.getName());
+                                .println("Warning: handler class==null in "
+                                    + method.getName());
                         }
                     }
                 }
@@ -629,6 +629,7 @@ public final class VmSystem {
 
     /**
      * Copy one array to another. This is the implementation for System.arraycopy in JNode
+     *
      * @param src
      * @param srcPos
      * @param dst
@@ -637,9 +638,9 @@ public final class VmSystem {
      */
     @PrivilegedActionPragma
     public static void arrayCopy(Object src, int srcPos, Object dst,
-            int dstPos, int length) {
-        Class< ? > src_class = src.getClass();
-        Class< ? > dst_class = dst.getClass();
+                                 int dstPos, int length) {
+        Class<?> src_class = src.getClass();
+        Class<?> dst_class = dst.getClass();
 
         if (!src_class.isArray()) {
             // Unsafe.debug('!');
@@ -669,7 +670,8 @@ public final class VmSystem {
             // Unsafe.debug("invalid array types:");
             // Unsafe.debug(src_class.getName());
             // Unsafe.debug(dst_class.getName());
-            throw new ArrayStoreException("Incompatible array types: " + src_class.getName() + ", " + dst_class.getName());
+            throw new ArrayStoreException(
+                "Incompatible array types: " + src_class.getName() + ", " + dst_class.getName());
         }
 
         if (srcPos < 0) {
@@ -683,9 +685,9 @@ public final class VmSystem {
         }
 
         final int slotSize = VmProcessor.current().getArchitecture()
-                .getReferenceSize();
+            .getReferenceSize();
         final Offset lengthOffset = Offset
-                .fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize);
+            .fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize);
         final int dataOffset = VmArray.DATA_OFFSET * slotSize;
 
         final Address srcAddr = ObjectReference.fromObject(src).toAddress();
@@ -700,7 +702,7 @@ public final class VmSystem {
 
         if ((srcEnd > srcLen) || (srcEnd < 0)) {
             throw new IndexOutOfBoundsException("srcPos+length > src.length ("
-                    + srcPos + "+" + length + " > " + srcLen + ")");
+                + srcPos + "+" + length + " > " + srcLen + ")");
         }
         if ((dstEnd > dstLen) || (dstEnd < 0)) {
             throw new IndexOutOfBoundsException("dstPos+length > dst.length");
@@ -709,44 +711,44 @@ public final class VmSystem {
         final int elemsize;
         final boolean isObjectArray;
         switch (src_type) {
-        case 'Z':
-            // Boolean
-        case 'B':
-            // Byte
-            elemsize = 1;
-            isObjectArray = false;
-            break;
-        case 'C':
-            // Character
-        case 'S':
-            // Short
-            elemsize = 2;
-            isObjectArray = false;
-            break;
-        case 'I':
-            // Integer
-        case 'F':
-            // Float
-            elemsize = 4;
-            isObjectArray = false;
-            break;
-        case 'L':
-            // Object
-            elemsize = slotSize;
-            isObjectArray = true;
-            break;
-        case 'J':
-            // Long
-        case 'D':
-            // Double
-            elemsize = 8;
-            isObjectArray = false;
-            break;
-        default:
-            // Unsafe.debug("uat:");
-            // Unsafe.debug(src_type);
-            // Unsafe.debug(src_name);
-            throw new ArrayStoreException("Unknown array type");
+            case 'Z':
+                // Boolean
+            case 'B':
+                // Byte
+                elemsize = 1;
+                isObjectArray = false;
+                break;
+            case 'C':
+                // Character
+            case 'S':
+                // Short
+                elemsize = 2;
+                isObjectArray = false;
+                break;
+            case 'I':
+                // Integer
+            case 'F':
+                // Float
+                elemsize = 4;
+                isObjectArray = false;
+                break;
+            case 'L':
+                // Object
+                elemsize = slotSize;
+                isObjectArray = true;
+                break;
+            case 'J':
+                // Long
+            case 'D':
+                // Double
+                elemsize = 8;
+                isObjectArray = false;
+                break;
+            default:
+                // Unsafe.debug("uat:");
+                // Unsafe.debug(src_type);
+                // Unsafe.debug(src_name);
+                throw new ArrayStoreException("Unknown array type");
         }
 
         final Address srcPtr = srcAddr.add(dataOffset + (srcPos * elemsize));
@@ -771,10 +773,10 @@ public final class VmSystem {
      * milliseconds. See the description of the class Date for a discussion of
      * slight discrepancies that may arise between "computer time" and
      * coordinated universal time (UTC).
-     * 
+     * <p/>
      * This method does call other methods and CANNOT be used in the low-level
      * system environment, where synchronization cannot be used. *
-     * 
+     *
      * @return the difference, measured in milliseconds, between the current
      *         time and midnight, January 1, 1970 UTC
      */
@@ -802,54 +804,54 @@ public final class VmSystem {
     }
 
     /**
-   * <p>
-   * Returns the current value of a nanosecond-precise system timer.
-   * The value of the timer is an offset relative to some arbitrary fixed
-   * time, which may be in the future (making the value negative).  This
-   * method is useful for timing events where nanosecond precision is
-   * required.  This is achieved by calling this method before and after the
-   * event, and taking the difference betweent the two times:
-   * </p>
-   * <p>
-   * <code>long startTime = System.nanoTime();</code><br />
-   * <code>... <emph>event code</emph> ...</code><br />
-   * <code>long endTime = System.nanoTime();</code><br />
-   * <code>long duration = endTime - startTime;</code><br />
-   * </p>
-   * <p>
-   * Note that the value is only nanosecond-precise, and not accurate; there
-   * is no guarantee that the difference between two values is really a
-   * nanosecond.  Also, the value is prone to overflow if the offset
-   * exceeds 2^63.
-   * </p>
-   *
-   * @return the time of a system timer in nanoseconds.
-   * @since 1.5
-   */
-    public static long nanoTime(){
-	if (mhz == -1) {
-	    long start = Unsafe.getCpuCycles();
-	    try {
-		Thread.sleep(1000);
-	    } catch (Exception e) {
-		// set some "random" value
-		mhz = 1000;
-	    }
-	    long end = Unsafe.getCpuCycles();
-	    mhz = end - start;
-	    mhz = mhz / 1000000;
-	}
-	return Unsafe.getCpuCycles() / mhz;
+     * <p>
+     * Returns the current value of a nanosecond-precise system timer.
+     * The value of the timer is an offset relative to some arbitrary fixed
+     * time, which may be in the future (making the value negative).  This
+     * method is useful for timing events where nanosecond precision is
+     * required.  This is achieved by calling this method before and after the
+     * event, and taking the difference betweent the two times:
+     * </p>
+     * <p>
+     * <code>long startTime = System.nanoTime();</code><br />
+     * <code>... <emph>event code</emph> ...</code><br />
+     * <code>long endTime = System.nanoTime();</code><br />
+     * <code>long duration = endTime - startTime;</code><br />
+     * </p>
+     * <p>
+     * Note that the value is only nanosecond-precise, and not accurate; there
+     * is no guarantee that the difference between two values is really a
+     * nanosecond.  Also, the value is prone to overflow if the offset
+     * exceeds 2^63.
+     * </p>
+     *
+     * @return the time of a system timer in nanoseconds.
+     * @since 1.5
+     */
+    public static long nanoTime() {
+        if (mhz == -1) {
+            long start = Unsafe.getCpuCycles();
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                // set some "random" value
+                mhz = 1000;
+            }
+            long end = Unsafe.getCpuCycles();
+            mhz = end - start;
+            mhz = mhz / 1000000;
+        }
+        return Unsafe.getCpuCycles() / mhz;
     }
 
     /**
      * Returns the number of milliseconds since booting the kernel of JNode.
-     * 
+     * <p/>
      * This method does not call any other method and CAN be used in the
      * low-level system environment, where synchronization cannot be used.
-     * 
+     *
      * @return The current time of the kernel
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @KernelSpace
     @Uninterruptible
@@ -866,6 +868,7 @@ public final class VmSystem {
 
     /**
      * Returns the free memory in system ram
+     *
      * @return free memory in system ram
      */
     public static long freeMemory() {
@@ -874,6 +877,7 @@ public final class VmSystem {
 
     /**
      * Returns the total amount of system memory
+     *
      * @return the total amount of system memory
      */
     public static long totalMemory() {
@@ -902,6 +906,7 @@ public final class VmSystem {
 
         /**
          * Returns the data written to the system output stream
+         *
          * @return data written to the system output stream
          */
         public String getData() {
@@ -910,8 +915,7 @@ public final class VmSystem {
     }
 
     /**
-     * @param rtcService
-     *            The rtcService to set.
+     * @param rtcService The rtcService to set.
      */
     public static final void setRtcService(RTCService rtcService) {
         if (VmSystem.rtcService == null) {
@@ -920,8 +924,7 @@ public final class VmSystem {
     }
 
     /**
-     * @param rtcService
-     *            The rtcService previously set.
+     * @param rtcService The rtcService previously set.
      */
     public static final void resetRtcService(RTCService rtcService) {
         if (VmSystem.rtcService == rtcService) {
@@ -945,7 +948,7 @@ public final class VmSystem {
 
     /**
      * Calculate the speed of the current processor.
-     * 
+     *
      * @return the speed of the current processor in "JNodeMips"
      */
     @Uninterruptible
@@ -965,7 +968,8 @@ public final class VmSystem {
 
     /**
      * Is the system shutting down.
-     * @return if the system is shutting down 
+     *
+     * @return if the system is shutting down
      */
     public static boolean isShuttingDown() {
         return inShutdown;
@@ -973,6 +977,7 @@ public final class VmSystem {
 
     /**
      * Gets the system exit code.
+     *
      * @return the system exit code
      */
     public static int getExitCode() {
@@ -981,7 +986,7 @@ public final class VmSystem {
 
     /**
      * Halt the system. This method requires a JNodePermission("halt").
-     * 
+     *
      * @param reset
      */
     @PrivilegedActionPragma
@@ -994,7 +999,7 @@ public final class VmSystem {
         inShutdown = true;
         try {
             final PluginManager pm = (PluginManager) InitialNaming
-                    .lookup(PluginManager.NAME);
+                .lookup(PluginManager.NAME);
             pm.stopPlugins();
         } catch (NameNotFoundException ex) {
             System.err.println("Cannot find ServiceManager");
@@ -1003,52 +1008,52 @@ public final class VmSystem {
 
     /**
      * Set the effective System.in to a different InputStream.  The actual behavior depends
-     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream, 
-     * to the new stream, depending on whether the current thread is a ProcletContext or not.  
+     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream,
+     * to the new stream, depending on whether the current thread is a ProcletContext or not.
      * Otherwise, we update the System.in field.
-     * 
+     *
      * @param in the new InputStream
      * @see #setIn(InputStream)
      */
     @PrivilegedActionPragma
     public static void setIn(InputStream in) {
-    	getIOContext().setSystemIn(in);
+        getIOContext().setSystemIn(in);
     }
 
     /**
      * Set the effective System.out to a different PrintStream.  The actual behavior depends
-     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream, 
-     * to the new stream, depending on whether the current thread is a ProcletContext or not.  
+     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream,
+     * to the new stream, depending on whether the current thread is a ProcletContext or not.
      * Otherwise, we update the System.out field.
-     * 
+     *
      * @param out the new PrintStream
      * @see java.lang.System#setOut(PrintStream)
      */
     @PrivilegedActionPragma
     public static void setOut(PrintStream out) {
-    	getIOContext().setSystemOut(out);
+        getIOContext().setSystemOut(out);
     }
 
     /**
      * Set the effective System.err to a different PrintStream.  The actual behavior depends
-     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream, 
-     * to the new stream, depending on whether the current thread is a ProcletContext or not.  
+     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream,
+     * to the new stream, depending on whether the current thread is a ProcletContext or not.
      * Otherwise, we update the System.err field.
-     * 
+     *
      * @param err the new PrintStream
      * @see java.lang.System#setErr(PrintStream)
      */
     @PrivilegedActionPragma
     public static void setErr(PrintStream err) {
-    	getIOContext().setSystemErr(err);
+        getIOContext().setSystemErr(err);
     }
 
     //todo protect this method from arbitrary access
     @PrivilegedActionPragma
-    public static void setStaticField(Class< ? > clazz, String fieldName,
-            Object value) {
+    public static void setStaticField(Class<?> clazz, String fieldName,
+                                      Object value) {
         final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
-                fieldName);
+            fieldName);
         final Object staticsTable;
         final Offset offset;
         if (f.isShared()) {
@@ -1063,12 +1068,12 @@ public final class VmSystem {
     }
 
     //io context related
-    
+
     public static IOContext getIOContext() {
-    	return VmIsolate.currentIsolate().getIOContext();
+        return VmIsolate.currentIsolate().getIOContext();
     }
 
-    public static boolean hasVmIOContext(){
+    public static boolean hasVmIOContext() {
         return getIOContext() instanceof VmIOContext;
     }
 
@@ -1079,8 +1084,8 @@ public final class VmSystem {
      * @return the global 'err' stream.
      */
     public static PrintStream getGlobalErrStream() {
-		return getIOContext().getGlobalErrStream();
-	}
+        return getIOContext().getGlobalErrStream();
+    }
 
     /**
      * Get the current global (i.e. non-ProcletContext) flavor of System.in.
@@ -1088,8 +1093,8 @@ public final class VmSystem {
      * @return the global 'in' stream.
      */
     public static InputStream getGlobalInStream() {
-		return getIOContext().getGlobalInStream();
-	}
+        return getIOContext().getGlobalInStream();
+    }
 
     /**
      * Get the current global (i.e. non-ProcletContext) flavor of System.out.
@@ -1097,16 +1102,16 @@ public final class VmSystem {
      * @return the global 'out' stream.
      */
     public static PrintStream getGlobalOutStream() {
-		return getIOContext().getGlobalOutStream();
-	}
+        return getIOContext().getGlobalOutStream();
+    }
 
     /**
      * Switch the current Isolate from the initial IOContext to an external one.
      * If the Isolate already has an external IOContext, this is a no-op.
-     * 
-     * @param context 
+     *
+     * @param context
      */
-    public static synchronized void switchToExternalIOContext(IOContext context){
+    public static synchronized void switchToExternalIOContext(IOContext context) {
         if (hasVmIOContext()) {
             getIOContext().exitContext();
             VmIsolate.currentIsolate().setIOContext(context);
@@ -1117,13 +1122,13 @@ public final class VmSystem {
     /**
      * Reset to the current Isolate to its initial IOContext.
      */
-    public static synchronized void resetIOContext(){
-        if (!hasVmIOContext()){
+    public static synchronized void resetIOContext() {
+        if (!hasVmIOContext()) {
             getIOContext().exitContext();
             VmIsolate.currentIsolate().resetIOContext();
             getIOContext().enterContext();
         } else {
-    		throw new RuntimeException("IO Context cannot be reset");
-    	}
+            throw new RuntimeException("IO Context cannot be reset");
+        }
     }
 }

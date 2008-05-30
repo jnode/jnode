@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -30,7 +30,7 @@ import org.vmmagic.pragma.Uninterruptible;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 final class HeapStatisticsVisitor extends ObjectVisitor implements
-        Uninterruptible {
+    Uninterruptible {
 
     private final DefHeapStatistics heapStatistics;
 
@@ -40,7 +40,7 @@ final class HeapStatisticsVisitor extends ObjectVisitor implements
 
     /**
      * Count the visited object.
-     * 
+     *
      * @param object
      * @return boolean
      */
@@ -48,9 +48,9 @@ final class HeapStatisticsVisitor extends ObjectVisitor implements
     public final boolean visit(Object object) {
         int size = 0;
         if (!heapStatistics.contains(object.getClass().getName())) {
-            final VmType< ? > type = object.getClass().getVmClass();
-            size = (type instanceof VmNormalClass ? ((VmNormalClass< ? >) type)
-                    .getObjectSize() : 0);
+            final VmType<?> type = object.getClass().getVmClass();
+            size = (type instanceof VmNormalClass ? ((VmNormalClass<?>) type)
+                .getObjectSize() : 0);
         }
 
         heapStatistics.add(object.getClass().getName(), size);

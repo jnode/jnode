@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.security;
 
 import java.security.Policy;
-
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
@@ -35,9 +34,13 @@ import org.jnode.plugin.PluginException;
  */
 public class SecurityPlugin extends Plugin implements ExtensionPointListener {
 
-    /** The permissions extension point */
+    /**
+     * The permissions extension point
+     */
     private final ExtensionPoint permissionsEp;
-    /** The security policy */
+    /**
+     * The security policy
+     */
     private final JNodePolicy policy;
 
     /**

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system.event;
 
 /**
@@ -26,61 +26,64 @@ package org.jnode.system.event;
  */
 public class SystemEvent {
 
-	protected final int id;
-	private final long time;
-	private boolean consumed;
+    protected final int id;
+    private final long time;
+    private boolean consumed;
 
-	/**
-	 * Create a new system event
-	 * @param id
-	 * @param time
-	 */	
-	public SystemEvent(int id, long time) {
-		this.id = id;
-		this.time = time;
-	}
-	
-	/**
-	 * Create a new system event
-	 */
-	public SystemEvent() {
-		this(-1, System.currentTimeMillis());
-	}
-	
-	/**
-	 * Create a new system event
-	 * @param id
-	 */
-	public SystemEvent(int id) {
-		this(id, System.currentTimeMillis());
-	}
-	
-	/**
-	 * @return int
-	 */
-	final public int getId() {
-		return id;
-	}
+    /**
+     * Create a new system event
+     *
+     * @param id
+     * @param time
+     */
+    public SystemEvent(int id, long time) {
+        this.id = id;
+        this.time = time;
+    }
 
-	/**
-	 * @return long
-	 */
+    /**
+     * Create a new system event
+     */
+    public SystemEvent() {
+        this(-1, System.currentTimeMillis());
+    }
+
+    /**
+     * Create a new system event
+     *
+     * @param id
+     */
+    public SystemEvent(int id) {
+        this(id, System.currentTimeMillis());
+    }
+
+    /**
+     * @return int
+     */
+    final public int getId() {
+        return id;
+    }
+
+    /**
+     * @return long
+     */
     final public long getTime() {
-		return time;
-	}
-	
-	/**
-	 * Mark this event as being consumed.
-	 */
+        return time;
+    }
+
+    /**
+     * Mark this event as being consumed.
+     */
     final public void consume() {
-		consumed = true;
-	}
-	
-	/**
-	 * Has this event been consumed.
-	 * @return boolean
-	 */
+        consumed = true;
+    }
+
+    /**
+     * Has this event been consumed.
+     *
+     * @return boolean
+     */
     final public boolean isConsumed() {
-		return consumed;
-	}
+        return consumed;
+    }
 }

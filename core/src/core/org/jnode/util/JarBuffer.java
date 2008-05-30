@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import java.io.FileInputStream;
@@ -46,7 +46,7 @@ public class JarBuffer implements JarConstants {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param buffer
      * @throws IOException
      * @throws ZipException
@@ -59,7 +59,7 @@ public class JarBuffer implements JarConstants {
 
     /**
      * Gets a map of jar entries.
-     * 
+     *
      * @return A map between the name and the data of each entry.
      */
     public Map<String, ByteBuffer> entries() {
@@ -76,7 +76,7 @@ public class JarBuffer implements JarConstants {
 
     @SuppressWarnings("deprecation")
     private Map<String, ByteBuffer> readEntries() throws ZipException,
-            IOException {
+        IOException {
 
         // Start at the beginning
         buffer.rewind();
@@ -95,7 +95,7 @@ public class JarBuffer implements JarConstants {
         }
         if (pos < 0) {
             throw new ZipException(
-                    "central directory not found, probably not a zip file");
+                "central directory not found, probably not a zip file");
         }
 
         final int count = buffer.getShort(pos + ENDTOT);
@@ -104,7 +104,7 @@ public class JarBuffer implements JarConstants {
 //        System.out.println("centralOffset=" + centralOffset);
 
         HashMap<String, ByteBuffer> entries = new HashMap<String, ByteBuffer>(
-                count + count / 2);
+            count + count / 2);
         buffer.position(centralOffset);
 
         byte[] strBuf = new byte[16];
@@ -114,7 +114,7 @@ public class JarBuffer implements JarConstants {
 
             if (buffer.getInt(pos + 0) != CENSIG) {
                 throw new ZipException("Wrong Central Directory signature "
-                        + NumberUtils.hex(buffer.getInt(pos + 0)));
+                    + NumberUtils.hex(buffer.getInt(pos + 0)));
             }
 
             int method = buffer.getShort(pos + CENHOW);
@@ -154,7 +154,7 @@ public class JarBuffer implements JarConstants {
     }
 
     private int checkLocalHeader(ByteBuffer buffer, int offset, int method)
-            throws IOException {
+        throws IOException {
 
         if (buffer.getInt(offset + 0) != LOCSIG) {
             throw new ZipException("Wrong Local header signature");
@@ -179,7 +179,7 @@ public class JarBuffer implements JarConstants {
     }
 
     public static void main(String[] args) throws SecurityException,
-            IOException {
+        IOException {
         FileChannel ch = new FileInputStream(args[0]).getChannel();
         ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
         JarBuffer jb = new JarBuffer(buf);
@@ -188,7 +188,7 @@ public class JarBuffer implements JarConstants {
             final ByteBuffer ebuf = entry.getValue();
             if (ebuf.limit() > 0) {
                 System.out.println(entry.getKey() + " " + ebuf.limit() + " 0x"
-                        + NumberUtils.hex(ebuf.getInt(0)));
+                    + NumberUtils.hex(ebuf.getInt(0)));
             }
         }
     }

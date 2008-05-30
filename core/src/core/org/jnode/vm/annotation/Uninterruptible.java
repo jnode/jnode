@@ -18,26 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
+import java.lang.annotation.Documented;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
-import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * Annotation used to inform the compiler not to inline yield points.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented
 @Retention(CLASS)
-@Target({CONSTRUCTOR, METHOD, TYPE})
+@Target({CONSTRUCTOR, METHOD, TYPE })
 public @interface Uninterruptible {
 
 }

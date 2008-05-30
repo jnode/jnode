@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.security;
 
 import gnu.java.security.PolicyFile;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -36,7 +35,6 @@ import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -44,15 +42,19 @@ import org.jnode.system.BootLog;
 
 /**
  * Default policy implementation for JNode.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class JNodePolicy extends Policy {
 
-    /** The permissions extension point */
+    /**
+     * The permissions extension point
+     */
     private final ExtensionPoint permissionsEp;
 
-    /** The configured policies */
+    /**
+     * The configured policies
+     */
     private final PolicyFile policyFile;
 
     /**
@@ -66,7 +68,7 @@ final class JNodePolicy extends Policy {
      */
     public JNodePolicy(ExtensionPoint permissionsEp) {
         this.policyFile = new PolicyFile(ClassLoader
-                .getSystemResource("/org/jnode/security/jnode.policy"));
+            .getSystemResource("/org/jnode/security/jnode.policy"));
         this.codeSource2Permissions = new HashMap<CodeSource, PermissionCollection>();
         this.permissionsEp = permissionsEp;
         loadExtensions();
@@ -74,7 +76,7 @@ final class JNodePolicy extends Policy {
 
     /**
      * Gets the permissions for a given code source.
-     * 
+     *
      * @see java.security.Policy#getPermissions(java.security.CodeSource)
      */
     public PermissionCollection getPermissions(CodeSource codesource) {
@@ -86,14 +88,14 @@ final class JNodePolicy extends Policy {
     /**
      * Allow extended classes to add permissions before the permissions
      * collection is set to read-only.
-     * 
+     *
      * @param codeSource
      * @param perms
      */
     protected void addPermissions(CodeSource codeSource,
-            PermissionCollection perms) {
+                                  PermissionCollection perms) {
         for (Map.Entry<CodeSource, PermissionCollection> e : codeSource2Permissions
-                .entrySet()) {
+            .entrySet()) {
             final CodeSource cs = e.getKey();
             if (cs.implies(codeSource)) {
                 // BootLog.info(cs + " -> " + codeSource);
@@ -128,10 +130,10 @@ final class JNodePolicy extends Policy {
         }
     }
 
-    private static final Class[] NAME_ACTIONS_ARGS = new Class[] {
-            String.class, String.class };
+    private static final Class[] NAME_ACTIONS_ARGS = new Class[]{
+        String.class, String.class};
 
-    private static final Class[] NAME_ARGS = new Class[] { String.class };
+    private static final Class[] NAME_ARGS = new Class[]{String.class};
 
     private final void loadExtension(Extension ext) {
         final String id = ext.getDeclaringPluginDescriptor().getId();
@@ -139,8 +141,8 @@ final class JNodePolicy extends Policy {
         try {
             url = new URL("plugin:" + id + "!/");
             final ClassLoader cl = ext.getDeclaringPluginDescriptor()
-                    .getPluginClassLoader();
-            final CodeSource cs = new CodeSource(url, (Certificate[])null);
+                .getPluginClassLoader();
+            final CodeSource cs = new CodeSource(url, (Certificate[]) null);
             final Permissions perms = new Permissions();
             codeSource2Permissions.put(cs, perms);
             // BootLog.debug("Adding permissions for " + cs);
@@ -158,13 +160,13 @@ final class JNodePolicy extends Policy {
                         final Class permClass = cl.loadClass(type);
                         if ((name != null) && (actions != null)) {
                             final Constructor c = permClass
-                                    .getConstructor(NAME_ACTIONS_ARGS);
+                                .getConstructor(NAME_ACTIONS_ARGS);
                             perm = c
-                                    .newInstance(new Object[] { name, actions });
+                                .newInstance(new Object[]{name, actions});
                         } else if (name != null) {
                             final Constructor c = permClass
-                                    .getConstructor(NAME_ARGS);
-                            perm = c.newInstance(new Object[] { name });
+                                .getConstructor(NAME_ARGS);
+                            perm = c.newInstance(new Object[]{name});
                         } else {
                             perm = permClass.newInstance();
                         }
@@ -172,24 +174,24 @@ final class JNodePolicy extends Policy {
                         perms.add(p);
                     } catch (ClassNotFoundException ex) {
                         BootLog
-                                .error("Permission class " + type
-                                        + " not found");
+                            .error("Permission class " + type
+                                + " not found");
                     } catch (InstantiationException ex) {
                         BootLog.error("Cannot instantiate permission class "
-                                + type);
+                            + type);
                     } catch (IllegalAccessException ex) {
                         BootLog.error("Illegal access to permission class "
-                                + type);
+                            + type);
                     } catch (NoSuchMethodException ex) {
                         BootLog
-                                .error("Constructor not found on permission class "
-                                        + type + " in plugin " + id);
+                            .error("Constructor not found on permission class "
+                                + type + " in plugin " + id);
                     } catch (InvocationTargetException ex) {
                         BootLog.error("Error constructing permission class "
-                                + type, ex);
+                            + type, ex);
                     } catch (ClassCastException ex) {
                         BootLog.error("Permission class " + type
-                                + " not instance of Permission");
+                            + " not instance of Permission");
                     }
                 }
             }

@@ -30,9 +30,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import nanoxml.XMLElement;
-
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Plugin;
@@ -49,11 +47,11 @@ import org.jnode.vm.isolate.VmIsolateLocal;
 
 /**
  * Implementation of {@link org.jnode.plugin.PluginDescriptor}.
- * 
+ *
  * @author epr
  */
 public class PluginDescriptorModel extends AbstractModelObject implements
-        PluginDescriptor {
+    PluginDescriptor {
 
     private final boolean autoStart;
 
@@ -111,11 +109,11 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Create a new instance
-     * 
+     *
      * @param e
      */
     PluginDescriptorModel(PluginJar jarFile, XMLElement e)
-            throws PluginException {
+        throws PluginException {
         this.jarFile = jarFile;
         this.fragments = new BootableArrayList<FragmentDescriptorModel>();
         id = getAttribute(e, "id", true);
@@ -129,7 +127,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         system = getBooleanAttribute(e, "system", false);
         autoStart = getBooleanAttribute(e, "auto-start", false);
         priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY,
-                getIntAttribute(e, "priority", DEFAULT_PRIORITY)));
+            getIntAttribute(e, "priority", DEFAULT_PRIORITY)));
 
         // if (registry != null) {
         // registry.registerPlugin(this);
@@ -142,25 +140,25 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
         initializeRequiresList(reqList, e);
 
-        for (Iterator< ? > ci = e.getChildren().iterator(); ci.hasNext();) {
+        for (Iterator<?> ci = e.getChildren().iterator(); ci.hasNext();) {
             final XMLElement childE = (XMLElement) ci.next();
             final String tag = childE.getName();
             if (tag.equals("extension-point")) {
                 final ExtensionPointModel ep = new ExtensionPointModel(this,
-                        childE);
+                    childE);
                 epList.add(ep);
                 // if (registry != null) {
                 // registry.registerExtensionPoint(ep);
                 // }
             } else if (tag.equals("requires")) {
-                for (Iterator< ? > i = childE.getChildren().iterator(); i
-                        .hasNext();) {
+                for (Iterator<?> i = childE.getChildren().iterator(); i
+                    .hasNext();) {
                     final XMLElement impE = (XMLElement) i.next();
                     if (impE.getName().equals("import")) {
                         reqList.add(new PluginPrerequisiteModel(this, impE));
                     } else {
                         throw new PluginException("Unknown element "
-                                + impE.getName());
+                            + impE.getName());
                     }
                 }
             } else if (tag.equals("extension")) {
@@ -177,21 +175,21 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         }
         if (!epList.isEmpty()) {
             extensionPoints = (ExtensionPointModel[]) epList
-                    .toArray(new ExtensionPointModel[epList.size()]);
+                .toArray(new ExtensionPointModel[epList.size()]);
         } else {
             extensionPoints = new ExtensionPointModel[0];
         }
 
         if (!reqList.isEmpty()) {
             requires = (PluginPrerequisiteModel[]) reqList
-                    .toArray(new PluginPrerequisiteModel[reqList.size()]);
+                .toArray(new PluginPrerequisiteModel[reqList.size()]);
         } else {
             requires = new PluginPrerequisiteModel[0];
         }
 
         if (!exList.isEmpty()) {
             extensions = (ExtensionModel[]) exList
-                    .toArray(new ExtensionModel[exList.size()]);
+                .toArray(new ExtensionModel[exList.size()]);
         } else {
             extensions = new ExtensionModel[0];
         }
@@ -201,7 +199,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Load a plugin-descriptor without a registry.
-     * 
+     *
      * @param e
      */
     PluginDescriptorModel(XMLElement e) throws PluginException {
@@ -211,7 +209,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Add a fragment to this plugin. This method is called only by
      * {@link FragmentDescriptorModel#resolve }.
-     * 
+     *
      * @param fragment
      */
     final void add(FragmentDescriptorModel fragment) {
@@ -223,7 +221,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Add a listener to this descriptor.
-     * 
+     *
      * @param listener
      */
     public final void addListener(PluginDescriptorListener listener) {
@@ -254,8 +252,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                     return plugin;
                 } else {
                     final Constructor cons = cls
-                            .getConstructor(new Class[] { PluginDescriptor.class });
-                    return (Plugin) cons.newInstance(new Object[] { this });
+                        .getConstructor(new Class[]{PluginDescriptor.class});
+                    return (Plugin) cons.newInstance(new Object[]{this});
                 }
             } catch (ClassNotFoundException ex) {
                 throw new PluginException(ex);
@@ -274,7 +272,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Does the plugin described by this descriptor directly depends on the
      * given plugin id.
-     * 
+     *
      * @param id
      * @return True if id is in the list of required plugins of this descriptor,
      *         false otherwise.
@@ -298,7 +296,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         synchronized (listenerLock) {
             if (this.listeners != null) {
                 listeners = new ArrayList<PluginDescriptorListener>(
-                        this.listeners);
+                    this.listeners);
             } else {
                 return;
             }
@@ -316,7 +314,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         synchronized (listenerLock) {
             if (this.listeners != null) {
                 listeners = new ArrayList<PluginDescriptorListener>(
-                        this.listeners);
+                    this.listeners);
             } else {
                 return;
             }
@@ -328,7 +326,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets all fragments attached to this plugin.
-     * 
+     *
      * @return
      */
     public final List<FragmentDescriptorModel> fragments() {
@@ -337,7 +335,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets the name of the custom plugin class of this plugin.
-     * 
+     *
      * @return Null if no custom plugin class
      */
     public String getCustomPluginClassName() {
@@ -347,9 +345,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Returns the extension point with the given simple identifier declared in
      * this plug-in, or null if there is no such extension point.
-     * 
-     * @param extensionPointId
-     *            the simple identifier of the extension point (e.g. "wizard").
+     *
+     * @param extensionPointId the simple identifier of the extension point (e.g. "wizard").
      * @return the extension point, or null
      */
     public ExtensionPoint getExtensionPoint(String extensionPointId) {
@@ -365,7 +362,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets all extension-points provided by this plugin
-     * 
+     *
      * @return List&lt;ExtensionPointConfig&gt;
      */
     public ExtensionPoint[] getExtensionPoints() {
@@ -374,7 +371,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets all extensions provided by this plugin
-     * 
+     *
      * @return List&lt;ExtensionConfig&gt;
      */
     public Extension[] getExtensions() {
@@ -437,7 +434,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets the classloader of this plugin descriptor.
-     * 
+     *
      * @return ClassLoader
      */
     public ClassLoader getPluginClassLoader() {
@@ -460,14 +457,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         }
         if (jarFile == null) {
             throw new RuntimeException(
-                    "Cannot create classloader without a jarfile");
+                "Cannot create classloader without a jarfile");
         }
         final int reqMax = requires.length;
         final PluginClassLoaderImpl[] preLoaders = new PluginClassLoaderImpl[reqMax];
         for (int i = 0; i < reqMax; i++) {
             final String reqId = requires[i].getPluginId();
             final PluginDescriptor reqDescr = registry
-                    .getPluginDescriptor(reqId);
+                .getPluginDescriptor(reqId);
             final ClassLoader cl = reqDescr.getPluginClassLoader();
             if (cl instanceof PluginClassLoaderImpl) {
                 preLoaders[i] = (PluginClassLoaderImpl) cl;
@@ -478,14 +475,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
             public Object run() {
                 if (currentVmClassLoader != null) {
                     PluginClassLoaderImpl cl = new PluginClassLoaderImpl(
-                            currentVmClassLoader, registry,
-                            PluginDescriptorModel.this, jarFile, preLoaders);
-                    return new Object[] { cl, currentVmClassLoader };
+                        currentVmClassLoader, registry,
+                        PluginDescriptorModel.this, jarFile, preLoaders);
+                    return new Object[]{cl, currentVmClassLoader};
                 } else {
                     PluginClassLoaderImpl cl = new PluginClassLoaderImpl(
-                            registry, PluginDescriptorModel.this, jarFile,
-                            preLoaders);
-                    return new Object[] { cl, cl.getVmClassLoader() };
+                        registry, PluginDescriptorModel.this, jarFile,
+                        preLoaders);
+                    return new Object[]{cl, cl.getVmClassLoader()};
                 }
             }
         };
@@ -496,7 +493,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets the required imports
-     * 
+     *
      * @return List&lt;ImportConfig&gt;
      */
     public PluginPrerequisite[] getPrerequisites() {
@@ -519,7 +516,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Gets the runtime information of this descriptor.
-     * 
+     *
      * @return The runtime, or null if no runtime information is provided.
      */
     public Runtime getRuntime() {
@@ -535,7 +532,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Does this plugin have a custom plugin class specified?
-     * 
+     *
      * @return
      */
     public boolean hasCustomPluginClass() {
@@ -546,14 +543,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * Initialize the list of plugin requirements.
      */
     protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
-            XMLElement e) throws PluginException {
+                                          XMLElement e) throws PluginException {
         // Nothing here
     }
 
     /**
      * Has this plugin the auto-start flag set. If true, the plugin will be
      * started automatically at boot/load time.
-     * 
+     *
      * @return
      */
     public boolean isAutoStart() {
@@ -563,7 +560,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Gets the priority of this plugin. Plugins are loaded by increasing
      * priority.
-     * 
+     *
      * @return
      */
     public int getPriority() {
@@ -572,7 +569,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Is this a descriptor of a fragment.
-     * 
+     *
      * @return boolean True for a fragment, false for a plugin
      */
     public boolean isFragment() {
@@ -582,7 +579,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Is this a descriptor of a system plugin. System plugins are not
      * reloadable.
-     * 
+     *
      * @return boolean
      */
     public boolean isSystemPlugin() {
@@ -592,7 +589,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Remove a fragment from this plugin. This method is called only by
      * {@link FragmentDescriptorModel#unresolve(PluginRegistryModel)}.
-     * 
+     *
      * @param fragment
      */
     final void remove(FragmentDescriptorModel fragment) {
@@ -604,7 +601,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Remove a listener from this descriptor.
-     * 
+     *
      * @param listener
      */
     public final void removeListener(PluginDescriptorListener listener) {
@@ -617,7 +614,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Resolve all references to (elements of) other plugin descriptors
-     * 
+     *
      * @throws PluginException
      */
     public void resolve(PluginRegistryModel registry) throws PluginException {
@@ -649,7 +646,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * plugin depends on, are started first.
      */
     final void startPlugin(final PluginRegistryModel registry)
-            throws PluginException {
+        throws PluginException {
         if (started || starting) {
             return;
         }
@@ -669,7 +666,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                         final String reqId = requires[i].getPluginId();
                         // BootLog.info("Start dependency " + reqId);
                         final PluginDescriptorModel reqDescr = (PluginDescriptorModel) registry
-                        .getPluginDescriptor(reqId);
+                            .getPluginDescriptor(reqId);
                         reqDescr.startPlugin(registry);
                         // Make sure that it is really started
                         reqDescr.waitUntilStarted();
@@ -693,13 +690,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
             }
         }
     }
-    
+
     /**
      * Block the current thread until this plugin is started.
      * If the current thread is starting this plugin, then the thread
      * will not be blocked.
-     * @throws InterruptedException 
-     * @throws  
+     *
+     * @throws InterruptedException
+     * @throws
      */
     private void waitUntilStarted() throws PluginException {
         if (!started) {
@@ -726,11 +724,11 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Remove all references to (elements of) other plugin descriptors
-     * 
+     *
      * @throws PluginException
      */
     protected void unresolve(PluginRegistryModel registry)
-            throws PluginException {
+        throws PluginException {
         if (plugin != null) {
             plugin.stop();
         }

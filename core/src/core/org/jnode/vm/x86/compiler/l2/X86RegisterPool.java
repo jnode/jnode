@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l2;
 
 import org.jnode.assembler.x86.X86Register;
@@ -31,7 +31,7 @@ import org.jnode.vm.compiler.ir.RegisterPool;
  * @author Levente S\u00e1ntha
  */
 public class X86RegisterPool extends RegisterPool<X86Register> {
-    
+
     private final BootableArrayList<X86Register> registers;
 
     public X86RegisterPool() {

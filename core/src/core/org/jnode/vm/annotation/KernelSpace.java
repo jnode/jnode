@@ -18,28 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
 import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * Annotation used to inform the compiler that the method
  * runs in kernel (ring 0) space.
- * 
+ * <p/>
  * In kernel space, only methods with this this attribute set may be called,
  * no classloading or memory allocation is allowed.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented
 @Retention(CLASS)
-@Target({METHOD})
+@Target({METHOD })
 public @interface KernelSpace {
 
 }

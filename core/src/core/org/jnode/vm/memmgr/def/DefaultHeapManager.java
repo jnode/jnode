@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import java.io.PrintStream;
-
 import org.jnode.vm.MemoryBlockManager;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.annotation.Inline;
@@ -125,7 +123,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      */
     @SuppressWarnings("unchecked")
     public DefaultHeapManager(VmClassLoader loader, HeapHelper helper)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException {
         super(helper);
         this.bootHeap = new VmBootHeap(helper);
         // this.writeBarrier = new DefaultWriteBarrier(helper);
@@ -134,14 +132,13 @@ public final class DefaultHeapManager extends VmHeapManager {
         this.currentHeap = firstNormalHeap;
         this.heapList = firstNormalHeap;
         this.defaultHeapClass = (VmNormalClass<VmDefaultHeap>) loader.loadClass(
-                VmDefaultHeap.class.getName(), true);
+            VmDefaultHeap.class.getName(), true);
     }
 
     /**
      * Is the given address the address of an allocated object on this heap?
-     * 
-     * @param ptr
-     *            The address to examine.
+     *
+     * @param ptr The address to examine.
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
@@ -166,7 +163,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 
     /**
      * Is the system low on memory?
-     * 
+     *
      * @return boolean
      */
     public boolean isLowOnMemory() {
@@ -182,7 +179,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 
     /**
      * Gets the size of free memory in bytes.
-     * 
+     *
      * @return long
      */
     public long getFreeMemory() {
@@ -200,7 +197,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 
     /**
      * Gets the size of all memory in bytes.
-     * 
+     *
      * @return the size of all memory in bytes
      */
     public long getTotalMemory() {
@@ -219,7 +216,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * Gets the first heap. All other heaps can be iterated through the
      * <code>getNext()</code> method.
-     * 
+     *
      * @return the first heap
      */
     public final VmDefaultHeap getHeapList() {
@@ -238,11 +235,11 @@ public final class DefaultHeapManager extends VmHeapManager {
 
         // Initialize the boot heap.
         bootHeap.initialize(helper.getBootHeapStart(), helper.getBootHeapEnd(),
-                slotSize);
+            slotSize);
 
         // Initialize the first normal heap
         final Address ptr = helper.allocateBlock(Extent
-                .fromIntZeroExtend(DEFAULT_HEAP_SIZE));
+            .fromIntZeroExtend(DEFAULT_HEAP_SIZE));
         firstNormalHeap.initialize(ptr, ptr.add(DEFAULT_HEAP_SIZE), slotSize);
 
         // Initialize the GC heap
@@ -264,14 +261,14 @@ public final class DefaultHeapManager extends VmHeapManager {
         finalizerThread.start();
         // Calculate the trigger size
         triggerSize = (int) Math.min(Integer.MAX_VALUE, getFreeMemory()
-                * GC_TRIGGER_PERCENTAGE);
+            * GC_TRIGGER_PERCENTAGE);
     }
 
     /**
      * Allocate a new instance for the given class. Not that this method cannot
      * be synchronized, since obtaining a monitor might require creating one,
      * which in turn needs this method.
-     * 
+     *
      * @param vmClass
      * @param size
      * @return Object
@@ -317,7 +314,7 @@ public final class DefaultHeapManager extends VmHeapManager {
                             newHeapSize = size;
                         }
                         if ((heap = allocHeap(Extent
-                                .fromIntZeroExtend(newHeapSize), true)) == null) {
+                            .fromIntZeroExtend(newHeapSize), true)) == null) {
                             lowOnMemory = true;
                             // It was not possible to allocate another heap.
                             // First try to GC, if we've done that before
@@ -351,14 +348,14 @@ public final class DefaultHeapManager extends VmHeapManager {
                     result = heap.alloc(vmClass, alignedSize);
 
                     if (result == null) {
-                        heap = (VmDefaultHeap)heap.getNext();
+                        heap = (VmDefaultHeap) heap.getNext();
                     }
                 }
                 lowOnMemory = false;
 
                 allocatedSinceGcTrigger += alignedSize;
                 if ((allocatedSinceGcTrigger > triggerSize)
-                        && (gcThread != null)) {
+                    && (gcThread != null)) {
                     if ((heapFlags & TRACE_TRIGGER) != 0) {
                         debug("<alloc:GC trigger/>");
                     }
@@ -369,7 +366,7 @@ public final class DefaultHeapManager extends VmHeapManager {
             vmClass.incInstanceCount();
             // Allocated objects are initially black.
             VmMagic.setObjectFlags(result, Word
-                    .fromIntZeroExtend(ObjectFlags.GC_DEFAULT_COLOR));
+                .fromIntZeroExtend(ObjectFlags.GC_DEFAULT_COLOR));
         } finally {
             if (m != null) {
                 m.exit();
@@ -383,7 +380,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * Allocate a new heap with a given size. The heap object itself is
      * allocated on the new heap, so this method can be called even if all other
      * heaps are full.
-     * 
+     *
      * @param size
      * @return The heap
      */
@@ -396,9 +393,9 @@ public final class DefaultHeapManager extends VmHeapManager {
         }
         final Address end = start.add(size);
         final int slotSize = VmProcessor.current().getArchitecture()
-                .getReferenceSize();
+            .getReferenceSize();
         final VmDefaultHeap heap = VmDefaultHeap.setupHeap(helper, start,
-                defaultHeapClass, slotSize);
+            defaultHeapClass, slotSize);
         heap.initialize(start, end, slotSize);
 
         if (addToHeapList) {
@@ -422,8 +419,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     }
 
     /**
-     * @param gcActive
-     *            The gcActive to set.
+     * @param gcActive The gcActive to set.
      */
     final void setGcActive(boolean gcActive) {
         this.gcActive = gcActive;
@@ -436,7 +432,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         this.currentHeap = this.firstNormalHeap;
         // Recalculate the trigger size
         triggerSize = (int) Math.min(Integer.MAX_VALUE, getFreeMemory()
-                * GC_TRIGGER_PERCENTAGE);
+            * GC_TRIGGER_PERCENTAGE);
     }
 
     /**
@@ -453,7 +449,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     public HeapStatistics getHeapStatistics() {
         final DefHeapStatistics heapStatistics = new DefHeapStatistics();
         final HeapStatisticsVisitor heapStatisticsVisitor = new HeapStatisticsVisitor(
-                heapStatistics);
+            heapStatistics);
 
         VmDefaultHeap heap = firstNormalHeap;
         final Word zero = Word.zero();
@@ -477,7 +473,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * @see org.jnode.vm.memmgr.VmHeapManager#notifyClassResolved(org.jnode.vm.classmgr.VmType)
      */
-    public void notifyClassResolved(VmType< ? > vmType) {
+    public void notifyClassResolved(VmType<?> vmType) {
         // Do nothing
     }
 

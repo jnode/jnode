@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 import org.jnode.vm.compiler.ir.quad.BinaryOperation;
@@ -56,7 +56,7 @@ public abstract class CodeGenerator<T> {
 
     /**
      * Returns true of this CPU supports 3 address operands
-     * 
+     *
      * @return
      */
     public abstract boolean supports3AddrOps();
@@ -67,7 +67,7 @@ public abstract class CodeGenerator<T> {
     public abstract void setSpilledVariables(Variable<T>[] variables);
 
     /**
-     * 
+     *
      */
     public abstract void emitHeader();
 
@@ -108,7 +108,7 @@ public abstract class CodeGenerator<T> {
      * @param con
      */
     public abstract void generateCodeFor(UnaryQuad<T> quad, Object lhsReg,
-            UnaryOperation operation, Constant<T> con);
+                                         UnaryOperation operation, Constant<T> con);
 
     /**
      * @param quad
@@ -117,7 +117,7 @@ public abstract class CodeGenerator<T> {
      * @param rhsReg
      */
     public abstract void generateCodeFor(UnaryQuad<T> quad, Object lhsReg,
-            UnaryOperation operation, Object rhsReg);
+                                         UnaryOperation operation, Object rhsReg);
 
     /**
      * @param quad
@@ -126,7 +126,7 @@ public abstract class CodeGenerator<T> {
      * @param rhsDisp
      */
     public abstract void generateCodeFor(UnaryQuad<T> quad, Object lhsReg,
-            UnaryOperation operation, int rhsDisp);
+                                         UnaryOperation operation, int rhsDisp);
 
     /**
      * @param quad
@@ -135,7 +135,7 @@ public abstract class CodeGenerator<T> {
      * @param rhsReg
      */
     public abstract void generateCodeFor(UnaryQuad<T> quad, int lhsDisp,
-            UnaryOperation operation, Object rhsReg);
+                                         UnaryOperation operation, Object rhsReg);
 
     /**
      * @param quad
@@ -144,7 +144,7 @@ public abstract class CodeGenerator<T> {
      * @param rhsDisp
      */
     public abstract void generateCodeFor(UnaryQuad<T> quad, int lhsDisp,
-            UnaryOperation operation, int rhsDisp);
+                                         UnaryOperation operation, int rhsDisp);
 
     /**
      * @param quad
@@ -153,7 +153,7 @@ public abstract class CodeGenerator<T> {
      * @param con
      */
     public abstract void generateCodeFor(UnaryQuad<T> quad, int lhsDisp,
-            UnaryOperation operation, Constant<T> con);
+                                         UnaryOperation operation, Constant<T> con);
 
     /**
      * @param reg1
@@ -162,7 +162,7 @@ public abstract class CodeGenerator<T> {
      * @param c3
      */
     public abstract void generateBinaryOP(T reg1, Constant<T> c2,
-            BinaryOperation operation, Constant<T> c3);
+                                          BinaryOperation operation, Constant<T> c3);
 
     /**
      * @param reg1
@@ -171,7 +171,7 @@ public abstract class CodeGenerator<T> {
      * @param reg3
      */
     public abstract void generateBinaryOP(T reg1, Constant<T> c2,
-            BinaryOperation operation, T reg3);
+                                          BinaryOperation operation, T reg3);
 
     /**
      * @param reg1
@@ -180,7 +180,7 @@ public abstract class CodeGenerator<T> {
      * @param disp3
      */
     public abstract void generateBinaryOP(T reg1, Constant<T> c2,
-            BinaryOperation operation, int disp3);
+                                          BinaryOperation operation, int disp3);
 
     /**
      * @param reg1
@@ -189,7 +189,7 @@ public abstract class CodeGenerator<T> {
      * @param c3
      */
     public abstract void generateBinaryOP(T reg1, T reg2,
-            BinaryOperation operation, Constant<T> c3);
+                                          BinaryOperation operation, Constant<T> c3);
 
     /**
      * @param reg1
@@ -198,7 +198,7 @@ public abstract class CodeGenerator<T> {
      * @param reg3
      */
     public abstract void generateBinaryOP(T reg1, T reg2,
-            BinaryOperation operation, T reg3);
+                                          BinaryOperation operation, T reg3);
 
     /**
      * @param reg1
@@ -207,7 +207,7 @@ public abstract class CodeGenerator<T> {
      * @param disp3
      */
     public abstract void generateBinaryOP(T reg1, T reg2,
-            BinaryOperation operation, int disp3);
+                                          BinaryOperation operation, int disp3);
 
     /**
      * @param reg1
@@ -216,7 +216,7 @@ public abstract class CodeGenerator<T> {
      * @param c3
      */
     public abstract void generateBinaryOP(T reg1, int disp2,
-            BinaryOperation operation, Constant<T> c3);
+                                          BinaryOperation operation, Constant<T> c3);
 
     /**
      * @param reg1
@@ -225,7 +225,7 @@ public abstract class CodeGenerator<T> {
      * @param reg3
      */
     public abstract void generateBinaryOP(T reg1, int disp2,
-            BinaryOperation operation, T reg3);
+                                          BinaryOperation operation, T reg3);
 
     /**
      * @param reg1
@@ -234,7 +234,7 @@ public abstract class CodeGenerator<T> {
      * @param disp3
      */
     public abstract void generateBinaryOP(T reg1, int disp2,
-            BinaryOperation operation, int disp3);
+                                          BinaryOperation operation, int disp3);
 
     /**
      * @param disp1
@@ -243,7 +243,7 @@ public abstract class CodeGenerator<T> {
      * @param c3
      */
     public abstract void generateBinaryOP(int disp1, Constant<T> c2,
-            BinaryOperation operation, Constant<T> c3);
+                                          BinaryOperation operation, Constant<T> c3);
 
     /**
      * @param disp1
@@ -252,7 +252,7 @@ public abstract class CodeGenerator<T> {
      * @param reg3
      */
     public abstract void generateBinaryOP(int disp1, Constant<T> c2,
-            BinaryOperation operation, T reg3);
+                                          BinaryOperation operation, T reg3);
 
     /**
      * @param disp1
@@ -261,7 +261,7 @@ public abstract class CodeGenerator<T> {
      * @param disp3
      */
     public abstract void generateBinaryOP(int disp1, Constant<T> c2,
-            BinaryOperation operation, int disp3);
+                                          BinaryOperation operation, int disp3);
 
     /**
      * @param disp1
@@ -270,7 +270,7 @@ public abstract class CodeGenerator<T> {
      * @param c3
      */
     public abstract void generateBinaryOP(int disp1, T reg2,
-            BinaryOperation operation, Constant<T> c3);
+                                          BinaryOperation operation, Constant<T> c3);
 
     /**
      * @param disp1
@@ -279,7 +279,7 @@ public abstract class CodeGenerator<T> {
      * @param reg3
      */
     public abstract void generateBinaryOP(int disp1, T reg2,
-            BinaryOperation operation, T reg3);
+                                          BinaryOperation operation, T reg3);
 
     /**
      * @param disp1
@@ -288,7 +288,7 @@ public abstract class CodeGenerator<T> {
      * @param disp3
      */
     public abstract void generateBinaryOP(int disp1, T reg2,
-            BinaryOperation operation, int disp3);
+                                          BinaryOperation operation, int disp3);
 
     /**
      * @param disp1
@@ -297,7 +297,7 @@ public abstract class CodeGenerator<T> {
      * @param c3
      */
     public abstract void generateBinaryOP(int disp1, int disp2,
-            BinaryOperation operation, Constant<T> c3);
+                                          BinaryOperation operation, Constant<T> c3);
 
     /**
      * @param disp1
@@ -306,7 +306,7 @@ public abstract class CodeGenerator<T> {
      * @param reg3
      */
     public abstract void generateBinaryOP(int disp1, int disp2,
-            BinaryOperation operation, T reg3);
+                                          BinaryOperation operation, T reg3);
 
     /**
      * @param disp1
@@ -315,7 +315,7 @@ public abstract class CodeGenerator<T> {
      * @param disp3
      */
     public abstract void generateBinaryOP(int disp1, int disp2,
-            BinaryOperation operation, int disp3);
+                                          BinaryOperation operation, int disp3);
 
     /**
      * @param quad
@@ -323,7 +323,7 @@ public abstract class CodeGenerator<T> {
      * @param reg
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            BranchCondition condition, Object reg);
+                                         BranchCondition condition, Object reg);
 
     /**
      * @param quad
@@ -331,7 +331,7 @@ public abstract class CodeGenerator<T> {
      * @param disp
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            BranchCondition condition, int disp);
+                                         BranchCondition condition, int disp);
 
     /**
      * @param quad
@@ -339,7 +339,7 @@ public abstract class CodeGenerator<T> {
      * @param reg
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            BranchCondition condition, Constant<T> reg);
+                                         BranchCondition condition, Constant<T> reg);
 
     /**
      * @param quad
@@ -348,7 +348,7 @@ public abstract class CodeGenerator<T> {
      * @param c2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            Constant<T> c1, BranchCondition condition, Constant<T> c2);
+                                         Constant<T> c1, BranchCondition condition, Constant<T> c2);
 
     /**
      * @param quad
@@ -357,7 +357,7 @@ public abstract class CodeGenerator<T> {
      * @param c2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            Object reg1, BranchCondition condition, Constant<T> c2);
+                                         Object reg1, BranchCondition condition, Constant<T> c2);
 
     /**
      * @param quad
@@ -366,7 +366,7 @@ public abstract class CodeGenerator<T> {
      * @param reg2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            Constant<T> c1, BranchCondition condition, Object reg2);
+                                         Constant<T> c1, BranchCondition condition, Object reg2);
 
     /**
      * @param quad
@@ -375,7 +375,7 @@ public abstract class CodeGenerator<T> {
      * @param disp2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            Constant<T> c1, BranchCondition condition, int disp2);
+                                         Constant<T> c1, BranchCondition condition, int disp2);
 
     /**
      * @param quad
@@ -384,7 +384,7 @@ public abstract class CodeGenerator<T> {
      * @param reg2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            Object reg1, BranchCondition condition, Object reg2);
+                                         Object reg1, BranchCondition condition, Object reg2);
 
     /**
      * @param quad
@@ -393,7 +393,7 @@ public abstract class CodeGenerator<T> {
      * @param disp2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad,
-            Object reg1, BranchCondition condition, int disp2);
+                                         Object reg1, BranchCondition condition, int disp2);
 
     /**
      * @param quad
@@ -402,7 +402,7 @@ public abstract class CodeGenerator<T> {
      * @param c2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
-            BranchCondition condition, Constant<T> c2);
+                                         BranchCondition condition, Constant<T> c2);
 
     /**
      * @param quad
@@ -411,7 +411,7 @@ public abstract class CodeGenerator<T> {
      * @param reg2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
-            BranchCondition condition, Object reg2);
+                                         BranchCondition condition, Object reg2);
 
     /**
      * @param quad
@@ -420,5 +420,5 @@ public abstract class CodeGenerator<T> {
      * @param disp2
      */
     public abstract void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
-            BranchCondition condition, int disp2);
+                                         BranchCondition condition, int disp2);
 }

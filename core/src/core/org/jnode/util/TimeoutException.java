@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.util;
  */
 public class TimeoutException extends Exception {
 
-	/**
-	 * 
-	 */
-	public TimeoutException() {
-		super();
-	}
+    /**
+     *
+     */
+    public TimeoutException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public TimeoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public TimeoutException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public TimeoutException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public TimeoutException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public TimeoutException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public TimeoutException(String s) {
+        super(s);
+    }
 }

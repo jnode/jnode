@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.boot;
 
 import java.io.IOException;
@@ -28,9 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.jar.Manifest;
 import java.util.jar.Attributes;
-
+import java.util.jar.Manifest;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
@@ -50,7 +49,7 @@ public class InitJarProcessor {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param initJarRes
      */
     public InitJarProcessor(MemoryResource initJarRes) {
@@ -70,11 +69,13 @@ public class InitJarProcessor {
 
     /**
      * Load all plugins found in the initjar.
-     * 
+     *
      * @param piRegistry
      */
     public List<PluginDescriptor> loadPlugins(PluginRegistryModel piRegistry) {
-        if (jbuf == null) { return null; }
+        if (jbuf == null) {
+            return null;
+        }
 
         final InitJarPluginLoader loader = new InitJarPluginLoader();
         final ArrayList<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
@@ -85,7 +86,7 @@ public class InitJarProcessor {
                     // Load it
                     loader.setBuffer(entry.getValue());
                     final PluginDescriptor descr = piRegistry.loadPlugin(
-                            loader, "", "", false);
+                        loader, "", "", false);
                     descriptors.add(descr);
                 } catch (PluginException ex) {
                     BootLog.error("Cannot load " + name, ex);
@@ -111,8 +112,7 @@ public class InitJarProcessor {
         }
 
         /**
-         * @param is
-         *            The is to set.
+         * @param is The is to set.
          */
         final void setBuffer(ByteBuffer buf) {
             this.buf = buf;
@@ -121,7 +121,7 @@ public class InitJarProcessor {
 
     /**
      * Gets the name of the Main-Class from the initjar manifest.
-     * 
+     *
      * @return The classname of the main class, or null.
      */
     public String getMainClassName() {
@@ -134,15 +134,16 @@ public class InitJarProcessor {
 
     /**
      * Gets the value of Main-Class-Arg1, Main-Class-Arg2 ...  from the initjar manifest.
+     *
      * @return the array of String arguments or an empty array if there are no arguments
      */
     public String[] getMainClassArguments() {
         if (mf != null) {
             Attributes mainAttributes = mf.getMainAttributes();
-            SortedMap<String,String> arg_map = new TreeMap<String, String>();
-            for(Object key : mainAttributes.keySet()){
+            SortedMap<String, String> arg_map = new TreeMap<String, String>();
+            for (Object key : mainAttributes.keySet()) {
                 String s = String.valueOf(key);
-                if(s.startsWith("Main-Class-Arg")){
+                if (s.startsWith("Main-Class-Arg")) {
                     arg_map.put(s, String.valueOf(mainAttributes.get(key)));
                 }
             }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.io.ByteArrayInputStream;
@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.ByteBufferInputStream;
@@ -55,7 +54,7 @@ import org.jnode.vm.scheduler.VmProcessor;
 
 /**
  * Default classloader.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class VmSystemClassLoader extends VmAbstractClassLoader {
@@ -80,7 +79,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private final ClassLoader parent;
 
-    /** Our mapping from method signatures to selectors */
+    /**
+     * Our mapping from method signatures to selectors
+     */
     private final SelectorMap selectorMap;
 
     private final VmArchitecture arch;
@@ -94,10 +95,10 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private transient HashSet<String> failedClassNames;
 
     private List<ResourceLoader> resourceLoaders;
-    
+
     /**
      * Constructor for VmClassLoader.
-     * 
+     *
      * @param classesURL
      * @param arch
      */
@@ -107,13 +108,13 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Constructor for VmClassLoader.
-     * 
+     *
      * @param classesURL
      * @param arch
-     * @param resolver 
+     * @param resolver
      */
     public VmSystemClassLoader(URL classesURL, VmArchitecture arch,
-            ObjectResolver resolver) {
+                               ObjectResolver resolver) {
         this.classesURL = classesURL;
         this.classInfos = new TreeMap<String, ClassInfo>();
         this.parent = null;
@@ -127,7 +128,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Constructor for VmClassLoader.
-     * 
+     *
      * @param classLoader
      */
     public VmSystemClassLoader(ClassLoader classLoader) {
@@ -143,7 +144,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     /**
      * Gets the collection with all currently loaded classes. All collection
      * elements are instanceof VmClass.
-     * 
+     *
      * @return Collection
      */
     public Collection<VmType> getLoadedClasses() {
@@ -172,6 +173,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the number of loaded classes.
+     *
      * @return the number of loaded classes
      */
     public int getLoadedClassCount() {
@@ -185,7 +187,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     /**
      * Gets the loaded class with a given name, or null if no such class has
      * been loaded.
-     * 
+     *
      * @param name
      * @return VmClass
      */
@@ -222,7 +224,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Result all loaded classes as an array of VmClass entries.
-     * 
+     *
      * @return VmClass[]
      * @throws ClassNotFoundException
      */
@@ -234,7 +236,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 result[j++] = ci.getVmClass();
                 if (systemRtJar != null) {
                     final String cfName = ci.getName().replace('.', '/')
-                            + ".class";
+                        + ".class";
                     systemRtJar.remove(cfName);
                 }
             }
@@ -247,15 +249,15 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Add a class that has been loaded.
-     * 
+     *
      * @param name
      * @param cls
      */
     public synchronized void addLoadedClass(String name, VmType cls) {
         if (failOnNewLoad) {
             throw new RuntimeException(
-                    "Cannot load a new class when failOnNewLoad is set ("
-                            + name + ")");
+                "Cannot load a new class when failOnNewLoad is set ("
+                    + name + ")");
         }
         if (classInfos != null) {
             classInfos.put(name, new ClassInfo(cls));
@@ -266,7 +268,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * Gets the ClassInfo for the given name. If not found and create is True, a
      * new ClassInfo is created, added to the list and returned. If not found
      * and create is False, null is returned.
-     * 
+     *
      * @param name
      * @param create
      * @return the ClassInfo for the given name
@@ -287,22 +289,22 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Load a class with a given name
-     * 
+     *
      * @param name
      * @param resolve
-     * @see org.jnode.vm.classmgr.VmClassLoader#loadClass(String, boolean)
      * @return The loaded class
      * @throws ClassNotFoundException
+     * @see org.jnode.vm.classmgr.VmClassLoader#loadClass(String, boolean)
      */
     @PrivilegedActionPragma
-    public VmType< ? > loadClass(String name, boolean resolve)
-            throws ClassNotFoundException {
+    public VmType<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException {
 
         // Also implement the java.lang.ClassLoader principals here
         // otherwise they cannot work in java.lang.ClassLoader.
         if ((parent != null) && !parent.skipParentLoader(name)) {
             try {
-                final Class< ? > cls = parent.loadClass(name);
+                final Class<?> cls = parent.loadClass(name);
                 return cls.getVmClass();
             } catch (ClassNotFoundException ex) {
                 // Don't care, try it ourselves.
@@ -341,8 +343,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 }
                 if (failOnNewLoad) {
                     throw new RuntimeException(
-                            "Cannot load a new class when failOnNewLoad is set ("
-                                    + name + ")");
+                        "Cannot load a new class when failOnNewLoad is set ("
+                            + name + ")");
                 }
             } catch (ClassNotFoundException ex) {
                 ci.setLoadError(ex.toString());
@@ -371,7 +373,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the ClassLoader belonging to this loader.
-     * 
+     *
      * @return ClassLoader
      */
     public final ClassLoader asClassLoader() {
@@ -392,14 +394,14 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Load a normal (non-array) class with a given name
-     * 
+     *
      * @param name
      * @return VmClass
      * @throws IOException
      * @throws ClassNotFoundException
      */
     private VmType loadNormalClass(String name) throws IOException,
-            ClassNotFoundException {
+        ClassNotFoundException {
 
         final String archN = arch.getName();
         boolean allowNatives = VmUtils.allowNatives(name, archN);
@@ -409,8 +411,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
         if (failOnNewLoad) {
             throw new RuntimeException(
-                    "Cannot load a new class when failOnNewLoad is set ("
-                            + name + ")");
+                "Cannot load a new class when failOnNewLoad is set ("
+                    + name + ")");
         }
 
         return ClassDecoder.defineClass(name, image, !allowNatives, this, null);
@@ -418,7 +420,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the number of loaded classes.
-     * 
+     *
      * @return int
      */
     public int size() {
@@ -431,7 +433,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets an inputstream for the class file that contains the given classname.
-     * 
+     *
      * @param clsName
      * @return InputStream
      * @throws MalformedURLException
@@ -439,7 +441,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @throws ClassNotFoundException
      */
     private ByteBuffer getClassData(String clsName)
-            throws MalformedURLException, IOException, ClassNotFoundException {
+        throws MalformedURLException, IOException, ClassNotFoundException {
 
         final String fName = clsName.replace('.', '/') + ".class";
 
@@ -459,12 +461,12 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             }
 
             throw new ClassNotFoundException("System class " + clsName
-                    + " not found.");
+                + " not found.");
         } else {
             final InputStream is = getResourceAsStream(fName);
             if (is == null) {
                 throw new ClassNotFoundException("Class resource of " + clsName
-                        + " not found.");
+                    + " not found.");
             } else {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 int len;
@@ -514,8 +516,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
     }
 
-    protected URL findResource(String name) 
-    {
+    protected URL findResource(String name) {
         if (verbose) {
             System.out.println("VmSystemClassLoader.findResource(" + name + ")");
         }
@@ -524,31 +525,28 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
         if (classesURL != null) {
             if (verbose) {
-                System.out.println("Loading resource " + name + " from "+classesURL);
+                System.out.println("Loading resource " + name + " from " + classesURL);
             }
             try {
-				return new URL(classesURL, name);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-				return null;
-			}
+                return new URL(classesURL, name);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
         } else if (systemRtJar != null) {
             if (verbose) {
                 System.out.println("Loading resource " + name + " from systemRtJar");
             }
             final byte[] data = (byte[]) systemRtJar.get(name);
-            if(verbose)
-            {
-            	System.out.println(">>>>>> findResource("+name+"), (data==null)="+(data == null));
+            if (verbose) {
+                System.out.println(">>>>>> findResource(" + name + "), (data==null)=" + (data == null));
             }
-            
-            if(data != null)
-            {
-            	if(verbose)
-            	{
-            		System.out.println(">>>>>> resource: "+new String(data));
-            	}
-            	return ClassLoader.getSystemResource(name);
+
+            if (data != null) {
+                if (verbose) {
+                    System.out.println(">>>>>> resource: " + new String(data));
+                }
+                return ClassLoader.getSystemResource(name);
             } else {
                 for (ResourceLoader l : resourceLoaders) {
                     final URL url = l.getResource(name);
@@ -560,31 +558,30 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             }
         } else {
             if (verbose) {
-            	System.out.println("!!!! findResource("+name+") : ERROR");        	
+                System.out.println("!!!! findResource(" + name + ") : ERROR");
             }
             return null;
-        }    	
+        }
     }
 
-    	
+
     /**
      * Gets an inputstream for a resource with the given name.
-     * 
-     * @param name
-     *            The name of the resource
+     *
+     * @param name The name of the resource
      * @return An opened inputstream to the resource with the given name, or
      *         null if not found.
      * @throws MalformedURLException
      * @throws IOException
      */
     public InputStream getResourceAsStream(String name)
-            throws MalformedURLException, IOException {
+        throws MalformedURLException, IOException {
         if (name.startsWith("/")) {
             name = name.substring(1);
         }
         if (classesURL != null) {
             if (verbose) {
-                System.out.println("Loading resource " + name + " from "+classesURL);
+                System.out.println("Loading resource " + name + " from " + classesURL);
             }
             URL url = new URL(classesURL, name);
             // System.out.println("url=" + url);
@@ -612,7 +609,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Returns the verbose.
-     * 
+     *
      * @return boolean
      */
     public boolean isVerbose() {
@@ -621,9 +618,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Sets the verbose.
-     * 
-     * @param verbose
-     *            The verbose to set
+     *
+     * @param verbose The verbose to set
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
@@ -631,7 +627,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Returns the failOnNewLoad.
-     * 
+     *
      * @return boolean
      */
     public boolean isFailOnNewLoad() {
@@ -640,9 +636,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Sets the failOnNewLoad.
-     * 
-     * @param failOnNewLoad
-     *            The failOnNewLoad to set
+     *
+     * @param failOnNewLoad The failOnNewLoad to set
      */
     public void setFailOnNewLoad(boolean failOnNewLoad) {
         if (classesURL != null) {
@@ -652,10 +647,12 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * (non-Javadoc)
-     * @see org.jnode.vm.classmgr.VmClassLoader#disassemble(org.jnode.vm.classmgr.VmMethod, int, boolean, java.io.Writer)
+     *
+     * @see org.jnode.vm.classmgr.VmClassLoader#disassemble(org.jnode.vm.classmgr.VmMethod,
+     * int, boolean, java.io.Writer)
      */
     public void disassemble(VmMethod vmMethod, int optLevel,
-            boolean enableTestCompilers, Writer writer) {
+                            boolean enableTestCompilers, Writer writer) {
         final NativeCodeCompiler cmps[];
         int index;
         if (enableTestCompilers) {
@@ -679,13 +676,14 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Compile the given IMT.
-     * @param builder 
-     * @return the compiled IMT 
+     *
+     * @param builder
+     * @return the compiled IMT
      */
     public CompiledIMT compileIMT(IMTBuilder builder) {
         final IMTCompiler cmp = arch.getIMTCompiler();
         return cmp.compile(resolver, builder.getImt(), builder
-                .getImtCollisions());
+            .getImtCollisions());
     }
 
     /**
@@ -718,7 +716,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Set the object resolver. This can be called only once.
-     * @param resolver 
+     *
+     * @param resolver
      */
     public void setResolver(ObjectResolver resolver) {
         if (this.resolver == null) {
@@ -731,9 +730,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     /**
      * Sets the systemRtJar. The given map must contains the resource names as
      * keys of type String, and the actual resources as byte array.
-     * 
-     * @param resources
-     *            The systemRtJar to set
+     *
+     * @param resources The systemRtJar to set
      */
     public void setSystemRtJar(Map<String, byte[]> resources) {
         if (this.systemRtJar == null) {
@@ -745,50 +743,55 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Is this loader the system classloader?
-     * 
+     *
      * @return boolean
      */
     public boolean isSystemClassLoader() {
         VmSystemClassLoader systemLoader = VmSystem.getSystemClassLoader();
         return ((systemLoader == this) || (systemLoader == null));
     }
-    
-    static class ClassLoaderWrapper extends ClassLoader 
-    {
-    	//TODO maybe it should be declared as 'protected' in ClassLoader ???
-    	private final VmSystemClassLoader vmClassLoader;
-    	
+
+    static class ClassLoaderWrapper extends ClassLoader {
+        //TODO maybe it should be declared as 'protected' in ClassLoader ???
+        private final VmSystemClassLoader vmClassLoader;
+
         public ClassLoaderWrapper(VmSystemClassLoader vmClassLoader) {
             super(vmClassLoader, 0);
             this.vmClassLoader = vmClassLoader;
         }
-        
+
         protected URL findResource(String name) {
-        	return vmClassLoader.findResource(name);
-        }        
+            return vmClassLoader.findResource(name);
+        }
     }
-    
+
     /**
      * Class that holds information of a loading &amp; loaded class.
-     * 
+     *
      * @author epr
      */
     static class ClassInfo {
 
-        /** Name of the class */
+        /**
+         * Name of the class
+         */
         private final String name;
 
-        /** The class itself */
-        private VmType< ? > vmClass;
+        /**
+         * The class itself
+         */
+        private VmType<?> vmClass;
 
-        /** Classloading got an error? */
+        /**
+         * Classloading got an error?
+         */
         private boolean error = false;
 
         private String errorMsg;
 
         /**
          * Create a new instance
-         * 
+         *
          * @param name
          */
         public ClassInfo(String name) {
@@ -797,20 +800,21 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
         /**
          * Create a new instance
-         * 
+         *
          * @param vmClass
          */
-        public ClassInfo(VmType< ? > vmClass) {
+        public ClassInfo(VmType<?> vmClass) {
             this.name = vmClass.getName();
             this.vmClass = vmClass;
             if (name.indexOf('/') >= 0) {
                 throw new IllegalArgumentException(
-                        "vmClass.getName() contains '/'");
+                    "vmClass.getName() contains '/'");
             }
         }
 
         /**
          * Returns the name of the class
+         *
          * @return the name of the class
          */
         public final String getName() {
@@ -821,8 +825,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
          * @return Type
          * @throws ClassNotFoundException
          */
-        public final synchronized VmType< ? > getVmClass()
-                throws ClassNotFoundException {
+        public final synchronized VmType<?> getVmClass()
+            throws ClassNotFoundException {
             while (vmClass == null) {
                 if (error) {
                     throw new ClassNotFoundException(name + "; " + errorMsg);
@@ -851,7 +855,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         /**
          * Signal a class loading error. This will release other threads waiting
          * for this class with a ClassNotFoundException.
-         * @param errorMsg 
+         *
+         * @param errorMsg
          */
         public final synchronized void setLoadError(String errorMsg) {
             this.error = true;
@@ -861,7 +866,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
         /**
          * Has the class wrapped by this object been loaded?
-         * 
+         *
          * @return if the class wrapped by this object has been loaded
          */
         public boolean isLoaded() {
@@ -871,7 +876,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the mapping between method name&types and selectors.
-     * 
+     *
      * @return The map
      */
     public final SelectorMap getSelectorMap() {
@@ -880,7 +885,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the statics table.
-     * 
+     *
      * @return The statics table
      */
     public final VmSharedStatics getSharedStatics() {
@@ -889,7 +894,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the isolated statics table (of the current isolate)
-     * 
+     *
      * @return The statics table
      */
     public final VmIsolatedStatics getIsolatedStatics() {
@@ -902,7 +907,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the architecture used by this loader.
-     * 
+     *
      * @return The architecture
      */
     public final VmArchitecture getArchitecture() {
@@ -911,7 +916,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Should prepared classes be compiled.
-     * 
+     *
      * @return boolean
      */
     public boolean isCompileRequired() {

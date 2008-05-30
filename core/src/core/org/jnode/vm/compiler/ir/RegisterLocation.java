@@ -18,24 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
  */
 public class RegisterLocation<T> extends Location<T> {
-	private T register;
-	
-	/**
-	 * @param register
-	 */
-	public RegisterLocation(T register) {
-		super(register.toString());
-		this.register = register;
-	}
-	
-	public T getRegister() {
-		return register;
-	}
+    private T register;
+
+    /**
+     * @param register
+     */
+    public RegisterLocation(T register) {
+        super(register.toString());
+        this.register = register;
+    }
+
+    public T getRegister() {
+        return register;
+    }
 }

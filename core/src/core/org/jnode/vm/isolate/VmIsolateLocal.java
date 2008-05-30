@@ -9,19 +9,24 @@ import org.jnode.vm.VmSystemObject;
 /**
  * Holder for variables specific to an isolate.
  * This class can be compared to ThreadLocal.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class VmIsolateLocal<T> extends VmSystemObject {
 
-    /** Object used in root isolate */
+    /**
+     * Object used in root isolate
+     */
     private T rootObject;
 
-    /** Map used for non-root isolates */
+    /**
+     * Map used for non-root isolates
+     */
     private BootableHashMap<VmIsolate, T> map;
-    
+
     /**
      * Gets the stored object reference.
+     *
      * @return
      */
     public T get() {
@@ -35,7 +40,7 @@ public final class VmIsolateLocal<T> extends VmSystemObject {
             }
         }
     }
-    
+
     /**
      * Sets the stored object reference for the current isolate.
      */
@@ -47,6 +52,6 @@ public final class VmIsolateLocal<T> extends VmSystemObject {
                 map = new BootableHashMap<VmIsolate, T>();
             }
             map.put(VmIsolate.currentIsolate(), object);
-        }        
+        }
     }
 }

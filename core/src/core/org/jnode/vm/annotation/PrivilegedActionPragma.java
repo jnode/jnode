@@ -18,27 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
+import java.lang.annotation.Documented;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
-import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * Exception used to signal privileged methods. A privileged method is similar
  * to {@link java.security.PrivilegedAction} but avoids creation a new object
  * instance.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented
 @Retention(CLASS)
-@Target({ METHOD, CONSTRUCTOR })
+@Target({METHOD, CONSTRUCTOR })
 public @interface PrivilegedActionPragma {
 
 }

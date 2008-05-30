@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
-
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
@@ -33,16 +32,18 @@ import org.jnode.vm.classmgr.VmType;
  */
 abstract class VmAbstractClassLoader extends VmClassLoader {
 
-	/**
-	 * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, byte[], int, int, java.security.ProtectionDomain)
-	 */
-	public final VmType<?> defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain) {
+    /**
+     * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, byte[], int, int,
+     * java.security.ProtectionDomain)
+     */
+    public final VmType<?> defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain) {
         ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
         return defineClass(name, buf, protDomain);
-	}
-	
+    }
+
     /**
-     * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, ByteBuffer, java.security.ProtectionDomain)
+     * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, ByteBuffer,
+     * java.security.ProtectionDomain)
      */
     public final VmType<?> defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
         VmType<?> vmClass;
@@ -70,10 +71,10 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
         }
         return vmClass;
     }
-    
+
     /**
      * Define a class that is created in memory.
-     * 
+     *
      * @param createdType
      * @return VmClass
      */
@@ -87,39 +88,39 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
             return vmClass;
         }
         addLoadedClass(name, createdType);
-        return createdType;        
+        return createdType;
     }
-    
-	/**
-	 * Load an array class with a given name
-	 * 
-	 * @param name
-	 * @param resolve
-	 * @return VmClass
-	 * @throws ClassNotFoundException
-	 */
-	protected final VmType loadArrayClass(String name, boolean resolve) throws ClassNotFoundException {
-		VmType<?> compType;
-		String compName = name.substring(1);
-		if ((compName.charAt(0) == 'L') && (compName.charAt(compName.length() - 1) == ';')) {
-			compName = compName.substring(1, compName.length() - 1);
-			compType = loadClass(compName, resolve);
-			return compType.getArrayClass();
-		} else if (compName.charAt(0) == '[') {
-			compType = loadClass(compName, resolve);
-			return compType.getArrayClass();
-		} else {
-			return VmType.getPrimitiveArrayClass(compName.charAt(0));
-		}
-	}
 
-	protected abstract SelectorMap getSelectorMap();
+    /**
+     * Load an array class with a given name
+     *
+     * @param name
+     * @param resolve
+     * @return VmClass
+     * @throws ClassNotFoundException
+     */
+    protected final VmType loadArrayClass(String name, boolean resolve) throws ClassNotFoundException {
+        VmType<?> compType;
+        String compName = name.substring(1);
+        if ((compName.charAt(0) == 'L') && (compName.charAt(compName.length() - 1) == ';')) {
+            compName = compName.substring(1, compName.length() - 1);
+            compType = loadClass(compName, resolve);
+            return compType.getArrayClass();
+        } else if (compName.charAt(0) == '[') {
+            compType = loadClass(compName, resolve);
+            return compType.getArrayClass();
+        } else {
+            return VmType.getPrimitiveArrayClass(compName.charAt(0));
+        }
+    }
 
-	/**
-	 * Add a class that has been loaded.
-	 * 
-	 * @param name
-	 * @param cls
-	 */
-	protected abstract void addLoadedClass(String name, VmType cls);
+    protected abstract SelectorMap getSelectorMap();
+
+    /**
+     * Add a class that has been loaded.
+     *
+     * @param name
+     * @param cls
+     */
+    protected abstract void addLoadedClass(String name, VmType cls);
 }

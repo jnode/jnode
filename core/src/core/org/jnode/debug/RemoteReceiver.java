@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debug;
 
 import java.io.FileOutputStream;
@@ -38,21 +38,21 @@ import java.net.SocketAddress;
  */
 public class RemoteReceiver {
     public static final int DEFAULT_PORT = 5612;
-    
+
     private static class UDPReceiver {
         private final DatagramSocket socket;
         private final OutputStream out;
-        
+
         public UDPReceiver(int port, OutputStream out)
-        throws IOException {
+            throws IOException {
             final SocketAddress address = new InetSocketAddress(port);
             this.socket = new DatagramSocket(address);
             this.out = out;
         }
-        
-        public void run() 
-        throws IOException {
-            final byte[] buf = new byte[2*4096];
+
+        public void run()
+            throws IOException {
+            final byte[] buf = new byte[2 * 4096];
             final DatagramPacket p = new DatagramPacket(buf, buf.length);
             while (true) {
                 socket.receive(p);
@@ -66,25 +66,25 @@ public class RemoteReceiver {
         }
 
     }
-    
+
     private static class TCPReceiver {
         private final OutputStream out;
         private final int port;
-        
+
         public TCPReceiver(int port, OutputStream out)
-        throws IOException {
+            throws IOException {
             this.out = out;
             this.port = port;
         }
-        
-        public void run() 
-        throws IOException {
+
+        public void run()
+            throws IOException {
             ServerSocket serverSocket = new ServerSocket();
             serverSocket.bind(new InetSocketAddress(port));
             Socket socket = serverSocket.accept();
             InputStream is = socket.getInputStream();
             socket.shutdownOutput();
-            final byte[] buf = new byte[2*4096];
+            final byte[] buf = new byte[2 * 4096];
             while (true) {
                 int count = is.read(buf);
                 if (count == -1) {
@@ -103,26 +103,25 @@ public class RemoteReceiver {
 
     }
 
-	
-	public static void main(String[] args) 
-	throws IOException {
-	    if (args.length > 0 && (args[0].equals("--help") || args[0].equals("-h"))) {
-	        System.err.println("Usage: receiver [--udp] [<port> [<out-file>]]");
-	        return;
-	    }
-	    int i = 0;
-	    final boolean udp = args.length > 0 && args[0].equals("--udp");
-	    if (udp) {
-	        i++;
-	    }
-		final int port = (args.length > i) ? Integer.parseInt(args[i++]) : DEFAULT_PORT;
-		final String fname = (args.length > i) ? args[i++] : null;
-		OutputStream out = (fname != null) ? new FileOutputStream(fname, true) : null;
-		if (udp) {
-		    new UDPReceiver(port, out).run();
-		}
-		else {
-		    new TCPReceiver(port, out).run();
-		}
-	}
+
+    public static void main(String[] args)
+        throws IOException {
+        if (args.length > 0 && (args[0].equals("--help") || args[0].equals("-h"))) {
+            System.err.println("Usage: receiver [--udp] [<port> [<out-file>]]");
+            return;
+        }
+        int i = 0;
+        final boolean udp = args.length > 0 && args[0].equals("--udp");
+        if (udp) {
+            i++;
+        }
+        final int port = (args.length > i) ? Integer.parseInt(args[i++]) : DEFAULT_PORT;
+        final String fname = (args.length > i) ? args[i++] : null;
+        OutputStream out = (fname != null) ? new FileOutputStream(fname, true) : null;
+        if (udp) {
+            new UDPReceiver(port, out).run();
+        } else {
+            new TCPReceiver(port, out).run();
+        }
+    }
 }

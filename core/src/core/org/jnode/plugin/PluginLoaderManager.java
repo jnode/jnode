@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 
@@ -26,15 +26,17 @@ package org.jnode.plugin;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class PluginLoaderManager extends PluginLoader {
-    
+
     /**
      * Add a plugin loader.
+     *
      * @param loader
      */
     public abstract void addPluginLoader(PluginLoader loader);
 
     /**
      * Remove a plugin loader.
+     *
      * @param loader
      */
     public abstract void removePluginLoader(PluginLoader loader);

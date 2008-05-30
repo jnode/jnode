@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -39,12 +39,14 @@ final class VmBootHeap extends VmAbstractHeap {
 
     //public static final String START_FIELD_NAME = "start";
     //public static final String END_FIELD_NAME = "end";
-    /** Offset (in bytes) from the start of an object to the size of an object */
+    /**
+     * Offset (in bytes) from the start of an object to the size of an object
+     */
     private Offset sizeOffset;
 
     /**
      * Initialize this instance
-     * 
+     *
      * @param helper
      */
     public VmBootHeap(HeapHelper helper) {
@@ -72,7 +74,7 @@ final class VmBootHeap extends VmAbstractHeap {
         // Create an allocation bitmap
         final int heapSize = getSize();
         final int bits = ObjectLayout.objectAlign(heapSize)
-                / ObjectLayout.OBJECT_ALIGN;
+            / ObjectLayout.OBJECT_ALIGN;
         final int bitmapSize = ObjectLayout.objectAlign(bits / 8);
         allocationBitmapPtr = helper.allocateBlock(Extent.fromIntZeroExtend(bitmapSize));
         //allocationBitmapPtr = MemoryBlockManager.allocateBlock(bitmapSize);
@@ -94,12 +96,11 @@ final class VmBootHeap extends VmAbstractHeap {
 
     /**
      * Let all objects in this heap make a visit to the given visitor.
-     * 
+     *
      * @param visitor
-     * @param locking
-     *            If true, use lock/unlock while proceeding to the next object.
-     *            This parameter is irrelevant here, since the structure of
-     *            this heap never changes.
+     * @param locking If true, use lock/unlock while proceeding to the next object.
+     *                This parameter is irrelevant here, since the structure of
+     *                this heap never changes.
      */
     protected void walk(ObjectVisitor visitor, boolean locking, Word flagsMask, Word flagsValue) {
         // Go through the heap and mark all objects in the allocation bitmap.

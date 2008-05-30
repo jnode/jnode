@@ -18,13 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler.x86;
 
 /**
  * Exception used to signal an opcode with is invalid in the current
  * operating mode.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class InvalidOpcodeException extends RuntimeException {
@@ -35,7 +35,7 @@ public class InvalidOpcodeException extends RuntimeException {
     private static final long serialVersionUID = 3761408616460268596L;
 
     /**
-     * 
+     *
      */
     public InvalidOpcodeException() {
         super();

@@ -18,18 +18,18 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir.quad;
 
 public enum BranchCondition {
 
     IFEQ("== 0", false), IFNE("!= 0", false), IFLT("< 0", false), IFGE(
-            ">= 0", false), IFGT("> 0", false), IFLE("<= 0", false),
+    ">= 0", false), IFGT("> 0", false), IFLE("<= 0", false),
 
     IFNONNULL("!= null", false), IFNULL("== null", false),
 
     IF_ICMPEQ("==", true), IF_ICMPNE("!=", true), IF_ICMPLT("<", true), IF_ICMPGE(
-            ">=", true), IF_ICMPGT(">", true), IF_ICMPLE("<=", true),
+    ">=", true), IF_ICMPGT(">", true), IF_ICMPLE("<=", true),
 
     IF_ACMPEQ("==", true), IF_ACMPNE("!=", true);
 

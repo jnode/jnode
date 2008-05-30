@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
@@ -26,29 +26,29 @@ package org.jnode.vm.compiler.ir;
  * @author Levente S\u00e1ntha
  */
 public abstract class Constant<T> extends Operand<T> {
-	public Constant(int type) {
-		super(type);
-	}
-	
-	public static <T> Constant<T> getInstance(int value) {
-		return new IntConstant<T>(value);
-	}
-	
-	public static <T> Constant<T> getInstance(long value) {
-		return new LongConstant<T>(value);
-	}
-	
-	public static <T> Constant<T> getInstance(float value) {
-		return new FloatConstant<T>(value);
-	}
-	
-	public static <T> Constant<T> getInstance(double value) {
-		return new DoubleConstant<T>(value);
-	}
-	
-	public static final <T> Constant<T> getInstance(Object value) {
-		return new ReferenceConstant<T>(value);
-	}
+    public Constant(int type) {
+        super(type);
+    }
+
+    public static <T> Constant<T> getInstance(int value) {
+        return new IntConstant<T>(value);
+    }
+
+    public static <T> Constant<T> getInstance(long value) {
+        return new LongConstant<T>(value);
+    }
+
+    public static <T> Constant<T> getInstance(float value) {
+        return new FloatConstant<T>(value);
+    }
+
+    public static <T> Constant<T> getInstance(double value) {
+        return new DoubleConstant<T>(value);
+    }
+
+    public static final <T> Constant<T> getInstance(Object value) {
+        return new ReferenceConstant<T>(value);
+    }
 
     ///////////////// UNARY OPERATIONS ////////////////////
     public Constant<T> i2l() {
@@ -148,361 +148,333 @@ public abstract class Constant<T> extends Operand<T> {
 
 
     ///////////////// BINARY OPERATIONS ////////////////////
-	/**
-	 * @param c2
-	 */
-	public Constant<T> iAdd(Constant<T> c2) {
-		int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 + i2);
-	}
-
-	/**
-	 * @param c2
-	 */
-	public Constant<T> iSub(Constant<T> c2) {
-		int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 - i2);
-	}
-
-	/**
-	 * @param c2
-	 */
-	public Constant<T> iMul(Constant<T> c2) {
-		int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 * i2);
-	}
-
-	/**
-	 * @param c2
-	 */
-	public Constant<T> iDiv(Constant<T> c2) {
-		int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 / i2);
-	}
+    /**
+     * @param c2
+     */
+    public Constant<T> iAdd(Constant<T> c2) {
+        int i1 = ((IntConstant<T>) this).getValue();
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 + i2);
+    }
 
     /**
-     *
+     * @param c2
+     */
+    public Constant<T> iSub(Constant<T> c2) {
+        int i1 = ((IntConstant<T>) this).getValue();
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 - i2);
+    }
+
+    /**
+     * @param c2
+     */
+    public Constant<T> iMul(Constant<T> c2) {
+        int i1 = ((IntConstant<T>) this).getValue();
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 * i2);
+    }
+
+    /**
+     * @param c2
+     */
+    public Constant<T> iDiv(Constant<T> c2) {
+        int i1 = ((IntConstant<T>) this).getValue();
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 / i2);
+    }
+
+    /**
      * @param c2
      * @return
      */
     public Constant<T> iRem(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 % i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 % i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> iAnd(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 & i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 & i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> iOr(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 | i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 | i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> iXor(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 ^ i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 ^ i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> iShl(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 << i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 << i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> iShr(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 >> i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 >> i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> iUshr(Constant<T> c2) {
         int i1 = ((IntConstant<T>) this).getValue();
-		int i2 = ((IntConstant<T>) c2).getValue();
-		return new IntConstant<T>(i1 >>> i2);
+        int i2 = ((IntConstant<T>) c2).getValue();
+        return new IntConstant<T>(i1 >>> i2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lAdd(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 + l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 + l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lSub(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 - l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 - l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lMul(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 * l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 * l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lDiv(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 / l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 / l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lRem(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 % l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 % l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lAnd(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 & l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 & l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lOr(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 | l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 | l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lXor(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 ^ l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 ^ l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lShl(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 << l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 << l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lShr(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 >> l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 >> l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> lUshr(Constant<T> c2) {
         long l1 = ((LongConstant<T>) this).getValue();
-		long l2 = ((LongConstant<T>) c2).getValue();
-		return new LongConstant<T>(l1 >>> l2);
+        long l2 = ((LongConstant<T>) c2).getValue();
+        return new LongConstant<T>(l1 >>> l2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> fAdd(Constant<T> c2) {
         float f1 = ((FloatConstant<T>) this).getValue();
-		float f2 = ((FloatConstant<T>) c2).getValue();
-		return new FloatConstant<T>(f1 + f2);
+        float f2 = ((FloatConstant<T>) c2).getValue();
+        return new FloatConstant<T>(f1 + f2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> fSub(Constant<T> c2) {
         float f1 = ((FloatConstant<T>) this).getValue();
-		float f2 = ((FloatConstant<T>) c2).getValue();
-		return new FloatConstant<T>(f1 - f2);
+        float f2 = ((FloatConstant<T>) c2).getValue();
+        return new FloatConstant<T>(f1 - f2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> fMul(Constant<T> c2) {
         float f1 = ((FloatConstant<T>) this).getValue();
-		float f2 = ((FloatConstant<T>) c2).getValue();
-		return new FloatConstant<T>(f1 * f2);
+        float f2 = ((FloatConstant<T>) c2).getValue();
+        return new FloatConstant<T>(f1 * f2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> fDiv(Constant<T> c2) {
         float f1 = ((FloatConstant<T>) this).getValue();
-		float f2 = ((FloatConstant<T>) c2).getValue();
-		return new FloatConstant<T>(f1 / f2);
+        float f2 = ((FloatConstant<T>) c2).getValue();
+        return new FloatConstant<T>(f1 / f2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> fRem(Constant<T> c2) {
         float f1 = ((FloatConstant<T>) this).getValue();
-		float f2 = ((FloatConstant<T>) c2).getValue();
-		return new FloatConstant<T>(f1 / f2);
+        float f2 = ((FloatConstant<T>) c2).getValue();
+        return new FloatConstant<T>(f1 / f2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> dAdd(Constant<T> c2) {
         double d1 = ((DoubleConstant<T>) this).getValue();
-		double d2 = ((DoubleConstant<T>) c2).getValue();
-		return new DoubleConstant<T>(d1 + d2);
+        double d2 = ((DoubleConstant<T>) c2).getValue();
+        return new DoubleConstant<T>(d1 + d2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> dSub(Constant<T> c2) {
         double d1 = ((DoubleConstant<T>) this).getValue();
-		double d2 = ((DoubleConstant<T>) c2).getValue();
-		return new DoubleConstant<T>(d1 - d2);
+        double d2 = ((DoubleConstant<T>) c2).getValue();
+        return new DoubleConstant<T>(d1 - d2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> dMul(Constant<T> c2) {
         double d1 = ((DoubleConstant<T>) this).getValue();
-		double d2 = ((DoubleConstant<T>) c2).getValue();
-		return new DoubleConstant<T>(d1 * d2);
+        double d2 = ((DoubleConstant<T>) c2).getValue();
+        return new DoubleConstant<T>(d1 * d2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> dDiv(Constant<T> c2) {
         double d1 = ((DoubleConstant<T>) this).getValue();
-		double d2 = ((DoubleConstant<T>) c2).getValue();
-		return new DoubleConstant<T>(d1 / d2);
+        double d2 = ((DoubleConstant<T>) c2).getValue();
+        return new DoubleConstant<T>(d1 / d2);
     }
 
     /**
-     *
      * @param c2
      * @return
      */
     public Constant<T> dRem(Constant<T> c2) {
         double d1 = ((DoubleConstant<T>) this).getValue();
-		double d2 = ((DoubleConstant<T>) c2).getValue();
-		return new DoubleConstant<T>(d1 % d2);
+        double d2 = ((DoubleConstant<T>) c2).getValue();
+        return new DoubleConstant<T>(d1 % d2);
     }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
-	 */
-	public Operand<T> simplify() {
-		return this;
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.Operand#simplify()
+     */
+    public Operand<T> simplify() {
+        return this;
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
-	 */
-	public AddressingMode getAddressingMode() {
-		return AddressingMode.CONSTANT;
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
+     */
+    public AddressingMode getAddressingMode() {
+        return AddressingMode.CONSTANT;
+    }
 }

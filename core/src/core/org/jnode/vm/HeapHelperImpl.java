@@ -26,6 +26,7 @@ import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.scheduler.Monitor;
@@ -33,7 +34,6 @@ import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import org.jnode.vm.scheduler.VmThreadVisitor;
-import org.jnode.vm.isolate.VmIsolate;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -53,7 +53,7 @@ final class HeapHelperImpl extends HeapHelper {
         private ObjectVisitor visitor;
 
         public final void initialize(ObjectVisitor visitor,
-                VmHeapManager heapManager) {
+                                     VmHeapManager heapManager) {
             this.visitor = visitor;
             this.heapManager = heapManager;
         }
@@ -69,13 +69,13 @@ final class HeapHelperImpl extends HeapHelper {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param arch
      */
     public HeapHelperImpl(VmArchitecture arch) {
         if (Vm.getVm() != null) {
             throw new SecurityException(
-                    "Cannot instantiate HeapHelpImpl at runtime");
+                "Cannot instantiate HeapHelpImpl at runtime");
         }
         final int refSize = arch.getReferenceSize();
         flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
@@ -91,7 +91,7 @@ final class HeapHelperImpl extends HeapHelper {
 
     /**
      * Change the color of the given object from oldColor to newColor.
-     * 
+     *
      * @param dst
      * @param oldColor
      * @param newColor
@@ -99,19 +99,19 @@ final class HeapHelperImpl extends HeapHelper {
      *         object was not equal to oldColor.
      */
     public boolean atomicChangeObjectColor(Object dst, int oldColor,
-            int newColor) {
+                                           int newColor) {
         final Address addr = ObjectReference.fromObject(dst).toAddress().add(
-                flagsOffset);
+            flagsOffset);
         for (;;) {
             Word oldValue = addr.prepareWord();
             if (oldValue
-                    .and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK))
-                    .NE(Word.fromIntZeroExtend(oldColor))) {
+                .and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK))
+                .NE(Word.fromIntZeroExtend(oldColor))) {
                 return false;
             }
             Word newValue = oldValue.and(
-                    Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK).not())
-                    .or(Word.fromIntZeroExtend(newColor));
+                Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK).not())
+                .or(Word.fromIntZeroExtend(newColor));
             if (addr.attempt(oldValue, newValue)) {
                 return true;
             }
@@ -145,7 +145,7 @@ final class HeapHelperImpl extends HeapHelper {
     public final void die(String msg) {
         try {
             VmProcessor.current().getArchitecture().getStackReader()
-                    .debugStackTrace();
+                .debugStackTrace();
         } finally {
             Unsafe.die(msg);
         }
@@ -215,12 +215,12 @@ final class HeapHelperImpl extends HeapHelper {
 
     /**
      * Mark the given object as finalized.
-     * 
+     *
      * @param dst
      */
     public final void setFinalized(Object dst) {
         final Address addr = ObjectReference.fromObject(dst).toAddress().add(
-                flagsOffset);
+            flagsOffset);
         int oldValue;
         int newValue;
         do {
@@ -243,7 +243,7 @@ final class HeapHelperImpl extends HeapHelper {
 
     /**
      * Visit all roots of the object tree.
-     * 
+     *
      * @param visitor
      */
     public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager) {

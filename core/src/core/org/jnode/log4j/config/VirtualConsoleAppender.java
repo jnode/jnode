@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.log4j.config;
 
 import java.io.OutputStreamWriter;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
 import org.jnode.driver.console.TextConsole;
@@ -32,12 +31,13 @@ import org.jnode.driver.console.TextConsole;
  */
 public class VirtualConsoleAppender extends WriterAppender {
 
-	/**
-	 * Create an appender for a given console
-	 * @param console
-	 */
-	public VirtualConsoleAppender(TextConsole console, Layout layout) {
-		setLayout(layout);
-		setWriter(new OutputStreamWriter(console.getOut()));
-	}
+    /**
+     * Create an appender for a given console
+     *
+     * @param console
+     */
+    public VirtualConsoleAppender(TextConsole console, Layout layout) {
+        setLayout(layout);
+        setWriter(new OutputStreamWriter(console.getOut()));
+    }
 }

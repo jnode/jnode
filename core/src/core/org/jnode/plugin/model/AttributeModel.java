@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import org.jnode.vm.BootableObject;
@@ -28,25 +28,25 @@ import org.jnode.vm.BootableObject;
  */
 final class AttributeModel implements BootableObject {
 
-	private final String name;
-	private final String value;
-	
-	public AttributeModel(String name, String value) {
-		this.name = name;
-		this.value = value;
-	}
+    private final String name;
+    private final String value;
 
-	/**
-	 * Gets the name of this attribute
-	 */
-	public String getName() {
-		return name;
-	}
+    public AttributeModel(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
-	/**
-	 * Gets the value of this attribute
-	 */
-	public String getValue() {
-		return value;
-	}
+    /**
+     * Gets the name of this attribute
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the value of this attribute
+     */
+    public String getValue() {
+        return value;
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 /**
@@ -28,18 +28,18 @@ package org.jnode.vm.classmgr;
  */
 public class VmStaticMethod extends VmMethod {
 
-	/**
-	 * @param name
-	 * @param signature
-	 * @param modifiers
-	 * @param declaringClass
-	 */
-	public VmStaticMethod(
-		String name,
-		String signature,
-		int modifiers,
-		VmType declaringClass) {
-		super(name, signature, modifiers, declaringClass);
-	}
+    /**
+     * @param name
+     * @param signature
+     * @param modifiers
+     * @param declaringClass
+     */
+    public VmStaticMethod(
+        String name,
+        String signature,
+        int modifiers,
+        VmType declaringClass) {
+        super(name, signature, modifiers, declaringClass);
+    }
 
 }

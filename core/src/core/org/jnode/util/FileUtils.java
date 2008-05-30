@@ -38,65 +38,67 @@ import java.nio.ByteBuffer;
  */
 public class FileUtils {
 
-	/**
-	 * Copy dest.length bytes from the inputstream into the dest bytearray.
-	 * @param is
-	 * @param dest
-	 * @throws IOException
-	 */
-	public static void copy(InputStream is, byte[] dest)
-	throws IOException {
-		int len = dest.length;
-		int ofs = 0;
-		while (len > 0) {
-			int size = is.read(dest, ofs, len);
-			ofs += size;
-			len -= size;
-		}
-	}
+    /**
+     * Copy dest.length bytes from the inputstream into the dest bytearray.
+     *
+     * @param is
+     * @param dest
+     * @throws IOException
+     */
+    public static void copy(InputStream is, byte[] dest)
+        throws IOException {
+        int len = dest.length;
+        int ofs = 0;
+        while (len > 0) {
+            int size = is.read(dest, ofs, len);
+            ofs += size;
+            len -= size;
+        }
+    }
 
-	/**
-	 * Copy the contents of is to os.
-	 * @param is
-	 * @param os
-	 * @param buf Can be null
-	 * @param close If true, is is closed after the copy.
-	 * @throws IOException
-	 */
-	public static final void copy(InputStream is, OutputStream os, byte[] buf, boolean close) throws IOException {
-		try
-		{
-			int len;
-			if (buf == null) {
-				buf = new byte[4096];
-			}
-			while ((len = is.read(buf)) > 0) {
-				os.write(buf, 0, len);
-			}
-			os.flush();
-		}
-		finally // in any case, we must close the stream if requested
-		{
-			if (close) {
-				is.close();
-			}
-		}
-	}
+    /**
+     * Copy the contents of is to os.
+     *
+     * @param is
+     * @param os
+     * @param buf   Can be null
+     * @param close If true, is is closed after the copy.
+     * @throws IOException
+     */
+    public static final void copy(InputStream is, OutputStream os, byte[] buf, boolean close) throws IOException {
+        try {
+            int len;
+            if (buf == null) {
+                buf = new byte[4096];
+            }
+            while ((len = is.read(buf)) > 0) {
+                os.write(buf, 0, len);
+            }
+            os.flush();
+        } finally {
+            // in any case, we must close the stream if requested
+            if (close) {
+                is.close();
+            }
+        }
+    }
 
-	/**
-	 * Copy the contents of is to the returned byte array.
-	 * @param is
-	 * @param close If true, is is closed after the copy.
-	 * @throws IOException
-	 */
-	public static final byte[] load(InputStream is, boolean close) throws IOException {
-		final ByteArrayOutputStream os = new ByteArrayOutputStream();
-		copy(is, os, null, close);
-		return os.toByteArray();
-	}
+    /**
+     * Copy the contents of is to the returned byte array.
+     *
+     * @param is
+     * @param close If true, is is closed after the copy.
+     * @throws IOException
+     */
+    public static final byte[] load(InputStream is, boolean close) throws IOException {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        copy(is, os, null, close);
+        return os.toByteArray();
+    }
 
     /**
      * Copy the contents of is to the returned byte buffer.
+     *
      * @param is
      * @param close If true, is is closed after the copy.
      * @throws IOException
@@ -105,50 +107,44 @@ public class FileUtils {
         return ByteBuffer.wrap(load(is, close));
     }
 
-	/**
-	 * close quietly a stream (no IOException thrown), which might be null
-	 *
-	 * @param closeable the stream to close, might be null
-	 *
-	 * @return true if the stream was null or was closed properly
-	 */
-    public static final boolean close(Closeable closeable)
-	{
-		boolean ok = false;
+    /**
+     * close quietly a stream (no IOException thrown), which might be null
+     *
+     * @param closeable the stream to close, might be null
+     * @return true if the stream was null or was closed properly
+     */
+    public static final boolean close(Closeable closeable) {
+        boolean ok = false;
 
-		try {
-			if(closeable != null)
-			{
-				closeable.close();
-			}
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
 
-			ok = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            ok = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		return ok;
-	}
+        return ok;
+    }
 
-	public static final void copyFile(File srcFile, File destFile) throws IOException {
+    public static final void copyFile(File srcFile, File destFile) throws IOException {
         InputStream in = null;
         OutputStream out = null;
 
-        try
-        {
-	        in = new FileInputStream(srcFile);
-	        out = new FileOutputStream(destFile);
+        try {
+            in = new FileInputStream(srcFile);
+            out = new FileOutputStream(destFile);
 
-	        byte[] buffer = new byte[1024];
-	        int bytesRead;
-	        while ((bytesRead = in.read(buffer)) >= 0) {
-	            out.write(buffer, 0, bytesRead);
-	        }
-        }
-        finally
-        {
-        	FileUtils.close(out);
-        	FileUtils.close(in);
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) >= 0) {
+                out.write(buffer, 0, bytesRead);
+            }
+        } finally {
+            FileUtils.close(out);
+            FileUtils.close(in);
         }
     }
 

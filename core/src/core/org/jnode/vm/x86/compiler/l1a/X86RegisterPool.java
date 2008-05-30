@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -29,26 +29,34 @@ import org.jnode.vm.JvmType;
  * @author Madhu Siddalingaiah
  * @author Patrik Reali
  * @author Ewout Prangsma
- * 
- * Handle the pool of registers Taken from l2 compiler. Should be merged with it
- * in the end, integrating the changes.
- * 
- * TODO: merge with l2's version of X86RegisterPool
+ *         <p/>
+ *         Handle the pool of registers Taken from l2 compiler. Should be merged with it
+ *         in the end, integrating the changes.
+ *         <p/>
+ *         TODO: merge with l2's version of X86RegisterPool
  */
 abstract class X86RegisterPool {
 
-    /** All available registers and their current usage */
+    /**
+     * All available registers and their current usage
+     */
     private final RegisterGroupUsage[] registers;
 
-    /** Length of registers */
+    /**
+     * Length of registers
+     */
     private final int regCount;
 
     private final boolean lastFirst;
 
-    /** Minimum index of the register that can be requested if !lastFirst */
+    /**
+     * Minimum index of the register that can be requested if !lastFirst
+     */
     private final int minimumRequestIndex;
 
-    /** Index of the last requested register */
+    /**
+     * Index of the last requested register
+     */
     private int lastRequestIndex;
 
     /**
@@ -71,11 +79,9 @@ abstract class X86RegisterPool {
 
     /**
      * require a register from the pool
-     * 
-     * @param type
-     *            the register type (from Operand)
-     * @param owner
-     *            the register owner
+     *
+     * @param type  the register type (from Operand)
+     * @param owner the register owner
      * @return the allocated register or null
      */
     public final X86Register request(int type, Item owner) {
@@ -84,15 +90,13 @@ abstract class X86RegisterPool {
 
     /**
      * require a register from the pool
-     * 
-     * @param type
-     *            the register type (from Operand)
-     * @param owner
-     *            the register owner
+     *
+     * @param type  the register type (from Operand)
+     * @param owner the register owner
      * @return the allocated register or null
      */
     public final X86Register request(int type, Item owner, boolean supportBits8) {
-         if (!lastFirst) {
+        if (!lastFirst) {
             for (int i = regCount - 1 - minimumRequestIndex; i >= 0; i--) {
                 lastRequestIndex--;
                 if (lastRequestIndex < minimumRequestIndex) {
@@ -131,7 +135,7 @@ abstract class X86RegisterPool {
 
     /**
      * Check whether the given register is free
-     * 
+     *
      * @param register
      * @return true, when register is free
      */
@@ -141,7 +145,7 @@ abstract class X86RegisterPool {
 
     /**
      * Check whether the given register is to be saved by a called method.
-     * 
+     *
      * @param register
      * @return true, when register is to be saved by a called method
      */
@@ -151,7 +155,7 @@ abstract class X86RegisterPool {
 
     /**
      * Require a particular register
-     * 
+     *
      * @param register
      * @return false, if the register is already in use
      */
@@ -166,7 +170,7 @@ abstract class X86RegisterPool {
 
     /**
      * Require a particular register
-     * 
+     *
      * @param register
      * @return false, if the register is already in use
      */
@@ -176,7 +180,7 @@ abstract class X86RegisterPool {
 
     /**
      * return the register's owner
-     * 
+     *
      * @param register
      * @return the owner (may be null if not set or when register not allocated)
      */
@@ -186,11 +190,9 @@ abstract class X86RegisterPool {
 
     /**
      * transfer ownership of a register
-     * 
-     * @param register
-     *            the register to be transferred
-     * @param newOwner
-     *            the register's new owner
+     *
+     * @param register the register to be transferred
+     * @param newOwner the register's new owner
      */
     public final void transferOwnerTo(X86Register register, Item newOwner) {
         get(register).setOwner(newOwner);
@@ -205,16 +207,15 @@ abstract class X86RegisterPool {
 
     /**
      * Reset the register pool
-     * 
-     * @param os
-     *            stream for issuing warning messages
+     *
+     * @param os stream for issuing warning messages
      */
     public final void reset(X86Assembler os) {
         boolean inuse = false;
         for (int i = regCount - 1; i >= 0; i--) {
             if (!registers[i].isFree()) {
                 os.log("Warning: register in use"
-                        + registers[i].getUsedRegister());
+                    + registers[i].getUsedRegister());
                 inuse = true;
             }
         }
@@ -228,7 +229,7 @@ abstract class X86RegisterPool {
      * Gets the register in the same group as the given register, but now for
      * the new type. E.g. getRegisterInSameGroup(X86Register.RAX, JvmType.INT)
      * returns X86Register.EAX;
-     * 
+     *
      * @param src
      * @param newType
      * @return
@@ -240,7 +241,7 @@ abstract class X86RegisterPool {
 
     /**
      * Gets the register usage for a given register.
-     * 
+     *
      * @param reg
      * @return
      */
@@ -256,7 +257,7 @@ abstract class X86RegisterPool {
 
     /**
      * Invoke the visit method on the given visitor for all used registers.
-     * 
+     *
      * @param visitor
      */
     public final void visitUsedRegisters(RegisterVisitor visitor) {
@@ -270,7 +271,7 @@ abstract class X86RegisterPool {
 
     /**
      * Convert to a string representation.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public final String toString() {
@@ -284,7 +285,7 @@ abstract class X86RegisterPool {
 
     /**
      * Pool of GPR registers in 32-bit mode.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class GPRs32 extends X86RegisterPool {
@@ -304,28 +305,23 @@ abstract class X86RegisterPool {
             // register.
             // The cost of a register is lower when its index in this
             // array is higher.
-            return new RegisterGroupUsage[] {
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.EAX,
-                            JvmType.INT), new RegisterEntry(X86Register.EAX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.EAX, JvmType.FLOAT), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.EDX,
-                            JvmType.INT), new RegisterEntry(X86Register.EDX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.EDX, JvmType.FLOAT), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.ECX,
-                            JvmType.INT), new RegisterEntry(X86Register.ECX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.ECX, JvmType.FLOAT), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.ESI,
-                            JvmType.INT), new RegisterEntry(X86Register.ESI,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.ESI, JvmType.FLOAT), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.EBX,
-                            JvmType.INT), new RegisterEntry(X86Register.EBX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.EBX, JvmType.FLOAT), false),
-                            };
+            return new RegisterGroupUsage[]{
+                new RegisterGroupUsage(new RegisterEntry(X86Register.EAX, JvmType.INT),
+                    new RegisterEntry(X86Register.EAX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.EAX, JvmType.FLOAT), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.EDX, JvmType.INT),
+                    new RegisterEntry(X86Register.EDX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.EDX, JvmType.FLOAT), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.ECX, JvmType.INT),
+                    new RegisterEntry(X86Register.ECX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.ECX, JvmType.FLOAT), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.ESI, JvmType.INT),
+                    new RegisterEntry(X86Register.ESI, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.ESI, JvmType.FLOAT), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.EBX, JvmType.INT),
+                    new RegisterEntry(X86Register.EBX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.EBX, JvmType.FLOAT), false),
+            };
             // EDI always points to the statics, do not use
         }
 
@@ -333,7 +329,7 @@ abstract class X86RegisterPool {
 
     /**
      * Pool of GPR registers in 64-bit mode.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class GPRs64 extends X86RegisterPool {
@@ -353,79 +349,67 @@ abstract class X86RegisterPool {
             // register.
             // The cost of a register is lower when its index in this
             // array is higher.
-            return new RegisterGroupUsage[] {
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.EAX,
-                            JvmType.INT), new RegisterEntry(X86Register.EAX,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.RAX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.RAX, JvmType.LONG), new RegisterEntry(
-                            X86Register.RAX, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.EDX,
-                            JvmType.INT), new RegisterEntry(X86Register.EDX,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.RDX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.RDX, JvmType.LONG), new RegisterEntry(
-                            X86Register.RDX, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.ECX,
-                            JvmType.INT), new RegisterEntry(X86Register.ECX,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.RCX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.RCX, JvmType.LONG), new RegisterEntry(
-                            X86Register.RCX, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.EBX,
-                            JvmType.INT), new RegisterEntry(X86Register.EBX,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.RBX,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.RBX, JvmType.LONG), new RegisterEntry(
-                            X86Register.RBX, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.ESI,
-                            JvmType.INT), new RegisterEntry(X86Register.ESI,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.RSI,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.RSI, JvmType.LONG), new RegisterEntry(
-                            X86Register.RSI, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R8d,
-                            JvmType.INT), new RegisterEntry(X86Register.R8d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R8,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R8, JvmType.LONG), new RegisterEntry(
-                            X86Register.R8, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R9d,
-                            JvmType.INT), new RegisterEntry(X86Register.R9d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R9,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R9, JvmType.LONG), new RegisterEntry(
-                            X86Register.R9, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R10d,
-                            JvmType.INT), new RegisterEntry(X86Register.R10d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R10,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R10, JvmType.LONG), new RegisterEntry(
-                            X86Register.R10, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R11d,
-                            JvmType.INT), new RegisterEntry(X86Register.R11d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R11,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R11, JvmType.LONG), new RegisterEntry(
-                            X86Register.R11, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R13d,
-                            JvmType.INT), new RegisterEntry(X86Register.R13d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R13,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R13, JvmType.LONG), new RegisterEntry(
-                            X86Register.R13, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R14d,
-                            JvmType.INT), new RegisterEntry(X86Register.R14d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R14,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R14, JvmType.LONG), new RegisterEntry(
-                            X86Register.R14, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.R15d,
-                            JvmType.INT), new RegisterEntry(X86Register.R15d,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.R15,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.R15, JvmType.LONG), new RegisterEntry(
-                            X86Register.R15, JvmType.DOUBLE), false), };
+            return new RegisterGroupUsage[]{
+                new RegisterGroupUsage(new RegisterEntry(X86Register.EAX, JvmType.INT),
+                    new RegisterEntry(X86Register.EAX, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.RAX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.RAX, JvmType.LONG),
+                    new RegisterEntry(X86Register.RAX, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.EDX, JvmType.INT),
+                    new RegisterEntry(X86Register.EDX, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.RDX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.RDX, JvmType.LONG),
+                    new RegisterEntry(X86Register.RDX, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.ECX, JvmType.INT),
+                    new RegisterEntry(X86Register.ECX, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.RCX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.RCX, JvmType.LONG),
+                    new RegisterEntry(X86Register.RCX, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.EBX,
+                    JvmType.INT), new RegisterEntry(X86Register.EBX, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.RBX, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.RBX, JvmType.LONG),
+                    new RegisterEntry(X86Register.RBX, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.ESI, JvmType.INT),
+                    new RegisterEntry(X86Register.ESI, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.RSI, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.RSI, JvmType.LONG),
+                    new RegisterEntry(X86Register.RSI, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R8d, JvmType.INT),
+                    new RegisterEntry(X86Register.R8d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R8, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R8, JvmType.LONG),
+                    new RegisterEntry(X86Register.R8, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R9d, JvmType.INT),
+                    new RegisterEntry(X86Register.R9d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R9, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R9, JvmType.LONG),
+                    new RegisterEntry(X86Register.R9, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R10d, JvmType.INT),
+                    new RegisterEntry(X86Register.R10d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R10, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R10, JvmType.LONG),
+                    new RegisterEntry(X86Register.R10, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R11d, JvmType.INT),
+                    new RegisterEntry(X86Register.R11d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R11, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R11, JvmType.LONG),
+                    new RegisterEntry(X86Register.R11, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R13d, JvmType.INT),
+                    new RegisterEntry(X86Register.R13d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R13, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R13, JvmType.LONG),
+                    new RegisterEntry(X86Register.R13, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R14d, JvmType.INT),
+                    new RegisterEntry(X86Register.R14d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R14, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R14, JvmType.LONG),
+                    new RegisterEntry(X86Register.R14, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.R15d, JvmType.INT),
+                    new RegisterEntry(X86Register.R15d, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.R15, JvmType.REFERENCE),
+                    new RegisterEntry(X86Register.R15, JvmType.LONG),
+                    new RegisterEntry(X86Register.R15, JvmType.DOUBLE), false)};
             // RDI always points to the statics, do not use
             // R12 always points to the VmProcessor, do not use
         }
@@ -434,7 +418,7 @@ abstract class X86RegisterPool {
 
     /**
      * Pool of XMM registers in 32-bit mode.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class XMMs32 extends X86RegisterPool {
@@ -454,37 +438,29 @@ abstract class X86RegisterPool {
             // register.
             // The cost of a register is lower when its index in this
             // array is higher.
-            return new RegisterGroupUsage[] {
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM0,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM0,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM1,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM1,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM2,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM2,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM3,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM3,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM4,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM4,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM5,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM5,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM6,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM6,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM7,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM7,
-                            JvmType.DOUBLE), false) };
+            return new RegisterGroupUsage[]{
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM0, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM0, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM1, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM1, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM2, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM2, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM3, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM3, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM4, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM4, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM5, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM5, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM6, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM6, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM7, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM7, JvmType.DOUBLE), false)};
         }
     }
 
     /**
      * Pool of XMM registers in 64-bit mode.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class XMMs64 extends X86RegisterPool {
@@ -504,61 +480,45 @@ abstract class X86RegisterPool {
             // register.
             // The cost of a register is lower when its index in this
             // array is higher.
-            return new RegisterGroupUsage[] {
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM0,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM0,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM1,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM1,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM2,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM2,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM3,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM3,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM4,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM4,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM5,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM5,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM6,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM6,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM7,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM7,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM8,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM8,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM9,
-                            JvmType.FLOAT), new RegisterEntry(X86Register.XMM9,
-                            JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM10,
-                            JvmType.FLOAT), new RegisterEntry(
-                            X86Register.XMM10, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM11,
-                            JvmType.FLOAT), new RegisterEntry(
-                            X86Register.XMM11, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM12,
-                            JvmType.FLOAT), new RegisterEntry(
-                            X86Register.XMM12, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM13,
-                            JvmType.FLOAT), new RegisterEntry(
-                            X86Register.XMM13, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM14,
-                            JvmType.FLOAT), new RegisterEntry(
-                            X86Register.XMM14, JvmType.DOUBLE), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.XMM15,
-                            JvmType.FLOAT), new RegisterEntry(
-                            X86Register.XMM15, JvmType.DOUBLE), false) };
+            return new RegisterGroupUsage[]{
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM0, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM0, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM1, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM1, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM2, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM2, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM3, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM3, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM4, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM4, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM5, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM5, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM6, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM6, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM7, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM7, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM8, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM8, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM9, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM9, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM10, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM10, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM11, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM11, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM12, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM12, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM13, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM13, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM14, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM14, JvmType.DOUBLE), false),
+                new RegisterGroupUsage(new RegisterEntry(X86Register.XMM15, JvmType.FLOAT),
+                    new RegisterEntry(X86Register.XMM15, JvmType.DOUBLE), false)};
         }
     }
 
     /**
      * Register & type information.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     private static final class RegisterEntry {
@@ -578,11 +538,13 @@ abstract class X86RegisterPool {
 
     /**
      * Register usage information for a group of registers that shared bits.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     private static final class RegisterGroupUsage {
-        /** The registers in this group */
+        /**
+         * The registers in this group
+         */
         private final RegisterEntry[] regs;
 
         private Item owner;
@@ -591,57 +553,59 @@ abstract class X86RegisterPool {
 
         private final boolean callerSaved;
 
-        /** The register in this group that is actually in use */
+        /**
+         * The register in this group that is actually in use
+         */
         private X86Register usedReg;
 
         /**
          * Initialize this instance.
-         * 
+         *
          * @param reg
          */
         public RegisterGroupUsage(RegisterEntry reg, boolean callerSaved) {
-            this(new RegisterEntry[] { reg }, callerSaved);
+            this(new RegisterEntry[]{reg}, callerSaved);
         }
 
         /**
          * Initialize this instance.
-         * 
+         *
          * @param reg1
          * @param reg2
          */
         public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                boolean callerSaved) {
-            this(new RegisterEntry[] { reg1, reg2 }, callerSaved);
+                                  boolean callerSaved) {
+            this(new RegisterEntry[]{reg1, reg2}, callerSaved);
         }
 
         /**
          * Initialize this instance.
-         * 
+         *
          * @param reg1
          * @param reg2
          * @param reg3
          */
         public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                RegisterEntry reg3, boolean callerSaved) {
-            this(new RegisterEntry[] { reg1, reg2, reg3 }, callerSaved);
+                                  RegisterEntry reg3, boolean callerSaved) {
+            this(new RegisterEntry[]{reg1, reg2, reg3}, callerSaved);
         }
 
         /**
          * Initialize this instance.
-         * 
+         *
          * @param reg1
          * @param reg2
          * @param reg3
          * @param reg4
          */
         public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                RegisterEntry reg3, RegisterEntry reg4, boolean callerSaved) {
-            this(new RegisterEntry[] { reg1, reg2, reg3, reg4 }, callerSaved);
+                                  RegisterEntry reg3, RegisterEntry reg4, boolean callerSaved) {
+            this(new RegisterEntry[]{reg1, reg2, reg3, reg4}, callerSaved);
         }
 
         /**
          * Initialize this instance.
-         * 
+         *
          * @param reg1
          * @param reg2
          * @param reg3
@@ -649,15 +613,15 @@ abstract class X86RegisterPool {
          * @param reg5
          */
         public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
-                RegisterEntry reg3, RegisterEntry reg4, RegisterEntry reg5,
-                boolean callerSaved) {
-            this(new RegisterEntry[] { reg1, reg2, reg3, reg4, reg5 },
-                    callerSaved);
+                                  RegisterEntry reg3, RegisterEntry reg4, RegisterEntry reg5,
+                                  boolean callerSaved) {
+            this(new RegisterEntry[]{reg1, reg2, reg3, reg4, reg5},
+                callerSaved);
         }
 
         /**
          * Initialize this instance.
-         * 
+         *
          * @param reg
          */
         public RegisterGroupUsage(RegisterEntry[] regs, boolean callerSaved) {
@@ -668,7 +632,7 @@ abstract class X86RegisterPool {
 
         /**
          * Register this register for the given owner.
-         * 
+         *
          * @param owner
          * @return The register if request succeeds, null if this register group
          *         is already used.
@@ -688,7 +652,7 @@ abstract class X86RegisterPool {
 
         /**
          * Register this register for the given owner.
-         * 
+         *
          * @param owner
          * @return The register if request succeeds, null if this register group
          *         is already used.
@@ -715,7 +679,7 @@ abstract class X86RegisterPool {
 
         /**
          * Is this register currently not used.
-         * 
+         *
          * @return
          */
         public boolean isFree() {
@@ -724,7 +688,7 @@ abstract class X86RegisterPool {
 
         /**
          * Gets the current owner of this register.
-         * 
+         *
          * @return
          */
         public Object getOwner() {
@@ -743,7 +707,7 @@ abstract class X86RegisterPool {
 
         /**
          * Is this register saved by any called method.
-         * 
+         *
          * @return
          */
         public boolean isCallerSaved() {
@@ -752,7 +716,7 @@ abstract class X86RegisterPool {
 
         /**
          * Is the given register contains in this instance.
-         * 
+         *
          * @param reg
          * @return true / false
          */
@@ -769,7 +733,7 @@ abstract class X86RegisterPool {
 
         /**
          * Gets the register in this group with the given type.
-         * 
+         *
          * @param type
          * @return The register found, or null if not found.
          */
@@ -786,7 +750,7 @@ abstract class X86RegisterPool {
 
         /**
          * Gets the register in this group that is actually in use.
-         * 
+         *
          * @return
          */
         public X86Register getUsedRegister() {
@@ -795,7 +759,7 @@ abstract class X86RegisterPool {
 
         /**
          * Convert to a string representation.
-         * 
+         *
          * @see java.lang.Object#toString()
          */
         public String toString() {

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.system.BootLog;
@@ -30,29 +30,39 @@ import org.vmmagic.unboxed.Word;
 /**
  * Thread used to invoke the {@link java.lang.Object#finalize()}method of all
  * objects that are about to be reclamed.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 final class FinalizerThread extends Thread {
 
-    /** The heap manager */
+    /**
+     * The heap manager
+     */
     private final DefaultHeapManager heapManager;
 
-    /** Monitor for synchronizing access to my fields */
+    /**
+     * Monitor for synchronizing access to my fields
+     */
     private final Monitor monitor;
 
-    /** The number of triggers received */
+    /**
+     * The number of triggers received
+     */
     private int triggerCount;
-    /** The number of finalization runs performed */
+    /**
+     * The number of finalization runs performed
+     */
     private int runCount;
-    
-    /** My visitor */
+
+    /**
+     * My visitor
+     */
     private final FinalizerVisitor visitor;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param heapManager
      */
     public FinalizerThread(DefaultHeapManager heapManager) {
@@ -64,10 +74,9 @@ final class FinalizerThread extends Thread {
 
     /**
      * Trigger a GC run.
-     * 
-     * @param waitToFinish
-     *            If true, block until the run is ready, if false, return
-     *            immediately.
+     *
+     * @param waitToFinish If true, block until the run is ready, if false, return
+     *                     immediately.
      */
     public final void trigger(boolean waitToFinish) {
         triggerCount++;
@@ -90,7 +99,7 @@ final class FinalizerThread extends Thread {
 
     /**
      * Continue to call runFinalization.
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     public final void run() {

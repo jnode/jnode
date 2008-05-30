@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 /**
@@ -26,40 +26,42 @@ package org.jnode.util;
  */
 public final class SynchronizedCounter extends Statistic {
     private int counter;
-	
-	public SynchronizedCounter(String name) {
-		super(name, null);
-	}
 
-	public SynchronizedCounter(String name, String description) {
-	    super(name, description);
-	}
+    public SynchronizedCounter(String name) {
+        super(name, null);
+    }
 
-	/**
-	 * Gets the counter of this statistic
-	 * @return the counter
-	 */
-	public int get() {
-		return counter;
-	}
+    public SynchronizedCounter(String name, String description) {
+        super(name, description);
+    }
 
-	public Object getValue() {
-	    return new Integer(counter);
-	}
+    /**
+     * Gets the counter of this statistic
+     *
+     * @return the counter
+     */
+    public int get() {
+        return counter;
+    }
 
-	/**
-	 * Increment the counter of this statistic by 1.
-	 */
-	public synchronized void inc() {
-		counter++;
-	}
-	
-	/**
-	 * Convert to a String representation
-	 * @see java.lang.Object#toString()
-	 * @return String
-	 */
-	public String toString() {
-		return getName() + "=" + counter;
-	}
+    public Object getValue() {
+        return new Integer(counter);
+    }
+
+    /**
+     * Increment the counter of this statistic by 1.
+     */
+    public synchronized void inc() {
+        counter++;
+    }
+
+    /**
+     * Convert to a String representation
+     *
+     * @return String
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return getName() + "=" + counter;
+    }
 }

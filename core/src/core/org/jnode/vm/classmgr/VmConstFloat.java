@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 /**
@@ -27,9 +27,10 @@ package org.jnode.vm.classmgr;
 public class VmConstFloat extends VmConstObject {
 
     private float value;
-    
+
     /**
      * Initialize this instance.
+     *
      * @param value
      */
     VmConstFloat(float value) {
@@ -48,6 +49,6 @@ public class VmConstFloat extends VmConstObject {
      */
     public final int getConstType() {
         return CONST_FLOAT;
-    }       
+    }
 
 }

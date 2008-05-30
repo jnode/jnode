@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import org.jnode.vm.VmSystemObject;
@@ -27,43 +27,46 @@ import org.jnode.vm.VmSystemObject;
  * @author epr
  */
 public abstract class Statistic extends VmSystemObject {
-	
-	private final String name;
-	private final String description;
-	
-	public Statistic(String name) {
-		this(name, null);
-	}
 
-	public Statistic(String name, String description) {
-		this.name = name;
-		this.description = description;
-	}
+    private final String name;
+    private final String description;
 
-	public abstract Object getValue();
-	
-	/**
-	 * Gets the name of this statistic
-	 * @return The name
-	 */
-	public String getName() {
-		return name;
-	}
+    public Statistic(String name) {
+        this(name, null);
+    }
 
-	/**
-	 * Convert to a String representation
-	 * @see java.lang.Object#toString()
-	 * @return String
-	 */
-	public String toString() {
-		return name;
-	}
-	
-	/**
-	 * Gets the description of this statistic
-	 * @return The description
-	 */
-	public String getDescription() {
-		return description;
-	}
+    public Statistic(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public abstract Object getValue();
+
+    /**
+     * Gets the name of this statistic
+     *
+     * @return The name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Convert to a String representation
+     *
+     * @return String
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return name;
+    }
+
+    /**
+     * Gets the description of this statistic
+     *
+     * @return The description
+     */
+    public String getDescription() {
+        return description;
+    }
 }

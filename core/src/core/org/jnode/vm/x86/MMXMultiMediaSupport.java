@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VmMultiMediaSupport;
@@ -26,6 +26,7 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Multi media support class optimized using MMX instructions.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class MMXMultiMediaSupport extends VmMultiMediaSupport {

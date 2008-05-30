@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 /**
@@ -45,21 +45,25 @@ final class IOAPICRedirectionEntry {
     private int low;
 
     private int high;
-    
+
     // Destination mode
     private static final int DESTMOD_MASK = 1 << 11;
-    /** Destination is specified by APIC id */
+    /**
+     * Destination is specified by APIC id
+     */
     private static final int DESTMOD_PHYSICAL = 0;
-    /** Destination is specified by processor set */
+    /**
+     * Destination is specified by processor set
+     */
     private static final int DESTMOD_LOGICAL = DESTMOD_MASK;
-    
+
     //private static final int IRR = 1 << 14;
     private static final int TRIGGERMODE = 1 << 15;
     private static final int MASK = 1 << 16;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param offset
      */
     public IOAPICRedirectionEntry(IOAPIC apic, int offset) {
@@ -70,7 +74,7 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Gets the interrupt vector
-     * 
+     *
      * @return the interrupt vector
      */
     public int getVector() {
@@ -88,7 +92,7 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Gets the delivery mode.
-     * 
+     *
      * @return the delivery mode
      */
     public int getDeliveryMode() {
@@ -106,7 +110,7 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Is this entry set for physical destination to an APIC ID.
-     * 
+     *
      * @return True/false
      */
     public final boolean isPhysicalDestination() {
@@ -115,7 +119,7 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Is this entry set for logical destination to set of processors.
-     * 
+     *
      * @return True/false
      */
     public final boolean isLogicalDestination() {
@@ -124,7 +128,7 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Is the type signal that triggers an interrupt level sensative.
-     * 
+     *
      * @return True/false
      */
     public boolean isLevelTriggerMode() {
@@ -133,7 +137,7 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Is the type signal that triggers an interrupt edge sensative.
-     * 
+     *
      * @return True/false
      */
     public boolean isEdgeTriggerMode() {
@@ -142,13 +146,13 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Is this interrupt signal masked.
-     * 
+     *
      * @return True/false
      */
     public boolean isMasked() {
         return ((low & MASK) != 0);
     }
-    
+
     /**
      * Initialize this entry to a masked, cleared state.
      */
@@ -161,13 +165,13 @@ final class IOAPICRedirectionEntry {
 
     /**
      * Convert to a string representation
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
         return "VECT" + getVector() + ", DELMOD " + getDeliveryMode()
-                + ", MASKED " + isMasked() + ", "
-                + (isLevelTriggerMode() ? "LEVEL" : "EDGE");
+            + ", MASKED " + isMasked() + ", "
+            + (isLevelTriggerMode() ? "LEVEL" : "EDGE");
     }
 
     private final void read() {

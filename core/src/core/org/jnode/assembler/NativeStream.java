@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 
@@ -34,221 +33,250 @@ public abstract class NativeStream {
      * Remove all data and references.
      */
     public abstract void clear();
-    
-	/**
-	 * Returns the base address.
-	 * @return long
-	 */
-	public abstract long getBaseAddr();
 
-	/**
-	 * Get the length in bytes of valid data
-	 * @return The length 
-	 */
-	public abstract int getLength();
+    /**
+     * Returns the base address.
+     *
+     * @return long
+     */
+    public abstract long getBaseAddr();
 
-	/**
-	 * Return the actual bytes. This array may be longer then getLength()
-	 * @return The actual bytes
-	 */
-	public abstract byte[] getBytes();
+    /**
+     * Get the length in bytes of valid data
+     *
+     * @return The length
+     */
+    public abstract int getLength();
 
-	/**
-	 * Gets the identification of the CPU for which this stream will produce data.
-	 */
-	public abstract CpuID getCPUID();
-	
-	/**
-	 * Write my contents to the given stream.
-	 * @param os
-	 * @throws IOException
-	 */
-	public abstract void writeTo(OutputStream os) throws IOException;
+    /**
+     * Return the actual bytes. This array may be longer then getLength()
+     *
+     * @return The actual bytes
+     */
+    public abstract byte[] getBytes();
 
-	/**
-	 * Start a new object and write its header.
-	 * An ObjectInfo object is returned, on which the <code>markEnd</code>
-	 * mehod must be called after all data has been written into the object.
-	 * @param cls
-	 * @see ObjectInfo
-	 * @return The object info for the started object
-	 */
-	public abstract ObjectInfo startObject(VmType cls);
+    /**
+     * Gets the identification of the CPU for which this stream will produce data.
+     */
+    public abstract CpuID getCPUID();
 
-	/**
-	 * Gets an objectref for a given object.
-	 * @param key
-	 * @return ObjectRef
-	 */
-	public abstract ObjectRef getObjectRef(Object key);
+    /**
+     * Write my contents to the given stream.
+     *
+     * @param os
+     * @throws IOException
+     */
+    public abstract void writeTo(OutputStream os) throws IOException;
 
-	/**
-	 * Gets all references of objects as instanceof ObjectRef
-	 * @return Collection
-	 */
-	public abstract Collection<? extends ObjectRef> getObjectRefs();
+    /**
+     * Start a new object and write its header.
+     * An ObjectInfo object is returned, on which the <code>markEnd</code>
+     * mehod must be called after all data has been written into the object.
+     *
+     * @param cls
+     * @return The object info for the started object
+     * @see ObjectInfo
+     */
+    public abstract ObjectInfo startObject(VmType cls);
 
-	/**
-	 * Gets all unresolved references of objects as instanceof ObjectRef
-	 * @return Collection
-	 */
-	public abstract Collection getUnresolvedObjectRefs();
+    /**
+     * Gets an objectref for a given object.
+     *
+     * @param key
+     * @return ObjectRef
+     */
+    public abstract ObjectRef getObjectRef(Object key);
 
-	/**
-	 * Are there unresolved references?
-	 * @return True if there are unsolved references, false otherwise
-	 */
-	public abstract boolean hasUnresolvedObjectRefs();
+    /**
+     * Gets all references of objects as instanceof ObjectRef
+     *
+     * @return Collection
+     */
+    public abstract Collection<? extends ObjectRef> getObjectRefs();
 
-	/**
-	 * Resolve the given object to the current position.
-	 * @param label
-	 * @return ObjectRef
-	 */
-	public abstract ObjectRef setObjectRef(Object label);
-	
-	/**
-	 * Write a reference to the given object
-	 * @param object
-	 */
-	//public abstract void writeObjectRef(Object object);
+    /**
+     * Gets all unresolved references of objects as instanceof ObjectRef
+     *
+     * @return Collection
+     */
+    public abstract Collection getUnresolvedObjectRefs();
+
+    /**
+     * Are there unresolved references?
+     *
+     * @return True if there are unsolved references, false otherwise
+     */
+    public abstract boolean hasUnresolvedObjectRefs();
+
+    /**
+     * Resolve the given object to the current position.
+     *
+     * @param label
+     * @return ObjectRef
+     */
+    public abstract ObjectRef setObjectRef(Object label);
+
+    /**
+     * Write a reference to the given object
+     * @param object
+     */
+    //public abstract void writeObjectRef(Object object);
 
     /**
      * Write a 64-bit integer
+     *
      * @param value
      */
     public abstract void set64(int offset, long value);
 
     /**
      * Write a 32-bit integer
+     *
      * @param value
      */
     public abstract void set32(int offset, int value);
 
     /**
      * Write a 16-bit short
+     *
      * @param value
      */
     public abstract void set16(int offset, int value);
 
     /**
      * Write a 8-bit byte
+     *
      * @param value
      */
     public abstract void set8(int offset, int value);
 
     /**
      * Write a word with the processor specific word size.
+     *
      * @param word
      */
     public abstract void setWord(int offset, long word);
 
-	/**
-	 * Write a 64-bit integer
-	 * @param value
-	 */
-	public abstract void write64(long value);
-
-	/**
-	 * Write a 32-bit integer
-	 * @param value
-	 */
-	public abstract void write32(int value);
-
-	/**
-	 * Write a 16-bit short
-	 * @param value
-	 */
-	public abstract void write16(int value);
-
-	/**
-	 * Write a 8-bit byte
-	 * @param value
-	 */
-	public abstract void write8(int value);
-
-	/**
-	 * Write a word with the processor specific word size.
-	 * @param word
-	 */
-	public abstract void writeWord(long word);
-
-	/**
-	 * Write a series of bytes
-	 * @param data
-	 * @param ofs
-	 * @param len
-	 */
-	public abstract void write(byte[] data, int ofs, int len);
+    /**
+     * Write a 64-bit integer
+     *
+     * @param value
+     */
+    public abstract void write64(long value);
 
     /**
-	 * Write a reference to the given object
-	 * @param object
-	 */
-	public abstract void writeObjectRef(Object object);
+     * Write a 32-bit integer
+     *
+     * @param value
+     */
+    public abstract void write32(int value);
 
-	/**
-	 * A wrapper for constructing objects in the native stream.
-	 */
-	public abstract class ObjectInfo {
+    /**
+     * Write a 16-bit short
+     *
+     * @param value
+     */
+    public abstract void write16(int value);
 
-		/**
-		 * Mark the current location as the end of this object end fixup the objectheader.
-		 */
-		public abstract void markEnd();
-	}
+    /**
+     * Write a 8-bit byte
+     *
+     * @param value
+     */
+    public abstract void write8(int value);
 
-	public abstract class ObjectRef {
-		private Object object;
+    /**
+     * Write a word with the processor specific word size.
+     *
+     * @param word
+     */
+    public abstract void writeWord(long word);
 
-		/**
-		 * Create a new instance
-		 * @param object
-		 */
-		public ObjectRef(Object object) {
-			this.object = object;
-		}
+    /**
+     * Write a series of bytes
+     *
+     * @param data
+     * @param ofs
+     * @param len
+     */
+    public abstract void write(byte[] data, int ofs, int len);
 
-		/**
-		 * Gets the object i'm refering to.
-		 * @return Object
-		 */
-		public Object getObject() {
-			return object;
-		}
+    /**
+     * Write a reference to the given object
+     *
+     * @param object
+     */
+    public abstract void writeObjectRef(Object object);
 
-		/**
-		 * Gets the offset of my object within this stream. This offset is only valid if <code>isResolved() == true</code>.
-		 * @return long
-		 * @throws UnresolvedObjectRefException
-		 */
-		public abstract int getOffset()
-		throws UnresolvedObjectRefException;
+    /**
+     * A wrapper for constructing objects in the native stream.
+     */
+    public abstract class ObjectInfo {
 
-		/**
-		 * Has my object been resolved?
-		 * @return boolean
-		 */
-		public abstract boolean isResolved();
-		
-		/**
-		 * Link this objectref to the given objectref. That is, the offset of this
-		 * objectref will be set to the offset of the given objectref.
-		 * @param objectRef
-		 * @throws UnresolvedObjectRefException The given objectref is not resolved.
-		 */
-		public abstract void link(ObjectRef objectRef)
-		throws UnresolvedObjectRefException;
-		
-		/**
-		 * Add an offset that needs to be resolved by this objectref.
-		 * @param offset
-		 * @param patchSize
-		 */
-		public abstract void addUnresolvedLink(int offset, int patchSize);
-		
-		public String toString() {
-			return object.toString();
-		}
-	}
+        /**
+         * Mark the current location as the end of this object end fixup the objectheader.
+         */
+        public abstract void markEnd();
+    }
+
+    public abstract class ObjectRef {
+        private Object object;
+
+        /**
+         * Create a new instance
+         *
+         * @param object
+         */
+        public ObjectRef(Object object) {
+            this.object = object;
+        }
+
+        /**
+         * Gets the object i'm refering to.
+         *
+         * @return Object
+         */
+        public Object getObject() {
+            return object;
+        }
+
+        /**
+         * Gets the offset of my object within this stream.
+         * This offset is only valid if <code>isResolved() == true</code>.
+         *
+         * @return long
+         * @throws UnresolvedObjectRefException
+         */
+        public abstract int getOffset()
+            throws UnresolvedObjectRefException;
+
+        /**
+         * Has my object been resolved?
+         *
+         * @return boolean
+         */
+        public abstract boolean isResolved();
+
+        /**
+         * Link this objectref to the given objectref. That is, the offset of this
+         * objectref will be set to the offset of the given objectref.
+         *
+         * @param objectRef
+         * @throws UnresolvedObjectRefException The given objectref is not resolved.
+         */
+        public abstract void link(ObjectRef objectRef)
+            throws UnresolvedObjectRefException;
+
+        /**
+         * Add an offset that needs to be resolved by this objectref.
+         *
+         * @param offset
+         * @param patchSize
+         */
+        public abstract void addUnresolvedLink(int offset, int patchSize);
+
+        public String toString() {
+            return object.toString();
+        }
+    }
 }

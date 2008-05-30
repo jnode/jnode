@@ -18,17 +18,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler.x86;
 
-import org.jnode.vm.VmSystemObject;
 import org.jnode.util.BootableHashMap;
+import org.jnode.vm.VmSystemObject;
 
 /**
  * Registers of the x86 architecture.
- * 
+ *
  * @author epr
- * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net) 
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class X86Register extends VmSystemObject implements X86Constants {
 
@@ -208,7 +208,7 @@ public class X86Register extends VmSystemObject implements X86Constants {
     public static final XMM XMM6 = new XMM("xmm6", 6);
 
     public static final XMM XMM7 = new XMM("xmm7", 7);
-    
+
     public static final XMM XMM8 = new XMM("xmm8", 8);
     public static final XMM XMM9 = new XMM("xmm9", 9);
     public static final XMM XMM10 = new XMM("xmm10", 10);
@@ -240,7 +240,7 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     /**
      * Returns the name.
-     * 
+     *
      * @return String
      */
     public final String getName() {
@@ -249,7 +249,7 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     /**
      * Returns the nr.
-     * 
+     *
      * @return int
      */
     public final int getNr() {
@@ -258,7 +258,7 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     /**
      * Returns the size of this register
-     * 
+     *
      * @return int
      * @see X86Constants#BITS8
      * @see X86Constants#BITS16
@@ -276,34 +276,34 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     /**
      * Does this register have an 8-bit part.
-     * 
+     *
      * @return True for EAX, EBX, ECX, EDX, false otherwise.
      */
     public final boolean isSuitableForBits8() {
         return suitableFor8Bit;
     }
 
-    public static GPR getGPR(String name){
-        Object obj =  registerMap.get(name);
-        if( obj == null) throw new IllegalArgumentException("Unknown register: " + name);
-        if( ! (obj instanceof GPR)) throw new IllegalArgumentException("Not a GPR: " + name);
+    public static GPR getGPR(String name) {
+        Object obj = registerMap.get(name);
+        if (obj == null) throw new IllegalArgumentException("Unknown register: " + name);
+        if (!(obj instanceof GPR)) throw new IllegalArgumentException("Not a GPR: " + name);
         return (GPR) obj;
     }
 
-    public static boolean isGPR(String name){
-        Object obj =  registerMap.get(name);
+    public static boolean isGPR(String name) {
+        Object obj = registerMap.get(name);
         return (obj != null) && (obj instanceof GPR);
     }
 
-    public static X86Register getRegister(String name){
-        Object obj =  registerMap.get(name);
-        if( obj == null) throw new IllegalArgumentException("Unknown register: " + name);
-        if( !(obj instanceof X86Register)) throw new IllegalArgumentException("Not a X86Register: " + name);
+    public static X86Register getRegister(String name) {
+        Object obj = registerMap.get(name);
+        if (obj == null) throw new IllegalArgumentException("Unknown register: " + name);
+        if (!(obj instanceof X86Register)) throw new IllegalArgumentException("Not a X86Register: " + name);
         return (X86Register) obj;
     }
 
-    public static boolean isRegister(String name){
-        Object obj =  registerMap.get(name);
+    public static boolean isRegister(String name) {
+        Object obj = registerMap.get(name);
         return (obj != null) && (obj instanceof X86Register);
     }
 

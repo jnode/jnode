@@ -18,25 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class FloatConstant<T> extends Constant<T> {
-	private float value;
-	
-	public FloatConstant(float value) {
-		super(Operand.FLOAT);
-		this.value = value;
-	}
+    private float value;
 
-	public float getValue() {
-		return value;
-	}
-	
-	public String toString() {
-		return Float.toString(value);
-	}
+    public FloatConstant(float value) {
+        super(Operand.FLOAT);
+        this.value = value;
+    }
+
+    public float getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return Float.toString(value);
+    }
 }

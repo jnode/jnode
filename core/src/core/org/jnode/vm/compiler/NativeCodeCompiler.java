@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import java.io.Writer;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
@@ -44,7 +43,7 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Abstract native code compiler.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
@@ -52,14 +51,13 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
     /**
      * Compile the given method during bootstrapping
-     * 
+     *
      * @param method
      * @param os
-     * @param level
-     *            Optimization level
+     * @param level  Optimization level
      */
     public final void compileBootstrap(VmMethod method, NativeStream os,
-            int level) {
+                                       int level) {
         int start = os.getLength();
         final CompiledMethod cm;
         final boolean abstractM = method.isAbstract();
@@ -87,7 +85,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
         if (!(method.isNative() || abstractM)) {
             final NativeStream.ObjectRef defExHRef = cm
-                    .getDefExceptionHandler();
+                .getDefExceptionHandler();
             if (defExHRef != null) {
                 defExHandler = (VmAddress) defExHRef.getObject();
             } else {
@@ -100,15 +98,15 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                 for (int i = 0; i < ceh.length; i++) {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
-                            .getCatchType();
+                        .getCatchType();
                     final VmAddress startPtr = (VmAddress) ceh[i].getStartPc()
-                            .getObject();
+                        .getObject();
                     final VmAddress endPtr = (VmAddress) ceh[i].getEndPc()
-                            .getObject();
+                        .getObject();
                     final VmAddress handler = (VmAddress) ceh[i].getHandler()
-                            .getObject();
+                        .getObject();
                     eTable[i] = new VmCompiledExceptionHandler(catchType,
-                            startPtr, endPtr, handler);
+                        startPtr, endPtr, handler);
                 }
             } else {
                 eTable = null;
@@ -120,22 +118,20 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
         }
 
         method.addCompiledCode(Vm.getCompiledMethods().createCompiledCode(cm,
-                method, this, bc, nativeCode, null, end - start, eTable,
-                defExHandler, aTable), level);
+            method, this, bc, nativeCode, null, end - start, eTable,
+            defExHandler, aTable), level);
     }
 
     /**
      * Compile the given method during runtime.
-     * 
+     *
      * @param method
      * @param resolver
-     * @param level
-     *            Optimization level
-     * @param os
-     *            The native stream, can be null
+     * @param level    Optimization level
+     * @param os       The native stream, can be null
      */
     public void compileRuntime(VmMethod method, ObjectResolver resolver,
-            int level, NativeStream os) {
+                               int level, NativeStream os) {
 
         if (method.isNative()) {
             throw new IllegalArgumentException("Cannot compile native methods");
@@ -166,12 +162,12 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final Address codePtr = VmMagic.getArrayData(code);
 
             final NativeStream.ObjectRef defExHRef = cm
-                    .getDefExceptionHandler();
+                .getDefExceptionHandler();
             final Address defExHandler;
             if (defExHRef != null) {
                 defExHandler = codePtr.add(cm.getDefExceptionHandler()
-                        .getOffset()
-                        - startOffset);
+                    .getOffset()
+                    - startOffset);
             } else {
                 defExHandler = Address.zero();
             }
@@ -185,28 +181,28 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                 for (int i = 0; i < ceh.length; i++) {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
-                            .getCatchType();
+                        .getCatchType();
                     final Address startPtr = codePtr.add(ceh[i].getStartPc()
-                            .getOffset()
-                            - startOffset);
+                        .getOffset()
+                        - startOffset);
                     final Address endPtr = codePtr.add(ceh[i].getEndPc()
-                            .getOffset()
-                            - startOffset);
+                        .getOffset()
+                        - startOffset);
                     final Address handler = codePtr.add(ceh[i].getHandler()
-                            .getOffset()
-                            - startOffset);
+                        .getOffset()
+                        - startOffset);
 
                     eTable[i] = new VmCompiledExceptionHandler(catchType,
-                            startPtr.toAddress(), endPtr.toAddress(), handler
-                                    .toAddress());
+                        startPtr.toAddress(), endPtr.toAddress(), handler
+                        .toAddress());
                 }
             } else {
                 eTable = null;
             }
 
             method.addCompiledCode(Vm.getCompiledMethods().createCompiledCode(
-                    cm, method, this, bc, codePtr.toAddress(), code, size,
-                    eTable, defExHandler.toAddress(), aTable), level);
+                cm, method, this, bc, codePtr.toAddress(), code, size,
+                eTable, defExHandler.toAddress(), aTable), level);
 
             // For debugging only
             // System.out.println("Code: " + NumberUtils.hex(code));
@@ -222,11 +218,11 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
     }
 
     public abstract void disassemble(VmMethod method, ObjectResolver resolver,
-            int level, Writer writer);
+                                     int level, Writer writer);
 
     /**
      * Create a native stream for the current architecture.
-     * 
+     *
      * @param resolver
      * @return NativeStream
      */
@@ -234,16 +230,15 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
     /**
      * Compile the given method into the given stream.
-     * 
+     *
      * @param method
      * @param os
-     * @param level
-     *            Optimization level
+     * @param level       Optimization level
      * @param isBootstrap
      * @return The compiled method
      */
     protected CompiledMethod doCompile(VmMethod method, NativeStream os,
-            int level, boolean isBootstrap) {
+                                       int level, boolean isBootstrap) {
         final CompiledMethod cm = new CompiledMethod(level);
         if (method.isNative()) {
             Object label = new Label(method.getMangledName());
@@ -251,7 +246,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
         } else {
             // Create the visitor
             CompilerBytecodeVisitor bcv = createBytecodeVisitor(method,
-                    cm, os, level, isBootstrap);
+                cm, os, level, isBootstrap);
             // Wrap in verifier if needed
             if (!(bcv instanceof VerifyingCompilerBytecodeVisitor)) {
                 bcv = new VerifyingCompilerBytecodeVisitor<CompilerBytecodeVisitor>(bcv);
@@ -266,7 +261,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             }
             // Compile the code 1 basic block at a time
             final CompilerBytecodeParser parser = new CompilerBytecodeParser(
-                    bc, cfg, bcv);
+                bc, cfg, bcv);
             bcv.startMethod(method);
             for (BasicBlock bb : cfg) {
                 bcv.startBasicBlock(bb);
@@ -284,20 +279,19 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
     /**
      * Compile the given abstract method into the given stream.
-     * 
+     *
      * @param method
      * @param os
-     * @param level
-     *            Optimization level
+     * @param level       Optimization level
      * @param isBootstrap
      * @return The compiled method
      */
     protected abstract CompiledMethod doCompileAbstract(VmMethod method,
-            NativeStream os, int level, boolean isBootstrap);
+                                                        NativeStream os, int level, boolean isBootstrap);
 
     /**
      * Create the visitor that converts bytecodes into native code.
-     * 
+     *
      * @param method
      * @param cm
      * @param os
@@ -306,12 +300,12 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * @return The new bytecode visitor.
      */
     protected abstract CompilerBytecodeVisitor createBytecodeVisitor(
-            VmMethod method, CompiledMethod cm, NativeStream os, int level,
-            boolean isBootstrap);
+        VmMethod method, CompiledMethod cm, NativeStream os, int level,
+        boolean isBootstrap);
 
     /**
      * Initialize this compiler
-     * 
+     *
      * @param loader
      */
     public abstract void initialize(VmClassLoader loader);
@@ -323,29 +317,31 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
     /**
      * Gets the magic value of this compiler.
-     * 
+     *
+     * @return
      * @see org.jnode.vm.VmStackFrame#MAGIC_COMPILED
      * @see org.jnode.vm.VmStackFrame#MAGIC_INTERPRETED
      * @see org.jnode.vm.VmStackFrame#MAGIC_MASK
-     * @return
      */
     public abstract int getMagic();
 
     /**
      * Gets the name of this compiler.
-     * 
+     *
      * @return
      */
     public abstract String getName();
-    
+
     /**
      * Create an iterator that can iterator of GCMaps generated by this compiler.
+     *
      * @return
      */
     public abstract GCMapIterator createGCMapIterator();
-    
+
     /**
      * Gets the names of the packages that are required by this compiler.
+     *
      * @return
      */
     public abstract String[] getCompilerPackages();

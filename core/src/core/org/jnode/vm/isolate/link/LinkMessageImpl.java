@@ -7,7 +7,7 @@ import javax.isolate.LinkMessage;
 
 /**
  * Base class for all types of LinkMessage implementation classes.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class LinkMessageImpl extends LinkMessage {
@@ -16,7 +16,7 @@ abstract class LinkMessageImpl extends LinkMessage {
 
     /**
      * Close this message in the current isolate.
-     * 
+     *
      * @return
      */
     abstract LinkMessageImpl CloneMessage();
@@ -33,7 +33,7 @@ abstract class LinkMessageImpl extends LinkMessage {
             }
         }
     }
-    
+
     /**
      * Mark this message as received and notify all waiting threads.
      */

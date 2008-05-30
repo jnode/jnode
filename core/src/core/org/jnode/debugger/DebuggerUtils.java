@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debugger;
 
 import java.io.PrintStream;
@@ -31,6 +31,6 @@ public class DebuggerUtils {
 
     public static void showThreadHeading(PrintStream out, Thread thread) {
         out.print(thread.getName() + ", " + thread.getPriority() + ", "
-                + thread.getVmThread().getThreadStateName());
+            + thread.getVmThread().getThreadStateName());
     }
 }

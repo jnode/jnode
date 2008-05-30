@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import org.jnode.system.BootLog;
@@ -42,13 +42,13 @@ public class QueueProcessorThread<T> extends Thread {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param name
      * @param queue
      * @param processor
      */
     public QueueProcessorThread(String name, Queue<T> queue,
-            QueueProcessor<T> processor) {
+                                QueueProcessor<T> processor) {
         super(name);
         this.queue = queue;
         this.processor = processor;
@@ -57,7 +57,7 @@ public class QueueProcessorThread<T> extends Thread {
 
     /**
      * Create a new instance. A new queue is automatically created.
-     * 
+     *
      * @param name
      * @param processor
      * @see #getQueue()
@@ -77,7 +77,7 @@ public class QueueProcessorThread<T> extends Thread {
 
     /**
      * Handle an exception thrown during the processing of the object.
-     * 
+     *
      * @param ex
      */
     protected void handleException(Exception ex) {
@@ -86,7 +86,7 @@ public class QueueProcessorThread<T> extends Thread {
 
     /**
      * Handle an exception thrown during the processing of the object.
-     * 
+     *
      * @param ex
      */
     protected void handleError(Error ex) {
@@ -95,7 +95,7 @@ public class QueueProcessorThread<T> extends Thread {
 
     /**
      * Thread runner
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     public void run() {
@@ -115,7 +115,7 @@ public class QueueProcessorThread<T> extends Thread {
 
     /**
      * Gets this queue this thread works on.
-     * 
+     *
      * @return The queue
      */
     public Queue<T> getQueue() {

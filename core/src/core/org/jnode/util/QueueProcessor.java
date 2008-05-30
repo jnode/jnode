@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 /**
@@ -26,12 +26,13 @@ package org.jnode.util;
  */
 public interface QueueProcessor<T> {
 
-	/**
-	 * Process the given object from the queue.
-	 * @param object
-	 * @throws Exception
-	 */
-	public abstract void process(T object)
-	throws Exception;
-	
+    /**
+     * Process the given object from the queue.
+     *
+     * @param object
+     * @throws Exception
+     */
+    public abstract void process(T object)
+        throws Exception;
+
 }

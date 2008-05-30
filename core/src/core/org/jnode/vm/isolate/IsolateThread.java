@@ -5,12 +5,11 @@ package org.jnode.vm.isolate;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.plugin.PluginManager;
 
 /**
  * Thread type that is used to start new isolated.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class IsolateThread extends Thread {
@@ -27,14 +26,14 @@ public final class IsolateThread extends Thread {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param isolate
      */
     IsolateThread(ThreadGroup group, VmIsolate isolate,
-            PluginManager piManager, PrintStream stdout, PrintStream stderr,
-            InputStream stdin) {
+                  PluginManager piManager, PrintStream stdout, PrintStream stderr,
+                  InputStream stdin) {
         super(group, null, isolate.getMainClassName(), isolate
-                .getIsolatedStaticsTable());
+            .getIsolatedStaticsTable());
         this.isolate = isolate;
         this.piManager = piManager;
         this.stdout = stdout;

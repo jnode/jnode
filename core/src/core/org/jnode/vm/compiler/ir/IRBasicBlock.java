@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 import java.util.List;
-
 import org.jnode.util.BootableArrayList;
 import org.jnode.vm.compiler.ir.quad.BranchQuad;
 import org.jnode.vm.compiler.ir.quad.PhiAssignQuad;
@@ -30,360 +29,359 @@ import org.jnode.vm.compiler.ir.quad.Quad;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
 public class IRBasicBlock<T> {
-	private boolean startOfExceptionHandler;
-	private int endPC;
-	private int startPC;
-	private Variable<T>[] variables;
-	private static int blockIndex = 1;
-	private static int postOrderCounter = 1;
-	
-	private String name;
+    private boolean startOfExceptionHandler;
+    private int endPC;
+    private int startPC;
+    private Variable<T>[] variables;
+    private static int blockIndex = 1;
+    private static int postOrderCounter = 1;
 
-	/**
-	 * This blocks immediate dominator (up the dom tree)
-	 */
-	private IRBasicBlock<T> idominator;
-	
-	/**
-	 * The blocks immediately dominated (down the dom tree)
-	 */
-	private List<IRBasicBlock<T>> dominatedBlocks;
-	
-	/**
-	 * The blocks in the dominance frontier of this block
-	 */
-	private List<IRBasicBlock<T>> dominanceFrontier;
-	
-	/**
-	 * The immediate successors of this block
-	 */
-	private List<IRBasicBlock<T>> successors;
-	
-	/**
-	 * The immediate predecessors of this block
-	 */
-	private List<IRBasicBlock<T>> predecessors;
-	
-	/**
-	 * Depth from the root (root = 0, next lower = 1 etc., unknown = -1)
-	 */
-	private int postOrderNumber;
-	
-	/**
-	 * The quads in this block
-	 */
-	private List<Quad<T>> quads;
-	private BootableArrayList<Operand> defList;
-	
-	// The stack offset at the beginning of this block
-	// In some cases, e.g. terniary operators, this is important
-	private int stackOffset;
+    private String name;
 
-	/**
-	 * @param startPC
-	 * @param endPC
-	 * @param startOfExceptionHandler
-	 */
-	public IRBasicBlock(
-		int startPC,
-		int endPC,
-		boolean startOfExceptionHandler) {
+    /**
+     * This blocks immediate dominator (up the dom tree)
+     */
+    private IRBasicBlock<T> idominator;
 
-		this.startPC = startPC;
-		this.endPC = endPC;
-		this.startOfExceptionHandler = startOfExceptionHandler;
+    /**
+     * The blocks immediately dominated (down the dom tree)
+     */
+    private List<IRBasicBlock<T>> dominatedBlocks;
 
-		this.stackOffset = -1; // We'll check to make sure this is set
+    /**
+     * The blocks in the dominance frontier of this block
+     */
+    private List<IRBasicBlock<T>> dominanceFrontier;
 
-		this.name = "B" + startPC;
-		predecessors = new BootableArrayList<IRBasicBlock<T>>();
-		successors = new BootableArrayList<IRBasicBlock<T>>();
-		dominatedBlocks = new BootableArrayList<IRBasicBlock<T>>();
-		postOrderNumber = -1;
-		dominanceFrontier = new BootableArrayList<IRBasicBlock<T>>();
-		quads = new BootableArrayList<Quad<T>>();
-		defList = new BootableArrayList<Operand>();
-	}
+    /**
+     * The immediate successors of this block
+     */
+    private List<IRBasicBlock<T>> successors;
 
-	/**
-	 * @param address
-	 */
-	public IRBasicBlock(int address) {
-		this(address, -1, false);
-	}
+    /**
+     * The immediate predecessors of this block
+     */
+    private List<IRBasicBlock<T>> predecessors;
 
-	private void addPredecessor(IRBasicBlock<T> p) {
-		if (!predecessors.contains(p)) {
-			predecessors.add(p);
-		}
-	}
+    /**
+     * Depth from the root (root = 0, next lower = 1 etc., unknown = -1)
+     */
+    private int postOrderNumber;
 
-	public void addDominatedBlock(IRBasicBlock<T> db) {
-		if (!dominatedBlocks.contains(db)) {
-			dominatedBlocks.add(db);
-		}
-	}
+    /**
+     * The quads in this block
+     */
+    private List<Quad<T>> quads;
+    private BootableArrayList<Operand> defList;
 
-	/**
-	 * @return
-	 */
-	public Variable<T>[] getVariables() {
-		if (variables == null) {
-			if (variables == null) {
-				variables = idominator.getVariables();
-			}
-		}
-		if (variables == null) {
-			throw new AssertionError("variables are null!");
-		}
-		return variables;
-	}
+    // The stack offset at the beginning of this block
+    // In some cases, e.g. terniary operators, this is important
+    private int stackOffset;
 
-	/**
-	 * @param variables
-	 */
-	public void setVariables(Variable<T>[] variables) {
-		this.variables = variables;
-	}
+    /**
+     * @param startPC
+     * @param endPC
+     * @param startOfExceptionHandler
+     */
+    public IRBasicBlock(
+        int startPC,
+        int endPC,
+        boolean startOfExceptionHandler) {
 
-	/**
-	 * @return
-	 */
-	public int getStackOffset() {
-		if (stackOffset < 0) {
-			stackOffset = idominator.getStackOffset();
-		}
-		if (stackOffset < 0) {
-			throw new AssertionError("stack offset is invalid!");
-		}
-		return stackOffset;
-	}
+        this.startPC = startPC;
+        this.endPC = endPC;
+        this.startOfExceptionHandler = startOfExceptionHandler;
 
-	/**
-	 * @param initialOffset
-	 */
-	public void setStackOffset(int initialOffset) {
-		stackOffset = initialOffset;
-	}
+        this.stackOffset = -1; // We'll check to make sure this is set
 
-	/**
-	 * @param quad
-	 */
-	public void add(Quad<T> q) {
-		addDef(q);
-		int n = quads.size();
-		if (n < 1 || q instanceof BranchQuad || !(quads.get(n-1) instanceof BranchQuad)) {
-			quads.add(q);
-		} else {
-			quads.add(n-1, q);
-		}
-	}
+        this.name = "B" + startPC;
+        predecessors = new BootableArrayList<IRBasicBlock<T>>();
+        successors = new BootableArrayList<IRBasicBlock<T>>();
+        dominatedBlocks = new BootableArrayList<IRBasicBlock<T>>();
+        postOrderNumber = -1;
+        dominanceFrontier = new BootableArrayList<IRBasicBlock<T>>();
+        quads = new BootableArrayList<Quad<T>>();
+        defList = new BootableArrayList<Operand>();
+    }
 
-	public void add(PhiAssignQuad<T> paq) {
-		if (!quads.contains(paq)) {
-			addDef(paq);
-			quads.add(0, paq);
-		}
-	}
+    /**
+     * @param address
+     */
+    public IRBasicBlock(int address) {
+        this(address, -1, false);
+    }
 
-	private void addDef(Quad<T> q) {
-		Operand<T> def = q.getDefinedOp();
-		if (def instanceof Variable &&
-			!defList.contains(def)) {
-			
-			defList.add(def);
-		}
-	}
+    private void addPredecessor(IRBasicBlock<T> p) {
+        if (!predecessors.contains(p)) {
+            predecessors.add(p);
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public List<IRBasicBlock<T>> getSuccessors() {
-		return successors;
-	}
+    public void addDominatedBlock(IRBasicBlock<T> db) {
+        if (!dominatedBlocks.contains(db)) {
+            dominatedBlocks.add(db);
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public IRBasicBlock<T> getIDominator() {
-		return idominator;
-	}
+    /**
+     * @return
+     */
+    public Variable<T>[] getVariables() {
+        if (variables == null) {
+            if (variables == null) {
+                variables = idominator.getVariables();
+            }
+        }
+        if (variables == null) {
+            throw new AssertionError("variables are null!");
+        }
+        return variables;
+    }
 
-	/**
-	 * @return
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * @param variables
+     */
+    public void setVariables(Variable<T>[] variables) {
+        this.variables = variables;
+    }
 
-	/**
-	 * @return
-	 */
-	public List<IRBasicBlock<T>> getPredecessors() {
-		return predecessors;
-	}
+    /**
+     * @return
+     */
+    public int getStackOffset() {
+        if (stackOffset < 0) {
+            stackOffset = idominator.getStackOffset();
+        }
+        if (stackOffset < 0) {
+            throw new AssertionError("stack offset is invalid!");
+        }
+        return stackOffset;
+    }
 
-	/**
-	 * @param block
-	 */
-	public void addSuccessor(IRBasicBlock<T> block) {
-		if (!successors.contains(block)) {
-			successors.add(block);
-			block.addPredecessor(this);
-		}
-	}
+    /**
+     * @param initialOffset
+     */
+    public void setStackOffset(int initialOffset) {
+        stackOffset = initialOffset;
+    }
 
-	/**
-	 * @param block
-	 */
-	public void setIDominator(IRBasicBlock<T> block) {
-		idominator = block;
-		if (block != null) {
-			block.addDominatedBlock(this);
-		}
-	}
+    /**
+     * @param quad
+     */
+    public void add(Quad<T> q) {
+        addDef(q);
+        int n = quads.size();
+        if (n < 1 || q instanceof BranchQuad || !(quads.get(n - 1) instanceof BranchQuad)) {
+            quads.add(q);
+        } else {
+            quads.add(n - 1, q);
+        }
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setName(String string) {
-		name = string;
-	}
+    public void add(PhiAssignQuad<T> paq) {
+        if (!quads.contains(paq)) {
+            addDef(paq);
+            quads.add(0, paq);
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public int getPostOrderNumber() {
-		return postOrderNumber;
-	}
-	
-	/**
-	 * @param i
-	 */
-	public void setPostOrderNumber(int i) {
-		postOrderNumber = i;
-	}
+    private void addDef(Quad<T> q) {
+        Operand<T> def = q.getDefinedOp();
+        if (def instanceof Variable &&
+            !defList.contains(def)) {
 
-	public void computePostOrder(List<IRBasicBlock<T>> list) {
-		setPostOrderNumber(0);
-		for (IRBasicBlock<T> b : successors) {
-			if (b.getPostOrderNumber() < 0) {
-				b.computePostOrder(list);
-			}
-		}
-		setPostOrderNumber(postOrderCounter++);
-		list.add(this);
-	}
+            defList.add(def);
+        }
+    }
 
-	public void printDomTree() {
-		System.out.print(getName() + " doms:");
-		IRBasicBlock<T> d = getIDominator();
-		while (d != null) {
-			System.out.print(" " + d.getName());
-			d = d.getIDominator();
-		}
-		System.out.println();
-	}
-	
-	public void printPredecessors() {
-		System.out.print(getName() + " preds:");
-		for (IRBasicBlock b : predecessors) {
-			System.out.print(" " + b.getName());
-		}
-		System.out.println();
-	}
+    /**
+     * @return
+     */
+    public List<IRBasicBlock<T>> getSuccessors() {
+        return successors;
+    }
 
-	/**
-	 * @param b
-	 */
-	public void addDominanceFrontier(IRBasicBlock<T> b) {
-		if (!dominanceFrontier.contains(b)) {
-			dominanceFrontier.add(b);
-		}
-	}
+    /**
+     * @return
+     */
+    public IRBasicBlock<T> getIDominator() {
+        return idominator;
+    }
 
-	/**
-	 * @return
-	 */
-	public List<IRBasicBlock<T>> getDominanceFrontier() {
-		return dominanceFrontier;
-	}
+    /**
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * @return
-	 */
-	public List<IRBasicBlock<T>> getDominatedBlocks() {
-		return dominatedBlocks;
-	}
+    /**
+     * @return
+     */
+    public List<IRBasicBlock<T>> getPredecessors() {
+        return predecessors;
+    }
 
-	/**
-	 * @return
-	 */
-	public List<Quad<T>> getQuads() {
-		return quads;
-	}
+    /**
+     * @param block
+     */
+    public void addSuccessor(IRBasicBlock<T> block) {
+        if (!successors.contains(block)) {
+            successors.add(block);
+            block.addPredecessor(this);
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public List<Operand> getDefList() {
-		return defList;
-	}
+    /**
+     * @param block
+     */
+    public void setIDominator(IRBasicBlock<T> block) {
+        idominator = block;
+        if (block != null) {
+            block.addDominatedBlock(this);
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public int getEndPC() {
-		return endPC;
-	}
+    /**
+     * @param string
+     */
+    public void setName(String string) {
+        name = string;
+    }
 
-	/**
-	 * @return
-	 */
-	public int getStartPC() {
-		return startPC;
-	}
+    /**
+     * @return
+     */
+    public int getPostOrderNumber() {
+        return postOrderNumber;
+    }
 
-	/**
-	 * @param i
-	 */
-	public void setEndPC(int i) {
-		endPC = i;
-	}
+    /**
+     * @param i
+     */
+    public void setPostOrderNumber(int i) {
+        postOrderNumber = i;
+    }
 
-	/**
-	 * @param i
-	 */
-	public void setStartPC(int i) {
-		startPC = i;
-	}
+    public void computePostOrder(List<IRBasicBlock<T>> list) {
+        setPostOrderNumber(0);
+        for (IRBasicBlock<T> b : successors) {
+            if (b.getPostOrderNumber() < 0) {
+                b.computePostOrder(list);
+            }
+        }
+        setPostOrderNumber(postOrderCounter++);
+        list.add(this);
+    }
 
-	/**
-	 * @return
-	 */
-	public boolean isStartOfExceptionHandler() {
-		return startOfExceptionHandler;
-	}
+    public void printDomTree() {
+        System.out.print(getName() + " doms:");
+        IRBasicBlock<T> d = getIDominator();
+        while (d != null) {
+            System.out.print(" " + d.getName());
+            d = d.getIDominator();
+        }
+        System.out.println();
+    }
 
-	/**
-	 * @param b
-	 */
-	public void setStartOfExceptionHandler(boolean b) {
-		startOfExceptionHandler = b;
-	}
+    public void printPredecessors() {
+        System.out.print(getName() + " preds:");
+        for (IRBasicBlock b : predecessors) {
+            System.out.print(" " + b.getName());
+        }
+        System.out.println();
+    }
 
-	/**
-	 * @param pc
-	 * @return
-	 */
-	public boolean contains(int pc) {
-		return ((pc >= startPC) && (pc < endPC));
-	}
-	
-	public String toString() {
-		return name;
-	}
+    /**
+     * @param b
+     */
+    public void addDominanceFrontier(IRBasicBlock<T> b) {
+        if (!dominanceFrontier.contains(b)) {
+            dominanceFrontier.add(b);
+        }
+    }
+
+    /**
+     * @return
+     */
+    public List<IRBasicBlock<T>> getDominanceFrontier() {
+        return dominanceFrontier;
+    }
+
+    /**
+     * @return
+     */
+    public List<IRBasicBlock<T>> getDominatedBlocks() {
+        return dominatedBlocks;
+    }
+
+    /**
+     * @return
+     */
+    public List<Quad<T>> getQuads() {
+        return quads;
+    }
+
+    /**
+     * @return
+     */
+    public List<Operand> getDefList() {
+        return defList;
+    }
+
+    /**
+     * @return
+     */
+    public int getEndPC() {
+        return endPC;
+    }
+
+    /**
+     * @return
+     */
+    public int getStartPC() {
+        return startPC;
+    }
+
+    /**
+     * @param i
+     */
+    public void setEndPC(int i) {
+        endPC = i;
+    }
+
+    /**
+     * @param i
+     */
+    public void setStartPC(int i) {
+        startPC = i;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isStartOfExceptionHandler() {
+        return startOfExceptionHandler;
+    }
+
+    /**
+     * @param b
+     */
+    public void setStartOfExceptionHandler(boolean b) {
+        startOfExceptionHandler = b;
+    }
+
+    /**
+     * @param pc
+     * @return
+     */
+    public boolean contains(int pc) {
+        return ((pc >= startPC) && (pc < endPC));
+    }
+
+    public String toString() {
+        return name;
+    }
 }

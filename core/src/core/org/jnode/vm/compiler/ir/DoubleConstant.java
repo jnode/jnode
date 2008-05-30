@@ -18,25 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class DoubleConstant<T> extends Constant<T> {
-	private double value;
-	
-	public DoubleConstant(double value) {
-		super(Operand.DOUBLE);
-		this.value = value;
-	}
+    private double value;
 
-	public double getValue() {
-		return value;
-	}
-	
-	public String toString() {
-		return Double.toString(value);
-	}
+    public DoubleConstant(double value) {
+        super(Operand.DOUBLE);
+        this.value = value;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return Double.toString(value);
+    }
 }

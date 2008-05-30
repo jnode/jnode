@@ -9,10 +9,14 @@ import org.jnode.vm.scheduler.IRQManager;
 
 final class X86IRQManager extends IRQManager {
 
-    /** Number of IRQ vectors */
+    /**
+     * Number of IRQ vectors
+     */
     final static int IRQ_COUNT = 16;
-    
-    /** Programmable interrupt controller */
+
+    /**
+     * Programmable interrupt controller
+     */
     private final PIC8259A pic8259a;
 
     /**
@@ -25,7 +29,7 @@ final class X86IRQManager extends IRQManager {
 
     /**
      * Set an End Of Interrupt message to the 8259 interrupt controller(s).
-     * 
+     *
      * @param irq
      */
     @Uninterruptible

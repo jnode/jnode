@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import java.io.PrintStream;
-
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.util.NumberUtils;
@@ -31,60 +30,63 @@ import org.jnode.util.NumberUtils;
  * @author epr
  */
 public class CompiledExceptionHandler {
-	
-	private NativeStream.ObjectRef startPc;
-	private NativeStream.ObjectRef endPc;
-	private NativeStream.ObjectRef handler;
-	
-	/**
-	 * @return NativeStream.ObjectRef
-	 */
-	public NativeStream.ObjectRef getEndPc() {
-		return endPc;
-	}
 
-	/**
-	 * @return NativeStream.ObjectRef
-	 */
-	public NativeStream.ObjectRef getHandler() {
-		return handler;
-	}
+    private NativeStream.ObjectRef startPc;
+    private NativeStream.ObjectRef endPc;
+    private NativeStream.ObjectRef handler;
 
-	/**
-	 * @return NativeStream.ObjectRef
-	 */
-	public NativeStream.ObjectRef getStartPc() {
-		return startPc;
-	}
+    /**
+     * @return NativeStream.ObjectRef
+     */
+    public NativeStream.ObjectRef getEndPc() {
+        return endPc;
+    }
 
-	/**
-	 * Sets the endPc.
-	 * @param endPc The endPcO to set
-	 */
-	public void setEndPc(NativeStream.ObjectRef endPc) {
-		this.endPc = endPc;
-	}
+    /**
+     * @return NativeStream.ObjectRef
+     */
+    public NativeStream.ObjectRef getHandler() {
+        return handler;
+    }
 
-	/**
-	 * Sets the handler.
-	 * @param handler The handler to set
-	 */
-	public void setHandler(NativeStream.ObjectRef handler) {
-		this.handler = handler;
-	}
+    /**
+     * @return NativeStream.ObjectRef
+     */
+    public NativeStream.ObjectRef getStartPc() {
+        return startPc;
+    }
 
-	/**
-	 * Sets the startPc.
-	 * @param startPc The startPc to set
-	 */
-	public void setStartPc(NativeStream.ObjectRef startPc) {
-		this.startPc = startPc;
-	}
+    /**
+     * Sets the endPc.
+     *
+     * @param endPc The endPcO to set
+     */
+    public void setEndPc(NativeStream.ObjectRef endPc) {
+        this.endPc = endPc;
+    }
 
-	public void writeTo(PrintStream out, int startOffset) 
-	throws UnresolvedObjectRefException {
-		out.println("start:   0x" + NumberUtils.hex(startPc.getOffset() - startOffset));
-		out.println("end:     0x" + NumberUtils.hex(endPc.getOffset() - startOffset));
-		out.println("handler: 0x" + NumberUtils.hex(handler.getOffset() - startOffset));
-	}
+    /**
+     * Sets the handler.
+     *
+     * @param handler The handler to set
+     */
+    public void setHandler(NativeStream.ObjectRef handler) {
+        this.handler = handler;
+    }
+
+    /**
+     * Sets the startPc.
+     *
+     * @param startPc The startPc to set
+     */
+    public void setStartPc(NativeStream.ObjectRef startPc) {
+        this.startPc = startPc;
+    }
+
+    public void writeTo(PrintStream out, int startOffset)
+        throws UnresolvedObjectRefException {
+        out.println("start:   0x" + NumberUtils.hex(startPc.getOffset() - startOffset));
+        out.println("end:     0x" + NumberUtils.hex(endPc.getOffset() - startOffset));
+        out.println("handler: 0x" + NumberUtils.hex(handler.getOffset() - startOffset));
+    }
 }

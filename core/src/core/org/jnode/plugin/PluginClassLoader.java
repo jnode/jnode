@@ -22,14 +22,13 @@
 package org.jnode.plugin;
 
 import java.util.Set;
-
 import org.jnode.vm.classmgr.VmClassLoader;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class PluginClassLoader extends ClassLoader {
-    
+
     /**
      * Default ctor
      */
@@ -40,6 +39,7 @@ public abstract class PluginClassLoader extends ClassLoader {
     /**
      * Wrap this classloader around the given vmClassLoader.
      * Requires special permission.
+     *
      * @param parent
      * @param vmClassLoader
      */
@@ -49,19 +49,19 @@ public abstract class PluginClassLoader extends ClassLoader {
 
     /**
      * Gets the descriptor of the plugin in which this element was declared.
-     * 
+     *
      * @return The descriptor
      */
     public abstract PluginDescriptor getDeclaringPluginDescriptor();
 
     /**
      * Gets the names of the classes contained in this plugin.
+     *
      * @return the set of contained classnames
      */
     public abstract Set<String> getClassNames();
-    
-    public String toString()
-    {
-    	return getClass().getName()+"("+getDeclaringPluginDescriptor().getId()+")";
+
+    public String toString() {
+        return getClass().getName() + "(" + getDeclaringPluginDescriptor().getId() + ")";
     }
 }

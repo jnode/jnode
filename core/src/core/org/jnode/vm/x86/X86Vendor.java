@@ -18,23 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public enum X86Vendor {
-    
+
     INTEL("GenuineIntel"),
     AMD("AuthenticAMD"),
     UNKNOWN("?");
-    
+
     private final String id;
+
     private X86Vendor(String id) {
         this.id = id;
     }
-    
+
     public static X86Vendor getById(String id) {
         for (X86Vendor v : values()) {
             if (v.id.equals(id)) {
@@ -43,7 +44,7 @@ public enum X86Vendor {
         }
         return UNKNOWN;
     }
-    
+
     /**
      * @return Returns the id.
      */

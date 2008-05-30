@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.security.AccessControlException;
@@ -27,7 +27,6 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
-
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.annotation.MagicPermission;
@@ -38,7 +37,7 @@ import org.jnode.vm.scheduler.VmThread;
 
 /**
  * JNode VM implementation of the java AccessControl system.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
@@ -49,17 +48,15 @@ public final class VmAccessController {
      * given Permission. Throws an <code>AccessControlException</code> when
      * the permission is not allowed in the current context. Otherwise returns
      * silently without throwing an exception.
-     * 
-     * @param perm
-     *            the permission to be checked.
-     * @exception AccessControlException
-     *                thrown if the current context does not allow the given
-     *                permission.
+     *
+     * @param perm the permission to be checked.
+     * @throws AccessControlException thrown if the current context does not allow the given
+     *                                permission.
      */
 
     @CheckPermission
     public static void checkPermission(Permission perm)
-            throws AccessControlException {
+        throws AccessControlException {
         if (!VmProcessor.current().isThreadSwitchActive()) {
             // getContext().checkPermission(perm);
 
@@ -67,7 +64,7 @@ public final class VmAccessController {
             // getContext().checkPermission()
             // that does not require any memory allocations.
             final VmStackReader reader = VmProcessor.current()
-                    .getArchitecture().getStackReader();
+                .getArchitecture().getStackReader();
             final VmStackFrameEnumerator sfEnum = new VmStackFrameEnumerator(reader);
             int recursionCount = 0;
             while (sfEnum.isValid()) {
@@ -91,8 +88,8 @@ public final class VmAccessController {
                         if (!pd.implies(perm)) {
                             // Unsafe.debug("Permission denied");
                             throw new AccessControlException("Permission \""
-                                    + perm + "\" not granted due to "
-                                    + declClass.getName());
+                                + perm + "\" not granted due to "
+                                + declClass.getName());
                         }
                     }
                 }
@@ -116,14 +113,14 @@ public final class VmAccessController {
      * includes the current Thread's inherited AccessControlContext, and places
      * it in an AccessControlContext object. This context may then be checked at
      * a later point, possibly in another thread.
-     * 
+     *
      * @return the AccessControlContext based on the current context.
      */
     public static VmAccessControlContext getContext() {
         final VmStackReader reader = VmProcessor.current()
-                .getArchitecture().getStackReader();
+            .getArchitecture().getStackReader();
         final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
-                .getCurrentFrame(), null, Integer.MAX_VALUE);
+            .getCurrentFrame(), null, Integer.MAX_VALUE);
         final int count = stack.length;
         final ProtectionDomain domains[] = new ProtectionDomain[count];
 
@@ -150,19 +147,17 @@ public final class VmAccessController {
      * <code>checkPermission()</code> in the <code>run()</code> method
      * ignore all earlier protection domains of classes in the call chain, but
      * add checks for the protection domains given in the supplied context.
-     * 
-     * @param action
-     *            the <code>PrivilegedAction</code> whose <code>run()</code>
-     *            should be be called.
-     * @param context
-     *            the <code>AccessControlContext</code> whose protection
-     *            domains should be added to the protection domain of the
-     *            calling class.
+     *
+     * @param action  the <code>PrivilegedAction</code> whose <code>run()</code>
+     *                should be be called.
+     * @param context the <code>AccessControlContext</code> whose protection
+     *                domains should be added to the protection domain of the
+     *                calling class.
      * @returns the result of the <code>action.run()</code> method.
      */
     @DoPrivileged
     public static Object doPrivileged(PrivilegedAction action,
-            VmAccessControlContext context) {
+                                      VmAccessControlContext context) {
         final VmThread thread = VmThread.currentThread();
         final VmAccessControlContext prevContext = thread.getContext();
         thread.setContext(context);
@@ -182,22 +177,19 @@ public final class VmAccessController {
      * add checks for the protection domains given in the supplied context. If
      * the <code>run()</code> method throws an exception then this method will
      * wrap that exception in an <code>PrivilegedActionException</code>.
-     * 
-     * @param action
-     *            the <code>PrivilegedExceptionAction</code> whose
-     *            <code>run()</code> should be be called.
-     * @param context
-     *            the <code>AccessControlContext</code> whose protection
-     *            domains should be added to the protection domain of the
-     *            calling class.
+     *
+     * @param action  the <code>PrivilegedExceptionAction</code> whose
+     *                <code>run()</code> should be be called.
+     * @param context the <code>AccessControlContext</code> whose protection
+     *                domains should be added to the protection domain of the
+     *                calling class.
+     * @throws PrivilegedActionException wrapped around any exception that is thrown in the
+     *                                   <code>run()</code> method.
      * @returns the result of the <code>action.run()</code> method.
-     * @exception PrivilegedActionException
-     *                wrapped around any exception that is thrown in the
-     *                <code>run()</code> method.
      */
     @DoPrivileged
     public static Object doPrivileged(PrivilegedExceptionAction action,
-            VmAccessControlContext context) throws PrivilegedActionException {
+                                      VmAccessControlContext context) throws PrivilegedActionException {
         final VmThread thread = VmThread.currentThread();
         final VmAccessControlContext prevContext = thread.getContext();
         thread.setContext(context);

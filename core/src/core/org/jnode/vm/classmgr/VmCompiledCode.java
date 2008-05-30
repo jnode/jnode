@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.util.NumberUtils;
@@ -35,39 +35,59 @@ import org.vmmagic.unboxed.Address;
 @MagicPermission
 public final class VmCompiledCode extends AbstractCode {
 
-    /** Address of native code of this method */
+    /**
+     * Address of native code of this method
+     */
     private final VmAddress nativeCode;
 
-    /** Size in bytes of native code */
+    /**
+     * Size in bytes of native code
+     */
     private int nativeCodeSize1;
 
-    /** Address of the default exception handler (only for compiled methods) */
+    /**
+     * Address of the default exception handler (only for compiled methods)
+     */
     private final VmAddress defaultExceptionHandler;
 
-    /** Compiled code of this method */
+    /**
+     * Compiled code of this method
+     */
     private final Object compiledCode1;
 
-    /** Exception handler table */
+    /**
+     * Exception handler table
+     */
     private final VmCompiledExceptionHandler[] eTable;
 
-    /** Mapping between PC's and addresses */
+    /**
+     * Mapping between PC's and addresses
+     */
     private final VmAddressMap addressTable;
 
-    /** The compiler used to generate this code */
+    /**
+     * The compiler used to generate this code
+     */
     private final NativeCodeCompiler compiler;
 
-    /** Next in linked list */
+    /**
+     * Next in linked list
+     */
     private VmCompiledCode next;
 
-    /** Unique id of this compiled code */
+    /**
+     * Unique id of this compiled code
+     */
     private final int id;
-    
-    /** The method this code is generated for */
+
+    /**
+     * The method this code is generated for
+     */
     private final VmMethod method;
 
     /**
      * Create a new instance
-     * 
+     *
      * @param bytecode
      * @param nativeCode
      * @param compiledCode
@@ -77,9 +97,9 @@ public final class VmCompiledCode extends AbstractCode {
      * @param addressTable
      */
     VmCompiledCode(int id, VmMethod method, NativeCodeCompiler compiler, VmByteCode bytecode,
-            VmAddress nativeCode, Object compiledCode, int size,
-            VmCompiledExceptionHandler[] eTable,
-            VmAddress defaultExceptionHandler, VmAddressMap addressTable) {
+                   VmAddress nativeCode, Object compiledCode, int size,
+                   VmCompiledExceptionHandler[] eTable,
+                   VmAddress defaultExceptionHandler, VmAddressMap addressTable) {
         this.id = id;
         this.method = method;
         this.compiler = compiler;
@@ -105,7 +125,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Returns the defaultExceptionHandler.
-     * 
+     *
      * @return Object
      */
     public VmAddress getDefaultExceptionHandler() {
@@ -114,7 +134,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Gets the length of the native code in bytes.
-     * 
+     *
      * @return the length
      */
     public int getSize() {
@@ -123,7 +143,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Get the number of exception handlers
-     * 
+     *
      * @return the number of exception handlers
      */
     public int getNoExceptionHandlers() {
@@ -132,7 +152,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Get the handler PC of the exception handler at a given index
-     * 
+     *
      * @param index
      * @return The handler
      */
@@ -141,13 +161,13 @@ public final class VmCompiledCode extends AbstractCode {
             return eTable[index];
         } else {
             throw new IndexOutOfBoundsException("eTable is null; index "
-                    + index);
+                + index);
         }
     }
 
     /**
      * Gets address map index for the given instruction pointer.
-     * 
+     *
      * @param instrPtr
      * @return The index, or -1 is not found.
      */
@@ -159,7 +179,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Gets the address of the start of the native code.
-     * 
+     *
      * @return The address
      */
     final VmAddress getNativeCode() {
@@ -172,7 +192,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Does this method contain the given address?
-     * 
+     *
      * @param codePtr
      * @return boolean
      */
@@ -193,7 +213,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Gets the compiler that generated this code.
-     * 
+     *
      * @return Returns the compiler.
      */
     public final NativeCodeCompiler getCompiler() {
@@ -208,8 +228,7 @@ public final class VmCompiledCode extends AbstractCode {
     }
 
     /**
-     * @param next
-     *            The next to set.
+     * @param next The next to set.
      */
     final void setNext(VmCompiledCode next) {
         if (this.next != null) {
@@ -220,7 +239,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * Do a lookup of the compiled code that has the given magic value.
-     * 
+     *
      * @param magic
      * @return The compiled code found in the list, or null if not found.
      */
@@ -241,7 +260,7 @@ public final class VmCompiledCode extends AbstractCode {
     public final int getId() {
         return id;
     }
-    
+
     /**
      * @return Returns the method.
      */
@@ -253,7 +272,7 @@ public final class VmCompiledCode extends AbstractCode {
 
     /**
      * @return Returns the addressTable.
-     * Can be null.
+     *         Can be null.
      */
     public final VmAddressMap getAddressMap() {
         return addressTable;

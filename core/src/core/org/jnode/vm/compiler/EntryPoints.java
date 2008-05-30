@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import org.jnode.vm.VmSystemObject;
@@ -129,70 +129,64 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param loader
      */
     public EntryPoints(VmClassLoader loader, VmHeapManager heapManager,
-            int magic) {
+                       int magic) {
         try {
             this.magic = magic;
             // VmMember class
             final VmType vmMemberType = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmMember", true);
+                "org.jnode.vm.classmgr.VmMember", true);
             this.vmMemberDeclaringClassField = (VmInstanceField) testField(vmMemberType
-                    .getField("declaringClass"));
+                .getField("declaringClass"));
 
             // SoftByteCode
             this.vmSoftByteCodesClass = loader.loadClass(
-                    "org.jnode.vm.SoftByteCodes", true);
+                "org.jnode.vm.SoftByteCodes", true);
             anewarrayMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "anewarray",
-                    "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
+                "anewarray",
+                "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
             allocArrayMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "allocArray",
-                    "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
+                "allocArray",
+                "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
             allocMultiArrayMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "allocMultiArray",
-                    "(Lorg/jnode/vm/classmgr/VmType;[I)Ljava/lang/Object;"));
+                "allocMultiArray",
+                "(Lorg/jnode/vm/classmgr/VmType;[I)Ljava/lang/Object;"));
             allocPrimitiveArrayMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod("allocPrimitiveArray",
-                            "(Lorg/jnode/vm/classmgr/VmType;II)Ljava/lang/Object;"));
-            resolveFieldMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod(
-                            "resolveField",
-                            "(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstFieldRef;Z)Lorg/jnode/vm/classmgr/VmField;"));
-            resolveMethodMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod(
-                            "resolveMethod",
-                            "(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstMethodRef;)Lorg/jnode/vm/classmgr/VmMethod;"));
-            resolveClassMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod("resolveClass",
-                            "(Lorg/jnode/vm/classmgr/VmConstClass;)Lorg/jnode/vm/classmgr/VmType;"));
-            allocObjectMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "allocObject",
-                    "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
+                .getMethod("allocPrimitiveArray", "(Lorg/jnode/vm/classmgr/VmType;II)Ljava/lang/Object;"));
+            resolveFieldMethod = testMethod(vmSoftByteCodesClass.getMethod("resolveField",
+                "(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstFieldRef;Z)" +
+                    "Lorg/jnode/vm/classmgr/VmField;"));
+            resolveMethodMethod = testMethod(vmSoftByteCodesClass.getMethod("resolveMethod",
+                "(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstMethodRef;)" +
+                    "Lorg/jnode/vm/classmgr/VmMethod;"));
+            resolveClassMethod = testMethod(vmSoftByteCodesClass.getMethod("resolveClass",
+                "(Lorg/jnode/vm/classmgr/VmConstClass;)Lorg/jnode/vm/classmgr/VmType;"));
+            allocObjectMethod = testMethod(vmSoftByteCodesClass.getMethod("allocObject",
+                "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
             classCastFailedMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "classCastFailed", "(Ljava/lang/Object;Lorg/jnode/vm/classmgr/VmType;)V"));
+                "classCastFailed", "(Ljava/lang/Object;Lorg/jnode/vm/classmgr/VmType;)V"));
             throwArrayOutOfBounds = testMethod(vmSoftByteCodesClass.getMethod(
-                    "throwArrayOutOfBounds", "(Ljava/lang/Object;I)V"));
-            getClassForVmTypeMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod("getClassForVmType",
-                            "(Lorg/jnode/vm/classmgr/VmType;)Ljava/lang/Class;"));
+                "throwArrayOutOfBounds", "(Ljava/lang/Object;I)V"));
+            getClassForVmTypeMethod = testMethod(vmSoftByteCodesClass.getMethod("getClassForVmType",
+                "(Lorg/jnode/vm/classmgr/VmType;)Ljava/lang/Class;"));
 
             // Write barrier
             writeBarrier = (heapManager != null) ? heapManager
-                    .getWriteBarrier() : null;
+                .getWriteBarrier() : null;
             if (writeBarrier != null) {
                 final VmType wbClass = loader.loadClass(writeBarrier.getClass()
-                        .getName(), true);
+                    .getName(), true);
                 arrayStoreWriteBarrier = testMethod(wbClass.getMethod(
-                        "arrayStoreWriteBarrier",
-                        "(Ljava/lang/Object;ILjava/lang/Object;)V"));
+                    "arrayStoreWriteBarrier",
+                    "(Ljava/lang/Object;ILjava/lang/Object;)V"));
                 putfieldWriteBarrier = testMethod(wbClass.getMethod(
-                        "putfieldWriteBarrier",
-                        "(Ljava/lang/Object;ILjava/lang/Object;)V"));
+                    "putfieldWriteBarrier",
+                    "(Ljava/lang/Object;ILjava/lang/Object;)V"));
                 putstaticWriteBarrier = testMethod(wbClass.getMethod(
-                        "putstaticWriteBarrier", "(ILjava/lang/Object;)V"));
+                    "putstaticWriteBarrier", "(ILjava/lang/Object;)V"));
             } else {
                 arrayStoreWriteBarrier = null;
                 putfieldWriteBarrier = null;
@@ -201,92 +195,91 @@ public class EntryPoints extends VmSystemObject {
 
             // MonitorManager
             this.vmMonitorManagerClass = loader.loadClass(
-                    "org.jnode.vm.scheduler.MonitorManager", true);
+                "org.jnode.vm.scheduler.MonitorManager", true);
             monitorEnterMethod = testMethod(vmMonitorManagerClass.getMethod(
-                    "monitorEnter", "(Ljava/lang/Object;)V"));
+                "monitorEnter", "(Ljava/lang/Object;)V"));
             monitorExitMethod = testMethod(vmMonitorManagerClass.getMethod(
-                    "monitorExit", "(Ljava/lang/Object;)V"));
+                "monitorExit", "(Ljava/lang/Object;)V"));
 
             // MathSupport
             final VmType vmClass = loader.loadClass("org.jnode.vm.MathSupport",
-                    true);
+                true);
             ldivMethod = testMethod(vmClass.getMethod("ldiv", "(JJ)J"));
             lremMethod = testMethod(vmClass.getMethod("lrem", "(JJ)J"));
 
             // VmInstanceField
             this.vmInstanceFieldClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmInstanceField", true);
+                "org.jnode.vm.classmgr.VmInstanceField", true);
             vmFieldOffsetField = (VmInstanceField) testField(vmInstanceFieldClass
-                    .getField("offset"));
+                .getField("offset"));
 
             // VmStaticField
             this.vmStaticFieldClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmStaticField", true);
+                "org.jnode.vm.classmgr.VmStaticField", true);
             vmFieldStaticsIndexField = (VmInstanceField) testField(vmStaticFieldClass
-                    .getField("staticsIndex"));
+                .getField("staticsIndex"));
 
             // VmInstanceMethod
             this.vmInstanceMethodClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmInstanceMethod", true);
+                "org.jnode.vm.classmgr.VmInstanceMethod", true);
             vmMethodTibOffsetField = (VmInstanceField) testField(vmInstanceMethodClass
-                    .getField("tibOffset"));
+                .getField("tibOffset"));
 
             // VmMethodCode
             this.vmMethodCodeClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmMethodCode", true);
+                "org.jnode.vm.classmgr.VmMethodCode", true);
             vmMethodSelectorField = (VmInstanceField) testField(vmInstanceMethodClass
-                    .getField("selector"));
+                .getField("selector"));
             vmMethodNativeCodeField = (VmInstanceField) testField(vmInstanceMethodClass
-                    .getField("nativeCode"));
+                .getField("nativeCode"));
 
             // VmConstIMethodRef
             final VmType cimrClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmConstIMethodRef", true);
+                "org.jnode.vm.classmgr.VmConstIMethodRef", true);
             this.vmConstIMethodRefSelectorField = (VmInstanceField) testField(cimrClass
-                    .getField("selector"));
+                .getField("selector"));
 
             // VmProcessor
             final VmType processorClass = loader.loadClass(
-                    "org.jnode.vm.scheduler.VmProcessor", true);
-            vmThreadSwitchIndicatorOffset = ((VmInstanceField) testField(processorClass
-                    .getField("threadSwitchIndicator"))).getOffset();
+                "org.jnode.vm.scheduler.VmProcessor", true);
+            vmThreadSwitchIndicatorOffset =
+                ((VmInstanceField) testField(processorClass.getField("threadSwitchIndicator"))).getOffset();
             yieldPoint = testMethod(processorClass.getMethod("yieldPoint", "()V"));
-            vmProcessorMeField = (VmInstanceField)testField(processorClass.getField("me"));
+            vmProcessorMeField = (VmInstanceField) testField(processorClass.getField("me"));
             vmProcessorStackEnd = (VmInstanceField) testField(processorClass
-                    .getField("stackEnd"));
+                .getField("stackEnd"));
             vmProcessorSharedStaticsTable = (VmInstanceField) testField(processorClass
-                    .getField("staticsTable"));
+                .getField("staticsTable"));
             vmProcessorIsolatedStaticsTable = (VmInstanceField) testField(processorClass
-                    .getField("isolatedStaticsTable"));
-
+                .getField("isolatedStaticsTable"));
 
             // VmType
             final VmType typeClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmType", true);
+                "org.jnode.vm.classmgr.VmType", true);
             vmTypeInitialize = testMethod(typeClass.getMethod("initialize",
-                    "()V"));
+                "()V"));
             vmTypeModifiers = (VmInstanceField) testField(typeClass
-                    .getField("modifiers"));
+                .getField("modifiers"));
             vmTypeState = (VmInstanceField) testField(typeClass
-                    .getField("state"));
+                .getField("state"));
             vmTypeCp = (VmInstanceField) testField(typeClass.getField("cp"));
 
             // VmCP
             final VmType cpClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmCP", true);
+                "org.jnode.vm.classmgr.VmCP", true);
             vmCPCp = (VmInstanceField) testField(cpClass.getField("cp"));
 
             // VmProcessor
             // VmThread
             final VmType vmThreadClass = loader.loadClass("org.jnode.vm.scheduler.VmThread", true);
             systemExceptionMethod = testMethod(vmThreadClass.getMethod(
-                    "systemException", "(II)Ljava/lang/Throwable;"));
-            
+                "systemException", "(II)Ljava/lang/Throwable;"));
+
             // VmMethod
             final VmType vmMethodClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmMethod", true);
+                "org.jnode.vm.classmgr.VmMethod", true);
             recompileMethod = testMethod(vmMethodClass.getDeclaredMethod(
-                    "recompileMethod", "(II)V"));
+                "recompileMethod", "(II)V"));
 
         } catch (ClassNotFoundException ex) {
             throw new NoClassDefFoundError(ex.getMessage());
@@ -309,7 +302,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the allocArray method
-     * 
+     *
      * @return method
      */
     public final VmMethod getAllocArrayMethod() {
@@ -318,7 +311,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the allocObject method
-     * 
+     *
      * @return method
      */
     public final VmMethod getAllocObjectMethod() {
@@ -327,7 +320,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the anewArray
-     * 
+     *
      * @return method
      */
     public final VmMethod getAnewarrayMethod() {
@@ -336,7 +329,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the ldiv method
-     * 
+     *
      * @return method
      */
     public final VmMethod getLdivMethod() {
@@ -345,7 +338,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the lrem method
-     * 
+     *
      * @return method
      */
     public final VmMethod getLremMethod() {
@@ -354,7 +347,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the monitorEnter method
-     * 
+     *
      * @return method
      */
     public final VmMethod getMonitorEnterMethod() {
@@ -363,7 +356,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the monitorExit method
-     * 
+     *
      * @return method
      */
     public final VmMethod getMonitorExitMethod() {
@@ -372,7 +365,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the resolveClass method
-     * 
+     *
      * @return method
      */
     public final VmMethod getResolveClassMethod() {
@@ -381,7 +374,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the resolveField method
-     * 
+     *
      * @return method
      */
     public final VmMethod getResolveFieldMethod() {
@@ -390,7 +383,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the resolveMethod method
-     * 
+     *
      * @return method
      */
     public final VmMethod getResolveMethodMethod() {
@@ -399,7 +392,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the offset field of VmInstanceField
-     * 
+     *
      * @return field
      */
     public final VmInstanceField getVmFieldOffsetField() {
@@ -408,7 +401,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the VmInstanceField class
-     * 
+     *
      * @return type
      */
     public final VmType getVmInstanceFieldClass() {
@@ -417,7 +410,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the VmInstanceMethod class
-     * 
+     *
      * @return type
      */
     public final VmType getVmInstanceMethodClass() {
@@ -426,7 +419,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the VmMethodCode class
-     * 
+     *
      * @return type
      */
     public final VmType getVmMethodCodeClass() {
@@ -435,7 +428,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the vmtOffset field of VmMethod
-     * 
+     *
      * @return field
      */
     public final VmInstanceField getVmMethodVmtOffsetField() {
@@ -444,7 +437,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the MonitorManager class
-     * 
+     *
      * @return type
      */
     public final VmType getVmMonitorManagerClass() {
@@ -453,7 +446,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the SoftByteCodes class
-     * 
+     *
      * @return type
      */
     public final VmType getVmSoftByteCodesClass() {
@@ -462,7 +455,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the VmStaticField class
-     * 
+     *
      * @return type
      */
     public final VmType getVmStaticFieldClass() {
@@ -471,7 +464,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the selector field of VmConstIMethodRef
-     * 
+     *
      * @return type
      */
     public final VmInstanceField getVmConstIMethodRefSelectorField() {
@@ -480,7 +473,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the selector field of VmMethod
-     * 
+     *
      * @return type
      */
     public final VmInstanceField getVmMethodSelectorField() {
@@ -489,7 +482,7 @@ public class EntryPoints extends VmSystemObject {
 
     /**
      * Gets the systemException method of SoftByteCodes
-     * 
+     *
      * @return type
      */
     public final VmMethod getSystemExceptionMethod() {
@@ -637,24 +630,24 @@ public class EntryPoints extends VmSystemObject {
     }
 
     /**
-     * @see org.jnode.vm.scheduler.VmProcessor#yieldPoint()
      * @return Returns the yieldPoint.
+     * @see org.jnode.vm.scheduler.VmProcessor#yieldPoint()
      */
     public final VmMethod getYieldPoint() {
         return yieldPoint;
     }
 
     /**
-     * @see VmMethod#recompileMethod(int, int)
      * @return Returns the recompileMethod.
+     * @see VmMethod#recompileMethod(int, int)
      */
     public final VmMethod getRecompileMethod() {
         return recompileMethod;
     }
 
     /**
-     * @see org.jnode.vm.SoftByteCodes#getClassForVmType(VmType)
      * @return Returns the getClassForVmTypeMethod.
+     * @see org.jnode.vm.SoftByteCodes#getClassForVmType(VmType)
      */
     public final VmMethod getGetClassForVmTypeMethod() {
         return getClassForVmTypeMethod;

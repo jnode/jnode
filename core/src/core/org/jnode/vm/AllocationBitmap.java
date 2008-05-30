@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.MagicPermission;
@@ -30,35 +30,51 @@ import org.vmmagic.unboxed.Word;
 
 /**
  * A bitmap that stores its bits in a raw memory region.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 @Uninterruptible
 public class AllocationBitmap {
 
-    /** Inclusive start address of the bitmap memory region */
+    /**
+     * Inclusive start address of the bitmap memory region
+     */
     private Address start = Address.zero();
 
-    /** Exclusive end address of the bitmap memory region */
+    /**
+     * Exclusive end address of the bitmap memory region
+     */
     private Address end = Address.zero();
 
-    /** Number of bits in the bitmap */
+    /**
+     * Number of bits in the bitmap
+     */
     private Word bits;
 
-    /** Lock address for access to the bits in this bitmap */
+    /**
+     * Lock address for access to the bits in this bitmap
+     */
     private Address lock;
 
-    /** Address of bits data */
+    /**
+     * Address of bits data
+     */
     private Address bitmap;
 
-    /** Size of the bitmap memory region */
+    /**
+     * Size of the bitmap memory region
+     */
     private Extent size;
 
-    /** Number of allocated bits */
+    /**
+     * Number of allocated bits
+     */
     private Word allocatedBits = Word.zero();
 
-    /** Number of next allocatable bit */
+    /**
+     * Number of next allocatable bit
+     */
     private Word nextBitNr = Word.zero();
 
     /**
@@ -70,19 +86,19 @@ public class AllocationBitmap {
 
     /**
      * Initialize this bitmap.
-     * 
+     *
      * @param start
      * @param bits
      */
     public final void initialize(Address start, Word bits) {
         // Size of the lock (we only use an int)
         final Extent lockSize = Extent.fromIntZeroExtend(Vm.getArch()
-                .getReferenceSize());
+            .getReferenceSize());
 
         // Create a lock and actual bitmap
         final Extent rawBitmapSize = bits.rshl(3).toExtent();
         final Extent bitmapSize = rawBitmapSize.toWord().add(lockSize)
-                .toExtent();
+            .toExtent();
 
         this.start = start;
         this.end = start.add(bitmapSize);
@@ -99,7 +115,7 @@ public class AllocationBitmap {
 
     /**
      * Gets the size of the memory region occupied by this bitmap.
-     * 
+     *
      * @return
      */
     public final Extent getSize() {
@@ -108,7 +124,7 @@ public class AllocationBitmap {
 
     /**
      * Allocate a new series of bits.
-     * 
+     *
      * @param noBits
      * @return The bit index of the start of the bit series, or Word.max() when
      *         not enough free bits are available.
@@ -136,11 +152,9 @@ public class AllocationBitmap {
 
     /**
      * Free a previously allocated new series of bits.
-     * 
-     * @param bit
-     *            The bit number as returned by allocateBits.
-     * @param noBits
-     *            The size of the bit series as given to allocateBits.
+     *
+     * @param bit    The bit number as returned by allocateBits.
+     * @param noBits The size of the bit series as given to allocateBits.
      */
     public final void freeBits(Word bit, Word noBits) {
         lock();
@@ -157,10 +171,11 @@ public class AllocationBitmap {
             unlock();
         }
     }
-    
+
     /**
      * Mark a series of bits as set.
-     * @param bit The start of the series
+     *
+     * @param bit    The start of the series
      * @param noBits The number of bits in the series
      */
     public final void setBits(Word bit, Word noBits) {
@@ -181,7 +196,7 @@ public class AllocationBitmap {
 
     /**
      * Find the first free bits that is following by freeBits-1 free bits.
-     * 
+     *
      * @param freeBits
      * @return The bit number of the first block, or Word.max() if not found.
      */
@@ -210,7 +225,7 @@ public class AllocationBitmap {
 
     /**
      * Is a given set.
-     * 
+     *
      * @param bit
      * @return boolean
      */
@@ -224,7 +239,7 @@ public class AllocationBitmap {
 
     /**
      * Set/Reset a given bit.
-     * 
+     *
      * @param bit
      */
     private final void set(Word bit, boolean value) {

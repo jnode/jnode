@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system.event;
 
 /**
@@ -26,30 +26,30 @@ package org.jnode.system.event;
  */
 public class FocusEvent extends SystemEvent {
 
-	public static final int FOCUS_LOST = 101;
-	public static final int FOCUS_GAINED = 102;
+    public static final int FOCUS_LOST = 101;
+    public static final int FOCUS_GAINED = 102;
 
-	/**
-	 * @param id
-	 * @param time
-	 */
-	public FocusEvent(int id, long time) {
-		super(id, time);
-	}
+    /**
+     * @param id
+     * @param time
+     */
+    public FocusEvent(int id, long time) {
+        super(id, time);
+    }
 
-	/**
-	 * @param id
-	 */
-	public FocusEvent(int id) {
-		super(id);
-	}
-	
-	public boolean isFocusLost() {
-		return (id == FOCUS_LOST);
-	}
+    /**
+     * @param id
+     */
+    public FocusEvent(int id) {
+        super(id);
+    }
 
-	public boolean isFocusGained() {
-		return (id == FOCUS_GAINED);
-	}
+    public boolean isFocusLost() {
+        return (id == FOCUS_LOST);
+    }
+
+    public boolean isFocusGained() {
+        return (id == FOCUS_GAINED);
+    }
 
 }

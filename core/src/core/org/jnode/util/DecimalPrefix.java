@@ -7,62 +7,61 @@ import org.jnode.vm.annotation.SharedStatics;
 
 @SharedStatics
 public enum DecimalPrefix {
-	B(1l, ""),
-	K(1000l, "k"),
-	M(1000l*1000l, "M"),
-	G(1000l*1000l*1000l, "G"),
-	T(1000l*1000l*1000l*1000l, "T"),
-	P(1000l*1000l*1000l*1000l*1000l, "P"),
-	E(1000l*1000l*1000l*1000l*1000l*1000l, "E");
-	//these units have too big multipliers to fit in a long
-	// (aka they are greater than 2^64) :
-	//Z(1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Z"),
-	//Y(1000l*1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Y");
+    B(1l, ""),
+    K(1000l, "k"),
+    M(1000l * 1000l, "M"),
+    G(1000l * 1000l * 1000l, "G"),
+    T(1000l * 1000l * 1000l * 1000l, "T"),
+    P(1000l * 1000l * 1000l * 1000l * 1000l, "P"),
+    E(1000l * 1000l * 1000l * 1000l * 1000l * 1000l, "E");
+    //these units have too big multipliers to fit in a long
+    // (aka they are greater than 2^64) :
+    //Z(1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Z"),
+    //Y(1000l*1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Y");
 
-	public static final DecimalPrefix MIN = B;
-	public static final DecimalPrefix MAX = E;
+    public static final DecimalPrefix MIN = B;
+    public static final DecimalPrefix MAX = E;
 
-	final private long multiplier;
-	final private String unit;
+    final private long multiplier;
+    final private String unit;
 
-	private DecimalPrefix(long multiplier, String unit)
-	{
-		this.multiplier = multiplier;
-		this.unit = unit;
-	}
+    private DecimalPrefix(long multiplier, String unit) {
+        this.multiplier = multiplier;
+        this.unit = unit;
+    }
 
-	public long getMultiplier() {
-		return multiplier;
-	}
+    public long getMultiplier() {
+        return multiplier;
+    }
 
-	public String getUnit() {
-		return unit;
-	}
+    public String getUnit() {
+        return unit;
+    }
 
-	public String toString()
-	{
-		return multiplier + ", " + unit;
-	}
+    public String toString() {
+        return multiplier + ", " + unit;
+    }
 
     /**
-	 * Convert the given value to a size string like 64K
-	 * @param v the size to convert
-	 * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all. 
-	 * @return the text for the size
-	 */
+     * Convert the given value to a size string like 64K
+     *
+     * @param v          the size to convert
+     * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all.
+     * @return the text for the size
+     */
     public static String apply(final long value, final int nbDecimals) {
-    	long v = value;    	
-    	DecimalPrefix unit = null;    	
+        long v = value;
+        DecimalPrefix unit = null;
         for (DecimalPrefix u : values()) {
             if ((v < 1000l) && (v >= 0l)) {
-            	unit = u;
-            	break;
-           }
+                unit = u;
+                break;
+            }
 
             v = v / 1000l;
         }
         unit = (unit == null) ? MAX : unit;
-        float dv = ((float) value) / unit.getMultiplier(); 
+        float dv = ((float) value) / unit.getMultiplier();
         return NumberUtils.toString(dv, nbDecimals) + " " + unit.getUnit();
     }
 }

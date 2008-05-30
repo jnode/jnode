@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system.x86;
 
 import java.security.PrivilegedExceptionAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.DMAException;
 import org.jnode.system.IOResource;
@@ -90,255 +88,270 @@ import org.vmmagic.unboxed.Address;
 @MagicPermission
 final class DMA implements DMAConstants {
 
-	/** Number of channels */
-	public static final int MAX = 8;
+    /**
+     * Number of channels
+     */
+    public static final int MAX = 8;
 
-	/** Page I/O ports */
-	private final IOResource pageIO;
-	private final IOResource dma1IO;
-	private final IOResource dma2IO;
+    /**
+     * Page I/O ports
+     */
+    private final IOResource pageIO;
+    private final IOResource dma1IO;
+    private final IOResource dma2IO;
 
-	/**
-	 * Create a new instance
-	 * @throws DMAException
-	 */
-	public DMA() throws DMAException {
-		final ResourceManager rm;
-		try {
-			rm = (ResourceManager)InitialNaming.lookup(ResourceManager.NAME);
-		} catch (NameNotFoundException ex) {
-			throw new DMAException("Cannot find ResourceManager", ex);
-		}
-		IOResource pageIO = null;
-		IOResource dma1IO = null;
-		IOResource dma2IO = null;
+    /**
+     * Create a new instance
+     *
+     * @throws DMAException
+     */
+    public DMA() throws DMAException {
+        final ResourceManager rm;
+        try {
+            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+        } catch (NameNotFoundException ex) {
+            throw new DMAException("Cannot find ResourceManager", ex);
+        }
+        IOResource pageIO = null;
+        IOResource dma1IO = null;
+        IOResource dma2IO = null;
 
-		try {
-			final ResourceOwner owner = new SimpleResourceOwner("DMA-X86");
-			pageIO = claimPorts(rm, owner, 0x81, 0x8f - 0x81 + 1);
-			dma1IO = claimPorts(rm, owner, 0x00, 16);
-			dma2IO = claimPorts(rm, owner, 0xc0, 32);
+        try {
+            final ResourceOwner owner = new SimpleResourceOwner("DMA-X86");
+            pageIO = claimPorts(rm, owner, 0x81, 0x8f - 0x81 + 1);
+            dma1IO = claimPorts(rm, owner, 0x00, 16);
+            dma2IO = claimPorts(rm, owner, 0xc0, 32);
 
-			this.pageIO = pageIO;
-			this.dma1IO = dma1IO;
-			this.dma2IO = dma2IO;
-			
-			for (int dmanr = 0; dmanr < MAX; dmanr++) {
-				clearFF(dmanr);
-			}
+            this.pageIO = pageIO;
+            this.dma1IO = dma1IO;
+            this.dma2IO = dma2IO;
 
-		} catch (ResourceNotFreeException ex) {
-			if (pageIO != null) {
-				pageIO.release();
-			}
-			if (dma1IO != null) {
-				dma1IO.release();
-			}
-			if (dma2IO != null) {
-				dma2IO.release();
-			}
-			throw new DMAException("Cannot claim DMA I/O ports", ex);
-		}
-	}
-	
-	/**
-	 * Release all resources
-	 */
-	protected final void release() {
-		pageIO.release();
-		dma1IO.release();
-		dma2IO.release();
-	}
+            for (int dmanr = 0; dmanr < MAX; dmanr++) {
+                clearFF(dmanr);
+            }
 
-	/**
-	 * Program the page register for a given channel
-	 * @param dmanr
-	 * @param page
-	 */
-	private final void setPage(int dmanr, int page) {
-		switch (dmanr) {
-			case 0 :
-				pageIO.outPortByte(DMA_PAGE_0, page);
-				break;
-			case 1 :
-				pageIO.outPortByte(DMA_PAGE_1, page);
-				break;
-			case 2 :
-				pageIO.outPortByte(DMA_PAGE_2, page);
-				break;
-			case 3 :
-				pageIO.outPortByte(DMA_PAGE_3, page);
-				break;
-			case 5 :
-				pageIO.outPortByte(DMA_PAGE_5, page & 0xfe);
-				break;
-			case 6 :
-				pageIO.outPortByte(DMA_PAGE_6, page & 0xfe);
-				break;
-			case 7 :
-				pageIO.outPortByte(DMA_PAGE_7, page & 0xfe);
-				break;
-			default :
-				throw new IllegalArgumentException("Invalid dmanr " + dmanr);
-		}
-	}
+        } catch (ResourceNotFreeException ex) {
+            if (pageIO != null) {
+                pageIO.release();
+            }
+            if (dma1IO != null) {
+                dma1IO.release();
+            }
+            if (dma2IO != null) {
+                dma2IO.release();
+            }
+            throw new DMAException("Cannot claim DMA I/O ports", ex);
+        }
+    }
 
-	/**
-	 * Program the address register for a given channel
-	 * @param dmanr
-	 * @param address
-	 * @throws DMAException
-	 */
-	public void setAddress(int dmanr, Address address) throws DMAException {
-		final int a32 = address.toInt();
-		final int page = (a32 >> 16);
-		
-		setPage(dmanr, page);
-		if (dmanr <= 3) {
-			final int port = DMA_ADDR_0 + ((dmanr & 3) << 1);
-			dma1IO.outPortByte(port, a32 & 0xFF);
-			dma1IO.outPortByte(port, (a32 >> 8) & 0xFF);
-		} else {
-			final int port = DMA_ADDR_4 + ((dmanr & 3) << 2);
-			dma1IO.outPortByte(port, (a32 >> 1) & 0xFF);
-			dma1IO.outPortByte(port, (a32 >> 9) & 0xFF);
-		}
-	}
+    /**
+     * Release all resources
+     */
+    protected final void release() {
+        pageIO.release();
+        dma1IO.release();
+        dma2IO.release();
+    }
 
-	/**
-	 * Program the address register for a given channel
-	 * @param dmanr
-	 * @param length
-	 * @throws DMAException
-	 */
-	public void setLength(int dmanr, int length) throws DMAException {
-		length--;
-		if (dmanr <= 3) {
-			final int port = DMA_CNT_0 + ((dmanr & 3) << 1);
-			dma1IO.outPortByte(port, length & 0xFF);
-			dma1IO.outPortByte(port, (length >> 8) & 0xFF);
-		} else {
-			final int port = DMA_CNT_4 + ((dmanr & 3) << 2);
-			dma1IO.outPortByte(port, (length >> 1) & 0xFF);
-			dma1IO.outPortByte(port, (length >> 9) & 0xFF);
-		}
-	}
-	
-	public int getLength(int dmanr) {
-		final int port;
-		int count;
-		if (dmanr <= 3) {
-			port = DMA_CNT_0 + ((dmanr & 3) << 1);
-		} else {
-			port = DMA_CNT_4 + ((dmanr & 3) << 2);
-		}
-		count = (dma1IO.inPortByte(port) & 0xFF) + 1;
-		count += ((dma1IO.inPortByte(port) & 0xFF) << 8);
-		if (dmanr <= 3) {
-			return count;
-		} else {
-			return count << 1;
-		}		
-	}
+    /**
+     * Program the page register for a given channel
+     *
+     * @param dmanr
+     * @param page
+     */
+    private final void setPage(int dmanr, int page) {
+        switch (dmanr) {
+            case 0:
+                pageIO.outPortByte(DMA_PAGE_0, page);
+                break;
+            case 1:
+                pageIO.outPortByte(DMA_PAGE_1, page);
+                break;
+            case 2:
+                pageIO.outPortByte(DMA_PAGE_2, page);
+                break;
+            case 3:
+                pageIO.outPortByte(DMA_PAGE_3, page);
+                break;
+            case 5:
+                pageIO.outPortByte(DMA_PAGE_5, page & 0xfe);
+                break;
+            case 6:
+                pageIO.outPortByte(DMA_PAGE_6, page & 0xfe);
+                break;
+            case 7:
+                pageIO.outPortByte(DMA_PAGE_7, page & 0xfe);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid dmanr " + dmanr);
+        }
+    }
 
-	/**
-	 * Program the mode register for a given channel
-	 * @param dmanr
-	 * @param mode
-	 * @throws DMAException
-	 */
-	public void setMode(int dmanr, int mode) throws DMAException {
-		mode |= (dmanr & 3);
-		if (dmanr <= 3) {
-			dma1IO.outPortByte(DMA1_MODE_REG, mode);
-		} else {
-			dma2IO.outPortByte(DMA2_MODE_REG, mode);
-		}
-	}
+    /**
+     * Program the address register for a given channel
+     *
+     * @param dmanr
+     * @param address
+     * @throws DMAException
+     */
+    public void setAddress(int dmanr, Address address) throws DMAException {
+        final int a32 = address.toInt();
+        final int page = (a32 >> 16);
 
-	/**
-	 * Enable the given channel
-	 * @param dmanr
-	 */
-	public void enable(int dmanr) {
-		if (dmanr <= 3) {
-			dma1IO.outPortByte(DMA1_MASK_REG, dmanr);
-		} else {
-			dma2IO.outPortByte(DMA2_MASK_REG, dmanr & 3);
-		}
-	}
+        setPage(dmanr, page);
+        if (dmanr <= 3) {
+            final int port = DMA_ADDR_0 + ((dmanr & 3) << 1);
+            dma1IO.outPortByte(port, a32 & 0xFF);
+            dma1IO.outPortByte(port, (a32 >> 8) & 0xFF);
+        } else {
+            final int port = DMA_ADDR_4 + ((dmanr & 3) << 2);
+            dma1IO.outPortByte(port, (a32 >> 1) & 0xFF);
+            dma1IO.outPortByte(port, (a32 >> 9) & 0xFF);
+        }
+    }
 
-	/**
-	 * Disable the given channel
-	 * @param dmanr
-	 */
-	public void disable(int dmanr) {
-		if (dmanr <= 3) {
-			dma1IO.outPortByte(DMA1_MASK_REG, dmanr | 4);
-		} else {
-			dma2IO.outPortByte(DMA2_MASK_REG, (dmanr & 3) | 4);
-		}
-	}
+    /**
+     * Program the address register for a given channel
+     *
+     * @param dmanr
+     * @param length
+     * @throws DMAException
+     */
+    public void setLength(int dmanr, int length) throws DMAException {
+        length--;
+        if (dmanr <= 3) {
+            final int port = DMA_CNT_0 + ((dmanr & 3) << 1);
+            dma1IO.outPortByte(port, length & 0xFF);
+            dma1IO.outPortByte(port, (length >> 8) & 0xFF);
+        } else {
+            final int port = DMA_CNT_4 + ((dmanr & 3) << 2);
+            dma1IO.outPortByte(port, (length >> 1) & 0xFF);
+            dma1IO.outPortByte(port, (length >> 9) & 0xFF);
+        }
+    }
 
-	/**
-	 * Clear the 'DMA Pointer Flip Flop'.
-	 * Write 0 for LSB/MSB, 1 for MSB/LSB access.
-	 * Use this once to initialize the FF to a known state.
-	 * After that, keep track of it. :-)
-	 * @param dmanr
-	 */
-	protected final void clearFF(int dmanr) {
-		if (dmanr <= 3) {
-			dma1IO.outPortByte(DMA1_CLEAR_FF_REG, 0);
-		} else {
-			dma2IO.outPortByte(DMA2_CLEAR_FF_REG, 0);
-		}
-	}
-	
-	/**
-	 * Test the combination of address and length
-	 * @param dmanr
-	 * @param address
-	 * @param length
-	 * @throws IllegalArgumentException
-	 */
-	protected final void test(int dmanr, Address address, int length) 
-	throws IllegalArgumentException {
-		final int maxLength;
-		final int pageMask;
-		if (dmanr <= 3) {
-			maxLength = 64*1024;
-			pageMask = 0xff;
-		} else {
-			maxLength = 128*1024;
-			if ((length & 2) != 0) {
-				throw new IllegalArgumentException("Invalid length-alignment: " + length);
-			}
-			pageMask = 0xfe;
-		}
-		if ((length <= 0) || (length > maxLength)) {
-			throw new IllegalArgumentException("Invalid length: " + length);
-		}
-		
-		final int a32 = address.toInt();
-		final int pageStart = (a32 >> 16) & pageMask;
-		final int pageEnd = ((a32 + length-1) >> 16) & pageMask;
-		if (pageStart != pageEnd) {
-			throw new IllegalArgumentException("Invalid address alignment. DMA block cannot cross pages");
-		}
-	}
+    public int getLength(int dmanr) {
+        final int port;
+        int count;
+        if (dmanr <= 3) {
+            port = DMA_CNT_0 + ((dmanr & 3) << 1);
+        } else {
+            port = DMA_CNT_4 + ((dmanr & 3) << 2);
+        }
+        count = (dma1IO.inPortByte(port) & 0xFF) + 1;
+        count += ((dma1IO.inPortByte(port) & 0xFF) << 8);
+        if (dmanr <= 3) {
+            return count;
+        } else {
+            return count << 1;
+        }
+    }
 
-	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DMAException {
-		try {
-            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+    /**
+     * Program the mode register for a given channel
+     *
+     * @param dmanr
+     * @param mode
+     * @throws DMAException
+     */
+    public void setMode(int dmanr, int mode) throws DMAException {
+        mode |= (dmanr & 3);
+        if (dmanr <= 3) {
+            dma1IO.outPortByte(DMA1_MODE_REG, mode);
+        } else {
+            dma2IO.outPortByte(DMA2_MODE_REG, mode);
+        }
+    }
+
+    /**
+     * Enable the given channel
+     *
+     * @param dmanr
+     */
+    public void enable(int dmanr) {
+        if (dmanr <= 3) {
+            dma1IO.outPortByte(DMA1_MASK_REG, dmanr);
+        } else {
+            dma2IO.outPortByte(DMA2_MASK_REG, dmanr & 3);
+        }
+    }
+
+    /**
+     * Disable the given channel
+     *
+     * @param dmanr
+     */
+    public void disable(int dmanr) {
+        if (dmanr <= 3) {
+            dma1IO.outPortByte(DMA1_MASK_REG, dmanr | 4);
+        } else {
+            dma2IO.outPortByte(DMA2_MASK_REG, (dmanr & 3) | 4);
+        }
+    }
+
+    /**
+     * Clear the 'DMA Pointer Flip Flop'.
+     * Write 0 for LSB/MSB, 1 for MSB/LSB access.
+     * Use this once to initialize the FF to a known state.
+     * After that, keep track of it. :-)
+     *
+     * @param dmanr
+     */
+    protected final void clearFF(int dmanr) {
+        if (dmanr <= 3) {
+            dma1IO.outPortByte(DMA1_CLEAR_FF_REG, 0);
+        } else {
+            dma2IO.outPortByte(DMA2_CLEAR_FF_REG, 0);
+        }
+    }
+
+    /**
+     * Test the combination of address and length
+     *
+     * @param dmanr
+     * @param address
+     * @param length
+     * @throws IllegalArgumentException
+     */
+    protected final void test(int dmanr, Address address, int length)
+        throws IllegalArgumentException {
+        final int maxLength;
+        final int pageMask;
+        if (dmanr <= 3) {
+            maxLength = 64 * 1024;
+            pageMask = 0xff;
+        } else {
+            maxLength = 128 * 1024;
+            if ((length & 2) != 0) {
+                throw new IllegalArgumentException("Invalid length-alignment: " + length);
+            }
+            pageMask = 0xfe;
+        }
+        if ((length <= 0) || (length > maxLength)) {
+            throw new IllegalArgumentException("Invalid length: " + length);
+        }
+
+        final int a32 = address.toInt();
+        final int pageStart = (a32 >> 16) & pageMask;
+        final int pageEnd = ((a32 + length - 1) >> 16) & pageMask;
+        if (pageStart != pageEnd) {
+            throw new IllegalArgumentException("Invalid address alignment. DMA block cannot cross pages");
+        }
+    }
+
+    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length)
+        throws ResourceNotFreeException, DMAException {
+        try {
+            return (IOResource) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
                 public Object run() throws ResourceNotFreeException {
-            		return rm.claimIOResource(owner, low, length);
-                    }});
-		} catch (ResourceNotFreeException ex) {
-		    throw ex;
+                    return rm.claimIOResource(owner, low, length);
+                }
+            });
+        } catch (ResourceNotFreeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new DMAException("Unknown exception", ex);
         }
-	    
-	}
+
+    }
 }

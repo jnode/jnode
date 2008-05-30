@@ -18,19 +18,18 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmSystemObject;
 
 /**
  * This table is a mapping between a program counter and an address of that
  * program counter in compiled code.
- * 
+ *
  * @author epr
  */
 public final class VmAddressMap extends VmSystemObject {
@@ -41,13 +40,19 @@ public final class VmAddressMap extends VmSystemObject {
 
     private int[] offsetTable;
 
-    /** Program counter at a given index */
+    /**
+     * Program counter at a given index
+     */
     private char[] pcTable;
 
-    /** Index in the methodTable at a index (null is methodTable.length == 1) */
+    /**
+     * Index in the methodTable at a index (null is methodTable.length == 1)
+     */
     private byte[] methodIndexTable;
 
-    /** Inline depth at a given index (0..) (null is methodTable.length == 1) */
+    /**
+     * Inline depth at a given index (0..) (null is methodTable.length == 1)
+     */
     private byte[] inlineDepthTable;
 
     /**
@@ -58,9 +63,8 @@ public final class VmAddressMap extends VmSystemObject {
 
     /**
      * Add an address-pc mapping
-     * 
-     * @param offset
-     *            Offset from the start of the method
+     *
+     * @param offset Offset from the start of the method
      * @param pc
      */
     public void add(VmMethod method, int pc, int offset, int inlineDepth) {
@@ -88,7 +92,7 @@ public final class VmAddressMap extends VmSystemObject {
 
     /**
      * Gets the last known address index that corresponds to the given code offset.
-     * 
+     *
      * @param offset
      * @return -1 of not found.
      */
@@ -104,9 +108,10 @@ public final class VmAddressMap extends VmSystemObject {
         }
         return -1;
     }
-    
+
     /**
      * Gets the method at the given index.
+     *
      * @param index
      * @return
      */
@@ -122,6 +127,7 @@ public final class VmAddressMap extends VmSystemObject {
 
     /**
      * Gets the program counter at the given index.
+     *
      * @param index
      * @return
      */
@@ -136,7 +142,7 @@ public final class VmAddressMap extends VmSystemObject {
     /**
      * Gets the index that contains the call to the (inlined) method that is
      * identified by the given index.
-     * 
+     *
      * @param offset
      * @return The callsite index, or -1 if there is no callsite within this
      *         address map.
@@ -183,7 +189,7 @@ public final class VmAddressMap extends VmSystemObject {
         final byte[] methodIndexTable = (methodCount > 1) ? new byte[count] : null;
         final byte[] inlineDepthTable = (maxInlineDepth == 0) ? null : new byte[count];
         this.methodTable = (VmMethod[]) methods.toArray(new VmMethod[methodCount]);
-        
+
         p = list;
         int i = 0;
         int lastOffset = -1;
@@ -217,7 +223,7 @@ public final class VmAddressMap extends VmSystemObject {
             final int offset = offsetTable[i];
 
             out.println(methodTable[methodIdx].getName() + ", pc[" + pc
-                    + "]\t0x" + NumberUtils.hex(offset));
+                + "]\t0x" + NumberUtils.hex(offset));
         }
     }
 
@@ -237,7 +243,7 @@ public final class VmAddressMap extends VmSystemObject {
             this.method = method;
             this.pc = (char) pc;
             this.offset = offset;
-            this.inlineDepth = (byte)inlineDepth;
+            this.inlineDepth = (byte) inlineDepth;
         }
     }
 }

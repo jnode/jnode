@@ -18,16 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system.repository.plugins;
 
 import java.nio.ByteBuffer;
-
 import javax.naming.CompositeName;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginLoader;
@@ -38,17 +36,23 @@ import org.jnode.system.repository.spi.SystemRepositoryProvider;
 
 public final class PluginLoaderPlugin extends RepositoryPlugin {
 
-    /** Name of the Plugins sub-node in the repository */
+    /**
+     * Name of the Plugins sub-node in the repository
+     */
     private static final Name PLUGINS;
 
-    /** Empty array of providers */
+    /**
+     * Empty array of providers
+     */
     final static SystemRepositoryProvider[] EMPTY_ARR = new SystemRepositoryProvider[0];
 
     private PluginRegistry registry;
-    
-    /** My logger */
+
+    /**
+     * My logger
+     */
     private static final Logger log = Logger
-            .getLogger(PluginLoaderPlugin.class);
+        .getLogger(PluginLoaderPlugin.class);
 
     static {
         try {
@@ -66,23 +70,25 @@ public final class PluginLoaderPlugin extends RepositoryPlugin {
     }
 
     /**
-     * @see org.jnode.system.repository.RepositoryPlugin#providerAdded(org.jnode.system.repository.spi.SystemRepositoryProvider[],
+     * @see org.jnode.system.repository.RepositoryPlugin
+     * #providerAdded(org.jnode.system.repository.spi.SystemRepositoryProvider[],
      *      org.jnode.system.repository.spi.SystemRepositoryProvider)
      */
     @Override
     protected void providerAdded(SystemRepositoryProvider[] providers,
-            SystemRepositoryProvider provider) {
+                                 SystemRepositoryProvider provider) {
         // TODO Auto-generated method stub
         super.providerAdded(providers, provider);
     }
 
     /**
-     * @see org.jnode.system.repository.RepositoryPlugin#providerRemoved(org.jnode.system.repository.spi.SystemRepositoryProvider[],
+     * @see org.jnode.system.repository.RepositoryPlugin
+     * #providerRemoved(org.jnode.system.repository.spi.SystemRepositoryProvider[],
      *      org.jnode.system.repository.spi.SystemRepositoryProvider)
      */
     @Override
     protected void providerRemoved(SystemRepositoryProvider[] providers,
-            SystemRepositoryProvider provider) {
+                                   SystemRepositoryProvider provider) {
         // TODO Auto-generated method stub
         super.providerRemoved(providers, provider);
     }
@@ -111,12 +117,14 @@ public final class PluginLoaderPlugin extends RepositoryPlugin {
 
     /**
      * The actual loader implementation.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     private static class Loader extends PluginLoader {
 
-        /** List of providers that have a plugins sub-node */
+        /**
+         * List of providers that have a plugins sub-node
+         */
         private SystemRepositoryProvider[] pluginProviders = EMPTY_ARR;
 
         /**
@@ -128,14 +136,14 @@ public final class PluginLoaderPlugin extends RepositoryPlugin {
             final Name name;
             try {
                 name = ((Name) PLUGINS.clone()).add(getPluginFileName(pluginId,
-                        pluginVersion));
+                    pluginVersion));
             } catch (InvalidNameException ex) {
                 log.debug("Cannot combine name", ex);
                 return null;
             }
             final SystemRepositoryProvider[] pluginProviders = this.pluginProviders;
             for (SystemRepositoryProvider prov : pluginProviders) {
-                
+                //todo empty ?
             }
             // TODO Auto-generated method stub
             return null;

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.system.MultiMediaMemoryResource;
@@ -27,14 +27,16 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Implementation class for {@link org.jnode.system.MultiMediaMemoryResource}.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 final class MultiMediaMemoryResourceImpl extends MemoryResourceImpl implements
-        MultiMediaMemoryResource {
+    MultiMediaMemoryResource {
 
-    /** The multi media support class */
+    /**
+     * The multi media support class
+     */
     private final VmMultiMediaSupport multiMediaSupport;
 
     /**
@@ -44,7 +46,7 @@ final class MultiMediaMemoryResourceImpl extends MemoryResourceImpl implements
      * @param size
      */
     public MultiMediaMemoryResourceImpl(MemoryResourceImpl parent,
-            VmMultiMediaSupport mmSupport) {
+                                        VmMultiMediaSupport mmSupport) {
         super(parent, parent.getOwner(), parent.getAddress(), parent.getSize());
         this.multiMediaSupport = mmSupport;
     }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import org.jnode.vm.classmgr.VmCompiledCode;
@@ -31,23 +31,23 @@ import org.vmmagic.unboxed.Offset;
 public abstract class GCMapIterator {
 
     /**
-     * Prepare this iterator to iterate over the references found in the 
+     * Prepare this iterator to iterate over the references found in the
      * stack frame of the given compiled method.
-     * 
+     *
      * @param method
      * @param instructionOffset
      * @param framePtr
      */
     public abstract void setupIteration(VmCompiledCode method, Offset instructionOffset, Address framePtr);
-    
+
     /**
      * Gets the address of the next object reference on the stack frame
      * of the current method.
-     * 
+     *
      * @return Address.zero() is no other object references are available.
      */
     public abstract Address getNextReferenceAddress();
-    
+
     /**
      * Called after the iteration.
      * Cleanup any references that are only needed during an iteration.

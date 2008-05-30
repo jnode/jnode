@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.MagicPermission;
@@ -29,17 +29,26 @@ import org.vmmagic.unboxed.Address;
 @MagicPermission
 final class VmStackFrameEnumerator {
 
-    /** Stack frame reader */
+    /**
+     * Stack frame reader
+     */
     private final VmStackReader reader;
-    /** Address of current stack frame */
+    /**
+     * Address of current stack frame
+     */
     private Address framePtr;
-    /** Index in address map of current stack frame method (deals with inlined methods) */
+    /**
+     * Index in address map of current stack frame method (deals with inlined methods)
+     */
     private int codeIndex;
-    /** Compiled code for the current frame */
+    /**
+     * Compiled code for the current frame
+     */
     private VmCompiledCode cc;
-    
+
     /**
      * Initialize this instance.
+     *
      * @param reader
      * @param framePtr
      * @param instrPtr
@@ -48,10 +57,11 @@ final class VmStackFrameEnumerator {
         this.reader = reader;
         reset(framePtr, instrPtr);
     }
-    
+
     /**
      * Initialize this instance.
      * Set the enumerator to enumerate the stack of the current thread.
+     *
      * @param reader
      */
     public VmStackFrameEnumerator(VmStackReader reader) {
@@ -59,10 +69,10 @@ final class VmStackFrameEnumerator {
         final Address curFrame = VmMagic.getCurrentFrame();
         reset(reader.getPrevious(curFrame), reader.getReturnAddress(curFrame));
     }
-    
+
     /**
      * Reset the enumerator to the given pointers.
-     * 
+     *
      * @param framePtr
      * @param instrPtr
      */
@@ -70,15 +80,16 @@ final class VmStackFrameEnumerator {
         this.framePtr = framePtr;
         initializeCodeIndex(instrPtr);
     }
-    
+
     /**
      * Is the current frameptr valid.
+     *
      * @return
      */
     public final boolean isValid() {
         return reader.isValid(framePtr);
     }
-    
+
     /**
      * Move to the next stack position.
      */
@@ -96,9 +107,10 @@ final class VmStackFrameEnumerator {
             initializeCodeIndex(nextIP);
         }
     }
-    
+
     /**
      * Gets the method at the current stack position.
+     *
      * @return
      */
     public final VmMethod getMethod() {
@@ -114,9 +126,10 @@ final class VmStackFrameEnumerator {
         }
         return m;
     }
-    
+
     /**
      * Gets the method at the current stack position.
+     *
      * @return
      */
     public final int getProgramCounter() {
@@ -126,21 +139,22 @@ final class VmStackFrameEnumerator {
             return -1;
         }
     }
-    
+
     /**
      * Gets the line number at the current stack position.
+     *
      * @return
      */
     public final int getLineNumber() {
         return getMethod().getBytecode().getLineNr(getProgramCounter());
     }
-    
+
     private void initializeCodeIndex(Address instrPtr) {
         cc = reader.getCompiledCode(framePtr);
         if (cc != null) {
             codeIndex = cc.getAddressMapIndex(instrPtr);
         } else {
             codeIndex = -1;
-        }        
-    }    
+        }
+    }
 }

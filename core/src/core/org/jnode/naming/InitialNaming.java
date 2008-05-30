@@ -18,15 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.naming;
 
 import java.util.Set;
-
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.jnode.vm.annotation.SharedStatics;
 
 /**
@@ -37,40 +35,41 @@ import org.jnode.vm.annotation.SharedStatics;
  * needed. <p/>Only a single service can be bound under each name. There is no
  * restriction on the syntax of a name. Nor is there any interpretation of a
  * name by this namespace.
- * 
+ *
  * @author epr
  */
 @SharedStatics
 public final class InitialNaming {
 
-    /** All bound names+services */
+    /**
+     * All bound names+services
+     */
     private static NameSpace namespace;
 
     public static void setNameSpace(NameSpace namespace) {
         if (InitialNaming.namespace != null) {
             throw new SecurityException(
-                    "namespace can't be modified after first initialization");
+                "namespace can't be modified after first initialization");
         }
         InitialNaming.namespace = namespace;
     }
 
     /**
      * Bind a given service in the namespace under a given name.
-     * 
+     *
      * @param name
      * @param service
-     * @throws NameAlreadyBoundException
-     *             if the name already exists within this namespace
+     * @throws NameAlreadyBoundException if the name already exists within this namespace
      */
     public static <T, E extends T> void bind(Class<T> name, E service) throws NamingException,
-            NameAlreadyBoundException {
+        NameAlreadyBoundException {
         getNameSpace().bind(name, service);
     }
 
     /**
      * Unbind a service with a given name from the namespace. If the name does
      * not exist in this namespace, this method returns without an error.
-     * 
+     *
      * @param name
      */
     public static void unbind(Class<?> name) {
@@ -79,10 +78,9 @@ public final class InitialNaming {
 
     /**
      * Lookup a service with a given name.
-     * 
+     *
      * @param name
-     * @throws NameNotFoundException
-     *             if the name was not found in this namespace
+     * @throws NameNotFoundException if the name was not found in this namespace
      */
     public static <T> T lookup(Class<T> name) throws NameNotFoundException {
         return getNameSpace().lookup(name);

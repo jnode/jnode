@@ -18,25 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class LongConstant<T> extends Constant<T> {
-	private long value;
-	
-	public LongConstant(long value) {
-		super(Operand.LONG);
-		this.value = value;
-	}
+    private long value;
 
-	public long getValue() {
-		return value;
-	}
-	
-	public String toString() {
-		return Long.toString(value);
-	}
+    public LongConstant(long value) {
+        super(Operand.LONG);
+        this.value = value;
+    }
+
+    public long getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return Long.toString(value);
+    }
 }

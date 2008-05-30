@@ -18,24 +18,28 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * Wrapper around a Model Specific Register.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class MSR implements Uninterruptible {
 
-    /** Number of the MSR */
+    /**
+     * Number of the MSR
+     */
     private final int id;
-    
-    /** Last read value of the MSR */
+
+    /**
+     * Last read value of the MSR
+     */
     private long value;
-    
+
     public MSR(int id) {
         this(id, 0);
     }
@@ -47,6 +51,7 @@ public final class MSR implements Uninterruptible {
 
     /**
      * Gets the last known value of this MSR.
+     *
      * @return Returns the value.
      */
     public final long getValue() {

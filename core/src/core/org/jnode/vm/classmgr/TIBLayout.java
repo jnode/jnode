@@ -18,54 +18,58 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 /**
  * Constants defining indexes in the TIB array.
- * 
+ *
  * @author epr
  */
 public interface TIBLayout {
 
-	// TIB array indexes
+    // TIB array indexes
 
-	/** 
-	 * Index of VmType entry.
-	 * Type: VmType.
-	 */
-	public static final int VMTYPE_INDEX	= 0;
-	
-	/** 
-	 * Index of IMT entry.
-	 * Type: Object[]
-	 */
-	public static final int IMT_INDEX	= 1;
-	
-	/** 
-	 * Index of IMT collisions array entry.
-	 * Type: boolean[]
-	 */
-	public static final int IMTCOLLISIONS_INDEX	= 2;
-	
-	/** 
-	 * Index of compiled IMT table.
-	 * Type: Object (architecture dependent)
-	 */
-	public static final int COMPILED_IMT_INDEX	= 3;
-	
-	/**
-	 * Index of the Superclasses array entry.
-	 * Type: VmType[]
-	 */
-	public static final int SUPERCLASSES_INDEX = 4;
-	
-	// Other constants
-	
-	/** Minimum length (in elements) of a TIB */
-	public static final int MIN_TIB_LENGTH = 5;
-	
-	/** Index of the first virtual method in the TIB */
-	public static final int FIRST_METHOD_INDEX = MIN_TIB_LENGTH;
+    /**
+     * Index of VmType entry.
+     * Type: VmType.
+     */
+    public static final int VMTYPE_INDEX = 0;
+
+    /**
+     * Index of IMT entry.
+     * Type: Object[]
+     */
+    public static final int IMT_INDEX = 1;
+
+    /**
+     * Index of IMT collisions array entry.
+     * Type: boolean[]
+     */
+    public static final int IMTCOLLISIONS_INDEX = 2;
+
+    /**
+     * Index of compiled IMT table.
+     * Type: Object (architecture dependent)
+     */
+    public static final int COMPILED_IMT_INDEX = 3;
+
+    /**
+     * Index of the Superclasses array entry.
+     * Type: VmType[]
+     */
+    public static final int SUPERCLASSES_INDEX = 4;
+
+    // Other constants
+
+    /**
+     * Minimum length (in elements) of a TIB
+     */
+    public static final int MIN_TIB_LENGTH = 5;
+
+    /**
+     * Index of the first virtual method in the TIB
+     */
+    public static final int FIRST_METHOD_INDEX = MIN_TIB_LENGTH;
 
 }

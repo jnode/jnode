@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 import org.jnode.vm.Unsafe;
 
 /**
  * Thread that is run when the processor is idle.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class IdleThread extends Thread implements SystemThread {

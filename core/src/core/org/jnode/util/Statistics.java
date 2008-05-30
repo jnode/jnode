@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 
@@ -27,10 +27,11 @@ package org.jnode.util;
  */
 public interface Statistics {
 
-	/**
-	 * Gets all statistics
-	 * @return All statistics
-	 */
-	public Statistic[] getStatistics();
+    /**
+     * Gets all statistics
+     *
+     * @return All statistics
+     */
+    public Statistic[] getStatistics();
 
 }

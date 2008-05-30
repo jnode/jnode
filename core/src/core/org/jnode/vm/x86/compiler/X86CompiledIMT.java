@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.vm.compiler.CompiledIMT;
@@ -28,20 +28,21 @@ import org.jnode.vm.compiler.CompiledIMT;
  */
 final class X86CompiledIMT extends CompiledIMT {
 
-	final byte[] code;
+    final byte[] code;
 
-	/**
-	 * Initialize this instance.
-	 * @param code
-	 */
-	public X86CompiledIMT(byte[] code) {
-		this.code = code;
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param code
+     */
+    public X86CompiledIMT(byte[] code) {
+        this.code = code;
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.CompiledIMT#getIMTAddress()
-	 */
-	public Object getIMTAddress() {
-		return code;
-	}
+    /**
+     * @see org.jnode.vm.compiler.CompiledIMT#getIMTAddress()
+     */
+    public Object getIMTAddress() {
+        return code;
+    }
 }

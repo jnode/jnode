@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
@@ -27,32 +27,39 @@ import org.jnode.vm.VmSystemObject;
  * @author epr
  */
 public final class VmLocalVariableTable extends VmSystemObject {
-	
-    /** Empty table */
+
+    /**
+     * Empty table
+     */
     final static VmLocalVariableTable EMPTY = new VmLocalVariableTable(VmLocalVariable.EMPTY);
-    
-    /** Local variables */
-	private final VmLocalVariable[] table;
-	
-	/**
-	 * Create a new instance
-	 * @param table
-	 */
-	public VmLocalVariableTable(VmLocalVariable[] table) {
-		this.table = table;
-	}
-	
-	/**
-	 * Gets the number of local variables in this table.
-	 * @return The length
-	 */
-	public int getLength() {
-		return table.length;
-	}
-    
+
+    /**
+     * Local variables
+     */
+    private final VmLocalVariable[] table;
+
+    /**
+     * Create a new instance
+     *
+     * @param table
+     */
+    public VmLocalVariableTable(VmLocalVariable[] table) {
+        this.table = table;
+    }
+
+    /**
+     * Gets the number of local variables in this table.
+     *
+     * @return The length
+     */
+    public int getLength() {
+        return table.length;
+    }
+
     /**
      * Find the local variable at the given program counter (index
      * in bytecode) and the given index.
+     *
      * @param pc
      * @param index
      * @return The variable or null if not found.
@@ -65,7 +72,7 @@ public final class VmLocalVariableTable extends VmSystemObject {
         }
         return null;
     }
-    
+
     public final String toString() {
         StringBuilder sb = new StringBuilder();
         for (VmLocalVariable var : table) {

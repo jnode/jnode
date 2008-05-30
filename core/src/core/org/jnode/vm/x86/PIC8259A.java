@@ -4,7 +4,6 @@
 package org.jnode.vm.x86;
 
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.IOResource;
 import org.jnode.system.ResourceManager;
@@ -18,14 +17,16 @@ import org.jnode.vm.scheduler.ProcessorLock;
 
 /**
  * Wrapper for the 8259A Programmable Interrupt Controller.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class PIC8259A {
 
-    /** PIC Access lock */
-    private final ProcessorLock lock = new ProcessorLock();   
-    
+    /**
+     * PIC Access lock
+     */
+    private final ProcessorLock lock = new ProcessorLock();
+
     // IO resources
     private final IOResource io8259_A;
     private final IOResource io8259_B;
@@ -36,7 +37,7 @@ final class PIC8259A {
     @PrivilegedActionPragma
     public PIC8259A() {
         final SimpleResourceOwner owner = new SimpleResourceOwner("PIC8259A");
-        
+
         try {
             final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
             io8259_A = rm.claimIOResource(owner, 0x20, 1); // 0xA0
@@ -47,10 +48,10 @@ final class PIC8259A {
             throw new Error("Cannot claim PIC0-IO ports", ex);
         }
     }
-    
+
     /**
      * Set an End Of Interrupt message to the 8259 interrupt controller(s).
-     * 
+     *
      * @param irq
      */
     @Uninterruptible
@@ -60,7 +61,7 @@ final class PIC8259A {
         try {
             // Get access
             lock.lock();
-            
+
             // Perform EOI
             if (irq < 8) {
                 io8259_A.outPortByte(0x20, 0x60 + irq);

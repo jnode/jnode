@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1b;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -32,34 +32,34 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  */
 final class FPUHelper implements X86CompilerConstants {
 
-	/**
-	 * Swap ST0 and the given item. Action is emitted to code & performed on
-	 * fpuStack.
-	 * 
-	 * @param os
-	 * @param fpuStack
-	 * @param item
-	 */
-	static final void fxch(X86Assembler os, FPUStack fpuStack, Item item) {
-		if (!fpuStack.isTos(item)) {
-			final FPU fpuReg = fpuStack.getRegister(item);
-			fxch(os, fpuStack, fpuReg);
-		}
-	}
+    /**
+     * Swap ST0 and the given item. Action is emitted to code & performed on
+     * fpuStack.
+     *
+     * @param os
+     * @param fpuStack
+     * @param item
+     */
+    static final void fxch(X86Assembler os, FPUStack fpuStack, Item item) {
+        if (!fpuStack.isTos(item)) {
+            final FPU fpuReg = fpuStack.getRegister(item);
+            fxch(os, fpuStack, fpuReg);
+        }
+    }
 
-	/**
-	 * Swap ST0 and fpuReg. Action is emitted to code & performed on fpuStack.
-	 * 
-	 * @param os
-	 * @param fpuStack
-	 * @param fpuReg
-	 */
-	static final void fxch(X86Assembler os, FPUStack fpuStack,
-			FPU fpuReg) {
-		if (fpuReg == X86Register.ST0) {
-			throw new StackException("Cannot fxch ST0");
-		}
-		os.writeFXCH(fpuReg);
-		fpuStack.fxch(fpuReg);
-	}
+    /**
+     * Swap ST0 and fpuReg. Action is emitted to code & performed on fpuStack.
+     *
+     * @param os
+     * @param fpuStack
+     * @param fpuReg
+     */
+    static final void fxch(X86Assembler os, FPUStack fpuStack,
+                           FPU fpuReg) {
+        if (fpuReg == X86Register.ST0) {
+            throw new StackException("Cannot fxch ST0");
+        }
+        os.writeFXCH(fpuReg);
+        fpuStack.fxch(fpuReg);
+    }
 }

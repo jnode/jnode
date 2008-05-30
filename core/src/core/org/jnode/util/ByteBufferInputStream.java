@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 
 public class ByteBufferInputStream extends InputStream {
     private final ByteBuffer buf;
-    
+
     public ByteBufferInputStream(ByteBuffer buf) {
         this.buf = buf;
     }
@@ -42,14 +42,13 @@ public class ByteBufferInputStream extends InputStream {
         } else {
             return -1;
         }
-    }    
-        
+    }
+
     @Override
     /**
      * @author Andrei DORE
      */
-    public int available() throws IOException
-    {
-      return buf.remaining();
-    }  
+    public int available() throws IOException {
+        return buf.remaining();
+    }
 }

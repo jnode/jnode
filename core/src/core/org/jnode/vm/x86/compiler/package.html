@@ -1,72 +1,73 @@
 <html>
-  <head>
+<head>
     <title>org.jnode.vm.x86.compiler</title>
-  </head>
-  <body>
-  
-    This package contains Intel X86 native code compiler helper classes.
+</head>
+<body>
 
-    <h2>X86 calling convention</h2>
-    A method must be invoked by a NEAR CALL to its native code address. 
-    <p/>
-    The stack must contain the parameters for the method from left to right, 
-    so the first parameters is pushed first. These parameters must be removed
-    by the called method.
-    <p/>
-    Register usage:
-    <table border="1" width="100%">
-      <tr>
+This package contains Intel X86 native code compiler helper classes.
+
+<h2>X86 calling convention</h2>
+A method must be invoked by a NEAR CALL to its native code address.
+<p/>
+The stack must contain the parameters for the method from left to right,
+so the first parameters is pushed first. These parameters must be removed
+by the called method.
+<p/>
+Register usage:
+<table border="1" width="100%">
+    <tr>
         <th>Register</th>
         <th>On method call</th>
         <th>After method call</th>
         <th>Must be saved by called method</th>
-      </tr>
-      
-      <tr>
+    </tr>
+
+    <tr>
         <td>EAX</td>
         <td>Reference to method being called</td>
         <td>Return value for int, float, Object, low part of return value
-            for long and double, undefined for void.</td>
+            for long and double, undefined for void.
+        </td>
         <td>No</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>EBX</td>
         <td>Any</td>
         <td>Same as input</td>
         <td>Yes</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>ECX</td>
         <td>Any</td>
         <td>Any</td>
         <td>No</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>EDX</td>
         <td>Any</td>
         <td>High part of return value for long, double</td>
         <td>No</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>EDI</td>
         <td>Any</td>
         <td>Same as input</td>
         <td>Yes</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>ESI</td>
         <td>Any</td>
         <td>Same as input</td>
         <td>Yes</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>EBP</td>
         <td>Previous framepointer</td>
         <td>Same as input</td>
         <td>Yes</td>
-      </tr>
-      
-    </table>
+    </tr>
 
-  </body>
+</table>
+
+</body>
 </html>

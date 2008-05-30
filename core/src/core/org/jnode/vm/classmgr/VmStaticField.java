@@ -18,60 +18,66 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 /**
  * VM representation of a special (&lt;init&gt;) method.
- * 
+ *
  * @author epr
  */
 public final class VmStaticField extends VmField implements VmSharedStaticsEntry, VmIsolatedStaticsEntry {
 
-	/** The index in the statics table */
-	private final int staticsIndex;
-    
-    /** Is this static field shared */
+    /**
+     * The index in the statics table
+     */
+    private final int staticsIndex;
+
+    /**
+     * Is this static field shared
+     */
     private final boolean shared;
 
-	/**
-	 * @param name
-	 * @param signature
-	 * @param modifiers
-	 * @param staticsIndex
-	 * @param declaringClass
-	 * @param slotSize
-	 */
-	public VmStaticField(
-		String name,
-		String signature,
-		int modifiers,
-		int staticsIndex,
-		VmType declaringClass,
-		int slotSize,
+    /**
+     * @param name
+     * @param signature
+     * @param modifiers
+     * @param staticsIndex
+     * @param declaringClass
+     * @param slotSize
+     */
+    public VmStaticField(
+        String name,
+        String signature,
+        int modifiers,
+        int staticsIndex,
+        VmType declaringClass,
+        int slotSize,
         boolean shared) {
-		super(name, signature, modifiers, declaringClass, slotSize);
-		if (!Modifier.isStatic(modifiers)) {
-			throw new IllegalArgumentException("Instance field in VmStaticField");
-		}
-		this.staticsIndex = staticsIndex;
+        super(name, signature, modifiers, declaringClass, slotSize);
+        if (!Modifier.isStatic(modifiers)) {
+            throw new IllegalArgumentException("Instance field in VmStaticField");
+        }
+        this.staticsIndex = staticsIndex;
         this.shared = shared;
-	}
+    }
 
-	/**
-	 * Gets the index of this field in the shared statics table.
-	 * @return Returns the staticsIndex.
+    /**
+     * Gets the index of this field in the shared statics table.
+     *
+     * @return Returns the staticsIndex.
      * @throws IllegalStateException If this field is not shared
-	 */
-	public final int getSharedStaticsIndex() {
+     */
+    public final int getSharedStaticsIndex() {
         if (!shared) {
             throw new IllegalStateException("Static field is not shared");
         }
-		return this.staticsIndex;
-	}
+        return this.staticsIndex;
+    }
 
     /**
      * Gets the index of this field in the isolated statics table.
+     *
      * @return Returns the staticsIndex.
      * @throws IllegalStateException If this field is shared
      */
@@ -84,9 +90,10 @@ public final class VmStaticField extends VmField implements VmSharedStaticsEntry
 
     /**
      * Is this a shared static field.
+     *
      * @return Returns the shared.
      */
     public final boolean isShared() {
         return shared;
-    }       
+    }
 }

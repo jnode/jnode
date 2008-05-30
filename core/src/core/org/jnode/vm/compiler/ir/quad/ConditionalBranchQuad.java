@@ -18,18 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir.quad;
 
+import org.jnode.vm.compiler.ir.AddressingMode;
 import static org.jnode.vm.compiler.ir.AddressingMode.CONSTANT;
 import static org.jnode.vm.compiler.ir.AddressingMode.REGISTER;
 import static org.jnode.vm.compiler.ir.AddressingMode.STACK;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPEQ;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPNE;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPEQ;
-import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPNE;
-
-import org.jnode.vm.compiler.ir.AddressingMode;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -38,6 +33,10 @@ import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.RegisterLocation;
 import org.jnode.vm.compiler.ir.StackLocation;
 import org.jnode.vm.compiler.ir.Variable;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPEQ;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ACMPNE;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPEQ;
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.IF_ICMPNE;
 
 /**
  * @author Madhu Siddalingaiah
@@ -53,9 +52,9 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
 
     private enum Mode {
         MODE_CC(CONSTANT, CONSTANT), MODE_CR(CONSTANT, REGISTER), MODE_CS(
-                CONSTANT, STACK), MODE_RC(REGISTER, CONSTANT), MODE_RR(
-                REGISTER, REGISTER), MODE_RS(REGISTER, STACK), MODE_SC(STACK,
-                CONSTANT), MODE_SR(STACK, REGISTER), MODE_SS(STACK, STACK);
+        CONSTANT, STACK), MODE_RC(REGISTER, CONSTANT), MODE_RR(
+        REGISTER, REGISTER), MODE_RS(REGISTER, STACK), MODE_SC(STACK,
+        CONSTANT), MODE_SR(STACK, REGISTER), MODE_SS(STACK, STACK);
 
         private final AddressingMode m1;
 
@@ -82,7 +81,7 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
      * @param targetAddress
      */
     public ConditionalBranchQuad(int address, IRBasicBlock<T> block,
-            int varIndex1, BranchCondition condition, int varIndex2, int targetAddress) {
+                                 int varIndex1, BranchCondition condition, int varIndex2, int targetAddress) {
 
         super(address, block, targetAddress);
         if (!condition.isBinary()) {
@@ -90,12 +89,12 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
         }
         this.condition = condition;
         this.commutative = condition == IF_ICMPEQ || condition == IF_ICMPNE
-                || condition == IF_ACMPEQ || condition == IF_ACMPNE;
-        refs = new Operand[] { getOperand(varIndex1), getOperand(varIndex2) };
+            || condition == IF_ACMPEQ || condition == IF_ACMPNE;
+        refs = new Operand[]{getOperand(varIndex1), getOperand(varIndex2)};
     }
 
     public ConditionalBranchQuad(int address, IRBasicBlock<T> block, int varIndex,
-            BranchCondition condition, int targetAddress) {
+                                 BranchCondition condition, int targetAddress) {
 
         super(address, block, targetAddress);
         if (!condition.isUnary()) {
@@ -103,8 +102,8 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
         }
         this.condition = condition;
         this.commutative = condition == IF_ICMPEQ || condition == IF_ICMPNE
-                || condition == IF_ACMPEQ || condition == IF_ACMPNE;
-        refs = new Operand[] { getOperand(varIndex) };
+            || condition == IF_ACMPEQ || condition == IF_ACMPNE;
+        refs = new Operand[]{getOperand(varIndex)};
     }
 
     /**
@@ -145,11 +144,11 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
     public String toString() {
         if (condition.isBinary()) {
             return getAddress() + ": if " + refs[0].toString() + " "
-                    + condition.getCondition() + " " + refs[1].toString()
-                    + " goto " + getTargetBlock();
+                + condition.getCondition() + " " + refs[1].toString()
+                + " goto " + getTargetBlock();
         } else {
             return getAddress() + ": if " + refs[0].toString() + " "
-                    + condition.getCondition() + " goto " + getTargetBlock();
+                + condition.getCondition() + " goto " + getTargetBlock();
         }
     }
 
@@ -186,7 +185,7 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
                 cg.generateCodeFor(this, condition, stackLoc.getDisplacement());
             } else {
                 throw new IllegalArgumentException("Unknown location: "
-                        + varLoc);
+                    + varLoc);
             }
         } else if (refs[0] instanceof Constant) {
             // this probably won't happen, is should be folded earlier
@@ -200,7 +199,7 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
     /**
      * Code generation is complicated by the permutations of addressing modes.
      * This is not as nice as it could be, but it could be worse!
-     * 
+     *
      * @see org.jnode.vm.compiler.ir.quad.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
      */
     public void generateCodeForBinary(CodeGenerator<T> cg) {
@@ -248,47 +247,47 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
 
         final Mode aMode = Mode.valueOf(op1Mode, op2Mode);
         switch (aMode) {
-        case MODE_CC:
-            cg.generateCodeFor(this, c2, condition, c3);
-            break;
-        case MODE_CR:
-            if (commutative && !cg.supports3AddrOps()) {
-                cg.generateCodeFor(this, reg3, condition, c2);
-            } else {
-                cg.generateCodeFor(this, c2, condition, reg3);
-            }
-            break;
-        case MODE_CS:
-            cg.generateCodeFor(this, c2, condition, disp3);
-            break;
-        case MODE_RC:
-            cg.generateCodeFor(this, reg2, condition, c3);
-            break;
-        case MODE_RR:
-            if (commutative && !cg.supports3AddrOps()) {
-                cg.generateCodeFor(this, reg3, condition, reg2);
-            } else {
-                cg.generateCodeFor(this, reg2, condition, reg3);
-            }
-            break;
-        case MODE_RS:
-            cg.generateCodeFor(this, reg2, condition, disp3);
-            break;
-        case MODE_SC:
-            cg.generateCodeFor(this, disp2, condition, c3);
-            break;
-        case MODE_SR:
-            if (commutative && !cg.supports3AddrOps()) {
-                cg.generateCodeFor(this, reg3, condition, disp2);
-            } else {
-                cg.generateCodeFor(this, disp2, condition, reg3);
-            }
-            break;
-        case MODE_SS:
-            cg.generateCodeFor(this, disp2, condition, disp3);
-            break;
-        default:
-            throw new IllegalArgumentException("Undefined addressing mode: "
+            case MODE_CC:
+                cg.generateCodeFor(this, c2, condition, c3);
+                break;
+            case MODE_CR:
+                if (commutative && !cg.supports3AddrOps()) {
+                    cg.generateCodeFor(this, reg3, condition, c2);
+                } else {
+                    cg.generateCodeFor(this, c2, condition, reg3);
+                }
+                break;
+            case MODE_CS:
+                cg.generateCodeFor(this, c2, condition, disp3);
+                break;
+            case MODE_RC:
+                cg.generateCodeFor(this, reg2, condition, c3);
+                break;
+            case MODE_RR:
+                if (commutative && !cg.supports3AddrOps()) {
+                    cg.generateCodeFor(this, reg3, condition, reg2);
+                } else {
+                    cg.generateCodeFor(this, reg2, condition, reg3);
+                }
+                break;
+            case MODE_RS:
+                cg.generateCodeFor(this, reg2, condition, disp3);
+                break;
+            case MODE_SC:
+                cg.generateCodeFor(this, disp2, condition, c3);
+                break;
+            case MODE_SR:
+                if (commutative && !cg.supports3AddrOps()) {
+                    cg.generateCodeFor(this, reg3, condition, disp2);
+                } else {
+                    cg.generateCodeFor(this, disp2, condition, reg3);
+                }
+                break;
+            case MODE_SS:
+                cg.generateCodeFor(this, disp2, condition, disp3);
+                break;
+            default:
+                throw new IllegalArgumentException("Undefined addressing mode: "
                     + aMode);
         }
     }

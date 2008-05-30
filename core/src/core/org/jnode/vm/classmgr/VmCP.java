@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
 
 /**
  * A VmCP is the runtime representation of a constant pool
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class VmCP extends VmSystemObject {
@@ -58,17 +58,17 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Construct a new VmCP with a given number of entries
-     * 
+     *
      * @param count
      */
     protected VmCP(int count) {
-        this.cp = new Object[ count];
+        this.cp = new Object[count];
         this.used = count;
     }
 
     /**
      * Gets the number of enntries in this CP
-     * 
+     *
      * @return int
      */
     public int getLength() {
@@ -77,9 +77,8 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Read an int out of this CP
-     * 
-     * @param index
-     *            The index where to read
+     *
+     * @param index The index where to read
      * @return int
      */
     public int getInt(int index) {
@@ -91,11 +90,9 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Write an int into this CP
-     * 
-     * @param index
-     *            The index where to read
-     * @param data
-     *            The int to write
+     *
+     * @param index The index where to read
+     * @param data  The int to write
      */
     protected void setInt(int index, int data) {
         set(index, new VmConstInt(data));
@@ -103,9 +100,8 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Read a long out of this CP
-     * 
-     * @param index
-     *            The index where to read
+     *
+     * @param index The index where to read
      * @return long
      */
     public long getLong(int index) {
@@ -114,11 +110,9 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Write a long into this CP
-     * 
-     * @param index
-     *            The index where to read
-     * @param data
-     *            The long to write
+     *
+     * @param index The index where to read
+     * @param data  The long to write
      */
     protected void setLong(int index, long data) {
         set(index, new VmConstLong(data));
@@ -126,9 +120,8 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Read a float out of this CP
-     * 
-     * @param index
-     *            The index where to read
+     *
+     * @param index The index where to read
      * @return float
      */
     public float getFloat(int index) {
@@ -137,11 +130,9 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Write a float into this CP
-     * 
-     * @param index
-     *            The index where to read
-     * @param data
-     *            The float to write
+     *
+     * @param index The index where to read
+     * @param data  The float to write
      */
     protected void setFloat(int index, float data) {
         set(index, new VmConstFloat(data));
@@ -149,9 +140,8 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Read a double out of this CP
-     * 
-     * @param index
-     *            The index where to read
+     *
+     * @param index The index where to read
      * @return double
      */
     public double getDouble(int index) {
@@ -160,11 +150,9 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Write a double into this CP
-     * 
-     * @param index
-     *            The index where to read
-     * @param data
-     *            The double to write
+     *
+     * @param index The index where to read
+     * @param data  The double to write
      */
     protected void setDouble(int index, double data) {
         set(index, new VmConstDouble(data));
@@ -224,44 +212,45 @@ public final class VmCP extends VmSystemObject {
 
     /**
      * Gets the index of a constant in this CP, or -1 if not found.
-     * 
+     *
      * @param object
      * @return int
      */
     public final int indexOf(Object object) {
         for (int i = 0; i < used; i++) {
-            final Object o = cp[ i];
-            if ((o != null) && (o.equals(object))) { return i; }
+            final Object o = cp[i];
+            if ((o != null) && (o.equals(object))) {
+                return i;
+            }
         }
         return -1;
     }
 
     /**
      * Read an Object out of this CP
-     * 
-     * @param index
-     *            The index where to read
+     *
+     * @param index The index where to read
      * @return Object
      */
     private final Object get(int index) {
-        return cp[ index];
+        return cp[index];
     }
 
     /**
      * Write an Object into this CP
-     * 
-     * @param index
-     *            The index where to read
-     * @param data
-     *            The Object to write
+     *
+     * @param index The index where to read
+     * @param data  The Object to write
      */
     private void set(int index, Object data) {
-        if (data == null) { throw new NullPointerException(
-                "Cannot set a null data"); }
-        cp[ index] = data;
+        if (data == null) {
+            throw new NullPointerException(
+                "Cannot set a null data");
+        }
+        cp[index] = data;
     }
-    
+
     final void reset(int index) {
-    	cp[index] = null;
+        cp[index] = null;
     }
 }

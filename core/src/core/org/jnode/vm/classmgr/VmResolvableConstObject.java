@@ -18,23 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 /**
  * A constant object that needs to be resolved.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class VmResolvableConstObject extends VmConstObject {
 
     private boolean resolved = false;
-    
+
     public VmResolvableConstObject() {
     }
-    
+
     /**
      * Resolve the references of this constant to loaded VmXxx objects.
+     *
      * @param clc
      */
     public void resolve(VmClassLoader clc) {
@@ -43,9 +44,10 @@ public abstract class VmResolvableConstObject extends VmConstObject {
             resolved = true;
         }
     }
-    
+
     /**
      * Returns the resolved.
+     *
      * @return boolean
      */
     public boolean isResolved() {
@@ -54,6 +56,7 @@ public abstract class VmResolvableConstObject extends VmConstObject {
 
     /**
      * Resolve the references of this constant to loaded VmXxx objects.
+     *
      * @param clc
      */
     protected abstract void doResolve(VmClassLoader clc);

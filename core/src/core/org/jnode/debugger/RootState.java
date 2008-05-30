@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debugger;
 
 import java.io.PrintStream;
 import java.util.Map;
-
 import org.jnode.driver.input.KeyboardEvent;
 
 
@@ -35,16 +34,17 @@ public class RootState extends DebugState {
     public RootState() {
         super("debugger", null);
     }
-           
+
     /**
      * @see org.jnode.debugger.DebugState#print(java.io.PrintStream)
      */
     public void print(PrintStream out) {
         out.println("[Debugger]");
     }
-    
+
     /**
      * Fill the given map with usage information for this state.
+     *
      * @param map keychar - message
      */
     public void fillHelp(Map<String, String> map) {
@@ -53,17 +53,24 @@ public class RootState extends DebugState {
         map.put("r", "List all running threads");
         map.put("w", "List all waiting threads");
     }
-    
+
     /**
      * @see org.jnode.debugger.DebugState#process(KeyboardEvent)
      */
     public DebugState process(KeyboardEvent event) {
         final DebugState newState;
         switch (event.getKeyChar()) {
-        	case 't': newState = new ThreadListState(this, ThreadListState.ST_ALL); break;
-        	case 'r': newState = new ThreadListState(this, ThreadListState.ST_RUNNING); break;
-        	case 'w': newState = new ThreadListState(this, ThreadListState.ST_WAITING); break;
-        	default: return this;
+            case 't':
+                newState = new ThreadListState(this, ThreadListState.ST_ALL);
+                break;
+            case 'r':
+                newState = new ThreadListState(this, ThreadListState.ST_RUNNING);
+                break;
+            case 'w':
+                newState = new ThreadListState(this, ThreadListState.ST_WAITING);
+                break;
+            default:
+                return this;
         }
         event.consume();
         return newState;

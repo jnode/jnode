@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debugger;
 
 import java.io.PrintStream;
 import java.util.Map;
-
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.vm.scheduler.VmThread;
 
@@ -32,10 +31,10 @@ import org.jnode.vm.scheduler.VmThread;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class ThreadState extends DebugState {
-   
+
     private final Thread thread;
     private final int index;
-    
+
     /**
      * @param parent
      */
@@ -44,18 +43,17 @@ public class ThreadState extends DebugState {
         this.thread = thread;
         this.index = index;
     }
-        
+
     public void print(PrintStream out) {
-        final int max = ((ThreadListState)getParent()).size();
+        final int max = ((ThreadListState) getParent()).size();
         out.println("[Thread " + index + "/" + max + "]");
         showThread(out, thread);
     }
 
     /**
      * Fill the given map with usage information for this state.
-     * 
-     * @param map
-     *            keychar - message
+     *
+     * @param map keychar - message
      */
     public void fillHelp(Map<String, String> map) {
         super.fillHelp(map);
@@ -69,11 +67,11 @@ public class ThreadState extends DebugState {
         DebugState newState = this;
 
         switch (event.getKeyChar()) {
-        case 'i':
-            thread.interrupt();
-            break;
-        default:
-            return this;
+            case 'i':
+                thread.interrupt();
+                break;
+            default:
+                return this;
         }
         event.consume();
         return newState;
@@ -85,7 +83,7 @@ public class ThreadState extends DebugState {
         final Object[] trace = VmThread.getStackTrace(thread.getVmThread());
         final int traceLen = Math.min(trace.length, 10);
         for (int k = 0; k < traceLen; k++) {
-            out.println(trace[ k]);
+            out.println(trace[k]);
         }
         out.println();
     }

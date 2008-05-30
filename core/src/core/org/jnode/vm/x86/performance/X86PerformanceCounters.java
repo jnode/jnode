@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.performance;
 
 import java.util.Collections;
 import java.util.Set;
-
 import org.jnode.vm.performance.PerformanceCounterEvent;
 import org.jnode.vm.performance.PerformanceCounters;
 import org.jnode.vm.x86.UnsafeX86;
@@ -39,27 +38,27 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
 
     /**
      * Create the appropriate instance for the specific cpu.
-     * 
+     *
      * @param id
      * @return
      */
     public static final X86PerformanceCounters create(VmX86Processor processor,
-            X86CpuID id) {
+                                                      X86CpuID id) {
         if (id.hasMSR()) {
             // All known cpu's that have performance counters
             // implement them via MSR's
-            
+
             if (id.isIntel()) {
                 switch (id.getFamily()) {
-                case 0x06:
-                    return new P6PerformanceCouters(processor);
-                case 0x0F:
-                    return new Pentium4PerformanceCounters(processor);
+                    case 0x06:
+                        return new P6PerformanceCouters(processor);
+                    case 0x0F:
+                        return new Pentium4PerformanceCounters(processor);
                 }
             } else if (id.isAMD()) {
                 switch (id.getFamily()) {
-                case 0x0F:
-                    return new Athlon64PerformanceCounters(processor);
+                    case 0x0F:
+                        return new Athlon64PerformanceCounters(processor);
                 }
             }
         }
@@ -68,10 +67,14 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
         return new X86PerformanceCounters(processor, 0);
     }
 
-    /** Maximum number of simulanious counters */
+    /**
+     * Maximum number of simulanious counters
+     */
     private final int maxCounters;
 
-    /** The cpu we're attached to */
+    /**
+     * The cpu we're attached to
+     */
     private final VmX86Processor cpu;
 
     /**
@@ -115,7 +118,7 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
 
     /**
      * Gets the counters of the given thread.
-     * 
+     *
      * @param counters
      * @param thread
      */
@@ -124,21 +127,22 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
     }
 
     /**
-     * @see org.jnode.vm.performance.PerformanceCounters#startCounters(org.jnode.vm.performance.PerformanceCounterEvent[])
+     * @see org.jnode.vm.performance.PerformanceCounters#
+     * startCounters(org.jnode.vm.performance.PerformanceCounterEvent[])
      */
     public final void startCounters(PerformanceCounterEvent[] events)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         // Test if the events array is not too long
         if (events.length > getMaximumCounters()) {
             throw new IllegalArgumentException(
-                    "events.length is greater then maximum available counters");
+                "events.length is greater then maximum available counters");
         }
         // Test if given events are valid for me
         final Set<PerformanceCounterEvent> myEvents = getAvailableEvents();
         for (PerformanceCounterEvent e : events) {
             if (!myEvents.contains(e)) {
                 throw new IllegalArgumentException("Event " + e
-                        + " is not one of the available events");
+                    + " is not one of the available events");
             }
         }
         // Do the actual start
@@ -151,11 +155,11 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
 
     /**
      * Stop the counters on the given thread.
-     * 
+     *
      * @see org.jnode.vm.performance.PerformanceCounters#stopCounters()
      */
     protected void startCounters(PerformanceCounterEvent[] events,
-            VmX86Thread thread) throws IllegalArgumentException {
+                                 VmX86Thread thread) throws IllegalArgumentException {
         // Override me
     }
 
@@ -167,14 +171,15 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
         final VmX86Thread thread = (VmX86Thread) cpu.getCurrentThread();
         stopCounters(thread);
         UnsafeX86.saveMSRs();
-        
+
         thread.setMSRs(null, null);
     }
 
     /**
      * Start the counters on the given thread.
-     * 
-     * @see org.jnode.vm.performance.PerformanceCounters#startCounters(org.jnode.vm.performance.PerformanceCounterEvent[])
+     *
+     * @see org.jnode.vm.performance.PerformanceCounters#
+     * startCounters(org.jnode.vm.performance.PerformanceCounterEvent[])
      */
     protected void stopCounters(VmX86Thread thread) throws IllegalArgumentException {
         // Override me

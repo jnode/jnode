@@ -18,27 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system;
 
 import gnu.java.security.util.SimplePermissionCollection;
-
 import java.security.Permission;
 import java.security.PermissionCollection;
 
 /**
  * Permission required for allocating system resources.
- * 
+ * <p/>
  * The following permissions names are supported.
- * 
+ * <p/>
  * <ul>
  * <li>"ioports"
  * <li>"memory:" ( "dma" | "normal" )
  * <li>"irq"
  * </ul>
- * 
+ * <p/>
  * There is no actions attribute.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class ResourcePermission extends Permission {
@@ -82,10 +81,10 @@ public class ResourcePermission extends Permission {
         if (!(perm instanceof ResourcePermission)) {
             return false;
         }
-        
+
         return getName().equals(perm.getName());
-    }    
-    
+    }
+
     /**
      * @see java.security.Permission#newPermissionCollection()
      */

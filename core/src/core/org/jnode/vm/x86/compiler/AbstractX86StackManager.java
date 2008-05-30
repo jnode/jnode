@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.x86.X86Register;
@@ -30,7 +30,7 @@ public interface AbstractX86StackManager {
 
     /**
      * Write code to push the contents of the given register on the stack
-     * 
+     *
      * @param reg
      * @see JvmType
      */
@@ -38,17 +38,17 @@ public interface AbstractX86StackManager {
 
     /**
      * Write code to push a 64-bit word on the stack
-     * 
+     *
      * @param lsbReg
      * @param msbReg
      * @see JvmType
      */
     public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
-            X86Register.GPR msbReg);
+                            X86Register.GPR msbReg);
 
     /**
      * Write code to push a 64-bit word on the stack
-     * 
+     *
      * @param reg
      * @see JvmType
      */

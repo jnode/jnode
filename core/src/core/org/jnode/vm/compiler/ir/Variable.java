@@ -18,137 +18,136 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 import org.jnode.vm.compiler.ir.quad.AssignQuad;
 
 /**
  * @author Madhu Siddalingaiah
- *
  */
 public abstract class Variable<T> extends Operand<T> implements Cloneable {
-	private int index;
-	private int ssaValue;
-	private Location<T> location;
+    private int index;
+    private int ssaValue;
+    private Location<T> location;
 
-	/*
-	 * The operation where this variable is assigned
-	 */
-	private AssignQuad<T> assignQuad;
+    /*
+      * The operation where this variable is assigned
+      */
+    private AssignQuad<T> assignQuad;
 
-	/*
-	 * The address where this variable is last used
-	 */
-	private int lastUseAddress;
+    /*
+      * The address where this variable is last used
+      */
+    private int lastUseAddress;
 
-	public Variable(int type, int index) {
-		super(type);
-		this.index = index;
-	}
+    public Variable(int type, int index) {
+        super(type);
+        this.index = index;
+    }
 
-	/**
-	 * @return
-	 */
-	public int getIndex() {
-		return index;
-	}
+    /**
+     * @return
+     */
+    public int getIndex() {
+        return index;
+    }
 
-	/**
-	 * @return
-	 */
-	public int getSSAValue() {
-		return ssaValue;
-	}
-	
-	/**
-	 * @param i
-	 */
-	public void setSSAValue(int i) {
-		ssaValue = i;
-	}
+    /**
+     * @return
+     */
+    public int getSSAValue() {
+        return ssaValue;
+    }
 
-	public abstract Object clone();
+    /**
+     * @param i
+     */
+    public void setSSAValue(int i) {
+        ssaValue = i;
+    }
 
-	/**
-	 * Returns the AssignQuad where this variable was last assigned.
-	 * 
-	 * @return
-	 */
-	public AssignQuad<T> getAssignQuad() {
-		return assignQuad;
-	}
+    public abstract Object clone();
 
-	/**
-	 * @return
-	 */
-	public int getLastUseAddress() {
-		return lastUseAddress;
-	}
+    /**
+     * Returns the AssignQuad where this variable was last assigned.
+     *
+     * @return
+     */
+    public AssignQuad<T> getAssignQuad() {
+        return assignQuad;
+    }
 
-	/**
-	 * @param assignQuad
-	 */
-	public void setAssignQuad(AssignQuad<T> assignQuad) {
-		this.assignQuad = assignQuad;
-	}
+    /**
+     * @return
+     */
+    public int getLastUseAddress() {
+        return lastUseAddress;
+    }
 
-	public int getAssignAddress() {
-		if (assignQuad == null) {
-			return 0;
-		}
-		// Add one so this live range starts just after this operation.
-		// This way live range interference computation is simplified.
-		return assignQuad.getLHSLiveAddress();
-	}
+    /**
+     * @param assignQuad
+     */
+    public void setAssignQuad(AssignQuad<T> assignQuad) {
+        this.assignQuad = assignQuad;
+    }
 
-	/**
-	 * @param address
-	 */
-	public void setLastUseAddress(int address) {
-		if (address > lastUseAddress) {
-			lastUseAddress = address;
-		}
-	}
+    public int getAssignAddress() {
+        if (assignQuad == null) {
+            return 0;
+        }
+        // Add one so this live range starts just after this operation.
+        // This way live range interference computation is simplified.
+        return assignQuad.getLHSLiveAddress();
+    }
 
-	public Operand<T> simplify() {
-		Operand<T> op = assignQuad.propagate(this);
-		return op;
-	}
-	
-	/**
-	 * @return
-	 */
-	public Location<T> getLocation() {
-		return this.location;
-	}
+    /**
+     * @param address
+     */
+    public void setLastUseAddress(int address) {
+        if (address > lastUseAddress) {
+            lastUseAddress = address;
+        }
+    }
 
-	/**
-	 * @param loc
-	 */
-	public void setLocation(Location<T> loc) {
-		this.location = loc;
-	}
+    public Operand<T> simplify() {
+        Operand<T> op = assignQuad.propagate(this);
+        return op;
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
-	 */
-	public AddressingMode getAddressingMode() {
-		if (location instanceof StackLocation) {
-			return AddressingMode.STACK;
-		} else if (location instanceof RegisterLocation) {
-			return AddressingMode.REGISTER;
-		} else {
-			throw new IllegalArgumentException("Undefined location: " + toString());
-		}
-	}
+    /**
+     * @return
+     */
+    public Location<T> getLocation() {
+        return this.location;
+    }
 
-	public boolean equals(Object other) {
-		if (other instanceof Variable) {
-			Variable v = (Variable) other;
-			return index == v.getIndex() &&
-				ssaValue == v.getSSAValue();
-		}
-		return false;
-	}
+    /**
+     * @param loc
+     */
+    public void setLocation(Location<T> loc) {
+        this.location = loc;
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
+     */
+    public AddressingMode getAddressingMode() {
+        if (location instanceof StackLocation) {
+            return AddressingMode.STACK;
+        } else if (location instanceof RegisterLocation) {
+            return AddressingMode.REGISTER;
+        } else {
+            throw new IllegalArgumentException("Undefined location: " + toString());
+        }
+    }
+
+    public boolean equals(Object other) {
+        if (other instanceof Variable) {
+            Variable v = (Variable) other;
+            return index == v.getIndex() &&
+                ssaValue == v.getSSAValue();
+        }
+        return false;
+    }
 }

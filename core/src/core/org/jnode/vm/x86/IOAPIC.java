@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -40,19 +39,20 @@ import org.vmmagic.unboxed.Extent;
  */
 @MagicPermission
 final class IOAPIC {
-    
+
     private final MemoryResource mem;
     private final List<IOAPICRedirectionEntry> entries;
-    
+
     private static final int IOREGSEL = 0x00;
     private static final int IOWIN = 0x10;
-    
+
     private static final int REG_IOAPICID = 0x00;
     private static final int REG_IOAPICVER = 0x01;
     private static final int REG_IOAPICARB = 0x02;
-    
+
     /**
      * Initialize this instance.
+     *
      * @param rm
      * @param owner
      * @param ptr
@@ -63,72 +63,80 @@ final class IOAPIC {
         final int cnt = getMaximumRedirectionEntryIndex() + 1;
         this.entries = new ArrayList<IOAPICRedirectionEntry>(cnt);
         for (int i = 0; i < cnt; i++) {
-            entries.add(new IOAPICRedirectionEntry(this, 0x10 + i*2));
+            entries.add(new IOAPICRedirectionEntry(this, 0x10 + i * 2));
         }
     }
-    
+
     /**
      * Release all resources.
      */
     public void release() {
         mem.release();
     }
-    
+
     /**
      * Gets the ID of this I/O APIC.
+     *
      * @return the id
      */
     public int getId() {
         return (getReg(REG_IOAPICID) >> 24) & 0xF;
     }
-    
+
     /**
      * Gets the version of this I/O APIC.
+     *
      * @return the version
      */
     public int getVersion() {
         return getReg(REG_IOAPICVER) & 0xFF;
     }
-    
+
     /**
      * Gets the maximum index of the redirection table.
      * The number of redirection entries equals this number + 1.
+     *
      * @return the maximum index of the redirection table.
      */
     public int getMaximumRedirectionEntryIndex() {
-        return (getReg(REG_IOAPICVER) >> 16) & 0xFF;        
+        return (getReg(REG_IOAPICVER) >> 16) & 0xFF;
     }
-    
+
     /**
      * Gets the arbitration ID of this I/O APIC.
+     *
      * @return the arbitration id
      */
     public int getArbitrationId() {
         return (getReg(REG_IOAPICARB) >> 24) & 0xF;
     }
-    
+
     /**
      * Gets all redirection entries.
+     *
      * @return the redirection entries
      */
     public List<IOAPICRedirectionEntry> getRedirectionEntries() {
         return entries;
     }
-    
+
     /**
      * Dump all info about this I/O APIC to the given stream.
+     *
      * @param out
      */
     public void dump(PrintStream out) {
-        out.println("I/O APIC ID 0x" + NumberUtils.hex(getId(), 2) + ", version " + getVersion() + ", arb 0x" + NumberUtils.hex(getArbitrationId(), 2));
+        out.println("I/O APIC ID 0x" + NumberUtils.hex(getId(), 2) + ", version " + getVersion() + ", arb 0x" +
+            NumberUtils.hex(getArbitrationId(), 2));
         int idx = 0;
         for (IOAPICRedirectionEntry entry : getRedirectionEntries()) {
             out.println("REDIR" + (idx++) + " " + entry);
         }
     }
-    
+
     /**
      * Read an I/O APIC register.
+     *
      * @param regNr
      * @return the register value
      */
@@ -139,6 +147,7 @@ final class IOAPIC {
 
     /**
      * Write an I/O APIC register.
+     *
      * @param regNr
      */
     final synchronized void setReg(int regNr, int value) {

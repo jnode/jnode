@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.assembler.ObjectResolver;
@@ -29,7 +29,9 @@ import org.jnode.vm.VmArchitecture;
  */
 public final class VmIsolatedStatics extends VmStatics {
 
-    /** Size of the statics table */
+    /**
+     * Size of the statics table
+     */
     private static final int SIZE = 1 << 17;
 
     /**

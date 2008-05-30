@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1b;
 
 import org.jnode.vm.annotation.MagicPermission;
@@ -35,7 +35,7 @@ final class X86GCMapIterator extends GCMapIterator {
 
     /** Address of the current stack frame */
 //    private Address framePtr;
-    
+
     /**
      * @see org.jnode.vm.compiler.GCMapIterator#getNextReferenceAddress()
      */
@@ -54,13 +54,14 @@ final class X86GCMapIterator extends GCMapIterator {
     }
 
     /**
-     * @see org.jnode.vm.compiler.GCMapIterator#setupIteration(org.jnode.vm.classmgr.VmCompiledCode, org.vmmagic.unboxed.Offset, org.vmmagic.unboxed.Address)
+     * @see org.jnode.vm.compiler.GCMapIterator#setupIteration(org.jnode.vm.classmgr.VmCompiledCode,
+     * org.vmmagic.unboxed.Offset, org.vmmagic.unboxed.Address)
      */
     @Override
     public void setupIteration(VmCompiledCode method, Offset instructionOffset, Address framePtr) {
 //        this.framePtr = framePtr;
         // TODO Implement me
-        
+
     }
 
 }

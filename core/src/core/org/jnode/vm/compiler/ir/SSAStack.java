@@ -18,51 +18,49 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 import java.util.List;
-
 import org.jnode.util.BootableArrayList;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
 public class SSAStack<T> {
-	private final List<Variable<T>> stack;
-	private int count;
-	private Variable variable;
+    private final List<Variable<T>> stack;
+    private int count;
+    private Variable variable;
 
-	/**
-	 * 
-	 */
-	public SSAStack(Variable<T> variable) {
-		this.variable = variable;
-		count = 0;
-		stack = new BootableArrayList<Variable<T>>();
-	}
-	
-	public Variable<T> peek() {
-		int n = stack.size();
-		// This deals with cases where there are excessive phis (unpruned SSA)
-		if (n <= 0) {
-			return null;
-		}
-		Variable<T> var = stack.get(n - 1);
-		return var;
-	}
-	
-	public Variable<T> getNewVariable() {
-		count += 1;
-		Variable<T> var = (Variable<T>) variable.clone();
-		var.setSSAValue(count);
-		stack.add(var);
-		return var;
-	}
-	
-	public Variable<T> pop() {
-		Variable<T> var = stack.remove(stack.size() - 1);
-		return var;
-	}
+    /**
+     *
+     */
+    public SSAStack(Variable<T> variable) {
+        this.variable = variable;
+        count = 0;
+        stack = new BootableArrayList<Variable<T>>();
+    }
+
+    public Variable<T> peek() {
+        int n = stack.size();
+        // This deals with cases where there are excessive phis (unpruned SSA)
+        if (n <= 0) {
+            return null;
+        }
+        Variable<T> var = stack.get(n - 1);
+        return var;
+    }
+
+    public Variable<T> getNewVariable() {
+        count += 1;
+        Variable<T> var = (Variable<T>) variable.clone();
+        var.setSSAValue(count);
+        stack.add(var);
+        return var;
+    }
+
+    public Variable<T> pop() {
+        Variable<T> var = stack.remove(stack.size() - 1);
+        return var;
+    }
 }

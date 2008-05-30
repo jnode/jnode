@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -53,11 +53,11 @@ final class GCVerifyVisitor extends ObjectVisitor {
         this.heapManager = heapManager;
         this.arch = arch;
     }
-    
+
     public final void reset() {
         errorCount = 0;
     }
-    
+
     /**
      * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      */
@@ -84,7 +84,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         }
         return (errorCount == 0);
     }
-    
+
     @Inline
     private final void verifyArray(Object object) {
         final Object[] arr = (Object[]) object;
@@ -95,9 +95,9 @@ final class GCVerifyVisitor extends ObjectVisitor {
                 verifyChild(child, object, "Object[]");
             }
         }
-    
+
     }
-    
+
     @Inline
     private final void verifyObject(Object object, VmNormalClass<?> vmClass) {
         final int[] referenceOffsets = vmClass.getReferenceOffsets();
@@ -105,7 +105,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         final int size = vmClass.getObjectSize();
         final Address ptr = ObjectReference.fromObject(object).toAddress();
         for (int i = 0; i < cnt; i++) {
-            int offset = referenceOffsets[ i];
+            int offset = referenceOffsets[i];
             if ((offset < 0) || (offset >= size)) {
                 Unsafe.debug("reference offset out of range!");
                 Unsafe.debug(vmClass.getName());
@@ -118,7 +118,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
             }
         }
     }
-    
+
     @Inline
     private final void verifyChild(Object child, Object parent, String where) {
         if (child != null) {
@@ -137,7 +137,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
             }
         }
     }
-    
+
     /**
      * @return Returns the errorCount.
      */
