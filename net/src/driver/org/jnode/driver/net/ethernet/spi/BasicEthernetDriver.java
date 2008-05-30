@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.ethernet.spi;
 
 import org.apache.log4j.Logger;
@@ -112,7 +112,8 @@ public abstract class BasicEthernetDriver extends AbstractEthernetDriver {
     /**
      * Create a new RTL8139Core instance
      */
-    protected abstract AbstractDeviceCore newCore(Device device, Flags flags) throws DriverException, ResourceNotFreeException;
+    protected abstract AbstractDeviceCore newCore(Device device, Flags flags)
+        throws DriverException, ResourceNotFreeException;
 
     /**
      * Get the flags for this device

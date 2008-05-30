@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net;
 
 import java.net.SocketException;
@@ -28,34 +28,34 @@ import java.net.SocketException;
  */
 public class NetworkException extends SocketException {
 
-	/**
-	 * 
-	 */
-	public NetworkException() {
-		super();
-	}
+    /**
+     *
+     */
+    public NetworkException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public NetworkException(String message, Throwable cause) {
-		super(message);
-		initCause(cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public NetworkException(String message, Throwable cause) {
+        super(message);
+        initCause(cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public NetworkException(Throwable cause) {
-		super();
-		initCause(cause);
-	}
+    /**
+     * @param cause
+     */
+    public NetworkException(Throwable cause) {
+        super();
+        initCause(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public NetworkException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public NetworkException(String s) {
+        super(s);
+    }
 }

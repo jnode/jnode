@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net;
 
 import java.util.EventObject;
@@ -27,14 +27,16 @@ import org.jnode.driver.Device;
 
 /**
  * Base class for all net device events.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class NetDeviceEvent extends EventObject {
 
-    /** Identification of the event */
+    /**
+     * Identification of the event
+     */
     private final int id;
-    
+
     /**
      * @param source
      */
@@ -45,14 +47,16 @@ public abstract class NetDeviceEvent extends EventObject {
 
     /**
      * Gets the device that it the source of this event.
+     *
      * @return
      */
     public final Device getDevice() {
-        return (Device)getSource();
+        return (Device) getSource();
     }
-    
+
     /**
      * Gets the event ID.
+     *
      * @return Returns the id.
      */
     public final int getId() {
