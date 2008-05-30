@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.wireless.spi;
 
 import java.io.PrintWriter;
@@ -35,12 +35,14 @@ import org.jnode.system.ResourceNotFreeException;
 
 /**
  * Base class for wireless ethernet drivers.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class WirelessEthernetDriver extends BasicEthernetDriver implements WirelessNetDeviceAPI {
 
-    /** Device prefix for ethernet devices */
+    /**
+     * Device prefix for ethernet devices
+     */
     public static final String WLAN_DEVICE_PREFIX = "wlan";
 
     /**
@@ -76,24 +78,27 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
 
     /**
      * Gets the wireless device core.
+     *
      * @return
      */
     protected final WirelessDeviceCore getWirelessCore() {
-        return (WirelessDeviceCore)getDeviceCore();
+        return (WirelessDeviceCore) getDeviceCore();
     }
 
     /**
      * @see org.jnode.driver.net.ethernet.spi.BasicEthernetDriver#newCore(org.jnode.driver.Device, org.jnode.driver.net.ethernet.spi.Flags)
      */
-    protected final AbstractDeviceCore newCore(Device device, Flags flags) throws DriverException, ResourceNotFreeException {
+    protected final AbstractDeviceCore newCore(Device device, Flags flags)
+        throws DriverException, ResourceNotFreeException {
         return newWirelessCore(device, flags);
     }
 
     /**
      * Create a new device code instance
      */
-    protected abstract WirelessDeviceCore newWirelessCore(Device device, Flags flags) throws DriverException, ResourceNotFreeException;
-    
+    protected abstract WirelessDeviceCore newWirelessCore(Device device, Flags flags)
+        throws DriverException, ResourceNotFreeException;
+
     /**
      * @see org.jnode.driver.net.WirelessNetDeviceAPI#setAuthenticationMode(org.jnode.net.wireless.AuthenticationMode)
      */
@@ -140,5 +145,5 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
     protected void stopDevice() throws DriverException {
         getDevice().unregisterAPI(WirelessNetDeviceAPI.class);
         super.stopDevice();
-    }    
+    }
 }

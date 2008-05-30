@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.prism2;
 
 import static org.jnode.driver.net.prism2.Prism2Constants.Register.RESP0;
@@ -41,7 +41,7 @@ final class Prism2CommandResponse {
 
     /**
      * Read the status from the device.
-     * 
+     *
      * @param core
      */
     final void initialize(Prism2IO core) {
@@ -74,7 +74,7 @@ final class Prism2CommandResponse {
 
     /**
      * Gets the full status value
-     * 
+     *
      * @return Returns the status.
      */
     public final int getStatus() {
@@ -83,7 +83,7 @@ final class Prism2CommandResponse {
 
     /**
      * Gets the result code.
-     * 
+     *
      * @return
      */
     public final int getResult() {

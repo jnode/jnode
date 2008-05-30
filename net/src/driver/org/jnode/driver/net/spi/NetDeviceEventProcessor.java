@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.spi;
 
 import java.util.ArrayList;
@@ -34,21 +34,29 @@ import org.jnode.util.QueueProcessorThread;
  */
 final class NetDeviceEventProcessor implements QueueProcessor<NetDeviceEvent> {
 
-    /** Event listeners */
+    /**
+     * Event listeners
+     */
     private ArrayList<NetDeviceListener> listeners = new ArrayList<NetDeviceListener>();
 
-    /** Cached array of listeners */
+    /**
+     * Cached array of listeners
+     */
     private NetDeviceListener[] listenerCache;
 
-    /** Event queue */
+    /**
+     * Event queue
+     */
     private final Queue<NetDeviceEvent> eventQueue = new Queue<NetDeviceEvent>();
 
-    /** The thread that will dispatch the events to the listeners */
+    /**
+     * The thread that will dispatch the events to the listeners
+     */
     private QueueProcessorThread<NetDeviceEvent> thread;
 
     /**
      * Does this processor have any listeners.
-     * 
+     *
      * @return
      */
     final synchronized boolean isEmpty() {
@@ -63,7 +71,7 @@ final class NetDeviceEventProcessor implements QueueProcessor<NetDeviceEvent> {
         this.listenerCache = null;
         if (thread == null) {
             thread = new QueueProcessorThread<NetDeviceEvent>("NetDeviceEventProcessor",
-                    eventQueue, this);
+                eventQueue, this);
             thread.start();
         }
     }
@@ -82,7 +90,7 @@ final class NetDeviceEventProcessor implements QueueProcessor<NetDeviceEvent> {
 
     /**
      * Post an event that will be fired (on another thread) to the listeners.
-     * 
+     *
      * @param event
      */
     final void postEvent(NetDeviceEvent event) {
@@ -101,7 +109,7 @@ final class NetDeviceEventProcessor implements QueueProcessor<NetDeviceEvent> {
                 final int size = this.listeners.size();
                 if (size > 0) {
                     listeners = (NetDeviceListener[]) this.listeners
-                            .toArray(new NetDeviceListener[size]);
+                        .toArray(new NetDeviceListener[size]);
                     this.listenerCache = listeners;
                 }
             }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.bcm570x;
 
 import org.jnode.driver.Device;
@@ -45,7 +45,7 @@ public class BCM570xDriver extends BasicEthernetDriver {
 
     /**
      * Create new driver instance for this device
-     * 
+     *
      * @param flags
      */
     public BCM570xDriver(BCM570xFlags flags) {
@@ -56,7 +56,7 @@ public class BCM570xDriver extends BasicEthernetDriver {
      * Create a new BCM570xCore instance
      */
     protected AbstractDeviceCore newCore(Device device, Flags flags)
-            throws DriverException, ResourceNotFreeException {
+        throws DriverException, ResourceNotFreeException {
         return new BCM570xCore(this, device, (PCIDevice) device, flags);
     }
 }
