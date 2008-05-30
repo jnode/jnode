@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.loopback;
 
 import org.jnode.driver.net.NetworkException;
@@ -32,15 +32,15 @@ import org.jnode.net.ethernet.EthernetUtils;
 
 /**
  * Driver for loopback device.
- * 
+ *
  * @author epr
  * @author Martin Husted Hartvig
  */
 public class LoopbackDriver extends AbstractNetDriver implements
-        EthernetConstants {
+    EthernetConstants {
 
     private static final EthernetAddress hwAddress = new EthernetAddress(
-            "00-00-00-00-00-00");
+        "00-00-00-00-00-00");
 
     /**
      * Gets the hardware address of this device
@@ -62,7 +62,7 @@ public class LoopbackDriver extends AbstractNetDriver implements
      *      HardwareAddress)
      */
     protected final void doTransmit(SocketBuffer skbuf,
-            HardwareAddress destination) throws NetworkException {
+                                    HardwareAddress destination) throws NetworkException {
         skbuf.insert(ETH_HLEN);
         if (destination != null) {
             destination.writeTo(skbuf, 0);

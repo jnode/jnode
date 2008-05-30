@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.loopback;
 
 import org.jnode.driver.Bus;
@@ -32,15 +32,15 @@ import org.jnode.driver.DriverException;
  */
 public class LoopbackFinder implements DeviceFinder {
 
-	/**
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
-		try {
-			devMan.register(new LoopbackDevice(bus));
-		} catch (DriverException ex) {
-			throw new DeviceException(ex);
-		}
-	}
+    /**
+     * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
+     */
+    public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
+        try {
+            devMan.register(new LoopbackDevice(bus));
+        } catch (DriverException ex) {
+            throw new DeviceException(ex);
+        }
+    }
 
 }

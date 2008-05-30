@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.lance;
 
 import org.apache.log4j.Logger;
@@ -27,98 +27,99 @@ import org.jnode.system.MemoryResource;
 
 /**
  * @author Chris Cole
- *
  */
 public class RxDescriptorRing extends DescriptorRing {
-	/** My logger */
-	private static final Logger log = Logger.getLogger(RxDescriptorRing.class);
-	
-	private RxDescriptor[] rxDescriptors;
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(RxDescriptorRing.class);
 
-	public RxDescriptorRing(
-		MemoryResource mem,
-		int offset,
-		int length,
-		int dataBufferOffset) {
+    private RxDescriptor[] rxDescriptors;
 
-		super(mem, offset, length);
+    public RxDescriptorRing(
+        MemoryResource mem,
+        int offset,
+        int length,
+        int dataBufferOffset) {
 
-		rxDescriptors = new RxDescriptor[length];
+        super(mem, offset, length);
 
-		for (int i = 0; i < length; i++) {
-			rxDescriptors[i] =
-				new RxDescriptor(
-					mem,
-					offset + (i * Descriptor.MESSAGE_DESCRIPTOR_SIZE),
-					dataBufferOffset + (i * BufferManager.DATA_BUFFER_SIZE));
-		}
-		currentDescriptor = 0;
-	}
+        rxDescriptors = new RxDescriptor[length];
 
-	public SocketBuffer getPacket() {
-		if (currentDescriptor > rxDescriptors.length)
-			return null;
-			
-		RxDescriptor des = rxDescriptors[currentDescriptor];
-		short status = des.getStatus();
-			
-		if ((status & RxDescriptor.STATUS_OWN) != 0) {
-			//log.warn("Descriptor is not owned by the host");
-			return null;
-		} else if ((status & RxDescriptor.STATUS_ERR) != 0) {
-			log.warn("Error");
-			if ((status & RxDescriptor.STATUS_FRAM) != 0
-				&& (status & RxDescriptor.STATUS_ENP) != 0
-				&& (status & RxDescriptor.STATUS_OFLO) == 0) {
+        for (int i = 0; i < length; i++) {
+            rxDescriptors[i] =
+                new RxDescriptor(
+                    mem,
+                    offset + (i * Descriptor.MESSAGE_DESCRIPTOR_SIZE),
+                    dataBufferOffset + (i * BufferManager.DATA_BUFFER_SIZE));
+        }
+        currentDescriptor = 0;
+    }
 
-				log.warn("Framming Error");
-			}
-			if ((status & RxDescriptor.STATUS_OFLO) != 0
-				&& (status & RxDescriptor.STATUS_ENP) == 0) {
+    public SocketBuffer getPacket() {
+        if (currentDescriptor > rxDescriptors.length)
+            return null;
 
-				log.warn("Overflow Error");
-			}
-			if ((status & RxDescriptor.STATUS_CRC) != 0
-				&& (status & RxDescriptor.STATUS_ENP) != 0
-				&& (status & RxDescriptor.STATUS_OFLO) == 0) {
+        RxDescriptor des = rxDescriptors[currentDescriptor];
+        short status = des.getStatus();
 
-				log.warn("CRC Error");
-			}
-			if ((status & RxDescriptor.STATUS_BUFF) != 0) {
-				log.warn("Buffer Error");
-			}
-			des.clearStatus();
-			currentDescriptor = currentDescriptor + 1;
-			if (currentDescriptor == length)
-				currentDescriptor = 0;
-			return null;
-		} else if (
-			(status & RxDescriptor.STATUS_STP) != 0
-				&& (status & RxDescriptor.STATUS_ENP) != 0) {
-			byte[] buf = des.getDataBuffer();
-			SocketBuffer skbuf = new SocketBuffer(buf, 0, buf.length);
-			des.clearStatus();
-			currentDescriptor = currentDescriptor + 1;
-			if (currentDescriptor == length)
-				currentDescriptor = 0;
-			return skbuf;
-		} else {
-			log.error("Didn't find valid status "+status);
-			currentDescriptor = currentDescriptor + 1;
+        if ((status & RxDescriptor.STATUS_OWN) != 0) {
+            //log.warn("Descriptor is not owned by the host");
+            return null;
+        } else if ((status & RxDescriptor.STATUS_ERR) != 0) {
+            log.warn("Error");
+            if ((status & RxDescriptor.STATUS_FRAM) != 0
+                && (status & RxDescriptor.STATUS_ENP) != 0
+                && (status & RxDescriptor.STATUS_OFLO) == 0) {
 
-			if (currentDescriptor == length)
-				currentDescriptor = 0;
+                log.warn("Framming Error");
+            }
+            if ((status & RxDescriptor.STATUS_OFLO) != 0
+                && (status & RxDescriptor.STATUS_ENP) == 0) {
 
-			return null;
-		}
-	}
+                log.warn("Overflow Error");
+            }
+            if ((status & RxDescriptor.STATUS_CRC) != 0
+                && (status & RxDescriptor.STATUS_ENP) != 0
+                && (status & RxDescriptor.STATUS_OFLO) == 0) {
 
-	public void dumpData(Logger out) {
-		out.debug("Receive Ring Descriptors - Software Style 2");
-		for (int i = 0; i < length; i++) {
-			out.debug("Descriptor " + i);
-			rxDescriptors[i].dumpData(out);
-		}
-	}
+                log.warn("CRC Error");
+            }
+            if ((status & RxDescriptor.STATUS_BUFF) != 0) {
+                log.warn("Buffer Error");
+            }
+            des.clearStatus();
+            currentDescriptor = currentDescriptor + 1;
+            if (currentDescriptor == length)
+                currentDescriptor = 0;
+            return null;
+        } else if (
+            (status & RxDescriptor.STATUS_STP) != 0
+                && (status & RxDescriptor.STATUS_ENP) != 0) {
+            byte[] buf = des.getDataBuffer();
+            SocketBuffer skbuf = new SocketBuffer(buf, 0, buf.length);
+            des.clearStatus();
+            currentDescriptor = currentDescriptor + 1;
+            if (currentDescriptor == length)
+                currentDescriptor = 0;
+            return skbuf;
+        } else {
+            log.error("Didn't find valid status " + status);
+            currentDescriptor = currentDescriptor + 1;
+
+            if (currentDescriptor == length)
+                currentDescriptor = 0;
+
+            return null;
+        }
+    }
+
+    public void dumpData(Logger out) {
+        out.debug("Receive Ring Descriptors - Software Style 2");
+        for (int i = 0; i < length; i++) {
+            out.debug("Descriptor " + i);
+            rxDescriptors[i].dumpData(out);
+        }
+    }
 
 }
