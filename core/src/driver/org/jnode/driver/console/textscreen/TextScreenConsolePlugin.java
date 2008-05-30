@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console.textscreen;
 
 import java.io.PrintStream;
-
 import javax.naming.NamingException;
-
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
@@ -55,12 +53,12 @@ public class TextScreenConsolePlugin extends Plugin {
         try {
             mgr = new TextScreenConsoleManager();
             InitialNaming.bind(ConsoleManager.NAME, mgr);
-            
+
             // Create the first console
             final TextConsole first = (TextConsole) mgr.createConsole(
-            		null, 
-            		(ConsoleManager.CreateOptions.TEXT | 
-            				ConsoleManager.CreateOptions.SCROLLABLE));
+                null,
+                (ConsoleManager.CreateOptions.TEXT |
+                    ConsoleManager.CreateOptions.SCROLLABLE));
             mgr.focus(first);
             System.setOut(new PrintStream(first.getOut()));
             System.setErr(new PrintStream(first.getErr()));

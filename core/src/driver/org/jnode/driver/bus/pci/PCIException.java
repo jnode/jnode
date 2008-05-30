@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.driver.bus.pci;
  */
 public class PCIException extends Exception {
 
-	/**
-	 * 
-	 */
-	public PCIException() {
-		super();
-	}
+    /**
+     *
+     */
+    public PCIException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public PCIException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public PCIException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public PCIException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public PCIException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public PCIException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public PCIException(String s) {
+        super(s);
+    }
 }

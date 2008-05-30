@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import org.jnode.system.MemoryResource;
@@ -30,23 +30,23 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Structure wrapper for the RootSystemDescriptionTable (RSDT).
- * 
+ *
  * @author Francois-Frederic Ozog
  */
 public class RootSystemDescriptionTable extends SystemDescriptionTable {
 
     public RootSystemDescriptionTable(AcpiDriver driver, ResourceManager rm,
-            MemoryResource tableResource) throws ResourceNotFreeException {
+                                      MemoryResource tableResource) throws ResourceNotFreeException {
         super(driver, tableResource);
         parse(rm);
     }
 
     private final void parse(ResourceManager rm)
-            throws ResourceNotFreeException {
+        throws ResourceNotFreeException {
         final int startOfTablePointers = 36;
         final int tablesCount = (getSize() - startOfTablePointers) / 4;
         final ResourceOwner owner = new SimpleResourceOwner(
-                "ACPI-RootSystemDescriptionTable");
+            "ACPI-RootSystemDescriptionTable");
         for (int index = 0; index < tablesCount; index++) {
             // log.debug("Handling RSDT index " + index + "/" + tablesCount);
             try {

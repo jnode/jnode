@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import org.jnode.driver.Device;
@@ -31,7 +31,7 @@ import org.jnode.plugin.ConfigurationElement;
 /**
  * Generic mapper for PCI devices that match of vendor + device id
  * and an optional revision.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class PCIDeviceToDriverMapper extends AbstractPCIDeviceToDriverMapper implements DeviceToDriverMapper {
@@ -39,7 +39,7 @@ public class PCIDeviceToDriverMapper extends AbstractPCIDeviceToDriverMapper imp
     public PCIDeviceToDriverMapper(ConfigurationElement config) throws DriverException {
         super(config);
     }
-   
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
      */
@@ -47,15 +47,16 @@ public class PCIDeviceToDriverMapper extends AbstractPCIDeviceToDriverMapper imp
         if (!(device instanceof PCIDevice)) {
             return null;
         }
-        final PCIDevice pciDev = (PCIDevice)device;
+        final PCIDevice pciDev = (PCIDevice) device;
         final PCIDeviceConfig cfg = pciDev.getConfig();
-        
+
         if (!matches(cfg.getVendorID(), cfg.getDeviceID(), cfg.getRevision())) {
             return null;
         } else {
             return newDriver(pciDev);
         }
     }
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
      */
@@ -63,8 +64,8 @@ public class PCIDeviceToDriverMapper extends AbstractPCIDeviceToDriverMapper imp
         if (hasMinor()) {
             return DeviceToDriverMapper.MATCH_DEVICE_REVISION;
         } else {
-            return DeviceToDriverMapper.MATCH_DEVICE;            
+            return DeviceToDriverMapper.MATCH_DEVICE;
         }
     }
-    
+
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import org.jnode.system.MemoryResource;
@@ -26,14 +26,14 @@ import org.jnode.system.ResourceManager;
 
 /**
  * FirmwareAcpiControlStructure.
- * 
+ *
  * @author Francois-Frederic Ozog
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 
 final class FirmwareAcpiControlStructure extends AcpiSystemTable {
     public FirmwareAcpiControlStructure(AcpiDriver driver, ResourceManager rm,
-            MemoryResource tableResource) {
+                                        MemoryResource tableResource) {
         super(driver, tableResource);
     }
 

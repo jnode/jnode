@@ -18,24 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface USBPipeListener {
-	
-	/** 
-	 * The given request completed without errors.
-	 * @param request
-	 */
-	public void requestCompleted(USBRequest request);
 
-	/** 
-	 * The given request completed with errors.
-	 * @param request
-	 */
-	public void requestFailed(USBRequest request);
+    /**
+     * The given request completed without errors.
+     *
+     * @param request
+     */
+    public void requestCompleted(USBRequest request);
+
+    /**
+     * The given request completed with errors.
+     *
+     * @param request
+     */
+    public void requestFailed(USBRequest request);
 
 }

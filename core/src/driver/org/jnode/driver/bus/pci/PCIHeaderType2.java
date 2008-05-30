@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 /**
@@ -77,6 +77,7 @@ public final class PCIHeaderType2 extends PCIDeviceConfig {
                                                              * address (ExCa)
                                                              */
     /* = 0x48-= 0x7f reserved */
+
     /**
      * @param device
      */
@@ -101,7 +102,7 @@ public final class PCIHeaderType2 extends PCIDeviceConfig {
      */
     public String toString() {
         return super.toString() + ", " + "primary-bus=" + getPrimaryBus()
-                + ", " + "card-bus=" + getCardBus()
-                + ", " + "subordinate-bus=" + getSubordinateBus();
+            + ", " + "card-bus=" + getCardBus()
+            + ", " + "subordinate-bus=" + getSubordinateBus();
     }
 }

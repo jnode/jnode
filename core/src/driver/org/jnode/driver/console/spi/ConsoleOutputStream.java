@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console.spi;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.jnode.driver.console.TextConsole;
 
 /**
@@ -36,7 +35,6 @@ public class ConsoleOutputStream extends OutputStream {
     private final char[] buffer = new char[BUFFER_SIZE];
     private TextConsole console;
     private int fgColor;
-
 
 
     /**
@@ -60,7 +58,7 @@ public class ConsoleOutputStream extends OutputStream {
     }
 
     public void write(byte[] b, int off, int len)
-            throws IOException, NullPointerException, IndexOutOfBoundsException {
+        throws IOException, NullPointerException, IndexOutOfBoundsException {
         if (off < 0 || len < 0 || off + len > b.length)
             throw new ArrayIndexOutOfBoundsException();
 

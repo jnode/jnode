@@ -18,27 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 public class LogitechWheelMouseProtocol extends LogitechProtocol {
 
-	public boolean supportsId(int id) {
-		return id == 3;
-	}
+    public boolean supportsId(int id) {
+        return id == 3;
+    }
 
-	public String getName() {
-		return "Logitech Wheel Mouse";
-	}
+    public String getName() {
+        return "Logitech Wheel Mouse";
+    }
 
-	public int getPacketSize() {
-		return 4;
-	}
+    public int getPacketSize() {
+        return 4;
+    }
 
-	public PointerEvent buildEvent(byte[] data) {
-		PointerEvent e = super.buildEvent(data);
+    public PointerEvent buildEvent(byte[] data) {
+        PointerEvent e = super.buildEvent(data);
 
-		int z = data[3];
-		return new PointerEvent(e.getButtons(), e.getX(), e.getY(), z, e.isAbsolute());
-	}
+        int z = data[3];
+        return new PointerEvent(e.getButtons(), e.getX(), e.getY(), z, e.isAbsolute());
+    }
 }

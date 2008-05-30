@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import org.jnode.driver.Device;
@@ -33,19 +33,21 @@ public final class AcpiDeviceToDriverMapper implements DeviceToDriverMapper {
 
     /**
      * Find a driver for the given device, or return null if not found.
+     *
      * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
      */
     public Driver findDriver(Device device) {
         if (device instanceof AcpiDevice) {
             return new AcpiDriver();
         }
-        
+
         // No driver found
         return null;
     }
-    
+
     /**
      * Gets the matching level for this mapper.
+     *
      * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
      */
     public int getMatchLevel() {

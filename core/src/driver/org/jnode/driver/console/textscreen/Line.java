@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console.textscreen;
 
 import java.util.Arrays;
 import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
@@ -35,18 +33,18 @@ import org.jnode.driver.console.spi.ConsolePrintStream;
  * A class that handles the content of the current command line in the shell.
  * That can be : - a new command that the user is beeing editing - an existing
  * command (from the command history)
- * 
+ * <p/>
  * This class also handles the current cursor position in the command line and
  * keep trace of the position (consoleX, consoleY) of the first character of the
  * command line (to handle commands that are multilines).
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
 class Line {
-	//TODO get the real screen width (in columns)
+    //TODO get the real screen width (in columns)
     final static private int SCREEN_WIDTH = 80;
-    
+
     private int consoleX;
 
     private int consoleY;
@@ -56,7 +54,9 @@ class Line {
      */
     private int posOnCurrentLine = 0;
 
-    /** Contains the current line * */
+    /**
+     * Contains the current line *
+     */
     private StringBuffer currentLine = new StringBuffer(80);
 
     private boolean shortened = true;
@@ -64,7 +64,7 @@ class Line {
     private int oldLength = 0;
 
     private int maxLength = 0;
-    
+
     private final TextConsole console;
 
     private ConsolePrintStream out;
@@ -92,7 +92,7 @@ class Line {
             consoleY = console.getCursorY();
 
             setContent("");
-            console.setCursor( consoleX,consoleY);//move the cursor to the start of the line.
+            console.setCursor(consoleX, consoleY); //move the cursor to the start of the line.
         }
     }
 
@@ -153,7 +153,7 @@ class Line {
 
     public void delete() {
         if ((posOnCurrentLine >= 0)
-                && (posOnCurrentLine < currentLine.length())) {
+            && (posOnCurrentLine < currentLine.length())) {
             startModif();
             currentLine.deleteCharAt(posOnCurrentLine);
             endModif();
@@ -163,7 +163,7 @@ class Line {
     public boolean complete() {
         CompletionInfo info = null;
         InputCompleter completer = console.getCompleter();
-        String ending = 
+        String ending =
             posOnCurrentLine != currentLine.length() ? currentLine.substring(posOnCurrentLine) : "";
         info = completer.complete(currentLine.substring(0, posOnCurrentLine));
         boolean res = printList(info);
@@ -172,8 +172,7 @@ class Line {
             int startPos = info.getCompletionStart();
             if (startPos == -1) {
                 setContent(currentLine.substring(0, posOnCurrentLine) + completion + ending);
-            }
-            else {
+            } else {
                 setContent(currentLine.substring(0, startPos) + completion + ending);
             }
             // (This is the updated line's length ...)
@@ -196,17 +195,16 @@ class Line {
 
         final int minItemsToSplit = 5;
         if (list.length > minItemsToSplit) {
-            list = splitInColumns(list); 
+            list = splitInColumns(list);
         }
 
         // display items column (may be single or multiple columns)
-        for (String item : list) {               	
+        for (String item : list) {
             // item may actually be a single item or in fact multiple items
             if (item.length() % SCREEN_WIDTH == 0) {
                 // we are already at the first column of the next line 
                 out.print(item);
-            }
-            else {
+            } else {
                 // we aren't at the first column of the next line
                 out.println(item);
             }
@@ -214,46 +212,45 @@ class Line {
         posOnCurrentLine = oldPosOnCurrentLine;
         return true;
     }
-    
-    protected String[] splitInColumns(String[] items)
-    {
+
+    protected String[] splitInColumns(String[] items) {
         final int separatorWidth = 3;
-        
+
         // compute the maximum width of items
         int maxWidth = 0;
         for (String item : items) {
-        	if (item.length() > maxWidth) {
-        		maxWidth = item.length();
-        	}
+            if (item.length() > maxWidth) {
+                maxWidth = item.length();
+            }
         }
-        
+
         final int columnWidth = Math.min(SCREEN_WIDTH, maxWidth + separatorWidth);
         final int nbColumns = SCREEN_WIDTH / columnWidth;
         final boolean lastLineIsFull = ((items.length % nbColumns) == 0);
         final int nbLines = (items.length / nbColumns) + (lastLineIsFull ? 0 : 1);
-        
-        String[] lines = new String[nbLines];
-    	StringBuilder line = new StringBuilder(SCREEN_WIDTH);
-    	int lineNum = 0;
-        for (int itemNum = 0 ; itemNum < items.length ; ) {
-        	for (int c = 0 ; c < nbColumns ; c++) {
-        		final String item = items[itemNum++];
-        		line.append(item);
-        		
-        		// add some blanks
-        		final int nbBlanks = columnWidth - item.length();
-        		for (int i = 0 ; i < nbBlanks ; i++) {
-        			line.append(' ');
-        		}
 
-        		if (itemNum >= items.length) break;
-        	}
-        	
-        	lines[lineNum++] = line.toString(); 
-        	line.setLength(0); // clear the buffer
+        String[] lines = new String[nbLines];
+        StringBuilder line = new StringBuilder(SCREEN_WIDTH);
+        int lineNum = 0;
+        for (int itemNum = 0; itemNum < items.length;) {
+            for (int c = 0; c < nbColumns; c++) {
+                final String item = items[itemNum++];
+                line.append(item);
+
+                // add some blanks
+                final int nbBlanks = columnWidth - item.length();
+                for (int i = 0; i < nbBlanks; i++) {
+                    line.append(' ');
+                }
+
+                if (itemNum >= items.length) break;
+            }
+
+            lines[lineNum++] = line.toString();
+            line.setLength(0); // clear the buffer
         }
-        
-        return lines; 
+
+        return lines;
     }
 
     public void appendChar(char c) {
@@ -277,19 +274,19 @@ class Line {
         shortened = oldLength > currentLine.length();
         oldLength = 0;
     }
-    
+
     private volatile char[] mySpaces;
-    
+
     private char[] getSpaces(int count) {
-    	char[] res = mySpaces;
-    	if (res == null || res.length < count) {
-    		res = new char[count];
-    		Arrays.fill(res, ' ');
-    		mySpaces = res;
-    	}
-    	return res;
+        char[] res = mySpaces;
+        if (res == null || res.length < count) {
+            res = new char[count];
+            Arrays.fill(res, ' ');
+            mySpaces = res;
+        }
+        return res;
     }
-    
+
     public void refreshCurrentLine() {
         try {
             int x = consoleX;
@@ -303,19 +300,19 @@ class Line {
             console.setCursorVisible(false);
             console.setCursor(consoleX, consoleY);
             out.print(currentLine);
-            
+
             // get position of end of line
             // FIXME ... there's a problem here if some application simultaneously
             // writes to console output.
             int newConsoleX = console.getCursorX();
             int newConsoleY = console.getCursorY();
-            
+
             // blank to the end of the screen region
             if (newConsoleX > 0) {
-            	int len = width - newConsoleX;
-            	console.setChar(newConsoleX, newConsoleY, getSpaces(len), 
-            			0, len, out.getFgColor());
-            	newConsoleY++;
+                int len = width - newConsoleX;
+                console.setChar(newConsoleX, newConsoleY, getSpaces(len),
+                    0, len, out.getFgColor());
+                newConsoleY++;
             }
             for (int i = newConsoleY; i < consoleY + nbLines; i++) {
                 console.clearRow(i);
@@ -332,20 +329,20 @@ class Line {
             }
             console.setCursor(inputCursorX, inputCursorY);
             console.setCursorVisible(true);
-            
+
             // if the line has not been shortened (delete, backspace...)
             if (!shortened) {
                 // ensure that the location of the input cursor is included.
-            	console.ensureVisible(inputCursorY);
+                console.ensureVisible(inputCursorY);
             }
             console.setCursorVisible(true);
         } catch (Exception e) {
             // TODO - why ignore these exceptions?  Are they due to the console methods
-        	// not being thread-safe???
+            // not being thread-safe???
         }
     }
 
-	public int getLineLength() {
-		return currentLine.length();
-	}
+    public int getLineLength() {
+        return currentLine.length();
+    }
 }

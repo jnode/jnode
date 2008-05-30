@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 /**
@@ -26,7 +26,7 @@ package org.jnode.driver.input;
  */
 public interface KeyboardConstants {
 
-	public static final int KB_IRQ = 1;
-	public static final int KB_DATA_PORT = 0x60;
-	public static final int KB_CTRL_PORT = 0x64;
+    public static final int KB_IRQ = 1;
+    public static final int KB_DATA_PORT = 0x60;
+    public static final int KB_CTRL_PORT = 0x64;
 }

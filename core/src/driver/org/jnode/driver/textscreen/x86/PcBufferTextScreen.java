@@ -18,22 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.textscreen.x86;
 
 import org.jnode.driver.textscreen.TextScreen;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class PcBufferTextScreen extends AbstractPcBufferTextScreen implements TextScreen {
 
-    /** My parent */
+    /**
+     * My parent
+     */
     private final AbstractPcTextScreen parent;
 
     /**
      * Initialize this instance.
+     *
      * @param width
      * @param height
      */
@@ -49,7 +51,7 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen implements Te
         copyTo(parent);
     }
 
-    protected void setParentCursor( int x, int y ) {
+    protected void setParentCursor(int x, int y) {
         parent.setCursor(x, y);
     }
 

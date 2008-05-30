@@ -18,15 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.serial;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.security.PrivilegedExceptionAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -42,7 +40,7 @@ import org.jnode.util.AccessControllerUtils;
  * @author mgeisse
  */
 public class SerialPortDriver extends Driver implements SerialPortAPI,
-        ByteChannel {
+    ByteChannel {
 
     private Device channelOwner;
 
@@ -62,7 +60,7 @@ public class SerialPortDriver extends Driver implements SerialPortAPI,
     protected void startDevice() throws DriverException {
         try {
             final ResourceManager rm = (ResourceManager) InitialNaming
-                    .lookup(ResourceManager.NAME);
+                .lookup(ResourceManager.NAME);
             port = claimPorts(rm, getDevice(), basePort, 8);
             configure(BAUD9600);
             getDevice().registerAPI(SerialPortAPI.class, this);
@@ -78,9 +76,9 @@ public class SerialPortDriver extends Driver implements SerialPortAPI,
     }
 
     public ByteChannel getChannel(Device owner)
-            throws ChannelAlreadyOwnedException {
+        throws ChannelAlreadyOwnedException {
         if (channelOwner != null)
-                throw new ChannelAlreadyOwnedException(channelOwner);
+            throw new ChannelAlreadyOwnedException(channelOwner);
         channelOwner = owner;
         return this;
     }
@@ -93,27 +91,27 @@ public class SerialPortDriver extends Driver implements SerialPortAPI,
     }
 
     public void configure(int divisor, int bits, boolean longStop,
-            boolean parity, boolean pEven) {
+                          boolean parity, boolean pEven) {
         if (divisor < 1 || divisor > 65535)
-                throw new IllegalArgumentException(
-                        "invalid baud rate divisor: " + divisor);
+            throw new IllegalArgumentException(
+                "invalid baud rate divisor: " + divisor);
 
         int control;
         switch (bits) {
-        case 5:
-            control = 0;
-            break;
-        case 6:
-            control = 1;
-            break;
-        case 7:
-            control = 2;
-            break;
-        case 8:
-            control = 3;
-            break;
-        default:
-            throw new IllegalArgumentException("invalid data block bits: "
+            case 5:
+                control = 0;
+                break;
+            case 6:
+                control = 1;
+                break;
+            case 7:
+                control = 2;
+                break;
+            case 8:
+                control = 3;
+                break;
+            default:
+                throw new IllegalArgumentException("invalid data block bits: "
                     + bits);
         }
 
@@ -187,16 +185,16 @@ public class SerialPortDriver extends Driver implements SerialPortAPI,
     }
 
     private IOResource claimPorts(final ResourceManager rm,
-            final ResourceOwner owner, final int low, final int length)
-            throws ResourceNotFreeException, DriverException {
+                                  final ResourceOwner owner, final int low, final int length)
+        throws ResourceNotFreeException, DriverException {
         try {
             return (IOResource) AccessControllerUtils
-                    .doPrivileged(new PrivilegedExceptionAction() {
+                .doPrivileged(new PrivilegedExceptionAction() {
 
-                        public Object run() throws ResourceNotFreeException {
-                            return rm.claimIOResource(owner, low, length);
-                        }
-                    });
+                    public Object run() throws ResourceNotFreeException {
+                        return rm.claimIOResource(owner, low, length);
+                    }
+                });
         } catch (ResourceNotFreeException ex) {
             throw ex;
         } catch (Exception ex) {

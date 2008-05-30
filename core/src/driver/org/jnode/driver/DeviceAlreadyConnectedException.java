@@ -18,42 +18,42 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 /**
  * The device has already been connected to a driver exception.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DeviceAlreadyConnectedException extends DriverException {
 
-	/**
-	 * 
-	 */
-	public DeviceAlreadyConnectedException() {
-		super();
-	}
+    /**
+     *
+     */
+    public DeviceAlreadyConnectedException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public DeviceAlreadyConnectedException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public DeviceAlreadyConnectedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public DeviceAlreadyConnectedException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public DeviceAlreadyConnectedException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public DeviceAlreadyConnectedException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public DeviceAlreadyConnectedException(String s) {
+        super(s);
+    }
 }

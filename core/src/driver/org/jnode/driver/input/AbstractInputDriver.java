@@ -18,52 +18,48 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.ArrayList;
-
 import org.jnode.driver.Driver;
 import org.jnode.system.event.SystemEvent;
 import org.jnode.util.Queue;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
 
-abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
-{
+abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver {
     final private ArrayList<SystemListener> listeners = new ArrayList<SystemListener>();
 
     private QueueProcessorThread<E> eventQueueThread;
     final private Queue<E> eventQueue = new Queue<E>();
     private InputDaemon daemon;
 
-    final protected void startDispatcher(String id)
-    {
+    final protected void startDispatcher(String id) {
         this.daemon = new InputDaemon(id + "-daemon");
         daemon.start();
-        
+
         this.eventQueueThread = new QueueProcessorThread<E>(id + "-dispatcher",
-                eventQueue, new SystemEventDispatcher());
-        eventQueueThread.start();        
+            eventQueue, new SystemEventDispatcher());
+        eventQueueThread.start();
     }
-    
-    final protected void stopDispatcher()
-    {
+
+    final protected void stopDispatcher() {
         if (eventQueueThread != null) {
             eventQueueThread.stopProcessor();
         }
         this.eventQueueThread = null;
-        
+
         InputDaemon daemon = this.daemon;
         this.daemon = null;
         if (daemon != null) {
             daemon.setRunningState(false);
             daemon.interrupt();
-        }        
+        }
     }
-    
+
     class SystemEventDispatcher implements QueueProcessor<E> {
 
         /**
@@ -75,15 +71,15 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
                 if (event.isConsumed()) {
                     break;
                 }
-            }            
+            }
         }
     }
-    
-    abstract protected void sendEvent(SystemListener<E> l, E e); 
-        
+
+    abstract protected void sendEvent(SystemListener<E> l, E e);
+
     /**
      * Add a pointer listener
-     * 
+     *
      * @param l
      */
     final public synchronized void addListener(SystemListener<E> l) {
@@ -92,7 +88,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
 
     /**
      * Remove a pointer listener
-     * 
+     *
      * @param l
      */
     final public synchronized void removeListener(SystemListener<E> l) {
@@ -103,6 +99,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
      * Claim to be the preferred listener.
      * The given listener must have been added by addKeyboardListener.
      * <b>This is not checked by a security manager</b>
+     *
      * @param l
      */
     final protected synchronized void setPreferredListener(SystemListener<E> l) {
@@ -110,23 +107,23 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
             listeners.add(0, l);
         }
     }
-    
-    
+
+
     abstract protected E handleScancode(byte b);
-    
+
     /**
      * Gets the byte channel. This is implementation specific
-     * 
+     *
      * @return The byte channel
      */
-    protected abstract ByteChannel getChannel();    
-    
+    protected abstract ByteChannel getChannel();
+
     /**
      * InputDaemon that translates scancodes to SystemEvents and dispatches those events.
      */
     class InputDaemon extends Thread {
         private boolean runningState;
-    
+
         public InputDaemon(String name) {
             super(name);
         }
@@ -134,7 +131,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
         public void run() {
             processChannel();
         }
-        
+
         /**
          * Read scancodes from the input channel and dispatch them as events.
          */
@@ -150,8 +147,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
                     }
                     final byte scancode = buf.get(0);
                     E event = handleScancode(scancode);
-                    if((event != null) && !event.isConsumed())
-                    {
+                    if ((event != null) && !event.isConsumed()) {
                         eventQueue.add(event);
                     }
                 } catch (Throwable ex) {

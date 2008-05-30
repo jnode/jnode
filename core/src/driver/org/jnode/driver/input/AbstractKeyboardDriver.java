@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.awt.event.KeyEvent;
@@ -28,7 +28,6 @@ import java.nio.channels.ByteChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.util.SystemInputStream;
@@ -37,7 +36,7 @@ import org.jnode.util.SystemInputStream;
  * @author epr
  */
 public abstract class AbstractKeyboardDriver extends AbstractInputDriver<KeyboardEvent> implements
-        KeyboardAPI, SystemTriggerAPI {
+    KeyboardAPI, SystemTriggerAPI {
 
     ByteChannel channel;
 
@@ -47,34 +46,33 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
 
     private final ArrayList<SystemTriggerListener> stListeners = new ArrayList<SystemTriggerListener>();
 
-    final public void addKeyboardListener(KeyboardListener l)
-    {
-        super.addListener(l);        
+    final public void addKeyboardListener(KeyboardListener l) {
+        super.addListener(l);
     }
 
-    final public void removeKeyboardListener(KeyboardListener l)
-    {
+    final public void removeKeyboardListener(KeyboardListener l) {
         super.removeListener(l);
     }
 
-	/**
-	 * Claim to be the preferred listener.
-	 * The given listener must have been added by addKeyboardListener.
-	 * If there is a security manager, this method will call
-	 * <code>checkPermission(new DriverPermission("setPreferredListener"))</code>.
-	 * @param l
-	 */
-	public synchronized void setPreferredListener(KeyboardListener l) {
-	    final SecurityManager sm = System.getSecurityManager();
-	    if (sm != null) {
-	        sm.checkPermission(SET_PREFERRED_LISTENER_PERMISSION);
-	    }
+    /**
+     * Claim to be the preferred listener.
+     * The given listener must have been added by addKeyboardListener.
+     * If there is a security manager, this method will call
+     * <code>checkPermission(new DriverPermission("setPreferredListener"))</code>.
+     *
+     * @param l
+     */
+    public synchronized void setPreferredListener(KeyboardListener l) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(SET_PREFERRED_LISTENER_PERMISSION);
+        }
         super.setPreferredListener(l);
-	}
-	
+    }
+
     /**
      * Add a listener
-     * 
+     *
      * @param l
      */
     public void addSystemTriggerListener(SystemTriggerListener l) {
@@ -83,7 +81,7 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
 
     /**
      * Remove a listener
-     * 
+     *
      * @param l
      */
     public void removeSystemTriggerListener(SystemTriggerListener l) {
@@ -119,14 +117,14 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
 
     /**
      * Gets the byte channel. This is implementation specific
-     * 
+     *
      * @return The byte channel
      */
     protected abstract ByteChannel getChannel();
 
     /**
      * Create an interpreter for this keyboard device
-     * 
+     *
      * @return The created interpreter
      */
     protected KeyboardInterpreter createKeyboardInterpreter() {
@@ -145,7 +143,7 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
                 public Object run() {
                     SystemInputStream.getInstance().releaseSystemIn();
                     return null;
-                }                
+                }
             });
         }
         stopDispatcher();
@@ -154,19 +152,18 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
             channel.close();
         } catch (IOException ex) {
             System.err.println("Error closing Keyboard channel: "
-                    + ex.toString());
+                + ex.toString());
         }
     }
 
     /**
      * Send a given keyboard event to the given listener.
-     * 
+     *
      * @param l
      * @param event
      */
-    @Override    
-    protected void sendEvent(SystemListener<KeyboardEvent> l, KeyboardEvent event)    
-    {            
+    @Override
+    protected void sendEvent(SystemListener<KeyboardEvent> l, KeyboardEvent event) {
         KeyboardListener kl = (KeyboardListener) l;
         if (event.isKeyPressed()) {
             kl.keyPressed(event);
@@ -177,7 +174,7 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
 
     /**
      * Dispatch a given event to all known system trigger listeners.
-     * 
+     *
      * @param event
      */
     protected void dispatchSystemTriggerEvent(KeyboardEvent event) {
@@ -187,20 +184,19 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
         }
     }
 
-    protected KeyboardEvent handleScancode(byte scancode)
-    {
+    protected KeyboardEvent handleScancode(byte scancode) {
         KeyboardEvent event = kbInterpreter.interpretScancode(scancode & 0xff);
         if (event != null) {
             if ((event.getKeyCode() == KeyEvent.VK_PRINTSCREEN) &&
-                    event.isControlDown() &&
-                    event.isShiftDown() &&
-                    event.isKeyPressed()) {
+                event.isControlDown() &&
+                event.isShiftDown() &&
+                event.isKeyPressed()) {
                 dispatchSystemTriggerEvent(event);
             }
         }
-        return event;        
+        return event;
     }
-    
+
     /**
      * @return KeyboardInterpreter
      */
@@ -210,13 +206,14 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
 
     /**
      * Sets the kbInterpreter.
-     * 
-     * @param kbInterpreter
-     *            The kbInterpreter to set
+     *
+     * @param kbInterpreter The kbInterpreter to set
      */
     public void setKbInterpreter(KeyboardInterpreter kbInterpreter) {
-        if (kbInterpreter == null) { throw new IllegalArgumentException(
-                "kbInterpreter==null"); }
+        if (kbInterpreter == null) {
+            throw new IllegalArgumentException(
+                "kbInterpreter==null");
+        }
         this.kbInterpreter = kbInterpreter;
     }
 }

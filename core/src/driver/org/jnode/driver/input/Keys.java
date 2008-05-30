@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.util.Arrays;
@@ -29,67 +29,56 @@ import java.util.Arrays;
  */
 
 
-public class Keys
-{
-  private Key[] keys = new Key[128];
+public class Keys {
+    private Key[] keys = new Key[128];
 
-  public Keys()
-  {
-  }
-
-  public Key getKey(int _scancode)
-  {
-    Key key = keys[_scancode];
-
-    if (key == null)
-    {
-      key = new Key();
-      keys[_scancode] = key;
+    public Keys() {
     }
-    return key;
-  }
-  
-  /**
-   * 
-   * @param keycode
-   * @return -1 if keycode has no scancode, otherwise return the scancode
-   */
-  public int getScanCode(int keycode)
-  {
-      for(int scancode = 0 ; scancode < keys.length ; scancode++)
-      {
-          final Key key = keys[scancode];
-          if((key.getLowerVirtuelKey() == keycode) ||
-             (key.getUpperVirtuelKey() == keycode) ||
-             (key.getAltGrVirtuelKey() == keycode))
-          {
-              return scancode;
-          }
-      }
-      
-      return -1; // bad keycode
-  }
+
+    public Key getKey(int _scancode) {
+        Key key = keys[_scancode];
+
+        if (key == null) {
+            key = new Key();
+            keys[_scancode] = key;
+        }
+        return key;
+    }
+
+    /**
+     * @param keycode
+     * @return -1 if keycode has no scancode, otherwise return the scancode
+     */
+    public int getScanCode(int keycode) {
+        for (int scancode = 0; scancode < keys.length; scancode++) {
+            final Key key = keys[scancode];
+            if ((key.getLowerVirtuelKey() == keycode) ||
+                (key.getUpperVirtuelKey() == keycode) ||
+                (key.getAltGrVirtuelKey() == keycode)) {
+                return scancode;
+            }
+        }
+
+        return -1; // bad keycode
+    }
 
 
-  public void setKey(int _scancode, Key key)
-  {
-    keys[_scancode] = key;
-  }
+    public void setKey(int _scancode, Key key) {
+        keys[_scancode] = key;
+    }
 
-  public String toString()
-  {
-    return "Keys{" +
-        "keys=" + (keys == null ? null : Arrays.asList(keys)) +
-        "}";
-  }
+    public String toString() {
+        return "Keys{" +
+            "keys=" + (keys == null ? null : Arrays.asList(keys)) +
+            "}";
+    }
 
-  public static void main(String[] args)
-  {
-    Keys keys = new Keys();
+    public static void main(String[] args) {
+        Keys keys = new Keys();
 
-    System.out.println(keys);
+        System.out.println(keys);
 
-    System.out.println(keys.getKey(1));
-    System.out.println(keys);
-  }
+        System.out.println(keys.getKey(1));
+        System.out.println(keys);
+    }
 }

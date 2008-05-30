@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import java.io.PrintWriter;
-
 import org.jnode.driver.DeviceAPI;
 
 /**
@@ -32,9 +31,10 @@ public interface AcpiAPI extends DeviceAPI {
 
     /**
      * Generate a listing of the ACPI device information on the given writer.
+     *
      * @param out
      */
     public void dump(PrintWriter out);
-    
+
     public String toDetailedString();
 }

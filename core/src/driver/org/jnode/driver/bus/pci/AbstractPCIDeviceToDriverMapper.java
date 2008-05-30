@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -56,7 +55,7 @@ public class AbstractPCIDeviceToDriverMapper {
             throw new DriverException("Specific a driver-class");
         }
         final StringTokenizer tok = new StringTokenizer(id, ":");
-        
+
         ids = new int[3];
         masks = new int[3];
         for (int i = 0; i < 3; i++) {
@@ -69,14 +68,14 @@ public class AbstractPCIDeviceToDriverMapper {
             }
         }
     }
-    
+
     final Driver newDriver(PCIDevice device) {
         try {
             final Class cls = loader.loadClass(driverClass);
             try {
-                final Constructor c = cls.getConstructor(new Class[] { ConfigurationElement.class });
+                final Constructor c = cls.getConstructor(new Class[]{ConfigurationElement.class});
                 try {
-                    return (Driver)c.newInstance(new Object[] { config });
+                    return (Driver) c.newInstance(new Object[]{config});
                 } catch (InvocationTargetException ex1) {
                     final InstantiationException ie = new InstantiationException();
                     ie.initCause(ex1.getTargetException());
@@ -92,10 +91,10 @@ public class AbstractPCIDeviceToDriverMapper {
         } catch (IllegalAccessException ex) {
             log.error("Cannot access driver class " + driverClass);
         }
-        
+
         return null;
     }
-    
+
     final boolean matches(int major, int sub, int minor) {
         if ((major & masks[0]) != ids[0]) {
             return false;
@@ -108,15 +107,15 @@ public class AbstractPCIDeviceToDriverMapper {
         }
         return true;
     }
-    
+
     final boolean hasMinor() {
         return (masks[2] != 0);
     }
-   
+
     final int parse(String v) {
         return Integer.parseInt(v, 16);
     }
-    
+
     public String toString() {
         return NumberUtils.hex(ids, 4) + " mask " + NumberUtils.hex(masks, 4);
     }

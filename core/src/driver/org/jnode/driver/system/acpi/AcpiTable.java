@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import org.apache.log4j.Logger;
@@ -32,7 +32,7 @@ import org.vmmagic.unboxed.Offset;
 
 /**
  * ACPI abstract table.
- * 
+ *
  * @author Francois-Frederic Ozog
  */
 public abstract class AcpiTable {
@@ -46,6 +46,7 @@ public abstract class AcpiTable {
 
     /**
      * Initialize this instance.
+     *
      * @param tableResource
      */
     public AcpiTable(AcpiDriver driver, MemoryResource tableResource) {
@@ -56,7 +57,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets the length of this table in bytes.
-     * 
+     *
      * @return
      */
     public final int getSize() {
@@ -72,7 +73,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets the signature of this table.
-     * 
+     *
      * @return
      */
     public String getSignature() {
@@ -81,7 +82,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets a 32-bit address from a given offset in the table.
-     * 
+     *
      * @param offset
      * @return
      */
@@ -91,7 +92,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets a 64-bit address from a given offset in the table.
-     * 
+     *
      * @param offset
      * @return
      */
@@ -101,7 +102,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets a 32-bit integer from a given offset in the table.
-     * 
+     *
      * @param offset
      * @return
      */
@@ -111,21 +112,20 @@ public abstract class AcpiTable {
 
     /**
      * Gets a 16-bit integer from a given offset in the table.
-     * 
+     *
      * @param offset
      * @return
      */
     protected final int getShort(int offset) {
         return ((tableResource.getByte(offset + 1) & 0xff) << 8)
-                + (tableResource.getByte(offset) & 0xff);
+            + (tableResource.getByte(offset) & 0xff);
     }
 
     /**
      * Gets an ASCII string from a given offset in the table.
-     * 
+     *
      * @param offset
-     * @param length
-     *            Length in bytes of the string.
+     * @param length Length in bytes of the string.
      * @return
      */
     protected final String getString(int offset, int length) {
@@ -138,7 +138,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets a 8-bit integer from a given offset in the table.
-     * 
+     *
      * @param offset
      * @return
      */
@@ -148,7 +148,7 @@ public abstract class AcpiTable {
 
     /**
      * Gets a series 8-bit integer from a given offset in the table.
-     * 
+     *
      * @param offset
      * @return
      */
@@ -158,7 +158,7 @@ public abstract class AcpiTable {
 
     /**
      * Convert to a String representation.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -169,7 +169,7 @@ public abstract class AcpiTable {
 
     /**
      * Load an ACPI table from a given address.
-     * 
+     *
      * @param owner
      * @param rm
      * @param ptr
@@ -177,17 +177,17 @@ public abstract class AcpiTable {
      * @throws ResourceNotFreeException
      */
     final static AcpiTable getTable(AcpiDriver drv, ResourceOwner owner, ResourceManager rm,
-            Address ptr) throws ResourceNotFreeException {
+                                    Address ptr) throws ResourceNotFreeException {
         try {
             // Convert physical address to virtual address.
             ptr = drv.physToVirtual(ptr);
-            
+
             // Load the length of the entire table.
             final int length = ptr.loadInt(Offset.fromIntZeroExtend(4));
             // Claim the full table memory region.
             final MemoryResource table;
             table = rm.claimMemoryResource(owner, ptr, length,
-                    ResourceManager.MEMMODE_NORMAL);
+                ResourceManager.MEMMODE_NORMAL);
             // Load the signature
             final char[] signatureArr = new char[4];
             for (int i = 0; i < 4; i++) {
@@ -209,8 +209,8 @@ public abstract class AcpiTable {
             }
         } catch (ResourceNotFreeException ex1) {
             throw new ResourceNotFreeException(
-                    "Could not get table header begining memory range: "
-                            + MagicUtils.toString(ptr) + "(8 bytes)");
+                "Could not get table header begining memory range: "
+                    + MagicUtils.toString(ptr) + "(8 bytes)");
         }
 
     }

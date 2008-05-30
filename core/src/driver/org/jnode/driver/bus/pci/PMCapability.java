@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 /**
  * Power management capability.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class PMCapability extends Capability {
@@ -35,9 +35,10 @@ public final class PMCapability extends Capability {
     PMCapability(PCIDevice device, int offset) {
         super(device, offset);
     }
-    
+
     /**
      * Gets the power management capabilities.
+     *
      * @return
      */
     public final int getCapabilities() {
@@ -46,6 +47,7 @@ public final class PMCapability extends Capability {
 
     /**
      * Gets the status register.
+     *
      * @return
      */
     public final int getStatus() {
@@ -54,6 +56,7 @@ public final class PMCapability extends Capability {
 
     /**
      * Gets the data register.
+     *
      * @return
      */
     public final int getData() {
@@ -62,6 +65,7 @@ public final class PMCapability extends Capability {
 
     /**
      * Gets the bridge support register.
+     *
      * @return
      */
     public final int getBridgeSupportExtensions() {

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 /**
@@ -204,13 +204,9 @@ public interface PCIConstants {
 
     /* Header type 0 (normal devices) */
 
-
     /* = 0x35-= 0x3b are reserved */
 
-
-
     /* Capability lists */
-
 
     /* Power Management Registers */
 
@@ -255,9 +251,9 @@ public interface PCIConstants {
     public static final int PCI_AGP_STATUS_RATE1 = 0x0001; /* 1x transfer rate supported */
     public static final int PCI_AGP_COMMAND = 8; /* Control register */
     public static final int PCI_AGP_COMMAND_RQ_MASK = 0xff000000; /*
-																   * Master: Maximum number of
-																   * requests
-																   */
+                                                                    * Master: Maximum number of
+                                                                    * requests
+                                                                    */
     public static final int PCI_AGP_COMMAND_SBA = 0x0200; /* Sideband addressing enabled */
     public static final int PCI_AGP_COMMAND_AGP = 0x0100; /* Allow processing of AGP transactions */
     public static final int PCI_AGP_COMMAND_64BIT = 0x0020; /* Allow processing of 64-bit addresses */

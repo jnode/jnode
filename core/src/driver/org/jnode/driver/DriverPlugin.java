@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import org.jnode.plugin.Plugin;
@@ -27,35 +27,38 @@ import org.jnode.plugin.PluginException;
 
 /**
  * Plugin start instantiates and initialize the default device manager.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DriverPlugin extends Plugin {
 
-	private DefaultDeviceManager devMgr;
-	
-	/**
-	 * @param descriptor
-	 */
-	public DriverPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    private DefaultDeviceManager devMgr;
 
-	/**
-	 * Start this plugin
-	 * @throws PluginException
-	 */
-	protected void startPlugin() throws PluginException {
-		devMgr = new DefaultDeviceManager(getDescriptor().getExtensionPoint("finders"), getDescriptor().getExtensionPoint("mappers"));
-		devMgr.start();
-	}
+    /**
+     * @param descriptor
+     */
+    public DriverPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Stop this plugin
-	 * @throws PluginException
-	 */
-	protected void stopPlugin() throws PluginException {
-		devMgr.stop();
-		devMgr = null;
-	}
+    /**
+     * Start this plugin
+     *
+     * @throws PluginException
+     */
+    protected void startPlugin() throws PluginException {
+        devMgr = new DefaultDeviceManager(getDescriptor().getExtensionPoint("finders"),
+            getDescriptor().getExtensionPoint("mappers"));
+        devMgr.start();
+    }
+
+    /**
+     * Stop this plugin
+     *
+     * @throws PluginException
+     */
+    protected void stopPlugin() throws PluginException {
+        devMgr.stop();
+        devMgr = null;
+    }
 }

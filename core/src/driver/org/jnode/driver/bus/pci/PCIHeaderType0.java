@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 /**
  * PCI device configuration header for header type 0: Normal devices.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class PCIHeaderType0 extends PCIDeviceConfig {
@@ -45,7 +45,9 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
     private static final int PCI_MIN_GNT = 0x3e; // 8 bits
     private static final int PCI_MAX_LAT = 0x3f; // 8 bits
 
-    /** Rom data */
+    /**
+     * Rom data
+     */
     private final PCIRomAddress romAddress;
 
     /**
@@ -58,13 +60,14 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
 
     /**
      * Gets the resource addresses.
+     *
      * @return
      */
     public final PCIBaseAddress[] getBaseAddresses() {
         PCIBaseAddress[] addresses = new PCIBaseAddress[6];
         int idx = 0;
         for (int r = 0; r < 6; r++) {
-            PCIBaseAddress a = PCIBaseAddress.read(device, PCI_BASE_ADDRESS_0, r);          
+            PCIBaseAddress a = PCIBaseAddress.read(device, PCI_BASE_ADDRESS_0, r);
             if (a != null) {
                 addresses[idx++] = a;
                 if (a.is64Bit()) {
@@ -89,37 +92,39 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
     public final int getInterruptPin() {
         return device.readConfigByte(PCI_INTERRUPT_PIN);
     }
-    
+
     /**
      * Gets the interrupt line
      */
     public final int getInterruptLine() {
         return device.readConfigByte(PCI_INTERRUPT_LINE);
     }
-    
+
     /**
      * Sets the interrupt line
+     *
      * @param line
      */
     public final void setInterruptLine(int line) {
         device.writeConfigByte(PCI_INTERRUPT_LINE, line);
     }
-    
+
     /**
      * Gets the maximum latency.
      */
     public final int getMaxLatency() {
         return device.readConfigByte(PCI_MAX_LAT);
     }
-    
-    /** 
+
+    /**
      * Gets the ROM base address, or null is no rom is found.
+     *
      * @return
      */
     public final PCIRomAddress getRomAddress() {
         return romAddress;
     }
-    
+
     /**
      * @see org.jnode.driver.bus.pci.PCIDeviceConfig#toString()
      */
@@ -131,7 +136,7 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
             sb.append(getInterruptPin());
             sb.append(", ");
             sb.append("intr-line=");
-            sb.append(getInterruptLine());          
+            sb.append(getInterruptLine());
         }
         final PCIBaseAddress[] baseAddresses = getBaseAddresses();
         if (baseAddresses.length > 0) {
@@ -149,5 +154,5 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
             sb.append(romAddress);
         }
         return sb.toString();
-    }    
+    }
 }

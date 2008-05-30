@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import gnu.java.security.action.GetPropertyAction;
-
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
@@ -40,46 +38,58 @@ import org.jnode.util.StopWatch;
 
 /**
  * Default device manager.
- * 
+ *
  * @author epr
  */
-public abstract class AbstractDeviceManager implements DeviceManager
-{
+public abstract class AbstractDeviceManager implements DeviceManager {
 
-    /** All registered devices */
+    /**
+     * All registered devices
+     */
     private final Map<String, Device> devices = new HashMap<String, Device>();
 
-    /** All registered device to driver mappers */
+    /**
+     * All registered device to driver mappers
+     */
     private final List<DeviceToDriverMapper> mappers = new ArrayList<DeviceToDriverMapper>();
 
-    /** All registered device finders */
+    /**
+     * All registered device finders
+     */
     private final List<DeviceFinder> finders = new ArrayList<DeviceFinder>();
 
-    /** All listeners to my events */
+    /**
+     * All listeners to my events
+     */
     private final List<DeviceManagerListener> listeners = new LinkedList<DeviceManagerListener>();
 
-    /** All listeners to device events */
+    /**
+     * All listeners to device events
+     */
     private final List<DeviceListener> deviceListeners = new LinkedList<DeviceListener>();
 
-    /** The system bus */
+    /**
+     * The system bus
+     */
     private final Bus systemBus;
 
-    /** The JNode command line */
+    /**
+     * The JNode command line
+     */
     private final String cmdLine;
 
     private boolean extensionsLoaded = false;
-    
+
     private long defaultStartTimeout = 10000;
 
     private long fastStartTimeout = 1000;
 
     /**
      * Create a new instance
-     * 
      */
     public AbstractDeviceManager() {
         cmdLine = (String) AccessController.doPrivileged(new GetPropertyAction(
-                "jnode.cmdline", ""));
+            "jnode.cmdline", ""));
         this.systemBus = new SystemBus();
     }
 
@@ -87,7 +97,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * Returns a collection of all known devices. The collection is not
      * modifiable, but the underlying collection can change, so be aware of
      * exceptions in iterators.
-     * 
+     *
      * @return All known devices.
      */
     final public Collection<Device> getDevices() {
@@ -98,7 +108,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * Returns a collection of all known devices that implement the given api..
      * The collection is not modifiable, but the underlying collection can
      * change, so be aware of exceptions in iterators.
-     * 
+     *
      * @param apiClass
      * @return All known devices the implement the given api.
      */
@@ -114,15 +124,16 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Gets the device with the given ID.
-     * 
+     *
      * @param id
      * @return The device with the given id
-     * @throws DeviceNotFoundException
-     *             No device with the given id was found.
+     * @throws DeviceNotFoundException No device with the given id was found.
      */
     final public Device getDevice(String id) throws DeviceNotFoundException {
         final Device device = devices.get(id);
-        if (device == null) { throw new DeviceNotFoundException(id); }
+        if (device == null) {
+            throw new DeviceNotFoundException(id);
+        }
         return device;
     }
 
@@ -138,13 +149,14 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * </ul>
      * Note that if the device already has a driver connected to it, the first
      * two steps are ignored.
-     * 
+     *
      * @param device
      * @throws DeviceAlreadyRegisteredException
+     *
      * @throws DriverException
      */
     final public void register(Device device)
-            throws DeviceAlreadyRegisteredException, DriverException {
+        throws DeviceAlreadyRegisteredException, DriverException {
 
         boolean shouldStart;
 
@@ -175,17 +187,20 @@ public abstract class AbstractDeviceManager implements DeviceManager
     /**
      * Actually register the device. The device is not started, nor is the
      * registered event fired.
-     * 
+     *
      * @param device
-     * @throws DeviceAlreadyRegisteredException
-     * @throws DriverException
      * @return true if the device should be tried to start.
+     * @throws DeviceAlreadyRegisteredException
+     *
+     * @throws DriverException
      */
     private synchronized final boolean doRegister(Device device)
-            throws DeviceAlreadyRegisteredException, DriverException {
+        throws DeviceAlreadyRegisteredException, DriverException {
         final String devID = device.getId();
-        if (devices.containsKey(devID)) { throw new DeviceAlreadyRegisteredException(
-                devID); }
+        if (devices.containsKey(devID)) {
+            throw new DeviceAlreadyRegisteredException(
+                devID);
+        }
         // Set a link to me
         device.setManager(this);
         // Find a driver if needed
@@ -209,7 +224,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
     /**
      * Unregister a device. The device will be stopped and removed from the
      * namespace.
-     * 
+     *
      * @param device
      * @throws DriverException
      */
@@ -231,14 +246,13 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Start a given device. The device must have been registered.
-     * 
+     *
      * @param device
-     * @throws DeviceNotFoundException
-     *             The device has not been registered.
+     * @throws DeviceNotFoundException The device has not been registered.
      * @throws DriverException
      */
     final public void start(Device device) throws DeviceNotFoundException,
-            DriverException {
+        DriverException {
         // Make sure the device exists.
         getDevice(device.getId());
         // Start it (if needed)
@@ -251,10 +265,10 @@ public abstract class AbstractDeviceManager implements DeviceManager
                 sw.stop();
                 if (sw.isElapsedLongerThen(defaultStartTimeout)) {
                     BootLog.error("Device startup took " + sw + ": "
-                            + device.getId());
+                        + device.getId());
                 } else if (sw.isElapsedLongerThen(fastStartTimeout)) {
                     BootLog.info("Device startup took " + sw + ": "
-                            + device.getId());
+                        + device.getId());
                 }
                 BootLog.debug("Started " + device.getId());
             } catch (DriverException ex) {
@@ -269,14 +283,13 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Stop a given device. The device must have been registered.
-     * 
+     *
      * @param device
-     * @throws DeviceNotFoundException
-     *             The device has not been registered.
+     * @throws DeviceNotFoundException The device has not been registered.
      * @throws DriverException
      */
     final public void stop(Device device) throws DeviceNotFoundException,
-            DriverException {
+        DriverException {
         // Make sure the device exists.
         getDevice(device.getId());
         // Stop it
@@ -289,14 +302,15 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Rename a device, optionally using an autonumber postfix
-     * 
+     *
      * @param device
      * @param name
      * @param autonumber
      * @throws DeviceAlreadyRegisteredException
+     *
      */
     final public synchronized void rename(Device device, String name,
-            boolean autonumber) throws DeviceAlreadyRegisteredException {
+                                          boolean autonumber) throws DeviceAlreadyRegisteredException {
         if (!device.getId().startsWith(name)) {
             String newId;
             if (autonumber) {
@@ -310,8 +324,10 @@ public abstract class AbstractDeviceManager implements DeviceManager
                 newId = name;
             }
 
-            if (devices.containsKey(newId)) { throw new DeviceAlreadyRegisteredException(
-                    newId); }
+            if (devices.containsKey(newId)) {
+                throw new DeviceAlreadyRegisteredException(
+                    newId);
+            }
             // Remove the old id
             if (devices.remove(device.getId()) != null) {
                 // Add the new id
@@ -324,7 +340,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Add a listener
-     * 
+     *
      * @param listener
      */
     final public void addListener(DeviceManagerListener listener) {
@@ -335,7 +351,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Add a listener
-     * 
+     *
      * @param listener
      */
     final public void removeListener(DeviceManagerListener listener) {
@@ -346,7 +362,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Add a device listener
-     * 
+     *
      * @param listener
      */
     final public void addListener(DeviceListener listener) {
@@ -357,7 +373,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Add a device listener
-     * 
+     *
      * @param listener
      */
     final public void removeListener(DeviceListener listener) {
@@ -385,7 +401,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
     /**
      * Gets the system bus. The system bus is the root of all hardware busses
      * and devices connected to these busses.
-     * 
+     *
      * @return The system bus
      */
     final public Bus getSystemBus() {
@@ -425,8 +441,8 @@ public abstract class AbstractDeviceManager implements DeviceManager
     final protected void findDevices() throws InterruptedException {
         waitUntilExtensionsLoaded();
         final ArrayList<DeviceFinder> finders;
-        synchronized( this ) {
-            finders = new ArrayList<DeviceFinder>( this.finders );
+        synchronized (this) {
+            finders = new ArrayList<DeviceFinder>(this.finders);
         }
         for (DeviceFinder finder : finders) {
             try {
@@ -435,16 +451,16 @@ public abstract class AbstractDeviceManager implements DeviceManager
                 BootLog.error("Error while trying to find system devices", ex);
             } catch (RuntimeException ex) {
                 BootLog
-                        .error(
-                                "Runtime exception while trying to find system devices",
-                                ex);
+                    .error(
+                        "Runtime exception while trying to find system devices",
+                        ex);
             }
         }
     }
 
     /**
      * Search for a suitable driver for the given device.
-     * 
+     *
      * @param device
      * @return The first suitable driver for the given device, or a NullDriver
      *         if no suitable driver has been found.
@@ -454,38 +470,40 @@ public abstract class AbstractDeviceManager implements DeviceManager
             for (DeviceToDriverMapper mapper : mappers) {
                 final Driver drv = mapper.findDriver(device);
                 if (drv != null) {
-                //Syslog.debug("Found driver for " + device);
-                return drv; }
+                    //Syslog.debug("Found driver for " + device);
+                    return drv;
+                }
             }
         }
         BootLog.debug("No driver found for " + device
-                + " delaying device startup");
+            + " delaying device startup");
         return null;
     }
 
     /**
      * Start this manager
-     * 
+     *
      * @throws PluginException
      */
     abstract public void start() throws PluginException;
-    
+
     final protected synchronized void loadExtensions() {
         refreshFinders(finders);
-        refreshMappers(mappers);  
+        refreshMappers(mappers);
         extensionsLoaded = true;
         notifyAll();
     }
 
-    final private synchronized void waitUntilExtensionsLoaded() throws IllegalMonitorStateException, InterruptedException {
+    final private synchronized void waitUntilExtensionsLoaded()
+        throws IllegalMonitorStateException, InterruptedException {
         while (!extensionsLoaded) {
             wait();
         }
     }
-    
+
     /**
      * Stop this manager
-     * 
+     *
      * @throws PluginException
      */
     final public void stop() throws PluginException {
@@ -495,7 +513,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Fire a deviceRegistered event to all my listeners
-     * 
+     *
      * @param device
      */
     protected final void fireRegisteredEvent(Device device) {
@@ -509,14 +527,14 @@ public abstract class AbstractDeviceManager implements DeviceManager
             l.deviceRegistered(device);
             if (sw.isElapsedLongerThen(100)) {
                 BootLog.error("DeviceManagerListener took " + sw
-                        + " in deviceRegistered: " + l.getClass().getName());
+                    + " in deviceRegistered: " + l.getClass().getName());
             }
         }
     }
 
     /**
      * Fire a deviceUnregister event to all my listeners
-     * 
+     *
      * @param device
      */
     protected final void fireUnregisterEvent(Device device) {
@@ -530,14 +548,14 @@ public abstract class AbstractDeviceManager implements DeviceManager
             l.deviceUnregister(device);
             if (sw.isElapsedLongerThen(100)) {
                 BootLog.error("DeviceManagerListener took " + sw
-                        + " in deviceUnregister: " + l.getClass().getName());
+                    + " in deviceUnregister: " + l.getClass().getName());
             }
         }
     }
 
     /**
      * Fire a device started event to all the device listeners
-     * 
+     *
      * @param device
      */
     final public void fireStartedEvent(Device device) {
@@ -551,14 +569,14 @@ public abstract class AbstractDeviceManager implements DeviceManager
             l.deviceStarted(device);
             if (sw.isElapsedLongerThen(100)) {
                 BootLog.error("DeviceListener (in manager) took " + sw
-                        + " in deviceStarted: " + l.getClass().getName());
+                    + " in deviceStarted: " + l.getClass().getName());
             }
         }
     }
 
     /**
      * Fire a device stop event to all the device listeners
-     * 
+     *
      * @param device
      */
     public final void fireStopEvent(Device device) {
@@ -572,26 +590,28 @@ public abstract class AbstractDeviceManager implements DeviceManager
             l.deviceStop(device);
             if (sw.isElapsedLongerThen(100)) {
                 BootLog.error("DeviceListener (in manager) took " + sw
-                        + " in deviceStop: " + l.getClass().getName());
+                    + " in deviceStop: " + l.getClass().getName());
             }
         }
     }
 
     /**
      * Refresh the list of finders, based on the mappers extension-point.
+     *
      * @param finders
      */
     abstract protected void refreshFinders(List<DeviceFinder> finders);
 
     /**
-     * Refresh the list of mappers, based on the mappers extension-point. 
+     * Refresh the list of mappers, based on the mappers extension-point.
+     *
      * @param mappers
      */
     abstract protected void refreshMappers(List<DeviceToDriverMapper> mappers);
-    
+
     /**
      * The root bus of every system.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     static class SystemBus extends Bus {
@@ -600,7 +620,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Comparator used to sort DeviceToDriverMapper's.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     protected static class MapperComparator implements Comparator<DeviceToDriverMapper> {
@@ -610,8 +630,8 @@ public abstract class AbstractDeviceManager implements DeviceManager
         /**
          * @param o1
          * @param o2
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          * @return int
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
         public int compare(DeviceToDriverMapper o1, DeviceToDriverMapper o2) {
             final DeviceToDriverMapper m1 = (DeviceToDriverMapper) o1;
@@ -631,7 +651,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Gets the default timeout for device startup.
-     * 
+     *
      * @return Returns the defaultStartTimeout.
      */
     public final long getDefaultStartTimeout() {
@@ -640,9 +660,8 @@ public abstract class AbstractDeviceManager implements DeviceManager
 
     /**
      * Sets the default timeout for device startup.
-     * 
-     * @param defaultStartTimeout
-     *            The defaultStartTimeout to set.
+     *
+     * @param defaultStartTimeout The defaultStartTimeout to set.
      */
     public final void setDefaultStartTimeout(long defaultStartTimeout) {
         this.defaultStartTimeout = defaultStartTimeout;

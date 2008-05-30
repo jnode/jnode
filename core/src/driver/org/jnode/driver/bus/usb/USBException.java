@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
@@ -26,33 +26,33 @@ package org.jnode.driver.bus.usb;
  */
 public class USBException extends Exception {
 
-	/**
-	 * 
-	 */
-	public USBException() {
-		super();
-	}
+    /**
+     *
+     */
+    public USBException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public USBException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public USBException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public USBException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public USBException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public USBException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public USBException(String s) {
+        super(s);
+    }
 
 }

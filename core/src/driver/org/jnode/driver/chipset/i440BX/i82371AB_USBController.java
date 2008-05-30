@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.chipset.i440BX;
 
 import org.jnode.driver.Driver;
 
 /**
  * i82371AB_USBController.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -37,19 +37,21 @@ import org.jnode.driver.Driver;
  * </p>
  * <p>
  * </p>
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
 
 public class i82371AB_USBController extends Driver {
-	public i82371AB_USBController() {
-	}
-	protected void stopDevice() throws org.jnode.driver.DriverException {
-		/** @todo Implement this org.jnode.driver.Driver abstract method */
-	}
-	protected void startDevice() throws org.jnode.driver.DriverException {
-		/** @todo Implement this org.jnode.driver.Driver abstract method */
-	}
+    public i82371AB_USBController() {
+    }
+
+    protected void stopDevice() throws org.jnode.driver.DriverException {
+        /** @todo Implement this org.jnode.driver.Driver abstract method */
+    }
+
+    protected void startDevice() throws org.jnode.driver.DriverException {
+        /** @todo Implement this org.jnode.driver.Driver abstract method */
+    }
 
 }

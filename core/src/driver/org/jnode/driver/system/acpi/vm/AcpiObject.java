@@ -18,16 +18,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi.vm;
 
 import java.io.PrintWriter;
-
 import org.apache.log4j.Logger;
 
 /**
  * AcpiObject.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -39,55 +38,55 @@ import org.apache.log4j.Logger;
  * </p>
  * <p>
  * </p>
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
 
 public class AcpiObject {
 
-	protected final Logger log = Logger.getLogger(getClass());
-	private NameSpace nameSpace = null;
+    protected final Logger log = Logger.getLogger(getClass());
+    private NameSpace nameSpace = null;
 
-	public AcpiObject() {
-		if (getName() != null)
-			this.putInSameNameSpace(NameSpace.currentNameSpace);
-	}
+    public AcpiObject() {
+        if (getName() != null)
+            this.putInSameNameSpace(NameSpace.currentNameSpace);
+    }
 
-	public AcpiObject(NameSpace space) {
-		nameSpace = space;
-		if (getName() != null)
-			this.putInSameNameSpace(space);
-	}
+    public AcpiObject(NameSpace space) {
+        nameSpace = space;
+        if (getName() != null)
+            this.putInSameNameSpace(space);
+    }
 
-	public NameSpace getNameSpace() {
-		return nameSpace;
-	}
+    public NameSpace getNameSpace() {
+        return nameSpace;
+    }
 
-	public String getName() {
-		return Integer.toHexString(this.hashCode());
-	}
+    public String getName() {
+        return Integer.toHexString(this.hashCode());
+    }
 
-	public void putInSameNameSpace(NameSpace space) {
-		if (space == null)
-			return;
-		if (nameSpace != null)
-			nameSpace.remove(getName());
-		space.put(this);
-	}
+    public void putInSameNameSpace(NameSpace space) {
+        if (space == null)
+            return;
+        if (nameSpace != null)
+            nameSpace.remove(getName());
+        space.put(this);
+    }
 
-	public void putInSameNameSpace(AcpiObject obj) {
-		if (obj == null)
-			return;
-		NameSpace newSpace = obj.getNameSpace();
-		if (newSpace == null)
-			return;
-		if (nameSpace != null)
-			nameSpace.remove(getName());
-		newSpace.put(this);
-	}
+    public void putInSameNameSpace(AcpiObject obj) {
+        if (obj == null)
+            return;
+        NameSpace newSpace = obj.getNameSpace();
+        if (newSpace == null)
+            return;
+        if (nameSpace != null)
+            nameSpace.remove(getName());
+        newSpace.put(this);
+    }
 
-	public void dump(PrintWriter out, String prefix) {
-		out.println(prefix + this.getClass().getName());
-	}
+    public void dump(PrintWriter out, String prefix) {
+        out.println(prefix + this.getClass().getName());
+    }
 }

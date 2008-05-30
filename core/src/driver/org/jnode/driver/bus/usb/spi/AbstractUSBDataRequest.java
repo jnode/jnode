@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb.spi;
 
 import org.jnode.driver.bus.usb.USBPacket;
@@ -28,20 +28,21 @@ import org.jnode.driver.bus.usb.USBPacket;
  */
 public class AbstractUSBDataRequest extends AbstractUSBRequest {
 
-	private final USBPacket dataPacket;
-	
-	/**
-	 * Initialize this instance
-	 * @param dataPacket
-	 */
-	public AbstractUSBDataRequest(USBPacket dataPacket) {
-		this.dataPacket = dataPacket;
-	}
-	
-	/**
-	 * @return Returns the dataPacket.
-	 */
-	public USBPacket getDataPacket() {
-		return this.dataPacket;
-	}
+    private final USBPacket dataPacket;
+
+    /**
+     * Initialize this instance
+     *
+     * @param dataPacket
+     */
+    public AbstractUSBDataRequest(USBPacket dataPacket) {
+        this.dataPacket = dataPacket;
+    }
+
+    /**
+     * @return Returns the dataPacket.
+     */
+    public USBPacket getDataPacket() {
+        return this.dataPacket;
+    }
 }

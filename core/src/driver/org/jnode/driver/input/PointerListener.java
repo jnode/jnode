@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 /**
  * @author qades
  */
 public interface PointerListener extends SystemListener {
-	void pointerStateChanged(PointerEvent event);
+    void pointerStateChanged(PointerEvent event);
 }

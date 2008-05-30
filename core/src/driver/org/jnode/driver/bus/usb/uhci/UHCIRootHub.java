@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb.uhci;
 
 import org.jnode.driver.bus.usb.USBBus;
@@ -30,173 +30,173 @@ import org.jnode.driver.bus.usb.USBHubAPI;
  */
 public class UHCIRootHub implements USBHubAPI, UHCIConstants {
 
-	private final UHCIIO io;
-	private final USBBus bus;
-	private final USBDevice[] devices;
+    private final UHCIIO io;
+    private final USBBus bus;
+    private final USBDevice[] devices;
 
-	/**
-	 * Initialize this instance.
-	 * 
-	 * @param io
-	 */
-	public UHCIRootHub(UHCIIO io, USBBus bus) {
-		this.io = io;
-		this.bus = bus;
-		this.devices = new USBDevice[getNumPorts()];
-	}
-	
-	public void resetHub() {
-		final int ports = getNumPorts();
-		for (int i = 0; i < ports; i++) {
-			io.setPortSC(i, 0);
-		}
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param io
+     */
+    public UHCIRootHub(UHCIIO io, USBBus bus) {
+        this.io = io;
+        this.bus = bus;
+        this.devices = new USBDevice[getNumPorts()];
+    }
 
-	/**
-	 * Gets the bus to which this HUB is connected.
-	 */
-	public USBBus getUSBBus() {
-		return bus;
-	}
+    public void resetHub() {
+        final int ports = getNumPorts();
+        for (int i = 0; i < ports; i++) {
+            io.setPortSC(i, 0);
+        }
+    }
 
-	/**
-	 * Gets the device for the given port.
-	 * 
-	 * @param port
-	 */
-	public USBDevice getDevice(int port) {
-		return devices[port];
-	}
+    /**
+     * Gets the bus to which this HUB is connected.
+     */
+    public USBBus getUSBBus() {
+        return bus;
+    }
 
-	/**
-	 * Set the device for the given port.
-	 * 
-	 * @param dev
-	 * @param port
-	 */
-	public void setDevice(USBDevice dev, int port) {
-		if (devices[port] != null) {
-			throw new IllegalStateException("Cannot overwrite the device at port " + port);
-		} else {
-			this.devices[port] = dev;
-		}
-	}
+    /**
+     * Gets the device for the given port.
+     *
+     * @param port
+     */
+    public USBDevice getDevice(int port) {
+        return devices[port];
+    }
 
-	/**
-	 * Unset the device for the given port.
-	 * 
-	 * @param port
-	 */
-	public void unsetDevice(int port) {
-		this.devices[port] = null;
-	}
+    /**
+     * Set the device for the given port.
+     *
+     * @param dev
+     * @param port
+     */
+    public void setDevice(USBDevice dev, int port) {
+        if (devices[port] != null) {
+            throw new IllegalStateException("Cannot overwrite the device at port " + port);
+        } else {
+            this.devices[port] = dev;
+        }
+    }
 
-	/**
-	 * Gets the number of downstream ports connected to this HUB.
-	 */
-	public int getNumPorts() {
-		return 2;
-	}
+    /**
+     * Unset the device for the given port.
+     *
+     * @param port
+     */
+    public void unsetDevice(int port) {
+        this.devices[port] = null;
+    }
 
-	/**
-	 * Is the given port enabled.
-	 */
-	public boolean isPortEnabled(int port) {
-		testPort(port);
-		return io.getPortSCBits(port, USBPORTSC_PE);
-	}
+    /**
+     * Gets the number of downstream ports connected to this HUB.
+     */
+    public int getNumPorts() {
+        return 2;
+    }
 
-	/**
-	 * Enable/disable a given port
-	 * 
-	 * @param enabled
-	 */
-	public void setPortEnabled(int port, boolean enabled) {
-		testPort(port);
-		io.setPortSCBits(port, USBPORTSC_PE, enabled);
-	}
+    /**
+     * Is the given port enabled.
+     */
+    public boolean isPortEnabled(int port) {
+        testPort(port);
+        return io.getPortSCBits(port, USBPORTSC_PE);
+    }
 
-	/**
-	 * Reset a given port
-	 */
-	public void resetPort(int port) {
-		try {
-			testPort(port);
-			io.setPortSCBits(port, USBPORTSC_PR, true);
-			Thread.sleep(100);
-			io.setPortSCBits(port, USBPORTSC_PR, false);
-			Thread.sleep(1);
-			io.setPortSCBits(port, USBPORTSC_PE, true);
-			Thread.sleep(10);
-			io.setPortSCBits(port, 0xA, true);
-			Thread.sleep(200);
-		} catch (InterruptedException ex) {
-			// Ignore
-		}
-	}
+    /**
+     * Enable/disable a given port
+     *
+     * @param enabled
+     */
+    public void setPortEnabled(int port, boolean enabled) {
+        testPort(port);
+        io.setPortSCBits(port, USBPORTSC_PE, enabled);
+    }
 
-	/**
-	 * Gets the port connection status.
-	 * 
-	 * @return True if a device is connected, false otherwise
-	 */
-	public boolean isPortConnected(int port) {
-		testPort(port);
-		return io.getPortSCBits(port, USBPORTSC_CCS);
-	}
+    /**
+     * Reset a given port
+     */
+    public void resetPort(int port) {
+        try {
+            testPort(port);
+            io.setPortSCBits(port, USBPORTSC_PR, true);
+            Thread.sleep(100);
+            io.setPortSCBits(port, USBPORTSC_PR, false);
+            Thread.sleep(1);
+            io.setPortSCBits(port, USBPORTSC_PE, true);
+            Thread.sleep(10);
+            io.setPortSCBits(port, 0xA, true);
+            Thread.sleep(200);
+        } catch (InterruptedException ex) {
+            // Ignore
+        }
+    }
 
-	/**
-	 * Has the port connection status changed.
-	 */
-	public boolean isPortConnectionStatusChanged(int port) {
-		testPort(port);
-		return io.getPortSCBits(port, USBPORTSC_CSC);
-	}
+    /**
+     * Gets the port connection status.
+     *
+     * @return True if a device is connected, false otherwise
+     */
+    public boolean isPortConnected(int port) {
+        testPort(port);
+        return io.getPortSCBits(port, USBPORTSC_CCS);
+    }
 
-	/**
-	 * Clear the port connection status changed flag.
-	 */
-	public void clearPortConnectionStatusChanged(int port) {
-		testPort(port);
-		io.setPortSCBits(port, USBPORTSC_CSC, true);
-	}
+    /**
+     * Has the port connection status changed.
+     */
+    public boolean isPortConnectionStatusChanged(int port) {
+        testPort(port);
+        return io.getPortSCBits(port, USBPORTSC_CSC);
+    }
 
-	/**
-	 * Is a lowspeed device connected to the given port. This method is only relevant if the port
-	 * connection status is true.
-	 * 
-	 * @return True if a lowspeed device is connected, false otherwise (full or high speed)
-	 */
-	public boolean isPortConnectedToLowSpeed(int port) {
-		testPort(port);
-		return io.getPortSCBits(port, USBPORTSC_LSDA);
-	}
+    /**
+     * Clear the port connection status changed flag.
+     */
+    public void clearPortConnectionStatusChanged(int port) {
+        testPort(port);
+        io.setPortSCBits(port, USBPORTSC_CSC, true);
+    }
 
-	/**
-	 * Is a highspeed device connected to the given port. This method is only relevant if the port
-	 * connection status is true.
-	 * 
-	 * @return True if a highspeed device is connected, false otherwise (low or full)
-	 */
-	public boolean isPortConnectedToHighSpeed(int port) {
-		testPort(port);
-		return false;
-	}
+    /**
+     * Is a lowspeed device connected to the given port. This method is only relevant if the port
+     * connection status is true.
+     *
+     * @return True if a lowspeed device is connected, false otherwise (full or high speed)
+     */
+    public boolean isPortConnectedToLowSpeed(int port) {
+        testPort(port);
+        return io.getPortSCBits(port, USBPORTSC_LSDA);
+    }
 
-	public int getPortStatus(int port) {
-		testPort(port);
-		return io.getPortSC(port);
-	}
+    /**
+     * Is a highspeed device connected to the given port. This method is only relevant if the port
+     * connection status is true.
+     *
+     * @return True if a highspeed device is connected, false otherwise (low or full)
+     */
+    public boolean isPortConnectedToHighSpeed(int port) {
+        testPort(port);
+        return false;
+    }
 
-	/**
-	 * Test for a valid port number
-	 * 
-	 * @param port
-	 * @throws IllegalArgumentException
-	 */
-	private final void testPort(int port) throws IllegalArgumentException {
-		if ((port < 0) || (port > 1)) {
-			throw new IllegalArgumentException("Invalid port " + port);
-		}
-	}
+    public int getPortStatus(int port) {
+        testPort(port);
+        return io.getPortSC(port);
+    }
+
+    /**
+     * Test for a valid port number
+     *
+     * @param port
+     * @throws IllegalArgumentException
+     */
+    private final void testPort(int port) throws IllegalArgumentException {
+        if ((port < 0) || (port > 1)) {
+            throw new IllegalArgumentException("Invalid port " + port);
+        }
+    }
 }

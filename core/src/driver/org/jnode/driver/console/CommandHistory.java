@@ -18,77 +18,94 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** Used to keep an archive of commands.
- *  @author Matt Paine
+/**
+ * Used to keep an archive of commands.
+ *
+ * @author Matt Paine
  */
 public class CommandHistory {
 
-	/** Holds the commands. **/
-	private final List<String> history = new ArrayList<String>();
+    /**
+     * Holds the commands. *
+     */
+    private final List<String> history = new ArrayList<String>();
 
-	/** Constructs a CommandHistory object. **/
-	public CommandHistory() {
-	}
+    /**
+     * Constructs a CommandHistory object. *
+     */
+    public CommandHistory() {
+    }
 
-	/** Adds a command to the archive.
-	 *  @param line The CommandLine to add to the archive.
-	 **/
-	public void addCommand(String line) {
-		if( history.contains(line) )
-			history.remove(line);
-		history.add(line);
-	}
+    /**
+     * Adds a command to the archive.
+     *
+     * @param line The CommandLine to add to the archive.
+     */
+    public void addCommand(String line) {
+        if (history.contains(line))
+            history.remove(line);
+        history.add(line);
+    }
 
-	/** Returns the number of commands held in the archive.
-	 *  @return the number of commands held in the archive.
-	 **/
-	public int size() {
-		return history.size();
-	}
+    /**
+     * Returns the number of commands held in the archive.
+     *
+     * @return the number of commands held in the archive.
+     */
+    public int size() {
+        return history.size();
+    }
 
-	/** Gets a command at a given index.
-	 *  TODO: make exception more specific
-	 *  @param index The index (starting at zero) of the command to return.
-	 *  @return The command at the index given or null if no command found
-	 *          (out of bounds index).
-	 **/
-	public String getCommand(int index) {
-		String retCommand = null;
-		try {
-			retCommand = (String)history.get(index);
-		} catch (Exception ex) {
-		}
-		return retCommand;
-	}
+    /**
+     * Gets a command at a given index.
+     * TODO: make exception more specific
+     *
+     * @param index The index (starting at zero) of the command to return.
+     * @return The command at the index given or null if no command found
+     *         (out of bounds index).
+     */
+    public String getCommand(int index) {
+        String retCommand = null;
+        try {
+            retCommand = (String) history.get(index);
+        } catch (Exception ex) {
+            //empty
+        }
+        return retCommand;
+    }
 
-	/** Searches for the most recent command types starting with the specified
-	 *  string.
-	 *  @param start The string to search for.
-	 *  @return The most recent command matching the search string.
-	 **/
-	public String getCommand(String start) {
-		return getCommand(findCommand(start));
-	}
+    /**
+     * Searches for the most recent command types starting with the specified
+     * string.
+     *
+     * @param start The string to search for.
+     * @return The most recent command matching the search string.
+     */
+    public String getCommand(String start) {
+        return getCommand(findCommand(start));
+    }
 
-	/** Searches the collection for the most recent command starting with the
-	 *  specified string.
-	 *  @param start the string to search for.
-	 *  @return the index number of the specified string (or -1 if not found).
-	 **/
-	private int findCommand(String start) {
-		for (int x = 0; x < history.size(); x++) {
-			String cmdLine = (String)history.get(x);
-			if (cmdLine != null)
-				if (cmdLine.startsWith(start))
-					return x;
-		}
-		return -1;
-	}
+    /**
+     * Searches the collection for the most recent command starting with the
+     * specified string.
+     *
+     * @param start the string to search for.
+     * @return the index number of the specified string (or -1 if not found).
+     */
+    private int findCommand(String start) {
+        for (int x = 0; x < history.size(); x++) {
+            String cmdLine = (String) history.get(x);
+            if (cmdLine != null)
+                if (cmdLine.startsWith(start))
+                    return x;
+        }
+        return -1;
+    }
 
 }

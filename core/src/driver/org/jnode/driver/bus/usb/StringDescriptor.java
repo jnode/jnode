@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
@@ -26,37 +26,39 @@ package org.jnode.driver.bus.usb;
  */
 public class StringDescriptor extends AbstractDescriptor {
 
-	/** The cached string */
-	private String cachedString;
-	
-	/**
-	 * @param data
-	 * @param ofs
-	 * @param len
-	 */
-	public StringDescriptor(byte[] data, int ofs, int len) {
-		super(data, ofs, len);
-	}
+    /**
+     * The cached string
+     */
+    private String cachedString;
 
-	/**
-	 * @param size
-	 */
-	public StringDescriptor(int size) {
-		super(size);
-	}
-	
-	/**
-	 * Gets the actual string.
-	 */
-	public final String getString() {
-		if (cachedString == null) {
-			final int strLen = (getLength() - 2) >> 1;
-			final char[] str = new char[strLen];
-			for (int i = 0; i < strLen; i++) {
-				str[i] = getChar(2 + (i << 1));
-			}
-			cachedString = new String(str);
-		}
-		return cachedString;
-	}	
+    /**
+     * @param data
+     * @param ofs
+     * @param len
+     */
+    public StringDescriptor(byte[] data, int ofs, int len) {
+        super(data, ofs, len);
+    }
+
+    /**
+     * @param size
+     */
+    public StringDescriptor(int size) {
+        super(size);
+    }
+
+    /**
+     * Gets the actual string.
+     */
+    public final String getString() {
+        if (cachedString == null) {
+            final int strLen = (getLength() - 2) >> 1;
+            final char[] str = new char[strLen];
+            for (int i = 0; i < strLen; i++) {
+                str[i] = getChar(2 + (i << 1));
+            }
+            cachedString = new String(str);
+        }
+        return cachedString;
+    }
 }

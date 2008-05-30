@@ -18,54 +18,60 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import java.io.IOException;
 
 /**
  * API that must be implemented by removable devices.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface RemovableDeviceAPI extends DeviceAPI {
 
     /**
      * Can this device be locked.
+     *
      * @return <code>true</code> if this device can be locked, <code>false</code> otherwise
      */
     public boolean canLock();
-    
+
     /**
      * Can this device be ejected.
+     *
      * @return <code>true</code> if this device can be ejected, <code>false</code> otherwise
      */
     public boolean canEject();
-    
+
     /**
      * Lock the device.
+     *
      * @throws IOException
      */
     public void lock()
-    throws IOException;
-    
+        throws IOException;
+
     /**
      * Unlock the device.
+     *
      * @throws IOException
      */
     public void unlock()
-    throws IOException;
-    
+        throws IOException;
+
     /**
      * Is this device locked.
+     *
      * @return <code>true</code> if this device is locked, <code>false</code> otherwise
      */
     public boolean isLocked();
-    
+
     /**
      * Eject this device.
+     *
      * @throws IOException
      */
     public void eject()
-    throws IOException;
+        throws IOException;
 }

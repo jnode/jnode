@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.system.acpi.aml.ParseNode;
 import org.jnode.driver.system.acpi.aml.Parser;
 import org.jnode.system.MemoryResource;
@@ -31,31 +30,32 @@ import org.jnode.system.ResourceNotFreeException;
 
 /**
  * DifferentiatedSystemDescriptionTable.
- * 
+ *
  * @author Francois-Frederic Ozog
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DifferentiatedSystemDescriptionTable extends AcpiSystemTable {
 
-	private final ParseNode root;
+    private final ParseNode root;
 
-	public DifferentiatedSystemDescriptionTable(AcpiDriver driver, ResourceManager rm, MemoryResource tableResource) throws ResourceNotFreeException {
-		super(driver, tableResource);
+    public DifferentiatedSystemDescriptionTable(AcpiDriver driver, ResourceManager rm, MemoryResource tableResource)
+        throws ResourceNotFreeException {
+        super(driver, tableResource);
         root = parse();
-	}
+    }
 
-	private final ParseNode parse() throws ResourceNotFreeException {
-		final Parser p = new Parser();
+    private final ParseNode parse() throws ResourceNotFreeException {
+        final Parser p = new Parser();
         // the AML starts at offsset 36 of DSDT
         final int amlLength = getSize() - 36;
         final byte[] table = new byte[amlLength];
         getBytes(36, table, 0, amlLength);
-		ByteBuffer amlBuffer = ByteBuffer.wrap(table); 
-		amlBuffer.rewind();
-		return p.parse(amlBuffer);
-	}
+        ByteBuffer amlBuffer = ByteBuffer.wrap(table);
+        amlBuffer.rewind();
+        return p.parse(amlBuffer);
+    }
 
-	public ParseNode getParsedAml() {
-		return root;
-	}
+    public ParseNode getParsedAml() {
+        return root;
+    }
 }

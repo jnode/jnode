@@ -18,16 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import java.io.PrintWriter;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
@@ -51,21 +49,29 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Driver for the PCI bus itself.
- * 
+ *
  * @author epr
  */
 final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCIConstants {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(PCIDriver.class);
 
-    /** IO space of the PCI configuration registers */
+    /**
+     * IO space of the PCI configuration registers
+     */
     private IOResource pciConfigIO;
 
-    /** All pci devices */
+    /**
+     * All pci devices
+     */
     private List<PCIDevice> devices;
 
-    /** Global lock used to protected access to the configuration space */
+    /**
+     * Global lock used to protected access to the configuration space
+     */
     private static final Object CONFIG_LOCK = new Object();
 
     private final PCIBus rootBus;
@@ -84,7 +90,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         try {
             final Device pciBusDevice = getDevice();
             final ResourceManager rm = (ResourceManager) InitialNaming
-                    .lookup(ResourceManager.NAME);
+                .lookup(ResourceManager.NAME);
             // Claim the resources
             pciConfigIO = claimPorts(rm, pciBusDevice);
             // Register the API's
@@ -105,7 +111,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
             throw new DriverException("Driver exception during register", ex);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find resource or device manager",
-                    ex);
+                ex);
         }
     }
 
@@ -126,7 +132,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
                 devMan.unregister(dev);
             } catch (DriverException ex) {
                 throw new DriverException("Driver exception during unregister",
-                        ex);
+                    ex);
             }
         }
         // Remove the API
@@ -140,7 +146,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Return the list of connection PCI devices.
-     * 
+     *
      * @return A List containing all connected devices as instanceof PCIDevice.
      */
     public List getDevices() {
@@ -149,7 +155,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Find a device with a given vendor and device id.
-     * 
+     *
      * @param vendorId
      * @param deviceId
      * @return The found device, of null if not found.
@@ -158,7 +164,9 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         for (PCIDevice dev : devices) {
             final PCIDeviceConfig cfg = dev.getConfig();
             if (cfg.getVendorID() == vendorId) {
-                if (cfg.getDeviceID() == deviceId) { return dev; }
+                if (cfg.getDeviceID() == deviceId) {
+                    return dev;
+                }
             }
         }
         return null;
@@ -166,7 +174,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Probe the PCI bus for a list of all connected devices.
-     * 
+     *
      * @return A List containing all connected devices as instanceof PCIDevice.
      */
     protected List<PCIDevice> probeDevices() {
@@ -184,19 +192,19 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         for (PCIDevice dev : devices) {
             final PCIDeviceConfig cfg = dev.getConfig();
             log.debug("PCI " + dev.getPCIName() + "\t"
-                    + NumberUtils.hex(cfg.getVendorID(), 4) + ":"
-                    + NumberUtils.hex(cfg.getDeviceID(), 4) + ":"
-                    + NumberUtils.hex(cfg.getRevision(), 2) + " "
-                    + NumberUtils.hex(cfg.getBaseClass(), 2) + ":"
-                    + NumberUtils.hex(cfg.getSubClass(), 2) + ":"
-                    + NumberUtils.hex(cfg.getMinorClass(), 2) 
+                + NumberUtils.hex(cfg.getVendorID(), 4) + ":"
+                + NumberUtils.hex(cfg.getDeviceID(), 4) + ":"
+                + NumberUtils.hex(cfg.getRevision(), 2) + " "
+                + NumberUtils.hex(cfg.getBaseClass(), 2) + ":"
+                + NumberUtils.hex(cfg.getSubClass(), 2) + ":"
+                + NumberUtils.hex(cfg.getMinorClass(), 2)
 //                    + "\tIRQ" + cfg.getInterruptLine() + ":" + cfg.getInterruptPin()
-                    + "\tCMD " + NumberUtils.hex(cfg.getCommand(), 4));
+                + "\tCMD " + NumberUtils.hex(cfg.getCommand(), 4));
         }
-        
+
         // Remap all devices
         remapDeviceAddresses(devices);
-        
+
         // Register all bridges
         final DeviceManager devMan = getDevice().getManager();
         for (PCIDevice dev : devices) {
@@ -227,12 +235,12 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
             }
         }
     }
-    
+
     /**
      * Remap the addresses of the given pci devices.
      * Currently we only verify if the memory addresses are in the
      * DEVICE space.
-     * 
+     *
      * @param devices
      */
     protected void remapDeviceAddresses(List<PCIDevice> devices) {
@@ -249,14 +257,14 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
                         // Ignore
                     } else if (addr.isMemorySpace()) {
                         final Address memStart = Address.fromLong(addr
-                                .getMemoryBase());
+                            .getMemoryBase());
                         final Address memEnd = memStart.add(addr.getSize());
                         if (memStart.LT(start) || memEnd.GE(end)) {
                             log.error("Base address[" + addrIdx + "] of " + dev
-                                    + " out of device space");
+                                + " out of device space");
                         } else {
                             log.debug("Base address[" + addrIdx + "] of " + dev
-                                    + " in device space");
+                                + " in device space");
                         }
                     } else if (addr.isIOSpace()) {
                         // Ignore for now
@@ -269,22 +277,31 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Read an 8-bit int from the PCI configuration space of the given device.
-     * @param bus 0..255
-     * @param unit 0..31
-     * @param func 0..7
+     *
+     * @param bus    0..255
+     * @param unit   0..31
+     * @param func   0..7
      * @param offset 0..255 (byte offset)
      */
     protected int readConfigByte(int bus, int unit, int func, int offset) {
-        if ((bus < 0) || (bus > 255)) { throw new IllegalArgumentException(
-                "Invalid bus value"); }
-        if ((unit < 0) || (unit > 31)) { throw new IllegalArgumentException(
-                "Invalid unit value"); }
-        if ((func < 0) || (func > 7)) { throw new IllegalArgumentException(
-                "Invalid func value"); }
-        if ((offset < 0) || (offset > 255)) { throw new IllegalArgumentException(
-                "Invalid offset value"); }
+        if ((bus < 0) || (bus > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid bus value");
+        }
+        if ((unit < 0) || (unit > 31)) {
+            throw new IllegalArgumentException(
+                "Invalid unit value");
+        }
+        if ((func < 0) || (func > 7)) {
+            throw new IllegalArgumentException(
+                "Invalid func value");
+        }
+        if ((offset < 0) || (offset > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid offset value");
+        }
         int address = 0x80000000 | (bus << 16) | (unit << 11) | (func << 8)
-                | (offset & ~3);
+            | (offset & ~3);
         synchronized (CONFIG_LOCK) {
             pciConfigIO.outPortDword(PW32_CONFIG_ADDRESS, address);
             return pciConfigIO.inPortByte(PRW32_CONFIG_DATA + (offset & 3)) & 0xFF;
@@ -293,22 +310,31 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Read a 32-bit int from the PCI configuration space of the given device.
-     * @param bus 0..255
-     * @param unit 0..31
-     * @param func 0..7
+     *
+     * @param bus    0..255
+     * @param unit   0..31
+     * @param func   0..7
      * @param offset 0..255 (byte offset)
      */
     protected int readConfigDword(int bus, int unit, int func, int offset) {
-        if ((bus < 0) || (bus > 255)) { throw new IllegalArgumentException(
-                "Invalid bus value"); }
-        if ((unit < 0) || (unit > 31)) { throw new IllegalArgumentException(
-                "Invalid unit value"); }
-        if ((func < 0) || (func > 7)) { throw new IllegalArgumentException(
-                "Invalid func value"); }
-        if ((offset < 0) || (offset > 255)) { throw new IllegalArgumentException(
-                "Invalid offset value"); }
+        if ((bus < 0) || (bus > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid bus value");
+        }
+        if ((unit < 0) || (unit > 31)) {
+            throw new IllegalArgumentException(
+                "Invalid unit value");
+        }
+        if ((func < 0) || (func > 7)) {
+            throw new IllegalArgumentException(
+                "Invalid func value");
+        }
+        if ((offset < 0) || (offset > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid offset value");
+        }
         int address = 0x80000000 | (bus << 16) | (unit << 11) | (func << 8)
-                | offset;
+            | offset;
         synchronized (CONFIG_LOCK) {
             pciConfigIO.outPortDword(PW32_CONFIG_ADDRESS, address);
             return pciConfigIO.inPortDword(PRW32_CONFIG_DATA);
@@ -317,22 +343,31 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Read a 16-bit int from the PCI configuration space of the given device.
-     * @param bus 0..255
-     * @param unit 0..31
-     * @param func 0..7
+     *
+     * @param bus    0..255
+     * @param unit   0..31
+     * @param func   0..7
      * @param offset 0..255 (byte offset)
      */
     protected int readConfigWord(int bus, int unit, int func, int offset) {
-        if ((bus < 0) || (bus > 255)) { throw new IllegalArgumentException(
-                "Invalid bus value"); }
-        if ((unit < 0) || (unit > 31)) { throw new IllegalArgumentException(
-                "Invalid unit value"); }
-        if ((func < 0) || (func > 7)) { throw new IllegalArgumentException(
-                "Invalid func value"); }
-        if ((offset < 0) || (offset > 255)) { throw new IllegalArgumentException(
-                "Invalid offset value"); }
+        if ((bus < 0) || (bus > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid bus value");
+        }
+        if ((unit < 0) || (unit > 31)) {
+            throw new IllegalArgumentException(
+                "Invalid unit value");
+        }
+        if ((func < 0) || (func > 7)) {
+            throw new IllegalArgumentException(
+                "Invalid func value");
+        }
+        if ((offset < 0) || (offset > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid offset value");
+        }
         int address = 0x80000000 | (bus << 16) | (unit << 11) | (func << 8)
-                | (offset & ~3);
+            | (offset & ~3);
         synchronized (CONFIG_LOCK) {
             pciConfigIO.outPortDword(PW32_CONFIG_ADDRESS, address);
             return pciConfigIO.inPortWord(PRW32_CONFIG_DATA + (offset & 2));
@@ -341,24 +376,33 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Write a 32-bit int into the PCI configuration space of the given device.
-     * @param bus 0..255
-     * @param unit 0..31
-     * @param func 0..7
+     *
+     * @param bus    0..255
+     * @param unit   0..31
+     * @param func   0..7
      * @param offset 0..255 (byte offset)
      * @param value
      */
     protected void writeConfigDword(int bus, int unit, int func, int offset,
-            int value) {
-        if ((bus < 0) || (bus > 255)) { throw new IllegalArgumentException(
-                "Invalid bus value"); }
-        if ((unit < 0) || (unit > 31)) { throw new IllegalArgumentException(
-                "Invalid unit value"); }
-        if ((func < 0) || (func > 7)) { throw new IllegalArgumentException(
-                "Invalid func value"); }
-        if ((offset < 0) || (offset > 255)) { throw new IllegalArgumentException(
-                "Invalid register value"); }
+                                    int value) {
+        if ((bus < 0) || (bus > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid bus value");
+        }
+        if ((unit < 0) || (unit > 31)) {
+            throw new IllegalArgumentException(
+                "Invalid unit value");
+        }
+        if ((func < 0) || (func > 7)) {
+            throw new IllegalArgumentException(
+                "Invalid func value");
+        }
+        if ((offset < 0) || (offset > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid register value");
+        }
         int address = 0x80000000 | (bus << 16) | (unit << 11) | (func << 8)
-                | (offset & ~3);
+            | (offset & ~3);
         synchronized (CONFIG_LOCK) {
             pciConfigIO.outPortDword(PW32_CONFIG_ADDRESS, address);
             pciConfigIO.outPortDword(PRW32_CONFIG_DATA, value);
@@ -367,24 +411,33 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Write a 16-bit int into the PCI configuration space of the given device.
-     * @param bus 0..255
-     * @param unit 0..31
-     * @param func 0..7
+     *
+     * @param bus    0..255
+     * @param unit   0..31
+     * @param func   0..7
      * @param offset 0..255 (byte offset)
      * @param value
      */
     protected void writeConfigWord(int bus, int unit, int func, int offset,
-            int value) {
-        if ((bus < 0) || (bus > 255)) { throw new IllegalArgumentException(
-                "Invalid bus value"); }
-        if ((unit < 0) || (unit > 31)) { throw new IllegalArgumentException(
-                "Invalid unit value"); }
-        if ((func < 0) || (func > 7)) { throw new IllegalArgumentException(
-                "Invalid func value"); }
-        if ((offset < 0) || (offset > 255)) { throw new IllegalArgumentException(
-                "Invalid register value"); }
+                                   int value) {
+        if ((bus < 0) || (bus > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid bus value");
+        }
+        if ((unit < 0) || (unit > 31)) {
+            throw new IllegalArgumentException(
+                "Invalid unit value");
+        }
+        if ((func < 0) || (func > 7)) {
+            throw new IllegalArgumentException(
+                "Invalid func value");
+        }
+        if ((offset < 0) || (offset > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid register value");
+        }
         int address = 0x80000000 | (bus << 16) | (unit << 11) | (func << 8)
-                | (offset & ~3);
+            | (offset & ~3);
         synchronized (CONFIG_LOCK) {
             pciConfigIO.outPortDword(PW32_CONFIG_ADDRESS, address);
             pciConfigIO.outPortWord(PRW32_CONFIG_DATA + (offset & 2), value);
@@ -393,24 +446,33 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
 
     /**
      * Write a 8-bit int into the PCI configuration space of the given device.
-     * @param bus 0..255
-     * @param unit 0..31
-     * @param func 0..7
+     *
+     * @param bus    0..255
+     * @param unit   0..31
+     * @param func   0..7
      * @param offset 0..255 (byte offset)
      * @param value
      */
     protected void writeConfigByte(int bus, int unit, int func, int offset,
-            int value) {
-        if ((bus < 0) || (bus > 255)) { throw new IllegalArgumentException(
-                "Invalid bus value"); }
-        if ((unit < 0) || (unit > 31)) { throw new IllegalArgumentException(
-                "Invalid unit value"); }
-        if ((func < 0) || (func > 7)) { throw new IllegalArgumentException(
-                "Invalid func value"); }
-        if ((offset < 0) || (offset > 255)) { throw new IllegalArgumentException(
-                "Invalid register value"); }
+                                   int value) {
+        if ((bus < 0) || (bus > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid bus value");
+        }
+        if ((unit < 0) || (unit > 31)) {
+            throw new IllegalArgumentException(
+                "Invalid unit value");
+        }
+        if ((func < 0) || (func > 7)) {
+            throw new IllegalArgumentException(
+                "Invalid func value");
+        }
+        if ((offset < 0) || (offset > 255)) {
+            throw new IllegalArgumentException(
+                "Invalid register value");
+        }
         int address = 0x80000000 | (bus << 16) | (unit << 11) | (func << 8)
-                | (offset & ~3);
+            | (offset & ~3);
         synchronized (CONFIG_LOCK) {
             pciConfigIO.outPortDword(PW32_CONFIG_ADDRESS, address);
             pciConfigIO.outPortByte(PRW32_CONFIG_DATA + (offset & 3), value);
@@ -418,17 +480,17 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
     }
 
     private IOResource claimPorts(final ResourceManager rm,
-            final ResourceOwner owner) throws ResourceNotFreeException,
-            DriverException {
+                                  final ResourceOwner owner) throws ResourceNotFreeException,
+        DriverException {
         try {
             return (IOResource) AccessControllerUtils
-                    .doPrivileged(new PrivilegedExceptionAction() {
+                .doPrivileged(new PrivilegedExceptionAction() {
 
-                        public Object run() throws ResourceNotFreeException {
-                            return rm.claimIOResource(owner, PCI_FIRST_PORT,
-                                    PCI_LAST_PORT - PCI_FIRST_PORT + 1);
-                        }
-                    });
+                    public Object run() throws ResourceNotFreeException {
+                        return rm.claimIOResource(owner, PCI_FIRST_PORT,
+                            PCI_LAST_PORT - PCI_FIRST_PORT + 1);
+                    }
+                });
         } catch (ResourceNotFreeException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -436,7 +498,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         }
 
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceInfoAPI#showInfo(java.io.PrintWriter)
      */
@@ -446,15 +508,15 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         for (PCIDevice dev : devices) {
             final PCIDeviceConfig cfg = dev.getConfig();
             out.println("PCI " + dev.getPCIName() + "\t"
-                    + NumberUtils.hex(cfg.getVendorID(), 4) + ":"
-                    + NumberUtils.hex(cfg.getDeviceID(), 4) + ":"
-                    + NumberUtils.hex(cfg.getRevision(), 2) + " "
-                    + NumberUtils.hex(cfg.getBaseClass(), 2) + ":"
-                    + NumberUtils.hex(cfg.getSubClass(), 2) + ":"
-                    + NumberUtils.hex(cfg.getMinorClass(), 2) 
+                + NumberUtils.hex(cfg.getVendorID(), 4) + ":"
+                + NumberUtils.hex(cfg.getDeviceID(), 4) + ":"
+                + NumberUtils.hex(cfg.getRevision(), 2) + " "
+                + NumberUtils.hex(cfg.getBaseClass(), 2) + ":"
+                + NumberUtils.hex(cfg.getSubClass(), 2) + ":"
+                + NumberUtils.hex(cfg.getMinorClass(), 2)
 //                    + "\tIRQ"
 //                    + cfg.getInterruptLine() + ":" + cfg.getInterruptPin()
-                    + "\tCMD " + NumberUtils.hex(cfg.getCommand(), 4));
+                + "\tCMD " + NumberUtils.hex(cfg.getCommand(), 4));
         }
     }
 }

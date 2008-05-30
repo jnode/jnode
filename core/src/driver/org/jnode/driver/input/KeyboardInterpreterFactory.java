@@ -18,28 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-
 import org.apache.log4j.Logger;
 
 /**
  * KeyboardInterpreterFactory.java
- * 
+ *
  * @author Created by Marc DENTY
  * @since 0.15
  */
 public class KeyboardInterpreterFactory {
 
     private static final Logger log = Logger
-            .getLogger(KeyboardInterpreterFactory.class);
+        .getLogger(KeyboardInterpreterFactory.class);
 
     /**
      * Method loadDefaultKeyboardInterpreter
-     * 
+     *
      * @return a valid KeyboardInterpreter
      * @version 2/8/2004
      */
@@ -50,17 +49,14 @@ public class KeyboardInterpreterFactory {
             String defaultRegion = null;
 
             try {
-                rb = ResourceBundle.getBundle(
-                        "org.jnode.driver.input.KeyboardLayout", Locale
-                                .getDefault(), Thread.currentThread()
-                                .getContextClassLoader());
+                rb = ResourceBundle.getBundle("org.jnode.driver.input.KeyboardLayout", Locale.getDefault(),
+                    Thread.currentThread().getContextClassLoader());
                 defaultCountry = rb.getString("defaultCountry");
                 if (defaultCountry.trim().length() == 0) {
                     defaultCountry = null;
                 }
             } catch (Exception ex) {
-                log
-                        .warn("Cannot load default keyboard layout, loading US layout instead", ex);
+                log.warn("Cannot load default keyboard layout, loading US layout instead", ex);
                 return getKeyboardInterpreter("US", null, null);
             }
             try {
@@ -69,13 +65,14 @@ public class KeyboardInterpreterFactory {
                     defaultRegion = null;
                 }
             } catch (Exception e) {
+                //todo empty?
             }
 
             KeyboardInterpreter ki = getKeyboardInterpreter(defaultCountry,
-                    defaultRegion, null);
+                defaultRegion, null);
             if (ki == null) {
                 throw new NullPointerException("KeyboardInterpreter for "
-                        + defaultCountry + " not found");
+                    + defaultCountry + " not found");
             } else {
                 return ki;
             }
@@ -96,30 +93,28 @@ public class KeyboardInterpreterFactory {
 
     /**
      * Method getKeyboardInterpreter this method
-     * 
-     * @param country
-     *            a String
-     * @param language
-     *            a String
      *
+     * @param country  a String
+     * @param language a String
      * @param variant
      * @return a KeyboardInterpreter
      * @version 2/8/2004
      */
     public static KeyboardInterpreter getKeyboardInterpreter(String country,
-                                                             String language, String variant) throws InstantiationException,
-            IllegalAccessException {
-        
+                                                             String language, String variant)
+        throws InstantiationException,
+        IllegalAccessException {
+
         final String id;
         country = country.toUpperCase();
         if (language != null) {
             language = language.toLowerCase();
-            if(variant == null){
+            if (variant == null) {
                 id = country + "_" + language;
-            }else{
+            } else {
                 id = country + "_" + language + "_" + variant;
             }
-        } else if(variant != null){
+        } else if (variant != null) {
             id = country + "_" + variant;
         } else {
             id = country;

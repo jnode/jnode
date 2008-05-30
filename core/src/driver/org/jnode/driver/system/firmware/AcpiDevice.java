@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.firmware;
 
 import org.jnode.driver.Bus;
@@ -27,12 +27,13 @@ import org.jnode.driver.Device;
 /**
  * Device class for an ACPI device.
  * This device gives access to a
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class AcpiDevice extends Device {
 
     private final AcpiRSDPInfo rsdpInfo;
+
     /**
      * @param bus
      * @param id
@@ -41,9 +42,10 @@ public class AcpiDevice extends Device {
         super(bus, id);
         this.rsdpInfo = rsdpInfo;
     }
-    
+
     /**
      * Gets the information of the ACPI root descriptor table.
+     *
      * @return
      */
     public final AcpiRSDPInfo getRsdpInfo() {

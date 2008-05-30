@@ -18,17 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.driver.system.acpi;
 
-import static org.jnode.vm.VirtualMemoryRegion.ACPI;
+package org.jnode.driver.system.acpi;
 
 import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -46,6 +42,7 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.MemoryMapEntry;
+import static org.jnode.vm.VirtualMemoryRegion.ACPI;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.vmmagic.unboxed.Address;
@@ -55,7 +52,7 @@ import org.vmmagic.unboxed.Word;
 
 /**
  * AcpiDriver.
- * 
+ *
  * @author Francois-Frederic Ozog
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -68,10 +65,14 @@ final class AcpiDriver extends Driver implements AcpiAPI {
     private NameSpace root;
 
     private RSDP rsdp;
-    
-    /** Physical address of the first ACPI memory map entry */
+
+    /**
+     * Physical address of the first ACPI memory map entry
+     */
     private Address acpiPhysStart;
-    /** Virtual address of the first ACPI memory map entry */
+    /**
+     * Virtual address of the first ACPI memory map entry
+     */
     private Address acpiVirtStart;
 
     public void reset() {
@@ -80,7 +81,6 @@ final class AcpiDriver extends Driver implements AcpiAPI {
 
     /**
      * Initialize this instance.
-     * 
      */
     public AcpiDriver() {
     }
@@ -129,7 +129,7 @@ final class AcpiDriver extends Driver implements AcpiAPI {
 
     /**
      * Dump the namespace.
-     * 
+     *
      * @see org.jnode.driver.system.acpi.AcpiAPI#dump(java.io.PrintWriter)
      */
     public void dump(PrintWriter out) {
@@ -150,35 +150,35 @@ final class AcpiDriver extends Driver implements AcpiAPI {
     public void dumpBattery(PrintWriter out) {
         ParseNode battery;
         battery = sdt.getParsedAml().findName(new NameString("BAT0"),
-                Aml.AML_DEVICE);
+            Aml.AML_DEVICE);
         if (battery != null) {
             out.println(battery.toString());
         }
         battery = sdt.getParsedAml().findName(new NameString("BAT1"),
-                Aml.AML_DEVICE);
+            Aml.AML_DEVICE);
         if (battery != null) {
             out.println(battery.toString());
         }
     }
 
     /**
-     * Map the ACPI virtual memory region. 
+     * Map the ACPI virtual memory region.
      */
-    private void mmapAcpiRegion() 
-    throws DriverException {
+    private void mmapAcpiRegion()
+        throws DriverException {
         final VmArchitecture arch = Vm.getArch();
-        final MemoryMapEntry[] mmap = (MemoryMapEntry[])AccessController.doPrivileged(new PrivilegedAction() {
+        final MemoryMapEntry[] mmap = (MemoryMapEntry[]) AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
                 return arch.getMemoryMap();
-            }            
+            }
         });
-        
+
         final Address acpiStart = arch.getStart(ACPI);
         final Address acpiEnd = arch.getEnd(ACPI);
         // First unmap the entire ACPI region
-        arch.munmap(ACPI, acpiStart, acpiEnd.toWord().sub(acpiStart.toWord()).toExtent());        
+        arch.munmap(ACPI, acpiStart, acpiEnd.toWord().sub(acpiStart.toWord()).toExtent());
         this.acpiVirtStart = acpiStart;
-        
+
         MemoryMapEntry lastAcpiEntry = null;
         Address start = acpiStart;
         for (MemoryMapEntry e : mmap) {
@@ -190,33 +190,33 @@ final class AcpiDriver extends Driver implements AcpiAPI {
 
                 // Check for adjacent memory blocks
                 if (lastAcpiEntry != null) {
-                    Address expected = lastAcpiEntry.getStart().add(lastAcpiEntry.getSize());                    
+                    Address expected = lastAcpiEntry.getStart().add(lastAcpiEntry.getSize());
                     if (e.getStart().NE(expected)) {
                         throw new DriverException("ACPI memory map entries are not adjacent");
                     }
                 } else {
                     this.acpiPhysStart = alignedPhysStart;
                 }
-                
+
                 // Map entry
                 log.info("Mapping ACPI memory map entry to " + MagicUtils.toString(start));
                 arch.mmap(ACPI, start, size, alignedPhysStart);
-                start = start.add(e.getSize());   
+                start = start.add(e.getSize());
                 lastAcpiEntry = e;
-            }           
+            }
         }
         if (lastAcpiEntry == null) {
             throw new DriverException("No ACPI memory map entries found");
         }
     }
-    
+
     private void loadRootTable(ResourceManager rm, AcpiRSDPInfo acpiInfo)
-            throws ResourceNotFreeException {
+        throws ResourceNotFreeException {
         if (acpiInfo != null) {
             final ResourceOwner owner = new SimpleResourceOwner("ACPI");
             final MemoryResource rsdtptrRes;
             rsdtptrRes = rm.claimMemoryResource(owner, acpiInfo.getRsdpStart(),
-                    acpiInfo.getLength(), ResourceManager.MEMMODE_NORMAL);
+                acpiInfo.getLength(), ResourceManager.MEMMODE_NORMAL);
             this.rsdp = new RSDP(this, rsdtptrRes);
             this.root = NameSpace.getRoot();
             Address ptr = rsdp.getXsdtAddress();
@@ -226,12 +226,12 @@ final class AcpiDriver extends Driver implements AcpiAPI {
 
                 // Use the RSDT (ACPI 1.0)
                 sdt = (RootSystemDescriptionTable) AcpiTable.getTable(this, owner,
-                        rm, ptr);
+                    rm, ptr);
                 root.parse(sdt.getParsedAml());
             } else {
                 // Use the XSDT (ACPI >= 2.0)
-                sdt = (ExtendedSystemDescriptionTable) AcpiTable.getTable(this, 
-                        owner, rm, ptr);
+                sdt = (ExtendedSystemDescriptionTable) AcpiTable.getTable(this,
+                    owner, rm, ptr);
                 root.parse(sdt.getParsedAml());
             }
         }
@@ -241,6 +241,7 @@ final class AcpiDriver extends Driver implements AcpiAPI {
     /**
      * Convert a physical address of an ACPI table to a virtual address
      * in the ACPI virtual memory region.
+     *
      * @param physAddr
      * @return
      */
@@ -259,7 +260,7 @@ final class AcpiDriver extends Driver implements AcpiAPI {
         buffer.append(": ACPI version ");
         final int revision = rsdp.getRevision();
         buffer.append(revision == 0 ? "1.0" : (revision == 2 ? "2.0"
-                : "unknown-" + revision));
+            : "unknown-" + revision));
         return buffer.toString();
     }
 
@@ -272,7 +273,7 @@ final class AcpiDriver extends Driver implements AcpiAPI {
         buffer.append(" ACPI version ");
         final int revision = rsdp.getRevision();
         buffer.append(revision == 0 ? "1.0" : (revision == 2 ? "2.0"
-                : "unknown-" + revision));
+            : "unknown-" + revision));
         buffer.append("\n    PM1A(");
         buffer.append(Integer.toHexString(facp.getPm1aControl()));
         buffer.append(", ");

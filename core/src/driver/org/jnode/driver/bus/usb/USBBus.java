@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 import org.jnode.driver.Bus;
@@ -29,45 +29,49 @@ import org.jnode.driver.Device;
  */
 public class USBBus extends Bus {
 
-	/** Bitmap with in use device id's */
-	private final boolean devIdsInUse[];
-	/** The Host Controller API for this bus */
-	private final USBHostControllerAPI hcApi;
+    /**
+     * Bitmap with in use device id's
+     */
+    private final boolean devIdsInUse[];
+    /**
+     * The Host Controller API for this bus
+     */
+    private final USBHostControllerAPI hcApi;
 
-	/**
-	 * @param parent
-	 */
-	public USBBus(Device parent, USBHostControllerAPI hcApi) {
-		super(parent);
-		this.hcApi = hcApi;
-		this.devIdsInUse = new boolean[128];
-	}
+    /**
+     * @param parent
+     */
+    public USBBus(Device parent, USBHostControllerAPI hcApi) {
+        super(parent);
+        this.hcApi = hcApi;
+        this.devIdsInUse = new boolean[128];
+    }
 
-	/**
-	 * Allocate a new device id.
-	 */
-	final synchronized int allocDeviceID() {
-		final int max = devIdsInUse.length;
-		for (int i = 1; i < max; i++) {
-			if (!devIdsInUse[i]) {
-				devIdsInUse[i] = true;
-				return i;
-			}
-		}
-		throw new IllegalArgumentException("Too many allocated USB device id's");
-	}
+    /**
+     * Allocate a new device id.
+     */
+    final synchronized int allocDeviceID() {
+        final int max = devIdsInUse.length;
+        for (int i = 1; i < max; i++) {
+            if (!devIdsInUse[i]) {
+                devIdsInUse[i] = true;
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Too many allocated USB device id's");
+    }
 
-	/**
-	 * Free a given device id.
-	 */
-	final synchronized void freeDeviceID(int devId) {
-		devIdsInUse[devId] = false;
-	}
-	
-	/**
-	 * @return Returns the hcApi.
-	 */
-	public USBHostControllerAPI getHcApi() {
-		return this.hcApi;
-	}
+    /**
+     * Free a given device id.
+     */
+    final synchronized void freeDeviceID(int devId) {
+        devIdsInUse[devId] = false;
+    }
+
+    /**
+     * @return Returns the hcApi.
+     */
+    public USBHostControllerAPI getHcApi() {
+        return this.hcApi;
+    }
 }

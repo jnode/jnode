@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import org.jnode.system.MemoryResource;
 
 /**
  * ACPI system table.
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
@@ -54,6 +54,7 @@ public abstract class AcpiSystemTable extends AcpiTable {
 
     /**
      * Convert to a String representation.
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -62,7 +63,7 @@ public abstract class AcpiSystemTable extends AcpiTable {
 
     /**
      * Gets the OEM ID.
-     * 
+     *
      * @return
      */
     public final String getOemId() {
@@ -71,7 +72,7 @@ public abstract class AcpiSystemTable extends AcpiTable {
 
     /**
      * Gets the OEM table ID.
-     * 
+     *
      * @return
      */
     public final String getOemTableId() {

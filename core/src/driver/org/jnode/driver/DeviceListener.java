@@ -18,28 +18,28 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 /**
  * Listener interface for device events.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface DeviceListener {
 
-	/**
-	 * The given device has been started
-	 * 
-	 * @param device
-	 */
-	public void deviceStarted(Device device);
+    /**
+     * The given device has been started
+     *
+     * @param device
+     */
+    public void deviceStarted(Device device);
 
-	/**
-	 * The given device will be stopped.
-	 * 
-	 * @param device
-	 */
-	public void deviceStop(Device device);
+    /**
+     * The given device will be stopped.
+     *
+     * @param device
+     */
+    public void deviceStop(Device device);
 
 }

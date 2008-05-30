@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb.uhci;
 
 import org.jnode.system.ResourceManager;
@@ -28,12 +28,12 @@ import org.jnode.system.ResourceManager;
  */
 public abstract class AbstractTreeStructure extends AbstractStructure {
 
-	/**
-	 * @param rm
-	 * @param size
-	 * @param alignment
-	 */
-	public AbstractTreeStructure(ResourceManager rm, int size, int alignment) {
-		super(rm, size, alignment);
-	}
+    /**
+     * @param rm
+     * @param size
+     * @param alignment
+     */
+    public AbstractTreeStructure(ResourceManager rm, int size, int alignment) {
+        super(rm, size, alignment);
+    }
 }

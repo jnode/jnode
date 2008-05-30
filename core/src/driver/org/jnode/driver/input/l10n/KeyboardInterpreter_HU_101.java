@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input.l10n;
 
 /**
  * @author Levente S\u00e1ntha
  * @since 0.1.9
  */
-public class KeyboardInterpreter_HU_101 extends KeyboardInterpreter_HU{
+public class KeyboardInterpreter_HU_101 extends KeyboardInterpreter_HU {
 }

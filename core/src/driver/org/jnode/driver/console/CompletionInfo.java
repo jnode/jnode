@@ -22,8 +22,8 @@
 package org.jnode.driver.console;
 
 import java.util.Collections;
-import java.util.TreeSet;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -31,7 +31,7 @@ import java.util.SortedSet;
  */
 public class CompletionInfo {
     private static final SortedSet<String> NO_COMPLETIONS =
-            Collections.unmodifiableSortedSet(new TreeSet<String>());
+        Collections.unmodifiableSortedSet(new TreeSet<String>());
 
     private TreeSet<String> completions;
 
@@ -40,10 +40,10 @@ public class CompletionInfo {
     /**
      * This method is called to register a possible completion. A null or empty
      * completion string will be quietly ignored.
-     * 
+     *
      * @param completion the completion string
-     * @param partial if <code>true</code>, further completions of the
-     *            completion string may be possible.
+     * @param partial    if <code>true</code>, further completions of the
+     *                   completion string may be possible.
      */
     public void addCompletion(String completion, boolean partial) {
         if (completion == null || completion.length() == 0) {
@@ -61,7 +61,7 @@ public class CompletionInfo {
     /**
      * This method is called to register a completion than cannot be completed
      * further. A null or empty completion string will be quietly ignored.
-     * 
+     *
      * @param completion the completion string
      */
     public void addCompletion(String completion) {
@@ -70,7 +70,7 @@ public class CompletionInfo {
 
     /**
      * Retrieve the completion details.
-     * 
+     *
      * @return a TreeSet consisting of all possible completions
      */
     public SortedSet<String> getCompletions() {
@@ -105,7 +105,7 @@ public class CompletionInfo {
     /**
      * The completion start is the offset in the original string of the first
      * character to be replaced with the 'completed'.
-     * 
+     *
      * @return the completion start position, or <code>-1</code>
      */
     public int getCompletionStart() {
@@ -115,14 +115,14 @@ public class CompletionInfo {
     /**
      * Set the completion start position. This can only be set once. After that,
      * attempts to change the start position will throw {@link IllegalArgumentException}.
-     * 
+     *
      * @param completionStart
      */
     public void setCompletionStart(int completionStart) {
         if (this.completionStart != completionStart) {
             if (this.completionStart != -1) {
                 throw new IllegalArgumentException(
-                        "completionStart cannot be changed");
+                    "completionStart cannot be changed");
             }
             this.completionStart = completionStart;
         }
@@ -133,7 +133,7 @@ public class CompletionInfo {
      * this will be the longest common left substring of the alternatives. If
      * the substring is zero length, or if there were no alternatives in the
      * first place, the result is <code>null</code>.
-     * 
+     *
      * @return the combined completion, or <code>null</code>.
      */
     public String getCompletion() {

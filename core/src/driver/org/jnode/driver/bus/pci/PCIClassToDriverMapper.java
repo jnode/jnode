@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import org.jnode.driver.Device;
@@ -29,9 +29,9 @@ import org.jnode.plugin.ConfigurationElement;
 
 
 /**
- * Generic mapper for PCI devices that match of baseclass + subclass 
+ * Generic mapper for PCI devices that match of baseclass + subclass
  * and an optional minor class.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class PCIClassToDriverMapper extends AbstractPCIDeviceToDriverMapper implements DeviceToDriverMapper {
@@ -41,10 +41,10 @@ public class PCIClassToDriverMapper extends AbstractPCIDeviceToDriverMapper impl
      * @throws DriverException
      */
     public PCIClassToDriverMapper(ConfigurationElement config)
-            throws DriverException {
+        throws DriverException {
         super(config);
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
      */
@@ -52,16 +52,16 @@ public class PCIClassToDriverMapper extends AbstractPCIDeviceToDriverMapper impl
         if (!(device instanceof PCIDevice)) {
             return null;
         }
-        final PCIDevice pciDev = (PCIDevice)device;
+        final PCIDevice pciDev = (PCIDevice) device;
         final PCIDeviceConfig cfg = pciDev.getConfig();
-        
+
         if (!matches(cfg.getBaseClass(), cfg.getSubClass(), cfg.getMinorClass())) {
             return null;
         } else {
             return newDriver(pciDev);
         }
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
      */

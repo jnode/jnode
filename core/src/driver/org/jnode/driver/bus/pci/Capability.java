@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import org.jnode.util.NumberUtils;
@@ -28,30 +28,49 @@ import org.jnode.util.NumberUtils;
  */
 public abstract class Capability {
 
-    /** Offset of this capability in the device config space */
+    /**
+     * Offset of this capability in the device config space
+     */
     private final int offset;
-    /** The device this is a capability of */
+    /**
+     * The device this is a capability of
+     */
     private final PCIDevice device;
-    /** The capability id */
+    /**
+     * The capability id
+     */
     private final int id;
 
     /**
      * Well known capability id's.
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class Id {
-        /** Power Management */
-        public static final int PM = 0x01; 
-        /** Accelerated Graphics Port */
-        public static final int AGP = 0x02; 
-        /** Vital Product Data */
-        public static final int VPD = 0x03; 
-        /** Slot Identification */
-        public static final int SLOTID = 0x04; 
-        /** Message Signalled Interrupts */
-        public static final int MSI = 0x05; 
-        /** CompactPCI HotSwap */
-        public static final int CHSWP = 0x06; 
+        /**
+         * Power Management
+         */
+        public static final int PM = 0x01;
+        /**
+         * Accelerated Graphics Port
+         */
+        public static final int AGP = 0x02;
+        /**
+         * Vital Product Data
+         */
+        public static final int VPD = 0x03;
+        /**
+         * Slot Identification
+         */
+        public static final int SLOTID = 0x04;
+        /**
+         * Message Signalled Interrupts
+         */
+        public static final int MSI = 0x05;
+        /**
+         * CompactPCI HotSwap
+         */
+        public static final int CHSWP = 0x06;
     }
 
     private static final int PCI_CAP_LIST_ID = 0; /* Capability ID */
@@ -61,6 +80,7 @@ public abstract class Capability {
 
     /**
      * Initialize this instance.
+     *
      * @param device
      * @param offset
      */
@@ -69,10 +89,11 @@ public abstract class Capability {
         this.offset = offset;
         this.id = device.readConfigByte(offset + PCI_CAP_LIST_ID);
     }
-    
+
     /**
      * Create a concrete instance of Capability, based on the
      * id read from the PCI config space.
+     *
      * @param device
      * @param offset
      * @return
@@ -80,38 +101,49 @@ public abstract class Capability {
     static final Capability createCapability(PCIDevice device, int offset) {
         final int id = device.readConfigByte(offset + PCI_CAP_LIST_ID);
         switch (id) {
-        case Id.PM: return new PMCapability(device, offset);
-        case Id.AGP: return new AGPCapability(device, offset);
-        case Id.VPD: return new VPDCapability(device, offset);
-        case Id.SLOTID: return new SlotIDCapability(device, offset);
-        case Id.MSI: return new MSICapability(device, offset);
-        case Id.CHSWP: return new CompactHotSwapCapability(device, offset);
-        default: return new Capability(device, offset) {};
+            case Id.PM:
+                return new PMCapability(device, offset);
+            case Id.AGP:
+                return new AGPCapability(device, offset);
+            case Id.VPD:
+                return new VPDCapability(device, offset);
+            case Id.SLOTID:
+                return new SlotIDCapability(device, offset);
+            case Id.MSI:
+                return new MSICapability(device, offset);
+            case Id.CHSWP:
+                return new CompactHotSwapCapability(device, offset);
+            default:
+                return new Capability(device, offset) {
+                };
         }
     }
-    
+
     /**
      * Gets the capability ID.
+     *
      * @return
      */
     public final int getId() {
         return id;
     }
- 
+
     /**
      * Convert to a string representation.
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("id=0x");
         sb.append(NumberUtils.hex(getId(), 2));
-        
+
         return sb.toString();
     }
-    
+
     /**
      * Read a configuration dword for this device at a given offset
+     *
      * @param offset
      */
     protected final int readConfigDword(int offset) {
@@ -120,6 +152,7 @@ public abstract class Capability {
 
     /**
      * Read a configuration word for this device at a given offset
+     *
      * @param offset
      */
     protected final int readConfigWord(int offset) {
@@ -128,6 +161,7 @@ public abstract class Capability {
 
     /**
      * Read a configuration byte for this device at a given offset
+     *
      * @param offset
      */
     protected final int readConfigByte(int offset) {
@@ -136,7 +170,7 @@ public abstract class Capability {
 
     /**
      * Write a configuration dword for this device at a given offset
-     * 
+     *
      * @param offset
      * @param value
      */
@@ -146,7 +180,7 @@ public abstract class Capability {
 
     /**
      * Write a configuration word for this device at a given offset
-     * 
+     *
      * @param offset
      * @param value
      */
@@ -156,7 +190,7 @@ public abstract class Capability {
 
     /**
      * Write a configuration byte for this device at a given offset
-     * 
+     *
      * @param offset
      * @param value
      */

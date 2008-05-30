@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
@@ -26,25 +26,27 @@ package org.jnode.driver.bus.usb;
  */
 public interface USBRequest {
 
-	/**
-	 * Gets the actual transfered data length.
-	 * @return Returns the actualLength.
-	 */
-	public int getActualLength();
-	
-	/**
-	 * Has this request bee completed.
-	 */
-	public boolean isCompleted();
-	
-	/**
-	 * Gets the status of as this request.
-	 */
-	public int getStatus();
-	
-	/**
-	 * Wait for this request to complete, or until a timeout occurs.
-	 * @param timeout
-	 */
-	public void waitUntilComplete(long timeout);
+    /**
+     * Gets the actual transfered data length.
+     *
+     * @return Returns the actualLength.
+     */
+    public int getActualLength();
+
+    /**
+     * Has this request bee completed.
+     */
+    public boolean isCompleted();
+
+    /**
+     * Gets the status of as this request.
+     */
+    public int getStatus();
+
+    /**
+     * Wait for this request to complete, or until a timeout occurs.
+     *
+     * @param timeout
+     */
+    public void waitUntilComplete(long timeout);
 }
