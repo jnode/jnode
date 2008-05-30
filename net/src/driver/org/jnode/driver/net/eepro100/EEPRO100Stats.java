@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.eepro100;
 
 import org.jnode.system.MemoryResource;
@@ -27,10 +27,11 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * @author flesire
- * 
  */
 public class EEPRO100Stats implements EEPRO100Constants {
-    /** statistic block size (60,72,78) + dword for status information */
+    /**
+     * statistic block size (60,72,78) + dword for status information
+     */
     public final static int STATS_BLOCK_SIZE = 60 + 8;
 
     private EEPRO100Registers regs;
@@ -39,7 +40,9 @@ public class EEPRO100Stats implements EEPRO100Constants {
     private MemoryResource mem;
     private Address memAddr;
 
-    /** Statistical counters */
+    /**
+     * Statistical counters
+     */
     private int tx_aborted_errors;
     private int tx_window_errors;
     private int tx_fifo_errors;
@@ -51,7 +54,7 @@ public class EEPRO100Stats implements EEPRO100Constants {
     private int rx_length_errors;
 
     /**
-     *  
+     *
      */
     public EEPRO100Stats(ResourceManager rm, EEPRO100Registers regs) {
 

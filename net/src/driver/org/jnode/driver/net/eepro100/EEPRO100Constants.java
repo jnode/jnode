@@ -18,14 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.eepro100;
 
 /**
  * @author flesire
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Generation - Code and Comments
+ *         <p/>
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Generation - Code and Comments
  */
 public interface EEPRO100Constants {
     final static int MAX_ETH_FRAME_LEN = 1536;
@@ -42,7 +42,8 @@ public interface EEPRO100Constants {
     final static int TX_TIMEOUT = (2 * HZ);
 
     /* PHY media interface chips. */
-    final static String phys[] = { "None", "i82553-A/B", "i82553-C", "i82503", "DP83840", "80c240", "80c24", "i82555", "Microlinear", "Level One", "DP83840A", "ICS 1890", "unknown-12", "unknown-13", "unknown-14", "unknown-15",};
+    final static String phys[] = {"None", "i82553-A/B", "i82553-C", "i82503", "DP83840", "80c240", "80c24", "i82555",
+        "Microlinear", "Level One", "DP83840A", "ICS 1890", "unknown-12", "unknown-13", "unknown-14", "unknown-15",};
     final static int NonSuchPhy = 0;
     final static int I82553AB = 1;
     final static int I82553C = 2;
@@ -58,26 +59,26 @@ public interface EEPRO100Constants {
      * that it would be difficult to document each bit. We mostly use the
      * default or recommended settings.
      */
-    final static byte i82557ConfigCmd[] = { 22, 0x08, 0, 0, 0, 0, 0x32, 0x03, 1, /*
+    final static byte i82557ConfigCmd[] = {22, 0x08, 0, 0, 0, 0, 0x32, 0x03, 1, /*
                                                                      * 1=Use MII
                                                                      * 0=Use AUI
                                                                      */
-    0, 0x2E, 0, 0x60, 0, (byte) 0xf2, 0x48, 0, 0x40, (byte) 0xf2, (byte) 0x80, /*
+        0, 0x2E, 0, 0x60, 0, (byte) 0xf2, 0x48, 0, 0x40, (byte) 0xf2, (byte) 0x80, /*
                                                                                 * 0x40=Force
                                                                                 * full-duplex
                                                                                 */
-    0x3f, 0x05};
-    final static byte i82558ConfigCmd[] = { 22, 0x08, 0, 1, 0, 0, (byte) 0x22, 0x03, 1, /*
+        0x3f, 0x05};
+    final static byte i82558ConfigCmd[] = {22, 0x08, 0, 1, 0, 0, (byte) 0x22, 0x03, 1, /*
                                                                             * 1=Use
                                                                             * MII
                                                                             * 0=Use
                                                                             * AUI
                                                                             */
-    0, 0x2E, 0, 0x60, 0x8, (byte) 0x88, 0x68, 0, 0x40, (byte) 0xf2, (byte) 0x84, /*
+        0, 0x2E, 0, 0x60, 0x8, (byte) 0x88, 0x68, 0, 0x40, (byte) 0xf2, (byte) 0x84, /*
                                                                                   * 0xBD->0xFD=Force
                                                                                   * full-duplex
                                                                                   */
-    0x31, 0x05};
+        0x31, 0x05};
 
     /* EEPROM_Ctrl bits. */
     final static int EE_SHIFT_CLK = 0x01; /* EEPROM shift clock. */
@@ -86,9 +87,9 @@ public interface EEPRO100Constants {
     final static int EE_DATA_READ = 0x08; /* EEPROM chip data out. */
     final static int EE_WRITE_0 = 0x4802;
     final static int EE_WRITE_1 = 0x4806;
-	final static int EE_ENB = (0x4800 | EE_CS);
+    final static int EE_ENB = (0x4800 | EE_CS);
     final static int EE_READ_CMD = 6;
-	
+
     final static int SCBStatus = 0;
     final static int SCBCmd = 2; /* Rx/Command Unit command and status. */
     final static int SCBPointer = 4; /* General purpose pointer. */

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.prism2;
 
 import org.jnode.driver.Device;
@@ -31,7 +31,7 @@ import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 public class Prism2Driver extends WirelessEthernetDriver {
-    
+
     /**
      * Create new driver instance for this device
      */
@@ -41,7 +41,7 @@ public class Prism2Driver extends WirelessEthernetDriver {
 
     /**
      * Create new driver instance for this device
-     * 
+     *
      * @param flags
      */
     public Prism2Driver(Prism2Flags flags) {
@@ -52,7 +52,7 @@ public class Prism2Driver extends WirelessEthernetDriver {
      * Create a new Prism2Core instance
      */
     protected WirelessDeviceCore newWirelessCore(Device device, Flags flags)
-            throws DriverException, ResourceNotFreeException {
+        throws DriverException, ResourceNotFreeException {
         return new Prism2Core(this, device, (PCIDevice) device, flags);
     }
 

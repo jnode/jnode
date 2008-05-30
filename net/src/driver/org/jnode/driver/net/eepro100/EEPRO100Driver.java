@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.eepro100;
 
 import org.jnode.driver.Device;
@@ -31,13 +31,11 @@ import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 
-
 /**
  * @author flesire
- *  
  */
 public class EEPRO100Driver extends BasicEthernetDriver {
-    
+
     /**
      * Create a new instance
      */
@@ -56,7 +54,7 @@ public class EEPRO100Driver extends BasicEthernetDriver {
      *      org.jnode.driver.net.ethernet.Flags)
      */
     protected AbstractDeviceCore newCore(Device device, Flags flags) throws DriverException, ResourceNotFreeException {
-        return new EEPRO100Core(this, device, (PCIDevice) device, (EEPRO100Flags)flags);
+        return new EEPRO100Core(this, device, (PCIDevice) device, (EEPRO100Flags) flags);
     }
 
 }

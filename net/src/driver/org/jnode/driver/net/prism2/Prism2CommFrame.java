@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.prism2;
 
 import org.jnode.net.ethernet.EthernetAddress;
@@ -27,32 +27,42 @@ import org.jnode.util.LittleEndian;
 
 /**
  * Access class for communication frames.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class Prism2CommFrame implements Prism2Constants {
 
-    /** Length of the header of an communication frame. */
+    /**
+     * Length of the header of an communication frame.
+     */
     final static int HDR_LENGTH = 60;
 
-    /** Offset in this frame of the 802.11 header */
+    /**
+     * Offset in this frame of the 802.11 header
+     */
     final static int p80211HDR_OFF = 14;
 
-    /** Offset in this frame of the 802.3 header */
+    /**
+     * Offset in this frame of the 802.3 header
+     */
     final static int p8023HDR_OFF = 46;
 
-    /** Maximum lenght on an communication frame */
+    /**
+     * Maximum lenght on an communication frame
+     */
     final static int MAX_FRAME_LEN = BAP_DATALEN_MAX;
 
-    /** Maximum length of a transmit buffer */
+    /**
+     * Maximum length of a transmit buffer
+     */
     final static int MAX_TXBUF_LEN = HDR_LENGTH
-            + WirelessConstants.WLAN_DATA_MAXLEN
-            - WirelessConstants.WLAN_WEP_IV_LEN
-            - WirelessConstants.WLAN_WEP_ICV_LEN + 2;
+        + WirelessConstants.WLAN_DATA_MAXLEN
+        - WirelessConstants.WLAN_WEP_IV_LEN
+        - WirelessConstants.WLAN_WEP_ICV_LEN + 2;
 
     /**
      * Gets the status field of a comm frame.
-     * 
+     *
      * @param src
      * @param srcOffset
      * @return
@@ -63,7 +73,7 @@ public class Prism2CommFrame implements Prism2Constants {
 
     /**
      * Gets the datalength field of a comm frame.
-     * 
+     *
      * @param src
      * @param srcOffset
      * @return
@@ -71,9 +81,10 @@ public class Prism2CommFrame implements Prism2Constants {
     public static final int getDataLength(byte[] src, int srcOffset) {
         return LittleEndian.getUInt16(src, srcOffset + 58);
     }
-    
+
     /**
      * Sets the TxControl field.
+     *
      * @param dst
      * @param dstOffset
      * @param txControl
@@ -81,9 +92,10 @@ public class Prism2CommFrame implements Prism2Constants {
     public static final void setTxControl(byte[] dst, int dstOffset, int txControl) {
         LittleEndian.setInt16(dst, dstOffset + 12, txControl);
     }
-    
+
     /**
      * Sets the Address1 field.
+     *
      * @param dst
      * @param dstOffset
      * @param addr
@@ -91,9 +103,10 @@ public class Prism2CommFrame implements Prism2Constants {
     public static final void setAddress1(byte[] dst, int dstOffset, EthernetAddress addr) {
         addr.writeTo(dst, dstOffset + 18);
     }
-    
+
     /**
      * Sets the Address2 field.
+     *
      * @param dst
      * @param dstOffset
      * @param addr
@@ -101,9 +114,10 @@ public class Prism2CommFrame implements Prism2Constants {
     public static final void setAddress2(byte[] dst, int dstOffset, EthernetAddress addr) {
         addr.writeTo(dst, dstOffset + 24);
     }
-    
+
     /**
      * Sets the Address3 field.
+     *
      * @param dst
      * @param dstOffset
      * @param addr

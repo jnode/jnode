@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net._3c90x;
 
 import java.security.PrivilegedExceptionAction;
@@ -83,10 +83,10 @@ public class _3c90xDriver extends AbstractEthernetDriver {
 
     /**
      * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer,
-            *      HardwareAddress)
+     *      HardwareAddress)
      */
     protected void doTransmitEthernet(SocketBuffer skbuf, HardwareAddress destination)
-            throws NetworkException {
+        throws NetworkException {
         try {
             // Pad
             if (skbuf.getSize() < ETH_ZLEN) {
@@ -111,7 +111,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
             super.startDevice();
         } catch (ResourceNotFreeException ex) {
             throw new DriverException("Cannot claim " + flags.getName()
-                    + " resources", ex);
+                + " resources", ex);
         }
     }
 
@@ -119,15 +119,15 @@ public class _3c90xDriver extends AbstractEthernetDriver {
      * Create a new _3c90xCore instance
      */
     protected _3c90xCore newCore(final Device device, final _3c90xFlags flags)
-            throws DriverException, ResourceNotFreeException {
+        throws DriverException, ResourceNotFreeException {
         try {
             return (_3c90xCore) AccessControllerUtils
-                    .doPrivileged(new PrivilegedExceptionAction() {
-                        public Object run() throws DriverException, ResourceNotFreeException {
-                            return new _3c90xCore(_3c90xDriver.this, device, (PCIDevice) device,
-                                    flags);
-                        }
-                    });
+                .doPrivileged(new PrivilegedExceptionAction() {
+                    public Object run() throws DriverException, ResourceNotFreeException {
+                        return new _3c90xCore(_3c90xDriver.this, device, (PCIDevice) device,
+                            flags);
+                    }
+                });
         } catch (DriverException ex) {
             throw ex;
         } catch (ResourceNotFreeException ex) {

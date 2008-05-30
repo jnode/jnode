@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.prism2;
 
 import org.jnode.util.LittleEndian;
@@ -28,14 +28,19 @@ import org.jnode.util.LittleEndian;
  */
 final class Prism2InfoFrame implements Prism2Constants {
 
-    /** Length of the header of an Info frame. */
+    /**
+     * Length of the header of an Info frame.
+     */
     final static int HDR_LENGTH = 4;
-    
-    /** Maximum lenght on an Info frame */
+
+    /**
+     * Maximum lenght on an Info frame
+     */
     final static int MAX_FRAME_LEN = BAP_DATALEN_MAX;
 
     /**
      * Gets the framelength of an Info frame.
+     *
      * @param src
      * @param srcOffset
      * @return The frame length in bytes (including the length of the header)
@@ -46,6 +51,7 @@ final class Prism2InfoFrame implements Prism2Constants {
 
     /**
      * Gets the infotype of an Info frame.
+     *
      * @param src
      * @param srcOffset
      * @return
@@ -53,9 +59,10 @@ final class Prism2InfoFrame implements Prism2Constants {
     public static final InformationType getInfoType(byte[] src, int srcOffset) {
         return InformationType.getByValue(LittleEndian.getInt16(src, srcOffset + 2) & 0xFFFF);
     }
-    
+
     /**
      * Gets the link status of an IT_LINKSTATUS frame.
+     *
      * @param src
      * @param srcOffset
      * @return

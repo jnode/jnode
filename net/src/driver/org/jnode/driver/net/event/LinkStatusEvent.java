@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.event;
 
 import org.jnode.driver.Device;
@@ -29,15 +29,19 @@ import org.jnode.driver.net.NetDeviceEvent;
  */
 public class LinkStatusEvent extends NetDeviceEvent {
 
-    /** The link status has changed */ 
+    /**
+     * The link status has changed
+     */
     public static final int LINK_STATUS_CHANGED = 100;
-    
-    /** The connection status of the link */
+
+    /**
+     * The connection status of the link
+     */
     private final boolean connected;
-    
+
     /**
      * @param source
-     * @param id
+     * @param connected
      */
     public LinkStatusEvent(Device source, boolean connected) {
         super(source, LINK_STATUS_CHANGED);
@@ -49,5 +53,5 @@ public class LinkStatusEvent extends NetDeviceEvent {
      */
     public final boolean isConnected() {
         return connected;
-    }    
+    }
 }

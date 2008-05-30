@@ -18,24 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.eepro100;
 
 import org.jnode.system.IOResource;
 
 /**
  * @author flesire
- *  
  */
 public class EEPRO100Registers {
 
-    /** Start of IO address space */
+    /**
+     * Start of IO address space
+     */
     private final int iobase;
-    /** IO address space resource */
+    /**
+     * IO address space resource
+     */
     private final IOResource io;
 
     /**
-     *  
+     *
      */
     public EEPRO100Registers(int iobase, IOResource io) {
         this.iobase = iobase;
@@ -46,7 +49,7 @@ public class EEPRO100Registers {
 
     /**
      * Writes a 8-bit NIC register
-     * 
+     *
      * @param reg
      * @param value
      */
@@ -57,7 +60,7 @@ public class EEPRO100Registers {
 
     /**
      * Writes a 16-bit NIC register
-     * 
+     *
      * @param reg
      * @param value
      */
@@ -68,7 +71,7 @@ public class EEPRO100Registers {
 
     /**
      * Writes a 32-bit NIC register
-     * 
+     *
      * @param reg
      * @param value
      */
@@ -79,24 +82,26 @@ public class EEPRO100Registers {
 
     /**
      * Reads a 16-bit NIC register
-     * 
+     *
      * @param reg
      */
     public final int getReg16(int reg) {
         return io.inPortWord(iobase + reg);
     }
+
     /**
      * Reads a 32-bit NIC register
-     * 
+     *
      * @param reg
      */
 
     public final int getReg32(int reg) {
         return io.inPortDword(iobase + reg);
     }
+
     /**
      * Reads a 8-bit NIC register
-     * 
+     *
      * @param reg
      */
     public final int getReg8(int reg) {

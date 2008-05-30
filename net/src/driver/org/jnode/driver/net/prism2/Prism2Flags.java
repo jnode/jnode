@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.prism2;
 
 import org.jnode.driver.net.ethernet.spi.Flags;
@@ -28,7 +28,7 @@ import org.jnode.plugin.ConfigurationElement;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class Prism2Flags implements Flags {
-    
+
     private final String name;
 
     /**
@@ -45,7 +45,7 @@ final class Prism2Flags implements Flags {
 
     /**
      * Create a new instance of the flags
-     * 
+     *
      * @param name
      */
 
