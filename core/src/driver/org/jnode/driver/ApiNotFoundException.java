@@ -18,42 +18,42 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 /**
  * API has not been found exception.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class ApiNotFoundException extends DeviceException {
 
-	/**
-	 * 
-	 */
-	public ApiNotFoundException() {
-		super();
-	}
+    /**
+     *
+     */
+    public ApiNotFoundException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ApiNotFoundException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public ApiNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public ApiNotFoundException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public ApiNotFoundException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public ApiNotFoundException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public ApiNotFoundException(String s) {
+        super(s);
+    }
 }

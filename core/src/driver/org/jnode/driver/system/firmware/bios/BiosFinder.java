@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.firmware.bios;
 
 import org.apache.log4j.Logger;
@@ -34,23 +34,25 @@ import org.jnode.driver.DriverException;
  */
 public final class BiosFinder implements DeviceFinder {
 
-	/** My logger */
-	private static final Logger log = Logger.getLogger(BiosFinder.class);
-	
-	/**
-	 * @param devMan
-	 * @param bus
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
-	 * @throws DeviceException
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
-		try {
-			final Device bios = new Device(bus, "bios");
-			bios.setDriver(new BiosDriver());
-			devMan.register(bios);
-		} catch (DriverException ex) {
-			throw new DeviceException(ex);
-		}
-	}
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(BiosFinder.class);
+
+    /**
+     * @param devMan
+     * @param bus
+     * @throws DeviceException
+     * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
+     */
+    public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
+        try {
+            final Device bios = new Device(bus, "bios");
+            bios.setDriver(new BiosDriver());
+            devMan.register(bios);
+        } catch (DriverException ex) {
+            throw new DeviceException(ex);
+        }
+    }
 
 }

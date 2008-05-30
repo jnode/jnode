@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input.l10n;
 
 import java.awt.event.KeyEvent;
-
 import org.jnode.driver.input.Key;
 import org.jnode.driver.input.KeyboardInterpreter;
 import org.jnode.driver.input.Keys;
@@ -35,7 +34,7 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
     protected void initKeys(Keys keys) {
         keys.setKey(1, new Key(KeyEvent.VK_ESCAPE));
         keys.setKey(2, new Key('1', KeyEvent.VK_1, '!',
-                KeyEvent.VK_EXCLAMATION_MARK));
+            KeyEvent.VK_EXCLAMATION_MARK));
         keys.setKey(3, new Key('2', KeyEvent.VK_2, '"', KeyEvent.VK_QUOTEDBL));
         keys.setKey(4, new Key('3', '\u00a3', KeyEvent.VK_3));
         keys.setKey(5, new Key('4', KeyEvent.VK_4, '$', KeyEvent.VK_DOLLAR));
@@ -43,9 +42,9 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
         keys.setKey(7, new Key('6', '&', KeyEvent.VK_6));
         keys.setKey(8, new Key('7', '/', KeyEvent.VK_SLASH));
         keys.setKey(9, new Key('8', KeyEvent.VK_8, '(',
-                KeyEvent.VK_LEFT_PARENTHESIS));
+            KeyEvent.VK_LEFT_PARENTHESIS));
         keys.setKey(10, new Key('9', KeyEvent.VK_9, ')',
-                KeyEvent.VK_RIGHT_PARENTHESIS));
+            KeyEvent.VK_RIGHT_PARENTHESIS));
         keys.setKey(11, new Key('0', KeyEvent.VK_0, '=', KeyEvent.VK_EQUALS));
         keys.setKey(12, new Key("'".charAt(0), '?', KeyEvent.VK_QUOTE));
         keys.setKey(13, new Key('\u00ec', '^'));
@@ -54,7 +53,7 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
         keys.setKey(16, new Key('q', 'Q', KeyEvent.VK_Q));
         keys.setKey(17, new Key('w', 'W', KeyEvent.VK_W));
         keys.setKey(18, new Key('e', KeyEvent.VK_E, 'E', KeyEvent.VK_E, '\u20ac',
-                KeyEvent.VK_EURO_SIGN));
+            KeyEvent.VK_EURO_SIGN));
         keys.setKey(19, new Key('r', 'R', KeyEvent.VK_R));
         keys.setKey(20, new Key('t', 'T', KeyEvent.VK_T));
         keys.setKey(21, new Key('y', 'Y', KeyEvent.VK_Y));
@@ -64,7 +63,7 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
         keys.setKey(25, new Key('p', 'P', KeyEvent.VK_P));
         keys.setKey(26, new Key('\u00e8', '\u00e9', '[', KeyEvent.VK_OPEN_BRACKET));
         keys.setKey(27, new Key('+', KeyEvent.VK_PLUS, '*',
-                KeyEvent.VK_MULTIPLY, ']', KeyEvent.VK_CLOSE_BRACKET));
+            KeyEvent.VK_MULTIPLY, ']', KeyEvent.VK_CLOSE_BRACKET));
         keys.setKey(28, new Key('\n', KeyEvent.VK_ENTER));
         keys.setKey(29, new Key((char) 0, KeyEvent.VK_CONTROL));
         keys.setKey(30, new Key('a', 'A', KeyEvent.VK_A));
@@ -89,11 +88,11 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
         keys.setKey(49, new Key('n', 'N', KeyEvent.VK_N));
         keys.setKey(50, new Key('m', 'M', KeyEvent.VK_M));
         keys.setKey(51, new Key(',', KeyEvent.VK_COMMA, ';',
-                KeyEvent.VK_SEMICOLON));
+            KeyEvent.VK_SEMICOLON));
         keys.setKey(52,
-                new Key('.', KeyEvent.VK_PERIOD, ':', KeyEvent.VK_COLON));
+            new Key('.', KeyEvent.VK_PERIOD, ':', KeyEvent.VK_COLON));
         keys.setKey(53, new Key('-', KeyEvent.VK_MINUS, '_',
-                KeyEvent.VK_UNDERSCORE));
+            KeyEvent.VK_UNDERSCORE));
         keys.setKey(54, new Key(KeyEvent.VK_SHIFT));
 
         keys.setKey(55, new Key('*', KeyEvent.VK_MULTIPLY));
@@ -127,7 +126,7 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
         keys.setKey(83, new Key('.', KeyEvent.VK_DECIMAL));
 
         keys.setKey(86,
-                new Key('<', KeyEvent.VK_LESS, '>', KeyEvent.VK_GREATER));
+            new Key('<', KeyEvent.VK_LESS, '>', KeyEvent.VK_GREATER));
         keys.setKey(87, new Key(KeyEvent.VK_F11));
         keys.setKey(88, new Key(KeyEvent.VK_F12));
 

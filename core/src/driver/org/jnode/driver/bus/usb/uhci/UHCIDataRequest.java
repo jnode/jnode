@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb.uhci;
 
 import org.jnode.driver.bus.usb.USBConstants;
@@ -31,53 +31,55 @@ import org.jnode.driver.bus.usb.spi.AbstractUSBDataRequest;
  */
 public class UHCIDataRequest extends AbstractUSBDataRequest implements UHCIRequest, USBConstants {
 
-	/** The first TD of this request */
-	private TransferDescriptor firstTD;
+    /**
+     * The first TD of this request
+     */
+    private TransferDescriptor firstTD;
 
-	/**
-	 * Initialize this instance.
-	 * 
-	 * @param dataPacket
-	 */
-	public UHCIDataRequest(USBPacket dataPacket) {
-		super(dataPacket);
-	}
-	
-	public void createTDs(UHCIPipe pipe) {
-		final USBPacket dataPacket = getDataPacket();
-		int offset = 0;
-		int length = dataPacket.getSize();
-		final USBEndPoint ep = pipe.getEndPoint();
-		final int dataPid = (ep.getDescriptor().isDirIn() ? USB_PID_IN : USB_PID_OUT);
-		final int maxPacketSize = pipe.getMaxPacketSize();
-		TransferDescriptor firstTD = null;
+    /**
+     * Initialize this instance.
+     *
+     * @param dataPacket
+     */
+    public UHCIDataRequest(USBPacket dataPacket) {
+        super(dataPacket);
+    }
 
-		while (length > 0) {
+    public void createTDs(UHCIPipe pipe) {
+        final USBPacket dataPacket = getDataPacket();
+        int offset = 0;
+        int length = dataPacket.getSize();
+        final USBEndPoint ep = pipe.getEndPoint();
+        final int dataPid = (ep.getDescriptor().isDirIn() ? USB_PID_IN : USB_PID_OUT);
+        final int maxPacketSize = pipe.getMaxPacketSize();
+        TransferDescriptor firstTD = null;
 
-			// Create the TD for this part of the data packet
-			final int curlen = Math.min(length, maxPacketSize);
-			final TransferDescriptor dataTD;
-			final boolean ioc = (curlen == length);
-			dataTD = pipe.createTD(dataPid, ep.getDataToggle(), dataPacket.getData(), offset, curlen, ioc);
-			// Add the TD to the list
-			if (firstTD == null) {
-				firstTD = dataTD;
-			} else {
-				firstTD.append(dataTD, false);
-			}
+        while (length > 0) {
 
-			// Update fields
-			ep.toggle();
-			length -= curlen;
-			offset += curlen;
-		}
-		this.firstTD = firstTD;
-	}
+            // Create the TD for this part of the data packet
+            final int curlen = Math.min(length, maxPacketSize);
+            final TransferDescriptor dataTD;
+            final boolean ioc = (curlen == length);
+            dataTD = pipe.createTD(dataPid, ep.getDataToggle(), dataPacket.getData(), offset, curlen, ioc);
+            // Add the TD to the list
+            if (firstTD == null) {
+                firstTD = dataTD;
+            } else {
+                firstTD.append(dataTD, false);
+            }
 
-	/**
-	 * @see org.jnode.driver.bus.usb.uhci.UHCIRequest#getFirstTD()
-	 */
-	public final TransferDescriptor getFirstTD() {
-		return firstTD;
-	}
+            // Update fields
+            ep.toggle();
+            length -= curlen;
+            offset += curlen;
+        }
+        this.firstTD = firstTD;
+    }
+
+    /**
+     * @see org.jnode.driver.bus.usb.uhci.UHCIRequest#getFirstTD()
+     */
+    public final TransferDescriptor getFirstTD() {
+        return firstTD;
+    }
 }

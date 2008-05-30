@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 import org.jnode.driver.DeviceAPI;
@@ -28,29 +28,30 @@ import org.jnode.driver.DeviceAPI;
  */
 public interface USBHostControllerAPI extends DeviceAPI {
 
-	/**
-	 * Create a default control pipe for a given device.
-	 * @param device
-	 * @return The created pipe.
-	 */
-	public USBControlPipe createDefaultControlPipe(USBDevice device);
-	
-	/**
-	 * Create a new pipe for a given endpoint.
-	 * Depending on the type of endpoint, this method will return an instance
-	 * of USBControlType for control type endpoints and an instance of
-	 * USBDataPipe for other endpoint transfer types.
-	 * 
-	 * @param endPoint
-	 * @return The new pipe.
-	 * @see USBControlPipe
-	 * @see USBDataPipe
-	 */
-	public USBPipe createPipe(USBEndPoint endPoint);
-	
-	/**
-	 * Gets the API to control the root HUB.
-	 */
-	public USBHubAPI getRootHUB();
-	
+    /**
+     * Create a default control pipe for a given device.
+     *
+     * @param device
+     * @return The created pipe.
+     */
+    public USBControlPipe createDefaultControlPipe(USBDevice device);
+
+    /**
+     * Create a new pipe for a given endpoint.
+     * Depending on the type of endpoint, this method will return an instance
+     * of USBControlType for control type endpoints and an instance of
+     * USBDataPipe for other endpoint transfer types.
+     *
+     * @param endPoint
+     * @return The new pipe.
+     * @see USBControlPipe
+     * @see USBDataPipe
+     */
+    public USBPipe createPipe(USBEndPoint endPoint);
+
+    /**
+     * Gets the API to control the root HUB.
+     */
+    public USBHubAPI getRootHUB();
+
 }

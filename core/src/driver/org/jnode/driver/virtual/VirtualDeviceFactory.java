@@ -1,8 +1,8 @@
 package org.jnode.driver.virtual;
 
+import org.jnode.driver.DeviceException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
-import org.jnode.driver.DeviceException;
 
 /**
  * @author Levente S\u00e1ntha
@@ -15,7 +15,7 @@ public class VirtualDeviceFactory {
             final DeviceManager dm = DeviceUtils.getDeviceManager();
             dm.register(dev);
             return dev;
-        } catch(Exception x){
+        } catch (Exception x) {
             throw new DeviceException(x);
         }
     }

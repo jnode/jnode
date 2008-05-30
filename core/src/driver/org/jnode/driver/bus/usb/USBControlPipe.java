@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
@@ -26,12 +26,13 @@ package org.jnode.driver.bus.usb;
  */
 public interface USBControlPipe extends USBPipe {
 
-	/**
-	 * Create a request for this pipe.
-	 * @param setupP
-	 * @param dataP
-	 * @return The new request.
-	 */
-	public USBRequest createRequest(SetupPacket setupP, USBPacket dataP);
-	
+    /**
+     * Create a request for this pipe.
+     *
+     * @param setupP
+     * @param dataP
+     * @return The new request.
+     */
+    public USBRequest createRequest(SetupPacket setupP, USBPacket dataP);
+
 }

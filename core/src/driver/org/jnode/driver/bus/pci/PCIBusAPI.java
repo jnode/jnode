@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import org.jnode.driver.DeviceAPI;
@@ -28,12 +28,13 @@ import org.jnode.driver.DeviceAPI;
  */
 public interface PCIBusAPI extends DeviceAPI {
 
-	/**
-	 * Find a device with a given vendor and device id.
-	 * @param vendorId
-	 * @param deviceId
-	 * @return The found device, of null if not found.
-	 */
-	public PCIDevice findDevice(int vendorId, int deviceId);
-	
+    /**
+     * Find a device with a given vendor and device id.
+     *
+     * @param vendorId
+     * @param deviceId
+     * @return The found device, of null if not found.
+     */
+    public PCIDevice findDevice(int vendorId, int deviceId);
+
 }

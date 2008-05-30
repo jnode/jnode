@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import org.jnode.system.MemoryResource;
@@ -29,7 +29,7 @@ import org.jnode.system.SimpleResourceOwner;
 
 /**
  * FixedAcpiDescriptionTable.
- * 
+ *
  * @author Francois-Frederic Ozog
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -40,7 +40,7 @@ public class FixedAcpiDescriptionTable extends AcpiSystemTable {
     private DifferentiatedSystemDescriptionTable dsdt;
 
     public FixedAcpiDescriptionTable(AcpiDriver driver, ResourceManager rm,
-            MemoryResource tableResource) throws ResourceNotFreeException {
+                                     MemoryResource tableResource) throws ResourceNotFreeException {
         super(driver, tableResource);
         parse(rm);
     }
@@ -64,7 +64,7 @@ public class FixedAcpiDescriptionTable extends AcpiSystemTable {
             dsdt = null;
         }
     }
-    
+
     public GenericAddress getResetRegister() {
         final byte[] raw = new byte[12];
         for (int i = 0; i < 12; i++) {
@@ -138,13 +138,13 @@ public class FixedAcpiDescriptionTable extends AcpiSystemTable {
     }
 
     private final void parse(ResourceManager rm)
-            throws ResourceNotFreeException {
+        throws ResourceNotFreeException {
         final ResourceOwner owner = new SimpleResourceOwner(
-                "ACPI-FixedAcpiDescriptionTable");
+            "ACPI-FixedAcpiDescriptionTable");
         facs = (FirmwareAcpiControlStructure) AcpiTable.getTable(getDriver(), owner, rm,
-                getAddress32(36));
+            getAddress32(36));
         dsdt = (DifferentiatedSystemDescriptionTable) AcpiTable.getTable(getDriver(), owner,
-                rm, getAddress32(40));
+            rm, getAddress32(40));
     }
 
 }

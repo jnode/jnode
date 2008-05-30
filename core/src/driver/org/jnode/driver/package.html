@@ -1,43 +1,43 @@
 <html>
-  <head>
+<head>
     <title>org.jnode.driver</title>
-  </head>
-  <body>
-  
-    This package contains the JNode driver framework.
-    <p/>
-    The most important classes of this framework are:
-    <ul>
-      <li>Device</li>
-      <li>Driver</li>
-      <li>Bus</li>
-      <li>DeviceFinder</li>
-      <li>DeviceToDriverMapper</li>
-    </ul>
-    
-    <h2>Device</h2>
-    A Device is a software representation of a physical device.<br/>
-    A Device is controlled by a Driver.<br/>
-    A Device is discovered by a DeviceFinder.
-  
-    <h2>Driver</h2>
-    A Driver controls a Device.<br/>
-    A Driver is found by a DeviceToDriverMapper.
-  
-    <h2>Bus</h2>
-    A Bus is a software representation of a hardware bus.<br/>
-    A Bus has zero or more Device's connected to it.<br/>
-    A Bus has zero or more Bus's connected to it.
-  
-    <h2>DeviceFinder</h2>
-    A DeviceFinder finds Device's on a given Bus.<br/>
-    A DeviceFinder is configured in a plugin-descriptor with 
-      an extension to the <code>org.jnode.driver.finders</code> extension-point.
-  
-    <h2>DeviceToDriverMapper</h2>
-    A DeviceToDriverMapper finds a Driver for a given Device.<br/>
-    A DeviceToDriverMapper is configured in a plugin-descriptor with 
-      an extension to the <code>org.jnode.driver.mappers</code> extension-point.
-  
-  </body>
+</head>
+<body>
+
+This package contains the JNode driver framework.
+<p/>
+The most important classes of this framework are:
+<ul>
+    <li>Device</li>
+    <li>Driver</li>
+    <li>Bus</li>
+    <li>DeviceFinder</li>
+    <li>DeviceToDriverMapper</li>
+</ul>
+
+<h2>Device</h2>
+A Device is a software representation of a physical device.<br/>
+A Device is controlled by a Driver.<br/>
+A Device is discovered by a DeviceFinder.
+
+<h2>Driver</h2>
+A Driver controls a Device.<br/>
+A Driver is found by a DeviceToDriverMapper.
+
+<h2>Bus</h2>
+A Bus is a software representation of a hardware bus.<br/>
+A Bus has zero or more Device's connected to it.<br/>
+A Bus has zero or more Bus's connected to it.
+
+<h2>DeviceFinder</h2>
+A DeviceFinder finds Device's on a given Bus.<br/>
+A DeviceFinder is configured in a plugin-descriptor with
+an extension to the <code>org.jnode.driver.finders</code> extension-point.
+
+<h2>DeviceToDriverMapper</h2>
+A DeviceToDriverMapper finds a Driver for a given Device.<br/>
+A DeviceToDriverMapper is configured in a plugin-descriptor with
+an extension to the <code>org.jnode.driver.mappers</code> extension-point.
+
+</body>
 </html>

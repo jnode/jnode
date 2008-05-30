@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
@@ -26,22 +26,25 @@ package org.jnode.driver.bus.usb;
  */
 public abstract class AbstractDeviceItem implements USBConstants {
 
-	/** The device I belong to */
-	private final USBDevice device;
-	
-	/**
-	 * Initialize this instance.
-	 * @param device
-	 */
-	public AbstractDeviceItem(USBDevice device) {
-		this.device = device;
-	}
+    /**
+     * The device I belong to
+     */
+    private final USBDevice device;
 
-	/**
-	 * @return Returns the device.
-	 */
-	public final USBDevice getDevice() {
-		return this.device;
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param device
+     */
+    public AbstractDeviceItem(USBDevice device) {
+        this.device = device;
+    }
+
+    /**
+     * @return Returns the device.
+     */
+    public final USBDevice getDevice() {
+        return this.device;
+    }
 
 }

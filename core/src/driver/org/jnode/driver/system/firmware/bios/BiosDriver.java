@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.firmware.bios;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
@@ -44,29 +42,30 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * BIOS firmware driver implementation.
- * 
+ *
  * @author Francois-Frederic Ozog
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class BiosDriver extends Driver implements FirmwareAPI {
 
     private static final Logger log = Logger.getLogger(BiosDriver.class);
-	private AcpiRSDPInfo info;
+    private AcpiRSDPInfo info;
     private AcpiDevice acpiDevice;
 
     /**
      * Initialize this instance.
      */
-	public BiosDriver() {
-	}
-	
-	/**
-	 * Start the device
-	 * @throws DriverException
-	 */
-	protected void startDevice() throws DriverException {
+    public BiosDriver() {
+    }
+
+    /**
+     * Start the device
+     *
+     * @throws DriverException
+     */
+    protected void startDevice() throws DriverException {
         final Device dev = getDevice();
-        
+
         // Find the ACPI info
         try {
             final ResourceManager rm;
@@ -77,10 +76,10 @@ final class BiosDriver extends Driver implements FirmwareAPI {
         } catch (ResourceNotFreeException ex) {
             log.error("Cannot claim BIOS region", ex);
         }
-        
+
         // Register out API
-		dev.registerAPI(FirmwareAPI.class, this);
-        
+        dev.registerAPI(FirmwareAPI.class, this);
+
         // Start an ACPI device if we found the info for it.
         if (info != null) {
             log.info("Start ACPI device");
@@ -89,57 +88,61 @@ final class BiosDriver extends Driver implements FirmwareAPI {
                 dev.getManager().register(acpiDevice);
             } catch (DeviceAlreadyRegisteredException ex) {
                 log.error("Cannot register ACPI device", ex);
-            }            
+            }
         }
-	}
+    }
 
-	/**
-	 * Stop the device
-	 * @throws DriverException
-	 */
-	protected void stopDevice() throws DriverException {
+    /**
+     * Stop the device
+     *
+     * @throws DriverException
+     */
+    protected void stopDevice() throws DriverException {
         final Device dev = getDevice();
         if (acpiDevice != null) {
             dev.getManager().unregister(acpiDevice);
         }
-		dev.unregisterAPI(FirmwareAPI.class);
-	}
+        dev.unregisterAPI(FirmwareAPI.class);
+    }
 
     /**
      * Find the ACPI root descriptor table.
+     *
      * @param rm
      * @return
      * @throws ResourceNotFreeException
      */
-	private static final AcpiRSDPInfo findAcpiRSDTPTR(final ResourceManager rm) throws ResourceNotFreeException {
-		final byte[] match = { 'R', 'S', 'D', ' ', 'P', 'T', 'R', ' ' };
+    private static final AcpiRSDPInfo findAcpiRSDTPTR(final ResourceManager rm) throws ResourceNotFreeException {
+        final byte[] match = {'R', 'S', 'D', ' ', 'P', 'T', 'R', ' '};
 
-		final MemoryScanner scanner = (MemoryScanner)AccessController.doPrivileged(new PrivilegedAction() {
-		    public Object run() {
-				return rm.getMemoryScanner();
-		        }});
-		final Address tablePtr = scanner.findInt8Array(Address.fromIntZeroExtend(0xe0000), 0x1ffff, match, 0, match.length, 1);
-		if (tablePtr != null) {
-			final int version = getRSDTVersion(rm, tablePtr);
-			return new AcpiRSDPInfo(tablePtr, version);
-		} else {
-			// Not an ACPI system
-			return null;
-		}
-	}
-	
-	private static int getRSDTVersion(ResourceManager rm, Address start) {
-		final MemoryResource res;
-		try {
-			res = rm.claimMemoryResource(ResourceOwner.SYSTEM, start, 20, ResourceManager.MEMMODE_NORMAL);
-		} catch (ResourceNotFreeException e) {
-			// Cannot claim memory
-			return 1;
-		}
-		try {
-			return res.getByte(15);
-		} finally {
-			res.release();
-		}
-	}
+        final MemoryScanner scanner = (MemoryScanner) AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                return rm.getMemoryScanner();
+            }
+        });
+        final Address tablePtr =
+            scanner.findInt8Array(Address.fromIntZeroExtend(0xe0000), 0x1ffff, match, 0, match.length, 1);
+        if (tablePtr != null) {
+            final int version = getRSDTVersion(rm, tablePtr);
+            return new AcpiRSDPInfo(tablePtr, version);
+        } else {
+            // Not an ACPI system
+            return null;
+        }
+    }
+
+    private static int getRSDTVersion(ResourceManager rm, Address start) {
+        final MemoryResource res;
+        try {
+            res = rm.claimMemoryResource(ResourceOwner.SYSTEM, start, 20, ResourceManager.MEMMODE_NORMAL);
+        } catch (ResourceNotFreeException e) {
+            // Cannot claim memory
+            return 1;
+        }
+        try {
+            return res.getByte(15);
+        } finally {
+            res.release();
+        }
+    }
 }

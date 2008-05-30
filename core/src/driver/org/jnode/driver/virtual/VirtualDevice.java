@@ -7,12 +7,13 @@ import org.jnode.driver.Device;
  */
 public class VirtualDevice extends Device {
     private final String initialName;
+
     public VirtualDevice(String id) {
         super(null, id);
         this.initialName = id;
     }
 
-    String getInitialName(){
+    String getInitialName() {
         return initialName;
     }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 import org.jnode.driver.Bus;
@@ -32,23 +32,23 @@ import org.jnode.driver.DriverException;
  * Device finder that finds the PCI bus.
  * The PCI driver will probe for all PCI devices, when the PCI bus (device)
  * is started.
- * 
+ *
  * @author epr
  */
 public class PCIFinder implements DeviceFinder {
 
-	/**
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
-		try {
-			final Device pciBusDevice = new Device(bus, "pcibus");
-			final PCIDriver pciDriver = new PCIDriver(pciBusDevice);
-			pciBusDevice.setDriver(pciDriver);
-			devMan.register(pciBusDevice);
-		} catch (DriverException ex) {
-			throw new DeviceException(ex);
-		}
-	}
+    /**
+     * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
+     */
+    public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
+        try {
+            final Device pciBusDevice = new Device(bus, "pcibus");
+            final PCIDriver pciDriver = new PCIDriver(pciBusDevice);
+            pciBusDevice.setDriver(pciDriver);
+            devMan.register(pciBusDevice);
+        } catch (DriverException ex) {
+            throw new DeviceException(ex);
+        }
+    }
 
 }

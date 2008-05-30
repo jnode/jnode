@@ -18,32 +18,33 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi.vm;
 
 /**
  * ByteField.
- * 
+ * <p/>
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
+ *
  * @author not attributable
  * @version 1.0
  */
 
-public class ByteField  extends AcpiNamedObject{
-  Buffer sourceBuffer;
-  int byteIndex;
+public class ByteField extends AcpiNamedObject {
+    Buffer sourceBuffer;
+    int byteIndex;
 
-  public ByteField(String name, Buffer sourceBuffer, int byteIndex) {
-    super(name);
-    this.sourceBuffer=sourceBuffer;
-    this.byteIndex=byteIndex;
-    sourceBuffer.putInSameNameSpace(this);
-  }
+    public ByteField(String name, Buffer sourceBuffer, int byteIndex) {
+        super(name);
+        this.sourceBuffer = sourceBuffer;
+        this.byteIndex = byteIndex;
+        sourceBuffer.putInSameNameSpace(this);
+    }
 
-  public AcpiInteger getValue() {
-    return sourceBuffer.getByte(byteIndex);
-  }
+    public AcpiInteger getValue() {
+        return sourceBuffer.getByte(byteIndex);
+    }
 }

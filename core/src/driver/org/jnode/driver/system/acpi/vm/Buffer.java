@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi.vm;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Buffer.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -39,47 +39,48 @@ import java.util.Map;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
 
 public class Buffer extends AcpiNamedObject {
-	private byte[] buffer = null;
-	private final Map<String, ByteField> fields = new HashMap<String, ByteField>();
+    private byte[] buffer = null;
+    private final Map<String, ByteField> fields = new HashMap<String, ByteField>();
 
-	public Buffer(String name, int size) {
-		super(name);
-		buffer = new byte[size];
-	}
+    public Buffer(String name, int size) {
+        super(name);
+        buffer = new byte[size];
+    }
 
-	public Buffer(int size) {
-		super("");
-		buffer = new byte[size];
-	}
+    public Buffer(int size) {
+        super("");
+        buffer = new byte[size];
+    }
 
-	public void createByteField(int byteIndex, String name) {
-		ByteField f = new ByteField(name, this, byteIndex);
+    public void createByteField(int byteIndex, String name) {
+        ByteField f = new ByteField(name, this, byteIndex);
 
-		fields.put(name, f);
-	}
-	public static void CreateByteField(Buffer sourceBuffer, int byteIndex, String name) {
-		ByteField f = new ByteField(name, sourceBuffer, byteIndex);
-		sourceBuffer.fields.put(name, f);
-	}
+        fields.put(name, f);
+    }
 
-	public static void CreateByteField(String bufferName, int byteIndex, String name) {
-		AcpiObject sourceBuffer = NameSpace.rootNameSpace.get(bufferName);
-		if (!(sourceBuffer instanceof Buffer))
-			return;
-		CreateByteField((Buffer) sourceBuffer, byteIndex, name);
-	}
+    public static void CreateByteField(Buffer sourceBuffer, int byteIndex, String name) {
+        ByteField f = new ByteField(name, sourceBuffer, byteIndex);
+        sourceBuffer.fields.put(name, f);
+    }
 
-	public AcpiObject getValue() {
-		return this;
-	}
+    public static void CreateByteField(String bufferName, int byteIndex, String name) {
+        AcpiObject sourceBuffer = NameSpace.rootNameSpace.get(bufferName);
+        if (!(sourceBuffer instanceof Buffer))
+            return;
+        CreateByteField((Buffer) sourceBuffer, byteIndex, name);
+    }
 
-	public AcpiInteger getByte(int index) {
-		return new AcpiInteger(buffer[index] & 0xff);
-	}
+    public AcpiObject getValue() {
+        return this;
+    }
+
+    public AcpiInteger getByte(int index) {
+        return new AcpiInteger(buffer[index] & 0xff);
+    }
 }

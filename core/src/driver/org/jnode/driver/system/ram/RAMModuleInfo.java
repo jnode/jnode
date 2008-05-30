@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.ram;
 
 /**
  * RAMModuleInfo.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -35,23 +35,23 @@ package org.jnode.driver.system.ram;
  * </p>
  * <p>
  * </p>
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
 
 public class RAMModuleInfo {
 
-	//private String brand;
-	//private int type;
-	//private long size;
-	//private double speed;
-	//private double refreshRate;
+    //private String brand;
+    //private int type;
+    //private long size;
+    //private double speed;
+    //private double refreshRate;
 
-	public RAMModuleInfo() {
-	}
+    public RAMModuleInfo() {
+    }
 
-	public boolean isOccupied() {
-		return true;
-	}
+    public boolean isOccupied() {
+        return true;
+    }
 }

@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.driver.input.l10n;
 
+package org.jnode.driver.input.l10n;
 
 
 /**
  * @author Matteo Di Giovinazzo <matteo.digiovinazzo@jugpadova.it>
  */
-public class KeyboardInterpreter_IT_it extends KeyboardInterpreter_IT
-{
+public class KeyboardInterpreter_IT_it extends KeyboardInterpreter_IT {
 }

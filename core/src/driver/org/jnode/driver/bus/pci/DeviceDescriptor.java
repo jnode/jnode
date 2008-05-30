@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.pci;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.driver.bus.pci;
  */
 public class DeviceDescriptor {
 
-	private final int id;
-	private final String name;
-	
-	public DeviceDescriptor(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    private final int id;
+    private final String name;
 
-	/**
-	 * Gets the ID of this device
-	 */
-	public int getId() {
-		return id;
-	}
+    public DeviceDescriptor(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	/**
-	 * Gets the Name of this device
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return getName();
-	}
+    /**
+     * Gets the ID of this device
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Gets the Name of this device
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return getName();
+    }
 }

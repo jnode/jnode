@@ -18,16 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
-
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
@@ -44,7 +42,7 @@ import org.jnode.work.WorkUtils;
  * @author epr
  */
 public final class DefaultDeviceManager extends AbstractDeviceManager
-        implements ExtensionPointListener {
+    implements ExtensionPointListener {
 
     /**
      * finder extension-point
@@ -125,7 +123,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         for (int i = 0; i < extensions.length; i++) {
             final Extension ext = extensions[i];
             final ConfigurationElement[] elements = ext
-                    .getConfigurationElements();
+                .getConfigurationElements();
             for (int j = 0; j < elements.length; j++) {
                 configureFinder(finders, elements[j]);
             }
@@ -146,7 +144,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         for (int i = 0; i < extensions.length; i++) {
             final Extension ext = extensions[i];
             final ConfigurationElement[] elements = ext
-                    .getConfigurationElements();
+                .getConfigurationElements();
             for (int j = 0; j < elements.length; j++) {
                 configureMapper(mappers, elements[j]);
             }
@@ -176,7 +174,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         if (className != null) {
             try {
                 final Class cls = Thread.currentThread()
-                        .getContextClassLoader().loadClass(className);
+                    .getContextClassLoader().loadClass(className);
                 final DeviceFinder finder = (DeviceFinder) cls.newInstance();
                 finders.add(finder);
             } catch (ClassNotFoundException ex) {
@@ -187,7 +185,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
                 BootLog.error("Cannot instantiate finder class " + className);
             } catch (ClassCastException ex) {
                 BootLog.error("Finder class " + className
-                        + " does not implement the DeviceFinder interface");
+                    + " does not implement the DeviceFinder interface");
             }
         }
     }
@@ -212,7 +210,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         if (className != null) {
             try {
                 final Class cls = Thread.currentThread()
-                        .getContextClassLoader().loadClass(className);
+                    .getContextClassLoader().loadClass(className);
                 final DeviceToDriverMapper mapper = newMapperInstance(cls, element);
                 mappers.add(mapper);
             } catch (ClassNotFoundException ex) {
@@ -223,7 +221,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
                 BootLog.error("Cannot instantiate mapper class " + className, ex);
             } catch (ClassCastException ex) {
                 BootLog
-                        .error("Mapper class "
+                    .error("Mapper class "
                         + className
                         + " does not implement the DeviceToDriverMapper interface");
             }
@@ -243,7 +241,8 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    private DeviceToDriverMapper newMapperInstance(Class cls, ConfigurationElement element) throws InstantiationException, IllegalAccessException {
+    private DeviceToDriverMapper newMapperInstance(Class cls, ConfigurationElement element)
+        throws InstantiationException, IllegalAccessException {
         try {
             final Constructor c = cls.getConstructor(new Class[]{ConfigurationElement.class});
             try {

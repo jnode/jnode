@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.chipset.via;
 
 import org.apache.log4j.Logger;
@@ -31,22 +31,26 @@ import org.jnode.driver.bus.pci.PCIDevice;
  */
 public class Via8363_0 extends Driver {
 
-	/** My logger */
-	private static final Logger log = Logger.getLogger(Via8363_0.class);
-	
-	/**
-	 * Start the device
-	 * @throws DriverException
-	 */
-	protected void startDevice() throws DriverException {
-		ViaQuirks.applyLatencyFix((PCIDevice)getDevice(), log);
-	}
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(Via8363_0.class);
 
-	/**
-	 * Stop the device
-	 * @throws DriverException
-	 */
-	protected void stopDevice() throws DriverException {
-		// Nothing to do here
-	}
+    /**
+     * Start the device
+     *
+     * @throws DriverException
+     */
+    protected void startDevice() throws DriverException {
+        ViaQuirks.applyLatencyFix((PCIDevice) getDevice(), log);
+    }
+
+    /**
+     * Stop the device
+     *
+     * @throws DriverException
+     */
+    protected void stopDevice() throws DriverException {
+        // Nothing to do here
+    }
 }

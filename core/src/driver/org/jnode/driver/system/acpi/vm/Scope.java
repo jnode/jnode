@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi.vm;
 
 /**
  * Scope.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -35,25 +35,25 @@ package org.jnode.driver.system.acpi.vm;
  * </p>
  * <p>
  * </p>
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
 
 public class Scope extends NameSpace {
 
-	//private final Hashtable elements = new Hashtable();
+    //private final Hashtable elements = new Hashtable();
 
-	public Scope(String scope) {
-		super(scope);
-	}
+    public Scope(String scope) {
+        super(scope);
+    }
 
-	public Scope(NameSpace root, String scope) {
-		super(root, scope);
-	}
+    public Scope(NameSpace root, String scope) {
+        super(root, scope);
+    }
 
-	public String toString() {
-		return "Device " + getName();
-	}
+    public String toString() {
+        return "Device " + getName();
+    }
 
 }

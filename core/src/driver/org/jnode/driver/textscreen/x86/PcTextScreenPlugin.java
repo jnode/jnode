@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.textscreen.x86;
 
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -34,7 +33,7 @@ import org.jnode.plugin.PluginException;
 public class PcTextScreenPlugin extends Plugin {
 
     private final PcTextScreenManager mgr;
-    
+
     /**
      * @param descriptor
      */
@@ -42,7 +41,7 @@ public class PcTextScreenPlugin extends Plugin {
         super(descriptor);
         this.mgr = new PcTextScreenManager();
     }
-    
+
     /**
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
@@ -53,7 +52,7 @@ public class PcTextScreenPlugin extends Plugin {
             throw new PluginException(ex);
         }
     }
-    
+
     /**
      * @see org.jnode.plugin.Plugin#stopPlugin()
      */

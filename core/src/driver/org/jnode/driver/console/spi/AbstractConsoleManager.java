@@ -18,16 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console.spi;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.*;
 import java.io.PrintStream;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -49,25 +57,39 @@ import org.jnode.system.event.FocusEvent;
  */
 public abstract class AbstractConsoleManager implements ConsoleManager {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     protected final Logger log = Logger.getLogger(getClass());
-    
-    /** All registered consoles */
+
+    /**
+     * All registered consoles
+     */
     private final Map<String, Console> consoles = new HashMap<String, Console>();
 
-    /** The current console */
+    /**
+     * The current console
+     */
     private Console current;
 
-    /** The keyboard api i'm using */
+    /**
+     * The keyboard api i'm using
+     */
     private KeyboardAPI kbApi;
 
-    /** The pointer devices that I'm listener on */
+    /**
+     * The pointer devices that I'm listener on
+     */
     private final LinkedList<Device> pointerDevs = new LinkedList<Device>();
 
-    /** The device manager i'm using */
+    /**
+     * The device manager i'm using
+     */
     private final DeviceManager devMan;
-    
-    /** The holder for the context console */
+
+    /**
+     * The holder for the context console
+     */
     private static final InheritableThreadLocal<Console> contextConsole = new InheritableThreadLocal<Console>();
 
     private AbstractConsoleManager parent;
@@ -79,7 +101,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * Initialize a new instance
      */
     public AbstractConsoleManager()
-            throws ConsoleException {
+        throws ConsoleException {
         try {
             devMan = InitialNaming.lookup(DeviceManager.NAME);
             openInput(devMan);
@@ -99,12 +121,12 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     }
 
     protected KeyboardAPI getKeyboardApi() {
-    	return kbApi;
+        return kbApi;
     }
 
     /**
      * Add a pointer device
-     * 
+     *
      * @param pDev
      */
     protected final void addPointerDevice(Device pDev) {
@@ -131,14 +153,14 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     /**
      * Remove a pointer device
-     * 
+     *
      * @param pDev
      */
     final void removePointer(Device pDev) {
         if (pointerDevs.remove(pDev)) {
             try {
                 final PointerAPI pApi = (PointerAPI) pDev
-                        .getAPI(PointerAPI.class);
+                    .getAPI(PointerAPI.class);
                 pApi.removePointerListener(this);
             } catch (ApiNotFoundException ex) {
                 BootLog.error("PointerAPI not found", ex);
@@ -148,7 +170,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     /**
      * Gets the console with the given index
-     * 
+     *
      * @param name
      * @return The console
      */
@@ -158,7 +180,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     /**
      * Gets the console that "hosts" the current thread.
-     * 
+     *
      * @return Console
      */
     public Console getContextConsole() {
@@ -167,12 +189,12 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
             c = getFocus();
             contextConsole.set(c);
         }
-        return c;            
+        return c;
     }
 
     /**
      * Gets the currently focused console.
-     * 
+     *
      * @return Console
      */
     public Console getFocus() {
@@ -181,7 +203,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     /**
      * Focus the given console
-     * 
+     *
      * @param console
      */
     public synchronized void focus(Console console) {
@@ -201,14 +223,14 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         ArrayList<Integer> list = new ArrayList<Integer>();
         list.addAll(stackMap.keySet());
         Collections.sort(list);
-        for(Integer key : list){
+        for (Integer key : list) {
             ps.println("Screen of " + KeyEvent.getKeyText(key) + ":");
             Stack<Console> stack = stackMap.get(key);
             int t_ind = stack.size();
-            for(int i = t_ind; i-- > 0;){
+            for (int i = t_ind; i-- > 0;) {
                 Console console = stack.get(i);
                 String prefix = console == current ? " > " :
-                            i == t_ind - 1? " * " : "   ";
+                    i == t_ind - 1 ? " * " : "   ";
                 ps.println(prefix + console.getConsoleName());
             }
         }
@@ -216,7 +238,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     public Console getConsoleByAccelerator(int keyCode) {
         Stack<Console> stack = stackMap.get(keyCode);
-        if(stack != null && !stack.empty()){
+        if (stack != null && !stack.empty()) {
             currentStack = stack;
             return stack.peek();
         }
@@ -232,7 +254,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
                 stack = new Stack<Console>();
             }
 
-            if (stack.empty()){
+            if (stack.empty()) {
                 stackMap.put(keyCode, stack);
                 stack.push(console);
                 currentStack = stack;
@@ -241,15 +263,15 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
-    protected void stackConsole(Console console){
-        if(currentStack != null) currentStack.push(console);
+    protected void stackConsole(Console console) {
+        if (currentStack != null) currentStack.push(console);
     }
 
     /**
      * Just keeping track of the One previous console will lead to lots of
      * problems. We need a stack, at least. Currently it is the client's
      * responsibility to choose the new console.
-     * 
+     *
      * @param console
      */
     public void unregisterConsole(Console console) {
@@ -262,39 +284,39 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
 
         consoles.remove(console.getConsoleName());
-        if(currentStack != null && !currentStack.empty() && currentStack.peek() == console) {
+        if (currentStack != null && !currentStack.empty() && currentStack.peek() == console) {
             currentStack.pop();
-            if(!currentStack.empty()) {
+            if (!currentStack.empty()) {
                 current = currentStack.peek();
                 focus(current);
             } else {
                 Integer last_key = null;
-                for(Iterator<Map.Entry<Integer, Stack<Console>>> it = stackMap.entrySet().iterator(); it.hasNext(); ){
+                for (Iterator<Map.Entry<Integer, Stack<Console>>> it = stackMap.entrySet().iterator(); it.hasNext();) {
                     Map.Entry<Integer, Stack<Console>> entry = it.next();
-                    if(entry.getValue().equals(currentStack)){
+                    if (entry.getValue().equals(currentStack)) {
                         last_key = entry.getKey();
                         it.remove();
                         break;
                     }
                 }
-                if(!stackMap.isEmpty()){
+                if (!stackMap.isEmpty()) {
                     Integer new_key = null;
                     List<Integer> keys = new ArrayList<Integer>(stackMap.keySet());
                     Collections.sort(keys);
-                     if(last_key == null){
-                         new_key = keys.get(0);
-                     } else {
-                         Collections.reverse(keys);
-                         for(Integer k : keys){
-                             if(k < last_key){
-                                 new_key = k;
-                                 break;
-                             }
-                         }
-                         if(new_key == null){
-                             new_key = keys.get(keys.size() - 1);
-                         }
-                     }
+                    if (last_key == null) {
+                        new_key = keys.get(0);
+                    } else {
+                        Collections.reverse(keys);
+                        for (Integer k : keys) {
+                            if (k < last_key) {
+                                new_key = k;
+                                break;
+                            }
+                        }
+                        if (new_key == null) {
+                            new_key = keys.get(keys.size() - 1);
+                        }
+                    }
 
                     currentStack = stackMap.get(new_key);
                     current = currentStack.peek();
@@ -309,8 +331,8 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
                 focus(consoles.values().iterator().next());
             }
         }
-        
-        if(parent != null && consoles.isEmpty()){
+
+        if (parent != null && consoles.isEmpty()) {
             handleFocus();
         }
     }
@@ -327,9 +349,9 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
-    private void handleFocus(){
-        if(consoles.isEmpty()){
-            if(parent != null)
+    private void handleFocus() {
+        if (consoles.isEmpty()) {
+            if (parent != null)
                 parent.handleFocus();
         } else {
             Console c = getFocus();
@@ -404,21 +426,21 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         this.parent = (AbstractConsoleManager) parent;
     }
 
-    void restack(final AbstractConsole console){
+    void restack(final AbstractConsole console) {
         int accel = console.getAcceleratorKeyCode();
-        if(accel == 0) return;
+        if (accel == 0) return;
 
         //remove console
-        for(Iterator<Integer> iter = stackMap.keySet().iterator(); iter.hasNext(); ){
+        for (Iterator<Integer> iter = stackMap.keySet().iterator(); iter.hasNext();) {
             Integer key = iter.next();
-            if(key == accel)
+            if (key == accel)
                 return; //no restack needed
 
             Stack<Console> stack = stackMap.get(key);
-            if(stack.contains(console)){
+            if (stack.contains(console)) {
                 stack.remove(console);
 
-                if(stack.empty())
+                if (stack.empty())
                     iter.remove();
 
                 break;
@@ -427,7 +449,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
         //add the console to the specified screen
         Stack<Console> stack = stackMap.get(accel);
-        if(stack == null){
+        if (stack == null) {
             stack = new Stack<Console>();
             stackMap.put(accel, stack);
         }
@@ -436,7 +458,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     /**
      * This listener looks for registration of a keyboard device.
-     * 
+     *
      * @author epr
      */
     class DevManListener implements DeviceListener {

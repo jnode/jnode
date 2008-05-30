@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console;
 
-import java.util.Set;
-import java.io.InputStream;
 import java.io.PrintStream;
-
+import java.util.Set;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerListener;
 
@@ -33,12 +31,14 @@ import org.jnode.driver.input.PointerListener;
  */
 public interface ConsoleManager extends KeyboardListener, PointerListener {
 
-    /** The name used to bind this manager in the InitialNaming namespace. */
+    /**
+     * The name used to bind this manager in the InitialNaming namespace.
+     */
     public static final Class<ConsoleManager> NAME = ConsoleManager.class;
 
     /**
      * Gets the console with the given index
-     * 
+     *
      * @param name
      * @return The console
      */
@@ -46,6 +46,7 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
 
     /**
      * Gets the console with the given accelerator keycode.
+     *
      * @param keyCode
      * @return
      */
@@ -53,80 +54,97 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
 
     /**
      * Gets the names of all registers consoles.
+     *
      * @return
      */
     public Set<String> getConsoleNames();
 
     /**
      * Register a new console.
+     *
      * @param console
      */
     public void registerConsole(Console console);
 
     /**
      * Remove an already registered console.
+     *
      * @param console
      */
     public void unregisterConsole(Console console);
 
     /**
      * Gets the currently focused console.
-     * 
+     *
      * @return Console
      */
     public Console getFocus();
 
     /**
      * Gets the console that "hosts" the current thread.
-     * 
+     *
      * @return Console
      */
     public Console getContextConsole();
 
     /**
      * Focus the given console
-     * 
+     *
      * @param console
      */
     public void focus(Console console);
 
     /**
      * Return the parent of this console manager.
+     *
      * @return
      */
     public ConsoleManager getParent();
 
     /**
      * Set the parent of this console manager.
+     *
      * @param parent
      */
     public void setParent(ConsoleManager parent);
 
     /**
      * Option constants for use in {@link org.jnode.driver.console.ConsoleManager#createConsole(String, int)}
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class CreateOptions {
-        /** Create a text console. */
+        /**
+         * Create a text console.
+         */
         public static final int TEXT = 0x01;
 
-        /** Create a scrollable console. */
+        /**
+         * Create a scrollable console.
+         */
         public static final int SCROLLABLE = 0x02;
 
-        /** Do not claim System.out, err when focused. */
+        /**
+         * Do not claim System.out, err when focused.
+         */
         public static final int NO_SYSTEM_OUT_ERR = 0x04;
 
-        /** Stack console on the current screen */
+        /**
+         * Stack console on the current screen
+         */
         public static final int STACKED = 0x08;
-        
-        /** Do not create a line-editting input stream for the console.
-         * The console's input will be whatever System.in currently is. */
+
+        /**
+         * Do not create a line-editting input stream for the console.
+         * The console's input will be whatever System.in currently is.
+         */
         public static final int NO_LINE_EDITTING = 0x10;
     }
-    
+
     /**
      * Create a new console.
-     * @param name The name of the new console, or null for an automatic name.
+     *
+     * @param name    The name of the new console, or null for an automatic name.
      * @param options The options that determine the type of console to create.
      * @return
      */

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb.uhci;
 
 import org.jnode.driver.DriverException;
@@ -29,50 +29,52 @@ import org.jnode.system.ResourceNotFreeException;
 
 /**
  * UHCI (Universal Host Controller Interface) driver.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class UHCIDriver extends AbstractHostControllerDriver {
 
-	/** The low-level implementation */
-	private UHCICore core;
+    /**
+     * The low-level implementation
+     */
+    private UHCICore core;
 
-	/**
-	 * Initialize this instance
-	 */
-	public UHCIDriver() {
-	}
+    /**
+     * Initialize this instance
+     */
+    public UHCIDriver() {
+    }
 
-	/**
-	 * @see org.jnode.driver.bus.usb.AbstractHostControllerDriver#claimResources()
-	 */
-	protected void claimResources() throws DriverException {
-		try {
-			core = new UHCICore((PCIDevice) getDevice());
-		} catch (ResourceNotFreeException ex) {
-			throw new DriverException(ex);
-		}
-	}
+    /**
+     * @see org.jnode.driver.bus.usb.AbstractHostControllerDriver#claimResources()
+     */
+    protected void claimResources() throws DriverException {
+        try {
+            core = new UHCICore((PCIDevice) getDevice());
+        } catch (ResourceNotFreeException ex) {
+            throw new DriverException(ex);
+        }
+    }
 
-	/**
-	 * @see org.jnode.driver.bus.usb.AbstractHostControllerDriver#releaseResources()
-	 */
-	protected void releaseResources() {
-		core.release();
-		core = null;
-	}
+    /**
+     * @see org.jnode.driver.bus.usb.AbstractHostControllerDriver#releaseResources()
+     */
+    protected void releaseResources() {
+        core.release();
+        core = null;
+    }
 
-	/**
-	 * Gets the API implementation.
-	 */
-	protected USBHostControllerAPI getAPIImplementation() {
-		return core;
-	}
+    /**
+     * Gets the API implementation.
+     */
+    protected USBHostControllerAPI getAPIImplementation() {
+        return core;
+    }
 
-	/**
-	 * Gets the prefix for the device name
-	 */
-	protected String getDevicePrefix() {
-		return "usb-uhci";
-	}
+    /**
+     * Gets the prefix for the device name
+     */
+    protected String getDevicePrefix() {
+        return "usb-uhci";
+    }
 }

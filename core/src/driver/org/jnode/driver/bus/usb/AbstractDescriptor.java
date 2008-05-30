@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 
@@ -27,44 +27,44 @@ package org.jnode.driver.bus.usb;
  */
 public abstract class AbstractDescriptor extends USBPacket {
 
-	/**
-	 * Initialize this instance
-	 * 
-	 * @param size
-	 */
-	public AbstractDescriptor(int size) {
-		super(size);
-	}
+    /**
+     * Initialize this instance
+     *
+     * @param size
+     */
+    public AbstractDescriptor(int size) {
+        super(size);
+    }
 
-	/**
-	 * @param data
-	 * @param ofs
-	 * @param len
-	 */
-	public AbstractDescriptor(byte[] data, int ofs, int len) {
-		super(data, ofs, len);
-	}
+    /**
+     * @param data
+     * @param ofs
+     * @param len
+     */
+    public AbstractDescriptor(byte[] data, int ofs, int len) {
+        super(data, ofs, len);
+    }
 
-	/**
-	 * Gets the length of the descriptor
-	 */
-	public final int getLength() {
-		return getByte(0);
-	}
+    /**
+     * Gets the length of the descriptor
+     */
+    public final int getLength() {
+        return getByte(0);
+    }
 
-	/**
-	 * Gets the type of the descriptor
-	 */
-	public final int getType() {
-		return getByte(1);
-	}
+    /**
+     * Gets the type of the descriptor
+     */
+    public final int getType() {
+        return getByte(1);
+    }
 
-	/**
-	 * Load all strings with the default Language ID.
-	 * 
-	 * @param dev
-	 */
-	void loadStrings(USBDevice dev) throws USBException {
-		// Do nothing
-	}
+    /**
+     * Load all strings with the default Language ID.
+     *
+     * @param dev
+     */
+    void loadStrings(USBDevice dev) throws USBException {
+        // Do nothing
+    }
 }

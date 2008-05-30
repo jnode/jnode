@@ -18,25 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver;
 
 /**
  * Interface used to discover devices on a given bus.
  *
- * @see org.jnode.driver.Device 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @see org.jnode.driver.Device
  */
 public interface DeviceFinder {
 
-	/**
-	 * Find all devices that are connected to the given bus and register 
-	 * them with the given device manager.
-	 * @param devMan
-	 * @param bus
-	 * @throws DeviceException
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus)
-	throws DeviceException;
+    /**
+     * Find all devices that are connected to the given bus and register
+     * them with the given device manager.
+     *
+     * @param devMan
+     * @param bus
+     * @throws DeviceException
+     */
+    public void findDevices(DeviceManager devMan, Bus bus)
+        throws DeviceException;
 
 }

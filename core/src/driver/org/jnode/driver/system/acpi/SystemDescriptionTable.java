@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
 import org.jnode.driver.system.acpi.aml.ParseNode;
 import org.jnode.system.MemoryResource;
 
@@ -39,6 +38,7 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
 
     /**
      * Initialize this instance.
+     *
      * @param tableResource
      */
     public SystemDescriptionTable(AcpiDriver driver, MemoryResource tableResource) {
@@ -47,6 +47,7 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
 
     /**
      * List of AcpiTable.
+     *
      * @return
      */
     public final List<AcpiTable> getTables() {
@@ -55,6 +56,7 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
 
     /**
      * Release all resources.
+     *
      * @see org.jnode.driver.system.acpi.AcpiTable#release()
      */
     public void release() {
@@ -63,7 +65,7 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
             table.release();
         }
     }
-    
+
     public final FixedAcpiDescriptionTable getFACP() {
         return (FixedAcpiDescriptionTable) getTable("FACP");
     }
@@ -82,10 +84,10 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
 
     protected final void addTable(AcpiTable table) {
         tables.add(table);
-        tableMap.put(table.getSignature(), table);        
+        tableMap.put(table.getSignature(), table);
     }
 
     protected final AcpiTable getTable(String signature) {
-        return (AcpiTable)tableMap.get(signature);
+        return (AcpiTable) tableMap.get(signature);
     }
 }

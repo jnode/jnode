@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 
@@ -27,80 +27,82 @@ package org.jnode.driver.bus.usb;
  */
 public final class ConfigurationDescriptor extends AbstractDescriptor {
 
-	private String configurationName;
-	
-	/**
-	 * Initialize a new instance
-	 */
-	public ConfigurationDescriptor() {
-		super(USB_DT_CONFIG_SIZE);
-	}
-	
-	/**
-	 * @param data
-	 * @param ofs
-	 * @param len
-	 */
-	public ConfigurationDescriptor(byte[] data, int ofs, int len) {
-		super(data, ofs, len);
-	}
+    private String configurationName;
 
-	/**
-	 * Gets the total length of data returned for this configuration.
-	 */
-	public final int getTotalLength() {
-		return getShort(2);
-	}
-	
-	/**
-	 * Gets the number of interfaces
-	 */
-	public final int getNumInterfaces() {
-		return getByte(4);
-	}
-	
-	/**
-	 * Gets the value to use as an argument to SetConfiguration.
-	 */
-	public final int getConfigurationValue() {
-		return getByte(5);
-	}
-	
-	/**
-	 * Gets the index of string descriptor describing this configuration.
-	 */
-	public final int getConfigurationStringIndex() {
-		return getByte(6);
-	}
-	
-	/**
-	 * @return Returns the configuration.
-	 */
-	public final String getConfigurationName() {
-		return this.configurationName;
-	}
+    /**
+     * Initialize a new instance
+     */
+    public ConfigurationDescriptor() {
+        super(USB_DT_CONFIG_SIZE);
+    }
 
-	/**
-	 * Load all strings with the default Language ID.
-	 * @param dev
-	 */
-	final void loadStrings(USBDevice dev) 
-	throws USBException {
-		final int cIdx = getConfigurationStringIndex();
-		if (cIdx > 0) {
-			configurationName = dev.getString(cIdx, 0);
-		} 
-	}
+    /**
+     * @param data
+     * @param ofs
+     * @param len
+     */
+    public ConfigurationDescriptor(byte[] data, int ofs, int len) {
+        super(data, ofs, len);
+    }
 
-	/**
-	 * Convert to a String representation 
-	 * @see java.lang.Object#toString()
-	 */
-	public final String toString() {
-		return "CONF[totlen:" + getTotalLength() +
-			", #intf:" + getNumInterfaces() +
-			", cnfval:" + getConfigurationValue() +
-			", name:" + ((configurationName != null) ? configurationName : ("%" + getConfigurationStringIndex())) + "]";
-	}
+    /**
+     * Gets the total length of data returned for this configuration.
+     */
+    public final int getTotalLength() {
+        return getShort(2);
+    }
+
+    /**
+     * Gets the number of interfaces
+     */
+    public final int getNumInterfaces() {
+        return getByte(4);
+    }
+
+    /**
+     * Gets the value to use as an argument to SetConfiguration.
+     */
+    public final int getConfigurationValue() {
+        return getByte(5);
+    }
+
+    /**
+     * Gets the index of string descriptor describing this configuration.
+     */
+    public final int getConfigurationStringIndex() {
+        return getByte(6);
+    }
+
+    /**
+     * @return Returns the configuration.
+     */
+    public final String getConfigurationName() {
+        return this.configurationName;
+    }
+
+    /**
+     * Load all strings with the default Language ID.
+     *
+     * @param dev
+     */
+    final void loadStrings(USBDevice dev)
+        throws USBException {
+        final int cIdx = getConfigurationStringIndex();
+        if (cIdx > 0) {
+            configurationName = dev.getString(cIdx, 0);
+        }
+    }
+
+    /**
+     * Convert to a String representation
+     *
+     * @see java.lang.Object#toString()
+     */
+    public final String toString() {
+        return "CONF[totlen:" + getTotalLength() +
+            ", #intf:" + getNumInterfaces() +
+            ", cnfval:" + getConfigurationValue() +
+            ", name:" + ((configurationName != null) ? configurationName : ("%" + getConfigurationStringIndex())) + "]";
+    }
 
 }

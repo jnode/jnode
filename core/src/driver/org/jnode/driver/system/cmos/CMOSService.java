@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.cmos;
 
 
@@ -26,15 +26,18 @@ package org.jnode.driver.system.cmos;
  * @author epr
  */
 public interface CMOSService {
-	
-	/** Name used to bind this service in the InitialNaming namespace */
-	public static final Class<CMOSService> NAME = CMOSService.class;//"system/cmos";
 
-	/**
-	 * Gets the value of a CMOS register with a given nr. 
-	 * @param regnr
-	 * @return The register value
-	 */
-	public int getRegister(int regnr);
+    /**
+     * Name used to bind this service in the InitialNaming namespace
+     */
+    public static final Class<CMOSService> NAME = CMOSService.class; //"system/cmos";
+
+    /**
+     * Gets the value of a CMOS register with a given nr.
+     *
+     * @param regnr
+     * @return The register value
+     */
+    public int getRegister(int regnr);
 
 }

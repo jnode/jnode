@@ -18,22 +18,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console.spi;
 
 import java.util.ArrayList;
-
 import org.jnode.driver.console.Console;
-import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.ConsoleListener;
 import org.jnode.driver.console.ConsoleEvent;
+import org.jnode.driver.console.ConsoleListener;
+import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.system.event.FocusEvent;
-import org.jnode.util.QueueProcessorThread;
 import org.jnode.util.QueueProcessor;
+import org.jnode.util.QueueProcessorThread;
 
 /**
  * @author epr
@@ -54,7 +53,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param mgr
      * @param name
      */
@@ -66,7 +65,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Does this console has the focus?
-     * 
+     *
      * @return True if this console has the focus, false otherwise
      */
     public boolean isFocused() {
@@ -75,7 +74,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Add a PointerListener
-     * 
+     *
      * @param l
      */
     public void addPointerListener(PointerListener l) {
@@ -88,7 +87,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Remove a PointerListener
-     * 
+     *
      * @param l
      */
     public void removePointerListener(PointerListener l) {
@@ -99,7 +98,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Send the PointerEvent to all the PointerListeners
-     * 
+     *
      * @param event
      */
     protected void dispatchPointerEvent(PointerEvent event) {
@@ -211,15 +210,17 @@ public abstract class AbstractConsole implements Console {
     public void focusLost(FocusEvent event) {
     }
 
-    private QueueProcessorThread<KeyboardEvent> keyboardEventProcessor = new QueueProcessorThread<KeyboardEvent>("console-keyboard-event-processor", new QueueProcessor<KeyboardEvent>() {
-        public void process(KeyboardEvent event) throws Exception {
-            dispatchKeyboardEvent(event);
-        }
-    });
+    private QueueProcessorThread<KeyboardEvent> keyboardEventProcessor =
+        new QueueProcessorThread<KeyboardEvent>("console-keyboard-event-processor",
+            new QueueProcessor<KeyboardEvent>() {
+                public void process(KeyboardEvent event) throws Exception {
+                    dispatchKeyboardEvent(event);
+                }
+            });
 
     /**
      * Dispatch a given keyboard event to all known listeners.
-     * 
+     *
      * @param event
      */
     protected void dispatchKeyboardEvent(KeyboardEvent event) {
@@ -243,7 +244,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Respond to scroll events from the mouse.
-     * 
+     *
      * @param event
      * @see org.jnode.driver.input.PointerListener#pointerStateChanged(org.jnode.driver.input.PointerEvent)
      */
@@ -255,7 +256,7 @@ public abstract class AbstractConsole implements Console {
 
     /**
      * Close this console.
-     * 
+     *
      * @see org.jnode.driver.console.Console#close()
      */
     public void close() {
@@ -266,8 +267,8 @@ public abstract class AbstractConsole implements Console {
 
     public void setAcceleratorKeyCode(int keyCode) {
         this.acceleratorKeyCode = keyCode;
-        if(mgr instanceof AbstractConsoleManager)
-            ((AbstractConsoleManager)mgr).restack(this);
+        if (mgr instanceof AbstractConsoleManager)
+            ((AbstractConsoleManager) mgr).restack(this);
     }
 
     public int getAcceleratorKeyCode() {
@@ -280,6 +281,7 @@ public abstract class AbstractConsole implements Console {
     public String getConsoleName() {
         return consoleName;
     }
+
     /**
      * @see org.jnode.driver.console.Console#getManager()
      */

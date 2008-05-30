@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb.hub;
 
 import org.jnode.driver.Device;
@@ -29,40 +29,40 @@ import org.jnode.driver.bus.usb.USBDevice;
 
 /**
  * Device to driver mapper for the USB HUB driver.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class USBHubDeviceToDriverMapper implements DeviceToDriverMapper, USBConstants {
 
-	/**
-	 * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
-	 */
-	public Driver findDriver(Device device) {
-		if (!(device instanceof USBDevice)) {
-			return null;
-		}
+    /**
+     * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
+     */
+    public Driver findDriver(Device device) {
+        if (!(device instanceof USBDevice)) {
+            return null;
+        }
 
-		final USBDevice dev = (USBDevice) device;
-		if (dev.getDescriptor().getDeviceClass() != USB_CLASS_HUB) {
-			return null;
-		}
+        final USBDevice dev = (USBDevice) device;
+        if (dev.getDescriptor().getDeviceClass() != USB_CLASS_HUB) {
+            return null;
+        }
 
-		// We found an USB HUB
-		return new USBHubDriver();
-	}
+        // We found an USB HUB
+        return new USBHubDriver();
+    }
 
-	
-	/**
-	 * Gets the matching level of this mapper.
-	 * The mappers are queried in order of match level. This will ensure
-	 * the best available driver for a device.
-	 * 
-	 * @return One of the MATCH_xxx constants.
-	 * @see #MATCH_DEVICE_REVISION
-	 * @see #MATCH_DEVICE
-	 * @see #MATCH_DEVCLASS
-	 */
-	public int getMatchLevel() {
-		return MATCH_DEVCLASS;
-	}
+
+    /**
+     * Gets the matching level of this mapper.
+     * The mappers are queried in order of match level. This will ensure
+     * the best available driver for a device.
+     *
+     * @return One of the MATCH_xxx constants.
+     * @see #MATCH_DEVICE_REVISION
+     * @see #MATCH_DEVICE
+     * @see #MATCH_DEVCLASS
+     */
+    public int getMatchLevel() {
+        return MATCH_DEVCLASS;
+    }
 }

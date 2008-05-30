@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi.vm;
 
 import java.io.PrintWriter;
@@ -26,7 +26,7 @@ import java.io.PrintWriter;
 
 /**
  * AcpiNamedObject.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -39,46 +39,46 @@ import java.io.PrintWriter;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
 
 public class AcpiNamedObject extends AcpiObject {
 
-	private String name;
+    private String name;
 
-	public AcpiNamedObject() {
-		this.name = null;
-	}
+    public AcpiNamedObject() {
+        this.name = null;
+    }
 
-	public AcpiNamedObject(String name) {
-		this.name = name;
-		this.putInSameNameSpace(NameSpace.currentNameSpace);
-	}
+    public AcpiNamedObject(String name) {
+        this.name = name;
+        this.putInSameNameSpace(NameSpace.currentNameSpace);
+    }
 
-	public AcpiNamedObject(NameSpace space, String name) {
-		super(space);
-		this.name = name;
-		this.putInSameNameSpace(space);
-	}
+    public AcpiNamedObject(NameSpace space, String name) {
+        super(space);
+        this.name = name;
+        this.putInSameNameSpace(space);
+    }
 
-	public String getName() {
-		return name;
-	}
-	
-	protected void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void dump(PrintWriter out, String prefix) {
-		out.println(toString(prefix));
-	}
+    protected void setName(String name) {
+        this.name = name;
+    }
 
-	public String toString(String prefix) {
-		String className = this.getClass().getName();
-		String n = className.substring(className.lastIndexOf(".") + 1);
-		return prefix + n + ": " + this.name;
-	}
+    public void dump(PrintWriter out, String prefix) {
+        out.println(toString(prefix));
+    }
+
+    public String toString(String prefix) {
+        String className = this.getClass().getName();
+        String n = className.substring(className.lastIndexOf(".") + 1);
+        return prefix + n + ": " + this.name;
+    }
 
 }

@@ -18,39 +18,40 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.acpi.vm;
 
 /**
  * AcpiInteger.
- * 
+ * <p/>
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
+ *
  * @author not attributable
  * @version 1.0
  */
 public class AcpiInteger extends AcpiNamedObject {
 
-  int value;
+    int value;
 
-  public AcpiInteger(String name) {
-  super(name);
-  }
+    public AcpiInteger(String name) {
+        super(name);
+    }
 
-  public AcpiInteger(String name, int value) {
-  super(name);
-  this.value=value;
-  }
+    public AcpiInteger(String name, int value) {
+        super(name);
+        this.value = value;
+    }
 
-  public AcpiInteger(int value) {
-    super("");
-    this.value=value;
-  }
+    public AcpiInteger(int value) {
+        super("");
+        this.value = value;
+    }
 
-  public AcpiInteger getValue() {
-    return this;
-  }
+    public AcpiInteger getValue() {
+        return this;
+    }
 
 }

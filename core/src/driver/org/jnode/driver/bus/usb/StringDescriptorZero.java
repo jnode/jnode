@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.usb;
 
 /**
@@ -26,50 +26,53 @@ package org.jnode.driver.bus.usb;
  */
 public class StringDescriptorZero extends AbstractDescriptor {
 
-	/**
-	 * @param data
-	 * @param ofs
-	 * @param len
-	 */
-	public StringDescriptorZero(byte[] data, int ofs, int len) {
-		super(data, ofs, len);
-	}
+    /**
+     * @param data
+     * @param ofs
+     * @param len
+     */
+    public StringDescriptorZero(byte[] data, int ofs, int len) {
+        super(data, ofs, len);
+    }
 
-	/**
-	 * @param size
-	 */
-	public StringDescriptorZero(int size) {
-		super(size);
-	}
-	
-	/**
-	 * Gets the number of language ID's.
-	 * @return The number of language ID's.
-	 */
-	public final int getNumLangIDs() {
-		return (getLength() - 2) / 2;
-	}
-	
-	/**
-	 * Gets the language ID at a given index.
-	 * @param index
-	 */
-	public int getLangID(int index) {
-		return getShort(2 + (index << 1));
-	}
-	
-	/**
-	 * Is the given language ID contained in this descriptor.
-	 * @param langID
-	 */
-	public boolean contains(int langID) {
-		final int cnt = getNumLangIDs();
-		for (int i = 0; i < cnt; i++) {
-			if (getLangID(i) == langID) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * @param size
+     */
+    public StringDescriptorZero(int size) {
+        super(size);
+    }
+
+    /**
+     * Gets the number of language ID's.
+     *
+     * @return The number of language ID's.
+     */
+    public final int getNumLangIDs() {
+        return (getLength() - 2) / 2;
+    }
+
+    /**
+     * Gets the language ID at a given index.
+     *
+     * @param index
+     */
+    public int getLangID(int index) {
+        return getShort(2 + (index << 1));
+    }
+
+    /**
+     * Is the given language ID contained in this descriptor.
+     *
+     * @param langID
+     */
+    public boolean contains(int langID) {
+        final int cnt = getNumLangIDs();
+        for (int i = 0; i < cnt; i++) {
+            if (getLangID(i) == langID) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

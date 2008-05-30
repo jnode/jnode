@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input;
 
 import org.jnode.driver.DeviceAPI;
@@ -27,21 +27,23 @@ import org.jnode.driver.DeviceAPI;
 /**
  * API implemented by devices that can trigger a system inspection
  * function such as a debugger.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface SystemTriggerAPI extends DeviceAPI {
 
-	/**
-	 * Add a listener
-	 * @param l
-	 */
-	public void addSystemTriggerListener(SystemTriggerListener l);
-	
-	/**
-	 * Remove a listener
-	 * @param l
-	 */
-	public void removeSystemTriggerListener(SystemTriggerListener l);
-	
+    /**
+     * Add a listener
+     *
+     * @param l
+     */
+    public void addSystemTriggerListener(SystemTriggerListener l);
+
+    /**
+     * Remove a listener
+     *
+     * @param l
+     */
+    public void removeSystemTriggerListener(SystemTriggerListener l);
+
 }

@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.smbus;
 
 /**
  * DIMM device.
- * 
+ * <p/>
  * <p>
  * Title:
  * </p>
@@ -35,68 +35,69 @@ package org.jnode.driver.bus.smbus;
  * </p>
  * <p>
  * </p>
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
 
 public class DIMM extends SMBusDevice {
 
-	final public static int SPDTABLE_SIZE = 128;
-	
-	byte[] rawSPDTable = null;
+    final public static int SPDTABLE_SIZE = 128;
 
-	public DIMM(SMBus bus, String name) {
-		super(bus, name, 0);
-	}
+    byte[] rawSPDTable = null;
 
-	private String type2String(int type) {
-		switch (type) {
-			case 2 :
-				return "EDO";
-			case 4 :
-				return "SDRAM";
-			case 7 :
-				return "SDRAM DDR";
-			default :
-				return "Unknown RAM type";
-		}
-	}
-	/**
-	 * DIMMDriver fills the array when starting the device
-	 * 
-	 * @param table
-	 */
-	public void setSPDTable(byte[] table) {
-		rawSPDTable = table;
-	}
+    public DIMM(SMBus bus, String name) {
+        super(bus, name, 0);
+    }
 
-	public int getType() {
-		return rawSPDTable[2];
-	}
+    private String type2String(int type) {
+        switch (type) {
+            case 2:
+                return "EDO";
+            case 4:
+                return "SDRAM";
+            case 7:
+                return "SDRAM DDR";
+            default:
+                return "Unknown RAM type";
+        }
+    }
 
-	public int getRevisionCode() {
-		return rawSPDTable[62];
-	}
+    /**
+     * DIMMDriver fills the array when starting the device
+     *
+     * @param table
+     */
+    public void setSPDTable(byte[] table) {
+        rawSPDTable = table;
+    }
 
-	public byte[] getManufacturerCode() {
-		byte[] info = new byte[8];
-		for (int i = 0; i < 8; i++)
-			info[i] = rawSPDTable[64 + i];
-		return info;
-	}
+    public int getType() {
+        return rawSPDTable[2];
+    }
 
-	public byte[] getManufacturerData() {
-		byte[] info = new byte[27];
-		for (int i = 0; i < 27; i++)
-			info[i] = rawSPDTable[99 + i];
-		return info;
-	}
+    public int getRevisionCode() {
+        return rawSPDTable[62];
+    }
 
-	public String toString() {
-		if (rawSPDTable == null)
-			return "SPDTable not filled";
-		String tmp = "Device: " + super.getId() + " type=" + getType() + "(" + type2String(getType()) + ")";
-		return tmp;
-	}
+    public byte[] getManufacturerCode() {
+        byte[] info = new byte[8];
+        for (int i = 0; i < 8; i++)
+            info[i] = rawSPDTable[64 + i];
+        return info;
+    }
+
+    public byte[] getManufacturerData() {
+        byte[] info = new byte[27];
+        for (int i = 0; i < 27; i++)
+            info[i] = rawSPDTable[99 + i];
+        return info;
+    }
+
+    public String toString() {
+        if (rawSPDTable == null)
+            return "SPDTable not filled";
+        String tmp = "Device: " + super.getId() + " type=" + getType() + "(" + type2String(getType()) + ")";
+        return tmp;
+    }
 }

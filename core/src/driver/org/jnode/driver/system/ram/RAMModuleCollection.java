@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.system.ram;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.List;
  * </p>
  * <p>
  * </p>
- * 
+ *
  * @author Francois-Frederic Ozog
  * @version 1.0
  */
@@ -47,9 +47,8 @@ public class RAMModuleCollection {
 
     /**
      * Creates the list of slots
-     * 
-     * @param slots
-     *            number of possible slots
+     *
+     * @param slots number of possible slots
      */
     public RAMModuleCollection(int slots) {
         this.slots = new ArrayList<RAMModuleInfo>(slots);
@@ -64,7 +63,7 @@ public class RAMModuleCollection {
 
     /**
      * Retrieves the actual number of occupied slots
-     * 
+     *
      * @return number of occupied slots
      */
     public int size() {
@@ -76,9 +75,8 @@ public class RAMModuleCollection {
 
     /**
      * get details on one slot
-     * 
-     * @param index
-     *            slot number
+     *
+     * @param index slot number
      * @return RAM module information
      * @see org.jnode.driver.system.ram.RAMModuleInfo
      */
