@@ -18,97 +18,104 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
 
 /**
  * Element of a class that represents a single implemented interface.
- * 
+ *
  * @author epr
  */
 public final class VmImplementedInterface extends VmSystemObject {
-	
-	/** The name of the interface class or the resolved class */
-	private Object data;
 
-	/**
-	 * Create a new instance
-	 * @param className
-	 */
-	protected VmImplementedInterface(String className) {
-		if (className == null) {
-			throw new IllegalArgumentException("className cannot be null");
-		}
-		this.data = className;
-	}
+    /**
+     * The name of the interface class or the resolved class
+     */
+    private Object data;
 
-	/**
-	 * Create a new instance
-	 * @param vmClass
-	 */
-	protected VmImplementedInterface(VmType vmClass) {
-		if (vmClass == null) {
-			throw new IllegalArgumentException("vmClass cannot be null");
-		}
-		if (vmClass instanceof VmInterfaceClass) {
-			this.data = (VmInterfaceClass)vmClass;
-		} else {
-			throw new IllegalArgumentException("vmClass must be an interface class");
-		}
-	}
+    /**
+     * Create a new instance
+     *
+     * @param className
+     */
+    protected VmImplementedInterface(String className) {
+        if (className == null) {
+            throw new IllegalArgumentException("className cannot be null");
+        }
+        this.data = className;
+    }
 
-	/**
-	 * Gets the resolved interface class.
-	 * @return The resolved class
-	 */
-	public VmInterfaceClass<?> getResolvedVmClass() 
-	throws NotResolvedYetException {
+    /**
+     * Create a new instance
+     *
+     * @param vmClass
+     */
+    protected VmImplementedInterface(VmType vmClass) {
+        if (vmClass == null) {
+            throw new IllegalArgumentException("vmClass cannot be null");
+        }
+        if (vmClass instanceof VmInterfaceClass) {
+            this.data = (VmInterfaceClass) vmClass;
+        } else {
+            throw new IllegalArgumentException("vmClass must be an interface class");
+        }
+    }
+
+    /**
+     * Gets the resolved interface class.
+     *
+     * @return The resolved class
+     */
+    public VmInterfaceClass<?> getResolvedVmClass()
+        throws NotResolvedYetException {
         final Object data = this.data;
-		if (data instanceof String) {
-			throw new NotResolvedYetException((String)data);
-		}
-		return (VmInterfaceClass<?>)data;
-	}
+        if (data instanceof String) {
+            throw new NotResolvedYetException((String) data);
+        }
+        return (VmInterfaceClass<?>) data;
+    }
 
-	/**
-	 * Resolve the members of this object.
-	 * @param clc
-	 * @throws ClassNotFoundException
-	 */
-	protected void resolve(VmClassLoader clc)
-		throws ClassNotFoundException {
+    /**
+     * Resolve the members of this object.
+     *
+     * @param clc
+     * @throws ClassNotFoundException
+     */
+    protected void resolve(VmClassLoader clc)
+        throws ClassNotFoundException {
         final Object data = this.data;
-		if (data instanceof String) {
-            final String className = (String)data;
-			final VmType<?> type = clc.loadClass(className, true);
-			if (type instanceof VmInterfaceClass) {
-				this.data = (VmInterfaceClass<?>)type;
-			} else {
-				throw new ClassNotFoundException("Class " + className + " is not an interface");
-			}
-			type.link();
-		}
-	}
+        if (data instanceof String) {
+            final String className = (String) data;
+            final VmType<?> type = clc.loadClass(className, true);
+            if (type instanceof VmInterfaceClass) {
+                this.data = (VmInterfaceClass<?>) type;
+            } else {
+                throw new ClassNotFoundException("Class " + className + " is not an interface");
+            }
+            type.link();
+        }
+    }
 
-	/**
+    /**
      * @return Returns the className.
      */
     final String getClassName() {
         final Object data = this.data;
         if (data instanceof String) {
-            return (String)data;
+            return (String) data;
         } else {
-            return ((VmInterfaceClass<?>)data).getName();
+            return ((VmInterfaceClass<?>) data).getName();
         }
     }
 
     /**
-	 * Convert myself into a String representation
-	 * @return String
-	 */
-	public String toString() {
-		return "_I_" + mangleClassName(getResolvedVmClass().getName());
-	}
+     * Convert myself into a String representation
+     *
+     * @return String
+     */
+    public String toString() {
+        return "_I_" + mangleClassName(getResolvedVmClass().getName());
+    }
 }

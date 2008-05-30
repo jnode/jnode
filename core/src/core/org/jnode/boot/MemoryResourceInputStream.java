@@ -18,28 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.boot;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.jnode.system.MemoryResource;
 import org.jnode.vm.annotation.MagicPermission;
 
 
 @MagicPermission
 final class MemoryResourceInputStream extends InputStream {
-    
+
     private final MemoryResource resource;
     private int offset;
     private final int length;
-    
+
     public MemoryResourceInputStream(MemoryResource resource) {
         this.resource = resource;
         this.length = resource.getSize().toInt();
-    }     
-    
+    }
+
     /**
      * @see java.io.InputStream#read()
      */
@@ -50,6 +49,7 @@ final class MemoryResourceInputStream extends InputStream {
             return -1;
         }
     }
+
     /**
      * @see java.io.InputStream#read(byte[], int, int)
      */

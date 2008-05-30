@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.protocol.plugin;
 
 import java.io.IOException;
@@ -31,11 +31,11 @@ import java.net.URLStreamHandler;
  */
 public class Handler extends URLStreamHandler {
 
-	/**
-	 * @see java.net.URLStreamHandler#openConnection(java.net.URL)
-	 */
-	protected URLConnection openConnection(URL url) throws IOException {
-		return new PluginURLConnection(url);
-	}
+    /**
+     * @see java.net.URLStreamHandler#openConnection(java.net.URL)
+     */
+    protected URLConnection openConnection(URL url) throws IOException {
+        return new PluginURLConnection(url);
+    }
 
 }

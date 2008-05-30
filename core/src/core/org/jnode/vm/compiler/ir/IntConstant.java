@@ -18,26 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
 public class IntConstant<T> extends Constant<T> {
-	private int value;
-	
-	public IntConstant(int value) {
-		super(Operand.INT);
-		this.value = value;
-	}
+    private int value;
 
-	public int getValue() {
-		return value;
-	}
-	
-	public String toString() {
-		return Integer.toString(value);
-	}
+    public IntConstant(int value) {
+        super(Operand.INT);
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return Integer.toString(value);
+    }
 }

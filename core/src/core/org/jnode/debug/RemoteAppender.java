@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debug;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
@@ -33,18 +32,18 @@ import org.apache.log4j.WriterAppender;
  */
 public class RemoteAppender extends WriterAppender {
 
-	public static final String LAYOUT = "%-5p [%c{1}]: %m%n";
-    
+    public static final String LAYOUT = "%-5p [%c{1}]: %m%n";
+
     /**
-	 * Create an appender for a given outputstream
-	 */
-	public RemoteAppender(OutputStream out, Layout layout) {
-	    if (layout != null) {
-	        setLayout(layout);
-	    } else {
-	        setLayout(new PatternLayout(LAYOUT));
-	    }
-		setWriter(new OutputStreamWriter(out));
-	}
+     * Create an appender for a given outputstream
+     */
+    public RemoteAppender(OutputStream out, Layout layout) {
+        if (layout != null) {
+            setLayout(layout);
+        } else {
+            setLayout(new PatternLayout(LAYOUT));
+        }
+        setWriter(new OutputStreamWriter(out));
+    }
 
 }

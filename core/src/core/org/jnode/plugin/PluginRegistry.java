@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 import java.util.Iterator;
@@ -26,55 +26,60 @@ import java.util.List;
 
 /**
  * Registry of all plugins in the system.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface PluginRegistry extends Iterable<PluginDescriptor> {
 
-	/**
-	 * Gets the descriptor of the plugin with the given id.
-	 * @param pluginId
-	 * @return The plugin descriptor found, or null if not found
-	 */
-	public PluginDescriptor getPluginDescriptor(String pluginId);
-	
-	/**
-	 * Gets the extension point with the given id.
-	 * @param id
-	 * @return The extension point found, or null if not found
-	 */
-	public ExtensionPoint getExtensionPoint(String id);
-	
-	/**
-	 * Returns an iterator to iterate over all PluginDescriptor's.
-	 * @return Iterator&lt;PluginDescriptor&gt;
-	 */
-	public Iterator<PluginDescriptor> iterator();
+    /**
+     * Gets the descriptor of the plugin with the given id.
+     *
+     * @param pluginId
+     * @return The plugin descriptor found, or null if not found
+     */
+    public PluginDescriptor getPluginDescriptor(String pluginId);
 
-	/**
-	 * Load a plugin from a given loader.
-	 * 
-	 * @param loader
-	 * @param pluginId
-	 * @param pluginVersion 
-	 * @return The descriptor of the loaded plugin.
-	 * @throws PluginException
-	 */
-	public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion) throws PluginException;
+    /**
+     * Gets the extension point with the given id.
+     *
+     * @param id
+     * @return The extension point found, or null if not found
+     */
+    public ExtensionPoint getExtensionPoint(String id);
 
-	/**
-	 * Remove the plugin with the given id from this registry.
+    /**
+     * Returns an iterator to iterate over all PluginDescriptor's.
+     *
+     * @return Iterator&lt;PluginDescriptor&gt;
+     */
+    public Iterator<PluginDescriptor> iterator();
+
+    /**
+     * Load a plugin from a given loader.
+     *
+     * @param loader
+     * @param pluginId
+     * @param pluginVersion
+     * @return The descriptor of the loaded plugin.
+     * @throws PluginException
+     */
+    public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion)
+        throws PluginException;
+
+    /**
+     * Remove the plugin with the given id from this registry.
      * All plugins that depend on the given plugin will also be unloaded.
-	 * 
-	 * @param pluginId
-	 * @throws PluginException
+     *
+     * @param pluginId
      * @return The references of the plugins that have been unloaded in order of loading.
-	 */
-	public List<PluginReference> unloadPlugin(String pluginId) throws PluginException;
-	
-	/**
-	 * Gets the classloader that loads classes from all loaded plugins.
-	 * @return ClassLoader
-	 */
-	public ClassLoader getPluginsClassLoader();
+     * @throws PluginException
+     */
+    public List<PluginReference> unloadPlugin(String pluginId) throws PluginException;
+
+    /**
+     * Gets the classloader that loads classes from all loaded plugins.
+     *
+     * @return ClassLoader
+     */
+    public ClassLoader getPluginsClassLoader();
 }

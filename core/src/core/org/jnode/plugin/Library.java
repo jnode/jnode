@@ -18,43 +18,48 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 /**
  * Resource library descriptor.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface Library {
 
-	/**
-	 * Gets the name of the jar file or directory
-	 * @return The name
-	 */
-	public String getName();
-	
-	/**
-	 * Is this a code library?
-	 * @return boolean
-	 */
-	public boolean isCode();
+    /**
+     * Gets the name of the jar file or directory
+     *
+     * @return The name
+     */
+    public String getName();
 
-	/**
-	 * Is this a resource only library?
-	 * @return boolean
-	 */
-	public boolean isResource();
+    /**
+     * Is this a code library?
+     *
+     * @return boolean
+     */
+    public boolean isCode();
 
-	/**
-	 * Gets all declared export names
-	 * @return All declared export names
-	 */
-	public String[] getExports();
+    /**
+     * Is this a resource only library?
+     *
+     * @return boolean
+     */
+    public boolean isResource();
 
-	/**
-	 * Gets the descriptor of the plugin in which this element was declared.
-	 * @return The descriptor
-	 */
-	public PluginDescriptor getDeclaringPluginDescriptor();
+    /**
+     * Gets all declared export names
+     *
+     * @return All declared export names
+     */
+    public String[] getExports();
+
+    /**
+     * Gets the descriptor of the plugin in which this element was declared.
+     *
+     * @return The descriptor
+     */
+    public PluginDescriptor getDeclaringPluginDescriptor();
 }

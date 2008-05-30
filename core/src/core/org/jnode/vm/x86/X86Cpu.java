@@ -18,10 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
-import static org.jnode.vm.x86.X86Vendor.*;
+import static org.jnode.vm.x86.X86Vendor.AMD;
+import static org.jnode.vm.x86.X86Vendor.INTEL;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -29,42 +30,42 @@ import static org.jnode.vm.x86.X86Vendor.*;
 public enum X86Cpu {
 
     // Intel CPU's
-    PENTIUM("Pentium", INTEL, 0x05, new int[]{ 0x01, 0x02 }),
+    PENTIUM("Pentium", INTEL, 0x05, new int[]{0x01, 0x02}),
     PENTIUM_MMX("Pentium with MMX", INTEL, 0x05, 0x04),
     PENTIUMPRO("Pentium Pro", INTEL, 0x06, 0x01),
-    PENTIUM2("Pentium II", INTEL, 0x06, new int[]{ 0x03, 0x05 }),
+    PENTIUM2("Pentium II", INTEL, 0x06, new int[]{0x03, 0x05}),
     CELERON("Celeron", INTEL, 0x06, 0x06),
-    PENTIUM3("Pentium III", INTEL, 0x06, new int[]{ 0x07, 0x08, 0x0A, 0x0B }),
-    PENTIUMM("Pentium M", INTEL, 0x06, new int[]{ 0x09, 0x0D }),
-    PENTIUM4("Pentium 4", INTEL, 0x0F, new int[]{ 0x00, 0x01, 0x02, 0x03, 0x04 }),
-    
+    PENTIUM3("Pentium III", INTEL, 0x06, new int[]{0x07, 0x08, 0x0A, 0x0B}),
+    PENTIUMM("Pentium M", INTEL, 0x06, new int[]{0x09, 0x0D}),
+    PENTIUM4("Pentium 4", INTEL, 0x0F, new int[]{0x00, 0x01, 0x02, 0x03, 0x04}),
+
     // AMD CPU's
-    ATHLON("Athlon", AMD, 0x06, new int[]{ 0x01, 0x02, 0x04, 0x06, 0x07, 0x08, 0x0A }),
-    ATHLON64("Athlon64", AMD, 0x0F, new int[]{ 0x04, 0x08, 0x0B, 0x0C, 0x0E, 0x0F }),
-    OPTERON("Opteron", AMD, 0x0F, new int[]{ 0x05 }),
-        
+    ATHLON("Athlon", AMD, 0x06, new int[]{0x01, 0x02, 0x04, 0x06, 0x07, 0x08, 0x0A}),
+    ATHLON64("Athlon64", AMD, 0x0F, new int[]{0x04, 0x08, 0x0B, 0x0C, 0x0E, 0x0F}),
+    OPTERON("Opteron", AMD, 0x0F, new int[]{0x05}),
+
     // Other CPU's
-    UNKNOWN("?", X86Vendor.UNKNOWN, 0, 0);
-    ;
-    
+    UNKNOWN("?", X86Vendor.UNKNOWN, 0, 0);    
+
     private final String name;
     private final X86Vendor vendor;
     private final int family;
     private final int[] model;
 
     private X86Cpu(String name, X86Vendor vendor, int family, int model) {
-        this(name, vendor, family, new int[] { model });
+        this(name, vendor, family, new int[]{model});
     }
-    
+
     private X86Cpu(String name, X86Vendor vendor, int family, int[] model) {
         this.name = name;
         this.vendor = vendor;
         this.family = family;
         this.model = model;
     }
-    
+
     /**
      * Get by CPUID
+     *
      * @param id
      * @return
      */
@@ -83,7 +84,7 @@ public enum X86Cpu {
         }
         return UNKNOWN;
     }
-    
+
     /**
      * @return Returns the name.
      */

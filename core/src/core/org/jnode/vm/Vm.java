@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.io.PrintStream;
@@ -27,7 +27,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginRegistry;
@@ -58,55 +57,79 @@ import org.jnode.vm.scheduler.VmScheduler;
 @SharedStatics
 public final class Vm extends VmSystemObject implements Statistics {
 
-    /** The single instance */
+    /**
+     * The single instance
+     */
     private static Vm instance;
 
-    /** Are will in bootimage building phase? */
+    /**
+     * Are will in bootimage building phase?
+     */
     private transient boolean bootstrap;
 
-    /** The current architecture */
+    /**
+     * The current architecture
+     */
     private final VmArchitecture arch;
 
-    /** The heap manager */
+    /**
+     * The heap manager
+     */
     private final VmHeapManager heapManager;
 
     /** Set this boolean to turn the hot method manager on/off */
     // private final boolean runHotMethodManager = false;
-    /** Should this VM run in debug mode? */
+    /**
+     * Should this VM run in debug mode?
+     */
     private final boolean debugMode;
 
-    /** Version of the OS and VM */
+    /**
+     * Version of the OS and VM
+     */
     private final String version;
 
-    /** The statics table */
+    /**
+     * The statics table
+     */
     private final VmSharedStatics statics;
 
-    /** The list of all system processors */
+    /**
+     * The list of all system processors
+     */
     private final List<VmProcessor> processors;
 
-    /** All statistics */
+    /**
+     * All statistics
+     */
     private transient Map<String, Statistic> statistics;
 
-    /** List of all compiled methods */
+    /**
+     * List of all compiled methods
+     */
     private final CompiledCodeList compiledMethods;
 
-    /** Should assertions be verified? */
+    /**
+     * Should assertions be verified?
+     */
     public static final boolean VerifyAssertions = true;
 
-    /** For assertion checking things that should never happen. */
+    /**
+     * For assertion checking things that should never happen.
+     */
     public static final boolean NOT_REACHED = false;
-    
+
     private VmScheduler scheduler;
 
     /**
      * Initialize a new instance
-     * 
+     *
      * @param arch
      * @throws InstantiationException
      */
     public Vm(String version, VmArchitecture arch, VmSharedStatics statics,
-            boolean debugMode, VmClassLoader loader, PluginRegistry pluginReg)
-            throws InstantiationException {
+              boolean debugMode, VmClassLoader loader, PluginRegistry pluginReg)
+        throws InstantiationException {
         this.version = version;
         this.debugMode = debugMode;
         this.bootstrap = true;
@@ -121,7 +144,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Find and instantiate the heap manager.
-     * 
+     *
      * @param arch
      * @param loader
      * @param pluginReg
@@ -129,8 +152,8 @@ public final class Vm extends VmSystemObject implements Statistics {
      * @throws InstantiationException
      */
     private static VmHeapManager createHeapManager(HeapHelper helper,
-            VmArchitecture arch, VmClassLoader loader, PluginRegistry pluginReg)
-            throws InstantiationException {
+                                                   VmArchitecture arch, VmClassLoader loader, PluginRegistry pluginReg)
+        throws InstantiationException {
         if (pluginReg == null) {
             // Use in tests and asm constant construction
             return null;
@@ -138,38 +161,38 @@ public final class Vm extends VmSystemObject implements Statistics {
 
         // Find and instantiate the heap manager.
         PluginDescriptor core = pluginReg
-                .getPluginDescriptor("org.jnode.vm.core");
+            .getPluginDescriptor("org.jnode.vm.core");
         Extension[] memMgrs = core.getExtensionPoint("memmgr").getExtensions();
         if (memMgrs.length != 1) {
             throw new InstantiationException(
-                    "memmgr extension point must have 1 extension");
+                "memmgr extension point must have 1 extension");
         }
         Extension memMgr = memMgrs[0];
         if (memMgr.getConfigurationElements().length != 1) {
             throw new InstantiationException(
-                    "Expected 1 element in memmgr extension");
+                "Expected 1 element in memmgr extension");
         }
         String memMgrClassName = memMgr.getConfigurationElements()[0]
-                .getAttribute("class");
-        Class[] consArgTypes = { VmClassLoader.class, HeapHelper.class };
+            .getAttribute("class");
+        Class[] consArgTypes = {VmClassLoader.class, HeapHelper.class};
         try {
             Class cls = Class.forName(memMgrClassName);
             Constructor cons = cls.getConstructor(consArgTypes);
-            return (VmHeapManager) cons.newInstance(new Object[] { loader,
-                    helper });
+            return (VmHeapManager) cons.newInstance(new Object[]{loader,
+                helper});
         } catch (ClassNotFoundException ex) {
             throw new InstantiationException("Cannot find heap manager class "
-                    + memMgrClassName);
+                + memMgrClassName);
         } catch (IllegalAccessException ex) {
             throw new InstantiationException(
-                    "Cannot access heap manager class " + memMgrClassName);
+                "Cannot access heap manager class " + memMgrClassName);
         } catch (InvocationTargetException ex) {
             throw (InstantiationException) new InstantiationException(
-                    "Exception in creating heap manager" + ex.getMessage())
-                    .initCause(ex);
+                "Exception in creating heap manager" + ex.getMessage())
+                .initCause(ex);
         } catch (NoSuchMethodException ex) {
             throw new InstantiationException(
-                    "Cannot find heap manager constructor");
+                "Cannot find heap manager constructor");
         }
     }
 
@@ -182,7 +205,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Is JNode currently running.
-     * 
+     *
      * @return true or false
      */
     public static final boolean isRunningVm() {
@@ -191,7 +214,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Is the bootimage being written?
-     * 
+     *
      * @return true or false.
      */
     public static final boolean isWritingImage() {
@@ -200,7 +223,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Causes JNode to stop working with a given message.
-     * 
+     *
      * @param msg
      */
     public static final void sysFail(String msg) {
@@ -236,13 +259,13 @@ public final class Vm extends VmSystemObject implements Statistics {
      * Returns the number of available processors currently available to the
      * virtual machine. This number may change over time; so a multi-processor
      * program want to poll this to determine maximal resource usage.
-     * 
+     *
      * @return the number of processors available, at least 1
      */
     public final int availableProcessors() {
         return processors.size();
     }
-    
+
     // The following code has been moved to org.jnode.shell.command.system.VmInfoCommand
 //    /**
 //     * Show VM info.
@@ -271,7 +294,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Does this VM run in debug mode.
-     * 
+     *
      * @return Returns the debugMode.
      */
     public final boolean isDebugMode() {
@@ -287,7 +310,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Gets the version of the current VM.
-     * 
+     *
      * @return Returns the version.
      */
     public final String getVersion() {
@@ -313,7 +336,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Add a discovered CPU.
-     * 
+     *
      * @param cpu
      */
     final void addProcessor(VmProcessor cpu) {
@@ -322,7 +345,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Gets of create a counter with a given name.
-     * 
+     *
      * @param name
      * @return The counter
      */
@@ -342,7 +365,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Gets of create a counter group with a given name.
-     * 
+     *
      * @param name
      * @return The counter group
      */
@@ -381,7 +404,7 @@ public final class Vm extends VmSystemObject implements Statistics {
     public synchronized Statistic[] getStatistics() {
         if (statistics != null) {
             return (Statistic[]) statistics.values().toArray(
-                    new Statistic[statistics.size()]);
+                new Statistic[statistics.size()]);
         } else {
             return new Statistic[0];
         }
@@ -410,7 +433,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Assert the given value to be true.
-     * 
+     *
      * @param value
      */
     public static void _assert(boolean value) {
@@ -421,7 +444,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Assert the given value to be true.
-     * 
+     *
      * @param value
      */
     public static void _assert(boolean value, String msg) {
@@ -432,7 +455,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Assert the given value to be true.
-     * 
+     *
      * @param value
      */
     public static void _assert(boolean value, String msg, String msg2) {
@@ -443,7 +466,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Throw an AssertionError with the given messages.
-     * 
+     *
      * @param msg
      * @param msg2
      * @throws NoInlinePragma
@@ -460,7 +483,7 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /**
      * Gets the list of compiled methods.
-     * 
+     *
      * @return Returns the compiledMethods.
      */
     @KernelSpace
@@ -471,12 +494,11 @@ public final class Vm extends VmSystemObject implements Statistics {
     /**
      * A new type has been resolved by the VM. Create a new MM type to reflect
      * the VM type, and associate the MM type with the VM type.
-     * 
-     * @param vmType
-     *            The newly resolved type
+     *
+     * @param vmType The newly resolved type
      */
     @Inline
-    public static void notifyClassResolved(VmType< ? > vmType) {
+    public static void notifyClassResolved(VmType<?> vmType) {
         final Vm instance = Vm.instance;
         if (instance != null) {
             final VmHeapManager hm = instance.heapManager;

@@ -30,7 +30,6 @@ import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.NoFieldAlignments;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.Uninterruptible;
-import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 
@@ -42,19 +41,29 @@ import org.vmmagic.unboxed.ObjectReference;
 @MagicPermission
 public final class Monitor {
 
-    /** Number of locks on this monitor THIS FIELD MUST BE THE FIRST!! */
+    /**
+     * Number of locks on this monitor THIS FIELD MUST BE THE FIRST!!
+     */
     private int lockCount;
 
-    /** Lock counter of the monitor itself. THIS FIELD MUST BE THE SECOND!! */
+    /**
+     * Lock counter of the monitor itself. THIS FIELD MUST BE THE SECOND!!
+     */
     private int monitorLock;
 
-    /** Thread that owns the monitor */
+    /**
+     * Thread that owns the monitor
+     */
     private VmThread owner;
 
-    /** Thread queue for monitorenter/exit */
+    /**
+     * Thread queue for monitorenter/exit
+     */
     private final VmThreadQueue.ScheduleQueue enterQueue;
 
-    /** Thread queue for wait/notify/notifyAll */
+    /**
+     * Thread queue for wait/notify/notifyAll
+     */
     private final VmThreadQueue.ScheduleQueue notifyQueue;
 
     /**
@@ -70,7 +79,7 @@ public final class Monitor {
 
     /**
      * Create a new instance that has already been locked.
-     * 
+     *
      * @param owner
      * @param lockCount
      */
@@ -87,7 +96,7 @@ public final class Monitor {
 
     /**
      * Initialize this monitor. Only called from MonitorManager.
-     * 
+     *
      * @param owner
      * @param lockcount
      */
@@ -99,8 +108,8 @@ public final class Monitor {
     /**
      * Enter the given monitor. This method will block until the monitor is
      * locked by the current thread.
-     * 
-     * @throws UninterruptiblePragma
+     *
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @Inline
     public final void enter() {
@@ -149,8 +158,8 @@ public final class Monitor {
 
     /**
      * Giveup this monitor.
-     * 
-     * @throws UninterruptiblePragma
+     *
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     public final void exit() {
         String exMsg = null;
@@ -191,9 +200,9 @@ public final class Monitor {
      * should only be called by a thread that is the owner of this monitor. See
      * the notify method for a description of the ways in which a thread can
      * become the owner of a monitor.
-     * 
+     *
      * @param timeout
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      * @throws InterruptedException
      */
     public final void Wait(long timeout) throws InterruptedException {
@@ -261,8 +270,8 @@ public final class Monitor {
 
     /**
      * Notify threads waiting on this monitor.
-     * 
-     * @throws UninterruptiblePragma
+     *
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     public final void NotifyAll() {
         Notify(true);
@@ -270,9 +279,9 @@ public final class Monitor {
 
     /**
      * Notify the first or all waiting threads on this monitor.
-     * 
+     *
      * @param all
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     final void Notify(boolean all) {
         final VmProcessor proc = VmProcessor.current();
@@ -300,8 +309,8 @@ public final class Monitor {
      * Notify the all waiting threads on this monitor. This method does not
      * require the current thread to be the owner of the monitor, nor is an
      * exception thrown if the monitor is not locked.
-     * 
-     * @throws UninterruptiblePragma
+     *
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     final boolean unsynchronizedNotifyAll() {
         if (lockNoWait()) {
@@ -318,10 +327,10 @@ public final class Monitor {
 
     /**
      * Is the given thread owner of this monitor?
-     * 
+     *
      * @param thread
      * @return boolean
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @Inline
     final boolean isOwner(VmThread thread) {
@@ -330,7 +339,7 @@ public final class Monitor {
 
     /**
      * Gets the owner of this monitor, or null if not owned.
-     * 
+     *
      * @return The owner of this monitor, or null if not owned.
      */
     @KernelSpace
@@ -342,9 +351,9 @@ public final class Monitor {
 
     /**
      * Is this monitor locked?
-     * 
+     *
      * @return boolean
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @Inline
     final boolean isLocked() {
@@ -353,15 +362,15 @@ public final class Monitor {
 
     /**
      * Prepare the given thread for a waiting state.
-     * 
+     *
      * @param thread
      * @param queue
      * @param queueName
      * @return The queue
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     private final void prepareWait(VmThread thread,
-            VmThreadQueue.ScheduleQueue queue, int waitState, String queueName) {
+                                   VmThreadQueue.ScheduleQueue queue, int waitState, String queueName) {
         if (monitorLock != 1) {
             Unsafe.debug("MonitorLock not claimed");
             Unsafe.die("prepareWait");
@@ -373,9 +382,9 @@ public final class Monitor {
     /**
      * Notify a single thread. The thread is remove from the notifyQueue and its
      * <code>wakeupAfterMonitor</code> method is called.
-     * 
+     *
      * @param thread
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @NoInline
     private final void notifyThread(VmThread thread) {
@@ -392,7 +401,7 @@ public final class Monitor {
 
     /**
      * The given thread is removed from the notifyQueue.
-     * 
+     *
      * @param thread
      */
     @KernelSpace
@@ -410,14 +419,14 @@ public final class Monitor {
 
     /**
      * Wakeup all waiting threads.
-     * 
+     *
      * @param queue
      * @param all
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @Inline
     private final void wakeupWaitingThreads(VmThreadQueue.ScheduleQueue queue,
-            boolean all) {
+                                            boolean all) {
         if (queue != null) {
             while (!queue.isEmpty()) {
                 final VmThread thread = queue.first();
@@ -432,7 +441,7 @@ public final class Monitor {
     /**
      * Gets the address of the lockCount variable. It is assumed that this
      * variable is at offset 0 within this object!
-     * 
+     *
      * @return The address of lockCount
      */
     @Inline
@@ -443,7 +452,7 @@ public final class Monitor {
     /**
      * Claim access to this monitor. A monitor may only be locked for a small
      * amount of time, since this method uses a spinlock.
-     * 
+     *
      * @see #unlock()
      * @see #monitorLock
      */
@@ -451,7 +460,7 @@ public final class Monitor {
     private final void lock() {
         //final VmProcessor proc = VmProcessor.current();
         final Address mlAddr = ObjectReference.fromObject(this).toAddress()
-                .add(4);
+            .add(4);
         while (!mlAddr.attempt(0, 1)) {
             //proc.yield(true); // Yield breaks the Uninterruptible idea, so don't use it!
         }
@@ -459,21 +468,21 @@ public final class Monitor {
 
     /**
      * Claim access to this monitor. Return true on success, false on failure
-     * 
+     *
      * @see #unlock()
      * @see #monitorLock
      */
     @Inline
     private final boolean lockNoWait() {
         final Address mlAddr = ObjectReference.fromObject(this).toAddress()
-                .add(4);
+            .add(4);
         return mlAddr.attempt(0, 1);
     }
 
     /**
      * Release access to this monitor. A monitor may only be locked for a small
      * amount of time, since this method uses a spinlock.
-     * 
+     *
      * @see #lock()
      * @see #monitorLock
      */

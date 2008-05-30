@@ -15,33 +15,44 @@ import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.Uninterruptible;
-import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Thread scheduler. This scheduler is used by all processors in the system, so
  * all access to data structures are protected by processor locks.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 public final class VmScheduler {
 
-    /** Reference to current architecture */
+    /**
+     * Reference to current architecture
+     */
     private final VmArchitecture architecture;
 
-    /** Lock for the allThreadsQueue */
+    /**
+     * Lock for the allThreadsQueue
+     */
     private final ProcessorLock allThreadsLock;
-    
-    /** Queue holding all threads */
+
+    /**
+     * Queue holding all threads
+     */
     private final VmThreadQueue.AllThreadsQueue allThreadsQueue;
-    
-    /** My ready queue */
+
+    /**
+     * My ready queue
+     */
     private final VmThreadQueue.ScheduleQueue readyQueue;
 
-    /** My sleep queue */
+    /**
+     * My sleep queue
+     */
     private final VmThreadQueue.SleepQueue sleepQueue;
 
-    /** Lock used to protect the ready and sleep queue */
+    /**
+     * Lock used to protect the ready and sleep queue
+     */
     private final ProcessorLock queueLock;
 
     /**
@@ -49,7 +60,7 @@ public final class VmScheduler {
      */
     public VmScheduler(VmArchitecture architecture) {
         this.architecture = architecture;
-        this.allThreadsLock = new ProcessorLock();        
+        this.allThreadsLock = new ProcessorLock();
         this.allThreadsQueue = new VmThreadQueue.AllThreadsQueue("scheduler-all");
 
         this.queueLock = new ProcessorLock();
@@ -59,7 +70,7 @@ public final class VmScheduler {
 
     /**
      * Call the visitor for all live threads.
-     * 
+     *
      * @param visitor
      */
     final VmThread getThreadById(int id) {
@@ -88,7 +99,7 @@ public final class VmScheduler {
 
     /**
      * Register a thread in the list of all live threads.
-     * 
+     *
      * @param thread
      */
     final void registerThread(VmThread thread) {
@@ -106,7 +117,7 @@ public final class VmScheduler {
 
     /**
      * Remove the given thread from the list of all threads.
-     * 
+     *
      * @param thread
      */
     final void unregisterThread(VmThread thread) {
@@ -120,7 +131,7 @@ public final class VmScheduler {
 
     /**
      * Call the visitor for all live threads.
-     * 
+     *
      * @param visitor
      */
     @Internal
@@ -164,18 +175,17 @@ public final class VmScheduler {
     /**
      * Add the given thread to the ready queue to the scheduler and remove it
      * from the sleep queue (if it still was on the sleep queue)
-     * 
+     *
      * @param thread
-     * @param ignorePriority
-     *            If true, the thread is always added to the back of the list,
-     *            regarding its priority.
+     * @param ignorePriority If true, the thread is always added to the back of the list,
+     *                       regarding its priority.
      * @param caller
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @KernelSpace
     @Uninterruptible
     final void addToReadyQueue(VmThread thread, boolean ignorePriority,
-            String caller) {
+                               String caller) {
         try {
             // Get access to queues
             queueLock.lock();
@@ -185,7 +195,7 @@ public final class VmScheduler {
                 readyQueue.add(thread, ignorePriority, caller);
             } else {
                 Unsafe
-                        .debug("Thread must be in running state to add to ready queue, not ");
+                    .debug("Thread must be in running state to add to ready queue, not ");
                 Unsafe.debug(thread.getThreadState());
                 architecture.getStackReader().debugStackTrace();
                 Unsafe.die("addToReadyQueue");
@@ -198,9 +208,9 @@ public final class VmScheduler {
 
     /**
      * Add the given thread to the sleep queue to this scheduler.
-     * 
+     *
      * @param thread
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @Uninterruptible
     final void addToSleepQueue(VmThread thread) {
@@ -218,7 +228,7 @@ public final class VmScheduler {
     /**
      * Gets the first thread from the ready queue. If such a thread is
      * available, it is removed from the ready queue.
-     * 
+     *
      * @return
      */
     @KernelSpace
@@ -243,7 +253,7 @@ public final class VmScheduler {
     /**
      * Gets the first thread from the sleep queue that is ready to be woken up.
      * If such a thread is available, it is removed from the sleep queue.
-     * 
+     *
      * @return
      */
     @KernelSpace
@@ -270,7 +280,6 @@ public final class VmScheduler {
 
     /**
      * Dump the state of the scheduler to the unsafe debug stream.
-     * 
      */
     @KernelSpace
     @Uninterruptible
@@ -289,7 +298,6 @@ public final class VmScheduler {
 
     /**
      * Process all waiting KDB commands.
-     * 
      */
     @Uninterruptible
     @KernelSpace
@@ -303,103 +311,102 @@ public final class VmScheduler {
 
     /**
      * Process the input from the kernel debugger.
-     * 
+     *
      * @param input
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @Uninterruptible
     @KernelSpace
     private final void processKdbInput(int input) {
         switch ((char) input) {
-        case '?':
-        case 'h':
-            Unsafe.debug("Commands:\n");
-            Unsafe.debug("l   Show Load/Compile queue\n");
-            Unsafe.debug("p   Ping\n");
-            Unsafe.debug("q   Print thread queues\n");
-            Unsafe.debug("r   Print stacktraces of ready-queue\n");
-            Unsafe.debug("t   Print current thread\n");
-            Unsafe.debug("v   Verify thread\n");
-            Unsafe.debug("w   Print waiting threads\n");
-            Unsafe.debug("W   Print stacktraces of waiting threads\n");
-            break;
-        case 'l':
-            Unsafe.debug("<load-compile-service: ");
-            Unsafe.debug("\n");
-            LoadCompileService.showInfo();
-            Unsafe.debug("/>\n");
-            break;
-        case 'p':
-            Unsafe.debug("<ping/>");
-            break;
-        case 'q': {
-            final VmThread currentThread = VmMagic.currentProcessor().currentThread;
-            Unsafe.debug("<queues: current-thread name='");
-            Unsafe.debug(currentThread.getName());
-            Unsafe.debug("' state='");
-            Unsafe.debug(currentThread.getThreadStateName());
-            Unsafe.debug("\n");
-            readyQueue.dump(false, null);
-            sleepQueue.dump(false, null);
-            Unsafe.debug("/>\n");
-        }
-            break;
-        case 'r':
-            Unsafe.debug("<traces: ");
-            Unsafe.debug("\n");
-            readyQueue.dump(true, architecture.getStackReader());
-            Unsafe.debug("/>\n");
-            break;
-        case 'v':
-            Unsafe.debug("<verify: ");
-            Unsafe.debug("\n");
-            verifyThreads();
-            Unsafe.debug("/>\n");
-            break;
-        case 'w':
-            Unsafe.debug("<waiting: ");
-            Unsafe.debug("\n");
-            dumpWaitingThreads(false, null);
-            Unsafe.debug("/>\n");
-            break;
-        case 'W':
-            Unsafe.debug("<waiting: ");
-            Unsafe.debug("\n");
-            dumpWaitingThreads(true, architecture.getStackReader());
-            Unsafe.debug("/>\n");
-            break;
-        case 't': {
-            final VmThread currentThread = VmMagic.currentProcessor().currentThread;
-            Unsafe.debug("<currentthread name='");
-            Unsafe.debug(currentThread.getName());
-            Unsafe.debug("' state='");
-            Unsafe.debug(currentThread.getThreadStateName());
-            Unsafe.debug("'/>\n");
-        }
-            break;
-        case 'T': {
-            final VmThread currentThread = VmMagic.currentProcessor().currentThread;
-            Unsafe.debug("<currentthread name='");
-            Unsafe.debug(currentThread.getName());
-            Unsafe.debug("' state='");
-            Unsafe.debug(currentThread.getThreadStateName());
-            architecture.getStackReader().debugStackTrace(currentThread);
-            Unsafe.debug("'/>\n");
-        }
-            break;
-        case '#':
-            Unsafe.debug("Halt for ever\n");
-            while (true)
-                ;
+            case '?':
+            case 'h':
+                Unsafe.debug("Commands:\n");
+                Unsafe.debug("l   Show Load/Compile queue\n");
+                Unsafe.debug("p   Ping\n");
+                Unsafe.debug("q   Print thread queues\n");
+                Unsafe.debug("r   Print stacktraces of ready-queue\n");
+                Unsafe.debug("t   Print current thread\n");
+                Unsafe.debug("v   Verify thread\n");
+                Unsafe.debug("w   Print waiting threads\n");
+                Unsafe.debug("W   Print stacktraces of waiting threads\n");
+                break;
+            case 'l':
+                Unsafe.debug("<load-compile-service: ");
+                Unsafe.debug("\n");
+                LoadCompileService.showInfo();
+                Unsafe.debug("/>\n");
+                break;
+            case 'p':
+                Unsafe.debug("<ping/>");
+                break;
+            case 'q': {
+                final VmThread currentThread = VmMagic.currentProcessor().currentThread;
+                Unsafe.debug("<queues: current-thread name='");
+                Unsafe.debug(currentThread.getName());
+                Unsafe.debug("' state='");
+                Unsafe.debug(currentThread.getThreadStateName());
+                Unsafe.debug("\n");
+                readyQueue.dump(false, null);
+                sleepQueue.dump(false, null);
+                Unsafe.debug("/>\n");
+                break;
+            }
+            case 'r':
+                Unsafe.debug("<traces: ");
+                Unsafe.debug("\n");
+                readyQueue.dump(true, architecture.getStackReader());
+                Unsafe.debug("/>\n");
+                break;
+            case 'v':
+                Unsafe.debug("<verify: ");
+                Unsafe.debug("\n");
+                verifyThreads();
+                Unsafe.debug("/>\n");
+                break;
+            case 'w':
+                Unsafe.debug("<waiting: ");
+                Unsafe.debug("\n");
+                dumpWaitingThreads(false, null);
+                Unsafe.debug("/>\n");
+                break;
+            case 'W':
+                Unsafe.debug("<waiting: ");
+                Unsafe.debug("\n");
+                dumpWaitingThreads(true, architecture.getStackReader());
+                Unsafe.debug("/>\n");
+                break;
+            case 't': {
+                final VmThread currentThread = VmMagic.currentProcessor().currentThread;
+                Unsafe.debug("<currentthread name='");
+                Unsafe.debug(currentThread.getName());
+                Unsafe.debug("' state='");
+                Unsafe.debug(currentThread.getThreadStateName());
+                Unsafe.debug("'/>\n");
+                break;
+            }
+            case 'T': {
+                final VmThread currentThread = VmMagic.currentProcessor().currentThread;
+                Unsafe.debug("<currentthread name='");
+                Unsafe.debug(currentThread.getName());
+                Unsafe.debug("' state='");
+                Unsafe.debug(currentThread.getThreadStateName());
+                architecture.getStackReader().debugStackTrace(currentThread);
+                Unsafe.debug("'/>\n");
+                break;
+            }
+            case '#':
+                Unsafe.debug("Halt for ever\n");
+                while (true)
+                    ;
 
-            // default:
-            // Unsafe.debug(input);
+                // default:
+                // Unsafe.debug(input);
         }
     }
-    
+
     /**
      * Lock the queues for access by the current processor.
-     *
      */
     @Inline
     @Uninterruptible
@@ -409,7 +416,6 @@ public final class VmScheduler {
 
     /**
      * Unlock the queues
-     *
      */
     @Inline
     @Uninterruptible

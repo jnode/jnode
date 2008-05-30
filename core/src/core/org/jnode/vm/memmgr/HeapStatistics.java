@@ -18,34 +18,37 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr;
 
 import org.jnode.vm.VmSystemObject;
 
 /**
  * Heap statistical data collection.
- * 
+ *
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public abstract class HeapStatistics extends VmSystemObject {
-    
+
     /**
      * Sets the minimum number of instances a class must have before
      * it is listed in toString.
+     *
      * @param count
      */
     public abstract void setMinimumInstanceCount(int count);
-    
+
     /**
-     * Sets the minimum bytes of occupied memory by all instances of a class 
+     * Sets the minimum bytes of occupied memory by all instances of a class
      * before it is listed in toString.
+     *
      * @param bytes
      */
     public abstract void setMinimumTotalSize(long bytes);
-    
+
     /**
      * Convert the statistical data to a string.
+     *
      * @see java.lang.Object#toString()
      */
     public abstract String toString();

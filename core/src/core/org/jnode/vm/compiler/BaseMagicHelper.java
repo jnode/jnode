@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import java.util.Map;
-
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -31,10 +30,10 @@ import org.jnode.vm.classmgr.VmType;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class BaseMagicHelper {
-    
+
     /**
      * Enum of all magic classes.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public enum MagicClass {
@@ -42,28 +41,33 @@ public class BaseMagicHelper {
         EXTENT("org.vmmagic.unboxed.Extent"),
         OBJECTREFERENCE("org.vmmagic.unboxed.ObjectReference"),
         OFFSET("org.vmmagic.unboxed.Offset"),
-        WORD("org.vmmagic.unboxed.Word"),       
+        WORD("org.vmmagic.unboxed.Word"),
         ADDRESSARRAY("org.vmmagic.unboxed.AddressArray"),
         EXTENTARRAY("org.vmmagic.unboxed.ExtentArray"),
         OBJECTREFERENCEARRAY("org.vmmagic.unboxed.ObjectReferenceArray"),
         OFFSETARRAY("org.vmmagic.unboxed.OffsetArray"),
-        WORDARRAY("org.vmmagic.unboxed.WordArray"),       
+        WORDARRAY("org.vmmagic.unboxed.WordArray"),
         VMMAGIC("org.jnode.vm.VmMagic");
-        
-        /** Name of the class */
+
+        /**
+         * Name of the class
+         */
         private final String name;
-        
-        /** Lookup table */
+
+        /**
+         * Lookup table
+         */
         private static final Map<String, MagicClass> nameToClass;
-        
+
         /**
          * Initialize this instance.
+         *
          * @param name
          */
         private MagicClass(String name) {
             this.name = name;
         }
-        
+
         /**
          * Initialize the lookup table
          */
@@ -73,9 +77,10 @@ public class BaseMagicHelper {
                 nameToClass.put(mc.name, mc);
             }
         }
-        
+
         /**
          * Gets the MagicClass instance for the given type.
+         *
          * @param type
          * @return
          * @throws InternalError When type is no magic type.
@@ -87,15 +92,15 @@ public class BaseMagicHelper {
             } else {
                 return mc;
             }
-        }                
+        }
     }
-    
+
     /**
      * Enum of all methods in all magic classes.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    public enum MagicMethod {        
+    public enum MagicMethod {
         ADD("add", false),
         AND("and", false),
         OR("or", false),
@@ -152,7 +157,8 @@ public class BaseMagicHelper {
         LOADWORD("loadWord", true, "()Lorg/vmmagic/unboxed/Word;"),
         LOADWORD_OFS("loadWord", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
         LOADOBJECTREFERENCE("loadObjectReference", true, "()Lorg/vmmagic/unboxed/ObjectReference;"),
-        LOADOBJECTREFERENCE_OFS("loadObjectReference", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
+        LOADOBJECTREFERENCE_OFS("loadObjectReference", true,
+            "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
         SIZE("size", false),
         STOREBYTE("store", true, "(B)V"),
         STOREBYTE_OFS("store", true, "(BLorg/vmmagic/unboxed/Offset;)V"),
@@ -181,15 +187,21 @@ public class BaseMagicHelper {
         PREPAREWORD("prepareWord", true, "()Lorg/vmmagic/unboxed/Word;"),
         PREPAREWORD_OFS("prepareWord", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
         PREPAREOBJECTREFERENCE("prepareObjectReference", true, "()Lorg/vmmagic/unboxed/ObjectReference;"),
-        PREPAREOBJECTREFERENCE_OFS("prepareObjectReference", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
+        PREPAREOBJECTREFERENCE_OFS("prepareObjectReference", true,
+            "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
         ATTEMPTINT("attempt", true, "(II)Z"),
         ATTEMPTINT_OFS("attempt", true, "(IILorg/vmmagic/unboxed/Offset;)Z"),
         ATTEMPTADDRESS("attempt", true, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)Z"),
-        ATTEMPTADDRESS_OFS("attempt", true, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Offset;)Z"),
-        ATTEMPTOBJECTREFERENCE("attempt", true, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;)Z"),
-        ATTEMPTOBJECTREFERENCE_OFS("attempt", true, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/Offset;)Z"),
+        ATTEMPTADDRESS_OFS("attempt", true,
+            "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Offset;)Z"),
+        ATTEMPTOBJECTREFERENCE("attempt", true,
+            "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;)Z"),
+        ATTEMPTOBJECTREFERENCE_OFS("attempt", true,
+            "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;" +
+                "Lorg/vmmagic/unboxed/Offset;)Z"),
         ATTEMPTWORD("attempt", true, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;)Z"),
-        ATTEMPTWORD_OFS("attempt", true, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Offset;)Z"),
+        ATTEMPTWORD_OFS("attempt", true,
+            "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Offset;)Z"),
         FROMOBJECT("fromObject", true),
         FROMADDRESS("fromAddress", true),
         GETOBJECTTYPE("getObjectType", true),
@@ -217,29 +229,30 @@ public class BaseMagicHelper {
         GETSHAREDSTATICSFIELDADDRESS("getSharedStaticFieldAddress", true),
         GETISOLATEDSTATICSFIELDADDRESS("getIsolatedStaticFieldAddress", true),
         ISRUNNINGJNODE("isRunningJNode", false, "()Z"),
-        
+
         // Array classes
         ARR_CREATE("create", true),
         ARR_GET("get", true),
         ARR_SET("set", true),
         ARR_LENGTH("length", false);
-        
+
         private final String name;
         private final String signature;
         private final boolean permissionRequired;
         private static BootableHashMap<VmMethod, MagicMethod> methods = new BootableHashMap<VmMethod, MagicMethod>();
-        
+
         private MagicMethod(String name, boolean permissionRequired) {
             this.name = name;
             this.signature = null;
-            this.permissionRequired = permissionRequired;          
+            this.permissionRequired = permissionRequired;
         }
+
         private MagicMethod(String name, boolean permissionRequired, String signature) {
             this.name = name;
             this.permissionRequired = permissionRequired;
             this.signature = signature;
         }
-        
+
         public static MagicMethod get(VmMethod method) {
             MagicMethod mm = methods.get(method);
             if (mm != null) {
@@ -247,39 +260,41 @@ public class BaseMagicHelper {
             }
             final String mname = method.getName();
             final String msignature = method.getSignature();
-            
+
             for (MagicMethod m : values()) {
                 if (m.name.equals(mname)) {
                     if ((m.signature == null) || m.signature.equals(msignature)) {
                         methods.put(method, m);
                         return m;
                     }
-                    
+
                 }
             }
             throw new InternalError("Unknown method " + mname + '#' + msignature + " in "
-                    + method.getDeclaringClass().getName());
+                + method.getDeclaringClass().getName());
         }
-        
+
         /**
          * Is MagicPermission required for this method.
+         *
          * @return
          */
         final boolean isPermissionRequired() {
             return this.permissionRequired;
         }
     }
-    
+
     /**
      * Is the given method allowed to call magic code.
+     *
      * @param caller
      */
     public static void testMagicPermission(MagicMethod callee, VmMethod caller)
-    throws SecurityException {
+        throws SecurityException {
         if (callee.isPermissionRequired()) {
             if (!caller.getDeclaringClass().isMagicPermissionGranted()) {
                 System.out.println("MagicPermission is not granted for type: "
-                        + caller.getDeclaringClass().getName());
+                    + caller.getDeclaringClass().getName());
                 // throw new SecurityException("MagicPermission is not granted
                 // for method: " + caller.getFullName());
             }

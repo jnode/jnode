@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -32,15 +32,19 @@ import org.jnode.vm.memmgr.HeapHelper;
 @MagicPermission
 final class FinalizerVisitor extends ObjectVisitor implements ObjectFlags {
 
-    /** My heap helper */
+    /**
+     * My heap helper
+     */
     private final HeapHelper helper;
 
-    /** The heap that is currently being visited */
+    /**
+     * The heap that is currently being visited
+     */
     private VmAbstractHeap currentHeap;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param helper
      */
     public FinalizerVisitor(HeapHelper helper) {
@@ -76,8 +80,7 @@ final class FinalizerVisitor extends ObjectVisitor implements ObjectFlags {
     }
 
     /**
-     * @param currentHeap
-     *            The currentHeap to set.
+     * @param currentHeap The currentHeap to set.
      */
     public final void setCurrentHeap(VmAbstractHeap currentHeap) {
         this.currentHeap = currentHeap;

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
@@ -30,24 +30,26 @@ import org.vmmagic.unboxed.Address;
  * Address is not a normal Java object. Instead it is used as a reference
  * to a virtual memory address. Variables of this type are not considered to
  * be objects by the garbage collector.
+ *
  * @author epr
  */
 @MagicPermission
 public abstract class VmAddress extends VmSystemObject {
-	
-	/**
-	 * Convert the given address to a String.
-	 * The length of the string depends of the reference size of
-	 * the current architecture.
-	 * @param addr
-	 * @return
-	 */
-	public static String toString(VmAddress addr) {
-	    final int refsize = VmProcessor.current().getArchitecture().getReferenceSize();
-	    if (refsize == 4) {
-	        return NumberUtils.hex(Address.fromAddress(addr).toInt());
-	    } else {
-	        return NumberUtils.hex(Address.fromAddress(addr).toLong());	        
-	    }
-	}
+
+    /**
+     * Convert the given address to a String.
+     * The length of the string depends of the reference size of
+     * the current architecture.
+     *
+     * @param addr
+     * @return
+     */
+    public static String toString(VmAddress addr) {
+        final int refsize = VmProcessor.current().getArchitecture().getReferenceSize();
+        if (refsize == 4) {
+            return NumberUtils.hex(Address.fromAddress(addr).toInt());
+        } else {
+            return NumberUtils.hex(Address.fromAddress(addr).toLong());
+        }
+    }
 }

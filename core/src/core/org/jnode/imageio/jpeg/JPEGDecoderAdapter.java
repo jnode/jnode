@@ -3,22 +3,23 @@
  */
 package org.jnode.imageio.jpeg;
 
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.imageio.stream.ImageInputStream;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class JPEGDecoderAdapter implements JPEGDecoder.PixelArray{
+public class JPEGDecoderAdapter implements JPEGDecoder.PixelArray {
     private JPEGDecoder dec;
     private InputStream is;
     private BufferedImage im;
+
     public JPEGDecoderAdapter(final ImageInputStream in) throws JPEGException {
         dec = new JPEGDecoder();
-        is = new BufferedInputStream(new InputStream(){
+        is = new BufferedInputStream(new InputStream() {
             public int read() throws IOException {
                 return in.read();
             }
@@ -40,17 +41,17 @@ public class JPEGDecoderAdapter implements JPEGDecoder.PixelArray{
     }
 
     public void decode() {
-        if(im == null) {
+        if (im == null) {
             try {
                 dec.decode(is, this);
-            }catch (Exception x) {
+            } catch (Exception x) {
                 throw new RuntimeException(x);
             }
         }
     }
 
     public void setPixel(int x, int y, int argb) {
-        im.setRGB(x,y,argb);
+        im.setRGB(x, y, argb);
     }
 
     public void setSize(int width, int height) throws Exception {

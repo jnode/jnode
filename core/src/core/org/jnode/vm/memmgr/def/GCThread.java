@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.system.BootLog;
@@ -29,21 +29,29 @@ import org.jnode.vm.scheduler.Monitor;
  */
 final class GCThread extends Thread {
 
-    /** The manager */
+    /**
+     * The manager
+     */
     private final GCManager manager;
 
-    /** Monitor for synchronizing access to my fields */
+    /**
+     * Monitor for synchronizing access to my fields
+     */
     private final Monitor heapMonitor;
 
-    /** Is a GC run requested? */
+    /**
+     * Is a GC run requested?
+     */
     private boolean runNeeded;
 
-    /** Is the GC currently active */
+    /**
+     * Is the GC currently active
+     */
     private boolean gcActive;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param manager
      */
     public GCThread(GCManager manager, Monitor heapMonitor) {
@@ -54,10 +62,9 @@ final class GCThread extends Thread {
 
     /**
      * Trigger a GC run.
-     * 
-     * @param waitToFinish
-     *            If true, block until the run is ready, if false, return
-     *            immediately.
+     *
+     * @param waitToFinish If true, block until the run is ready, if false, return
+     *                     immediately.
      */
     public final void trigger(boolean waitToFinish) {
         if (runNeeded && !waitToFinish) {
@@ -83,7 +90,7 @@ final class GCThread extends Thread {
 
     /**
      * Continue to GC.
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     public final void run() {
@@ -99,10 +106,10 @@ final class GCThread extends Thread {
                 } finally {
                     heapMonitor.exit();
                 }
-                 
+
                 // Now do the actual GC
                 manager.gc();
-                
+
                 // Notify that we're ready
                 gcActive = false;
                 heapMonitor.enter();

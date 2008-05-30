@@ -18,38 +18,36 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.naming;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.isolate.VmIsolate;
 
 public class DefaultNameSpace implements NameSpace {
 
-    /** All bound names+services */
+    /**
+     * All bound names+services
+     */
     protected final Map<VmType<?>, Object> namespace = new HashMap<VmType<?>, Object>();
 
     /**
      * Bind a given service in the namespace under a given name.
-     * 
+     *
      * @param name
      * @param service
-     * @throws NameAlreadyBoundException
-     *             if the name already exists within this namespace
+     * @throws NameAlreadyBoundException if the name already exists within this namespace
      */
     @PrivilegedActionPragma
     public <T> void bind(Class<T> name, T service) throws NamingException,
-            NameAlreadyBoundException {
+        NameAlreadyBoundException {
         if (name == null) {
             throw new IllegalArgumentException("name == null");
         }
@@ -64,7 +62,7 @@ public class DefaultNameSpace implements NameSpace {
     /**
      * Unbind a service with a given name from the namespace. If the name does
      * not exist in this namespace, this method returns without an error.
-     * 
+     *
      * @param name
      */
     @PrivilegedActionPragma
@@ -76,10 +74,9 @@ public class DefaultNameSpace implements NameSpace {
 
     /**
      * Lookup a service with a given name.
-     * 
+     *
      * @param name
-     * @throws NameNotFoundException
-     *             if the name was not found in this namespace
+     * @throws NameNotFoundException if the name was not found in this namespace
      */
     @PrivilegedActionPragma
     public <T> T lookup(Class<T> name) throws NameNotFoundException {

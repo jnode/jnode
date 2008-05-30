@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.assembler;
  */
 public class UnresolvedObjectRefException extends Exception {
 
-	/**
-	 * 
-	 */
-	public UnresolvedObjectRefException() {
-		super();
-	}
+    /**
+     *
+     */
+    public UnresolvedObjectRefException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public UnresolvedObjectRefException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public UnresolvedObjectRefException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public UnresolvedObjectRefException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public UnresolvedObjectRefException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public UnresolvedObjectRefException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public UnresolvedObjectRefException(String s) {
+        super(s);
+    }
 }

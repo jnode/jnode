@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
@@ -28,9 +28,10 @@ import org.jnode.vm.VmSystemObject;
  */
 public abstract class AbstractCode extends VmSystemObject {
 
-	/**
-	 * Get the number of exception handlers
-	 * @return int
-	 */
-	public abstract int getNoExceptionHandlers();
+    /**
+     * Get the number of exception handlers
+     *
+     * @return int
+     */
+    public abstract int getNoExceptionHandlers();
 }

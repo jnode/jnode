@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VmStackReader;
@@ -28,9 +28,9 @@ import org.vmmagic.unboxed.Offset;
 
 /**
  * Stack frame reader for the X86 architecture.
- * 
+ * <p/>
  * Strack frame layout.
- * 
+ * <p/>
  * <pre>
  *   .. bottom of stack ..
  *   method argument 1
@@ -42,56 +42,56 @@ import org.vmmagic.unboxed.Offset;
  *   local variables
  *   calculation stack
  * </pre>
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 public final class VmX86StackReader extends VmStackReader {
 
-	// Locals are before this object.
-	// ...
-	public static final int METHOD_ID_OFFSET = 0;
-	public static final int PREVIOUS_OFFSET = 1;
-	public static final int RETURNADDRESS_OFFSET = 2;
-	// Stack follows here
-	// ...
+    // Locals are before this object.
+    // ...
+    public static final int METHOD_ID_OFFSET = 0;
+    public static final int PREVIOUS_OFFSET = 1;
+    public static final int RETURNADDRESS_OFFSET = 2;
+    // Stack follows here
+    // ...
 
     private final int slotSize;
-    
+
     public VmX86StackReader(int slotSize) {
         this.slotSize = slotSize;
     }
 
-	/**
-	 * @param sf
-	 * @return int
-	 */
-	protected Offset getMethodIdOffset(Address sf) {
-		return Offset.fromIntSignExtend(METHOD_ID_OFFSET * slotSize);
-	}
+    /**
+     * @param sf
+     * @return int
+     */
+    protected Offset getMethodIdOffset(Address sf) {
+        return Offset.fromIntSignExtend(METHOD_ID_OFFSET * slotSize);
+    }
 
-	/**
-	 * @param sf
-	 * @return int
-	 */
-	protected final Offset getPCOffset(Address sf) {
-		return Offset.fromIntSignExtend(0xFFFFFFFF);//PC_OFFSET;
-	}
+    /**
+     * @param sf
+     * @return int
+     */
+    protected final Offset getPCOffset(Address sf) {
+        return Offset.fromIntSignExtend(0xFFFFFFFF); //PC_OFFSET;
+    }
 
-	/**
-	 * @param sf
-	 * @return int
-	 */
-	protected Offset getPreviousOffset(Address sf) {
-		return Offset.fromIntSignExtend(PREVIOUS_OFFSET * slotSize);
-	}
+    /**
+     * @param sf
+     * @return int
+     */
+    protected Offset getPreviousOffset(Address sf) {
+        return Offset.fromIntSignExtend(PREVIOUS_OFFSET * slotSize);
+    }
 
-	/**
-	 * @param sf
-	 * @return int
-	 */
-	protected Offset getReturnAddressOffset(Address sf) {
-		return Offset.fromIntSignExtend(RETURNADDRESS_OFFSET * slotSize);
-	}
+    /**
+     * @param sf
+     * @return int
+     */
+    protected Offset getReturnAddressOffset(Address sf) {
+        return Offset.fromIntSignExtend(RETURNADDRESS_OFFSET * slotSize);
+    }
 
 }

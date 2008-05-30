@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir.quad;
 
 import org.jnode.vm.compiler.ir.CodeGenerator;
@@ -39,7 +39,7 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
      * @param lhsIndex
      */
     public ConstantRefAssignQuad(int address, IRBasicBlock<T> block, int lhsIndex,
-            Constant<T> rhs) {
+                                 Constant<T> rhs) {
         super(address, block, lhsIndex);
         this.rhs = rhs;
     }
@@ -53,7 +53,7 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
 
     public String toString() {
         return getAddress() + ": " + getLHS().toString() + " = "
-                + rhs.toString();
+            + rhs.toString();
     }
 
     /**

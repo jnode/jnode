@@ -7,15 +7,16 @@ package org.jnode.vm.isolate.link;
 final class StringLinkMessage extends LinkMessageImpl {
 
     private final String value;
-    
+
     /**
      * Message constructor
+     *
      * @param value
      */
     StringLinkMessage(String value) {
         this.value = value;
     }
-    
+
     /**
      * @see org.jnode.vm.isolate.LinkMessageImpl#CloneMessage()
      */
@@ -46,5 +47,5 @@ final class StringLinkMessage extends LinkMessageImpl {
     @Override
     public String extractString() {
         return value;
-    }        
+    }
 }

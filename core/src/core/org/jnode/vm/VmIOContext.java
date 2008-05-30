@@ -31,7 +31,7 @@ public class VmIOContext implements IOContext {
         globalErrStream = err;
     }
 
-    public PrintStream getGlobalErrStream(){
+    public PrintStream getGlobalErrStream() {
         return globalErrStream;
     }
 
@@ -55,22 +55,22 @@ public class VmIOContext implements IOContext {
     }
 
     public void enterContext() {
-    	// No-op
+        // No-op
     }
 
     public void exitContext() {
-    	// No-op
+        // No-op
     }
 
-	public PrintStream getRealSystemErr() {
-		return System.err;
-	}
+    public PrintStream getRealSystemErr() {
+        return System.err;
+    }
 
-	public InputStream getRealSystemIn() {
-		return System.in;
-	}
+    public InputStream getRealSystemIn() {
+        return System.in;
+    }
 
-	public PrintStream getRealSystemOut() {
-		return System.out;
-	}
+    public PrintStream getRealSystemOut() {
+        return System.out;
+    }
 }

@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
-
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
@@ -36,8 +35,9 @@ public @interface AllowedPackages {
 
     /**
      * Gets the packages in which it is allowed to use this annotation.
+     *
      * @return
      */
     String[] value();
-    
+
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import org.jnode.plugin.PluginDescriptor;
@@ -28,20 +28,21 @@ import org.jnode.plugin.PluginDescriptor;
  */
 abstract class PluginModelObject extends AbstractModelObject {
 
-	private final PluginDescriptorModel plugin;
-	
-	/**
-	 * Create a new instance
-	 * @param plugin
-	 */
-	public PluginModelObject(PluginDescriptorModel plugin) {
-		this.plugin = plugin;
-	}
-	
-	/**
-	 * Gets the descriptor of the plugin in which this element was declared.
-	 */
-	public PluginDescriptor getDeclaringPluginDescriptor() {
-		return plugin;
-	}
+    private final PluginDescriptorModel plugin;
+
+    /**
+     * Create a new instance
+     *
+     * @param plugin
+     */
+    public PluginModelObject(PluginDescriptorModel plugin) {
+        this.plugin = plugin;
+    }
+
+    /**
+     * Gets the descriptor of the plugin in which this element was declared.
+     */
+    public PluginDescriptor getDeclaringPluginDescriptor() {
+        return plugin;
+    }
 }

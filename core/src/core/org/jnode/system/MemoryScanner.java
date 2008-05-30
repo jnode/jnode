@@ -18,25 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system;
 
 import org.vmmagic.unboxed.Address;
 
 /**
  * Interface for searching data in a memory region.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface MemoryScanner {
-    
+
     /**
      * Find a given 8-bit int (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
+     *
+     * @param start    The address where to start searching.
+     * @param size     The length of the region to search (in bytes)
+     * @param match    The value to search for
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
@@ -46,9 +47,10 @@ public interface MemoryScanner {
      * Find a given 16-bit int (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
+     *
+     * @param start    The address where to start searching.
+     * @param size     The length of the region to search (in bytes)
+     * @param match    The value to search for
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
@@ -58,21 +60,23 @@ public interface MemoryScanner {
      * Find a given 32-bit int (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
+     *
+     * @param start    The address where to start searching.
+     * @param size     The length of the region to search (in bytes)
+     * @param match    The value to search for
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
     public Address findInt32(Address start, int size, int match, int stepSize);
-    
+
     /**
      * Find a given 64-bit int (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
+     *
+     * @param start    The address where to start searching.
+     * @param size     The length of the region to search (in bytes)
+     * @param match    The value to search for
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
@@ -82,12 +86,13 @@ public interface MemoryScanner {
      * Find a given 8-bit int array (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
-     * @param matchOffset 
-     * @param matchLength 
-     * @param stepSize The size of of step.
+     *
+     * @param start       The address where to start searching.
+     * @param size        The length of the region to search (in bytes)
+     * @param match       The value to search for
+     * @param matchOffset
+     * @param matchLength
+     * @param stepSize    The size of of step.
      * @return The address of the first match, or null if not found.
      */
     public Address findInt8Array(Address start, int size, byte[] match, int matchOffset, int matchLength, int stepSize);
@@ -96,55 +101,62 @@ public interface MemoryScanner {
      * Find a given 16-bit int array (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
-     * @param matchOffset 
-     * @param matchLength 
-     * @param stepSize The size of of step.
+     *
+     * @param start       The address where to start searching.
+     * @param size        The length of the region to search (in bytes)
+     * @param match       The value to search for
+     * @param matchOffset
+     * @param matchLength
+     * @param stepSize    The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public Address findInt16Array(Address start, int size, char[] match, int matchOffset, int matchLength, int stepSize);
-    
+    public Address findInt16Array(Address start, int size, char[] match, int matchOffset, int matchLength,
+                                  int stepSize);
+
     /**
      * Find a given 16-bit int array (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
-     * @param matchOffset 
-     * @param matchLength 
-     * @param stepSize The size of of step.
+     *
+     * @param start       The address where to start searching.
+     * @param size        The length of the region to search (in bytes)
+     * @param match       The value to search for
+     * @param matchOffset
+     * @param matchLength
+     * @param stepSize    The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public Address findInt16Array(Address start, int size, short[] match, int matchOffset, int matchLength, int stepSize);
-    
+    public Address findInt16Array(Address start, int size, short[] match, int matchOffset, int matchLength,
+                                  int stepSize);
+
     /**
      * Find a given 32-bit int array (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
-     * @param matchOffset 
-     * @param matchLength 
-     * @param stepSize The size of of step.
+     *
+     * @param start       The address where to start searching.
+     * @param size        The length of the region to search (in bytes)
+     * @param match       The value to search for
+     * @param matchOffset
+     * @param matchLength
+     * @param stepSize    The size of of step.
      * @return The address of the first match, or null if not found.
      */
     public Address findInt32Array(Address start, int size, int[] match, int matchOffset, int matchLength, int stepSize);
-    
+
     /**
      * Find a given 64-bit int array (match) withing a given region.
      * This method searches at interface of stepSize large, only values at
      * the beginning of a step are matched.
-     * @param start The address where to start searching.
-     * @param size The length of the region to search (in bytes)
-     * @param match The value to search for
-     * @param matchOffset 
-     * @param matchLength 
-     * @param stepSize The size of of step.
+     *
+     * @param start       The address where to start searching.
+     * @param size        The length of the region to search (in bytes)
+     * @param match       The value to search for
+     * @param matchOffset
+     * @param matchLength
+     * @param stepSize    The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public Address findInt64Array(Address start, int size, long[] match, int matchOffset, int matchLength, int stepSize);
+    public Address findInt64Array(Address start, int size, long[] match, int matchOffset, int matchLength,
+                                  int stepSize);
 }

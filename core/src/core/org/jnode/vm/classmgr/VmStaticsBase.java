@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
@@ -28,7 +28,7 @@ import org.jnode.vm.VmSystemObject;
  */
 abstract class VmStaticsBase extends VmSystemObject {
 
-	protected static final byte TYPE_INT = 0x01;
+    protected static final byte TYPE_INT = 0x01;
     protected static final byte TYPE_LONG = 0x02;
     protected static final byte TYPE_OBJECT = 0x03;
     protected static final byte TYPE_ADDRESS = 0x04;

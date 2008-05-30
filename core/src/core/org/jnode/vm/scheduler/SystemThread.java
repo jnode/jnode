@@ -18,13 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 /**
  * When a Thread implements this interface, calls to setPriority will be
  * accepted. Otherwise these calls will be ignored.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface SystemThread {

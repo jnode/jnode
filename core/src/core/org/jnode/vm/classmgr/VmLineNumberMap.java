@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
@@ -48,7 +48,7 @@ public class VmLineNumberMap extends VmSystemObject {
 
     /**
      * Gets the number of entries of this table
-     * 
+     *
      * @return length of the table
      */
     public int getLength() {
@@ -57,7 +57,7 @@ public class VmLineNumberMap extends VmSystemObject {
 
     /**
      * Gets the start PC field of an entry in this table with a given index.
-     * 
+     *
      * @param index
      * @return int
      */
@@ -67,7 +67,7 @@ public class VmLineNumberMap extends VmSystemObject {
 
     /**
      * Gets the line number field of an entry in this table with a given index.
-     * 
+     *
      * @param index
      * @return int
      */
@@ -77,7 +77,7 @@ public class VmLineNumberMap extends VmSystemObject {
 
     /**
      * Gets the linenumber for a given PC.
-     * 
+     *
      * @param pc
      * @return The line number
      */

@@ -18,20 +18,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.security;
 
 import java.security.BasicPermission;
 
 /**
  * JNode specific permission.
- * 
+ * <p/>
  * Known permission names:
  * <ul>
- *   <li>getVmClass
- *   <li>getVmThread
+ * <li>getVmClass
+ * <li>getVmThread
  * </ul>
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class JNodePermission extends BasicPermission {
@@ -42,7 +42,7 @@ public class JNodePermission extends BasicPermission {
     public JNodePermission(String name) {
         super(name);
     }
-    
+
     /**
      * @param name
      * @param actions

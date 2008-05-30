@@ -18,20 +18,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
 import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * Exception to trigger the compiler to load the statics register upon entry of
  * this method.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented

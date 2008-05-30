@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.system.MemoryScanner;
@@ -45,10 +45,11 @@ final class MemoryScannerImpl implements MemoryScanner {
                 return start.add(offset);
             } else {
                 offset += stepSize;
-            }           
+            }
         }
         return null;
     }
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt32(org.jnode.vm.Address, int, int, int)
      */
@@ -60,10 +61,11 @@ final class MemoryScannerImpl implements MemoryScanner {
                 return start.add(offset);
             } else {
                 offset += stepSize;
-            }           
+            }
         }
         return null;
     }
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt64(org.jnode.vm.Address, int, long, int)
      */
@@ -75,10 +77,11 @@ final class MemoryScannerImpl implements MemoryScanner {
                 return start.add(offset);
             } else {
                 offset += stepSize;
-            }           
+            }
         }
         return null;
     }
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt8(org.jnode.vm.Address, int, int, int)
      */
@@ -90,20 +93,20 @@ final class MemoryScannerImpl implements MemoryScanner {
                 return start.add(offset);
             } else {
                 offset += stepSize;
-            }           
+            }
         }
         return null;
     }
-    
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt8Array(org.jnode.vm.Address, int, byte[], int, int, int)
      */
     public Address findInt8Array(Address start, int size, byte[] match,
-            int matchOffset, int matchLength, int stepSize) {
+                                 int matchOffset, int matchLength, int stepSize) {
         int offset = 0;
         size -= (matchLength - 1);
         final int match0 = match[matchOffset] & 0xFF;
-        while (offset < size) {            
+        while (offset < size) {
             if ((start.loadByte(Offset.fromIntSignExtend(offset)) & 0xFF) == match0) {
                 if (isMatch(start, offset, match, matchOffset, matchLength)) {
                     return start.add(offset);
@@ -113,16 +116,16 @@ final class MemoryScannerImpl implements MemoryScanner {
         }
         return null;
     }
-    
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt16Array(org.jnode.vm.Address, int, char[], int, int, int)
      */
     public Address findInt16Array(Address start, int size, char[] match,
-            int matchOffset, int matchLength, int stepSize) {
+                                  int matchOffset, int matchLength, int stepSize) {
         int offset = 0;
         size -= ((matchLength * 2) - 1);
         final int match0 = match[matchOffset] & 0xFFFF;
-        while (offset < size) {            
+        while (offset < size) {
             if ((start.loadChar(Offset.fromIntSignExtend(offset)) & 0xFFFF) == match0) {
                 if (isMatch(start, offset, match, matchOffset, matchLength)) {
                     return start.add(offset);
@@ -132,16 +135,16 @@ final class MemoryScannerImpl implements MemoryScanner {
         }
         return null;
     }
-    
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt16Array(org.jnode.vm.Address, int, short[], int, int, int)
      */
     public Address findInt16Array(Address start, int size, short[] match,
-            int matchOffset, int matchLength, int stepSize) {
+                                  int matchOffset, int matchLength, int stepSize) {
         int offset = 0;
         size -= ((matchLength * 2) - 1);
         final int match0 = match[matchOffset] & 0xFFFF;
-        while (offset < size) {            
+        while (offset < size) {
             if ((start.loadShort(Offset.fromIntSignExtend(offset)) & 0xFFFF) == match0) {
                 if (isMatch(start, offset, match, matchOffset, matchLength)) {
                     return start.add(offset);
@@ -151,16 +154,16 @@ final class MemoryScannerImpl implements MemoryScanner {
         }
         return null;
     }
-    
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt32Array(org.jnode.vm.Address, int, int[], int, int, int)
      */
     public Address findInt32Array(Address start, int size, int[] match,
-            int matchOffset, int matchLength, int stepSize) {
+                                  int matchOffset, int matchLength, int stepSize) {
         int offset = 0;
         size -= ((matchLength * 4) - 1);
         final int match0 = match[matchOffset];
-        while (offset < size) {            
+        while (offset < size) {
             if (start.loadInt(Offset.fromIntSignExtend(offset)) == match0) {
                 if (isMatch(start, offset, match, matchOffset, matchLength)) {
                     return start.add(offset);
@@ -170,16 +173,16 @@ final class MemoryScannerImpl implements MemoryScanner {
         }
         return null;
     }
-    
+
     /**
      * @see org.jnode.system.MemoryScanner#findInt64Array(org.jnode.vm.Address, int, long[], int, int, int)
      */
     public Address findInt64Array(Address start, int size, long[] match,
-            int matchOffset, int matchLength, int stepSize) {
+                                  int matchOffset, int matchLength, int stepSize) {
         int offset = 0;
         size -= ((matchLength * 8) - 1);
         final long match0 = match[matchOffset];
-        while (offset < size) {            
+        while (offset < size) {
             if (start.loadLong(Offset.fromIntSignExtend(offset)) == match0) {
                 if (isMatch(start, offset, match, matchOffset, matchLength)) {
                     return start.add(offset);
@@ -189,53 +192,55 @@ final class MemoryScannerImpl implements MemoryScanner {
         }
         return null;
     }
-    
+
     private final boolean isMatch(Address start, int offset, byte[] match,
-            int matchOffset, int matchLength) {
+                                  int matchOffset, int matchLength) {
         for (int i = 0; i < matchLength; i++) {
-            if ((start.loadByte(Offset.fromIntSignExtend(offset + i)) & 0xFF) != (match[matchOffset+i] & 0xFF)) {
+            if ((start.loadByte(Offset.fromIntSignExtend(offset + i)) & 0xFF) != (match[matchOffset + i] & 0xFF)) {
                 return false;
-            }            
+            }
         }
         return true;
     }
 
     private final boolean isMatch(Address start, int offset, char[] match,
-            int matchOffset, int matchLength) {
+                                  int matchOffset, int matchLength) {
         for (int i = 0; i < matchLength; i++) {
-            if ((start.loadChar(Offset.fromIntSignExtend(offset + (i * 2))) & 0xFFFF) != (match[matchOffset+i] & 0xFFFF)) {
+            if ((start.loadChar(Offset.fromIntSignExtend(offset + (i * 2))) & 0xFFFF) !=
+                (match[matchOffset + i] & 0xFFFF)) {
                 return false;
-            }            
+            }
         }
         return true;
     }
 
     private final boolean isMatch(Address start, int offset, short[] match,
-            int matchOffset, int matchLength) {
+                                  int matchOffset, int matchLength) {
         for (int i = 0; i < matchLength; i++) {
-            if ((start.loadShort(Offset.fromIntSignExtend(offset + (i * 2))) & 0xFFFF) != (match[matchOffset+i] & 0xFFFF)) {
+            if ((start.loadShort(Offset.fromIntSignExtend(offset + (i * 2))) & 0xFFFF) !=
+                (match[matchOffset + i] & 0xFFFF)) {
                 return false;
-            }            
+            }
         }
         return true;
     }
 
     private final boolean isMatch(Address start, int offset, int[] match,
-            int matchOffset, int matchLength) {
+                                  int matchOffset, int matchLength) {
         for (int i = 0; i < matchLength; i++) {
-            if (start.loadInt(Offset.fromIntSignExtend(offset + (i * 4))) != match[matchOffset+i]) {
+            if (start.loadInt(Offset.fromIntSignExtend(offset + (i * 4))) != match[matchOffset + i]) {
                 return false;
-            }            
+            }
         }
         return true;
     }
 
     private final boolean isMatch(Address start, int offset, long[] match,
-            int matchOffset, int matchLength) {
+                                  int matchOffset, int matchLength) {
         for (int i = 0; i < matchLength; i++) {
-            if (start.loadLong(Offset.fromIntSignExtend(offset + (i * 8))) != match[matchOffset+i]) {
+            if (start.loadLong(Offset.fromIntSignExtend(offset + (i * 8))) != match[matchOffset + i]) {
                 return false;
-            }            
+            }
         }
         return true;
     }

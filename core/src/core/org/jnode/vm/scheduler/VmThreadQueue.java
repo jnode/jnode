@@ -30,10 +30,10 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Queue of VmThread's.
- * 
+ * <p/>
  * This class is not synchronized, but protected by PragmaUninterruptible's,
  * since it is used by the scheduler itself.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class VmThreadQueue extends VmSystemObject {
@@ -44,7 +44,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param name
      * @param sortByWakeupTime
      */
@@ -54,7 +54,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Gets the first thread in the queue.
-     * 
+     *
      * @return VmThread
      * @throws UninterruptiblePragma
      */
@@ -72,9 +72,8 @@ abstract class VmThreadQueue extends VmSystemObject {
     /**
      * Gets the first thread in the queue that has its currentProcessor field
      * set to null of the given processor.
-     * 
-     * @param currentProcessor
-     *            The processor making this request.
+     *
+     * @param currentProcessor The processor making this request.
      * @return VmThread
      */
     @KernelSpace
@@ -84,7 +83,7 @@ abstract class VmThreadQueue extends VmSystemObject {
         while (entry != null) {
             final VmThread thread = entry.thread;
             if ((thread.currentProcessor == null)
-                    || (thread.currentProcessor == currentProcessor)) {
+                || (thread.currentProcessor == currentProcessor)) {
                 return thread;
             }
             entry = entry.next;
@@ -94,7 +93,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Invoke the visit method of the visitor for all threads in this queue.
-     * 
+     *
      * @param visitor
      * @return false if the last visit returned false, true otherwise.
      */
@@ -111,7 +110,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Is this queue empty?
-     * 
+     *
      * @return boolean
      * @throws UninterruptiblePragma
      */
@@ -124,12 +123,11 @@ abstract class VmThreadQueue extends VmSystemObject {
     /**
      * Add the given thread to the given queue. The thread is added after all
      * thread with equal or higher priority.
-     * 
+     *
      * @param queue
      * @param entry
-     * @param ignorePriority
-     *            If true, the thread is always added to the back of the list,
-     *            regarding its priority.
+     * @param ignorePriority If true, the thread is always added to the back of the list,
+     *                       regarding its priority.
      * @param caller
      * @return The new queue.
      * @throws UninterruptiblePragma
@@ -137,7 +135,7 @@ abstract class VmThreadQueue extends VmSystemObject {
     @KernelSpace
     @Uninterruptible
     protected final VmThreadQueueEntry addToQueue(VmThreadQueueEntry queue,
-            VmThreadQueueEntry entry, boolean ignorePriority, String caller) {
+                                                  VmThreadQueueEntry entry, boolean ignorePriority, String caller) {
         entry.setInUse(this, caller);
         if (queue == null) {
             return entry;
@@ -174,7 +172,7 @@ abstract class VmThreadQueue extends VmSystemObject {
     /**
      * Add the given thread to the given queue such that the queue is sorted by
      * wakeup time. The nearest wakeup time is the first element in the queue.
-     * 
+     *
      * @param queue
      * @param entry
      * @param caller
@@ -182,8 +180,8 @@ abstract class VmThreadQueue extends VmSystemObject {
      * @throws UninterruptiblePragma
      */
     protected final VmThreadQueueEntry addToQueueSortByWakeupTime(
-            VmThreadQueueEntry queue, VmThreadQueueEntry entry, String caller)
-            throws UninterruptiblePragma {
+        VmThreadQueueEntry queue, VmThreadQueueEntry entry, String caller)
+        throws UninterruptiblePragma {
         entry.setInUse(this, caller);
         if (queue == null) {
             return entry;
@@ -211,7 +209,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Remove the given thread from the given queue.
-     * 
+     *
      * @param queue
      * @param entry
      * @return The new queue.
@@ -220,7 +218,7 @@ abstract class VmThreadQueue extends VmSystemObject {
     @KernelSpace
     @Uninterruptible
     static VmThreadQueueEntry removeFromQueue(VmThreadQueueEntry queue,
-            VmThreadQueueEntry entry) {
+                                              VmThreadQueueEntry entry) {
         if (queue == null) {
             return queue;
         } else if (entry == null) {
@@ -277,7 +275,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Queue for all threads.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     final static class AllThreadsQueue extends VmThreadQueue {
@@ -290,7 +288,7 @@ abstract class VmThreadQueue extends VmSystemObject {
         }
 
         final void add(VmThread thread, String caller)
-                throws UninterruptiblePragma {
+            throws UninterruptiblePragma {
             first = addToQueue(first, thread.allThreadsEntry, true, caller);
         }
 
@@ -301,7 +299,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Queue for all sleeping threads.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     final static class SleepQueue extends VmThreadQueue {
@@ -316,7 +314,7 @@ abstract class VmThreadQueue extends VmSystemObject {
         @Uninterruptible
         final void add(VmThread thread, String caller) {
             first = addToQueueSortByWakeupTime(first, thread.sleepQueueEntry,
-                    caller);
+                caller);
         }
 
         @KernelSpace
@@ -328,7 +326,7 @@ abstract class VmThreadQueue extends VmSystemObject {
 
     /**
      * Queue used by the scheduler and monitors.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     final static class ScheduleQueue extends VmThreadQueue {

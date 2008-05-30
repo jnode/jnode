@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import java.security.AccessController;
@@ -31,9 +31,9 @@ import java.security.PrivilegedExceptionAction;
 public class AccessControllerUtils {
 
     /**
-     * Calls AccessController.doPrivileged and unwraps any exception wrapped 
+     * Calls AccessController.doPrivileged and unwraps any exception wrapped
      * in the PrivilegedActionException.
-     * 
+     *
      * @param action
      * @return
      * @throws Exception

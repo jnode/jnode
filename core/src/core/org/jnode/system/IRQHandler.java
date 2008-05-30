@@ -18,24 +18,25 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system;
 
 /**
  * Hardware Interrupt Handler interface.
- * 
+ * <p/>
  * An interrupt handler is called from the kernel with interrupts disabled. So keep and handling
  * here as short as possible!
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface IRQHandler {
 
-	/**
-	 * Handle a given hardware interrupt. This method is called from the kernel with interrupts
-	 * disabled. So keep and handling here as short as possible!
-	 * @param irq
-	 */
-	public void handleInterrupt(int irq);
+    /**
+     * Handle a given hardware interrupt. This method is called from the kernel with interrupts
+     * disabled. So keep and handling here as short as possible!
+     *
+     * @param irq
+     */
+    public void handleInterrupt(int irq);
 
 }

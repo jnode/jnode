@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.net.URL;
@@ -31,7 +31,7 @@ public interface ResourceLoader {
 
     /**
      * Gets a resource with a given name as a byte buffer.
-     * 
+     *
      * @param resourceName
      * @return null if not found
      */
@@ -39,7 +39,7 @@ public interface ResourceLoader {
 
     /**
      * Does this loader contain the resource with the given name.
-     * 
+     *
      * @param resourceName
      * @return boolean
      */
@@ -47,7 +47,7 @@ public interface ResourceLoader {
 
     /**
      * Does this loader contain the resource with the given name.
-     * 
+     *
      * @param resourceName
      * @return boolean
      */

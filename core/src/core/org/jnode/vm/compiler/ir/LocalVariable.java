@@ -18,34 +18,33 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- *
  */
 public class LocalVariable<T> extends Variable<T> {
-	/**
-	 * @param type
-	 * @param index
-	 */
-	public LocalVariable(int type, int index) {
-		super(type, index);
-	}
+    /**
+     * @param type
+     * @param index
+     */
+    public LocalVariable(int type, int index) {
+        super(type, index);
+    }
 
-	/**
-	 * @param variable
-	 */
-	public LocalVariable(LocalVariable<T> variable) {
-		this(variable.getType(), variable.getIndex());
-	}
+    /**
+     * @param variable
+     */
+    public LocalVariable(LocalVariable<T> variable) {
+        this(variable.getType(), variable.getIndex());
+    }
 
-	public String toString() {
-		return "l" + getIndex() + '_' + getSSAValue();
-	}
-	
-	public Object clone() {
-		return new LocalVariable<T>(this);
-	}
+    public String toString() {
+        return "l" + getIndex() + '_' + getSSAValue();
+    }
+
+    public Object clone() {
+        return new LocalVariable<T>(this);
+    }
 }

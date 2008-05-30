@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.manager;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginLoaderManager;
 
@@ -34,7 +33,7 @@ import org.jnode.plugin.PluginLoaderManager;
 public class DefaultPluginLoaderManager extends PluginLoaderManager {
 
     private final List<PluginLoader> loaders = new ArrayList<PluginLoader>();
-    
+
     /**
      * @see org.jnode.plugin.PluginLoaderManager#addPluginLoader(org.jnode.plugin.PluginLoader)
      */
@@ -43,20 +42,20 @@ public class DefaultPluginLoaderManager extends PluginLoaderManager {
             loaders.add(loader);
         }
     }
-    
+
     /**
      * @see org.jnode.plugin.PluginLoaderManager#removePluginLoader(org.jnode.plugin.PluginLoader)
      */
     public synchronized void removePluginLoader(PluginLoader loader) {
         loaders.remove(loader);
     }
-    
+
     /**
      * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
      */
     public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
         final List<PluginLoader> loaders;
-        synchronized(this) {
+        synchronized (this) {
             loaders = new ArrayList<PluginLoader>(this.loaders);
         }
         for (PluginLoader loader : loaders) {

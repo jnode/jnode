@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.Internal;
@@ -32,181 +32,184 @@ import org.vmmagic.unboxed.Word;
 /**
  * Class containing "magic" methods that are interpreted by the VM itself,
  * instead of being executed as normal java methods.
- * 
+ * <p/>
  * Methods is this class can also be called from inside JNode.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 public final class VmMagic {
 
-	/**
-	 * Gets the VmType of the given object.
-	 * 
-	 * @param object
-	 * @return the VmType of the given object
-	 */
-	public static VmClassType<?> getObjectType(Object object) {
-		return null;
-	}
+    /**
+     * Gets the VmType of the given object.
+     *
+     * @param object
+     * @return the VmType of the given object
+     */
+    public static VmClassType<?> getObjectType(Object object) {
+        return null;
+    }
 
-	/**
-	 * Gets the Type Information Block of the given object.
-	 * 
-	 * @param object
-	 * @return TIB
-	 */
-	public static Object[] getTIB(Object object) {
-		return null;
-	}
+    /**
+     * Gets the Type Information Block of the given object.
+     *
+     * @param object
+     * @return TIB
+     */
+    public static Object[] getTIB(Object object) {
+        return null;
+    }
 
-	/**
-	 * Gets all of the flags of the given object.
-	 * 
-	 * @param object
-	 * @return int
-	 */
-	public static Word getObjectFlags(Object object) {
-		return Word.zero();
-	}
+    /**
+     * Gets all of the flags of the given object.
+     *
+     * @param object
+     * @return int
+     */
+    public static Word getObjectFlags(Object object) {
+        return Word.zero();
+    }
 
-	/**
-	 * Gets the GC color flags of the given object.
-	 * 
-	 * @param object
-	 * @return int
-	 */
-	public static int getObjectColor(Object object) {
-		return 0;
-	}
+    /**
+     * Gets the GC color flags of the given object.
+     *
+     * @param object
+     * @return int
+     */
+    public static int getObjectColor(Object object) {
+        return 0;
+    }
 
-	/**
-	 * Sets all of the flags of the given object.
-	 * 
-	 * @param object
-	 * @param flags
-	 */
-	public static void setObjectFlags(Object object, Word flags) {
+    /**
+     * Sets all of the flags of the given object.
+     *
+     * @param object
+     * @param flags
+     */
+    public static void setObjectFlags(Object object, Word flags) {
 
-	}
+    }
 
-	/**
-	 * Gets the address of the first array element of the given array.
-	 * 
-	 * @param array
-	 * @return the address of the first array element of the given array
-	 */
-	public static Address getArrayData(Object array) {
-		return null;
-	}
+    /**
+     * Gets the address of the first array element of the given array.
+     *
+     * @param array
+     * @return the address of the first array element of the given array
+     */
+    public static Address getArrayData(Object array) {
+        return null;
+    }
 
-	/**
-	 * Has the given object been finalized.
-	 * 
-	 * @param src
-	 * @return if the given object has been finalized
-	 */
-	public static boolean isFinalized(Object src) {
-		return false;
-	}
+    /**
+     * Has the given object been finalized.
+     *
+     * @param src
+     * @return if the given object has been finalized
+     */
+    public static boolean isFinalized(Object src) {
+        return false;
+    }
 
-	/**
-	 * Gets the current stackframe
-	 * 
-	 * @return The address of the stackframe of the current thread
-	 */
+    /**
+     * Gets the current stackframe
+     *
+     * @return The address of the stackframe of the current thread
+     */
     @KernelSpace
     @Internal
-	public static Address getCurrentFrame() {
-		return null;
-	}
+    public static Address getCurrentFrame() {
+        return null;
+    }
 
-	/**
-	 * Gets the timestamp of the current processor.
-	 * 
-	 * @return the timestamp of the current processor
-	 */
-	public static long getTimeStamp() {
-		return 0;
-	}
+    /**
+     * Gets the timestamp of the current processor.
+     *
+     * @return the timestamp of the current processor
+     */
+    public static long getTimeStamp() {
+        return 0;
+    }
 
-	/**
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static float intBitsToFloat(int value) {
-		return 0;
-	}
+    /**
+     * @param value
+     * @return
+     */
+    public static float intBitsToFloat(int value) {
+        return 0;
+    }
 
-	/**
-	 * @param value
-	 * @return
-	 */
-	public static int floatToRawIntBits(float value) {
-		return 0;
-	}
+    /**
+     * @param value
+     * @return
+     */
+    public static int floatToRawIntBits(float value) {
+        return 0;
+    }
 
-	/**
-	 * @param value
-	 * @return
-	 */
-	public static double longBitsToDouble(long value) {
-		return 0;
-	}
+    /**
+     * @param value
+     * @return
+     */
+    public static double longBitsToDouble(long value) {
+        return 0;
+    }
 
-	/**
-	 * @param value
-	 * @return
-	 */
-	public static long doubleToRawLongBits(double value) {
-		return 0;
-	}
+    /**
+     * @param value
+     * @return
+     */
+    public static long doubleToRawLongBits(double value) {
+        return 0;
+    }
 
-	/**
-	 * Force a breakpoint
-	 */
-	public static void breakPoint() {}
+    /**
+     * Force a breakpoint
+     */
+    public static void breakPoint() {
+    }
 
     /**
      * Gets the processor executing the current thread.
+     *
      * @return the processor executing the current thread
      */
     @KernelSpace
     public final static VmProcessor currentProcessor() {
         return null;
     }
-    
+
     /**
      * Gets the address of a shared static field.
-     * @param index 
+     *
+     * @param index
      * @return the address of a shared static field
      */
     public final static Address getSharedStaticFieldAddress(int index) {
         return null;
     }
-    
+
     /**
      * Gets the address of a isolated static field.
-     * @param index 
+     *
+     * @param index
      * @return the address of a isolated static field
      */
     public final static Address getIsolatedStaticFieldAddress(int index) {
         return null;
     }
-    
+
     /**
      * Are we currently running JNode.
-     * 
+     *
      * @return true when running JNode, false when running any other VM.
      */
     public final static boolean isRunningJNode() {
         return false;
     }
-    
-	/**
-	 * Do not instantiate this class.
-	 */
-	private VmMagic() {
-	}
+
+    /**
+     * Do not instantiate this class.
+     */
+    private VmMagic() {
+    }
 }

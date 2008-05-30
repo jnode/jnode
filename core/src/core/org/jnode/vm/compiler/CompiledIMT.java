@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import org.jnode.vm.VmSystemObject;
@@ -28,11 +28,11 @@ import org.jnode.vm.VmSystemObject;
  */
 public abstract class CompiledIMT extends VmSystemObject {
 
-	/**
-	 * Gets the address of the IMT code table.
-	 * 
-	 * @return
-	 */
-	public abstract Object getIMTAddress();
+    /**
+     * Gets the address of the IMT code table.
+     *
+     * @return
+     */
+    public abstract Object getIMTAddress();
 
 }

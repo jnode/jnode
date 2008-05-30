@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
@@ -32,6 +31,6 @@ import java.lang.annotation.Target;
  */
 @Retention(CLASS)
 @Target(METHOD)
-@AllowedPackages({"org.jnode.vm"})
+@AllowedPackages({"org.jnode.vm" })
 public @interface CheckPermission {
 }

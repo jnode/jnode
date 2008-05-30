@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.work;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
@@ -37,33 +35,49 @@ import org.jnode.util.QueueProcessorThread;
 
 /**
  * Plugin that implements the {@link org.jnode.work.WorkManager}.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class WorkPlugin extends Plugin implements WorkManager {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(WorkPlugin.class);
-    
-    /** Queue of work items */
+
+    /**
+     * Queue of work items
+     */
     private final Queue<Work> queue = new Queue<Work>();
 
-    /** Queue processor threads */
+    /**
+     * Queue processor threads
+     */
     private final List<QueueProcessorThread<Work>> threads;
 
-    /** Number of workers started initially. */
+    /**
+     * Number of workers started initially.
+     */
     private final int workerCount = 2; //8
 
-    /** Counter used for worker thread names */
+    /**
+     * Counter used for worker thread names
+     */
     private int counter = 1;
-    
-    /** Number of work items added */
+
+    /**
+     * Number of work items added
+     */
     private int workCounter;
-    
-    /** Number of work items started */
+
+    /**
+     * Number of work items started
+     */
     private int workStartCounter;
-    
-    /** Number of work items ended */
+
+    /**
+     * Number of work items ended
+     */
     private int workEndCounter;
 
     /**
@@ -117,7 +131,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
 
     /**
      * Gets the number of entries in the work queue.
-     * 
+     *
      * @return
      */
     public final int queueSize() {
@@ -126,7 +140,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
 
     /**
      * Is the work queue empty.
-     * 
+     *
      * @return
      */
     public final boolean isEmpty() {
@@ -138,7 +152,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
      */
     private synchronized void addWorker() {
         final QueueProcessorThread<Work> t = new QueueProcessorThread<Work>("worker-"
-                + counter, queue, new WorkProcessor());
+            + counter, queue, new WorkProcessor());
         threads.add(t);
         counter++;
         t.start();
@@ -157,7 +171,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
     final synchronized void incWorkEndCounter() {
         workEndCounter++;
     }
-    
+
     private int getFreeProcessors() {
         return workStartCounter - workEndCounter;
     }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system.repository;
 
 import org.jnode.system.repository.spi.SystemRepositoryProvider;
@@ -26,17 +26,19 @@ import org.jnode.system.repository.spi.SystemRepositoryProvider;
 public interface SystemRepository {
 
     public static final Class<SystemRepository> NAME = SystemRepository.class;
-    
+
     /**
      * Add a provider
+     *
      * @param provider
      */
     public void addProvider(SystemRepositoryProvider provider);
-    
+
     /**
      * Remove a provider
+     *
      * @param provider
      */
     public void removeProvider(SystemRepositoryProvider provider);
-    
+
 }

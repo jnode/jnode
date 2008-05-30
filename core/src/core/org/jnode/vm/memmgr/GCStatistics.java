@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr;
 
 import org.jnode.vm.VmSystemObject;
@@ -27,6 +27,6 @@ import org.jnode.vm.VmSystemObject;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class GCStatistics extends VmSystemObject {
-	
-	public abstract String toString();
+
+    public abstract String toString();
 }

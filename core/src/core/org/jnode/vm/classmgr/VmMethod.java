@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-
 import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
@@ -35,63 +34,89 @@ import org.vmmagic.unboxed.Address;
 @MagicPermission
 public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry {
 
-    /** Address of native code of this method */
+    /**
+     * Address of native code of this method
+     */
     private VmAddress nativeCode;
 
-    /** #Slots taken by arguments of this method (including this pointer) */
+    /**
+     * #Slots taken by arguments of this method (including this pointer)
+     */
     private final short argSlotCount;
 
-    /** Resolved types for each argument of this method */
+    /**
+     * Resolved types for each argument of this method
+     */
     private VmType[] paramTypes;
 
-    /** Resolved return type of this method */
+    /**
+     * Resolved return type of this method
+     */
     private VmType returnType;
 
-    /** java.lang.reflect.Method for this method */
+    /**
+     * java.lang.reflect.Method for this method
+     */
     private VmIsolateLocal<Member> javaMemberHolder;
 
-    /** The bytecode (if any) */
+    /**
+     * The bytecode (if any)
+     */
     private VmByteCode bytecode;
 
-    /** The compiled code (if any) */
+    /**
+     * The compiled code (if any)
+     */
     private VmCompiledCode compiledCode;
 
-    /** The exceptions we can throw */
+    /**
+     * The exceptions we can throw
+     */
     private VmExceptions exceptions;
 
-    /** The selector of this method name&type */
+    /**
+     * The selector of this method name&type
+     */
     private int selector;
 
-    /** Optimization level of native code */
+    /**
+     * Optimization level of native code
+     */
     private short nativeCodeOptLevel = -1;
 
-    /** The index in the statics table */
+    /**
+     * The index in the statics table
+     */
     private final int staticsIndex;
 
-    /** The mangled name of this method */
+    /**
+     * The mangled name of this method
+     */
     private String mangledName;
-    
-    /** Flags of variour pragma's set to this method */
+
+    /**
+     * Flags of variour pragma's set to this method
+     */
     private char pragmaFlags;
 
     /**
      * Constructor for VmMethod.
-     * 
+     *
      * @param name
      * @param signature
      * @param modifiers
      * @param declaringClass
      */
     protected VmMethod(String name, String signature, int modifiers,
-            VmType<?> declaringClass) {
+                       VmType<?> declaringClass) {
         super(
-                name,
-                signature,
-                modifiers | (returnsObject(signature) ? Modifier.ACC_OBJECTREF : 0),
-                declaringClass);
-        this.argSlotCount = (short)(Signature.getArgSlotCount(declaringClass
-                .getLoader().getArchitecture().getTypeSizeInfo(), signature)
-                + (isStatic() ? 0 : 1));
+            name,
+            signature,
+            modifiers | (returnsObject(signature) ? Modifier.ACC_OBJECTREF : 0),
+            declaringClass);
+        this.argSlotCount = (short) (Signature.getArgSlotCount(declaringClass
+            .getLoader().getArchitecture().getTypeSizeInfo(), signature)
+            + (isStatic() ? 0 : 1));
         final VmClassLoader cl = declaringClass.getLoader();
         if (isStatic()) {
             this.selector = 0;
@@ -100,18 +125,17 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         }
         this.staticsIndex = cl.getSharedStatics().allocMethodCode();
     }
-    
+
     private static final boolean returnsObject(String signature) {
         final char firstReturnSignatureChar = signature.charAt(signature
-                .indexOf(')') + 1);
-        return (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');        
+            .indexOf(')') + 1);
+        return (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');
     }
 
     /**
      * Initialize this instance, copy the given method.
-     * 
-     * @param src
-     *            The method that is copied.
+     *
+     * @param src The method that is copied.
      */
     protected VmMethod(VmMethod src) {
         super(src.name, src.signature, src.getModifiers(), src.declaringClass);
@@ -124,7 +148,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * Get the currently used byte-code information for this method. This
      * bytecode may have been optimized. This may return null if this is a
      * native or abstract method.
-     * 
+     *
      * @return The current bytecode
      */
     public final VmByteCode getBytecode() {
@@ -134,7 +158,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     //todo security review
     /**
      * Sets the bytecode information of this method.
-     * 
+     *
      * @param bc
      */
     public final void setBytecode(VmByteCode bc) {
@@ -144,7 +168,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Get the number of bytes in the byte-codes for this method.
-     * 
+     *
      * @return Length of bytecode
      */
     public final int getBytecodeSize() {
@@ -154,12 +178,12 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Gets myself as java.lang.reflect.Method or java.lang.reflect.Constructor,
      * depending on isConstructor().
-     * 
+     *
      * @return Method
      */
     public final Member asMember() {
         if (javaMemberHolder == null) {
-            javaMemberHolder = new VmIsolateLocal<Member>();            
+            javaMemberHolder = new VmIsolateLocal<Member>();
         }
         Member javaMember = javaMemberHolder.get();
         if (javaMember == null) {
@@ -175,7 +199,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Convert myself into a String representation
-     * 
+     *
      * @return String
      */
     public final String toString() {
@@ -184,13 +208,13 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Convert myself into a String representation
-     * 
+     *
      * @return The mangled name
      */
     public final String getMangledName() {
         if (mangledName == null) {
             mangledName = (declaringClass.getMangledName()
-                    + mangle("#" + getName() + '.' + getSignature())).intern();
+                + mangle("#" + getName() + '.' + getSignature())).intern();
         }
         return mangledName;
     }
@@ -198,6 +222,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Gets the full name of this method consisting of
      * its declaring class, its name and its signature.
+     *
      * @return
      */
     public final String getFullName() {
@@ -205,9 +230,10 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     }
 
     //todo security review
-    public final void resetOptLevel(){
+    public final void resetOptLevel() {
         nativeCodeOptLevel = 0;
     }
+
     /**
      * Compile this method with n optimization level 1 higher then the current
      * optimization level.
@@ -216,7 +242,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         final int optLevel = nativeCodeOptLevel + 1;
         if (!declaringClass.isPrepared()) {
             throw new IllegalStateException(
-                    "Declaring class must have been prepared");
+                "Declaring class must have been prepared");
         }
         LoadCompileService.compile(this, optLevel, false);
     }
@@ -224,13 +250,13 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Recompile a method declaring in the type given by its statics table index
      * and the index of the method within the type.
-     * 
+     *
      * @param typeStaticsIndex
      * @param methodIndex
      */
     static final void recompileMethod(int typeStaticsIndex, int methodIndex) {
         final VmType<?> type = Vm.getVm().getSharedStatics().getTypeEntry(
-                typeStaticsIndex);
+            typeStaticsIndex);
         type.initialize();
         final VmMethod method = type.getDeclaredMethod(methodIndex);
         method.recompile();
@@ -276,7 +302,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         if (paramTypes == null) {
             try {
                 Signature sig = new Signature(getSignature(), declaringClass
-                        .getLoader());
+                    .getLoader());
                 returnType = sig.getReturnType();
                 int count = sig.getParamCount();
                 final VmType[] types = new VmType[count];
@@ -286,7 +312,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                 this.paramTypes = types;
             } catch (ClassNotFoundException ex) {
                 throw (Error) new NoClassDefFoundError("In method "
-                        + toString()).initCause(ex);
+                    + toString()).initCause(ex);
             }
         }
     }
@@ -303,7 +329,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Does the given array of types match my argument types?
-     * 
+     *
      * @param argTypes
      * @return boolean
      */
@@ -331,7 +357,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Does this method return void?
-     * 
+     *
      * @return boolean
      */
     public final boolean isReturnVoid() {
@@ -340,7 +366,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Does this method return long or double?
-     * 
+     *
      * @return boolean
      */
     public final boolean isReturnWide() {
@@ -349,7 +375,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Does this method return an object reference.
-     * 
+     *
      * @return boolean
      */
     public final boolean isReturnObject() {
@@ -358,7 +384,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Gets the exceptions this method has declared to throw
-     * 
+     *
      * @return The exceptions this method has declared to throw, never null.
      */
     public final VmExceptions getExceptions() {
@@ -370,7 +396,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Sets the exceptions this method has declared to throw
-     * 
+     *
      * @param exceptions
      * @throws ClassFormatError
      */
@@ -380,7 +406,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
             this.pragmaFlags |= exceptions.getPragmaFlags();
         } else {
             throw new ClassFormatError(
-                    "Cannot have more then 1 Exceptions attribute");
+                "Cannot have more then 1 Exceptions attribute");
         }
     }
 
@@ -389,7 +415,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     final void addPragmaFlags(int flags) {
         this.pragmaFlags |= flags;
-        
+
         // KernelSpace implies uninterruptible
         if ((flags & MethodPragmaFlags.KERNELSPACE) != 0) {
             this.pragmaFlags |= MethodPragmaFlags.UNINTERRUPTIBLE;
@@ -398,7 +424,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Gets the compiled code information of this method (if any)
-     * 
+     *
      * @return The compiled code, or null if no compiled code has been set.
      */
     public final VmCompiledCode getDefaultCompiledCode() {
@@ -407,7 +433,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Gets the compiled code for a given magic value (if any)
-     * 
+     *
      * @return The compiled code, or null if no compiled code with the given
      *         magic has been set.
      */
@@ -422,10 +448,9 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Install the generated code.
-     * 
+     *
      * @param code
-     * @param optLevel
-     *            The optimization level of the generated code.
+     * @param optLevel The optimization level of the generated code.
      */
     public final void addCompiledCode(VmCompiledCode code, int optLevel) {
         if ((this.nativeCode == null) || (optLevel > nativeCodeOptLevel)) {
@@ -435,7 +460,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                 this.nativeCode = code.getNativeCode();
                 this.compiledCode = code;
                 Vm.getVm().getSharedStatics().setMethodCode(
-                        getSharedStaticsIndex(), code.getNativeCode());
+                    getSharedStaticsIndex(), code.getNativeCode());
                 this.nativeCodeOptLevel = (short) optLevel;
             }
         }
@@ -443,7 +468,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Gets the global unique selector if this method name&amp;type.
-     * 
+     *
      * @return The selector
      */
     public final int getSelector() {
@@ -453,7 +478,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Gets the number of stack slots used by the arguments of this method. This
      * number included the slot for "this" on non-static fields.
-     * 
+     *
      * @return int
      */
     public final int getArgSlotCount() {
@@ -462,82 +487,92 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Is this method uninterruptible.
+     *
      * @return True | false.
      */
     public final boolean isUninterruptible() {
         return ((pragmaFlags & MethodPragmaFlags.UNINTERRUPTIBLE) != 0);
     }
-    
+
     /**
      * Is the checkpermission pragma set for this method.
+     *
      * @return
      */
     public final boolean hasCheckPermissionPragma() {
-        return ((pragmaFlags & MethodPragmaFlags.CHECKPERMISSION) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.CHECKPERMISSION) != 0);
     }
 
     /**
      * Is the doprivileged pragma set for this method.
+     *
      * @return
      */
     public final boolean hasDoPrivilegedPragma() {
-        return ((pragmaFlags & MethodPragmaFlags.DOPRIVILEGED) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.DOPRIVILEGED) != 0);
     }
 
     /**
      * Is the inline pragma set for this method.
+     *
      * @return
      */
     public final boolean hasInlinePragma() {
-        return ((pragmaFlags & MethodPragmaFlags.INLINE) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.INLINE) != 0);
     }
 
     /**
      * Is the loadstatics pragma set for this method.
+     *
      * @return
      */
     public final boolean hasLoadStaticsPragma() {
-        return ((pragmaFlags & MethodPragmaFlags.LOADSTATICS) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.LOADSTATICS) != 0);
     }
 
     /**
      * Is the noinline pragma set for this method.
+     *
      * @return
      */
     public final boolean hasNoInlinePragma() {
-        return ((pragmaFlags & MethodPragmaFlags.NOINLINE) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.NOINLINE) != 0);
     }
 
     /**
      * Is the noreadbarrier pragma set for this method.
+     *
      * @return
      */
     public final boolean hasNoReadBarrierPragma() {
-        return ((pragmaFlags & MethodPragmaFlags.NOREADBARRIER) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.NOREADBARRIER) != 0);
     }
 
     /**
      * Is the nowritebarrier pragma set for this method.
+     *
      * @return
      */
     public final boolean hasNoWriteBarrierPragma() {
-        return ((pragmaFlags & MethodPragmaFlags.NOWRITEBARRIER) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.NOWRITEBARRIER) != 0);
     }
 
     /**
      * Is the privilegedaction pragma set for this method.
+     *
      * @return
      */
     public final boolean hasPrivilegedActionPragma() {
-        return ((pragmaFlags & MethodPragmaFlags.PRIVILEGEDACTION) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.PRIVILEGEDACTION) != 0);
     }
 
     /**
      * Is the KernelSpace pragma set for this method.
+     *
      * @return
      */
     public final boolean hasKernelSpacePragma() {
-        return ((pragmaFlags & MethodPragmaFlags.KERNELSPACE) != 0);        
+        return ((pragmaFlags & MethodPragmaFlags.KERNELSPACE) != 0);
     }
 
     /**
@@ -550,7 +585,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Gets the optimization level of the native code. A value of -1 means not
      * compiled yet.
-     * 
+     *
      * @return Returns the nativeCodeOptLevel.
      */
     public final int getNativeCodeOptLevel() {
@@ -559,7 +594,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /**
      * Gets the indexe of this field in the shared statics table.
-     * 
+     *
      * @return Returns the staticsIndex.
      */
     public final int getSharedStaticsIndex() {
@@ -584,7 +619,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
             final int ptr = Address.fromAddress(nativeCode).toInt();
             if ((ptr < 0) || (Math.abs(ptr) < 4096)) {
                 System.err.println("nativeCode has low address " + ptr + " in "
-                        + this);
+                    + this);
             }
         }
     }
@@ -597,8 +632,8 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         if (nativeCode == null) {
             if (!declaringClass.isInterface()) {
                 throw new RuntimeException("nativeCode of " + this
-                        + " is null; declaringclass compiled? "
-                        + getDeclaringClass().isCompiled());
+                    + " is null; declaringclass compiled? "
+                    + getDeclaringClass().isCompiled());
             }
         }
     }

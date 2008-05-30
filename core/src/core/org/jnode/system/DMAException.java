@@ -18,42 +18,42 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system;
 
 /**
  * Direct Memory Access Exception.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DMAException extends Exception {
 
-	/**
-	 * 
-	 */
-	public DMAException() {
-		super();
-	}
+    /**
+     *
+     */
+    public DMAException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public DMAException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public DMAException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public DMAException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public DMAException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public DMAException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public DMAException(String s) {
+        super(s);
+    }
 }

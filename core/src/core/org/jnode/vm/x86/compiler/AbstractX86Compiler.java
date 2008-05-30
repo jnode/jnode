@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler;
 
 import java.io.Writer;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
@@ -48,12 +47,12 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * Abstract native code compiler for the Intel X86 architecture.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
-        X86CompilerConstants {
+    X86CompilerConstants {
 
     private EntryPoints context;
 
@@ -65,7 +64,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
 
     /**
      * Initialize this compiler
-     * 
+     *
      * @param loader
      */
     public final void initialize(VmClassLoader loader) {
@@ -84,7 +83,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         os = (X86BinaryAssembler) nativeStreamHolder.get();
         if (os == null) {
             os = new X86BinaryAssembler((X86CpuID) VmProcessor.current()
-                    .getCPUID(), mode, 0);
+                .getCPUID(), mode, 0);
             os.setResolver(resolver);
             nativeStreamHolder.set(os);
         }
@@ -97,36 +96,36 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
      */
     @PrivilegedActionPragma
     protected final CompiledMethod doCompileAbstract(VmMethod method,
-            NativeStream nos, int level, boolean isBootstrap) {
+                                                     NativeStream nos, int level, boolean isBootstrap) {
         if (isBootstrap) {
             // System.out.println("Abstraxct method " + method);
             final CompiledMethod cm = new CompiledMethod(level);
             final X86Assembler os = (X86Assembler) nos;
             // Create the helper
             final X86CompilerHelper helper = new X86CompilerHelper(os, null,
-                    context, isBootstrap);
+                context, isBootstrap);
             // Start an "object"
             final NativeStream.ObjectInfo objectInfo = os.startObject(context
-                    .getVmMethodCodeClass());
+                .getVmMethodCodeClass());
             // Start the code creation
             cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName()
-                    + "$$abstract-start")));
+                + "$$abstract-start")));
             // Call abstract method error method
             helper.writeJumpTableJMP(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
             // Close the "object"
             objectInfo.markEnd();
             // The end
             cm.setCodeEnd(os.setObjectRef(new Label(method.getMangledName()
-                    + "$$abstract-end")));
+                + "$$abstract-end")));
 
             return cm;
         } else {
             // Set the address of the abstract method code
             final Address errorAddr = Unsafe
-                    .getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
+                .getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
             final VmCompiledCode code = Vm.getCompiledMethods()
-                    .createCompiledCode(null, method, this, null,
-                            errorAddr.toAddress(), null, 0, null, null, null);
+                .createCompiledCode(null, method, this, null,
+                    errorAddr.toAddress(), null, 0, null, null, null);
             method.addCompiledCode(code, level);
             return null;
         }
@@ -141,7 +140,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
 
     /**
      * Gets the operating mode.
-     * 
+     *
      * @return
      */
     protected final X86Constants.Mode getMode() {
@@ -149,7 +148,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     }
 
     public void disassemble(VmMethod method, ObjectResolver resolver,
-            int level, Writer writer) {
+                            int level, Writer writer) {
 
         if (method.isNative()) {
             System.out.println(method + " is native");
@@ -179,7 +178,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
 
     /**
      * Gets the type size information.
-     * 
+     *
      * @return
      */
     public final TypeSizeInfo getTypeSizeInfo() {

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -34,11 +34,13 @@ import org.vmmagic.pragma.Uninterruptible;
  */
 @MagicPermission
 final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
-        Uninterruptible {
+    Uninterruptible {
 
     private final HeapHelper helper;
 
-    /** The heap that is currently being visited */
+    /**
+     * The heap that is currently being visited
+     */
     private VmDefaultHeap currentHeap;
 
     public GCSweepVisitor(DefaultHeapManager heapMgr) {
@@ -47,7 +49,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * Mark every visited object white.
-     * 
+     *
      * @param object
      * @return boolean
      */
@@ -83,8 +85,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
     }
 
     /**
-     * @param currentHeap
-     *            The currentHeap to set.
+     * @param currentHeap The currentHeap to set.
      */
     public final void setCurrentHeap(VmDefaultHeap currentHeap) {
         this.currentHeap = currentHeap;

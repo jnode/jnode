@@ -18,42 +18,41 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- *
  */
 public class MethodArgument<T> extends Variable<T> {
-	/**
-	 * @param type
-	 * @param index
-	 */
-	public MethodArgument(int type, int index) {
-		super(type, index);
-	}
+    /**
+     * @param type
+     * @param index
+     */
+    public MethodArgument(int type, int index) {
+        super(type, index);
+    }
 
-	/**
-	 * @param argument
-	 */
-	public MethodArgument(MethodArgument<T> argument) {
-		this(argument.getType(), argument.getIndex());
-	}
+    /**
+     * @param argument
+     */
+    public MethodArgument(MethodArgument<T> argument) {
+        this(argument.getType(), argument.getIndex());
+    }
 
-	public String toString() {
-		return "a" + getIndex() + '_' + getSSAValue();
-	}
-	
-	public Object clone() {
-		return new MethodArgument<T>(this);
-	}
+    public String toString() {
+        return "a" + getIndex() + '_' + getSSAValue();
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
-	 */
-	public Operand<T> simplify() {
-		// Can't do much with this...
-		return this;
-	}
+    public Object clone() {
+        return new MethodArgument<T>(this);
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.Operand#simplify()
+     */
+    public Operand<T> simplify() {
+        // Can't do much with this...
+        return this;
+    }
 }

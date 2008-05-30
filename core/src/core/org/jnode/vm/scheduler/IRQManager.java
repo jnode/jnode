@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 import org.jnode.system.IRQHandler;
@@ -30,123 +30,126 @@ import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.Uninterruptible;
-import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * IRQ manager implementation.
- * 
+ *
  * @author epr
  */
 public abstract class IRQManager {
 
-	private final Object LOCK = new Object();
-	private final IRQThread[] handlers;
-	private final int count;
-	private final int[] irqCount;
+    private final Object LOCK = new Object();
+    private final IRQThread[] handlers;
+    private final int count;
+    private final int[] irqCount;
     private final VmProcessor defaultIrqProcessor;
-    
-	/**
-	 * Initialize a new instance
-	 * 
-	 * @param irqCount
-	 */
+
+    /**
+     * Initialize a new instance
+     *
+     * @param irqCount
+     */
     @PrivilegedActionPragma
-	protected IRQManager(int[] irqCount, VmProcessor defaultIrqProcessor) {
-		this.irqCount = irqCount;
-		this.count = irqCount.length;
+    protected IRQManager(int[] irqCount, VmProcessor defaultIrqProcessor) {
+        this.irqCount = irqCount;
+        this.count = irqCount.length;
         this.defaultIrqProcessor = defaultIrqProcessor;
-		this.handlers = new IRQThread[count];
-	}
+        this.handlers = new IRQThread[count];
+    }
 
-	/**
-	 * Gets the IRQ counter value for the given IRQ
-	 * @param irq
-	 * @return The irq count
-	 */
-	public final int getIrqCount(int irq) {
-		return irqCount[irq];
-	}
+    /**
+     * Gets the IRQ counter value for the given IRQ
+     *
+     * @param irq
+     * @return The irq count
+     */
+    public final int getIrqCount(int irq) {
+        return irqCount[irq];
+    }
 
-	/**
-	 * Gets the number of IRQ's this processor supports.
-	 * @return int
-	 */
-	public final int getNumIRQs() {
-		return count;
-	}
+    /**
+     * Gets the number of IRQ's this processor supports.
+     *
+     * @return int
+     */
+    public final int getNumIRQs() {
+        return count;
+    }
 
-	public Object getHandlerInfo(int irq) {
-		return handlers[irq];
-	}
+    public Object getHandlerInfo(int irq) {
+        return handlers[irq];
+    }
 
-	/**
-	 * Register an interrupt handler for a given irq number.
-	 * 
-	 * @param owner
-	 * @param irq
-	 * @param handler
-	 * @param shared
-	 * @return True is the handler was set, false if there was already a handler for the given irq
-	 *         number set.
-	 * @throws ResourceNotFreeException
-	 */
+    /**
+     * Register an interrupt handler for a given irq number.
+     *
+     * @param owner
+     * @param irq
+     * @param handler
+     * @param shared
+     * @return True is the handler was set, false if there was already a handler for the given irq
+     *         number set.
+     * @throws ResourceNotFreeException
+     */
     @Internal
-	public final IRQResource claimIRQ(ResourceOwner owner, int irq, IRQHandler handler, boolean shared) throws ResourceNotFreeException {
+    public final IRQResource claimIRQ(ResourceOwner owner, int irq, IRQHandler handler, boolean shared)
+        throws ResourceNotFreeException {
         IRQThread newThread = null;
-		synchronized (LOCK) {
+        synchronized (LOCK) {
             final IRQThread thread = handlers[irq];
-			if (thread == null) {
-				newThread = new IRQThread(this, irq, owner, handler, shared, defaultIrqProcessor);
-				handlers[irq] = newThread;
-			} else {
-				if (thread.isShared()) {
-					if (shared) {
-						thread.addHandler(owner, handler);
-					} else {
-						throw new ResourceNotFreeException("IRQ " + irq + " is already claimed, but you don't want to share");
-					}
-				} else {
-					if (shared) {
-						throw new ResourceNotFreeException("IRQ " + irq + " is already claimed, but not shared");
-					} else {
-						//Unsafe.debug("IRQ was already claim");
-						throw new ResourceNotFreeException("IRQ " + irq + " is not free");
-					}
-				}
-			}
-		}
+            if (thread == null) {
+                newThread = new IRQThread(this, irq, owner, handler, shared, defaultIrqProcessor);
+                handlers[irq] = newThread;
+            } else {
+                if (thread.isShared()) {
+                    if (shared) {
+                        thread.addHandler(owner, handler);
+                    } else {
+                        throw new ResourceNotFreeException(
+                            "IRQ " + irq + " is already claimed, but you don't want to share");
+                    }
+                } else {
+                    if (shared) {
+                        throw new ResourceNotFreeException("IRQ " + irq + " is already claimed, but not shared");
+                    } else {
+                        //Unsafe.debug("IRQ was already claim");
+                        throw new ResourceNotFreeException("IRQ " + irq + " is not free");
+                    }
+                }
+            }
+        }
         if (newThread != null) {
             newThread.start();
         }
         return new IRQResourceImpl(owner, irq, handler, shared);
-	}
+    }
 
-	/**
-	 * Unregister a given interrupt handler for a given irq number. If the current handler for the
-	 * given irq number is not equal to the given handler, nothing is done.
-	 * 
-	 * @param res
-	 *            The IRQ resource
-	 */
-	final void releaseIRQ(IRQResourceImpl res) {
-		final int irq = res.getIRQ();
-		synchronized (LOCK) {
-			final IRQThread thread = handlers[irq];
-			if (thread != null) {
-				thread.remove(res.getHandler());
-				if (thread.isEmpty()) {
-					handlers[irq] = null;
-					thread.stopThread();
-				}
-			}
-		}
-	}
+    /**
+     * Unregister a given interrupt handler for a given irq number. If the current handler for the
+     * given irq number is not equal to the given handler, nothing is done.
+     *
+     * @param res The IRQ resource
+     */
+    final void releaseIRQ(IRQResourceImpl res) {
+        final int irq = res.getIRQ();
+        synchronized (LOCK) {
+            final IRQThread thread = handlers[irq];
+            if (thread != null) {
+                thread.remove(res.getHandler());
+                if (thread.isEmpty()) {
+                    handlers[irq] = null;
+                    thread.stopThread();
+                }
+            }
+        }
+    }
 
     /**
      * Dispatch IRQ events to their corresponding threads. This method should only be called by the
      * Thread scheduler.
+     *
      * @param current
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @KernelSpace
     @Uninterruptible
@@ -165,80 +168,89 @@ public abstract class IRQManager {
         }
     }
 
-	/**
-	 * Set an End Of Interrupt message to the 8259 interrupt controller(s).
-	 * 
-	 * @param irq
-	 */
+    /**
+     * Set an End Of Interrupt message to the 8259 interrupt controller(s).
+     *
+     * @param irq
+     */
     @Uninterruptible
     @KernelSpace
-	protected abstract void eoi(int irq);
+    protected abstract void eoi(int irq);
 
-	final class IRQResourceImpl implements IRQResource {
+    final class IRQResourceImpl implements IRQResource {
 
-		/** The owner of this resource */
-		private final ResourceOwner owner;
-		/** The IRQ number */
-		private final int irq;
-		/** The handler */
-		private final IRQHandler handler;
-		private final boolean shared;
+        /**
+         * The owner of this resource
+         */
+        private final ResourceOwner owner;
+        /**
+         * The IRQ number
+         */
+        private final int irq;
+        /**
+         * The handler
+         */
+        private final IRQHandler handler;
+        private final boolean shared;
 
-		/**
-		 * Create a new instance
-		 * 
-		 * @param owner
-		 * @param irq
-		 * @param handler
-		 * @param shared
-		 */
-		public IRQResourceImpl(ResourceOwner owner, int irq, IRQHandler handler, boolean shared) {
-			this.owner = owner;
-			this.irq = irq;
-			this.handler = handler;
-			this.shared = shared;
-		}
+        /**
+         * Create a new instance
+         *
+         * @param owner
+         * @param irq
+         * @param handler
+         * @param shared
+         */
+        public IRQResourceImpl(ResourceOwner owner, int irq, IRQHandler handler, boolean shared) {
+            this.owner = owner;
+            this.irq = irq;
+            this.handler = handler;
+            this.shared = shared;
+        }
 
-		/**
-		 * @see org.jnode.system.IRQResource#getIRQ()
-		 * @return int
-		 */
-		public int getIRQ() {
-			return irq;
-		}
+        /**
+         * @return int
+         * @see org.jnode.system.IRQResource#getIRQ()
+         */
+        public int getIRQ() {
+            return irq;
+        }
 
-		/**
-		 * Is this a shared interrupt?
-		 * @return boolean
-		 */
-		public boolean isShared() {
-			return shared;
-		}
+        /**
+         * Is this a shared interrupt?
+         *
+         * @return boolean
+         */
+        public boolean isShared() {
+            return shared;
+        }
 
-		/**
-		 * @see org.jnode.system.Resource#getOwner()
-		 * @return The owner
-		 */
-		public ResourceOwner getOwner() {
-			return owner;
-		}
+        /**
+         * @return The owner
+         * @see org.jnode.system.Resource#getOwner()
+         */
+        public ResourceOwner getOwner() {
+            return owner;
+        }
 
-		public IRQHandler getHandler() {
-			return handler;
-		}
+        public IRQHandler getHandler() {
+            return handler;
+        }
 
-		/**
-		 * @see org.jnode.system.Resource#release()
-		 */
-		public void release() {
-			releaseIRQ(this);
-		}
-		/**
-		 * Gets the parent resource if any.
-		 * @return The parent resource, or null if this resource has no parent.
-		 */
-		public Resource getParent() {
-		    return null;
-		}
-	}
+        /**
+         * @see org.jnode.system.Resource#release()
+         */
+        public void release() {
+            releaseIRQ(this);
+        }
+
+        /**
+         * Gets the parent resource if any.
+         *
+         * @return The parent resource, or null if this resource has no parent.
+         */
+        public Resource getParent() {
+            return null;
+        }
+    }
 }

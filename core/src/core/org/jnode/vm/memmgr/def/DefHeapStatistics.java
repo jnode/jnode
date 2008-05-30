@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import java.util.TreeMap;
-
-import org.jnode.vm.memmgr.HeapStatistics;
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.memmgr.HeapStatistics;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
@@ -58,21 +57,23 @@ final class DefHeapStatistics extends HeapStatistics {
     /**
      * Sets the minimum number of instances a class must have before
      * it is listed in toString.
+     *
      * @param count
      */
     public void setMinimumInstanceCount(int count) {
         this.minInstanceCount = count;
     }
-    
+
     /**
-     * Sets the minimum bytes of occupied memory by all instances of a class 
+     * Sets the minimum bytes of occupied memory by all instances of a class
      * before it is listed in toString.
+     *
      * @param bytes
      */
     public void setMinimumTotalSize(long bytes) {
         this.minTotalSize = bytes;
     }
-    
+
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         boolean first = true;
@@ -83,7 +84,7 @@ final class DefHeapStatistics extends HeapStatistics {
                     first = false;
                 } else {
                     sb.append(newline);
-                }            
+                }
                 c.append(sb);
             }
         }
@@ -108,7 +109,7 @@ final class DefHeapStatistics extends HeapStatistics {
         public void inc() {
             instanceCount++;
         }
-        
+
         public int getInstanceCount() {
             return instanceCount;
         }
@@ -116,9 +117,9 @@ final class DefHeapStatistics extends HeapStatistics {
         public int getObjectSize() {
             return objectSize;
         }
-        
+
         public long getTotalSize() {
-            return objectSize * (long)instanceCount;
+            return objectSize * (long) instanceCount;
         }
 
         public void append(StringBuilder sb) {
@@ -128,12 +129,12 @@ final class DefHeapStatistics extends HeapStatistics {
 
             if (objectSize != 0) {
                 sb.append(usage);
-		long size = getTotalSize();
-		if (size >= 1024) {
-            	    sb.append(NumberUtils.size(size) + " (" + getTotalSize() + "b)");
-		} else {
-		    sb.append(size + "b");
-		}
+                long size = getTotalSize();
+                if (size >= 1024) {
+                    sb.append(NumberUtils.size(size) + " (" + getTotalSize() + "b)");
+                } else {
+                    sb.append(size + "b");
+                }
             }
         }
     }

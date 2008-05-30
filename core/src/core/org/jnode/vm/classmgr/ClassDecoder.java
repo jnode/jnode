@@ -21,13 +21,10 @@
 
 package org.jnode.vm.classmgr;
 
-import gnu.java.lang.VMClassHelper;
-
 import java.io.UTFDataFormatException;
 import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
-
 import org.jnode.system.BootLog;
 import org.jnode.vm.VmUtils;
 import org.jnode.vm.annotation.AllowedPackages;
@@ -49,7 +46,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Decoder of .class files into VmType instances.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class ClassDecoder {
@@ -81,48 +78,48 @@ public final class ClassDecoder {
     private static char[] RuntimeInvisibleParameterAnnotationsAttrName;
 
     @SuppressWarnings("deprecation")
-    private static final MethodPragmaException[] METHOD_PRAGMA_EXCEPTIONS = new MethodPragmaException[] {
-            new MethodPragmaException(UninterruptiblePragma.class,
-                    MethodPragmaFlags.UNINTERRUPTIBLE),
-            new MethodPragmaException(org.vmmagic.pragma.InlinePragma.class,
-                    MethodPragmaFlags.INLINE),
-            new MethodPragmaException(org.vmmagic.pragma.NoInlinePragma.class,
-                    MethodPragmaFlags.NOINLINE), };
+    private static final MethodPragmaException[] METHOD_PRAGMA_EXCEPTIONS = new MethodPragmaException[]{
+        new MethodPragmaException(UninterruptiblePragma.class,
+            MethodPragmaFlags.UNINTERRUPTIBLE),
+        new MethodPragmaException(org.vmmagic.pragma.InlinePragma.class,
+            MethodPragmaFlags.INLINE),
+        new MethodPragmaException(org.vmmagic.pragma.NoInlinePragma.class,
+            MethodPragmaFlags.NOINLINE)};
 
-    private static final PragmaInterface[] INTERFACE_PRAGMAS = new PragmaInterface[] { new PragmaInterface(
-            org.vmmagic.pragma.Uninterruptible.class,
-            TypePragmaFlags.UNINTERRUPTIBLE), };
+    private static final PragmaInterface[] INTERFACE_PRAGMAS = new PragmaInterface[]{new PragmaInterface(
+        org.vmmagic.pragma.Uninterruptible.class,
+        TypePragmaFlags.UNINTERRUPTIBLE)};
 
-    private static final PragmaAnnotation[] CLASS_ANNOTATIONS = new PragmaAnnotation[] {
-            new PragmaAnnotation(MagicPermission.class,
-                    TypePragmaFlags.MAGIC_PERMISSION),
-            new PragmaAnnotation(NoFieldAlignments.class,
-                    TypePragmaFlags.NO_FIELD_ALIGNMENT),
-            new PragmaAnnotation(SharedStatics.class,
-                    TypePragmaFlags.SHAREDSTATICS),
-            new PragmaAnnotation(Uninterruptible.class,
-                    TypePragmaFlags.UNINTERRUPTIBLE), };
+    private static final PragmaAnnotation[] CLASS_ANNOTATIONS = new PragmaAnnotation[]{
+        new PragmaAnnotation(MagicPermission.class,
+            TypePragmaFlags.MAGIC_PERMISSION),
+        new PragmaAnnotation(NoFieldAlignments.class,
+            TypePragmaFlags.NO_FIELD_ALIGNMENT),
+        new PragmaAnnotation(SharedStatics.class,
+            TypePragmaFlags.SHAREDSTATICS),
+        new PragmaAnnotation(Uninterruptible.class,
+            TypePragmaFlags.UNINTERRUPTIBLE)};
 
-    private static final PragmaAnnotation[] METHOD_ANNOTATIONS = new PragmaAnnotation[] {
-            new PragmaAnnotation(CheckPermission.class,
-                    MethodPragmaFlags.CHECKPERMISSION),
-            new PragmaAnnotation(DoPrivileged.class,
-                    MethodPragmaFlags.DOPRIVILEGED),
-            new PragmaAnnotation(Inline.class, MethodPragmaFlags.INLINE),
-            new PragmaAnnotation(LoadStatics.class,
-                    MethodPragmaFlags.LOADSTATICS),
-            new PragmaAnnotation(NoInline.class, MethodPragmaFlags.NOINLINE),
-            new PragmaAnnotation(NoReadBarrier.class,
-                    MethodPragmaFlags.NOREADBARRIER),
-            new PragmaAnnotation(NoWriteBarrier.class,
-                    MethodPragmaFlags.NOWRITEBARRIER),
-            new PragmaAnnotation(PrivilegedActionPragma.class,
-                    MethodPragmaFlags.PRIVILEGEDACTION),
-            new PragmaAnnotation(Uninterruptible.class,
-                    MethodPragmaFlags.UNINTERRUPTIBLE),
-            new PragmaAnnotation(KernelSpace.class,
-                    MethodPragmaFlags.KERNELSPACE), };
-    
+    private static final PragmaAnnotation[] METHOD_ANNOTATIONS = new PragmaAnnotation[]{
+        new PragmaAnnotation(CheckPermission.class,
+            MethodPragmaFlags.CHECKPERMISSION),
+        new PragmaAnnotation(DoPrivileged.class,
+            MethodPragmaFlags.DOPRIVILEGED),
+        new PragmaAnnotation(Inline.class, MethodPragmaFlags.INLINE),
+        new PragmaAnnotation(LoadStatics.class,
+            MethodPragmaFlags.LOADSTATICS),
+        new PragmaAnnotation(NoInline.class, MethodPragmaFlags.NOINLINE),
+        new PragmaAnnotation(NoReadBarrier.class,
+            MethodPragmaFlags.NOREADBARRIER),
+        new PragmaAnnotation(NoWriteBarrier.class,
+            MethodPragmaFlags.NOWRITEBARRIER),
+        new PragmaAnnotation(PrivilegedActionPragma.class,
+            MethodPragmaFlags.PRIVILEGEDACTION),
+        new PragmaAnnotation(Uninterruptible.class,
+            MethodPragmaFlags.UNINTERRUPTIBLE),
+        new PragmaAnnotation(KernelSpace.class,
+            MethodPragmaFlags.KERNELSPACE)};
+
     /**
      * Names of classes that you use shared statics, but cannot be modified.
      */
@@ -131,14 +128,14 @@ public final class ClassDecoder {
         "org.apache.log4j.LogManager",
     };
 
-    private static final byte[] TYPE_SIZES = { 1, 2, 4, 8 };
+    private static final byte[] TYPE_SIZES = {1, 2, 4, 8};
 
-    private static final Class< ? >[] BOOT_TYPES = new Class[] { Class.class,
-            String.class, Integer.class, Long.class };
+    private static final Class<?>[] BOOT_TYPES = new Class[]{Class.class,
+        String.class, Integer.class, Long.class};
 
     /**
      * Align the given value on the given alignment.
-     * 
+     *
      * @param value
      * @param alignment
      * @return the new value
@@ -152,12 +149,12 @@ public final class ClassDecoder {
 
     /**
      * Is the given type of the BOOT_TYPES classes.
-     * 
+     *
      * @param type
      */
-    private static final boolean isBootType(VmType< ? > type) {
+    private static final boolean isBootType(VmType<?> type) {
         final String typeName = type.getName();
-        for (Class< ? > c : BOOT_TYPES) {
+        for (Class<?> c : BOOT_TYPES) {
             if (c.getName().equals(typeName)) {
                 return true;
             }
@@ -168,7 +165,7 @@ public final class ClassDecoder {
     /**
      * Align the offsets of the fields in the class optimized for minimal object
      * size.
-     * 
+     *
      * @param fields
      * @return The objectsize taken by all the fields
      */
@@ -181,7 +178,7 @@ public final class ClassDecoder {
                     if (!aligned) {
                         // Align on the current type size
                         objectSize = align(objectSize, Math.min(
-                                currentTypeSize, slotSize));
+                            currentTypeSize, slotSize));
                         aligned = true;
                     }
                     final VmInstanceField fld = (VmInstanceField) f;
@@ -204,19 +201,19 @@ public final class ClassDecoder {
             LineNrTableAttrName = "LineNumberTable".toCharArray();
             LocalVariableTableAttrName = "LocalVariableTable".toCharArray();
             RuntimeVisibleAnnotationsAttrName = "RuntimeVisibleAnnotations"
-                    .toCharArray();
+                .toCharArray();
             RuntimeInvisibleAnnotationsAttrName = "RuntimeInvisibleAnnotations"
-                    .toCharArray();
+                .toCharArray();
             RuntimeVisibleParameterAnnotationsAttrName = "RuntimeVisibleParameterAnnotations"
-                    .toCharArray();
+                .toCharArray();
             RuntimeInvisibleParameterAnnotationsAttrName = "RuntimeInvisibleParameterAnnotations"
-                    .toCharArray();
+                .toCharArray();
         }
     }
 
     /**
      * Decode a given class.
-     * 
+     *
      * @param data
      * @param rejectNatives
      * @param clc
@@ -225,8 +222,8 @@ public final class ClassDecoder {
      * @throws ClassFormatError
      */
     private static final VmType decodeClass(ByteBuffer data,
-            boolean rejectNatives, VmClassLoader clc,
-            ProtectionDomain protectionDomain) throws ClassFormatError {
+                                            boolean rejectNatives, VmClassLoader clc,
+                                            ProtectionDomain protectionDomain) throws ClassFormatError {
         final VmSharedStatics sharedStatics = clc.getSharedStatics();
         final VmIsolatedStatics isolatedStatics = clc.getIsolatedStatics();
         final int slotSize = clc.getArchitecture().getReferenceSize();
@@ -240,7 +237,7 @@ public final class ClassDecoder {
 
         if (false) {
             BootLog.debug("Class file version " + maj_version + ";"
-                    + min_version);
+                + min_version);
         }
 
         final int cpcount = data.getChar();
@@ -251,61 +248,61 @@ public final class ClassDecoder {
             final int tag = data.get() & 0xFF;
             tags[i] = (byte) tag;
             switch (tag) {
-            case 1:
-                // Utf8
-                cp.setUTF8(i, readUTF(data));
-                break;
-            case 3:
-                // int
-                cp.setInt(i, data.getInt());
-                break;
-            case 4:
-                // float
-                // cp.setInt(i, data.getInt());
-                final int ival = data.getInt();
-                final float fval = Float.intBitsToFloat(ival);
-                cp.setFloat(i, fval);
-                break;
-            case 5:
-                // long
-                cp.setLong(i, data.getLong());
-                i++;
-                break;
-            case 6:
-                // double
-                // cp.setLong(i, data.getLong());
-                final long lval = data.getLong();
-                final double dval = Double.longBitsToDouble(lval);
-                cp.setDouble(i, dval);
-                i++;
-                break;
-            case 7:
-                // class
-                cp.setInt(i, data.getChar());
-                break;
-            case 8:
-                // String
-                cp.setInt(i, data.getChar());
-                break;
-            case 9: // Fieldref
-            case 10: // Methodref
-            case 11: // IMethodref
-            {
-                final int clsIdx = data.getChar();
-                final int ntIdx = data.getChar();
-                cp.setInt(i, clsIdx << 16 | ntIdx);
-            }
-                break;
-            case 12:
-                // Name and Type
-            {
-                final int nIdx = data.getChar();
-                final int dIdx = data.getChar();
-                cp.setInt(i, nIdx << 16 | dIdx);
-            }
-                break;
-            default:
-                throw new ClassFormatError("Invalid constantpool tag: "
+                case 1:
+                    // Utf8
+                    cp.setUTF8(i, readUTF(data));
+                    break;
+                case 3:
+                    // int
+                    cp.setInt(i, data.getInt());
+                    break;
+                case 4:
+                    // float
+                    // cp.setInt(i, data.getInt());
+                    final int ival = data.getInt();
+                    final float fval = Float.intBitsToFloat(ival);
+                    cp.setFloat(i, fval);
+                    break;
+                case 5:
+                    // long
+                    cp.setLong(i, data.getLong());
+                    i++;
+                    break;
+                case 6:
+                    // double
+                    // cp.setLong(i, data.getLong());
+                    final long lval = data.getLong();
+                    final double dval = Double.longBitsToDouble(lval);
+                    cp.setDouble(i, dval);
+                    i++;
+                    break;
+                case 7:
+                    // class
+                    cp.setInt(i, data.getChar());
+                    break;
+                case 8:
+                    // String
+                    cp.setInt(i, data.getChar());
+                    break;
+                case 9: // Fieldref
+                case 10: // Methodref
+                case 11: // IMethodref
+                {
+                    final int clsIdx = data.getChar();
+                    final int ntIdx = data.getChar();
+                    cp.setInt(i, clsIdx << 16 | ntIdx);
+                    break;
+                }
+                case 12:
+                    // Name and Type
+                {
+                    final int nIdx = data.getChar();
+                    final int dIdx = data.getChar();
+                    cp.setInt(i, nIdx << 16 | dIdx);
+                    break;
+                }
+                default:
+                    throw new ClassFormatError("Invalid constantpool tag: "
                         + tags[i]);
             }
         }
@@ -313,23 +310,23 @@ public final class ClassDecoder {
         // Now patch the required entries (level 1)
         for (int i = 1; i < cpcount; i++) {
             switch (tags[i]) {
-            case 7: {
-                // Class
-                final int idx = cp.getInt(i);
-                final VmConstClass constClass = new VmConstClass(cp
+                case 7: {
+                    // Class
+                    final int idx = cp.getInt(i);
+                    final VmConstClass constClass = new VmConstClass(cp
                         .getUTF8(idx));
-                cp.setConstClass(i, constClass);
-                break;
-            }
-            case 8: {
-                // String
-                final int idx = cp.getInt(i);
-                final int staticsIdx = sharedStatics
+                    cp.setConstClass(i, constClass);
+                    break;
+                }
+                case 8: {
+                    // String
+                    final int idx = cp.getInt(i);
+                    final int staticsIdx = sharedStatics
                         .allocConstantStringField(cp.getUTF8(idx));
-                final VmConstString constStr = new VmConstString(staticsIdx);
-                cp.setString(i, constStr);
-                break;
-            }
+                    final VmConstString constStr = new VmConstString(staticsIdx);
+                    cp.setString(i, constStr);
+                    break;
+                }
             }
         }
 
@@ -343,21 +340,21 @@ public final class ClassDecoder {
                 final String name = cp.getUTF8(nat >>> 16);
                 final String descriptor = cp.getUTF8(nat & 0xFFFF);
                 switch (tag) {
-                case 9:
-                    // FieldRef
-                    cp.setConstFieldRef(i, new VmConstFieldRef(constClass,
+                    case 9:
+                        // FieldRef
+                        cp.setConstFieldRef(i, new VmConstFieldRef(constClass,
                             name, descriptor));
-                    break;
-                case 10:
-                    // MethodRef
-                    cp.setConstMethodRef(i, new VmConstMethodRef(constClass,
+                        break;
+                    case 10:
+                        // MethodRef
+                        cp.setConstMethodRef(i, new VmConstMethodRef(constClass,
                             name, descriptor));
-                    break;
-                case 11:
-                    // IMethodRef
-                    cp.setConstIMethodRef(i, new VmConstIMethodRef(constClass,
+                        break;
+                    case 11:
+                        // IMethodRef
+                        cp.setConstIMethodRef(i, new VmConstIMethodRef(constClass,
                             name, descriptor));
-                    break;
+                        break;
                 }
             }
         }
@@ -365,10 +362,10 @@ public final class ClassDecoder {
         // Cleanup the unwantend entries
         for (int i = 1; i < cpcount; i++) {
             switch (tags[i]) {
-            case 12:
-                // Name and Type
-                cp.reset(i);
-                break;
+                case 12:
+                    // Name and Type
+                    cp.reset(i);
+                    break;
             }
         }
 
@@ -389,10 +386,10 @@ public final class ClassDecoder {
         final VmType cls;
         if (Modifier.isInterface(classModifiers)) {
             cls = new VmInterfaceClass(clsName, superClassName, clc,
-                    classModifiers, protectionDomain);
+                classModifiers, protectionDomain);
         } else {
             cls = new VmNormalClass(clsName, superClassName, clc,
-                    classModifiers, protectionDomain);
+                classModifiers, protectionDomain);
         }
         cls.setCp(cp);
 
@@ -424,7 +421,7 @@ public final class ClassDecoder {
             if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
                 rVisAnn = readRuntimeAnnotations(data, cp, true);
             } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName,
-                    attrName)) {
+                attrName)) {
                 rInvisAnn = readRuntimeAnnotations(data, cp, false);
             } else if (VmArray.equals(SourceFileAttrName, attrName)) {
                 sourceFile = cp.getUTF8(data.getChar());
@@ -447,7 +444,7 @@ public final class ClassDecoder {
         // Create the fields
         if (fieldData != null) {
             createFields(cls, fieldData, sharedStatics, isolatedStatics,
-                    slotSize, cls.getPragmaFlags());
+                slotSize, cls.getPragmaFlags());
         }
 
         return cls;
@@ -459,7 +456,7 @@ public final class ClassDecoder {
      * super-class of the loaded class (CLS_LS_DEFINED) 3. Link the class so
      * that the VMT is set and the offset of the non-static fields are set
      * correctly.
-     * 
+     *
      * @param className
      * @param data
      * @param rejectNatives
@@ -468,21 +465,21 @@ public final class ClassDecoder {
      * @return The defined class
      */
     public static final VmType defineClass(String className, ByteBuffer data,
-            boolean rejectNatives, VmClassLoader clc,
-            ProtectionDomain protectionDomain) {
+                                           boolean rejectNatives, VmClassLoader clc,
+                                           ProtectionDomain protectionDomain) {
         cl_init();
         return decodeClass(data, rejectNatives, clc, protectionDomain);
     }
 
     /**
      * Gets the bytecode of a native code replacement method.
-     * 
+     *
      * @param method
      * @param cl
      * @return the bytecode
      */
     private static VmByteCode getNativeCodeReplacement(VmMethod method,
-            VmClassLoader cl, boolean verbose) {
+                                                       VmClassLoader cl, boolean verbose) {
         final String className = method.getDeclaringClass().getName();
         final String nativeClassName = VmUtils.getNativeClassName(className);
         final VmType nativeType;
@@ -491,13 +488,13 @@ public final class ClassDecoder {
         } catch (ClassNotFoundException ex) {
             if (verbose) {
                 BootLog.error("Native class replacement (" + nativeClassName
-                        + ") not found");
+                    + ") not found");
             }
             return null;
         }
 
         String signature = method.getSignature();
-        if(!method.isStatic()){
+        if (!method.isStatic()) {
             signature = "(" + Signature.toSignature(method.getDeclaringClass()) + signature.substring(1);
         }
 
@@ -506,20 +503,20 @@ public final class ClassDecoder {
         if (nativeMethod == null) {
             if (verbose) {
                 BootLog.error("Native method replacement (" + method
-                        + ") not found");
+                    + ") not found");
             }
             return null;
         }
         if (!nativeMethod.isStatic()) {
             throw new ClassFormatError(
-                    "Native method replacement must be static");
+                "Native method replacement must be static");
         }
         return nativeMethod.getBytecode();
     }
 
     /**
      * Decode the data of a code-attribute
-     * 
+     *
      * @param data
      * @param cls
      * @param cp
@@ -527,7 +524,7 @@ public final class ClassDecoder {
      * @return The read code
      */
     private static final VmByteCode readCode(ByteBuffer data, VmType cls,
-            VmCP cp, VmMethod method) {
+                                             VmCP cp, VmMethod method) {
 
         final int maxStack = data.getChar();
         final int noLocals = data.getChar();
@@ -543,7 +540,7 @@ public final class ClassDecoder {
             final int handlerPC = data.getChar();
             final int catchType = data.getChar();
             etable[i] = new VmInterpretedExceptionHandler(cp, startPC, endPC,
-                    handlerPC, catchType);
+                handlerPC, catchType);
         }
 
         // Read the attributes
@@ -563,19 +560,19 @@ public final class ClassDecoder {
         }
 
         return new VmByteCode(method, code, noLocals, maxStack, etable,
-                lnTable, lvTable);
+            lnTable, lvTable);
     }
 
     /**
      * Decode the data of a Exceptions attribute
-     * 
+     *
      * @param data
      * @param cls
      * @param cp
      * @return The read exceptions
      */
     private static final VmExceptions readExceptions(ByteBuffer data,
-            VmType cls, VmCP cp) {
+                                                     VmType cls, VmCP cp) {
 
         // Read the exceptions
         char pragmaFlags = 0;
@@ -617,14 +614,14 @@ public final class ClassDecoder {
 
     /**
      * Read the fields table
-     * 
+     *
      * @param data
      * @param cp
      * @param slotSize
      * @param pragmaFlags
      */
     private static FieldData[] readFields(ByteBuffer data, VmCP cp,
-            int slotSize) {
+                                          int slotSize) {
         final int fcount = data.getChar();
         if (fcount > 0) {
             final FieldData[] ftable = new FieldData[fcount];
@@ -643,13 +640,13 @@ public final class ClassDecoder {
                     final String attrName = cp.getUTF8(data.getChar());
                     final int length = data.getInt();
                     if (isstatic
-                            && VmArray.equals(ConstantValueAttrName, attrName)) {
+                        && VmArray.equals(ConstantValueAttrName, attrName)) {
                         constantValue = cp.getAny(data.getChar());
                     } else if (VmArray.equals(
-                            RuntimeVisibleAnnotationsAttrName, attrName)) {
+                        RuntimeVisibleAnnotationsAttrName, attrName)) {
                         rVisAnn = readRuntimeAnnotations(data, cp, true);
                     } else if (VmArray.equals(
-                            RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                        RuntimeInvisibleAnnotationsAttrName, attrName)) {
                         readRuntimeAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
@@ -657,7 +654,7 @@ public final class ClassDecoder {
                 }
 
                 ftable[i] = new FieldData(name, signature, modifiers,
-                        constantValue, rVisAnn);
+                    constantValue, rVisAnn);
             }
             return ftable;
         } else {
@@ -667,7 +664,7 @@ public final class ClassDecoder {
 
     /**
      * Read the fields table
-     * 
+     *
      * @param cls
      * @param fieldDatas
      * @param sharedStatics
@@ -675,9 +672,9 @@ public final class ClassDecoder {
      * @param slotSize
      * @param pragmaFlags
      */
-    private static void createFields(VmType< ? > cls, FieldData[] fieldDatas,
-            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
-            int slotSize, int pragmaFlags) {
+    private static void createFields(VmType<?> cls, FieldData[] fieldDatas,
+                                     VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+                                     int slotSize, int pragmaFlags) {
         final int fcount = fieldDatas.length;
         final VmField[] ftable = new VmField[fcount];
 
@@ -689,13 +686,13 @@ public final class ClassDecoder {
             final String name = fd.name;
             final String signature = fd.signature;
             switch (signature.charAt(0)) {
-            case 'J':
-            case 'D':
-                modifiers = modifiers | Modifier.ACC_WIDE;
-                wide = true;
-                break;
-            default:
-                wide = false;
+                case 'J':
+                case 'D':
+                    modifiers = modifiers | Modifier.ACC_WIDE;
+                    wide = true;
+                    break;
+                default:
+                    wide = false;
             }
             final boolean isstatic = (modifiers & Modifier.ACC_STATIC) != 0;
             final int staticsIdx;
@@ -712,43 +709,43 @@ public final class ClassDecoder {
 
                 // If static allocate space for it.
                 switch (signature.charAt(0)) {
-                case 'B':
-                    staticsIdx = statics.allocIntField();
-                    break;
-                case 'C':
-                    staticsIdx = statics.allocIntField();
-                    break;
-                case 'D':
-                    staticsIdx = statics.allocLongField();
-                    break;
-                case 'F':
-                    staticsIdx = statics.allocIntField();
-                    break;
-                case 'I':
-                    staticsIdx = statics.allocIntField();
-                    break;
-                case 'J':
-                    staticsIdx = statics.allocLongField();
-                    break;
-                case 'S':
-                    staticsIdx = statics.allocIntField();
-                    break;
-                case 'Z':
-                    staticsIdx = statics.allocIntField();
-                    break;
-                default: {
-                    if (Modifier.isAddressType(signature)) {
-                        staticsIdx = statics.allocAddressField();
-                    } else {
-                        staticsIdx = statics.allocObjectField();
-                        // System.out.println(NumberUtils.hex(staticsIdx)
-                        // + "\t" + cls.getName() + "." + name);
+                    case 'B':
+                        staticsIdx = statics.allocIntField();
+                        break;
+                    case 'C':
+                        staticsIdx = statics.allocIntField();
+                        break;
+                    case 'D':
+                        staticsIdx = statics.allocLongField();
+                        break;
+                    case 'F':
+                        staticsIdx = statics.allocIntField();
+                        break;
+                    case 'I':
+                        staticsIdx = statics.allocIntField();
+                        break;
+                    case 'J':
+                        staticsIdx = statics.allocLongField();
+                        break;
+                    case 'S':
+                        staticsIdx = statics.allocIntField();
+                        break;
+                    case 'Z':
+                        staticsIdx = statics.allocIntField();
+                        break;
+                    default: {
+                        if (Modifier.isAddressType(signature)) {
+                            staticsIdx = statics.allocAddressField();
+                        } else {
+                            staticsIdx = statics.allocObjectField();
+                            // System.out.println(NumberUtils.hex(staticsIdx)
+                            // + "\t" + cls.getName() + "." + name);
+                        }
+                        break;
                     }
                 }
-                    break;
-                }
                 fs = new VmStaticField(name, signature, modifiers, staticsIdx,
-                        cls, slotSize, shared);
+                    cls, slotSize, shared);
             } else {
                 staticsIdx = -1;
                 statics = null;
@@ -766,7 +763,7 @@ public final class ClassDecoder {
                     objectSize += slotSize;
                 }
                 fs = new VmInstanceField(name, signature, modifiers,
-                        fieldOffset, cls, slotSize);
+                    fieldOffset, cls, slotSize);
             }
             ftable[i] = fs;
 
@@ -774,36 +771,36 @@ public final class ClassDecoder {
             final VmAnnotation[] rVisAnn = fd.rVisAnn;
             if (isstatic && (fd.constantValue != null)) {
                 switch (signature.charAt(0)) {
-                case 'B':
-                case 'C':
-                case 'I':
-                case 'S':
-                case 'Z':
-                    statics.setInt(staticsIdx, ((VmConstInt) fd.constantValue)
+                    case 'B':
+                    case 'C':
+                    case 'I':
+                    case 'S':
+                    case 'Z':
+                        statics.setInt(staticsIdx, ((VmConstInt) fd.constantValue)
                             .intValue());
-                    break;
-                case 'D':
-                    final long lval = Double
+                        break;
+                    case 'D':
+                        final long lval = Double
                             .doubleToRawLongBits(((VmConstDouble) fd.constantValue)
-                                    .doubleValue());
-                    statics.setLong(staticsIdx, lval);
-                    break;
-                case 'F':
-                    final int ival = Float
+                                .doubleValue());
+                        statics.setLong(staticsIdx, lval);
+                        break;
+                    case 'F':
+                        final int ival = Float
                             .floatToRawIntBits(((VmConstFloat) fd.constantValue)
-                                    .floatValue());
-                    statics.setInt(staticsIdx, ival);
-                    break;
-                case 'J':
-                    statics.setLong(staticsIdx,
+                                .floatValue());
+                        statics.setInt(staticsIdx, ival);
+                        break;
+                    case 'J':
+                        statics.setLong(staticsIdx,
                             ((VmConstLong) fd.constantValue).longValue());
-                    break;
-                default:
-                    // throw new IllegalArgumentException("signature "
-                    // + signature);
-                    statics.setObject(staticsIdx,
+                        break;
+                    default:
+                        // throw new IllegalArgumentException("signature "
+                        // + signature);
+                        statics.setObject(staticsIdx,
                             (VmConstString) fd.constantValue);
-                    break;
+                        break;
                 }
             }
             fs.setRuntimeAnnotations(rVisAnn);
@@ -816,13 +813,13 @@ public final class ClassDecoder {
 
         cls.setFieldTable(ftable);
         if (objectSize > 0) {
-            ((VmNormalClass< ? >) cls).setObjectSize(objectSize);
+            ((VmNormalClass<?>) cls).setObjectSize(objectSize);
         }
     }
 
     /**
      * Read the interfaces table
-     * 
+     *
      * @param data
      * @param cls
      * @param cp
@@ -851,7 +848,7 @@ public final class ClassDecoder {
 
     /**
      * Decode the data of a LineNumberTable-attribute
-     * 
+     *
      * @param data
      * @return The line number map
      */
@@ -870,13 +867,13 @@ public final class ClassDecoder {
 
     /**
      * Decode the data of a LocalVariable-attribute
-     * 
+     *
      * @param data
      * @param cp
      * @return The line number map
      */
     private static final VmLocalVariableTable readLocalVariableTable(
-            ByteBuffer data, VmCP cp) {
+        ByteBuffer data, VmCP cp) {
         final int len = data.getChar();
         if (len == 0) {
             return VmLocalVariableTable.EMPTY;
@@ -891,7 +888,7 @@ public final class ClassDecoder {
                 final char index = data.getChar();
 
                 table[i] = new VmLocalVariable(startPc, length, nameIdx,
-                        descrIdx, index);
+                    descrIdx, index);
             }
 
             return new VmLocalVariableTable(table);
@@ -900,7 +897,7 @@ public final class ClassDecoder {
 
     /**
      * Read the method table
-     * 
+     *
      * @param data
      * @param rejectNatives
      * @param cls
@@ -909,7 +906,7 @@ public final class ClassDecoder {
      * @param cl
      */
     private static void readMethods(ByteBuffer data, boolean rejectNatives,
-            VmType cls, VmCP cp, VmStatics statics, VmClassLoader cl) {
+                                    VmType cls, VmCP cp, VmStatics statics, VmClassLoader cl) {
         final int mcount = data.getChar();
         if (mcount > 0) {
             final VmMethod[] mtable = new VmMethod[mcount];
@@ -926,10 +923,10 @@ public final class ClassDecoder {
                 if (isStatic || isSpecial) {
                     if (isSpecial) {
                         mts = new VmSpecialMethod(name, signature, modifiers,
-                                cls);
+                            cls);
                     } else {
                         mts = new VmStaticMethod(name, signature, modifiers,
-                                cls);
+                            cls);
                     }
                 } else {
                     mts = new VmInstanceMethod(name, signature, modifiers, cls);
@@ -949,18 +946,18 @@ public final class ClassDecoder {
                     } else if (VmArray.equals(ExceptionsAttrName, attrName)) {
                         mts.setExceptions(readExceptions(data, cls, cp));
                     } else if (VmArray.equals(
-                            RuntimeVisibleAnnotationsAttrName, attrName)) {
+                        RuntimeVisibleAnnotationsAttrName, attrName)) {
                         rVisAnn = readRuntimeAnnotations(data, cp, true);
                     } else if (VmArray.equals(
-                            RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                        RuntimeInvisibleAnnotationsAttrName, attrName)) {
                         rInvisAnn = readRuntimeAnnotations(data, cp, false);
                     } else if (VmArray.equals(
-                            RuntimeVisibleParameterAnnotationsAttrName,
-                            attrName)) {
+                        RuntimeVisibleParameterAnnotationsAttrName,
+                        attrName)) {
                         readRuntimeParameterAnnotations(data, cp, true);
                     } else if (VmArray.equals(
-                            RuntimeInvisibleParameterAnnotationsAttrName,
-                            attrName)) {
+                        RuntimeInvisibleParameterAnnotationsAttrName,
+                        attrName)) {
                         readRuntimeParameterAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
@@ -969,15 +966,15 @@ public final class ClassDecoder {
                 mts.setRuntimeAnnotations(rVisAnn);
                 if (rVisAnn != null) {
                     mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn, cls
-                            .getName()));
+                        .getName()));
                 }
                 if (rInvisAnn != null) {
                     mts.addPragmaFlags(getMethodPragmaFlags(rInvisAnn, cls
-                            .getName()));
+                        .getName()));
                 }
                 if ((modifiers & Modifier.ACC_NATIVE) != 0) {
                     final VmByteCode bc = getNativeCodeReplacement(mts, cl,
-                            rejectNatives);
+                        rejectNatives);
                     if (bc != null) {
                         mts.setModifier(false, Modifier.ACC_NATIVE);
                         mts.setBytecode(bc);
@@ -994,12 +991,12 @@ public final class ClassDecoder {
 
     /**
      * Read a runtime parameter annotations attributes.
-     * 
+     *
      * @param data
      * @param cp
      */
     private static VmAnnotation[][] readRuntimeParameterAnnotations(
-            ByteBuffer data, VmCP cp, boolean visible) {
+        ByteBuffer data, VmCP cp, boolean visible) {
         final int numParams = data.get();
         final VmAnnotation[][] arr = new VmAnnotation[numParams][];
         for (int i = 0; i < numParams; i++) {
@@ -1010,12 +1007,12 @@ public final class ClassDecoder {
 
     /**
      * Read a runtime annotations attributes.
-     * 
+     *
      * @param data
      * @param cp
      */
     private static VmAnnotation[] readRuntimeAnnotations(ByteBuffer data,
-            VmCP cp, boolean visible) {
+                                                         VmCP cp, boolean visible) {
         final int numAnn = data.getChar();
         final VmAnnotation[] arr = new VmAnnotation[numAnn];
         for (int i = 0; i < numAnn; i++) {
@@ -1026,12 +1023,12 @@ public final class ClassDecoder {
 
     /**
      * Combine the pragma flags for a given list of annotations.
-     * 
+     *
      * @param annotations
      * @param className
      */
     private static int getMethodPragmaFlags(VmAnnotation[] annotations,
-            String className) {
+                                            String className) {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
@@ -1047,12 +1044,12 @@ public final class ClassDecoder {
 
     /**
      * Combine the pragma flags for a given list of annotations.
-     * 
+     *
      * @param annotations
      * @param className
      */
     private static int getClassPragmaFlags(VmAnnotation[] annotations,
-            String className) {
+                                           String className) {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
@@ -1065,7 +1062,7 @@ public final class ClassDecoder {
         }
         for (String name : SHARED_STATICS_CLASSNAMES) {
             if (className.equals(name)) {
-                System.out.println("FOUND IT: "+ className);
+                System.out.println("FOUND IT: " + className);
                 flags |= TypePragmaFlags.SHAREDSTATICS;
                 break;
             }
@@ -1075,7 +1072,7 @@ public final class ClassDecoder {
 
     /**
      * Combine the pragma flags for a given classname.
-     * 
+     *
      * @param className
      */
     private static int getClassNamePragmaFlags(String className) {
@@ -1091,12 +1088,12 @@ public final class ClassDecoder {
 
     /**
      * Read a single annotation structure.
-     * 
+     *
      * @param data
      * @param cp
      */
     private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp,
-            boolean visible) {
+                                               boolean visible) {
         final String typeDescr = cp.getUTF8(data.getChar());
         final int numElemValuePairs = data.getChar();
         final VmAnnotation.ElementValue[] values;
@@ -1121,99 +1118,99 @@ public final class ClassDecoder {
 
     /**
      * Read a single element_value structure.
-     * 
+     *
      * @param data
      * @param cp
      */
     private static Object readElementValue(ByteBuffer data, VmCP cp) {
         final int tag = data.get() & 0xFF;
         switch (tag) {
-        case 'B':
-            return Byte.valueOf((byte) cp.getInt(data.getChar()));
-        case 'C':
-            return Character.valueOf((char) cp.getInt(data.getChar()));
-        case 'D':
-            return cp.getDouble(data.getChar());
-        case 'F':
-            return cp.getFloat(data.getChar());
-        case 'I':
-            return cp.getInt(data.getChar());
-        case 'J':
-            return cp.getLong(data.getChar());
-        case 'S':
-            return Short.valueOf((short) cp.getInt(data.getChar()));
-        case 'Z':
-            return Boolean.valueOf(cp.getInt(data.getChar()) != 0);
-        case 's':
-            return cp.getAny(data.getChar());
-        case 'e': // enum
-        {
-            final String typeDescr = cp.getUTF8(data.getChar());
-            final String constName = cp.getUTF8(data.getChar());
-            return new VmAnnotation.EnumValue(typeDescr, constName);
-        }
-        case 'c': // class
-        {
-            final String classDescr = cp.getUTF8(data.getChar());
-            return new VmAnnotation.ClassInfo(classDescr);
-        }
-        case '@': // annotation
-            return readAnnotation(data, cp, true);
-        case '[': // array
-        {
-            final int numValues = data.getChar();
-            final Object[] arr = new Object[numValues];
-            for (int i = 0; i < numValues; i++) {
-                arr[i] = readElementValue(data, cp);
+            case 'B':
+                return Byte.valueOf((byte) cp.getInt(data.getChar()));
+            case 'C':
+                return Character.valueOf((char) cp.getInt(data.getChar()));
+            case 'D':
+                return cp.getDouble(data.getChar());
+            case 'F':
+                return cp.getFloat(data.getChar());
+            case 'I':
+                return cp.getInt(data.getChar());
+            case 'J':
+                return cp.getLong(data.getChar());
+            case 'S':
+                return Short.valueOf((short) cp.getInt(data.getChar()));
+            case 'Z':
+                return Boolean.valueOf(cp.getInt(data.getChar()) != 0);
+            case 's':
+                return cp.getAny(data.getChar());
+            case 'e': // enum
+            {
+                final String typeDescr = cp.getUTF8(data.getChar());
+                final String constName = cp.getUTF8(data.getChar());
+                return new VmAnnotation.EnumValue(typeDescr, constName);
             }
-            return arr;
-        }
-        default:
-            throw new ClassFormatError("Unknown element_value tag '"
+            case 'c': // class
+            {
+                final String classDescr = cp.getUTF8(data.getChar());
+                return new VmAnnotation.ClassInfo(classDescr);
+            }
+            case '@': // annotation
+                return readAnnotation(data, cp, true);
+            case '[': // array
+            {
+                final int numValues = data.getChar();
+                final Object[] arr = new Object[numValues];
+                for (int i = 0; i < numValues; i++) {
+                    arr[i] = readElementValue(data, cp);
+                }
+                return arr;
+            }
+            default:
+                throw new ClassFormatError("Unknown element_value tag '"
                     + (char) tag + "'");
         }
     }
 
     /**
      * Skip over a single element_value structure.
-     * 
+     *
      * @param data
      * @param cp
      */
     private static void skipElementValue(ByteBuffer data, VmCP cp) {
         final int tag = data.get() & 0xFF;
         switch (tag) {
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'F':
-        case 'I':
-        case 'J':
-        case 'S':
-        case 'Z':
-        case 's':
-            data.getChar();
-            break;
-        case 'e': // enum
-            data.getChar(); // typedescr
-            data.getChar(); // constname
-            break;
-        case 'c': // class
-            data.getChar(); // classdescr
-            break;
-        case '@': // annotation
-            readAnnotation(data, cp, false);
-            break;
-        case '[': // array
-        {
-            final int numValues = data.getChar();
-            for (int i = 0; i < numValues; i++) {
-                skipElementValue(data, cp);
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'F':
+            case 'I':
+            case 'J':
+            case 'S':
+            case 'Z':
+            case 's':
+                data.getChar();
+                break;
+            case 'e': // enum
+                data.getChar(); // typedescr
+                data.getChar(); // constname
+                break;
+            case 'c': // class
+                data.getChar(); // classdescr
+                break;
+            case '@': // annotation
+                readAnnotation(data, cp, false);
+                break;
+            case '[': // array
+            {
+                final int numValues = data.getChar();
+                for (int i = 0; i < numValues; i++) {
+                    skipElementValue(data, cp);
+                }
+                break;
             }
-        }
-            break;
-        default:
-            throw new ClassFormatError("Unknown element_value tag '"
+            default:
+                throw new ClassFormatError("Unknown element_value tag '"
                     + (char) tag + "'");
         }
     }
@@ -1233,10 +1230,10 @@ public final class ClassDecoder {
         final String result;
         try {
             result = VmUTF8Convert.fromUTF8(data,
-                    getUtfConversionBuffer(utflen), utflen);
+                getUtfConversionBuffer(utflen), utflen);
         } catch (UTFDataFormatException ex) {
             throw (ClassFormatError) new ClassFormatError(
-                    "Invalid UTF sequence").initCause(ex);
+                "Invalid UTF sequence").initCause(ex);
         }
         return result;
     }
@@ -1265,8 +1262,8 @@ public final class ClassDecoder {
 
         public final String className;
 
-        public MethodPragmaException(Class< ? extends PragmaException> cls,
-                char flags) {
+        public MethodPragmaException(Class<? extends PragmaException> cls,
+                                     char flags) {
             this.className = cls.getName();
             this.flags = flags;
         }
@@ -1277,7 +1274,7 @@ public final class ClassDecoder {
 
         public final String className;
 
-        public PragmaInterface(Class< ? > cls, char flags) {
+        public PragmaInterface(Class<?> cls, char flags) {
             this.className = cls.getName();
             this.flags = flags;
         }
@@ -1290,11 +1287,11 @@ public final class ClassDecoder {
 
         private final String[] allowedPackages;
 
-        public PragmaAnnotation(Class< ? extends Annotation> cls, char flags) {
+        public PragmaAnnotation(Class<? extends Annotation> cls, char flags) {
             this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
             this.flags = flags;
             final AllowedPackages ann = cls
-                    .getAnnotation(AllowedPackages.class);
+                .getAnnotation(AllowedPackages.class);
             if (ann != null) {
                 allowedPackages = ann.value();
             } else {
@@ -1308,14 +1305,14 @@ public final class ClassDecoder {
         public final void checkPragmaAllowed(String className) {
             if (allowedPackages != null) {
                 final String pkg = className.substring(0, className
-                        .lastIndexOf('.'));
+                    .lastIndexOf('.'));
                 for (String allowedPkg : allowedPackages) {
                     if (pkg.equals(allowedPkg)) {
                         return;
                     }
                 }
                 throw new SecurityException("Pragma " + typeDescr
-                        + " is not allowed in class " + className);
+                    + " is not allowed in class " + className);
             }
         }
     }
@@ -1339,7 +1336,7 @@ public final class ClassDecoder {
          * @param rVisAnn
          */
         public FieldData(String name, String signature, int modifiers,
-                Object value, VmAnnotation[] rVisAnn) {
+                         Object value, VmAnnotation[] rVisAnn) {
             this.name = name;
             this.signature = signature;
             this.modifiers = modifiers;

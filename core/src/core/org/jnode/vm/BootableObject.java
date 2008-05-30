@@ -18,12 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 /**
  * This interface is a marker for those classes that can be safely instantiated
  * during the boot image building process.
+ *
  * @author epr
  */
 public interface BootableObject {

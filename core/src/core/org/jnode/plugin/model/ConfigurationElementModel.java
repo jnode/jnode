@@ -18,16 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import nanoxml.XMLElement;
-
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.PluginException;
 
@@ -46,7 +44,7 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
      * @param e
      */
     public ConfigurationElementModel(PluginDescriptorModel plugin, XMLElement e)
-            throws PluginException {
+        throws PluginException {
         super(plugin);
         name = e.getName();
 

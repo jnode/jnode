@@ -23,7 +23,6 @@ package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
 import java.util.HashMap;
-
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
@@ -53,13 +52,15 @@ import org.vmmagic.unboxed.Offset;
 
 /**
  * Architecture descriptor for the Intel X86 architecture.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
 public abstract class VmX86Architecture extends VmArchitecture {
 
-    /** Start address of the boot image (1Mb) */
+    /**
+     * Start address of the boot image (1Mb)
+     */
     public static final int BOOT_IMAGE_START = 0x00100000;
 
     // Page entry flags
@@ -100,25 +101,39 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     // found in it
 
-    /** The compilers */
+    /**
+     * The compilers
+     */
     private final NativeCodeCompiler[] compilers;
 
-    /** The compilers under test */
+    /**
+     * The compilers under test
+     */
     private final NativeCodeCompiler[] testCompilers;
 
-    /** The local APIC accessor, if any */
+    /**
+     * The local APIC accessor, if any
+     */
     private LocalAPIC localAPIC;
 
-    /** The MP configuration table */
+    /**
+     * The MP configuration table
+     */
     private MPConfigTable mpConfigTable;
-    
-    /** Programmable interrupt controller */
+
+    /**
+     * Programmable interrupt controller
+     */
     private PIC8259A pic8259a;
-    
-    /** The boot processor */
+
+    /**
+     * The boot processor
+     */
     private transient VmX86Processor bootProcessor;
-    
-    /** The centralized irq manager */
+
+    /**
+     * The centralized irq manager
+     */
     private transient X86IRQManager irqManager;
 
     /**
@@ -130,9 +145,8 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Initialize this instance.
-     * 
-     * @param compiler
-     *            L1a to use L1A compiler, L1 compiler otherwise.
+     *
+     * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
      */
     public VmX86Architecture(int referenceSize, String compiler) {
         super(referenceSize, new VmX86StackReader(referenceSize));
@@ -148,7 +162,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Gets the name of this architecture.
-     * 
+     *
      * @return name
      */
     public final String getName() {
@@ -157,7 +171,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Gets the full name of this architecture, including operating mode.
-     * 
+     *
      * @return Name
      */
     public String getFullName() {
@@ -170,7 +184,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Gets the byte ordering of this architecture.
-     * 
+     *
      * @return ByteOrder
      */
     public final ByteOrder getByteOrder() {
@@ -179,7 +193,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Gets the operating mode.
-     * 
+     *
      * @return
      */
     public final X86Constants.Mode getMode() {
@@ -192,7 +206,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Gets all compilers for this architecture.
-     * 
+     *
      * @return The compilers, sorted by optimization level, from least
      *         optimizations to most optimizations.
      */
@@ -202,7 +216,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Gets all test compilers for this architecture.
-     * 
+     *
      * @return The compilers, sorted by optimization level, from least
      *         optimizations to most optimizations.
      */
@@ -226,7 +240,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         //
 
         final MPFloatingPointerStructure mp = MPFloatingPointerStructure.find(
-                rm, ResourceOwner.SYSTEM);
+            rm, ResourceOwner.SYSTEM);
         if (mp == null) {
             BootLog.info("No MP table found");
             // No MP table found.
@@ -248,7 +262,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         try {
             // Create the local APIC accessor
             localAPIC = new LocalAPIC(rm, owner, mpConfigTable
-                    .getLocalApicAddress());
+                .getLocalApicAddress());
         } catch (ResourceNotFreeException ex) {
             BootLog.error("Cannot claim APIC region");
             return;
@@ -266,7 +280,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
                     try {
                         // We found an enabled I/O APIC.
                         final IOAPIC ioAPIC = new IOAPIC(rm, owner, apicEntry
-                                .getAddress());
+                            .getAddress());
                         ioAPIC.dump(System.out);
                         break;
                     } catch (ResourceNotFreeException ex) {
@@ -281,7 +295,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
             VmX86Processor.detectAndstartLogicalProcessors(rm);
         } catch (ResourceNotFreeException ex) {
             BootLog.error("Cannot claim region for logical processor startup",
-                    ex);
+                ex);
         }
 
         // Find all physical AP processors
@@ -310,8 +324,8 @@ public abstract class VmX86Architecture extends VmArchitecture {
             final int apicId = cpuEntry.getApicID();
             // New CPU
             final VmX86Processor newCpu = (VmX86Processor) createProcessor(
-                    apicId, Vm.getVm().getSharedStatics(), bootCpu
-                            .getIsolatedStatics(), bootCpu.getScheduler());
+                apicId, Vm.getVm().getSharedStatics(), bootCpu
+                .getIsolatedStatics(), bootCpu.getScheduler());
             initX86Processor(newCpu);
             try {
                 newCpu.startup(rm);
@@ -319,7 +333,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
                 BootLog.error("Cannot claim region for processor startup", ex);
             }
         }
-        
+
         // If there is more then one CPU, start sending timeslice interrupts now
         BootLog.info("Activating timeslice interrupts");
         bootCpu.activateTimeSliceInterrupts();
@@ -327,13 +341,13 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Create a processor instance for this architecture.
-     * 
+     *
      * @return The processor
      */
     public abstract VmProcessor createProcessor(int id,
-            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
-            VmScheduler scheduler);
-       
+                                                VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+                                                VmScheduler scheduler);
+
     /**
      * @see org.jnode.vm.VmArchitecture#createIRQManager()
      */
@@ -348,13 +362,13 @@ public abstract class VmX86Architecture extends VmArchitecture {
             if (irqManager == null) {
                 irqManager = new X86IRQManager(bootProcessor, pic8259a);
             }
-        }                
+        }
         return irqManager;
     }
 
     /**
      * Initialize a processor wrt. APIC and add it to the list of processors.
-     * 
+     *
      * @param cpu
      */
     final void initX86Processor(VmX86Processor cpu) {
@@ -372,9 +386,9 @@ public abstract class VmX86Architecture extends VmArchitecture {
         Unsafe.debug("Memory map\n");
         for (int i = 0; i < cnt; i++) {
             long base = mmap
-                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
+                .loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
             long length = mmap
-                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
+                .loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
             int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
             mmap = mmap.add(MBMMAP_ESIZE);
 
@@ -388,24 +402,24 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /**
      * Convert an mmap type into a human readable string.
-     * 
+     *
      * @param type
      * @return
      */
     private final String mmapTypeToString(int type) {
         switch (type) {
-        case MMAP_TYPE_MEMORY:
-            return "Available    ";
-        case MMAP_TYPE_RESERVED:
-            return "Reserved     ";
-        case MMAP_TYPE_ACPI:
-            return "ACPI reclaim ";
-        case MMAP_TYPE_NVS:
-            return "ACPI NVS     ";
-        case MMAP_TYPE_UNUSABLE:
-            return "Unusable     ";
-        default:
-            return "Undefined    ";
+            case MMAP_TYPE_MEMORY:
+                return "Available    ";
+            case MMAP_TYPE_RESERVED:
+                return "Reserved     ";
+            case MMAP_TYPE_ACPI:
+                return "ACPI reclaim ";
+            case MMAP_TYPE_NVS:
+                return "ACPI NVS     ";
+            case MMAP_TYPE_UNUSABLE:
+                return "Unusable     ";
+            default:
+                return "Undefined    ";
         }
     }
 
@@ -419,14 +433,14 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
         for (int i = 0; i < cnt; i++) {
             long base = mmap
-                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
+                .loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
             long length = mmap
-                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
+                .loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
             int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
             mmap = mmap.add(MBMMAP_ESIZE);
 
             map[i] = new X86MemoryMapEntry(Address.fromLong(base), Extent
-                    .fromLong(length), type);
+                .fromLong(length), type);
         }
 
         return map;

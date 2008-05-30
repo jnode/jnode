@@ -18,11 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.performance;
 
 /**
  * Well known event types that occur on many platforms.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public enum PresetEvent {
@@ -38,15 +39,14 @@ public enum PresetEvent {
     TLB_IM("TLB instruction misses"),
     TLB_TL("TLB misses"),
     TOT_CYC("Total cycles"),
-    TOT_INS("Total instructions"),
-    
-    ;
-    
+    TOT_INS("Total instructions");
+
     final String description;
+
     private PresetEvent(String description) {
         this.description = description;
     }
-    
+
     public final String getDescription() {
         return description;
     }

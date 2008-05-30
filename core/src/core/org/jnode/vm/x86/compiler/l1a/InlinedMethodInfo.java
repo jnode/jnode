@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
@@ -32,71 +32,72 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 final class InlinedMethodInfo {
 
     private final InlinedMethodInfo previous;
-    
-	private final VmMethod inlinedMethod;
 
-	private TypeStack exitStack;
+    private final VmMethod inlinedMethod;
 
-	private final Label endOfInlineLabel;
+    private TypeStack exitStack;
 
-	private TypeStack outerMethodStack;
-    
+    private final Label endOfInlineLabel;
+
+    private TypeStack outerMethodStack;
+
     private final String previousLabelPrefix;
 
-	/**
-	 * Initialize this instance.
-	 * 
-	 * @param inlinedMethod
-	 */
-	public InlinedMethodInfo(InlinedMethodInfo previous, VmMethod inlinedMethod, Label endOfInlineLabel, String previousLabelPrefix) {
+    /**
+     * Initialize this instance.
+     *
+     * @param inlinedMethod
+     */
+    public InlinedMethodInfo(InlinedMethodInfo previous, VmMethod inlinedMethod, Label endOfInlineLabel,
+                             String previousLabelPrefix) {
         this.previous = previous;
-		this.inlinedMethod = inlinedMethod;
-		this.endOfInlineLabel = endOfInlineLabel;
+        this.inlinedMethod = inlinedMethod;
+        this.endOfInlineLabel = endOfInlineLabel;
         this.previousLabelPrefix = previousLabelPrefix;
-	}
+    }
 
-	final void setExitStack(VirtualStack vstack) {
-		this.exitStack = vstack.asTypeStack();
-	}
+    final void setExitStack(VirtualStack vstack) {
+        this.exitStack = vstack.asTypeStack();
+    }
 
-	/**
-	 * @return Returns the endOfInlineLabel.
-	 */
-	final Label getEndOfInlineLabel() {
-		return endOfInlineLabel;
-	}
+    /**
+     * @return Returns the endOfInlineLabel.
+     */
+    final Label getEndOfInlineLabel() {
+        return endOfInlineLabel;
+    }
 
-	/**
-	 * Push the stack elements of the outer method stack.
-	 * 
-	 * @param vstack
-	 */
-	final void pushOuterMethodStack(ItemFactory ifac, VirtualStack vstack) {
-		vstack.pushAll(ifac, outerMethodStack);
-	}
+    /**
+     * Push the stack elements of the outer method stack.
+     *
+     * @param vstack
+     */
+    final void pushOuterMethodStack(ItemFactory ifac, VirtualStack vstack) {
+        vstack.pushAll(ifac, outerMethodStack);
+    }
 
-	/**
-	 * Push the stack elements of the outer method stack and the exit stack.
-	 * 
-	 * @param vstack
-	 */
-	final void pushExitStack(ItemFactory ifac, VirtualStack vstack) {
-		vstack.reset();
-		//vstack.pushAll(outerMethodStack);
-		vstack.pushAll(ifac, exitStack);
-	}
+    /**
+     * Push the stack elements of the outer method stack and the exit stack.
+     *
+     * @param vstack
+     */
+    final void pushExitStack(ItemFactory ifac, VirtualStack vstack) {
+        vstack.reset();
+        //vstack.pushAll(outerMethodStack);
+        vstack.pushAll(ifac, exitStack);
+    }
 
-	/**
-	 * @param outerMethodStack
-	 *            The outerMethodStack to set.
-	 */
-	final void setOuterMethodStack(TypeStack outerMethodStack) {
-		this.outerMethodStack = outerMethodStack;
-	}
-    
+    /**
+     * @param outerMethodStack The outerMethodStack to set.
+     */
+    final void setOuterMethodStack(TypeStack outerMethodStack) {
+        this.outerMethodStack = outerMethodStack;
+    }
+
     /**
      * Push the return value of the inlined method on the current
      * vstack.
+     *
      * @param helper
      */
     final void pushReturnValue(X86CompilerHelper helper) {

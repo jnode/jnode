@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
@@ -28,22 +28,24 @@ import org.jnode.vm.VmSystemObject;
  */
 public abstract class AbstractExceptionHandler extends VmSystemObject {
 
-	private final VmConstClass catchType;
+    private final VmConstClass catchType;
 
-	/**
-	 * Create a new instance
-	 * @param catchType
-	 */
-	public AbstractExceptionHandler(VmConstClass catchType) {
-		this.catchType = catchType;
-	}
+    /**
+     * Create a new instance
+     *
+     * @param catchType
+     */
+    public AbstractExceptionHandler(VmConstClass catchType) {
+        this.catchType = catchType;
+    }
 
-	/**
-	 * Gets the classreference of the exception class this exception handler
-	 * can handle.
-	 * @return VmConstClass
-	 */
-	public final VmConstClass getCatchType() {
-		return catchType;
-	}
+    /**
+     * Gets the classreference of the exception class this exception handler
+     * can handle.
+     *
+     * @return VmConstClass
+     */
+    public final VmConstClass getCatchType() {
+        return catchType;
+    }
 }

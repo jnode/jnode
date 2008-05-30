@@ -18,23 +18,22 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
 import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * This annotation is used to request permission to use magic code
  * in the methods of this type.
  * It is up to the classloader & verifier to verify that this permission
- * is actually allowed. If not, an exception must be thrown during 
+ * is actually allowed. If not, an exception must be thrown during
  * class loading.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented

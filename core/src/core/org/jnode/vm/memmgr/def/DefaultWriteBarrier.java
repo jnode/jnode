@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.VmMagic;
@@ -34,10 +34,14 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 @MagicPermission
 final class DefaultWriteBarrier extends VmWriteBarrier {
 
-    /** The heap helper */
+    /**
+     * The heap helper
+     */
     private final HeapHelper helper;
 
-    /** Is the write barrier active? */
+    /**
+     * Is the write barrier active?
+     */
     private boolean active;
 
     /**
@@ -66,7 +70,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
      *      int, int)
      */
     public final void arrayCopyWriteBarrier(Object array, int start, int end)
-            throws UninterruptiblePragma {
+        throws UninterruptiblePragma {
         // The source array is already reachable, so by definition, all
         // entries will be reachable.
         // So we do nothing here
@@ -78,7 +82,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
      *      int, java.lang.Object)
      */
     public final void arrayStoreWriteBarrier(Object ref, int index, Object value)
-            throws UninterruptiblePragma {
+        throws UninterruptiblePragma {
         if (active) {
             shade(value);
         }
@@ -90,7 +94,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
      *      int, java.lang.Object)
      */
     public final void putfieldWriteBarrier(Object ref, int offset, Object value)
-            throws UninterruptiblePragma {
+        throws UninterruptiblePragma {
         if (active) {
             shade(value);
         }
@@ -102,7 +106,7 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
      *      java.lang.Object)
      */
     public final void putstaticWriteBarrier(boolean shared, int staticsIndex, Object value)
-            throws UninterruptiblePragma {
+        throws UninterruptiblePragma {
         if (active) {
             shade(value);
         }
@@ -111,18 +115,19 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
 
     /**
      * Set the GC color of the given value to gray if it is white.
-     * 
+     *
      * @param value
      */
     private final void shade(Object value) throws UninterruptiblePragma {
         if (value != null) {
             while (true) {
                 final int gcColor = VmMagic.getObjectColor(value);
-                if (gcColor > ObjectFlags.GC_WHITE) { 
-                // Not white or yellow, we're done
-                return; }
+                if (gcColor > ObjectFlags.GC_WHITE) {
+                    // Not white or yellow, we're done
+                    return;
+                }
                 if (helper.atomicChangeObjectColor(value, gcColor,
-                        ObjectFlags.GC_GREY)) {
+                    ObjectFlags.GC_GREY)) {
                     // Change to grey, we're done
                     changed = true;
                     return;
@@ -133,13 +138,12 @@ final class DefaultWriteBarrier extends VmWriteBarrier {
 
     public String toString() {
         return "arrayCopy: " + arrayCopyCount + ", arrayStore: "
-                + arrayStoreCount + ", putField: " + putFieldCount
-                + ", putStatic: " + putStaticCount;
+            + arrayStoreCount + ", putField: " + putFieldCount
+            + ", putStatic: " + putStaticCount;
     }
 
     /**
-     * @param active
-     *            The active to set.
+     * @param active The active to set.
      */
     final void setActive(boolean active) {
         this.changed = false;

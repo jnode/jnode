@@ -18,19 +18,20 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 /**
  * @author epr
  */
-public abstract class ObjectVisitor extends VmSystemObject  {
+public abstract class ObjectVisitor extends VmSystemObject {
 
-	/**
-	 * Generic visit method for objects.
-	 * @param object
-	 * @return true to continue with the next object, false to stop calling this method.
-	 */
-	public abstract boolean visit(Object object);
+    /**
+     * Generic visit method for objects.
+     *
+     * @param object
+     * @return true to continue with the next object, false to stop calling this method.
+     */
+    public abstract boolean visit(Object object);
 
 }

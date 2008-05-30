@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import org.jnode.vm.bytecode.BytecodeFlags;
@@ -31,34 +31,34 @@ import org.jnode.vm.classmgr.VmByteCode;
  */
 public class CompilerBytecodeParser extends BytecodeParser implements BytecodeFlags {
 
-	private final ControlFlowGraph cfg;
-	private final CompilerBytecodeVisitor handler;
-	
-	/**
-	 * @param bc
-	 * @param handler
-	 */
-	protected CompilerBytecodeParser(VmByteCode bc, ControlFlowGraph cfg, CompilerBytecodeVisitor handler) {
-		super(bc, handler);
-		this.cfg = cfg;
-		this.handler = handler;
-	}
-	
-	/**
-	 * @see org.jnode.vm.bytecode.BytecodeParser#fireStartInstruction(int)
-	 */
-	protected void fireStartInstruction(int address) {
-		final int flags = cfg.getOpcodeFlags(address);
-		if ((flags & F_START_OF_TRYBLOCK) != 0) {
-		    handler.startTryBlock();
-		}
-		if ((flags & F_START_OF_TRYBLOCKEND) != 0) {
-		    handler.endTryBlock();
-		}
-		super.fireStartInstruction(address);
-		if ((flags & F_YIELDPOINT) != 0) {
-			handler.yieldPoint();
-		}
-	}
+    private final ControlFlowGraph cfg;
+    private final CompilerBytecodeVisitor handler;
+
+    /**
+     * @param bc
+     * @param handler
+     */
+    protected CompilerBytecodeParser(VmByteCode bc, ControlFlowGraph cfg, CompilerBytecodeVisitor handler) {
+        super(bc, handler);
+        this.cfg = cfg;
+        this.handler = handler;
+    }
+
+    /**
+     * @see org.jnode.vm.bytecode.BytecodeParser#fireStartInstruction(int)
+     */
+    protected void fireStartInstruction(int address) {
+        final int flags = cfg.getOpcodeFlags(address);
+        if ((flags & F_START_OF_TRYBLOCK) != 0) {
+            handler.startTryBlock();
+        }
+        if ((flags & F_START_OF_TRYBLOCKEND) != 0) {
+            handler.endTryBlock();
+        }
+        super.fireStartInstruction(address);
+        if ((flags & F_YIELDPOINT) != 0) {
+            handler.yieldPoint();
+        }
+    }
 
 }

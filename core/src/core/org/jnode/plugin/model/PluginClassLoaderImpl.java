@@ -22,7 +22,6 @@
 package org.jnode.plugin.model;
 
 import gnu.java.security.action.GetPolicyAction;
-
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
@@ -36,7 +35,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -49,26 +47,34 @@ import org.jnode.vm.classmgr.VmClassLoader;
  */
 final class PluginClassLoaderImpl extends PluginClassLoader {
 
-    /** The registry */
+    /**
+     * The registry
+     */
     private final PluginRegistryModel registry;
 
-    /** The descriptor */
+    /**
+     * The descriptor
+     */
     private final PluginDescriptorModel descriptor;
 
-    /** The plugin jar file */
+    /**
+     * The plugin jar file
+     */
     private final PluginJar jar;
 
-    /** The classloaders of the prerequisite plugins */
+    /**
+     * The classloaders of the prerequisite plugins
+     */
     private final PluginClassLoaderImpl[] prerequisiteLoaders;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param jar
      */
     public PluginClassLoaderImpl(PluginRegistryModel registry,
-            PluginDescriptorModel descr, PluginJar jar,
-            PluginClassLoaderImpl[] prerequisiteLoaders) {
+                                 PluginDescriptorModel descr, PluginJar jar,
+                                 PluginClassLoaderImpl[] prerequisiteLoaders) {
         this.registry = registry;
         this.descriptor = descr;
         this.jar = jar;
@@ -77,12 +83,12 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param jar
      */
     protected PluginClassLoaderImpl(VmClassLoader vmClassLoader, PluginRegistryModel registry,
-            PluginDescriptorModel descr, PluginJar jar,
-            PluginClassLoaderImpl[] prerequisiteLoaders) {
+                                    PluginDescriptorModel descr, PluginJar jar,
+                                    PluginClassLoaderImpl[] prerequisiteLoaders) {
         super(ClassLoader.getSystemClassLoader(), vmClassLoader);
         this.registry = registry;
         this.descriptor = descr;
@@ -92,7 +98,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 
     /**
      * Gets the names of the classes contained in this plugin
-     * 
+     *
      * @return
      */
     public Set<String> getClassNames() {
@@ -112,7 +118,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
      * classes, and will be called by the loadClass method after checking the
      * parent class loader for the requested class. The default implementation
      * throws ClassNotFoundException.
-     * 
+     *
      * @param name
      * @return Class
      * @throws ClassNotFoundException
@@ -134,7 +140,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
      * classes, and will be called by the loadClass method after checking the
      * parent class loader for the requested class. The default implementation
      * throws ClassNotFoundException.
-     * 
+     *
      * @param name
      * @return Class The class, or null if not found.
      * @see java.lang.ClassLoader#findClass(java.lang.String)
@@ -197,18 +203,18 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
                     String implVersion = descriptor.getVersion();
                     URL sealed = null;
                     definePackage(packageName, specTitle, specVendor,
-                            specVersion, implTitle, implVendor, implVersion,
-                            sealed);
+                        specVersion, implTitle, implVendor, implVersion,
+                        sealed);
                 }
             }
 
             final URL sourceUrl = jar.getResource(name.replace('.', '/')
-                    + ".class");
-            final CodeSource cs = new CodeSource(sourceUrl, (Certificate[])null);
+                + ".class");
+            final CodeSource cs = new CodeSource(sourceUrl, (Certificate[]) null);
             final Policy policy = (Policy) AccessController
-                    .doPrivileged(GetPolicyAction.getInstance());
+                .doPrivileged(GetPolicyAction.getInstance());
             final ProtectionDomain pd = new ProtectionDomain(cs, policy
-                    .getPermissions(cs));
+                .getPermissions(cs));
             final Class cls = defineClass(name, b, pd);
             resolveClass(cls);
             return cls;
@@ -219,7 +225,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 
     /**
      * Does this classloader contain the specified class.
-     * 
+     *
      * @return boolean
      */
     protected final boolean containsClass(String name) {
@@ -238,7 +244,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
     /**
      * Finds the resource with the given name. Class loader implementations
      * should override this method to specify where to find resources.
-     * 
+     *
      * @param name
      * @return URL
      * @see java.lang.ClassLoader#findResource(java.lang.String)
@@ -353,7 +359,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 
     /**
      * Try to load the data of a class with a given name.
-     * 
+     *
      * @param name
      * @return The loaded class data or null if not found.
      */

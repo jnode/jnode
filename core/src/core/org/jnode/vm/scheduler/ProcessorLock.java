@@ -35,7 +35,7 @@ import org.vmmagic.unboxed.Word;
 /**
  * A ProcessorLock is a lock that grants access to a resource from a single
  * processor.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
@@ -48,12 +48,14 @@ public class ProcessorLock {
      */
     private VmProcessor owner;
 
-    /** Number of times the lock has been locked */
+    /**
+     * Number of times the lock has been locked
+     */
     private Word lockCount;
 
     /**
      * Claim access to this lock.
-     * 
+     *
      * @see #unlock()
      * @see #lockCount
      */
@@ -66,9 +68,9 @@ public class ProcessorLock {
             lockCount = lockCount.add(Word.one());
         } else {
             final Address ownerAddr = ObjectReference.fromObject(this)
-                    .toAddress();
+                .toAddress();
             final ObjectReference procRef = ObjectReference.fromObject(VmMagic
-                    .currentProcessor());
+                .currentProcessor());
             while (!ownerAddr.attempt(null, procRef)) {
                 // Busy wait
             }
@@ -80,7 +82,7 @@ public class ProcessorLock {
     /**
      * Release access to this monitor. A monitor may only be locked for a small
      * amount of time, since this method uses a spinlock.
-     * 
+     *
      * @see #lock()
      * @see #lockCount
      */

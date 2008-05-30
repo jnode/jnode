@@ -37,7 +37,7 @@ public final class Counter extends Statistic implements Comparable<Counter> {
     public Counter(String name, String description) {
         this(name, description, 0);
     }
-    
+
     public Counter(String name, int value) {
         this(name, null, value);
     }
@@ -46,10 +46,10 @@ public final class Counter extends Statistic implements Comparable<Counter> {
         super(name, description);
         this.counter = value;
     }
-    
+
     /**
      * Gets the counter of this statistic
-     * 
+     *
      * @return the counter
      */
     public int get() {
@@ -89,13 +89,13 @@ public final class Counter extends Statistic implements Comparable<Counter> {
             return 1;
         } else if (o.counter > this.counter) {
             return -1;
-        } 
+        }
         return 0;
     }
 
     /**
      * Convert to a String representation
-     * 
+     *
      * @return String
      * @see java.lang.Object#toString()
      */

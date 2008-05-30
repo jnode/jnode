@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.Unsafe;
@@ -39,34 +39,54 @@ import org.vmmagic.unboxed.Word;
 @MagicPermission
 final class GCManager extends VmSystemObject implements Uninterruptible {
 
-    /** The heap manager */
+    /**
+     * The heap manager
+     */
     private final DefaultHeapManager heapManager;
 
-    /** The mark stack */
+    /**
+     * The mark stack
+     */
     private final GCStack markStack;
 
-    /** An object visitor used for marking */
+    /**
+     * An object visitor used for marking
+     */
     private final GCMarkVisitor markVisitor;
 
-    /** An object visitor used for sweeping */
+    /**
+     * An object visitor used for sweeping
+     */
     private final GCSweepVisitor sweepVisitor;
 
-    /** An object visitor used for setting objects to GC colour white */
+    /**
+     * An object visitor used for setting objects to GC colour white
+     */
     private final GCSetWhiteVisitor setWhiteVisitor;
 
-    /** The object visitor that verifies the correctness of the object tree */
+    /**
+     * The object visitor that verifies the correctness of the object tree
+     */
     private final GCVerifyVisitor verifyVisitor;
 
-    /** My statistics */
+    /**
+     * My statistics
+     */
     private final DefGCStatistics stats;
 
-    /** The low level helper */
+    /**
+     * The low level helper
+     */
     private final HeapHelper helper;
 
-    /** The write barrier */
+    /**
+     * The write barrier
+     */
     private final DefaultWriteBarrier writeBarrier;
 
-    /** Debug mode? */
+    /**
+     * Debug mode?
+     */
     private final boolean debug;
 
     /**
@@ -146,11 +166,11 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
     /**
      * Mark all live objects in the heap.
-     * 
+     *
      * @param bootHeap
      * @param firstHeap
      */
-    private final void markHeap(VmBootHeap bootHeap, VmDefaultHeap firstHeap,             boolean locking) {
+    private final void markHeap(VmBootHeap bootHeap, VmDefaultHeap firstHeap, boolean locking) {
 
         if (writeBarrier != null) {
             writeBarrier.setActive(true);
@@ -171,7 +191,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             markVisitor.reset();
             markVisitor.setRootSet(true);
             // Mark all roots
-            helper.visitAllRoots(markVisitor, heapManager);            
+            helper.visitAllRoots(markVisitor, heapManager);
 //            statics.walk(markVisitor, resolver);
 //            helper.visitAllThreads(threadMarkVisitor);
             // Mark every object in the rootset
@@ -213,7 +233,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
     /**
      * Sweep all heaps for dead objects.
-     * 
+     *
      * @param firstHeap
      */
     private void sweep(VmDefaultHeap firstHeap) {
@@ -232,7 +252,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
     /**
      * Mark all objects white, so a next GC action is valid
-     * 
+     *
      * @param bootHeap
      * @param firstHeap
      */
@@ -251,7 +271,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
     /**
      * Verify all heaps.
-     * 
+     *
      * @param bootHeap
      * @param firstHeap
      */

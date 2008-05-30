@@ -25,11 +25,10 @@ import org.jnode.system.IRQHandler;
 import org.jnode.system.ResourceOwner;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.Uninterruptible;
-import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Thread for IRQ handler.
- * 
+ *
  * @author epr
  */
 final class IRQThread extends Thread implements SystemThread {
@@ -44,7 +43,9 @@ final class IRQThread extends Thread implements SystemThread {
 
     private int handledIrqCount;
 
-    /** Is this a shared IRQ? */
+    /**
+     * Is this a shared IRQ?
+     */
     private final boolean shared;
 
     private IRQAction actions;
@@ -54,7 +55,7 @@ final class IRQThread extends Thread implements SystemThread {
     private final Object ACTION_LOCK = new Object();
 
     public IRQThread(IRQManager mgr, int irq, ResourceOwner owner,
-            IRQHandler handler, boolean shared, VmProcessor processor) {
+                     IRQHandler handler, boolean shared, VmProcessor processor) {
         super("IRQ-" + irq);
         this.mgr = mgr;
         this.irq = irq;
@@ -70,7 +71,7 @@ final class IRQThread extends Thread implements SystemThread {
 
     /**
      * Add an IRQ handler
-     * 
+     *
      * @param owner
      * @param handler
      */
@@ -87,7 +88,7 @@ final class IRQThread extends Thread implements SystemThread {
 
     /**
      * Remove a given handler
-     * 
+     *
      * @param handler
      */
     public final void remove(IRQHandler handler) {
@@ -104,7 +105,6 @@ final class IRQThread extends Thread implements SystemThread {
 
     /**
      * Stop this IRQ thread.
-     * 
      */
     final void stopThread() {
         this.stop = true;
@@ -114,7 +114,7 @@ final class IRQThread extends Thread implements SystemThread {
 
     /**
      * Continue to run until i'm stopped.
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     public final void run() {
@@ -166,16 +166,16 @@ final class IRQThread extends Thread implements SystemThread {
     /**
      * Tell this thread how many IRQ's have been received, so this thread can
      * start the IRQ handler if needed.
-     * 
+     *
      * @param count
      * @param current
-     * @throws UninterruptiblePragma
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
      */
     @KernelSpace
     @Uninterruptible
     final void signalIRQ(int count, VmThread current) {
         this.irqCount = count;
-        if ((irqCount != handledIrqCount) && (current != vmThread)){
+        if ((irqCount != handledIrqCount) && (current != vmThread)) {
             vmThread.unsecureResume();
         }
     }
@@ -189,9 +189,9 @@ final class IRQThread extends Thread implements SystemThread {
 
     /**
      * Convert to a String representation.
-     * 
-     * @see java.lang.Object#toString()
+     *
      * @return String
+     * @see java.lang.Object#toString()
      */
     public String toString() {
         final StringBuilder b = new StringBuilder();
@@ -262,7 +262,7 @@ final class IRQThread extends Thread implements SystemThread {
 
         public final String toString() {
             return owner.getShortDescription()
-                    + ((errorCount > 0) ? " errors " + errorCount : "");
+                + ((errorCount > 0) ? " errors " + errorCount : "");
         }
     }
 

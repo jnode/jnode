@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import nanoxml.XMLElement;
-
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
@@ -35,7 +33,7 @@ import org.jnode.plugin.PluginException;
  * @author epr
  */
 final class ExtensionPointModel extends PluginModelObject implements
-        ExtensionPoint {
+    ExtensionPoint {
 
     private final String id;
 
@@ -50,7 +48,7 @@ final class ExtensionPointModel extends PluginModelObject implements
     private transient List<Extension> extensionsCache;
 
     public ExtensionPointModel(PluginDescriptorModel plugin, XMLElement e)
-            throws PluginException {
+        throws PluginException {
         super(plugin);
         id = getAttribute(e, "id", true);
         name = getAttribute(e, "name", true);
@@ -62,7 +60,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Resolve all references to (elements of) other plugin descriptors
-     * 
+     *
      * @throws PluginException
      */
     protected void resolve(PluginRegistryModel registry) throws PluginException {
@@ -71,11 +69,11 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Remove all references to (elements of) other plugin descriptors
-     * 
+     *
      * @throws PluginException
      */
     protected void unresolve(PluginRegistryModel registry)
-            throws PluginException {
+        throws PluginException {
         registry.unregisterExtensionPoint(this);
     }
 
@@ -112,14 +110,14 @@ final class ExtensionPointModel extends PluginModelObject implements
         if (extensionArray == null) {
             final List<Extension> cache = getExtensionsCache();
             extensionArray = (Extension[]) cache.toArray(new Extension[cache
-                    .size()]);
+                .size()]);
         }
         return extensionArray;
     }
 
     /**
      * Add a listener
-     * 
+     *
      * @param listener
      */
     public void addListener(ExtensionPointListener listener) {
@@ -131,7 +129,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Add a listener to the front of the listeners list.
-     * 
+     *
      * @param listener
      */
     public void addPriorityListener(ExtensionPointListener listener) {
@@ -143,7 +141,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Remove a listener
-     * 
+     *
      * @param listener
      */
     public void removeListener(ExtensionPointListener listener) {
@@ -154,7 +152,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Add an extension to this point.
-     * 
+     *
      * @param extension
      */
     protected void add(Extension extension) {
@@ -169,7 +167,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Add an extension to this point.
-     * 
+     *
      * @param extension
      */
     protected void remove(Extension extension) {
@@ -181,7 +179,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Fire and extensionAdded event to all listeners
-     * 
+     *
      * @param extension
      */
     protected void fireExtensionAdded(Extension extension) {
@@ -194,7 +192,7 @@ final class ExtensionPointModel extends PluginModelObject implements
 
     /**
      * Fire and extensionRemoved event to all listeners
-     * 
+     *
      * @param extension
      */
     protected void fireExtensionRemoved(Extension extension) {
@@ -229,7 +227,7 @@ final class ExtensionPointModel extends PluginModelObject implements
         // System.out.println("Cache->Array " + extensionsCache);
         if (extensionsCache != null) {
             extensionArray = (Extension[]) extensionsCache
-                    .toArray(new Extension[extensionsCache.size()]);
+                .toArray(new Extension[extensionsCache.size()]);
         }
     }
 }

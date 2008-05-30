@@ -18,28 +18,28 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system;
 
 /**
  * Simple ResourceOwner implementation.
- * 
- * @see org.jnode.system.ResourceOwner
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @see org.jnode.system.ResourceOwner
  */
 public class SimpleResourceOwner implements ResourceOwner {
 
-	private final String name;
-	
-	public SimpleResourceOwner(String name) {
-		this.name = name;
-	}
+    private final String name;
 
-	/**
-	 * @see org.jnode.system.ResourceOwner#getShortDescription()
-	 * @return The short description
-	 */
-	public String getShortDescription() {
-		return name;
-	}
+    public SimpleResourceOwner(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return The short description
+     * @see org.jnode.system.ResourceOwner#getShortDescription()
+     */
+    public String getShortDescription() {
+        return name;
+    }
 }

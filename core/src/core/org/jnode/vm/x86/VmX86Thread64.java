@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
@@ -35,53 +35,53 @@ import org.vmmagic.unboxed.Word;
 @MagicPermission
 public final class VmX86Thread64 extends VmX86Thread {
 
-	// State when not running
-	volatile Word r8;
-	volatile Word r9;
-	volatile Word r10;
-	volatile Word r11;
-	volatile Word r13;
-	volatile Word r14;
-	volatile Word r15;
+    // State when not running
+    volatile Word r8;
+    volatile Word r9;
+    volatile Word r10;
+    volatile Word r11;
+    volatile Word r13;
+    volatile Word r14;
+    volatile Word r15;
 
-	/**
-	 * 
-	 */
-	public VmX86Thread64(VmIsolatedStatics isolatedStatics) {
-		super(isolatedStatics, VmX86Architecture64.SLOT_SIZE);
-	}
+    /**
+     *
+     */
+    public VmX86Thread64(VmIsolatedStatics isolatedStatics) {
+        super(isolatedStatics, VmX86Architecture64.SLOT_SIZE);
+    }
 
-	/**
-	 * @param stack
-	 */
-	public VmX86Thread64(VmIsolatedStatics isolatedStatics, byte[] stack) {
-		super(isolatedStatics, stack, VmX86Architecture64.SLOT_SIZE);
-	}
+    /**
+     * @param stack
+     */
+    public VmX86Thread64(VmIsolatedStatics isolatedStatics, byte[] stack) {
+        super(isolatedStatics, stack, VmX86Architecture64.SLOT_SIZE);
+    }
 
-	/**
-	 * @param javaThread
-	 */
-	public VmX86Thread64(VmIsolatedStatics isolatedStatics, Thread javaThread) {
-		super(isolatedStatics, javaThread);
-	}
+    /**
+     * @param javaThread
+     */
+    public VmX86Thread64(VmIsolatedStatics isolatedStatics, Thread javaThread) {
+        super(isolatedStatics, javaThread);
+    }
 
-	protected final int getReferenceSize() {
-		return VmX86Architecture64.SLOT_SIZE;
-	}
+    protected final int getReferenceSize() {
+        return VmX86Architecture64.SLOT_SIZE;
+    }
 
-	public String getReadableErrorState() {
-		return "RAX " + NumberUtils.hex(exEax.toLong()) + " RBX "
-				+ NumberUtils.hex(exEbx.toLong()) + " RCX "
-				+ NumberUtils.hex(exEcx.toLong()) + " RDX "
-				+ NumberUtils.hex(exEdx.toLong()) + " RSI "
-				+ NumberUtils.hex(exEsi.toLong()) + " RDI "
-				+ NumberUtils.hex(exEdi.toLong()) + " RSP "
-				+ NumberUtils.hex(exEsp.toLong()) + " RIP "
-				+ NumberUtils.hex(exEip.toLong()) + " CR2 "
-				+ NumberUtils.hex(exCr2.toLong()) + " RFLAGS "
-				+ NumberUtils.hex(exEflags.toInt());
-	}
-    
+    public String getReadableErrorState() {
+        return "RAX " + NumberUtils.hex(exEax.toLong()) + " RBX "
+            + NumberUtils.hex(exEbx.toLong()) + " RCX "
+            + NumberUtils.hex(exEcx.toLong()) + " RDX "
+            + NumberUtils.hex(exEdx.toLong()) + " RSI "
+            + NumberUtils.hex(exEsi.toLong()) + " RDI "
+            + NumberUtils.hex(exEdi.toLong()) + " RSP "
+            + NumberUtils.hex(exEsp.toLong()) + " RIP "
+            + NumberUtils.hex(exEip.toLong()) + " CR2 "
+            + NumberUtils.hex(exCr2.toLong()) + " RFLAGS "
+            + NumberUtils.hex(exEflags.toInt());
+    }
+
     /**
      * @see org.jnode.vm.scheduler.VmThread#visit(org.jnode.vm.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
      */

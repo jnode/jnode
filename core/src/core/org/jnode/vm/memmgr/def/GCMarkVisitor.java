@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -43,12 +43,16 @@ import org.vmmagic.unboxed.Offset;
  */
 @MagicPermission
 final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
-        Uninterruptible {
+    Uninterruptible {
 
-    /** The marking stack */
+    /**
+     * The marking stack
+     */
     private final GCStack stack;
 
-    /** The number of marked objects. */
+    /**
+     * The number of marked objects.
+     */
     private int markedObjects;
 
     /**
@@ -64,16 +68,16 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 //    private final DefaultHeapManager heapManager;
 
     private final HeapHelper helper;
-    
+
 //    private final ProcessChildVisitor processChildVisitor = new ProcessChildVisitor();
 
     /**
      * Create a new instance
-     * 
+     *
      * @param stack
      */
     public GCMarkVisitor(DefaultHeapManager heapManager, VmArchitecture arch,
-            GCStack stack) {
+                         GCStack stack) {
 //        this.heapManager = heapManager;
         this.stack = stack;
         this.markedObjects = 0;
@@ -85,8 +89,8 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * @param object
-     * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      * @return boolean
+     * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      */
     public boolean visit(Object object) {
 
@@ -107,21 +111,19 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             return true;
         } else if (rootSet || (gcColor == GC_GREY)) {
             switch (gcColor) {
-            case GC_WHITE:
-            case GC_YELLOW:
-                {
+                case GC_WHITE:
+                case GC_YELLOW: {
                     final boolean ok;
                     ok = helper.atomicChangeObjectColor(object, gcColor,
-                            GC_GREY);
+                        GC_GREY);
                     if (!ok) {
                         Unsafe.debug("Could not change object color. ");
                     }
-                }
-                break;
-            case GC_GREY:
-                break;
-            default:
-                {
+                    break;
+                }                
+                case GC_GREY:
+                    break;
+                default: {
                     Unsafe.debug("color");
                     Unsafe.debug(gcColor);
                     helper.die("Unknown GC color on object");
@@ -158,7 +160,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
                 Unsafe.debug(")");
                 helper.die("vmClass == null in mark()");
             } else if (vmClass.isArray()) {
-                if (!vmClass.isPrimitiveArray()) {            
+                if (!vmClass.isPrimitiveArray()) {
                     markArray(object);
                 }
             } else {
@@ -177,7 +179,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     /**
      * Mark all elements in the given array. The array must contain references
      * only.
-     * 
+     *
      * @param object
      */
     @Inline
@@ -186,7 +188,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             final Object[] arr = (Object[]) object;
             final int length = arr.length;
             for (int i = 0; i < length; i++) {
-                final Object child = arr[ i];
+                final Object child = arr[i];
                 if (child != null) {
                     processChild(child);
                 }
@@ -199,7 +201,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * Mark all instance variables of the given object.
-     * 
+     *
      * @param object
      * @param vmClass
      */
@@ -213,9 +215,9 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
         final int size = vmClass.getObjectSize();
         final Address objAddr = ObjectReference.fromObject(object).toAddress();
-        
+
         for (int i = 0; i < cnt; i++) {
-            final int offset = referenceOffsets[ i];
+            final int offset = referenceOffsets[i];
             if ((offset < 0) || (offset >= size)) {
                 Unsafe.debug("reference offset out of range!");
                 Unsafe.debug(vmClass.getName());
@@ -231,7 +233,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * Process a child of an object (this child is a reference).
-     * 
+     *
      * @param child
      */
     @Inline
@@ -255,7 +257,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * Gets the number of objects marked by this visitor.
-     * 
+     *
      * @return int
      */
     @Inline
@@ -265,7 +267,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * Gets the rootSet attribute.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -275,10 +277,9 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     /**
      * Sets the rootSet attribute.
-     * 
-     * @param b
-     *            If true, all white and grey objects will be marked, otherwise
-     *            only the grey objects will be marked.
+     *
+     * @param b If true, all white and grey objects will be marked, otherwise
+     *          only the grey objects will be marked.
      */
     @Inline
     public void setRootSet(boolean b) {

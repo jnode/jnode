@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.naming;
 
 import java.util.Set;
-
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
@@ -31,23 +30,26 @@ import javax.naming.NamingException;
 public interface NameSpace {
     /**
      * Bind a given service in the namespace under a given name.
+     *
      * @param name
      * @param service
      * @throws NameAlreadyBoundException if the name already exists within this namespace
      */
-    public <T> void bind(Class<T> name, T service) 
-    throws NamingException, NameAlreadyBoundException;
-    
+    public <T> void bind(Class<T> name, T service)
+        throws NamingException, NameAlreadyBoundException;
+
     /**
      * Unbind a service with a given name from the namespace.
      * If the name does not exist in this namespace, this method
      * returns without an error.
+     *
      * @param name
      */
     public void unbind(Class<?> name);
 
     /**
      * Lookup a service with a given name.
+     *
      * @param name
      * @throws NameNotFoundException if the name was not found in this namespace
      */

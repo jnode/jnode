@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l2;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -30,7 +30,7 @@ import org.jnode.assembler.x86.X86Register;
  * @author Levente S\u00e1ntha
  */
 public class X86CodeGenerator extends GenericX86CodeGenerator<X86Register> implements
-        X86Constants {
+    X86Constants {
 
     /**
      * Initialize this instance

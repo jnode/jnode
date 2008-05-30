@@ -38,33 +38,51 @@ import org.jnode.vm.classmgr.VmType;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class OptimizingBytecodeVisitor extends
-        VerifyingCompilerBytecodeVisitor<InlineBytecodeVisitor> {
+    VerifyingCompilerBytecodeVisitor<InlineBytecodeVisitor> {
 
-    /** Maximum length of methods that will be inlined */
+    /**
+     * Maximum length of methods that will be inlined
+     */
     private static final int SIZE_LIMIT = 32;
 
-    /** Maximum depth of recursive inlining */
-    private static final int MAX_INLINE_DEPTH = -1;//5;
+    /**
+     * Maximum depth of recursive inlining
+     */
+    private static final int MAX_INLINE_DEPTH = -1; //5;
 
-    /** Common method entrypoints */
+    /**
+     * Common method entrypoints
+     */
     private final EntryPoints entryPoints;
 
-    /** The classloader */
+    /**
+     * The classloader
+     */
     private final VmClassLoader loader;
 
-    /** The method that is currently being visited */
+    /**
+     * The method that is currently being visited
+     */
     private VmMethod method;
 
-    /** The current max locals of method (adjusted for inlined methods) */
+    /**
+     * The current max locals of method (adjusted for inlined methods)
+     */
     private char maxLocals;
 
-    /** Diff to add to local indexes */
+    /**
+     * Diff to add to local indexes
+     */
     private char localDelta;
 
-    /** Has a return been visited during an inline */
+    /**
+     * Has a return been visited during an inline
+     */
     private boolean visitedReturn = false;
 
-    /** How many nested inlines we're currently in (0 == no inline) */
+    /**
+     * How many nested inlines we're currently in (0 == no inline)
+     */
     private byte inlineDepth = 0;
 
     // Inter instruction optimization flags
@@ -94,42 +112,58 @@ public final class OptimizingBytecodeVisitor extends
         int DLOAD = 0x0200;
     }
 
-    /** Optimize flags set by the current instruction */
+    /**
+     * Optimize flags set by the current instruction
+     */
     private int optimizeFlags;
 
-    /** Optimize flags set by the previous instruction */
+    /**
+     * Optimize flags set by the previous instruction
+     */
     private int previousOptimizeFlags;
 
-    /** Index of the last xstore instruction */
+    /**
+     * Index of the last xstore instruction
+     */
     private int storeIndex;
 
-    /** Index of the last xload instruction */
+    /**
+     * Index of the last xload instruction
+     */
     private int loadIndex;
 
-    /** Statistic counter for #inlined invokespecial's */
+    /**
+     * Statistic counter for #inlined invokespecial's
+     */
     private static Counter inlineSpecialCounter = Vm.getVm().getCounter(
-            "inlined-invokespecial");
+        "inlined-invokespecial");
 
-    /** Statistic counter for #inlined invokespecial's */
+    /**
+     * Statistic counter for #inlined invokespecial's
+     */
     private static Counter inlineStaticCounter = Vm.getVm().getCounter(
-            "inlined-invokestatic");
+        "inlined-invokestatic");
 
-    /** Statistic counter for #inlined invokespecial's */
+    /**
+     * Statistic counter for #inlined invokespecial's
+     */
     private static Counter inlineVirtualCounter = Vm.getVm().getCounter(
-            "inlined-invokevirtual");
+        "inlined-invokevirtual");
 
-    /** Statistic counter for astore/aload sequence */
+    /**
+     * Statistic counter for astore/aload sequence
+     */
     private static Counter storeLoadCounter = Vm.getVm().getCounter(
-            "store-load");
+        "store-load");
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param delegate
      * @param loader
      */
     public OptimizingBytecodeVisitor(EntryPoints entryPoints,
-            InlineBytecodeVisitor delegate, VmClassLoader loader) {
+                                     InlineBytecodeVisitor delegate, VmClassLoader loader) {
         super(delegate);
         this.entryPoints = entryPoints;
         this.loader = loader;
@@ -173,7 +207,7 @@ public final class OptimizingBytecodeVisitor extends
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
      */
-    public void visit_invokespecial(VmConstMethodRef methodRef) {        
+    public void visit_invokespecial(VmConstMethodRef methodRef) {
         methodRef.resolve(loader);
         final VmMethod im = methodRef.getResolvedVmMethod();
         if (!canInline(im)) {
@@ -220,7 +254,7 @@ public final class OptimizingBytecodeVisitor extends
 
     /**
      * Inline the given method into the current method
-     * 
+     *
      * @param im
      */
     private void inline(VmMethod im) {
@@ -234,12 +268,12 @@ public final class OptimizingBytecodeVisitor extends
         // Calculate the new maxLocals
         final int imLocals = bc.getNoLocals(); // #Locals of the inlined method
         final int curLocals = oldMethod.getBytecode().getNoLocals(); // #Locals
-                                                                        // of
-                                                                        // the
-                                                                        // current
-                                                                        // method
+        // of
+        // the
+        // current
+        // method
         maxLocals = (char) Math.max(maxLocals, oldLocalDelta + curLocals
-                + imLocals);
+            + imLocals);
 
         // Set new variables
         this.localDelta += curLocals;
@@ -273,7 +307,7 @@ public final class OptimizingBytecodeVisitor extends
         }
         // Compile the code 1 basic block at a time
         final CompilerBytecodeParser parser = new CompilerBytecodeParser(bc,
-                cfg, this);
+            cfg, this);
         for (BasicBlock bb : cfg) {
             this.startBasicBlock(bb);
             parser.parse(bb.getStartPC(), bb.getEndPC(), false);
@@ -330,13 +364,13 @@ public final class OptimizingBytecodeVisitor extends
 
     /**
      * Pop the method arguments of the stack and store them in locals.
-     * 
+     *
      * @param im
      * @param ibv
      * @param localDelta
      */
     private void storeArgumentsToLocals(VmMethod im, InlineBytecodeVisitor ibv,
-            int localDelta) {
+                                        int localDelta) {
         final int cnt = im.getNoArguments();
         int local = localDelta + im.getArgSlotCount() - 1;
         /*
@@ -344,11 +378,11 @@ public final class OptimizingBytecodeVisitor extends
          */
 
         for (int i = cnt - 1; i >= 0; i--) {
-            final VmType< ? > argType = im.getArgumentType(i);
+            final VmType<?> argType = im.getArgumentType(i);
             // System.out.println("arg" + i + ": " + argType);
 
             if (argType.isPrimitive()) {
-                final VmPrimitiveClass< ? > pc = (VmPrimitiveClass< ? >) argType;
+                final VmPrimitiveClass<?> pc = (VmPrimitiveClass<?>) argType;
                 if (pc.isWide()) {
                     local--;
                     if (pc.isFloatingPoint()) {
@@ -383,7 +417,7 @@ public final class OptimizingBytecodeVisitor extends
 
     /**
      * Can the given method be inlined?
-     * 
+     *
      * @param method
      * @return
      */
@@ -394,10 +428,10 @@ public final class OptimizingBytecodeVisitor extends
             return false;
         }
         if (!(method.isFinal() || method.isPrivate() || method.isStatic() || method
-                .getDeclaringClass().isFinal())) {
+            .getDeclaringClass().isFinal())) {
             return false;
         }
-        final VmType< ? > declClass = method.getDeclaringClass();
+        final VmType<?> declClass = method.getDeclaringClass();
         if (declClass.isMagicType()) {
             return false;
         }
@@ -433,11 +467,11 @@ public final class OptimizingBytecodeVisitor extends
     public void visit_aload(int index) {
         index += localDelta;
         if (((previousOptimizeFlags & OptFlags.ASTORE) != 0)
-                && (storeIndex == index)) {
+            && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_aloadStored(index);
         } else if (((previousOptimizeFlags & OptFlags.ALOAD) != 0)
-                && (loadIndex == index)) {
+            && (loadIndex == index)) {
             super.visit_dup();
         } else {
             super.visit_aload(index);
@@ -474,11 +508,11 @@ public final class OptimizingBytecodeVisitor extends
     public void visit_dload(int index) {
         index += localDelta;
         if (((previousOptimizeFlags & OptFlags.DSTORE) != 0)
-                && (storeIndex == index)) {
+            && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_dloadStored(index);
         } else if (((previousOptimizeFlags & OptFlags.DLOAD) != 0)
-                && (loadIndex == index)) {
+            && (loadIndex == index)) {
             super.visit_dup2();
         } else {
             super.visit_dload(index);
@@ -515,11 +549,11 @@ public final class OptimizingBytecodeVisitor extends
     public void visit_fload(int index) {
         index += localDelta;
         if (((previousOptimizeFlags & OptFlags.FSTORE) != 0)
-                && (storeIndex == index)) {
+            && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_floadStored(index);
         } else if (((previousOptimizeFlags & OptFlags.FLOAD) != 0)
-                && (loadIndex == index)) {
+            && (loadIndex == index)) {
             super.visit_dup();
         } else {
             super.visit_fload(index);
@@ -563,11 +597,11 @@ public final class OptimizingBytecodeVisitor extends
     public void visit_iload(int index) {
         index += localDelta;
         if (((previousOptimizeFlags & OptFlags.ISTORE) != 0)
-                && (storeIndex == index)) {
+            && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_iloadStored(index);
         } else if (((previousOptimizeFlags & OptFlags.ILOAD) != 0)
-                && (loadIndex == index)) {
+            && (loadIndex == index)) {
             super.visit_dup();
         } else {
             super.visit_iload(index);
@@ -604,11 +638,11 @@ public final class OptimizingBytecodeVisitor extends
     public void visit_lload(int index) {
         index += localDelta;
         if (((previousOptimizeFlags & OptFlags.LSTORE) != 0)
-                && (storeIndex == index)) {
+            && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_lloadStored(index);
         } else if (((previousOptimizeFlags & OptFlags.LLOAD) != 0)
-                && (loadIndex == index)) {
+            && (loadIndex == index)) {
             super.visit_dup2();
         } else {
             super.visit_lload(index);
@@ -660,7 +694,7 @@ public final class OptimizingBytecodeVisitor extends
 
     /**
      * Have we visited a return statement?
-     * 
+     *
      * @return
      */
     public boolean isReturnVisited() {

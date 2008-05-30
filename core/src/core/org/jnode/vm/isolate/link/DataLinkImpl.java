@@ -5,7 +5,6 @@ package org.jnode.vm.isolate.link;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-
 import javax.isolate.ClosedLinkException;
 import javax.isolate.Isolate;
 import javax.isolate.Link;
@@ -14,15 +13,16 @@ import javax.isolate.LinkMessage;
 final class DataLinkImpl extends Link {
 
     private final VmDataLink vmLink;
-    
+
     /**
      * Constructor
+     *
      * @param vmLink
      */
     DataLinkImpl(VmDataLink vmLink) {
         this.vmLink = vmLink;
     }
-    
+
     final VmDataLink getImpl() {
         return vmLink;
     }
@@ -41,7 +41,7 @@ final class DataLinkImpl extends Link {
     @Override
     public boolean equals(Object other) {
         if (other instanceof DataLinkImpl) {
-            return (((DataLinkImpl)other).vmLink == this.vmLink);
+            return (((DataLinkImpl) other).vmLink == this.vmLink);
         }
         return false;
     }
@@ -74,7 +74,8 @@ final class DataLinkImpl extends Link {
      * @see javax.isolate.Link#receive()
      */
     @Override
-    public LinkMessage receive() throws ClosedLinkException, IllegalStateException, InterruptedIOException, IOException {
+    public LinkMessage receive()
+        throws ClosedLinkException, IllegalStateException, InterruptedIOException, IOException {
         return vmLink.receive();
     }
 

@@ -18,15 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
-
 import nanoxml.XMLElement;
-
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
@@ -36,12 +34,12 @@ import org.jnode.vm.ResourceLoader;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class FragmentDescriptorModel extends PluginDescriptorModel implements
-        FragmentDescriptor, ResourceLoader {
+    FragmentDescriptor, ResourceLoader {
 
     private final String pluginId;
 
     private final String pluginVersion;
-    
+
     private PluginDescriptorModel plugin;
 
     /**
@@ -50,7 +48,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
      * @throws PluginException
      */
     public FragmentDescriptorModel(PluginJar jarFile, XMLElement e)
-            throws PluginException {
+        throws PluginException {
         super(jarFile, e);
         this.pluginId = getAttribute(e, "plugin-id", true);
         this.pluginVersion = getAttribute(e, "plugin-version", true);
@@ -126,11 +124,11 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
     }
 
     /**
-     * @throws PluginException 
+     * @throws PluginException
      * @see org.jnode.plugin.model.PluginDescriptorModel#initializeRequiresList(java.util.List)
      */
     protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
-            XMLElement e) throws PluginException {
+                                          XMLElement e) throws PluginException {
         final String pluginId = getAttribute(e, "plugin-id", true);
         final String pluginVersion = getAttribute(e, "plugin-version", true);
         list.add(new PluginPrerequisiteModel(this, pluginId, pluginVersion));
@@ -141,7 +139,7 @@ final class FragmentDescriptorModel extends PluginDescriptorModel implements
      */
     public void resolve(PluginRegistryModel registry) throws PluginException {
         super.resolve(registry);
-        plugin = (PluginDescriptorModel)registry.getPluginDescriptor(pluginId);
+        plugin = (PluginDescriptorModel) registry.getPluginDescriptor(pluginId);
         if (plugin == null) {
             throw new PluginException("Plugin " + getPluginId() + " not found");
         }

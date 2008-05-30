@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 /**
@@ -27,9 +27,10 @@ package org.jnode.vm.classmgr;
 public final class VmConstInt extends VmConstObject {
 
     private int value;
-    
+
     /**
      * Initialize this instance.
+     *
      * @param value
      */
     VmConstInt(int value) {
@@ -48,5 +49,5 @@ public final class VmConstInt extends VmConstObject {
      */
     public final int getConstType() {
         return CONST_INT;
-    }       
+    }
 }

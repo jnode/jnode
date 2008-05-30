@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.util.BootableHashMap;
@@ -27,45 +27,46 @@ import org.jnode.vm.VmSystemObject;
 /**
  * This class is used to maintain a mapping between a method signature (name+type)
  * and a unique selector.
- * 
+ *
  * @author epr
  */
 public class SelectorMap extends VmSystemObject {
 
-	private final BootableHashMap<String, Integer> map = new BootableHashMap<String, Integer>(8192);
-	private int lastSelector = 1;
-	
-	/**
-	 * Gets the selector for a given name &amp; type
-	 * @param name
-	 * @param signature
-	 * @return The global unique selector
-	 */
-	public int get(String name, String signature) {
-		final String id = (name + '#' + signature).intern();
-		final Integer selector = (Integer)map.get(id);
-		if (selector != null) {
-			return selector.intValue();
-		} else {
-			return getNew(id);
-		}
-	}
+    private final BootableHashMap<String, Integer> map = new BootableHashMap<String, Integer>(8192);
+    private int lastSelector = 1;
 
-	/**
-	 * Get was not able to get a selector, do a synchronized test
-	 * and create a new selector if needed.
-	 * 
-	 * @param id
-	 * @return The selector
-	 */
-	private synchronized int getNew(String id) {
-		Integer selector = (Integer)map.get(id);
-		if (selector != null) {
-			return selector.intValue();
-		} else {
-		    final int sel = ++lastSelector;
-			map.put(id, new Integer(sel));
-			return sel;
-		}
-	}
+    /**
+     * Gets the selector for a given name &amp; type
+     *
+     * @param name
+     * @param signature
+     * @return The global unique selector
+     */
+    public int get(String name, String signature) {
+        final String id = (name + '#' + signature).intern();
+        final Integer selector = (Integer) map.get(id);
+        if (selector != null) {
+            return selector.intValue();
+        } else {
+            return getNew(id);
+        }
+    }
+
+    /**
+     * Get was not able to get a selector, do a synchronized test
+     * and create a new selector if needed.
+     *
+     * @param id
+     * @return The selector
+     */
+    private synchronized int getNew(String id) {
+        Integer selector = (Integer) map.get(id);
+        if (selector != null) {
+            return selector.intValue();
+        } else {
+            final int sel = ++lastSelector;
+            map.put(id, new Integer(sel));
+            return sel;
+        }
+    }
 }

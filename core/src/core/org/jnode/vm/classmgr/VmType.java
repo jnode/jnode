@@ -22,7 +22,6 @@
 package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
-
 import java.io.Serializable;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +29,6 @@ import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.LoadCompileService;
@@ -56,93 +54,147 @@ import org.vmmagic.unboxed.Address;
 @Uninterruptible
 @MagicPermission
 public abstract class VmType<T> extends VmAnnotatedElement implements
-        VmSharedStaticsEntry, VmIsolatedStaticsEntry {
+    VmSharedStaticsEntry, VmIsolatedStaticsEntry {
 
     /**
      * The parent of this class. Normally VmClass instance, during loading
      * String instance
      */
-    private VmNormalClass< ? super T> superClass;
+    private VmNormalClass<? super T> superClass;
 
-    /** The classname of the parent of this class. */
+    /**
+     * The classname of the parent of this class.
+     */
     private final String superClassName;
 
-    /** The number of super classes until (and including) Object */
+    /**
+     * The number of super classes until (and including) Object
+     */
     private int superClassDepth;
 
-    /** The name of this class */
+    /**
+     * The name of this class
+     */
     private String name;
 
-    /** The the source file name of this class */
+    /**
+     * The the source file name of this class
+     */
     private String sourceFile;
 
-    /** The the source file name of this class */
+    /**
+     * The the source file name of this class
+     */
     private String signature;
 
-    /** All methods and constructors declared in this class */
+    /**
+     * All methods and constructors declared in this class
+     */
     private VmMethod[] methodTable;
 
-    /** All fields declared in this class */
+    /**
+     * All fields declared in this class
+     */
     private VmField[] fieldTable;
 
-    /** My modifiers */
+    /**
+     * My modifiers
+     */
     private int modifiers = -1;
 
-    /** Pragma flags, see {@link TypePragmaFlags} */
+    /**
+     * Pragma flags, see {@link TypePragmaFlags}
+     */
     private char pragmaFlags;
 
-    /** State of this type see {@link VmTypeState}. */
+    /**
+     * State of this type see {@link VmTypeState}.
+     */
     private char state;
 
-    /** The constant pool */
+    /**
+     * The constant pool
+     */
     private VmCP cp;
 
-    /** Interface implemented by this class */
+    /**
+     * Interface implemented by this class
+     */
     private VmImplementedInterface[] interfaceTable;
 
-    /** All interface implemented by this class and its superclasses */
+    /**
+     * All interface implemented by this class and its superclasses
+     */
     private VmInterfaceClass[] allInterfaceTable;
 
-    /** Loaded of this class */
+    /**
+     * Loaded of this class
+     */
     private final VmClassLoader loader;
 
-    /** Holder for isolate specific Class instance */
+    /**
+     * Holder for isolate specific Class instance
+     */
     private VmIsolateLocal<Class<T>> javaClassHolder;
 
-    /** Have the references in the constant pool been resolved? */
+    /**
+     * Have the references in the constant pool been resolved?
+     */
     private boolean resolvedCpRefs;
 
-    /** Size of instances of this class in bytes (1..8) */
+    /**
+     * Size of instances of this class in bytes (1..8)
+     */
     private final byte typeSize;
 
-    /** Name of the array class with this class as component type */
+    /**
+     * Name of the array class with this class as component type
+     */
     private String arrayClassName;
 
-    /** The array class with this class as component type */
+    /**
+     * The array class with this class as component type
+     */
     private VmArrayClass<T[]> arrayClass;
 
-    /** Array containing all super classes and all implemented interfaces */
+    /**
+     * Array containing all super classes and all implemented interfaces
+     */
     private VmType[] superClassesArray;
 
-    /** The finalize method of this class */
+    /**
+     * The finalize method of this class
+     */
     private VmMethod finalizeMethod;
 
-    /** The mangled name (cache) */
+    /**
+     * The mangled name (cache)
+     */
     private String mangledName;
 
-    /** Error message during linkage */
+    /**
+     * Error message during linkage
+     */
     private String errorMsg;
 
-    /** Index of this type in the statics index */
+    /**
+     * Index of this type in the statics index
+     */
     private final int staticsIndex;
 
-    /** Index of this type in the isolated statics index */
+    /**
+     * Index of this type in the isolated statics index
+     */
     private final int isolatedStaticsIndex;
 
-    /** The protection domain of this class */
+    /**
+     * The protection domain of this class
+     */
     private final ProtectionDomain protectionDomain;
 
-    /** Type information managed and required by the memory manager */
+    /**
+     * Type information managed and required by the memory manager
+     */
     private Object mmType;
 
     private static VmNormalClass<Object> ObjectClass;
@@ -189,52 +241,51 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Construct a new VmClass
-     * 
+     *
      * @param name
      * @param superClassName
      * @param loader
      * @param accessFlags
      */
     protected VmType(String name, String superClassName, VmClassLoader loader,
-            int accessFlags, ProtectionDomain protectionDomain) {
+                     int accessFlags, ProtectionDomain protectionDomain) {
         this(name, null, superClassName, loader, accessFlags, -1,
-                protectionDomain);
+            protectionDomain);
     }
 
     /**
      * Construct a new VmClass with a given name and superclass
-     * 
+     *
      * @param name
      * @param superClass
      * @param loader
      * @param typeSize
      */
-    VmType(String name, VmNormalClass< ? super T> superClass,
-            VmClassLoader loader, int typeSize,
-            ProtectionDomain protectionDomain) {
+    VmType(String name, VmNormalClass<? super T> superClass,
+           VmClassLoader loader, int typeSize,
+           ProtectionDomain protectionDomain) {
         this(name, superClass, superClass.getName(), loader,
-                Modifier.ACC_PUBLIC, typeSize, protectionDomain);
+            Modifier.ACC_PUBLIC, typeSize, protectionDomain);
     }
 
     /**
      * Construct a new VmClass with a given name and superclass
-     * 
+     *
      * @param name
      * @param superClass
      * @param superClassName
      * @param loader
      * @param modifiers
      * @param typeSize
-     * @param protectionDomain
-     *            the protection domain of this type.
+     * @param protectionDomain the protection domain of this type.
      */
-    private VmType(String name, VmNormalClass< ? super T> superClass,
-            String superClassName, VmClassLoader loader, int modifiers,
-            int typeSize, ProtectionDomain protectionDomain) {
+    private VmType(String name, VmNormalClass<? super T> superClass,
+                   String superClassName, VmClassLoader loader, int modifiers,
+                   int typeSize, ProtectionDomain protectionDomain) {
         if (superClassName == null) {
             if (!name.equals("java.lang.Object")) {
                 throw new IllegalArgumentException(
-                        "superClassName cannot be null in class " + name);
+                    "superClassName cannot be null in class " + name);
             }
         } else if (superClassName.indexOf('/') >= 0) {
             throw new IllegalArgumentException("superClassName contains '/'");
@@ -247,12 +298,12 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         if (pkg.equals("org.vmmagic.unboxed") || pkg.equals("org.jnode.vm")) {
             final String cname = VMClassHelper.getClassNamePortion(name);
             if (cname.equals("Address") || cname.equals("AddressArray")
-                    || cname.equals("Extent") || cname.equals("ExtentArray")
-                    || cname.equals("ObjectReference")
-                    || cname.equals("ObjectReferenceArray")
-                    || cname.equals("Offset") || cname.equals("OffsetArray")
-                    || cname.equals("Word") || cname.equals("WordArray")
-                    | cname.equals("VmMagic")) {
+                || cname.equals("Extent") || cname.equals("ExtentArray")
+                || cname.equals("ObjectReference")
+                || cname.equals("ObjectReferenceArray")
+                || cname.equals("Offset") || cname.equals("OffsetArray")
+                || cname.equals("Word") || cname.equals("WordArray")
+                | cname.equals("VmMagic")) {
                 modifiers |= Modifier.ACC_MAGIC;
             }
         }
@@ -260,7 +311,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         this.name = name.intern();
         this.superClass = superClass;
         this.superClassName = (superClassName == null) ? null : superClassName
-                .intern();
+            .intern();
         this.modifiers = modifiers;
         this.state = VmTypeState.ST_LOADED;
         this.loader = loader;
@@ -268,9 +319,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         this.staticsIndex = loader.getSharedStatics().allocClass(this);
         this.isolatedStaticsIndex = loader.getIsolatedStatics().allocIntField();
         if (name.charAt(0) == '[') {
-            this.interfaceTable = new VmImplementedInterface[] {
-                    new VmImplementedInterface(CloneableClass),
-                    new VmImplementedInterface(SerializableClass) };
+            this.interfaceTable = new VmImplementedInterface[]{
+                new VmImplementedInterface(CloneableClass),
+                new VmImplementedInterface(SerializableClass)};
             this.typeSize = (byte) loader.getArchitecture().getReferenceSize();
         } else if (typeSize >= 0) {
             this.typeSize = (byte) typeSize;
@@ -282,19 +333,19 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Load the system classes during our bootstrap process.
-     * 
+     *
      * @param clc
      * @return VmClass[]
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
     public final static VmType[] initializeForBootImage(VmSystemClassLoader clc)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException {
         ObjectClass = (VmNormalClass) clc.loadClass("java.lang.Object", false);
         CloneableClass = (VmInterfaceClass) clc.loadClass(
-                "java.lang.Cloneable", false);
+            "java.lang.Cloneable", false);
         SerializableClass = (VmInterfaceClass) clc.loadClass(
-                "java.io.Serializable", false);
+            "java.io.Serializable", false);
 
         ObjectClass.link();
         CloneableClass.link();
@@ -302,23 +353,23 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
         final ProtectionDomain protectionDomain = null;
         BooleanClass = new VmPrimitiveClass("boolean", ObjectClass, clc,
-                JvmType.BOOLEAN, 1, false, protectionDomain);
+            JvmType.BOOLEAN, 1, false, protectionDomain);
         ByteClass = new VmPrimitiveClass("byte", ObjectClass, clc,
-                JvmType.BYTE, 1, false, protectionDomain);
+            JvmType.BYTE, 1, false, protectionDomain);
         CharClass = new VmPrimitiveClass("char", ObjectClass, clc,
-                JvmType.CHAR, 2, false, protectionDomain);
+            JvmType.CHAR, 2, false, protectionDomain);
         ShortClass = new VmPrimitiveClass("short", ObjectClass, clc,
-                JvmType.SHORT, 2, false, protectionDomain);
+            JvmType.SHORT, 2, false, protectionDomain);
         IntClass = new VmPrimitiveClass("int", ObjectClass, clc, JvmType.INT,
-                4, false, protectionDomain);
+            4, false, protectionDomain);
         FloatClass = new VmPrimitiveClass("float", ObjectClass, clc,
-                JvmType.FLOAT, 4, true, protectionDomain);
+            JvmType.FLOAT, 4, true, protectionDomain);
         LongClass = new VmPrimitiveClass("long", ObjectClass, clc,
-                JvmType.LONG, 8, false, protectionDomain);
+            JvmType.LONG, 8, false, protectionDomain);
         DoubleClass = new VmPrimitiveClass("double", ObjectClass, clc,
-                JvmType.DOUBLE, 8, true, protectionDomain);
+            JvmType.DOUBLE, 8, true, protectionDomain);
         VoidClass = new VmPrimitiveClass("void", ObjectClass, clc,
-                JvmType.VOID, 0, false, protectionDomain);
+            JvmType.VOID, 0, false, protectionDomain);
 
         BooleanClass.link();
         ByteClass.link();
@@ -350,18 +401,18 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         DoubleArrayClass.link();
         ObjectArrayClass.link();
 
-        return new VmType[] { ObjectClass, CloneableClass, SerializableClass,
-                BooleanClass, ByteClass, CharClass, ShortClass, IntClass,
-                FloatClass, LongClass, DoubleClass, VoidClass,
-                BooleanArrayClass, ByteArrayClass, CharArrayClass,
-                ShortArrayClass, IntArrayClass, FloatArrayClass,
-                LongArrayClass, DoubleArrayClass, ObjectArrayClass, };
+        return new VmType[]{ObjectClass, CloneableClass, SerializableClass,
+            BooleanClass, ByteClass, CharClass, ShortClass, IntClass,
+            FloatClass, LongClass, DoubleClass, VoidClass,
+            BooleanArrayClass, ByteArrayClass, CharArrayClass,
+            ShortArrayClass, IntArrayClass, FloatArrayClass,
+            LongArrayClass, DoubleArrayClass, ObjectArrayClass};
     }
 
     /**
      * Load the system classes from an array of system classes. This method is
      * called during the boot of the system.
-     * 
+     *
      * @param bootClasses
      */
     @SuppressWarnings("unchecked")
@@ -370,7 +421,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         Unsafe.debug("[loadFromBootClassArray:");
         final int count = bootClasses.length;
         for (int i = 0; i < count; i++) {
-            final VmType< ? > vmClass = bootClasses[i];
+            final VmType<?> vmClass = bootClasses[i];
             final String name = vmClass.name;
             if (vmClass.isPrimitive()) {
                 if (name.equals("boolean")) {
@@ -425,7 +476,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Create an array classname with a this class as component type.
-     * 
+     *
      * @return char[]
      */
     public final String getArrayClassName() {
@@ -454,7 +505,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the array class with this class as its component type
-     * 
+     *
      * @param arrayClassName
      * @return The array class
      */
@@ -469,7 +520,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the array class with this class as its component type
-     * 
+     *
      * @return The array class
      */
     public final VmArrayClass getArrayClass() {
@@ -478,7 +529,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the array class with this class as its component type
-     * 
+     *
      * @param link
      * @return The array class
      */
@@ -491,14 +542,13 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Create an array class with a given component type.
-     * 
-     * @param link
-     *            True if the new class should be linked, false otherwise
+     *
+     * @param link           True if the new class should be linked, false otherwise
      * @param arrayClassName
      * @return VmClass
      */
     private final VmArrayClass<T[]> createArrayClass(boolean link,
-            String arrayClassName) {
+                                                     String arrayClassName) {
         final String name;
         if (arrayClassName != null) {
             name = arrayClassName;
@@ -506,7 +556,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             name = getArrayClassName();
         }
         final VmArrayClass<T[]> arrayClass = new VmArrayClass<T[]>(name, this
-                .getLoader(), this, -1, protectionDomain);
+            .getLoader(), this, -1, protectionDomain);
         if (link) {
             arrayClass.link();
         }
@@ -515,7 +565,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the VmClass of java.lang.Object.
-     * 
+     *
      * @return The class
      */
     public final static VmNormalClass<Object> getObjectClass() {
@@ -527,97 +577,97 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the primitive class corresponding to the given signature type.
-     * 
+     *
      * @param type
      * @return VmClass
      */
-    public final static VmNormalClass< ? > getPrimitiveClass(char type) {
+    public final static VmNormalClass<?> getPrimitiveClass(char type) {
         switch (type) {
-        case 'Z':
-            return BooleanClass;
-        case 'B':
-            return ByteClass;
-        case 'C':
-            return CharClass;
-        case 'S':
-            return ShortClass;
-        case 'I':
-            return IntClass;
-        case 'F':
-            return FloatClass;
-        case 'J':
-            return LongClass;
-        case 'D':
-            return DoubleClass;
-        case 'V':
-            return VoidClass;
-        default:
-            throw new IllegalArgumentException("Unknown type " + type);
+            case 'Z':
+                return BooleanClass;
+            case 'B':
+                return ByteClass;
+            case 'C':
+                return CharClass;
+            case 'S':
+                return ShortClass;
+            case 'I':
+                return IntClass;
+            case 'F':
+                return FloatClass;
+            case 'J':
+                return LongClass;
+            case 'D':
+                return DoubleClass;
+            case 'V':
+                return VoidClass;
+            default:
+                throw new IllegalArgumentException("Unknown type " + type);
         }
     }
 
     /**
      * Gets the primitive arrayclass corresponding to the given signature type.
-     * 
+     *
      * @param type
      * @return VmClass
      */
     public final static VmType getPrimitiveArrayClass(char type) {
         switch (type) {
-        case 'Z':
-            return BooleanArrayClass;
-        case 'B':
-            return ByteArrayClass;
-        case 'C':
-            return CharArrayClass;
-        case 'S':
-            return ShortArrayClass;
-        case 'I':
-            return IntArrayClass;
-        case 'F':
-            return FloatArrayClass;
-        case 'J':
-            return LongArrayClass;
-        case 'D':
-            return DoubleArrayClass;
-        default:
-            throw new IllegalArgumentException("Unknown type " + type);
+            case 'Z':
+                return BooleanArrayClass;
+            case 'B':
+                return ByteArrayClass;
+            case 'C':
+                return CharArrayClass;
+            case 'S':
+                return ShortArrayClass;
+            case 'I':
+                return IntArrayClass;
+            case 'F':
+                return FloatArrayClass;
+            case 'J':
+                return LongArrayClass;
+            case 'D':
+                return DoubleArrayClass;
+            default:
+                throw new IllegalArgumentException("Unknown type " + type);
         }
     }
 
     /**
      * Gets the primitive array class corresponding to the given (newarray)
      * type.
-     * 
+     *
      * @param type
      * @return VmClass
      */
     public final static VmArrayClass getPrimitiveArrayClass(int type) {
         switch (type) {
-        case 4:
-            return BooleanArrayClass;
-        case 8:
-            return ByteArrayClass;
-        case 5:
-            return CharArrayClass;
-        case 9:
-            return ShortArrayClass;
-        case 10:
-            return IntArrayClass;
-        case 6:
-            return FloatArrayClass;
-        case 11:
-            return LongArrayClass;
-        case 7:
-            return DoubleArrayClass;
-        default:
-            throw new IllegalArgumentException("Unknown type " + type);
+            case 4:
+                return BooleanArrayClass;
+            case 8:
+                return ByteArrayClass;
+            case 5:
+                return CharArrayClass;
+            case 9:
+                return ShortArrayClass;
+            case 10:
+                return IntArrayClass;
+            case 6:
+                return FloatArrayClass;
+            case 11:
+                return LongArrayClass;
+            case 7:
+                return DoubleArrayClass;
+            default:
+                throw new IllegalArgumentException("Unknown type " + type);
         }
     }
 
     /**
      * Gets the size in bytes of instances of this object on the stack.
-     * 
+     *
      * @return 0..8
      */
     public final int getTypeSize() {
@@ -627,7 +677,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Return the corresponding java.lang.Class for this VmClass. During build
      * environment the Class will be loaded by Class.forName
-     * 
+     *
      * @return The class
      */
     public final Class<T> asClass() {
@@ -637,7 +687,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Return the corresponding java.lang.Class for this VmClass. During build
      * environment the Class will be loaded by Class.forName
-     * 
+     *
      * @return The class
      */
     public final Class<T> asClassDuringBootstrap() {
@@ -647,7 +697,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Return the corresponding java.lang.Class for this VmClass. During build
      * environment the Class will be loaded by Class.forName
-     * 
+     *
      * @param isBuildEnv
      * @return The class
      */
@@ -676,10 +726,10 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the super class of this class or return null for java.lang.Object
-     * 
+     *
      * @return The class
      */
-    public final VmNormalClass< ? super T> getSuperClass() {
+    public final VmNormalClass<? super T> getSuperClass() {
         if (superClass != null) {
             return superClass;
         } else if (superClassName == null) {
@@ -687,13 +737,13 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             return null;
         } else {
             throw new RuntimeException(
-                    "getSuperClass called too early in class " + name);
+                "getSuperClass called too early in class " + name);
         }
     }
 
     /**
      * Return the name of this class
-     * 
+     *
      * @return The name of this class
      */
     @KernelSpace
@@ -703,7 +753,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Convert myself into a String representation
-     * 
+     *
      * @return The mangled name
      */
     public final String getMangledName() {
@@ -715,7 +765,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Returns the second character of the name of this class
-     * 
+     *
      * @return char
      */
     public char getSecondNameChar() {
@@ -724,7 +774,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is my name equal to the given array of characters?
-     * 
+     *
      * @param otherName
      * @return boolean
      */
@@ -734,7 +784,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is my name equal to the given String?
-     * 
+     *
      * @param otherName
      * @return boolean
      */
@@ -744,7 +794,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is my name equal to the given array of characters?
-     * 
+     *
      * @param classRef
      * @return boolean
      */
@@ -758,7 +808,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the number of fields declared in this class
-     * 
+     *
      * @return int
      */
     public final int getNoDeclaredFields() {
@@ -767,7 +817,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the declared field with a given index (0..getNoFields()-1)
-     * 
+     *
      * @param index
      * @return The field
      */
@@ -786,7 +836,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * parameter can be converted to the type represented by this Class object
      * via an identity conversion or via a widening reference conversion. See
      * The Java Language Specification, sections 5.1.1 and 5.1.4, for details.
-     * 
+     *
      * @param S
      * @return boolean
      */
@@ -804,7 +854,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type public.
-     * 
+     *
      * @return boolean
      */
     public final boolean isPublic() {
@@ -813,7 +863,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type public.
-     * 
+     *
      * @return boolean
      */
     public final boolean isProtected() {
@@ -822,7 +872,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type public.
-     * 
+     *
      * @return boolean
      */
     public final boolean isPrivate() {
@@ -831,7 +881,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type public.
-     * 
+     *
      * @return boolean
      */
     public final boolean isStatic() {
@@ -840,7 +890,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Does this type have shared statics.
-     * 
+     *
      * @return boolean
      */
     public final boolean isSharedStatics() {
@@ -849,7 +899,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Does this type have magic permission.
-     * 
+     *
      * @return boolean
      */
     public final boolean isMagicPermissionGranted() {
@@ -858,7 +908,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type public.
-     * 
+     *
      * @return boolean
      */
     public final boolean isFinal() {
@@ -867,7 +917,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type an enum class.
-     * 
+     *
      * @return boolean
      */
     public final boolean isEnum() {
@@ -885,7 +935,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type an interface.
-     * 
+     *
      * @return boolean
      */
     public final boolean isInterface() {
@@ -894,7 +944,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type abstract.
-     * 
+     *
      * @return boolean
      */
     public final boolean isAbstract() {
@@ -903,7 +953,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type a magic type.
-     * 
+     *
      * @return boolean
      */
     public final boolean isMagicType() {
@@ -912,7 +962,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type loaded.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -922,7 +972,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type invalid.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -932,7 +982,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type verifying.
-     * 
+     *
      * @return boolean
      */
     public final boolean isVerifying() {
@@ -941,7 +991,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type verified.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -951,7 +1001,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type preparing.
-     * 
+     *
      * @return boolean
      */
     private final boolean isPreparing() {
@@ -960,7 +1010,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type prepared.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -970,7 +1020,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type compiling.
-     * 
+     *
      * @return boolean
      */
     final boolean isCompiling() {
@@ -979,7 +1029,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type compiled.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -994,7 +1044,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     private final int getIsolatedState() {
         if (VmMagic.isRunningJNode()) {
             return VmMagic.getIsolatedStaticFieldAddress(isolatedStaticsIndex)
-                    .loadInt();
+                .loadInt();
         } else {
             return loader.getIsolatedStatics().getInt(isolatedStaticsIndex);
         }
@@ -1007,7 +1057,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     private final void addIsolatedState(int value) {
         if (VmMagic.isRunningJNode()) {
             final Address ptr = VmMagic
-                    .getIsolatedStaticFieldAddress(isolatedStaticsIndex);
+                .getIsolatedStaticFieldAddress(isolatedStaticsIndex);
             ptr.store(ptr.loadInt() | value);
         } else {
             final VmIsolatedStatics statics;
@@ -1019,7 +1069,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type initializing.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -1033,18 +1083,18 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type initialized.
-     * 
+     *
      * @return boolean
      */
     @Inline
     public final boolean isInitialized() {
         return ((state & (VmTypeState.ST_ALWAYS_INITIALIZED | VmTypeState.SST_INITIALIZED)) != 0)
-                || ((getIsolatedState() & VmTypeState.IST_INITIALIZED) != 0);
+            || ((getIsolatedState() & VmTypeState.IST_INITIALIZED) != 0);
     }
 
     /**
      * Is this type always initialized in every isolate.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -1053,7 +1103,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     /**
-     * Mark this type always initialized. 
+     * Mark this type always initialized.
      * Can only be called during bootstrapping.
      */
     public final void setAlwaysInitialized() {
@@ -1063,7 +1113,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type linked.
-     * 
+     *
      * @return boolean
      */
     @Inline
@@ -1073,7 +1123,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this type an array.
-     * 
+     *
      * @return boolean
      */
     public boolean isArray() {
@@ -1082,7 +1132,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this class an array of primitive types
-     * 
+     *
      * @return boolean
      */
     public boolean isPrimitiveArray() {
@@ -1091,7 +1141,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Does this class have a finalize method other then in java.lang.Object.
-     * 
+     *
      * @return boolean
      */
     public final boolean hasFinalizer() {
@@ -1108,7 +1158,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Get the number of interfaces implemented by this class, or its
      * super-classes.
-     * 
+     *
      * @return int
      */
     public final int getNoInterfaces() {
@@ -1118,17 +1168,17 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Get on of the list of interfaces implemented by this class, or its
      * super-classes.
-     * 
+     *
      * @param index
      * @return class
      */
-    public final VmInterfaceClass< ? > getInterface(int index) {
+    public final VmInterfaceClass<?> getInterface(int index) {
         return allInterfaceTable[index];
     }
 
     /**
      * Get the number of implementing interfaces declared in this class
-     * 
+     *
      * @return int
      */
     public final int getNoDeclaredInterfaces() {
@@ -1137,7 +1187,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Get the number of methods declared in this class
-     * 
+     *
      * @return int
      */
     public final int getNoDeclaredMethods() {
@@ -1146,7 +1196,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the declared method with a given index (0..getNoMethods()-1)
-     * 
+     *
      * @param index
      * @return The method
      */
@@ -1156,7 +1206,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the index of the given method within this class.
-     * 
+     *
      * @param method
      * @return The index of the given method within this class or -1 if not
      *         found.
@@ -1173,7 +1223,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the constants pool of this class
-     * 
+     *
      * @return The constant pool
      */
     public final VmCP getCP() {
@@ -1182,7 +1232,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the loader of this class
-     * 
+     *
      * @return The loader
      */
     public final VmClassLoader getLoader() {
@@ -1191,7 +1241,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Return the accessflags of this class
-     * 
+     *
      * @return The modifiers
      */
     public final int getAccessFlags() {
@@ -1201,7 +1251,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the field within the given class that has the given name and
      * signature.
-     * 
+     *
      * @param name
      * @param signature
      * @return The field
@@ -1224,7 +1274,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the field within the given class that has the given name and
      * signature.
-     * 
+     *
      * @param name
      * @return The field
      */
@@ -1235,7 +1285,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the field within the given class (or super-classes) that has the
      * given name and signature.
-     * 
+     *
      * @param name
      * @param signature
      * @return The field
@@ -1265,7 +1315,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the field within the given class (or super-classes) that has the
      * given name.
-     * 
+     *
      * @param name
      * @return The field
      */
@@ -1276,7 +1326,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the field within the given class (or super-classes) that matches the
      * given fieldRef.
-     * 
+     *
      * @param fieldRef
      * @return The field
      */
@@ -1287,7 +1337,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the method within the given class (or super-classes) that has the
      * given name and signature.
-     * 
+     *
      * @param name
      * @param signature
      * @param onlyThisClass
@@ -1296,7 +1346,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @return The method
      */
     final VmMethod getMethod(String name, String signature,
-            boolean onlyThisClass, boolean searchInterfaces, int hashCode) {
+                             boolean onlyThisClass, boolean searchInterfaces, int hashCode) {
         /* Search in my own method table */
         final VmMethod[] mt = this.methodTable;
         if (mt != null) {
@@ -1325,7 +1375,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         // Is it a synthetic abstract method?
         if (isAbstract()) {
             final VmMethod method = getSyntheticAbstractMethod(name, signature,
-                    hashCode);
+                hashCode);
             if (method != null) {
                 return method;
             }
@@ -1334,7 +1384,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         // Look in the superclass
         if ((superClass != null) && (!onlyThisClass)) {
             final VmMethod method = superClass.getMethod(name, signature,
-                    false, false, hashCode);
+                false, false, hashCode);
             if (method != null) {
                 return method;
             }
@@ -1348,7 +1398,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                 for (int i = 0; i < count; i++) {
                     final VmInterfaceClass intf = ait[i];
                     final VmMethod method = intf.getMethod(name, signature,
-                            true, false, hashCode);
+                        true, false, hashCode);
                     if (method != null) {
                         return method;
                     }
@@ -1364,14 +1414,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * Search for an synthetic abstract class, that is not in this class, but is
      * a method of one of the implemented interfaces. Synthetic abstract methods
      * are added when the VMT is created.
-     * 
+     *
      * @param name
      * @param signature
      * @param hashCode
      * @return The method
      */
     protected abstract VmMethod getSyntheticAbstractMethod(String name,
-            String signature, int hashCode);
+                                                           String signature, int hashCode);
 
     final VmMethod getNativeMethodReplacement(String name, String signature) {
         signature = signature.substring(0, signature.indexOf(')'));
@@ -1395,14 +1445,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the method within the given class (or super-classes) that has the
      * given name and list of argument types.
-     * 
+     *
      * @param name
      * @param argTypes
      * @param declaredOnly
      * @return The method
      */
     final VmMethod getMethod(String name, VmType[] argTypes,
-            boolean declaredOnly) {
+                             boolean declaredOnly) {
 
         /* Search in my own method table */
         final VmMethod[] mt = this.methodTable;
@@ -1426,7 +1476,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                 for (int i = 0; i < count; i++) {
                     VmImplementedInterface intf = it[i];
                     VmMethod method = intf.getResolvedVmClass().getMethod(name,
-                            argTypes, false);
+                        argTypes, false);
                     if (method != null) {
                         return method;
                     }
@@ -1446,7 +1496,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the method within the given class that has the given name and list
      * of argument types.
-     * 
+     *
      * @param name
      * @param argTypes
      * @return The method
@@ -1458,7 +1508,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the method within the given class and its super-classes that has the
      * given name and list of argument types.
-     * 
+     *
      * @param name
      * @param argTypes
      * @return The method
@@ -1470,7 +1520,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Find the method within the given class (or super-classes) that has the
      * given name and signature.
-     * 
+     *
      * @param name
      * @param signature
      * @param onlyThisClass
@@ -1478,51 +1528,51 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @return The method
      */
     private final VmMethod getMethod(String name, String signature,
-            boolean onlyThisClass, boolean searchInterfaces) {
+                                     boolean onlyThisClass, boolean searchInterfaces) {
         return getMethod(name, signature, onlyThisClass, searchInterfaces,
-                VmMember.calcHashCode(name, signature));
+            VmMember.calcHashCode(name, signature));
     }
 
     /**
      * Find the method within this class that has the given name and signature.
-     * 
+     *
      * @param name
      * @param signature
      * @return The method
      */
     public final VmMethod getDeclaredMethod(String name, String signature) {
         return getMethod(name, signature, true, false, VmMember.calcHashCode(
-                name, signature));
+            name, signature));
     }
 
     /**
      * Find the method within the given class (or super-classes) that has the
      * given name and signature.
-     * 
+     *
      * @param name
      * @param signature
      * @return The method
      */
     public final VmMethod getMethod(String name, String signature) {
         return getMethod(name, signature, false, true, VmMember.calcHashCode(
-                name, signature));
+            name, signature));
     }
 
     /**
      * Find the method within the given class (or super-classes) that matches
      * the given methodRef.
-     * 
+     *
      * @param methodRef
      * @return The method
      */
     public final VmMethod getMethod(VmConstMethodRef methodRef) {
         return getMethod(methodRef.getName(), methodRef.getSignature(), false,
-                true, methodRef.getMemberHashCode());
+            true, methodRef.getMemberHashCode());
     }
 
     /**
      * Do in the following order: Verification, Preparation, Resolution
-     * 
+     *
      * @return VmClass This class
      */
     public final VmType link() {
@@ -1607,8 +1657,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         try {
             // Step 1a: Load the super class
             if ((superClass == null) && (superClassName != null)) {
-                setSuperClass((VmNormalClass< ? super T>) loader.loadClass(
-                        superClassName, false));
+                setSuperClass((VmNormalClass<? super T>) loader.loadClass(
+                    superClassName, false));
             }
 
             // Step 1b: Resolve the super class
@@ -1616,7 +1666,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                 superClass.prepare();
                 superClassDepth = superClass.getSuperClassDepth() + 1;
                 addPragmaFlags(superClass.getPragmaFlags()
-                        & TypePragmaFlags.INHERITABLE_FLAGS_MASK);
+                    & TypePragmaFlags.INHERITABLE_FLAGS_MASK);
             }
 
             /**
@@ -1643,7 +1693,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         prepareForInstantiation();
 
         /* Build the allInterfaceTable */
-        final HashSet<VmInterfaceClass< ? >> all = new HashSet<VmInterfaceClass< ? >>();
+        final HashSet<VmInterfaceClass<?>> all = new HashSet<VmInterfaceClass<?>>();
         getAllInterfaces(all, this);
         this.allInterfaceTable = new VmInterfaceClass[all.size()];
         all.toArray(allInterfaceTable);
@@ -1657,7 +1707,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             if (imtBuilder != null) {
                 tib[TIBLayout.IMT_INDEX] = imtBuilder.getImt();
                 tib[TIBLayout.IMTCOLLISIONS_INDEX] = imtBuilder
-                        .getImtCollisions();
+                    .getImtCollisions();
 
                 final CompiledIMT cimt = loader.compileIMT(imtBuilder);
                 tib[TIBLayout.COMPILED_IMT_INDEX] = cimt.getIMTAddress();
@@ -1729,14 +1779,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                     state &= ~VmTypeState.ST_COMPILING;
                     errorMsg = ex.toString();
                     final LinkageError le = new LinkageError(
-                            "Failed to compile " + name);
+                        "Failed to compile " + name);
                     le.initCause(ex);
                     throw le;
                 }
                 final int declared = getNoDeclaredMethods();
                 if (count != declared) {
                     errorMsg = "Compiled skipped some methods ("
-                            + (declared - count);
+                        + (declared - count);
                     throw new LinkageError(errorMsg);
                 }
 
@@ -1780,37 +1830,36 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Prepare the virtual method table
-     * 
+     *
      * @param allInterfaces
      * @return The tib
      */
     protected abstract Object[] prepareTIB(
-            HashSet<VmInterfaceClass< ? >> allInterfaces);
+        HashSet<VmInterfaceClass<?>> allInterfaces);
 
     /**
      * Prepare the interface method table
-     * 
+     *
      * @param allInterfaces
      * @return The imt builder
      */
     protected abstract IMTBuilder prepareIMT(
-            HashSet<VmInterfaceClass< ? >> allInterfaces);
+        HashSet<VmInterfaceClass<?>> allInterfaces);
 
     /**
      * Create the super classes array for this type.
-     * 
-     * @param allInterfaces
-     *            All interfaces directly or indirectly implemented by this
-     *            class
+     *
+     * @param allInterfaces All interfaces directly or indirectly implemented by this
+     *                      class
      * @return The super classes array
      */
-    protected VmType< ? >[] createSuperClassesArray(
-            HashSet<VmInterfaceClass< ? >> allInterfaces) {
+    protected VmType<?>[] createSuperClassesArray(
+        HashSet<VmInterfaceClass<?>> allInterfaces) {
 
         final int length = superClassDepth + 1 + allInterfaces.size();
         final VmType[] array = new VmType[length];
         // array[0] = this;
-        VmType< ? super T> superPtr = superClass;
+        VmType<? super T> superPtr = superClass;
         for (int i = 0; i < superClassDepth; i++) {
             array[superClassDepth - i - 1] = superPtr;
             superPtr = superPtr.getSuperClass();
@@ -1835,13 +1884,12 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Fill the given hashset with all interface implemented by the given type
      * C.
-     * 
-     * @param all
-     *            A HashSet of VmInterfaceClass instances.
+     *
+     * @param all A HashSet of VmInterfaceClass instances.
      * @param C
      */
-    private void getAllInterfaces(HashSet<VmInterfaceClass< ? >> all,
-            VmType< ? > C) {
+    private void getAllInterfaces(HashSet<VmInterfaceClass<?>> all,
+                                  VmType<?> C) {
         while (C != null) {
             final VmImplementedInterface[] it = C.interfaceTable;
             if (it != null) {
@@ -1905,15 +1953,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Compile all the methods in this class during bootstrapping.
-     * 
+     *
      * @param compiler
      * @param os
-     * @param optLevel
-     *            The optimization level
+     * @param optLevel The optimization level
      * @return The number of compiled methods
      */
     public final int compileBootstrap(NativeCodeCompiler compiler,
-            NativeStream os, int optLevel) {
+                                      NativeStream os, int optLevel) {
         if (!isPrepared()) {
             throw new IllegalStateException("VmType must have been prepared");
         }
@@ -1932,7 +1979,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                         // }
                     } catch (Throwable ex) {
                         throw new CompileError("Compile of " + method
-                                + " failed", ex);
+                            + " failed", ex);
                     }
                 }
             }
@@ -1947,9 +1994,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Compile all the methods in this class during runtime.
-     * 
-     * @param optLevel
-     *            The optimization level
+     *
+     * @param optLevel The optimization level
      * @return The number of compiled methods
      */
     public final int compileRuntime(int optLevel, boolean enableTestCompilers) {
@@ -1961,9 +2007,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Compile all the methods in this class during runtime.
-     * 
-     * @param optLevel
-     *            The optimization level
+     *
+     * @param optLevel The optimization level
      * @return The number of compiled methods
      */
     private final int doCompileRuntime(int optLevel, boolean enableTestCompilers) {
@@ -1975,7 +2020,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                 final VmMethod method = mt[i];
                 if (optLevel > method.getNativeCodeOptLevel()) {
                     LoadCompileService.compile(method, optLevel,
-                                    enableTestCompilers);
+                        enableTestCompilers);
                     // method.setModifier(true, Modifier.ACC_COMPILED);
                     compileCount++;
                 }
@@ -1986,7 +2031,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     public final int disassemble(String methodName, int optLevel,
-            boolean enableTestCompilers, Writer writer) {
+                                 boolean enableTestCompilers, Writer writer) {
         if (!isPrepared()) {
             throw new IllegalStateException("VmType must have been prepared");
         }
@@ -1994,7 +2039,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     private final int doDisassemble(String methodName, int optLevel,
-            boolean enableTestCompilers, Writer writer) {
+                                    boolean enableTestCompilers, Writer writer) {
         final VmMethod[] mt = this.methodTable;
         int disasmCount = 0;
         if (mt != null) {
@@ -2003,11 +2048,11 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                 final VmMethod method = mt[i];
                 if (methodName == null || "".equals(methodName.trim())) {
                     loader.disassemble(method, optLevel, enableTestCompilers,
-                            writer);
+                        writer);
                     disasmCount++;
                 } else if (method.getName().equals(methodName)) {
                     loader.disassemble(method, optLevel, enableTestCompilers,
-                            writer);
+                        writer);
                     disasmCount++;
                 }
             }
@@ -2017,11 +2062,10 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Sets the superClass.
-     * 
-     * @param superClass
-     *            The superClass to set
+     *
+     * @param superClass The superClass to set
      */
-    protected void setSuperClass(VmNormalClass< ? super T> superClass) {
+    protected void setSuperClass(VmNormalClass<? super T> superClass) {
         if (superClass == null) {
             throw new IllegalArgumentException("superClass cannot be null");
         }
@@ -2034,9 +2078,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Sets the mTable.
-     * 
-     * @param methodTable
-     *            The method table to set
+     *
+     * @param methodTable The method table to set
      */
     protected final void setMethodTable(VmMethod[] methodTable) {
         if (this.methodTable == null) {
@@ -2049,9 +2092,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Sets the fieldTable.
-     * 
-     * @param fieldTable
-     *            The fieldTable to set
+     *
+     * @param fieldTable The fieldTable to set
      */
     protected void setFieldTable(VmField[] fieldTable) {
         if (this.fieldTable == null) {
@@ -2063,25 +2105,23 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Sets the interfaceTable.
-     * 
-     * @param interfaceTable
-     *            The interfaceTable to set
+     *
+     * @param interfaceTable The interfaceTable to set
      */
     protected final void setInterfaceTable(
-            VmImplementedInterface[] interfaceTable) {
+        VmImplementedInterface[] interfaceTable) {
         if (this.interfaceTable == null) {
             this.interfaceTable = interfaceTable;
         } else {
             throw new IllegalArgumentException(
-                    "Cannot overwrite interface table");
+                "Cannot overwrite interface table");
         }
     }
 
     /**
      * Sets the cp.
-     * 
-     * @param cp
-     *            The cp to set
+     *
+     * @param cp The cp to set
      */
     protected void setCp(VmCP cp) {
         if (this.cp == null) {
@@ -2093,7 +2133,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Is this class a primitive type?
-     * 
+     *
      * @return boolean
      */
     public boolean isPrimitive() {
@@ -2103,7 +2143,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Is this class a reference type. A reference type is an array of a
      * non-primitive class.
-     * 
+     *
      * @return boolean
      */
     public final boolean isReferenceType() {
@@ -2113,7 +2153,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Verify this object before it is written into the bootimage by the
      * bootimage builder.
-     * 
+     *
      * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
      */
     public void verifyBeforeEmit() {
@@ -2176,10 +2216,10 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                             ex.getTargetException().printStackTrace();
                             // Unsafe.die("VmType.doInitialize");
                             throw new ExceptionInInitializerError(ex
-                                    .getTargetException());
+                                .getTargetException());
                         } else {
                             throw new ExceptionInInitializerError(
-                                    "targetEx == null");
+                                "targetEx == null");
                         }
                     }
                 }
@@ -2195,7 +2235,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Gets the <clinit>method or null if no <clinit>method was found in this
      * class.
-     * 
+     *
      * @return VmMethod
      */
     private VmMethod getInitializerMethod() {
@@ -2213,8 +2253,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     /**
-     * @see org.jnode.vm.VmSystemObject#getExtraInfo()
      * @return String
+     * @see org.jnode.vm.VmSystemObject#getExtraInfo()
      */
     public String getExtraInfo() {
         return "Modifiers: " + Modifier.toString(modifiers);
@@ -2225,8 +2265,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         /**
          * @param o1
          * @param o2
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          * @return int
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
         public int compare(VmMethod o1, VmMethod o2) {
             final int m1 = o1.getMemberHashCode();
@@ -2243,8 +2283,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
         /**
          * @param obj
-         * @see java.lang.Object#equals(java.lang.Object)
          * @return boolean
+         * @see java.lang.Object#equals(java.lang.Object)
          */
         public boolean equals(Object obj) {
             return (obj instanceof MethodComparator);
@@ -2255,7 +2295,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Gets the number of super classes until (and including) Object. E.g. this
      * is 0 for Object and 1 for an interface.
-     * 
+     *
      * @return int
      */
     public final int getSuperClassDepth() {
@@ -2264,7 +2304,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the super classes array of this type
-     * 
+     *
      * @return The super classes array
      */
     protected final VmType[] getSuperClassesArray() {
@@ -2273,7 +2313,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the index of this type in the shared statics table.
-     * 
+     *
      * @return Returns the staticsIndex.
      */
     public final int getSharedStaticsIndex() {
@@ -2282,7 +2322,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the protection domain of this type.
-     * 
+     *
      * @return the protection domain of this type.
      */
     public final ProtectionDomain getProtectionDomain() {
@@ -2291,9 +2331,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the JvmType of this type.
-     * 
-     * @see org.jnode.vm.JvmType
+     *
      * @return
+     * @see org.jnode.vm.JvmType
      */
     public int getJvmType() {
         return JvmType.REFERENCE;
@@ -2301,7 +2341,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Gets the type information required and managed by the memory manager.
-     * 
+     *
      * @return Returns the mmType.
      */
     public final Object getMmType() {
@@ -2310,9 +2350,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Sets the type information required and managed by the memory manager.
-     * 
-     * @param mmType
-     *            The mmType to set.
+     *
+     * @param mmType The mmType to set.
      */
     public final void setMmType(Object mmType) {
         if (this.mmType != null) {
@@ -2362,7 +2401,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Index of the isolated type state. This refers to an int entry.
-     * 
+     *
      * @see org.jnode.vm.classmgr.VmIsolatedStaticsEntry#getIsolatedStaticsIndex()
      */
     public final int getIsolatedStaticsIndex() {

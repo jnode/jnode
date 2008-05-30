@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.system.repository;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -51,13 +49,13 @@ public final class SystemRepositoryPlugin extends Plugin {
     @Override
     protected void startPlugin() throws PluginException {
         final Repository r = (Repository) AccessController
-                .doPrivileged(new PrivilegedAction() {
-                    public Object run() {
-                        RepositoryPlugin plugins = new PluginLoaderPlugin(null);
+            .doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    RepositoryPlugin plugins = new PluginLoaderPlugin(null);
 
-                        return new Repository(plugins);
-                    }
-                });
+                    return new Repository(plugins);
+                }
+            });
         this.repository = r;
         try {
             InitialNaming.bind(SystemRepository.NAME, r);

@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.work;
 
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.BootLog;
 
@@ -34,9 +33,10 @@ public class WorkUtils {
 
     /**
      * Add the given work to the workmanager.
+     *
      * @param work
      * @return True if the work was added to the workmanager, false if
-     * the workmanager could not be found.
+     *         the workmanager could not be found.
      */
     public static boolean add(Work work) {
         final WorkManager wm;

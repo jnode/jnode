@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 /**
@@ -26,34 +26,34 @@ package org.jnode.vm.compiler;
  */
 public class CompileError extends LinkageError {
 
-	/**
-	 * 
-	 */
-	public CompileError() {
-		super();
-	}
+    /**
+     *
+     */
+    public CompileError() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public CompileError(String message, Throwable cause) {
-		super(message);
-		initCause(cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public CompileError(String message, Throwable cause) {
+        super(message);
+        initCause(cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public CompileError(Throwable cause) {
-		super();
-		initCause(cause);
-	}
+    /**
+     * @param cause
+     */
+    public CompileError(Throwable cause) {
+        super();
+        initCause(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public CompileError(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public CompileError(String s) {
+        super(s);
+    }
 }

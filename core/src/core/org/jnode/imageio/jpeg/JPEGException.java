@@ -37,12 +37,10 @@ exception statement from your version. */
 
 package org.jnode.imageio.jpeg;
 
-import javax.imageio.*;
+import javax.imageio.IIOException;
 
-public class JPEGException extends IIOException
-{
-  public JPEGException(String message)
-  {
-     super(message);
-  }
+public class JPEGException extends IIOException {
+    public JPEGException(String message) {
+        super(message);
+    }
 }

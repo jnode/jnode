@@ -1,12 +1,14 @@
 package org.jnode.imageio.jpeg;
 
-import java.io.IOException;
-import javax.imageio.*;
-import javax.imageio.spi.*;
-import javax.imageio.metadata.*;
-import javax.imageio.stream.ImageInputStream;
-import java.util.Iterator;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Iterator;
+import javax.imageio.IIOException;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
 
 public class JPEGImageReader extends ImageReader {
     private JPEGDecoderAdapter decoder;
@@ -22,7 +24,7 @@ public class JPEGImageReader extends ImageReader {
     }
 
     public IIOMetadata getImageMetadata(int imageIndex)
-            throws IOException {
+        throws IOException {
         checkIndex(imageIndex);
         //todo handle metadata
         return null;
@@ -37,20 +39,20 @@ public class JPEGImageReader extends ImageReader {
     }
 
     public IIOMetadata getStreamMetadata()
-            throws IOException {
+        throws IOException {
         //todo handle metadata
         return null;
     }
 
     public int getWidth(int imageIndex)
-            throws IOException {
+        throws IOException {
         checkIndex(imageIndex);
         decodeStream();
         return decoder.getWidth();
     }
 
     public BufferedImage read(int imageIndex, ImageReadParam param)
-            throws IOException {
+        throws IOException {
         checkIndex(imageIndex);
         decodeStream();
         return decoder.getImage();

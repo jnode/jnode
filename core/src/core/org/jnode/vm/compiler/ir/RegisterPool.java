@@ -18,25 +18,23 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
 public abstract class RegisterPool<T> {
-    
-	/**
-	 * @param type - one of the types found in Operand
-	 * @return an available register or null if none available
-	 * 
-	 * @see org.jnode.vm.compiler.ir.Operand
-	 */
-	public abstract T request(int type);
 
-	/**
-	 * @param register - register to put back into pool
-	 */
-	public abstract void release(T register);
+    /**
+     * @param type - one of the types found in Operand
+     * @return an available register or null if none available
+     * @see org.jnode.vm.compiler.ir.Operand
+     */
+    public abstract T request(int type);
+
+    /**
+     * @param register - register to put back into pool
+     */
+    public abstract void release(T register);
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import org.jnode.vm.VmSystem;
@@ -29,22 +29,24 @@ import org.jnode.vm.VmSystem;
  */
 public class TimeUtils {
 
-	/**
-	 * Sleep for ms milliseconds.
-	 * @return True if return normal, false on InterruptedException.
+    /**
+     * Sleep for ms milliseconds.
+     *
+     * @return True if return normal, false on InterruptedException.
      */
     public static boolean sleep(long ms) {
-    	try {
+        try {
             Thread.sleep(ms);
             return true;
         } catch (InterruptedException ex) {
-        	return false;
+            return false;
         }
-    }    
-    
+    }
+
     /**
      * Wait for ms milliseconds in a busy waiting loop.
      * This method is very CPU intensive, so be carefull.
+     *
      * @param ms
      */
     public static void loop(long ms) {

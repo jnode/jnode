@@ -18,22 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.performance;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class PerformanceCounterEvent implements
-        Comparable<PerformanceCounterEvent> {
+    Comparable<PerformanceCounterEvent> {
 
-    /** Identifier of this event */
+    /**
+     * Identifier of this event
+     */
     private final String id;
     private final String description;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param id
      */
     protected PerformanceCounterEvent(PresetEvent preset) {
@@ -42,7 +44,7 @@ public abstract class PerformanceCounterEvent implements
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param id
      */
     protected PerformanceCounterEvent(String id) {
@@ -51,7 +53,7 @@ public abstract class PerformanceCounterEvent implements
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param id
      */
     protected PerformanceCounterEvent(String id, String description) {
@@ -61,7 +63,7 @@ public abstract class PerformanceCounterEvent implements
 
     /**
      * Gets the language independent identifier of this event.
-     * 
+     *
      * @return
      */
     public final String getId() {
@@ -75,7 +77,7 @@ public abstract class PerformanceCounterEvent implements
         if (obj == this) {
             return true;
         } else if (obj instanceof PerformanceCounterEvent) {
-            return (compareTo((PerformanceCounterEvent)obj) == 0);
+            return (compareTo((PerformanceCounterEvent) obj) == 0);
         }
         return false;
     }

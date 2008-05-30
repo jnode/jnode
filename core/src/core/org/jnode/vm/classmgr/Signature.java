@@ -18,16 +18,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.util.ArrayList;
-
 import org.jnode.vm.JvmType;
 
 /**
  * <description>
- * 
+ *
  * @author epr
  */
 public class Signature {
@@ -38,20 +37,20 @@ public class Signature {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param signature
      * @param loader
      * @throws ClassNotFoundException
      */
     public Signature(String signature, VmClassLoader loader)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException {
         this.signature = signature;
         this.parts = split(signature.toCharArray(), loader);
     }
 
     /**
      * Is this the signature of a field?
-     * 
+     *
      * @return boolean
      */
     public boolean isField() {
@@ -60,7 +59,7 @@ public class Signature {
 
     /**
      * Is this the signature of a method?
-     * 
+     *
      * @return boolean
      */
     public boolean isMethod() {
@@ -69,7 +68,7 @@ public class Signature {
 
     /**
      * Gets the type of the signature (for field signatures)
-     * 
+     *
      * @return String
      */
     public VmType getType() {
@@ -78,7 +77,7 @@ public class Signature {
 
     /**
      * Gets the return type of the signature (for method signatures)
-     * 
+     *
      * @return String
      */
     public VmType getReturnType() {
@@ -88,7 +87,7 @@ public class Signature {
     /**
      * Gets the type of the parameter with the given index in this signature
      * (for method signatures)
-     * 
+     *
      * @param index
      * @return String
      */
@@ -99,7 +98,7 @@ public class Signature {
     /**
      * Gets the type of the parameter with the given index in this signature
      * (for method signatures)
-     * 
+     *
      * @return String
      */
     public int getParamCount() {
@@ -108,12 +107,12 @@ public class Signature {
 
     /**
      * Calculate the number of arguments a method has, based of the signature
-     * 
+     *
      * @param signature
      * @return int
      */
     public static final int getArgSlotCount(TypeSizeInfo typeSizeInfo,
-            char[] signature) {
+                                            char[] signature) {
         int ofs = 0;
         final int len = signature.length;
         if (signature[ofs++] != '(') {
@@ -123,60 +122,60 @@ public class Signature {
         while (ofs < len) {
             char ch = signature[ofs++];
             switch (ch) {
-            case ')':
-                return count;
-            case 'B': // Byte
-            case 'Z': // Boolean
-            case 'C': // Char
-            case 'S': // Short
-            case 'I': // Int
-                count += typeSizeInfo.getStackSlots(JvmType.INT);
-                break;
-            case 'F': // Float
-                count += typeSizeInfo.getStackSlots(JvmType.FLOAT);
-                break;
-            case 'D': // Double
-                count += typeSizeInfo.getStackSlots(JvmType.DOUBLE);
-                break;
-            case 'J': // Long
-                count += typeSizeInfo.getStackSlots(JvmType.LONG);
-                break;
-            case '[': // Array
-            {
-                count += typeSizeInfo.getStackSlots(JvmType.REFERENCE);
-                while (signature[ofs] == '[')
-                    ofs++;
-                if (signature[ofs] == 'L') {
-                    ofs++;
-                    while (signature[ofs] != ';') {
+                case ')':
+                    return count;
+                case 'B': // Byte
+                case 'Z': // Boolean
+                case 'C': // Char
+                case 'S': // Short
+                case 'I': // Int
+                    count += typeSizeInfo.getStackSlots(JvmType.INT);
+                    break;
+                case 'F': // Float
+                    count += typeSizeInfo.getStackSlots(JvmType.FLOAT);
+                    break;
+                case 'D': // Double
+                    count += typeSizeInfo.getStackSlots(JvmType.DOUBLE);
+                    break;
+                case 'J': // Long
+                    count += typeSizeInfo.getStackSlots(JvmType.LONG);
+                    break;
+                case '[': // Array
+                {
+                    count += typeSizeInfo.getStackSlots(JvmType.REFERENCE);
+                    while (signature[ofs] == '[')
                         ofs++;
+                    if (signature[ofs] == 'L') {
+                        ofs++;
+                        while (signature[ofs] != ';') {
+                            ofs++;
+                        }
                     }
-                }
-                ofs++;
-            }
-                break;
-            case 'L': // Object
-            {
-                count += typeSizeInfo.getStackSlots(JvmType.REFERENCE);
-                while (signature[ofs] != ';')
                     ofs++;
-                ofs++;
-            }
-                break;
+                    break;
+                }
+                case 'L': // Object
+                {
+                    count += typeSizeInfo.getStackSlots(JvmType.REFERENCE);
+                    while (signature[ofs] != ';')
+                        ofs++;
+                    ofs++;
+                    break;
+                }
             }
         }
         throw new RuntimeException("Invalid signature in getArgSlotCount: "
-                + String.valueOf(signature));
+            + String.valueOf(signature));
     }
 
     /**
      * Calculate the number of arguments a method has, based of the signature
-     * 
+     *
      * @param signature
      * @return int
      */
     public static final int getArgSlotCount(TypeSizeInfo typeSizeInfo,
-            String signature) {
+                                            String signature) {
         return getArgSlotCount(typeSizeInfo, signature.toCharArray());
     }
 
@@ -184,14 +183,14 @@ public class Signature {
      * Gets the stack slot number (0..) for a given java argument number. This
      * method takes into account the (per architecture) difference between the
      * size of longs, double and references and the number of slots they use.
-     * 
+     *
      * @param typeSizeInfo
      * @param method
      * @param javaArgIndex
      * @return
      */
     public static final int getStackSlotForJavaArgNumber(
-            TypeSizeInfo typeSizeInfo, VmMethod method, int javaArgIndex) {
+        TypeSizeInfo typeSizeInfo, VmMethod method, int javaArgIndex) {
         final int[] argTypes = JvmType.getArgumentTypes(method.getSignature());
         final int argCount = argTypes.length;
         int stackSlot = 0;
@@ -211,7 +210,7 @@ public class Signature {
     }
 
     private VmType[] split(char[] signature, VmClassLoader loader)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException {
         ArrayList<VmType> list = new ArrayList<VmType>();
         int ofs = 0;
         final int len = signature.length;
@@ -223,54 +222,54 @@ public class Signature {
             char ch = signature[ofs++];
             VmType vmClass;
             switch (ch) {
-            case ')':
-                continue;
-            case 'B': // Byte
-            case 'Z': // Boolean
-            case 'C': // Char
-            case 'S': // Short
-            case 'I': // Int
-            case 'F': // Float
-            case 'D': // Double
-            case 'J': // Long
-            case 'V': // Void
-                vmClass = VmType.getPrimitiveClass(ch);
-                break;
-            case '[': // Array
-            {
-                while (signature[ofs] == '[') {
+                case ')':
+                    continue;
+                case 'B': // Byte
+                case 'Z': // Boolean
+                case 'C': // Char
+                case 'S': // Short
+                case 'I': // Int
+                case 'F': // Float
+                case 'D': // Double
+                case 'J': // Long
+                case 'V': // Void
+                    vmClass = VmType.getPrimitiveClass(ch);
+                    break;
+                case '[': // Array
+                {
+                    while (signature[ofs] == '[') {
+                        ofs++;
+                    }
+                    if (signature[ofs] == 'L') {
+                        ofs++;
+                        while (signature[ofs] != ';') {
+                            ofs++;
+                        }
+                    }
                     ofs++;
+                    String sig = new String(signature, start, ofs - start).intern()
+                        .replace('/', '.');
+                    vmClass = loader.loadClass(sig, true);
+                    break;
                 }
-                if (signature[ofs] == 'L') {
-                    ofs++;
+                case 'L': // Object
+                {
+                    start++;
                     while (signature[ofs] != ';') {
                         ofs++;
                     }
-                }
-                ofs++;
-                String sig = new String(signature, start, ofs - start).intern()
+                    String sig = new String(signature, start, ofs - start).intern()
                         .replace('/', '.');
-                vmClass = loader.loadClass(sig, true);
-            }
-                break;
-            case 'L': // Object
-            {
-                start++;
-                while (signature[ofs] != ';') {
                     ofs++;
+                    vmClass = loader.loadClass(sig, true);
+                    break;
                 }
-                String sig = new String(signature, start, ofs - start).intern()
-                        .replace('/', '.');
-                ofs++;
-                vmClass = loader.loadClass(sig, true);
-            }
-                break;
-            default:
-                throw new ClassFormatError("Unknown signature character " + ch);
+                default:
+                    throw new ClassFormatError("Unknown signature character " + ch);
             }
             if (vmClass == null) {
                 throw new RuntimeException(
-                        "vmClass is null for signature character " + ch);
+                    "vmClass is null for signature character " + ch);
             }
             list.add(vmClass);
         }
@@ -279,7 +278,7 @@ public class Signature {
 
     /**
      * Convert the given class to a signature
-     * 
+     *
      * @param cls
      * @return String
      */
@@ -318,7 +317,7 @@ public class Signature {
 
     /**
      * Convert the given class array to a signature
-     * 
+     *
      * @param returnType
      * @param argTypes
      * @return String
@@ -352,7 +351,7 @@ public class Signature {
         }
 
         if (cls.isArray()) {
-            return "[" + toSignature(((VmArrayClass)cls).getComponentType());
+            return "[" + toSignature(((VmArrayClass) cls).getComponentType());
         } else if (cls.isPrimitive()) {
             if (cls == VmType.getPrimitiveClass('Z')) {
                 return "Z";
@@ -378,6 +377,7 @@ public class Signature {
             return "L" + cls.getName().replace('.', '/') + ";";
         }
     }
+
     /**
      * Convert the given VmType array to a signature.
      *

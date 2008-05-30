@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.work;
 
 
@@ -26,17 +26,18 @@ package org.jnode.work;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class Work {
-    
+
     private final String name;
 
     /**
      * Initialize this instance.
+     *
      * @param name
      */
     public Work(String name) {
         this.name = name;
     }
-    
+
     /**
      * Execute this bit of work.
      */

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import org.jnode.system.MemoryResource;
@@ -36,25 +36,25 @@ final class MPBusEntry extends MPEntry {
     MPBusEntry(MemoryResource mem) {
         super(mem);
     }
-    
+
     public int getBusID() {
         return mem.getByte(1) & 0xFF;
     }
-    
+
     public String getBusType() {
         final byte[] data = new byte[6];
         mem.getBytes(2, data, 0, data.length);
         return new String(data).trim();
     }
-    
-    
+
+
     /**
      * @see org.jnode.vm.x86.MPEntry#toString()
      */
     public String toString() {
         return super.toString() + " ID 0x" + NumberUtils.hex(getBusID(), 2) + ", Type " + getBusType();
     }
-    
+
     /**
      * @see org.jnode.vm.x86.MPEntry#getEntryTypeName()
      */

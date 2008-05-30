@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.memmgr.GCStatistics;
@@ -39,13 +39,13 @@ final class DefGCStatistics extends GCStatistics {
 
     public String toString() {
         return "lastGCTime          " + lastGCTime + "\n" +
-               "lastMarkIterations  " + lastMarkIterations + "\n" +
-               "lastMarkDuration    " + lastMarkDuration + "\n" +
-               "lastSweepDuration   " + lastSweepDuration + "\n" +
-               "lastCleanupDuration " + lastCleanupDuration + "\n" +
-               "lastVerifyDuration  " + lastVerifyDuration + "\n" +
-               "lastMarkedObjects   " + lastMarkedObjects + "\n" +
-               "lastFreedBytes      " + lastFreedBytes;
+            "lastMarkIterations  " + lastMarkIterations + "\n" +
+            "lastMarkDuration    " + lastMarkDuration + "\n" +
+            "lastSweepDuration   " + lastSweepDuration + "\n" +
+            "lastCleanupDuration " + lastCleanupDuration + "\n" +
+            "lastVerifyDuration  " + lastVerifyDuration + "\n" +
+            "lastMarkedObjects   " + lastMarkedObjects + "\n" +
+            "lastFreedBytes      " + lastFreedBytes;
     }
-    
+
 }

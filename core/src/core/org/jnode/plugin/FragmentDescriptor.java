@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 /**
@@ -28,12 +28,14 @@ public interface FragmentDescriptor extends PluginDescriptor {
 
     /**
      * Gets the identifier of the plugin to which this fragment belongs.
+     *
      * @return the related plugin identifier
      */
     public String getPluginId();
 
     /**
      * Gets the version of the plugin to which this fragment belongs.
+     *
      * @return the related plugin version
      */
     public String getPluginVersion();

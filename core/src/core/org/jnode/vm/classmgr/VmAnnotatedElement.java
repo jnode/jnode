@@ -18,29 +18,29 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 
 /**
  * Base class for annoted elements.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class VmAnnotatedElement extends VmSystemObject implements
-        AnnotatedElement {
+    AnnotatedElement {
 
-    /** Runtime annotations */
+    /**
+     * Runtime annotations
+     */
     private VmAnnotation[] runtimeAnnotations;
 
     /**
-     * @param runtimeAnnotations
-     *            The runtimeAnnotations to set.
+     * @param runtimeAnnotations The runtimeAnnotations to set.
      */
     final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
         if (this.runtimeAnnotations == null) {
@@ -129,10 +129,10 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
      */
     @PrivilegedActionPragma
     public final boolean isAnnotationPresent(
-            Class< ? extends Annotation> annotationClass) {
+        Class<? extends Annotation> annotationClass) {
         if (runtimeAnnotations.length > 0) {
             final VmClassLoader loader = getLoader();
-            final VmType< ? > reqType = annotationClass.getVmClass();
+            final VmType<?> reqType = annotationClass.getVmClass();
             for (VmAnnotation ann : runtimeAnnotations) {
                 if (ann.annotationType(loader) == reqType) {
                     return true;
@@ -144,14 +144,14 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
 
     /**
      * Return the loader of this class
-     * 
+     *
      * @return The loader
      */
     protected abstract VmClassLoader getLoader();
 
     /**
      * Gets the parent of this element.
-     * 
+     *
      * @return
      */
     protected abstract VmAnnotatedElement getSuperElement();

@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-
 import org.jnode.util.FileUtils;
 
 
@@ -32,11 +31,12 @@ import org.jnode.util.FileUtils;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class URLPluginLoader extends PluginLoader {
-    
+
     private final URL baseUrl;
-    
+
     /**
      * Initialize this instance.
+     *
      * @param baseUrl
      */
     public URLPluginLoader(URL baseUrl) {
@@ -44,7 +44,7 @@ public class URLPluginLoader extends PluginLoader {
     }
 
     /**
-     * @see org.jnode.plugin.PluginLoader#getPluginBuffer(String, String) 
+     * @see org.jnode.plugin.PluginLoader#getPluginBuffer(String, String)
      */
     public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
         try {

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmByteCode;
@@ -35,35 +35,39 @@ import org.jnode.vm.classmgr.VmType;
  */
 public final class VmStackFrame extends VmSystemObject {
 
-	public static final int MAGIC_MASK = 0xFFFFFF00;
-	public static final int MAGIC_COMPILED = 0x21A52F00;
+    public static final int MAGIC_MASK = 0xFFFFFF00;
+    public static final int MAGIC_COMPILED = 0x21A52F00;
 
-	/** The method executing in this frame */
-	private final VmMethod sfMethod;
+    /**
+     * The method executing in this frame
+     */
+    private final VmMethod sfMethod;
     private final int programCounter;
-	
-	/**
-	 * Initialize this instance.
-	 * @param src
-	 * @param reader
-	 */
-	VmStackFrame(VmMethod method, int programCounter) {
-		this.sfMethod = method;
+
+    /**
+     * Initialize this instance.
+     *
+     * @param src
+     * @param reader
+     */
+    VmStackFrame(VmMethod method, int programCounter) {
+        this.sfMethod = method;
         this.programCounter = programCounter;
-	}
+    }
 
-	/**
-	 * @return Returns the method.
-	 */
-	public final VmMethod getMethod() {
-		return this.sfMethod;
-	}
+    /**
+     * @return Returns the method.
+     */
+    public final VmMethod getMethod() {
+        return this.sfMethod;
+    }
 
-	/**
-	 * Gets the line number of the current instruction of this frame.
-	 * @return The line number, or -1 if not found.
-	 */
-	public final String getLocationInfo() {
+    /**
+     * Gets the line number of the current instruction of this frame.
+     *
+     * @return The line number, or -1 if not found.
+     */
+    public final String getLocationInfo() {
         int lineNo = -1;
         if (sfMethod != null) {
             final VmByteCode bc = sfMethod.getBytecode();
@@ -76,19 +80,20 @@ public final class VmStackFrame extends VmSystemObject {
         } else {
             return "?";
         }
-	}
+    }
 
-	/**
-	 * Convert to a String representation.
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		final VmMethod method = sfMethod;
-		final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
-		final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
-		final String mname = (method == null) ? "<unknown method>" : method.getName();
-		final String location = getLocationInfo();
+    /**
+     * Convert to a String representation.
+     *
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        final VmMethod method = sfMethod;
+        final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
+        final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
+        final String mname = (method == null) ? "<unknown method>" : method.getName();
+        final String location = getLocationInfo();
 
-		return cname + "!" + mname + " (" + location + ")";
-	}
+        return cname + "!" + mname + " (" + location + ")";
+    }
 }

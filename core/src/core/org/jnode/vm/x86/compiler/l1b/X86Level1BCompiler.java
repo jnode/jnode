@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler.l1b;
 
 import org.jnode.assembler.NativeStream;
@@ -38,47 +38,49 @@ import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 
 /**
  * Native code compiler for the Intel x86 architecture.
- * 
+ * <p/>
  * <pre>
- * 
- *  
- *   
- *    
- *      
- *       HIGH VALUES first-arg ... last-arg old EIP old EBP magic method local 0 ... local n calculation stack LOW VALUES
- *        
- *      
- *     
- *    
- *   
- *  
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
+ * HIGH VALUES first-arg ... last-arg old EIP old EBP magic method local 0 ... local n calculation stack LOW VALUES
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
  * <h1>
- * 
- *  
- *   
- *    
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
  *     long entries
- *     
- *    
- *   
- *  
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
  * </h1>
- * 
- *  
- *   
- *    
- *     
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
  *       PUSH: MSB, LSB POP: LSB, MSB
- *      
- *     
- *    
- *   
- *  
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
+ * <p/>
  * </pre>
  */
 public final class X86Level1BCompiler extends AbstractX86Compiler {
 
-    /** Should this compiler try to inline methods? */
+    /**
+     * Should this compiler try to inline methods?
+     */
     private final boolean inlineMethods = true;
     private final MagicHelper magicHelper = new MagicHelper();
 
@@ -90,7 +92,7 @@ public final class X86Level1BCompiler extends AbstractX86Compiler {
 
     /**
      * Create the visitor that converts bytecodes into native code.
-     * 
+     *
      * @param method
      * @param cm
      * @param os
@@ -99,7 +101,8 @@ public final class X86Level1BCompiler extends AbstractX86Compiler {
      * @return The new bytecode visitor.
      */
     protected CompilerBytecodeVisitor createBytecodeVisitor(VmMethod method,
-            CompiledMethod cm, NativeStream os, int level, boolean isBootstrap) {
+                                                            CompiledMethod cm, NativeStream os, int level,
+                                                            boolean isBootstrap) {
         final InlineBytecodeVisitor cbv;
         final EntryPoints entryPoints = getEntryPoints();
         cbv = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints, magicHelper, getTypeSizeInfo());
@@ -113,7 +116,7 @@ public final class X86Level1BCompiler extends AbstractX86Compiler {
 
     /**
      * Create a native stream for the current architecture.
-     * 
+     *
      * @param resolver
      * @return NativeStream
      */
@@ -133,7 +136,7 @@ public final class X86Level1BCompiler extends AbstractX86Compiler {
 
     /**
      * Gets the name of this compiler.
-     * 
+     *
      * @return The name of this compiler
      */
     public String getName() {
@@ -153,6 +156,6 @@ public final class X86Level1BCompiler extends AbstractX86Compiler {
      */
     @Override
     public String[] getCompilerPackages() {
-        return new String[] { "org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.l1b" };
+        return new String[]{"org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.l1b"};
     }
 }

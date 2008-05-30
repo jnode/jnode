@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 import java.util.Map;
@@ -26,9 +26,11 @@ import java.util.TreeMap;
 
 public class CounterGroup extends Statistic {
 
-    /** All statistics */
+    /**
+     * All statistics
+     */
     private transient Map<String, Statistic> statistics;
-    
+
     /**
      * @param name
      * @param description
@@ -72,14 +74,15 @@ public class CounterGroup extends Statistic {
 
     /**
      * Gets of create a counter with a given name.
+     *
      * @param name
      * @return The counter
      */
     public final Counter getCounter(String name) {
-        Counter cnt = (Counter)getStatistic(name);
+        Counter cnt = (Counter) getStatistic(name);
         if (cnt == null) {
             synchronized (this) {
-                cnt = (Counter)getStatistic(name);
+                cnt = (Counter) getStatistic(name);
                 if (cnt == null) {
                     cnt = new Counter(name, name);
                     addStatistic(name, cnt);
@@ -88,17 +91,18 @@ public class CounterGroup extends Statistic {
         }
         return cnt;
     }
-    
+
     /**
      * Gets of create a counter group with a given name.
+     *
      * @param name
      * @return The counter group
      */
     public final CounterGroup getCounterGroup(String name) {
-        CounterGroup cnt = (CounterGroup)getStatistic(name);
+        CounterGroup cnt = (CounterGroup) getStatistic(name);
         if (cnt == null) {
             synchronized (this) {
-                cnt = (CounterGroup)getStatistic(name);
+                cnt = (CounterGroup) getStatistic(name);
                 if (cnt == null) {
                     cnt = new CounterGroup(name, name);
                     addStatistic(name, cnt);
@@ -107,20 +111,20 @@ public class CounterGroup extends Statistic {
         }
         return cnt;
     }
-    
-    private Statistic getStatistic(String name) {        
+
+    private Statistic getStatistic(String name) {
         if (statistics != null) {
             return statistics.get(name);
         } else {
             return null;
         }
     }
-    
+
     private void addStatistic(String name, Statistic stat) {
         if (statistics == null) {
             statistics = new TreeMap<String, Statistic>();
         }
         statistics.put(name, stat);
     }
-    
+
 }

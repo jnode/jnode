@@ -18,9 +18,8 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.vm.classmgr;
 
+package org.jnode.vm.classmgr;
 
 
 /**
@@ -28,19 +27,23 @@ package org.jnode.vm.classmgr;
  */
 public final class VmConstString extends VmConstObject implements VmSharedStaticsEntry {
 
-    /** Index in the statics table of the string constant. */
+    /**
+     * Index in the statics table of the string constant.
+     */
     private final int staticsIndex;
-    
+
     /**
      * Initialize this instance.
+     *
      * @param staticsIndex
      */
     VmConstString(int staticsIndex) {
         this.staticsIndex = staticsIndex;
     }
-    
+
     /**
      * Gets the index in the statics table of the string constants.
+     *
      * @return Returns the staticsIndex.
      */
     public final int getSharedStaticsIndex() {
@@ -52,5 +55,5 @@ public final class VmConstString extends VmConstObject implements VmSharedStatic
      */
     public final int getConstType() {
         return CONST_STRING;
-    }   
+    }
 }

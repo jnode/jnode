@@ -9,15 +9,16 @@ import javax.isolate.Link;
 final class LinkLinkMessage extends LinkMessageImpl {
 
     private final VmDataLink value;
-    
+
     /**
      * Message constructor
+     *
      * @param value
      */
     LinkLinkMessage(VmDataLink link) {
         this.value = link;
     }
-    
+
     /**
      * @see org.jnode.vm.isolate.LinkMessageImpl#CloneMessage()
      */
@@ -48,5 +49,5 @@ final class LinkLinkMessage extends LinkMessageImpl {
     @Override
     public Link extractLink() {
         return value.asLink();
-    }        
+    }
 }

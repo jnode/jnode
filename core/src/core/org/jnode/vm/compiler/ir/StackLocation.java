@@ -18,37 +18,36 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
 public class StackLocation<T> extends Location<T> {
-	private int displacement;
+    private int displacement;
 
-	/**
-	 * @param displacement
-	 */
-	public StackLocation(int displacement) {
-		super("local" + displacement);
-		this.displacement = displacement;
-	}
-	
-	public StackLocation() {
-		this(0);
-	}
-	
-	public void setDisplacement(int displacement) {
-		this.displacement = displacement;
-	}
+    /**
+     * @param displacement
+     */
+    public StackLocation(int displacement) {
+        super("local" + displacement);
+        this.displacement = displacement;
+    }
 
-	/**
-	 * 
-	 */
-	public int getDisplacement() {
+    public StackLocation() {
+        this(0);
+    }
+
+    public void setDisplacement(int displacement) {
+        this.displacement = displacement;
+    }
+
+    /**
+     *
+     */
+    public int getDisplacement() {
         //TODO: remove the 8 here, hack for C compatibility while testing
-		return displacement + 8;
-	}
+        return displacement + 8;
+    }
 }

@@ -18,12 +18,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debug;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -41,7 +44,7 @@ public class UDPOutputStream extends OutputStream {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param address
      * @throws SocketException
      */
@@ -51,25 +54,25 @@ public class UDPOutputStream extends OutputStream {
     }
 
     /**
-     * @see java.io.OutputStream#close()
      * @throws IOException
+     * @see java.io.OutputStream#close()
      */
     public void close() throws IOException {
-      socket.close();
-      super.close();
+        socket.close();
+        super.close();
     }
 
     /**
      * @param b
      * @param off
      * @param len
-     * @see java.io.OutputStream#write(byte[], int, int)
      * @throws IOException
      * @throws NullPointerException
      * @throws IndexOutOfBoundsException
+     * @see java.io.OutputStream#write(byte[], int, int)
      */
     public void write(final byte[] b, final int off, final int len)
-            throws IOException, NullPointerException, IndexOutOfBoundsException {
+        throws IOException, NullPointerException, IndexOutOfBoundsException {
         if (!inWrite) {
             inWrite = true;
             try {
@@ -93,9 +96,9 @@ public class UDPOutputStream extends OutputStream {
 
     /**
      * @param b
-     * @see java.io.OutputStream#write(byte[])
      * @throws IOException
      * @throws NullPointerException
+     * @see java.io.OutputStream#write(byte[])
      */
     public void write(byte[] b) throws IOException, NullPointerException {
         write(b, 0, b.length);
@@ -103,11 +106,11 @@ public class UDPOutputStream extends OutputStream {
 
     /**
      * @param b
-     * @see java.io.OutputStream#write(int)
      * @throws IOException
+     * @see java.io.OutputStream#write(int)
      */
     public void write(int b) throws IOException {
-        write(new byte[] { (byte) b }, 0, 1);
+        write(new byte[]{(byte) b}, 0, 1);
     }
 
 }

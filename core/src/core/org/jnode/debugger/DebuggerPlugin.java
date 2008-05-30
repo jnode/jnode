@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.debugger;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;
@@ -82,60 +80,60 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
             throw new PluginException(ex);
         }
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
      */
     public void deviceStarted(Device device) {
         addListeners(device);
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
      */
     public void deviceStop(Device device) {
         removeListeners(device);
     }
-    
+
     private void addListeners(Device device) {
         if (device.implementsAPI(SystemTriggerAPI.class)) {
             try {
                 final SystemTriggerAPI api = (SystemTriggerAPI) device
-                        .getAPI(SystemTriggerAPI.class);
+                    .getAPI(SystemTriggerAPI.class);
                 api.addSystemTriggerListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
-            }            
-        }        
+            }
+        }
         if (device.implementsAPI(KeyboardAPI.class)) {
             try {
                 final KeyboardAPI api = (KeyboardAPI) device
-                        .getAPI(KeyboardAPI.class);
+                    .getAPI(KeyboardAPI.class);
                 api.addKeyboardListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
-            }            
-        }        
+            }
+        }
     }
-    
+
     private void removeListeners(Device device) {
         if (device.implementsAPI(SystemTriggerAPI.class)) {
             try {
                 final SystemTriggerAPI api = (SystemTriggerAPI) device
-                        .getAPI(SystemTriggerAPI.class);
+                    .getAPI(SystemTriggerAPI.class);
                 api.removeSystemTriggerListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
-            }            
-        }        
+            }
+        }
         if (device.implementsAPI(KeyboardAPI.class)) {
             try {
                 final KeyboardAPI api = (KeyboardAPI) device
-                        .getAPI(KeyboardAPI.class);
+                    .getAPI(KeyboardAPI.class);
                 api.removeKeyboardListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
-            }            
-        }        
+            }
+        }
     }
 }

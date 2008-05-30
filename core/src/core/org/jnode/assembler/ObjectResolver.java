@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler;
 
 import org.jnode.vm.VmSystemObject;
@@ -28,19 +28,19 @@ import org.jnode.vm.VmSystemObject;
  */
 public abstract class ObjectResolver extends VmSystemObject {
 
-	/**
-	 * Gets the address of the given object.
-	 * 
-	 * @param object
-	 * @return int
-	 */
-	public abstract int addressOf32(Object object);
+    /**
+     * Gets the address of the given object.
+     *
+     * @param object
+     * @return int
+     */
+    public abstract int addressOf32(Object object);
 
-	/**
-	 * Gets the address of the given object.
-	 * 
-	 * @param object
-	 * @return long
-	 */
-	public abstract long addressOf64(Object object);
+    /**
+     * Gets the address of the given object.
+     *
+     * @param object
+     * @return long
+     */
+    public abstract long addressOf64(Object object);
 }

@@ -18,135 +18,154 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
-
 import org.jnode.vm.isolate.VmIsolateLocal;
 
 public abstract class VmField extends VmMember {
 
-	/** java.lang.reflect.Field corresponding to this field */
-	private VmIsolateLocal<Field> javaFieldHolder;
-	/** Type of this field */
-	private VmType type;
-	/** Is the type of this field primitive? */
-	private final boolean primitive;
-	/** The size of this field in bytes */
-	private final byte typeSize;
+    /**
+     * java.lang.reflect.Field corresponding to this field
+     */
+    private VmIsolateLocal<Field> javaFieldHolder;
+    /**
+     * Type of this field
+     */
+    private VmType type;
+    /**
+     * Is the type of this field primitive?
+     */
+    private final boolean primitive;
+    /**
+     * The size of this field in bytes
+     */
+    private final byte typeSize;
 
-	/**
-	 * Create a new instance
-	 * @param name
-	 * @param signature
-	 * @param modifiers
-	 * @param declaringClass
-	 * @param slotSize
-	 */
-	protected VmField(
-		String name,
-		String signature,
-		int modifiers,
-		VmType declaringClass,
-		int slotSize) {
-		super(name, signature, modifiers | (((Modifier.isPrimitive(signature) || Modifier.isAddressType(signature)) ? 0 : Modifier.ACC_OBJECTREF)), declaringClass);
-		this.primitive = Modifier.isPrimitive(signature);
-		this.typeSize = Modifier.getTypeSize(signature, slotSize);
-	}
+    /**
+     * Create a new instance
+     *
+     * @param name
+     * @param signature
+     * @param modifiers
+     * @param declaringClass
+     * @param slotSize
+     */
+    protected VmField(
+        String name,
+        String signature,
+        int modifiers,
+        VmType declaringClass,
+        int slotSize) {
+        super(name, signature, modifiers |
+            (((Modifier.isPrimitive(signature) || Modifier.isAddressType(signature)) ? 0 : Modifier.ACC_OBJECTREF)),
+            declaringClass);
+        this.primitive = Modifier.isPrimitive(signature);
+        this.typeSize = Modifier.getTypeSize(signature, slotSize);
+    }
 
-	/**
-	 * Is this a field with a primitive type?
-	 * @return boolean
-	 */
-	public final boolean isPrimitive() {
-		return primitive;
-	}
-	
-	/**
-	 * Is this a field transient?
-	 * @return boolean
-	 */
-	public final boolean isTransient() {
-		return ((this.getModifiers() & Modifier.ACC_TRANSIENT) != 0);
-	}
-	
-	/**
-	 * Is the field of the type Address?
-	 * @return boolean
-	 */
-	public boolean isAddressType() {
-		return Modifier.isAddressType(signature);
-	}
+    /**
+     * Is this a field with a primitive type?
+     *
+     * @return boolean
+     */
+    public final boolean isPrimitive() {
+        return primitive;
+    }
 
-	/**
-	 * Is the field a non-primitive field and not an address type?
-	 * @return boolean
-	 */
-	public boolean isObjectRef() {
-		return Modifier.isObjectRef(getModifiers());
-	}
+    /**
+     * Is this a field transient?
+     *
+     * @return boolean
+     */
+    public final boolean isTransient() {
+        return ((this.getModifiers() & Modifier.ACC_TRANSIENT) != 0);
+    }
 
-	/**
-	 * Is this a field of double width (double, long)
-	 * @return boolean
-	 */
-	public final boolean isWide() {
+    /**
+     * Is the field of the type Address?
+     *
+     * @return boolean
+     */
+    public boolean isAddressType() {
+        return Modifier.isAddressType(signature);
+    }
+
+    /**
+     * Is the field a non-primitive field and not an address type?
+     *
+     * @return boolean
+     */
+    public boolean isObjectRef() {
+        return Modifier.isObjectRef(getModifiers());
+    }
+
+    /**
+     * Is this a field of double width (double, long)
+     *
+     * @return boolean
+     */
+    public final boolean isWide() {
         return ((this.getModifiers() & Modifier.ACC_WIDE) != 0);
-	}
+    }
 
-	/**
-	 * Return me as java.lang.reflect.Field
-	 * @return Field
-	 */
-	public final Field asField() {
+    /**
+     * Return me as java.lang.reflect.Field
+     *
+     * @return Field
+     */
+    public final Field asField() {
         if (javaFieldHolder == null) {
             javaFieldHolder = new VmIsolateLocal<Field>();
         }
         Field javaField = javaFieldHolder.get();
         if (javaField == null) {
-            javaFieldHolder.set(javaField = new Field(this));            
+            javaFieldHolder.set(javaField = new Field(this));
         }
-		return javaField;
-	}
+        return javaField;
+    }
 
-	/**
-	 * Resolve the type of this field
-	 * @param cl
-	 */
-	protected final synchronized void resolve() {
-		try {
-			type = new Signature(getSignature(), declaringClass.getLoader()).getType();
-		} catch (ClassNotFoundException ex) {
-			throw (Error)new NoClassDefFoundError().initCause(ex);
-		}
-	}
+    /**
+     * Resolve the type of this field
+     *
+     * @param cl
+     */
+    protected final synchronized void resolve() {
+        try {
+            type = new Signature(getSignature(), declaringClass.getLoader()).getType();
+        } catch (ClassNotFoundException ex) {
+            throw (Error) new NoClassDefFoundError().initCause(ex);
+        }
+    }
 
-	public String toString() {
-		return getMangledName();
-	}
+    public String toString() {
+        return getMangledName();
+    }
 
-	public String getMangledName() {
-		return mangleClassName(declaringClass.getName())
-			+ mangle("." + getName() + '.' + getSignature());
-	}
+    public String getMangledName() {
+        return mangleClassName(declaringClass.getName())
+            + mangle("." + getName() + '.' + getSignature());
+    }
 
-	/**
-	 * Returns the type.
-	 * @return VmClass
-	 */
-	public VmType<?> getType() {
+    /**
+     * Returns the type.
+     *
+     * @return VmClass
+     */
+    public VmType<?> getType() {
         if (type == null) {
             resolve();
         }
-		return type;
-	}
-	
-	/**
-	 * Gets the size of this field in bytes [1..8].
-	 * @return size of this field
-	 */
-	public byte getTypeSize() {
-		return typeSize;
-	}
+        return type;
+    }
+
+    /**
+     * Gets the size of this field in bytes [1..8].
+     *
+     * @return size of this field
+     */
+    public byte getTypeSize() {
+        return typeSize;
+    }
 }

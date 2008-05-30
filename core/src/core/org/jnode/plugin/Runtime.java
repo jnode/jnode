@@ -18,25 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
 /**
  * Descriptor of runtime libraries provided by the plugin.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface Runtime {
-	
-	/**
-	 * Gets all declared libraries
-	 * @return The libraries
-	 */
-	public Library[] getLibraries();
 
-	/**
-	 * Gets the descriptor of the plugin in which this element was declared.
-	 * @return The descriptor
-	 */
-	public PluginDescriptor getDeclaringPluginDescriptor();
+    /**
+     * Gets all declared libraries
+     *
+     * @return The libraries
+     */
+    public Library[] getLibraries();
+
+    /**
+     * Gets the descriptor of the plugin in which this element was declared.
+     *
+     * @return The descriptor
+     */
+    public PluginDescriptor getDeclaringPluginDescriptor();
 }

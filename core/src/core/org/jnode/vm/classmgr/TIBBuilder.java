@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public final class TIBBuilder implements TIBLayout {
 
     /**
      * Create a blank instance
-     * 
+     *
      * @param vmClass
      */
     public TIBBuilder(VmClassType vmClass, int methodCount) {
@@ -52,7 +52,7 @@ public final class TIBBuilder implements TIBLayout {
 
     /**
      * Create a copied instance
-     * 
+     *
      * @param vmClass
      * @param src
      */
@@ -60,20 +60,22 @@ public final class TIBBuilder implements TIBLayout {
         this(vmClass, src.length + methodCount);
         final int length = src.length;
         for (int i = FIRST_METHOD_INDEX; i < length; i++) {
-            tibAsList.add(src[ i]);
-            nameSignature2Index.put(getNameSignature((VmInstanceMethod)src[i]), new Integer(i));
+            tibAsList.add(src[i]);
+            nameSignature2Index.put(getNameSignature((VmInstanceMethod) src[i]), new Integer(i));
         }
     }
 
     /**
      * Add an instance method to this VMT. The VMT offset of the method is
      * adjusted.
-     * 
+     *
      * @param method
      */
     public void add(VmInstanceMethod method) {
-        if (tibAsArray != null) { throw new RuntimeException(
-                "This VMT is locked"); }
+        if (tibAsArray != null) {
+            throw new RuntimeException(
+                "This VMT is locked");
+        }
         final int idx = tibAsList.size();
         tibAsList.add(method);
         nameSignature2Index.put(getNameSignature(method), new Integer(idx));
@@ -83,15 +85,19 @@ public final class TIBBuilder implements TIBLayout {
     /**
      * Overwrite a method at a given index The VMT offset of the method is
      * adjusted.
-     * 
+     *
      * @param index
      * @param method
      */
     public void set(int index, VmInstanceMethod method) {
-        if (tibAsArray != null) { throw new RuntimeException(
-                "This VMT is locked"); }
-        if (index < FIRST_METHOD_INDEX) { throw new IndexOutOfBoundsException(
-                "Index (" + index + ")must be >= " + FIRST_METHOD_INDEX); }
+        if (tibAsArray != null) {
+            throw new RuntimeException(
+                "This VMT is locked");
+        }
+        if (index < FIRST_METHOD_INDEX) {
+            throw new IndexOutOfBoundsException(
+                "Index (" + index + ")must be >= " + FIRST_METHOD_INDEX);
+        }
         tibAsList.set(index, method);
         nameSignature2Index.put(getNameSignature(method), new Integer(index));
         method.setTibOffset(index);
@@ -100,7 +106,7 @@ public final class TIBBuilder implements TIBLayout {
     /**
      * Search through a given VMT for a method with a given name & signature.
      * Return the index in the VMT (0..length-1) if found, -1 otherwise.
-     * 
+     *
      * @param name
      * @param signature
      * @return int
@@ -110,7 +116,7 @@ public final class TIBBuilder implements TIBLayout {
         // skip index 0
         final Object idx = nameSignature2Index.get(getNameSignature(name, signature));
         if (idx != null) {
-            return ((Integer)idx).intValue();
+            return ((Integer) idx).intValue();
         } else {
             return -1;
         }
@@ -132,21 +138,21 @@ public final class TIBBuilder implements TIBLayout {
     /**
      * Convert this TIB to a TIB array. After a call to this method, the TIB
      * cannot be changed anymore.
-     * 
+     *
      * @return The TIB
      */
     public Object[] toArray() {
         if (tibAsArray == null) {
-            tibAsArray = new Object[ tibAsList.size()];
+            tibAsArray = new Object[tibAsList.size()];
             tibAsList.toArray(tibAsArray);
         }
         return tibAsArray;
     }
-    
+
     private final String getNameSignature(String name, String signature) {
         return name + '#' + signature;
     }
-    
+
     private final String getNameSignature(VmInstanceMethod method) {
         return method.getName() + '#' + method.getSignature();
     }

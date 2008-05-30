@@ -40,8 +40,8 @@ package org.jnode.imageio.jpeg;
 import java.io.IOException;
 import java.util.Locale;
 import javax.imageio.ImageReader;
-import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
 public class JPEGImageReaderSpi extends ImageReaderSpi {
@@ -68,20 +68,20 @@ public class JPEGImageReaderSpi extends ImageReaderSpi {
 
     public JPEGImageReaderSpi() {
         super(vendorName, version,
-                names, suffixes, MIMETypes,
-                readerClassName,
-                STANDARD_INPUT_TYPE,
-                writerSpiNames,
-                supportsStandardStreamMetadataFormat,
-                nativeStreamMetadataFormatName,
-                nativeStreamMetadataFormatClassName,
-                extraStreamMetadataFormatNames,
-                extraStreamMetadataFormatClassNames,
-                supportsStandardImageMetadataFormat,
-                nativeImageMetadataFormatName,
-                nativeImageMetadataFormatClassName,
-                extraImageMetadataFormatNames,
-                extraImageMetadataFormatClassNames);
+            names, suffixes, MIMETypes,
+            readerClassName,
+            STANDARD_INPUT_TYPE,
+            writerSpiNames,
+            supportsStandardStreamMetadataFormat,
+            nativeStreamMetadataFormatName,
+            nativeStreamMetadataFormatClassName,
+            extraStreamMetadataFormatNames,
+            extraStreamMetadataFormatClassNames,
+            supportsStandardImageMetadataFormat,
+            nativeImageMetadataFormatName,
+            nativeImageMetadataFormatClassName,
+            extraImageMetadataFormatNames,
+            extraImageMetadataFormatClassNames);
     }
 
     public String getDescription(Locale locale) {

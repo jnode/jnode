@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.MagicPermission;
@@ -26,7 +26,7 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * The java implementation of {@link org.jnode.vm.VmMultiMediaSupport}.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
@@ -39,7 +39,7 @@ final class VmJavaMultiMediaSupport extends VmMultiMediaSupport {
         for (int i = length; i > 0; i--) {
             final int c = src.loadInt();
             final int alpha = (c >>> 24) & 0xFF;
-            
+
             if (alpha != 0) {
                 final int d = dst.loadInt();
                 final int c1 = c & 0xFF;

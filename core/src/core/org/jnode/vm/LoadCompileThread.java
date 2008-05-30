@@ -9,7 +9,6 @@ final class LoadCompileThread extends Thread {
 
     /**
      * Default ctor
-     * 
      */
     public LoadCompileThread(LoadCompileService service, String name) {
         super(name);
@@ -18,7 +17,7 @@ final class LoadCompileThread extends Thread {
 
     /**
      * Do the actual compilation
-     * 
+     *
      * @see java.lang.Thread#run()
      */
     public void run() {

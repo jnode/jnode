@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 /**
@@ -26,16 +26,17 @@ package org.jnode.util;
  */
 public class BooleanUtils {
 
-	/**
-	 * Returns true if value equals "true", "on", "yes" or "1".
-	 * @param value Can be null
-	 * @return
-	 */
-	public static boolean valueOf(String value) {
-		if (value == null) {
-			return false;
-		}
-		value = value.trim().toLowerCase();
-		return (value.equals("true") || value.equals("on") || value.equals("yes") || value.equals("1"));
-	}
+    /**
+     * Returns true if value equals "true", "on", "yes" or "1".
+     *
+     * @param value Can be null
+     * @return
+     */
+    public static boolean valueOf(String value) {
+        if (value == null) {
+            return false;
+        }
+        value = value.trim().toLowerCase();
+        return (value.equals("true") || value.equals("on") || value.equals("yes") || value.equals("1"));
+    }
 }

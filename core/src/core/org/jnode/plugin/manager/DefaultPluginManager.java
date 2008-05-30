@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.manager;
 
 import gnu.java.security.action.GetPropertyAction;
-
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,9 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -52,20 +49,24 @@ import org.jnode.system.BootLog;
  */
 public final class DefaultPluginManager extends PluginManager {
 
-    /** The registry of plugins */
+    /**
+     * The registry of plugins
+     */
     private final PluginRegistry registry;
-    /** The loader manager */
+    /**
+     * The loader manager
+     */
     private final DefaultPluginLoaderManager loaderMgr;
 
     private static final int START_TIMEOUT = 10000;
 
     private static final JNodePermission START_SYSTEM_PLUGINS_PERM = new JNodePermission("startSystemPlugins");
     private static final JNodePermission STOP_PLUGINS_PERM = new JNodePermission("stopPlugins");
-    
+
     /**
      * Initialize a new instance. This will also bind this pluginmanager in the
      * initial namespace.
-     * 
+     *
      * @param registry
      */
     public DefaultPluginManager(PluginRegistry registry) throws PluginException {
@@ -79,11 +80,11 @@ public final class DefaultPluginManager extends PluginManager {
     }
 
     /**
-	 * Gets the plugin loader manager.
-	 */
-	public final PluginLoaderManager getLoaderManager() {
-	    return loaderMgr;
-	}
+     * Gets the plugin loader manager.
+     */
+    public final PluginLoaderManager getLoaderManager() {
+        return loaderMgr;
+    }
 
 
     /**
@@ -95,7 +96,7 @@ public final class DefaultPluginManager extends PluginManager {
 
     /**
      * Start all system plugins and plugins with the auto-start flag on.
-     * 
+     *
      * @throws PluginException
      */
     public void startSystemPlugins(List descriptors) throws PluginException {
@@ -103,27 +104,27 @@ public final class DefaultPluginManager extends PluginManager {
         if (sm != null) {
             sm.checkPermission(START_SYSTEM_PLUGINS_PERM);
         }
-        
+
         // Resolve all plugins
         ((PluginRegistryModel) registry).resolveDescriptors();
         ((PluginRegistryModel) registry).resolveDescriptors(descriptors);
 
         // Set the context classloader
         Thread.currentThread().setContextClassLoader(
-                registry.getPluginsClassLoader());
+            registry.getPluginsClassLoader());
 
         // Start the plugins
-        final String cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
+        final String cmdLine = (String) AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
         final boolean debug = (cmdLine.indexOf("debug") > 0);
         final List<PluginDescriptor> descrList = createPluginDescriptorList();
-        
+
         // Order list by priority
         Collections.sort(descrList, new PriorityComparator());
 
         // 2 loops, first start all system plugins,
         // then start all auto-start plugins
-        for (int type = 0; type < 2; type++) {            
-        	BootLog.info("Starting " + ((type == 0) ? "system" : "auto-start") + " plugins");
+        for (int type = 0; type < 2; type++) {
+            BootLog.info("Starting " + ((type == 0) ? "system" : "auto-start") + " plugins");
             for (PluginDescriptor descr : descrList) {
                 try {
                     final boolean start;
@@ -136,7 +137,7 @@ public final class DefaultPluginManager extends PluginManager {
                         if (debug) {
                             Thread.sleep(250);
                         }
-                        
+
                         startSinglePlugin(descr.getPlugin());
                     }
                 } catch (Throwable ex) {
@@ -195,6 +196,7 @@ public final class DefaultPluginManager extends PluginManager {
                 try {
                     stopPlugin(descr);
                 } catch (PluginException ex) {
+                    //empty
                 }
             }
             BootLog.info("Stopped all plugins");
@@ -205,11 +207,9 @@ public final class DefaultPluginManager extends PluginManager {
 
     /**
      * Stops a single plugin and all plugins that depend on it.
-     * 
-     * @param d
-     *            The descriptor to stop.
-     * @throws PluginException
-     *             if the plugin fails to stop.
+     *
+     * @param d The descriptor to stop.
+     * @throws PluginException if the plugin fails to stop.
      */
     public final void stopPlugin(PluginDescriptor d) throws PluginException {
         final String id = d.getId();
@@ -224,7 +224,7 @@ public final class DefaultPluginManager extends PluginManager {
 
     /**
      * Create a list on plugin descriptors in the right order for startPlugins.
-     * 
+     *
      * @return List&lt;PluginDescriptor&gt;
      */
     private List<PluginDescriptor> createPluginDescriptorList() throws PluginException {
@@ -267,8 +267,10 @@ public final class DefaultPluginManager extends PluginManager {
                 }
 
             }
-            if (additions == 0) { throw new PluginException(
-                    "Cycle in plugin prerequisites remaining: " + all.keySet()); }
+            if (additions == 0) {
+                throw new PluginException(
+                    "Cycle in plugin prerequisites remaining: " + all.keySet());
+            }
         }
 
         return list;
@@ -276,44 +278,49 @@ public final class DefaultPluginManager extends PluginManager {
 
     /**
      * Can the given descriptor be added to a startPlugin ordered list?
-     * 
+     *
      * @param descr
      * @param nameSet
      */
     private boolean canAdd(PluginDescriptor descr, HashSet<String> nameSet,
-            HashSet<String> systemSet) {
+                           HashSet<String> systemSet) {
         //Syslog.debug("Testing " + descr.getId());
         if (!descr.isSystemPlugin()) {
-            if (!systemSet.isEmpty()) { return false; }
+            if (!systemSet.isEmpty()) {
+                return false;
+            }
         }
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
         for (int i = 0; i < prereq.length; i++) {
-            final PluginPrerequisite pr = prereq[ i];
-            if (!nameSet.contains(pr.getPluginId())) { 
-            //Syslog.debug("Not in set: " + pr.getPluginId());
-            return false; }
+            final PluginPrerequisite pr = prereq[i];
+            if (!nameSet.contains(pr.getPluginId())) {
+                //Syslog.debug("Not in set: " + pr.getPluginId());
+                return false;
+            }
         }
         return true;
     }
 
     /**
      * Do all prerequisite plugins exists?
-     * 
+     *
      * @param descr
      * @param all
      */
     private boolean prerequisitesExist(PluginDescriptor descr, HashMap all) {
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
         for (int i = 0; i < prereq.length; i++) {
-            final PluginPrerequisite pr = prereq[ i];
-            if (!all.containsKey(pr.getPluginId())) { return false; }
+            final PluginPrerequisite pr = prereq[i];
+            if (!all.containsKey(pr.getPluginId())) {
+                return false;
+            }
         }
         return true;
     }
 
     /**
      * Is the isStartFinished property of all started plugins true.
-     * 
+     *
      * @return
      */
     private boolean isStartPluginsFinished() {
@@ -321,7 +328,9 @@ public final class DefaultPluginManager extends PluginManager {
             try {
                 final Plugin pi = descr.getPlugin();
                 if (pi.isActive()) {
-                    if (!pi.isStartFinished()) { return false; }
+                    if (!pi.isStartFinished()) {
+                        return false;
+                    }
                 }
             } catch (PluginException ex) {
                 // Ignore
@@ -340,7 +349,7 @@ public final class DefaultPluginManager extends PluginManager {
                 if (pi.isActive()) {
                     if (!pi.isStartFinished()) {
                         BootLog.error("Plugin " + descr.getId()
-                                + " has not yet finished");
+                            + " has not yet finished");
                     }
                 }
             } catch (PluginException ex) {
@@ -379,7 +388,7 @@ public final class DefaultPluginManager extends PluginManager {
             return this.pluginId;
         }
     }
-    
+
     private static class PriorityComparator implements Comparator<PluginDescriptor> {
 
         /**
@@ -388,10 +397,14 @@ public final class DefaultPluginManager extends PluginManager {
         public int compare(PluginDescriptor o1, PluginDescriptor o2) {
             int p1 = o1.getPriority();
             int p2 = o2.getPriority();
-            if (p1 > p2) { return -1; }
-            if (p1 == p2) { return 0; }
+            if (p1 > p2) {
+                return -1;
+            }
+            if (p1 == p2) {
+                return 0;
+            }
             return 1;
         }
-        
+
     }
 }

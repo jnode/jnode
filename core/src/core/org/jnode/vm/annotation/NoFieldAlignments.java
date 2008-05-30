@@ -18,20 +18,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.annotation;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
 import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Target;
 
 /**
  * This marker interface signals the VM that instance fields in the
  * class that implements this interface must not be re-ordered.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented

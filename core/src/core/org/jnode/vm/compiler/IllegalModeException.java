@@ -18,46 +18,49 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 /**
  * Signal the use of a method in an invalid operating mode.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class IllegalModeException extends RuntimeException {
 
-	/**
-	 * Initialize this instance.
-	 */
-	public IllegalModeException() {
-		super();
-	}
+    /**
+     * Initialize this instance.
+     */
+    public IllegalModeException() {
+        super();
+    }
 
-	/**
-	 * Initialize this instance.
-	 * @param s
-	 */
-	public IllegalModeException(String s) {
-		super(s);
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param s
+     */
+    public IllegalModeException(String s) {
+        super(s);
+    }
 
-	/**
-	 * Initialize this instance.
-	 * @param s
-	 * @param cause
-	 */
-	public IllegalModeException(String s, Throwable cause) {
-		super(s, cause);
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param s
+     * @param cause
+     */
+    public IllegalModeException(String s, Throwable cause) {
+        super(s, cause);
+    }
 
-	/**
-	 * Initialize this instance.
-	 * @param cause
-	 */
-	public IllegalModeException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * Initialize this instance.
+     *
+     * @param cause
+     */
+    public IllegalModeException(Throwable cause) {
+        super(cause);
+    }
 
 }

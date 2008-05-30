@@ -45,7 +45,7 @@ public class VmStaticsAllocator extends VmStaticsBase {
 
     /**
      * Allocate an entry.
-     * 
+     *
      * @param type
      * @param length
      * @return the index of the allocated entry.
@@ -63,7 +63,7 @@ public class VmStaticsAllocator extends VmStaticsBase {
 
     /**
      * Is the entry are the given offset of the given type?
-     * 
+     *
      * @param index
      * @param type
      * @return
@@ -76,16 +76,24 @@ public class VmStaticsAllocator extends VmStaticsBase {
 
     /**
      * Get the statics type at a given index
-     * 
+     *
      * @return int
      */
     public final int getType(int index) {
         return types[index];
     }
-    
-    final byte[] getTypes() { return types; }
-    final int getLength() { return next; }
-    final int getCapacity() { return types.length; }
+
+    final byte[] getTypes() {
+        return types;
+    }
+
+    final int getLength() {
+        return next;
+    }
+
+    final int getCapacity() {
+        return types.length;
+    }
 
     public final void dumpStatistics(PrintStream out) {
         out.println("  #static int fields  " + typeCounter[TYPE_INT]);

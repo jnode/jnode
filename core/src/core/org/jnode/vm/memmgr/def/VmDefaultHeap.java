@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
@@ -44,24 +44,34 @@ import org.vmmagic.unboxed.Word;
 @MagicPermission
 final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
-    /** Offset within this heap of the next free memory block */
+    /**
+     * Offset within this heap of the next free memory block
+     */
     private Address nextFreePtr;
 
-    /** The allocation bitmap as object, so we won't throw it away in a GC cycle */
+    /**
+     * The allocation bitmap as object, so we won't throw it away in a GC cycle
+     */
     private Object allocationBitmap;
 
-    /** The total size of free space */
+    /**
+     * The total size of free space
+     */
     private Extent freeSize;
 
-    /** Offset (in bytes) from the start of an object to the size of an object */
+    /**
+     * Offset (in bytes) from the start of an object to the size of an object
+     */
     private Offset sizeOffset;
 
-    /** The next heap (linked list) */
+    /**
+     * The next heap (linked list)
+     */
     private VmDefaultHeap next;
 
     /**
      * Initialize this instance
-     * 
+     *
      * @param heapMgr
      */
     public VmDefaultHeap(DefaultHeapManager heapMgr) {
@@ -70,16 +80,16 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /**
      * Setup the heap object according to the given start-address of the heap.
-     * 
+     *
      * @param start
      * @param heapClass
      * @param slotSize
      * @return the heap
      */
     protected static VmDefaultHeap setupHeap(HeapHelper helper, Address start,
-            VmNormalClass<VmDefaultHeap> heapClass, int slotSize) {
+                                             VmNormalClass<VmDefaultHeap> heapClass, int slotSize) {
         final int headerSize = ObjectLayout
-                .objectAlign((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
+            .objectAlign((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
         final Offset vmtOffset = Offset.fromIntSignExtend(ObjectLayout.TIB_SLOT * slotSize);
         final Offset sizeOffset = Offset.fromIntSignExtend(-((ObjectLayout.HEADER_SLOTS + 1) * slotSize));
         final Offset flagsOffset = Offset.fromIntSignExtend(ObjectLayout.FLAGS_SLOT * slotSize);
@@ -87,7 +97,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         // Setup a heap object, so the heap can initialize itself.
         final Address heapPtr = start.add(headerSize);
         final Word heapObjSize = Word.fromIntZeroExtend(ObjectLayout.objectAlign(heapClass
-                .getObjectSize()));
+            .getObjectSize()));
         final Word flags = Word.fromIntZeroExtend(ObjectFlags.GC_DEFAULT_COLOR);
         heapPtr.store(heapObjSize, sizeOffset);
         heapPtr.store(flags, flagsOffset);
@@ -101,8 +111,9 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /**
      * Append a new heap to the end of the linked list of heaps.
+     *
      * @param newHeap
-     */ 
+     */
     protected final void append(VmDefaultHeap newHeap) {
         VmDefaultHeap heap = this;
         while (heap.next != null) {
@@ -110,23 +121,22 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         }
         heap.next = newHeap;
     }
-    
+
     /**
      * Gets the next heap in the linked list of heaps.
+     *
      * @return Next heap
      */
     @Inline
     public final VmDefaultHeap getNext() {
         return next;
     }
-    
+
     /**
      * Initialize this heap
-     * 
-     * @param start
-     *            Start address of this heap
-     * @param end
-     *            End address of this heap (first address after this heap)
+     *
+     * @param start    Start address of this heap
+     * @param end      End address of this heap (first address after this heap)
      * @param slotSize
      */
     protected void initialize(Address start, Address end, int slotSize) {
@@ -151,7 +161,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         // Initialize an allocation bitmap
         final int allocationBits = size / ObjectLayout.OBJECT_ALIGN;
         final int allocationBitmapSize = ObjectLayout
-                .objectAlign((allocationBits + 7) / 8);
+            .objectAlign((allocationBits + 7) / 8);
         this.allocationBitmapPtr = firstObject;
         final Address bitmapPtr = this.allocationBitmapPtr;
         // Make the bitmap an object, so it is easy to manipulate.
@@ -179,7 +189,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     /**
      * Allocate a new instance for the given class. Not that this method cannot
      * be synchronized, since the synchronization is handled in VmHeap.
-     * 
+     *
      * @param vmClass
      * @param alignedSize
      * @return Object Null if no space is left.
@@ -187,7 +197,8 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     protected Object alloc(VmClassType<?> vmClass, int alignedSize) {
 
         if (nextFreePtr.EQ(Address.zero())) { /* This heap is full */
-        return null; }
+            return null;
+        }
 
         final Offset tibOffset = this.tibOffset;
         final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
@@ -261,7 +272,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             setAllocationBit(objectPtr, true);
 
             // Fix the freeSize
-            freeSize  = freeSize.sub(alignedSizeW);
+            freeSize = freeSize.sub(alignedSizeW);
         } finally {
             unlock();
         }
@@ -274,7 +285,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /**
      * Mark the given object as free space.
-     * 
+     *
      * @param object
      */
     @Inline
@@ -284,11 +295,11 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         ptr.store(ObjectReference.fromObject(FREE), tibOffset);
         setAllocationBit(object, false);
         freeSize = freeSize.add(objSize);
-    } 
+    }
 
     /**
-     * @see VmAbstractHeap#getFreeSize()
      * @return The free size
+     * @see VmAbstractHeap#getFreeSize()
      */
     protected Extent getFreeSize() {
         return freeSize;
@@ -296,7 +307,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /**
      * Join all adjacent free spaces.
-     * 
+     *
      * @throws UninterruptiblePragma
      */
     protected final void defragment() throws UninterruptiblePragma {
@@ -305,7 +316,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         Word offset = headerSize;
         final Offset sizeOffset = this.sizeOffset;
         final Offset tibOffset = this.tibOffset;
-        
+
 
         lock();
         try {
@@ -346,13 +357,12 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /**
      * Let all objects in this heap make a visit to the given visitor.
-     * 
+     *
      * @param visitor
-     * @param locking
-     *            If true, use lock/unlock while proceeding to the next object.
+     * @param locking If true, use lock/unlock while proceeding to the next object.
      */
     protected final void walk(ObjectVisitor visitor, boolean locking,
-            Word flagsMask, Word flagsValue) {
+                              Word flagsMask, Word flagsValue) {
         // Go through the heap and call visit on each object
         final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
         final Offset sizeOffset = this.sizeOffset;

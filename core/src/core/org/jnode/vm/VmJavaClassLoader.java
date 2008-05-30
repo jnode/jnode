@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.io.Writer;
 import java.util.HashMap;
-
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -39,18 +38,24 @@ import org.jnode.vm.scheduler.VmProcessor;
  */
 public final class VmJavaClassLoader extends VmAbstractClassLoader {
 
-    /** The java classloader */
+    /**
+     * The java classloader
+     */
     private final ClassLoader loader;
 
-    /** The system classloader */
+    /**
+     * The system classloader
+     */
     private final VmSystemClassLoader systemLoader;
 
-    /** The loaded classes (nbame, VmType) */
+    /**
+     * The loaded classes (nbame, VmType)
+     */
     private final HashMap<String, VmType> loadedClasses = new HashMap<String, VmType>();
 
     /**
      * Initialize this class.
-     * 
+     *
      * @param loader
      */
     public VmJavaClassLoader(ClassLoader loader) {
@@ -73,9 +78,9 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      * Compile the given IMT.
      */
     public CompiledIMT compileIMT(IMTBuilder builder) {
-    	return systemLoader.compileIMT(builder);    	
+        return systemLoader.compileIMT(builder);
     }
-    
+
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#findLoadedClass(java.lang.String)
      */
@@ -85,7 +90,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
 
     /**
      * Add a class that has been loaded.
-     * 
+     *
      * @param name
      * @param cls
      */
@@ -113,7 +118,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      */
     @PrivilegedActionPragma
     public final VmType<?> loadClass(String className, boolean resolve)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException {
         final VmType<?> cls;
         if (className.charAt(0) == '[') {
             cls = loadArrayClass(className, resolve);
@@ -151,13 +156,13 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the isolated statics table (of the current isolate)
-     * 
+     *
      * @return The statics table
      */
     public final VmIsolatedStatics getIsolatedStatics() {
         return VmProcessor.current().getIsolatedStatics();
     }
-    
+
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#resourceExists(java.lang.String)
      */

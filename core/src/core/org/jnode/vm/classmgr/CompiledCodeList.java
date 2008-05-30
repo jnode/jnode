@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmAddress;
@@ -30,7 +30,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
  * List of compiled methods.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class CompiledCodeList extends VmSystemObject {
@@ -42,16 +42,18 @@ public final class CompiledCodeList extends VmSystemObject {
     /**
      * Create a new compiled method which is added to the internal list of
      * compiled methods.
-     * 
+     *
      * @param optLevel
      * @param magic
      * @return
      */
     public synchronized VmCompiledCode createCompiledCode(CompiledMethod cm,
-            VmMethod method, NativeCodeCompiler compiler, VmByteCode bytecode,
-            VmAddress nativeCode, Object compiledCode, int size,
-            VmCompiledExceptionHandler[] eTable,
-            VmAddress defaultExceptionHandler, VmAddressMap addressTable) {
+                                                          VmMethod method, NativeCodeCompiler compiler,
+                                                          VmByteCode bytecode,
+                                                          VmAddress nativeCode, Object compiledCode, int size,
+                                                          VmCompiledExceptionHandler[] eTable,
+                                                          VmAddress defaultExceptionHandler,
+                                                          VmAddressMap addressTable) {
         final int ccid;
         if (cm != null) {
             ccid = cm.getCompiledCodeId();
@@ -59,8 +61,8 @@ public final class CompiledCodeList extends VmSystemObject {
             ccid = createId();
         }
         final VmCompiledCode cc = new VmCompiledCode(ccid, method, compiler, bytecode,
-                nativeCode, compiledCode, size, eTable,
-                defaultExceptionHandler, addressTable);
+            nativeCode, compiledCode, size, eTable,
+            defaultExceptionHandler, addressTable);
         list[ccid] = cc;
         return cc;
     }
@@ -68,7 +70,7 @@ public final class CompiledCodeList extends VmSystemObject {
     /**
      * Create a new compiled method which is added to the internal list of
      * compiled methods.
-     * 
+     *
      * @param optLevel
      * @param magic
      * @return
@@ -83,7 +85,7 @@ public final class CompiledCodeList extends VmSystemObject {
 
     /**
      * Gets a compiled method with a given id.
-     * 
+     *
      * @param cmid
      * @return
      */
@@ -96,9 +98,10 @@ public final class CompiledCodeList extends VmSystemObject {
             return null;
         }
     }
-    
+
     /**
      * Gets the number of method in the list.
+     *
      * @return
      */
     public final int size() {

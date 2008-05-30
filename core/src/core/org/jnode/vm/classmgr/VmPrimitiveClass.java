@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.security.ProtectionDomain;
@@ -29,58 +29,66 @@ import java.security.ProtectionDomain;
  */
 public final class VmPrimitiveClass<T> extends VmNormalClass<T> {
 
-    /** Is this a floatingpoint type? */
+    /**
+     * Is this a floatingpoint type?
+     */
     private final boolean floatingPoint;
-    
-    /** Is this a wide type? */
+
+    /**
+     * Is this a wide type?
+     */
     private final boolean wide;
-    
-    /** JvmType of this type */
+
+    /**
+     * JvmType of this type
+     */
     private final int jvmType;
-    
-     /**
+
+    /**
      * @param name
      * @param superClass
      * @param loader
      * @param typeSize
      */
     public VmPrimitiveClass(String name, VmNormalClass<? super T> superClass,
-            VmClassLoader loader, int jvmType, int typeSize, boolean floatingPoint, ProtectionDomain protectionDomain) {
+                            VmClassLoader loader, int jvmType, int typeSize, boolean floatingPoint,
+                            ProtectionDomain protectionDomain) {
         super(name, superClass, loader, typeSize, protectionDomain);
         this.jvmType = jvmType;
         this.floatingPoint = floatingPoint;
         this.wide = (typeSize == 8);
     }
-    
+
     /**
      * Is this class a primitive type?
-     * 
+     *
      * @return boolean
      */
     public boolean isPrimitive() {
         return true;
     }
-   
+
     /**
      * Is this a wide primitive type; long or double
      */
     public final boolean isWide() {
         return wide;
     }
-    
+
     /**
      * Is this a floatingpoint primitive type; float or double
      */
     public final boolean isFloatingPoint() {
         return floatingPoint;
     }
-       
+
     /**
      * Gets the JvmType of this type.
-     * @see org.jnode.vm.JvmType
+     *
      * @return
+     * @see org.jnode.vm.JvmType
      */
     public int getJvmType() {
-    	return jvmType;
+        return jvmType;
     }
 }

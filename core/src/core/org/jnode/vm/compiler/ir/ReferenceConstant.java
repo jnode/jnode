@@ -18,28 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
 public class ReferenceConstant<T> extends Constant<T> {
-	private Object value;
+    private Object value;
 
-	/**
-	 * @param value
-	 */
-	public ReferenceConstant(Object value) {
-		super(Operand.REFERENCE);
-		this.value = value;
-	}
-	
-	public String toString() {
-		if (value == null) {
-			return "null";
-		}
-		return value.toString();
-	}
+    /**
+     * @param value
+     */
+    public ReferenceConstant(Object value) {
+        super(Operand.REFERENCE);
+        this.value = value;
+    }
+
+    public String toString() {
+        if (value == null) {
+            return "null";
+        }
+        return value.toString();
+    }
 }

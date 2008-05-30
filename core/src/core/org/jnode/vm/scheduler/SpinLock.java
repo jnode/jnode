@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 import org.jnode.vm.Unsafe;
@@ -37,54 +37,62 @@ import org.vmmagic.unboxed.ObjectReference;
 @MagicPermission
 public class SpinLock extends VmSystemObject {
 
-	/** Lock counter. THIS FIELD MUST BE AT OFFSET 0!! */
-	private int lockCount;
-    /** Owner used for deadlock detection */
+    /**
+     * Lock counter. THIS FIELD MUST BE AT OFFSET 0!!
+     */
+    private int lockCount;
+    /**
+     * Owner used for deadlock detection
+     */
     private VmProcessor owner;
 
-	/**
-	 * Claim access to this monitor. A monitor may only be locked for a small
-	 * amount of time, since this method uses a spinlock.
-	 * 
-	 * @see #unlock()
-	 * @see #lockCount
-	 */
-    @Inline @Uninterruptible
-	public final void lock() {
-		final VmProcessor current = VmProcessor.current();
-        
+    /**
+     * Claim access to this monitor. A monitor may only be locked for a small
+     * amount of time, since this method uses a spinlock.
+     *
+     * @see #unlock()
+     * @see #lockCount
+     */
+    @Inline
+    @Uninterruptible
+    public final void lock() {
+        final VmProcessor current = VmProcessor.current();
+
         // Test for obvious deadlock
         if (owner == current) {
             Unsafe.debugStackTrace();
             Unsafe.die("Deadlock in SpinLock#lock");
         }
-        
-        // Do the spinlock
-		final Address mlAddr = ObjectReference.fromObject(this).toAddress();
-		while (!mlAddr.attempt(0, 1)) {
-			current.yield(true);
-		}
-        this.owner = current;
-	}
 
-	/**
-	 * Release access to this monitor. A monitor may only be locked for a small
-	 * amount of time, since this method uses a spinlock.
-	 * 
-	 * @see #lock()
-	 * @see #lockCount
-	 */
-    @Inline @Uninterruptible
-	public final void unlock() {
+        // Do the spinlock
+        final Address mlAddr = ObjectReference.fromObject(this).toAddress();
+        while (!mlAddr.attempt(0, 1)) {
+            current.yield(true);
+        }
+        this.owner = current;
+    }
+
+    /**
+     * Release access to this monitor. A monitor may only be locked for a small
+     * amount of time, since this method uses a spinlock.
+     *
+     * @see #lock()
+     * @see #lockCount
+     */
+    @Inline
+    @Uninterruptible
+    public final void unlock() {
         this.owner = null;
-		this.lockCount = 0;
-	}
-    
+        this.lockCount = 0;
+    }
+
     /**
      * Is this lock locked.
+     *
      * @return
      */
-    @Inline @Uninterruptible
+    @Inline
+    @Uninterruptible
     protected final boolean isLocked() {
         return (lockCount != 0);
     }

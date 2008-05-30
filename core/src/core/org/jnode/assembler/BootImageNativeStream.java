@@ -18,31 +18,34 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.assembler;
 
 /**
  * Interface that contains methods that can be used during the creation
  * of the boot image, but not at runtime.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface BootImageNativeStream {
 
-	/**
-	 * Write a reference to the given object
-	 * @param object
-	 */
-	public void writeObjectRef(Object object);
+    /**
+     * Write a reference to the given object
+     *
+     * @param object
+     */
+    public void writeObjectRef(Object object);
 
     /**
      * Write a reference to the given object
+     *
      * @param object
      */
     public void setObjectRef(int offset, Object object);
-    
+
     /**
      * Allocate space from the current position and return the current position.
+     *
      * @param size
      * @return The start of the allocated region.
      */

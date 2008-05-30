@@ -22,7 +22,6 @@
 package org.jnode.vm.x86;
 
 import java.io.PrintStream;
-
 import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -50,7 +49,7 @@ import org.vmmagic.unboxed.Word;
 
 /**
  * Processor implementation for the X86 architecture.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @NoFieldAlignments
@@ -58,66 +57,102 @@ import org.vmmagic.unboxed.Word;
 @MagicPermission
 public abstract class VmX86Processor extends VmProcessor {
 
-    /** Interrupt vector for Timeslice interrupt */
+    /**
+     * Interrupt vector for Timeslice interrupt
+     */
     private static final int TIMESLICE_VECTOR = 0x33;
-    
-    /** The IRQ counters */
+
+    /**
+     * The IRQ counters
+     */
     private final int[] irqCount = new int[X86IRQManager.IRQ_COUNT];
 
-    /** The local API */
+    /**
+     * The local API
+     */
     private LocalAPIC localAPIC;
-    
-    /** Memory address of the EOI register in the local APIC */
+
+    /**
+     * Memory address of the EOI register in the local APIC
+     */
     private Address localApicEOIAddress;
 
-    /** GDT used in this processor */
+    /**
+     * GDT used in this processor
+     */
     private GDT gdt;
 
-    /** Is this a logical processor? */
+    /**
+     * Is this a logical processor?
+     */
     private boolean logical = false;
-    
-    /** Is this the boot processor? */
+
+    /**
+     * Is this the boot processor?
+     */
     private boolean bootProcessor;
-    
-    /** Must the processor send timeslice interrupts to other cpu's (vm_ints.asm) */
+
+    /**
+     * Must the processor send timeslice interrupts to other cpu's (vm_ints.asm)
+     */
     volatile Word sendTimeSliceInterrupt;
 
-    /** The resource manager */
+    /**
+     * The resource manager
+     */
     private ResourceManager rm;
 
-    /** Kernel variable (ints.asm) */
+    /**
+     * Kernel variable (ints.asm)
+     */
     volatile Word resume_int;
 
-    /** Kernel variable (ints.asm) */
+    /**
+     * Kernel variable (ints.asm)
+     */
     volatile Word resume_intno;
 
-    /** Kernel variable (ints.asm) */
+    /**
+     * Kernel variable (ints.asm)
+     */
     volatile Word resume_error;
 
-    /** Kernel variable (ints.asm) */
+    /**
+     * Kernel variable (ints.asm)
+     */
     volatile Address resume_handler;
 
-    /** Kernel variable (vm-ints.asm) */
+    /**
+     * Kernel variable (vm-ints.asm)
+     */
     volatile int deadLockCounter;
 
-    /** Kernel variable (vm-inst.asm) */
+    /**
+     * Kernel variable (vm-inst.asm)
+     */
     volatile int fxSaveCounter;
 
-    /** Kernel variable (vm-inst.asm) */
+    /**
+     * Kernel variable (vm-inst.asm)
+     */
     volatile int fxRestoreCounter;
 
-    /** Kernel variable (vm-inst.asm) */
+    /**
+     * Kernel variable (vm-inst.asm)
+     */
     volatile int deviceNaCounter;
 
-    /** My performance counter accessor */
+    /**
+     * My performance counter accessor
+     */
     transient X86PerformanceCounters perfCounters;
 
     /**
      * @param id
      */
     public VmX86Processor(int id, VmX86Architecture arch,
-            VmSharedStatics statics, VmIsolatedStatics isolatedStatics,
-            VmScheduler scheduler, X86CpuID cpuId) {
+                          VmSharedStatics statics, VmIsolatedStatics isolatedStatics,
+                          VmScheduler scheduler, X86CpuID cpuId) {
         super(id, arch, statics, isolatedStatics, scheduler);
         if (cpuId != null) {
             setCPUID(cpuId);
@@ -126,7 +161,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Gets the IRQ counters array.
-     * 
+     *
      * @return int[]
      */
     @Uninterruptible
@@ -137,7 +172,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Load the CPU id.
-     * 
+     *
      * @return CpuID
      */
     protected CpuID loadCPUID(int[] id) {
@@ -152,8 +187,7 @@ public abstract class VmX86Processor extends VmProcessor {
     }
 
     /**
-     * @param apic
-     *            The apic to set.
+     * @param apic The apic to set.
      */
     final void setApic(LocalAPIC apic) {
         this.localAPIC = apic;
@@ -180,7 +214,7 @@ public abstract class VmX86Processor extends VmProcessor {
         this.rm = rm;
         final VmProcessor me = current();
         Unsafe.debug("Starting up CPU " + getIdString() + " from "
-                + me.getIdString() + "\n");
+            + me.getIdString() + "\n");
 
         // Setup kernel structures
         setupStructures();
@@ -190,7 +224,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
         // Make sure Local APIC is enabled (the local apic of the current CPU!)
         Unsafe.debug("Enabling Local APIC: current state="
-                + (localAPIC.isEnabled() ? "enabled" : "disabled") + "\n");
+            + (localAPIC.isEnabled() ? "enabled" : "disabled") + "\n");
         localAPIC.setEnabled(true);
         localAPIC.clearErrors();
         // TimeUtils.loop(5000);
@@ -224,12 +258,12 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Create a new thread
-     * 
+     *
      * @param stack
      * @return The new thread
      */
     protected abstract VmX86Thread createThread(
-            VmIsolatedStatics isolatedStatics, byte[] stack);
+        VmIsolatedStatics isolatedStatics, byte[] stack);
 
     /**
      * Setup the required CPU structures. GDT, TSS, kernel stack, user stack,
@@ -242,7 +276,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
         // Create user stack
         final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SLOTS
-                * getArchitecture().getReferenceSize()];
+            * getArchitecture().getReferenceSize()];
         setupUserStack(userStack);
         this.currentThread = createThread(getIsolatedStatics(), userStack);
         this.stackEnd = ((VmX86Thread) currentThread).getStackEnd().toAddress();
@@ -252,7 +286,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Setup the given GDT for use by this processor.
-     * 
+     *
      * @param gdt
      */
     protected abstract void setupGDT(GDT gdt);
@@ -264,12 +298,12 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Setup a memory region with bootcode for this processor.
-     * 
+     *
      * @param rm
      * @return The address of the bootcode.
      */
     protected abstract Address setupBootCode(ResourceManager rm, GDT gdt)
-            throws ResourceNotFreeException;
+        throws ResourceNotFreeException;
 
     /**
      * Entry point for starting Application processors.
@@ -279,7 +313,7 @@ public abstract class VmX86Processor extends VmProcessor {
     static final void applicationProcessorMain() {
         final VmX86Processor cpu = (VmX86Processor) current();
         Unsafe.debug("Starting Application Processor " + cpu.getIdString()
-                + "\n");
+            + "\n");
 
         // First force a load of CPUID
         cpu.getCPUID();
@@ -305,7 +339,7 @@ public abstract class VmX86Processor extends VmProcessor {
      * CPU.
      */
     static final void detectAndstartLogicalProcessors(ResourceManager rm)
-            throws ResourceNotFreeException {
+        throws ResourceNotFreeException {
         final VmX86Processor cpu = (VmX86Processor) current();
         if (cpu.logical) {
             return;
@@ -320,15 +354,15 @@ public abstract class VmX86Processor extends VmProcessor {
         cpu.systemReadyForThreadSwitch();
 
         final VmX86Architecture arch = (VmX86Architecture) cpu
-                .getArchitecture();
+            .getArchitecture();
         final int logCpuCnt = cpuid.getLogicalProcessors();
         // Now create and start all logical processors
         for (int i = 1; i < logCpuCnt; i++) {
             final int logId = cpu.getId() | i;
             Unsafe.debug("Adding logical CPU 0x" + NumberUtils.hex(logId, 2));
             final VmX86Processor logCpu = (VmX86Processor) arch
-                    .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu
-                            .getIsolatedStatics(), cpu.getScheduler());
+                .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu
+                    .getIsolatedStatics(), cpu.getScheduler());
             logCpu.logical = true;
             arch.initX86Processor(logCpu);
             logCpu.startup(rm);
@@ -337,7 +371,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Gets the performance counter accessor of this processor.
-     * 
+     *
      * @return
      */
     public final PerformanceCounters getPerformanceCounters() {
@@ -345,7 +379,7 @@ public abstract class VmX86Processor extends VmProcessor {
             synchronized (this) {
                 if (perfCounters == null) {
                     perfCounters = X86PerformanceCounters.create(this,
-                            (X86CpuID) getCPUID());
+                        (X86CpuID) getCPUID());
                 }
             }
         }
@@ -356,15 +390,15 @@ public abstract class VmX86Processor extends VmProcessor {
         out.println("Type       : " + (bootProcessor ? "BSP" : (logical ? "AP-logical" : "AP")));
         out.println("CPUID      : " + getCPUID());
         out.println("fxSave/Res : " + fxSaveCounter + "/" + fxRestoreCounter
-                + "/" + deviceNaCounter);
-        out.println("Local APIC : " + ((localAPIC == null) ? "not present" : ((localAPIC.isEnabled() ? "enabled" : "disabled") + NumberUtils.hex(localAPIC.getErrors(), 4))));
+            + "/" + deviceNaCounter);
+        out.println("Local APIC : " + ((localAPIC == null) ? "not present" :
+            ((localAPIC.isEnabled() ? "enabled" : "disabled") + NumberUtils.hex(localAPIC.getErrors(), 4))));
         out.println("TimeSliceBC: " + (sendTimeSliceInterrupt.isZero() ? "disabled" : "enabled"));
         out.println("TSI        : " + MagicUtils.toString(getTSIAddress().loadWord()));
     }
-    
+
     /**
      * Broadcast a timeslice interrupt to all other processors.
-     *
      */
     @LoadStatics
     @KernelSpace
@@ -377,6 +411,7 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /**
      * Is this processor the boot processor?
+     *
      * @return the bootProcessor
      */
     public final boolean isBootProcessor() {
