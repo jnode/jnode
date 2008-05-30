@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Hashtable;
-
 import nanoxml.XMLElement;
 
 /**
@@ -32,10 +31,10 @@ import nanoxml.XMLElement;
  */
 public class NanoXmlTest {
 
-	public static void main(String[] args) 
-	throws IOException {
-		XMLElement xml = new XMLElement(new Hashtable(), true, false);
-		xml.parseFromReader(new FileReader(args[0]));
-		System.out.println(xml);
-	}
+    public static void main(String[] args)
+        throws IOException {
+        XMLElement xml = new XMLElement(new Hashtable(), true, false);
+        xml.parseFromReader(new FileReader(args[0]));
+        System.out.println(xml);
+    }
 }

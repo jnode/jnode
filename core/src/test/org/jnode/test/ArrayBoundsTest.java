@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -26,30 +26,30 @@ package org.jnode.test;
  */
 public class ArrayBoundsTest {
 
-	public static void main(String[] args) {
-		test(args, -1, false);
-		test(args, args.length, false);
-		if (args.length > 0) {
-			test(args, 0, true);
-			test(args, args.length-1, true);
-		}
-	}
-	
-	private static void test(String[] arr, int index, boolean ok) {
-		try {
-			System.out.println(arr[index]);
-			if (!ok) {
-				throw new RuntimeException("Test should fail at index " + index);
-			} else {
-				System.out.println("Ok");
-			}
-		} catch (ArrayIndexOutOfBoundsException ex) {
-			if (ok) {
-				throw ex;
-			} else {
-				System.out.println("Ok: " + ex.getMessage());
-			}
-		}
-	}
-	
+    public static void main(String[] args) {
+        test(args, -1, false);
+        test(args, args.length, false);
+        if (args.length > 0) {
+            test(args, 0, true);
+            test(args, args.length - 1, true);
+        }
+    }
+
+    private static void test(String[] arr, int index, boolean ok) {
+        try {
+            System.out.println(arr[index]);
+            if (!ok) {
+                throw new RuntimeException("Test should fail at index " + index);
+            } else {
+                System.out.println("Ok");
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            if (ok) {
+                throw ex;
+            } else {
+                System.out.println("Ok: " + ex.getMessage());
+            }
+        }
+    }
+
 }

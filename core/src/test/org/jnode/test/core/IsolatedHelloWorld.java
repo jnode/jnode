@@ -5,6 +5,7 @@ package org.jnode.test.core;
 
 /**
  * Test class started by IsolateTest is a new Isolate.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class IsolatedHelloWorld {

@@ -18,19 +18,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.bugs;
 
-public class bug824457
-{
+public class bug824457 {
 
-	public static void main (String args[])
-	{
-		String s = "test";
+    public static void main(String args[]) {
+        String s = "test";
 
-		System.out.println(s.intern() == "test");
-		System.out.println(s.intern() == args[0]);
-	}
+        System.out.println(s.intern() == "test");
+        System.out.println(s.intern() == args[0]);
+    }
 
 }
 

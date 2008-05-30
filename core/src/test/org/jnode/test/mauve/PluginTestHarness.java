@@ -23,7 +23,6 @@ package org.jnode.test.mauve;
 import gnu.testlet.ResourceNotFoundException;
 import gnu.testlet.TestHarness;
 import gnu.testlet.Testlet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +30,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
@@ -58,8 +56,8 @@ public class PluginTestHarness extends TestHarness {
     public void check(boolean result) {
         if (!result || verbose) {
             String message = (result ? "PASS" : "FAIL") + ": " + className
-                    + ((last_check == null) ? "" : (": " + last_check))
-                    + " (number " + count + ")";
+                + ((last_check == null) ? "" : (": " + last_check))
+                + " (number " + count + ")";
             System.out.println(message);
         }
         if (result) {
@@ -71,23 +69,23 @@ public class PluginTestHarness extends TestHarness {
     }
 
     public Reader getResourceReader(String name)
-            throws ResourceNotFoundException {
+        throws ResourceNotFoundException {
         return new BufferedReader(
-                new InputStreamReader(getResourceStream(name)));
+            new InputStreamReader(getResourceStream(name)));
     }
 
     public InputStream getResourceStream(String name)
-            throws ResourceNotFoundException {
+        throws ResourceNotFoundException {
         // The following code assumes File.separator is a single character.
         if (File.separator.length() > 1)
             throw new Error("File.separator length is greater than 1");
         String realName = name.replace('#', File.separator.charAt(0));
         try {
             return new FileInputStream(getSourceDirectory() + File.separator
-                    + realName);
+                + realName);
         } catch (FileNotFoundException ex) {
             throw new ResourceNotFoundException(ex.getLocalizedMessage() + ": "
-                    + getSourceDirectory() + File.separator + realName);
+                + getSourceDirectory() + File.separator + realName);
         }
     }
 
@@ -97,7 +95,7 @@ public class PluginTestHarness extends TestHarness {
 
     /**
      * Provide a directory name for writing temporary files.
-     * 
+     *
      * @return The temporary directory name.
      */
 
@@ -113,8 +111,8 @@ public class PluginTestHarness extends TestHarness {
         File f = new File(getSourceDirectory() + File.separator + realName);
         if (!f.exists()) {
             throw new ResourceNotFoundException(
-                    "cannot find mauve resource file" + ": "
-                            + getSourceDirectory() + File.separator + realName);
+                "cannot find mauve resource file" + ": "
+                    + getSourceDirectory() + File.separator + realName);
         }
         return f;
     }
@@ -215,11 +213,11 @@ public class PluginTestHarness extends TestHarness {
                                 if (Testlet.class.isAssignableFrom(k)) {
                                     if (!quiet) {
                                         System.out.println("Running "
-                                                + className);
+                                            + className);
                                     }
                                     Testlet t = (Testlet) k.newInstance();
                                     PluginTestHarness h = new PluginTestHarness(
-                                            t, verbose);
+                                        t, verbose);
                                     t.test(h);
                                     passed += h.passed;
                                     failed += h.failed;
@@ -234,7 +232,7 @@ public class PluginTestHarness extends TestHarness {
                         }
                     }
                     System.out.println("Tests passed: " + passed + ", failed: "
-                            + failed);
+                        + failed);
                 } else {
                     System.out.println("Plugin has no PluginClassLoader");
                 }

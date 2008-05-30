@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import java.io.File;
@@ -28,7 +28,6 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Map;
-
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
@@ -40,8 +39,14 @@ import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.compiler.ir.CodeGenerator;
+import org.jnode.vm.compiler.ir.IRBasicBlock;
+import org.jnode.vm.compiler.ir.IRControlFlowGraph;
+import org.jnode.vm.compiler.ir.IRGenerator;
+import org.jnode.vm.compiler.ir.LinearScanAllocator;
+import org.jnode.vm.compiler.ir.LiveRange;
+import org.jnode.vm.compiler.ir.Variable;
 import org.jnode.vm.compiler.ir.quad.Quad;
-import org.jnode.vm.compiler.ir.*;
 import org.jnode.vm.x86.VmX86Architecture32;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.l2.GenericX86CodeGenerator;
@@ -52,7 +57,7 @@ import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
  * @author Levente S\u00e1ntha
  */
 public class IRTest {
-	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
+    public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
 //        System.in.read();
         X86CpuID cpuId = X86CpuID.createID("p5");
         boolean binary = false;
@@ -60,84 +65,85 @@ public class IRTest {
         String className = "org.jnode.vm.compiler.ir.PrimitiveTest";
         if (args.length > 0) {
             String arg0 = args[0];
-            if("-b".equals(arg0)){
+            if ("-b".equals(arg0)) {
                 binary = true;
-                if(args.length > 1){
+                if (args.length > 1) {
                     className = args[1];
                 }
-            }else{
+            } else {
                 className = arg0;
             }
         }
 
-        if(binary){
+        if (binary) {
             X86BinaryAssembler os = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, 0);
             generateCode(os, className);
             FileOutputStream fos = new FileOutputStream("test.bin");
             os.writeTo(fos);
             fos.close();
-        }else{
-            X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.CODE32);
+        } else {
+            X86TextAssembler tos =
+                new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.CODE32);
             generateCode(tos, className);
             tos.flush();
         }
 
-
-
 /*
-		BytecodeViewer bv = new BytecodeViewer();
-		BytecodeParser.parse(code, bv);
+        BytecodeViewer bv = new BytecodeViewer();
+        BytecodeParser.parse(code, bv);
 
-		// System.out.println(cfg.toString());
-		// System.out.println();
+        // System.out.println(cfg.toString());
+        // System.out.println();
 
-		boolean printDeadCode = false;
-		boolean printDetail = false;
-		IRBasicBlock currentBlock = null;
-		for (int i=0; i<n; i+=1) {
-			Quad quad = (Quad) quads.get(i);
-			if (currentBlock != quad.getBasicBlock()) {
-				currentBlock = quad.getBasicBlock();
-				System.out.println();
-				System.out.println(currentBlock);
-			}
-			if (printDeadCode && quad.isDeadCode()) {
-				if (printDetail) {
-					printQuadDetail(quad);
-				}
-				System.out.println(quad);
-			}
-			if (!quad.isDeadCode()) {
-				if (printDetail) {
-					printQuadDetail(quad);
-				}
-				System.out.println(quad);
-			}
-		}
+        boolean printDeadCode = false;
+        boolean printDetail = false;
+        IRBasicBlock currentBlock = null;
+        for (int i=0; i<n; i+=1) {
+            Quad quad = (Quad) quads.get(i);
+            if (currentBlock != quad.getBasicBlock()) {
+                currentBlock = quad.getBasicBlock();
+                System.out.println();
+                System.out.println(currentBlock);
+            }
+            if (printDeadCode && quad.isDeadCode()) {
+                if (printDetail) {
+                    printQuadDetail(quad);
+                }
+                System.out.println(quad);
+            }
+            if (!quad.isDeadCode()) {
+                if (printDetail) {
+                    printQuadDetail(quad);
+                }
+                System.out.println(quad);
+            }
+        }
 
-		System.out.println();
-		System.out.println("Live ranges:");
-		n = lv.size();
-		for (int i=0; i<n; i+=1) {
-			System.out.println(liveRanges[i]);
-		}
+        System.out.println();
+        System.out.println("Live ranges:");
+        n = lv.size();
+        for (int i=0; i<n; i+=1) {
+            System.out.println(liveRanges[i]);
+        }
 */
-	}
+    }
 
-    private static void generateCode(X86Assembler os, String className) throws MalformedURLException, ClassNotFoundException {
-		//VmByteCode code = loadByteCode(className, "discriminant");
-		//VmByteCode code = loadByteCode(className, "arithOptIntx");
-		//VmByteCode code = loadByteCode(className, "simpleWhile");
-		//VmByteCode code = loadByteCode(className, "terniary2");
-		VmByteCode code = loadByteCode(className, "trivial");
-		//VmByteCode code = loadByteCode(className, "appel");
+    private static void generateCode(X86Assembler os, String className)
+        throws MalformedURLException, ClassNotFoundException {
+        //VmByteCode code = loadByteCode(className, "discriminant");
+        //VmByteCode code = loadByteCode(className, "arithOptIntx");
+        //VmByteCode code = loadByteCode(className, "simpleWhile");
+        //VmByteCode code = loadByteCode(className, "terniary2");
+        VmByteCode code = loadByteCode(className, "trivial");
+        //VmByteCode code = loadByteCode(className, "appel");
 
-		X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
-        
+        X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
+
         generateCode(os, code, x86cg);
     }
 
-    private static <T extends X86Register> void generateCode(X86Assembler os, VmByteCode code, CodeGenerator<T> cg) throws MalformedURLException, ClassNotFoundException {
+    private static <T extends X86Register> void generateCode(X86Assembler os, VmByteCode code, CodeGenerator<T> cg)
+        throws MalformedURLException, ClassNotFoundException {
         IRControlFlowGraph<T> cfg = new IRControlFlowGraph<T>(code);
 
         //BytecodeViewer bv = new BytecodeViewer();
@@ -155,7 +161,7 @@ public class IRTest {
 
         cfg.deconstrucSSA();
         cfg.fixupAddresses();
-        
+
         final Map<Variable, Variable<T>> liveVariables = new BootableHashMap<Variable, Variable<T>>();
 
         for (IRBasicBlock<T> b : cfg) {
@@ -186,7 +192,7 @@ public class IRTest {
             System.out.println(range);
         }
 
-        GenericX86CodeGenerator<T> x86cg = (GenericX86CodeGenerator<T>)cg;
+        GenericX86CodeGenerator<T> x86cg = (GenericX86CodeGenerator<T>) cg;
         x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
         x86cg.setSpilledVariables(lsa.getSpilledVariables());
         x86cg.emitHeader();
@@ -204,7 +210,6 @@ public class IRTest {
         // 1. Fix method argument location, allocator leaves it null and breaks
         // 2. Many necessary operations are not implemented in the code generator
         // 3. Do something about unused phi nodes, they just waste space right now
-
 
 //        BootableArrayList quads = irg.getQuadList();
 //        int n = quads.size();
@@ -244,34 +249,34 @@ public class IRTest {
     }
 
     private static VmByteCode loadByteCode(String className, String methodName)
-		throws MalformedURLException, ClassNotFoundException {
-		VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture32());
-		VmType<?> type = vmc.loadClass(className, true);
-		VmMethod arithMethod = null;
-		int nMethods = type.getNoDeclaredMethods();
-		for (int i=0; i<nMethods; i+=1) {
-			VmMethod method = type.getDeclaredMethod(i);
-			if (methodName.equals(method.getName())) {
-				arithMethod = method;
-				break;
-			}
-		}
-		VmByteCode code = arithMethod.getBytecode();
-		return code;
-	}
+        throws MalformedURLException, ClassNotFoundException {
+        VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture32());
+        VmType<?> type = vmc.loadClass(className, true);
+        VmMethod arithMethod = null;
+        int nMethods = type.getNoDeclaredMethods();
+        for (int i = 0; i < nMethods; i += 1) {
+            VmMethod method = type.getDeclaredMethod(i);
+            if (methodName.equals(method.getName())) {
+                arithMethod = method;
+                break;
+            }
+        }
+        VmByteCode code = arithMethod.getBytecode();
+        return code;
+    }
 
-	public static <T> void printQuadDetail(Quad<T> quad) {
-		System.out.print(quad.getBasicBlock());
-		System.out.print(" ");
-		Variable[] vars = quad.getBasicBlock().getVariables();
-		System.out.print("[");
-		for (int j=0; j<vars.length; j+=1) {
-			System.out.print(vars[j]);
-			System.out.print(",");
-		}
-		System.out.print("] ");
-		if (quad.isDeadCode()) {
-			System.out.print("(dead) ");
-		}
-	}
+    public static <T> void printQuadDetail(Quad<T> quad) {
+        System.out.print(quad.getBasicBlock());
+        System.out.print(" ");
+        Variable[] vars = quad.getBasicBlock().getVariables();
+        System.out.print("[");
+        for (int j = 0; j < vars.length; j += 1) {
+            System.out.print(vars[j]);
+            System.out.print(",");
+        }
+        System.out.print("] ");
+        if (quad.isDeadCode()) {
+            System.out.print("(dead) ");
+        }
+    }
 }

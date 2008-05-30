@@ -18,7 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package org.jnode.test.mauve;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -32,8 +39,8 @@ public class HTMLGenerator {
     /**
      * Creates an HTML report in the specified directory.
      *
-     * @param run  the Mauve run results.
-     * @param rootDirectory  the root directory.
+     * @param run           the Mauve run results.
+     * @param rootDirectory the root directory.
      */
     public static void createReport(RunResult run, File rootDirectory) throws IOException {
         // write basic HTML with info about package
@@ -49,7 +56,8 @@ public class HTMLGenerator {
         int checkCount = run.getCheckCount();
         int passed = run.getCheckCount(true);
         int failed = checkCount - passed;
-        writer.println("Run Date: " + DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date()) + "<br>");
+        writer.println("Run Date: " +
+            DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date()) + "<br>");
         writer.println("Passed: " + passed + "<br>");
         writer.println("Failed: " + failed + "<p>");
 
@@ -108,32 +116,33 @@ public class HTMLGenerator {
             String packageName = packageResult.getName().replace('.', '/');
             String name;
             System.out.println("Generating " + packageName);
-            if(top != null && packageName.startsWith(top))
-                name = "&nbsp;&nbsp;&nbsp;+&nbsp;"+ packageName.substring(top.length()+1);
+            if (top != null && packageName.startsWith(top))
+                name = "&nbsp;&nbsp;&nbsp;+&nbsp;" + packageName.substring(top.length() + 1);
             else {
                 top = packageName;
                 name = packageName;
             }
             // (1) write the summary line for the class HTML file
             writer.println("<tr>");
-            writer.println("<td bgcolor=\"white\"><a href=\"" + packageName + "/package_index.html\"" + ">" + name + "</a></td>");
+            writer.println(
+                "<td bgcolor=\"white\"><a href=\"" + packageName + "/package_index.html\"" + ">" + name + "</a></td>");
             writer.println("<td bgcolor=\"white\">" + packageResult.getCheckCount(true) + "</td>");
             writer.println("<td bgcolor=\"white\">" + packageResult.getCheckCount(false) + "</td>");
             writer.println("<td bgcolor=\"white\">" + packageResult.getCheckCount() + "</td>");
             writer.println("</tr>");
             // (2) generate an HTML page for the test and subfiles
             //     for the tests
-	    try {
-		HTMLGenerator.createPackageReport(packageResult, rootDirectory);
-	    } catch (Exception e) {
-		String temp = packageResult.getName().replace('.', '/');
-		System.err.println("Couldn't create package report for " + temp);
-		File tempDir = new File(rootDirectory, packageName);
-		tempDir.mkdirs();
-		File tempFile = new File(tempDir, "package_index.html");
-		tempFile.createNewFile();
-	    }
-	    System.gc();
+            try {
+                HTMLGenerator.createPackageReport(packageResult, rootDirectory);
+            } catch (Exception e) {
+                String temp = packageResult.getName().replace('.', '/');
+                System.err.println("Couldn't create package report for " + temp);
+                File tempDir = new File(rootDirectory, packageName);
+                tempDir.mkdirs();
+                File tempFile = new File(tempDir, "package_index.html");
+                tempFile.createNewFile();
+            }
+            System.gc();
         }
         writer.println("</table>");
         writer.println("</td>");
@@ -142,7 +151,7 @@ public class HTMLGenerator {
         writer.println("<p>");
         Iterator missing = run.getMissingTestsIterator();
         Iterator failures = run.getFaultyTestsIterator();
-        if(missing.hasNext() || failures.hasNext()) {
+        if (missing.hasNext() || failures.hasNext()) {
             writer.println("<h2>Unrunnable tests:</h2>");
 
             writer.println("<table BORDER=\"0\" width=\"100%\" CELLPADDING=\"0\">");
@@ -153,13 +162,13 @@ public class HTMLGenerator {
             writer.println("<td bgcolor=\"lightGray\">name:</td>");
             writer.println("<td bgcolor=\"lightGray\">problem:</td>");
             writer.println("</tr>");
-            while(missing.hasNext())
-                writer.println("<tr><td bgcolor=\"white\">"+ (String) missing.next()+
-                        "</td><td bgcolor=\"white\">Class not found</td></tr>");
-            while(failures.hasNext()) {
+            while (missing.hasNext())
+                writer.println("<tr><td bgcolor=\"white\">" + (String) missing.next() +
+                    "</td><td bgcolor=\"white\">Class not found</td></tr>");
+            while (failures.hasNext()) {
                 String[] fail = (String[]) failures.next();
-                writer.println("<tr><td bgcolor=\"white\">"+ fail[0] +"</td><td bgcolor=\"white\">"+
-                        fail[1] +"</td></tr>");
+                writer.println("<tr><td bgcolor=\"white\">" + fail[0] + "</td><td bgcolor=\"white\">" +
+                    fail[1] + "</td></tr>");
             }
             writer.println("</table>");
             writer.println("</td>");
@@ -175,9 +184,9 @@ public class HTMLGenerator {
     /**
      * Writes a row in a table for a pair of strings.
      *
-     * @param property  the property key.
-     * @param value  the property value.
-     * @param writer  the output stream.
+     * @param property the property key.
+     * @param value    the property value.
+     * @param writer   the output stream.
      */
     private static void writePropertyRow(String property, String value, PrintWriter writer) {
         writer.println("<tr>");
@@ -189,8 +198,7 @@ public class HTMLGenerator {
     /**
      * Returns the number of directory levels in the specified package name.
      *
-     * @param name  the name.
-     *
+     * @param name the name.
      * @return The number of directory levels.
      */
     private static int countLevels(String name) {
@@ -205,8 +213,8 @@ public class HTMLGenerator {
      * Creates an HTML page that summaries a package, and processes all the classes within
      * the package.
      *
-     * @param packageResult  the package result.
-     * @param rootDirectory  the root directory.
+     * @param packageResult the package result.
+     * @param rootDirectory the root directory.
      */
     public static void createPackageReport(PackageResult packageResult, File rootDirectory) throws IOException {
         // create directory for package
@@ -249,7 +257,8 @@ public class HTMLGenerator {
             ClassResult classResult = (ClassResult) iterator.next();
             // (1) write the summary line for the class HTML file
             writer.println("<tr>");
-            writer.println("<td bgcolor=\"white\"><a href=\"" + classResult.getName() + "/class_index.html\"" + ">" + classResult.getName() + "</a></td>");
+            writer.println("<td bgcolor=\"white\"><a href=\"" + classResult.getName() + "/class_index.html\"" + ">" +
+                classResult.getName() + "</a></td>");
             writer.println("<td bgcolor=\"white\">" + classResult.getCheckCount(true) + "</td>");
             writer.println("<td bgcolor=\"white\">" + classResult.getCheckCount(false) + "</td>");
             writer.println("<td bgcolor=\"white\">" + classResult.getCheckCount() + "</td>");
@@ -272,11 +281,12 @@ public class HTMLGenerator {
      * Creates an HTML page summarising the results for a class, and processes all the tests for
      * the class.
      *
-     * @param classResult  the class results.
-     * @param packageName  the package name.
-     * @param packageDirectory  the package directory.
+     * @param classResult      the class results.
+     * @param packageName      the package name.
+     * @param packageDirectory the package directory.
      */
-    public static void createClassReport(ClassResult classResult, String packageName, File packageDirectory) throws IOException {
+    public static void createClassReport(ClassResult classResult, String packageName, File packageDirectory)
+        throws IOException {
         // create directory for class
         File classDirectory = new File(packageDirectory, classResult.getName());
         classDirectory.mkdirs();
@@ -288,7 +298,8 @@ public class HTMLGenerator {
         writer.println("<HTML>");
         writer.println("<HEAD><TITLE>Class Summary: " + packageName + "." + classResult.getName() + "</TITLE></HEAD>");
         writer.println("<BODY>");
-        writer.println("<h2>Class: " + "<a href=\"../package_index.html\">" + packageName +"</a>." + classResult.getName() + "</h2>");
+        writer.println("<h2>Class: " + "<a href=\"../package_index.html\">" + packageName + "</a>." +
+            classResult.getName() + "</h2>");
         int checkCount = classResult.getCheckCount();
         int passed = classResult.getCheckCount(true);
         int failed = checkCount - passed;
@@ -311,7 +322,8 @@ public class HTMLGenerator {
             TestResult testResult = (TestResult) iterator.next();
             // (1) write the summary line for the class HTML file
             writer.println("<tr>");
-            writer.println("<td bgcolor=\"white\"><a href=\"" + testResult.getName() + ".html\"" + ">" + testResult.getName() + "</a></td>");
+            writer.println("<td bgcolor=\"white\"><a href=\"" + testResult.getName() + ".html\"" + ">" +
+                testResult.getName() + "</a></td>");
             writer.println("<td bgcolor=\"white\">" + testResult.getCheckCount(true) + "</td>");
             writer.println("<td bgcolor=\"white\">" + testResult.getCheckCount(false) + "</td>");
             writer.println("<td bgcolor=\"white\">" + testResult.getCheckCount() + "</td>");
@@ -333,11 +345,12 @@ public class HTMLGenerator {
     /**
      * Creates an HTML page that summarises a test.
      *
-     * @param testResult  the test result.
-     * @param className  the class name.
-     * @param classDirectory  the class directory.
+     * @param testResult     the test result.
+     * @param className      the class name.
+     * @param classDirectory the class directory.
      */
-    public static void createTestReport(TestResult testResult, String className, File classDirectory) throws IOException {
+    public static void createTestReport(TestResult testResult, String className, File classDirectory)
+        throws IOException {
 
         // write basic HTML for test
         File testFile = new File(classDirectory, testResult.getName() + ".html");
@@ -347,7 +360,8 @@ public class HTMLGenerator {
         writer.println("<HEAD><TITLE>Test Summary: " + className + "." + testResult.getName() + "</TITLE>\n");
         writer.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></HEAD>");
         writer.println("<BODY>");
-        writer.println("<h2>Test: <a href=\"class_index.html\">" + className + "</a>." + testResult.getName() + "</h2>");
+        writer
+            .println("<h2>Test: <a href=\"class_index.html\">" + className + "</a>." + testResult.getName() + "</h2>");
         int checkCount = testResult.getCheckCount();
         int passed = testResult.getCheckCount(true);
         int failed = checkCount - passed;
@@ -371,18 +385,18 @@ public class HTMLGenerator {
             CheckResult check = (CheckResult) iterator.next();
             // write a summary line (ID, pass/fail, actual, expected);
             writer.println("<tr><td bgcolor=\"white\">" + check.getNumber() +
-                    "</td><td bgcolor=\"white\">" + check.getCheckPoint() +
-                    "</td><td bgcolor=\"" + (check.getPassed() ? "white" : "red") + "\">" +
-                    check.getPassed() + "</td><td bgcolor=\"white\">" + check.getExpected() +
-                    "</td><td bgcolor=\"white\">" + check.getActual() + "</td>");
+                "</td><td bgcolor=\"white\">" + check.getCheckPoint() +
+                "</td><td bgcolor=\"" + (check.getPassed() ? "white" : "red") + "\">" +
+                check.getPassed() + "</td><td bgcolor=\"white\">" + check.getExpected() +
+                "</td><td bgcolor=\"white\">" + check.getActual() + "</td>");
             if (!check.getPassed()) {
-		try {
-		    createLogReport(check, className, testResult.getName(), classDirectory);
-		} catch (Exception e) {
-		    System.err.println("Couldn't write report for class " + className);
-		    File temp = new File(classDirectory, testResult.getName() + "_log.html");
-		    temp.createNewFile();
-		}	    
+                try {
+                    createLogReport(check, className, testResult.getName(), classDirectory);
+                } catch (Exception e) {
+                    System.err.println("Couldn't write report for class " + className);
+                    File temp = new File(classDirectory, testResult.getName() + "_log.html");
+                    temp.createNewFile();
+                }
             }
             writer.println("</td>");
             writer.println("</tr>");
@@ -391,9 +405,9 @@ public class HTMLGenerator {
         writer.println("</td>");
         writer.println("</tr>");
         writer.println("</table>");
-        if(testResult.isFailed()) {
+        if (testResult.isFailed()) {
             writer.println("<h2>Run aborted due to exception</h2>");
-            writer.println("<pre>"+ testResult.getFailedMessage() +"</pre>");
+            writer.println("<pre>" + testResult.getFailedMessage() + "</pre>");
         }
         writer.println("</BODY>");
         writer.println("</HTML>");
@@ -403,13 +417,14 @@ public class HTMLGenerator {
     /**
      * Creates an HTML page that summarises the log for a check.
      *
-     * @param checkResult  the test result.
-     * @param className  the class name.
-     * @param testName  the test name.
-     * @param classDirectory  the class directory.
+     * @param checkResult    the test result.
+     * @param className      the class name.
+     * @param testName       the test name.
+     * @param classDirectory the class directory.
      */
-    public static void createLogReport(CheckResult checkResult, String className, String testName, File classDirectory) throws IOException {
-	
+    public static void createLogReport(CheckResult checkResult, String className, String testName, File classDirectory)
+        throws IOException {
+
         // write basic HTML for test
         File logFile = new File(classDirectory, testName + "_log.html");
         OutputStream out = new BufferedOutputStream(new FileOutputStream(logFile));

@@ -25,29 +25,41 @@ package org.jnode.test.mauve;
  */
 public class CheckResult {
 
-    /** The check number. */
+    /**
+     * The check number.
+     */
     private int number;
 
-    /** The check point string. */
+    /**
+     * The check point string.
+     */
     private String checkPoint;
 
-    /** A flag that indicates whether or not the check passed. */
+    /**
+     * A flag that indicates whether or not the check passed.
+     */
     private boolean passed;
 
-    /** The expected result (converted to a string). */
+    /**
+     * The expected result (converted to a string).
+     */
     private String expected;
 
-    /** The actual result (converted to a string). */
+    /**
+     * The actual result (converted to a string).
+     */
     private String actual;
 
-    /** The log output for the check. */
+    /**
+     * The log output for the check.
+     */
     private StringBuffer log;
 
     /**
      * Creates a new check.
      *
-     * @param number  the check number.
-     * @param passed  a flag that indicates whether or not the check passed.
+     * @param number the check number.
+     * @param passed a flag that indicates whether or not the check passed.
      */
     CheckResult(int number, boolean passed) {
         this.number = number;
@@ -66,7 +78,7 @@ public class CheckResult {
     /**
      * Sets the check number.
      *
-     * @param number  the number.
+     * @param number the number.
      */
     void setNumber(int number) {
         this.number = number;
@@ -84,7 +96,7 @@ public class CheckResult {
     /**
      * Sets the flag that indicates whether or not the check passed.
      *
-     * @param passed  the flag.
+     * @param passed the flag.
      */
     void setPassed(boolean passed) {
         this.passed = passed;
@@ -102,7 +114,7 @@ public class CheckResult {
     /**
      * Sets the check point string.
      *
-     * @param checkPoint  the check point string.
+     * @param checkPoint the check point string.
      */
     void setCheckPoint(String checkPoint) {
         this.checkPoint = checkPoint;
@@ -114,7 +126,7 @@ public class CheckResult {
      * @return The actual value.
      */
     public String getActual() {
-        if(actual == null)
+        if (actual == null)
             return "n/a";
         return actual;
     }
@@ -122,7 +134,7 @@ public class CheckResult {
     /**
      * Sets the actual value.
      *
-     * @param actual  the actual value.
+     * @param actual the actual value.
      */
     void setActual(String actual) {
         this.actual = actual;
@@ -134,7 +146,7 @@ public class CheckResult {
      * @return The expected value.
      */
     public String getExpected() {
-        if(expected == null)
+        if (expected == null)
             return "n/a";
         return expected;
     }
@@ -142,7 +154,7 @@ public class CheckResult {
     /**
      * Sets the expected value.
      *
-     * @param expected  the expected value.
+     * @param expected the expected value.
      */
     void setExpected(String expected) {
         this.expected = expected;
@@ -154,7 +166,7 @@ public class CheckResult {
      * @return The log.
      */
     public String getLog() {
-        if(log == null)
+        if (log == null)
             return "";
         return log.toString();
     }
@@ -162,10 +174,10 @@ public class CheckResult {
     /**
      * Appends the specified message to the log.
      *
-     * @param message  the message to append.
+     * @param message the message to append.
      */
     void appendToLog(String message) {
-        if(log == null)
+        if (log == null)
             log = new StringBuffer();
         log.append(message);
     }

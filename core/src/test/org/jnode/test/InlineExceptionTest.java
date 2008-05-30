@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 public class InlineExceptionTest {
@@ -35,13 +35,13 @@ public class InlineExceptionTest {
     }
 
     public static void f1() {
-        f2();   
+        f2();
     }
-    
+
     public static void f2() {
         f3();
     }
-    
+
     public static void f3() {
         throw new RuntimeException();
     }

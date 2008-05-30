@@ -18,20 +18,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.bugs;
-import  java.util.Date;
 
-public class bug778001
-{
+import java.util.Date;
 
-	public static void main (String args[])
-	{
+public class bug778001 {
 
-		Date d = new Date();
+    public static void main(String args[]) {
 
-		System.out.println(d);
-	}
+        Date d = new Date();
+
+        System.out.println(d);
+    }
 
 }
 

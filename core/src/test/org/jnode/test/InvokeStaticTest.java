@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -26,18 +26,18 @@ package org.jnode.test;
  */
 public class InvokeStaticTest {
 
-	public static void main(String[] args) {
-		final long start = System.currentTimeMillis();
-		int v = 0;
-		for (int i = 0; i < 100000; i++) {
-			v = foo(v);
-		}
-		final long end = System.currentTimeMillis();
-		System.out.println("Test returned " + v + " in " + (end - start) + "ms");
+    public static void main(String[] args) {
+        final long start = System.currentTimeMillis();
+        int v = 0;
+        for (int i = 0; i < 100000; i++) {
+            v = foo(v);
+        }
+        final long end = System.currentTimeMillis();
+        System.out.println("Test returned " + v + " in " + (end - start) + "ms");
 
-	}
+    }
 
-	public static int foo(int v) {
-		return v + 1;
-	}
+    public static int foo(int v) {
+        return v + 1;
+    }
 }

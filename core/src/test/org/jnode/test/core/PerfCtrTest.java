@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.core;
 
 import org.jnode.util.NumberUtils;
@@ -37,7 +37,7 @@ public class PerfCtrTest {
     public static void main(String[] args) {
 
         PerformanceCounters perfCtr = VmProcessor.current()
-                .getPerformanceCounters();
+            .getPerformanceCounters();
         if (perfCtr.getMaximumCounters() == 0) {
             System.out.println("No counters available");
             return;
@@ -51,7 +51,7 @@ public class PerfCtrTest {
             System.out.println();
         } else {
             PerformanceCounterEvent[] events = new PerformanceCounterEvent[perfCtr
-                    .getMaximumCounters()];
+                .getMaximumCounters()];
             int i = 0;
             for (String arg : args) {
                 if (i >= events.length) {
@@ -85,7 +85,7 @@ public class PerfCtrTest {
             perfCtr.stopCounters();
             for (i = 0; i < events.length; i++) {
                 System.out.println(events[i].getId() + " 0x"
-                        + NumberUtils.hex(counters[i]));
+                    + NumberUtils.hex(counters[i]));
             }
         }
     }

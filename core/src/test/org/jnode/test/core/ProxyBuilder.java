@@ -4,8 +4,6 @@
 package org.jnode.test.core;
 
 import gnu.java.lang.reflect.TypeSignature;
-
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -20,12 +18,12 @@ public class ProxyBuilder {
     /**
      * Returns the proxy {@link Class} for the given ClassLoader and array of
      * interfaces, dynamically generating it if necessary.
-     * 
+     * <p/>
      * <p>
      * There are several restrictions on this method, the violation of which
      * will result in an IllegalArgumentException or NullPointerException:
      * </p>
-     * 
+     * <p/>
      * <ul>
      * <li>All objects in `interfaces' must represent distinct interfaces.
      * Classes, primitive types, null, and duplicates are forbidden.</li>
@@ -42,28 +40,24 @@ public class ProxyBuilder {
      * throws clauses for each method that is overridden.</li>
      * <li>VM constraints limit the number of interfaces a proxy class may
      * directly implement (however, the indirect inheritance of
-     * {@link Serializable} does not count against this limit). Even though most
+     * {@link java.io.Serializable} does not count against this limit). Even though most
      * VMs can theoretically have 65535 superinterfaces for a class, the actual
      * limit is smaller because a class's constant pool is limited to 65535
      * entries, and not all entries can be interfaces.</li>
      * </ul>
-     * 
+     * <p/>
      * <p>
      * Note that different orders of interfaces produce distinct classes.
      * </p>
-     * 
-     * @param loader
-     *            the class loader to define the proxy class in; null implies
-     *            the bootstrap class loader
-     * @param interfaces
-     *            the array of interfaces the proxy class implements, may be
-     *            empty, but not null
+     *
+     * @param loader     the class loader to define the proxy class in; null implies
+     *                   the bootstrap class loader
+     * @param interfaces the array of interfaces the proxy class implements, may be
+     *                   empty, but not null
      * @return the Class object of the proxy class
-     * @throws IllegalArgumentException
-     *             if the constraints above were violated, except for problems
-     *             with null
-     * @throws NullPointerException
-     *             if `interfaces' is null or contains a null entry
+     * @throws IllegalArgumentException if the constraints above were violated, except for problems
+     *                                  with null
+     * @throws NullPointerException     if `interfaces' is null or contains a null entry
      */
     // synchronized so that we aren't trying to build the same class
     // simultaneously in two threads
@@ -77,7 +71,7 @@ public class ProxyBuilder {
     /**
      * Helper class for mapping unique ClassLoader and interface combinations to
      * proxy classes.
-     * 
+     *
      * @author Eric Blake (ebb9@email.byu.edu)
      */
     private static final class ProxyType {
@@ -93,12 +87,10 @@ public class ProxyBuilder {
 
         /**
          * Construct the helper object.
-         * 
-         * @param loader
-         *            the class loader to define the proxy class in; null
-         *            implies the bootstrap class loader
-         * @param interfaces
-         *            an array of interfaces
+         *
+         * @param loader     the class loader to define the proxy class in; null
+         *                   implies the bootstrap class loader
+         * @param interfaces an array of interfaces
          */
         ProxyType(ClassLoader loader, Class[] interfaces) {
             this.loader = loader;
@@ -107,7 +99,7 @@ public class ProxyBuilder {
 
         /**
          * Calculates the hash code.
-         * 
+         *
          * @return a combination of the classloader and interfaces hashcodes.
          */
         public int hashCode() {
@@ -119,15 +111,14 @@ public class ProxyBuilder {
 
         /**
          * Calculates equality.
-         * 
-         * @param other
-         *            object to compare to
+         *
+         * @param other object to compare to
          * @return true if it is a ProxyType with same data
          */
         public boolean equals(Object other) {
             ProxyType pt = (ProxyType) other;
             if (loader != pt.loader
-                    || interfaces.length != pt.interfaces.length)
+                || interfaces.length != pt.interfaces.length)
                 return false;
             for (int i = 0; i < interfaces.length; i++)
                 if (interfaces[i] != pt.interfaces[i])
@@ -140,29 +131,31 @@ public class ProxyBuilder {
      * Helper class which allows hashing of a method name and signature without
      * worrying about return type, declaring class, or throws clause, and which
      * reduces the maximally common throws clause between two methods
-     * 
+     *
      * @author Eric Blake (ebb9@email.byu.edu)
      */
     private static final class ProxySignature {
         /**
          * The core signatures which all Proxy instances handle.
          */
-        static final HashMap<ProxySignature, ProxySignature> coreMethods = new HashMap<ProxySignature, ProxySignature>();
+        static final HashMap<ProxySignature, ProxySignature> coreMethods =
+            new HashMap<ProxySignature, ProxySignature>();
+
         static {
             try {
                 ProxySignature sig = new ProxySignature(Object.class.getMethod(
-                        "equals", new Class[] { Object.class }));
+                    "equals", new Class[]{Object.class}));
                 coreMethods.put(sig, sig);
                 sig = new ProxySignature(Object.class.getMethod("hashCode",
-                        null));
+                    null));
                 coreMethods.put(sig, sig);
                 sig = new ProxySignature(Object.class.getMethod("toString",
-                        null));
+                    null));
                 coreMethods.put(sig, sig);
             } catch (Exception e) {
                 // assert false;
                 throw (Error) new InternalError("Unexpected: " + e)
-                        .initCause(e);
+                    .initCause(e);
             }
         }
 
@@ -178,9 +171,8 @@ public class ProxyBuilder {
 
         /**
          * Construct a signature
-         * 
-         * @param method
-         *            the Method this signature is based on, never null
+         *
+         * @param method the Method this signature is based on, never null
          */
         ProxySignature(Method method) {
             this.method = method;
@@ -189,7 +181,7 @@ public class ProxyBuilder {
             while (--i >= 0) {
                 // discard unchecked exceptions
                 if (Error.class.isAssignableFrom(exc[i])
-                        || RuntimeException.class.isAssignableFrom(exc[i]))
+                    || RuntimeException.class.isAssignableFrom(exc[i]))
                     continue;
                 exceptions.add(exc[i]);
             }
@@ -198,17 +190,15 @@ public class ProxyBuilder {
         /**
          * Given a method, make sure it's return type is identical to this, and
          * adjust this signature's throws clause appropriately
-         * 
-         * @param other
-         *            the signature to merge in
-         * @throws IllegalArgumentException
-         *             if the return types conflict
+         *
+         * @param other the signature to merge in
+         * @throws IllegalArgumentException if the return types conflict
          */
         void checkCompatibility(ProxySignature other) {
             if (method.getReturnType() != other.method.getReturnType())
                 throw new IllegalArgumentException(
-                        "incompatible return types: " + method + ", "
-                                + other.method);
+                    "incompatible return types: " + method + ", "
+                        + other.method);
 
             // if you can think of a more efficient way than this O(n^2) search,
             // implement it!
@@ -219,11 +209,11 @@ public class ProxyBuilder {
             Iterator itr = exceptions.iterator();
             int pos = size1;
             while (--pos >= 0) {
-                Class< ? > c1 = (Class) itr.next();
+                Class<?> c1 = (Class) itr.next();
                 Iterator itr2 = other.exceptions.iterator();
                 int pos2 = size2;
                 while (--pos2 >= 0) {
-                    Class< ? > c2 = (Class) itr2.next();
+                    Class<?> c2 = (Class) itr2.next();
                     if (c2.isAssignableFrom(c1))
                         valid1[pos] = true;
                     if (c1.isAssignableFrom(c2))
@@ -249,7 +239,7 @@ public class ProxyBuilder {
 
         /**
          * Calculates the hash code.
-         * 
+         *
          * @return a combination of name and parameter types
          */
         public int hashCode() {
@@ -262,9 +252,8 @@ public class ProxyBuilder {
 
         /**
          * Calculates equality.
-         * 
-         * @param other
-         *            object to compare to
+         *
+         * @param other object to compare to
          * @return true if it is a ProxySignature with same data
          */
         public boolean equals(Object other) {
@@ -272,7 +261,7 @@ public class ProxyBuilder {
             Class[] types1 = method.getParameterTypes();
             Class[] types2 = ps.method.getParameterTypes();
             if (!method.getName().equals(ps.method.getName())
-                    || types1.length != types2.length)
+                || types1.length != types2.length)
                 return false;
             int i = types1.length;
             while (--i >= 0)
@@ -285,7 +274,7 @@ public class ProxyBuilder {
     /**
      * A flat representation of all data needed to generate bytecode/instantiate
      * a proxy class. This is basically a struct.
-     * 
+     *
      * @author Eric Blake (ebb9@email.byu.edu)
      */
     static final class ProxyData {
@@ -351,19 +340,17 @@ public class ProxyBuilder {
          * Verifies that the arguments are legal, and sets up remaining data
          * This should only be called when a class must be generated, as it is
          * expensive.
-         * 
-         * @param pt
-         *            the ProxyType to convert to ProxyData
+         *
+         * @param pt the ProxyType to convert to ProxyData
          * @return the flattened, verified ProxyData structure for use in class
          *         generation
-         * @throws IllegalArgumentException
-         *             if `interfaces' contains non-interfaces or incompatible
-         *             combinations, and verify is true
-         * @throws NullPointerException
-         *             if interfaces is null or contains null
+         * @throws IllegalArgumentException if `interfaces' contains non-interfaces or incompatible
+         *                                  combinations, and verify is true
+         * @throws NullPointerException     if interfaces is null or contains null
          */
         static ProxyData getProxyData(ProxyType pt) {
-            Map<ProxySignature, ProxySignature> method_set = (Map<ProxySignature, ProxySignature>) ProxySignature.coreMethods
+            Map<ProxySignature, ProxySignature> method_set =
+                (Map<ProxySignature, ProxySignature>) ProxySignature.coreMethods
                     .clone();
             boolean in_package = false; // true if we encounter non-public
             // interface
@@ -378,22 +365,22 @@ public class ProxyBuilder {
                 Class inter = data.interfaces[i];
                 if (!inter.isInterface())
                     throw new IllegalArgumentException("not an interface: "
-                            + inter);
+                        + inter);
                 try {
                     if (Class.forName(inter.getName(), false, pt.loader) != inter)
                         throw new IllegalArgumentException("not accessible in "
-                                + "classloader: " + inter);
+                            + "classloader: " + inter);
                 } catch (ClassNotFoundException e) {
                     throw new IllegalArgumentException("not accessible in "
-                            + "classloader: " + inter);
+                        + "classloader: " + inter);
                 }
                 if (!Modifier.isPublic(inter.getModifiers()))
                     if (in_package) {
                         String p = getPackage(inter);
                         if (!data.pack.equals(p))
                             throw new IllegalArgumentException(
-                                    "non-public interfaces "
-                                            + "from different " + "packages");
+                                "non-public interfaces "
+                                    + "from different " + "packages");
                     } else {
                         in_package = true;
                         data.pack = getPackage(inter);
@@ -401,7 +388,7 @@ public class ProxyBuilder {
                 for (int j = i - 1; j >= 0; j--)
                     if (data.interfaces[j] == inter)
                         throw new IllegalArgumentException(
-                                "duplicate interface: " + inter);
+                            "duplicate interface: " + inter);
                 Method[] methods = inter.getMethods();
                 int j = methods.length;
                 while (--j >= 0) {
@@ -413,7 +400,7 @@ public class ProxyBuilder {
                     }
                     ProxySignature sig = new ProxySignature(methods[j]);
                     ProxySignature old = (ProxySignature) method_set.put(sig,
-                            sig);
+                        sig);
                     if (old != null)
                         sig.checkCompatibility(old);
                 }
@@ -427,7 +414,7 @@ public class ProxyBuilder {
                 ProxySignature sig = (ProxySignature) itr.next();
                 data.methods[i] = sig.method;
                 data.exceptions[i] = (Class[]) sig.exceptions
-                        .toArray(new Class[sig.exceptions.size()]);
+                    .toArray(new Class[sig.exceptions.size()]);
             }
             return data;
         }
@@ -439,9 +426,8 @@ public class ProxyBuilder {
          * on Method.equals as it would also check the declaring class, what we
          * do not want. We only want to check that the given method have the
          * same signature as a core method (same name and parameter types)
-         * 
-         * @param method
-         *            the method to check
+         *
+         * @param method the method to check
          * @return whether the method has the same name and parameter types as
          *         Object.equals, Object.hashCode or Object.toString
          * @see java.lang.Object#equals(Object)
@@ -452,7 +438,7 @@ public class ProxyBuilder {
             String methodName = method.getName();
             if (methodName.equals("equals")) {
                 return Arrays.equals(method.getParameterTypes(),
-                        new Class[] { Object.class });
+                    new Class[]{Object.class});
             }
             if (methodName.equals("hashCode")) {
                 return method.getParameterTypes().length == 0;
@@ -469,11 +455,13 @@ public class ProxyBuilder {
      * Does all the work of building a class. By making this a nested class,
      * this code is not loaded in memory if the VM has a native implementation
      * instead.
-     * 
+     *
      * @author Eric Blake (ebb9@email.byu.edu)
      */
     private static final class ClassFactory {
-        /** Constants for assisting the compilation */
+        /**
+         * Constants for assisting the compilation
+         */
         private static final byte FIELD = 1;
 
         private static final byte METHOD = 2;
@@ -483,9 +471,11 @@ public class ProxyBuilder {
         private static final String CTOR_SIG = "(Ljava/lang/reflect/InvocationHandler;)V";
 
         private static final String INVOKE_SIG = "(Ljava/lang/Object;"
-                + "Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;";
+            + "Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;";
 
-        /** Bytecodes for insertion in the class definition byte[] */
+        /**
+         * Bytecodes for insertion in the class definition byte[]
+         */
         private static final char ACONST_NULL = 1;
 
         private static final char ICONST_0 = 3;
@@ -550,16 +540,24 @@ public class ProxyBuilder {
         // every char in the array, so we are using twice the necessary memory
         // for the ease StringBuffer provides.
 
-        /** The constant pool. */
+        /**
+         * The constant pool.
+         */
         private final StringBuffer pool = new StringBuffer();
 
-        /** The rest of the class data. */
+        /**
+         * The rest of the class data.
+         */
         private final StringBuffer stream = new StringBuffer();
 
-        /** Map of strings to byte sequences, to minimize size of pool. */
+        /**
+         * Map of strings to byte sequences, to minimize size of pool.
+         */
         private final Map poolEntries = new HashMap();
 
-        /** The VM name of this proxy class. */
+        /**
+         * The VM name of this proxy class.
+         */
         private final String qualName;
 
         /**
@@ -570,14 +568,12 @@ public class ProxyBuilder {
 
         /**
          * Initializes the buffers with the bytecode contents for a proxy class.
-         * 
-         * @param data
-         *            the remainder of the class data
-         * @throws IllegalArgumentException
-         *             if anything else goes wrong this late in the game; as far
-         *             as I can tell, this will only happen if the constant pool
-         *             overflows, which is possible even when the user doesn't
-         *             exceed the 65535 interface limit
+         *
+         * @param data the remainder of the class data
+         * @throws IllegalArgumentException if anything else goes wrong this late in the game; as far
+         *                                  as I can tell, this will only happen if the constant pool
+         *                                  overflows, which is possible even when the user doesn't
+         *                                  exceed the 65535 interface limit
          */
         ClassFactory(ProxyData data) {
             methods = data.methods;
@@ -590,7 +586,7 @@ public class ProxyBuilder {
             // constant_pool[], filled in as we go
 
             // access_flags
-            putU2(0x0020/* Modifier.SUPER */| Modifier.FINAL | Modifier.PUBLIC);
+            putU2(0x0020/* Modifier.SUPER */ | Modifier.FINAL | Modifier.PUBLIC);
             // this_class
             qualName = (data.pack + "$Proxy" + data.id);
             putU2(classInfo(TypeSignature.getEncodingOfClass(qualName, false)));
@@ -641,7 +637,7 @@ public class ProxyBuilder {
             // <init>.Code.code_length = 6
             // <init>.Code.code[]
             stream.append("\0\0\0\22\0\2\0\2\0\0\0\6" + ALOAD_0 + ALOAD_1
-                    + INVOKESPECIAL);
+                + INVOKESPECIAL);
             putU2(refInfo(METHOD, "java/lang/reflect/Proxy", "<init>", CTOR_SIG));
             // <init>.Code.exception_table_length = 0
             // <init>.Code.exception_table[]
@@ -660,11 +656,9 @@ public class ProxyBuilder {
 
         /**
          * Produce the bytecode for a single method.
-         * 
-         * @param i
-         *            the index of the method we are building
-         * @param e
-         *            the exceptions possible for the method
+         *
+         * @param i the index of the method we are building
+         * @param e the exceptions possible for the method
          */
         private void emitMethod(int i, Class[] e) {
             // First, we precalculate the method length and other information.
@@ -736,9 +730,9 @@ public class ProxyBuilder {
             StringBuffer signature = new StringBuffer("(");
             for (int j = 0; j < paramtypes.length; j++)
                 signature.append(TypeSignature
-                        .getEncodingOfClass(paramtypes[j]));
+                    .getEncodingOfClass(paramtypes[j]));
             signature.append(")").append(
-                    TypeSignature.getEncodingOfClass(ret_type));
+                TypeSignature.getEncodingOfClass(ret_type));
 
             // Now we have enough information to emit the method.
 
@@ -782,11 +776,11 @@ public class ProxyBuilder {
             putU1(ALOAD_0);
             putU1(GETFIELD);
             putU2(refInfo(FIELD, "java/lang/reflect/Proxy", "h",
-                    "Ljava/lang/reflect/InvocationHandler;"));
+                "Ljava/lang/reflect/InvocationHandler;"));
             putU1(ALOAD_0);
             putU1(GETSTATIC);
             putU2(refInfo(FIELD, TypeSignature.getEncodingOfClass(qualName,
-                    false), "m", "[Ljava/lang/reflect/Method;"));
+                false), "m", "[Ljava/lang/reflect/Method;"));
             putConst(i);
             putU1(AALOAD);
             if (paramtypes.length > 0) {
@@ -806,13 +800,13 @@ public class ProxyBuilder {
                     if (paramtypes[j].isPrimitive()) {
                         putU1(INVOKESPECIAL);
                         putU2(refInfo(
-                                METHOD,
-                                wrapper(paramtypes[j]),
-                                "<init>",
-                                '(' + (TypeSignature
-                                        .getEncodingOfClass(paramtypes[j]) + ")V")));
+                            METHOD,
+                            wrapper(paramtypes[j]),
+                            "<init>",
+                            '(' + (TypeSignature
+                                .getEncodingOfClass(paramtypes[j]) + ")V")));
                         if (paramtypes[j] == long.class
-                                || paramtypes[j] == double.class)
+                            || paramtypes[j] == double.class)
                             param_count++;
                     }
                     putU1(AASTORE);
@@ -821,7 +815,7 @@ public class ProxyBuilder {
                 putU1(ACONST_NULL);
             putU1(INVOKEINTERFACE);
             putU2(refInfo(INTERFACE, "java/lang/reflect/InvocationHandler",
-                    "invoke", INVOKE_SIG));
+                "invoke", INVOKE_SIG));
             putU1(4); // InvocationHandler, this, Method, Object[]
             putU1(0);
             System.out.println(" return type: " + ret_type.getName());
@@ -834,8 +828,8 @@ public class ProxyBuilder {
                 putU2(classInfo(wrapper(ret_type)));
                 putU1(INVOKEVIRTUAL);
                 putU2(refInfo(METHOD, wrapper(ret_type), ret_type.getName()
-                        + "Value", "()"
-                        + TypeSignature.getEncodingOfClass(ret_type)));
+                    + "Value", "()"
+                    + TypeSignature.getEncodingOfClass(ret_type)));
                 if (ret_type == long.class)
                     putU1(LRETURN);
                 else if (ret_type == float.class)
@@ -856,8 +850,8 @@ public class ProxyBuilder {
                 putU1(SWAP);
                 putU1(INVOKESPECIAL);
                 putU2(refInfo(METHOD,
-                        "java/lang/reflect/UndeclaredThrowableException",
-                        "<init>", "(Ljava/lang/Throwable;)V"));
+                    "java/lang/reflect/UndeclaredThrowableException",
+                    "<init>", "(Ljava/lang/Throwable;)V"));
                 putU1(ATHROW);
             }
 
@@ -921,10 +915,9 @@ public class ProxyBuilder {
         /**
          * Creates the Class object that corresponds to the bytecode buffers
          * built when this object was constructed.
-         * 
-         * @param loader
-         *            the class loader to define the proxy class in; null
-         *            implies the bootstrap class loader
+         *
+         * @param loader the class loader to define the proxy class in; null
+         *               implies the bootstrap class loader
          * @return the proxy class Class object
          */
         byte[] generate(ClassLoader loader) {
@@ -950,9 +943,8 @@ public class ProxyBuilder {
 
         /**
          * Put a single byte on the stream.
-         * 
-         * @param i
-         *            the information to add (only lowest 8 bits are used)
+         *
+         * @param i the information to add (only lowest 8 bits are used)
          */
         private void putU1(int i) {
             stream.append((char) i);
@@ -960,9 +952,8 @@ public class ProxyBuilder {
 
         /**
          * Put two bytes on the stream.
-         * 
-         * @param i
-         *            the information to add (only lowest 16 bits are used)
+         *
+         * @param i the information to add (only lowest 16 bits are used)
          */
         private void putU2(int i) {
             stream.append((char) (i >> 8)).append((char) i);
@@ -970,9 +961,8 @@ public class ProxyBuilder {
 
         /**
          * Put four bytes on the stream.
-         * 
-         * @param i
-         *            the information to add (treated as unsigned)
+         *
+         * @param i the information to add (treated as unsigned)
          */
         private void putU4(int i) {
             stream.append((char) (i >> 24)).append((char) (i >> 16));
@@ -982,9 +972,8 @@ public class ProxyBuilder {
         /**
          * Put bytecode to load a constant integer on the stream. This only
          * needs to work for values less than Short.MAX_VALUE.
-         * 
-         * @param i
-         *            the int to add
+         *
+         * @param i the int to add
          */
         private void putConst(int i) {
             if (i >= -1 && i <= 5)
@@ -1000,11 +989,9 @@ public class ProxyBuilder {
 
         /**
          * Put bytecode to load a given local variable on the stream.
-         * 
-         * @param i
-         *            the slot to load
-         * @param type
-         *            the base type of the load
+         *
+         * @param i    the slot to load
+         * @param type the base type of the load
          */
         private void putLoad(int i, Class type) {
             int offset = 0;
@@ -1026,9 +1013,8 @@ public class ProxyBuilder {
 
         /**
          * Given a primitive type, return its wrapper class name.
-         * 
-         * @param clazz
-         *            the primitive type (but not void.class)
+         *
+         * @param clazz the primitive type (but not void.class)
          * @return the internal form of the wrapper class name
          */
         private String wrapper(Class clazz) {
@@ -1055,88 +1041,79 @@ public class ProxyBuilder {
         /**
          * Returns the entry of this String in the Constant pool, adding it if
          * necessary.
-         * 
-         * @param str
-         *            the String to resolve
+         *
+         * @param str the String to resolve
          * @return the index of the String in the constant pool
          */
         private char utf8Info(String str) {
             String utf8 = toUtf8(str);
             int len = utf8.length();
             return poolIndex("\1" + (char) (len >> 8) + (char) (len & 0xff)
-                    + utf8);
+                + utf8);
         }
 
         /**
          * Returns the entry of the appropriate class info structure in the
          * Constant pool, adding it if necessary.
-         * 
-         * @param name
-         *            the class name, in internal form
+         *
+         * @param name the class name, in internal form
          * @return the index of the ClassInfo in the constant pool
          */
         private char classInfo(String name) {
             char index = utf8Info(name);
-            char[] c = { 7, (char) (index >> 8), (char) (index & 0xff) };
+            char[] c = {7, (char) (index >> 8), (char) (index & 0xff)};
             return poolIndex(new String(c));
         }
 
         /**
          * Returns the entry of the appropriate class info structure in the
          * Constant pool, adding it if necessary.
-         * 
-         * @param clazz
-         *            the class type
+         *
+         * @param clazz the class type
          * @return the index of the ClassInfo in the constant pool
          */
         private char classInfo(Class clazz) {
             return classInfo(TypeSignature.getEncodingOfClass(clazz.getName(),
-                    false));
+                false));
         }
 
         /**
          * Returns the entry of the appropriate fieldref, methodref, or
          * interfacemethodref info structure in the Constant pool, adding it if
          * necessary.
-         * 
-         * @param structure
-         *            FIELD, METHOD, or INTERFACE
-         * @param clazz
-         *            the class name, in internal form
-         * @param name
-         *            the simple reference name
-         * @param type
-         *            the type of the reference
+         *
+         * @param structure FIELD, METHOD, or INTERFACE
+         * @param clazz     the class name, in internal form
+         * @param name      the simple reference name
+         * @param type      the type of the reference
          * @return the index of the appropriate Info structure in the constant
          *         pool
          */
         private char refInfo(byte structure, String clazz, String name,
-                String type) {
+                             String type) {
             char cindex = classInfo(clazz);
             char ntindex = nameAndTypeInfo(name, type);
             // relies on FIELD == 1, METHOD == 2, INTERFACE == 3
-            char[] c = { (char) (structure + 8), (char) (cindex >> 8),
-                    (char) (cindex & 0xff), (char) (ntindex >> 8),
-                    (char) (ntindex & 0xff) };
+            char[] c = {(char) (structure + 8), (char) (cindex >> 8),
+                (char) (cindex & 0xff), (char) (ntindex >> 8),
+                (char) (ntindex & 0xff)};
             return poolIndex(new String(c));
         }
 
         /**
          * Returns the entry of the appropriate nameAndTyperef info structure in
          * the Constant pool, adding it if necessary.
-         * 
-         * @param name
-         *            the simple name
-         * @param type
-         *            the reference type
+         *
+         * @param name the simple name
+         * @param type the reference type
          * @return the index of the NameAndTypeInfo structure in the constant
          *         pool
          */
         private char nameAndTypeInfo(String name, String type) {
             char nindex = utf8Info(name);
             char tindex = utf8Info(type);
-            char[] c = { 12, (char) (nindex >> 8), (char) (nindex & 0xff),
-                    (char) (tindex >> 8), (char) (tindex & 0xff) };
+            char[] c = {12, (char) (nindex >> 8), (char) (nindex & 0xff),
+                (char) (tindex >> 8), (char) (tindex & 0xff)};
             return poolIndex(new String(c));
         }
 
@@ -1145,9 +1122,8 @@ public class ProxyBuilder {
          * every char is 0, and '\\u0000' is not in the string. This is
          * basically to use a String as a fancy byte[], and while it is less
          * efficient in memory use, it is easier for hashing.
-         * 
-         * @param str
-         *            the original, in straight unicode
+         *
+         * @param str the original, in straight unicode
          * @return a modified string, in UTF8 format in the low bytes
          */
         private String toUtf8(String str) {
@@ -1168,8 +1144,9 @@ public class ProxyBuilder {
                 final char c = ca[i];
                 if (c > 0 && c <= '\u007f')
                     sb.append(c);
-                else if (c <= '\u07ff') // includes '\0'
-                {
+                else if (c <= '\u07ff') {
+                    // includes '\0'
+                    
                     sb.append((char) (0xc0 | (c >> 6)));
                     sb.append((char) (0x80 | (c & 0x6f)));
                 } else {
@@ -1185,12 +1162,10 @@ public class ProxyBuilder {
          * Returns the location of a byte sequence (conveniently wrapped in a
          * String with all characters between \u0001 and \u00ff inclusive) in
          * the constant pool, adding it if necessary.
-         * 
-         * @param sequence
-         *            the byte sequence to look for
+         *
+         * @param sequence the byte sequence to look for
          * @return the index of the sequence
-         * @throws IllegalArgumentException
-         *             if this would make the constant pool overflow
+         * @throws IllegalArgumentException if this would make the constant pool overflow
          */
         private char poolIndex(String sequence) {
             Integer i = (Integer) poolEntries.get(sequence);

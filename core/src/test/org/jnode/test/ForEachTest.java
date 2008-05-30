@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import java.util.ArrayList;
-
 import junit.framework.TestCase;
 
 
@@ -36,14 +35,14 @@ public class ForEachTest extends TestCase {
      * @param args
      */
     public static void main(String[] args) {
-    	ForEachTest test = new ForEachTest();
+        ForEachTest test = new ForEachTest();
         test.testIntArray();
         test.testStringArray();
         test.testCollection();
     }
 
     public void testIntArray() {
-        final int[] a = new int[] { 0, 1, 2, 3, 4, 5 };
+        final int[] a = new int[]{0, 1, 2, 3, 4, 5};
 
         int expected = 0;
         for (int i : a) {
@@ -52,29 +51,29 @@ public class ForEachTest extends TestCase {
         }
         assertEquals("array not fully iterated", expected, a.length);
     }
-    
+
     public void testStringArray() {
-        final String[] a = new String[] { "A", "B", "C", "D", "E" };
-        
+        final String[] a = new String[]{"A", "B", "C", "D", "E"};
+
         int idxExpected = 0;
         for (String s : a) {
             assertEquals(a[idxExpected], s);
-            idxExpected++;            
+            idxExpected++;
         }
         assertEquals("array not fully iterated", idxExpected, a.length);
     }
-    
+
     public void testCollection() {
         final ArrayList<String> list = new ArrayList<String>();
         list.add("Aap");
         list.add("Noot");
         list.add("Mies");
-        
+
         int idxExpected = 0;
         for (String s : list) {
             assertEquals(list.get(idxExpected), s);
-            idxExpected++;            
+            idxExpected++;
         }
         assertEquals("collection not fully iterated", idxExpected, list.size());
-    }   
+    }
 }

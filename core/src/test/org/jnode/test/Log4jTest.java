@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import org.apache.log4j.Logger;
@@ -28,18 +28,18 @@ import org.apache.log4j.Logger;
  */
 public class Log4jTest {
 
-	public static void main(String[] args) {
-		
-		//System.getProperties().setProperty("log4j.defaultInitOverride", "true");
-		//BasicConfigurator.configure();
-		
-		final Logger log = Logger.getLogger(Log4jTest.class);
-		
-		log.debug("This is a debug message");
-		log.info("This is a info message");
-		log.warn("This is a warn message");
-		log.error("This is a error message");
-		log.fatal("This is a fatal message");
-		
-	}
+    public static void main(String[] args) {
+
+        //System.getProperties().setProperty("log4j.defaultInitOverride", "true");
+        //BasicConfigurator.configure();
+
+        final Logger log = Logger.getLogger(Log4jTest.class);
+
+        log.debug("This is a debug message");
+        log.info("This is a info message");
+        log.warn("This is a warn message");
+        log.error("This is a error message");
+        log.fatal("This is a fatal message");
+
+    }
 }

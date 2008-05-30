@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -26,9 +26,9 @@ package org.jnode.test;
  */
 public class ConsoleTest {
 
-	public static void main(String[] args) {
-		for (int i = 0; i < 300; i++) {
-			System.out.println("Row" + i);
-		}
-	}
+    public static void main(String[] args) {
+        for (int i = 0; i < 300; i++) {
+            System.out.println("Row" + i);
+        }
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import org.jnode.util.NumberUtils;
@@ -27,11 +27,11 @@ import org.jnode.util.NumberUtils;
  * @author Levente S?ntha
  */
 public class DoubleTest2 {
-    public static void main(String[] argv){
+    public static void main(String[] argv) {
         System.out.println(test1());
         System.out.println(test2());
         System.out.println(test3());
-        
+
         System.out.println(NumberUtils.hex(Double.doubleToLongBits(1.3)));
         System.out.println(NumberUtils.hex(Double.doubleToRawLongBits(1.3)));
 
@@ -39,23 +39,23 @@ public class DoubleTest2 {
         System.out.println(toString(Double.longBitsToDouble(Double.doubleToRawLongBits(1.3)), false));
     }
 
-    private static double test1(){
-        return (long)1.3;
+    private static double test1() {
+        return (long) 1.3;
     }
 
-    private static double test2(){
+    private static double test2() {
         return 1.3;
     }
-    
+
     private static double test3() {
-    	double i = 13;
-    	return i / 10;
+        double i = 13;
+        return i / 10;
     }
-    
+
     public static String toString(double v, boolean isFloat) {
-        
+
         final int MAX_DIGITS = isFloat ? 10 : 19;
-        
+
         if (Double.isNaN(v))
             return "NaN";
         if (v == Double.POSITIVE_INFINITY)

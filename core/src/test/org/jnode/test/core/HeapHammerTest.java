@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.core;
 
 /**
  * Hammer the heap by allocating and dropping large numbers of objects (byte arrays)
- * 
+ *
  * @author crawley@jnode.org
  */
 public class HeapHammerTest {

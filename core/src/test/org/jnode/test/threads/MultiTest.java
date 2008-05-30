@@ -18,10 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.threads;
 
 import static org.jnode.test.threads.ThreadingUtils.print;
+
 /**
  * @author Levente S\u00e1ntha
  */
@@ -34,7 +35,7 @@ public class MultiTest {
         int n = 10;
         try {
             n = Integer.parseInt(argv[0]);
-        }catch(Exception e){
+        } catch (Exception e) {
             //ignore
         }
         Incrementer[] incr = new Incrementer[n];
@@ -69,12 +70,12 @@ public class MultiTest {
 
         public void run() {
             synchronized (MultiTest.class) {
-                number = threadCounter++ ;
+                number = threadCounter++;
             }
             while (true) {
                 synchronized (MultiTest.class) {
                     if (counter >= 1000) break;
-                    print(number + " " + counter + " " + ++ counter);
+                    print(number + " " + counter + " " + ++counter);
                 }
                 Thread.yield();
                 i++;

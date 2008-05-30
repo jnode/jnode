@@ -29,17 +29,21 @@ import java.util.List;
  */
 public class PackageResult implements Comparable {
 
-    /** The name of the package. */
+    /**
+     * The name of the package.
+     */
     private String name;
 
-    /** A list containing results for each class in the package. */
+    /**
+     * A list containing results for each class in the package.
+     */
     private List classResults;
-    private boolean sorted=true;
+    private boolean sorted = true;
 
     /**
      * Creates a new result, initially empty.
      *
-     * @param name  the class name.
+     * @param name the class name.
      */
     PackageResult(String name) {
         this.name = name;
@@ -58,7 +62,7 @@ public class PackageResult implements Comparable {
     /**
      * Sets the package name.
      *
-     * @param name  the name.
+     * @param name the name.
      */
     void setName(String name) {
         this.name = name;
@@ -67,7 +71,7 @@ public class PackageResult implements Comparable {
     /**
      * Adds a class result.
      *
-     * @param result  the test result.
+     * @param result the test result.
      */
     void add(ClassResult result) {
         classResults.add(result);
@@ -87,8 +91,7 @@ public class PackageResult implements Comparable {
     /**
      * Returns the class result for the named class.
      *
-     * @param name  the class name.
-     *
+     * @param name the class name.
      * @return A class result.
      */
     public ClassResult getClassResult(String name) {
@@ -119,8 +122,7 @@ public class PackageResult implements Comparable {
     /**
      * Returns the number of checks with the specified status.
      *
-     * @param passed  the check status.
-     *
+     * @param passed the check status.
      * @return The number of checks passed or failed.
      */
     public int getCheckCount(boolean passed) {
@@ -136,8 +138,7 @@ public class PackageResult implements Comparable {
     /**
      * Returns the index of the specified result.
      *
-     * @param result  the class result.
-     *
+     * @param result the class result.
      * @return The index.
      */
     public int indexOf(ClassResult result) {
@@ -154,7 +155,7 @@ public class PackageResult implements Comparable {
      * Sorts the class results.
      */
     private void sortClasses() {
-        if(sorted) return;
+        if (sorted) return;
         Collections.sort(classResults);
         sorted = true;
     }

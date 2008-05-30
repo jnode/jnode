@@ -16,7 +16,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 
@@ -26,28 +26,28 @@ package org.jnode.test;
 public class NanoTimeTest {
 
     public static void main(String[] args) {
-	NanoTimeTest ntt = new NanoTimeTest();
-	ntt.run(500);
-	ntt.run(1000);
-	ntt.run(1500);
-	ntt.run(2000);
-	ntt.run(2500);
-	ntt.run(3000);
+        NanoTimeTest ntt = new NanoTimeTest();
+        ntt.run(500);
+        ntt.run(1000);
+        ntt.run(1500);
+        ntt.run(2000);
+        ntt.run(2500);
+        ntt.run(3000);
     }
-    
-    public void run(int ms) {
-	long start = System.nanoTime();
-	try {
-	    Thread.sleep(ms);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-	long end = System.nanoTime();
-	long nano = end - start;
 
-	System.out.println("The test ran " + ms + "ms and according to " +
-			   "System.nanoTime that was " + nano + "ns");
-	long p = Math.abs(ms * 1000L - nano) / ms;
-	System.out.println("Aberration : " + p + " promill");
+    public void run(int ms) {
+        long start = System.nanoTime();
+        try {
+            Thread.sleep(ms);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        long end = System.nanoTime();
+        long nano = end - start;
+
+        System.out.println("The test ran " + ms + "ms and according to " +
+            "System.nanoTime that was " + nano + "ns");
+        long p = Math.abs(ms * 1000L - nano) / ms;
+        System.out.println("Aberration : " + p + " promill");
     }
 }

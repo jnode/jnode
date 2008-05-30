@@ -1,5 +1,5 @@
 package org.jnode.test.jnodenative;
 
 public class NativeTestCase1 {
-	public native void aMethod();
+    public native void aMethod();
 }

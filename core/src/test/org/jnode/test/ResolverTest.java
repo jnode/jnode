@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import org.jnode.assembler.ObjectResolver;
@@ -35,10 +35,10 @@ import org.jnode.vm.x86.X86CpuID;
 public class ResolverTest {
 
     public static void main(String[] args) {
-        
+
         final ObjectResolver res = new Unsafe.UnsafeObjectResolver();
         System.out.println(NumberUtils.hex(res.addressOf32(Vm.getVm())));
-        
+
         final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID(null), X86Constants.Mode.CODE32, 0);
         os.write32(0x12345678);
         byte[] b = os.getBytes();

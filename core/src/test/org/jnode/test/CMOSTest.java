@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import javax.naming.NamingException;
-
 import org.jnode.driver.system.cmos.CMOSService;
 import org.jnode.driver.system.cmos.def.RTC;
 import org.jnode.naming.InitialNaming;
@@ -34,21 +33,21 @@ import org.jnode.util.BCDUtils;
  */
 public class CMOSTest {
 
-	public static void main(String[] args) 
-	throws ResourceNotFreeException, NamingException {
-		
-		CMOSService cmos = InitialNaming.lookup(CMOSService.NAME);
-		RTC rtc = new RTC(cmos);
-		
-		for (int i = 0; i < 10; i++) {
-			System.out.println("CMOS" + i + "=" + BCDUtils.bcd2bin(cmos.getRegister(i)));
-		}
-		
-		System.out.println("time=" + rtc.getHours() + ":" + rtc.getMinutes() + ":" + rtc.getSeconds());
-		System.out.println("date=" + rtc.getDay() + "-" + rtc.getMonth() + "-" + rtc.getYear());
-		
-		int fp = cmos.getRegister(0x10);
-		System.out.println("floppy A: " + ((fp >> 4) & 0x0f));
-		System.out.println("floppy B: " + (fp & 0x0f));
-	}
+    public static void main(String[] args)
+        throws ResourceNotFreeException, NamingException {
+
+        CMOSService cmos = InitialNaming.lookup(CMOSService.NAME);
+        RTC rtc = new RTC(cmos);
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println("CMOS" + i + "=" + BCDUtils.bcd2bin(cmos.getRegister(i)));
+        }
+
+        System.out.println("time=" + rtc.getHours() + ":" + rtc.getMinutes() + ":" + rtc.getSeconds());
+        System.out.println("date=" + rtc.getDay() + "-" + rtc.getMonth() + "-" + rtc.getYear());
+
+        int fp = cmos.getRegister(0x10);
+        System.out.println("floppy A: " + ((fp >> 4) & 0x0f));
+        System.out.println("floppy B: " + (fp & 0x0f));
+    }
 }

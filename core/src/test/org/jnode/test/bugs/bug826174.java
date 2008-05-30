@@ -18,17 +18,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.bugs;
 
-public class bug826174
-{
+public class bug826174 {
 
-	public static void main (String args[])
-	{
-		System.out.println(12L);
-		System.out.println(Long.parseLong("12"));
-	}
+    public static void main(String args[]) {
+        System.out.println(12L);
+        System.out.println(Long.parseLong("12"));
+    }
 
 }
 

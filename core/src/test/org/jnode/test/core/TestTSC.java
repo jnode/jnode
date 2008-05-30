@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.core;
 
 import org.jnode.vm.VmMagic;
@@ -28,7 +28,7 @@ import org.jnode.vm.VmMagic;
  */
 public class TestTSC {
 
-	public static void main(String[] args) {
-		System.out.println("TSC=" + VmMagic.getTimeStamp());
-	}
+    public static void main(String[] args) {
+        System.out.println("TSC=" + VmMagic.getTimeStamp());
+    }
 }

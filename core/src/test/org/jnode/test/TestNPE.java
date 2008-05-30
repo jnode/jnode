@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 /**
@@ -26,21 +26,21 @@ package org.jnode.test;
  */
 public class TestNPE {
 
-	public static void main(String[] args) {
-		//try {
-			String s = null;
-			s.length();
-			System.out.println("No throw of NPE: NOK!");
-		//} catch (NullPointerException ex) {
-//			System.out.println("catch of NPE: OK! (" + ex + ")");
-		//}
-	}
-	
-	public void test() {
-	    if (System.currentTimeMillis() > 100) {
-	        throw new RuntimeException();
-	    }
-	    System.out.println("Hoi");
-	}
+    public static void main(String[] args) {
+        //try {
+        String s = null;
+        s.length();
+        System.out.println("No throw of NPE: NOK!");
+        //} catch (NullPointerException ex) {
+//          System.out.println("catch of NPE: OK! (" + ex + ")");
+        //}
+    }
+
+    public void test() {
+        if (System.currentTimeMillis() > 100) {
+            throw new RuntimeException();
+        }
+        System.out.println("Hoi");
+    }              
 
 }

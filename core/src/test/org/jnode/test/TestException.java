@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test;
 
 import junit.framework.TestCase;
@@ -27,10 +27,10 @@ import junit.framework.TestCase;
  * @author epr
  */
 public class TestException extends TestCase {
-	
-	public void testThrow() 
-	throws Exception {
-		throw new Exception("Just a test");
-	}
+
+    public void testThrow()
+        throws Exception {
+        throw new Exception("Just a test");
+    }
 
 }
