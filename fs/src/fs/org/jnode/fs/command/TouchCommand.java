@@ -27,52 +27,51 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
- * Touch a file
- * 
- * TODO if file exist change modified date
+ * Touch a file; i.e. create it if it doesn't exist and change its
+ * modification timestamp if it does exist.
  * 
  * @author Yves Galante (yves.galante@jmob.net)
  * @author Andreas H\u00e4nel
  */
 public class TouchCommand extends AbstractCommand {
 
-    static final FileArgument ARG_TOUCH = new FileArgument("file",
-            "the file to touch");
+    private final FileArgument ARG_FILE = new FileArgument(
+            "file", Argument.MANDATORY, "the file to touch");
 
-    public static Help.Info HELP_INFO = new Help.Info("touch",
-            "touch a file", new Parameter[] { new Parameter(ARG_TOUCH,
-                    Parameter.MANDATORY)});
-
+    public TouchCommand() {
+        super("touch a file");
+        registerArguments(ARG_FILE);
+    }
+    
     public static void main(String[] args) throws Exception {
     	new TouchCommand().execute(args);
     }
     
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
     throws Exception {
-    	ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-        File file = ARG_TOUCH.getFile(cmdLine);
-
+    	File file = ARG_FILE.getValue();
         if (!file.exists()) {
             File parentFile = file.getParentFile();
-            if (parentFile!=null && !parentFile.exists()) {
+            if (parentFile != null && !parentFile.exists()) {
+                // FIXME ... this is wrong.  Touch should not do this.
                 if (!parentFile.mkdirs()) {
-                    err.println("Parent dirs can't create");
+                    err.println("Cannot create parent directories");
                     exit(2);
                 }
             }            
             if (file.createNewFile()) {
                 out.println("File created");
             } else {
-                err.println("File can't create");
+                err.println("Cannot create file");
                 exit(1);
             }
         }
-        file.setLastModified(System.currentTimeMillis());
+        else {
+            file.setLastModified(System.currentTimeMillis());
+        }
     }
 }
