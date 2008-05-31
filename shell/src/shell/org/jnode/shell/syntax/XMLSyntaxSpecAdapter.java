@@ -21,7 +21,7 @@
  
 package org.jnode.shell.syntax;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 /**
  * This class adapts nanoxml.XMLElement instances for Syntax loaders / readers.

@@ -24,7 +24,7 @@ package org.jnode.shell.syntax;
 import java.util.HashSet;
 import java.util.Set;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 public abstract class GroupSyntax extends Syntax {
     private static Syntax MY_EMPTY = new EmptySyntax(null, null);

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Set;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 public abstract class Syntax {
     
