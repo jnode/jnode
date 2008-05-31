@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
 import org.jnode.plugin.PluginException;

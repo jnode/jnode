@@ -443,7 +443,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/org"/>
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/nanoxml"/>
+                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
@@ -468,7 +468,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/nanoxml"/>
+                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
             </sourcepath>
             <package name="org.mmtk.*"/>
             <package name="org.jnode.vm.memmgr.mmtk.*"/>
@@ -496,7 +496,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
-                <pathelement location="${root.dir}/core/src/nanoxml"/>
+                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
                 <pathelement location="${root.dir}/core/src/test"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/distr/src/install"/>

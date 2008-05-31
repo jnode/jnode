@@ -10,7 +10,7 @@
         
   <runtime>
     <library name="jnode-core.jar">
-      <export name="nanoxml.*"/>
+      <export name="org.jnode.nanoxml.*"/>
     </library>
   </runtime>
         

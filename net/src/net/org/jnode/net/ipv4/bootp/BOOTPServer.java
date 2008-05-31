@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 import org.apache.log4j.Logger;
 import org.jnode.net.ipv4.IPv4Address;
