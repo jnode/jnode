@@ -107,6 +107,9 @@
     <syntax alias="pwd">
       <empty description="show the pathname for the current directory"/>
     </syntax>
+    <syntax alias="touch">
+      <argument argLabel="file" description="touch the given file"/>
+    </syntax>
   </extension>
 
 
