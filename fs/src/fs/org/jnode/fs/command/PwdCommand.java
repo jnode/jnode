@@ -34,7 +34,7 @@ import org.jnode.shell.CommandLine;
 public class PwdCommand extends AbstractCommand
 {
     public PwdCommand() {
-        super("show the name of current working directory");
+        super("show the pathname of current working directory");
     }
 
     public static void main(String[] args) throws Exception {
