@@ -13,9 +13,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/endorsed/nanoxml" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/icedtea" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/nanoxml" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/com" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/javax" isTestSource="false" />

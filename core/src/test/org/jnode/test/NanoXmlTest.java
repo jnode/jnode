@@ -24,7 +24,7 @@ package org.jnode.test;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Hashtable;
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
