@@ -21,7 +21,7 @@
 
 package org.jnode.shell.syntax;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 /**
  * This class provides a way of representing an empty syntax or syntax alternative; e.g. when

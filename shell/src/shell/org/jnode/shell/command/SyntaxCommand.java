@@ -31,7 +31,7 @@ import java.io.PrintStream;
 import java.io.Writer;
 import java.util.Hashtable;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
