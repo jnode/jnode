@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.PluginException;
 

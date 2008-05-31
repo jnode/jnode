@@ -24,7 +24,7 @@ package org.jnode.plugin.model;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;

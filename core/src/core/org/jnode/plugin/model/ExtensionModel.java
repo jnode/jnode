@@ -23,7 +23,7 @@ package org.jnode.plugin.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginException;

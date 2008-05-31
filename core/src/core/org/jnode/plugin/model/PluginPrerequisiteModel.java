@@ -21,7 +21,7 @@
 
 package org.jnode.plugin.model;
 
-import nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 

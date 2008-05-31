@@ -35,7 +35,7 @@
   <path id="my-sources1">
 	<path refid="classpath-sources"/>
 	<pathelement location="${my-src.dir}/core"/>
-	<pathelement location="${my-src.dir}/nanoxml"/>
+	<pathelement location="${my-src.dir}/endorsed/nanoxml"/>
 	<pathelement location="${my-src.dir}/vmmagic"/>
 	<pathelement location="${my-src.dir}/mmtk-vm"/>
 	<pathelement location="${my-src.dir}/driver"/>
@@ -137,7 +137,7 @@
 	    <fileset dir="${my-src.dir}/openjdk/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/icedtea" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/core" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/nanoxml" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/endorsed/nanoxml" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/mmtk-vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/driver" excludes="${my-non-resources}"/>
