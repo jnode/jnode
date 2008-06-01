@@ -71,11 +71,6 @@
       <export name="gnu.java.lang.*"/>      
       <export name="gnu.java.lang.reflect.*"/>
 
-      <export name="gnu.java.locale.LocaleHelper"/>
-      <export name="gnu.java.locale.LocaleData"/>  
-      <export name="gnu.java.locale.LocaleInformation_en"/>
-      <export name="gnu.java.locale.LocaleInformation"/>
-
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.ber.*"/>
@@ -91,7 +86,6 @@
       <export name="gnu.java.security.x509.*"/>
       <export name="gnu.java.security.x509.ext.*"/>
 
-      <export name="gnu.java.text.*"/>
       <export name="gnu.java.util.*"/>
       <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.java.util.jar.*"/>
