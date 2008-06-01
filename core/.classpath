@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/openjdk/vm"/>
+	<classpathentry kind="src" path="src/endorsed/nanoxml"/>
 	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/sun"/>
 	<classpathentry kind="src" path="src/openjdk/org"/>
 	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/com"/>
