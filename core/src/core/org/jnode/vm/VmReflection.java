@@ -332,18 +332,18 @@ public final class VmReflection {
             if (o == null) {
                 throw new NullPointerException();
             }
-            Unsafe.pushObject(o);
-            // This is incorrect ... JDK 1.6 throws IllegalArgumentException if the
-            // class of 'o' is the declaring class of 'method'.  Stephen Crawley 2008-04-25.
-//            if (!method.isConstructor()) {
-//                method = o.getClass().getVmClass().getMethod(method.getName(), method.getSignature());
-//            }
+
+            //todo should we make this check here or on a higher level?
             Class declaringClass = method.getDeclaringClass().asClass();
             if (!declaringClass.isInstance(o)) {
                 throw new IllegalArgumentException("Target object arg is not an instance of " +
                     declaringClass.getName());
             }
 
+            Unsafe.pushObject(o);
+            if (!method.isConstructor()) {
+                method = o.getClass().getVmClass().getMethod(method.getName(), method.getSignature());
+            }            
         } else {
             method.getDeclaringClass().initialize();
         }
