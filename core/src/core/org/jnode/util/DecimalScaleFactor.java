@@ -6,7 +6,7 @@ package org.jnode.util;
 import org.jnode.vm.annotation.SharedStatics;
 
 @SharedStatics
-public enum DecimalPrefix {
+public enum DecimalScaleFactor implements ScaleFactor {
     B(1l, ""),
     K(1000l, "k"),
     M(1000l * 1000l, "M"),
@@ -19,13 +19,13 @@ public enum DecimalPrefix {
     //Z(1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Z"),
     //Y(1000l*1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Y");
 
-    public static final DecimalPrefix MIN = B;
-    public static final DecimalPrefix MAX = E;
+    public static final DecimalScaleFactor MIN = B;
+    public static final DecimalScaleFactor MAX = E;
 
     final private long multiplier;
     final private String unit;
 
-    private DecimalPrefix(long multiplier, String unit) {
+    private DecimalScaleFactor(long multiplier, String unit) {
         this.multiplier = multiplier;
         this.unit = unit;
     }
@@ -51,8 +51,8 @@ public enum DecimalPrefix {
      */
     public static String apply(final long value, final int nbDecimals) {
         long v = value;
-        DecimalPrefix unit = null;
-        for (DecimalPrefix u : values()) {
+        DecimalScaleFactor unit = null;
+        for (DecimalScaleFactor u : values()) {
             if ((v < 1000l) && (v >= 0l)) {
                 unit = u;
                 break;

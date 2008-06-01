@@ -24,5 +24,37 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="fdisk" class="org.jnode.partitions.command.FdiskCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="fdisk">
+      <empty description="list all block devices"/>
+      <argument argLabel="deviceId" description="show a device's partition table"/>
+      <sequence description="initialize a device's master boot record">
+        <option argLabel="initMBR" shortName="i" longName="initMBR"/>
+        <argument argLabel="deviceId"/>
+      </sequence>
+      <sequence description="modify (or create) a partition">
+        <option argLabel="modify" shortName="m" longName="modify"/>
+        <argument argLabel="deviceId"/>
+        <argument argLabel="partition"/>
+        <argument argLabel="start"/>
+        <alternatives>
+          <argument argLabel="sectors"/>
+          <argument argLabel="bytes"/>
+        </alternatives>
+        <argument argLabel="type"/>
+      </sequence>
+      <sequence description="toggle a partition's bootable flag">
+        <option argLabel="bootable" shortName="b" longName="bootable"/>
+        <argument argLabel="deviceId"/>
+        <argument argLabel="partition"/>
+      </sequence>
+      <sequence description="delete a partition">
+        <option argLabel="delete" shortName="d" longName="delete"/>
+        <argument argLabel="deviceId"/>
+        <argument argLabel="partition"/>
+      </sequence>
+    </syntax>
+  </extension>
 
 </plugin>

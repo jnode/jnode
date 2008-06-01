@@ -1,6 +1,6 @@
 package org.jnode.fs.ext2;
 
-import org.jnode.util.BinaryPrefix;
+import org.jnode.util.BinaryScaleFactor;
 
 
 public enum BlockSize {
@@ -12,7 +12,7 @@ public enum BlockSize {
 
     private BlockSize(int blockSizeKb)
     {
-    	this.size = (int) (blockSizeKb * BinaryPrefix.K.getMultiplier()); //Converted into KB
+    	this.size = (int) (blockSizeKb * BinaryScaleFactor.K.getMultiplier()); //Converted into KB
     }
 
 	final public int getSize() {

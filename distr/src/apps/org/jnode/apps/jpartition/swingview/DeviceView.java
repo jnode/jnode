@@ -11,7 +11,7 @@ import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.Partition;
 import org.jnode.apps.jpartition.model.UserFacade;
-import org.jnode.util.BinaryPrefix;
+import org.jnode.util.BinaryScaleFactor;
 import org.jnode.util.NumberUtils;
 
 public class DeviceView extends DiskAreaView<Device>
