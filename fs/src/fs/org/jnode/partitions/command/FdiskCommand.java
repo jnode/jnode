@@ -22,6 +22,8 @@
 package org.jnode.partitions.command;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.List;
@@ -43,278 +45,187 @@ import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.DeviceArgument;
-import org.jnode.shell.help.argument.IntegerArgument;
-import org.jnode.shell.help.argument.LongArgument;
-import org.jnode.shell.help.argument.OptionArgument;
-import org.jnode.shell.help.argument.SizeArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.*;
+
+import com.sun.org.apache.xml.internal.utils.ObjectPool;
 
 /**
  * @author gbin
  * @author Trickkiste
+ * @author crawley@jnode.org
  */
-public class FdiskCommand {
+public class FdiskCommand extends AbstractCommand {
+    // FIXME ... this is a dangerous command and it needs some extra checking to help
+    // avoid catastrophic errors.  At the very least, it needs a mode that shows the
+    // user what would happen but does nothing.
+	private final FlagArgument FLAG_INIT_MBR = new FlagArgument(
+			"initMBR", Argument.OPTIONAL, "if set, init the device's Master Boot Record");
 
-	static final OptionArgument INITMBR =
-		new OptionArgument(
-			"init. MBR",
-			"Type parameter",
-			new OptionArgument.Option[] {
-				 new OptionArgument.Option("--initmbr", "initialize the Master Boot Record of the device")});
+	private final FlagArgument FLAG_DELETE = new FlagArgument(
+	        "delete", Argument.OPTIONAL, "if set, delete a partition");
+    
+    private final FlagArgument FLAG_BOOTABLE = new FlagArgument(
+            "bootable", Argument.OPTIONAL, "if set, toggle the partition's bootable flag");
+    
+    private final FlagArgument FLAG_MODIFY = new FlagArgument(
+            "modify", Argument.OPTIONAL, "if set, modify or create a partition");
 
-	static final OptionArgument ACTION =
-		new OptionArgument(
-			"action",
-			"Action on a specified partition",
-			new OptionArgument.Option[] {
-				new OptionArgument.Option("-d", "Delete a partition"),
-				new OptionArgument.Option("-b", "Switch the bootable flag of a partition")});
-
-	static final OptionArgument ACTION_MODIFY =
-		new OptionArgument(
-			"action",
-			"Action on a specified partition",
-			new OptionArgument.Option[] {
-				new OptionArgument.Option("-m", "Modify/create a partition")});
-
-	static final IntegerArgument PARTITION = new IntegerArgument("partition number", "Targeted partition");
-	static final LongArgument START = new LongArgument("start", "Sector where the partition starts");
-	static final SizeArgument SIZE = new SizeArgument("size", "Size of the partition in sectors or in bytes(use prefixes K, M, G, ...)");	
-	static final IBMPartitionTypeArgument PARTITION_TYPE = new IBMPartitionTypeArgument(
-			"partition type", "partition type code");
+	private final IntegerArgument ARG_PARTITION = new IntegerArgument(
+	        "partition", Argument.OPTIONAL, "Target partition number (0..3)");
 	
-	static final DeviceArgument ARG_DEVICE =
-		new DeviceArgument("device-id", "the device on which you want to change/create the partition");
+	private final LongArgument ARG_START = new LongArgument(
+	        "start", Argument.OPTIONAL, "Partition start sector");
+	
+	private final LongArgument ARG_SECTORS = new LongArgument(
+            "sectors", Argument.OPTIONAL, "Partition size in sectors");
+    
+	private final SizeArgument ARG_BYTES = new SizeArgument(
+            "bytes", Argument.OPTIONAL, "Partition size in bytes (300K, 45M, etc)");
+    
+    private final IBMPartitionTypeArgument ARG_TYPE = new IBMPartitionTypeArgument(
+			"type", Argument.OPTIONAL, "IBM partition type code");
+	
+	private final DeviceArgument ARG_DEVICE = new DeviceArgument(
+	        "deviceId", Argument.OPTIONAL, "Target device", BlockDeviceAPI.class);
+	
 
-	static final Parameter PARAM_INITMBR = new Parameter(INITMBR, Parameter.MANDATORY);
-	static final Parameter PARAM_ACTION = new Parameter(ACTION, Parameter.MANDATORY);
-	static final Parameter PARAM_ACTION_MODIFY = new Parameter(ACTION_MODIFY, Parameter.MANDATORY);
-	static final Parameter PARAM_DEVICE = new Parameter(ARG_DEVICE, Parameter.MANDATORY);
-	static final Parameter PARAM_PARTITION = new Parameter(PARTITION, Parameter.MANDATORY);
-	static final Parameter PARAM_START = new Parameter(START, Parameter.MANDATORY);
-	static final Parameter PARAM_SIZE = new Parameter(SIZE, Parameter.MANDATORY);
-	static final Parameter PARAM_PARTITION_TYPE = new Parameter(PARTITION_TYPE, Parameter.MANDATORY);
+	public FdiskCommand() {
+        super("perform disk partition management tasks");
+        registerArguments(FLAG_BOOTABLE, FLAG_DELETE, FLAG_INIT_MBR, FLAG_MODIFY,
+                ARG_DEVICE, ARG_PARTITION, ARG_START, ARG_SECTORS, ARG_BYTES, ARG_TYPE);
+    }
 
-	public static Help.Info HELP_INFO =
-		new Help.Info(
-			"fdisk",
-			new Syntax[] {
-				new Syntax("Lists the available devices"),
-				new Syntax("Print the partition table of a device", 
-							new Parameter[] { 
-								PARAM_DEVICE }),
-				new Syntax("Initialize the MBR of a device", 
-							new Parameter[] { 
-								PARAM_INITMBR, PARAM_DEVICE }),
-				new Syntax("Change a partition",
-							new Parameter[] { 
-								PARAM_ACTION_MODIFY, PARAM_PARTITION, PARAM_START, 
-								PARAM_SIZE, PARAM_PARTITION_TYPE, 
-								PARAM_DEVICE }),
-				new Syntax("Delete a partition / switch bootable flag", 
-							new Parameter[] { 
-								PARAM_ACTION, PARAM_PARTITION, PARAM_DEVICE }),
-	});
-
-	public static void main(String[] args) throws SyntaxErrorException {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-		DeviceManager dm;
-		try {
-			dm = InitialNaming.lookup(DeviceManager.NAME);
-
-			boolean isAction = PARAM_ACTION.isSet(cmdLine);
-			boolean isActionModify = PARAM_ACTION_MODIFY.isSet(cmdLine);
-			boolean isInitMBR = PARAM_INITMBR.isSet(cmdLine);
-			boolean isDevice = PARAM_DEVICE.isSet(cmdLine);
-
-			// no parameters
-			if (!isDevice) {
-				listAvailableDevice(dm);
-				return;
-			}
-
-			// only device is set
-			if (!isAction && !isActionModify && !isInitMBR && isDevice) {
-				printTable(ARG_DEVICE.getValue(cmdLine), dm);
-				return;
-			}
-
-			final String deviceId = ARG_DEVICE.getValue(cmdLine);
-			final PartitionHelper helper = new PartitionHelper(deviceId); 
-			
-			// initMBR
-			if (isInitMBR) {
-				helper.initMbr();
-				helper.write();
-				return;
-			}
-
-			int partNumber = getPartitionNumber(helper, cmdLine);
-
-			// modify a partition ?
-			if (ACTION_MODIFY.getValue(cmdLine).intern() == "-m") {				
-				modifyPartition(helper, partNumber, cmdLine);
-				helper.write();
-				return;
-			}
-
-			// delete a partition ?
-			if (ACTION.getValue(cmdLine).intern() == "-d") {
-				helper.deletePartition(partNumber);
-				helper.write();
-				return;
-			}
-
-			// toggle boot flag for a partition ?
-			if (ACTION.getValue(cmdLine).intern() == "-b") {
-				helper.toggleBootable(partNumber);
-				helper.write();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		} catch (ApiNotFoundException e) {
-			e.printStackTrace();
-		} catch (DeviceNotFoundException e) {
-			e.printStackTrace();
-		} 
+	public static void main(String[] args) throws Exception {
+	    new FdiskCommand().execute(args);
 	}
-	
-	private static int getPartitionNumber(PartitionHelper helper, ParsedArguments cmdLine)
-	{
-		int partNumber = PARTITION.getInteger(cmdLine);
+	 
+	public void execute(CommandLine commandLine, InputStream in,
+	        PrintStream out, PrintStream err) throws Exception {
+	    final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+	    
+	    if (!ARG_DEVICE.isSet()) {
+	        // Show all devices.
+	        listAvailableDevices(dm, out);
+	        return;
+	    }
+	    
+	    Device dev = ARG_DEVICE.getValue();
+	    // FIXME PartitionHelper assumes that the device is an IDE device !?!
+	    if (!(dev instanceof IDEDevice)) {
+	        err.println(dev.getId() + " is not an IDE device");
+	        exit(1);
+	    }
+        final PartitionHelper helper = new PartitionHelper(dev.getId()); 
 
-		if ((partNumber >= helper.getNbPartitions()) || 
-			(partNumber < 0) )
+	    if (FLAG_BOOTABLE.isSet()) {
+            helper.toggleBootable(getPartitionNumber(helper));
+            helper.write();
+	    }
+	    else if (FLAG_DELETE.isSet()) {
+            helper.deletePartition(getPartitionNumber(helper));
+            helper.write();
+	    }
+	    else if (FLAG_MODIFY.isSet()) {
+            modifyPartition(helper, getPartitionNumber(helper), out);
+            helper.write();
+	    }
+	    else if (FLAG_INIT_MBR.isSet()) {
+            helper.initMbr();
+            helper.write();
+	    }
+	    else {
+	        printPartitionTable(dev, out);
+	    }
+	} 
+	
+	private int getPartitionNumber(PartitionHelper helper) {
+		int partNumber = ARG_PARTITION.getValue();
+		if (partNumber >= helper.getNbPartitions() || partNumber < 0) {
 			throw new IllegalArgumentException("Partition number is invalid");
-		
+		}
 		return partNumber;
 	}
 
-	private static void modifyPartition(PartitionHelper helper, 
-										int id, 
-										ParsedArguments cmdLine) 
-							throws IOException 
-	{
-		long start = START.getLong(cmdLine);
-		long size = SIZE.getLong(cmdLine);
-		IBMPartitionTypes type = PARTITION_TYPE.getArgValue(cmdLine);
-			
-//		try {
-			System.out.println("D");
-			System.out.println("Init " + id + " with start = " + start
-					+ ", size = " + size + ", fs = "
-					+ Integer.toHexString(type.getCode() & 0xff));
-			System.out.println("E");			
-			boolean sizeUnit = SIZE.hasSizeUnit(cmdLine) ? 
-								PartitionHelper.BYTES : PartitionHelper.SECTORS; 
-			helper.modifyPartition(id, false, start, size, sizeUnit, type);
-			System.out.println("F");
-//		} 
-//		catch (NumberFormatException nfe) 
-//		{
-//			System.err.println("not an integer");
-//			System.err.println(helpMsg);
-//		}
-//		catch (NoSuchElementException nsee) 
-//		{
-//			System.err.println("not enough elements");
-//			System.err.println(helpMsg);
-//		}
-//		catch (IllegalArgumentException iae) 
-//		{
-//			System.err.println(iae.getMessage());
-//			System.err.println(helpMsg);
-//		}
+	private void modifyPartition(PartitionHelper helper, int id, PrintStream out) 
+	throws IOException  {
+	    long start = ARG_START.getValue();
+	    long size = ARG_SECTORS.isSet() ? ARG_SECTORS.getValue() : ARG_BYTES.getValue();
+	    IBMPartitionTypes type = ARG_TYPE.getValue();
+
+	    out.println("Init " + id + " with start = " + start
+	            + ", size = " + size + ", fs = "
+	            + Integer.toHexString(type.getCode()));
+	    boolean sizeUnit = ARG_BYTES.isSet() ? 
+	            PartitionHelper.BYTES : PartitionHelper.SECTORS; 
+	    helper.modifyPartition(id, false, start, size, sizeUnit, type);
 	}
 	
-	private static void printTable(String deviceName, DeviceManager dm)
-		throws DeviceNotFoundException, ApiNotFoundException, IOException {
-		{
-			IDEDevice current = (IDEDevice)dm.getDevice(deviceName);
-			BlockDeviceAPI api = current.getAPI(BlockDeviceAPI.class);
-			IDEDriveDescriptor descriptor = current.getDescriptor();
-			ByteBuffer MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
-			api.read(0, MBR);
-			if (IBMPartitionTable.containsPartitionTable(MBR.array())) {
-				IBMPartitionTable partitionTable = new IBMPartitionTable(new IBMPartitionTableType(), MBR.array(), current);
+	private void printPartitionTable(Device dev, PrintStream out)
+	throws DeviceNotFoundException, ApiNotFoundException, IOException {
+	    IDEDevice ideDev = null;
+	    // FIXME ... this needs to be generalized to other disc device types.
+	    if (dev instanceof IDEDevice) {
+	        ideDev = (IDEDevice) dev;
+	    }
+	    BlockDeviceAPI api = dev.getAPI(BlockDeviceAPI.class);
+	    IDEDriveDescriptor descriptor = ideDev.getDescriptor();
+	    ByteBuffer MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
+	    api.read(0, MBR);
+	    if (IBMPartitionTable.containsPartitionTable(MBR.array())) {
+	        IBMPartitionTable partitionTable = 
+	            new IBMPartitionTable(new IBMPartitionTableType(), MBR.array(), dev);
+	        if (ideDev != null) {
+	            out.println( "IDE Disk : " + dev.getId() + ": " + 
+	                    descriptor.getSectorsIn28bitAddressing() * 512 + " bytes");
+	        }
+	        out.println("Device Boot    Start       End    Blocks   System");
 
-				System.out.println(
-					"Disk : " + current.getId() + ": " + descriptor.getSectorsIn28bitAddressing() * 512 + " bytes");
-				System.out.println("Device Boot    Start       End    Blocks   System");
-
-				int i = 0;
-				for (IBMPartitionTableEntry entry : partitionTable) {
-					//IBMPartitionTableEntry entry = (IBMPartitionTableEntry)partitionTable.getEntry(i);
-					IBMPartitionTypes si = entry.getSystemIndicator();
-					if (si != IBMPartitionTypes.PARTTYPE_EMPTY)
-						System.out.println(
-							"ID "
-								+ i
-								+ " "
-								+ (entry.getBootIndicator() ? "Boot" : "No")
-								+ "    "
-								+ entry.getStartLba()
-								+ "    "
-								+ (entry.getStartLba() + entry.getNrSectors())
-								+ "    "
-								+ entry.getNrSectors()
-								+ "    "
-								+ si);
-					if(entry.isExtended()) {
-						final List<IBMPartitionTableEntry> exPartitions = partitionTable.getExtendedPartitions();
-						int j = 0;
-						for (IBMPartitionTableEntry exEntry : exPartitions) {
-							si = exEntry.getSystemIndicator();
-							System.out.println(
-									"ID "
-									+ i
-									+ " "
-									+ (exEntry.getBootIndicator() ? "Boot" : "No")
-									+ "    "
-									+ exEntry.getStartLba()
-									+ "    "
-									+ "-----"//(exEntry.getStartLba() + entry.getNrSectors())
-									+ "    "
-									+ "-----"//exEntry.getNrSectors()
-									+ "    "
-									+ si);
-							j++;
-						}
-					}
-					i++;	
-				}
-
-			} else {
-				System.out.println(" No valid MBR found on this device. Use --initmbr to initialize it.");
-			}
-		}
+	        int i = 0;
+	        for (IBMPartitionTableEntry entry : partitionTable) {
+	            //IBMPartitionTableEntry entry = (IBMPartitionTableEntry)partitionTable.getEntry(i);
+	            IBMPartitionTypes si = entry.getSystemIndicator();
+	            if (si != IBMPartitionTypes.PARTTYPE_EMPTY) {
+	                out.println("ID " + i  + " " +
+	                        (entry.getBootIndicator() ? "Boot" : "No") + "    " +
+	                        entry.getStartLba() + "    " +
+	                        (entry.getStartLba() + entry.getNrSectors()) + "    " +
+	                        entry.getNrSectors() + "    " + si);
+	            }
+	            if (entry.isExtended()) {
+	                final List<IBMPartitionTableEntry> exPartitions = partitionTable.getExtendedPartitions();
+	                int j = 0;
+	                for (IBMPartitionTableEntry exEntry : exPartitions) {
+	                    si = exEntry.getSystemIndicator();
+	                    // FIXME ... this needs work
+	                    out.println("ID " + i + " " +
+	                            (exEntry.getBootIndicator() ? "Boot" : "No") + "    " +
+	                            exEntry.getStartLba() + "    " +
+	                            "-----" /* (exEntry.getStartLba() + entry.getNrSectors()) */ + "    " +
+	                            "-----" /* exEntry.getNrSectors() */ + "    " + si);
+	                    j++;
+	                }
+	            }
+	            i++;	
+	        }
+	    }
+	    else {
+	        out.println(" No valid MBR found on this device. Use --initMBR to initialize it.");
+	    }
 	}
 
-	private static void listAvailableDevice(DeviceManager dm) {
+	private void listAvailableDevices(DeviceManager dm, PrintStream out) {
 		final Collection<Device> allDevices = dm.getDevicesByAPI(BlockDeviceAPI.class);
-        for (Device current : allDevices) {
-			System.out.println("Found device : " + current.getId() + "[" + current.getClass() + "]");
-
-			if (current instanceof IDEDevice) {
-				IDEDevice ideDevice = (IDEDevice)current;
-				IDEDriveDescriptor currentDescriptor = ideDevice.getDescriptor();
-				if (currentDescriptor.isDisk()) {
-					System.out.println(
-						"    IDE Disk : "
-							+ ideDevice.getId()
-							+ "("
-							+ currentDescriptor.getModel()
-							+ " "
-							+ currentDescriptor.getSectorsIn28bitAddressing() * IDEConstants.SECTOR_SIZE
-							+ ")");
+        for (Device dev : allDevices) {
+			out.println("Found device : " + dev.getId() + "[" + dev.getClass() + "]");
+			if (dev instanceof IDEDevice) {
+				IDEDevice ideDevice = (IDEDevice) dev;
+				IDEDriveDescriptor desc = ideDevice.getDescriptor();
+				if (desc.isDisk()) {
+					out.println("    IDE Disk : " + ideDevice.getId() +
+							"(" + desc.getModel() + " " +
+							desc.getSectorsIn28bitAddressing() * IDEConstants.SECTOR_SIZE + ")");
 				}
 			}
 		}

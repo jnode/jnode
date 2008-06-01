@@ -14,7 +14,7 @@ import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.swingview.actions.AddPartitionAction;
 import org.jnode.apps.jpartition.swingview.actions.FormatPartitionAction;
 import org.jnode.apps.jpartition.swingview.actions.RemovePartitionAction;
-import org.jnode.util.BinaryPrefix;
+import org.jnode.util.BinaryScaleFactor;
 import org.jnode.util.NumberUtils;
 
 public class PartitionView extends DiskAreaView<Partition>

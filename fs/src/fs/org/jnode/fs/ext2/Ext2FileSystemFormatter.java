@@ -25,7 +25,7 @@ import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.Formatter;
 import org.jnode.fs.service.FileSystemService;
-import org.jnode.util.BinaryPrefix;
+import org.jnode.util.BinaryScaleFactor;
 import org.jnode.naming.InitialNaming;
 import javax.naming.NameNotFoundException;
 

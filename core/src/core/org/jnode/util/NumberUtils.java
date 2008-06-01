@@ -255,7 +255,7 @@ public class NumberUtils {
      * @return the text for of the size
      */
     public static String toDecimalByte(long v, int nbDecimals) {
-        return DecimalPrefix.apply(v, nbDecimals) + "B";
+        return DecimalScaleFactor.apply(v, nbDecimals) + "B";
     }
 
     /**
@@ -266,7 +266,7 @@ public class NumberUtils {
      * @return the text for of the size
      */
     public static String toBinaryByte(long v, int nbDecimals) {
-        return BinaryPrefix.apply(v, nbDecimals) + "B";
+        return BinaryScaleFactor.apply(v, nbDecimals) + "B";
     }
 
     /**

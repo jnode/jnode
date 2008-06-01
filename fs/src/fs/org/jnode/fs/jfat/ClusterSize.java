@@ -1,6 +1,6 @@
 package org.jnode.fs.jfat;
 
-import org.jnode.util.BinaryPrefix;
+import org.jnode.util.BinaryScaleFactor;
 
 
 public enum ClusterSize {
@@ -16,7 +16,7 @@ public enum ClusterSize {
 
     private ClusterSize(int sizeInKb)
     {
-    	size = (int) (sizeInKb * BinaryPrefix.K.getMultiplier()); //Converted into KB
+    	size = (int) (sizeInKb * BinaryScaleFactor.K.getMultiplier()); //Converted into KB
     }
 
     final public int getSize()

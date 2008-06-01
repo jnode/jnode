@@ -6,7 +6,7 @@ package org.jnode.util;
 import org.jnode.vm.annotation.SharedStatics;
 
 @SharedStatics
-public enum BinaryPrefix {
+public enum BinaryScaleFactor implements ScaleFactor {
     B(1l, ""),
     K(1024l, "K"),
     M(1024l * 1024l, "M"),
@@ -19,13 +19,13 @@ public enum BinaryPrefix {
     //Z(1024l*1024l*1024l*1024l*1024l*1024l*1024l, "Z"),
     //Y(1024l*1024l*1024l*1024l*1024l*1024l*1024l*1024l, "Y");
 
-    public static final BinaryPrefix MIN = B;
-    public static final BinaryPrefix MAX = E;
+    public static final BinaryScaleFactor MIN = B;
+    public static final BinaryScaleFactor MAX = E;
 
     final private long multiplier;
     final private String unit;
 
-    private BinaryPrefix(long multiplier, String unit) {
+    private BinaryScaleFactor(long multiplier, String unit) {
         this.multiplier = multiplier;
         this.unit = unit;
     }
@@ -51,8 +51,8 @@ public enum BinaryPrefix {
      */
     public static String apply(final long value, final int nbDecimals) {
         long v = value;
-        BinaryPrefix unit = null;
-        for (BinaryPrefix u : values()) {
+        BinaryScaleFactor unit = null;
+        for (BinaryScaleFactor u : values()) {
             if ((v < 1024) && (v >= 0)) {
                 unit = u;
                 break;
