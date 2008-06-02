@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.context;
 
 import org.jmock.MockObjectTestCase;
@@ -29,19 +29,16 @@ import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.support.MockObjectFactory;
 import org.jnode.test.support.TestConfig;
 
-public class MappedBlockDeviceSupportContext extends BlockDeviceAPIContext
-{
-    public MappedBlockDeviceSupportContext()
-    {
+public class MappedBlockDeviceSupportContext extends BlockDeviceAPIContext {
+    public MappedBlockDeviceSupportContext() {
         super("MappedBlockDeviceSupport");
     }
-            
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
         super.init(config, testCase);
-        
+
         Device parent = MockObjectFactory.createParentDevice();
-        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;        
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;
         MappedBlockDeviceSupport api = new MappedBlockDeviceSupport(parent, 0L, cfg.getDeviceSize());
         init(null, api, null);
     }

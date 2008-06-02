@@ -18,37 +18,32 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver;
 
-public class Partition
-{
+public class Partition {
     private final boolean extended;
     private final long startLba;
     private final long nbSectors;
-    
-    public Partition(final boolean extended, final long startLba, final long nbSectors)
-    {
+
+    public Partition(final boolean extended, final long startLba, final long nbSectors) {
         this.extended = extended;
         this.startLba = startLba;
         this.nbSectors = nbSectors;
     }
 
-    public boolean isExtended()
-    {
+    public boolean isExtended() {
         return extended;
     }
-    
 
-    public long getNbSectors()
-    {
+
+    public long getNbSectors() {
         return nbSectors;
     }
-    
 
-    public long getStartLba()
-    {
+
+    public long getStartLba() {
         return startLba;
     }
-    
+
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.support;
 
 import java.util.ArrayList;
@@ -26,98 +26,82 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 
-public class ConfigManager
-{   
+public class ConfigManager {
     private static final Logger log = Logger.getLogger(ConfigManager.class);
-    
-    static private ConfigManager instance; 
-    static private boolean log4jInitialized = false; 
-    
-    private Map<Class, List<TestConfig>> configs; 
-    private Map<TestKey, Iterator<TestConfig>> iterators; 
-    
-    static public ConfigManager getInstance()
-    {
-        if(instance == null)
-        {
+
+    static private ConfigManager instance;
+    static private boolean log4jInitialized = false;
+
+    private Map<Class, List<TestConfig>> configs;
+    private Map<TestKey, Iterator<TestConfig>> iterators;
+
+    static public ConfigManager getInstance() {
+        if (instance == null) {
             instance = new ConfigManager();
         }
-        
+
         return instance;
     }
-    
-    public void addConfig(TestConfig config)
-    {
+
+    public void addConfig(TestConfig config) {
         List<TestConfig> cfgs = configs.get(config.getClass());
-        if(cfgs == null)
-        {
+        if (cfgs == null) {
             cfgs = new ArrayList<TestConfig>();
             configs.put(config.getClass(), cfgs);
         }
-        
-        cfgs.add(config);        
+
+        cfgs.add(config);
     }
-    
-    public TestConfig getConfig(Class configClazz, Class clazz, String testName)
-    {
+
+    public TestConfig getConfig(Class configClazz, Class clazz, String testName) {
         TestKey key = new TestKey(clazz, testName);
-        
-        synchronized(iterators)
-        {
+
+        synchronized (iterators) {
             Iterator<TestConfig> it = iterators.get(key);
-            if(it == null)
-            {
+            if (it == null) {
                 List<TestConfig> cfgs = configs.get(configClazz);
                 it = cfgs.iterator();
                 iterators.put(key, it);
             }
             TestConfig cfg = it.next();
-            log.info(key+" got config "+cfg);
+            log.info(key + " got config " + cfg);
             return cfg;
-        }        
+        }
     }
-    
-    private ConfigManager()
-    {        
-        configs = new HashMap<Class, List<TestConfig>>(); 
+
+    private ConfigManager() {
+        configs = new HashMap<Class, List<TestConfig>>();
         iterators = new HashMap<TestKey, Iterator<TestConfig>>();
         ContextManager.getInstance().init();
-    }        
-    
-    static private class TestKey
-    {
+    }
+
+    static private class TestKey {
         private Class clazz;
         private String testName;
-        
-        public TestKey(Class clazz, String testName)
-        {
+
+        public TestKey(Class clazz, String testName) {
             this.clazz = clazz;
-            this.testName = testName;            
+            this.testName = testName;
         }
 
-        public boolean equals(Object o)
-        {
-            if((o == null) || !(o instanceof TestKey))
-            {
+        public boolean equals(Object o) {
+            if ((o == null) || !(o instanceof TestKey)) {
                 return false;
             }
-            
+
             TestKey tk = (TestKey) o;
-            return (tk.clazz == this.clazz) && tk.testName.equals(this.testName); 
+            return (tk.clazz == this.clazz) && tk.testName.equals(this.testName);
         }
-        
-        public int hashCode()
-        {
+
+        public int hashCode() {
             return testName.hashCode();
         }
-        
-        public String toString()
-        {
-            return clazz.getName()+"."+testName; 
+
+        public String toString() {
+            return clazz.getName() + "." + testName;
         }
     }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.factories;
 
 import org.jmock.cglib.Mock;
@@ -42,10 +42,10 @@ import org.jnode.test.support.MockInitializer;
 import org.jnode.test.support.MockUtils;
 
 public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
-        IDEDeviceFactory {
+    IDEDeviceFactory {
     public IDEDevice createIDEDevice(IDEBus bus, boolean primary,
-            boolean master, String name, IDEDriveDescriptor descriptor,
-            DefaultIDEControllerDriver controller) {
+                                     boolean master, String name, IDEDriveDescriptor descriptor,
+                                     DefaultIDEControllerDriver controller) {
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockIDEDevice) {
                 // Boolean diskChanged = Boolean.FALSE;
@@ -55,22 +55,22 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
         };
 
         return MockUtils.createMockObject(IDEDevice.class,
-                initializer);
+            initializer);
     }
 
     public IDEBus createIDEBus(Device parent, boolean primary) {
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockIDEBus) {
                 mockIDEBus.expects(testCase.atLeastOnce()).method(
-                        "executeAndWait").withAnyArguments();
+                    "executeAndWait").withAnyArguments();
             }
         };
 
-        Class[] argCls = new Class[] { Device.class, boolean.class };
-        Object[] args = new Object[] { parent, Boolean.valueOf(primary) };
+        Class[] argCls = new Class[]{Device.class, boolean.class};
+        Object[] args = new Object[]{parent, Boolean.valueOf(primary)};
 
         return (IDEBus) MockUtils.createMockObject(IDEBus.class, initializer,
-                argCls, args);
+            argCls, args);
     }
 
     public IDEIO createIDEIO(Device parent, boolean primary) {
@@ -78,15 +78,14 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             public void init(Mock mockIDEIO) {
                 Integer irq = new Integer(13);
                 mockIDEIO.expects(testCase.atLeastOnce()).method("getIrq")
-                        .withNoArguments().will(new ReturnStub(irq));
+                    .withNoArguments().will(new ReturnStub(irq));
 
                 mockIDEIO.expects(testCase.atLeastOnce()).method(
-                        "setControlReg").withAnyArguments();
+                    "setControlReg").withAnyArguments();
 
                 Integer statusReg = new Integer(13);
                 mockIDEIO.expects(testCase.atLeastOnce())
-                        .method("getStatusReg").withNoArguments().will(
-                                new ReturnStub(statusReg));
+                    .method("getStatusReg").withNoArguments().will(new ReturnStub(statusReg));
             }
         };
 
@@ -99,34 +98,33 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
     }
 
     private IBMPartitionTableEntry createEntry(int partNum,
-            final boolean extended, final long startLba, final long nbSectors) {
+                                               final boolean extended, final long startLba, final long nbSectors) {
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockEntry) {
                 Boolean valid = Boolean.TRUE;
                 mockEntry.expects(testCase.atLeastOnce()).method("isValid")
-                        .withNoArguments().will(new ReturnStub(valid));
+                    .withNoArguments().will(new ReturnStub(valid));
 
                 Boolean bExtended = Boolean.valueOf(extended);
                 mockEntry.expects(testCase.atLeastOnce()).method("isExtended")
-                        .withNoArguments().will(new ReturnStub(bExtended));
+                    .withNoArguments().will(new ReturnStub(bExtended));
 
                 Long lStartLba = new Long(0);
                 mockEntry.expects(testCase.atLeastOnce()).method("getStartLba")
-                        .withNoArguments().will(new ReturnStub(lStartLba));
+                    .withNoArguments().will(new ReturnStub(lStartLba));
 
                 Long lNbSectors = new Long(nbSectors);
                 mockEntry.expects(testCase.atLeastOnce())
-                        .method("getNrSectors").withNoArguments().will(
-                                new ReturnStub(lNbSectors));
+                    .method("getNrSectors").withNoArguments().will(new ReturnStub(lNbSectors));
             }
         };
 
-        Class[] argCls = new Class[] { byte[].class, int.class };
-        Object[] args = new Object[] { new byte[IDEConstants.SECTOR_SIZE],
-                new Integer(partNum) };
+        Class[] argCls = new Class[]{byte[].class, int.class};
+        Object[] args = new Object[]{new byte[IDEConstants.SECTOR_SIZE],
+            new Integer(partNum)};
 
         return (IBMPartitionTableEntry) MockUtils.createMockObject(
-                IBMPartitionTableEntry.class, initializer, argCls, args);
+            IBMPartitionTableEntry.class, initializer, argCls, args);
     }
 
     public class GetEntryStub implements Stub {
@@ -143,10 +141,10 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
         @SuppressWarnings("unchecked")
         public Object invoke(Invocation invocation) throws Throwable {
             int index = ((Integer) invocation.parameterValues.get(0))
-                    .intValue();
+                .intValue();
             Partition part = partitions[index];
             IBMPartitionTableEntry entry = createEntry(index,
-                    part.isExtended(), part.getStartLba(), part.getNbSectors());
+                part.isExtended(), part.getStartLba(), part.getNbSectors());
             return entry;
         }
     }
@@ -155,23 +153,23 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
         MockInitializer initializer = new MockInitializer() {
             public void init(Mock mockTable) {
                 final BlockDeviceAPIContext context = (BlockDeviceAPIContext) ContextManager
-                        .getInstance().getContext();
+                    .getInstance().getContext();
                 final Partition[] parts = context.getPartitions();
                 log.debug("with " + parts.length + " partitions");
 
                 Integer nbParts = new Integer(parts.length);
                 mockTable.expects(testCase.atLeastOnce()).method("getLength")
-                        .withNoArguments().will(new ReturnStub(nbParts));
+                    .withNoArguments().will(new ReturnStub(nbParts));
 
                 mockTable.expects(testCase.atLeastOnce()).method("getEntry")
-                        .withAnyArguments().will(new GetEntryStub(parts));
+                    .withAnyArguments().will(new GetEntryStub(parts));
             }
         };
 
-        Class[] argCls = new Class[] { byte[].class, Device.class };
-        Object[] args = new Object[] { bs, dev };
+        Class[] argCls = new Class[]{byte[].class, Device.class};
+        Object[] args = new Object[]{bs, dev};
 
         return (IBMPartitionTable) MockUtils.createMockObject(
-                IBMPartitionTable.class, initializer, argCls, args);
+            IBMPartitionTable.class, initializer, argCls, args);
     }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.context;
 
 import org.jmock.MockObjectTestCase;
@@ -27,19 +27,16 @@ import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.support.TestConfig;
 
-public class ByteArrayDeviceContext extends BlockDeviceAPIContext
-{
-    public ByteArrayDeviceContext()
-    {
+public class ByteArrayDeviceContext extends BlockDeviceAPIContext {
+    public ByteArrayDeviceContext() {
         super("ByteArrayDevice");
     }
 
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
         super.init(config, testCase);
-        
-        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;                 
+
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;
         ByteArrayDevice device = new ByteArrayDevice(new byte[cfg.getDeviceSize()]);
         init(null, device, null);
-    }                
+    }
 }

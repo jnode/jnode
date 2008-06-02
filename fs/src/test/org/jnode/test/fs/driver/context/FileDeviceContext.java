@@ -18,38 +18,33 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.context;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.support.TestConfig;
 import org.jnode.test.support.TestUtils;
 
-public class FileDeviceContext extends BlockDeviceAPIContext
-{
+public class FileDeviceContext extends BlockDeviceAPIContext {
     final private File f;
 
-    public FileDeviceContext() throws IOException
-    {
+    public FileDeviceContext() throws IOException {
         super("FileDevice");
         f = TestUtils.makeTempFile("TestFileDevice", "1M");
     }
-    
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
         super.init(config, testCase);
-        
+
         FileDevice device = new FileDevice(f, "rw");
         init(null, device, null);
     }
-    
-    protected void destroyImpl()
-    {
+
+    protected void destroyImpl() {
         f.delete();
-    }                    
+    }
 }

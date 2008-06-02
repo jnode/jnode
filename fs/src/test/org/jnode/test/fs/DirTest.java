@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import java.io.File;
@@ -32,16 +32,17 @@ public class DirTest {
      * @param args
      */
     public static void main(String[] args) {
-        
+
         final String name = (args.length > 0) ? args[0] : "";
         System.out.println("Creating File(\"" + name + "\")");
         final File f = new File(name);
         System.out.println("Created File(\"" + name + "\")");
-        
+
         System.out.println("List entries on File(\"" + name + "\")");
         final String[] entries = f.list();
-        System.out.println("Listed " + ((entries != null) ? ""+entries.length : "#null#") + " entries on File(\"" + name + "\")");
-        
+        System.out.println(
+            "Listed " + ((entries != null) ? "" + entries.length : "#null#") + " entries on File(\"" + name + "\")");
+
     }
 
 }

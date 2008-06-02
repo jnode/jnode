@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.context;
 
 import java.io.IOException;
-
 import javax.naming.NamingException;
-
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.block.floppy.FloppyControllerFinder;
@@ -36,34 +34,31 @@ import org.jnode.test.fs.driver.factories.MockFloppyDeviceFactory;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.TestConfig;
 
-public class FloppyDriverContext extends BlockDeviceAPIContext
-{
-    public FloppyDriverContext()
-    {
+public class FloppyDriverContext extends BlockDeviceAPIContext {
+    public FloppyDriverContext() {
         super("FloppyDriver");
     }
-    
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
         super.init(config, testCase);
-        
+
         // set the current testCase for our factory
         MockFloppyDeviceFactory factory;
         try {
-            factory = (MockFloppyDeviceFactory) 
-                                    FloppyDriverUtils.getFloppyDeviceFactory();
+            factory = (MockFloppyDeviceFactory)
+                FloppyDriverUtils.getFloppyDeviceFactory();
         } catch (NamingException ex) {
-            throw (IOException)new IOException().initCause(ex);
+            throw (IOException) new IOException().initCause(ex);
         }
         factory.setTestCase(testCase);
-        
+
         DeviceFinder deviceFinder = new FloppyControllerFinder();
-        
-        StubDeviceManager.INSTANCE.removeAll();                
+
+        StubDeviceManager.INSTANCE.removeAll();
         StubDeviceManager.INSTANCE.add(deviceFinder, new FloppyDeviceToDriverMapper());
-        
+
         FloppyDriver driver = (FloppyDriver) findDriver(deviceFinder, "fd0");
-        log.debug("findDriver->"+driver);
-        init(null, driver, null);                    
+        log.debug("findDriver->" + driver);
+        init(null, driver, null);
     }
 }

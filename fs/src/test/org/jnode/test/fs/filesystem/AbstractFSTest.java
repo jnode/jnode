@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem;
 
 import java.io.IOException;
@@ -27,11 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import junit.extensions.jfunc.JFuncTestCase;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -40,105 +37,98 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
-import org.jnode.test.fs.filesystem.config.FSType;
 import org.jnode.test.support.TestUtils;
 
 /**
- * 
  * @author Fabien DUMINY
  */
 public abstract class AbstractFSTest extends JFuncTestCase {
-	final protected Logger log = Logger.getLogger(getClass());
-	
-	//public static final int FILE_SIZE_IN_WORDS = 256 * 1024; // 512 Ko = 256 K Words
-	public static final int FILE_SIZE_IN_WORDS = 128; // 512 Ko = 128 K Words	
-    
-	private FileSystem fs;
-	private FSTestConfig config;
-	private Device device;
-	
-	public AbstractFSTest()
-    {
+    final protected Logger log = Logger.getLogger(getClass());
+
+    //public static final int FILE_SIZE_IN_WORDS = 256 * 1024; // 512 Ko = 256 K Words
+    public static final int FILE_SIZE_IN_WORDS = 128; // 512 Ko = 128 K Words
+
+    private FileSystem fs;
+    private FSTestConfig config;
+    private Device device;
+
+    public AbstractFSTest() {
         super();
     }
 
     /**
-	 * 
-	 */
-	protected AbstractFSTest(String name)
-	{
+     *
+     */
+    protected AbstractFSTest(String name) {
         super(name);
-	}
-	
-	final protected void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException, InstantiationException, IllegalAccessException, Exception
-	{
-		super.setUp();
-		
-		this.config = config;
-		this.device = config.getDeviceParam().createDevice();
-		this.fs = config.getFileSystem().mount(this.device);
-	}
-	
-	final public void tearDown() throws Exception
-	{
-		config.getDeviceParam().tearDown(device);
-		super.tearDown();				
-	}
-	
-//	/**
-//	 * @return Returns the device.
-//	 */
-//	protected Device getDevice() {
-//		return device;
-//	}
-//	/**
-//	 * @return Returns the readOnly.
-//	 */
-//	final protected boolean isReadOnly() {
-//		return getFSTestConfig().isReadOnly();
-//	}
+    }
 
-	/**
-	 * @return Returns the fs.
-	 */
-	final protected FileSystem getFs() {
-		return fs;
-	}
+    final protected void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException,
+        InstantiationException, IllegalAccessException, Exception {
+        super.setUp();
 
-	/**
-	 * 
-	 */
-//	public void setUp() throws Exception
-//	{
-//        super.setUp();
+        this.config = config;
+        this.device = config.getDeviceParam().createDevice();
+        this.fs = config.getFileSystem().mount(this.device);
+    }
+
+    final public void tearDown() throws Exception {
+        config.getDeviceParam().tearDown(device);
+        super.tearDown();
+    }
+
+//  /**
+//   * @return Returns the device.
+//   */
+//  protected Device getDevice() {
+//      return device;
+//  }
+//  /**
+//   * @return Returns the readOnly.
+//   */
+//  final protected boolean isReadOnly() {
+//      return getFSTestConfig().isReadOnly();
+//  }
+
+    /**
+     * @return Returns the fs.
+     */
+    final protected FileSystem getFs() {
+        return fs;
+    }
+
+    /**
+     *
+     */
+//  public void setUp() throws Exception
+//  {
+//      super.setUp();
 //        
-//        device = getFSContext().getWorkDevice();
-//		fs = TestUtils.mountDevice(device, getFSTestConfig().getFsClass(), getFSTestConfig().isReadOnly());		
-//	}
-	
-//	/**
-//	 * 
-//	 */
-//	public void tearDown() throws Exception
-//	{
-//		if(fs != null)
-//		{
-//			fs.close();
-//			fs = null;
-//		}
-//		super.tearDown();
-//	}
+//     device = getFSContext().getWorkDevice();
+//      fs = TestUtils.mountDevice(device, getFSTestConfig().getFsClass(), getFSTestConfig().isReadOnly());
+//  }
 
-	/**
-	 * 
-	 * @param isRoot
-	 * @return
-	 */
-	final protected String[] getEmptyDirNames(FSTestConfig config, boolean isRoot)
-	{
-		return config.getFileSystem().getType().getEmptyDirNames(isRoot);
-	}
-    
+//  /**
+//   *
+//   */
+//  public void tearDown() throws Exception
+//  {
+//      if(fs != null)
+//      {
+//          fs.close();
+//          fs = null;
+//      }
+//      super.tearDown();
+//  }
+
+    /**
+     * @param isRoot
+     * @return
+     */
+    final protected String[] getEmptyDirNames(FSTestConfig config, boolean isRoot) {
+        return config.getFileSystem().getType().getEmptyDirNames(isRoot);
+    }
+
 //    final protected FSTestConfig getFSTestConfig()
 //    {
 //        return (FSTestConfig) getTestConfig();
@@ -148,89 +138,80 @@ public abstract class AbstractFSTest extends JFuncTestCase {
 //    {
 //        return (FSContext) ContextManager.getInstance().getContext();
 //    }
-    
-    protected void assertFalse(String message, boolean condition)
-    {
-    	assertTrue(message, !condition);
+
+    protected void assertFalse(String message, boolean condition) {
+        assertTrue(message, !condition);
     }
-    
-    protected void assertContainsOnly(String errorMessage, Iterator<? extends FSEntry> it, String[] requiredNames)
-    {
+
+    protected void assertContainsOnly(String errorMessage, Iterator<? extends FSEntry> it, String[] requiredNames) {
         boolean ok = true;
-        List<String> reqNames = (requiredNames == null) ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(requiredNames));
+        List<String> reqNames =
+            (requiredNames == null) ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(requiredNames));
         List<String> names = TestUtils.getEntryNames(it);
 
         //log.debug("reqNames="+reqNames);
         //log.debug("names="+names);
 
         // remove required names from list
-        for(int i = 0 ; i < reqNames.size(); i++)
-        {
-            if(!names.remove(reqNames.get(i)))
-            {
+        for (int i = 0; i < reqNames.size(); i++) {
+            if (!names.remove(reqNames.get(i))) {
                 ok = false;
                 break;
             }
         }
 
-        if(ok)
-        {
+        if (ok) {
             // remaining names must be null
-            for(int i = 0 ; i < names.size(); i++)
-            {
-                if(names.get(i) != null)
-                {
+            for (int i = 0; i < names.size(); i++) {
+                if (names.get(i) != null) {
                     ok = false;
                     break;
                 }
             }
         }
 
-        assertTrue(errorMessage+" (must contains only "+TestUtils.toString(reqNames)+") found: "+
-                TestUtils.toString(names), ok);
+        assertTrue(errorMessage + " (must contains only " + TestUtils.toString(reqNames) + ") found: " +
+            TestUtils.toString(names), ok);
     }
-	
-	/**
-	 * 
-	 * @param readOnly
-	 * @throws NameNotFoundException
-	 * @throws IOException
-	 * @throws FileSystemException
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 */
-	final protected void remountFS(FSTestConfig config, boolean readOnly) 
-				throws NameNotFoundException, IOException, FileSystemException, InstantiationException, IllegalAccessException
-	{
-		fs.close();
-		fs = config.getFileSystem().getType().mount(fs.getDevice(), readOnly);
-	}
-	
-	/**
-	 * 
-	 * @param fileName
-	 * @param fileSizeInWords
-	 * @return
-	 * @throws Exception
-	 * @throws IOException
-	 * @throws FileSystemException
-	 */
-	final protected byte[] addTestFile(String fileName, int fileSizeInWords) throws Exception, IOException, FileSystemException
-	{
-		boolean oldReadOnly = config.isReadOnly();
-		
-		// remount FS in write mode, and write some data to our test file
-		remountFS(config, false); // false = read/write mode
-		
-		FSDirectory rootDir = fs.getRootEntry().getDirectory();
-		ByteBuffer data = ByteBuffer.wrap(TestUtils.getTestData(fileSizeInWords));
-		FSFile file = rootDir.addFile(fileName).getFile();			
-		file.write(0, data);
-		file.flush();
 
-		// remount FS in readOnly mode
-		remountFS(config, oldReadOnly);
-		
-		return data.array();
-	}
+    /**
+     * @param readOnly
+     * @throws NameNotFoundException
+     * @throws IOException
+     * @throws FileSystemException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    final protected void remountFS(FSTestConfig config, boolean readOnly)
+        throws NameNotFoundException, IOException, FileSystemException, InstantiationException, IllegalAccessException {
+        fs.close();
+        fs = config.getFileSystem().getType().mount(fs.getDevice(), readOnly);
+    }
+
+    /**
+     * @param fileName
+     * @param fileSizeInWords
+     * @return
+     * @throws Exception
+     * @throws IOException
+     * @throws FileSystemException
+     */
+    final protected byte[] addTestFile(String fileName, int fileSizeInWords)
+        throws Exception, IOException, FileSystemException {
+        boolean oldReadOnly = config.isReadOnly();
+
+        // remount FS in write mode, and write some data to our test file
+        remountFS(config, false); // false = read/write mode
+
+        FSDirectory rootDir = fs.getRootEntry().getDirectory();
+        ByteBuffer data = ByteBuffer.wrap(TestUtils.getTestData(fileSizeInWords));
+        FSFile file = rootDir.addFile(fileName).getFile();
+        file.write(0, data);
+        file.flush();
+
+        // remount FS in readOnly mode
+        remountFS(config, oldReadOnly);
+
+        return data.array();
+    }
 }

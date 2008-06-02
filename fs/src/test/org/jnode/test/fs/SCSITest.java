@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
@@ -49,7 +48,7 @@ public class SCSITest {
 
     private final SCSIDeviceAPI api;
 
-    private final byte[] data = new byte[ 4096];
+    private final byte[] data = new byte[4096];
 
     private String name = "sg0";
 
@@ -63,16 +62,16 @@ public class SCSITest {
     }
 
     public SCSITest(String[] args) throws ApiNotFoundException,
-            NameNotFoundException, DeviceNotFoundException {
+        NameNotFoundException, DeviceNotFoundException {
         processArgs(args);
         final DeviceManager dm = InitialNaming
-                .lookup(DeviceManager.NAME);
+            .lookup(DeviceManager.NAME);
         final Device dev = dm.getDevice(name);
         api = dev.getAPI(SCSIDeviceAPI.class);
     }
 
     public void run() throws SCSIException, TimeoutException,
-            InterruptedException {
+        InterruptedException {
         try {
             if (lock) {
                 setMediaRemoval(true, false);
@@ -91,7 +90,7 @@ public class SCSITest {
 
     private void processArgs(String[] args) {
         for (int i = 0; i < args.length; i++) {
-            final String arg = args[ i];
+            final String arg = args[i];
             if (arg.startsWith("-")) {
                 if (arg.equals("-lock")) {
                     lock = true;
@@ -105,21 +104,21 @@ public class SCSITest {
     }
 
     private void setMediaRemoval(boolean prevent, boolean persistent)
-            throws SCSIException, TimeoutException, InterruptedException {
+        throws SCSIException, TimeoutException, InterruptedException {
         final CDB cdb = new CDBMediaRemoval(prevent, persistent);
         api.executeCommand(cdb, null, 0, 5000);
     }
 
     public SenseData requestSense() throws SCSIException,
-            TimeoutException, InterruptedException {
-        final byte[] data = new byte[ 256];
+        TimeoutException, InterruptedException {
+        final byte[] data = new byte[256];
         final CDB cdb = new CDBRequestSense(data.length);
         api.executeCommand(cdb, data, 0, 5000);
         return new SenseData(data);
     }
 
     private CapacityData readCapacity() throws SCSIException, TimeoutException,
-            InterruptedException {
+        InterruptedException {
         final CDB cdb = new CDBReadCapacity();
         api.executeCommand(cdb, data, 0, 5000);
         CapacityData rc = new CapacityData(data);
@@ -128,24 +127,24 @@ public class SCSITest {
     }
 
     private void readBlocks(CapacityData cap, int lba, int nrBlocks)
-            throws SCSIException, TimeoutException, InterruptedException {
-        final byte[] data = new byte[ nrBlocks * cap.getBlockLength()];
+        throws SCSIException, TimeoutException, InterruptedException {
+        final byte[] data = new byte[nrBlocks * cap.getBlockLength()];
         final CDB cdb = new CDBRead10(lba, nrBlocks);
         final int len = api.executeCommand(cdb, data, 0, 5000);
         System.out.println("Read " + NumberUtils.hex(data, 0, len));
     }
 
     private void reportLuns() throws SCSIException, TimeoutException,
-            InterruptedException {
-        final byte[] data = new byte[ 4096];
+        InterruptedException {
+        final byte[] data = new byte[4096];
         final CDB cdb = new CDBReportLuns(data.length);
         final int len = api.executeCommand(cdb, data, 0, 5000);
         System.out.println("ReportLuns" + NumberUtils.hex(data, 0, len));
     }
 
     private void getConfig() throws SCSIException, TimeoutException,
-            InterruptedException {
-        final byte[] data = new byte[ 4096];
+        InterruptedException {
+        final byte[] data = new byte[4096];
         final CDB cdb = new CDBGetConfiguration(0, 0);
         final int len = api.executeCommand(cdb, data, 0, 5000);
         System.out.println("GetConfig " + NumberUtils.hex(data, 0, len));

@@ -30,9 +30,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -43,17 +41,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.ext2.Ext2FileSystem;
-import org.jnode.fs.ext2.Ext2FileSystemType;
-import org.jnode.fs.fat.FatFileSystem;
-import org.jnode.fs.fat.FatFileSystemType;
-import org.jnode.fs.iso9660.ISO9660FileSystem;
-import org.jnode.fs.iso9660.ISO9660FileSystemType;
-import org.jnode.fs.ntfs.NTFSFileSystem;
-import org.jnode.fs.ntfs.NTFSFileSystemType;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.naming.InitialNaming;
 import org.jnode.util.NumberUtils;
@@ -64,14 +52,13 @@ import org.jnode.util.NumberUtils;
 public class TestUtils {
     /**
      * @param filename
-     * @param size
-     *            a number eventually followed by a multiplier (K: Kilobytes, M:
-     *            Megabytes, G:Gigabytes)
+     * @param size     a number eventually followed by a multiplier (K: Kilobytes, M:
+     *                 Megabytes, G:Gigabytes)
      * @return
      * @throws IOException
      */
     static public File makeTempFile(String filename, String size)
-            throws IOException {
+        throws IOException {
         File tempFile = File.createTempFile(filename, "");
         tempFile.deleteOnExit();
 
@@ -121,7 +108,7 @@ public class TestUtils {
     }
 
     static public String toString(String filename, int offset, int length)
-            throws IOException {
+        throws IOException {
         // byte[] buf = new byte[1024];
         File file = new File(filename);
         FileInputStream input = new FileInputStream(file);
@@ -165,13 +152,13 @@ public class TestUtils {
     }
 
     static public File copyFile(String srcFile, String destFile)
-            throws SecurityException, IOException {
+        throws SecurityException, IOException {
         return copyInputStreamToFile(new FileInputStream(new File(srcFile)),
-                destFile);
+            destFile);
     }
 
     static public File copyInputStreamToFile(InputStream src, String destFile)
-            throws SecurityException, IOException {
+        throws SecurityException, IOException {
         File dest = new File(destFile);
 
         if (dest.exists())
@@ -204,10 +191,10 @@ public class TestUtils {
     }
 
     static public File copyDeviceToFile(Device imageDevice, String destFile)
-            throws SecurityException, IOException, ApiNotFoundException {
+        throws SecurityException, IOException, ApiNotFoundException {
         File dest = new File(destFile);
         BlockDeviceAPI imgApi = imageDevice
-                .getAPI(BlockDeviceAPI.class);
+            .getAPI(BlockDeviceAPI.class);
 
         if (dest.exists())
             dest.delete();
@@ -221,8 +208,7 @@ public class TestUtils {
             int toRead = 0;
             long devOffset = 0;
             long remaining = imgApi.getLength();
-            while (remaining > 0)
-            {
+            while (remaining > 0) {
                 toRead = (int) Math.min(buffer.length, remaining);
                 imgApi.read(devOffset, ByteBuffer.wrap(buffer, 0, toRead));
                 fos.write(buffer, 0, toRead);
@@ -257,10 +243,10 @@ public class TestUtils {
      */
 
     public static void copyInputStreamToDevice(InputStream imageStream,
-            Device workDevice) throws ApiNotFoundException,
-            NameNotFoundException, IOException, FileSystemException {
+                                               Device workDevice) throws ApiNotFoundException,
+        NameNotFoundException, IOException, FileSystemException {
         BlockDeviceAPI wrkApi = workDevice
-                .getAPI(BlockDeviceAPI.class);
+            .getAPI(BlockDeviceAPI.class);
 
         int sectorSize = 512;
         byte[] sector = new byte[sectorSize];
@@ -278,11 +264,11 @@ public class TestUtils {
     }
 
     public static void copyDevice(Device imageDevice, Device workDevice)
-            throws ApiNotFoundException, IOException {
+        throws ApiNotFoundException, IOException {
         BlockDeviceAPI imgApi = imageDevice
-                .getAPI(BlockDeviceAPI.class);
+            .getAPI(BlockDeviceAPI.class);
         BlockDeviceAPI wrkApi = workDevice
-                .getAPI(BlockDeviceAPI.class);
+            .getAPI(BlockDeviceAPI.class);
 
         if (imgApi.getLength() != wrkApi.getLength())
             throw new IllegalArgumentException("devices of different length");
@@ -378,7 +364,7 @@ public class TestUtils {
         RamDiskDevice dev = null;
         try {
             final DeviceManager dm = InitialNaming
-                    .lookup(DeviceManager.NAME);
+                .lookup(DeviceManager.NAME);
             dev = new RamDiskDevice(null, "dummy", size);
             dev.setDriver(new RamDiskDriver(null));
             dm.register(dev);
@@ -407,13 +393,13 @@ public class TestUtils {
      * @return
      * @throws Exception
      */
-    static public Object newInstance(String className, Class< ? > cls)
-            throws Exception {
-        Class< ? > clazz = Class.forName(className);
+    static public Object newInstance(String className, Class<?> cls)
+        throws Exception {
+        Class<?> clazz = Class.forName(className);
         Object instance = clazz.newInstance();
         if ((instance != null) && !cls.isAssignableFrom(instance.getClass()))
             throw new IllegalArgumentException(className
-                    + " is not an instanceof " + cls.getName());
+                + " is not an instanceof " + cls.getName());
 
         return instance;
     }

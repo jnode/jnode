@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.test.fs.driver.context.ByteArrayDeviceContext;
 import org.jnode.test.fs.driver.context.FileDeviceContext;
 import org.jnode.test.fs.driver.context.FloppyDriverContext;
@@ -33,31 +32,28 @@ import org.jnode.test.fs.driver.tests.BlockDeviceAPITest;
 import org.jnode.test.support.AbstractTestSuite;
 import org.jnode.test.support.TestConfig;
 
-public class BlockDeviceAPITestSuite extends AbstractTestSuite
-{
-	public BlockDeviceAPITestSuite()
-	{
-		System.out.println("new BlockDeviceAPITestSuite");
-	}
-	
-    public List<TestConfig> getConfigs()
-    {
+public class BlockDeviceAPITestSuite extends AbstractTestSuite {
+    public BlockDeviceAPITestSuite() {
+        System.out.println("new BlockDeviceAPITestSuite");
+    }
+
+    public List<TestConfig> getConfigs() {
         List<TestConfig> configs = new ArrayList<TestConfig>();
         BlockDeviceAPITestConfig cfg;
-        
-        addConfig(configs, RamDiskDriverContext.class);     
+
+        addConfig(configs, RamDiskDriverContext.class);
         addConfig(configs, ByteArrayDeviceContext.class);
-               
+
         addConfig(configs, FloppyDriverContext.class);
-        addConfig(configs, FileDeviceContext.class);        
+        addConfig(configs, FileDeviceContext.class);
 
         // with no partition
         cfg = addConfig(configs, IDEDiskDriverContext.class);
-        
+
         // with one partition
         cfg = addConfig(configs, IDEDiskDriverContext.class);
         cfg.addPartition(new Partition(false, 0, cfg.getDeviceNbSectors()));
-        
+
         // with two partitions
         cfg = addConfig(configs, IDEDiskDriverContext.class);
         int nbSectors1 = cfg.getDeviceNbSectors() / 2;
@@ -74,28 +70,23 @@ public class BlockDeviceAPITestSuite extends AbstractTestSuite
 //        nbSectors2 = cfg.getDeviceNbSectors() - nbSectors1;
 //        cfg.addPartition(new Partition(false, 0, nbSectors1));
 //        cfg.addPartition(new Partition(false, nbSectors1-overlapSectors, nbSectors2));
-                
+
 //        addConfig(configs, IDEDiskPartitionDriverContext.class);//TODO: develop stubs ?
 //        
 //        addConfig(configs, SCSICDROMDriverContext.class); //TODO: develop stubs ?
 //        addConfig(configs, BlockAlignmentSupportContext.class);  //TODO: develop stubs ?
 //        addConfig(configs, MappedBlockDeviceSupportContext.class);//TODO: develop stubs ? 
-        
+
         return configs;
     }
-    
-    protected BlockDeviceAPITestConfig addConfig(List<TestConfig> configs, Class contextClass)
-    {
+
+    protected BlockDeviceAPITestConfig addConfig(List<TestConfig> configs, Class contextClass) {
         BlockDeviceAPITestConfig cfg = new BlockDeviceAPITestConfig(contextClass);
-        configs.add(cfg);            
+        configs.add(cfg);
         return cfg;
     }
-    
-    public Class[] getTestSuites()
-    {
-        return new Class[]
-                  {
-                        BlockDeviceAPITest.class, 
-                  };
+
+    public Class[] getTestSuites() {
+        return new Class[]{BlockDeviceAPITest.class};
     }
 }

@@ -18,50 +18,43 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import org.jnode.util.NumberUtils;
 
 
 /**
- * @author Fabien DUMINY 
- *
+ * @author Fabien DUMINY
  */
-public class RamDiskParam extends JNodeDeviceParam 
-{
-	/**
-	 * 
-	 *
-	 */
-	public RamDiskParam()
-	{
-	}
-	
-	/**
-	 * 
-	 * @param size
-	 */
-	public void setSize(String size)
-	{
-		ramdiskSize = NumberUtils.getSize(size);
-	}
-	
-	/**
-	 * 
-	 */
-	public long getSize()
-	{
-		return ramdiskSize;
-	}
+public class RamDiskParam extends JNodeDeviceParam {
+    /**
+     *
+     *
+     */
+    public RamDiskParam() {
+    }
 
-	/**
-	 * 
-	 */
-	public String toString()
-	{
-		return "Ramdisk["+getDeviceName() + ' ' + NumberUtils.size(ramdiskSize) + "]";
-	}
-			
-	private long ramdiskSize;
+    /**
+     * @param size
+     */
+    public void setSize(String size) {
+        ramdiskSize = NumberUtils.getSize(size);
+    }
+
+    /**
+     *
+     */
+    public long getSize() {
+        return ramdiskSize;
+    }
+
+    /**
+     *
+     */
+    public String toString() {
+        return "Ramdisk[" + getDeviceName() + ' ' + NumberUtils.size(ramdiskSize) + "]";
+    }
+
+    private long ramdiskSize;
 }

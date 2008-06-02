@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -38,30 +36,32 @@ import org.jnode.naming.InitialNaming;
  * @author epr
  */
 public class FloppyTest {
-	
-	/** My logger */
-	private static final Logger log = Logger.getLogger(FloppyTest.class);
-	
-	public static void main(String[] args) { 
-		
-		try {
-			final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-			final Device fd0 = dm.getDevice ("fd0");
-			final BlockDeviceAPI api = fd0.getAPI(BlockDeviceAPI.class);
-			try {
-				
-				final ByteBuffer buf = ByteBuffer.allocate(512);
-				api.read(0, buf);
-			} catch (IOException ex) {
-				log.error("Oops", ex);
-			}
-		} catch (ApiNotFoundException ex) {
-			log.error("BlockDeviceAPI not found", ex);
-		} catch (DeviceNotFoundException ex) {
-			log.error("fd0 device not found", ex);
-		} catch (NameNotFoundException ex) {
-			log.error("device manager not found", ex);
-		}
-	}
+
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(FloppyTest.class);
+
+    public static void main(String[] args) {
+
+        try {
+            final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+            final Device fd0 = dm.getDevice("fd0");
+            final BlockDeviceAPI api = fd0.getAPI(BlockDeviceAPI.class);
+            try {
+
+                final ByteBuffer buf = ByteBuffer.allocate(512);
+                api.read(0, buf);
+            } catch (IOException ex) {
+                log.error("Oops", ex);
+            }
+        } catch (ApiNotFoundException ex) {
+            log.error("BlockDeviceAPI not found", ex);
+        } catch (DeviceNotFoundException ex) {
+            log.error("fd0 device not found", ex);
+        } catch (NameNotFoundException ex) {
+            log.error("device manager not found", ex);
+        }
+    }
 
 }

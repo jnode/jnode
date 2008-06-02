@@ -22,9 +22,7 @@
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -43,25 +41,25 @@ import org.jnode.fs.ntfs.NTFSFileSystemType;
  */
 public enum FSType {
     EXT2("ext2", Ext2FileSystem.class, Ext2FileSystemType.class,
-    				new String[] { ".", "..", "lost+found" }),
+        new String[]{".", "..", "lost+found"}),
     FAT("fat", FatFileSystem.class, FatFileSystemType.class,
-    				null),
+        null),
 
     ISO9660("iso9660", ISO9660FileSystem.class, ISO9660FileSystemType.class,
-    				new String[] { ".", ".." }),
+        new String[]{".", ".."}),
     NTFS("ntfs", NTFSFileSystem.class, NTFSFileSystemType.class,
-    				new String[] { "." });
+        new String[]{"."});
 
-    final private Class< ? extends FileSystem> fsClass;
+    final private Class<? extends FileSystem> fsClass;
 
-    final private Class< ? extends FileSystemType> fsTypeClass;
+    final private Class<? extends FileSystemType> fsTypeClass;
 
     final private String name;
     final private String[] emptyDirNames;
 
-    private FSType(String name, Class< ? extends FileSystem> fsClass,
-            Class< ? extends FileSystemType> fsTypeClass,
-            String[] emptyDirNames) {
+    private FSType(String name, Class<? extends FileSystem> fsClass,
+                   Class<? extends FileSystemType> fsTypeClass,
+                   String[] emptyDirNames) {
         this.name = name;
         this.fsClass = fsClass;
         this.fsTypeClass = fsTypeClass;
@@ -73,7 +71,7 @@ public enum FSType {
     }
 
     public FileSystem mount(Device device, boolean readOnly)
-            throws IOException, FileSystemException, NameNotFoundException, InstantiationException, IllegalAccessException {
+        throws IOException, FileSystemException, NameNotFoundException, InstantiationException, IllegalAccessException {
 
         // mount the device
         FileSystemType type = (FileSystemType) fsTypeClass.newInstance();
@@ -85,14 +83,14 @@ public enum FSType {
     /**
      * @return
      */
-    public Class< ? extends FileSystem> getFsClass() {
+    public Class<? extends FileSystem> getFsClass() {
         return fsClass;
     }
 
     /**
      * @return
      */
-    public Class< ? extends FileSystemType> getFsTypeClass() {
+    public Class<? extends FileSystemType> getFsTypeClass() {
         return fsTypeClass;
     }
 

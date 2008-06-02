@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import junit.framework.TestCase;
-
 import org.jnode.driver.block.CHS;
 import org.jnode.driver.block.Geometry;
 import org.jnode.driver.block.Geometry.GeometryException;
@@ -32,22 +31,23 @@ import org.jnode.driver.block.Geometry.GeometryException;
  */
 public class GeometryTest extends TestCase {
 
-	/**
-	 * Constructor for GeometryTest.
-	 * @param arg0
-	 */
-	public GeometryTest(String arg0) {
-		super(arg0);
-	}
+    /**
+     * Constructor for GeometryTest.
+     *
+     * @param arg0
+     */
+    public GeometryTest(String arg0) {
+        super(arg0);
+    }
 
-	public void testLogSec2CHS() throws GeometryException {
-		Geometry geom = new Geometry(64, 8, 40);
-		long max = geom.getTotalSectors();
-		for (long logSec = 0; logSec < max; logSec++) {
-			CHS chs = geom.getCHS(logSec);
-			//System.out.println("logSec=" + logSec + ", chs=" + chs);
-			assertEquals("logSec=" + logSec, logSec, geom.getLogicalSector(chs));
-		}
-	}
+    public void testLogSec2CHS() throws GeometryException {
+        Geometry geom = new Geometry(64, 8, 40);
+        long max = geom.getTotalSectors();
+        for (long logSec = 0; logSec < max; logSec++) {
+            CHS chs = geom.getCHS(logSec);
+            //System.out.println("logSec=" + logSec + ", chs=" + chs);
+            assertEquals("logSec=" + logSec, logSec, geom.getLogicalSector(chs));
+        }
+    }
 
 }

@@ -22,55 +22,51 @@
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.Formatter;
 
 /**
- *
  * @author Fabien DUMINY
  */
 public class FS {
-	final private FSType type;
-	final private boolean readOnly;
-	final private Formatter<? extends FileSystem> formatter;
+    final private FSType type;
+    final private boolean readOnly;
+    final private Formatter<? extends FileSystem> formatter;
 
-	public FS(FSType type, boolean readOnly, Formatter<? extends FileSystem> formatter)
-	{
-		this.type = type;
+    public FS(FSType type, boolean readOnly, Formatter<? extends FileSystem> formatter) {
+        this.type = type;
         this.readOnly = readOnly;
         this.formatter = formatter;
-	}
+    }
 
-	/**
-	 * @return Returns the type.
-	 */
-	public FSType getType() {
-		return type;
-	}
-	/**
-	 * @return Returns the readOnly.
-	 */
-	public boolean isReadOnly() {
-		return readOnly;
-	}
+    /**
+     * @return Returns the type.
+     */
+    public FSType getType() {
+        return type;
+    }
 
-	public FileSystem mount(Device device) throws FileSystemException, IOException, InstantiationException, IllegalAccessException, NameNotFoundException
-	{
-		if(formatter != null)
-			formatter.format(device);
+    /**
+     * @return Returns the readOnly.
+     */
+    public boolean isReadOnly() {
+        return readOnly;
+    }
 
-		return type.mount(device, readOnly);
-	}
+    public FileSystem mount(Device device)
+        throws FileSystemException, IOException, InstantiationException, IllegalAccessException, NameNotFoundException {
+        if (formatter != null)
+            formatter.format(device);
 
-	public String toString()
-	{
-		return type.toString() +
-			   (readOnly ? " ro" : " rw") +
-			   ((formatter==null) ? "" : "not") + " formatted";
-	}
+        return type.mount(device, readOnly);
+    }
+
+    public String toString() {
+        return type.toString() +
+            (readOnly ? " ro" : " rw") +
+            ((formatter == null) ? "" : "not") + " formatted";
+    }
 }

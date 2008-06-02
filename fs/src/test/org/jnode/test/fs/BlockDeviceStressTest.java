@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceNotFoundException;
@@ -34,19 +33,19 @@ import org.jnode.driver.block.BlockDeviceAPI;
 
 /**
  * Invoke many read requests from multiple threads to stress the device.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class BlockDeviceStressTest {
 
     public static void main(String[] args) throws DeviceNotFoundException,
-            ApiNotFoundException, IOException, InterruptedException {
+        ApiNotFoundException, IOException, InterruptedException {
         if (args.length == 0) {
             System.out.println("specify device ids");
         } else {
             final List<BlockDeviceAPI> apis = new ArrayList<BlockDeviceAPI>();
             for (int i = 0; i < args.length; i++) {
-                final String id = args[ i];
+                final String id = args[i];
                 final Device device = DeviceUtils.getDevice(id);
                 apis.add(device.getAPI(BlockDeviceAPI.class));
             }
@@ -59,7 +58,7 @@ public class BlockDeviceStressTest {
                 final long length = api.getLength();
                 for (int t = 0; t < threadCount; t++) {
                     threads.add(new TestThread(api, repeatCount, length
-                            / (threadCount + 2)));
+                        / (threadCount + 2)));
                 }
             }
             for (Thread t : threads) {
@@ -96,7 +95,7 @@ public class BlockDeviceStressTest {
                 }
             }
             System.out.println("Finished " + repeatCount + " with " + errors
-                    + " errors");
+                + " errors");
         }
     }
 }

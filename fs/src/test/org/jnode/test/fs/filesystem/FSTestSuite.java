@@ -18,32 +18,28 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem;
 
 import junit.extensions.jfunc.JFuncSuite;
 import junit.extensions.jfunc.textui.JFuncRunner;
-
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.fs.filesystem.tests.BasicFSTest;
 import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 
-public class FSTestSuite extends JFuncSuite
-{
-	public static void main(String[] args) throws Throwable {
-		JFuncRunner.run(FSTestSuite.suite());
-		//JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
-		//JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
-	}
-	
-	public static JFuncSuite suite() throws Throwable
-	{
-		JFuncSuite suite = new JFuncSuite();
+public class FSTestSuite extends JFuncSuite {
+    public static void main(String[] args) throws Throwable {
+        JFuncRunner.run(FSTestSuite.suite());
+        //JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
+        //JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
+    }
 
-        for(FSTestConfig config : new FSConfigurations())
-        {
+    public static JFuncSuite suite() throws Throwable {
+        JFuncSuite suite = new JFuncSuite();
+
+        for (FSTestConfig config : new FSConfigurations()) {
             BasicFSTest basicTest = (BasicFSTest) suite.getTestProxy(new BasicFSTest());
             basicTest.testAddDirectory(config);
             basicTest.testAddFile(config);
@@ -51,24 +47,24 @@ public class FSTestSuite extends JFuncSuite
             basicTest.testGetRootEntry(config);
             basicTest.testListRootEntries(config);
             basicTest.testRemoveThenRemountFSAndGetEntry(config);
-            
+
             FileFSTest fileTest = (FileFSTest) suite.getTestProxy(new FileFSTest());
             fileTest.testSetLength(config);
             fileTest.testWriteFileInReadOnlyMode(config);
             fileTest.testWriteFileThenRemountFSAndRead(config);
- 
+
             TreeFSTest treeTest = (TreeFSTest) suite.getTestProxy(new TreeFSTest());
             treeTest.testFSTree(config);
             treeTest.testFSTreeWithRemountAndLongName(config);
             treeTest.testFSTreeWithRemountAndShortName(config);
- 
-            ConcurrentAccessFSTest threadTest = (ConcurrentAccessFSTest) 
-            						suite.getTestProxy(new ConcurrentAccessFSTest());
+
+            ConcurrentAccessFSTest threadTest = (ConcurrentAccessFSTest)
+                suite.getTestProxy(new ConcurrentAccessFSTest());
             threadTest.testRead(config);
             threadTest.testWrite(config);
             threadTest.testReadWrite(config);
         }
-        
-		return suite;
-	}
+
+        return suite;
+    }
 }

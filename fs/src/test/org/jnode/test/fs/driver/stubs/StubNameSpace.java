@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.stubs;
 
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.naming.DefaultNameSpace;
 import org.jnode.test.support.MockUtils;
@@ -37,10 +36,9 @@ public class StubNameSpace extends DefaultNameSpace {
 
     /**
      * Lookup a service with a given name.
-     * 
+     *
      * @param name
-     * @throws NameNotFoundException
-     *             if the name was not found in this namespace
+     * @throws NameNotFoundException if the name was not found in this namespace
      */
     public <T> T lookup(Class<T> name) throws NameNotFoundException {
         if (!namespace.containsKey(name)) {

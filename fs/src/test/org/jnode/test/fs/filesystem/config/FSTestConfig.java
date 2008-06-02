@@ -18,12 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import org.jnode.fs.FileSystem;
-import org.jnode.test.fs.filesystem.FSContext;
-import org.jnode.test.support.TestConfig;
 
 /**
  * @author Fabien DUMINY
@@ -37,7 +35,7 @@ public class FSTestConfig {
     final private FS fs;
 
     /**
-     * 
+     *
      *
      */
     public FSTestConfig(OsType osType, FS fs, DeviceParam deviceParam) {
@@ -73,7 +71,7 @@ public class FSTestConfig {
     }
 
     /**
-     * 
+     *
      */
     public String toString() {
         return os.toString() + "," + fs + "\n" + deviceParam;

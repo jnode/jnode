@@ -18,63 +18,54 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.support;
 
 import org.apache.log4j.Logger;
 import org.jmock.cglib.Mock;
 
-public class MockUtils
-{
-    private static final Logger log = Logger.getLogger(MockUtils.class);    
-    
-    static public <T> T createMockObject(Class<T> name)
-    {
+public class MockUtils {
+    private static final Logger log = Logger.getLogger(MockUtils.class);
+
+    static public <T> T createMockObject(Class<T> name) {
         return createMockObject(name, null);
     }
-    
-    static public <T> T createMockObject(Class<T> name, MockInitializer initializer)
-    {
+
+    static public <T> T createMockObject(Class<T> name, MockInitializer initializer) {
         String shortName = getShortName(name);
         Mock mock = new Mock(name, shortName);
-        log.info("created a Mock for "+shortName);
-        
-        if(initializer != null)
-        {
+        log.info("created a Mock for " + shortName);
+
+        if (initializer != null) {
             initializer.init(mock);
         }
-                                
+
         return name.cast(mock.proxy());
     }
 
-    static public Object createMockObject(Class name, Class[] clsArgs, Object[] args)
-    {
+    static public Object createMockObject(Class name, Class[] clsArgs, Object[] args) {
         return createMockObject(name, null, clsArgs, args);
     }
-    
-    static public Object createMockObject(Class name, MockInitializer initializer, Class[] clsArgs, Object[] args)
-    {
+
+    static public Object createMockObject(Class name, MockInitializer initializer, Class[] clsArgs, Object[] args) {
         String shortName = getShortName(name);
         CGLibCoreMockExt cglibMock = new CGLibCoreMockExt(name, shortName);
         Mock mock = new Mock(cglibMock);
-        log.info("created a Mock for "+shortName);
-        
-        if(initializer != null)
-        {
+        log.info("created a Mock for " + shortName);
+
+        if (initializer != null) {
             initializer.init(mock);
         }
-                
-        return cglibMock.createProxy(clsArgs, args);        
+
+        return cglibMock.createProxy(clsArgs, args);
     }
 
-    static public String getShortName(Class<?> clazz)
-    {
+    static public String getShortName(Class<?> clazz) {
         String name = clazz.getName();
         int idx = name.lastIndexOf('.');
-        return (idx >= 0) ? name.substring(idx+1) : name;
+        return (idx >= 0) ? name.substring(idx + 1) : name;
     }
-        
-    private MockUtils()
-    {
+
+    private MockUtils() {
     }
 }

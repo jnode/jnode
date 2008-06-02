@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
@@ -32,34 +30,31 @@ import org.jnode.naming.InitialNaming;
 
 /**
  * @author Fabien DUMINY
- *  
  */
 public class JNodeDeviceParam extends DeviceParam {
     /**
-     * 
-     *  
+     *
+     *
      */
     public JNodeDeviceParam() {
 
     }
 
     /**
-     *  
+     *
      */
     public Device createDevice() throws Exception {
         return lookupDevice();
     }
 
     /**
-     * @param deviceName
-     *            The name to set.
+     * @param deviceName The name to set.
      */
     public void setName(String deviceName) {
         this.deviceName = deviceName;
     }
 
     /**
-     * 
      * @return @throws
      *         IOException
      */
@@ -67,21 +62,21 @@ public class JNodeDeviceParam extends DeviceParam {
         Device device = null;
         try {
             device = InitialNaming.lookup(DeviceManager.NAME)
-                    .getDevice(deviceName);
+                .getDevice(deviceName);
         } catch (DeviceNotFoundException ex) {
             final IOException ioe = new IOException();
             ioe.initCause(ex);
             throw ioe;
         } catch (NameNotFoundException ex) {
-			final IOException ioe = new IOException();
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
         }
         return device;
     }
 
     /**
-     *  
+     *
      */
     public void tearDown(Device device) throws Exception {
         // nothing to do
@@ -92,7 +87,6 @@ public class JNodeDeviceParam extends DeviceParam {
     }
 
     /**
-     * 
      * @return
      */
     public String getDeviceName() {

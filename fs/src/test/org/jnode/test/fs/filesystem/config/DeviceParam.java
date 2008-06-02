@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import org.jnode.driver.Device;
@@ -27,39 +27,39 @@ import org.jnode.driver.Device;
  * @author Fabien DUMINY
  */
 public abstract class DeviceParam {
-	private boolean input;
-	
-	/**
-	 * 
-	 *  
-	 */
-	protected DeviceParam()
-	{
-		
-	}
-	
-	/**
-	 * @return @throws
-	 *         Exception
-	 */
-	abstract public Device createDevice() throws Exception;
-		
-	/**
-	 * @param device
-	 * @throws Exception
-	 */
-	abstract public void tearDown(Device device) throws Exception;
-	
-	/**
-	 * @return Returns the input.
-	 */
-	public boolean isInput() {
-		return input;
-	}
-	/**
-	 * @param input The input to set.
-	 */
-	final public void setInput(boolean input) {
-		this.input = input;
-	}
+    private boolean input;
+
+    /**
+     *
+     *
+     */
+    protected DeviceParam() {
+
+    }
+
+    /**
+     * @return @throws
+     *         Exception
+     */
+    abstract public Device createDevice() throws Exception;
+
+    /**
+     * @param device
+     * @throws Exception
+     */
+    abstract public void tearDown(Device device) throws Exception;
+
+    /**
+     * @return Returns the input.
+     */
+    public boolean isInput() {
+        return input;
+    }
+
+    /**
+     * @param input The input to set.
+     */
+    final public void setInput(boolean input) {
+        this.input = input;
+    }
 }
