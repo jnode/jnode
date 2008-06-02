@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.driver.Bus;
@@ -28,21 +28,22 @@ import org.jnode.driver.Bus;
  */
 public class FloppyControllerBus extends Bus {
 
-	private final FloppyControllerDriver controller;
+    private final FloppyControllerDriver controller;
 
-	/**
-	 * Create a new instance
-	 * @param controller
-	 */
-	public FloppyControllerBus(FloppyControllerDriver controller) {
-		super(controller.getDevice());
-		this.controller = controller;
-	}
+    /**
+     * Create a new instance
+     *
+     * @param controller
+     */
+    public FloppyControllerBus(FloppyControllerDriver controller) {
+        super(controller.getDevice());
+        this.controller = controller;
+    }
 
-	/**
-	 * @return The controller
-	 */
-	public final FloppyControllerDriver getController() {
-		return this.controller;
-	}
+    /**
+     * @return The controller
+     */
+    public final FloppyControllerDriver getController() {
+        return this.controller;
+    }
 }

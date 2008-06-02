@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -27,14 +27,15 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an READ (10) command.
  * See SCSI Multimedia Commands-4, section 6.19.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBRead10 extends CDB {
 
     /**
      * Initialize this instance.
-     * @param lba Logical block address of first block that will be read.
+     *
+     * @param lba      Logical block address of first block that will be read.
      * @param nrBlocks The number of blocks that will be read.
      */
     public CDBRead10(int lba, int nrBlocks) {
@@ -43,10 +44,10 @@ public class CDBRead10 extends CDB {
         setInt16(7, nrBlocks);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-    
+    @Override
+    public int getDataTransfertCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }

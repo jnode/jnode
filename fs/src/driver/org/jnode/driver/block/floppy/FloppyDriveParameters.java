@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 /**
@@ -26,103 +26,112 @@ package org.jnode.driver.block.floppy;
  */
 public class FloppyDriveParameters {
 
-	private final int cmosType;
-	private final int mtr;
-	private final int hlt;
-	private final int hut;
-	private final int srt;
-	private final String name;
-	private final FloppyParameters[] autodetect;
+    private final int cmosType;
+    private final int mtr;
+    private final int hlt;
+    private final int hut;
+    private final int srt;
+    private final String name;
+    private final FloppyParameters[] autodetect;
 
-	/**
-	 * Create a new instance
-	 * @param cmosType
-	 * @param mtr
-	 * @param hlt
-	 * @param hut
-	 * @param srt
-	 * @param name
-	 * @param autodetect
-	 */
-	public FloppyDriveParameters(
-		int cmosType,
-		int mtr,
-		int hlt,
-		int hut,
-		int srt,
-		String name,
-		FloppyParameters[] autodetect) {
-		this.cmosType = cmosType;
-		this.mtr = mtr;
-		this.hlt = hlt;
-		this.hut = hut;
-		this.srt = srt;
-		this.autodetect = autodetect;
-		this.name = name;
-	}
+    /**
+     * Create a new instance
+     *
+     * @param cmosType
+     * @param mtr
+     * @param hlt
+     * @param hut
+     * @param srt
+     * @param name
+     * @param autodetect
+     */
+    public FloppyDriveParameters(
+        int cmosType,
+        int mtr,
+        int hlt,
+        int hut,
+        int srt,
+        String name,
+        FloppyParameters[] autodetect) {
+        this.cmosType = cmosType;
+        this.mtr = mtr;
+        this.hlt = hlt;
+        this.hut = hut;
+        this.srt = srt;
+        this.autodetect = autodetect;
+        this.name = name;
+    }
 
-	/**
-	 * Is this drive present?
-	 * @return boolean
-	 */
-	public boolean isPresent() {
-		return (cmosType != 0);
-	}
+    /**
+     * Is this drive present?
+     *
+     * @return boolean
+     */
+    public boolean isPresent() {
+        return (cmosType != 0);
+    }
 
-	/**
-	 * Gets a human readable type name for this drive
-	 * @return name
-	 */
-	public String getTypeName() {
-		return name;
-	}
+    /**
+     * Gets a human readable type name for this drive
+     *
+     * @return name
+     */
+    public String getTypeName() {
+        return name;
+    }
 
-	/**
-	 * Gets the head load time fom this drive in msec
-	 * @return head load time
-	 */
-	public int getHeadLoadTime() {
-		return hlt;
-	}
+    /**
+     * Gets the head load time fom this drive in msec
+     *
+     * @return head load time
+     */
+    public int getHeadLoadTime() {
+        return hlt;
+    }
 
-	/**
-	 * Gets the head unload time fom this drive in msec
-	 * @return head unload time
-	 */
-	public int getHeadUnloadTime() {
-		return hut;
-	}
+    /**
+     * Gets the head unload time fom this drive in msec
+     *
+     * @return head unload time
+     */
+    public int getHeadUnloadTime() {
+        return hut;
+    }
 
-	/**
-	 * Gets the step rate time fom this drive in usec
-	 * @return step rate time
-	 */
-	public int getStepRateTime() {
-		return srt;
-	}
+    /**
+     * Gets the step rate time fom this drive in usec
+     *
+     * @return step rate time
+     */
+    public int getStepRateTime() {
+        return srt;
+    }
 
-	/**
-	 * Gets the maximum transfer rate for this drive in Kb/sec
-	 * @return int
-	 */
-	public int getMaxTransferRate() {
-		return mtr;
-	}
+    /**
+     * Gets the maximum transfer rate for this drive in Kb/sec
+     *
+     * @return int
+     */
+    public int getMaxTransferRate() {
+        return mtr;
+    }
 
-	/**
-	 * Gets the CMOS type of this drive
-	 * @return int
-	 */
-	public int getCmosType() {
-		return cmosType;
-	}
+    /**
+     * Gets the CMOS type of this drive
+     *
+     * @return int
+     */
+    public int getCmosType() {
+        return cmosType;
+    }
 
-	/**
-	 * Gets the formats that can be autodetected on this drive
-	 * @return parameters
-	 */
-	public FloppyParameters[] getAutodetectFormats() {
-		return autodetect;
-	}
+    /**
+     * Gets the formats that can be autodetected on this drive
+     *
+     * @return parameters
+     */
+    public FloppyParameters[] getAutodetectFormats() {
+        return autodetect;
+    }
 
 }

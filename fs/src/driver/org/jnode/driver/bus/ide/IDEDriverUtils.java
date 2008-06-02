@@ -18,21 +18,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class IDEDriverUtils {
-	
+
     /**
      * search and return the IDEDeviceFactory responsible for JNode
+     *
      * @return the IDEDeviceFactory from JNode
      * @throws NamingException
      */

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.util.Command;
@@ -27,64 +27,72 @@ import org.jnode.util.Command;
  * @author epr
  */
 public abstract class FloppyCommand extends Command implements FloppyConstants {
-	
-	/** The drive number 0..3 */
-	private final int drive;
-	private FloppyException error;
-	
-	/**
-	 * Create a new instance
-	 * @param drive
-	 */
-	public FloppyCommand(int drive) {
-		if ((drive < 0) || (drive > 3)) {
-			throw new IllegalArgumentException("Invalid drive " + drive);
-		}
-		this.drive = drive;
-	}
-	
-	/**
-	 * Execute the command phase of this command.
-	 * @param fdc
-	 * @throws FloppyException
-	 */
-	public abstract void setup(FDC fdc)
-	throws FloppyException;
-	
-	/**
-	 * Handle the given IRQ
-	 * @param fdc
-	 * @throws FloppyException
-	 */
-	public abstract void handleIRQ(FDC fdc)
-	throws FloppyException;
 
-	/**
-	 * Gets the driver number for which this command is intended.
-	 * @return drive
-	 */
-	public int getDrive() {
-		return drive;
-	}
-	
-	protected void notifyError(FloppyException ex) {
-		this.error = ex;
-		notifyFinished();
-	}
-	
-	/**
-	 * Has an error occured?
-	 * @return boolean
-	 */
-	public boolean hasError() {
-		return (error != null);
-	}
-	
-	/**
-	 * Gets the error 
-	 * @return error
-	 */
-	public FloppyException getError() {
-		return error;
-	}
+    /**
+     * The drive number 0..3
+     */
+    private final int drive;
+    private FloppyException error;
+
+    /**
+     * Create a new instance
+     *
+     * @param drive
+     */
+    public FloppyCommand(int drive) {
+        if ((drive < 0) || (drive > 3)) {
+            throw new IllegalArgumentException("Invalid drive " + drive);
+        }
+        this.drive = drive;
+    }
+
+    /**
+     * Execute the command phase of this command.
+     *
+     * @param fdc
+     * @throws FloppyException
+     */
+    public abstract void setup(FDC fdc)
+        throws FloppyException;
+
+    /**
+     * Handle the given IRQ
+     *
+     * @param fdc
+     * @throws FloppyException
+     */
+    public abstract void handleIRQ(FDC fdc)
+        throws FloppyException;
+
+    /**
+     * Gets the driver number for which this command is intended.
+     *
+     * @return drive
+     */
+    public int getDrive() {
+        return drive;
+    }
+
+    protected void notifyError(FloppyException ex) {
+        this.error = ex;
+        notifyFinished();
+    }
+
+    /**
+     * Has an error occured?
+     *
+     * @return boolean
+     */
+    public boolean hasError() {
+        return (error != null);
+    }
+
+    /**
+     * Gets the error
+     *
+     * @return error
+     */
+    public FloppyException getError() {
+        return error;
+    }
 }

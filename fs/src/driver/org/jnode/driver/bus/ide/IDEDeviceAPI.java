@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import org.jnode.driver.block.PartitionableBlockDeviceAPI;
@@ -27,7 +27,7 @@ import org.jnode.partitions.PartitionTableEntry;
 /**
  * @author epr
  */
-public interface IDEDeviceAPI <PTE extends PartitionTableEntry>
-	extends PartitionableBlockDeviceAPI<PTE> {
-	// nothing different
+public interface IDEDeviceAPI<PTE extends PartitionTableEntry>
+    extends PartitionableBlockDeviceAPI<PTE> {
+    // nothing different
 }

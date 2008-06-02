@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.driver.Bus;
@@ -33,22 +33,22 @@ import org.jnode.driver.DriverException;
  */
 public class FloppyControllerFinder implements DeviceFinder {
 
-	/**
-	 * @param devMan
-	 * @param bus
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
-	 * @throws DeviceException
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus)
-	throws DeviceException {
-		try {
-			// Register floppy controller device
-			Device fdcDev = new FloppyControllerDevice(bus);
-			fdcDev.setDriver(new FloppyControllerDriver());
-			devMan.register(fdcDev);
-		} catch (DriverException ex) {
-			throw new DeviceException(ex);
-		}
-	}
+    /**
+     * @param devMan
+     * @param bus
+     * @throws DeviceException
+     * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
+     */
+    public void findDevices(DeviceManager devMan, Bus bus)
+        throws DeviceException {
+        try {
+            // Register floppy controller device
+            Device fdcDev = new FloppyControllerDevice(bus);
+            fdcDev.setDriver(new FloppyControllerDriver());
+            devMan.register(fdcDev);
+        } catch (DriverException ex) {
+            throw new DeviceException(ex);
+        }
+    }
 
 }

@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.scsi.cdrom;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.RemovableDeviceAPI;
@@ -44,7 +43,7 @@ import org.jnode.util.TimeoutException;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
-        RemovableDeviceAPI {
+    RemovableDeviceAPI {
 
     private boolean locked;
     private final FSBlockAlignmentSupport blockAlignment;
@@ -56,7 +55,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
     public SCSICDROMDriver() {
         this.blockAlignment = new FSBlockAlignmentSupport(this, 2048);
     }
-    
+
     /**
      * @see org.jnode.driver.Driver#startDevice()
      */
@@ -67,7 +66,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
         this.blockAlignment.setAlignment(2048);
         final SCSIDevice dev = (SCSIDevice) getDevice();
         dev.registerAPI(SCSIDeviceAPI.class, new SCSIDevice.SCSIDeviceAPIImpl(
-                dev));
+            dev));
         dev.registerAPI(RemovableDeviceAPI.class, this);
         dev.registerAPI(FSBlockDeviceAPI.class, blockAlignment);
     }
@@ -122,15 +121,17 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
      * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
      */
     public void read(long devOffset, ByteBuffer destBuf)
-            throws IOException {
+        throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level                 
         ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         byte[] dest = destBA.toArray();
         int destOffset = 0;
         int length = dest.length;
-        
+
         processChanged();
-        if (capacity == null) { throw new IOException("No medium"); }
+        if (capacity == null) {
+            throw new IOException("No medium");
+        }
         final int blockLength = capacity.getBlockLength();
         final int lba = (int) (devOffset / blockLength);
         final int nrBlocks = length / blockLength;
@@ -138,17 +139,17 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
         try {
             MMCUtils.readData(dev, lba, nrBlocks, dest, destOffset);
         } catch (SCSIException ex) {
-			final IOException ioe = new IOException();
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
         } catch (TimeoutException ex) {
-			final IOException ioe = new IOException();
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
         } catch (InterruptedException ex) {
             throw new InterruptedIOException();
         }
-        
+
         destBA.refreshByteBuffer();
     }
 
@@ -156,13 +157,13 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
      * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
      */
     public void write(long devOffset, ByteBuffer src)
-            throws IOException {
+        throws IOException {
         throw new IOException("Readonly device");
     }
 
     /**
      * Can this device be locked.
-     * 
+     *
      * @return
      */
     public boolean canLock() {
@@ -171,7 +172,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
 
     /**
      * Can this device be ejected.
-     * 
+     *
      * @return
      */
     public boolean canEject() {
@@ -180,7 +181,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
 
     /**
      * Lock the device.
-     * 
+     *
      * @throws IOException
      */
     public synchronized void lock() throws IOException {
@@ -189,13 +190,13 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
             try {
                 MMCUtils.setMediaRemoval(dev, true, false);
             } catch (SCSIException ex) {
-    			final IOException ioe = new IOException();
-    			ioe.initCause(ex);
-    			throw ioe;
+                final IOException ioe = new IOException();
+                ioe.initCause(ex);
+                throw ioe;
             } catch (TimeoutException ex) {
-    			final IOException ioe = new IOException();
-    			ioe.initCause(ex);
-    			throw ioe;
+                final IOException ioe = new IOException();
+                ioe.initCause(ex);
+                throw ioe;
             } catch (InterruptedException ex) {
                 throw new InterruptedIOException();
             }
@@ -205,7 +206,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
 
     /**
      * Unlock the device.
-     * 
+     *
      * @throws IOException
      */
     public synchronized void unlock() throws IOException {
@@ -214,13 +215,13 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
             try {
                 MMCUtils.setMediaRemoval(dev, false, false);
             } catch (SCSIException ex) {
-    			final IOException ioe = new IOException();
-    			ioe.initCause(ex);
-    			throw ioe;
+                final IOException ioe = new IOException();
+                ioe.initCause(ex);
+                throw ioe;
             } catch (TimeoutException ex) {
-    			final IOException ioe = new IOException();
-    			ioe.initCause(ex);
-    			throw ioe;
+                final IOException ioe = new IOException();
+                ioe.initCause(ex);
+                throw ioe;
             } catch (InterruptedException ex) {
                 throw new InterruptedIOException();
             }
@@ -230,7 +231,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
 
     /**
      * Is this device locked.
-     * 
+     *
      * @see org.jnode.driver.RemovableDeviceAPI#isLocked()
      */
     public boolean isLocked() {
@@ -239,22 +240,24 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
 
     /**
      * Eject this device.
-     * 
+     *
      * @throws IOException
      */
     public void eject() throws IOException {
-        if (locked) { throw new IOException("Device is locked"); }
+        if (locked) {
+            throw new IOException("Device is locked");
+        }
         final SCSIDevice dev = (SCSIDevice) getDevice();
         try {
             MMCUtils.startStopUnit(dev, CDBStartStopUnit.Action.EJECT, false);
         } catch (SCSIException ex) {
-			final IOException ioe = new IOException();
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
         } catch (TimeoutException ex) {
-			final IOException ioe = new IOException();
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException();
+            ioe.initCause(ex);
+            throw ioe;
         } catch (InterruptedException ex) {
             throw new InterruptedIOException();
         }
@@ -262,7 +265,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
 
     /**
      * Process the changed flag.
-     * 
+     *
      * @throws IOException
      */
     private void processChanged() throws IOException {
@@ -274,13 +277,13 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
                 this.capacity = MMCUtils.readCapacity(dev);
                 this.blockAlignment.setAlignment(capacity.getBlockLength());
             } catch (SCSIException ex) {
-    			final IOException ioe = new IOException();
-    			ioe.initCause(ex);
-    			throw ioe;
+                final IOException ioe = new IOException();
+                ioe.initCause(ex);
+                throw ioe;
             } catch (TimeoutException ex) {
-    			final IOException ioe = new IOException();
-    			ioe.initCause(ex);
-    			throw ioe;
+                final IOException ioe = new IOException();
+                ioe.initCause(ex);
+                throw ioe;
             } catch (InterruptedException ex) {
                 throw new InterruptedIOException();
             }

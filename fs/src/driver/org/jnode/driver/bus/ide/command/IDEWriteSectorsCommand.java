@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide.command;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
 import org.jnode.util.TimeoutException;
@@ -30,67 +29,68 @@ import org.jnode.util.TimeoutException;
 /**
  * This is a simple write command for IDE drives.
  * It uses the old style non DMA command style for the moment.
+ *
  * @author gbin
  */
 public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
 
-        private final ByteBuffer buf;
-	private final int offset;
-	private final int length;
-	private int currentPosition;
+    private final ByteBuffer buf;
+    private final int offset;
+    private final int length;
+    private int currentPosition;
 
-	//private int readSectors;
+    //private int readSectors;
 
-	public IDEWriteSectorsCommand(
-	        boolean primary,
-		boolean master,
-		long lbaStart,
-		int sectors,
-		ByteBuffer src,
-		int srcOffset,
-		int length) {
-		super(primary, master, lbaStart, sectors);
-		this.buf = src;
-		this.offset = srcOffset;
-		this.currentPosition = srcOffset;
-		this.length = length;
-	}
+    public IDEWriteSectorsCommand(
+        boolean primary,
+        boolean master,
+        long lbaStart,
+        int sectors,
+        ByteBuffer src,
+        int srcOffset,
+        int length) {
+        super(primary, master, lbaStart, sectors);
+        this.buf = src;
+        this.offset = srcOffset;
+        this.currentPosition = srcOffset;
+        this.length = length;
+    }
 
-	/**
-	 * @see org.jnode.driver.bus.ide.IDECommand#setup(IDEBus, IDEIO)
-	 */
-	protected void setup(IDEBus ide, IDEIO io) 
-	throws TimeoutException {
-		super.setup(ide, io);
-		io.setCommandReg(CMD_WRITE);
-		transfertASector(ide, io);
-	}
+    /**
+     * @see org.jnode.driver.bus.ide.IDECommand#setup(IDEBus, IDEIO)
+     */
+    protected void setup(IDEBus ide, IDEIO io)
+        throws TimeoutException {
+        super.setup(ide, io);
+        io.setCommandReg(CMD_WRITE);
+        transfertASector(ide, io);
+    }
 
-	private void transfertASector(IDEBus ide, IDEIO io) throws TimeoutException {
-		io.waitUntilNotBusy(IDE_TIMEOUT);
-		for (int i = 0; i < 256; i++) {
-		    int v = ( ( buf.get() & 0xFF ) + ( ( buf.get() & 0xFF ) << 8 ) );
-		    io.setDataReg ( v );
-		    currentPosition += 2;
-		}
-	}
+    private void transfertASector(IDEBus ide, IDEIO io) throws TimeoutException {
+        io.waitUntilNotBusy(IDE_TIMEOUT);
+        for (int i = 0; i < 256; i++) {
+            int v = ((buf.get() & 0xFF) + ((buf.get() & 0xFF) << 8));
+            io.setDataReg(v);
+            currentPosition += 2;
+        }
+    }
 
-	/**
-	 * @see org.jnode.driver.bus.ide.IDECommand#handleIRQ(IDEBus, IDEIO)
-	 */
-	protected void handleIRQ(IDEBus ide, IDEIO io) throws TimeoutException {
-		final int state = io.getStatusReg();
-		if ((state & ST_ERROR) != 0) {
-			setError(io.getErrorReg());
-		} else {
-		    if ((state & (ST_BUSY | ST_DEVICE_READY)) == ST_DEVICE_READY) {
-		        if (currentPosition < offset + length) {
-		            transfertASector(ide, io);
-		        } else {
-		            notifyFinished();
-		        }
-		    }
-		}
-	}
+    /**
+     * @see org.jnode.driver.bus.ide.IDECommand#handleIRQ(IDEBus, IDEIO)
+     */
+    protected void handleIRQ(IDEBus ide, IDEIO io) throws TimeoutException {
+        final int state = io.getStatusReg();
+        if ((state & ST_ERROR) != 0) {
+            setError(io.getErrorReg());
+        } else {
+            if ((state & (ST_BUSY | ST_DEVICE_READY)) == ST_DEVICE_READY) {
+                if (currentPosition < offset + length) {
+                    transfertASector(ide, io);
+                } else {
+                    notifyFinished();
+                }
+            }
+        }
+    }
 
 }

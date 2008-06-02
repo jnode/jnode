@@ -18,55 +18,60 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.driver.Device;
 
 /**
  * Device wrapper around a single floppy drive.
+ *
  * @author epr
  */
 public class FloppyDevice extends Device {
 
-	/** My drive number 0.. */
-	private final int drive;
-	private final FloppyDriveParameters dp;
-	private final FloppyControllerBus bus;
-	
-	/**
-	 * @param bus
-	 * @param drive
-	 * @param dp
-	 */
-	public FloppyDevice(FloppyControllerBus bus, int drive, FloppyDriveParameters dp) {
-		super(bus, "fd" + drive);
-		this.bus = bus;
-		this.drive = drive;
-		this.dp = dp;
-	}
+    /**
+     * My drive number 0..
+     */
+    private final int drive;
+    private final FloppyDriveParameters dp;
+    private final FloppyControllerBus bus;
 
-	/**
-	 * @return the bus for this floppy device
-	 */
-	public FloppyControllerBus getFloppyControllerBus() {
-		return bus;
-	}
+    /**
+     * @param bus
+     * @param drive
+     * @param dp
+     */
+    public FloppyDevice(FloppyControllerBus bus, int drive, FloppyDriveParameters dp) {
+        super(bus, "fd" + drive);
+        this.bus = bus;
+        this.drive = drive;
+        this.dp = dp;
+    }
 
-	/**
-	 * Gets the drive number of this device
-	 * @return drive
-	 */
-	public int getDrive() {
-		return drive;
-	}
-	
-	/**
-	 * Gets the drive parameters for this device
-	 * @return parametera
-	 */
-	public FloppyDriveParameters getDriveParams() {
-		return dp;
-	}
+    /**
+     * @return the bus for this floppy device
+     */
+    public FloppyControllerBus getFloppyControllerBus() {
+        return bus;
+    }
+
+    /**
+     * Gets the drive number of this device
+     *
+     * @return drive
+     */
+    public int getDrive() {
+        return drive;
+    }
+
+    /**
+     * Gets the drive parameters for this device
+     *
+     * @return parametera
+     */
+    public FloppyDriveParameters getDriveParams() {
+        return dp;
+    }
 
 }

@@ -18,48 +18,51 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.DeviceAPI;
 
 /**
  * <description>
- * 
+ *
  * @author epr
  */
 public interface BlockDeviceAPI extends DeviceAPI {
-	
-	/**
-	 * Gets the total length in bytes 
-	 * @return long
-	 * @throws IOException
-	 */
-	public abstract long getLength()
-	throws IOException;	
-	
-	/**
-	 * Read a block of data
-	 * @param devOffset
-	 * @param dest
-	 * @throws IOException
-	 */
-	public abstract void read(long devOffset, ByteBuffer dest) throws IOException;
-	
-	/**
-	 * Write a block of data
-	 * @param devOffset
-	 * @param src
-	 * @throws IOException
-	 */
-	public abstract void write(long devOffset, ByteBuffer src) throws IOException;
 
-	/**
-	 * flush data in caches to the block device
-	 * @throws IOException
-	 */
-	public abstract void flush() throws IOException;
+    /**
+     * Gets the total length in bytes
+     *
+     * @return long
+     * @throws IOException
+     */
+    public abstract long getLength()
+        throws IOException;
+
+    /**
+     * Read a block of data
+     *
+     * @param devOffset
+     * @param dest
+     * @throws IOException
+     */
+    public abstract void read(long devOffset, ByteBuffer dest) throws IOException;
+
+    /**
+     * Write a block of data
+     *
+     * @param devOffset
+     * @param src
+     * @throws IOException
+     */
+    public abstract void write(long devOffset, ByteBuffer src) throws IOException;
+
+    /**
+     * flush data in caches to the block device
+     *
+     * @throws IOException
+     */
+    public abstract void flush() throws IOException;
 }

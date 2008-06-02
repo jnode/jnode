@@ -18,23 +18,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.usb.storage;
 
 import org.jnode.driver.bus.scsi.CDB;
 import org.jnode.driver.bus.usb.USBException;
 
 public interface ITransport {
-	/**
-	 * 
-	 * @param cdb
-	 * @param timeout
-	 */
-	public void transport(CDB cdb, long timeout);
-	
-	/**
-	 * 
-	 * @throws USBException
-	 */
-	public void reset()throws USBException;
+    /**
+     * @param cdb
+     * @param timeout
+     */
+    public void transport(CDB cdb, long timeout);
+
+    /**
+     * @throws USBException
+     */
+    public void reset() throws USBException;
 }

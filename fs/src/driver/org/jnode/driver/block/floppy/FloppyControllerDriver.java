@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
-
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
@@ -42,123 +40,137 @@ import org.jnode.util.TimeoutException;
  */
 public class FloppyControllerDriver extends Driver {
 
-	/** My logger */
-	private static final Logger log = Logger.getLogger(FloppyControllerDriver.class);
-	/** The controller */
-	private FDC fdc;
-	/** The global devicemanager */
-	private DeviceManager devMan;
-	/** All floppy drive devices controlled by this controller */
-	private final ArrayList<FloppyDevice> devices = new ArrayList<FloppyDevice>();
-	private FloppyControllerBus bus;
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(FloppyControllerDriver.class);
+    /**
+     * The controller
+     */
+    private FDC fdc;
+    /**
+     * The global devicemanager
+     */
+    private DeviceManager devMan;
+    /**
+     * All floppy drive devices controlled by this controller
+     */
+    private final ArrayList<FloppyDevice> devices = new ArrayList<FloppyDevice>();
+    private FloppyControllerBus bus;
 
-	/**
-	 * Start the device.
-	 * @throws DriverException
-	 */
-	protected void startDevice() 
-	throws DriverException {                
-		try {            
-			devices.clear();            
-			fdc = FloppyDriverUtils.getFloppyDeviceFactory().createFDC(getDevice());
-			bus = new FloppyControllerBus(this);
-			registerDevices();
-		} catch (FloppyException ex) {
-			throw new DriverException("Cannot register drives", ex);
-		} catch (ResourceNotFreeException ex) {
-			throw new DriverException("Cannot claim all resources", ex);
+    /**
+     * Start the device.
+     *
+     * @throws DriverException
+     */
+    protected void startDevice()
+        throws DriverException {
+        try {
+            devices.clear();
+            fdc = FloppyDriverUtils.getFloppyDeviceFactory().createFDC(getDevice());
+            bus = new FloppyControllerBus(this);
+            registerDevices();
+        } catch (FloppyException ex) {
+            throw new DriverException("Cannot register drives", ex);
+        } catch (ResourceNotFreeException ex) {
+            throw new DriverException("Cannot claim all resources", ex);
         } catch (NamingException ex) {
             throw new DriverException("Cannot obtain device factory", ex);
         }
-	}
+    }
 
-	/**
-	 * Stop the device.
-	 * @throws DriverException
-	 */
-	protected void stopDevice() 
-	throws DriverException {
-		unregisterDevices();
-		if (fdc != null) {
-			fdc.release();
-			fdc = null;
-		}
-		devices.clear();
-		devMan = null;
-	}
+    /**
+     * Stop the device.
+     *
+     * @throws DriverException
+     */
+    protected void stopDevice()
+        throws DriverException {
+        unregisterDevices();
+        if (fdc != null) {
+            fdc.release();
+            fdc = null;
+        }
+        devices.clear();
+        devMan = null;
+    }
 
-	/**
-	 * Register all existing floppy drives
-	 * @throws FloppyException
-	 * @throws DriverException
-	 * @throws NamingException 
-	 */
-	protected void registerDevices() 
-	throws FloppyException, DriverException, NamingException {       
+    /**
+     * Register all existing floppy drives
+     *
+     * @throws FloppyException
+     * @throws DriverException
+     * @throws NamingException
+     */
+    protected void registerDevices()
+        throws FloppyException, DriverException, NamingException {
         devMan = InitialNaming.lookup(DeviceManager.NAME);
-		final int max = fdc.getDriveCount();
+        final int max = fdc.getDriveCount();
         final FloppyDeviceFactory factory = FloppyDriverUtils.getFloppyDeviceFactory();
-		for (int i = 0; i < max; i++) {
-			final FloppyDriveParameters dp = fdc.getDriveParams(i);
-			log.debug("For fd" + i + ", found CMOS type " + dp.getCmosType());
-            
-			if (dp.isPresent()) {               
-				try {                    
-					final FloppyDevice fd = factory.createDevice(bus, i, dp);
-					fd.setDriver(new FloppyDriver());
-					devMan.register(fd);
-					devices.add(fd);
-                    log.debug("Registered fd" + i);                    
-				} catch (DeviceAlreadyRegisteredException ex) {
-					log.error("Cannot register fd" + i, ex);
-				}
-			}
-		}
-	}
+        for (int i = 0; i < max; i++) {
+            final FloppyDriveParameters dp = fdc.getDriveParams(i);
+            log.debug("For fd" + i + ", found CMOS type " + dp.getCmosType());
 
-	/**
-	 * Unregister all floppy drive devices.
-	 * @throws DriverException
-	 */
-	protected void unregisterDevices() 
-	throws DriverException { 
-		for (FloppyDevice fd : devices) {
-			devMan.unregister(fd);
-		}
-	}
+            if (dp.isPresent()) {
+                try {
+                    final FloppyDevice fd = factory.createDevice(bus, i, dp);
+                    fd.setDriver(new FloppyDriver());
+                    devMan.register(fd);
+                    devices.add(fd);
+                    log.debug("Registered fd" + i);
+                } catch (DeviceAlreadyRegisteredException ex) {
+                    log.error("Cannot register fd" + i, ex);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Has the disk changed since the last command?
-	 * @param drive
-	 * @param resetFlag
-	 * @return boolean
-	 */
-	protected final boolean diskChanged(int drive, boolean resetFlag) {
-		return fdc.diskChanged(drive, resetFlag);
-	}
+    /**
+     * Unregister all floppy drive devices.
+     *
+     * @throws DriverException
+     */
+    protected void unregisterDevices()
+        throws DriverException {
+        for (FloppyDevice fd : devices) {
+            devMan.unregister(fd);
+        }
+    }
 
-	/**
-	 * Add the given command to the command queue and wait till the command
-	 * has finished.
-	 * @param cmd
-	 * @param timeout
-	 * @throws ClosedByInterruptException
-	 * @throws TimeoutException
-	 */
-	protected final void executeAndWait(FloppyCommand cmd, long timeout)
-	throws ClosedByInterruptException, TimeoutException {
-		try {
-			fdc.executeAndWait(cmd, timeout);
-		} catch (InterruptedException ex) {
-			throw new ClosedByInterruptException();
-		}
-	}
-	
-	/**
-	 * Reset the controller
-	 */
-	protected final void resetFDC() {
-		log.debug("Reset FDC");
-		fdc.reset();
-	}
+    /**
+     * Has the disk changed since the last command?
+     *
+     * @param drive
+     * @param resetFlag
+     * @return boolean
+     */
+    protected final boolean diskChanged(int drive, boolean resetFlag) {
+        return fdc.diskChanged(drive, resetFlag);
+    }
+
+    /**
+     * Add the given command to the command queue and wait till the command
+     * has finished.
+     *
+     * @param cmd
+     * @param timeout
+     * @throws ClosedByInterruptException
+     * @throws TimeoutException
+     */
+    protected final void executeAndWait(FloppyCommand cmd, long timeout)
+        throws ClosedByInterruptException, TimeoutException {
+        try {
+            fdc.executeAndWait(cmd, timeout);
+        } catch (InterruptedException ex) {
+            throw new ClosedByInterruptException();
+        }
+    }
+
+    /**
+     * Reset the controller
+     */
+    protected final void resetFDC() {
+        log.debug("Reset FDC");
+        fdc.reset();
+    }
 }

@@ -23,9 +23,7 @@ package org.jnode.driver.block.ramdisk.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DriverException;
@@ -42,31 +40,31 @@ import org.jnode.shell.syntax.IntegerArgument;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class RamDiskCommand extends AbstractCommand {
-	private final FlagArgument FLAG_CREATE = new FlagArgument(
-			"create", Argument.MANDATORY, "if set, create the ramdisk");
-	private final IntegerArgument ARG_SIZE = new IntegerArgument(
-	        "size", Argument.OPTIONAL, "the size of the ramdisk");
+    private final FlagArgument FLAG_CREATE = new FlagArgument(
+        "create", Argument.MANDATORY, "if set, create the ramdisk");
+    private final IntegerArgument ARG_SIZE = new IntegerArgument(
+        "size", Argument.OPTIONAL, "the size of the ramdisk");
 
-	public RamDiskCommand() {
+    public RamDiskCommand() {
         super("Manage RAM 'disks'");
         registerArguments(FLAG_CREATE, ARG_SIZE);
     }
 
-	public static void main(String[] args) throws Exception {
-	    new RamDiskCommand().execute(args);
-	}
-	
+    public static void main(String[] args) throws Exception {
+        new RamDiskCommand().execute(args);
+    }
+
     public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) 
-    throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException {
+                        PrintStream out, PrintStream err)
+        throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException {
         final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-		if (FLAG_CREATE.isSet()) {
-			// Create
-			final int size = ARG_SIZE.isSet() ? ARG_SIZE.getValue() : 4 * 4096;
-			RamDiskDevice dev = new RamDiskDevice(null, "dummy", size);
-			dev.setDriver(new RamDiskDriver(null));
-			dm.register(dev);
-		}
-	}
+        if (FLAG_CREATE.isSet()) {
+            // Create
+            final int size = ARG_SIZE.isSet() ? ARG_SIZE.getValue() : 4 * 4096;
+            RamDiskDevice dev = new RamDiskDevice(null, "dummy", size);
+            dev.setDriver(new RamDiskDriver(null));
+            dm.register(dev);
+        }
+    }
 
 }

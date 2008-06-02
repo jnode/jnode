@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi;
 
 import org.jnode.driver.Bus;
@@ -48,20 +48,20 @@ public abstract class SCSIDevice extends Device {
 
     /**
      * Execute a SCSI command on this device.
-     * 
+     *
      * @param cdb
      * @param data
-     * @param dataOffset
-     *            Offset in data where to start reading / writing
+     * @param dataOffset Offset in data where to start reading / writing
      * @param timeout
      * @return the number of transfered bytes.
      */
     public abstract int executeCommand(CDB cdb, byte[] data,
-            int dataOffset, long timeout) throws SCSIException,
-            TimeoutException, InterruptedException;
-    
+                                       int dataOffset, long timeout) throws SCSIException,
+        TimeoutException, InterruptedException;
+
     /**
      * Execute a request sense command.
+     *
      * @return The requested sense data.
      */
     public final SenseData requestSense() throws SCSIException, TimeoutException, InterruptedException {
@@ -80,13 +80,13 @@ public abstract class SCSIDevice extends Device {
         }
 
         /**
+         * @return the number of transfered bytes.
          * @see org.jnode.driver.bus.scsi.SCSIDeviceAPI#executeCommand(org.jnode.driver.bus.scsi.CDB,
          *      byte[], int, long)
-         * @return the number of transfered bytes.
          */
         public int executeCommand(CDB cdb, byte[] data, int dataOffset,
-                long timeout) throws SCSIException, TimeoutException,
-                InterruptedException {
+                                  long timeout) throws SCSIException, TimeoutException,
+            InterruptedException {
             return dev.executeCommand(cdb, data, dataOffset, timeout);
         }
 

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.SCSIBuffer;
@@ -29,26 +29,28 @@ import org.jnode.driver.bus.scsi.SCSIBuffer;
  */
 public class CapacityData extends SCSIBuffer {
 
-    /** Default length of capacity data byte array */
+    /**
+     * Default length of capacity data byte array
+     */
     public static final int DEFAULT_LENGTH = 8;
-    
+
     public CapacityData(byte[] buffer) {
         super(buffer);
     }
-    
+
     public final int getLogicalBlockAddress() {
         return getInt32(0);
     }
-    
+
     public final int getBlockLength() {
         return getInt32(4);
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
         return "LBA 0x" + hex8(getLogicalBlockAddress()) +
-        ", BlockLength 0x" + hex8(getBlockLength());
-    }    
+            ", BlockLength 0x" + hex8(getBlockLength());
+    }
 }

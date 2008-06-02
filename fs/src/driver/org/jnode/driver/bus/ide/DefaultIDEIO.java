@@ -18,13 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import java.security.PrivilegedExceptionAction;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
@@ -43,37 +41,52 @@ import org.jnode.util.TimeoutException;
 
 /**
  * IDE IO-port accessor.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class DefaultIDEIO implements IDEIO {
-    
-    /** My logger */
+
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(DefaultIDEIO.class);
-    
-    /** IDE Taskfile io space */
+
+    /**
+     * IDE Taskfile io space
+     */
     private IOResource cmdBlock;
 
-    /** IDE High taskfile io space */
+    /**
+     * IDE High taskfile io space
+     */
     private IOResource ctrlBlock;
 
-    /** First port address of command block */
+    /**
+     * First port address of command block
+     */
     private final int cmdBlockStart;
 
-    /** First port address of control block */
+    /**
+     * First port address of control block
+     */
     private final int ctrlBlockStart;
-    
-    /** Port number of AltStatus register */
+
+    /**
+     * Port number of AltStatus register
+     */
     private final int altStatusPort;
-    
-    /** IRQ number to respond to */
+
+    /**
+     * IRQ number to respond to
+     */
     private final int irq;
 
     /**
      * Create a new instance
      */
     protected DefaultIDEIO(Device device, boolean primary)
-            throws IllegalArgumentException, DriverException, ResourceNotFreeException {
-        
+        throws IllegalArgumentException, DriverException, ResourceNotFreeException {
+
         int cmdBlockStart = (primary ? IDE0_START_PORT : IDE1_START_PORT);
         int ctrlBlockStart = cmdBlockStart + HIGH_OFFSET;
         int cmdBlockSize = IDE_NR_PORTS;
@@ -81,10 +94,10 @@ public class DefaultIDEIO implements IDEIO {
         int altStatusPort = ctrlBlockStart + R8_ALTSTATUS_OFFSET;
         int irq = (primary ? IDE0_IRQ : IDE1_IRQ);
         boolean nativeMode = false;
-        
+
         // Detect PCI IDE Controller, look for enhanced mode
         if (device instanceof PCIDevice) {
-            final PCIDevice pciDev = (PCIDevice)device;
+            final PCIDevice pciDev = (PCIDevice) device;
             final PCIDeviceConfig pciCfg = pciDev.getConfig();
             final int pIntf = pciCfg.getMinorClass();
             final int progMask = 0x02 | 0x08;
@@ -99,7 +112,7 @@ public class DefaultIDEIO implements IDEIO {
                 final int idx = (primary ? 0 : 2);
                 cmdBlockStart = baseAddrs[idx].getIOBase();
                 cmdBlockSize = 8;
-                ctrlBlockStart = baseAddrs[idx+1].getIOBase();
+                ctrlBlockStart = baseAddrs[idx + 1].getIOBase();
                 ctrlBlockSize = 4;
                 altStatusPort = ctrlBlockStart + 0x02;
                 irq = pciCfg.asHeaderType0().getInterruptLine();
@@ -108,7 +121,7 @@ public class DefaultIDEIO implements IDEIO {
         }
 
         log.info("Using PCI IDE " + (nativeMode ? "Native" : "Compatibility") + " mode [irq=" + irq + "]");
-        
+
         // Now claim the resources
         IOResource cmdBlock = null;
         IOResource ctrlBlock = null;
@@ -119,7 +132,7 @@ public class DefaultIDEIO implements IDEIO {
             ctrlBlock = claimPorts(rm, device, ctrlBlockStart, ctrlBlockSize);
         } catch (NameNotFoundException ex) {
             throw new ResourceNotFreeException("Cannot find ResourceManager",
-                    ex);
+                ex);
         } catch (ResourceNotFreeException ex) {
             if (cmdBlock != null) {
                 cmdBlock.release();
@@ -147,6 +160,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets a word from the data register
+     *
      * @return a word from the data register
      */
     public final int getDataReg() {
@@ -155,15 +169,16 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Writes a word to the data register
-     * 
+     *
      * @param dataWord
      */
     public final void setDataReg(int dataWord) {
         cmdBlock.outPortWord(cmdBlockStart + RW16_DATA_OFFSET, dataWord);
     }
-    
+
     /**
      * Gets the contents of the error register
+     *
      * @return the contents of the error register
      */
     public final int getErrorReg() {
@@ -172,7 +187,8 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the featureregister
-     * @param features 
+     *
+     * @param features
      */
     public final void setFeatureReg(int features) {
         cmdBlock.outPortByte(cmdBlockStart + W8_FEATURE_OFFSET, features);
@@ -180,6 +196,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the sector count register
+     *
      * @return the contents of the sector count register
      */
     public final int getSectorCountReg() {
@@ -188,7 +205,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the sector count register
-     * 
+     *
      * @param sectorCount
      */
     public final void setSectorCountReg(int sectorCount) {
@@ -197,6 +214,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the sector register
+     *
      * @return the contents of the sector register
      */
     public final int getSectorReg() {
@@ -205,6 +223,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the LBA low register
+     *
      * @return the contents of the LBA low register
      */
     public final int getLbaLowReg() {
@@ -213,6 +232,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the LBA mid register
+     *
      * @return the contents of the LBA mid register
      */
     public final int getLbaMidReg() {
@@ -221,6 +241,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the LBA high register
+     *
      * @return the contents of the LBA high register
      */
     public final int getLbaHighReg() {
@@ -229,7 +250,8 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the LBA low register
-     * @param value 
+     *
+     * @param value
      */
     public final void setLbaLowReg(int value) {
         cmdBlock.outPortByte(cmdBlockStart + RW8_LBA_LOW_OFFSET, value);
@@ -237,7 +259,8 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the LBA mid register
-     * @param value 
+     *
+     * @param value
      */
     public final void setLbaMidReg(int value) {
         cmdBlock.outPortByte(cmdBlockStart + RW8_LBA_MID_OFFSET, value);
@@ -245,7 +268,8 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the LBA high register
-     * @param value 
+     *
+     * @param value
      */
     public final void setLbaHighReg(int value) {
         cmdBlock.outPortByte(cmdBlockStart + RW8_LBA_HIGH_OFFSET, value);
@@ -253,7 +277,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the sector register
-     * 
+     *
      * @param sector
      */
     protected final void setSectorReg(int sector) {
@@ -282,6 +306,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the select register
+     *
      * @return the contents of the select register
      */
     public final int getSelectReg() {
@@ -290,7 +315,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the select register
-     * 
+     *
      * @param select
      */
     public final void setSelectReg(int select) {
@@ -299,6 +324,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the status of the IDE controller. Any pending IRQ is reset.
+     *
      * @return the status of the IDE controller. Any pending IRQ is reset.
      */
     public final int getStatusReg() {
@@ -308,6 +334,7 @@ public class DefaultIDEIO implements IDEIO {
     /**
      * Gets the alternative status of the IDE controller. Any pending IRQ is
      * NOT reset.
+     *
      * @return the alternative status of the IDE controller
      */
     public final int getAltStatusReg() {
@@ -317,7 +344,7 @@ public class DefaultIDEIO implements IDEIO {
     /**
      * Sets the command register. This also activates the IDE controller so
      * always set other registers first.
-     * 
+     *
      * @param command
      */
     public final void setCommandReg(int command) {
@@ -326,9 +353,8 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the control register.
-     * 
-     * @param control
-     *            The new value for the control register
+     *
+     * @param control The new value for the control register
      */
     public final void setControlReg(int control) {
         ctrlBlock.outPortByte(ctrlBlockStart + W8_CONTROL_OFFSET, control);
@@ -336,16 +362,18 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Is this channel busy.
+     *
      * @return if this channel is busy
      */
     public final boolean isBusy() {
-        return ((getAltStatusReg() & ST_BUSY) == ST_BUSY);        
+        return ((getAltStatusReg() & ST_BUSY) == ST_BUSY);
     }
-    
+
     /**
      * Block the current thread until the controller is not busy anymore.
-     * @param timeout 
-     * @throws TimeoutException 
+     *
+     * @param timeout
+     * @throws TimeoutException
      */
     public final void waitUntilNotBusy(long timeout) throws TimeoutException {
         while (isBusy()) {
@@ -358,23 +386,23 @@ public class DefaultIDEIO implements IDEIO {
     }
 
     private IOResource claimPorts(final ResourceManager rm,
-            final ResourceOwner owner, final int low, final int length)
-            throws ResourceNotFreeException, DriverException {
+                                  final ResourceOwner owner, final int low, final int length)
+        throws ResourceNotFreeException, DriverException {
         try {
             return (IOResource) AccessControllerUtils
-                    .doPrivileged(new PrivilegedExceptionAction() {
+                .doPrivileged(new PrivilegedExceptionAction() {
 
-                        public Object run() throws ResourceNotFreeException {
-                            return rm.claimIOResource(owner, low, length);
-                        }
-                    });
+                    public Object run() throws ResourceNotFreeException {
+                        return rm.claimIOResource(owner, low, length);
+                    }
+                });
         } catch (ResourceNotFreeException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new DriverException("Unknown exception", ex);
         }
     }
-    
+
     /**
      * @return Returns the irq.
      */

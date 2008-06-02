@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -27,11 +27,11 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an READ TOC command.
  * See SCSI Multimedia Commands-4, section 6.30.
-
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBReadTOC extends CDB {
-	private int dataTransfertCount;
+    private int dataTransfertCount;
 
     public CDBReadTOC(int allocationLength) {
         super(10, 0x43);
@@ -41,8 +41,8 @@ public class CDBReadTOC extends CDB {
         setInt8(9, 0x80); // TOC format
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		return dataTransfertCount;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        return dataTransfertCount;
+    }
 }

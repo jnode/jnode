@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.util.TimeoutException;
@@ -28,78 +28,81 @@ import org.jnode.util.TimeoutException;
  * @author epr
  */
 public class FloppyIdCommand extends FloppyCommand {
-	
-	/** Resulting state */
-	private byte[] st;
-	
-	/**
-	 * Create a new instance
-	 * @param drive
-	 */
-	public FloppyIdCommand(int drive) {
-		super(drive);
-	}
 
-	/**
-	 * @param fdc
-	 * @see org.jnode.driver.block.floppy.FloppyCommand#setup(org.jnode.driver.block.floppy.FDC)
-	 * @throws FloppyException
-	 */
-	public void setup(FDC fdc)
-	throws FloppyException {
-		final byte[] cmd = new byte[2];
-		cmd[0] = 0x4a;
-		cmd[1] = (byte)getDrive();
-		
-		fdc.setDorReg(getDrive(), true, true);
-		fdc.sendCommand(cmd, false);
-	}
+    /**
+     * Resulting state
+     */
+    private byte[] st;
 
-	/**
-	 * @param fdc
-	 * @see org.jnode.driver.block.floppy.FloppyCommand#handleIRQ(org.jnode.driver.block.floppy.FDC)
-	 * @throws FloppyException
-	 */
-	public void handleIRQ(FDC fdc) 
-	throws FloppyException {
-		try {
-			st = fdc.getCommandState(7);
-			final int st0 = st[0] & 0xFF;
-			final int cmdState = (st0 & ST0_CMDST_MASK);
-			if (cmdState != ST0_CMDST_NORMAL) {
-				throw new FloppyException("Id failed [command state=" + cmdState + "]");
-			}
-			notifyFinished();
-		} catch (TimeoutException ex) {
-			notifyError(new FloppyException(ex));
-		}
-	}
-	
-	public int getST0() {
-		return st[0];
-	}
+    /**
+     * Create a new instance
+     *
+     * @param drive
+     */
+    public FloppyIdCommand(int drive) {
+        super(drive);
+    }
 
-	public int getST1() {
-		return st[1];
-	}
+    /**
+     * @param fdc
+     * @throws FloppyException
+     * @see org.jnode.driver.block.floppy.FloppyCommand#setup(org.jnode.driver.block.floppy.FDC)
+     */
+    public void setup(FDC fdc)
+        throws FloppyException {
+        final byte[] cmd = new byte[2];
+        cmd[0] = 0x4a;
+        cmd[1] = (byte) getDrive();
 
-	public int getST2() {
-		return st[2];
-	}
-	
-	public int getCylinder() {
-		return st[3];
-	}
-	
-	public int getHead() {
-		return st[4];
-	}
-	
-	public int getSector() {
-		return st[5];
-	}
-	
-	public int getSectorSize() {
-		return st[6];
-	}
+        fdc.setDorReg(getDrive(), true, true);
+        fdc.sendCommand(cmd, false);
+    }
+
+    /**
+     * @param fdc
+     * @throws FloppyException
+     * @see org.jnode.driver.block.floppy.FloppyCommand#handleIRQ(org.jnode.driver.block.floppy.FDC)
+     */
+    public void handleIRQ(FDC fdc)
+        throws FloppyException {
+        try {
+            st = fdc.getCommandState(7);
+            final int st0 = st[0] & 0xFF;
+            final int cmdState = (st0 & ST0_CMDST_MASK);
+            if (cmdState != ST0_CMDST_NORMAL) {
+                throw new FloppyException("Id failed [command state=" + cmdState + "]");
+            }
+            notifyFinished();
+        } catch (TimeoutException ex) {
+            notifyError(new FloppyException(ex));
+        }
+    }
+
+    public int getST0() {
+        return st[0];
+    }
+
+    public int getST1() {
+        return st[1];
+    }
+
+    public int getST2() {
+        return st[2];
+    }
+
+    public int getCylinder() {
+        return st[3];
+    }
+
+    public int getHead() {
+        return st[4];
+    }
+
+    public int getSector() {
+        return st[5];
+    }
+
+    public int getSectorSize() {
+        return st[6];
+    }
 }

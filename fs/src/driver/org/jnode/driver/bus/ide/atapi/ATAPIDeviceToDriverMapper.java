@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide.atapi;
 
 import org.jnode.driver.Device;
@@ -37,13 +37,14 @@ public class ATAPIDeviceToDriverMapper implements DeviceToDriverMapper {
      */
     public Driver findDriver(Device device) {
         if (device instanceof IDEDevice) {
-            final IDEDevice ideDev = (IDEDevice)device;
+            final IDEDevice ideDev = (IDEDevice) device;
             if (ideDev.getDescriptor().isAtapi()) {
                 return new ATAPIDriver();
             }
         }
         return null;
     }
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
      */

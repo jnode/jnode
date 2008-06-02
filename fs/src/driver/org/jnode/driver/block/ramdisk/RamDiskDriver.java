@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.ramdisk;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -35,108 +34,112 @@ import org.jnode.partitions.PartitionTableEntry;
  */
 public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
-	private static final String RAMDISK_DEFAULTNAME = "ramdisk";
-	/** The device */
-	private RamDiskDevice device;
-	/** The data */
-	private byte[] data;
-	private String devName;
+    private static final String RAMDISK_DEFAULTNAME = "ramdisk";
+    /**
+     * The device
+     */
+    private RamDiskDevice device;
+    /**
+     * The data
+     */
+    private byte[] data;
+    private String devName;
 
-	/**
-	 * Create a RamDisk Driver
-	 * 
-	 * @param deviceName
-	 *           null will name it ramdisk with autonumber
-	 */
-	public RamDiskDriver(String deviceName) {
-		this.devName = deviceName;
-	}
-	/**
-	 * Start the device
-	 * 
-	 * @throws DriverException
-	 */
-	protected void startDevice() throws DriverException {
-		try {
-			this.device = (RamDiskDevice)getDevice();
-			if (this.devName == null) {
-				this.device.getManager().rename(device, RAMDISK_DEFAULTNAME, true);
-			} else {
-				this.device.getManager().rename(device, devName, false);
-			}
+    /**
+     * Create a RamDisk Driver
+     *
+     * @param deviceName null will name it ramdisk with autonumber
+     */
+    public RamDiskDriver(String deviceName) {
+        this.devName = deviceName;
+    }
 
-			if (this.data == null) {
-				this.data = new byte[device.getSize()];
-				this.device.registerAPI(BlockDeviceAPI.class, this);
-			} else {
-				this.device.registerAPI(FSBlockDeviceAPI.class, this);
-			}
-		} catch (DeviceAlreadyRegisteredException ex) {
-			throw new DriverException(ex);
-		}
-	}
+    /**
+     * Start the device
+     *
+     * @throws DriverException
+     */
+    protected void startDevice() throws DriverException {
+        try {
+            this.device = (RamDiskDevice) getDevice();
+            if (this.devName == null) {
+                this.device.getManager().rename(device, RAMDISK_DEFAULTNAME, true);
+            } else {
+                this.device.getManager().rename(device, devName, false);
+            }
 
-	/**
-	 * Stop the device
-	 */
-	protected void stopDevice() {
-		this.device.unregisterAPI(FSBlockDeviceAPI.class);
-		this.device.unregisterAPI(BlockDeviceAPI.class);
-		this.device = null;
-	}
+            if (this.data == null) {
+                this.data = new byte[device.getSize()];
+                this.device.registerAPI(BlockDeviceAPI.class, this);
+            } else {
+                this.device.registerAPI(FSBlockDeviceAPI.class, this);
+            }
+        } catch (DeviceAlreadyRegisteredException ex) {
+            throw new DriverException(ex);
+        }
+    }
 
-	/**
-	 * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
-	 * @return The partition table entry
-	 */
-	public PartitionTableEntry getPartitionTableEntry() {
-		return null;
-	}
+    /**
+     * Stop the device
+     */
+    protected void stopDevice() {
+        this.device.unregisterAPI(FSBlockDeviceAPI.class);
+        this.device.unregisterAPI(BlockDeviceAPI.class);
+        this.device = null;
+    }
 
-	/**
-	 * @see org.jnode.driver.block.FSBlockDeviceAPI#getSectorSize()
-	 * @return The sector size
-	 */
-	public int getSectorSize() {
-		return 512;
-	}
+    /**
+     * @return The partition table entry
+     * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
+     */
+    public PartitionTableEntry getPartitionTableEntry() {
+        return null;
+    }
 
-	/**
-	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-	 */
-	public void flush() {
-		// Do nothing
-	}
+    /**
+     * @return The sector size
+     * @see org.jnode.driver.block.FSBlockDeviceAPI#getSectorSize()
+     */
+    public int getSectorSize() {
+        return 512;
+    }
 
-	/**
-	 * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
-	 * @return The length
-	 */
-	public long getLength() {
-		return data.length;
-	}
+    /**
+     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
+     */
+    public void flush() {
+        // Do nothing
+    }
 
-	/**
-	 * @param devOffset
-	 * @param dest
-	 * @param destOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-	 */
-	public void read(long devOffset, ByteBuffer dest) {
-		//System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
-        dest.put(this.data, (int)devOffset, dest.remaining());
-	}
+    /**
+     * @return The length
+     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
+     */
+    public long getLength() {
+        return data.length;
+    }
 
-	/**
-	 * @param devOffset
-	 * @param src
-	 * @param srcOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-	 */
-	public void write(long devOffset, ByteBuffer src) {
-		//System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);
-        src.get(this.data, (int)devOffset, src.remaining());
-	}
+    /**
+     * @param devOffset
+     * @param dest
+     * @param destOffset
+     * @param length
+     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
+     */
+    public void read(long devOffset, ByteBuffer dest) {
+        //System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
+        dest.put(this.data, (int) devOffset, dest.remaining());
+    }
+
+    /**
+     * @param devOffset
+     * @param src
+     * @param srcOffset
+     * @param length
+     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
+     */
+    public void write(long devOffset, ByteBuffer src) {
+        //System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);
+        src.get(this.data, (int) devOffset, src.remaining());
+    }
 }

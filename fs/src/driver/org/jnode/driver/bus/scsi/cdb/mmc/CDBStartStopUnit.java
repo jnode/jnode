@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -30,13 +30,11 @@ public class CDBStartStopUnit extends CDB {
 
     /**
      * Initialize this instance.
-     * 
-     * @param action
-     *            Action to perform.
-     * @param returnAsap
-     *            If true, the command will finish as soon as it is interpreted,
-     *            otherwise the command will finish as soon as the command has
-     *            beene executed.
+     *
+     * @param action     Action to perform.
+     * @param returnAsap If true, the command will finish as soon as it is interpreted,
+     *                   otherwise the command will finish as soon as the command has
+     *                   beene executed.
      */
     public CDBStartStopUnit(Action action, boolean returnAsap) {
         super(6, 0x1b);
@@ -49,25 +47,39 @@ public class CDBStartStopUnit extends CDB {
 
     public static final class Action {
 
-        /** Set the device into idle state */
+        /**
+         * Set the device into idle state
+         */
         public static final Action SET_IDLE_STATE = new Action(0x20);
 
-        /** Set the device into standby state */
+        /**
+         * Set the device into standby state
+         */
         public static final Action SET_STANDBY_STATE = new Action(0x30);
 
-        /** Set the device into sleep state */
+        /**
+         * Set the device into sleep state
+         */
         public static final Action SET_SLEEP_STATE = new Action(0x50);
 
-        /** Start the device */
+        /**
+         * Start the device
+         */
         public static final Action START = new Action(0x01);
 
-        /** Stop the device */
+        /**
+         * Stop the device
+         */
         public static final Action STOP = new Action(0x00);
 
-        /** Eject the medium from the device */
+        /**
+         * Eject the medium from the device
+         */
         public static final Action EJECT = new Action(0x02);
 
-        /** Load the medium into the device */
+        /**
+         * Load the medium into the device
+         */
         public static final Action LOAD = new Action(0x03);
 
         private final int code;
@@ -75,15 +87,16 @@ public class CDBStartStopUnit extends CDB {
         private Action(int code) {
             this.code = code;
         }
+
         final int getCode() {
             return code;
         }
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.scsi.cdrom;
 
 import org.jnode.driver.Device;
@@ -37,15 +37,15 @@ public class CDROMDeviceToDriverMapper implements DeviceToDriverMapper {
      */
     public Driver findDriver(Device device) {
         if (device instanceof SCSIDevice) {
-            final SCSIDevice dev = (SCSIDevice)device;
+            final SCSIDevice dev = (SCSIDevice) device;
             if (dev.getDescriptor().getPeripheralDeviceType() == 0x05) {
                 // CD/DVD device
                 return new SCSICDROMDriver();
-            }            
+            }
         }
         return null;
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
      */

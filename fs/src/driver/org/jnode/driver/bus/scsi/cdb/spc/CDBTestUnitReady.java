@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.spc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -27,7 +27,7 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an TEST UNIT READY command.
  * See SCSI Primary Commands-3, section 6.29.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBTestUnitReady extends CDB {
@@ -39,8 +39,8 @@ public class CDBTestUnitReady extends CDB {
         super(6, 0x00);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		return 0;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        return 0;
+    }
 }

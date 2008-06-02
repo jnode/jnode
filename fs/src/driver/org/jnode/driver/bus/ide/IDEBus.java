@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
@@ -45,36 +44,50 @@ import org.jnode.util.TimeoutException;
  * @author epr
  */
 public class IDEBus extends Bus implements IDEConstants, IRQHandler,
-        QueueProcessor<IDECommand> {
+    QueueProcessor<IDECommand> {
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(IDEBus.class);
 
     private final IRQResource irqRes;
 
-    /** The command queue for IDE commands */
+    /**
+     * The command queue for IDE commands
+     */
     private final Queue<IDECommand> commandQueue = new Queue<IDECommand>();
 
-    /** The command that is currently being processed */
+    /**
+     * The command that is currently being processed
+     */
     private IDECommand currentCommand;
 
-    /** The worker thread for the command queue */
+    /**
+     * The worker thread for the command queue
+     */
     private final QueueProcessorThread<IDECommand> queueProcessor;
 
-    /** IO Accessor */
+    /**
+     * IO Accessor
+     */
     private final IDEIO io;
-    
-    /** Is the the primary (true) or secondary (false) channel */
+
+    /**
+     * Is the the primary (true) or secondary (false) channel
+     */
     private final boolean primary;
-    
-    /** Name of this bus */
+
+    /**
+     * Name of this bus
+     */
     private final String name;
 
     /**
      * Create a new instance
      */
     protected IDEBus(Device parent, boolean primary)
-            throws IllegalArgumentException, DriverException, ResourceNotFreeException {
+        throws IllegalArgumentException, DriverException, ResourceNotFreeException {
         super(parent);
         this.name = parent.getId() + ':' + (primary ? "primary" : "secondary");
         this.primary = primary;
@@ -85,14 +98,14 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
             throw new DriverException(ex);
         }
         this.io = factory.createIDEIO(parent, primary);
-        
+
         // Register the irq handler
         final ResourceManager rm;
         try {
             rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new ResourceNotFreeException("Cannot find ResourceManager",
-                    ex);
+                ex);
         }
         irqRes = rm.claimIRQ(parent, io.getIrq(), this, true);
         // Reset the controller
@@ -105,7 +118,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
     /**
      * Add the given command to the queue of commands to be executed.
-     * 
+     *
      * @param command
      */
     public void execute(IDECommand command) {
@@ -115,15 +128,14 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
     /**
      * Add the given command to the queue of commands to be executed and wait
      * for the command to finish.
-     * 
+     *
      * @param command
-     * @param timeout
-     *            Maximum time to wait
-     * @throws InterruptedException 
-     * @throws TimeoutException 
+     * @param timeout Maximum time to wait
+     * @throws InterruptedException
+     * @throws TimeoutException
      */
     public void executeAndWait(IDECommand command, long timeout)
-            throws InterruptedException, TimeoutException {
+        throws InterruptedException, TimeoutException {
         execute(command);
         command.waitUntilFinished(timeout);
     }
@@ -139,7 +151,8 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
     /**
      * Handle the IDE interrupt.
-     * @param irq 
+     *
+     * @param irq
      */
     public void handleInterrupt(int irq) {
         final IDECommand cmd = currentCommand;
@@ -155,17 +168,17 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
                 this.currentCommand = null;
                 cmd.setError(ERR_ABORT);
             }
-        } else if(log.isDebugEnabled()) {
+        } else if (log.isDebugEnabled()) {
             log.debug("Unknown IDE IRQ " + irq + " status 0x" + NumberUtils.hex(io.getStatusReg(), 2));
         }
     }
 
     /**
      * Probe for the existence of a given IDE device.
-     * 
+     *
      * @param master
      * @return the found IDEDriveDescriptor
-     * @throws InterruptedException 
+     * @throws InterruptedException
      */
     public IDEDriveDescriptor probe(boolean master) throws InterruptedException {
 
@@ -200,8 +213,8 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
                 }
             }
         } else {
-        	// Finish the command
-        	cmd.setError(ERR_ABORT);
+            // Finish the command
+            cmd.setError(ERR_ABORT);
             // Force a reset of any IRQ
             final int state = io.getStatusReg();
             // Timeout
@@ -227,8 +240,8 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
         if (cmd.isFinished()) {
             return cmd.getResult();
         } else {
-        	// Finish the command
-        	cmd.setError(ERR_ABORT);
+            // Finish the command
+            cmd.setError(ERR_ABORT);
             log.debug("Probe of " + ideId + " done, return null");
             // No device found
             return null;
@@ -257,13 +270,13 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
     /**
      * Select the master of slave drive
-     * 
+     *
      * @param master
      * @return True if the controller accepted the setting, false otherwise.
      */
     protected final boolean selectDrive(boolean master) {
         final int select = SEL_BLANK
-                | (master ? SEL_DRIVE_MASTER : SEL_DRIVE_SLAVE);
+            | (master ? SEL_DRIVE_MASTER : SEL_DRIVE_SLAVE);
         io.setSelectReg(select);
         // Wait a while
         TimeUtils.sleep(50);
@@ -272,7 +285,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
     /**
      * Is the current register state a packet response.
-     * 
+     *
      * @return if the current register state is a packet response
      */
     protected boolean isPacketResponse() {
@@ -288,6 +301,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
      * Write data towards the device.
      * If the length is longer then the byte-array, 0 bytes are padded
      * after the byte-array.
+     *
      * @param src
      * @param ofs
      * @param length
@@ -295,35 +309,37 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
     public final void writeData(byte[] src, int ofs, int length) {
         final int srcLen = src.length - ofs;
         int len = Math.min(length, srcLen);
-		//waitUntilNotBusy();
-		for (; len > 0; len -= 2, length -= 2) {
-		    final int v0 = src[ofs++] & 0xFF;
-		    final int v1 = src[ofs++] & 0xFF;
-		    io.setDataReg(v0 | (v1 << 8));
-		}
-		// Send padding
-		for (; length > 0; length -= 2) {
-		    io.setDataReg(0);
-		}
+        //waitUntilNotBusy();
+        for (; len > 0; len -= 2, length -= 2) {
+            final int v0 = src[ofs++] & 0xFF;
+            final int v1 = src[ofs++] & 0xFF;
+            io.setDataReg(v0 | (v1 << 8));
+        }
+        // Send padding
+        for (; length > 0; length -= 2) {
+            io.setDataReg(0);
+        }
     }
-    
+
     /**
      * Read data from the device.
+     *
      * @param dst
      * @param ofs
      * @param length
      */
     public final void readData(byte[] dst, int ofs, int length) {
-		//waitUntilNotBusy();
-		for (; length > 0; length -= 2) {
-		    final int v = io.getDataReg();
-			dst[ofs++] = (byte)(v & 0xFF);
-			dst[ofs++] = (byte)((v >> 8) & 0xFF);
-		}
+        //waitUntilNotBusy();
+        for (; length > 0; length -= 2) {
+            final int v = io.getDataReg();
+            dst[ofs++] = (byte) (v & 0xFF);
+            dst[ofs++] = (byte) ((v >> 8) & 0xFF);
+        }
     }
 
     /**
      * (non-Javadoc)
+     *
      * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
      */
     public void process(IDECommand cmd) /*throws Exception*/ {
@@ -339,8 +355,8 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
         // If there is a current command active, wait for it.
         final IDECommand current = this.currentCommand;
         if (current != null) {
-            if (!current.isFinished()) {                
-	        	log.debug("process: wait for current.isFinished");
+            if (!current.isFinished()) {
+                log.debug("process: wait for current.isFinished");
                 try {
                     current.waitUntilFinished(IDE_DATA_XFER_TIMEOUT);
                 } catch (InterruptedException ex) {
