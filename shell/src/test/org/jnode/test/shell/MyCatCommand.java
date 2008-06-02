@@ -23,7 +23,6 @@ package org.jnode.test.shell;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -38,30 +37,30 @@ import org.jnode.shell.help.argument.URLArgument;
 public class MyCatCommand extends AbstractCommand {
 
     static final FileArgument ARG_FILE = new FileArgument("file",
-            "the files to be concatenated", true);
+        "the files to be concatenated", true);
 
     static final URLArgument ARG_URL = new URLArgument("url",
-            "the files to be concatenated", true);
-    
-    public static Help.Info HELP_INFO = new Help.Info("cat",
-            new Syntax[] {
-                new Syntax(
-                        "Fetch the argument urls and copy their contents to standard output.",
-                        new Parameter[] { 
-                                new Parameter("u", 
-                                        "selects urls rather than pathnames",
-                                        ARG_URL, Parameter.MANDATORY)}),
-                new Syntax(
-                        "Read the argument files, copying their contents to standard output.  " +
-                        "If there are no arguments, standard input is read until EOF is reached; " +
-                        "e.g. ^D when reading keyboard input.",
-                        new Parameter[] { 
-                                new Parameter(ARG_FILE, Parameter.OPTIONAL) })
-                           
-    });
+        "the files to be concatenated", true);
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+    public static Help.Info HELP_INFO = new Help.Info("cat",
+        new Syntax[]{
+            new Syntax(
+                "Fetch the argument urls and copy their contents to standard output.",
+                new Parameter[]{
+                    new Parameter("u",
+                        "selects urls rather than pathnames",
+                        ARG_URL, Parameter.MANDATORY)}),
+            new Syntax(
+                "Read the argument files, copying their contents to standard output.  " +
+                    "If there are no arguments, standard input is read until EOF is reached; " +
+                    "e.g. ^D when reading keyboard input.",
+                new Parameter[]{
+                    new Parameter(ARG_FILE, Parameter.OPTIONAL)})
+
+        });
+
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
     }
 
 }

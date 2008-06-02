@@ -23,11 +23,9 @@ package org.jnode.test.shell;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.apache.log4j.BasicConfigurator;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
@@ -39,14 +37,14 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.def.DefaultHelp;
 
 /**
- * A Cassowary is another large Australian bird ... 
- * 
+ * A Cassowary is another large Australian bird ...
+ *
  * @author Levente S\u00e1ntha
  * @author crawley@jnode.org
  */
 public class Cassowary {
     private static boolean initialized;
-    
+
     protected static void initEnv() throws NamingException {
         if (initialized) {
             return;
@@ -54,8 +52,8 @@ public class Cassowary {
         InitialNaming.setNameSpace(new NameSpace() {
             private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 
-            public <T> void bind(Class<T> name, T service) 
-            throws NamingException, NameAlreadyBoundException {
+            public <T> void bind(Class<T> name, T service)
+                throws NamingException, NameAlreadyBoundException {
                 if (space.get(name) != null) {
                     throw new NameAlreadyBoundException();
                 }
@@ -79,12 +77,12 @@ public class Cassowary {
             }
         });
         InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
-        AliasManager alias_mgr = 
+        AliasManager alias_mgr =
             new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
         InitialNaming.bind(AliasManager.NAME, alias_mgr);
         InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
         InitialNaming.bind(Help.NAME, new DefaultHelp());
-        
+
         BasicConfigurator.configure();
         initialized = true;
     }

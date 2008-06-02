@@ -23,15 +23,13 @@ package org.jnode.test.shell.syntax;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.SymbolSource;
 import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.StringArgument;
 
@@ -40,11 +38,11 @@ public class CommandLineTest extends TestCase {
     @SuppressWarnings("deprecation")
     public void testStringConstructors() {
         String[] args = new String[]{"1", "2", "3"};
-        
+
         CommandLine c1 = new CommandLine(args);
         assertEquals(null, c1.getCommandName());
         assertEquals(null, c1.getCommandToken());
-        
+
         SymbolSource<String> ss = c1.iterator();
         assertEquals(true, ss.hasNext());
         assertEquals("1", ss.next());
@@ -53,7 +51,7 @@ public class CommandLineTest extends TestCase {
         assertEquals(true, ss.hasNext());
         assertEquals("3", ss.next());
         assertEquals(false, ss.hasNext());
-        
+
         SymbolSource<Token> ts = c1.tokenIterator();
         assertEquals(true, ts.hasNext());
         assertEquals("1", ts.next().token);
@@ -62,22 +60,22 @@ public class CommandLineTest extends TestCase {
         assertEquals(true, ts.hasNext());
         assertEquals("3", ts.next().token);
         assertEquals(false, ts.hasNext());
-        
+
         CommandLine c2 = new CommandLine("foo", args);
         assertEquals("foo", c2.getCommandName());
         assertEquals("foo", c2.getCommandToken().token);
     }
-    
+
     @SuppressWarnings("deprecation")
     public void testTokenConstructors() {
         Token foo = new Token("foo");
         Token[] args = new Token[]{
-                new Token("1"), new Token("2"), new Token("3")};
-        
+            new Token("1"), new Token("2"), new Token("3")};
+
         CommandLine c1 = new CommandLine(foo, args, null);
         assertEquals("foo", c1.getCommandName());
         assertEquals(foo, c1.getCommandToken());
-        
+
         SymbolSource<String> ss = c1.iterator();
         assertEquals(true, ss.hasNext());
         assertEquals("1", ss.next());
@@ -86,7 +84,7 @@ public class CommandLineTest extends TestCase {
         assertEquals(true, ss.hasNext());
         assertEquals("3", ss.next());
         assertEquals(false, ss.hasNext());
-        
+
         SymbolSource<Token> ts = c1.tokenIterator();
         assertEquals(true, ts.hasNext());
         assertEquals(args[0], ts.next());
@@ -96,20 +94,20 @@ public class CommandLineTest extends TestCase {
         assertEquals(args[2], ts.next());
         assertEquals(false, ts.hasNext());
     }
-    
+
     public static class TestCommand extends AbstractCommand {
         private final StringArgument arg = new StringArgument("arg1");
-        
+
         public TestCommand() {
             registerArguments(arg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public void testParse() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.CommandLineTest$TestCommand");

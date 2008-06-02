@@ -23,9 +23,7 @@ package org.jnode.test.shell.syntax;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -41,7 +39,7 @@ public class ArgumentTypesTest extends TestCase {
     public enum TestEnum {
         ALT1, ALT2, ALT3
     }
-    
+
     public static class TestArgument extends EnumArgument<TestEnum> {
 
         public TestArgument(String label, int flags) {
@@ -56,57 +54,55 @@ public class ArgumentTypesTest extends TestCase {
 
     public static class TestEnumCommand extends AbstractCommand {
         private final EnumArgument<TestEnum> arg = new TestArgument("arg1", 0);
-        
+
         public TestEnumCommand() {
             registerArguments(arg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-	
-	public void testEnumArgument() throws Exception {
-	    TestShell shell = new TestShell();
+
+    public void testEnumArgument() throws Exception {
+        TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.ArgumentTypesTest$TestEnumCommand");
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals(TestEnum.ALT1, cmd.getArgumentBundle().getArgument("arg1").getValue());
-        
+
         try {
             cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT99")}, null);
             cl.parseCommandLine(shell);
             fail("parse didn't fail");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
         try {
             cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT1"), new Token("ALT1")}, null);
             cl.parseCommandLine(shell);
             fail("parse didn't fail");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
-	}
-	
-	public static class TestFileCommand extends AbstractCommand {
+    }
+
+    public static class TestFileCommand extends AbstractCommand {
         private final FileArgument arg = new FileArgument("arg1", 0);
-        
+
         public TestFileCommand() {
             registerArguments(arg);
         }
-        
+
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public void testFileArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.ArgumentTypesTest$TestFileCommand");
@@ -115,13 +111,12 @@ public class ArgumentTypesTest extends TestCase {
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
-        
+
         try {
             cl = new CommandLine(new Token("command"), new Token[]{new Token("")}, null);
             cl.parseCommandLine(shell);
             fail("parse didn't fail");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }

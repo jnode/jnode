@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.shell;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -36,12 +35,12 @@ import org.jnode.shell.help.argument.FileArgument;
 public class MyDirCommand extends AbstractCommand {
     static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
     public static Help.Info HELP_INFO =
-            new Help.Info(
-                    "dir",
-                    "List the entries of the given path",
-                    new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
+        new Help.Info(
+            "dir",
+            "List the entries of the given path",
+            new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
     }
 }

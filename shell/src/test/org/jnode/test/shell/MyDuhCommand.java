@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.shell;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
@@ -33,15 +32,15 @@ import org.jnode.shell.syntax.FileArgument;
  * Cut down test class ... dir done the new way
  */
 public class MyDuhCommand extends AbstractCommand {
-    private final FileArgument ARG_PATH = 
+    private final FileArgument ARG_PATH =
         new FileArgument("path", Argument.OPTIONAL + Argument.SINGLE, "the path to list contents of");
-    
+
     public MyDuhCommand() {
         super("List the entries of the given path");
         registerArguments(ARG_PATH);
     }
-    
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
     }
 }

@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.shell;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.AliasArgument;
@@ -38,7 +37,7 @@ public class MyAliasCommand extends AbstractCommand {
     private final AliasArgument ARG_ALIAS;
     private final ClassNameArgument ARG_CLASS;
     private final AliasArgument ARG_REMOVE;
-    
+
     public MyAliasCommand() {
         super("list, set or remove JNode command aliases");
         ARG_ALIAS = new AliasArgument("alias", Argument.OPTIONAL, "the alias to be added");
@@ -47,7 +46,7 @@ public class MyAliasCommand extends AbstractCommand {
         registerArguments(ARG_ALIAS, ARG_CLASS, ARG_REMOVE);
     }
 
-   public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute(CommandLine commandLine, InputStream in,
+                        PrintStream out, PrintStream err) throws Exception {
     }
 }

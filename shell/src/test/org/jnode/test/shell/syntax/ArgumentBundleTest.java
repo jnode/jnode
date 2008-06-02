@@ -22,9 +22,7 @@
 package org.jnode.test.shell.syntax;
 
 import java.io.File;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FileArgument;
@@ -37,25 +35,22 @@ public class ArgumentBundleTest extends TestCase {
         new ArgumentBundle();
         new ArgumentBundle(new FileArgument("arg1", 0));
         try {
-            new ArgumentBundle(new FileArgument("arg1", 0), 
-                               new FileArgument("arg1", 0));
+            new ArgumentBundle(new FileArgument("arg1", 0),
+                new FileArgument("arg1", 0));
             fail("Didn't throw an IllegalArgumentException for duplicate labels");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // expected ...
         }
         try {
             new ArgumentBundle((Argument<?>) null);
             fail("Didn't throw an NullPointerException for null argument");
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             // expected ...
         }
         try {
             new ArgumentBundle(new FileArgument(null, 0));
             fail("Didn't throw an NullPointerException for null label");
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             // expected ...
         }
     }
@@ -69,12 +64,11 @@ public class ArgumentBundleTest extends TestCase {
         try {
             b.getArgument("arg3");
             fail("didn't throw exception");
-        }
-        catch (SyntaxFailureException ex) {
+        } catch (SyntaxFailureException ex) {
             // expected
         }
     }
-    
+
     // Expose protected methods for testing ...
     private class MyArgumentBundle extends ArgumentBundle {
         public MyArgumentBundle(Argument<?>... elements) {
@@ -85,12 +79,12 @@ public class ArgumentBundleTest extends TestCase {
             return super.createDefaultSyntax();
         }
     }
-    
+
     public void testCreateDefaultSyntax() {
         Argument<File> arg1 = new FileArgument("arg1", 0);
         Argument<File> arg2 = new FileArgument("arg2", 0);
         MyArgumentBundle b = new MyArgumentBundle(arg1, arg2);
-        
+
         b.testCreateDefaultSyntax();
     }
 }

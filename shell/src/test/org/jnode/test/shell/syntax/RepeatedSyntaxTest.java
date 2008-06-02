@@ -23,9 +23,7 @@ package org.jnode.test.shell.syntax;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -41,19 +39,19 @@ import org.jnode.shell.syntax.Syntax;
 public class RepeatedSyntaxTest extends TestCase {
 
     public static class Test extends AbstractCommand {
-        private final FileArgument arg = 
+        private final FileArgument arg =
             new FileArgument("arg1", Argument.OPTIONAL + Argument.MULTIPLE);
 
         public Test() {
             registerArguments(arg);
-        }  
+        }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public void testFormat() {
         Test test = new Test();
         Syntax syntax1 = new RepeatSyntax(new ArgumentSyntax("arg1"));
@@ -65,73 +63,71 @@ public class RepeatedSyntaxTest extends TestCase {
         Syntax syntax4 = new RepeatSyntax(new ArgumentSyntax("arg1"), 3, 6);
         assertEquals("<arg1:file> 3...6", syntax4.format(test.getArgumentBundle()));
     }
-    
+
     public void testZeroToMany() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
-        
+
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals(0, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
         assertEquals(2, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
-        
+
     }
-    
+
     public void testOneToMany() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1"), 1, Integer.MAX_VALUE));
-        
+
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
-        
+
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
         assertEquals(2, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
     }
-    
+
     public void testOneToTwo() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.RepeatedSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1"), 1, 2));
-        
+
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
-        
+
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
@@ -147,11 +143,10 @@ public class RepeatedSyntaxTest extends TestCase {
 
         try {
             cl = new CommandLine(new Token("cmd"),
-                    new Token[]{new Token("F1"), new Token("F1"), new Token("F1")}, null);
+                new Token[]{new Token("F1"), new Token("F1"), new Token("F1")}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }
@@ -170,60 +165,56 @@ public class RepeatedSyntaxTest extends TestCase {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
             cl.parseCommandLine(shell);
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
             cl.parseCommandLine(shell);
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
         cl = new CommandLine(new Token("cmd"),
-                new Token[]{new Token("F1"), new Token("F1"), new Token("F1")}, null);
+            new Token[]{new Token("F1"), new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
 
         cl = new CommandLine(new Token("cmd"),
-                new Token[]{new Token("F1"), new Token("F1"), new Token("F1"), new Token("F1")}, null);
+            new Token[]{new Token("F1"), new Token("F1"), new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
 
         cl = new CommandLine(new Token("cmd"),
-                new Token[]{
-            new Token("F1"), new Token("F1"), new Token("F1"),
-            new Token("F1"), new Token("F1")}, null);
+            new Token[]{
+                new Token("F1"), new Token("F1"), new Token("F1"),
+                new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
 
         cl = new CommandLine(new Token("cmd"),
-                new Token[]{
-            new Token("F1"), new Token("F1"), new Token("F1"), 
-            new Token("F1"), new Token("F1"), new Token("F1")}, null);
+            new Token[]{
+                new Token("F1"), new Token("F1"), new Token("F1"),
+                new Token("F1"), new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
 
         try {
             cl = new CommandLine(new Token("cmd"),
-                    new Token[]{
-                new Token("F1"), new Token("F1"), new Token("F1"), new Token("F1"), 
-                new Token("F1"), new Token("F1"), new Token("F1")}, null);
+                new Token[]{
+                    new Token("F1"), new Token("F1"), new Token("F1"), new Token("F1"),
+                    new Token("F1"), new Token("F1"), new Token("F1")}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }

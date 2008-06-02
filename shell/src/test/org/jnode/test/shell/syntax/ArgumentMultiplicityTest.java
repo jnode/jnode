@@ -23,9 +23,7 @@ package org.jnode.test.shell.syntax;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -41,58 +39,58 @@ public class ArgumentMultiplicityTest extends TestCase {
 
     public static class Optional extends AbstractCommand {
         private final FileArgument arg = new FileArgument("arg1", Argument.OPTIONAL);
-        
+
         public Optional() {
             registerArguments(arg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public static class Mandatory extends AbstractCommand {
         private final FileArgument arg = new FileArgument("arg1", Argument.MANDATORY);
-        
+
         public Mandatory() {
             registerArguments(arg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public static class OptionalMulti extends AbstractCommand {
         private final FileArgument arg =
             new FileArgument("arg1", Argument.OPTIONAL + Argument.MULTIPLE);
-        
+
         public OptionalMulti() {
             registerArguments(arg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public static class MandatoryMulti extends AbstractCommand {
-        private final FileArgument arg = 
+        private final FileArgument arg =
             new FileArgument("arg1", Argument.MANDATORY + Argument.MULTIPLE);
-        
+
         public MandatoryMulti() {
             registerArguments(arg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
             out.print(arg.getValue());
         }
     }
-    
+
     public void testOptionalArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$Optional");
@@ -101,17 +99,16 @@ public class ArgumentMultiplicityTest extends TestCase {
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
-        
+
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("")}, null);
             cl.parseCommandLine(shell);
             fail("parse didn't fail");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }
-    
+
     public void testMandatoryArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$Mandatory");
@@ -120,17 +117,16 @@ public class ArgumentMultiplicityTest extends TestCase {
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
-        
+
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
             cl.parseCommandLine(shell);
             fail("parse didn't fail");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }
-    
+
     public void testOptionalMultiArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$OptionalMulti");
@@ -139,14 +135,14 @@ public class ArgumentMultiplicityTest extends TestCase {
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
         cmdInfo = cl.parseCommandLine(shell);
 
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F2")}, null);
         cmdInfo = cl.parseCommandLine(shell);
     }
-    
+
     public void testMandatoryMultiArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$MandatoryMulti");
@@ -155,13 +151,12 @@ public class ArgumentMultiplicityTest extends TestCase {
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
         Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
-        
+
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
             cl.parseCommandLine(shell);
             fail("parse didn't fail");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
