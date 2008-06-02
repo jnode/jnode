@@ -8,5 +8,6 @@ lib
 src.jpx
 *.patch
 jnode.properties
+udpout.log
 local
 bin
