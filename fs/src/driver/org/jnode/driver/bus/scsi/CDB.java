@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi;
 
 
@@ -26,24 +26,26 @@ package org.jnode.driver.bus.scsi;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class CDB extends SCSIBuffer {
-    
+
     /**
      * Initialize this instance.
+     *
      * @param cdbLength Length (in bytes) of this CDB
-     * @param opcode Opcode of this CDB
+     * @param opcode    Opcode of this CDB
      */
     public CDB(int cdbLength, int opcode) {
         super(cdbLength);
         setInt8(0, opcode);
     }
-    
+
     /**
      * Gets the opcode of this CDB.
+     *
      * @return
      */
     public final int getOpcode() {
         return getUInt8(0);
     }
-    
+
     public abstract int getDataTransfertCount();
 }

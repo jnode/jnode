@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import org.jnode.driver.Device;
@@ -31,15 +31,15 @@ public interface IDEDeviceFactory {
      * The name used to lookup this service.
      */
     public static final Class<IDEDeviceFactory> NAME = IDEDeviceFactory.class;
-    
-    IDEDevice createIDEDevice(IDEBus bus, boolean primary, boolean master, String name, 
-    		IDEDriveDescriptor descriptor, DefaultIDEControllerDriver controller);
-    
-    IDEBus createIDEBus(Device parent, boolean primary) 
-    		throws IllegalArgumentException, DriverException, ResourceNotFreeException;
 
-    IDEIO createIDEIO(Device parent, boolean primary) 
-    		throws IllegalArgumentException, DriverException, ResourceNotFreeException;
-    
+    IDEDevice createIDEDevice(IDEBus bus, boolean primary, boolean master, String name,
+                              IDEDriveDescriptor descriptor, DefaultIDEControllerDriver controller);
+
+    IDEBus createIDEBus(Device parent, boolean primary)
+        throws IllegalArgumentException, DriverException, ResourceNotFreeException;
+
+    IDEIO createIDEIO(Device parent, boolean primary)
+        throws IllegalArgumentException, DriverException, ResourceNotFreeException;
+
     IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev);
 }

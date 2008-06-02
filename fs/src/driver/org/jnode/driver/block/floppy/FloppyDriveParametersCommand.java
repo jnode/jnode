@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 /**
@@ -26,46 +26,46 @@ package org.jnode.driver.block.floppy;
  */
 public class FloppyDriveParametersCommand extends FloppyCommand {
 
-	private final FloppyDriveParameters dp;
-	private final FloppyParameters fp;
+    private final FloppyDriveParameters dp;
+    private final FloppyParameters fp;
 
-	/**
-	 * @param drive
-	 * @param dp
-	 * @param fp
-	 */
-	public FloppyDriveParametersCommand(int drive, FloppyDriveParameters dp, FloppyParameters fp) {
-		super(drive);
-		this.dp = dp;
-		this.fp = fp;
-	}
+    /**
+     * @param drive
+     * @param dp
+     * @param fp
+     */
+    public FloppyDriveParametersCommand(int drive, FloppyDriveParameters dp, FloppyParameters fp) {
+        super(drive);
+        this.dp = dp;
+        this.fp = fp;
+    }
 
-	/**
-	 * @param fdc
-	 * @see org.jnode.driver.block.floppy.FloppyCommand#setup(org.jnode.driver.block.floppy.FDC)
-	 * @throws FloppyException
-	 */
-	public void setup(FDC fdc) throws FloppyException {
-		final int drive = getDrive();
+    /**
+     * @param fdc
+     * @throws FloppyException
+     * @see org.jnode.driver.block.floppy.FloppyCommand#setup(org.jnode.driver.block.floppy.FDC)
+     */
+    public void setup(FDC fdc) throws FloppyException {
+        final int drive = getDrive();
 
-		//final int dtr = fdc.getDTR(drive);
-		final int hlt = dp.getHeadLoadTime();
+        //final int dtr = fdc.getDTR(drive);
+        final int hlt = dp.getHeadLoadTime();
 
-		byte[] cmd = new byte[3];
-		cmd[0] = 0x03;
-		cmd[1] = (byte) (fp.getSpec1());
-		cmd[2] = (byte) (hlt << 1);
-		fdc.setDorReg(drive, false, true);
-		fdc.sendCommand(cmd, false);
-		notifyFinished();
-	}
+        byte[] cmd = new byte[3];
+        cmd[0] = 0x03;
+        cmd[1] = (byte) (fp.getSpec1());
+        cmd[2] = (byte) (hlt << 1);
+        fdc.setDorReg(drive, false, true);
+        fdc.sendCommand(cmd, false);
+        notifyFinished();
+    }
 
-	/**
-	 * @param fdc
-	 * @see org.jnode.driver.block.floppy.FloppyCommand#handleIRQ(org.jnode.driver.block.floppy.FDC)
-	 */
-	public void handleIRQ(FDC fdc) {
-		// do nothing
-	}
+    /**
+     * @param fdc
+     * @see org.jnode.driver.block.floppy.FloppyCommand#handleIRQ(org.jnode.driver.block.floppy.FDC)
+     */
+    public void handleIRQ(FDC fdc) {
+        // do nothing
+    }
 
 }

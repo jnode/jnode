@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.driver.Bus;
@@ -29,11 +29,11 @@ import org.jnode.driver.Device;
  */
 public class FloppyControllerDevice extends Device {
 
-	/**
-	 * @param bus
-	 */
-	public FloppyControllerDevice(Bus bus) {
-		super(bus, "fdc");
-	}
+    /**
+     * @param bus
+     */
+    public FloppyControllerDevice(Bus bus) {
+        super(bus, "fdc");
+    }
 
 }

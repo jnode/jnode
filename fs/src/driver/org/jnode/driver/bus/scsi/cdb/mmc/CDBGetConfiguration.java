@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -27,11 +27,11 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an GET CONFIGURATION command.
  * See SCSI Multimedia Commands-4, section 6.6.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBGetConfiguration extends CDB {
-	private int dataTransfertCount;
+    private int dataTransfertCount;
 
     public CDBGetConfiguration(int allocationLength, int startingFeatureNumber) {
         super(10, 0x46);
@@ -40,9 +40,9 @@ public class CDBGetConfiguration extends CDB {
         setInt16(7, dataTransfertCount);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		return dataTransfertCount;
-	}
-    
+    @Override
+    public int getDataTransfertCount() {
+        return dataTransfertCount;
+    }
+
 }

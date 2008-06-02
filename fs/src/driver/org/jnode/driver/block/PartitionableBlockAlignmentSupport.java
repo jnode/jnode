@@ -18,23 +18,22 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block;
 
 import java.io.IOException;
-
 import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PartitionableBlockAlignmentSupport <PTE extends PartitionTableEntry>
-		extends BlockAlignmentSupport
-        implements PartitionableBlockDeviceAPI<PTE> {
+public class PartitionableBlockAlignmentSupport<PTE extends PartitionTableEntry>
+    extends BlockAlignmentSupport
+    implements PartitionableBlockDeviceAPI<PTE> {
 
     private final PartitionableBlockDeviceAPI<PTE> parentApi;
-    
+
     /**
      * @param parentApi
      * @param alignment
@@ -49,10 +48,11 @@ public class PartitionableBlockAlignmentSupport <PTE extends PartitionTableEntry
      */
     public int getSectorSize() throws IOException {
         return parentApi.getSectorSize();
-    }        
-    
+    }
+
     /**
      * Gets the partition table that this block device contains.
+     *
      * @return Null if no partition table is found.
      * @throws IOException
      */

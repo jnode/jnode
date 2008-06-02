@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 import org.jnode.driver.DeviceAPI;
@@ -29,7 +29,9 @@ import org.jnode.driver.DeviceAPI;
  */
 public interface IDEControllerAPI extends DeviceAPI {
 
-	/** Prefix for all IDE devices */
+    /**
+     * Prefix for all IDE devices
+     */
     public static final String DEVICE_PREFIX = "ide";
-    
+
 }

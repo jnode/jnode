@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide.command;
 
 import org.jnode.driver.bus.ide.IDEBus;
@@ -55,7 +55,7 @@ public class IDEPacketCommand extends IDECommand {
      * @throws IllegalArgumentException
      */
     public IDEPacketCommand(boolean primary, boolean master, byte[] commandPacket,
-            byte[] dataPacket, int dataOffset) throws IllegalArgumentException {
+                            byte[] dataPacket, int dataOffset) throws IllegalArgumentException {
         super(primary, master);
         this.commandPacket = commandPacket;
         this.dataPacket = dataPacket;
@@ -118,7 +118,7 @@ public class IDEPacketCommand extends IDECommand {
             if ((error & ERR_ABORT) != 0) {
                 // Command aborted
                 log.debug("Packet command aborted, error 0x"
-                        + NumberUtils.hex(error, 2));
+                    + NumberUtils.hex(error, 2));
             } else {
                 log.debug("Unknown error 0x" + NumberUtils.hex(error, 2));
             }
@@ -161,8 +161,8 @@ public class IDEPacketCommand extends IDECommand {
             } else {
                 // Unknown state
                 log
-                        .error("Unknown state IR=0x"
-                                + NumberUtils.hex(intReason, 2));
+                    .error("Unknown state IR=0x"
+                        + NumberUtils.hex(intReason, 2));
                 break;
             }
         }

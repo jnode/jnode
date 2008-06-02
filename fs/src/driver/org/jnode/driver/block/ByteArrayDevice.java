@@ -18,73 +18,75 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block;
 
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
 import org.jnode.driver.InvalidDriverException;
 
 /**
  * This class is a device wrapping a simple byte array
- * 
+ *
  * @author epr
  */
 public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 
-	private byte[] array;
+    private byte[] array;
 
-	/**
-	 * Create a new ByteArrayDevice wrapping the given array
-	 * @param array
-	 */
-	public ByteArrayDevice(byte[] array) {
-		super(null, "byte-array" + System.currentTimeMillis());
-		this.array = array;
-		registerAPI(BlockDeviceAPI.class, this);
-	}
+    /**
+     * Create a new ByteArrayDevice wrapping the given array
+     *
+     * @param array
+     */
+    public ByteArrayDevice(byte[] array) {
+        super(null, "byte-array" + System.currentTimeMillis());
+        this.array = array;
+        registerAPI(BlockDeviceAPI.class, this);
+    }
 
-	/**
-	 * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
-	 * @return The length
-	 */
-	public long getLength() {
-		return array.length;
-	}
+    /**
+     * @return The length
+     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
+     */
+    public long getLength() {
+        return array.length;
+    }
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
-	 */
-	public void read(long devOffset, ByteBuffer dest) {
-		//System.arraycopy(array, (int)devOffset, dest, destOffset, length);
-        dest.put(this.array, (int)devOffset, dest.remaining());        
-	}
+    /**
+     * (non-Javadoc)
+     *
+     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
+     */
+    public void read(long devOffset, ByteBuffer dest) {
+        //System.arraycopy(array, (int)devOffset, dest, destOffset, length);
+        dest.put(this.array, (int) devOffset, dest.remaining());
+    }
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
-	 */
-	public void write(long devOffset, ByteBuffer src) {
-		//System.arraycopy(src, srcOffset, array, (int)devOffset, length);
-        src.get(this.array, (int)devOffset, src.remaining());        
-	}
+    /**
+     * (non-Javadoc)
+     *
+     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
+     */
+    public void write(long devOffset, ByteBuffer src) {
+        //System.arraycopy(src, srcOffset, array, (int)devOffset, length);
+        src.get(this.array, (int) devOffset, src.remaining());
+    }
 
-	/**
-	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-	 */
-	public void flush() {
-		/* Nothing to do here */
-	}
+    /**
+     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
+     */
+    public void flush() {
+        /* Nothing to do here */
+    }
 
-	/**
-	 * @param driver
-	 * @see org.jnode.driver.Device#setDriver(org.jnode.driver.Driver)
-	 * @throws InvalidDriverException
-	 */
-	public void setDriver(Driver driver) throws InvalidDriverException {
-		throw new InvalidDriverException("No driver allowed here.");
-	}
+    /**
+     * @param driver
+     * @throws InvalidDriverException
+     * @see org.jnode.driver.Device#setDriver(org.jnode.driver.Driver)
+     */
+    public void setDriver(Driver driver) throws InvalidDriverException {
+        throw new InvalidDriverException("No driver allowed here.");
+    }
 }

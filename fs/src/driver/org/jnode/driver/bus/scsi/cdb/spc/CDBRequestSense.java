@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.spc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -27,22 +27,23 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an REQUEST SENSE command.
  * See SCSI Primary Commands-3, section 6.25.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBRequestSense extends CDB {
-	private int dataTransfertCount;
+    private int dataTransfertCount;
+
     /**
      * Initialize this instance.
      */
     public CDBRequestSense(int allocationLength) {
         super(6, 0x03);
-        dataTransfertCount = Math.min(allocationLength, 0xFF); 
+        dataTransfertCount = Math.min(allocationLength, 0xFF);
         setInt8(4, dataTransfertCount);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		return dataTransfertCount;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        return dataTransfertCount;
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.ide.disk;
 
 import org.jnode.driver.Device;
@@ -36,7 +36,7 @@ public class IDEDiskDeviceToDriverMapper implements DeviceToDriverMapper {
      */
     public Driver findDriver(Device device) {
         if (device instanceof IDEDevice) {
-            final IDEDevice ideDev = (IDEDevice)device;
+            final IDEDevice ideDev = (IDEDevice) device;
             if (ideDev.getDescriptor().isDisk()) {
                 return new IDEDiskDriver();
             }

@@ -18,11 +18,10 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block;
 
 import java.io.IOException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.partitions.PartitionTableEntry;
@@ -34,7 +33,7 @@ import org.jnode.partitions.PartitionTableEntry;
 public class MappedFSBlockDeviceSupport extends MappedBlockDeviceSupport implements FSBlockDeviceAPI {
 
     private final FSBlockDeviceAPI parentApi;
-    
+
     /**
      * @param parent
      * @param offset
@@ -42,24 +41,25 @@ public class MappedFSBlockDeviceSupport extends MappedBlockDeviceSupport impleme
      * @throws IOException
      */
     public MappedFSBlockDeviceSupport(Device parent, long offset, long length)
-            throws IOException {
+        throws IOException {
         super(parent, offset, length);
         try {
             this.parentApi = parent.getAPI(FSBlockDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
-			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
-			ioe.initCause(ex);
-			throw ioe;
+            final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+            ioe.initCause(ex);
+            throw ioe;
         }
         registerAPI(FSBlockDeviceAPI.class, this);
     }
+
     /**
      * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
      */
     public PartitionTableEntry getPartitionTableEntry() {
         return parentApi.getPartitionTableEntry();
     }
-    
+
     /**
      * @see org.jnode.driver.block.FSBlockDeviceAPI#getSectorSize()
      */

@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy.support;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.jnode.naming.InitialNaming;
 
 /**
@@ -39,5 +38,5 @@ public class FloppyDriverUtils {
             InitialNaming.bind(FloppyDeviceFactory.NAME, fac);
             return fac;
         }
-    }       
+    }
 }

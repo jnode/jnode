@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.spc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -27,11 +27,12 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an REPORT LUNS command.
  * See SCSI Primary Commands-3, section 6.21.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBReportLuns extends CDB {
-	private int dataTransfertCount;
+    private int dataTransfertCount;
+
     /**
      * Initialize this instance.
      */
@@ -41,8 +42,8 @@ public class CDBReportLuns extends CDB {
         setInt32(6, allocationLength);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		return dataTransfertCount;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        return dataTransfertCount;
+    }
 }

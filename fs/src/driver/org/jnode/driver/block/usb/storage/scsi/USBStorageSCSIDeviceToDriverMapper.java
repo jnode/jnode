@@ -26,35 +26,37 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.Driver;
 import org.jnode.driver.block.usb.storage.USBStorageSCSIHostDriver.USBStorageSCSIDevice;
-import org.jnode.driver.bus.scsi.SCSIDevice;
-import org.jnode.driver.bus.usb.USBDevice;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class USBStorageSCSIDeviceToDriverMapper implements DeviceToDriverMapper {
-	/** My logger */
-	private static final Logger log = Logger.getLogger(USBStorageSCSIDeviceToDriverMapper.class);
-	/**
-	 * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
-	 */
-	public Driver findDriver(Device device) {
-		log.debug("*** USBStorageSCSIDeviceToDriverMapper::findDriver ***");
-		if (device instanceof USBStorageSCSIDevice) {
-			return new USBStorageSCSIDriver();
-		}
-		return null;
-	}
-	/**
-	 * Gets the matching level of this mapper. The mappers are queried in order
-	 * of match level. This will ensure the best available driver for a device.
-	 *
-	 * @return One of the MATCH_xxx constants.
-	 * @see #MATCH_DEVICE_REVISION
-	 * @see #MATCH_DEVICE
-	 * @see #MATCH_DEVCLASS
-	 */
-	public int getMatchLevel() {
-		return MATCH_DEVCLASS;
-	}
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(USBStorageSCSIDeviceToDriverMapper.class);
+
+    /**
+     * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
+     */
+    public Driver findDriver(Device device) {
+        log.debug("*** USBStorageSCSIDeviceToDriverMapper::findDriver ***");
+        if (device instanceof USBStorageSCSIDevice) {
+            return new USBStorageSCSIDriver();
+        }
+        return null;
+    }
+
+    /**
+     * Gets the matching level of this mapper. The mappers are queried in order
+     * of match level. This will ensure the best available driver for a device.
+     *
+     * @return One of the MATCH_xxx constants.
+     * @see #MATCH_DEVICE_REVISION
+     * @see #MATCH_DEVICE
+     * @see #MATCH_DEVCLASS
+     */
+    public int getMatchLevel() {
+        return MATCH_DEVCLASS;
+    }
 }

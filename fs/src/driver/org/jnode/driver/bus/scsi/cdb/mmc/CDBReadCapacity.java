@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -26,11 +26,11 @@ import org.jnode.driver.bus.scsi.CDB;
 /**
  * CDB for an READ CAPACITY command.
  * See SCSI Multimedia Commands-4, section 6.23.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBReadCapacity extends CDB {
-    
+
     /**
      * Initialize this instance.
      */
@@ -38,10 +38,10 @@ public class CDBReadCapacity extends CDB {
         super(10, 0x25);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
 }

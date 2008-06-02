@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy.support;
 
 import org.jnode.driver.Device;
@@ -38,44 +38,40 @@ import org.jnode.driver.block.floppy.FloppySeekCommand;
 import org.jnode.driver.block.floppy.FloppyWriteSectorCommand;
 import org.jnode.system.ResourceNotFreeException;
 
-public class DefaultFloppyDeviceFactory implements FloppyDeviceFactory 
-{
-    public DefaultFloppyDeviceFactory()
-    {
+public class DefaultFloppyDeviceFactory implements FloppyDeviceFactory {
+    public DefaultFloppyDeviceFactory() {
     }
 
-    public FloppyDevice createDevice(FloppyControllerBus bus, int drive, FloppyDriveParameters dp)
-    {
+    public FloppyDevice createDevice(FloppyControllerBus bus, int drive, FloppyDriveParameters dp) {
         return new FloppyDevice(bus, drive, dp);
     }
 
-    public FDC createFDC(Device device) throws DriverException, ResourceNotFreeException
-    {
-        return new DefaultFDC(device, true);                    
+    public FDC createFDC(Device device) throws DriverException, ResourceNotFreeException {
+        return new DefaultFDC(device, true);
     }
 
-    public FloppyDriveParametersCommand createFloppyDriveParametersCommand(int drive, FloppyDriveParameters dp, FloppyParameters fp)
-    {
+    public FloppyDriveParametersCommand createFloppyDriveParametersCommand(int drive, FloppyDriveParameters dp,
+                                                                           FloppyParameters fp) {
         return new FloppyDriveParametersCommand(drive, dp, fp);
     }
 
-    public FloppySeekCommand createFloppySeekCommand(int drive, int cylinder)
-    {
+    public FloppySeekCommand createFloppySeekCommand(int drive, int cylinder) {
         return new FloppySeekCommand(drive, cylinder);
     }
 
-    public FloppyReadSectorCommand createFloppyReadSectorCommand(int drive, Geometry geometry, CHS chs, int currentSectorSize, boolean b, int gap1Size, byte[] dest, int destOffset)
-    {
+    public FloppyReadSectorCommand createFloppyReadSectorCommand(int drive, Geometry geometry, CHS chs,
+                                                                 int currentSectorSize, boolean b, int gap1Size,
+                                                                 byte[] dest, int destOffset) {
         return new FloppyReadSectorCommand(drive, geometry, chs, currentSectorSize, b, gap1Size, dest, destOffset);
     }
 
-    public FloppyWriteSectorCommand createFloppyWriteSectorCommand(int drive, Geometry geometry, CHS chs, int currentSectorSize, boolean b, int gap1Size, byte[] src, int srcOffset)
-    {
+    public FloppyWriteSectorCommand createFloppyWriteSectorCommand(int drive, Geometry geometry, CHS chs,
+                                                                   int currentSectorSize, boolean b, int gap1Size,
+                                                                   byte[] src, int srcOffset) {
         return new FloppyWriteSectorCommand(drive, geometry, chs, currentSectorSize, b, gap1Size, src, srcOffset);
     }
 
-    public FloppyIdCommand createFloppyIdCommand(int drive)
-    {
+    public FloppyIdCommand createFloppyIdCommand(int drive) {
         return new FloppyIdCommand(drive);
-    }    
+    }
 }

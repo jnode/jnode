@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.ide;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.driver.bus.ide;
  */
 public class IDEException extends Exception {
 
-	/**
-	 * 
-	 */
-	public IDEException() {
-		super();
-	}
+    /**
+     *
+     */
+    public IDEException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public IDEException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public IDEException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public IDEException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public IDEException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public IDEException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public IDEException(String s) {
+        super(s);
+    }
 }

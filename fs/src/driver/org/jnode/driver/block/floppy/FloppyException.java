@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.driver.block.floppy;
  */
 public class FloppyException extends Exception {
 
-	/**
-	 * 
-	 */
-	public FloppyException() {
-		super();
-	}
+    /**
+     *
+     */
+    public FloppyException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public FloppyException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public FloppyException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public FloppyException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public FloppyException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public FloppyException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public FloppyException(String s) {
+        super(s);
+    }
 }

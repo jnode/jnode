@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.floppy;
 
 import org.jnode.driver.Device;
@@ -26,7 +26,7 @@ import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.Driver;
 
 /**
- * @author Fabien DUMINY 
+ * @author Fabien DUMINY
  */
 public class FloppyDeviceToDriverMapper implements DeviceToDriverMapper {
 
@@ -37,10 +37,10 @@ public class FloppyDeviceToDriverMapper implements DeviceToDriverMapper {
         if (device instanceof FloppyDevice) {
             return new FloppyDriver();
         }
-        
+
         return null;
     }
-    
+
     /**
      * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
      */

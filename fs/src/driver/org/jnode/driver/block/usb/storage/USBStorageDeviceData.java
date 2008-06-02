@@ -30,239 +30,240 @@ import org.jnode.driver.bus.usb.USBEndPoint;
 import org.jnode.driver.bus.usb.USBInterface;
 
 final class USBStorageDeviceData implements USBStorageConstants {
-	/** My logger */
-	private static final Logger log = Logger.getLogger(USBStorageDeviceData.class);
-	/** */
-	private USBDevice device;
-	/** */
-	private USBInterface usbInterface;
-	/** */
-	private int protocol;
-	/** */
-	private int subClass;
-	/** */
-	private ITransport transport;
-	/** */
-	private USBDataPipe sendControlPipe;
-	/** */
-	private USBDataPipe receiveControlPipe;
-	/** */
-	private USBDataPipe sendBulkPipe;
-	/** */
-	private USBDataPipe receiveBulkPipe;
-	/** */
-	private USBEndPoint bulkInEndPoint;
-	/** */
-	private USBEndPoint bulkOutEndPoint;
-	/** */
-	private USBEndPoint intrEndPoint;
-	/** */
-	private byte maxLun;
+    /**
+     * My logger
+     */
+    private static final Logger log = Logger.getLogger(USBStorageDeviceData.class);
+    /** */
+    private USBDevice device;
+    /** */
+    private USBInterface usbInterface;
+    /** */
+    private int protocol;
+    /** */
+    private int subClass;
+    /** */
+    private ITransport transport;
+    /** */
+    private USBDataPipe sendControlPipe;
+    /** */
+    private USBDataPipe receiveControlPipe;
+    /** */
+    private USBDataPipe sendBulkPipe;
+    /** */
+    private USBDataPipe receiveBulkPipe;
+    /** */
+    private USBEndPoint bulkInEndPoint;
+    /** */
+    private USBEndPoint bulkOutEndPoint;
+    /** */
+    private USBEndPoint intrEndPoint;
+    /** */
+    private byte maxLun;
 
-	/**
-	 * 
-	 * @param device
-	 * @throws DriverException
-	 */
-	public USBStorageDeviceData(USBDevice device) throws DriverException {
-		this.device = device;
-		this.usbInterface = this.device.getConfiguration(0).getInterface(0);
-		InterfaceDescriptor intf = this.usbInterface.getDescriptor(); 
-		this.maxLun = 0;
-		this.protocol = intf.getInterfaceProtocol();
-		this.subClass = intf.getInterfaceSubClass();
+    /**
+     * @param device
+     * @throws DriverException
+     */
+    public USBStorageDeviceData(USBDevice device) throws DriverException {
+        this.device = device;
+        this.usbInterface = this.device.getConfiguration(0).getInterface(0);
+        InterfaceDescriptor intf = this.usbInterface.getDescriptor();
+        this.maxLun = 0;
+        this.protocol = intf.getInterfaceProtocol();
+        this.subClass = intf.getInterfaceSubClass();
 
-		switch (this.protocol) {
-		case US_PR_CBI:
-			log.info("*** Set transport protocol to CONTROL/BULK/INTERRUPT");
-			break;
-		case US_PR_BULK:
-			log.info("*** Set transport protocol to BULK ONLY");
-			this.transport = new USBStorageBulkTransport(this);
-			//((USBStorageBulkTransport)USBMassStorage.getTransport()).getMaxLun(usbDev);
-			break;
-		case US_PR_SCM_ATAPI:
-			log.info("*** Set transport protocol to SCM ATAPI");
-		default:
-			throw new DriverException("Transport protocol not implemented.");
-		}
+        switch (this.protocol) {
+            case US_PR_CBI:
+                log.info("*** Set transport protocol to CONTROL/BULK/INTERRUPT");
+                break;
+            case US_PR_BULK:
+                log.info("*** Set transport protocol to BULK ONLY");
+                this.transport = new USBStorageBulkTransport(this);
+                //((USBStorageBulkTransport)USBMassStorage.getTransport()).getMaxLun(usbDev);
+                break;
+            case US_PR_SCM_ATAPI:
+                log.info("*** Set transport protocol to SCM ATAPI");
+            default:
+                throw new DriverException("Transport protocol not implemented.");
+        }
 
-		USBEndPoint ep;
-		for (int i = 0; i < intf.getNumEndPoints(); i++) {
-			ep = this.usbInterface.getEndPoint(i);
-			// Is it a bulk endpoint ?
-			if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_BULK) {
-				// In or Out ?
-				if ((ep.getDescriptor().getEndPointAddress() & USB_DIR_IN) == 0) {
-					this.bulkInEndPoint = ep;
-					log.info("*** Set bulk in endpoint");
-				} else {
-					this.bulkOutEndPoint = ep;
-					log.info("*** Set bulk out endpoint");
-				}
-			} else if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT) {
-				this.intrEndPoint = ep;
-				log.info("*** Set interrupt endpoint");
-			}
-		}
-		
-
-	}
-
-	/**
-	 * @return Returns the receiveBulkPipe.
-	 */
-	public USBDataPipe getReceiveBulkPipe() {
-		return receiveBulkPipe;
-	}
-
-	/**
-	 * @param receiveBulkPipe The receiveBulkPipe to set.
-	 */
-	public void setReceiveBulkPipe(USBDataPipe receiveBulkPipe) {
-		this.receiveBulkPipe = receiveBulkPipe;
-	}
-
-	/**
-	 * @return Returns the receiveControlPipe.
-	 */
-	public USBDataPipe getReceiveControlPipe() {
-		return receiveControlPipe;
-	}
-
-	/**
-	 * @param receiveControlPipe The receiveControlPipe to set.
-	 */
-	public void setReceiveControlPipe(USBDataPipe receiveControlPipe) {
-		this.receiveControlPipe = receiveControlPipe;
-	}
-
-	/**
-	 * @return Returns the sendBulkPipe.
-	 */
-	public USBDataPipe getSendBulkPipe() {
-		return sendBulkPipe;
-	}
-
-	/**
-	 * @param sendBulkPipe The sendBulkPipe to set.
-	 */
-	public void setSendBulkPipe(USBDataPipe sendBulkPipe) {
-		this.sendBulkPipe = sendBulkPipe;
-	}
-
-	/**
-	 * @return Returns the sendControlPipe.
-	 */
-	public USBDataPipe getSendControlPipe() {
-		return sendControlPipe;
-	}
-
-	/**
-	 * @param sendControlPipe The sendControlPipe to set.
-	 */
-	public void setSendControlPipe(USBDataPipe sendControlPipe) {
-		this.sendControlPipe = sendControlPipe;
-	}
-
-	/**
-	 * 
-	 * @param dev
-	 */
+        USBEndPoint ep;
+        for (int i = 0; i < intf.getNumEndPoints(); i++) {
+            ep = this.usbInterface.getEndPoint(i);
+            // Is it a bulk endpoint ?
+            if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_BULK) {
+                // In or Out ?
+                if ((ep.getDescriptor().getEndPointAddress() & USB_DIR_IN) == 0) {
+                    this.bulkInEndPoint = ep;
+                    log.info("*** Set bulk in endpoint");
+                } else {
+                    this.bulkOutEndPoint = ep;
+                    log.info("*** Set bulk out endpoint");
+                }
+            } else if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT) {
+                this.intrEndPoint = ep;
+                log.info("*** Set interrupt endpoint");
+            }
+        }
 
 
-	/**
-	 * @return Returns the bulkInEndPoint.
-	 */
-	public USBEndPoint getBulkInEndPoint() {
-		return bulkInEndPoint;
-	}
+    }
 
-	/**
-	 * @param bulkInEndPoint The bulkInEndPoint to set.
-	 */
-	public void setBulkInEndPoint(USBEndPoint bulkInEndPoint) {
-		this.bulkInEndPoint = bulkInEndPoint;
-	}
+    /**
+     * @return Returns the receiveBulkPipe.
+     */
+    public USBDataPipe getReceiveBulkPipe() {
+        return receiveBulkPipe;
+    }
 
-	/**
-	 * @return Returns the bulkOutEndPoint.
-	 */
-	public USBEndPoint getBulkOutEndPoint() {
-		return bulkOutEndPoint;
-	}
+    /**
+     * @param receiveBulkPipe The receiveBulkPipe to set.
+     */
+    public void setReceiveBulkPipe(USBDataPipe receiveBulkPipe) {
+        this.receiveBulkPipe = receiveBulkPipe;
+    }
 
-	/**
-	 * @param bulkOutEndPoint The bulkOutEndPoint to set.
-	 */
-	public void setBulkOutEndPoint(USBEndPoint bulkOutEndPoint) {
-		this.bulkOutEndPoint = bulkOutEndPoint;
-	}
+    /**
+     * @return Returns the receiveControlPipe.
+     */
+    public USBDataPipe getReceiveControlPipe() {
+        return receiveControlPipe;
+    }
 
-	/**
-	 * @return Returns the intrEndPoint.
-	 */
-	public USBEndPoint getIntrEndPoint() {
-		return intrEndPoint;
-	}
+    /**
+     * @param receiveControlPipe The receiveControlPipe to set.
+     */
+    public void setReceiveControlPipe(USBDataPipe receiveControlPipe) {
+        this.receiveControlPipe = receiveControlPipe;
+    }
 
-	/**
-	 * @param intrEndPoint The intrEndPoint to set.
-	 */
-	public void setIntrEndPoint(USBEndPoint intrEndPoint) {
-		this.intrEndPoint = intrEndPoint;
-	}
+    /**
+     * @return Returns the sendBulkPipe.
+     */
+    public USBDataPipe getSendBulkPipe() {
+        return sendBulkPipe;
+    }
 
-	/**
-	 * @return Returns the maxLun.
-	 */
-	public byte getMaxLun() {
-		return maxLun;
-	}
+    /**
+     * @param sendBulkPipe The sendBulkPipe to set.
+     */
+    public void setSendBulkPipe(USBDataPipe sendBulkPipe) {
+        this.sendBulkPipe = sendBulkPipe;
+    }
 
-	/**
-	 * @param maxLun The maxLun to set.
-	 */
-	public void setMaxLun(byte maxLun) {
-		this.maxLun = maxLun;
-	}
+    /**
+     * @return Returns the sendControlPipe.
+     */
+    public USBDataPipe getSendControlPipe() {
+        return sendControlPipe;
+    }
 
-	/**
-	 * @return Returns the transport.
-	 */
-	public ITransport getTransport() {
-		return transport;
-	}
+    /**
+     * @param sendControlPipe The sendControlPipe to set.
+     */
+    public void setSendControlPipe(USBDataPipe sendControlPipe) {
+        this.sendControlPipe = sendControlPipe;
+    }
 
-	/**
-	 * @param transport The transport to set.
-	 */
-	public void setTransport(ITransport transport) {
-		this.transport = transport;
-	}
+    /**
+     *
+     * @param dev
+     */
 
-	public int getProtocol() {
-		return protocol;
-	}
 
-	public void setProtocol(int protocol) {
-		this.protocol = protocol;
-	}
+    /**
+     * @return Returns the bulkInEndPoint.
+     */
+    public USBEndPoint getBulkInEndPoint() {
+        return bulkInEndPoint;
+    }
 
-	public int getSubClass() {
-		return subClass;
-	}
+    /**
+     * @param bulkInEndPoint The bulkInEndPoint to set.
+     */
+    public void setBulkInEndPoint(USBEndPoint bulkInEndPoint) {
+        this.bulkInEndPoint = bulkInEndPoint;
+    }
 
-	public void setSubClass(int subClass) {
-		this.subClass = subClass;
-	}
+    /**
+     * @return Returns the bulkOutEndPoint.
+     */
+    public USBEndPoint getBulkOutEndPoint() {
+        return bulkOutEndPoint;
+    }
 
-	public USBDevice getDevice() {
-		return device;
-	}
+    /**
+     * @param bulkOutEndPoint The bulkOutEndPoint to set.
+     */
+    public void setBulkOutEndPoint(USBEndPoint bulkOutEndPoint) {
+        this.bulkOutEndPoint = bulkOutEndPoint;
+    }
 
-	public void setDevice(USBDevice device) {
-		this.device = device;
-	}
+    /**
+     * @return Returns the intrEndPoint.
+     */
+    public USBEndPoint getIntrEndPoint() {
+        return intrEndPoint;
+    }
+
+    /**
+     * @param intrEndPoint The intrEndPoint to set.
+     */
+    public void setIntrEndPoint(USBEndPoint intrEndPoint) {
+        this.intrEndPoint = intrEndPoint;
+    }
+
+    /**
+     * @return Returns the maxLun.
+     */
+    public byte getMaxLun() {
+        return maxLun;
+    }
+
+    /**
+     * @param maxLun The maxLun to set.
+     */
+    public void setMaxLun(byte maxLun) {
+        this.maxLun = maxLun;
+    }
+
+    /**
+     * @return Returns the transport.
+     */
+    public ITransport getTransport() {
+        return transport;
+    }
+
+    /**
+     * @param transport The transport to set.
+     */
+    public void setTransport(ITransport transport) {
+        this.transport = transport;
+    }
+
+    public int getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(int protocol) {
+        this.protocol = protocol;
+    }
+
+    public int getSubClass() {
+        return subClass;
+    }
+
+    public void setSubClass(int subClass) {
+        this.subClass = subClass;
+    }
+
+    public USBDevice getDevice() {
+        return device;
+    }
+
+    public void setDevice(USBDevice device) {
+        this.device = device;
+    }
 
 }

@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-
 import org.jnode.driver.Device;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.ByteBufferUtils;
@@ -38,82 +37,88 @@ import org.jnode.util.ByteBufferUtils;
  */
 public class FileDevice extends Device implements FSBlockDeviceAPI {
 
-	private RandomAccessFile raf;
+    private RandomAccessFile raf;
 
-	/**
-	 * Create a new FileDevice
-	 * @param file
-	 * @param mode
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public FileDevice(File file, String mode) throws FileNotFoundException, IOException {
-		super(null, "file" + System.currentTimeMillis());
-		raf = new RandomAccessFile(file, mode);
-		//registerAPI(BlockDeviceAPI.class, this);
-		registerAPI(FSBlockDeviceAPI.class, this);
-	}
+    /**
+     * Create a new FileDevice
+     *
+     * @param file
+     * @param mode
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public FileDevice(File file, String mode) throws FileNotFoundException, IOException {
+        super(null, "file" + System.currentTimeMillis());
+        raf = new RandomAccessFile(file, mode);
+        //registerAPI(BlockDeviceAPI.class, this);
+        registerAPI(FSBlockDeviceAPI.class, this);
+    }
 
-	/**
-	 * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
-	 * @return The length
-	 * @throws IOException
-	 */
-	public long getLength() throws IOException {
-		return raf.length();
-	}
+    /**
+     * @return The length
+     * @throws IOException
+     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
+     */
+    public long getLength() throws IOException {
+        return raf.length();
+    }
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
-	 */
-	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
+    /**
+     * (non-Javadoc)
+     *
+     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
+     */
+    public void read(long devOffset, ByteBuffer destBuf) throws IOException {
         BlockDeviceAPIHelper.checkBounds(this, devOffset, destBuf.remaining());
-		raf.seek(devOffset);
+        raf.seek(devOffset);
 
         //TODO optimize it also to use ByteBuffer at lower level
         ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         byte[] dest = destBA.toArray();
-		raf.read(dest, 0, dest.length);
+        raf.read(dest, 0, dest.length);
         destBA.refreshByteBuffer();
-	}
+    }
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
-	 */
-	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
-		//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
+    /**
+     * (non-Javadoc)
+     *
+     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
+     */
+    public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
+        //log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
         BlockDeviceAPIHelper.checkBounds(this, devOffset, srcBuf.remaining());
-		raf.seek(devOffset);
+        raf.seek(devOffset);
 
         //TODO optimize it also to use ByteBuffer at lower level
         byte[] src = ByteBufferUtils.toArray(srcBuf);
-		raf.write(src, 0, src.length);
-	}
-	/**
-	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-	 */
-	public void flush() {
-		// Nothing to flush
-	}
+        raf.write(src, 0, src.length);
+    }
 
-	/**
-	 * change the length of the underlaying file
-	 * @param length
-	 * @throws IOException
-	 */
-	public void setLength(long length) throws IOException {
-		raf.setLength(length);
-	}
+    /**
+     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
+     */
+    public void flush() {
+        // Nothing to flush
+    }
 
-	/**
-	 * close the underlaying file
-	 * @throws IOException
-	 */
-	public void close() throws IOException {
-		raf.close();
-	}
+    /**
+     * change the length of the underlaying file
+     *
+     * @param length
+     * @throws IOException
+     */
+    public void setLength(long length) throws IOException {
+        raf.setLength(length);
+    }
+
+    /**
+     * close the underlaying file
+     *
+     * @throws IOException
+     */
+    public void close() throws IOException {
+        raf.close();
+    }
 
     /**
      * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()

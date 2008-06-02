@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi;
 
 
@@ -26,15 +26,21 @@ package org.jnode.driver.bus.scsi;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface SCSIConstants {
-    
+
     // Timeouts
-    
-    /** No timeout in the device */
+
+    /**
+     * No timeout in the device
+     */
     public static final long GROUP_NOTIMEOUT = 500;
-    /** Group1 timeout, do not retry */
+    /**
+     * Group1 timeout, do not retry
+     */
     public static final long GROUP1_TIMEOUT = 5000;
-    /** Group2 timeout, you can retry */
+    /**
+     * Group2 timeout, you can retry
+     */
     public static final long GROUP2_TIMEOUT = 5000;
-    
+
 
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.mmc;
 
 import org.jnode.driver.bus.scsi.CDB;
@@ -31,8 +31,8 @@ public class CDBMediaRemoval extends CDB {
 
     /**
      * Initialize this instance.
-     * 
-     * @param prevent If true, the device will not open, if false the device can be opened. 
+     *
+     * @param prevent    If true, the device will not open, if false the device can be opened.
      * @param persistent Should the setting be persistent
      */
     public CDBMediaRemoval(boolean prevent, boolean persistent) {
@@ -43,8 +43,8 @@ public class CDBMediaRemoval extends CDB {
         setInt8(4, code);
     }
 
-	@Override
-	public int getDataTransfertCount() {
-		return 0;
-	}
+    @Override
+    public int getDataTransfertCount() {
+        return 0;
+    }
 }

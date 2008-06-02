@@ -18,16 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.scsi.cdb.spc;
 
 import org.jnode.driver.bus.scsi.SCSIBuffer;
 import org.jnode.util.NumberUtils;
 
 /**
- * Fixed format Sense data wrapper. 
+ * Fixed format Sense data wrapper.
  * See SCSI Primary Commands-3, section 4.5.3.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class SenseData {
@@ -37,9 +37,10 @@ public class SenseData {
     private final int asc;
     private final int ascq;
     //private final byte[] buffer;
-    
+
     /**
      * Initialize this instance from a given format sense data response.
+     *
      * @param buffer
      */
     public SenseData(byte[] buffer) {
@@ -83,8 +84,8 @@ public class SenseData {
      */
     public String toString() {
         return "Response code 0x" + NumberUtils.hex(getResponseCode(), 2) + ", "
-                + getSenseKey() + ", ASC 0x" + NumberUtils.hex(getASC(), 2)
-                + ", ASCQ 0x" + NumberUtils.hex(getASCQ(), 2);
+            + getSenseKey() + ", ASC 0x" + NumberUtils.hex(getASC(), 2)
+            + ", ASCQ 0x" + NumberUtils.hex(getASCQ(), 2);
     }
 
 }
