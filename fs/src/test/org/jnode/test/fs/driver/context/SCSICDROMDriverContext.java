@@ -18,24 +18,21 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.context;
 
 import org.jmock.MockObjectTestCase;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.support.TestConfig;
 
-public class SCSICDROMDriverContext  extends BlockDeviceAPIContext
-{
-    public SCSICDROMDriverContext()
-    {
+public class SCSICDROMDriverContext extends BlockDeviceAPIContext {
+    public SCSICDROMDriverContext() {
         super("SCSICDROMDriver");
     }
-                    
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
         super.init(config, testCase);
-        
+
 //      TODO: create context
     }
 }

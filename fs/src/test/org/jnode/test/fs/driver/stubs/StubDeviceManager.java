@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.stubs;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.AbstractDeviceManager;
 import org.jnode.driver.Device;
@@ -34,7 +33,7 @@ import org.jnode.driver.DriverException;
 
 /**
  * This a (modified) copy of DefaultDeviceManager
- * 
+ *
  * @author epr
  */
 public class StubDeviceManager extends AbstractDeviceManager {
@@ -111,7 +110,7 @@ public class StubDeviceManager extends AbstractDeviceManager {
 
     /**
      * Refresh the list of finders, based on the mappers extension-point.
-     * 
+     *
      * @param finders
      */
     protected final void refreshFinders(List<DeviceFinder> finders) {
@@ -122,7 +121,7 @@ public class StubDeviceManager extends AbstractDeviceManager {
 
     /**
      * Refresh the list of mappers, based on the mappers extension-point.
-     * 
+     *
      * @param mappers
      */
     protected final void refreshMappers(List<DeviceToDriverMapper> mappers) {

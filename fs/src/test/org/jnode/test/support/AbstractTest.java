@@ -18,108 +18,94 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.support;
 
 import org.apache.log4j.Logger;
 import org.jmock.cglib.MockObjectTestCase;
 
 /**
- * 
  * @author Fabien DUMINY
  */
 public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
     private TestConfig testConfig;
     private Class configClazz;
-        
-    protected final Logger log; 
-    
-	public AbstractTest(Class configClazz)
-    {
+
+    protected final Logger log;
+
+    public AbstractTest(Class configClazz) {
         super();
-        init(configClazz, null);              
+        init(configClazz, null);
         log = Logger.getLogger(getTestName());
     }
 
     /**
-	 * 
-	 */
-	protected AbstractTest(Class configClazz, String name)
-	{
+     *
+     */
+    protected AbstractTest(Class configClazz, String name) {
         super();
         init(configClazz, name);
         log = Logger.getLogger(getTestName());
-	}
-    
-    protected void init(Class configClazz, String name)
-    {       
+    }
+
+    protected void init(Class configClazz, String name) {
         setName(name);
         ContextManager.getInstance().init();
         this.configClazz = configClazz;
     }
-	
-	/**
-	 * 
-	 */
-	public void setUp() throws Exception
-	{
-		log.info("BEGIN "+getTestName()); // marker for log4j traces
-        
+
+    /**
+     *
+     */
+    public void setUp() throws Exception {
+        log.info("BEGIN " + getTestName()); // marker for log4j traces
+
         TestConfig tc = getTestConfig();
-        if(tc == null)
-        {
+        if (tc == null) {
             log.warn("NO CONFIGURATION");
             ContextManager.getInstance().clearContext();
-        }
-        else
-        {
+        } else {
             Class contextClass = tc.getContextClass();
-            if(!Context.class.isAssignableFrom(contextClass))
-                throw new IllegalArgumentException("contextClass("+contextClass.getName()+") must implements Context");                    
-            
+            if (!Context.class.isAssignableFrom(contextClass))
+                throw new IllegalArgumentException(
+                    "contextClass(" + contextClass.getName() + ") must implements Context");
+
             // create a new context from the test config
             // and apply it
             ContextManager.getInstance().setContext(contextClass, tc, this);
         }
-	}
-	
-	/**
-	 * 
-	 */
-	public void tearDown() throws Exception
-	{
+    }
+
+    /**
+     *
+     */
+    public void tearDown() throws Exception {
         String testName = getTestName(); // must be called before clearContext 
         ContextManager.getInstance().clearContext();
-        
-        log.info("END "+testName); // marker for log4j traces
-	}
 
-    final protected TestConfig getTestConfig()
-	{
-        if(testConfig == null)
-        {
+        log.info("END " + testName); // marker for log4j traces
+    }
+
+    final protected TestConfig getTestConfig() {
+        if (testConfig == null) {
             testConfig = ConfigManager.getInstance().getConfig(configClazz, getClass(), getName());
         }
-        
-		return testConfig;
-	}
-    
-    final public void runTest() throws Throwable
-    {
-        try
-        {
+
+        return testConfig;
+    }
+
+    final public void runTest() throws Throwable {
+        try {
             super.runTest();
-        }
-        catch(Throwable t)
-        {
+        } catch (Throwable t) {
             // trace the config and the tests that fail
             // to know the context of the error
-            log.error("FAILED  \n"+
-                      "config:"+testConfig, t);
+            log.error("FAILED  \n" +
+                "config:" + testConfig, t);
             throw t;
         }
     }
-    
+
 //    final public String getName()
 //    {
 //        String name = super.getName();
@@ -130,17 +116,14 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 //        return name;
 //    }
 
-    final public void setName(String name)
-    {
-        if(testConfig != null)
-        {
+    final public void setName(String name) {
+        if (testConfig != null) {
             name += "[" + testConfig.getName() + "]";
         }
         super.setName(name);
     }
-    
-    final protected String getTestName()
-    {
-        return getClass().getName()+"."+getName(); // className.methodName
-    }    
+
+    final protected String getTestName() {
+        return getClass().getName() + "." + getName(); // className.methodName
+    }
 }

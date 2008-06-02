@@ -18,47 +18,43 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
-public enum FSAccessMode
-{
+public enum FSAccessMode {
     /**
      * Do tests for access in readOnly mode
      */
     READ_ONLY("ReadOnly", true, false),
-    
+
     /**
      * Do tests for access in readWrite mode
      */
     READ_WRITE("ReadWrite", false, true),
-    
+
     /**
      * Do tests for access in readOnly and in readWrite mode
      */
     BOTH("Both", true, true);
-    
-    public String toString()
-    {
+
+    public String toString() {
         return name;
     }
 
-    public boolean doReadOnlyTests()
-    {
+    public boolean doReadOnlyTests() {
         return doReadOnlyTests;
     }
-    
-    public boolean doReadWriteTests()
-    {
+
+    public boolean doReadWriteTests() {
         return doReadWriteTests;
     }
 
-    private FSAccessMode(String name, boolean doReadOnlyTests, boolean doReadWriteTests)
-    {
+    private FSAccessMode(String name, boolean doReadOnlyTests, boolean doReadWriteTests) {
         this.name = name;
         this.doReadOnlyTests = doReadOnlyTests;
         this.doReadWriteTests = doReadWriteTests;
     }
+
     private String name;
     private boolean doReadOnlyTests;
     private boolean doReadWriteTests;

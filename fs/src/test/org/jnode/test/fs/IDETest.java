@@ -18,14 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import javax.naming.NamingException;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
@@ -40,28 +38,28 @@ import org.jnode.util.NumberUtils;
  */
 public class IDETest {
 
-	public static void main(String[] args) 
-	throws NamingException, ApiNotFoundException, IOException, DeviceNotFoundException {
-		
-		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-		final String name = (args.length > 0) ? args[0] : "hda";
-		
-		IDEDevice dev = (IDEDevice)dm.getDevice(name);
-		IDEDeviceAPI api = dev.getAPI(IDEDeviceAPI.class);
-		IDEDriveDescriptor descr = dev.getDescriptor();
-		
-		System.out.println("LBA support   : " + descr.supportsLBA());
-		System.out.println("DMA support   : " + descr.supportsDMA());
-		System.out.println("48-bit support: " + descr.supports48bitAddressing());
-		System.out.println("Length        : " + api.getLength());
-		
-		final ByteBuffer data = ByteBuffer.allocate(1024);
-		api.read(0, data);
-		
-		while(data.remaining() > 0) {
-			System.out.print(NumberUtils.hex(data.get(), 2) + ' ');
-		}
-		System.out.println();
-		
-	}
+    public static void main(String[] args)
+        throws NamingException, ApiNotFoundException, IOException, DeviceNotFoundException {
+
+        final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+        final String name = (args.length > 0) ? args[0] : "hda";
+
+        IDEDevice dev = (IDEDevice) dm.getDevice(name);
+        IDEDeviceAPI api = dev.getAPI(IDEDeviceAPI.class);
+        IDEDriveDescriptor descr = dev.getDescriptor();
+
+        System.out.println("LBA support   : " + descr.supportsLBA());
+        System.out.println("DMA support   : " + descr.supportsDMA());
+        System.out.println("48-bit support: " + descr.supports48bitAddressing());
+        System.out.println("Length        : " + api.getLength());
+
+        final ByteBuffer data = ByteBuffer.allocate(1024);
+        api.read(0, data);
+
+        while (data.remaining() > 0) {
+            System.out.print(NumberUtils.hex(data.get(), 2) + ' ');
+        }
+        System.out.println();
+
+    }
 }

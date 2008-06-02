@@ -18,15 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.support;
 
 import java.lang.reflect.Method;
-
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-
 import org.jmock.core.AbstractDynamicMock;
 import org.jmock.core.DynamicMockError;
 import org.jmock.core.Invocation;
@@ -35,29 +33,24 @@ import org.jmock.core.InvocationDispatcher;
 /**
  * @author Martin Kersten
  */
-public class CGLibCoreMockExt extends AbstractDynamicMock
-{
+public class CGLibCoreMockExt extends AbstractDynamicMock {
 
     private Object proxy = null;
 
-    public CGLibCoreMockExt(Class mockedClass, String name)
-    {
+    public CGLibCoreMockExt(Class mockedClass, String name) {
         super(mockedClass, name);
     }
 
     public CGLibCoreMockExt(Class mockedClass, String name,
-            InvocationDispatcher invocationDispatcher)
-    {
+                            InvocationDispatcher invocationDispatcher) {
         super(mockedClass, name, invocationDispatcher);
     }
 
-    private ClassLoader getClassLoader()
-    {
+    private ClassLoader getClassLoader() {
         return getMockedType().getClassLoader();
     }
 
-    protected Enhancer createEnhancer(Class mockedClass)
-    {
+    protected Enhancer createEnhancer(Class mockedClass) {
         Enhancer enhancer = new Enhancer();
         enhancer.setClassLoader(getClassLoader());
         enhancer.setSuperclass(mockedClass);
@@ -65,57 +58,46 @@ public class CGLibCoreMockExt extends AbstractDynamicMock
         return enhancer;
     }
 
-    protected MethodInterceptor createMethodInterceptor()
-    {
+    protected MethodInterceptor createMethodInterceptor() {
         return new MyInterceptor();
     }
 
-    public Object createProxy()
-    {
+    public Object createProxy() {
         return createProxy(new Class[0], new Object[0]);
     }
 
-    public Object createProxy(Class[] argumentTypes, Object[] arguments)
-    {
+    public Object createProxy(Class[] argumentTypes, Object[] arguments) {
         checkProxyCreationIsSupported();
         proxy = createEnhancer(getMockedType())
-                .create(argumentTypes, arguments);
+            .create(argumentTypes, arguments);
         return proxy;
     }
 
-    private void checkProxyCreationIsSupported()
-    {
+    private void checkProxyCreationIsSupported() {
         if (isProxyConstructed())
             throw new UnsupportedOperationException(
-                    "A proxy may only be created once.");
+                "A proxy may only be created once.");
     }
 
-    private boolean isProxyConstructed()
-    {
+    private boolean isProxyConstructed() {
         return proxy != null;
     }
 
-    public Object proxy()
-    {
+    public Object proxy() {
         if (!isProxyConstructed())
             return createProxy();
         else
             return proxy();
     }
 
-    private class MyInterceptor implements MethodInterceptor
-    {
+    private class MyInterceptor implements MethodInterceptor {
         public Object intercept(Object obj, Method method, Object[] args,
-                MethodProxy superProxy) throws Throwable
-        {
+                                MethodProxy superProxy) throws Throwable {
 
             Invocation invocation = new Invocation(proxy, method, args);
-            try
-            {
+            try {
                 return mockInvocation(invocation);
-            }
-            catch (DynamicMockError e)
-            {
+            } catch (DynamicMockError e) {
                 if (!isProxyConstructed())
                     return superProxy.invokeSuper(obj, args);
                 else

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver.context;
 
 import org.jmock.MockObjectTestCase;
@@ -29,21 +29,19 @@ import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.TestConfig;
 
-public class RamDiskDriverContext extends BlockDeviceAPIContext
-{
-    public RamDiskDriverContext()
-    {
+public class RamDiskDriverContext extends BlockDeviceAPIContext {
+    public RamDiskDriverContext() {
         super("RamDiskDriver");
     }
-                
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception {
         super.init(config, testCase);
-        
-        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;         
+
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;
         String name = "RamDiskDevice-Tests";
-        final RamDiskDevice device = new RamDiskDevice(StubDeviceManager.INSTANCE.getSystemBus(), name, cfg.getDeviceSize());
+        final RamDiskDevice device =
+            new RamDiskDevice(StubDeviceManager.INSTANCE.getSystemBus(), name, cfg.getDeviceSize());
         final RamDiskDriver driver = new RamDiskDriver(name);
-        init(null, driver, device);       
+        init(null, driver, device);
     }
 }

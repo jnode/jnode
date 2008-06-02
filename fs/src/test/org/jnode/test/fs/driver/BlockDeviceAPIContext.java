@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.driver;
 
 import java.io.IOException;
 import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.Device;
@@ -41,7 +40,7 @@ import org.jnode.test.support.TestConfig;
 
 abstract public class BlockDeviceAPIContext extends Context {
     protected static final Logger log = Logger
-            .getLogger(BlockDeviceAPIContext.class);
+        .getLogger(BlockDeviceAPIContext.class);
 
     private BlockDeviceAPI api;
 
@@ -60,13 +59,13 @@ abstract public class BlockDeviceAPIContext extends Context {
     }
 
     public void init(TestConfig config, MockObjectTestCase testCase)
-            throws Exception {
+        throws Exception {
         BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;
         partitions = cfg.getPartitions();
     }
 
     protected void init(BlockDeviceAPIContext parentContext,
-            BlockDeviceAPI api, Device device) {
+                        BlockDeviceAPI api, Device device) {
         this.api = api;
         this.parentContext = parentContext;
 
@@ -90,10 +89,10 @@ abstract public class BlockDeviceAPIContext extends Context {
                 }
             } catch (DriverException e) {
                 log.error("Error while starting device " + driver.getDevice(),
-                        e);
+                    e);
             } catch (DeviceAlreadyRegisteredException e) {
                 log.error("Error while starting device " + driver.getDevice(),
-                        e);
+                    e);
             }
         }
 
@@ -119,10 +118,10 @@ abstract public class BlockDeviceAPIContext extends Context {
                     StubDeviceManager.INSTANCE.unregister(device);
                 } catch (DriverException e) {
                     log.error("Error while stopping device "
-                            + driver.getDevice(), e);
+                        + driver.getDevice(), e);
                 } catch (DeviceNotFoundException e) {
                     log.error("Error while stopping device "
-                            + driver.getDevice(), e);
+                        + driver.getDevice(), e);
                 }
             }
         }
@@ -147,7 +146,7 @@ abstract public class BlockDeviceAPIContext extends Context {
     protected Driver findDriver(DeviceFinder finder, String devName) {
         try {
             finder.findDevices(StubDeviceManager.INSTANCE,
-                    StubDeviceManager.INSTANCE.getSystemBus());
+                StubDeviceManager.INSTANCE.getSystemBus());
         } catch (DeviceAlreadyRegisteredException e) {
             log.warn(e);
         } catch (DeviceException e) {
@@ -158,8 +157,8 @@ abstract public class BlockDeviceAPIContext extends Context {
             Device dev = StubDeviceManager.INSTANCE.getDevice(devName);
             log.debug("dev=" + dev);
             log
-                    .debug("driver="
-                            + (dev == null ? "null" : "" + dev.getDriver()));
+                .debug("driver="
+                    + (dev == null ? "null" : "" + dev.getDriver()));
             return dev.getDriver();
         } catch (DeviceNotFoundException e) {
             log.fatal("can't find " + devName, e);

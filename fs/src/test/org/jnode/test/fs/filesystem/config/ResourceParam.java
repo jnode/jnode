@@ -18,69 +18,60 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 
 
 /**
- * @author Fabien DUMINY 
- *
+ * @author Fabien DUMINY
  */
-public class ResourceParam extends DeviceParam 
-{
-	public ResourceParam()
-	{
-	}
-	
-	/**
-	 * 
-	 */
-	public Device createDevice() throws IOException
-	{
-		return new FileDevice(file, "r");
-	}
-	
-	/**
-	 * 
-	 * @param tmpInputFile
-	 */
-	public void setFile(File tmpInputFile)
-	{
-		this.file = tmpInputFile;
-	}
-	
-	/**
-	 * 
-	 */
-	public long getDeviceSize()
-	{
-		return file.length();
-	}
-		
-	/**
-	 * 
-	 */
-	public void tearDown(Device device)
-	{
-		// nothing to do
-	}
+public class ResourceParam extends DeviceParam {
+    public ResourceParam() {
+    }
 
-	public String toString()
-	{
-		return "Resource[" + " tmpFile=" + file.getAbsolutePath() + ")";
-	}
-				
-	/**
-	 * @return always return true.
-	 */
-	public boolean isInput() {
-		return true;
-	}	
-	private File file;
+    /**
+     *
+     */
+    public Device createDevice() throws IOException {
+        return new FileDevice(file, "r");
+    }
+
+    /**
+     * @param tmpInputFile
+     */
+    public void setFile(File tmpInputFile) {
+        this.file = tmpInputFile;
+    }
+
+    /**
+     *
+     */
+    public long getDeviceSize() {
+        return file.length();
+    }
+
+    /**
+     *
+     */
+    public void tearDown(Device device) {
+        // nothing to do
+    }
+
+    public String toString() {
+        return "Resource[" + " tmpFile=" + file.getAbsolutePath() + ")";
+    }
+
+    /**
+     * @return always return true.
+     */
+    public boolean isInput() {
+        return true;
+    }
+
+    private File file;
 }

@@ -18,16 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.tests;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Vector;
-
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.TestUtils;
@@ -53,8 +51,8 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
     }
 
     public void testRead(FSTestConfig config) throws Throwable {
-		setUp(config);
-		
+        setUp(config);
+
         FSFile file = prepareFile(config);
 
         Monitor monitor = new Monitor();
@@ -65,50 +63,50 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
     }
 
     public void testWrite(FSTestConfig config) throws Throwable {
-		if (!config.isReadOnly()) {
-			setUp(config);
-			
-			FSFile file = prepareFile(config);
-			Monitor monitor = new Monitor();
-			createWriters(monitor, file);
-			monitor.waitAll();
-			assertTrue("integrity test failed", isGoodResultFile(file));
-		}
-	}
+        if (!config.isReadOnly()) {
+            setUp(config);
 
-	public void testReadWrite(FSTestConfig config) throws Throwable {
-		setUp(config);
-		
-		FSFile file = prepareFile(config);
-		Monitor monitor = new Monitor();
-		createReaders(monitor, file);
-		if (!config.isReadOnly()) {
-			createWriters(monitor, file);
-		}
-		monitor.waitAll();
-		assertTrue("integrity test failed", isGoodResultFile(file));
-	}
-    
+            FSFile file = prepareFile(config);
+            Monitor monitor = new Monitor();
+            createWriters(monitor, file);
+            monitor.waitAll();
+            assertTrue("integrity test failed", isGoodResultFile(file));
+        }
+    }
+
+    public void testReadWrite(FSTestConfig config) throws Throwable {
+        setUp(config);
+
+        FSFile file = prepareFile(config);
+        Monitor monitor = new Monitor();
+        createReaders(monitor, file);
+        if (!config.isReadOnly()) {
+            createWriters(monitor, file);
+        }
+        monitor.waitAll();
+        assertTrue("integrity test failed", isGoodResultFile(file));
+    }
+
     protected void createReaders(Monitor monitor, FSFile file) {
         for (int i = 0; i < NB_READERS; i++)
             monitor.addWorker(new Reader(monitor, file, i * 2, NB_READERS * 2,
-                    MIN_SLEEP, MAX_SLEEP));
+                MIN_SLEEP, MAX_SLEEP));
     }
 
     protected void createWriters(Monitor monitor, FSFile file) {
         for (int i = 0; i < NB_WRITERS; i++)
             monitor.addWorker(new Writer(monitor, file, i * 2, NB_WRITERS * 2,
-                    MIN_SLEEP, MAX_SLEEP));
+                MIN_SLEEP, MAX_SLEEP));
     }
 
     protected boolean isGoodResultFile(FSFile file) throws IOException {
         byte[] expData = TestUtils.getTestData(FILE_SIZE_IN_WORDS);
-        
+
         ByteBuffer data = ByteBuffer.allocate(expData.length);
         file.read(0, data);
         //byte[] data = new byte[expData.length];
         //file.read(0, data, 0, data.length);
-        
+
         return TestUtils.equals(expData, data.array());
     }
 
@@ -156,7 +154,7 @@ class Monitor {
         workers.remove(worker);
 
         this.throwable = new Error(worker.getClass().getName() + " failed !",
-                throwable);
+            throwable);
     }
 
     public void waitAll() throws Throwable {
@@ -170,6 +168,7 @@ class Monitor {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
+                //empty
             }
             if (throwable != null)
                 throw throwable;
@@ -183,7 +182,7 @@ class Reader extends Worker {
      * @param file
      */
     public Reader(Monitor monitor, FSFile file, int start, int step,
-            int minSleep, int maxSleep) {
+                  int minSleep, int maxSleep) {
         super(monitor, file, start, step, minSleep, maxSleep);
     }
 
@@ -207,7 +206,7 @@ abstract class Worker implements Runnable {
     protected int step;
 
     public Worker(Monitor monitor, FSFile file, int start, int step,
-            int minSleep, int maxSleep) {
+                  int minSleep, int maxSleep) {
         this.file = file;
         this.step = step;
         this.start = start;
@@ -228,10 +227,11 @@ abstract class Worker implements Runnable {
                     throw new Error("Error in worker thread", e1);
                 }
                 int sleep = (int) (minSleep + Math.random()
-                        * (maxSleep - minSleep));
+                    * (maxSleep - minSleep));
                 try {
                     Thread.sleep(sleep);
                 } catch (InterruptedException e) {
+                    //ignore
                 }
             }
         } catch (Throwable t) {
@@ -249,7 +249,7 @@ class Writer extends Worker {
      * @param file
      */
     public Writer(Monitor monitor, FSFile file, int start, int step,
-            int minSleep, int maxSleep) {
+                  int minSleep, int maxSleep) {
         super(monitor, file, start, step, minSleep, maxSleep);
     }
 
@@ -257,7 +257,7 @@ class Writer extends Worker {
         long value = offset / 2;
         byte msbValue = (byte) (value & 0xFF00);
         byte lsbValue = (byte) (value & 0x00FF);
-        ByteBuffer src = ByteBuffer.wrap(new byte[]{ msbValue, lsbValue });
+        ByteBuffer src = ByteBuffer.wrap(new byte[]{msbValue, lsbValue});
         file.write(offset, src);
     }
 }
