@@ -3,15 +3,13 @@ package org.jnode.test.shell;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.SortedSet;
-
 import junit.framework.TestCase;
-
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandShell;
 
 /**
  * Helper methods for doing completion tests.
- * 
+ *
  * @author crawley@jnode.org
  */
 public class CompletionHelper {
@@ -30,14 +28,13 @@ public class CompletionHelper {
             i++;
         }
         if (startPos == -1) {
-            assert(startPos == ci.getCompletionStart() ||
-                    line.length() == ci.getCompletionStart());
-        }
-        else {
+            assert (startPos == ci.getCompletionStart() ||
+                line.length() == ci.getCompletionStart());
+        } else {
             TestCase.assertEquals(startPos, ci.getCompletionStart());
         }
     }
-    
+
     public static void err(String message, String[] expected, Collection<String> actual) {
         System.err.println(message);
         System.err.println("Expected completions:");
@@ -46,11 +43,11 @@ public class CompletionHelper {
         showList(actual);
         TestCase.fail(message);
     }
-    
+
     public static void showList(Collection<String> list) {
         for (String element : list) {
             System.err.println("    '" + element + "'");
         }
     }
-    
+
 }

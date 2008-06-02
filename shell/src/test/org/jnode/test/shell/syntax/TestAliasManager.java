@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.shell.syntax;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 
@@ -35,26 +34,27 @@ import org.jnode.shell.alias.NoSuchAliasException;
 public class TestAliasManager implements AliasManager {
 
     private final HashMap<String, Alias> aliases = new HashMap<String, Alias>();
-    
+
     /**
      * Add an alias
-     * 
+     *
      * @param alias
      * @param className
      */
     public void add(String alias, String className) {
         try {
-                if (getAliasClassName(className) != null) {
-                    className = getAliasClassName(className);
-                }
-            } catch (NoSuchAliasException e) {
+            if (getAliasClassName(className) != null) {
+                className = getAliasClassName(className);
             }
-            aliases.put(alias, new Alias(alias, className, false));
+        } catch (NoSuchAliasException e) {
+            //todo empty?
         }
+        aliases.put(alias, new Alias(alias, className, false));
+    }
 
     /**
      * Remove an alias
-     * 
+     *
      * @param alias
      */
     public void remove(String alias) {
@@ -63,20 +63,20 @@ public class TestAliasManager implements AliasManager {
 
     /**
      * Gets the class of a given alias
-     * 
+     *
      * @param alias
      * @return the class of the given alias
      * @throws ClassNotFoundException
      */
     public Class<?> getAliasClass(String alias) throws ClassNotFoundException,
-            NoSuchAliasException {
+        NoSuchAliasException {
         return getAlias(alias).getAliasClass();
     }
 
     /**
      * Should the given alias be invoked in the context of the shell, instead of
      * in its own context.
-     * 
+     *
      * @param alias
      */
     public boolean isInternal(String alias) throws NoSuchAliasException {
@@ -85,7 +85,7 @@ public class TestAliasManager implements AliasManager {
 
     /**
      * Gets the classname of a given alias
-     * 
+     *
      * @param alias
      * @return the classname of the given alias
      */
@@ -109,7 +109,7 @@ public class TestAliasManager implements AliasManager {
 
     /**
      * Gets an iterator to iterator over all aliases.
-     * 
+     *
      * @return An iterator the returns instances of String.
      */
     public Iterator<String> aliasIterator() {
@@ -118,7 +118,7 @@ public class TestAliasManager implements AliasManager {
 
     /**
      * Gets the alias with the given name
-     * 
+     *
      * @param alias
      */
     protected Alias getAlias(String alias) throws NoSuchAliasException {
@@ -164,7 +164,7 @@ public class TestAliasManager implements AliasManager {
         public Class<?> getAliasClass() throws ClassNotFoundException {
             if (aliasClass == null) {
                 aliasClass = Thread.currentThread().getContextClassLoader()
-                        .loadClass(className);
+                    .loadClass(className);
             }
             return aliasClass;
         }
@@ -172,7 +172,7 @@ public class TestAliasManager implements AliasManager {
         /**
          * Should this alias be executed in the context of the shell, instead of
          * in its own context.
-         * 
+         *
          * @return
          */
         public final boolean isInternal() {

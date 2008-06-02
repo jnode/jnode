@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.shell.syntax;
- 
+
 import java.util.Collection;
 import java.util.HashMap;
-
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 
@@ -54,6 +53,6 @@ public class TestSyntaxManager implements SyntaxManager {
     public Collection<String> getKeys() {
         throw new UnsupportedOperationException("go away");
     }
-    
-    
+
+
 }

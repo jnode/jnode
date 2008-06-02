@@ -22,21 +22,19 @@
 package org.jnode.test.shell.syntax;
 
 import java.util.NoSuchElementException;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.DefaultInterpreter;
 import org.jnode.shell.SymbolSource;
 
 public class DefaultTokenizerTest extends TestCase {
-    
+
     // Expose methods for testing.
     private class MyDefaultInterpreter extends DefaultInterpreter {
         DefaultInterpreter.Tokenizer makeTokenizer(String line) {
             return new DefaultInterpreter.Tokenizer(line);
         }
-        
+
         DefaultInterpreter.Tokenizer makeTokenizer(String line, int flags) {
             return new DefaultInterpreter.Tokenizer(line, flags);
         }
@@ -75,8 +73,7 @@ public class DefaultTokenizerTest extends TestCase {
         try {
             t.next();
             fail("No exception");
-        }
-        catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException ex) {
             // expected
         }
         t.seek(0);
@@ -89,19 +86,17 @@ public class DefaultTokenizerTest extends TestCase {
         try {
             t.seek(-1);
             fail("No exception");
-        }
-        catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException ex) {
             // expected
         }
         try {
             t.seek(4);
             fail("No exception");
-        }
-        catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException ex) {
             // expected
         }
     }
-    
+
     public void testTokenizerQuotes() {
         SymbolSource<CommandLine.Token> t = new MyDefaultInterpreter().makeTokenizer("'a' \"b c\"");
         assertEquals(true, t.hasNext());
@@ -116,7 +111,7 @@ public class DefaultTokenizerTest extends TestCase {
         assertEquals(9, s.end);
         assertEquals(false, t.hasNext());
     }
-    
+
     public void testTokenizerBackslashes() {
         SymbolSource<CommandLine.Token> t = new MyDefaultInterpreter().makeTokenizer("\\'a  b\\ c\\\"");
         assertEquals(true, t.hasNext());
@@ -131,7 +126,7 @@ public class DefaultTokenizerTest extends TestCase {
         assertEquals(11, s.end);
         assertEquals(false, t.hasNext());
     }
-    
+
     public void testTokenizerBackslashes2() {
         SymbolSource<CommandLine.Token> t = new MyDefaultInterpreter().makeTokenizer("\\\\\\n\\r\\t\\b ");
         assertEquals(true, t.hasNext());
@@ -142,11 +137,11 @@ public class DefaultTokenizerTest extends TestCase {
         assertEquals(10, s.end);
         assertEquals(false, t.hasNext());
     }
-    
+
     public void testTokenizerRedirects() {
-        SymbolSource<CommandLine.Token> t = 
-            new MyDefaultInterpreter().makeTokenizer("a< >b c|d \"<\" \\< '<'", 
-                    MyDefaultInterpreter.REDIRECTS_FLAG);
+        SymbolSource<CommandLine.Token> t =
+            new MyDefaultInterpreter().makeTokenizer("a< >b c|d \"<\" \\< '<'",
+                MyDefaultInterpreter.REDIRECTS_FLAG);
         assertEquals(true, t.hasNext());
         assertEquals(false, t.whitespaceAfterLast());
         assertEquals("a", t.next().token);

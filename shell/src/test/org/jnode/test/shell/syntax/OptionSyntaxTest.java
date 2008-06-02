@@ -23,9 +23,7 @@ package org.jnode.test.shell.syntax;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import junit.framework.TestCase;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -43,28 +41,28 @@ import org.jnode.shell.syntax.Syntax;
 public class OptionSyntaxTest extends TestCase {
 
     public static class Test extends AbstractCommand {
-        private final FileArgument fileArg = 
+        private final FileArgument fileArg =
             new FileArgument("fileArg", Argument.OPTIONAL + Argument.MULTIPLE);
-        private final IntegerArgument intArg = 
+        private final IntegerArgument intArg =
             new IntegerArgument("intArg", Argument.OPTIONAL + Argument.SINGLE);
-        private final FlagArgument flagArg = 
+        private final FlagArgument flagArg =
             new FlagArgument("flagArg", Argument.OPTIONAL + Argument.SINGLE);
-        
+
         public Test() {
             registerArguments(fileArg, intArg, flagArg);
         }
 
         public void execute(CommandLine commandLine, InputStream in,
-                PrintStream out, PrintStream err) throws Exception {
+                            PrintStream out, PrintStream err) throws Exception {
         }
     }
-    
+
     public void testConstructor() {
         new OptionSyntax("fileArg", "file");
         new OptionSyntax("fileArg", 'f');
         new OptionSyntax("fileArg", "file", 'f');
     }
-    
+
     public void testFormat() {
         Test test = new Test();
         Syntax syntax1 = new OptionSyntax("fileArg", "file", 'f');
@@ -76,31 +74,30 @@ public class OptionSyntaxTest extends TestCase {
         Syntax syntax4 = new OptionSyntax("flagArg", "xxx", 'x');
         assertEquals("--xxx | -x", syntax4.format(test.getArgumentBundle()));
     }
-    
+
     public void testOne() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.OptionSyntaxTest$Test");
         shell.addSyntax("cmd", new OptionSyntax("fileArg", "file", 'f'));
-        
+
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
-        
+
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("--file"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
-        
+
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
@@ -111,8 +108,7 @@ public class OptionSyntaxTest extends TestCase {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f")}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
@@ -120,8 +116,7 @@ public class OptionSyntaxTest extends TestCase {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("--file")}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
 
@@ -129,17 +124,16 @@ public class OptionSyntaxTest extends TestCase {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-g"), new Token("F1")}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }
-    
+
     public void testTwo() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.OptionSyntaxTest$Test");
         shell.addSyntax("cmd", new RepeatSyntax(new OptionSyntax("fileArg", "file", 'f')));
-        
+
         CommandLine cl;
         CommandInfo cmdInfo;
         Command cmd;
@@ -161,8 +155,8 @@ public class OptionSyntaxTest extends TestCase {
         assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
 
-        cl = new CommandLine(new Token("cmd"), 
-                new Token[]{new Token("-f"), new Token("F1"), new Token("-f"), new Token("F2")}, null);
+        cl = new CommandLine(new Token("cmd"),
+            new Token[]{new Token("-f"), new Token("F1"), new Token("-f"), new Token("F2")}, null);
         cmdInfo = cl.parseCommandLine(shell);
         cmd = cmdInfo.createCommandInstance();
         assertEquals(2, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
@@ -171,8 +165,7 @@ public class OptionSyntaxTest extends TestCase {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-g"), new Token("F1")}, null);
             cl.parseCommandLine(shell);
             fail("no exception");
-        }
-        catch (CommandSyntaxException ex) {
+        } catch (CommandSyntaxException ex) {
             // expected
         }
     }

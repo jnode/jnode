@@ -27,12 +27,11 @@ import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * Fake shell implementation that provides services for testing CommandLine etc.
- * 
- * @author crawley@jnode.org
  *
+ * @author crawley@jnode.org
  */
 public class TestShell extends CommandShell {
-    
+
     public TestShell() {
         super(new TestAliasManager(), new TestSyntaxManager());
     }
@@ -40,7 +39,7 @@ public class TestShell extends CommandShell {
     public void addAlias(String alias, String className) {
         getAliasManager().add(alias, className);
     }
-    
+
     public void addSyntax(String alias, Syntax syntax) {
         getSyntaxManager().add(new SyntaxBundle(alias, syntax));
     }
