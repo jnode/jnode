@@ -23,6 +23,17 @@
     <alias name="ftpmount" class="org.jnode.fs.ftpfs.command.FTPMountCommand"/>
   </extension>
   
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="ftpmount">
+      <sequence description="mount a remote FTP service as a file system">
+        <argument argLabel="directory"/>
+        <argument argLabel="host"/>
+        <argument argLabel="userName"/>
+        <optional><argument argLabel="password"/></optional>
+      </sequence>
+    </syntax>
+  </extension>
+  
   <extension point="org.jnode.security.permissions">
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
   </extension> 

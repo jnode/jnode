@@ -21,9 +21,13 @@
 
 package org.jnode.fs.ftpfs.command;
 
+import org.apache.log4j.Logger;
+import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.DriverException;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.ftpfs.FTPFSDevice;
 import org.jnode.fs.ftpfs.FTPFSDriver;
@@ -33,49 +37,77 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+
+import javax.naming.NameNotFoundException;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class FTPMountCommand extends AbstractCommand {
-    private static final FileArgument MOUNTPOINT_ARG = new FileArgument("directory", "the mountpoint");
-    private static final Argument HOST_ARG = new Argument("host", "FTP host");
-    private static final Argument USERNAME_ARG = new Argument("username", "FTP user");
-    private static final Argument PASSWORD_ARG = new Argument("password", "FTP password");
-    static Help.Info HELP_INFO = new Help.Info("mount", "Mount an FTP filesystem",
-            new Parameter[]{new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
-                    new Parameter(HOST_ARG, Parameter.MANDATORY),
-                    new Parameter(USERNAME_ARG, Parameter.MANDATORY),
-                    new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
+    private final FileArgument MOUNTPOINT_ARG = 
+        new FileArgument("directory", Argument.MANDATORY, "the mountpoint");
+    
+    private static final HostNameArgument HOST_ARG = 
+        new HostNameArgument("host", Argument.MANDATORY, "FTP host");
+    
+    private static final StringArgument USERNAME_ARG = 
+        new StringArgument("userName", Argument.MANDATORY, "FTP user");
+    
+    private static final StringArgument PASSWORD_ARG = 
+        new StringArgument("password", Argument.OPTIONAL, "FTP password");
+    
+    public FTPMountCommand() {
+        super("Mount an FTP filesystem");
+        registerArguments(MOUNTPOINT_ARG, HOST_ARG, USERNAME_ARG, PASSWORD_ARG);
+    }
 
     public static void main(String[] args) throws Exception {
         new FTPMountCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-
-        final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
-        final String host = HOST_ARG.getValue(cmdLine);
-        final String user = USERNAME_ARG.getValue(cmdLine);
-        final String password = PASSWORD_ARG.getValue(cmdLine);
-        final FTPFSDevice dev = new FTPFSDevice(host, user, password);
-        dev.setDriver(new FTPFSDriver());
-        final DeviceManager dm = DeviceUtils.getDeviceManager();
-        dm.register(dev);
+                        PrintStream out, PrintStream err) 
+    throws DriverException, NameNotFoundException, DeviceAlreadyRegisteredException, 
+        FileSystemException, IOException {
+        final File mountPoint = MOUNTPOINT_ARG.getValue();
+        final String host = HOST_ARG.getValue();
+        final String user = USERNAME_ARG.getValue();
+        final String password = PASSWORD_ARG.getValue();
+        boolean ok = false;
+        
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
         FTPFileSystemType type = fss.getFileSystemType(FTPFileSystemType.ID);
-        final FTPFileSystem fs = type.create(dev, true);
-        fss.registerFileSystem(fs);
-        fss.mount(mount_point, fs, null);
+        final DeviceManager dm = DeviceUtils.getDeviceManager();
+        final FTPFSDevice dev = new FTPFSDevice(host, user, password);
+        dev.setDriver(new FTPFSDriver());
+        FTPFileSystem fs = null;
+        try {
+            dm.register(dev);
+            fs = type.create(dev, true);
+            fss.registerFileSystem(fs);
+            fss.mount(mountPoint.getAbsolutePath(), fs, null);
+            ok = true;
+        }
+        finally {
+            if (!ok) {
+                try {
+                    // If we failed, try to undo the changes that we managed to make
+                    if (fs != null) {
+                        fss.unregisterFileSystem(dev);
+                    }
+                    dm.unregister(dev);
+                }
+                catch (Exception ex) {
+                    Logger log = Logger.getLogger(FTPMountCommand.class);
+                    log.fatal("Cannot undo failed mount attempt", ex);
+                }
+            }
+        }
     }
 }
