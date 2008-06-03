@@ -35,16 +35,16 @@
     <!-- application name="GlyphTest"      class="org.jnode.test.gui.GlyphTest"/ -->
   </extension>
 
-    <extension point="org.jnode.security.permissions">
-        <permission class="java.lang.RuntimePermission" name="setIO"/>
-        <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
-        <permission class="java.awt.AWTPermission" name="createRobot"/>
-        <permission class="java.awt.AWTPermission" name="readDisplayPixels"/>
-    	<permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
-    	<permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
-    	<permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>
-    	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
-    </extension>
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="java.awt.AWTPermission" name="createRobot"/>
+    <permission class="java.awt.AWTPermission" name="readDisplayPixels"/>
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+  </extension>
 
   <extension point="org.jnode.shell.aliases">
     <alias name="AWTTest"       class="org.jnode.test.gui.AWTTest"/>
@@ -65,6 +65,16 @@
     <alias name="GlyphTest"     class="org.jnode.test.gui.GlyphTest"/>
     <alias name="RobotTest"     class="org.jnode.test.gui.RobotTest"/>
     <alias name="Rubik"         class="org.jnode.test.gui.Rubik"/>
+  </extension>
+        
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="FBTest">
+      <optionSet description="run framebuffer tests">
+        <option argLabel="device" shortName="d"/>
+        <option argLabel="loops" shortName="l"/>
+        <option argLabel="tests" shortName="t"/>
+      </optionSet>
+    </syntax>
   </extension>
 
 </plugin>

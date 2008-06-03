@@ -28,54 +28,55 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.QuadCurve2D;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
-import org.jnode.naming.InitialNaming;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
+import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author epr
  */
-public class FBTest {
-
-    public static final Help.Info HELP_INFO = new Help.Info(
-        "FBTest",
-        "Performs tests on the FrameBuffer implementation and outputs performance data",
-        new Parameter[]{
-            new Parameter(new DeviceArgument("framebuffer", "the FrameBuffer device to use"), Parameter.OPTIONAL),
-            new Parameter(new Argument("loops", "how many loops each test should perform"), Parameter.OPTIONAL)
-        }
-    );
+public class FBTest extends AbstractCommand {
+    
+    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
+            "device", Argument.OPTIONAL, "the FrameBuffer device to use", FrameBufferAPI.class);
+    
+    private final IntegerArgument ARG_LOOPS = new IntegerArgument(
+            "loops", Argument.OPTIONAL, "how many loops each test should perform");
+    
+    private final StringArgument ARG_TESTS = new StringArgument(
+            "tests", Argument.OPTIONAL, "tests to be perform (lREAQ)");
+    
+    public FBTest() {
+        super("Performs tests on the FrameBuffer implementation and outputs performance data");
+        registerArguments(ARG_DEVICE, ARG_LOOPS, ARG_TESTS);
+    }
 
     private static final Logger log = Logger.getLogger(FBTest.class);
 
-    final Surface g;
-    private final int width;
-    private final int height;
+    Surface g;
+    private int width;
+    private int height;
     private final Color[] colors =
         new Color[]{Color.RED, Color.BLUE, Color.GRAY, Color.ORANGE, Color.CYAN, Color.MAGENTA};
     private int cIndex;
     int paintMode;
-    private final int count;
-    private final String tests;
+    private int count;
+    private String tests;
     final AffineTransform tx = new AffineTransform();
-
-    protected FBTest(Surface g, int width, int height, int count, String tests) {
-        this.g = g;
-        this.width = width;
-        this.height = height;
-        this.count = count;
-        this.tests = tests;
-    }
 
     protected void perform() {
         log.info("Loop count          " + count);
@@ -102,26 +103,24 @@ public class FBTest {
     }
 
     public static void main(String[] args) throws Exception {
+        new FBTest().execute(args);
+    }
+    
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) {
+        
+        Device dev = ARG_DEVICE.getValue();
+        count = ARG_LOOPS.isSet() ? ARG_LOOPS.getValue() : 100;
+        tests = ARG_TESTS.isSet() ? ARG_TESTS.getValue() : "lREAQ";
 
-        final String devId = (args.length > 0) ? args[0] : "" /*"fb0"*/;
-        final int count = (args.length > 1) ? Integer.parseInt(args[1]) : 100;
-        final String tests = (args.length > 2) ? args[2] : "plrREQ";
-
-        Surface g = null;
         try {
-            Device dev = null;
-            if ("".equals(devId)) {
-                final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
-                int dev_count = devs.size();
-                if (dev_count > 0) {
-                    Device[] dev_a = devs.toArray(new Device[dev_count]);
-                    dev = dev_a[0];
-                }
-            }
-
             if (dev == null) {
-                final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
-                dev = dm.getDevice(devId);
+                final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
+                if (devs.size() == 0) {
+                    err.println("No framebuffer devices to test");
+                    exit(1);
+                }
+                dev = new ArrayList<Device>(devs).get(0);
             }
 
             log.info("Using device " + dev.getId());
@@ -129,7 +128,11 @@ public class FBTest {
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
 
             g = api.open(conf);
-            new FBTest(g, conf.getScreenWidth(), conf.getScreenHeight(), count, tests).perform();
+            this.width = conf.getScreenWidth();
+            this.height = conf.getScreenHeight();
+            
+            perform();
+            
             Thread.sleep(3000);
         } catch (Throwable ex) {
             log.error("Error in FBTest", ex);
@@ -162,8 +165,9 @@ public class FBTest {
     final long performTest(Test test, int paintMode) {
         this.paintMode = paintMode;
         long start = System.currentTimeMillis();
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++) {
             test.perform();
+        }
         return System.currentTimeMillis() - start;
     }
 
