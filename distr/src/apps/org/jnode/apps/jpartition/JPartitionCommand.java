@@ -7,95 +7,43 @@ import org.jnode.apps.jpartition.consoleview.ConsoleViewFactory;
 import org.jnode.apps.jpartition.swingview.SwingViewFactory;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.OptionArgument;
-import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+
 
 public class JPartitionCommand extends AbstractCommand {
-	static public final String SWINGUI = "swing";
-	static public final String CONSOLEUI = "console";
+    private final FlagArgument FLAG_SWING = 
+        new FlagArgument("swing", Argument.OPTIONAL, "if set, use the Swing (graphic) UI");
+    
+    private final FlagArgument FLAG_CONSOLE = 
+        new FlagArgument("console", Argument.OPTIONAL, "if set, use the console (text) UI");
 
-	static private final OptionArgument ARG_UI = new OptionArgument("ui",
-            "The type of GUI you want to use",
-         new OptionArgument.Option(SWINGUI,   "use swing for UI"),
-         new OptionArgument.Option(CONSOLEUI, "use console for UI"));
+	private final FlagArgument ARG_INSTALL = new FlagArgument(
+	        "install", Argument.OPTIONAL, "if set, format the partition(s)");
+	
+	public JPartitionCommand() {
+        super("interactive disk partitioning tool");
+        registerArguments(FLAG_CONSOLE, FLAG_SWING, ARG_INSTALL);
+    }
 
-	static private final StringArgument ARG_INSTALL = new StringArgument("install",
-            "select a partition (optionally being created/formatted)");
-
-	public static Help.Info HELP_INFO = new Help.Info("jpartition", "partition disks",
-			new Parameter[] {
-					new Parameter(ARG_UI, Parameter.MANDATORY),
-					new Parameter(ARG_INSTALL, Parameter.OPTIONAL)
-			});
-
-	public static void main(String[] args) throws Exception
-	{
-//		testCharva(args);
-
+	public static void main(String[] args) throws Exception {
 		new JPartitionCommand().execute(args);
 	}
 
 	public void execute(CommandLine commandLine, InputStream in,
-			PrintStream out, PrintStream err) throws Exception
-	{
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-        String ui = ARG_UI.getValue(cmdLine);
-        boolean install = (ARG_INSTALL.getValue(cmdLine) != null);
+			PrintStream out, PrintStream err) 
+	throws Exception {
+        boolean install = ARG_INSTALL.isSet();
 
-        ViewFactory viewFactory = createViewFactory(ui, in, out, err);
+        ViewFactory viewFactory = FLAG_CONSOLE.isSet() ?
+                new ConsoleViewFactory(in, out, err) :
+                    FLAG_SWING.isSet() ? new SwingViewFactory() : null;
+        if (viewFactory == null) {
+            err.println("No UI selected");
+            exit(1);
+        }
 
         JPartition jpartition = new JPartition(viewFactory, install);
         jpartition.launch();
-	}
-
-	public static ViewFactory createViewFactory(String ui, InputStream in,
-			PrintStream out, PrintStream err)
-	{
-        ViewFactory viewFactory = null;
-		if(CONSOLEUI.equals(ui))
-		{
-			viewFactory = new ConsoleViewFactory(in, out, err);
-		}
-		else if(SWINGUI.equals(ui))
-		{
-			viewFactory = new SwingViewFactory();
-		}
-
-		return viewFactory;
-	}
-
-	private static void testCharva(String[] args) throws Exception
-	{
-/*
-        //initEnv();
-        SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
-        TextConsole tc = (TextConsole) cm.createConsole("Console 1",
-                ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE);
-        cm.focus(tc);
-
-        DefaultShellManager sm = new DefaultShellManager();
-        InitialNaming.bind(ShellManager.NAME, sm);
-
-        ExtensionPoint aliasesEP = new DummyExtensionPoint();
-        DefaultAliasManager am = new DefaultAliasManager(aliasesEP);
-        InitialNaming.bind(AliasManager.NAME, am);
-
-        //final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
-        CommandShell cs = new CommandShell(tc);
-        sm.registerShell(cs);
-        new Thread(cs).start();
-*/
-/*
-		charvax.swing.JFrame frm = new charvax.swing.JFrame("test");
-		JLabel label = new JLabel("test");
-		frm.add(label);
-		frm.setFocus(label);
-		frm.setSize(20, 20);
-		frm.setVisible(true);
-		frm.setDefaultCloseOperation(charvax.swing.JFrame.EXIT_ON_CLOSE);
-*/
 	}
 }
