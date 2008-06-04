@@ -30,7 +30,7 @@ public final class CommandInfo {
     private final Class<?> clazz;
 
     private final boolean internal;
-    
+
     private Command instance;
 
     public CommandInfo(Class<?> clazz, boolean internal) {
@@ -45,7 +45,7 @@ public final class CommandInfo {
     public final boolean isInternal() {
         return internal;
     }
-    
+
     /**
      * Get the Command instance for this CommandInfo, instantiating it if necessary.
      * 
@@ -59,7 +59,7 @@ public final class CommandInfo {
                 instance = (Command) (clazz.newInstance());
             }
         }
-    	return instance;
+        return instance;
     }
 
     /**

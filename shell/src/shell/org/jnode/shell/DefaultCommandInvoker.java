@@ -54,7 +54,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
     private final PrintStream err;
     private final CommandShell commandShell;
 
-    private static final Class<?>[] MAIN_ARG_TYPES = new Class[] { String[].class};
+    private static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
 
     public static final Factory FACTORY = new Factory() {
         public CommandInvoker create(CommandShell shell) {
@@ -107,15 +107,14 @@ public class DefaultCommandInvoker implements CommandInvoker {
                         }
                     });
                     AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
-                    final Object[] args = new Object[] { cmdLine.getArguments() };
+                    final Object[] args = new Object[] {cmdLine.getArguments()};
                     AccessController.doPrivileged(new InvokeAction(main, null, args));
                     return 0;
                 } catch (PrivilegedActionException ex) {
                     Exception ex2 = ex.getException();
                     if (ex2 instanceof InvocationTargetException) {
                         throw ex2.getCause();
-                    }
-                    else {
+                    } else {
                         throw ex2;
                     }
                 }
@@ -138,8 +137,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
         } catch (Exception ex) {
             err.println("I FOUND AN ERROR: " + ex);
             stackTrace(ex);
-        }
-        finally {
+        } finally {
             // This clears the current command to prevent leakage.
             AbstractCommand.retrieveCurrentCommand();
         }

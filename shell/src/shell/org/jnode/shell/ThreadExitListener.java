@@ -28,6 +28,6 @@ package org.jnode.shell;
  */
 public interface ThreadExitListener {
 
-	void notifyThreadExited(CommandThread thread);
+    void notifyThreadExited(CommandThread thread);
 
 }

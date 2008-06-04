@@ -58,8 +58,9 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
 
     CommandThreadImpl createThread(CommandLine cmdLine, CommandRunner cr) {
         Closeable[] streams = cmdLine.getStreams();
-        return ProcletContext.createProclet(cr, null, null, new Object[] {
-                streams[0], streams[1], streams[2] }, cmdLine.getCommandName());
+        return ProcletContext.createProclet(cr, null, null, 
+                new Object[] {streams[0], streams[1], streams[2]}, 
+                cmdLine.getCommandName());
     }
     
     private static synchronized void init() {

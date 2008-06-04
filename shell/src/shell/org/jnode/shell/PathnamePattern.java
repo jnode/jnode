@@ -311,25 +311,25 @@ public class PathnamePattern {
         int len = str.length();
         for (int i = 0; i < len; i++) {
             switch (str.charAt(i)) {
-            case '*':
-            case '?':
-                return true;
-            case '[':
-                if ((flags & CHARACTER_CLASSES) != 0) {
+                case '*':
+                case '?':
                     return true;
-                }
-                break;
-            case '\\':
-                if ((flags & SLASH_ESCAPES) != 0) {
-                    return true;
-                }
-                break;
-            case '\'':
-                if ((flags & SINGLE_QUOTE_ESCAPES) != 0) {
-                    return true;
-                }
-                break;
-            default:
+                case '[':
+                    if ((flags & CHARACTER_CLASSES) != 0) {
+                        return true;
+                    }
+                    break;
+                case '\\':
+                    if ((flags & SLASH_ESCAPES) != 0) {
+                        return true;
+                    }
+                    break;
+                case '\'':
+                    if ((flags & SINGLE_QUOTE_ESCAPES) != 0) {
+                        return true;
+                    }
+                    break;
+                default:
             }
         }
         return false;
@@ -351,74 +351,75 @@ public class PathnamePattern {
         for (int i = 0; i < len; i++) {
             char ch = filePattern.charAt(i);
             switch (ch) {
-            case '?':
-                if (quoted) {
-                    sb.append(ch);
-                } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
-                    sb.append("[^\\.]");
-                } else {
-                    sb.append(".");
-                }
-                break;
-            case '*':
-                if (quoted) {
-                    sb.append(ch);
-                } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
-                    sb.append("(|[^\\.].*)");
-                } else {
-                    sb.append(".*");
-                }
-                break;
-            case '[':
-                if ((flags & CHARACTER_CLASSES) != 0) {
-                    int j;
-                    StringBuffer sb2 = new StringBuffer(len);
-                    LOOP: for (j = i + 1; j < len; j++) {
-                        char ch2 = filePattern.charAt(j);
-                        switch (ch2) {
-                        case ']':
-                            break LOOP;
-                        case '\\':
-                            sb2.append(protect(filePattern.charAt(++j)));
-                            break;
-                        case '!':
-                        case '^':
-                            sb2.append((j == i + 1) ? "^" : protect(ch2));
-                            break;
-                        case '-':
-                            sb2.append('-');
-                            break;
-                        default:
-                            sb2.append(protect(ch2));
-                        }
-                    }
-                    if (j == len) {
-                        sb.append('[');
+                case '?':
+                    if (quoted) {
+                        sb.append(ch);
+                    } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
+                        sb.append("[^\\.]");
                     } else {
-                        sb.append("[").append(sb2).append(']');
-                        i = j;
+                        sb.append(".");
                     }
-                } else {
-                    sb.append(protect(ch));
-                }
-                break;
-            case '\\':
-                if ((flags & SLASH_ESCAPES) != 0) {
-                    sb.append(protect(filePattern.charAt(++i)));
-                } else {
-                    sb.append(protect(ch));
-                }
-                break;
-            case '\'':
-                if ((flags & SINGLE_QUOTE_ESCAPES) != 0) {
-                    quoted = !quoted;
-                } else {
+                    break;
+                case '*':
+                    if (quoted) {
+                        sb.append(ch);
+                    } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
+                        sb.append("(|[^\\.].*)");
+                    } else {
+                        sb.append(".*");
+                    }
+                    break;
+                case '[':
+                    if ((flags & CHARACTER_CLASSES) != 0) {
+                        int j;
+                        StringBuffer sb2 = new StringBuffer(len);
+                    LOOP: 
+                        for (j = i + 1; j < len; j++) {
+                            char ch2 = filePattern.charAt(j);
+                            switch (ch2) {
+                                case ']':
+                                    break LOOP;
+                                case '\\':
+                                    sb2.append(protect(filePattern.charAt(++j)));
+                                    break;
+                                case '!':
+                                case '^':
+                                    sb2.append((j == i + 1) ? "^" : protect(ch2));
+                                    break;
+                                case '-':
+                                    sb2.append('-');
+                                    break;
+                                default:
+                                    sb2.append(protect(ch2));
+                            }
+                        }
+                        if (j == len) {
+                            sb.append('[');
+                        } else {
+                            sb.append("[").append(sb2).append(']');
+                            i = j;
+                        }
+                    } else {
+                        sb.append(protect(ch));
+                    }
+                    break;
+                case '\\':
+                    if ((flags & SLASH_ESCAPES) != 0) {
+                        sb.append(protect(filePattern.charAt(++i)));
+                    } else {
+                        sb.append(protect(ch));
+                    }
+                    break;
+                case '\'':
+                    if ((flags & SINGLE_QUOTE_ESCAPES) != 0) {
+                        quoted = !quoted;
+                    } else {
 
+                        sb.append(protect(ch));
+                    }
+                    break;
+                default:
                     sb.append(protect(ch));
-                }
-                break;
-            default:
-                sb.append(protect(ch));
             }
         }
         return sb.toString();
@@ -426,21 +427,21 @@ public class PathnamePattern {
 
     private static String protect(char ch) {
         switch (ch) {
-        case '.':
-        case '|':
-        case '[':
-        case ']':
-        case '(':
-        case ')':
-        case '+':
-        case '*':
-        case '?':
-        case '$':
-        case '^':
-        case '\\':
-            return "\\" + ch;
-        default:
-            return Character.toString(ch);
+            case '.':
+            case '|':
+            case '[':
+            case ']':
+            case '(':
+            case ')':
+            case '+':
+            case '*':
+            case '?':
+            case '$':
+            case '^':
+            case '\\':
+                return "\\" + ch;
+            default:
+                return Character.toString(ch);
         }
     }
 

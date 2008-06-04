@@ -54,16 +54,16 @@ public class ShellUtils {
     }
 
     /**
-	 * Get the root alias manager.
-	 * 
-	 * @return The root alias manager
-	 * @throws NameNotFoundException
-	 */
-	public static AliasManager getAliasManager() throws NameNotFoundException {
-		return InitialNaming.lookup(AliasManager.NAME);
-	}
+     * Get the root alias manager.
+     * 
+     * @return The root alias manager
+     * @throws NameNotFoundException
+     */
+    public static AliasManager getAliasManager() throws NameNotFoundException {
+        return InitialNaming.lookup(AliasManager.NAME);
+    }
 
-	/**
+    /**
      * Get the current shell's alias manager.
      * 
      * @return The current alias manager
@@ -74,16 +74,16 @@ public class ShellUtils {
     }
 
     /**
-	 * Get the root syntax manager.
-	 * 
-	 * @return The root syntax manager
-	 * @throws NameNotFoundException
-	 */
-	public static SyntaxManager getSyntaxManager() throws NameNotFoundException {
-		return InitialNaming.lookup(SyntaxManager.NAME);
-	}
+     * Get the root syntax manager.
+     * 
+     * @return The root syntax manager
+     * @throws NameNotFoundException
+     */
+    public static SyntaxManager getSyntaxManager() throws NameNotFoundException {
+        return InitialNaming.lookup(SyntaxManager.NAME);
+    }
 
-	/**
+    /**
      * Get the current shell's syntax manager.
      * 
      * @return The current syntax manager
@@ -94,30 +94,30 @@ public class ShellUtils {
     }
 
     public static void registerCommandInvoker(CommandInvoker.Factory factory)
-			throws NameNotFoundException {
-		getShellManager().registerInvokerFactory(factory);
-	}
+        throws NameNotFoundException {
+        getShellManager().registerInvokerFactory(factory);
+    }
 
-	public static void registerCommandInterpreter(
-			CommandInterpreter.Factory factory) throws NameNotFoundException {
-		getShellManager().registerInterpreterFactory(factory);
-	}
+    public static void registerCommandInterpreter(CommandInterpreter.Factory factory) 
+        throws NameNotFoundException {
+        getShellManager().registerInterpreterFactory(factory);
+    }
 
-	public static CommandInvoker createInvoker(String name, CommandShell shell)
-			throws IllegalArgumentException {
-		try {
-			return getShellManager().createInvoker(name, shell);
-		} catch (NameNotFoundException ex) {
-			throw new ShellFailureException("no shell manager", ex);
-		}
-	}
+    public static CommandInvoker createInvoker(String name, CommandShell shell)
+        throws IllegalArgumentException {
+        try {
+            return getShellManager().createInvoker(name, shell);
+        } catch (NameNotFoundException ex) {
+            throw new ShellFailureException("no shell manager", ex);
+        }
+    }
 
-	public static CommandInterpreter createInterpreter(String name)
-			throws IllegalArgumentException, ShellFailureException {
-		try {
-			return getShellManager().createInterpreter(name);
-		} catch (NameNotFoundException ex) {
-			throw new ShellFailureException("no shell manager", ex);
-		}
-	}
+    public static CommandInterpreter createInterpreter(String name)
+        throws IllegalArgumentException, ShellFailureException {
+        try {
+            return getShellManager().createInterpreter(name);
+        } catch (NameNotFoundException ex) {
+            throw new ShellFailureException("no shell manager", ex);
+        }
+    }
 }

@@ -50,7 +50,8 @@ public interface CommandInvoker {
      *         non-zero indicating command failure.
      * @throws ShellException if there was some problem launching the command.
      */
-    int invoke(CommandLine commandLine, CommandInfo cmdInfo) throws ShellException;
+    int invoke(CommandLine commandLine, CommandInfo cmdInfo) 
+        throws ShellException;
 
     /**
      * Create a thread for running a command asynchronously. This can be used
@@ -64,8 +65,8 @@ public interface CommandInvoker {
      *         execute.
      * @throws ShellException if there was some problem launching the command.
      */
-    CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo)
-            throws ShellException;
+    CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo) 
+        throws ShellException;
 
     /**
      * Get the invoker's name.

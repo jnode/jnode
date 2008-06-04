@@ -27,6 +27,6 @@ import org.jnode.shell.help.CompletionException;
 public interface Completable {
 
     void complete(CompletionInfo completion, CommandShell shell)
-            throws CompletionException;
+        throws CompletionException;
 
 }
