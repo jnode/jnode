@@ -32,6 +32,11 @@
         <argument argLabel="device"/>
       </sequence>
     </syntax>
+    <syntax alias="grub">
+      <sequence description="install a grub stage2 loader">
+        <argument argLabel="device"/>
+      </sequence>
+    </syntax>
   </extension>
 
   <extension point="org.jnode.security.permissions">
