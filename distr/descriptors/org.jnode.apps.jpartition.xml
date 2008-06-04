@@ -31,4 +31,16 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="jpartition" class="org.jnode.apps.jpartition.JPartitionCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="jpartition">
+      <sequence description="interactive disk partitioning tool">
+        <alternatives>
+          <option argLabel="console" shortName="c" longName="console"/>
+          <option argLabel="swing" shortName="s" longName="swing"/>
+        </alternatives>
+        <optional><option argLabel="install" shortName="i" longName="install"/></optional>
+      </sequence>
+    </syntax>
+  </extension>
 </plugin>
