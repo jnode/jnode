@@ -36,7 +36,7 @@ import org.apache.tools.ant.types.FileSet;
  *
  * @author Fabien DUMINY (fduminy at jnode.org)
  */
-abstract public class FileSetTask extends Task {
+public abstract class FileSetTask extends Task {
     protected boolean trace = false;
     protected boolean failOnError = true;
 
@@ -54,7 +54,7 @@ abstract public class FileSetTask extends Task {
         fileSets.add(fs);
     }
 
-    final public void execute() throws BuildException {
+    public final void execute() throws BuildException {
         try {
             doExecute();
         } catch (BuildException be) {
@@ -77,7 +77,7 @@ abstract public class FileSetTask extends Task {
         processFiles();
     }
 
-    final protected void processFiles() throws BuildException {
+    protected final void processFiles() throws BuildException {
         final Project project = getProject();
         try {
             for (FileSet fs : fileSets) {
@@ -93,5 +93,5 @@ abstract public class FileSetTask extends Task {
         }
     }
 
-    abstract protected void processFile(File file) throws IOException;
+    protected abstract void processFile(File file) throws IOException;
 }

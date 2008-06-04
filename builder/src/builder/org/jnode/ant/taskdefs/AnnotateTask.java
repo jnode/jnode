@@ -320,7 +320,7 @@ public class AnnotateTask extends FileSetTask {
      * @author fabien
      */
     private static class MarkerClassVisitor extends ClassAdapter {
-        final private List<String> annotationTypeDescs;
+        private final List<String> annotationTypeDescs;
 
         private boolean classIsModified = false;
 

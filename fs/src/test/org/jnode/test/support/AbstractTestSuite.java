@@ -25,7 +25,7 @@ import java.util.List;
 import junit.framework.TestSuite;
 import org.apache.log4j.Logger;
 
-abstract public class AbstractTestSuite extends TestSuite {
+public abstract class AbstractTestSuite extends TestSuite {
     public AbstractTestSuite() {
         ContextManager.getInstance().init();
         init();
@@ -35,7 +35,7 @@ abstract public class AbstractTestSuite extends TestSuite {
      * Add a TestSuite containing TestSuites
      * (for each couple (config, TestSuite class))
      */
-    final public void init() {
+    public final void init() {
         List<TestConfig> configs = getConfigs();
         Class[] testSuites = getTestSuites();
         log.info(configs.size() + " configs, " +
@@ -55,12 +55,12 @@ abstract public class AbstractTestSuite extends TestSuite {
     /**
      * @return a list of TestConfig(s)
      */
-    abstract public List<TestConfig> getConfigs();
+    public abstract List<TestConfig> getConfigs();
 
     /**
      * @return an array of TestSuite classes
      */
-    abstract public Class[] getTestSuites();
+    public abstract Class[] getTestSuites();
 
     protected final Logger log = Logger.getLogger(getClass().getName());
 }

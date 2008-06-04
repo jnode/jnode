@@ -39,7 +39,7 @@ import org.jnode.awt.font.renderer.RenderContext;
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-abstract public class AbstractFontProvider implements FontProvider {
+public abstract class AbstractFontProvider implements FontProvider {
 
     /**
      * My logger
@@ -83,7 +83,7 @@ abstract public class AbstractFontProvider implements FontProvider {
      * Give the name of the font (used for setting the first provider to use
      * among all available ones)
      */
-    final public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -94,7 +94,7 @@ abstract public class AbstractFontProvider implements FontProvider {
      * @param font
      * @return True if this provider provides the given font, false otherwise
      */
-    final public boolean provides(Font font) {
+    public final boolean provides(Font font) {
         if (font == null) return false; // don't provide default (null) fonts
 
         if (!fontsLoaded) {
@@ -117,7 +117,7 @@ abstract public class AbstractFontProvider implements FontProvider {
      *
      * @return The set containing all fonts provides by this provider.
      */
-    final public Set<Font> getAllFonts() {
+    public final Set<Font> getAllFonts() {
         if (!fontsLoaded) {
             loadFonts();
         }
@@ -130,7 +130,7 @@ abstract public class AbstractFontProvider implements FontProvider {
      * @param font
      * @return The renderer
      */
-    final public TextRenderer getTextRenderer(Font font) {
+    public final TextRenderer getTextRenderer(Font font) {
         TextRenderer r = (TextRenderer) renderers.get(font);
         if (r == null) {
             r = createTextRenderer(renderCache, font);
@@ -139,7 +139,7 @@ abstract public class AbstractFontProvider implements FontProvider {
         return r;
     }
 
-    abstract protected TextRenderer createTextRenderer(RenderCache renderCache, Font font);
+    protected abstract TextRenderer createTextRenderer(RenderCache renderCache, Font font);
 
     /**
      * Gets the font metrics for the given font.
@@ -147,7 +147,7 @@ abstract public class AbstractFontProvider implements FontProvider {
      * @param font
      * @return The metrics
      */
-    final public FontMetrics getFontMetrics(Font font) {
+    public final FontMetrics getFontMetrics(Font font) {
         FontMetrics fm = (FontMetrics) metrics.get(font);
 /*
         if(log.isDebugEnabled()) log.debug("FontMetrics got from cache: "+fm+" font="+font);
@@ -166,13 +166,13 @@ abstract public class AbstractFontProvider implements FontProvider {
         return fm;
     }
 
-    abstract protected FontMetrics createFontMetrics(Font font) throws IOException;
+    protected abstract FontMetrics createFontMetrics(Font font) throws IOException;
 
-    abstract protected String[] getSystemFonts();
+    protected abstract String[] getSystemFonts();
 
-    abstract protected Font loadFont(URL url) throws IOException;
+    protected abstract Font loadFont(URL url) throws IOException;
 
-    final protected Font getCompatibleFont(Font font) {
+    protected final Font getCompatibleFont(Font font) {
         Font f = null;
         try {
             f = fontsByName.get(font.getFamily());

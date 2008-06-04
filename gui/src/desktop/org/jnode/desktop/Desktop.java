@@ -47,7 +47,7 @@ import org.jnode.vm.VmSystem;
  */
 public class Desktop implements Runnable {
 
-    final static Logger log = Logger.getLogger(Desktop.class);
+    static final Logger log = Logger.getLogger(Desktop.class);
 
     ControlBar controlBar;
 

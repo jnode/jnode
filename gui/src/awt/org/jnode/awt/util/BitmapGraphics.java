@@ -41,9 +41,9 @@ import org.jnode.system.ResourceManager;
  */
 public abstract class BitmapGraphics {
 
-    abstract public int getWidth();
+    public abstract int getWidth();
 
-    abstract public int getHeight();
+    public abstract int getHeight();
 
     /**
      * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int,

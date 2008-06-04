@@ -32,13 +32,13 @@ import org.apache.log4j.Logger;
 public class ConfigManager {
     private static final Logger log = Logger.getLogger(ConfigManager.class);
 
-    static private ConfigManager instance;
-    static private boolean log4jInitialized = false;
+    private static ConfigManager instance;
+    private static boolean log4jInitialized = false;
 
     private Map<Class, List<TestConfig>> configs;
     private Map<TestKey, Iterator<TestConfig>> iterators;
 
-    static public ConfigManager getInstance() {
+    public static ConfigManager getInstance() {
         if (instance == null) {
             instance = new ConfigManager();
         }
@@ -78,7 +78,7 @@ public class ConfigManager {
         ContextManager.getInstance().init();
     }
 
-    static private class TestKey {
+    private static class TestKey {
         private Class clazz;
         private String testName;
 

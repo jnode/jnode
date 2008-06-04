@@ -30,7 +30,7 @@ import org.jnode.naming.InitialNaming;
  */
 public class FloppyDriverUtils {
 
-    static public final FloppyDeviceFactory getFloppyDeviceFactory() throws NamingException {
+    public static final FloppyDeviceFactory getFloppyDeviceFactory() throws NamingException {
         try {
             return InitialNaming.lookup(FloppyDeviceFactory.NAME);
         } catch (NameNotFoundException ex) {

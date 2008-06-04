@@ -240,10 +240,10 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
      */
     private static final Logger log = Logger.getLogger(BlockAlignmentSupport.class);
 
-    static private final int EMPTY = 0;
-    static private final int CONTAINED = 1;
-    static private final int CROSSED = 2;
-    static private final int ALIGNED = 3;
+    private static final int EMPTY = 0;
+    private static final int CONTAINED = 1;
+    private static final int CROSSED = 2;
+    private static final int ALIGNED = 3;
 
     private final BlockDeviceAPI parentApi;
     private int alignment;

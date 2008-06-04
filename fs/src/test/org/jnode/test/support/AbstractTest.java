@@ -86,7 +86,7 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
         log.info("END " + testName); // marker for log4j traces
     }
 
-    final protected TestConfig getTestConfig() {
+    protected final TestConfig getTestConfig() {
         if (testConfig == null) {
             testConfig = ConfigManager.getInstance().getConfig(configClazz, getClass(), getName());
         }
@@ -94,7 +94,7 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
         return testConfig;
     }
 
-    final public void runTest() throws Throwable {
+    public final void runTest() throws Throwable {
         try {
             super.runTest();
         } catch (Throwable t) {
@@ -116,14 +116,14 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 //        return name;
 //    }
 
-    final public void setName(String name) {
+    public final void setName(String name) {
         if (testConfig != null) {
             name += "[" + testConfig.getName() + "]";
         }
         super.setName(name);
     }
 
-    final protected String getTestName() {
+    protected final String getTestName() {
         return getClass().getName() + "." + getName(); // className.methodName
     }
 }

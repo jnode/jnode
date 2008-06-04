@@ -32,9 +32,9 @@ import org.jnode.fs.Formatter;
  * @author Fabien DUMINY
  */
 public class FS {
-    final private FSType type;
-    final private boolean readOnly;
-    final private Formatter<? extends FileSystem> formatter;
+    private final FSType type;
+    private final boolean readOnly;
+    private final Formatter<? extends FileSystem> formatter;
 
     public FS(FSType type, boolean readOnly, Formatter<? extends FileSystem> formatter) {
         this.type = type;

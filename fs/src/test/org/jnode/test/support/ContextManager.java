@@ -47,7 +47,7 @@ public class ContextManager {
     private boolean initialized = false;
     private Context context;
 
-    static public ContextManager getInstance() {
+    public static ContextManager getInstance() {
         if (instance == null) {
             instance = new ContextManager();
         }

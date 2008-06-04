@@ -55,7 +55,7 @@ public abstract class AbstractBitmapGraphics extends BitmapGraphics {
         this.height = height;
     }
 
-    abstract protected int getOffset(int x, int y);
+    protected abstract int getOffset(int x, int y);
 
 
     /**
@@ -256,7 +256,7 @@ public abstract class AbstractBitmapGraphics extends BitmapGraphics {
         }
     }
 
-    abstract protected int getBytesForWidth(int width);
+    protected abstract int getBytesForWidth(int width);
 
     protected abstract void doDrawAlphaRaster(Raster raster, int srcX,
                                               int srcY, int dstX, int dstY, int width, int height, int color);

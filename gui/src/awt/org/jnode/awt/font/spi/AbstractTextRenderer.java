@@ -40,7 +40,7 @@ import org.jnode.vm.Vm;
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-abstract public class AbstractTextRenderer implements TextRenderer {
+public abstract class AbstractTextRenderer implements TextRenderer {
 
     /**
      * My logger
@@ -76,7 +76,7 @@ abstract public class AbstractTextRenderer implements TextRenderer {
      *
      * @return
      */
-    final protected WritableRaster createAlphaRaster() {
+    protected final WritableRaster createAlphaRaster() {
         final RenderContext ctx = renderCache.getContext();
         WritableRaster r = (WritableRaster) ctx.getObject(ALPHA_RASTER);
         final int fontSizeUp = (int) (fontMetrics.getFont().getSize() + 0.5);

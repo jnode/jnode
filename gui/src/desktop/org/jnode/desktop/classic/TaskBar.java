@@ -59,8 +59,8 @@ import org.jnode.plugin.ExtensionPoint;
  * @author Levente S\u00e1ntha
  */
 public class TaskBar extends JPanel {
-    final static Logger log = Logger.getLogger(TaskBar.class);
-    private final static Class[] mainTypes = {String[].class};
+    static final Logger log = Logger.getLogger(TaskBar.class);
+    private static final Class[] mainTypes = {String[].class};
     JButton startButton;
     JPopupMenu startMenu;
     WindowBar windowBar;

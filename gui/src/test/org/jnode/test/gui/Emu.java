@@ -139,7 +139,7 @@ public class Emu {
         /**
          * Start this manager
          */
-        final public void start() {
+        public final void start() {
             // Thread thread = new Thread()
             // {
             // public void run()

@@ -98,7 +98,7 @@ public class Tetris extends JPanel implements KeyListener {
 
     private static final int HEIGHT_C = 20;
 
-    private final static Color[] COLORS = {Color.BLACK, Color.YELLOW,
+    private static final Color[] COLORS = {Color.BLACK, Color.YELLOW,
         Color.RED, Color.CYAN, Color.BLUE, Color.MAGENTA, Color.ORANGE,
         Color.LIGHT_GRAY, Color.DARK_GRAY};
 

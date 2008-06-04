@@ -57,9 +57,9 @@ public class PluginDocumentationTask extends AbstractPluginTask {
 
     private final SortedMap<String, PluginData> descriptors = new TreeMap<String, PluginData>();
 
-    private final static String DOCHEADER = "JNode plugin documentation";
+    private static final String DOCHEADER = "JNode plugin documentation";
 
-    private final static String PLUGINS_SUBDIR = "plugins";
+    private static final String PLUGINS_SUBDIR = "plugins";
 
     private static final String EXT = ".html";
 
@@ -67,19 +67,15 @@ public class PluginDocumentationTask extends AbstractPluginTask {
 
     private static final String ALL_FILE = "all-frame" + EXT;
 
-    private static final String OVERVIEW_SUMMARY_FILE = "overview-summary"
-        + EXT;
+    private static final String OVERVIEW_SUMMARY_FILE = "overview-summary" + EXT;
 
     private static final String OVERVIEW_SUMMARY_FRAME = "overviewSummary";
 
-    private static final String OVERVIEW_PACKAGE_FILE = "overview-package"
-        + EXT;
+    private static final String OVERVIEW_PACKAGE_FILE = "overview-package" + EXT;
 
-    private static final String OVERVIEW_LICENSE_FILE = "overview-license"
-        + EXT;
+    private static final String OVERVIEW_LICENSE_FILE = "overview-license" + EXT;
 
-    private static final String OVERVIEW_TREE_FILE = "overview-tree"
-        + EXT;
+    private static final String OVERVIEW_TREE_FILE = "overview-tree" + EXT;
 
     private static final String OVERVIEW_TREE_DOTFILE = "overview-tree.dot";
     private static final String OVERVIEW_TREE_PNGFILE = "overview-tree.png";

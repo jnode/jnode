@@ -50,7 +50,7 @@ import org.jnode.awt.JNodeToolkit;
  * @author Levente S\u00e1ntha
  */
 public class WindowBar extends JPanel {
-    private final static Logger log = Logger.getLogger(WindowBar.class);
+    private static final Logger log = Logger.getLogger(WindowBar.class);
     private final Map<JInternalFrame, FrameWrapper> wrappers;
 
     public WindowBar() {
