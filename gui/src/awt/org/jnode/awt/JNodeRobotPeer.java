@@ -174,7 +174,7 @@ public class JNodeRobotPeer<toolkitT extends JNodeToolkit> extends
      * @param keycode
      * @param pressed true=key pressed, false=key released
      */
-    final private void sendKeyboardEvent(int keycode, boolean pressed) {
+    private void sendKeyboardEvent(int keycode, boolean pressed) {
         final KeyboardHandler kbHandler = getToolkitImpl().getKeyboardHandler();
         final KeyboardAPI api = kbHandler.getKeyboardAPI();
         final KeyboardInterpreter kbInt = api.getKbInterpreter();

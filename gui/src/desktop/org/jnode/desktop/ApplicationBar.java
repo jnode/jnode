@@ -42,11 +42,11 @@ import org.jnode.plugin.ExtensionPoint;
  */
 public class ApplicationBar extends JPanel {
 
-    final static Logger log = Logger.getLogger(ApplicationBar.class);
+    static final Logger log = Logger.getLogger(ApplicationBar.class);
 
     private final ExtensionPoint ep;
 
-    private final static Class[] mainTypes = {String[].class};
+    private static final Class[] mainTypes = {String[].class};
 
     public ApplicationBar(ExtensionPoint ep) {
         this.ep = ep;

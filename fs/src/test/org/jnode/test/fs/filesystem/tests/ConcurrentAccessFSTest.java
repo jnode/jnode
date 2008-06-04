@@ -217,7 +217,7 @@ abstract class Worker implements Runnable {
 
     protected abstract void doRun(long offset) throws IOException;
 
-    final public void run() {
+    public final void run() {
         long length = file.getLength();
         try {
             for (int i = start; i < (length - 1); i += step) {

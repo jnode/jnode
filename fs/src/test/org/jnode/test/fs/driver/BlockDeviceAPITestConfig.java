@@ -33,11 +33,10 @@ import org.jnode.util.NumberUtils;
  * @author Fabien DUMINY
  */
 public class BlockDeviceAPITestConfig implements TestConfig {
-    final private static String DEVICE_SIZE_STR = "1M"; // may use multipliers
+    private static final String DEVICE_SIZE_STR = "1M"; // may use multipliers
     // (K, M, G)
 
-    final private static int DEVICE_SIZE = (int) NumberUtils
-        .getSize(DEVICE_SIZE_STR);
+    private static final int DEVICE_SIZE = (int) NumberUtils.getSize(DEVICE_SIZE_STR);
 
     private Class<?> contextClass;
 
@@ -59,11 +58,11 @@ public class BlockDeviceAPITestConfig implements TestConfig {
     /**
      * @return
      */
-    final public BlockDeviceAPI getBlockDeviceAPI() {
+    public final BlockDeviceAPI getBlockDeviceAPI() {
         return ((BlockDeviceAPIContext) ContextManager.getInstance().getContext()).getApi();
     }
 
-    final public Class<?> getContextClass() {
+    public final Class<?> getContextClass() {
         return contextClass;
     }
 

@@ -32,7 +32,7 @@ public abstract class AbstractMockDeviceFactory {
     public AbstractMockDeviceFactory() {
     }
 
-    final public void setTestCase(MockObjectTestCase testCase) {
+    public final void setTestCase(MockObjectTestCase testCase) {
         this.testCase = testCase;
     }
 }

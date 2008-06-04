@@ -57,7 +57,7 @@ public class TestUtils {
      * @return
      * @throws IOException
      */
-    static public File makeTempFile(String filename, String size)
+    public static File makeTempFile(String filename, String size)
         throws IOException {
         File tempFile = File.createTempFile(filename, "");
         tempFile.deleteOnExit();
@@ -65,7 +65,7 @@ public class TestUtils {
         return makeFile(tempFile.getAbsolutePath(), NumberUtils.getSize(size));
     }
 
-    static public File makeFile(String filename, long size) throws IOException {
+    public static File makeFile(String filename, long size) throws IOException {
         byte[] buf = new byte[1024];
         File file = new File(filename);
         FileOutputStream output = new FileOutputStream(file);
@@ -85,7 +85,7 @@ public class TestUtils {
         return file;
     }
 
-    static public void listEntries(Iterator<? extends FSEntry> iterator) throws Exception {
+    public static void listEntries(Iterator<? extends FSEntry> iterator) throws Exception {
         log.debug("<<< BEGIN listEntries >>>");
         int i = 0;
         log.debug("------- entries ------");
@@ -98,7 +98,7 @@ public class TestUtils {
         log.debug("<<< END listEntries >>>");
     }
 
-    static public List<String> getEntryNames(Iterator<? extends FSEntry> it) {
+    public static List<String> getEntryNames(Iterator<? extends FSEntry> it) {
         List<String> names = new ArrayList<String>();
         while (it.hasNext()) {
             FSEntry entry = it.next();
@@ -107,7 +107,7 @@ public class TestUtils {
         return names;
     }
 
-    static public String toString(String filename, int offset, int length)
+    public static String toString(String filename, int offset, int length)
         throws IOException {
         // byte[] buf = new byte[1024];
         File file = new File(filename);
@@ -119,7 +119,7 @@ public class TestUtils {
         return dump;
     }
 
-    static public String toString(String[] array) {
+    public static String toString(String[] array) {
         StringBuffer sb = new StringBuffer("[");
 
         if (array != null) {
@@ -136,7 +136,7 @@ public class TestUtils {
         return sb.toString();
     }
 
-    static public String toString(List<String> list) {
+    public static String toString(List<String> list) {
         StringBuffer sb = new StringBuffer("[");
 
         for (int i = 0; i < list.size(); i++) {
@@ -151,13 +151,13 @@ public class TestUtils {
         return sb.toString();
     }
 
-    static public File copyFile(String srcFile, String destFile)
+    public static File copyFile(String srcFile, String destFile)
         throws SecurityException, IOException {
         return copyInputStreamToFile(new FileInputStream(new File(srcFile)),
             destFile);
     }
 
-    static public File copyInputStreamToFile(InputStream src, String destFile)
+    public static File copyInputStreamToFile(InputStream src, String destFile)
         throws SecurityException, IOException {
         File dest = new File(destFile);
 
@@ -190,7 +190,7 @@ public class TestUtils {
         return dest;
     }
 
-    static public File copyDeviceToFile(Device imageDevice, String destFile)
+    public static File copyDeviceToFile(Device imageDevice, String destFile)
         throws SecurityException, IOException, ApiNotFoundException {
         File dest = new File(destFile);
         BlockDeviceAPI imgApi = imageDevice
@@ -303,10 +303,10 @@ public class TestUtils {
      * null) fs.close(); } return imageFile; }
      */
     /*
-     * static public void deleteFile(TestConfig config, FileDevice device) { new
+     * public static void deleteFile(TestConfig config, FileDevice device) { new
      * File(device.getFileName()).delete(); }
      */
-    static public String[] append(String[] a1, String[] a2) {
+    public static String[] append(String[] a1, String[] a2) {
         if (a1 == null)
             return a2;
         if (a2 == null)
@@ -319,7 +319,7 @@ public class TestUtils {
         return a;
     }
 
-    static public byte[] getTestData(int lengthInWords) {
+    public static byte[] getTestData(int lengthInWords) {
         byte[] data = new byte[lengthInWords * 2];
         int index = 0;
         for (int i = 0; i < lengthInWords; i++) {
@@ -333,7 +333,7 @@ public class TestUtils {
         return data;
     }
 
-    static public boolean equals(byte[] origData, byte[] data) {
+    public static boolean equals(byte[] origData, byte[] data) {
         // return Arrays.equals(origData, data);
         if (origData == data)
             return true;
@@ -360,7 +360,7 @@ public class TestUtils {
         return true;
     }
 
-    static public RamDiskDevice createRamDisk(int size) {
+    public static RamDiskDevice createRamDisk(int size) {
         RamDiskDevice dev = null;
         try {
             final DeviceManager dm = InitialNaming
@@ -393,7 +393,7 @@ public class TestUtils {
      * @return
      * @throws Exception
      */
-    static public Object newInstance(String className, Class<?> cls)
+    public static Object newInstance(String className, Class<?> cls)
         throws Exception {
         Class<?> clazz = Class.forName(className);
         Object instance = clazz.newInstance();
@@ -404,5 +404,5 @@ public class TestUtils {
         return instance;
     }
 
-    static private final Logger log = Logger.getLogger(TestUtils.class);
+    private static final Logger log = Logger.getLogger(TestUtils.class);
 }

@@ -28,11 +28,11 @@ import org.jnode.fs.FileSystem;
  */
 public class FSTestConfig {
 
-    final private DeviceParam deviceParam;
+    private final DeviceParam deviceParam;
 
-    final private OsType os;
+    private final OsType os;
 
-    final private FS fs;
+    private final FS fs;
 
     /**
      *

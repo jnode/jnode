@@ -50,12 +50,12 @@ public enum FSType {
     NTFS("ntfs", NTFSFileSystem.class, NTFSFileSystemType.class,
         new String[]{"."});
 
-    final private Class<? extends FileSystem> fsClass;
+    private final Class<? extends FileSystem> fsClass;
 
-    final private Class<? extends FileSystemType> fsTypeClass;
+    private final Class<? extends FileSystemType> fsTypeClass;
 
-    final private String name;
-    final private String[] emptyDirNames;
+    private final String name;
+    private final String[] emptyDirNames;
 
     private FSType(String name, Class<? extends FileSystem> fsClass,
                    Class<? extends FileSystemType> fsTypeClass,

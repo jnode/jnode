@@ -23,8 +23,8 @@ package org.jnode.test.support;
 
 import org.jmock.MockObjectTestCase;
 
-abstract public class Context {
-    abstract public void init(TestConfig config, MockObjectTestCase testCase) throws Exception;
+public abstract class Context {
+    public abstract void init(TestConfig config, MockObjectTestCase testCase) throws Exception;
 
-    abstract public void destroy() throws Exception;
+    public abstract void destroy() throws Exception;
 }

@@ -88,7 +88,7 @@ public class AWTDemo {
         }
     }
 
-    static abstract class PrettyFrame extends Frame {
+    abstract static class PrettyFrame extends Frame {
         public PrettyFrame() {
             ((BorderLayout) getLayout()).setHgap(5);
             ((BorderLayout) getLayout()).setVgap(5);
@@ -101,7 +101,7 @@ public class AWTDemo {
         }
     }
 
-    static abstract class SubFrame extends PrettyFrame implements SubWindow {
+    abstract static class SubFrame extends PrettyFrame implements SubWindow {
         boolean initted = false;
 
         public void setVisible(boolean visible) {

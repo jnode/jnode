@@ -28,7 +28,7 @@ import org.jnode.awt.font.spi.ShapedGlyph;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final public class RenderCache {
+public final class RenderCache {
 
     /**
      * The current rendering context

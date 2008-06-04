@@ -985,19 +985,19 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             return new ImageProducer() {
                 Set<ImageConsumer> consumers = new HashSet<ImageConsumer>();
 
-                synchronized public void addConsumer(ImageConsumer ic) {
+                public synchronized void addConsumer(ImageConsumer ic) {
                     consumers.add(ic);
                 }
 
-                synchronized public boolean isConsumer(ImageConsumer ic) {
+                public synchronized boolean isConsumer(ImageConsumer ic) {
                     return consumers.contains(ic);
                 }
 
-                synchronized public void removeConsumer(ImageConsumer ic) {
+                public synchronized void removeConsumer(ImageConsumer ic) {
                     consumers.remove(ic);
                 }
 
-                synchronized public void startProduction(ImageConsumer ic) {
+                public synchronized void startProduction(ImageConsumer ic) {
                     consumers.add(ic);
                     for (ImageConsumer c : consumers) {
                         c.imageComplete(ImageConsumer.IMAGEERROR);

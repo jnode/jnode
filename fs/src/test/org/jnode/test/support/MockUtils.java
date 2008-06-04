@@ -27,11 +27,11 @@ import org.jmock.cglib.Mock;
 public class MockUtils {
     private static final Logger log = Logger.getLogger(MockUtils.class);
 
-    static public <T> T createMockObject(Class<T> name) {
+    public static <T> T createMockObject(Class<T> name) {
         return createMockObject(name, null);
     }
 
-    static public <T> T createMockObject(Class<T> name, MockInitializer initializer) {
+    public static <T> T createMockObject(Class<T> name, MockInitializer initializer) {
         String shortName = getShortName(name);
         Mock mock = new Mock(name, shortName);
         log.info("created a Mock for " + shortName);
@@ -43,11 +43,11 @@ public class MockUtils {
         return name.cast(mock.proxy());
     }
 
-    static public Object createMockObject(Class name, Class[] clsArgs, Object[] args) {
+    public static Object createMockObject(Class name, Class[] clsArgs, Object[] args) {
         return createMockObject(name, null, clsArgs, args);
     }
 
-    static public Object createMockObject(Class name, MockInitializer initializer, Class[] clsArgs, Object[] args) {
+    public static Object createMockObject(Class name, MockInitializer initializer, Class[] clsArgs, Object[] args) {
         String shortName = getShortName(name);
         CGLibCoreMockExt cglibMock = new CGLibCoreMockExt(name, shortName);
         Mock mock = new Mock(cglibMock);
@@ -60,7 +60,7 @@ public class MockUtils {
         return cglibMock.createProxy(clsArgs, args);
     }
 
-    static public String getShortName(Class<?> clazz) {
+    public static String getShortName(Class<?> clazz) {
         String name = clazz.getName();
         int idx = name.lastIndexOf('.');
         return (idx >= 0) ? name.substring(idx + 1) : name;

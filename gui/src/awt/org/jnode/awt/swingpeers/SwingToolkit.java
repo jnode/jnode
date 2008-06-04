@@ -117,7 +117,7 @@ public final class SwingToolkit extends JNodeToolkit {
      * @param awtComponent
      * @param peer
      */
-    final static void copyAwtProperties(Component awtComponent, Component peer) {
+    static void copyAwtProperties(Component awtComponent, Component peer) {
         Color c;
         Font f;
         if ((c = awtComponent.getForeground()) != null) {

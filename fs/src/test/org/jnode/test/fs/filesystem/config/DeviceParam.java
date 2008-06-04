@@ -41,13 +41,13 @@ public abstract class DeviceParam {
      * @return @throws
      *         Exception
      */
-    abstract public Device createDevice() throws Exception;
+    public abstract Device createDevice() throws Exception;
 
     /**
      * @param device
      * @throws Exception
      */
-    abstract public void tearDown(Device device) throws Exception;
+    public abstract void tearDown(Device device) throws Exception;
 
     /**
      * @return Returns the input.
@@ -59,7 +59,7 @@ public abstract class DeviceParam {
     /**
      * @param input The input to set.
      */
-    final public void setInput(boolean input) {
+    public final void setInput(boolean input) {
         this.input = input;
     }
 }

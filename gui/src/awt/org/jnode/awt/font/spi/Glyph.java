@@ -46,7 +46,7 @@ public abstract class Glyph {
         this.yMax = yMax;
     }
 
-    final public Rectangle getBBox() {
+    public final Rectangle getBBox() {
         return new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
     }
 

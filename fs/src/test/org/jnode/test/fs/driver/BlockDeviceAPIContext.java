@@ -38,7 +38,7 @@ import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.Context;
 import org.jnode.test.support.TestConfig;
 
-abstract public class BlockDeviceAPIContext extends Context {
+public abstract class BlockDeviceAPIContext extends Context {
     protected static final Logger log = Logger
         .getLogger(BlockDeviceAPIContext.class);
 
@@ -54,7 +54,7 @@ abstract public class BlockDeviceAPIContext extends Context {
         this.name = name;
     }
 
-    final public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -139,7 +139,7 @@ abstract public class BlockDeviceAPIContext extends Context {
         }
     }
 
-    final public BlockDeviceAPI getApi() {
+    public final BlockDeviceAPI getApi() {
         return api;
     }
 

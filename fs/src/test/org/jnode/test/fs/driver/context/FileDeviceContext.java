@@ -30,7 +30,7 @@ import org.jnode.test.support.TestConfig;
 import org.jnode.test.support.TestUtils;
 
 public class FileDeviceContext extends BlockDeviceAPIContext {
-    final private File f;
+    private final File f;
 
     public FileDeviceContext() throws IOException {
         super("FileDevice");

@@ -35,7 +35,7 @@ import java.net.URL;
  */
 public class ImageTest {
 
-    final static String IMAGE_PATH = "/org/zaval/lw/rs/img/tree.gif";
+    static final String IMAGE_PATH = "/org/zaval/lw/rs/img/tree.gif";
 
     static class TestComponent extends Component implements ImageObserver {
 

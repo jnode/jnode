@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class WindowBar extends JPanel {
 
-    private final static Logger log = Logger.getLogger(WindowBar.class);
+    private static final Logger log = Logger.getLogger(WindowBar.class);
 
     private final JList list;
     private final DefaultListModel model;

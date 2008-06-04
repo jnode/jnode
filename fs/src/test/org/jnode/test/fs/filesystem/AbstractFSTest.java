@@ -43,7 +43,7 @@ import org.jnode.test.support.TestUtils;
  * @author Fabien DUMINY
  */
 public abstract class AbstractFSTest extends JFuncTestCase {
-    final protected Logger log = Logger.getLogger(getClass());
+    protected final Logger log = Logger.getLogger(getClass());
 
     //public static final int FILE_SIZE_IN_WORDS = 256 * 1024; // 512 Ko = 256 K Words
     public static final int FILE_SIZE_IN_WORDS = 128; // 512 Ko = 128 K Words
@@ -63,7 +63,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
         super(name);
     }
 
-    final protected void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException,
+    protected final void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException,
         InstantiationException, IllegalAccessException, Exception {
         super.setUp();
 
@@ -72,7 +72,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
         this.fs = config.getFileSystem().mount(this.device);
     }
 
-    final public void tearDown() throws Exception {
+    public final void tearDown() throws Exception {
         config.getDeviceParam().tearDown(device);
         super.tearDown();
     }
@@ -93,7 +93,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
     /**
      * @return Returns the fs.
      */
-    final protected FileSystem getFs() {
+    protected final FileSystem getFs() {
         return fs;
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
      * @param isRoot
      * @return
      */
-    final protected String[] getEmptyDirNames(FSTestConfig config, boolean isRoot) {
+    protected final String[] getEmptyDirNames(FSTestConfig config, boolean isRoot) {
         return config.getFileSystem().getType().getEmptyDirNames(isRoot);
     }
 
@@ -182,7 +182,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    final protected void remountFS(FSTestConfig config, boolean readOnly)
+    protected final void remountFS(FSTestConfig config, boolean readOnly)
         throws NameNotFoundException, IOException, FileSystemException, InstantiationException, IllegalAccessException {
         fs.close();
         fs = config.getFileSystem().getType().mount(fs.getDevice(), readOnly);
@@ -196,7 +196,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
      * @throws IOException
      * @throws FileSystemException
      */
-    final protected byte[] addTestFile(String fileName, int fileSizeInWords)
+    protected final byte[] addTestFile(String fileName, int fileSizeInWords)
         throws Exception, IOException, FileSystemException {
         boolean oldReadOnly = config.isReadOnly();
 
