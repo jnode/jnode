@@ -97,7 +97,6 @@
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
 <!--        <module name="FileLength"/>
-        <module name="LineLength"/>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/> -->
         <module name="LineLength">
@@ -107,16 +106,6 @@
 
         <!-- Checks for whitespace                               -->
         <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-<!--        <module name="EmptyForIteratorPad"/>
-        <module name="MethodParamPad"/>
-        <module name="NoWhitespaceAfter"/>
-        <module name="NoWhitespaceBefore"/>
-        <module name="OperatorWrap"/>
-        <module name="ParenPad"/>
-        <module name="TypecastParenPad"/>
-        <module name="WhitespaceAfter"/>
-        <module name="WhitespaceAround"/>
-        -->
         <module name="MethodParamPad"/>
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>
@@ -142,13 +131,10 @@
         <module name="Indentation"/>
         <module name="TabCharacter"/>
 
-
-
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
-<!--        <module name="ModifierOrder"/>
-        <module name="RedundantModifier"/> -->
-
+<!--    <module name="RedundantModifier"/> -->
+        <module name="ModifierOrder"/>
 
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->        
