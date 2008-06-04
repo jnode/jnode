@@ -21,8 +21,24 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="nfsmount"
- class="org.jnode.fs.nfs.command.NFSMountCommand"/>
+    <alias name="nfsmount" class="org.jnode.fs.nfs.command.NFSMountCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="nfsmount">
+      <sequence description="mount an NFS file system">
+        <argument argLabel="nfsFileSystem"/>
+        <argument argLabel="directory"/>
+        <optionSet>
+          <option argLabel="uid" shortName="u" longName="uid"/>
+          <option argLabel="gid" shortName="g" longName="gid"/>
+          <option argLabel="tcp" longName="tcp"/>
+          <option argLabel="udp" longName="udp"/>
+          <option argLabel="readOnly" longName="ro"/>
+          <option argLabel="readWrite" longName="rw"/>
+        </optionSet>
+      </sequence>
+    </syntax>
   </extension>
 
   <extension point="org.jnode.security.permissions">

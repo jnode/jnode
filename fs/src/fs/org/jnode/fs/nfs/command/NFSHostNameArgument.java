@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jnode.driver.console.CompletionInfo;
@@ -14,29 +13,26 @@ import org.jnode.net.nfs.Protocol;
 import org.jnode.net.nfs.nfs2.mount.ExportEntry;
 import org.jnode.net.nfs.nfs2.mount.Mount1Client;
 import org.jnode.net.nfs.nfs2.mount.MountException;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CommandSyntaxException;
 
-public class NFSHostNameArgument extends Argument {
+public class NFSHostNameArgument extends Argument<String> {
 
-    public NFSHostNameArgument(String name, String description, boolean multi) {
-        super(name, description, multi);
-    }
-
-    public NFSHostNameArgument(String name, String description) {
-        super(name, description);
+    public NFSHostNameArgument(String name, int flags, String description) {
+        super(name, flags, new String[0], description);
     }
 
     public void complete(CompletionInfo completion, String partial) {
-
         int index = partial.indexOf(':');
-        if (index == -1) {
+        if (index <= 0) {
             return;
         }
 
+        String hostName = partial.substring(0, index);
         final InetAddress host;
         try {
-            host = InetAddress.getByName(partial.substring(0, index));
+            host = InetAddress.getByName(hostName);
         } catch (UnknownHostException e) {
             return;
         }
@@ -73,43 +69,48 @@ public class NFSHostNameArgument extends Argument {
         for (int i = 0; i < exportEntryList.size(); i++) {
             ExportEntry exportEntry = exportEntryList.get(i);
             if (exportEntry.getDirectory().startsWith(partialDirectory)) {
-                completion.addCompletion(partial.substring(0, index) + ":"
-                        + exportEntry.getDirectory());
+                completion.addCompletion(hostName + ":" + exportEntry.getDirectory());
             }
         }
     }
 
-    public InetAddress getAddress(ParsedArguments args)
-            throws UnknownHostException {
-        String value = getValue(args);
+    public InetAddress getAddress() throws UnknownHostException {
+        String value = getValue();
         if (value == null) {
             return null;
         }
-
         int index = value.indexOf(':');
-        if (index == -1) {
-            return InetAddress.getByName(value);
-        } else {
-            return InetAddress.getByName(value.substring(0, index));
-        }
-
+        return InetAddress.getByName(index == -1 ? value : value.substring(0, index));
     }
 
-    public String getRemoteDirectory(ParsedArguments args) {
-
-        String value = getValue(args);
-
+    public String getRemoteDirectory() {
+        String value = getValue();
         if (value == null) {
             return null;
         }
-
         int index = value.indexOf(':');
-        if (index == -1) {
-            return null;
-        }
-
-        return value.substring(index + 1);
-
+        return (index == -1 || index == value.length() - 1) ? null : value.substring(index + 1);
     }
 
+    @Override
+    protected String argumentKind() {
+        return "hostname:directory";
+    }
+
+    @Override
+    protected String doAccept(Token value) throws CommandSyntaxException {
+        int index = value.token.indexOf(':');
+        if (index == -1) {
+            throw new CommandSyntaxException("missing ':'");
+        }
+        else if (index == 0) {
+            throw new CommandSyntaxException("no hostname before ':'");
+        }
+        else if (index == value.token.length() - 1) {
+            throw new CommandSyntaxException("no directory after ':'");
+        }
+        else {
+            return value.token;
+        }
+    }
 }
