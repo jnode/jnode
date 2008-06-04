@@ -2,6 +2,7 @@ package org.jnode.apps.jpartition;
 
 import junit.framework.TestSuite;
 
+import org.jnode.apps.jpartition.consoleview.ConsoleViewFactory;
 import org.jnode.apps.jpartition.model.TestEmptyDevice;
 import org.jnode.apps.jpartition.model.TestNonEmptyDevice;
 import org.jnode.apps.jpartition.model.TestOSFacade;
@@ -25,7 +26,7 @@ public class JPartitionTest extends TestSuite {
 	}
 
 	public static void main(String[] args) throws Throwable {
-		final ViewFactory vf = JPartitionCommand.createViewFactory(JPartitionCommand.CONSOLEUI, System.in, System.out, System.err);
+		final ViewFactory vf = new ConsoleViewFactory(System.in, System.out, System.err);
 		final ErrorReporter errorReporter = vf.createErrorReporter();
 		new Thread()
 		{
