@@ -91,7 +91,7 @@ public final class MemoryBlockManager extends VmSystemObject {
     private static Word nextBlockNr;
 
     /* Predictive Compilation */
-    private final static boolean DBG = false;
+    private static final boolean DBG = false;
 
     /**
      * Allocate a new block of memory at blockSize large. The actual size is
@@ -245,7 +245,7 @@ public final class MemoryBlockManager extends VmSystemObject {
     /**
      * Initialize this manager.
      */
-    private final static void initialize() {
+    private static void initialize() {
         Unsafe.debug("Initialize MemoryBlockManager\n");
 
         startPtr = blockAlign(Unsafe.getMemoryStart().toWord(), true).toAddress();

@@ -26,7 +26,7 @@ package org.jnode.util;
  */
 public final class Counter extends Statistic implements Comparable<Counter> {
 
-    private final static String is = "=";
+    private static final String is = "=";
 
     private int counter = 0;
 

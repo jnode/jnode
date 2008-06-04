@@ -31,7 +31,7 @@ public final class VmLocalVariableTable extends VmSystemObject {
     /**
      * Empty table
      */
-    final static VmLocalVariableTable EMPTY = new VmLocalVariableTable(VmLocalVariable.EMPTY);
+    static final VmLocalVariableTable EMPTY = new VmLocalVariableTable(VmLocalVariable.EMPTY);
 
     /**
      * Local variables

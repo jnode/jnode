@@ -42,7 +42,7 @@ import org.jnode.plugin.PluginDescriptor;
 /**
  * @author Fabien DUMINY (fduminy at jnode.org)
  */
-final public class TestManager implements ExtensionPointListener {
+public final class TestManager implements ExtensionPointListener {
     public static final String ALL_CATEGORY = "all";
     public static final List<String> DEFAULT_CATEGORY =
         Collections.unmodifiableList(Arrays.asList(new String[]{ALL_CATEGORY, "default"}));
@@ -136,7 +136,7 @@ final public class TestManager implements ExtensionPointListener {
     /**
      * Get a TestSuite with all tests that have one of the given categories.
      */
-    synchronized public TestSuite getTestSuite(List<String> wantedCategories) {
+    public synchronized TestSuite getTestSuite(List<String> wantedCategories) {
         refreshTests();
         TestSuite suite = new TestSuite();
 
@@ -183,7 +183,7 @@ final public class TestManager implements ExtensionPointListener {
     /**
      * Refresh all known tests.
      */
-    synchronized private void refreshTests() {
+    private synchronized void refreshTests() {
         log.debug("<<< BEGIN refreshTests >>>");
 
         suites.clear();

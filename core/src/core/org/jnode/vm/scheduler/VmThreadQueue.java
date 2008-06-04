@@ -278,7 +278,7 @@ abstract class VmThreadQueue extends VmSystemObject {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    final static class AllThreadsQueue extends VmThreadQueue {
+    static final class AllThreadsQueue extends VmThreadQueue {
 
         /**
          * Initialize this instance.
@@ -302,7 +302,7 @@ abstract class VmThreadQueue extends VmSystemObject {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    final static class SleepQueue extends VmThreadQueue {
+    static final class SleepQueue extends VmThreadQueue {
 
         /**
          * Initialize this instance.
@@ -329,7 +329,7 @@ abstract class VmThreadQueue extends VmSystemObject {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    final static class ScheduleQueue extends VmThreadQueue {
+    static final class ScheduleQueue extends VmThreadQueue {
 
         /**
          * Initialize this instance.

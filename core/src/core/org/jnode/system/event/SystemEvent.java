@@ -60,21 +60,21 @@ public class SystemEvent {
     /**
      * @return int
      */
-    final public int getId() {
+    public final int getId() {
         return id;
     }
 
     /**
      * @return long
      */
-    final public long getTime() {
+    public final long getTime() {
         return time;
     }
 
     /**
      * Mark this event as being consumed.
      */
-    final public void consume() {
+    public final void consume() {
         consumed = true;
     }
 
@@ -83,7 +83,7 @@ public class SystemEvent {
      *
      * @return boolean
      */
-    final public boolean isConsumed() {
+    public final boolean isConsumed() {
         return consumed;
     }
 }

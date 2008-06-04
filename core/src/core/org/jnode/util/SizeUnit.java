@@ -22,8 +22,8 @@ public enum SizeUnit {
     public static final SizeUnit MIN = B;
     public static final SizeUnit MAX = E;
 
-    final private long multiplier;
-    final private String unit;
+    private final long multiplier;
+    private final String unit;
 
     private SizeUnit(long multiplier, String unit) {
         this.multiplier = multiplier;

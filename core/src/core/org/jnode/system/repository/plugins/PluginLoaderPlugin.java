@@ -44,7 +44,7 @@ public final class PluginLoaderPlugin extends RepositoryPlugin {
     /**
      * Empty array of providers
      */
-    final static SystemRepositoryProvider[] EMPTY_ARR = new SystemRepositoryProvider[0];
+    static final SystemRepositoryProvider[] EMPTY_ARR = new SystemRepositoryProvider[0];
 
     private PluginRegistry registry;
 

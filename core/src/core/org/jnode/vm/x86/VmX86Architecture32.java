@@ -113,7 +113,7 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     /**
      * Default page entry flags
      */
-    private final static int PF_DEFAULT = PF_PRESENT | PF_WRITE | PF_USER | PF_PSE;
+    private static final int PF_DEFAULT = PF_PRESENT | PF_WRITE | PF_USER | PF_PSE;
 
     /**
      * Initialize this instance.

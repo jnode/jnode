@@ -28,7 +28,7 @@ public class InlineTestClass {
 
     private int x;
 
-    public synchronized static int f1() {
+    public static synchronized int f1() {
         int r;
         r = f2();
         return r;

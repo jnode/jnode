@@ -383,7 +383,7 @@ public final class VmIsolate {
     /**
      * Gets the links passed to the start of the current isolate.
      */
-    public final static Link[] getLinks() {
+    public static Link[] getLinks() {
         final VmDataLink[] vmLinks = currentIsolate().dataLinks;
 
         if ((vmLinks == null) || (vmLinks.length == 0)) {

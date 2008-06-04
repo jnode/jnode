@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class AllTests {
 
-    final static Logger log = Logger.getLogger(AllTests.class);
+    static final Logger log = Logger.getLogger(AllTests.class);
 
     public static Test suite() {
         log.info("Starting test");

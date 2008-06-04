@@ -218,29 +218,29 @@ public abstract class VmThread extends VmSystemObject {
      *    &lt;/blockquote&gt;
      * </pre>
      */
-    final static int CREATED = 0;
+    static final int CREATED = 0;
 
-    final static int ASLEEP = 3;
+    static final int ASLEEP = 3;
 
-    final static int DESTROYED = 5;
+    static final int DESTROYED = 5;
 
-    final static int RUNNING = 1;
+    static final int RUNNING = 1;
 
-    final static int STOPPED = 4;
+    static final int STOPPED = 4;
 
-    final static int SUSPENDED = 2;
+    static final int SUSPENDED = 2;
 
-    final static int WAITING_ENTER = 6;
+    static final int WAITING_ENTER = 6;
 
-    final static int WAITING_NOTIFY = 7;
+    static final int WAITING_NOTIFY = 7;
 
-    final static int WAITING_NOTIFY_TIMEOUT = 8;
+    static final int WAITING_NOTIFY_TIMEOUT = 8;
 
-    final static int YIELDING = 9;
+    static final int YIELDING = 9;
 
-    final static int MAXSTATE = YIELDING;
+    static final int MAXSTATE = YIELDING;
 
-    final static String[] STATE_NAMES = {"CREATED", "RUNNING", "SUSPENDED",
+    static final String[] STATE_NAMES = {"CREATED", "RUNNING", "SUSPENDED",
         "ASLEEP", "STOPPED", "DESTROYED", "WAITING_ENTER",
         "WAITING_NOTIFY", "WAITING_NOTIFY_TIMEOUT", "YIELDING"};
 

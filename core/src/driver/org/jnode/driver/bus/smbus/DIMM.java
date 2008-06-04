@@ -42,7 +42,7 @@ package org.jnode.driver.bus.smbus;
 
 public class DIMM extends SMBusDevice {
 
-    final public static int SPDTABLE_SIZE = 128;
+    public static final int SPDTABLE_SIZE = 128;
 
     byte[] rawSPDTable = null;
 

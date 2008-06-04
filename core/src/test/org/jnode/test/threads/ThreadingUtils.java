@@ -60,7 +60,7 @@ class ThreadingUtils {
         return elem.getClassName() + "." + elem.getMethodName();
     }
 
-    static abstract class Forkable implements Runnable {
+    abstract static class Forkable implements Runnable {
         private Thread thread;
 
 

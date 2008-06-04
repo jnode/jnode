@@ -30,7 +30,7 @@ package org.jnode.util;
  */
 public class ByteQueue {
 
-    final static int Q_SIZE = 10;
+    static final int Q_SIZE = 10;
 
     private final byte[] data;
     private final int size;

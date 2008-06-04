@@ -30,14 +30,14 @@ import org.jnode.util.Queue;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
 
-abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver {
-    final private ArrayList<SystemListener> listeners = new ArrayList<SystemListener>();
+public abstract class AbstractInputDriver<E extends SystemEvent> extends Driver {
+    private final ArrayList<SystemListener> listeners = new ArrayList<SystemListener>();
 
     private QueueProcessorThread<E> eventQueueThread;
-    final private Queue<E> eventQueue = new Queue<E>();
+    private final Queue<E> eventQueue = new Queue<E>();
     private InputDaemon daemon;
 
-    final protected void startDispatcher(String id) {
+    protected final void startDispatcher(String id) {
         this.daemon = new InputDaemon(id + "-daemon");
         daemon.start();
 
@@ -46,7 +46,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver 
         eventQueueThread.start();
     }
 
-    final protected void stopDispatcher() {
+    protected final void stopDispatcher() {
         if (eventQueueThread != null) {
             eventQueueThread.stopProcessor();
         }
@@ -75,14 +75,14 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver 
         }
     }
 
-    abstract protected void sendEvent(SystemListener<E> l, E e);
+    protected abstract void sendEvent(SystemListener<E> l, E e);
 
     /**
      * Add a pointer listener
      *
      * @param l
      */
-    final public synchronized void addListener(SystemListener<E> l) {
+    public final synchronized void addListener(SystemListener<E> l) {
         listeners.add(l);
     }
 
@@ -91,7 +91,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver 
      *
      * @param l
      */
-    final public synchronized void removeListener(SystemListener<E> l) {
+    public final synchronized void removeListener(SystemListener<E> l) {
         listeners.remove(l);
     }
 
@@ -102,14 +102,14 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver 
      *
      * @param l
      */
-    final protected synchronized void setPreferredListener(SystemListener<E> l) {
+    protected final synchronized void setPreferredListener(SystemListener<E> l) {
         if (listeners.remove(l)) {
             listeners.add(0, l);
         }
     }
 
 
-    abstract protected E handleScancode(byte b);
+    protected abstract E handleScancode(byte b);
 
     /**
      * Gets the byte channel. This is implementation specific

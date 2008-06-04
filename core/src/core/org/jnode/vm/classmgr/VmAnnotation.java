@@ -37,7 +37,7 @@ public final class VmAnnotation extends VmSystemObject {
     /**
      * An empty array of annotations
      */
-    final static VmAnnotation[] EMPTY_ARR = new VmAnnotation[0];
+    static final VmAnnotation[] EMPTY_ARR = new VmAnnotation[0];
 
     /**
      * The descriptor of the annotation type
@@ -222,9 +222,9 @@ public final class VmAnnotation extends VmSystemObject {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    final static class ElementValue extends VmSystemObject {
+    static final class ElementValue extends VmSystemObject {
 
-        final static ElementValue[] EMPTY_ARR = new ElementValue[0];
+        static final ElementValue[] EMPTY_ARR = new ElementValue[0];
 
         private final String name;
 
@@ -286,7 +286,7 @@ public final class VmAnnotation extends VmSystemObject {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    final static class EnumValue {
+    static final class EnumValue {
         private final String typeDescr;
 
         private final String constName;
@@ -345,7 +345,7 @@ public final class VmAnnotation extends VmSystemObject {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    final static class ClassInfo extends VmSystemObject {
+    static final class ClassInfo extends VmSystemObject {
         private final String classDescr;
 
         private transient Class value;

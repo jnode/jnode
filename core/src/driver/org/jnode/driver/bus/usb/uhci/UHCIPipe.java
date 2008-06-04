@@ -246,7 +246,7 @@ public class UHCIPipe implements USBPipe, USBConstants {
     /**
      * Handle an interrupt.
      */
-    protected synchronized final void handleInterrupt() {
+    protected final synchronized void handleInterrupt() {
         if (this.open) {
             final UHCIRequest req = this.activeRequest;
             if (req != null) {

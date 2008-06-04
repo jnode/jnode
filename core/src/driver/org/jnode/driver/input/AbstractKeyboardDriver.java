@@ -46,11 +46,11 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
 
     private final ArrayList<SystemTriggerListener> stListeners = new ArrayList<SystemTriggerListener>();
 
-    final public void addKeyboardListener(KeyboardListener l) {
+    public final void addKeyboardListener(KeyboardListener l) {
         super.addListener(l);
     }
 
-    final public void removeKeyboardListener(KeyboardListener l) {
+    public final void removeKeyboardListener(KeyboardListener l) {
         super.removeListener(l);
     }
 
