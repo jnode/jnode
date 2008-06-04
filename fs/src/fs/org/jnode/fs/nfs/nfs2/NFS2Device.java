@@ -42,22 +42,15 @@ public class NFS2Device extends Device {
     private int gid;
 
     public NFS2Device(InetAddress host, String remoteDirectory,
-            Protocol protocol) {
-        this(host, remoteDirectory, protocol, -1, -1);
-
-    }
-
-    public NFS2Device(InetAddress host, String remoteDirectory,
             Protocol protocol, int uid, int gid) {
-        super(null, "nfs2-(" + host.getHostName() + "," + remoteDirectory + ","
-                + protocol + "," + uid + "," + gid + ")");
+        super(null, "nfs2-(" + host.getHostName() + "," + remoteDirectory + "," +
+                protocol + "," + uid + "," + gid + ")");
         this.host = host;
         this.remoteDirectory = remoteDirectory;
         this.protocol = protocol;
 
         this.uid = uid;
         this.gid = gid;
-
     }
 
     public InetAddress getHost() {
