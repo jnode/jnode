@@ -45,7 +45,7 @@ public final class PCIRomAddress {
      */
     private final int size;
 
-    final static PCIRomAddress read(PCIDevice dev, int headerType, int offset) {
+    static PCIRomAddress read(PCIDevice dev, int headerType, int offset) {
         final int rawData = dev.readConfigDword(offset);
         // Determine the size
         dev.writeConfigDword(offset, ~PCI_ROM_ADDRESS_ENABLE);

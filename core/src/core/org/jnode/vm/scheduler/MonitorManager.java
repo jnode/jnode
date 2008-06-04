@@ -252,7 +252,7 @@ public final class MonitorManager {
      *
      * @param k
      */
-    final static void setupInflatedLock(Object k) {
+    static void setupInflatedLock(Object k) {
         installInflatedLock(k);
     }
 
@@ -383,7 +383,7 @@ public final class MonitorManager {
      *
      * @param tid
      */
-    final static void testThreadId(int tid) {
+    static void testThreadId(int tid) {
         if ((tid & ~ObjectFlags.THREAD_ID_MASK) != 0) {
             throw new InternalError("Invalid thread id " + tid);
         }

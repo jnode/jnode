@@ -1238,7 +1238,7 @@ public final class ClassDecoder {
         return result;
     }
 
-    private transient static ThreadLocal utfConversionBuffer;
+    private static transient ThreadLocal utfConversionBuffer;
 
     private static final char[] getUtfConversionBuffer(int utfLength) {
         if (utfConversionBuffer == null) {

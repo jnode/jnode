@@ -5,8 +5,8 @@ package org.jnode.test;
 
 public class IfNullTest {
 
-    final static Object nullVariable = null;
-    final static Object nonNullVariable = new Object();
+    static final Object nullVariable = null;
+    static final Object nonNullVariable = new Object();
 
     /**
      * @param args

@@ -40,7 +40,7 @@ public class TestSecurityManager {
         }
     }
 
-    static public void main(String args[]) throws Exception {
+    public static void main(String args[]) throws Exception {
         Class sc = SecurityManager.class;
         Class sc2 = Security.class;
         Class sc3 = java.security.Permission.class;

@@ -78,7 +78,7 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
      * @param createdType
      * @return VmClass
      */
-    public synchronized final VmType<?> defineClass(VmType<?> createdType) {
+    public final synchronized VmType<?> defineClass(VmType<?> createdType) {
         if (createdType.getLoader() != this) {
             throw new SecurityException("Created type not for this loader");
         }

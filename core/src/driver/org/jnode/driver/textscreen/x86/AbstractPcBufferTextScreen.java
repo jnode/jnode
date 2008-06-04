@@ -165,14 +165,14 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen im
     /**
      * Synchronize the state with the actual device.
      */
-    abstract public void sync();
+    public abstract void sync();
 
     public void setCursor(int x, int y) {
         this.cursorIndex = getOffset(x, y);
         setParentCursor(x, y);
     }
 
-    abstract protected void setParentCursor(int x, int y);
+    protected abstract void setParentCursor(int x, int y);
 
     public void setCursorVisible(boolean visible) {
         this.cursorVisible = visible;

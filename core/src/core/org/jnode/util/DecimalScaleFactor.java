@@ -22,8 +22,8 @@ public enum DecimalScaleFactor implements ScaleFactor {
     public static final DecimalScaleFactor MIN = B;
     public static final DecimalScaleFactor MAX = E;
 
-    final private long multiplier;
-    final private String unit;
+    private final long multiplier;
+    private final String unit;
 
     private DecimalScaleFactor(long multiplier, String unit) {
         this.multiplier = multiplier;

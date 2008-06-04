@@ -12,7 +12,7 @@ final class X86IRQManager extends IRQManager {
     /**
      * Number of IRQ vectors
      */
-    final static int IRQ_COUNT = 16;
+    static final int IRQ_COUNT = 16;
 
     /**
      * Programmable interrupt controller

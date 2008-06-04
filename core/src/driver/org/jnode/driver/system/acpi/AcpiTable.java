@@ -176,7 +176,7 @@ public abstract class AcpiTable {
      * @return The table or null for an unknown table.
      * @throws ResourceNotFreeException
      */
-    final static AcpiTable getTable(AcpiDriver drv, ResourceOwner owner, ResourceManager rm,
+    static AcpiTable getTable(AcpiDriver drv, ResourceOwner owner, ResourceManager rm,
                                     Address ptr) throws ResourceNotFreeException {
         try {
             // Convert physical address to virtual address.

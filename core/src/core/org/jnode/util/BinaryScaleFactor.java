@@ -22,8 +22,8 @@ public enum BinaryScaleFactor implements ScaleFactor {
     public static final BinaryScaleFactor MIN = B;
     public static final BinaryScaleFactor MAX = E;
 
-    final private long multiplier;
-    final private String unit;
+    private final long multiplier;
+    private final String unit;
 
     private BinaryScaleFactor(long multiplier, String unit) {
         this.multiplier = multiplier;

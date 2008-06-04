@@ -174,7 +174,7 @@ public final class VmMagic {
      * @return the processor executing the current thread
      */
     @KernelSpace
-    public final static VmProcessor currentProcessor() {
+    public static VmProcessor currentProcessor() {
         return null;
     }
 
@@ -184,7 +184,7 @@ public final class VmMagic {
      * @param index
      * @return the address of a shared static field
      */
-    public final static Address getSharedStaticFieldAddress(int index) {
+    public static Address getSharedStaticFieldAddress(int index) {
         return null;
     }
 
@@ -194,7 +194,7 @@ public final class VmMagic {
      * @param index
      * @return the address of a isolated static field
      */
-    public final static Address getIsolatedStaticFieldAddress(int index) {
+    public static Address getIsolatedStaticFieldAddress(int index) {
         return null;
     }
 
@@ -203,7 +203,7 @@ public final class VmMagic {
      *
      * @return true when running JNode, false when running any other VM.
      */
-    public final static boolean isRunningJNode() {
+    public static boolean isRunningJNode() {
         return false;
     }
 

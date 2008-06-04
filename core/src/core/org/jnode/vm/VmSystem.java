@@ -205,7 +205,7 @@ public final class VmSystem {
         });
     }
 
-    final static boolean isInitialized() {
+    static boolean isInitialized() {
         return inited;
     }
 
@@ -952,7 +952,7 @@ public final class VmSystem {
      * @return the speed of the current processor in "JNodeMips"
      */
     @Uninterruptible
-    public final static float calculateJNodeMips() {
+    public static float calculateJNodeMips() {
         final long millis = currentTimeMillis % 1000;
         while (millis == (currentTimeMillis % 1000)) {
             // Wait

@@ -49,8 +49,8 @@ public abstract class KeyboardInterpreter {
     private final char enter = '\n';
     private final char divide = '/';
 
-    public final static int XT_RELEASE = 0x80;
-    public final static int XT_EXTENDED = 0xE0;
+    public static final int XT_RELEASE = 0x80;
+    public static final int XT_EXTENDED = 0xE0;
 
     public KeyboardInterpreter() {
         keys = new Keys();

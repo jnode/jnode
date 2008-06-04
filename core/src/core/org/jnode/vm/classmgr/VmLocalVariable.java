@@ -34,7 +34,7 @@ public final class VmLocalVariable extends VmSystemObject {
     /**
      * Sharable empty array.
      */
-    final static VmLocalVariable[] EMPTY = new VmLocalVariable[0];
+    static final VmLocalVariable[] EMPTY = new VmLocalVariable[0];
 
     /**
      * Start of the value value range.

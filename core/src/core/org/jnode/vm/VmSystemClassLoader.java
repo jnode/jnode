@@ -65,7 +65,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private transient URL classesURL;
 
-    static private transient boolean verbose = false;
+    private static transient boolean verbose = false;
 
     private transient boolean failOnNewLoad = false;
 

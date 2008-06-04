@@ -324,7 +324,7 @@ final class FPCompilerFPU extends FPCompiler {
     /**
      * Make sure that the given operand is on the top on the FPU stack.
      */
-    private final static void prepareForOperation(X86Assembler os,
+    private static void prepareForOperation(X86Assembler os,
                                                   EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
                                                   Item left) {
         final boolean onFpu = left.isFPUStack();
@@ -359,7 +359,7 @@ final class FPCompilerFPU extends FPCompiler {
      * @param left
      * @param right
      */
-    private final static FPU prepareForOperation(X86Assembler os,
+    private static FPU prepareForOperation(X86Assembler os,
                                                  EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
                                                  Item left, Item right, boolean commutative) {
         final boolean lOnFpu = left.isFPUStack();

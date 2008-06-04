@@ -43,7 +43,7 @@ import org.jnode.driver.console.spi.ConsolePrintStream;
  */
 class Line {
     //TODO get the real screen width (in columns)
-    final static private int SCREEN_WIDTH = 80;
+    private static final int SCREEN_WIDTH = 80;
 
     private int consoleX;
 

@@ -98,7 +98,7 @@ final class DefHeapStatistics extends HeapStatistics {
         private int instanceCount;
         private int objectSize = 0;
 
-        private final static String usage = " memory usage=";
+        private static final String usage = " memory usage=";
 
         public HeapCounter(String objectName, int objectSize) {
             this.name = objectName;

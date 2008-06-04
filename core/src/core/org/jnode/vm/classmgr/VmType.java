@@ -339,7 +339,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
-    public final static VmType[] initializeForBootImage(VmSystemClassLoader clc)
+    public static VmType[] initializeForBootImage(VmSystemClassLoader clc)
         throws ClassNotFoundException {
         ObjectClass = (VmNormalClass) clc.loadClass("java.lang.Object", false);
         CloneableClass = (VmInterfaceClass) clc.loadClass(
@@ -568,7 +568,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      *
      * @return The class
      */
-    public final static VmNormalClass<Object> getObjectClass() {
+    public static VmNormalClass<Object> getObjectClass() {
         if (ObjectClass == null) {
             Unsafe.die("ObjectClass == null");
         }
@@ -581,7 +581,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @param type
      * @return VmClass
      */
-    public final static VmNormalClass<?> getPrimitiveClass(char type) {
+    public static VmNormalClass<?> getPrimitiveClass(char type) {
         switch (type) {
             case 'Z':
                 return BooleanClass;
@@ -612,7 +612,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @param type
      * @return VmClass
      */
-    public final static VmType getPrimitiveArrayClass(char type) {
+    public static VmType getPrimitiveArrayClass(char type) {
         switch (type) {
             case 'Z':
                 return BooleanArrayClass;
@@ -642,7 +642,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @param type
      * @return VmClass
      */
-    public final static VmArrayClass getPrimitiveArrayClass(int type) {
+    public static VmArrayClass getPrimitiveArrayClass(int type) {
         switch (type) {
             case 4:
                 return BooleanArrayClass;
@@ -2194,7 +2194,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /**
      * Invoke the static initializer of this class.
      */
-    private synchronized final void doInitialize() {
+    private synchronized void doInitialize() {
         if (!isInitialized()) {
             if (!isInitializing()) {
                 final boolean sharedStatics = isSharedStatics();

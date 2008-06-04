@@ -48,7 +48,7 @@ public class JPEGDecoder {
     private int x = 0, y = 0, num = 0, yp = 0; // the begin point of MCU
 
     private int IDCT_Source[] = new int[64];
-    private final static int IDCT_P[] = {
+    private static final int IDCT_P[] = {
         0, 5, 40, 16, 45, 2, 7, 42,
         21, 56, 8, 61, 18, 47, 1, 4,
         41, 23, 58, 13, 32, 24, 37, 10,
@@ -58,7 +58,7 @@ public class JPEGDecoder {
         50, 55, 25, 36, 11, 62, 14, 35,
         28, 49, 52, 27, 38, 30, 51, 54
     };
-    private final static int table[] = {
+    private static final int table[] = {
         0, 1, 5, 6, 14, 15, 27, 28,
         2, 4, 7, 13, 16, 26, 29, 42,
         3, 8, 12, 17, 25, 30, 41, 43,

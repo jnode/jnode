@@ -59,7 +59,7 @@ public class X86StreamTest implements X86Constants {
         fos.close();
     }
 
-    private final static void testCode64(X86Assembler os) throws UnresolvedObjectRefException {
+    private static void testCode64(X86Assembler os) throws UnresolvedObjectRefException {
         os.writeCDQE();
         os.writeMOV_Const(X86Register.R15, 0xFFFFFFFFL);
         os.writeAND(X86Register.RAX, X86Register.R15);
@@ -101,7 +101,7 @@ public class X86StreamTest implements X86Constants {
         os.writePOP(X86Register.RBP);
     }
 
-    private final static void testCode32(X86Assembler os) throws UnresolvedObjectRefException {
+    private static void testCode32(X86Assembler os) throws UnresolvedObjectRefException {
         GPR regs[] = {X86Register.EAX, X86Register.EBX, X86Register.ECX, X86Register.EDX, X86Register.ESI};
         for (GPR reg1 : regs) {
             os.writeIDIV_EAX(reg1);

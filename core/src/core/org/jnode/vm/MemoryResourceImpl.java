@@ -730,7 +730,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
      *
      * @param child
      */
-    private synchronized final void removeChild(MemoryResourceImpl child) {
+    private synchronized void removeChild(MemoryResourceImpl child) {
         this.children = (MemoryResourceImpl) remove(this.children, child);
     }
 
