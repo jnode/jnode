@@ -881,11 +881,9 @@ clean             Remove all intermediate build results.
         <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
         <checkstyle config="jnode_checks.xml">
             <fileset dir="../builder/src/builder" includes="**/*.java"/>
-            <!-- temporally disabled
             <fileset dir="../core/src/core" includes="**/*.java"/>
             <fileset dir="../core/src/driver" includes="**/*.java"/>
             <fileset dir="../core/src/test" includes="**/*.java"/>
-            -->
             <fileset dir="../fs/src/driver" includes="**/*.java"/>
             <fileset dir="../fs/src/test" includes="**/*.java"/>
             <fileset dir="../gui/src/test" includes="**/*.java"/>
