@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
- package org.jnode.shell;
+package org.jnode.shell;
 
 /**
  * The CommandThread interface is used by JNode shells, interpreters and invokers 

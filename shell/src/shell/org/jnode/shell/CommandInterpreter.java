@@ -56,7 +56,7 @@ public interface CommandInterpreter {
      * @throws ShellException
      */
     Completable parsePartial(CommandShell shell, String partial)
-            throws ShellSyntaxException;
+        throws ShellSyntaxException;
 
     /**
      * Get the interpreter's name

@@ -32,9 +32,9 @@ import org.jnode.vm.VmExit;
  * 
  */
 public abstract class AbstractCommand implements Command {
-    
+
     private ArgumentBundle bundle;
-    
+
     public AbstractCommand() {
         this.bundle = null;
     }
@@ -54,13 +54,12 @@ public abstract class AbstractCommand implements Command {
             // We're ignoring the instance created in the static void main method and
             // using the one that the invoker saved for us earlier.
             command.execute(new CommandLine(args), System.in, System.out, System.err);
-        }
-        else {
+        } else {
             if (bundle != null) {
                 // It appears that this class is designed to use the new-style syntax mechanism
                 // but we've somehow been called without having a Command instance recorded.
                 throw new ShellInvocationException(
-                        "Commands with new-style syntax cannot be invoked this way");
+                    "Commands with new-style syntax cannot be invoked this way");
                 // FIXME ... if a JNode Command class is going to be usable outside of JNode, we
                 // will need to figure out how to call ArgumentBundle.parse here using the appropriate
                 // Syntax object.
@@ -80,9 +79,9 @@ public abstract class AbstractCommand implements Command {
     }
 
     public final ArgumentBundle getArgumentBundle() {
-		return bundle;
-	}
-    
+        return bundle;
+    }
+
     protected final void registerArguments(Argument<?> ... args) {
         if (bundle == null) {
             bundle = new ArgumentBundle();
@@ -91,13 +90,13 @@ public abstract class AbstractCommand implements Command {
             bundle.addArgument(arg);
         }
     }
-    
+
     static ThreadLocal<Command> currentCommand = new ThreadLocal<Command>();
-    
+
     static void saveCurrentCommand(Command command) {
         currentCommand.set(command);
     }
-    
+
     static Command retrieveCurrentCommand() {
         Command res = currentCommand.get();
         currentCommand.set(null);

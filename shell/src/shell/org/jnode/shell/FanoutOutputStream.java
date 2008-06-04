@@ -73,8 +73,7 @@ public class FanoutOutputStream extends OutputStream {
                 for (int j = 0; j < len2; j++) {
                     if (j < i) {
                         tmp[j] = streams[j];
-                    }
-                    else {
+                    } else {
                         tmp[j] = streams[j + 1];
                     }
                 }
@@ -88,11 +87,9 @@ public class FanoutOutputStream extends OutputStream {
     public synchronized void close() throws IOException {
         if (streams == null) {
             // already closed.
-        } 
-        else if (ignoreClose) {
+        } else if (ignoreClose) {
             flush();
-        }
-        else {
+        } else {
             for (OutputStream os : streams) {
                 os.close();
             }

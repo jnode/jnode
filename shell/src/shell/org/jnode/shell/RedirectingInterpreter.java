@@ -78,7 +78,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     }
 
     public Completable parsePartial(CommandShell shell, String line)
-            throws ShellSyntaxException {
+        throws ShellSyntaxException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
         List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
         return parse(tokenizer, commands, true);
@@ -99,7 +99,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
      */
     private Completable parse(Tokenizer tokenizer, 
             List<CommandDescriptor> commands, boolean completing)
-            throws ShellSyntaxException {
+        throws ShellSyntaxException {
         boolean wspAfter = tokenizer.whitespaceAfterLast();
         boolean pipeTo = false;
         List<CommandLine.Token> args = new ArrayList<CommandLine.Token>();
@@ -121,8 +121,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         from = parseFileName(tokenizer, "<");
                         if (from == null && !completing) {
                             throw new ShellSyntaxException("no filename after '<'");
-                        }
-                        else if (completing && 
+                        } else if (completing && 
                                 (from == null || (!tokenizer.hasNext() && !wspAfter))) {
                             return new ArgumentCompleter(FILE_ARG, from);
                         }
@@ -131,8 +130,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         to = parseFileName(tokenizer, ">");
                         if (to == null && !completing) {
                             throw new ShellSyntaxException("no filename after '>'");
-                        }
-                        else if (completing && 
+                        } else if (completing && 
                                 (to == null || (!tokenizer.hasNext() && !wspAfter))) {
                             return new ArgumentCompleter(FILE_ARG, to);
                         }
@@ -160,20 +158,18 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         if (completing) {
             if (pipeTo || commands.isEmpty()) {
                 return new CommandLine("", null);
-            }
-            else {
+            } else {
                 CommandLine res = commands.get(commands.size() - 1).commandLine;
                 res.setArgumentAnticipated(wspAfter);
                 return res;
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     private CommandLine.Token parseFileName(Tokenizer tokenizer, String special)
-            throws ShellSyntaxException {
+        throws ShellSyntaxException {
         if (!tokenizer.hasNext()) {
             return null;
         }
@@ -188,7 +184,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     }
 
     private int runCommand(CommandShell shell, CommandDescriptor desc)
-            throws ShellException {
+        throws ShellException {
         Closeable in = CommandLine.DEFAULT_STDIN;
         Closeable out = CommandLine.DEFAULT_STDOUT;
         Closeable err = CommandLine.DEFAULT_STDERR;
@@ -209,7 +205,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 throw new ShellInvocationException("cannot open '" +
                         desc.toFileName.token + "': " + ex.getMessage());
             }
-            desc.commandLine.setStreams(new Closeable[] { in, out, err });
+            desc.commandLine.setStreams(new Closeable[] {in, out, err});
             try {
                 CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
                 return shell.invoke(desc.commandLine, cmdInfo);
@@ -295,7 +291,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                                 // squash
                             }
                             prev.commandLine.setStreams(new Closeable[] {
-                                    ps[0], CommandLine.DEVNULL, ps[2] });
+                                    ps[0], CommandLine.DEVNULL, ps[2]});
                         }
                     } else {
                         // the previous stage has explicitly redirected stdout
@@ -316,7 +312,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         desc.openedStreams.add(out);
                     }
                 }
-                desc.commandLine.setStreams(new Closeable[] { in, out, err });
+                desc.commandLine.setStreams(new Closeable[] {in, out, err});
                 try {
                     CommandInfo cmdInfo = 
                         shell.getCommandInfo(desc.commandLine.getCommandName());

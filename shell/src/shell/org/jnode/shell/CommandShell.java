@@ -118,7 +118,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     /**
      * Contains the application input history for the current thread.
      */
-    private static InheritableThreadLocal<InputHistory> applicationHistory = new InheritableThreadLocal<InputHistory>();
+    private static InheritableThreadLocal<InputHistory> applicationHistory = 
+        new InheritableThreadLocal<InputHistory>();
 
     /**
      * When true, {@link complete(String)} performs command completion.
@@ -161,8 +162,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return console;
     }
 
-    public static void main(String[] args) throws NameNotFoundException,
-            ShellException {
+    public static void main(String[] args) 
+        throws NameNotFoundException, ShellException {
         CommandShell shell = new CommandShell();
         shell.run();
     }
@@ -376,8 +377,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public synchronized void setCommandInvoker(String name)
-            throws IllegalArgumentException {
+    public synchronized void setCommandInvoker(String name) throws IllegalArgumentException {
         if (!name.equals(this.invokerName)) {
             this.invoker = ShellUtils.createInvoker(name, this);
             errPs.println("Switched to " + name + " invoker");
@@ -386,8 +386,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public synchronized void setCommandInterpreter(String name)
-            throws IllegalArgumentException {
+    public synchronized void setCommandInterpreter(String name) throws IllegalArgumentException {
         if (!name.equals(this.interpreterName)) {
             this.interpreter = ShellUtils.createInterpreter(name);
             errPs.println("Switched to " + name + " interpreter");
@@ -477,12 +476,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @throws ShellException
      */
     public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
-            throws ShellException {
+        throws ShellException {
         return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
     }
 
-    public CommandInfo getCommandInfo(String cmd)
-            throws ClassNotFoundException {
+    public CommandInfo getCommandInfo(String cmd) throws ClassNotFoundException {
         try {
             Class<?> cls = aliasMgr.getAliasClass(cmd);
             return new CommandInfo(cls, aliasMgr.isInternal(cmd));
@@ -492,19 +490,18 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             return new CommandInfo(cl.loadClass(cmd), false);
         }
     }
-    
+
     protected ArgumentBundle getCommandArgumentBundle(CommandInfo commandInfo) {
-		if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
-			try {
-				Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
-				return cmd.getArgumentBundle();
-			}
-			catch (Exception ex) {
-				// drop through
-			}
-		}
-		return null;
-	}
+        if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
+            try {
+                Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
+                return cmd.getArgumentBundle();
+            } catch (Exception ex) {
+                // drop through
+            }
+        }
+        return null;
+    }
 
     boolean isDebugEnabled() {
         return debugEnabled;
@@ -540,7 +537,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      */
     protected String prompt() {
         String prompt = System
-                .getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+        .getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         final StringBuffer result = new StringBuffer();
         boolean commandMode = false;
         try {
@@ -550,29 +547,27 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 char c = (char) i;
                 if (commandMode) {
                     switch (c) {
-                    case 'P':
-                        result.append(new File(System.getProperty(
-                                DIRECTORY_PROPERTY_NAME, "")));
-                        break;
-                    case 'G':
-                        result.append("> ");
-                        break;
-                    case 'D':
-                        final Date now = new Date();
-                        DateFormat.getDateTimeInstance().format(now, result,
-                                null);
-                        break;
-                    default:
-                        result.append(c);
+                        case 'P':
+                            result.append(new File(System.getProperty(DIRECTORY_PROPERTY_NAME, "")));
+                            break;
+                        case 'G':
+                            result.append("> ");
+                            break;
+                        case 'D':
+                            final Date now = new Date();
+                            DateFormat.getDateTimeInstance().format(now, result, null);
+                            break;
+                        default:
+                            result.append(c);
                     }
                     commandMode = false;
                 } else {
                     switch (c) {
-                    case '$':
-                        commandMode = true;
-                        break;
-                    default:
-                        result.append(c);
+                        case '$':
+                            commandMode = true;
+                            break;
+                        default:
+                            result.append(c);
                     }
                 }
             }
@@ -584,10 +579,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public Completable parseCommandLine(String cmdLineStr)
-            throws ShellSyntaxException {
+        throws ShellSyntaxException {
         return interpreter.parsePartial(this, cmdLineStr);
     }
-    
+
     /**
      * This method is called by the console input driver to perform command line
      * completion in response to a TAB character.
@@ -603,6 +598,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         try {
             ShellUtils.getShellManager().registerShell(this);
         } catch (NameNotFoundException ex) {
+            log.error("Cannot find shell manager", ex);
         }
 
         // do command completion
@@ -628,7 +624,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         completion = null;
         return myCompletion;
     }
-    
+
     public void addCommandToHistory(String cmdLineStr) {
         // Add this command to the command history.
         if (isHistoryEnabled() && !cmdLineStr.equals(lastCommandLine)) {
@@ -727,7 +723,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             final BufferedReader br = new BufferedReader(new FileReader(file));
             int rc = 0;
             for (String line = br.readLine(); line != null; 
-                    line = br.readLine()) {
+            line = br.readLine()) {
                 line = line.trim();
 
                 if (line.startsWith("#") || line.equals("")) {
@@ -854,8 +850,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         if (out instanceof FanoutOutputStream) {
             ((FanoutOutputStream) out).addStream(os);
             ((FanoutOutputStream) err).addStream(os);
-        }
-        else {
+        } else {
             out = new FanoutOutputStream(true, out, os);
             outPs = new PrintStream(out);
             err = new FanoutOutputStream(true, err, os);

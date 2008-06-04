@@ -99,7 +99,7 @@ public class DefaultInterpreter implements CommandInterpreter {
             CommandLine.Token[] argTokens =
                     new CommandLine.Token[nosTokens - 1];
             cmd = new CommandLine(
-                    commandToken, tokens.toArray(argTokens),null);
+                    commandToken, tokens.toArray(argTokens), null);
         }
         shell.addCommandToHistory(line);
         try {
@@ -111,7 +111,7 @@ public class DefaultInterpreter implements CommandInterpreter {
     }
 
     public Completable parsePartial(CommandShell shell, String line)
-            throws ShellSyntaxException {
+        throws ShellSyntaxException {
         Tokenizer tokenizer = new Tokenizer(line);
         if (!tokenizer.hasNext()) {
             return new CommandLine("", null);
@@ -176,8 +176,7 @@ public class DefaultInterpreter implements CommandInterpreter {
             return tokens.get(pos++);
         }
 
-        private void tokenize(String s, int flags)
-                throws IllegalArgumentException {
+        private void tokenize(String s, int flags) throws IllegalArgumentException {
             int pos = 0;
 
             while (true) {
@@ -204,92 +203,92 @@ public class DefaultInterpreter implements CommandInterpreter {
                     currentChar = s.charAt(pos++);
 
                     switch (currentChar) {
-                    case ESCAPE_CHAR:
-                        if (pos >= s.length()) {
-                            throw new IllegalArgumentException(
+                        case ESCAPE_CHAR:
+                            if (pos >= s.length()) {
+                                throw new IllegalArgumentException(
                                     "escape char ('\\') not followed by a character");
-                        }
-                        char ch;
-                        switch (ch = s.charAt(pos++)) {
-                        case N:
-                            token.append(ESCAPE_N);
+                            }
+                            char ch;
+                            switch (ch = s.charAt(pos++)) {
+                                case N:
+                                    token.append(ESCAPE_N);
+                                    break;
+                                case B:
+                                    token.append(ESCAPE_B);
+                                    break;
+                                case R:
+                                    token.append(ESCAPE_R);
+                                    break;
+                                case T:
+                                    token.append(ESCAPE_T);
+                                    break;
+                                default:
+                                    token.append(ch);
+                            }
                             break;
-                        case B:
-                            token.append(ESCAPE_B);
+
+                        case FULL_ESCAPE_CHAR:
+                            if (inQuote) {
+                                token.append(currentChar);
+                            } else {
+                                inFullEscape = !inFullEscape; // just a toggle
+                                type = STRING;
+                                if (!inFullEscape) {
+                                    type |= CLOSED;
+                                }
+                            }
                             break;
-                        case R:
-                            token.append(ESCAPE_R);
+                        case QUOTE_CHAR:
+                            if (inFullEscape) {
+                                token.append(currentChar);
+                            } else {
+                                inQuote = !inQuote;
+                                type = STRING;
+                                if (!inQuote) {
+                                    type |= CLOSED;
+                                }
+                            }
                             break;
-                        case T:
-                            token.append(ESCAPE_T);
+                        case SPACE_CHAR:
+                            if (inFullEscape || inQuote) {
+                                token.append(currentChar);
+                            } else {
+                                if (token.length() != 0) { // don't return an empty
+                                    // token
+                                    finished = true;
+                                    pos--; // to return trailing space as empty
+                                    // last
+                                    // token
+                                }
+                            }
+                            break;
+                        case COMMENT_CHAR:
+                            if (inFullEscape || inQuote) {
+                                token.append(currentChar);
+                            } else {
+                                finished = true;
+                                pos = s.length(); // ignore EVERYTHING
+                            }
+                            break;
+                        case GET_INPUT_FROM_CHAR:
+                        case SEND_OUTPUT_TO_CHAR:
+                        case PIPE_CHAR:
+                            if (inFullEscape || inQuote ||
+                                    (flags & REDIRECTS_FLAG) == 0) {
+                                token.append(currentChar);
+                            } else {
+                                finished = true;
+                                if (token.length() == 0) {
+                                    token.append(currentChar);
+                                    type = SPECIAL;
+                                } else {
+                                    pos--; // the special character terminates the
+                                    // literal.
+                                }
+                            }
                             break;
                         default:
-                            token.append(ch);
-                        }
-                        break;
-
-                    case FULL_ESCAPE_CHAR:
-                        if (inQuote) {
                             token.append(currentChar);
-                        } else {
-                            inFullEscape = !inFullEscape; // just a toggle
-                            type = STRING;
-                            if (!inFullEscape) {
-                                type |= CLOSED;
-                            }
-                        }
-                        break;
-                    case QUOTE_CHAR:
-                        if (inFullEscape) {
-                            token.append(currentChar);
-                        } else {
-                            inQuote = !inQuote;
-                            type = STRING;
-                            if (!inQuote) {
-                                type |= CLOSED;
-                            }
-                        }
-                        break;
-                    case SPACE_CHAR:
-                        if (inFullEscape || inQuote) {
-                            token.append(currentChar);
-                        } else {
-                            if (token.length() != 0) { // don't return an empty
-                                // token
-                                finished = true;
-                                pos--; // to return trailing space as empty
-                                        // last
-                                // token
-                            }
-                        }
-                        break;
-                    case COMMENT_CHAR:
-                        if (inFullEscape || inQuote) {
-                            token.append(currentChar);
-                        } else {
-                            finished = true;
-                            pos = s.length(); // ignore EVERYTHING
-                        }
-                        break;
-                    case GET_INPUT_FROM_CHAR:
-                    case SEND_OUTPUT_TO_CHAR:
-                    case PIPE_CHAR:
-                        if (inFullEscape || inQuote ||
-                                (flags & REDIRECTS_FLAG) == 0) {
-                            token.append(currentChar);
-                        } else {
-                            finished = true;
-                            if (token.length() == 0) {
-                                token.append(currentChar);
-                                type = SPECIAL;
-                            } else {
-                                pos--; // the special character terminates the
-                                // literal.
-                            }
-                        }
-                        break;
-                    default:
-                        token.append(currentChar);
                     }
                 }
                 tokens.add(new CommandLine.Token(token.toString(), type, start, pos));

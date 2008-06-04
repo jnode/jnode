@@ -97,15 +97,15 @@ public class CommandLine implements Completable, Iterable<String> {
             new Parameter(
                     new org.jnode.shell.help.argument.FileArgument(
                             "file", "a file", org.jnode.shell.help.Argument.MULTI),
-                    org.jnode.shell.help.Parameter.OPTIONAL));
+                            org.jnode.shell.help.Parameter.OPTIONAL));
 
     private final org.jnode.shell.help.Argument defaultArg = 
         new org.jnode.shell.help.argument.AliasArgument("command",
             "the command to be called");
-            
-//    private final Syntax defaultSyntax = new RepeatSyntax(new ArgumentSyntax("argument"));
-//    private final ArgumentBundle defaultArguments = new ArgumentBundle(
-//    		new FileArgument("argument", org.jnode.shell.syntax.Argument.MULTIPLE));
+
+//  private final Syntax defaultSyntax = new RepeatSyntax(new ArgumentSyntax("argument"));
+//  private final ArgumentBundle defaultArguments = new ArgumentBundle(
+//  new FileArgument("argument", org.jnode.shell.syntax.Argument.MULTIPLE));
 
     private final Token commandToken;
 
@@ -145,14 +145,13 @@ public class CommandLine implements Completable, Iterable<String> {
             Closeable[] streams) {
         this.commandToken = commandName == null ? null : new Token(commandName);
         if (arguments == null || arguments.length == 0) {
-        	this.argumentTokens = NO_TOKENS;
-        }
-        else {
-        	int len = arguments.length;
-        	argumentTokens = new Token[len];
-        	for (int i = 0; i < len; i++) {
-        		this.argumentTokens[i] = new Token(arguments[i]);
-        	}
+            this.argumentTokens = NO_TOKENS;
+        } else {
+            int len = arguments.length;
+            argumentTokens = new Token[len];
+            for (int i = 0; i < len; i++) {
+                this.argumentTokens[i] = new Token(arguments[i]);
+            }
         }
         this.streams = setupStreams(streams);
     }
@@ -180,8 +179,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     private Closeable[] setupStreams(Closeable[] streams) {
         if (streams == null) {
-            return new Closeable[] { DEFAULT_STDIN, DEFAULT_STDOUT,
-                    DEFAULT_STDERR };
+            return new Closeable[] {DEFAULT_STDIN, DEFAULT_STDOUT, DEFAULT_STDERR};
         } else if (streams.length < 3) {
             throw new IllegalArgumentException("streams.length < 3");
         } else {
@@ -191,11 +189,12 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * This method returns an Iterator for the arguments represented as Strings.
+     * 
      * @deprecated
      */
     public SymbolSource<String> iterator() {
-    	final boolean whitespaceAfterLast = this.argumentAnticipated;
-    	
+        final boolean whitespaceAfterLast = this.argumentAnticipated;
+
         return new SymbolSource<String>() {
             private int pos = 0;
 
@@ -231,8 +230,7 @@ public class CommandLine implements Completable, Iterable<String> {
             public void seek(int pos) throws NoSuchElementException {
                 if (pos >= 0 && pos <= argumentTokens.length) {
                     this.pos = pos;
-                }
-                else {
+                } else {
                     throw new NoSuchElementException("pos out of range");
                 }
             }
@@ -241,9 +239,9 @@ public class CommandLine implements Completable, Iterable<String> {
                 return pos;
             }
 
-			public boolean whitespaceAfterLast() {
-				return whitespaceAfterLast;
-			}
+            public boolean whitespaceAfterLast() {
+                return whitespaceAfterLast;
+            }
 
         };
     }
@@ -253,13 +251,12 @@ public class CommandLine implements Completable, Iterable<String> {
      */
     public SymbolSource<Token> tokenIterator() throws NoTokensAvailableException {
         if (argumentTokens == null) {
-            throw new NoTokensAvailableException(
-                    "No tokens available in the CommandLine");
+            throw new NoTokensAvailableException("No tokens available in the CommandLine");
         }
-        
+
         final boolean whitespaceAfterLast = this.argumentAnticipated;
-        
-    	return new SymbolSource<Token>() {
+
+        return new SymbolSource<Token>() {
             private int pos = 0;
 
             public boolean hasNext() {
@@ -279,23 +276,22 @@ public class CommandLine implements Completable, Iterable<String> {
                 }
                 return argumentTokens[pos];
             }
-            
+
             public Token last() throws NoSuchElementException {
                 if (pos <= 0) {
                     throw new NoSuchElementException();
                 }
                 return argumentTokens[pos - 1];
             }
-            
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-			
-			public void seek(int pos) throws NoSuchElementException {
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public void seek(int pos) throws NoSuchElementException {
                 if (pos >= 0 && pos <= argumentTokens.length) {
                     this.pos = pos;
-                }
-                else {
+                } else {
                     throw new NoSuchElementException("pos out of range");
                 }
             }
@@ -303,10 +299,10 @@ public class CommandLine implements Completable, Iterable<String> {
             public int tell() {
                 return pos;
             }
-            
+
             public boolean whitespaceAfterLast() {
-				return whitespaceAfterLast;
-			}
+                return whitespaceAfterLast;
+            }
 
         };
     }
@@ -335,14 +331,14 @@ public class CommandLine implements Completable, Iterable<String> {
      * @return the arguments as String[]
      */
     public String[] getArguments() {
-    	int len = argumentTokens.length;
-    	if (len == 0) {
-    		return NO_ARGS;
-    	}
-    	String[] arguments = new String[len];
-    	for (int i = 0; i < len; i++) {
-    		arguments[i] = argumentTokens[i].token;
-    	}
+        int len = argumentTokens.length;
+        if (len == 0) {
+            return NO_ARGS;
+        }
+        String[] arguments = new String[len];
+        for (int i = 0; i < len; i++) {
+            arguments[i] = argumentTokens[i].token;
+        }
         return arguments;
     }
 
@@ -422,65 +418,65 @@ public class CommandLine implements Completable, Iterable<String> {
          * available.
          */
         public final int end;
-        
+
         public Token(String value, int type, int start, int end) {
             this.token = value;
             this.tokenType = type;
             this.start = start;
             this.end = end;
         }
-        
+
         public Token(String token) {
             this(token, -1, -1, -1);
         }
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + end;
-			result = prime * result + start;
-			result = prime * result + ((token == null) ? 0 : token.hashCode());
-			result = prime * result + tokenType;
-			return result;
-		}
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + end;
+            result = prime * result + start;
+            result = prime * result + ((token == null) ? 0 : token.hashCode());
+            result = prime * result + tokenType;
+            return result;
+        }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			final Token other = (Token) obj;
-			if (end != other.end)
-				return false;
-			if (start != other.start)
-				return false;
-			if (token == null) {
-				if (other.token != null)
-					return false;
-			} else if (!token.equals(other.token))
-				return false;
-			if (tokenType != other.tokenType)
-				return false;
-			return true;
-		} 
-		
-		public String toString() {
-		    return "Token{'" + token + "'," + start + "," + end + "," + tokenType + "}";
-		}
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final Token other = (Token) obj;
+            if (end != other.end)
+                return false;
+            if (start != other.start)
+                return false;
+            if (token == null) {
+                if (other.token != null)
+                    return false;
+            } else if (!token.equals(other.token))
+                return false;
+            if (tokenType != other.tokenType)
+                return false;
+            return true;
+        } 
+
+        public String toString() {
+            return "Token{'" + token + "'," + start + "," + end + "," + tokenType + "}";
+        }
     }
 
     // escape and unescape methods
 
     private static final Escape[] escapes = {
-            // plain escaped
-            new Escape(ESCAPE_CHAR, ESCAPE_CHAR), new Escape(ESCAPE_B, B),
-            new Escape(ESCAPE_N, N), new Escape(ESCAPE_R, R),
-            new Escape(ESCAPE_T, T),
-            new Escape(FULL_ESCAPE_CHAR, FULL_ESCAPE_CHAR) };
+        // plain escaped
+        new Escape(ESCAPE_CHAR, ESCAPE_CHAR), new Escape(ESCAPE_B, B),
+        new Escape(ESCAPE_N, N), new Escape(ESCAPE_R, R),
+        new Escape(ESCAPE_T, T),
+        new Escape(FULL_ESCAPE_CHAR, FULL_ESCAPE_CHAR) };
 
     /**
      * Escape a single command line argument for the Shell. Same as calling
@@ -576,40 +572,38 @@ public class CommandLine implements Completable, Iterable<String> {
      * @throws CommandSyntaxException if the chosen syntax doesn't match the command
      * line arguments.
      */
-    public CommandInfo parseCommandLine(CommandShell shell)
-    throws ShellException {
-    	String cmd = (commandToken == null) ? "" : commandToken.token.trim();
-    	if (cmd.equals("")) {
-    		throw new ShellFailureException("no command name");
-    	}
-    	try {
-    		// Get command's argument bundle and syntax
-    		CommandInfo cmdInfo = shell.getCommandInfo(cmd);
-    		Command command = cmdInfo.createCommandInstance();
-    		
-    		// Get the command's argument bundle, or the default one.
-    		ArgumentBundle bundle = (command == null) ? null :
-    		    command.getArgumentBundle();
-    		if (bundle != null) {
-    		    // Get a syntax for the alias, or a default one.
-    		    SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
+    public CommandInfo parseCommandLine(CommandShell shell) throws ShellException {
+        String cmd = (commandToken == null) ? "" : commandToken.token.trim();
+        if (cmd.equals("")) {
+            throw new ShellFailureException("no command name");
+        }
+        try {
+            // Get command's argument bundle and syntax
+            CommandInfo cmdInfo = shell.getCommandInfo(cmd);
+            Command command = cmdInfo.createCommandInstance();
 
-    		    // Do a full parse to bind the command line argument tokens to corresponding
-    		    // command arguments
-    		    bundle.parse(this, syntaxes);
-    		}
-    		return cmdInfo;
-    	} catch (ClassNotFoundException ex) {
-    		throw new ShellException("Command class not found", ex);
-    	} catch (InstantiationException ex) {
+            // Get the command's argument bundle, or the default one.
+            ArgumentBundle bundle = (command == null) ? null :
+                command.getArgumentBundle();
+            if (bundle != null) {
+                // Get a syntax for the alias, or a default one.
+                SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
+
+                // Do a full parse to bind the command line argument tokens to corresponding
+                // command arguments
+                bundle.parse(this, syntaxes);
+            }
+            return cmdInfo;
+        } catch (ClassNotFoundException ex) {
+            throw new ShellException("Command class not found", ex);
+        } catch (InstantiationException ex) {
             throw new ShellException("Command class cannot be instantiated", ex);
         } catch (IllegalAccessException ex) {
             throw new ShellException("Command class cannot be instantiated", ex);
         }
     }
-    
-    public void complete(CompletionInfo completion, CommandShell shell)
-            throws CompletionException {
+
+    public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
         String cmd = (commandToken == null) ? "" : commandToken.token.trim();
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
             CommandInfo cmdClass;
@@ -618,12 +612,11 @@ public class CommandLine implements Completable, Iterable<String> {
             } catch (ClassNotFoundException ex) {
                 throw new CompletionException("Command class not found", ex);
             }
-            
+
             Command command;
             try {
                 command = cmdClass.createCommandInstance();
-            }
-            catch (Throwable ex) {
+            } catch (Throwable ex) {
                 throw new CompletionException("Problem creating a command instance", ex);
             }
 
@@ -637,8 +630,7 @@ public class CommandLine implements Completable, Iterable<String> {
                 // Try new-style completion if we have a Syntax
                 if (bundle != null) {
                     bundle.complete(this, syntaxes, completion);
-                }
-                else {
+                } else {
                     // Otherwise, try old-style completion using the command's INFO
                     try {
                         Help.Info info = Help.getInfo(cmdClass.getCommandClass());

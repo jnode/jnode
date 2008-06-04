@@ -35,7 +35,7 @@ public interface ShellManager {
      * 
      * @see org.jnode.naming.InitialNaming
      */
-    public static final Class<ShellManager> NAME = ShellManager.class;// "jnode/shellmanager";
+    public static final Class<ShellManager> NAME = ShellManager.class;
 
     /**
      * Gets the current shell
@@ -58,9 +58,9 @@ public interface ShellManager {
     public void unregisterInterpreterFactory(CommandInterpreter.Factory factory);
 
     public CommandInvoker createInvoker(String name, CommandShell shell)
-            throws IllegalArgumentException;
+        throws IllegalArgumentException;
 
     public CommandInterpreter createInterpreter(String name)
-            throws IllegalArgumentException;
+        throws IllegalArgumentException;
 
 }

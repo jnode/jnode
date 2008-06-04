@@ -54,11 +54,12 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
 
     CommandShell commandShell;
 
-    static final Class<?>[] MAIN_ARG_TYPES = new Class[] { String[].class };
+    static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
 
     static final Class<?>[] EXECUTE_ARG_TYPES = new Class[] {
-            CommandLine.class, InputStream.class, PrintStream.class,
-            PrintStream.class };
+        CommandLine.class, InputStream.class, PrintStream.class,
+        PrintStream.class
+    };
 
     static final String MAIN_METHOD = "main";
 
@@ -73,8 +74,8 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     public AsyncCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
         this.err = commandShell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
-        commandShell.getConsole().addKeyboardListener(this);// listen for
-        // ctrl-c
+        // listen for ctrl-c
+        commandShell.getConsole().addKeyboardListener(this);
     }
 
     public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
@@ -83,13 +84,13 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     }
 
     public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
-            throws ShellException {
+        throws ShellException {
         CommandRunner cr = setup(cmdLine, cmdInfo);
         return forkIt(cmdLine, cmdInfo, cr);
     }
     
     private CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
-            throws ShellException {
+        throws ShellException {
         Method method;
         CommandRunner cr = null;
 
@@ -111,11 +112,9 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
         if (command != null) {
             cr = new CommandRunner(commandShell, this, cmdInfo, cmdLine, in, out, err);
-        }
-        else {
+        } else {
             try {
-                method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD,
-                        MAIN_ARG_TYPES);
+                method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
                 if ((method.getModifiers() & Modifier.STATIC) != 0) {
                     if (streams[0] != CommandLine.DEFAULT_STDIN
                             || streams[1] != CommandLine.DEFAULT_STDOUT
@@ -126,7 +125,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                                         + " does not allow redirection or pipelining");
                     }
                     cr = new CommandRunner(commandShell, this, cmdInfo, cmdInfo.getCommandClass(), method,
-                            new Object[] { cmdLine.getArguments() }, 
+                            new Object[] {cmdLine.getArguments()}, 
                             in, out, err);
                 }
             } catch (NoSuchMethodException e) {
@@ -140,12 +139,12 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
         
         // These are now the real streams ...
-        cmdLine.setStreams(new Closeable[] { in, out, err });
+        cmdLine.setStreams(new Closeable[] {in, out, err});
         return cr;
     }
 
     private int runIt(CommandLine cmdLine, CommandInfo cmdInfo, CommandRunner cr)
-            throws ShellInvocationException {
+        throws ShellInvocationException {
         try {
             if (cmdInfo.isInternal()) {
                 cr.run();

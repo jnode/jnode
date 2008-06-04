@@ -96,15 +96,13 @@ class CommandRunner implements Runnable {
                                 : cx.newInstance();
                         AccessController.doPrivileged(new InvokeAction(method, obj,
                                 args));
-                    }
-                    finally {
+                    } finally {
                         // This clears the current command to prevent leakage.  (This
                         // is only necessary if the current thread could be used to
                         // execute other commands.  But we'll do it anyway ... for now.)
                         AbstractCommand.retrieveCurrentCommand();
                     }
-                }
-                else {
+                } else {
                     // FIXME ... it would be nice if we could avoid all of this use of
                     // the reflection APIs ...
                     Method method = cmdInfo.getCommandClass().getMethod(
@@ -118,8 +116,7 @@ class CommandRunner implements Runnable {
                 Exception ex2 = ex.getException();
                 if (ex2 instanceof InvocationTargetException) {
                     throw ex2.getCause();
-                }
-                else {
+                } else {
                     throw ex2;
                 }
             }
