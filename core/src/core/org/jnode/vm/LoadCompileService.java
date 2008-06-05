@@ -108,7 +108,7 @@ public final class LoadCompileService {
     /**
      * Start this service.
      */
-    final static void start() {
+    static final void start() {
         initService();
         if (!started) {
             started = true;
@@ -122,7 +122,7 @@ public final class LoadCompileService {
 
     @KernelSpace
     @Internal
-    public final static void showInfo() {
+    public static final void showInfo() {
         Unsafe.debug(" #loadcompile requests: ");
         Unsafe.debug((service != null) ? service.requestQueue.size() : 0);
     }
@@ -218,7 +218,7 @@ public final class LoadCompileService {
         return ClassDecoder.defineClass(name, data, true, loader, protDomain);
     }
 
-    private static abstract class Request {
+    private abstract static class Request {
 
         private boolean finished = false;
         private Throwable exception;
@@ -265,7 +265,7 @@ public final class LoadCompileService {
         abstract String errorMessage();
     }
 
-    final static class CompileRequest extends Request {
+    static final class CompileRequest extends Request {
 
         private final VmMethod method;
 
@@ -303,7 +303,7 @@ public final class LoadCompileService {
         }
     }
 
-    final static class LoadRequest extends Request {
+    static final class LoadRequest extends Request {
         private final String name;
 
         private final ByteBuffer data;
