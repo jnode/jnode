@@ -76,27 +76,24 @@ public class SyntaxCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+        throws Exception {
         SyntaxManager synMgr = ShellUtils.getCurrentSyntaxManager();
         if (ARG_DUMP_ALL.isSet()) {
             for (String alias : synMgr.getKeys()) {
                 SyntaxBundle bundle = synMgr.getSyntaxBundle(alias);
                 dumpSyntax(alias, bundle, out);
             }
-        }
-        else {
+        } else {
             String alias;
             if (ARG_DUMP.isSet()) {
                 alias = getAlias();
                 SyntaxBundle bundle = synMgr.getSyntaxBundle(alias);
                 if (bundle == null) {
                     err.println("No syntax for alias '" + alias + "'");
-                }
-                else {
+                } else {
                     dumpSyntax(alias, bundle, out);
                 }
-            }
-            else if (ARG_FILE.isSet()) {
+            } else if (ARG_FILE.isSet()) {
                 alias = getAlias();
                 File file = ARG_FILE.getValue();
                 XMLElement xml = new XMLElement();
@@ -108,21 +105,17 @@ public class SyntaxCommand extends AbstractCommand {
                     SyntaxBundle bundle = 
                         new SyntaxSpecLoader().loadSyntax(new XMLSyntaxSpecAdapter(xml));
                     synMgr.add(bundle);
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     err.println("Cannot read file '" + file + "': " + ex.getMessage());
-                }
-                finally {
+                } finally {
                     if (reader != null) {
                         reader.close();
                     }
                 }
-            }
-            else if (ARG_REMOVE.isSet()) {
+            } else if (ARG_REMOVE.isSet()) {
                 alias = getAlias();
                 synMgr.remove(alias);
-            }
-            else {
+            } else {
                 for (String key : synMgr.getKeys()) {
                     out.println(key);
                 }
@@ -139,7 +132,7 @@ public class SyntaxCommand extends AbstractCommand {
     }
 
     private void dumpSyntax(String alias, SyntaxBundle bundle, PrintStream out) 
-    throws IOException {
+        throws IOException {
         XMLElement element = new XMLElement(new Hashtable<String, Object>(), false, false);
         element.setName("syntax");
         element.setAttribute("alias", alias);

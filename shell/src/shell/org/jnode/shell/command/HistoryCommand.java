@@ -28,7 +28,10 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /** 
  * List or execute a command from the shell's command history.
@@ -45,76 +48,71 @@ public class HistoryCommand extends AbstractCommand {
     private final FlagArgument FLAG_TEST =
         new FlagArgument("test", Argument.OPTIONAL, "If set, don't try to execute the history command");
 
-	private Shell shell;
+    private Shell shell;
     private PrintStream out;
     private PrintStream err;
-	private InputHistory history;
+    private InputHistory history;
 
 
-	public HistoryCommand() {
+    public HistoryCommand() {
         super("Command history list or execute");
         registerArguments(ARG_INDEX, ARG_PREFIX, FLAG_TEST);
     }
-	
+
     @Override
     public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception 
-    {
+            PrintStream out, PrintStream err) throws Exception {
         shell = ShellUtils.getShellManager().getCurrentShell();
-		history = shell.getCommandHistory();
-		this.out = out;
-		this.err = err;
-		
-		int index = ARG_INDEX.isSet() ? ARG_INDEX.getValue() : -1;
-		String prefix = ARG_PREFIX.isSet() ? ARG_PREFIX.getValue() : null;
-		boolean test = FLAG_TEST.isSet();
+        history = shell.getCommandHistory();
+        this.out = out;
+        this.err = err;
 
-		if (index == -1 && prefix == null && !test) {
-			listCommands();
-		}
-		else {
-		    runCommand(index, prefix, test);
-		}
-	}
+        int index = ARG_INDEX.isSet() ? ARG_INDEX.getValue() : -1;
+        String prefix = ARG_PREFIX.isSet() ? ARG_PREFIX.getValue() : null;
+        boolean test = FLAG_TEST.isSet();
 
-	/** 
-	 * List every command in the history with its history index. 
-	 */
-	public void listCommands() {
-		for (int i = 0; i < history.size(); i++) {
-			out.println("" + i + ": " + history.getLineAt(i));
-		}
-	}
+        if (index == -1 && prefix == null && !test) {
+            listCommands();
+        } else {
+            runCommand(index, prefix, test);
+        }
+    }
 
-	/**
-	 * Select and run (or print) a command from the history.
-	 * 
-	 * @param index a history index or <code>-1</code>
-	 * @param prefix a command prefix or <code>null</code>
-	 * @param test if <code>true</code> this is just a test ... don't execute the command.
-	 */
-	public void runCommand(int index, String prefix, boolean test) {
-		String line = (index >= 0) ? history.getLineAt(index) : history.getLineWithPrefix(prefix);
-		
-		if (line == null) {
-		    if (index >= 0) {
-		        err.println("History command #" + index + " not found");
-		    }
-		    else {
-		        err.println("History command starting with '" + prefix + "' not found");
-		    }
-			exit(1);
-		}
-		else if (test) {
-			out.println(line);
-		}
-		else {
-		    err.println("History command running is not implemented yet: try '-t' to test");
-		    exit(2);
-		}
-	}
+    /** 
+     * List every command in the history with its history index. 
+     */
+    public void listCommands() {
+        for (int i = 0; i < history.size(); i++) {
+            out.println("" + i + ": " + history.getLineAt(i));
+        }
+    }
 
-	public static void main(String[] args) throws Exception {
-		new HistoryCommand().execute(args);
-	}
+    /**
+     * Select and run (or print) a command from the history.
+     * 
+     * @param index a history index or <code>-1</code>
+     * @param prefix a command prefix or <code>null</code>
+     * @param test if <code>true</code> this is just a test ... don't execute the command.
+     */
+    public void runCommand(int index, String prefix, boolean test) {
+        String line = (index >= 0) ? history.getLineAt(index) : history.getLineWithPrefix(prefix);
+
+        if (line == null) {
+            if (index >= 0) {
+                err.println("History command #" + index + " not found");
+            } else {
+                err.println("History command starting with '" + prefix + "' not found");
+            }
+            exit(1);
+        } else if (test) {
+            out.println(line);
+        } else {
+            err.println("History command running is not implemented yet: try '-t' to test");
+            exit(2);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        new HistoryCommand().execute(args);
+    }
 }

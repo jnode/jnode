@@ -39,7 +39,7 @@ import org.jnode.vm.memmgr.VmHeapManager;
  * @author crawley@jnode.org
  */
 public class GcCommand extends AbstractCommand {
-    
+
     private enum HeapFlag {
         TRACE_BASIC(VmHeapManager.TRACE_BASIC), 
         TRACE_ALLOC(VmHeapManager.TRACE_ALLOC), 
@@ -47,14 +47,14 @@ public class GcCommand extends AbstractCommand {
         TRACE_OOM(VmHeapManager.TRACE_OOM),
         TRACE_AD_HOC(VmHeapManager.TRACE_AD_HOC),
         all(-1); // All flags
-        
+
         public final int flagBit;
-        
+
         private HeapFlag(int flagBit) {
             this.flagBit = flagBit;
         }
     }
-    
+
     private class HeapDebugFlagArgument extends EnumArgument<HeapFlag> {
         public HeapDebugFlagArgument() {
             super("debugFlag", Argument.OPTIONAL | Argument.MULTIPLE,
@@ -65,7 +65,7 @@ public class GcCommand extends AbstractCommand {
             return "debug flag";
         }
     }
-    
+
     private final HeapDebugFlagArgument ARG_DEBUG_FLAGS = new HeapDebugFlagArgument();
     private final FlagArgument ARG_SET =
         new FlagArgument("set", Argument.OPTIONAL, "set these debug flags");
@@ -79,71 +79,67 @@ public class GcCommand extends AbstractCommand {
         registerArguments(ARG_DEBUG_FLAGS, ARG_CLEAR, ARG_SET, ARG_SHOW);
     }
 
-	public static void main(String[] args) throws Exception {
-		new GcCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new GcCommand().execute(args);
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-	throws Exception {
-	    if (ARG_SET.isSet()) {
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
+        if (ARG_SET.isSet()) {
             Vm.getHeapManager().setHeapFlags(getFlags());
-        }
-	    else if (ARG_CLEAR.isSet()) {
-	        int flags = Vm.getHeapManager().getHeapFlags() ^ getFlags();
+        } else if (ARG_CLEAR.isSet()) {
+            int flags = Vm.getHeapManager().getHeapFlags() ^ getFlags();
             Vm.getHeapManager().setHeapFlags(flags);
-        }
-	    else if (ARG_SHOW.isSet()) {
+        } else if (ARG_SHOW.isSet()) {
             showFlags(Vm.getHeapManager().getHeapFlags(), out);
+        } else {
+            final Runtime rt = Runtime.getRuntime();
+            out.println("Memory size: " + NumberUtils.toBinaryByte(rt.totalMemory()));
+            out.println("Free memory: " + NumberUtils.toBinaryByte(rt.freeMemory()));
+
+            out.println("Starting gc...");
+            long start = System.currentTimeMillis();
+            rt.gc();
+            GCStatistics stats = Vm.getHeapManager().getStatistics();
+            Thread.yield();
+            long end = System.currentTimeMillis();
+
+            out.println("Memory size: " + NumberUtils.toBinaryByte(rt.totalMemory()));
+            out.println("Free memory: " + NumberUtils.toBinaryByte(rt.freeMemory()));
+            out.println("Time taken : " + (end - start) + "ms");
+            out.println("Stats      : " + stats.toString());
         }
-	    else {
-	        final Runtime rt = Runtime.getRuntime();
-	        out.println("Memory size: " + NumberUtils.toBinaryByte(rt.totalMemory()));
-	        out.println("Free memory: " + NumberUtils.toBinaryByte(rt.freeMemory()));
+    }
 
-	        out.println("Starting gc...");
-	        long start = System.currentTimeMillis();
-	        rt.gc();
-	        GCStatistics stats = Vm.getHeapManager().getStatistics();
-	        Thread.yield();
-	        long end = System.currentTimeMillis();
-
-	        out.println("Memory size: " + NumberUtils.toBinaryByte(rt.totalMemory()));
-	        out.println("Free memory: " + NumberUtils.toBinaryByte(rt.freeMemory()));
-	        out.println("Time taken : " + (end-start) + "ms");
-	        out.println("Stats      : " + stats.toString());
-	    }
-	}
-
-	private void showFlags(int flags, PrintStream out) {
-	    StringBuilder sb = new StringBuilder();
-	    for (int flagBitMask = 1; flagBitMask != 0; flagBitMask = flagBitMask << 1) {
-	        if ((flags & flagBitMask) != 0) {
-	            for (HeapFlag hf : HeapFlag.values()) {
-	                if (hf.flagBit == flagBitMask) {
-	                    sb.append(' ').append(hf.name());
-	                    break;
-	                }
-	            }
-	        }
+    private void showFlags(int flags, PrintStream out) {
+        StringBuilder sb = new StringBuilder();
+        for (int flagBitMask = 1; flagBitMask != 0; flagBitMask = flagBitMask << 1) {
+            if ((flags & flagBitMask) != 0) {
+                for (HeapFlag hf : HeapFlag.values()) {
+                    if (hf.flagBit == flagBitMask) {
+                        sb.append(' ').append(hf.name());
+                        break;
+                    }
+                }
+            }
         }
         if (sb.length() == 0) {
             out.println("No heap debug flags set");
-        }
-        else {
+        } else {
             out.println("Heap debug flags:" + sb.toString());
         }
     }
 
     private int getFlags() {
-	    int debugFlags = 0;
-	    if (ARG_DEBUG_FLAGS.isSet()) {
-	        for (HeapFlag flag : ARG_DEBUG_FLAGS.getValues()) {
-	            debugFlags |= flag.flagBit;
-	        }
-	    }
-	    return debugFlags;
-	}
+        int debugFlags = 0;
+        if (ARG_DEBUG_FLAGS.isSet()) {
+            for (HeapFlag flag : ARG_DEBUG_FLAGS.getValues()) {
+                debugFlags |= flag.flagBit;
+            }
+        }
+        return debugFlags;
+    }
 }

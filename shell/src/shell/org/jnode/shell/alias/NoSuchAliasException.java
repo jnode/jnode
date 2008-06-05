@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.alias;
 
 import org.jnode.shell.ShellException;
@@ -28,34 +28,34 @@ import org.jnode.shell.ShellException;
  */
 public class NoSuchAliasException extends ShellException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
-	 * 
-	 */
-	public NoSuchAliasException() {
-		super();
-	}
+     * 
+     */
+    public NoSuchAliasException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public NoSuchAliasException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public NoSuchAliasException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public NoSuchAliasException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public NoSuchAliasException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public NoSuchAliasException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public NoSuchAliasException(String s) {
+        super(s);
+    }
 }

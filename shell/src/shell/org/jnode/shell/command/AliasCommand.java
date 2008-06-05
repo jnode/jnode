@@ -43,35 +43,24 @@ import org.jnode.shell.syntax.ClassNameArgument;
  */
 public class AliasCommand extends AbstractCommand {
 
-    private final static String slash_t = ":\t\t";
+    private static final String slash_t = ":\t\t";
 
-    private final AliasArgument ARG_ALIAS;
-    private final ClassNameArgument ARG_CLASS;
-    private final AliasArgument ARG_REMOVE;
+    private final AliasArgument ARG_ALIAS = 
+        new AliasArgument("alias", Argument.OPTIONAL, "the alias to be added");
+    
+    private final ClassNameArgument ARG_CLASS =
+        new ClassNameArgument("className", Argument.OPTIONAL, "the classname");
+    
+    private final AliasArgument ARG_REMOVE =
+        new AliasArgument("remove", Argument.OPTIONAL, "the alias to be removed");
     
     public AliasCommand() {
         super("list, add or remove JNode command aliases");
-        ARG_ALIAS = new AliasArgument("alias", Argument.OPTIONAL, "the alias to be added");
-        ARG_CLASS = new ClassNameArgument("className", Argument.OPTIONAL, "the classname");
-        ARG_REMOVE = new AliasArgument("remove", Argument.OPTIONAL, "the alias to be removed");
         registerArguments(ARG_ALIAS, ARG_CLASS, ARG_REMOVE);
     }
 
     public static void main(String[] args) throws Exception {
         new AliasCommand().execute(args);
-    }
-
-    private static void showAliases(AliasManager aliasMgr, PrintStream out)
-            throws NoSuchAliasException {
-        final TreeMap<String, String> map = new TreeMap<String, String>();
-
-        for (String alias : aliasMgr.aliases()) {
-            map.put(alias, aliasMgr.getAliasClassName(alias));
-        }
-
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            out.println(entry.getKey() + slash_t + entry.getValue());
-        }
     }
 
     public void execute(CommandLine commandLine, InputStream in,
@@ -100,4 +89,18 @@ public class AliasCommand extends AbstractCommand {
             showAliases(aliasMgr, out);
         } 
     }
+    
+    private void showAliases(AliasManager aliasMgr, PrintStream out) throws NoSuchAliasException {
+        final TreeMap<String, String> map = new TreeMap<String, String>();
+
+        for (String alias : aliasMgr.aliases()) {
+            map.put(alias, aliasMgr.getAliasClassName(alias));
+        }
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            out.println(entry.getKey() + slash_t + entry.getValue());
+        }
+    }
+
+    
 }

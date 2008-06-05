@@ -78,11 +78,9 @@ public class LocaleCommand extends AbstractCommand {
             }
             out.println("Setting default Locale to " + formatLocale(locale));
             Locale.setDefault(locale);
-        }
-        else if (FLAG_LIST.isSet()) {
+        } else if (FLAG_LIST.isSet()) {
             listLocales(out);
-        }
-        else {
+        } else {
             out.println("Current default Locale is " + formatLocale(Locale.getDefault()));
         }
     }

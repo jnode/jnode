@@ -98,10 +98,11 @@ public class BjorneInterpreter implements CommandInterpreter {
 
     public static final int FLAG_PIPE = 0x0010;
 
-    public static final CommandNode EMPTY = new SimpleCommandNode(CMD_EMPTY,
-            new BjorneToken[0]);
+    public static final CommandNode EMPTY = 
+        new SimpleCommandNode(CMD_EMPTY, new BjorneToken[0]);
 
-    private static HashMap<String, BjorneBuiltin> BUILTINS = new HashMap<String, BjorneBuiltin>();
+    private static HashMap<String, BjorneBuiltin> BUILTINS = 
+        new HashMap<String, BjorneBuiltin>();
     
     private static boolean DEBUG = false;
 
@@ -124,19 +125,17 @@ public class BjorneInterpreter implements CommandInterpreter {
         return "bjorne";
     }
 
-    public int interpret(CommandShell shell, String command)
-            throws ShellException {
+    public int interpret(CommandShell shell, String command) throws ShellException {
         return interpret(shell, command, null, false);
     }
 
-    public Completable parsePartial(CommandShell shell, String partial)
-            throws ShellSyntaxException {
+    public Completable parsePartial(CommandShell shell, String partial) throws ShellSyntaxException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    int interpret(CommandShell shell, String command, OutputStream capture,
-            boolean source) throws ShellException {
+    int interpret(CommandShell shell, String command, OutputStream capture, boolean source) 
+        throws ShellException {
         BjorneContext myContext;
         if (capture == null) {
             if (this.shell != shell) {
@@ -159,22 +158,20 @@ public class BjorneInterpreter implements CommandInterpreter {
             return tree.execute((BjorneContext) myContext);
         } catch (BjorneControlException ex) {
             switch (ex.getControl()) {
-            case BRANCH_EXIT:
-                return ex.getCount();
-            case BRANCH_BREAK:
-            case BRANCH_CONTINUE:
-                return 0;
-            case BRANCH_RETURN:
-                return (source) ? ex.getCount() : 1;
-            default:
-                throw new ShellFailureException("unknown control "
-                        + ex.getControl());
+                case BRANCH_EXIT:
+                    return ex.getCount();
+                case BRANCH_BREAK:
+                case BRANCH_CONTINUE:
+                    return 0;
+                case BRANCH_RETURN:
+                    return (source) ? ex.getCount() : 1;
+                default:
+                    throw new ShellFailureException("unknown control " + ex.getControl());
             }
         }
     }
 
-    int executeCommand(CommandLine cmdLine, BjorneContext context,
-            Closeable[] streams) throws ShellException {
+    int executeCommand(CommandLine cmdLine, BjorneContext context, Closeable[] streams) throws ShellException {
         BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
         if (builtin != null) {
             // FIXME ... built-in commands should use the Syntax mechanisms so
@@ -183,12 +180,11 @@ public class BjorneInterpreter implements CommandInterpreter {
         } else {
             cmdLine.setStreams(streams);
             try {
-				CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
-				return shell.invoke(cmdLine, cmdInfo);
-			}
-			catch (CommandSyntaxException ex) {
-				throw new ShellException("Command arguments don't match syntax", ex);
-			}
+                CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
+                return shell.invoke(cmdLine, cmdInfo);
+            } catch (CommandSyntaxException ex) {
+                throw new ShellException("Command arguments don't match syntax", ex);
+            }
         }
     }
 
@@ -209,7 +205,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     }
 
     public CommandThread fork(CommandLine command, Closeable[] streams) 
-    throws ShellException {
+        throws ShellException {
         command.setStreams(streams);
         CommandInfo cmdInfo;
         try {

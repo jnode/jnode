@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command;
 
 import gnu.java.security.action.GetPropertiesAction;
@@ -37,29 +37,27 @@ import org.jnode.shell.CommandLine;
  * @author epr
  */
 public class EnvCommand extends AbstractCommand {
-    
+
     public EnvCommand() {
         super("Print the system properties");
     }
 
-	public static void main(String[] args) throws Exception {
-		new EnvCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new EnvCommand().execute(args);
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-		throws Exception {
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
+        final Properties ps = (Properties) AccessController.doPrivileged(new GetPropertiesAction());
+        final TreeMap<Object, Object> sortedPs = new TreeMap<Object, Object>(ps);
+        for (Map.Entry<Object, Object> entry : sortedPs.entrySet()) {
+            final String key = entry.getKey().toString();
+            final String value = entry.getValue().toString();
 
-	    final Properties ps = (Properties)AccessController.doPrivileged(new GetPropertiesAction());
-	    final TreeMap<Object, Object> sortedPs = new TreeMap<Object, Object>(ps);
-		for (Map.Entry<Object, Object> entry : sortedPs.entrySet()) {
-			final String key = entry.getKey().toString();
-			final String value = entry.getValue().toString();
-
-			out.println(key + '=' + value);
-		}
-	}
-
+            out.println(key + '=' + value);
+        }
+    }
 }
