@@ -18,28 +18,28 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs;
 
 /**
- * This interface is the base interface objects that are part of a FileSystem.
- *
+ * This interface is the base interface for objects that are part of a FileSystem.
+ * 
  * @author epr
  */
 public interface FSObject {
-	
-	/**
-	 * Is this object still valid.
-	 * 
-	 * An object is not valid anymore if it has been removed from the filesystem.
-	 * All invocations on methods (exception this method) of invalid objects 
-	 * must throw an IOException.
-	 */
-	public boolean isValid();
-	
-	/**
-	 * Gets the filesystem to which this object belongs.
-	 */
-	public FileSystem getFileSystem();
+
+    /**
+     * Is this object still valid.
+     * 
+     * An object is not valid anymore if it has been removed from the
+     * filesystem. All invocations on methods (exception this method) of invalid
+     * objects must throw an IOException.
+     */
+    public boolean isValid();
+
+    /**
+     * Gets the filesystem to which this object belongs.
+     */
+    public FileSystem<?> getFileSystem();
 
 }

@@ -23,10 +23,9 @@ package org.jnode.fs;
 
 import java.io.IOException;
 
-public class FileSystemFullException extends IOException
-{
-    public FileSystemFullException(String message)
-    {
+public class FileSystemFullException extends IOException {
+    
+    public FileSystemFullException(String message) {
         super(message);
     }
 }

@@ -30,23 +30,23 @@ import java.security.Principal;
  * @author epr
  */
 public interface FSAccessRights extends FSObject {
-	
-	/**
-	 * Gets the owner of the entry.
-	 * @throws IOException
-	 */
-	public Principal getOwner()
-	throws IOException;
 
-	public boolean canRead();
+    /**
+     * Gets the owner of the entry.
+     * 
+     * @throws IOException
+     */
+    public Principal getOwner() throws IOException;
 
-	public boolean canWrite();
+    public boolean canRead();
 
-	public boolean canExecute();
+    public boolean canWrite();
 
-	public boolean setReadable(boolean enable, boolean owneronly);
+    public boolean canExecute();
 
-	public boolean setWritable(boolean enable, boolean owneronly);
+    public boolean setReadable(boolean enable, boolean owneronly);
 
-	public boolean setExecutable(boolean enable, boolean owneronly);
+    public boolean setWritable(boolean enable, boolean owneronly);
+
+    public boolean setExecutable(boolean enable, boolean owneronly);
 }

@@ -59,7 +59,7 @@ public class DirCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws IOException {
+        throws IOException {
         File[] paths = ARG_PATH.getValues();
         if (paths.length == 0) {
             paths = new File[] {new File(System.getProperty("user.dir"))};
@@ -67,8 +67,7 @@ public class DirCommand extends AbstractCommand {
         for (File path : paths) {
             if (!path.exists()) {
                 err.println("No such path: " + path);
-            }
-            else {
+            } else {
                 if (paths.length > 1) {
                     out.println(path + ":");
                 }

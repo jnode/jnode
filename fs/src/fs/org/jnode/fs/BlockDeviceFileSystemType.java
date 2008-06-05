@@ -26,18 +26,17 @@ import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * Specific kind of FileSystemType for block devices
- *
+ * 
  * @author epr
  */
 public interface BlockDeviceFileSystemType<T extends FileSystem<?>> extends FileSystemType<T> {
-	/**
-	 * Can this file system type be used on the given first sector of a
-	 * blockdevice?
-	 *
-	 * @param pte
-	 *           The partition table entry, if any. If null, there is no
-	 *           partition table entry.
-	 * @param firstSector
-	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi);
+    /**
+     * Can this file system type be used on the given first sector of a
+     * blockdevice?
+     * 
+     * @param pte The partition table entry, if any. If null, there is no
+     *            partition table entry.
+     * @param firstSector
+     */
+    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi);
 }

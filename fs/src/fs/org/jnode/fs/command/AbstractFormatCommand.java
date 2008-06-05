@@ -54,11 +54,10 @@ public abstract class AbstractFormatCommand<T extends FileSystem<?>> extends Abs
         registerArguments(ARG_DEVICE);
     }
 
-    abstract protected Formatter<T> getFormatter();
+    protected abstract Formatter<T> getFormatter();
 
-    final public void execute(CommandLine commandLine, InputStream in, 
-            PrintStream out, PrintStream err) 
-    throws FileSystemException, NameNotFoundException, DeviceNotFoundException, DriverException {
+    public final void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws FileSystemException, NameNotFoundException, DeviceNotFoundException, DriverException {
         Device dev = ARG_DEVICE.getValue();
         Formatter<T> formatter = getFormatter();
         formatter.format(dev);

@@ -25,21 +25,21 @@ import org.jnode.driver.Device;
 
 /**
  * Descriptor and entry point for a class of filesystems.
- *
+ * 
  * @author epr
  */
 public interface FileSystemType<T extends FileSystem<?>> {
 
-	/**
-	 * Gets the unique name of this file system type.
-	 */
-	public String getName();
+    /**
+     * Gets the unique name of this file system type.
+     */
+    public String getName();
 
-	/**
-	 * Create a filesystem from a given device.
-	 *
-	 * @param device
-	 * @param readOnly
-	 */
-	public T create(Device device, boolean readOnly) throws FileSystemException;
+    /**
+     * Create a filesystem from a given device.
+     * 
+     * @param device
+     * @param readOnly
+     */
+    public T create(Device device, boolean readOnly) throws FileSystemException;
 }
