@@ -69,8 +69,7 @@ public class CatCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) 
-    throws IOException {
+            PrintStream out, PrintStream err) throws IOException {
         File[] files = ARG_FILE.getValues();
         String[] urls = ARG_URL.getValues();
         boolean ok = true;
@@ -82,14 +81,13 @@ public class CatCommand extends AbstractCommand {
                     is = url.openStream();
                     if (is == null) {
                         ok = false;
-                    }
-                    else {
+                    } else {
                         process(is, out);
                     }
                 } catch (MalformedURLException ex) {
                     err.println("Malformed url '" + urlString + "': " + ex.getMessage());
                 } catch (IOException ex) {
-                    err.println("Can't fetch url '" + urlString + "': " + ex.getMessage());                                        
+                    err.println("Can't fetch url '" + urlString + "': " + ex.getMessage());
                 } finally {
                     if (is != null) {
                         try { 
@@ -100,16 +98,14 @@ public class CatCommand extends AbstractCommand {
                     }
                 }
             }
-        }
-        else if (files != null && files.length > 0) {
+        } else if (files != null && files.length > 0) {
             for (File file : files) {
                 InputStream is = null;
                 try {
                     is = openFile(file, err);
                     if (is == null) {
                         ok = false;
-                    }
-                    else {
+                    } else {
                         process(is, out);
                     }
                 } finally {
@@ -122,8 +118,7 @@ public class CatCommand extends AbstractCommand {
                     }
                 }
             }
-        }
-        else {
+        } else {
             process(in, out);
         }
         if (out.checkError()) {
@@ -163,14 +158,11 @@ public class CatCommand extends AbstractCommand {
         // that the exception message is accurate and detailed!)
         if (!file.exists()) {
             err.println("File doesn't exist: '" + file + "'");
-        }
-        else if (!file.canRead()) {
+        } else if (!file.canRead()) {
             err.println("File not readable: '" + file + "'");
-        }
-        else if (file.isDirectory()) {
+        } else if (file.isDirectory()) {
             err.println("Can't 'cat' a directory: '" + file + "'");
-        }
-        else {
+        } else {
             is = new FileInputStream(file);
         }
         return is;

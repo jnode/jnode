@@ -113,19 +113,15 @@ public class CpCommand extends AbstractCommand {
                     copyIntoDirectory(source, target);
                 }
             }
-        }
-        else if (sources.length > 1) {
+        } else if (sources.length > 1) {
             error("Multi-file copy requires the target to be a directory");
-        }
-        else {
+        } else {
             File source = sources[0];
             if (source.isDirectory()) {
                 error("Cannot copy a directory to a file");
-            }
-            else if (target.exists() && !target.isFile()) {
+            } else if (target.exists() && !target.isFile()) {
                 error("Cannot copy to a device");
-            }
-            else {
+            } else {
                 if (checkSafe(source, target)) {
                     copyToFile(source, target);
                 }
@@ -167,8 +163,7 @@ public class CpCommand extends AbstractCommand {
     private void copyIntoDirectory(File source, File targetDir) throws IOException {
         if (!targetDir.canWrite()) {
             skip("directory '" + targetDir + "' is not writable");
-        }
-        else if (source.isDirectory()) {
+        } else if (source.isDirectory()) {
             if (recursive) {
                 File newDir = new File(targetDir, source.getName());
                 if (!newDir.exists()) {
@@ -177,8 +172,7 @@ public class CpCommand extends AbstractCommand {
                     }
                     newDir.mkdir();
                     directoriesCreated++;
-                }
-                else if (!newDir.isDirectory()) {
+                } else if (!newDir.isDirectory()) {
                     if (mode == MODE_FORCE) {
                         if (verbose) {
                             out.println("Replacing file '" + newDir + "' with a directory");
@@ -186,8 +180,7 @@ public class CpCommand extends AbstractCommand {
                         newDir.delete();
                         newDir.mkdir();
                         directoriesCreated++;
-                    }
-                    else {
+                    } else {
                         skip("not overwriting '" + newDir + "' with a directory");
                         return;
                     }
@@ -199,12 +192,10 @@ public class CpCommand extends AbstractCommand {
                     }
                     copyIntoDirectory(new File(source, name), newDir);
                 }
-            }
-            else {
+            } else {
                 skip("'" + source + "' is a directory");
             }
-        }
-        else {
+        } else {
             File newFile = new File(targetDir, source.getName());
             copyToFile(source, newFile);
         }
@@ -239,21 +230,18 @@ public class CpCommand extends AbstractCommand {
                 }
                 tout.write(buffer, 0, nosBytesRead);
             }
-        }
-        finally {
+        } finally {
             if (sin != null) {
                 try {
                     sin.close();
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     // ignore
                 }
             }
             if (tout != null) {
                 try {
                     tout.close();
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     // ignore
                 }
             }
@@ -271,14 +259,11 @@ public class CpCommand extends AbstractCommand {
     private boolean checkSource(File source) {
         if (!source.exists()) {
             return skip("'" + source + "' does not exist");
-        }
-        else if (!source.canRead()) {
+        } else if (!source.canRead()) {
             return skip("'" + source + "' cannot be read");
-        }
-        else if (!(source.isFile() || source.isDirectory())) {
+        } else if (!(source.isFile() || source.isDirectory())) {
             return vskip("'" + source + "' is a device");
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -310,8 +295,7 @@ public class CpCommand extends AbstractCommand {
                             "' into a subdirectory ('" + target + "')");
                 }
             }
-        }
-        else {
+        } else {
             if (sourcePath.equals(targetPath)) {
                 return skip("Cannot copy file '" + source + "' to itself");
             }
@@ -341,35 +325,33 @@ public class CpCommand extends AbstractCommand {
             return vskip("Cannot copy '" + source + "' to device '" + target + "'");
         }
         switch (mode) {
-        case MODE_NORMAL:
-            return vskip("'" + target + "' already exists");
-        case MODE_FORCE:
-            return true;
-        case MODE_UPDATE:
-            return (source.lastModified() > target.lastModified() ||
+            case MODE_NORMAL:
+                return vskip("'" + target + "' already exists");
+            case MODE_FORCE:
+                return true;
+            case MODE_UPDATE:
+                return (source.lastModified() > target.lastModified() ||
                         vskip("'" + target + "' is newer than '" + source + "'"));
-        case MODE_INTERACTIVE:
-            out.print("Overwrite '" + target + "' with '" + source + "'? [y/n]");
-            while (true) {
-                try {
-                    String line = in.readLine();
-                    if (line == null) {
-                        error("EOF - abandoning copying");
-                    }
-                    if (line.length() > 0) {
-                        if (line.charAt(0) == 'y' || line.charAt(0) == 'Y') {
-                            return true;
+            case MODE_INTERACTIVE:
+                out.print("Overwrite '" + target + "' with '" + source + "'? [y/n]");
+                while (true) {
+                    try {
+                        String line = in.readLine();
+                        if (line == null) {
+                            error("EOF - abandoning copying");
                         }
-                        else if (line.charAt(0) == 'n' || line.charAt(0) == 'N') {
-                            return vskip("'" + target + "'");
+                        if (line.length() > 0) {
+                            if (line.charAt(0) == 'y' || line.charAt(0) == 'Y') {
+                                return true;
+                            } else if (line.charAt(0) == 'n' || line.charAt(0) == 'N') {
+                                return vskip("'" + target + "'");
+                            }
                         }
+                        out.print("Answer 'y' or 'n'");
+                    } catch (IOException ex) {
+                        error("IO Error - abandoning copying");
                     }
-                    out.print("Answer 'y' or 'n'");
                 }
-                catch (IOException ex) {
-                    error("IO Error - abandoning copying");
-                }
-            }
         }
         return false;
     }

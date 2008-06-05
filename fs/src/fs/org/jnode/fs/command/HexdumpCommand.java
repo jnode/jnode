@@ -41,7 +41,7 @@ public class HexdumpCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws IOException {
+        throws IOException {
         InputStream is = null;
         try {
             // Set up the stream to be dumped.
@@ -49,28 +49,23 @@ public class HexdumpCommand extends AbstractCommand {
             if (ARG_FILE.isSet()) {
                 try {
                     is = new FileInputStream(file);
-                }
-                catch (FileNotFoundException ex) {
+                } catch (FileNotFoundException ex) {
                     err.println("Cannot open " + file + ": " + ex.getMessage());
                     exit(1);
                 }
-            }
-            else if (ARG_URL.isSet()) {
+            } else if (ARG_URL.isSet()) {
                 String urlStr = ARG_URL.getValue();
                 try {
                     URL url = new URL(urlStr);
                     is = url.openStream();
-                }
-                catch (MalformedURLException ex) {
+                } catch (MalformedURLException ex) {
                     err.println("Malformed URL '" + urlStr + "': " + ex.getMessage());
                     exit(1);
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     err.println("Cannot access URL '" + urlStr + "': " + ex.getMessage());
                     exit(1);
                 }
-            }
-            else {
+            } else {
                 is = in;
             }
 
@@ -131,13 +126,11 @@ public class HexdumpCommand extends AbstractCommand {
                 }
             }
             out.flush();
-        }
-        finally {
+        } finally {
             if (is != null && is != in) {
                 try {
                     is.close();
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     /* ignore */
                 }
             }

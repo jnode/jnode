@@ -46,14 +46,14 @@ public class TouchCommand extends AbstractCommand {
         super("touch a file");
         registerArguments(ARG_FILE);
     }
-    
+
     public static void main(String[] args) throws Exception {
-    	new TouchCommand().execute(args);
+        new TouchCommand().execute(args);
     }
-    
+
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
     throws Exception {
-    	File file = ARG_FILE.getValue();
+        File file = ARG_FILE.getValue();
         if (!file.exists()) {
             File parentFile = file.getParentFile();
             if (parentFile != null && !parentFile.exists()) {
@@ -69,8 +69,7 @@ public class TouchCommand extends AbstractCommand {
                 err.println("Cannot create file");
                 exit(1);
             }
-        }
-        else {
+        } else {
             file.setLastModified(System.currentTimeMillis());
         }
     }

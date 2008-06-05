@@ -30,7 +30,7 @@ import org.jnode.driver.Device;
  */
 public interface FileSystem<T extends FSEntry> {
 
-	public FileSystemType<? extends FileSystem<T>> getType();
+    public FileSystemType<? extends FileSystem<T>> getType();
 
     /**
      * Gets the device this FS driver operates on.
@@ -52,7 +52,7 @@ public interface FileSystem<T extends FSEntry> {
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     *
+     * 
      * @throws IOException
      */
     public void close() throws IOException;
@@ -62,9 +62,9 @@ public interface FileSystem<T extends FSEntry> {
      */
     public boolean isClosed();
 
-	public long getTotalSpace() throws IOException;
+    public long getTotalSpace() throws IOException;
 
-	public long getFreeSpace() throws IOException;
+    public long getFreeSpace() throws IOException;
 
-	public long getUsableSpace() throws IOException;
+    public long getUsableSpace() throws IOException;
 }

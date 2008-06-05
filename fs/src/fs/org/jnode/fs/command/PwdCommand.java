@@ -31,8 +31,7 @@ import org.jnode.shell.CommandLine;
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class PwdCommand extends AbstractCommand
-{
+public class PwdCommand extends AbstractCommand {
     public PwdCommand() {
         super("show the pathname of current working directory");
     }

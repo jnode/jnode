@@ -102,8 +102,7 @@ public class DeleteCommand extends AbstractCommand {
                         err.println("Directory is not empty " + file);
                         deleteOk = false;
                         break;
-                    }
-                    else {
+                    } else {
                         deleteOk &= deleteFile(f);
                     }
                 }

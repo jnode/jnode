@@ -27,7 +27,8 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * @author Guillaume BINET (gbin@users.sourceforge.net)
@@ -37,25 +38,25 @@ public class MkdirCommand extends AbstractCommand {
 
     private final FileArgument ARG_DIR = new FileArgument(
             "directory", Argument.MANDATORY, "the directory to create");
-   
+
     public MkdirCommand() {
         super("Create a new directory");
         registerArguments(ARG_DIR);
     }
 
     public static void main(String[] args) throws Exception {
-    	new MkdirCommand().execute(args);
+        new MkdirCommand().execute(args);
     }
-    
+
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
-    	File dir = ARG_DIR.getValue();
+        File dir = ARG_DIR.getValue();
         if (dir.exists()) {
             err.println(dir.getPath() + " already exists.");
             exit(1);
         }
         if (!dir.mkdir()) {
-        	err.println("Can't create directory.");
-        	exit(1);
+            err.println("Can't create directory.");
+            exit(1);
         }    	
     }
 }

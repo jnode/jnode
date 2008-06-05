@@ -33,7 +33,9 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -65,30 +67,30 @@ public class MountCommand extends AbstractCommand {
 
         if (!ARG_DEV.isSet()) {
             // List all mounted file systems
-	        Map<String, FileSystem<?>> filesystems = fss.getMountPoints();
-        	for (String mountPoint : filesystems.keySet()) {
-        		FileSystem<?> fs = filesystems.get(mountPoint);
-        		Device device = fs.getDevice();
-        		String mode = fs.isReadOnly() ? "ro" : "rw";
-        		String type = fs.getType().getName();
-        		out.println(device.getId() + " on " + mountPoint + " type " + type + " (" + mode + ')');
-        	}
+            Map<String, FileSystem<?>> filesystems = fss.getMountPoints();
+            for (String mountPoint : filesystems.keySet()) {
+                FileSystem<?> fs = filesystems.get(mountPoint);
+                Device device = fs.getDevice();
+                String mode = fs.isReadOnly() ? "ro" : "rw";
+                String type = fs.getType().getName();
+                out.println(device.getId() + " on " + mountPoint + " type " + type + " (" + mode + ')');
+            }
         }
         else {
             // Get the parameters
             final Device dev = ARG_DEV.getValue();
-	        final File mountPoint = ARG_DIR.getValue();
-	        final File fsPath = ARG_FSPATH.getValue();
+            final File mountPoint = ARG_DIR.getValue();
+            final File fsPath = ARG_FSPATH.getValue();
 
-	        // Find the filesystem
-	        final FileSystem<?> fs = fss.getFileSystem(dev);
-	        if (fs == null) {
-	            err.println("No filesystem found on " + dev.getId());
-	            exit(1);
-	        } else {
-	            // Mount it
-	            fss.mount(mountPoint.toString(), fs, fsPath.toString());
-	        }
+            // Find the filesystem
+            final FileSystem<?> fs = fss.getFileSystem(dev);
+            if (fs == null) {
+                err.println("No filesystem found on " + dev.getId());
+                exit(1);
+            } else {
+                // Mount it
+                fss.mount(mountPoint.toString(), fs, fsPath.toString());
+            }
         }
     }
 

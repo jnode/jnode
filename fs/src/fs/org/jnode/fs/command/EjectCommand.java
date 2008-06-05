@@ -39,29 +39,28 @@ import org.jnode.shell.syntax.DeviceArgument;
  */
 public class EjectCommand extends AbstractCommand {
 
-	private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-	        "device", Argument.MANDATORY, "device to eject the medium from",
-	        RemovableDeviceAPI.class);
-	
-	public EjectCommand() {
+    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
+            "device", Argument.MANDATORY, "device to eject the medium from",
+            RemovableDeviceAPI.class);
+
+    public EjectCommand() {
         super("Eject the medium from a given device");
         registerArguments(ARG_DEVICE);
-	}
-        
-	public static void main(String[] args) throws Exception {
-		new EjectCommand().execute(args);
-	}
+    }
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-	throws ApiNotFoundException, IOException {
-		final Device dev = ARG_DEVICE.getValue();
-		final RemovableDeviceAPI api = dev.getAPI(RemovableDeviceAPI.class);
-		try {
-		    api.eject();
-		}
-		catch (IOException ex) {
-		    err.println("eject failed for " + dev.getId() + ": " + ex.getMessage());
-		    exit(1);
-		}
-	}
+    public static void main(String[] args) throws Exception {
+        new EjectCommand().execute(args);
+    }
+
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws ApiNotFoundException, IOException {
+        final Device dev = ARG_DEVICE.getValue();
+        final RemovableDeviceAPI api = dev.getAPI(RemovableDeviceAPI.class);
+        try {
+            api.eject();
+        } catch (IOException ex) {
+            err.println("eject failed for " + dev.getId() + ": " + ex.getMessage());
+            exit(1);
+        }
+    }
 }

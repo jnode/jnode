@@ -54,31 +54,26 @@ public class DFCommand extends AbstractCommand {
         super("Print file system usage information");
         registerArguments(ARG_DEVICE);
     }
-    /*
-     * (non-Javadoc)
-     * @see org.jnode.shell.Command#execute(org.jnode.shell.CommandLine, java.io.InputStream, java.io.PrintStream, java.io.PrintStream)
-     */
+   
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws NameNotFoundException {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        final Map mountPoints = fss.getDeviceMountPoints();
+        final Map<String, String> mountPoints = fss.getDeviceMountPoints();
         out.println("ID\tTotal\tUse\tFree\tMount");
         if (ARG_DEVICE.isSet()) {
             final Device dev = ARG_DEVICE.getValue();
-            FileSystem fs = fss.getFileSystem(dev);
+            FileSystem<?> fs = fss.getFileSystem(dev);
             if (fs == null) {
                 out.println("No filesystem on device");
+            } else {
+                displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
             }
-            else {
-                displayInfo(out, dev, fs,(String)mountPoints.get(fs.getDevice().getId()));
-            }
-        }
-        else {
+        } else {
             final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             for (Device dev : dm.getDevices()) {
-                FileSystem fs = fss.getFileSystem(dev);
+                FileSystem<?> fs = fss.getFileSystem(dev);
                 if (fs != null) {
-                    displayInfo(out, dev, fs, (String)mountPoints.get(fs.getDevice().getId()));
+                    displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
                 }
             }
         }
@@ -90,7 +85,7 @@ public class DFCommand extends AbstractCommand {
      * @param fs
      * @param mountPoint
      */
-    private void displayInfo(PrintStream out, Device dev, FileSystem fs, String mountPoint) {
+    private void displayInfo(PrintStream out, Device dev, FileSystem<?> fs, String mountPoint) {
         try {
             long total = fs.getTotalSpace();
             if (total > 0) {
