@@ -29,32 +29,32 @@ import org.jnode.driver.console.CompletionInfo;
  * @author qades
  */
 abstract class CommandLineElement {
-	private final String name;
-	private final String description;
+    private final String name;
+    private final String description;
 
-	public CommandLineElement(String name, String description) {
-		this.name = name;
-		this.description = description;
-	}
+    public CommandLineElement(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public abstract String format();
-	public abstract void describe(Help help, PrintStream out);
-	public abstract void complete(CompletionInfo completion, String partial);
+    public abstract String format();
+    public abstract void describe(Help help, PrintStream out);
+    public abstract void complete(CompletionInfo completion, String partial);
 
-	/** 
-	 * Indicates if the element is satisfied.
-	 * I.e. not taking any more values.
-	 * @return <code>false</code> if the element takes more argument values;
-	 * <code>false</code> otherwise
-	 */
-	public abstract boolean isSatisfied();
+    /** 
+     * Indicates if the element is satisfied.
+     * I.e. not taking any more values.
+     * @return <code>false</code> if the element takes more argument values;
+     * <code>false</code> otherwise
+     */
+    public abstract boolean isSatisfied();
 
 }

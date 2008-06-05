@@ -49,19 +49,19 @@ public class AliasArgument extends Argument<String> {
         this(label, 0);
     }
 
-	@Override
-	public String doAccept(Token value) throws CommandSyntaxException {
-	    if (value.token.length() == 0) {
-	        throw new CommandSyntaxException("Empty alias name '" + value.token + "'");
-	    }
-	    return value.token;
-	}
+    @Override
+    public String doAccept(Token value) throws CommandSyntaxException {
+        if (value.token.length() == 0) {
+            throw new CommandSyntaxException("Empty alias name '" + value.token + "'");
+        }
+        return value.token;
+    }
 
-	public void complete(CompletionInfo completion, String partial) {
+    public void complete(CompletionInfo completion, String partial) {
         try {
             // get the alias manager
-            final AliasManager aliasMgr = ShellUtils.getShellManager()
-                    .getCurrentShell().getAliasManager();
+            final AliasManager aliasMgr = 
+                ShellUtils.getShellManager().getCurrentShell().getAliasManager();
 
             // collect matching aliases
             for (String alias : aliasMgr.aliases()) {
@@ -74,7 +74,7 @@ public class AliasArgument extends Argument<String> {
             return;
         }
     }
-    
+
     @Override
     protected String argumentKind() {
         return "alias";

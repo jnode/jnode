@@ -29,7 +29,10 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 import bsh.Interpreter;
 
@@ -56,7 +59,7 @@ public class BshCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+        throws Exception {
         Interpreter bsh = null;
         Object ret;
         boolean interactive = false;
@@ -78,7 +81,7 @@ public class BshCommand extends AbstractCommand {
             }
         }
 
-        if (ARG_FILE.isSet()){
+        if (ARG_FILE.isSet()) {
             if (bsh == null) {
                 bsh = createInterpreter(in, out, err, false);
             }
@@ -104,7 +107,7 @@ public class BshCommand extends AbstractCommand {
 
     private Interpreter createInterpreter(
             InputStream in, OutputStream out, OutputStream err, boolean interactive)
-        throws Exception{
+        throws Exception {
         Interpreter interpreter = new Interpreter(
                 new BufferedReader(new InputStreamReader(in)),
                 new PrintStream(out),

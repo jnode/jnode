@@ -39,38 +39,38 @@ import org.jnode.shell.syntax.SyntaxManager;
  */
 public class ShellPlugin extends Plugin {
 
-	/**
-	 * Initialize a new instance
-	 * @param descriptor
-	 */
-	public ShellPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    /**
+     * Initialize a new instance
+     * @param descriptor
+     */
+    public ShellPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Start this plugin
-	 */
-	protected void startPlugin() throws PluginException {
-		try {
+    /**
+     * Start this plugin
+     */
+    protected void startPlugin() throws PluginException {
+        try {
             final ShellManager shellMgr = new DefaultShellManager();
             final AliasManager aliasMgr = 
-			    new DefaultAliasManager(getDescriptor().getExtensionPoint("aliases"));
-			final SyntaxManager syntaxMgr = 
-			    new DefaultSyntaxManager(getDescriptor().getExtensionPoint("syntaxes"));
-			InitialNaming.bind(AliasManager.NAME, aliasMgr);
-			InitialNaming.bind(ShellManager.NAME, shellMgr);
-			InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);
-		} catch (NamingException ex) {
-			throw new PluginException("Cannot bind shell component", ex);
-		}
-	}
+                new DefaultAliasManager(getDescriptor().getExtensionPoint("aliases"));
+            final SyntaxManager syntaxMgr = 
+                new DefaultSyntaxManager(getDescriptor().getExtensionPoint("syntaxes"));
+            InitialNaming.bind(AliasManager.NAME, aliasMgr);
+            InitialNaming.bind(ShellManager.NAME, shellMgr);
+            InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);
+        } catch (NamingException ex) {
+            throw new PluginException("Cannot bind shell component", ex);
+        }
+    }
 
-	/**
-	 * Stop this plugin
-	 */
-	protected void stopPlugin() throws PluginException {
-		InitialNaming.unbind(ShellManager.NAME);
-		InitialNaming.unbind(AliasManager.NAME);
-		InitialNaming.unbind(SyntaxManager.NAME);
-	}
+    /**
+     * Stop this plugin
+     */
+    protected void stopPlugin() throws PluginException {
+        InitialNaming.unbind(ShellManager.NAME);
+        InitialNaming.unbind(AliasManager.NAME);
+        InitialNaming.unbind(SyntaxManager.NAME);
+    }
 }

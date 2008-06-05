@@ -36,11 +36,12 @@ import org.jnode.shell.syntax.SyntaxBundle;
  * @author crawley@jnode.org
  */
 public class DefaultHelp extends Help {
-	public static final String RESOURCE_NAME = "messages.properties";
-	private static final int NOMINAL_WIDTH = 75;
-	private static String spaces = // start with 80 ...
+    public static final String RESOURCE_NAME = "messages.properties";
+    private static final int NOMINAL_WIDTH = 75;
+    /* start with 80 spaces ... */
+    private static String spaces = 
         "                                                                                ";
-	
+
     /**
      * Create a new instance
      */
@@ -127,10 +128,9 @@ public class DefaultHelp extends Help {
         String usageText = Help.getLocalizedHelp("help.usage") + ":";
         int usageLength = usageText.length();
         int commandLength = command.length();
-        Cell[] cells = new Cell[]{
-                new Cell(0, usageLength), 
-                new Cell(1, commandLength), 
-                new Cell(1, NOMINAL_WIDTH - 2 - usageLength - commandLength)};
+        Cell[] cells =
+                new Cell[] {new Cell(0, usageLength), new Cell(1, commandLength),
+                    new Cell(1, NOMINAL_WIDTH - 2 - usageLength - commandLength)};
         String[] texts = new String[]{usageText, command, null};
         String[] texts2 = new String[]{"", "", null};
         org.jnode.shell.syntax.Syntax[] syntaxes = syntaxBundle.getSyntaxes();
@@ -144,13 +144,12 @@ public class DefaultHelp extends Help {
                 texts2[2] = syntaxes[i].getDescription();
                 format(out, cells, texts2);
             }
-        }
-        else {
+        } else {
             texts[2] = "";
             format(out, cells, texts);
         }
     }
-    
+
     public void describeParameter(Parameter param, PrintStream out) {
         format(out, new Cell[]{new Cell(2, 18), new Cell(2, NOMINAL_WIDTH - 22)}, 
                 new String[]{param.getName(), param.getDescription()});
@@ -198,7 +197,7 @@ public class DefaultHelp extends Help {
         }
         out.print(result.toString());
     }
-    
+
     /**
      * Get a String consisting of 'count' spaces.
      * @param count the number of spaces
@@ -216,11 +215,9 @@ public class DefaultHelp extends Help {
             }
             spaces = sb.toString();
             return spaces;
-        }
-        else if (count == len) {
+        } else if (count == len) {
             return spaces;
-        }
-        else {
+        } else {
             return spaces.substring(0, count);
         }
     }
@@ -230,7 +227,7 @@ public class DefaultHelp extends Help {
      * the unit test can declare a subclass ...)
      */
     protected static class Cell {
-        
+
         final String field;
         final int margin;
         final int width;
@@ -263,8 +260,7 @@ public class DefaultHelp extends Help {
             int lastSpace = hardFit.lastIndexOf(' ');
             if (lastSpace > 3 * width / 4) {
                 return hardFit.substring(0, lastSpace);
-            }
-            else {
+            } else {
                 return hardFit;
             }
         }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import javax.naming.NameNotFoundException;
@@ -54,8 +54,7 @@ public class PluginArgument extends Argument {
     public void complete(CompletionInfo completion, String partial) {
         try {
             // get the plugin manager
-            final PluginManager piMgr = (PluginManager) InitialNaming
-                    .lookup(PluginManager.NAME);
+            final PluginManager piMgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
 
             // collect matching plugin id's
             for (PluginDescriptor descr : piMgr.getRegistry()) {
@@ -70,4 +69,3 @@ public class PluginArgument extends Argument {
         }
     }
 }
-

@@ -107,8 +107,7 @@ public class RepeatSyntax extends GroupSyntax {
             tail = new MuAlternation(label, 
                     null, 
                     new MuSequence(childSyntax, new MuBackReference(label)));
-        }
-        else {
+        } else {
             int tailCount = maxCount - minCount;
             tail = null;
             while (tailCount-- > 0) {
@@ -119,11 +118,9 @@ public class RepeatSyntax extends GroupSyntax {
         }
         if (minCount == 0) {
             res = tail;
-        }
-        else if (minCount == 1) {
+        } else if (minCount == 1) {
             res = (tail == null) ? childSyntax : new MuSequence(childSyntax, tail);
-        }
-        else {
+        } else {
             MuSyntax[] sequence = new MuSyntax[minCount];
             for (int i = 0; i < minCount; i++) {
                 sequence[i] = childSyntax;
@@ -142,30 +139,23 @@ public class RepeatSyntax extends GroupSyntax {
         if (minCount == 0) {
             if (maxCount == Integer.MAX_VALUE) {
                 return "[ " + child.format(bundle) + " ... ]";
-            }
-            else if (maxCount == 1) {
+            } else if (maxCount == 1) {
                 return "[ " + child.format(bundle) + "]";
-            }
-            else {
+            } else {
                 return "[ " + child.format(bundle) + " ..." + maxCount + " ]";
             }
-        }
-        else if (minCount == 1) {
+        } else if (minCount == 1) {
             if (maxCount == Integer.MAX_VALUE) {
                 return child.format(bundle) + " ...";
-            }
-            else if (maxCount == 1) {
+            } else if (maxCount == 1) {
                 return child.format(bundle);
-            }
-            else {
+            } else {
                 return child.format(bundle) + " ..." + maxCount;
             }
-        }
-        else {
+        } else {
             if (maxCount == Integer.MAX_VALUE) {
                 return child.format(bundle) + " " + minCount + "...";
-            }
-            else {
+            } else {
                 return child.format(bundle) + " " + minCount + "..." + maxCount;
             }
         }

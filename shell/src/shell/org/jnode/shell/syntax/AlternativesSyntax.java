@@ -65,8 +65,7 @@ public class AlternativesSyntax extends GroupSyntax {
             }
             if (needsBracketting(formatted)) {
                 sb.append("( ").append(formatted).append(" )");
-            }
-            else {
+            } else {
                 sb.append(formatted);
             }
         }

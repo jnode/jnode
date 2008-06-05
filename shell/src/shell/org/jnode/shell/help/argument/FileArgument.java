@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import java.io.File;
@@ -36,8 +36,8 @@ import org.jnode.shell.help.ParsedArguments;
  * @author qades
  */
 public class FileArgument extends Argument {
-    
-    private static final int PATTERN_FLAGS = 0;  /* just '*' and '?' */
+
+    private static final int PATTERN_FLAGS = 0; /* just '*' and '?' */
 
     public FileArgument(String name, String description, boolean multi) {
         super(name, description, multi);
@@ -51,7 +51,8 @@ public class FileArgument extends Argument {
 
     public File getFile(ParsedArguments args) {
         String value = getValue(args);
-        if (value == null) return null;
+        if (value == null)
+            return null;
         return new File(value);
     }
 
@@ -67,17 +68,16 @@ public class FileArgument extends Argument {
             if (PathnamePattern.isPattern(val, PATTERN_FLAGS)) {
                 List<String> matches = PathnamePattern.compile(val, PATTERN_FLAGS).expand(cwd);
                 if (matches.isEmpty()) {
-                    // A pathname pattern that produces no matches needs to be treated as
+                    // A pathname pattern that produces no matches needs to be
+                    // treated as
                     // literal pathname.
                     files.add(new File(val));
-                }
-                else {
+                } else {
                     for (String match : matches) {
                         files.add(new File(match));
                     }
                 }
-            }
-            else {
+            } else {
                 files.add(new File(val));
             }
         }
@@ -97,32 +97,30 @@ public class FileArgument extends Argument {
             dir = "";
         }
 
-        // Get the contents of the directory.  (Note that the call to getProperty()
-        // is needed because new File("").exists() returns false.  According to Sun, this
+        // Get the contents of the directory. (Note that the call to
+        // getProperty()
+        // is needed because new File("").exists() returns false. According to
+        // Sun, this
         // behavior is "not a bug".)
-        final File f = dir.isEmpty() ? 
-                new File(System.getProperty("user.dir")) : new File(dir);
-        final String[] names = AccessController
-                .doPrivileged(new PrivilegedAction <String[]>() {
-                    public String[] run() {
-                        if (!f.exists()) {
-                            return null;
-                        } else {
-                            return f.list();
-                        }
-                    }
-                });
+        final File f = dir.isEmpty() ? new File(System.getProperty("user.dir")) : new File(dir);
+        final String[] names = AccessController.doPrivileged(new PrivilegedAction<String[]>() {
+            public String[] run() {
+                if (!f.exists()) {
+                    return null;
+                } else {
+                    return f.list();
+                }
+            }
+        });
         if (names != null && names.length > 0) {
-            final String prefix = (dir.length() == 0) ? "" :
-                    dir.equals("/") ? "/" : dir + File.separatorChar;
+            final String prefix = (dir.length() == 0) ? "" : dir.equals("/") ? "/" : dir + File.separatorChar;
             for (String n : names) {
                 String name = prefix + n;
                 if (name.startsWith(partial)) {
                     if (new File(f, name).isDirectory()) {
                         name += File.separatorChar;
                         completion.addCompletion(name, true);
-                    }
-                    else {
+                    } else {
                         completion.addCompletion(name);
                     }
                 }

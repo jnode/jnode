@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import java.util.Locale;
 public class LanguageArgument extends StringListArgument {
 
     private static final List<String> languages = Arrays.asList(Locale.getISOLanguages());
-    
+
     public LanguageArgument(String name, String description, boolean multi) {
         super(name, description, multi);
     }
@@ -43,6 +43,6 @@ public class LanguageArgument extends StringListArgument {
 
     @Override
     protected Collection<String> getValues() {
-    	return languages;
+        return languages;
     }
 }

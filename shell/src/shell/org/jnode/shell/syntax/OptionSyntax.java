@@ -25,10 +25,10 @@ import org.jnode.nanoxml.XMLElement;
 
 
 public class OptionSyntax extends ArgumentSyntax {
-    
+
     private final String longOptName;
     private final String shortOptName;
-    
+
     public OptionSyntax(String argName, String optionName, char optionChar, String description) {
         super(null, argName, description);
         this.longOptName = "--" + optionName;
@@ -52,7 +52,7 @@ public class OptionSyntax extends ArgumentSyntax {
     }
 
     public OptionSyntax(String argName, char optionChar) {
-       this(argName, optionChar, null);
+        this(argName, optionChar, null);
     }
 
     public OptionSyntax(String argName, String optionName) {
@@ -61,8 +61,8 @@ public class OptionSyntax extends ArgumentSyntax {
 
     @Override
     public String toString() {
-    	return "OptionSyntax{label='" + label + 
-    	", short='" + shortOptName + "', long='" + longOptName + "'}";
+        return ("OptionSyntax{label='" + label + 
+                ", short='" + shortOptName + "', long='" + longOptName + "'}");
     }
 
     @Override
@@ -92,41 +92,36 @@ public class OptionSyntax extends ArgumentSyntax {
                 return new MuSequence(
                         new MuSymbol(shortOptName), 
                         new MuPreset(arg.getLabel(), "true"));
-            }
-            else if (shortOptName == null) {
+            } else if (shortOptName == null) {
                 return new MuSequence(
                         new MuSymbol(longOptName), 
                         new MuPreset(arg.getLabel(), "true"));
-            }
-            else {
+            } else {
                 return new MuAlternation(
                         new MuSequence(
                                 new MuSymbol(shortOptName), 
                                 new MuPreset(arg.getLabel(), "true")),
-                        new MuSequence(
-                                new MuSymbol(longOptName), 
-                                new MuPreset(arg.getLabel(), "true")));
+                                new MuSequence(
+                                        new MuSymbol(longOptName), 
+                                        new MuPreset(arg.getLabel(), "true")));
             }
-        }
-        else {
+        } else {
             if (longOptName == null) {
                 return new MuSequence(
                         new MuSymbol(shortOptName), 
                         new MuArgument(arg.getLabel()));
-            }
-            else if (shortOptName == null) {
+            } else if (shortOptName == null) {
                 return new MuSequence(
                         new MuSymbol(longOptName), 
                         new MuArgument(arg.getLabel()));
-            }
-            else {
+            } else {
                 return new MuAlternation(
                         new MuSequence(
                                 new MuSymbol(shortOptName), 
                                 new MuArgument(arg.getLabel())),
-                        new MuSequence(
-                                new MuSymbol(longOptName), 
-                                new MuArgument(arg.getLabel())));
+                                new MuSequence(
+                                        new MuSymbol(longOptName), 
+                                        new MuArgument(arg.getLabel())));
             }
         }
     }
@@ -138,7 +133,7 @@ public class OptionSyntax extends ArgumentSyntax {
     String getLongOptName() {
         return longOptName;
     }
-    
+
 
     @Override
     public XMLElement toXML() {

@@ -46,8 +46,8 @@ public class StringArgument extends Argument<String> {
     protected String doAccept(Token token) throws CommandSyntaxException {
         return token.token;
     }
-    
-   @Override
+
+    @Override
     protected String argumentKind() {
         return "string";
     }

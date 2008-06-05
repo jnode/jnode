@@ -87,7 +87,7 @@ public class Argument extends CommandLineElement {
             values[ this.values.length] = value;
             this.values = values;
         } else {
-            this.values = new String[] { value};
+            this.values = new String[] {value};
         }
         setSatisfied(!isMulti());
     }

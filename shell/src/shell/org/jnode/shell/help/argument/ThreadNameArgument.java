@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import java.security.AccessController;
@@ -32,13 +32,13 @@ import org.jnode.shell.help.Argument;
  */
 public class ThreadNameArgument extends Argument {
 
-	public ThreadNameArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public ThreadNameArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public ThreadNameArgument(String name, String description) {
-		super(name, description);
-	}
+    public ThreadNameArgument(String name, String description) {
+        super(name, description);
+    }
 
     public void complete(final CompletionInfo completion, final String partial) {
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
@@ -53,26 +53,26 @@ public class ThreadNameArgument extends Argument {
                 return null;
             }
         });
-        
+
     }
 
-	private void findList(ThreadGroup grp, String partial, CompletionInfo completion) {
-		final Thread[] ts = new Thread[grp.activeCount()];
-		grp.enumerate(ts);
-		for (Thread t : ts) {
-			if (t != null) {
-				final String name = t.getName();
-				if (name.startsWith(partial)) {
-					completion.addCompletion(name);
-				}
-			}
-		}
-		final ThreadGroup[] gs = new ThreadGroup[grp.activeGroupCount()];
-		grp.enumerate(gs);
-		for (ThreadGroup g : gs) {
-			if (g != null) {
-				findList(g, partial, completion);
-			}
-		}
-	}
+    private void findList(ThreadGroup grp, String partial, CompletionInfo completion) {
+        final Thread[] ts = new Thread[grp.activeCount()];
+        grp.enumerate(ts);
+        for (Thread t : ts) {
+            if (t != null) {
+                final String name = t.getName();
+                if (name.startsWith(partial)) {
+                    completion.addCompletion(name);
+                }
+            }
+        }
+        final ThreadGroup[] gs = new ThreadGroup[grp.activeGroupCount()];
+        grp.enumerate(gs);
+        for (ThreadGroup g : gs) {
+            if (g != null) {
+                findList(g, partial, completion);
+            }
+        }
+    }
 }

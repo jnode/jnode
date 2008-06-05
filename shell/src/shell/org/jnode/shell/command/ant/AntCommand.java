@@ -29,12 +29,11 @@ import org.apache.tools.ant.Main;
 
 /**
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
  */
-public class AntCommand
-{
-    public static void main(String[] args)
-    throws Exception {
+public class AntCommand {
+    // FIXME ... someone ought to complete this.
+    
+    public static void main(String[] args) throws Exception {
         makeBuildXml("build.xml");
         
         //final Set<Permission> permissions = new HashSet<Permission>();  
@@ -60,10 +59,9 @@ public class AntCommand
 //        }
     }
     
-    public static void makeBuildXml(String file) throws Exception 
-    {
+    public static void makeBuildXml(String file) throws Exception {
         File f = new File(file);
-        if(!f.exists()){
+        if (!f.exists()) {
             System.out.println("build.xml not found, creating a template");
             FileOutputStream fos = new FileOutputStream(f);
             PrintWriter pw = new PrintWriter(fos);

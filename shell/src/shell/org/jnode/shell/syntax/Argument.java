@@ -131,8 +131,7 @@ public abstract class Argument<V> {
         int size = values.size();
         if (size == 1) {
             return values.get(0);
-        }
-        else {
+        } else {
             throw new SyntaxMultiplicityException(label + " is bound to " + size + " values");
         }
     }
@@ -142,6 +141,7 @@ public abstract class Argument<V> {
             throw new SyntaxFailureException(
                     "This Argument is not associated with an ArgumentBundle");
         }
+        // FIXME ... complete this
         switch (bundle.getStatus()) {
         
         }

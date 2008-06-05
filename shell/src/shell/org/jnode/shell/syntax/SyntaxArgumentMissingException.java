@@ -22,11 +22,11 @@
 package org.jnode.shell.syntax;
 
 public class SyntaxArgumentMissingException extends CommandSyntaxException {
-    
+
     private static final long serialVersionUID = 1L;
-	
-	private final Argument<?> argument;
-    
+
+    private final Argument<?> argument;
+
     public SyntaxArgumentMissingException(String msg, Argument<?> argument) {
         super(msg);
         this.argument = argument;

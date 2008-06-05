@@ -110,11 +110,9 @@ class SharedStack<E> implements Deque<E> {
             public E next() {
                 if (it1.hasNext()) {
                     return it1.next();
-                }
-                else if (it2 != null) {
+                } else if (it2 != null) {
                     return it2.next();
-                }
-                else {
+                } else {
                     throw new NoSuchElementException("iterator is tired and emotional");
                 }
             }
@@ -237,8 +235,7 @@ class SharedStack<E> implements Deque<E> {
         if (DEBUG) check();
         if (baseStack == null) {
             return myStack.toArray();
-        }
-        else {
+        } else {
             int myStackSize = myStack.size();
             Object[] res = new Object[baseStackSize + myStackSize];
             myStack.toArray(res);

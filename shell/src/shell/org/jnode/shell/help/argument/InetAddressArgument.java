@@ -30,30 +30,26 @@ import org.jnode.shell.help.ParsedArguments;
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class InetAddressArgument extends Argument
-{
+public class InetAddressArgument extends Argument {
 
-  /**
-   * @param name
-   * @param description
-   */
-  public InetAddressArgument(String name, String description)
-  {
-    super(name, description);
-  }
+    /**
+     * @param name
+     * @param description
+     */
+    public InetAddressArgument(String name, String description) {
+        super(name, description);
+    }
 
-  /**
-   * @param name
-   * @param description
-   * @param multi
-   */
-  public InetAddressArgument(String name, String description, boolean multi)
-  {
-    super(name, description, multi);
-  }
+    /**
+     * @param name
+     * @param description
+     * @param multi
+     */
+    public InetAddressArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-  public InetAddress getAddress(ParsedArguments args) throws UnknownHostException
-  {
-    return InetAddress.getByName(this.getValue(args));
-  }
+    public InetAddress getAddress(ParsedArguments args) throws UnknownHostException {
+        return InetAddress.getByName(this.getValue(args));
+    }
 }

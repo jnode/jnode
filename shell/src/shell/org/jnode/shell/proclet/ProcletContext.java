@@ -56,8 +56,7 @@ public class ProcletContext extends ThreadGroup {
     private static int nextPid = 1;
 
     private ProcletContext(ThreadGroup parent, Properties properties,
-            Map<String, String> environment, Object[] streams)
-            throws ProcletException {
+        Map<String, String> environment, Object[] streams) throws ProcletException {
         super(parent, nextProcletName());
         ProcletContext parentContext = getParentContext(parent);
         if (properties == null) {
@@ -80,8 +79,8 @@ public class ProcletContext extends ThreadGroup {
             }
             if (streams == null) {
                 try {
-                    streams = new Object[] { resolve(System.in),
-                            resolve(System.out), resolve(System.err) };
+                    streams = new Object[] {
+                        resolve(System.in), resolve(System.out), resolve(System.err)};
                 } catch (ProxyStreamException ex) {
                     throw new ProcletException("Broken streams", ex);
                 }
@@ -230,9 +229,8 @@ public class ProcletContext extends ThreadGroup {
      * @param target the new Thread's Runnable object.
      * @return the new Thread
      */
-    public static CommandThread createProclet(Runnable target,
-            Properties properties, Map<String, String> environment,
-            Object[] streams) {
+    public static CommandThread createProclet(Runnable target, Properties properties, 
+            Map<String, String> environment, Object[] streams) {
         return createProclet(target, properties, environment, streams, null, 0);
     }
 

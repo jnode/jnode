@@ -52,8 +52,7 @@ public class MuArgument extends MuSyntax {
     }
 
     @Override
-    MuSyntax resolveBackReferences(ResolveState state)
-            throws SyntaxFailureException {
+    MuSyntax resolveBackReferences(ResolveState state) throws SyntaxFailureException {
         if (label != null) {
             state.refMap.put(label, this);
         }

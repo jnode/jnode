@@ -60,12 +60,10 @@ public class KdbCommand extends AbstractCommand {
         if (FLAG_OFF.isSet()) {
             Unsafe.setKdbEnabled(false);
             out.println("KDB disabled");
-        }
-        else if (FLAG_ON.isSet()) {
+        } else if (FLAG_ON.isSet()) {
             Unsafe.setKdbEnabled(true);
             out.println("KDB enabled");
-        } 
-        else {
+        } else {
             // FIXME ... we shouldn't have to do this ...
             final boolean state = Unsafe.setKdbEnabled(false);
             Unsafe.setKdbEnabled(state);

@@ -43,15 +43,14 @@ public class FileArgument extends Argument<File> {
         // FIXME ... do proper filename checks ...
         if (token.token.length() > 0) {
             return new File(token.token);
-        }
-        else {
+        } else {
             throw new CommandSyntaxException("invalid file name '" + token.token + "'");
         }
     }
-    
+
     @Override
     public void complete(CompletionInfo completion, String partial) {
-     // Get last full directory
+        // Get last full directory
         final int idx = partial.lastIndexOf(File.separatorChar);
         final String dir;
         if (idx == 0) {
@@ -65,10 +64,9 @@ public class FileArgument extends Argument<File> {
         // Get the contents of the directory.  (Note that the call to getProperty()
         // is needed because new File("").exists() returns false.  According to Sun, this
         // behavior is "not a bug".)
-        final File f = dir.isEmpty() ? 
-                new File(System.getProperty("user.dir")) : new File(dir);
-        final String[] names = AccessController
-                .doPrivileged(new PrivilegedAction <String[]>() {
+        final File f = dir.isEmpty() ? new File(System.getProperty("user.dir")) : new File(dir);
+        final String[] names = AccessController.doPrivileged(
+                new PrivilegedAction <String[]>() {
                     public String[] run() {
                         if (!f.exists()) {
                             return null;
@@ -78,24 +76,23 @@ public class FileArgument extends Argument<File> {
                     }
                 });
         if (names != null && names.length > 0) {
-            final String prefix = (dir.length() == 0) ? "" :
-                    dir.equals("/") ? "/" : dir + File.separatorChar;
+            final String prefix = 
+                (dir.length() == 0) ? "" : dir.equals("/") ? "/" : dir + File.separatorChar;
             for (String n : names) {
                 String name = prefix + n;
                 if (name.startsWith(partial)) {
                     if (new File(f, name).isDirectory()) {
                         name += File.separatorChar;
                         completion.addCompletion(name, true);
-                    }
-                    else {
+                    } else {
                         completion.addCompletion(name);
                     }
                 }
             }
         }
     }
-	
-	@Override
+
+    @Override
     protected String argumentKind() {
         return "file";
     }

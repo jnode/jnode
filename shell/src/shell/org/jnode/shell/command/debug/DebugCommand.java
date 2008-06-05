@@ -25,20 +25,20 @@ public class DebugCommand extends AbstractCommand {
     private final IntegerArgument ARG_PORT = 
         new IntegerArgument("port", Argument.OPTIONAL, "the port to listen to");
 
-	public DebugCommand() {
+    public DebugCommand() {
         super("Listen for connections from a remote debugger");
         registerArguments(ARG_PORT);
-	}
-	
-	public static void main(String[] args) throws Exception {
-	    new DebugCommand().execute(args);
-	}
-	
-	@Override
+    }
+
+    public static void main(String[] args) throws Exception {
+        new DebugCommand().execute(args);
+    }
+
+    @Override
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
         int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : DEFAULT_PORT;
-        
+
         // FIXME - in the even of internal exceptions, JDWP writes to System.out.
         final String ps = "transport=dt_socket,suspend=n,address=" + port + ",server=y";
         Thread t = new Thread(new Runnable() {

@@ -66,8 +66,7 @@ public class MuAlternation extends MuSyntax {
     }
     
     @Override
-    MuSyntax resolveBackReferences(ResolveState state)
-            throws SyntaxFailureException {
+    MuSyntax resolveBackReferences(ResolveState state) throws SyntaxFailureException {
         if (state.seen.add(this)) {
             if (label != null) {
                 state.refMap.put(label, this);

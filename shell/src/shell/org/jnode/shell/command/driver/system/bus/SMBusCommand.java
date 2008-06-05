@@ -52,8 +52,7 @@ public class SMBusCommand extends AbstractCommand {
 
         try {
             smbusctrl = InitialNaming.lookup(SMBusControler.NAME);
-        }
-        catch (NameNotFoundException ex) {
+        } catch (NameNotFoundException ex) {
             out.println("Could not find the SMBusControler: " + ex.getMessage());
             exit(1);
         }
@@ -63,8 +62,7 @@ public class SMBusCommand extends AbstractCommand {
                 // TODO - can someone explain why we are shifting and ORing?  It looks like a bug to me.
                 byte res = smbusctrl.readByte((byte) (0xa0 | (i << 1)), (byte) 2);
                 out.println("DIMM " + i + " : type = " + Integer.toHexString(res));
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 out.println("DIMM " + i + " : not present");
             }
         }
