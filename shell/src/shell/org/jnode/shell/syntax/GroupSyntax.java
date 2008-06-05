@@ -31,7 +31,7 @@ public abstract class GroupSyntax extends Syntax {
 
     final Syntax[] syntaxes;
     private final HashSet<String> childLabels;
-    
+
     public GroupSyntax(String label, String description, Syntax...syntaxes) {
         super(label, description);
         this.syntaxes = syntaxes;
@@ -44,27 +44,27 @@ public abstract class GroupSyntax extends Syntax {
 
     @Override
     public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("label='").append(label).append("', children=[");
-		for (int i = 0; i < syntaxes.length; i++) {
-			if (i != 0) {
-				sb.append(", ");
-			}
-			sb.append(syntaxes[i]);
-		}
-		sb.append("]");
-		return sb.toString();
-	}
+        StringBuilder sb = new StringBuilder();
+        sb.append("label='").append(label).append("', children=[");
+        for (int i = 0; i < syntaxes.length; i++) {
+            if (i != 0) {
+                sb.append(", ");
+            }
+            sb.append(syntaxes[i]);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 
     @Override
     public Set<String> childLabels() {
         return childLabels;
     }
-    
+
     protected Syntax[] getChildSyntaxes() {
         return this.syntaxes;
     }
-    
+
     @Override
     public XMLElement basicElement(String name) {
         XMLElement element = super.basicElement(name);
@@ -74,4 +74,4 @@ public abstract class GroupSyntax extends Syntax {
         return element;
     }
 
- }
+}

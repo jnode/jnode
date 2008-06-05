@@ -56,17 +56,15 @@ public class ParsedArguments {
             sb.append(entry.getKey().format()).append("->");
             if (entry.getValue() == null) {
                 sb.append("null");
-            }
-            else {
+            } else {
                 sb.append('[');
-                for (String value: entry.getValue()) {
+                for (String value : entry.getValue()) {
                     if (sb.charAt(sb.length() - 1) != '[') {
                         sb.append(',');
                     }
                     if (value == null) {
                         sb.append("null");
-                    }
-                    else {
+                    } else {
                         sb.append('"').append(value).append('"');
                     }
                 }

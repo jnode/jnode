@@ -159,7 +159,7 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
     }
 
     public synchronized void print(char ch) {
-        print(new char[] { ch }, 0, 1, false);
+        print(new char[] {ch}, 0, 1, false);
     }
 
     public void print(char[] charArray) {
@@ -199,7 +199,7 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
     }
 
     public synchronized void println(char ch) {
-        print(new char[] { ch }, 0, 1, true);
+        print(new char[] {ch}, 0, 1, true);
     }
 
     public void println(char[] charArray) {

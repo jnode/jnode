@@ -95,13 +95,11 @@ public class OptionSetSyntax extends GroupSyntax {
                 boolean l2 = Character.isLowerCase(c2);
                 if (l1 == l2) {
                     return (int) c2 - (int) c1;
-                }
-                else {
+                } else {
                     return l1 ? -1 : +1;
                 }
             }
-        
-    };
+        };
     
     private final OptionSyntax[] optionSyntaxes;
     
@@ -137,10 +135,8 @@ public class OptionSetSyntax extends GroupSyntax {
             String label = MuSyntax.genLabel();
             FlagSetArgument arg = new FlagSetArgument(label, bundle, flagOptions);
             bundle.addArgument(arg);
-            childMuSyntaxes = new MuSyntax[] {
-                   new MuAlternation(childMuSyntaxes),
-                   new MuArgument(label)
-            };
+            childMuSyntaxes = 
+                new MuSyntax[] {new MuAlternation(childMuSyntaxes), new MuArgument(label)};
         }
         String label = this.label == null ? MuSyntax.genLabel() : this.label;
         MuSyntax res = new MuAlternation(label, 

@@ -69,33 +69,33 @@ import org.jnode.shell.SymbolSource;
  * @author crawley@jnode.org
  */
 public class ArgumentBundle implements Iterable<Argument<?>> {
-    
+
     public static final int UNPARSED = 0;
     public static final int PARSING = 1;
     public static final int PARSE_SUCCEEDED = 2;
     public static final int PARSE_FAILED = 3;
-    
-    
+
+
     private Argument<?>[] arguments;
-	private final Map<String, Argument<?>> argumentMap;
-	private final String description;
-	private int status = UNPARSED;
+    private final Map<String, Argument<?>> argumentMap;
+    private final String description;
+    private int status = UNPARSED;
 
-	public ArgumentBundle(String description, Argument<?>... arguments) {
-	    this.description = description;
-		this.arguments = arguments;
-		this.argumentMap = new HashMap<String, Argument<?>>();
-		for (Argument<?> element : arguments) {
-		    doAdd(element);
-		}
-	}
-	
-	public ArgumentBundle(Argument<?> ...arguments) {
-	    this(null, arguments);
-	}
+    public ArgumentBundle(String description, Argument<?>... arguments) {
+        this.description = description;
+        this.arguments = arguments;
+        this.argumentMap = new HashMap<String, Argument<?>>();
+        for (Argument<?> element : arguments) {
+            doAdd(element);
+        }
+    }
 
-	private void doAdd(Argument<?> argument) {
-	    String label = argument.getLabel();
+    public ArgumentBundle(Argument<?> ...arguments) {
+        this(null, arguments);
+    }
+
+    private void doAdd(Argument<?> argument) {
+        String label = argument.getLabel();
         if (label.isEmpty()) {
             throw new IllegalArgumentException("argument label is empty");
         }
@@ -107,34 +107,32 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         argument.setBundle(this);
     }
 
-	public synchronized void parse(CommandLine commandLine, SyntaxBundle syntaxes)
-	throws CommandSyntaxException {
-	    try {
-	        doParse(commandLine, syntaxes, null);
-	        for (Argument<?> element : arguments) {
-	            if (!element.isSatisfied() && element.isMandatory()) {
-	                throw new CommandSyntaxException(
-	                        "Command syntax error: required argument '"
-	                        + element.getLabel() + "' not supplied");
-	            }
-	        }
-	        status = PARSE_SUCCEEDED;
-	    }
-	    finally {
-	        if (status != PARSE_SUCCEEDED) {
-	            status = PARSE_FAILED;
-	        }
-	    }
-	}
+    public synchronized void parse(CommandLine commandLine, SyntaxBundle syntaxes)
+        throws CommandSyntaxException {
+        try {
+            doParse(commandLine, syntaxes, null);
+            for (Argument<?> element : arguments) {
+                if (!element.isSatisfied() && element.isMandatory()) {
+                    throw new CommandSyntaxException(
+                            "Command syntax error: required argument '"
+                            + element.getLabel() + "' not supplied");
+                }
+            }
+            status = PARSE_SUCCEEDED;
+        } finally {
+            if (status != PARSE_SUCCEEDED) {
+                status = PARSE_FAILED;
+            }
+        }
+    }
 
-    public synchronized void complete(CommandLine partial, 
-            SyntaxBundle syntaxes, CompletionInfo completion) 
-    throws CommandSyntaxException {
+    public synchronized void complete(CommandLine partial, SyntaxBundle syntaxes,
+        CompletionInfo completion) 
+        throws CommandSyntaxException {
         try {
             doParse(partial, syntaxes, completion);
             status = PARSE_SUCCEEDED;
-        }
-        finally {
+        } finally {
             if (status != PARSE_SUCCEEDED) {
                 status = PARSE_FAILED;
             }
@@ -142,21 +140,20 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
     }
 
     private void doParse(CommandLine commandLine, SyntaxBundle syntaxes,
-            CompletionInfo completion) 
-    throws CommandSyntaxException {
-	    if (status != UNPARSED) {
-	        clear();
-	    }
-	    status = PARSING;
-	    if (syntaxes == null) {
-			syntaxes = new SyntaxBundle(commandLine.getCommandName(), createDefaultSyntax());
-		}
-	    SymbolSource<CommandLine.Token> context = commandLine.tokenIterator();
-	    MuSyntax muSyntax = syntaxes.prepare(this);
-	    new MuParser().parse(muSyntax, completion, context, this);
+            CompletionInfo completion) throws CommandSyntaxException {
+        if (status != UNPARSED) {
+            clear();
+        }
+        status = PARSING;
+        if (syntaxes == null) {
+            syntaxes = new SyntaxBundle(commandLine.getCommandName(), createDefaultSyntax());
+        }
+        SymbolSource<CommandLine.Token> context = commandLine.tokenIterator();
+        MuSyntax muSyntax = syntaxes.prepare(this);
+        new MuParser().parse(muSyntax, completion, context, this);
     }
 
-	/**
+    /**
      * Find the command Argument (as defined by the bundle) for an ArgumentSyntax node.
      * 
      * @param syntax the ArgumentSyntax element
@@ -166,43 +163,41 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
      * no meaning to the command that created the bundle; i.e. the Syntax is broken.
      */
     public Argument<?> getArgument(ArgumentSyntax syntax) throws SyntaxFailureException {
-		return getArgument(syntax.getArgName());
-	}
+        return getArgument(syntax.getArgName());
+    }
 
-	/**
-	 * Find the command Argument (as defined by the bundle) for a given argument name.
-	 * 
-	 * @param argName an argument name
-	 * @return the corresponding Argument
-	 * @throws SyntaxFailureException if the label is not present in the argument
-	 * bundle.  This typically means that the Syntax includes elements that have
-	 * no meaning to the command that created the bundle; i.e. the Syntax is broken.
-	 */
-	public Argument<?> getArgument(String argName) throws SyntaxFailureException {
-		Argument<?> arg = argumentMap.get(argName);
-		if (arg == null) {
-		    throw new SyntaxFailureException(
-		            "No argument for syntax label '" + argName + "'");
-		}
-		return arg;
-	}
+    /**
+     * Find the command Argument (as defined by the bundle) for a given argument name.
+     * 
+     * @param argName an argument name
+     * @return the corresponding Argument
+     * @throws SyntaxFailureException if the label is not present in the argument
+     * bundle.  This typically means that the Syntax includes elements that have
+     * no meaning to the command that created the bundle; i.e. the Syntax is broken.
+     */
+    public Argument<?> getArgument(String argName) throws SyntaxFailureException {
+        Argument<?> arg = argumentMap.get(argName);
+        if (arg == null) {
+            throw new SyntaxFailureException(
+                    "No argument for syntax label '" + argName + "'");
+        }
+        return arg;
+    }
 
-	/**
-	 * Generate a default command syntax to use when none has been defined.
-	 * The syntax defines an option corresponding to each argument, with
-	 * the argument labels as the long option names.
-	 * 
-	 * @return the default syntax
-	 */
-     public Syntax createDefaultSyntax() {
+    /**
+     * Generate a default command syntax to use when none has been defined.
+     * The syntax defines an option corresponding to each argument, with
+     * the argument labels as the long option names.
+     * 
+     * @return the default syntax
+     */
+    public Syntax createDefaultSyntax() {
         if (arguments.length == 0) {
             return new EmptySyntax("default", null);
-        }
-        else if (arguments.length == 1) {
+        } else if (arguments.length == 1) {
             String label = arguments[0].getLabel();
             return new OptionSyntax(label, label, null);
-        }
-        else {
+        } else {
             // A better default syntax would only allow one Option repetition
             // for any Argument that accepts only one value, and would use mandatory
             // Options for mandatory Arguments.
@@ -213,7 +208,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
             }
             return new PowersetSyntax("default", syntaxes);
         }
-	}
+    }
 
     @Override
     public String toString() {
@@ -228,13 +223,13 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         sb.append("}");
         return sb.toString();
     }
-    
+
     public synchronized void clear() {
         for (Argument<?> element : arguments) {
             element.clear();
         }
     }
-    
+
     int getStatus() {
         return status;
     }
@@ -251,7 +246,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         tmp[arguments.length] = argument;
         arguments = tmp;
     }
-    
+
     /**
      * Return the command's description string or <code>null</code>.
      * @return the description string

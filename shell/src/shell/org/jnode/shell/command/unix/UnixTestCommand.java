@@ -118,7 +118,7 @@ public class UnixTestCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+        throws Exception {
         boolean res = false;
         String commandName = commandLine.getCommandName();
         bracketted = (commandName != null && commandName.equals("["));
@@ -126,34 +126,28 @@ public class UnixTestCommand extends AbstractCommand {
         try {
             if (bracketted && args.length == 0) {
                 throw new SyntaxErrorException("missing ']'");
-            }
-            else if (bracketted && !args[args.length - 1].equals("]")) {
+            } else if (bracketted && !args[args.length - 1].equals("]")) {
                 processAsOptions(args);
                 res = true;
-            }
-            else {
+            } else {
                 lastArg = bracketted ? args.length - 2 : args.length - 1;
                 if (lastArg == -1) {
                     res = false;
-                }
-                else {
+                } else {
                     Object obj = evaluate();
                     if (pos <= lastArg) {
                         if (args[pos].equals(")")) {
                             throw new SyntaxErrorException("unmatched ')'");
-                        }
-                        else {
+                        } else {
                             throw new AssertionError("I'm confused!  pos = " + pos + 
                                     ", lastArg = " + lastArg + ", next arg is " + args[pos]);
                         }
                     }
                     if (obj instanceof Boolean) {
                         res = obj == Boolean.TRUE;
-                    }
-                    else if (obj instanceof Long) {
+                    } else if (obj instanceof Long) {
                         res = ((Long) obj).longValue() != 0;
-                    }
-                    else {
+                    } else {
                         res = obj.toString().length() > 0;
                     }
                 }
@@ -161,8 +155,7 @@ public class UnixTestCommand extends AbstractCommand {
             if (!res) {
                 exit(1);
             }
-        }
-        catch (SyntaxErrorException ex) {
+        } catch (SyntaxErrorException ex) {
             err.println(ex.getMessage());
             exit(2);
         }
@@ -188,23 +181,22 @@ public class UnixTestCommand extends AbstractCommand {
                 throw new SyntaxErrorException("expected an operator");
             }
             switch(op.kind) {
-            case OP_UNARY:
-                throw new SyntaxErrorException("misplaced unary operator");
-            case OP_BINARY:
-                evaluatePrimary(nested);
-                reduceAndPush(op, popOperand());
-                break;
-            case OP_SPECIAL:
-                if (op.opNo == OP_LPAREN) {
-                    throw new SyntaxErrorException("misplaced '('");
-                }
-                else if (op.opNo == OP_RPAREN) {
-                    if (!nested) {
-                        throw new SyntaxErrorException("misplaced ')'");
+                case OP_UNARY:
+                    throw new SyntaxErrorException("misplaced unary operator");
+                case OP_BINARY:
+                    evaluatePrimary(nested);
+                    reduceAndPush(op, popOperand());
+                    break;
+                case OP_SPECIAL:
+                    if (op.opNo == OP_LPAREN) {
+                        throw new SyntaxErrorException("misplaced '('");
+                    } else if (op.opNo == OP_RPAREN) {
+                        if (!nested) {
+                            throw new SyntaxErrorException("misplaced ')'");
+                        }
+                        back();
+                        return;
                     }
-                    back();
-                    return;
-                }
             }
         }
     }
@@ -214,40 +206,36 @@ public class UnixTestCommand extends AbstractCommand {
         Operator op = OPERATOR_MAP.get(tok);
         if (op == null) {
             pushOperand(tok);
-        }
-        else {
+        } else {
             switch (op.kind) {
-            case OP_UNARY:
-                operatorStack.push(op);
-                operandStack.push(next());
-                break;
-            case OP_BINARY:
-                throw new SyntaxErrorException("misplaced binary operator");
-            case OP_SPECIAL:
-                if (op.opNo == OP_LPAREN) {
-                    operatorStack.push(op); // ... as a marker.
-                    evaluateExpression(true);
-                    if (!next().equals(")")) {
-                        throw new SyntaxErrorException("missing ')'");
+                case OP_UNARY:
+                    operatorStack.push(op);
+                    operandStack.push(next());
+                    break;
+                case OP_BINARY:
+                    throw new SyntaxErrorException("misplaced binary operator");
+                case OP_SPECIAL:
+                    if (op.opNo == OP_LPAREN) {
+                        operatorStack.push(op); // ... as a marker.
+                        evaluateExpression(true);
+                        if (!next().equals(")")) {
+                            throw new SyntaxErrorException("missing ')'");
+                        }
+                        while (operatorStack.peek() != op) {
+                            reduce();
+                        }
+                        if (operatorStack.pop() != op) {
+                            throw new AssertionError("cannot find my marker!");
+                        }
+                    } else {
+                        throw new SyntaxErrorException("unmatched ')'");
                     }
-                    while (operatorStack.peek() != op) {
-                        reduce();
-                    }
-                    if (operatorStack.pop() != op) {
-                        throw new AssertionError("cannot find my marker!");
-                    }
-                }
-                else {
-                    throw new SyntaxErrorException("unmatched ')'");
-                }
             }
         }
     }
 
-    private void reduceAndPush(Operator operator, Object operand) 
-    throws SyntaxErrorException {
-        while (!operatorStack.isEmpty() && 
-                operator.priority <= operatorStack.peek().priority) {
+    private void reduceAndPush(Operator operator, Object operand) throws SyntaxErrorException {
+        while (!operatorStack.isEmpty() && operator.priority <= operatorStack.peek().priority) {
             reduce();
         }
         operatorStack.push(operator);
@@ -259,92 +247,89 @@ public class UnixTestCommand extends AbstractCommand {
         Object operand = null, operand2 = null;
         if (operator.kind == OP_UNARY) {
             operand = popOperand();
-        }
-        else if (operator.kind == OP_BINARY) {
+        } else if (operator.kind == OP_BINARY) {
             operand2 = popOperand();
             operand = popOperand();
         }
         switch (operator.opNo) {
-        case OP_EXISTS:
-            pushOperand(toFile(operand).exists());
-            break;
-        case OP_DIRECTORY:
-            pushOperand(toFile(operand).isDirectory());
-            break;
-        case OP_FILE:
-            pushOperand(toFile(operand).isFile());
-            break;
-        case OP_NONEMPTY:
-            pushOperand(toFile(operand).length() > 0);
-            break;
-        case OP_READABLE:
-            pushOperand(toFile(operand).canRead());
-            break;
-        case OP_WRITEABLE:
-            pushOperand(toFile(popOperand()).canWrite());
-            break;
-        case OP_OLDER:
-            pushOperand(toFile(operand).lastModified() < toFile(operand2).lastModified());
-            break;
-        case OP_NEWER:
-            pushOperand(toFile(operand).lastModified() > toFile(operand2).lastModified());
-            break;
-        case OP_STRING_EMPTY:
-            pushOperand(toString().length() == 0);
-            break;
-        case OP_STRING_NONEMPTY:
-            pushOperand(toString(operand).length() > 0);
-            break;
-        case OP_STRING_LENGTH:
-            pushOperand(toString(operand).length());
-            break;
-        case OP_EQ:
-            pushOperand(toNumber(operand) == toNumber(operand2));
-            break;
-        case OP_NE:
-            pushOperand(toNumber(operand) != toNumber(operand2));
-            break;
-        case OP_LT:
-            pushOperand(toNumber(operand) < toNumber(operand2));
-            break;
-        case OP_LE:
-            pushOperand(toNumber(operand) <= toNumber(operand2));
-            break;
-        case OP_GT:
-            pushOperand(toNumber(operand) > toNumber(operand2));
-            break;
-        case OP_GE:
-            pushOperand(toNumber(operand) >= toNumber(operand2));
-            break;
-        case OP_AND:
-            pushOperand(toBoolean(operand) & toBoolean(operand2));
-            break;
-        case OP_OR:
-            pushOperand(toBoolean(operand) | toBoolean(operand2));
-            break;
-        case OP_NOT:
-            pushOperand(!toBoolean(operand));
-            break;
-        case OP_STRING_EQUALS:
-            pushOperand(toString(operand).equals(toString(operand2)));
-            break;
-        case OP_STRING_NONEQUAL:
-            pushOperand(!toString(operand).equals(toString(operand2)));
-            break;
-        default:
-            throw new AssertionError("bad operator");
+            case OP_EXISTS:
+                pushOperand(toFile(operand).exists());
+                break;
+            case OP_DIRECTORY:
+                pushOperand(toFile(operand).isDirectory());
+                break;
+            case OP_FILE:
+                pushOperand(toFile(operand).isFile());
+                break;
+            case OP_NONEMPTY:
+                pushOperand(toFile(operand).length() > 0);
+                break;
+            case OP_READABLE:
+                pushOperand(toFile(operand).canRead());
+                break;
+            case OP_WRITEABLE:
+                pushOperand(toFile(popOperand()).canWrite());
+                break;
+            case OP_OLDER:
+                pushOperand(toFile(operand).lastModified() < toFile(operand2).lastModified());
+                break;
+            case OP_NEWER:
+                pushOperand(toFile(operand).lastModified() > toFile(operand2).lastModified());
+                break;
+            case OP_STRING_EMPTY:
+                pushOperand(toString().length() == 0);
+                break;
+            case OP_STRING_NONEMPTY:
+                pushOperand(toString(operand).length() > 0);
+                break;
+            case OP_STRING_LENGTH:
+                pushOperand(toString(operand).length());
+                break;
+            case OP_EQ:
+                pushOperand(toNumber(operand) == toNumber(operand2));
+                break;
+            case OP_NE:
+                pushOperand(toNumber(operand) != toNumber(operand2));
+                break;
+            case OP_LT:
+                pushOperand(toNumber(operand) < toNumber(operand2));
+                break;
+            case OP_LE:
+                pushOperand(toNumber(operand) <= toNumber(operand2));
+                break;
+            case OP_GT:
+                pushOperand(toNumber(operand) > toNumber(operand2));
+                break;
+            case OP_GE:
+                pushOperand(toNumber(operand) >= toNumber(operand2));
+                break;
+            case OP_AND:
+                pushOperand(toBoolean(operand) & toBoolean(operand2));
+                break;
+            case OP_OR:
+                pushOperand(toBoolean(operand) | toBoolean(operand2));
+                break;
+            case OP_NOT:
+                pushOperand(!toBoolean(operand));
+                break;
+            case OP_STRING_EQUALS:
+                pushOperand(toString(operand).equals(toString(operand2)));
+                break;
+            case OP_STRING_NONEQUAL:
+                pushOperand(!toString(operand).equals(toString(operand2)));
+                break;
+            default:
+                throw new AssertionError("bad operator");
         }
     }
 
     private void processAsOptions(String[] args) throws SyntaxErrorException {
-        for (String option: args) {
+        for (String option : args) {
             if (option.equals("--help")) {
                 err.println("Don't panic!");
-            }
-            else if (option.equals("--version")) {
+            } else if (option.equals("--version")) {
                 err.println("JNode test 0.0");
-            }
-            else {
+            } else {
                 throw new SyntaxErrorException("unknown option '" + option + "'");
             }
         }
@@ -372,17 +357,14 @@ public class UnixTestCommand extends AbstractCommand {
     private long toNumber(Object obj) throws SyntaxErrorException {
         if (obj instanceof Long) {
             return ((Long) obj).longValue();
-        }
-        else if (obj instanceof String) {
+        } else if (obj instanceof String) {
             try {
                 return Long.parseLong((String) obj);
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 throw new SyntaxErrorException(
                         "operand is not a number: '" + obj.toString() + "'");
             }
-        }
-        else {
+        } else {
             throw new SyntaxErrorException("subexpression is not an INTEGER");
         }
     }
@@ -390,11 +372,9 @@ public class UnixTestCommand extends AbstractCommand {
     private boolean toBoolean(Object obj) throws SyntaxErrorException {
         if (obj instanceof Boolean) {
             return obj == Boolean.TRUE;
-        }
-        else if (obj instanceof String) {
+        } else if (obj instanceof String) {
             return ((String) obj).length() > 0;
-        }
-        else {
+        } else {
             throw new SyntaxErrorException("operand is an INTEGER");
         }
     }
@@ -402,8 +382,7 @@ public class UnixTestCommand extends AbstractCommand {
     private String toString(Object obj) throws SyntaxErrorException {
         if (obj instanceof String) {
             return (String) obj;
-        }
-        else {
+        } else {
             throw new SyntaxErrorException("operand is not a STRING");
         }
     }
@@ -411,8 +390,7 @@ public class UnixTestCommand extends AbstractCommand {
     private File toFile(Object obj) throws SyntaxErrorException {
         if (obj instanceof String) {
             return new File((String) obj);
-        }
-        else {
+        } else {
             throw new SyntaxErrorException("operand is not a FILENAME");
         }
     }

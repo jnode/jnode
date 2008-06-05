@@ -68,7 +68,7 @@ public class RemoteOutputCommand extends AbstractCommand {
 
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) 
-    throws Exception {
+        throws Exception {
         try {
             final int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : DEFAULT_PORT;
             final InetAddress addr = ARG_ADDRESS.getAsInetAddress();
@@ -79,8 +79,7 @@ public class RemoteOutputCommand extends AbstractCommand {
 
             try {
                 ShellUtils.getCurrentShell().addConsoleOuputRecorder(remoteOut);
-            }
-            catch (UnsupportedOperationException ex) {
+            } catch (UnsupportedOperationException ex) {
                 err.println("Cannot capture output from the current shell");
                 remoteOut.close();
                 exit(2);
@@ -92,12 +91,10 @@ public class RemoteOutputCommand extends AbstractCommand {
                 final Logger root = Logger.getRootLogger();
                 root.addAppender(new RemoteAppender(remoteOut, null));
             }
-        }
-        catch (ConnectException ex) {
+        } catch (ConnectException ex) {
             err.println("Connection failed: " + ex.getMessage());
             exit(1);
-        }
-        catch (UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             err.println("Unknown host: " + ex.getMessage());
             exit(1);
         }

@@ -51,11 +51,10 @@ public abstract class Help {
             throw new HelpException("Help application not found");
         }
     }
-    
-    public static String getLocalizedHelp(String messageKey)
-    {
-    	return PluginUtils.getLocalizedMessage(Help.class, 
-    					BUNDLE_NAME, messageKey);
+
+    public static String getLocalizedHelp(String messageKey) {
+        return PluginUtils.getLocalizedMessage(Help.class, 
+                BUNDLE_NAME, messageKey);
     }
 
     public static Info getInfo(Class<?> clazz) throws HelpException {
@@ -122,17 +121,6 @@ public abstract class Help {
      */
     public abstract void describeParameter(Parameter param, PrintStream out);
 
-    /**
-     * Here is where all the command description goes. Example code: <br>
-     * 
-     * <pre>
-     * 
-     *   public class DdCommand { public static CommandShell.Info commandShellInfo = new CommandShell.Info( &quot;dd&quot;, // Internal command name &quot;Copies blocks of data between block and character devices&quot;, // short description of the command new Parameter[]{ new Parameter(&quot;if&quot;, &quot;input file&quot;, new FileArgument(&quot;infilename&quot;, &quot;location of the input file / device&quot;), Parameter.MANDATORY), new Parameter(&quot;of&quot;, &quot;output file&quot;, new FileArgument(&quot;outfilename&quot;, &quot;location of the output file / device&quot;), Parameter.MANDATORY), new Parameter(&quot;count&quot;, &quot;count of blocks to transfer&quot;, new Argument(&quot;blockCount&quot;, &quot;count of blocks to transfer&quot;), Parameter.MANDATORY), new Parameter(&quot;bs&quot;, &quot;size of the blocks to transfer&quot;, new Argument(&quot;blocksize&quot;, &quot;example: 512, 42K, 300M, 2G. default: 1&quot;), Parameter.OPTIONAL) } );
-     *  
-     *   ... }
-     *  
-     * </pre>
-     */
     public static class Info {
 
         private final String name;
@@ -179,17 +167,16 @@ public abstract class Help {
             Help.getHelp().help(this, command, out);
         }
 
-        public String complete(CompletionInfo completion, CommandLine partial) 
-        throws CompletionException {
-        	// The completion strategy is to try to complete each of the
-        	// syntaxes, and return the longest completion string.
+        public String complete(CompletionInfo completion, CommandLine partial) throws CompletionException {
+            // The completion strategy is to try to complete each of the
+            // syntaxes, and return the longest completion string.
             String max = "";
             boolean foundCompletion = false;
             for (Syntax syntax : syntaxes) {
                 try {
                     syntax.complete(completion, partial);
                     foundCompletion = true;
-                    
+
                 } catch (CompletionException ex) {
                     // just try the next syntax
                 }
@@ -213,7 +200,7 @@ public abstract class Help {
         public ParsedArguments parse(String... args) throws SyntaxErrorException {
             return parse(new CommandLine(args));
         }
-            
+
         /**
          * Parse the supplied CommandLine against this object's syntax(es).
          * 
@@ -222,25 +209,25 @@ public abstract class Help {
          * @throws SyntaxErrorException
          */
         public ParsedArguments parse(CommandLine cmdLine) throws SyntaxErrorException {
-        	for (int i = 0; i < syntaxes.length; i++) {
-        		Syntax s = syntaxes[i];
-        		// FIXME ... it appears that s.parse is a stateful operation.  If that is
-        		// the case, we should either synchronize on s for s.parse + s.clearArguments,
-        		// or move the s.clearArgument call into s.parse.
+            for (int i = 0; i < syntaxes.length; i++) {
+                Syntax s = syntaxes[i];
+                // FIXME ... it appears that s.parse is a stateful operation.  If that is
+                // the case, we should either synchronize on s for s.parse + s.clearArguments,
+                // or move the s.clearArgument call into s.parse.
                 try {
-        			return s.parse(cmdLine);
+                    return s.parse(cmdLine);
                 } catch (SyntaxErrorException ex) {
                     s.clearArguments();
-        			if (syntaxes.length == 1) {
-        				// If there was only one syntax, propagate the exception so that
-        				// we can tell the user why the arguments didn't match.
-        				throw ex;
-        			}
+                    if (syntaxes.length == 1) {
+                        // If there was only one syntax, propagate the exception so that
+                        // we can tell the user why the arguments didn't match.
+                        throw ex;
+                    }
                 }
             }
 
             // There were no syntaxes, or we have tried more than one syntax and they 
-        	// all have failed.
+            // all have failed.
             throw new SyntaxErrorException("No matching syntax found");
         }
     }

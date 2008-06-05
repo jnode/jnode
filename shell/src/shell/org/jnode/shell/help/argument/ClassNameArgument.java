@@ -30,18 +30,18 @@ import org.jnode.shell.help.ParsedArguments;
  */
 public class ClassNameArgument extends Argument {
 
-	public ClassNameArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public ClassNameArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public ClassNameArgument(String name, String description) {
-		super(name, description);
-	}
+    public ClassNameArgument(String name, String description) {
+        super(name, description);
+    }
 
-	// here the specific command line completion would be implemented
+    // here the specific command line completion would be implemented
 
-	public Class<?> getClass(ParsedArguments cmdLine) throws ClassNotFoundException {
-		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		return cl.loadClass(getValue(cmdLine));
-	}
+    public Class<?> getClass(ParsedArguments cmdLine) throws ClassNotFoundException {
+        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return cl.loadClass(getValue(cmdLine));
+    }
 }

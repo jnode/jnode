@@ -33,21 +33,21 @@ import org.jnode.vm.scheduler.VmProcessor;
  */
 public class CpuIDCommand extends AbstractCommand {
 
-	public CpuIDCommand() {
-	    super("Show the identification of the current CPU");
-	}
+    public CpuIDCommand() {
+        super("Show the identification of the current CPU");
+    }
 
-	public static void main(String[] args) throws Exception {
-	    new CpuIDCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new CpuIDCommand().execute(args);
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) {
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) {
         final VmProcessor cpu = VmProcessor.current();
-		out.println(cpu.getCPUID());
+        out.println(cpu.getCPUID());
         out.println(cpu.getPerformanceCounters());
-	}
+    }
 
 }

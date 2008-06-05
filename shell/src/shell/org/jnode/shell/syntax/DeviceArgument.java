@@ -39,7 +39,7 @@ import org.jnode.shell.CommandLine.Token;
  */
 public class DeviceArgument extends Argument<Device> {
     private final Class<? extends DeviceAPI> apiClass;
-    
+
     public DeviceArgument(String label, int flags, String description, 
             Class<? extends DeviceAPI> apiClass) {
         super(label, flags, new Device[0], description);
@@ -61,13 +61,11 @@ public class DeviceArgument extends Argument<Device> {
             final Device device = devMgr.getDevice(token.token);
             if (apiClass == null || device.implementsAPI(apiClass)) {
                 return device;
-            }
-            else {
+            } else {
                 throw new CommandSyntaxException("Device '" + token.token + "' does not implement " +
                         apiClass.getSimpleName());
             }
-        } 
-        catch (DeviceNotFoundException ex) {
+        } catch (DeviceNotFoundException ex) {
             throw new CommandSyntaxException("Unknown device: '" + token.token + "'");
         } 
     }
@@ -87,7 +85,7 @@ public class DeviceArgument extends Argument<Device> {
             }
         }
     }
-    
+
     private DeviceManager getDeviceManager() {
         try {
             return InitialNaming.lookup(DeviceManager.NAME);
@@ -97,17 +95,16 @@ public class DeviceArgument extends Argument<Device> {
     }
 
     @Override
-	protected String state() {
-	    return super.state() + ",apiClass=" + apiClass.getName();
-	}
-	
-	@Override
+    protected String state() {
+        return super.state() + ",apiClass=" + apiClass.getName();
+    }
+
+    @Override
     protected String argumentKind() {
-	    if (apiClass == null) {
-	        return "device";
-	    }
-	    else {
-	        return "device(" + apiClass.getSimpleName() + ")";
-	    }
+        if (apiClass == null) {
+            return "device";
+        } else {
+            return "device(" + apiClass.getSimpleName() + ")";
+        }
     }
 }

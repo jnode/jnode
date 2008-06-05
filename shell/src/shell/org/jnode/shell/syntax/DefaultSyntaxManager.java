@@ -38,8 +38,7 @@ import org.jnode.plugin.ExtensionPointListener;
  * 
  * @author crawley@jnode.org
  */
-public class DefaultSyntaxManager implements SyntaxManager,
-        ExtensionPointListener {
+public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListener {
 
     private final DefaultSyntaxManager parent;
 
@@ -70,8 +69,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
         if (parent == null) {
             throw new UnsupportedOperationException(
                     "Cannot modify the system syntax manager");
-        } 
-        else if (bundle != null) {
+        } else if (bundle != null) {
             syntaxes.put(bundle.getAlias(), bundle);
         }
     }
@@ -89,11 +87,9 @@ public class DefaultSyntaxManager implements SyntaxManager,
         SyntaxBundle bundle = syntaxes.get(alias);
         if (bundle != null) {
             return bundle;
-        }
-        else if (parent != null) {
+        } else if (parent != null) {
             return parent.getSyntaxBundle(alias);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -133,8 +129,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
                         if (bundle != null) {
                             syntaxes.put(bundle.getAlias(), bundle);
                         }
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         log.log(Priority.WARN, "problem in syntax", ex);
                     }
                 }

@@ -45,8 +45,7 @@ public class LanguageArgument extends Argument<String> {
     protected String doAccept(Token token) throws CommandSyntaxException {
         if (validLanguages.contains(token.token)) {
             return token.token;
-        }
-        else {
+        } else {
             throw new CommandSyntaxException("Invalid language code");
         }
     }

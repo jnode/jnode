@@ -63,8 +63,7 @@ public class Syntax {
         return params;
     }
 
-    public void complete(CompletionInfo completion, CommandLine partial) 
-    throws CompletionException {
+    public void complete(CompletionInfo completion, CommandLine partial) throws CompletionException {
         Parameter param;
         CommandLine.Token value;
         int tokenType;
@@ -77,7 +76,7 @@ public class Syntax {
         } catch (SyntaxErrorException ex) {
             throw new CompletionException(ex.getMessage());
         }
-        
+
         if (DEBUG) LOGGER.debug("Syntax.complete: initial param = " + 
                 ((param == null) ? "null" : param.format()) + ", argumentAnticipated = " +
                 partial.isArgumentAnticipated());
@@ -90,7 +89,7 @@ public class Syntax {
             value = visitor.getLastValue();
             tokenType = visitor.getLastTokenType();
         }
-        
+
         if (param == null) {
             if (DEBUG) LOGGER.debug("Syntax.complete: no param");
             // completion.addCompletion(" ");
@@ -103,12 +102,10 @@ public class Syntax {
             if (value != null) {
                 param.complete(completion, value.token);
                 completion.setCompletionStart(value.start);
-            }
-            else {
+            } else {
                 param.complete(completion, "");
             }
-        }
-        else if (!param.isAnonymous()) {
+        } else if (!param.isAnonymous()) {
             completion.addCompletion("-" + param.getName());
         }
     }
@@ -142,11 +139,11 @@ public class Syntax {
 
     private synchronized Parameter visitCommandLine(
             CommandLine cmdLine, CommandLineVisitor visitor) 
-    throws SyntaxErrorException {
+        throws SyntaxErrorException {
         clearArguments();
         Parameter param = null;
         final ParameterIterator paramIterator = new ParameterIterator();
-        
+
         // FIXME - should use a Token iterator here ...
         final Iterator<CommandLine.Token> it = cmdLine.tokenIterator();
         boolean acceptNames = true;
@@ -158,8 +155,7 @@ public class Syntax {
                 if (acceptNames && "--".equals(token)) {
                     acceptNames = false;
                     token = it.hasNext() ? it.next() : null;
-                }
-                else if (paramIterator.hasNext()) {
+                } else if (paramIterator.hasNext()) {
                     param = (Parameter) paramIterator.next();
                     // FIXME real hacky stuff here!!  I'm trying to stop anonymous parameters matching
                     // "-name" ... except when they should ...
@@ -167,22 +163,18 @@ public class Syntax {
                         if (token.token.charAt(0) != '-' || param.getArgument() instanceof OptionArgument) {
                             if (DEBUG) LOGGER.debug("Syntax.visitor: trying anonymous param " + param.format());
                             visitor.visitParameter(param);
-                        }
-                        else {
+                        } else {
                             param = null;
                         }
-                    }
-                    else if (acceptNames && token.equals("-" + param.getName())) {
+                    } else if (acceptNames && token.equals("-" + param.getName())) {
                         if (DEBUG) LOGGER.debug("Syntax.visitor: trying named param " + param.format());
                         visitor.visitParameter(param);
                         token = it.hasNext() ? it.next() : null;
-                    }
-                    else {
+                    } else {
                         if (DEBUG) LOGGER.debug("Syntax.visitor: skipping named param " + param.format());
                         param = null;
                     }
-                }
-                else {
+                } else {
                     if (DEBUG) LOGGER.debug("Syntax.visitor: no param for '" + token + "'");
                     throw new SyntaxErrorException("Unexpected argument '" + token + "'");
                 }
@@ -193,8 +185,7 @@ public class Syntax {
                 Argument arg = param.getArgument();
                 if (arg == null) {
                     visitor.visitValue(null, last, CommandLine.LITERAL);
-                }
-                else if (token != null) {
+                } else if (token != null) {
                     CommandLine.Token value = visitor.visitValue(token, last, CommandLine.LITERAL);
                     if (visitor.isValueValid(arg, value, last)) {
                         arg.setValue(value.token);
@@ -209,8 +200,7 @@ public class Syntax {
                         if (DEBUG) LOGGER.debug("Syntax.visitor: clearing param");
                         param = null;
                     }
-                }
-                else if (!param.isOptional()) {
+                } else if (!param.isOptional()) {
                     if (DEBUG) LOGGER.debug("Syntax.visitor: missing arg for mandatory param " + param.format());
                     // FIXME .. what if param is anonymous?
                     throw new SyntaxErrorException("Missing argument value for '" +

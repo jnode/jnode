@@ -51,17 +51,17 @@ public class DeviceCommand extends AbstractCommand {
     private static final int STOP = 1;
     private static final int RESTART = 2;
     private static final int REMOVE = 3;
-    
+
     private static enum Action {
         start(START), stop(STOP), restart(RESTART), remove(REMOVE);
-        
+
         public final int no;
-        
+
         Action(int no) {
             this.no = no;
         }
     }
-    
+
     private static class ActionArgument extends EnumArgument<Action> {
         public ActionArgument() {
             super("action", Argument.OPTIONAL, Action.class, "action to be performed on device");
@@ -72,126 +72,120 @@ public class DeviceCommand extends AbstractCommand {
             return "{start,stop,restart,remove}";
         }
     }
-    
+
     private static ActionArgument ARG_ACTION = new ActionArgument();
 
-	private final DeviceArgument ARG_DEVICE =
-	    new DeviceArgument("device", Argument.OPTIONAL, "the target device");
-	
-	public DeviceCommand() {
+    private final DeviceArgument ARG_DEVICE =
+        new DeviceArgument("device", Argument.OPTIONAL, "the target device");
+
+    public DeviceCommand() {
         super("Examine or manage a device");
         registerArguments(ARG_ACTION, ARG_DEVICE);
     }
 
-	public static void main(String[] args) throws Exception {
-	    new DeviceCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new DeviceCommand().execute(args);
+    }
 
-	@Override
+    @Override
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
-	    if (ARG_ACTION.isSet()) {
-	        if (!ARG_DEVICE.isSet()) {
-	            err.println("No target device specified");
-	            exit(1);
-	        }
-	        switch (ARG_ACTION.getValue().no) {
-            case RESTART:
-	            restartDevice(ARG_DEVICE.getValue());
-	            break;
-	        case START:
-	            startDevice(ARG_DEVICE.getValue());
-	            break;
-	        case STOP:
-	            stopDevice(ARG_DEVICE.getValue());
-	            break;
-	        case REMOVE:
-	            removeDevice(ARG_DEVICE.getValue());
-	            break;
-	        }
-	    }
-	    else if (ARG_DEVICE.isSet()) {
-	        showDevice(System.out, ARG_DEVICE.getValue());
-	    }
-	    else {
-	        showDevices(System.out);
-	    } 
-	}
+        if (ARG_ACTION.isSet()) {
+            if (!ARG_DEVICE.isSet()) {
+                err.println("No target device specified");
+                exit(1);
+            }
+            switch (ARG_ACTION.getValue().no) {
+                case RESTART:
+                    restartDevice(ARG_DEVICE.getValue());
+                    break;
+                case START:
+                    startDevice(ARG_DEVICE.getValue());
+                    break;
+                case STOP:
+                    stopDevice(ARG_DEVICE.getValue());
+                    break;
+                case REMOVE:
+                    removeDevice(ARG_DEVICE.getValue());
+                    break;
+            }
+        } else if (ARG_DEVICE.isSet()) {
+            showDevice(System.out, ARG_DEVICE.getValue());
+        } else {
+            showDevices(System.out);
+        } 
+    }
 
-	/**
-	 * Stop the given device.
-	 * @param device
-	 * @throws DriverException 
-	 * @throws DeviceNotFoundException 
-	 */
-	private void stopDevice(Device device) 
-	throws DeviceNotFoundException, DriverException {
-		device.getManager().stop(device);
-	}
+    /**
+     * Stop the given device.
+     * @param device
+     * @throws DriverException 
+     * @throws DeviceNotFoundException 
+     */
+    private void stopDevice(Device device) throws DeviceNotFoundException, DriverException {
+        device.getManager().stop(device);
+    }
 
-	/**
-	 * Stop and Remove the given device.
-	 * @param device
-	 * @throws DriverException 
-	 * @throws DeviceNotFoundException 
-	 */
-	private void removeDevice(Device device) 
-	throws DeviceNotFoundException, DriverException {
-		device.getManager().stop(device);
-		device.getManager().unregister(device);
-	}
+    /**
+     * Stop and Remove the given device.
+     * @param device
+     * @throws DriverException 
+     * @throws DeviceNotFoundException 
+     */
+    private void removeDevice(Device device) throws DeviceNotFoundException, DriverException {
+        device.getManager().stop(device);
+        device.getManager().unregister(device);
+    }
 
-	/**
-	 * Start the given device
-	 * @param device
-	 * @throws DriverException 
-	 * @throws DeviceNotFoundException 
-	 */
-	private void startDevice(Device device) 
-	throws DeviceNotFoundException, DriverException {
-		device.getManager().start(device);
-	}
+    /**
+     * Start the given device
+     * @param device
+     * @throws DriverException 
+     * @throws DeviceNotFoundException 
+     */
+    private void startDevice(Device device) throws DeviceNotFoundException, DriverException {
+        device.getManager().start(device);
+    }
 
-	/**
-	 * Stop and start the given device.
-	 * @param device
-	 * @throws DriverException 
-	 * @throws DeviceNotFoundException 
-	 */
-	private void restartDevice(Device device) 
-	throws DeviceNotFoundException, DriverException  {
-		device.getManager().stop(device);
-		device.getManager().start(device);
-	}
+    /**
+     * Stop and start the given device.
+     * @param device
+     * @throws DriverException 
+     * @throws DeviceNotFoundException 
+     */
+    private void restartDevice(Device device) throws DeviceNotFoundException, DriverException  {
+        device.getManager().stop(device);
+        device.getManager().start(device);
+    }
 
-	/**
-	 * Display information about a given device
-	 * 
-	 * @param out
-	 * @param dev
-	 */
-	protected void showDevice(PrintStream out, Device dev) {
-		final String prefix = "    ";
-		out.println("Device: " + dev.getId());
-		final String drvClassName = dev.getDriverClassName();
-		if (dev.isStarted()) {
-			out.println(prefix + "state:started");
-		} else {
-			out.println(prefix + "state:stopped");
-		}
-		if (drvClassName != null) {
-			out.println(prefix + "driver:" + drvClassName);
-		} else {
-			out.println(prefix + "driver:none");
-		}
-		out.println(prefix + "implemented API's:");
-		for (Class<? extends DeviceAPI> api : dev.implementedAPIs()) {
-			out.println(prefix + prefix + api.getName());
-		}
-		out.println();
+    /**
+     * Display information about a given device
+     * 
+     * @param out
+     * @param dev
+     */
+    protected void showDevice(PrintStream out, Device dev) {
+        final String prefix = "    ";
+        out.println("Device: " + dev.getId());
+        final String drvClassName = dev.getDriverClassName();
+        if (dev.isStarted()) {
+            out.println(prefix + "state:started");
+        } else {
+            out.println(prefix + "state:stopped");
+        }
+        if (drvClassName != null) {
+            out.println(prefix + "driver:" + drvClassName);
+        } else {
+            out.println(prefix + "driver:none");
+        }
+        out.println(prefix + "implemented API's:");
+        for (Class<? extends DeviceAPI> api : dev.implementedAPIs()) {
+            out.println(prefix + prefix + api.getName());
+        }
+        out.println();
         final PrintWriter pw = new PrintWriter(out);
-		try {
-            final DeviceInfoAPI infoApi = (DeviceInfoAPI)dev.getAPI(DeviceInfoAPI.class);
+        try {
+            final DeviceInfoAPI infoApi = (DeviceInfoAPI) dev.getAPI(DeviceInfoAPI.class);
             if (infoApi != dev) {
                 infoApi.showInfo(pw);
             }
@@ -199,38 +193,38 @@ public class DeviceCommand extends AbstractCommand {
             // Ignore
         }
         if (dev instanceof DeviceInfoAPI) {
-            ((DeviceInfoAPI)dev).showInfo(pw);
+            ((DeviceInfoAPI) dev).showInfo(pw);
         }
-	}
+    }
 
-	/**
-	 * Display information about all devices
-	 * 
-	 * @param out
-	 * @throws NameNotFoundException
-	 */
-	protected void showDevices(PrintStream out) throws NameNotFoundException {
-		// Create a sorted list
-		final TreeMap<String, Device> tm = new TreeMap<String, Device>();
-		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+    /**
+     * Display information about all devices
+     * 
+     * @param out
+     * @throws NameNotFoundException
+     */
+    protected void showDevices(PrintStream out) throws NameNotFoundException {
+        // Create a sorted list
+        final TreeMap<String, Device> tm = new TreeMap<String, Device>();
+        final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 
-		for (Device dev : dm.getDevices()) {
-			tm.put(dev.getId(), dev);
-		}
-		for (Device dev : tm.values()) {
-			out.print(dev.getId());
-			final String drvClassName = dev.getDriverClassName();
-			if (dev.isStarted()) {
-				out.print("\tstarted");
-			} else {
-				out.print("\tstopped");
-			}
-			if (drvClassName != null) {
-				out.print("\tdriver:" + drvClassName);
-			} else {
-				out.print("\tdriver:none");
-			}
-			out.println();
-		}
-	}
+        for (Device dev : dm.getDevices()) {
+            tm.put(dev.getId(), dev);
+        }
+        for (Device dev : tm.values()) {
+            out.print(dev.getId());
+            final String drvClassName = dev.getDriverClassName();
+            if (dev.isStarted()) {
+                out.print("\tstarted");
+            } else {
+                out.print("\tstopped");
+            }
+            if (drvClassName != null) {
+                out.print("\tdriver:" + drvClassName);
+            } else {
+                out.print("\tdriver:none");
+            }
+            out.println();
+        }
+    }
 }

@@ -66,13 +66,13 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
             }
         } else {
             switch (fd) {
-            case 1:
-                return VmSystem.getGlobalOutStream();
-            case 2:
-                return VmSystem.getGlobalErrStream();
-            default:
-                throw new ProxyStreamException(
-                        "Proclet print stream broken: wrong fd = " + fd);
+                case 1:
+                    return VmSystem.getGlobalOutStream();
+                case 2:
+                    return VmSystem.getGlobalErrStream();
+                default:
+                    throw new ProxyStreamException(
+                            "Proclet print stream broken: wrong fd = " + fd);
             }
         }
     }

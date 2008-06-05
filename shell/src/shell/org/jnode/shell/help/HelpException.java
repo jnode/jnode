@@ -25,17 +25,17 @@ package org.jnode.shell.help;
  * @author qades
  */
 public class HelpException extends Exception {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     HelpException() {
-		super();
-	}
-	
-	HelpException(String message) {
-		super(message);
-	}
-	
-	public HelpException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super();
+    }
+
+    HelpException(String message) {
+        super(message);
+    }
+
+    public HelpException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

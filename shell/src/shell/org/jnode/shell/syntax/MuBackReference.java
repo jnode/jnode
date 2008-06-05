@@ -51,8 +51,7 @@ public class MuBackReference extends MuSyntax {
     }
 
     @Override
-    MuSyntax resolveBackReferences(ResolveState state)
-            throws SyntaxFailureException {
+    MuSyntax resolveBackReferences(ResolveState state) throws SyntaxFailureException {
         MuSyntax target = state.refMap.get(label);
         if (target == null) {
             throw new SyntaxFailureException("Cannot resolve '" + label + "'");

@@ -63,8 +63,7 @@ public class LongArgument extends Argument<Long> {
                 throw new CommandSyntaxException("number '" + token.token + "' is out of range");
             }
             return new Long(token.token);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid number '" + token.token + "'");
         }
     }

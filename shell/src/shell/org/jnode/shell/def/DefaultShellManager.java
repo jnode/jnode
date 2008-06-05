@@ -38,63 +38,60 @@ import org.jnode.util.SystemInputStream;
  */
 public class DefaultShellManager implements ShellManager {
 
-	private final InheritableThreadLocal<Shell> currentShell = 
-		new InheritableThreadLocal<Shell>();
-	
-	private final HashMap<String, CommandInvoker.Factory> invokerFactories =
-		new HashMap<String, CommandInvoker.Factory>();
+    private final InheritableThreadLocal<Shell> currentShell = 
+        new InheritableThreadLocal<Shell>();
 
-	private final HashMap<String, CommandInterpreter.Factory> interpreterFactories =
-		new HashMap<String, CommandInterpreter.Factory>();
+    private final HashMap<String, CommandInvoker.Factory> invokerFactories =
+        new HashMap<String, CommandInvoker.Factory>();
 
-	/**
-	 * @see org.jnode.shell.ShellManager#getCurrentShell()
-	 */
-	public Shell getCurrentShell() {
-		return (Shell) currentShell.get();
-	}
-	
-	/**
-	 * Register the new current shell
-	 * @param currentShell
-	 */
-	public void registerShell(Shell currentShell) {
+    private final HashMap<String, CommandInterpreter.Factory> interpreterFactories =
+        new HashMap<String, CommandInterpreter.Factory>();
+
+    /**
+     * @see org.jnode.shell.ShellManager#getCurrentShell()
+     */
+    public Shell getCurrentShell() {
+        return (Shell) currentShell.get();
+    }
+
+    /**
+     * Register the new current shell
+     * @param currentShell
+     */
+    public void registerShell(Shell currentShell) {
         SystemInputStream.getInstance().claimSystemIn();
-		this.currentShell.set(currentShell);
-	}
+        this.currentShell.set(currentShell);
+    }
 
-	public CommandInterpreter createInterpreter(String name) throws IllegalArgumentException {
-		CommandInterpreter.Factory factory = interpreterFactories.get(name);
-		if (factory == null) {
-			throw new IllegalArgumentException("Unknown interpreter '" + name + "'");
-		}
-		return factory.create();
-	}
+    public CommandInterpreter createInterpreter(String name) throws IllegalArgumentException {
+        CommandInterpreter.Factory factory = interpreterFactories.get(name);
+        if (factory == null) {
+            throw new IllegalArgumentException("Unknown interpreter '" + name + "'");
+        }
+        return factory.create();
+    }
 
-	public CommandInvoker createInvoker(String name, CommandShell shell) 
-	throws IllegalArgumentException {
-		CommandInvoker.Factory factory = invokerFactories.get(name);
-		if (factory == null) {
-			throw new IllegalArgumentException("Unknown invoker '" + name + "'");
-		}
-		return factory.create(shell);
-	}
+    public CommandInvoker createInvoker(String name, CommandShell shell) throws IllegalArgumentException {
+        CommandInvoker.Factory factory = invokerFactories.get(name);
+        if (factory == null) {
+            throw new IllegalArgumentException("Unknown invoker '" + name + "'");
+        }
+        return factory.create(shell);
+    }
 
-	public void registerInterpreterFactory(CommandInterpreter.Factory factory) {
-		interpreterFactories.put(factory.getName(), factory);
-	}
+    public void registerInterpreterFactory(CommandInterpreter.Factory factory) {
+        interpreterFactories.put(factory.getName(), factory);
+    }
 
-	public void registerInvokerFactory(CommandInvoker.Factory factory) {
-		invokerFactories.put(factory.getName(), factory);
-	}
+    public void registerInvokerFactory(CommandInvoker.Factory factory) {
+        invokerFactories.put(factory.getName(), factory);
+    }
 
-	public void unregisterInterpreterFactory(CommandInterpreter.Factory factory) {
-		interpreterFactories.put(factory.getName(), null);
-	}
+    public void unregisterInterpreterFactory(CommandInterpreter.Factory factory) {
+        interpreterFactories.put(factory.getName(), null);
+    }
 
-	public void unregisterInvokerFactory(CommandInvoker.Factory factory) {
-		invokerFactories.put(factory.getName(), null);
-	}
-	
-	
+    public void unregisterInvokerFactory(CommandInvoker.Factory factory) {
+        invokerFactories.put(factory.getName(), null);
+    }
 }

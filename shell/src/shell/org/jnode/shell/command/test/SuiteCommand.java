@@ -45,15 +45,16 @@ import org.jnode.test.framework.TestManager;
  * @author crawley@jnode.org
  */
 public class SuiteCommand extends AbstractCommand {
-    private final FlagArgument FLAG_LIST = 
-        new FlagArgument("list", Argument.OPTIONAL, "list the tests");
-    
-    private final FlagArgument FLAG_RUN = 
-        new FlagArgument("run", Argument.OPTIONAL, "run the tests");
-    
-    private final CategoryArgument ARG_CATEGORY =
-        new CategoryArgument("category", Argument.OPTIONAL | Argument.MULTIPLE,
-                "test categories to run or list");
+    private final FlagArgument FLAG_LIST = new FlagArgument(
+            "list", Argument.OPTIONAL, "list the tests");
+
+    private final FlagArgument FLAG_RUN = new FlagArgument(
+            "run", Argument.OPTIONAL, "run the tests");
+
+    private final CategoryArgument ARG_CATEGORY = new CategoryArgument(
+            "category", Argument.OPTIONAL | Argument.MULTIPLE,
+            "test categories to run or list");
+
     
     public SuiteCommand() {
         super("Run one or more JUnit testcase(s)");
@@ -71,25 +72,24 @@ public class SuiteCommand extends AbstractCommand {
             PrintStream out, PrintStream err) {
         TestManager mgr = TestManager.getInstance();
         if (FLAG_LIST.isSet()) {
-    		for (Class<? extends Test> test : mgr.getTests()) {
-    			out.print(test.getName() + " :");
-    			for (String category : mgr.getCategories(test)) {
-    				out.print(" ");
-    				out.print(category);
-    			}
-    			out.println();
-    		}
-    	}
-    	else if (FLAG_RUN.isSet()) {
-        	String[] categories = ARG_CATEGORY.getValues();
-        	if (categories == null) {
-        		categories = new String[0];
-        	}
-        	TestSuite suite = mgr.getTestSuite(Arrays.asList(categories));
-        	junit.textui.TestRunner.run(suite);        	
-    	}
+            for (Class<? extends Test> test : mgr.getTests()) {
+                out.print(test.getName() + " :");
+                for (String category : mgr.getCategories(test)) {
+                    out.print(" ");
+                    out.print(category);
+                }
+                out.println();
+            }
+        } else if (FLAG_RUN.isSet()) {
+            String[] categories = ARG_CATEGORY.getValues();
+            if (categories == null) {
+                categories = new String[0];
+            }
+            TestSuite suite = mgr.getTestSuite(Arrays.asList(categories));
+            junit.textui.TestRunner.run(suite);
+        }
     }
-    
+
     /**
      * Validate and complete test categories against the categories known to
      * the TestManager.
@@ -102,21 +102,20 @@ public class SuiteCommand extends AbstractCommand {
 
         public void complete(CompletionInfo completion, String partial) {
             Set<String> availCategories = TestManager.getInstance().getCategories();
-        	for (String availCategory : availCategories) {
-        		if (availCategory.startsWith(partial)) {
-        			completion.addCompletion(availCategory);
-        		}
-        	}
+            for (String availCategory : availCategories) {
+                if (availCategory.startsWith(partial)) {
+                    completion.addCompletion(availCategory);
+                }
+            }
         }
-        
+
         protected String doAccept(String category) throws CommandSyntaxException {
-        	Set<String> availCategories = TestManager.getInstance().getCategories();
-        	if (availCategories.contains(category)) {
-        	    return category;
-        	}
-        	else {
-        	    throw new CommandSyntaxException("not a recognized JUnit test category");
-        	}
+            Set<String> availCategories = TestManager.getInstance().getCategories();
+            if (availCategories.contains(category)) {
+                return category;
+            } else {
+                throw new CommandSyntaxException("not a recognized JUnit test category");
+            }
         }    
     }
 }

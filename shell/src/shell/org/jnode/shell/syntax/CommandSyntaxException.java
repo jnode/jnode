@@ -30,13 +30,13 @@ import org.jnode.shell.ShellException;
  * @author crawley@jnode.org
  */
 public class CommandSyntaxException extends ShellException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CommandSyntaxException(String message) {
-		super(message);
-	}
+    public CommandSyntaxException(String message) {
+        super(message);
+    }
 
-	public CommandSyntaxException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CommandSyntaxException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

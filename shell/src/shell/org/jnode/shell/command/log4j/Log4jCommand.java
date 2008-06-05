@@ -52,70 +52,66 @@ import org.jnode.shell.syntax.URLArgument;
  * @author crawley@jnode.org
  */
 public class Log4jCommand extends AbstractCommand {
-    
+
     private final FlagArgument FLAG_LIST =
         new FlagArgument("list", Argument.OPTIONAL, "List current loggers");
-    
+
     private final FlagArgument FLAG_SET_LEVEL =
         new FlagArgument("setLevel", Argument.OPTIONAL, "Set the Level of a logger");
-    
+
     private final FileArgument ARG_FILE =
         new FileArgument("file", Argument.OPTIONAL, "log4j configuration file");
-    
+
     private final URLArgument ARG_URL =
         new URLArgument("url", Argument.OPTIONAL, "URL for log4j configuration file");
+
+    private final Log4jLevelArgument ARG_LEVEL = 
+        new Log4jLevelArgument("level", Argument.OPTIONAL, "the logging level");
+
+    private final Log4jLoggerArgument ARG_LOGGER = 
+        new Log4jLoggerArgument("logger", Argument.OPTIONAL, "the logger");
+
     
-	private final Log4jLevelArgument ARG_LEVEL = 
-	    new Log4jLevelArgument("level", Argument.OPTIONAL, "the logging level");
-   
-	private final Log4jLoggerArgument ARG_LOGGER = 
-	    new Log4jLoggerArgument("logger", Argument.OPTIONAL, "the logger");
-	
-	public Log4jCommand() {
+    public Log4jCommand() {
         super("manage log4j logging");
         registerArguments(FLAG_SET_LEVEL, FLAG_LIST, ARG_FILE, ARG_LEVEL, ARG_LOGGER, ARG_URL);
     }
 
-	public static void main(String[] args) throws Exception {
-	    new Log4jCommand().execute(args);
-	}
-	
-	@Override
+    public static void main(String[] args) throws Exception {
+        new Log4jCommand().execute(args);
+    }
+
+    @Override
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws IOException {
-	    if (ARG_FILE.isSet()) {
-	        // Set configuration from a file
-	        final File configFile = ARG_FILE.getValue();
-	        final Properties props = new Properties();
-	        FileInputStream fis = null; 
-	        try {
-	            fis = new FileInputStream(configFile);
-	            props.load(fis);
-	            PropertyConfigurator.configure(props);
-	        } 
-	        catch (FileNotFoundException ex) {
-	            err.println("Cannot open configuration file '" + 
-	                    configFile + "': " + ex.getMessage());
-	            exit(1);
-	        }
-	        finally {
-	            if (fis != null) {
-	                fis.close();
-	            }
-	        }
-	    }
-        else if (ARG_URL.isSet()) {
+        if (ARG_FILE.isSet()) {
+            // Set configuration from a file
+            final File configFile = ARG_FILE.getValue();
+            final Properties props = new Properties();
+            FileInputStream fis = null; 
+            try {
+                fis = new FileInputStream(configFile);
+                props.load(fis);
+                PropertyConfigurator.configure(props);
+            } catch (FileNotFoundException ex) {
+                err.println("Cannot open configuration file '" + 
+                        configFile + "': " + ex.getMessage());
+                exit(1);
+            } finally {
+                if (fis != null) {
+                    fis.close();
+                }
+            }
+        } else if (ARG_URL.isSet()) {
             // Set configuration from a URL
             try {
                 final URL configURL = new URL(ARG_URL.getValue());
                 PropertyConfigurator.configure(configURL);
-            }
-            catch (MalformedURLException ex) {
+            } catch (MalformedURLException ex) {
                 err.println("Malformed configuration URL: " + ex.getMessage());
                 exit(1);
             }
-        }
-        else if (FLAG_LIST.isSet()) {
+        } else if (FLAG_LIST.isSet()) {
             // List current loggers and their levels.  Effective levels are shown
             // in parentheses.
             Enumeration<?> en = LogManager.getCurrentLoggers();
@@ -123,16 +119,14 @@ public class Log4jCommand extends AbstractCommand {
                 Logger logger = (Logger) en.nextElement();
                 String level = (logger.getLevel() == null) ? 
                         ("(" + logger.getEffectiveLevel().toString() + ")") :
-                        logger.getLevel().toString();
+                            logger.getLevel().toString();
                 out.println(logger.getName() + ": " + level);
             }
-        }
-        else if (FLAG_SET_LEVEL.isSet()){
+        } else if (FLAG_SET_LEVEL.isSet()) {
             // Change the logging level for a specified logger or the root logger
             final Level level = ARG_LEVEL.getValue();
-            final Logger log = ARG_LOGGER.isSet() ? 
-                    ARG_LOGGER.getValue() : Logger.getRootLogger();
-    		log.setLevel(level);
+            final Logger log = ARG_LOGGER.isSet() ?  ARG_LOGGER.getValue() : Logger.getRootLogger();
+            log.setLevel(level);
         }
-	}
+    }
 }

@@ -25,13 +25,13 @@ package org.jnode.shell.help;
  * @author qades
  */
 public class CompletionException extends HelpException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public CompletionException(String message) {
-		super(message);
-	}
+        super(message);
+    }
 
-	public CompletionException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CompletionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

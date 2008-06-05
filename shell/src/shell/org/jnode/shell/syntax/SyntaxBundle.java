@@ -56,12 +56,9 @@ public class SyntaxBundle {
     public MuSyntax prepare(ArgumentBundle bundle) {
         if (syntaxes.length == 0) {
             return null;
-        }
-        else if (syntaxes.length == 1) {
-            return (syntaxes[0] == null) ? null : 
-                    syntaxes[0].prepare(bundle);
-        }
-        else {
+        } else if (syntaxes.length == 1) {
+            return (syntaxes[0] == null) ? null : syntaxes[0].prepare(bundle);
+        } else {
             return new AlternativesSyntax(syntaxes).prepare(bundle);
         }
     }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import java.net.InetAddress;
@@ -31,27 +31,22 @@ import org.jnode.shell.help.ParsedArguments;
  * @author Martin Hartvig
  */
 
-public class HostNameArgument extends Argument
-{
+public class HostNameArgument extends Argument {
 
-	public HostNameArgument(String _name, String _description, boolean _multi)
-  {
-		super(_name, _description, _multi);
-	}
+    public HostNameArgument(String _name, String _description, boolean _multi) {
+        super(_name, _description, _multi);
+    }
 
-	public HostNameArgument(String _name, String _description)
-  {
-		super(_name, _description);
-	}
+    public HostNameArgument(String _name, String _description) {
+        super(_name, _description);
+    }
 
+    public InetAddress getAddress(ParsedArguments _parsedArguments) throws UnknownHostException {
+        String value = getValue(_parsedArguments);
 
-	public InetAddress getAddress(ParsedArguments _parsedArguments) throws UnknownHostException
-  {
-		String value = getValue(_parsedArguments);
+        if (value == null)
+            return null;
 
-		if (value == null)
-			return null;
-
-    return InetAddress.getByName(value);
-	}
+        return InetAddress.getByName(value);
+    }
 }

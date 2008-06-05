@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import org.jnode.driver.console.CompletionInfo;
@@ -30,18 +30,19 @@ import org.jnode.shell.help.Argument;
  */
 public class StringArgument extends Argument {
 
-	public StringArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public StringArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public StringArgument(String name, String description) {
-		super(name, description);
-	}
+    public StringArgument(String name, String description) {
+        super(name, description);
+    }
 
-	public void complete(CompletionInfo completion, String partial) {
-		String result = CommandLine.doEscape(partial, true);	// force quote
-		result = result.substring(0, result.length() - 1);	// remove ending quote
-		completion.addCompletion(result, true);
-	}
-	
+    public void complete(CompletionInfo completion, String partial) {
+        String result = CommandLine.doEscape(partial, true); // force quote
+        result = result.substring(0, result.length() - 1); // remove ending
+                                                            // quote
+        completion.addCompletion(result, true);
+    }
+
 }

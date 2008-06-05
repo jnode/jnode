@@ -37,8 +37,7 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
 
     private final EnumOption<T>[] options;
 
-    public EnumOptionArgument(String name, String description, boolean multi,
-    		EnumOption<T>... options) {
+    public EnumOptionArgument(String name, String description, boolean multi, EnumOption<T>... options) {
         super(name, description, multi);
         this.options = options;
     }
@@ -49,8 +48,9 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
 
     public String format() {
         StringBuilder result = new StringBuilder();
-        for (EnumOption<T> option : options)
+        for (EnumOption<T> option : options) {
             result.append('|').append(option.getName());
+        }
         return result.substring(1);
     }
 
@@ -70,34 +70,33 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
 
     public final T getEnum(ParsedArguments args, Class<T> type) {
         T[] result = getEnums(args, type);
-        if ((result == null) || (result.length == 0)) return null;
+        if ((result == null) || (result.length == 0)) {
+            return null;
+        }
         return result[0];
     }
 
-	@SuppressWarnings("unchecked")
-	public final T[] getEnums(ParsedArguments args, Class<T> type) {
+    @SuppressWarnings("unchecked")
+    public final T[] getEnums(ParsedArguments args, Class<T> type) {
         String[] values = getValues(args);
-        T[] enums = (T[])Array.newInstance(type,values.length);
+        T[] enums = (T[]) Array.newInstance(type, values.length);
         int i = 0;
-        for(String value : values)
-        {
-        	T enumValue = null;
-        	for(EnumOption<T> e : options)
-        	{
-        		if(value.equals(e.getName()))
-        		{
-        			enumValue = e.getValue();
-        			break;
-        		}
-        	}
-        	enums[i++] = enumValue;
+        for (String value : values) {
+            T enumValue = null;
+            for (EnumOption<T> e : options) {
+                if (value.equals(e.getName())) {
+                    enumValue = e.getValue();
+                    break;
+                }
+            }
+            enums[i++] = enumValue;
         }
         return enums;
     }
 
     /**
      * Override this method to check if a given value "fits" this argument.
-     *
+     * 
      * @param value
      * @return true if value, false otherwise.
      */
@@ -124,16 +123,15 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
     }
 
     public static class EnumOption<T extends Enum<?>> extends Parameter {
-    	private final T value;
+        private final T value;
 
         public EnumOption(String name, String description, T value) {
             super(name, description, MANDATORY);
             this.value = value;
         }
 
-        final public T getValue()
-        {
-        	return value;
+        public final T getValue() {
+            return value;
         }
     }
 }

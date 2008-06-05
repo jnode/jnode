@@ -55,11 +55,9 @@ public class OptionalSyntax extends GroupSyntax {
         MuSyntax tmp;
         if (children.length == 0) {
             return null;
-        }
-        else if (children.length == 1) {
+        } else if (children.length == 1) {
             tmp = children[0].prepare(bundle);
-        }
-        else {
+        } else {
             MuSyntax[] childMuSyntaxes = new MuSyntax[children.length];
             for (int i = 0; i < children.length; i++) {
                 childMuSyntaxes[i] = children[i].prepare(bundle);
@@ -75,15 +73,13 @@ public class OptionalSyntax extends GroupSyntax {
         for (Syntax childSyntax : getChildSyntaxes()) {
             if (sb.length() > 0) {
                 sb.append(" ");
-            }
-            else {
+            } else {
                 sb.append("[ ");
             }
             String formatted = childSyntax.format(bundle);
             if (needsBracketting(formatted)) {
                 sb.append("( ").append(formatted).append(" )");
-            }
-            else {
+            } else {
                 sb.append(formatted);
             }
         }

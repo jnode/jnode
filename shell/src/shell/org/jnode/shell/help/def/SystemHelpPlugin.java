@@ -35,30 +35,30 @@ import org.jnode.shell.help.Help;
  */
 public class SystemHelpPlugin extends Plugin {
 
-	/**
-	 * Initialize a new instance
-	 * @param descriptor
-	 */
-	public SystemHelpPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    /**
+     * Initialize a new instance
+     * @param descriptor
+     */
+    public SystemHelpPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Start this plugin
-	 */
-	protected void startPlugin() throws PluginException {
-		try {
-			final Help help = new DefaultHelp();
-			InitialNaming.bind(Help.NAME, help);
-		} catch (NamingException ex) {
-			throw new PluginException("Cannot bind system help", ex);
-		}
-	}
+    /**
+     * Start this plugin
+     */
+    protected void startPlugin() throws PluginException {
+        try {
+            final Help help = new DefaultHelp();
+            InitialNaming.bind(Help.NAME, help);
+        } catch (NamingException ex) {
+            throw new PluginException("Cannot bind system help", ex);
+        }
+    }
 
-	/**
-	 * Stop this plugin
-	 */
-	protected void stopPlugin() throws PluginException {
-		InitialNaming.unbind(Help.NAME);
-	}
+    /**
+     * Stop this plugin
+     */
+    protected void stopPlugin() throws PluginException {
+        InitialNaming.unbind(Help.NAME);
+    }
 }

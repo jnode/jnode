@@ -32,8 +32,8 @@ public abstract class Syntax {
     protected final String label;
     private Syntax parent;
     private String description;
-    
-    
+
+
     public Syntax(String label, String description) {
         this.label = label;
         this.description = description;
@@ -46,28 +46,28 @@ public abstract class Syntax {
     public final boolean isLabelled() {
         return label != null;
     }
-    
+
     public abstract String format(ArgumentBundle bundle);
-    
+
     /**
      * @return the set of labels for this syntactic element's children, if any.
      */
     public Set<String> childLabels() {
         return Collections.emptySet();
     }
-    
+
     public Syntax getParent() {
-    	return parent;
+        return parent;
     }
-    
+
     public final Syntax getRoot() {
         Syntax p = parent;
         while (p.getParent() != null) {
-        	p = p.getParent();
+            p = p.getParent();
         }
         return p;
     }
-    
+
     public void setParent(Syntax parent) {
         this.parent = parent;
     }
@@ -80,7 +80,7 @@ public abstract class Syntax {
      * @return the prepared MuSyntax
      */
     public abstract MuSyntax prepare(ArgumentBundle bundle);
-    
+
     /**
      * Determine if a formatted syntax would need to be wrapped in "()"s when embedded
      * in a larger format
@@ -91,11 +91,9 @@ public abstract class Syntax {
     protected final boolean needsBracketting(String formatted) {
         if (formatted.startsWith("(") && formatted.endsWith(")")) {
             return false;
-        }
-        else if (formatted.startsWith("[") && formatted.endsWith("]")) {
+        } else if (formatted.startsWith("[") && formatted.endsWith("]")) {
             return false;
-        }
-        else {
+        } else {
             return formatted.contains(" ");
         }
     }
@@ -105,7 +103,7 @@ public abstract class Syntax {
     }
 
     public abstract XMLElement toXML();
-    
+
     protected XMLElement basicElement(String name) {
         XMLElement element = new XMLElement(new Hashtable<String, Object>(), false, false);
         element.setName(name);

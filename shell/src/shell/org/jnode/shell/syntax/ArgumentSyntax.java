@@ -55,8 +55,7 @@ public class ArgumentSyntax extends Syntax {
         try {
             Argument<?> arg = bundle.getArgument(this);
             return "<" + arg.format() + ">";
-        }
-        catch (SyntaxFailureException ex) {
+        } catch (SyntaxFailureException ex) {
             return "<" + label + "> (Unmatched syntax label!)";
         }
     }

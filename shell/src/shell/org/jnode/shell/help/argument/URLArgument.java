@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.argument;
 
 import java.net.MalformedURLException;
@@ -26,7 +26,6 @@ import java.net.URL;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
-
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -40,7 +39,7 @@ public class URLArgument extends Argument {
     public URLArgument(String name, String description) {
         super(name, description);
     }
-    
+
     /**
      * @param name
      * @param description
@@ -50,8 +49,7 @@ public class URLArgument extends Argument {
         super(name, description, multi);
     }
 
-	public URL getURL(ParsedArguments args) throws MalformedURLException {
-		return new URL(this.getValue(args));
-	}
+    public URL getURL(ParsedArguments args) throws MalformedURLException {
+        return new URL(this.getValue(args));
+    }
 }
-

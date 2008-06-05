@@ -44,13 +44,11 @@ import org.jnode.shell.syntax.FlagArgument;
 
 public class AcpiCommand extends AbstractCommand {
 
-    private final FlagArgument FLAG_DUMP =
-        new FlagArgument("dump", Argument.OPTIONAL, 
-                "lists all devices that can be discovered and controlled through ACPI");
+    private final FlagArgument FLAG_DUMP = new FlagArgument(
+            "dump", Argument.OPTIONAL, "lists all devices that can be discovered and controlled through ACPI");
     
-    private final FlagArgument FLAG_BATTERY =
-        new FlagArgument("battery", Argument.OPTIONAL, 
-                    "displays information about installed batteries");
+    private final FlagArgument FLAG_BATTERY = new FlagArgument(
+            "battery", Argument.OPTIONAL, "displays information about installed batteries");
     
     public AcpiCommand() {
         super("display and (in the future) manage the ACPI system");
@@ -66,22 +64,19 @@ public class AcpiCommand extends AbstractCommand {
             PrintStream out, PrintStream err) throws ApiNotFoundException {
         final Collection<Device> acpiDevs = DeviceUtils.getDevicesByAPI(AcpiAPI.class);
         if (acpiDevs.isEmpty()) {
-           out.println("No ACPI devices are registered");
-           exit(1);
-        } 
-        else {
+            out.println("No ACPI devices are registered");
+            exit(1);
+        } else {
             for (Device dev : acpiDevs) {
                 final AcpiAPI api = (AcpiAPI) dev.getAPI(AcpiAPI.class);
 
                 if (FLAG_DUMP.isSet()) {
                     api.dump(new PrintWriter(out));
-                }
-                else if (FLAG_BATTERY.isSet()) {
+                } else if (FLAG_BATTERY.isSet()) {
                     // TODO fix this
                     out.println("The '--battery' option is temporary disabled");
                     //api.dumpBattery();
-                }
-                else {
+                } else {
                     out.println(api.toDetailedString());
                 } 
             }

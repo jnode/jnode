@@ -31,19 +31,19 @@ import java.util.Locale;
  */
 public class CountryArgument extends StringListArgument {
 
-	private static final List<String> validCountries = Arrays.asList(Locale
-			.getISOCountries());
+    private static final List<String> validCountries = Arrays.asList(Locale
+            .getISOCountries());
 
-	public CountryArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public CountryArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public CountryArgument(String name, String description) {
-		super(name, description);
-	}
+    public CountryArgument(String name, String description) {
+        super(name, description);
+    }
 
-	@Override
-	protected Collection<String> getValues() {
-		return validCountries;
-	}
+    @Override
+    protected Collection<String> getValues() {
+        return validCountries;
+    }
 }

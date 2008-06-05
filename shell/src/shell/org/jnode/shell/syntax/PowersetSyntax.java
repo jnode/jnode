@@ -72,15 +72,13 @@ public class PowersetSyntax extends GroupSyntax {
         for (Syntax childSyntax : getChildSyntaxes()) {
             if (sb.length() > 0) {
                 sb.append(" | ");
-            }
-            else {
+            } else {
                 sb.append("[ ");
             }
             String formatted = childSyntax.format(bundle);
             if (needsBracketting(formatted)) {
                 sb.append("( ").append(formatted).append(" )");
-            }
-            else {
+            } else {
                 sb.append(formatted);
             }
         }

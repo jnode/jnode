@@ -31,25 +31,25 @@ import org.jnode.plugin.PluginException;
  */
 public class SystemSyntaxPlugin extends Plugin {
 
-	/**
-	 * Initialize a new instance
-	 * @param descriptor
-	 */
-	public SystemSyntaxPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-	}
+    /**
+     * Initialize a new instance
+     * @param descriptor
+     */
+    public SystemSyntaxPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+    }
 
-	/**
-	 * Start this plugin
-	 */
-	protected void startPlugin() throws PluginException {
-		// Do nothing for now
-	}
+    /**
+     * Start this plugin
+     */
+    protected void startPlugin() throws PluginException {
+        // Do nothing for now
+    }
 
-	/**
-	 * Stop this plugin
-	 */
-	protected void stopPlugin() throws PluginException {
-		// Do nothing for now
-	}
+    /**
+     * Stop this plugin
+     */
+    protected void stopPlugin() throws PluginException {
+        // Do nothing for now
+    }
 }

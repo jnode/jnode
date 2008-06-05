@@ -63,8 +63,7 @@ public class IntegerArgument extends Argument<Integer> {
                 throw new CommandSyntaxException("number '" + token.token + "' is out of range");
             }
             return new Integer(token.token);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid number '" + token.token + "'");
         }
     }

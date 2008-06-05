@@ -115,8 +115,7 @@ public abstract class MuSyntax {
         if (label != null) {
             state.work.add(this);
             return state.getLabel(this);
-        }
-        else {
+        } else {
             return format(state);
         }
     }

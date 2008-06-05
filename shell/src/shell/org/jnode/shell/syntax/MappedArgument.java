@@ -83,8 +83,7 @@ public abstract class MappedArgument<V> extends Argument<V> {
         if (value == null) {
             throw new CommandSyntaxException("'" + token.token + 
                     "' is not an acceptable " + argumentKind());
-        }
-        else {
+        } else {
             return value;
         }
     }
