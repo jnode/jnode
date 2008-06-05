@@ -100,20 +100,20 @@ public class BjorneParser {
     private CommandNode parseList() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         CommandNode command = parseAndOr();
-        LOOP: while (command != null) {
+    LOOP: 
+        while (command != null) {
             commands.add(command);
             switch (tokens.peek().getTokenType()) {
-            case TOK_SEMI:
-                break;
-            case TOK_AMP:
-                command.setFlag(FLAG_ASYNC);
-                break;
-            case TOK_END_OF_LINE:
-            case TOK_END_OF_STREAM:
-                break LOOP;
-            default:
-                throw new ShellSyntaxException("unexpected token: "
-                        + tokens.peek());
+                case TOK_SEMI:
+                    break;
+                case TOK_AMP:
+                    command.setFlag(FLAG_ASYNC);
+                    break;
+                case TOK_END_OF_LINE:
+                case TOK_END_OF_STREAM:
+                    break LOOP;
+                default:
+                    throw new ShellSyntaxException("unexpected token: " + tokens.peek());
             }
             tokens.next();
             command = parseOptAndOr();
@@ -132,21 +132,22 @@ public class BjorneParser {
     private CommandNode parseAndOr() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         int flag = 0;
-        LOOP: while (true) {
+    LOOP: 
+        while (true) {
             CommandNode command = parsePipeline();
             command.setFlag(flag);
             BjorneToken token = tokens.peek();
             int type = token.getTokenType();
             switch (type) {
-            case TOK_AND_IF:
-                flag = FLAG_AND_IF;
-                break;
-            case TOK_OR_IF:
-                flag = FLAG_OR_IF;
-                break;
-            default:
-                commands.add(command);
-                break LOOP;
+                case TOK_AND_IF:
+                    flag = FLAG_AND_IF;
+                    break;
+                case TOK_OR_IF:
+                    flag = FLAG_OR_IF;
+                    break;
+                default:
+                    commands.add(command);
+                    break LOOP;
             }
             commands.add(command);
             tokens.next();
@@ -157,26 +158,26 @@ public class BjorneParser {
 
     private CommandNode parseOptAndOr() throws ShellSyntaxException {
         switch (tokens.peek(RULE_1_CONTEXT).getTokenType()) {
-        case TOK_LBRACE:
-        case TOK_LPAREN:
-        case TOK_WORD:
-        case TOK_IF:
-        case TOK_WHILE:
-        case TOK_UNTIL:
-        case TOK_CASE:
-        case TOK_FOR:
-        case TOK_IO_NUMBER:
-        case TOK_LESS:
-        case TOK_GREAT:
-        case TOK_DLESS:
-        case TOK_DGREAT:
-        case TOK_LESSAND:
-        case TOK_GREATAND:
-        case TOK_LESSGREAT:
-        case TOK_CLOBBER:
-            return parseAndOr();
-        default:
-            return null;
+            case TOK_LBRACE:
+            case TOK_LPAREN:
+            case TOK_WORD:
+            case TOK_IF:
+            case TOK_WHILE:
+            case TOK_UNTIL:
+            case TOK_CASE:
+            case TOK_FOR:
+            case TOK_IO_NUMBER:
+            case TOK_LESS:
+            case TOK_GREAT:
+            case TOK_DLESS:
+            case TOK_DGREAT:
+            case TOK_LESSAND:
+            case TOK_GREATAND:
+            case TOK_LESSGREAT:
+            case TOK_CLOBBER:
+                return parseAndOr();
+            default:
+                return null;
         }
     }
 
@@ -229,20 +230,20 @@ public class BjorneParser {
      */
     private CommandNode parseCommand() throws ShellSyntaxException {
         switch (tokens.peek(RULE_7a_CONTEXT).getTokenType()) {
-        case TOK_IF:
-        case TOK_WHILE:
-        case TOK_UNTIL:
-        case TOK_FOR:
-        case TOK_CASE:
-        case TOK_LBRACE:
-        case TOK_LPAREN:
-            return parseCompoundCommand();
-        default:
-            CommandNode tmp = parseFunctionDefinition();
-            if (tmp != null) {
-                return tmp;
-            }
-            return parseSimpleCommand();
+            case TOK_IF:
+            case TOK_WHILE:
+            case TOK_UNTIL:
+            case TOK_FOR:
+            case TOK_CASE:
+            case TOK_LBRACE:
+            case TOK_LPAREN:
+                return parseCompoundCommand();
+            default:
+                CommandNode tmp = parseFunctionDefinition();
+                if (tmp != null) {
+                    return tmp;
+                }
+                return parseSimpleCommand();
         }
     }
 
@@ -258,36 +259,10 @@ public class BjorneParser {
         for (int i = 0; !found; i++) {
             token = tokens.peek(i == 0 ? RULE_7a_CONTEXT : RULE_7b_CONTEXT);
             switch (token.getTokenType()) {
-            case TOK_ASSIGNMENT:
-                assignments.add(token);
-                tokens.next();
-                break;
-            case TOK_IO_NUMBER:
-            case TOK_LESS:
-            case TOK_GREAT:
-            case TOK_DLESS:
-            case TOK_DGREAT:
-            case TOK_LESSAND:
-            case TOK_GREATAND:
-            case TOK_LESSGREAT:
-            case TOK_CLOBBER:
-                redirects.add(parseRedirect());
-                break;
-            default:
-                found = true;
-                break;
-            }
-        }
-        if (token.getTokenType() == TOK_WORD) {
-            // This is the command name. Record then consume it.
-            words.add(token);
-            tokens.next();
-
-            // Deal with any command arguments and embedded / trailing
-            // redirections.
-            LOOP: while (true) {
-                token = tokens.peek();
-                switch (token.getTokenType()) {
+                case TOK_ASSIGNMENT:
+                    assignments.add(token);
+                    tokens.next();
+                    break;
                 case TOK_IO_NUMBER:
                 case TOK_LESS:
                 case TOK_GREAT:
@@ -299,33 +274,57 @@ public class BjorneParser {
                 case TOK_CLOBBER:
                     redirects.add(parseRedirect());
                     break;
-                case TOK_WORD:
-                    words.add(token);
-                    tokens.next();
-                    break;
                 default:
-                    break LOOP;
+                    found = true;
+                    break;
+            }
+        }
+        if (token.getTokenType() == TOK_WORD) {
+            // This is the command name. Record then consume it.
+            words.add(token);
+            tokens.next();
+
+            // Deal with any command arguments and embedded / trailing
+            // redirections.
+        LOOP: 
+            while (true) {
+                token = tokens.peek();
+                switch (token.getTokenType()) {
+                    case TOK_IO_NUMBER:
+                    case TOK_LESS:
+                    case TOK_GREAT:
+                    case TOK_DLESS:
+                    case TOK_DGREAT:
+                    case TOK_LESSAND:
+                    case TOK_GREATAND:
+                    case TOK_LESSGREAT:
+                    case TOK_CLOBBER:
+                        redirects.add(parseRedirect());
+                        break;
+                    case TOK_WORD:
+                        words.add(token);
+                        tokens.next();
+                        break;
+                    default:
+                        break LOOP;
                 }
             }
         } else {
             // An empty command is legal, as are assignments and redirections
             // w/o a command.
         }
-        SimpleCommandNode res = new SimpleCommandNode(CMD_COMMAND, words
-                .toArray(new BjorneToken[words.size()]));
+        SimpleCommandNode res = 
+            new SimpleCommandNode(CMD_COMMAND, words.toArray(new BjorneToken[words.size()]));
         if (!redirects.isEmpty()) {
-            res.setRedirects(redirects.toArray(new RedirectionNode[redirects
-                    .size()]));
+            res.setRedirects(redirects.toArray(new RedirectionNode[redirects.size()]));
         }
         if (!assignments.isEmpty()) {
-            res.setAssignments(assignments.toArray(new BjorneToken[assignments
-                    .size()]));
+            res.setAssignments(assignments.toArray(new BjorneToken[assignments.size()]));
         }
         return res;
     }
 
-    private FunctionDefinitionNode parseFunctionDefinition()
-            throws ShellSyntaxException {
+    private FunctionDefinitionNode parseFunctionDefinition() throws ShellSyntaxException {
         BjorneToken fname = tokens.peek(RULE_8_CONTEXT);
         if (fname.getTokenType() != TOK_NAME) {
             return null;
@@ -364,29 +363,29 @@ public class BjorneParser {
     private CommandNode parseCompoundCommand() throws ShellSyntaxException {
         CommandNode command;
         switch (tokens.peek(RULE_1_CONTEXT).getTokenType()) {
-        case TOK_IF:
-            command = parseIfCommand();
-            break;
-        case TOK_WHILE:
-            command = parseWhileCommand();
-            break;
-        case TOK_UNTIL:
-            command = parseUntilCommand();
-            break;
-        case TOK_FOR:
-            command = parseForCommand();
-            break;
-        case TOK_CASE:
-            command = parseCaseCommand();
-            break;
-        case TOK_LBRACE:
-            command = parseBraceGroup();
-            break;
-        case TOK_LPAREN:
-            command = parseSubshell();
-            break;
-        default:
-            throw new ShellFailureException("bad token");
+            case TOK_IF:
+                command = parseIfCommand();
+                break;
+            case TOK_WHILE:
+                command = parseWhileCommand();
+                break;
+            case TOK_UNTIL:
+                command = parseUntilCommand();
+                break;
+            case TOK_FOR:
+                command = parseForCommand();
+                break;
+            case TOK_CASE:
+                command = parseCaseCommand();
+                break;
+            case TOK_LBRACE:
+                command = parseBraceGroup();
+                break;
+            case TOK_LPAREN:
+                command = parseSubshell();
+                break;
+            default:
+                throw new ShellFailureException("bad token");
         }
         command.setRedirects(parseOptRedirects());
         return command;
@@ -402,30 +401,28 @@ public class BjorneParser {
         }
         int tokenType = token.getTokenType();
         switch (tokenType) {
-        case TOK_LESS:
-        case TOK_GREAT:
-        case TOK_DGREAT:
-        case TOK_LESSAND:
-        case TOK_GREATAND:
-        case TOK_LESSGREAT:
-        case TOK_CLOBBER:
-            arg = tokens.next();
-            if (arg.getTokenType() != TOK_WORD) {
-                throw new ShellSyntaxException("expected a filename after "
-                        + token);
-            }
-            break;
-        case TOK_DLESS:
-        case TOK_DLESSDASH:
-            arg = tokens.next();
-            if (arg.getTokenType() != TOK_WORD) {
-                throw new ShellSyntaxException("expected a here-end marker "
-                        + token);
-            }
-            // TODO ... need to grab the HERE document ...
-            break;
-        default:
-            throw new ShellSyntaxException("expected a redirection token");
+            case TOK_LESS:
+            case TOK_GREAT:
+            case TOK_DGREAT:
+            case TOK_LESSAND:
+            case TOK_GREATAND:
+            case TOK_LESSGREAT:
+            case TOK_CLOBBER:
+                arg = tokens.next();
+                if (arg.getTokenType() != TOK_WORD) {
+                    throw new ShellSyntaxException("expected a filename after " + token);
+                }
+                break;
+            case TOK_DLESS:
+            case TOK_DLESSDASH:
+                arg = tokens.next();
+                if (arg.getTokenType() != TOK_WORD) {
+                    throw new ShellSyntaxException("expected a here-end marker " + token);
+                }
+                // TODO ... need to grab the HERE document ...
+                break;
+            default:
+                throw new ShellSyntaxException("expected a redirection token");
         }
         // (The corresponding token type and redirection type values are the
         // same ...)
@@ -434,22 +431,23 @@ public class BjorneParser {
 
     private RedirectionNode[] parseOptRedirects() throws ShellSyntaxException {
         List<RedirectionNode> redirects = new LinkedList<RedirectionNode>();
-        LOOP: while (true) {
+    LOOP:
+        while (true) {
             switch (tokens.peek().getTokenType()) {
-            case TOK_IO_NUMBER:
-            case TOK_LESS:
-            case TOK_GREAT:
-            case TOK_DLESS:
-            case TOK_DLESSDASH:
-            case TOK_DGREAT:
-            case TOK_LESSAND:
-            case TOK_GREATAND:
-            case TOK_LESSGREAT:
-            case TOK_CLOBBER:
-                redirects.add(parseRedirect());
-                break;
-            default:
-                break LOOP;
+                case TOK_IO_NUMBER:
+                case TOK_LESS:
+                case TOK_GREAT:
+                case TOK_DLESS:
+                case TOK_DLESSDASH:
+                case TOK_DGREAT:
+                case TOK_LESSAND:
+                case TOK_GREATAND:
+                case TOK_LESSGREAT:
+                case TOK_CLOBBER:
+                    redirects.add(parseRedirect());
+                    break;
+                default:
+                    break LOOP;
             }
         }
         if (redirects.isEmpty()) {
@@ -472,16 +470,17 @@ public class BjorneParser {
         List<CommandNode> commands = new LinkedList<CommandNode>();
         skipLineBreaks();
         CommandNode command = parseAndOr();
-        LOOP: while (command != null) {
+    LOOP: 
+        while (command != null) {
             commands.add(command);
             skipLineBreaks();
             switch (tokens.peek().getTokenType()) {
-            case TOK_SEMI:
-                break;
-            case TOK_AMP:
-                command.setFlag(FLAG_ASYNC);
-            default:
-                break LOOP;
+                case TOK_SEMI:
+                    break;
+                case TOK_AMP:
+                    command.setFlag(FLAG_ASYNC);
+                default:
+                    break LOOP;
             }
             tokens.next();
             command = parseOptAndOr();
@@ -591,20 +590,19 @@ public class BjorneParser {
                         "expected a wordlist following 'in'");
             }
             switch (tokens.peek().getTokenType()) {
-            case TOK_SEMI:
-                tokens.next();
-                skipLineBreaks();
-                break;
-            case TOK_END_OF_LINE:
-                skipLineBreaks();
-                break;
-            default:
-                throw new ShellSyntaxException(
-                        "expected a ';' following wordlist");
+                case TOK_SEMI:
+                    tokens.next();
+                    skipLineBreaks();
+                    break;
+                case TOK_END_OF_LINE:
+                    skipLineBreaks();
+                    break;
+                default:
+                    throw new ShellSyntaxException("expected a ';' following wordlist");
             }
         }
-        return new ForCommandNode(var, words.toArray(new BjorneToken[words
-                .size()]), parseDoGroup());
+        return new ForCommandNode(var,
+                words.toArray(new BjorneToken[words.size()]), parseDoGroup());
     }
 
     private CommandNode parseDoGroup() throws ShellSyntaxException {
@@ -650,17 +648,17 @@ public class BjorneParser {
 
     private CommandNode parseOptElsePart() throws ShellSyntaxException {
         switch (tokens.next(RULE_1_CONTEXT).getTokenType()) {
-        case TOK_ELIF:
-            CommandNode cond = parseCompoundList();
-            if (tokens.next(RULE_1_CONTEXT).getTokenType() != TOK_THEN) {
-                throw new ShellSyntaxException("expected a 'then' in else_part");
-            }
-            return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(),
-                    parseOptElsePart());
-        case TOK_ELSE:
-            return parseCompoundList();
-        default:
-            return null;
+            case TOK_ELIF:
+                CommandNode cond = parseCompoundList();
+                if (tokens.next(RULE_1_CONTEXT).getTokenType() != TOK_THEN) {
+                    throw new ShellSyntaxException("expected a 'then' in else_part");
+                }
+                return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(),
+                        parseOptElsePart());
+            case TOK_ELSE:
+                return parseCompoundList();
+            default:
+                return null;
         }
     }
 

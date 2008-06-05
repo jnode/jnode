@@ -29,7 +29,9 @@ import java.util.regex.PatternSyntaxException;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author peda
@@ -48,62 +50,59 @@ public class GrepCommand extends AbstractCommand {
         super("Search for lines that match a string or regex");
         registerArguments(ARG_EXPR, FLAG_INVERSE, FLAG_REGEX);
     }
-    	
+
     /**
      * main method, normally not used, use execute instead!!
      * @param args
      * @throws Exception
      */
-	public static void main(String[] args) throws Exception {
-    	new GrepCommand().execute(args);
+    public static void main(String[] args) throws Exception {
+        new GrepCommand().execute(args);
     }
 
-	/**
-	 * Primary entry point
-	 */
-	public void execute(CommandLine commandLine, InputStream in,
-			PrintStream out, PrintStream err) throws Exception {
+    /**
+     * Primary entry point
+     */
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
 
-	    boolean inverse = FLAG_INVERSE.isSet();
-	    boolean useRegex = FLAG_REGEX.isSet();
-	    String expr = ARG_EXPR.getValue();
-	    
-	    Pattern pattern = null;
-	    try {
-	        if (useRegex) {
-	           pattern = Pattern.compile(expr);
-	        }
-	        else {
-	            // By using Pattern to search for regular strings, we should
-	            // get the benefit of Pattern's ability to do fast string 
-	            // searching; e.g. using the Boyer-Moore algorithm.
-	            pattern = Pattern.compile(Pattern.quote(expr));
-	        }
-	    }
-	    catch (PatternSyntaxException ex) {
-	        err.println("Invalid regex: " + ex.getMessage());
-	        exit(2);
-	    }
-		
-		final BufferedReader r = new BufferedReader(new InputStreamReader(in));
-		
-		// Read the input a line at a time, searching each line for the expression.
+        boolean inverse = FLAG_INVERSE.isSet();
+        boolean useRegex = FLAG_REGEX.isSet();
+        String expr = ARG_EXPR.getValue();
+
+        Pattern pattern = null;
+        try {
+            if (useRegex) {
+                pattern = Pattern.compile(expr);
+            } else {
+                // By using Pattern to search for regular strings, we should
+                // get the benefit of Pattern's ability to do fast string 
+                // searching; e.g. using the Boyer-Moore algorithm.
+                pattern = Pattern.compile(Pattern.quote(expr));
+            }
+        } catch (PatternSyntaxException ex) {
+            err.println("Invalid regex: " + ex.getMessage());
+            exit(2);
+        }
+
+        final BufferedReader r = new BufferedReader(new InputStreamReader(in));
+
+        // Read the input a line at a time, searching each line for the expression.
         boolean found = false;
         String line;
         while ((line = r.readLine()) != null) {
-		    if (pattern.matcher(line).find()) {
-		        if (!inverse) {
-		            out.println(line);
-		            found = true;
-		        }
-		    } 
-		    else if (inverse) {
-		        out.println(line);
-		        found = true;
-		    }
-		}
-		if (!found) {
-		    exit(1);
-		}
-	}
+            if (pattern.matcher(line).find()) {
+                if (!inverse) {
+                    out.println(line);
+                    found = true;
+                }
+            } else if (inverse) {
+                out.println(line);
+                found = true;
+            }
+        }
+        if (!found) {
+            exit(1);
+        }
+    }
 }

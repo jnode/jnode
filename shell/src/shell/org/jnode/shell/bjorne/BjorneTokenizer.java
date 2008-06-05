@@ -150,87 +150,88 @@ public class BjorneTokenizer {
         }
         int start = pos;
         switch (ch) {
-        case EOS:
-            return makeToken(TOK_END_OF_STREAM, start);
-        case '\n':
-            return makeToken(TOK_END_OF_LINE, start);
-        case '#':
-            while ((ch = nextCh()) != EOS) {
-                if (ch == '\n') {
-                    return makeToken(TOK_END_OF_LINE, start);
-                }
-            }
-            return makeToken(TOK_END_OF_STREAM, start);
-        case '(':
-            return makeToken(TOK_LPAREN, start);
-        case ')':
-            return makeToken(TOK_RPAREN, start);
-        case '<':
-        case '>':
-        case ';':
-        case '&':
-        case '|':
-            return parseOperator();
-        default:
-            return parseWord();
-        }
-    }
-
-    private BjorneToken makeToken(int tokenType, int start) {
-		return new BjorneToken(tokenType, "", start, pos);
-	}
-
-    private BjorneToken makeToken(int tokenType, String value, int start) {
-		return new BjorneToken(tokenType, value, start, pos);
-	}
-
-	private BjorneToken parseWord() {
-        int quoteChar = 0;
-        StringBuffer sb = new StringBuffer();
-        int ch = prevCh();
-        int start = pos - 1;
-        LOOP: while (true) {
-            switch (ch) {
             case EOS:
+                return makeToken(TOK_END_OF_STREAM, start);
             case '\n':
-                break LOOP;
+                return makeToken(TOK_END_OF_LINE, start);
+            case '#':
+                while ((ch = nextCh()) != EOS) {
+                    if (ch == '\n') {
+                        return makeToken(TOK_END_OF_LINE, start);
+                    }
+                }
+                return makeToken(TOK_END_OF_STREAM, start);
             case '(':
+                return makeToken(TOK_LPAREN, start);
             case ')':
+                return makeToken(TOK_RPAREN, start);
             case '<':
             case '>':
             case ';':
             case '&':
             case '|':
-            case '#':
-            case ' ':
-            case '\t':
-                if (quoteChar == 0) {
+                return parseOperator();
+            default:
+                return parseWord();
+        }
+    }
+
+    private BjorneToken makeToken(int tokenType, int start) {
+        return new BjorneToken(tokenType, "", start, pos);
+    }
+
+    private BjorneToken makeToken(int tokenType, String value, int start) {
+        return new BjorneToken(tokenType, value, start, pos);
+    }
+
+    private BjorneToken parseWord() {
+        int quoteChar = 0;
+        StringBuffer sb = new StringBuffer();
+        int ch = prevCh();
+        int start = pos - 1;
+    LOOP: 
+        while (true) {
+            switch (ch) {
+                case EOS:
+                case '\n':
                     break LOOP;
-                }
-                break;
-            case '"':
-            case '\'':
-            case '`':
-                if (quoteChar == 0) {
-                    quoteChar = ch;
-                } else if (quoteChar == ch) {
-                    quoteChar = 0;
-                }
-                break;
-            case '\\':
-                ch = nextCh();
-                if (ch == '\n') {
-                    ch = nextCh();
-                    continue;
-                } else {
-                    sb.append('\\');
-                    if (ch == EOS) {
+                case '(':
+                case ')':
+                case '<':
+                case '>':
+                case ';':
+                case '&':
+                case '|':
+                case '#':
+                case ' ':
+                case '\t':
+                    if (quoteChar == 0) {
                         break LOOP;
                     }
-                }
-                break;
-            default:
-                /* empty */
+                    break;
+                case '"':
+                case '\'':
+                case '`':
+                    if (quoteChar == 0) {
+                        quoteChar = ch;
+                    } else if (quoteChar == ch) {
+                        quoteChar = 0;
+                    }
+                    break;
+                case '\\':
+                    ch = nextCh();
+                    if (ch == '\n') {
+                        ch = nextCh();
+                        continue;
+                    } else {
+                        sb.append('\\');
+                        if (ch == EOS) {
+                            break LOOP;
+                        }
+                    }
+                    break;
+                default:
+                    /* empty */
             }
             sb.append((char) ch);
             ch = nextCh();
@@ -255,58 +256,58 @@ public class BjorneTokenizer {
     }
 
     private BjorneToken parseOperator() {
-    	int start = pos - 1;
+        int start = pos - 1;
         switch (prevCh()) {
-        case '<':
-            switch (peekCh()) {
             case '<':
-                nextCh();
-                if (peekCh() == '-') {
-                    nextCh();
-                    return makeToken(TOK_DLESSDASH, start);
+                switch (peekCh()) {
+                    case '<':
+                        nextCh();
+                        if (peekCh() == '-') {
+                            nextCh();
+                            return makeToken(TOK_DLESSDASH, start);
+                        }
+                        return makeToken(TOK_DLESS, start);
+                    case '>':
+                        nextCh();
+                        return makeToken(TOK_LESSGREAT, start);
+                    case '&':
+                        nextCh();
+                        return makeToken(TOK_LESSAND, start);
+                    default:
+                        return makeToken(TOK_LESS, start);
                 }
-                return makeToken(TOK_DLESS, start);
             case '>':
-                nextCh();
-                return makeToken(TOK_LESSGREAT, start);
+                switch (peekCh()) {
+                    case '|':
+                        nextCh();
+                        return makeToken(TOK_CLOBBER, start);
+                    case '>':
+                        nextCh();
+                        return makeToken(TOK_DGREAT, start);
+                    case '&':
+                        nextCh();
+                        return makeToken(TOK_GREATAND, start);
+                    default:
+                        return makeToken(TOK_GREAT, start);
+                }
+            case ';':
+                if (peekCh() == ';') {
+                    nextCh();
+                    return makeToken(TOK_DSEMI, start);
+                }
+                return makeToken(TOK_SEMI, start);
             case '&':
-                nextCh();
-                return makeToken(TOK_LESSAND, start);
-            default:
-                return makeToken(TOK_LESS, start);
-            }
-        case '>':
-            switch (peekCh()) {
+                if (peekCh() == '&') {
+                    nextCh();
+                    return makeToken(TOK_AND_IF, start);
+                }
+                return makeToken(TOK_AMP, start);
             case '|':
-                nextCh();
-                return makeToken(TOK_CLOBBER, start);
-            case '>':
-                nextCh();
-                return makeToken(TOK_DGREAT, start);
-            case '&':
-                nextCh();
-                return makeToken(TOK_GREATAND, start);
-            default:
-                return makeToken(TOK_GREAT, start);
-            }
-        case ';':
-            if (peekCh() == ';') {
-                nextCh();
-                return makeToken(TOK_DSEMI, start);
-            }
-            return makeToken(TOK_SEMI, start);
-        case '&':
-            if (peekCh() == '&') {
-                nextCh();
-                return makeToken(TOK_AND_IF, start);
-            }
-            return makeToken(TOK_AMP, start);
-        case '|':
-            if (peekCh() == '|') {
-                nextCh();
-                return makeToken(TOK_OR_IF, start);
-            }
-            return makeToken(TOK_BAR, start);
+                if (peekCh() == '|') {
+                    nextCh();
+                    return makeToken(TOK_OR_IF, start);
+                }
+                return makeToken(TOK_BAR, start);
         }
         throw new ShellFailureException("bad lexer state");
     }
@@ -347,63 +348,63 @@ public class BjorneTokenizer {
             return token;
         }
         switch (context) {
-        case RULE_1_CONTEXT: {
-            BjorneToken tmp = toReservedWordToken(token);
-            if (tmp != null) {
-                return tmp;
-            }
-            return token;
-        }
-
-        case RULE_5_CONTEXT:
-            if (token.isName()) {
-                return remakeToken(TOK_NAME, token);
-            }
-            return token;
-
-        case RULE_6_CONTEXT:
-            if (token.getText().equals("in")) {
-                return remakeToken(TOK_IN, token);
-            }
-            return token;
-
-        case RULE_7a_CONTEXT:
-            if (token.getText().indexOf('=') == -1) {
-                return reinterpret(token, RULE_1_CONTEXT);
-            }
-            // DROP THROUGH TO RULE 7b
-
-        case RULE_7b_CONTEXT:
-            int pos = token.getText().indexOf('=');
-            if (pos <= 0
-                    || !BjorneToken.isName(token.getText()
-                            .substring(0, pos - 1))) {
+            case RULE_1_CONTEXT: {
+                BjorneToken tmp = toReservedWordToken(token);
+                if (tmp != null) {
+                    return tmp;
+                }
                 return token;
             }
-            return remakeToken(TOK_ASSIGNMENT, token);
 
-        case RULE_8_CONTEXT:
-            BjorneToken tmp = toReservedWordToken(token);
-            if (tmp != null) {
-                return tmp;
-            }
-            if (token.isName()) {
-                return remakeToken(TOK_NAME, token);
-            }
-            return reinterpret(token, RULE_7b_CONTEXT);
+            case RULE_5_CONTEXT:
+                if (token.isName()) {
+                    return remakeToken(TOK_NAME, token);
+                }
+                return token;
 
-        default:
-            return token;
+            case RULE_6_CONTEXT:
+                if (token.getText().equals("in")) {
+                    return remakeToken(TOK_IN, token);
+                }
+                return token;
+
+            case RULE_7a_CONTEXT:
+                if (token.getText().indexOf('=') == -1) {
+                    return reinterpret(token, RULE_1_CONTEXT);
+                }
+                // DROP THROUGH TO RULE 7b
+
+            case RULE_7b_CONTEXT:
+                int pos = token.getText().indexOf('=');
+                if (pos <= 0
+                        || !BjorneToken.isName(token.getText()
+                                .substring(0, pos - 1))) {
+                    return token;
+                }
+                return remakeToken(TOK_ASSIGNMENT, token);
+
+            case RULE_8_CONTEXT:
+                BjorneToken tmp = toReservedWordToken(token);
+                if (tmp != null) {
+                    return tmp;
+                }
+                if (token.isName()) {
+                    return remakeToken(TOK_NAME, token);
+                }
+                return reinterpret(token, RULE_7b_CONTEXT);
+
+            default:
+                return token;
         }
     }
 
     private BjorneToken remakeToken(int tokenType, BjorneToken token) {
-		return new BjorneToken(tokenType, token.getText(), token.start,
-				token.end);
-	}
+        return new BjorneToken(tokenType, token.getText(), token.start,
+                token.end);
+    }
 
-	private BjorneToken toReservedWordToken(BjorneToken token) {
-		String str = token.getText();
+    private BjorneToken toReservedWordToken(BjorneToken token) {
+        String str = token.getText();
         if (str.equals("for")) {
             return remakeToken(TOK_FOR, token);
         } else if (str.equals("while")) {

@@ -38,69 +38,67 @@ import org.jnode.vm.scheduler.VmThread;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author crawley@jnode.org
  */
-public class ThreadCommand extends AbstractCommand
-{
-    private final static String SEPARATOR = ", ";
-    private final static String SLASH_T = "\t";
-    private final static String GROUP = "Group ";
-    private final static String TRACE = "Stack trace";
+public class ThreadCommand extends AbstractCommand {
+    private static final String SEPARATOR = ", ";
+    private static final String SLASH_T = "\t";
+    private static final String GROUP = "Group ";
+    private static final String TRACE = "Stack trace";
 
     private final ThreadNameArgument ARG_NAME = 
-	    new ThreadNameArgument("threadName", Argument.OPTIONAL, "the name of a specific thread to be printed");
+        new ThreadNameArgument("threadName", Argument.OPTIONAL, "the name of a specific thread to be printed");
     private final FlagArgument FLAG_GROUP_DUMP =
         new FlagArgument("groupDump", Argument.OPTIONAL, "if set, output a ThreadGroup dump");
 
-	public ThreadCommand() {
+    public ThreadCommand() {
         super("View all or a specific threads");
         registerArguments(ARG_NAME, FLAG_GROUP_DUMP);
-	}
-    
-	public static void main(String[] args) throws Exception {
-		new ThreadCommand().execute(args);
-	}
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-	throws Exception {
-	    // If threadName is null, we'll print all threads
-		String threadName = (ARG_NAME.isSet()) ? ARG_NAME.getValue() : null;
-		boolean dump = FLAG_GROUP_DUMP.isSet();
-		
-		// Find the root of the ThreadGroup tree
-		ThreadGroup grp = Thread.currentThread().getThreadGroup();
-		while (grp.getParent() != null) {
-			grp = grp.getParent();
-		}
-		
-		if (dump) {
-		    // Produce an ugly (but useful) ThreadGroup dump
-		    grp.list();
-		}
-		else {
-		    // Show the threads in the ThreadGroup tree.
-	        showThreads(grp, out, threadName);
-		}
-	}
+    public static void main(String[] args) throws Exception {
+        new ThreadCommand().execute(args);
+    }
 
-	/**
-	 * Traverse the ThreadGroups threads and its child ThreadGroups printing
-	 * information for each thread found.  If 'threadName' is non-null, only
-	 * print information for the thread that matches the name.
-	 * 
-	 * @param grp the ThreadGroup to traverse
-	 * @param out the destination for output
-	 * @param threadName if non-null, only display this thread.
-	 */
-	private void showThreads(ThreadGroup grp, PrintStream out, String threadName) {
-	    if (threadName == null) {
-			out.println(GROUP + grp.getName());
-		}
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws Exception {
+        // If threadName is null, we'll print all threads
+        String threadName = (ARG_NAME.isSet()) ? ARG_NAME.getValue() : null;
+        boolean dump = FLAG_GROUP_DUMP.isSet();
 
-		final int max = grp.activeCount() * 2;
-		final Thread[] ts = new Thread[max];
-		grp.enumerate(ts);
+        // Find the root of the ThreadGroup tree
+        ThreadGroup grp = Thread.currentThread().getThreadGroup();
+        while (grp.getParent() != null) {
+            grp = grp.getParent();
+        }
+
+        if (dump) {
+            // Produce an ugly (but useful) ThreadGroup dump
+            grp.list();
+        } else {
+            // Show the threads in the ThreadGroup tree.
+            showThreads(grp, out, threadName);
+        }
+    }
+
+    /**
+     * Traverse the ThreadGroups threads and its child ThreadGroups printing
+     * information for each thread found.  If 'threadName' is non-null, only
+     * print information for the thread that matches the name.
+     * 
+     * @param grp the ThreadGroup to traverse
+     * @param out the destination for output
+     * @param threadName if non-null, only display this thread.
+     */
+    private void showThreads(ThreadGroup grp, PrintStream out, String threadName) {
+        if (threadName == null) {
+            out.println(GROUP + grp.getName());
+        }
+
+        final int max = grp.activeCount() * 2;
+        final Thread[] ts = new Thread[max];
+        grp.enumerate(ts);
 
         for (int i = 0; i < max; i++) {
             final Thread t = ts[i];
@@ -121,14 +119,14 @@ public class ThreadCommand extends AbstractCommand
             }
         }
 
-		final int gmax = grp.activeGroupCount() * 2;
-		final ThreadGroup[] tgs = new ThreadGroup[gmax];
-		grp.enumerate(tgs);
-		for (int i = 0; i < gmax; i++) {
-			final ThreadGroup tg = tgs[i];
-			if (tg != null) {
-				showThreads(tg, out, threadName);
-			}
-		}
-	}
+        final int gmax = grp.activeGroupCount() * 2;
+        final ThreadGroup[] tgs = new ThreadGroup[gmax];
+        grp.enumerate(tgs);
+        for (int i = 0; i < gmax; i++) {
+            final ThreadGroup tg = tgs[i];
+            if (tg != null) {
+                showThreads(tg, out, threadName);
+            }
+        }
+    }
 }

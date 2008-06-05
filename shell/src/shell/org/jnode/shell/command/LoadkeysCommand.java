@@ -77,8 +77,7 @@ public class LoadkeysCommand extends AbstractCommand {
                 out.println("Current layout for keyboard " + kb.getId() + ": " +
                         api.getKbInterpreter().getClass().getName());
             }
-        }
-        else {
+        } else {
             String language = ARG_LANGUAGE.isSet() ? ARG_LANGUAGE.getValue() : "";
             String variant = ARG_VARIANT.isSet() ? ARG_VARIANT.getValue() : "";
             if (language.trim().length() == 0) {
@@ -97,8 +96,7 @@ public class LoadkeysCommand extends AbstractCommand {
                     out.println("Setting layout for keyboard " + kb.getId() + " to " +
                         kbInt.getClass().getName());
                     api.setKbInterpreter(kbInt);
-                } 
-                else {
+                } else {
                     out.println("No suitable keyboard layout found");
                     break;
                 }

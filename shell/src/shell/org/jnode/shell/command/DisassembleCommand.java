@@ -45,24 +45,24 @@ public class DisassembleCommand extends AbstractCommand {
     private final int maxNontestLevel = 
         LoadCompileService.getHighestOptimizationLevel(false);
     private final int maxLevel = Math.max(maxTestLevel, maxNontestLevel);
-    
-	private final ClassNameArgument ARG_CLASS =
-	    new ClassNameArgument("className", Argument.MANDATORY, "the class to disassemble");
+
+    private final ClassNameArgument ARG_CLASS =
+        new ClassNameArgument("className", Argument.MANDATORY, "the class to disassemble");
     private final StringArgument ARG_METHOD =
         new StringArgument("methodName", Argument.OPTIONAL, "the method to disassemble");
-	private final IntegerArgument ARG_LEVEL =
-	    new IntegerArgument("level", Argument.OPTIONAL, 0, maxLevel, "the optimization level");
-	private final FlagArgument ARG_TEST = 
-	    new FlagArgument("test", Argument.OPTIONAL, "If set, the test compilers are used");
-		
-	public DisassembleCommand() {
+    private final IntegerArgument ARG_LEVEL =
+        new IntegerArgument("level", Argument.OPTIONAL, 0, maxLevel, "the optimization level");
+    private final FlagArgument ARG_TEST = 
+        new FlagArgument("test", Argument.OPTIONAL, "If set, the test compilers are used");
+
+    public DisassembleCommand() {
         super("disassemble a Java class or method");
         registerArguments(ARG_CLASS, ARG_METHOD, ARG_LEVEL, ARG_TEST);
     }
 
     public static void main(String[] args) throws Exception {
-		new DisassembleCommand().execute(args);
-	}
+        new DisassembleCommand().execute(args);
+    }
 
     @Override
     public void execute(CommandLine commandLine, InputStream in,
@@ -71,13 +71,12 @@ public class DisassembleCommand extends AbstractCommand {
         final String methodName = ARG_METHOD.isSet() ? ARG_METHOD.getValue() : null;
         final int level = ARG_LEVEL.isSet() ? ARG_LEVEL.getValue() : 0;
         final boolean test = ARG_TEST.isSet();
-        
+
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Class<?> cls;
         try {
             cls = cl.loadClass(className);
-        }
-        catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             err.println("Class '" + className + "' not found");
             exit(1);
             // not reached
@@ -88,13 +87,11 @@ public class DisassembleCommand extends AbstractCommand {
             if (maxTestLevel == -1) {
                 err.println("No test compilers are currently registered");
                 exit(1);
-            }
-            else if (maxTestLevel < level) {
+            } else if (maxTestLevel < level) {
                 err.println("The highest (test) optimization level is " + maxTestLevel);
                 exit(1);
             }
-        }
-        else if (maxNontestLevel < level) {
+        } else if (maxNontestLevel < level) {
             err.println("The highest optimization level is " + maxNontestLevel);
             exit(1);
         }

@@ -49,30 +49,27 @@ public class HelpCommand extends AbstractCommand {
     private final AliasArgument ARG_ALIAS = 
         new AliasArgument("alias", Argument.OPTIONAL, "The command alias name");
 
-	public HelpCommand() {
-	    super("Print online help for a command alias");
-	    registerArguments(ARG_ALIAS);
-	}
+    public HelpCommand() {
+        super("Print online help for a command alias");
+        registerArguments(ARG_ALIAS);
+    }
 
-	public static void main(String[] args) throws Exception {
-	    new HelpCommand().execute(args);
-	}
-	
-	@Override
+    public static void main(String[] args) throws Exception {
+        new HelpCommand().execute(args);
+    }
+
+    @Override
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
-       
         String alias;
         if (ARG_ALIAS.isSet()) {
             alias = ARG_ALIAS.getValue();
-        }
-        else if (commandLine.getCommandName() != null) {
+        } else if (commandLine.getCommandName() != null) {
             alias = commandLine.getCommandName();
-        }
-        else {
+        } else {
             alias = "help";
         }
-		
+
         Help.Info info = null; 
         SyntaxBundle syntaxes = null;
         ArgumentBundle bundle = null;
@@ -80,8 +77,8 @@ public class HelpCommand extends AbstractCommand {
         try {
             final Shell shell = ShellUtils.getShellManager().getCurrentShell();
             final AliasManager aliasManager = shell.getAliasManager(); 
-            final SyntaxManager syntaxManager = shell.getSyntaxManager(); 
-            Class<?> clazz = getCommandClass(aliasManager, alias);	
+            final SyntaxManager syntaxManager = shell.getSyntaxManager();
+            Class<?> clazz = getCommandClass(aliasManager, alias);
 
             bundle = getBundle(clazz, err);
             if (bundle != null) {
@@ -89,8 +86,7 @@ public class HelpCommand extends AbstractCommand {
                 if (syntaxes == null) {
                     syntaxes = new SyntaxBundle(alias, bundle.createDefaultSyntax());
                 }
-            }
-            else {
+            } else {
                 info = Help.getInfo(clazz);
             }
             if (info != null || syntaxes != null) {
@@ -106,22 +102,20 @@ public class HelpCommand extends AbstractCommand {
             err.println("Can't find the shell manager");
             exit(2);
         }
- 
+
         if (syntaxes != null) {
             Help.getHelp().help(syntaxes, bundle, out);
-        }
-        else if (info != null) {
+        } else if (info != null) {
             Help.getHelp().help(info, alias, out);
-        }
-        else {
+        } else {
             out.println("No help information available: " + alias);
         }
         if (otherAliases != null) {
             out.println(otherAliases);
         }
-	}
+    }
 
-	private ArgumentBundle getBundle(Class<?> clazz, PrintStream err) {
+    private ArgumentBundle getBundle(Class<?> clazz, PrintStream err) {
         try {
             AbstractCommand command = (AbstractCommand) clazz.newInstance();
             return command.getArgumentBundle();
@@ -136,48 +130,45 @@ public class HelpCommand extends AbstractCommand {
         }
         return null;
     }
-	
-	private Class<?> getCommandClass(AliasManager aliasManager, String commandName)
-	throws ClassNotFoundException
-	{
-	    try {
-	        return aliasManager.getAliasClass(commandName);
-	    }
-	    catch (NoSuchAliasException ex) {
-	        // Not an alias -> assuming it's a class name
-	        return Class.forName(commandName);
-	    }
-	}
 
-    private String getOtherAliases(AliasManager aliasManager, String alias, Class<?> aliasClass)
-	{
-		boolean hasOtherAlias = false; 
-		StringBuilder sb = new StringBuilder("Other aliases: ");
-		boolean first = true;
-		
-		for(String otherAlias : aliasManager.aliases()) {
-			// exclude alias from the returned list
-			if (!otherAlias.equals(alias)) {
-				try {
-					Class<?> otherAliasClass = aliasManager.getAliasClass(otherAlias);
-					
-					if (aliasClass.equals(otherAliasClass)) {
-						// we have found another alias for the same command
-						hasOtherAlias = true;
-						if (!first) {
-							sb.append(",");
-						}
-						sb.append(otherAlias);
-						first = false;
-					}
-				} catch (NoSuchAliasException nsae) {
-					// should never happen since we iterate on known aliases
-				} catch (ClassNotFoundException e) {
-					// should never happen since we iterate on known aliases
-				}
-			}
-		}
-		
-		return hasOtherAlias ? sb.toString() : null;
-	}
+    private Class<?> getCommandClass(AliasManager aliasManager, String commandName)
+        throws ClassNotFoundException {
+        try {
+            return aliasManager.getAliasClass(commandName);
+        } catch (NoSuchAliasException ex) {
+            // Not an alias -> assuming it's a class name
+            return Class.forName(commandName);
+        }
+    }
+
+    private String getOtherAliases(AliasManager aliasManager, String alias, Class<?> aliasClass) {
+        boolean hasOtherAlias = false; 
+        StringBuilder sb = new StringBuilder("Other aliases: ");
+        boolean first = true;
+
+        for (String otherAlias : aliasManager.aliases()) {
+            // exclude alias from the returned list
+            if (!otherAlias.equals(alias)) {
+                try {
+                    Class<?> otherAliasClass = aliasManager.getAliasClass(otherAlias);
+
+                    if (aliasClass.equals(otherAliasClass)) {
+                        // we have found another alias for the same command
+                        hasOtherAlias = true;
+                        if (!first) {
+                            sb.append(",");
+                        }
+                        sb.append(otherAlias);
+                        first = false;
+                    }
+                } catch (NoSuchAliasException nsae) {
+                    // should never happen since we iterate on known aliases
+                } catch (ClassNotFoundException e) {
+                    // should never happen since we iterate on known aliases
+                }
+            }
+        }
+
+        return hasOtherAlias ? sb.toString() : null;
+    }
 }

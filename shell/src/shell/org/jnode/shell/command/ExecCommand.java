@@ -35,34 +35,32 @@ import org.jnode.shell.syntax.StringArgument;
  * @author crawley@jnode.org
  */
 public class ExecCommand extends AbstractCommand {
-    
-    private final ClassNameArgument ARG_CLASSNAME =
-        new ClassNameArgument("className", Argument.MANDATORY,
-                "The fully qualified name of the class to be 'exec'd");
-    private final StringArgument ARG_ARG =
-        new StringArgument("arg", Argument.OPTIONAL | Argument.MULTIPLE,
-                "Arguments to be passed to the class");
 
-	public ExecCommand() {
-	    super("Execute the given class in a new process");
-	    registerArguments(ARG_CLASSNAME, ARG_ARG);
-	}
+    private final ClassNameArgument ARG_CLASSNAME = new ClassNameArgument(
+            "className", Argument.MANDATORY, "The fully qualified name of the class to be 'exec'd");
+    private final StringArgument ARG_ARG = new StringArgument(
+            "arg", Argument.OPTIONAL | Argument.MULTIPLE, "Arguments to be passed to the class");
 
-	public static void main(String[] args) throws Exception {
-		new ExecCommand().execute(args);
-	}
+    public ExecCommand() {
+        super("Execute the given class in a new process");
+        registerArguments(ARG_CLASSNAME, ARG_ARG);
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-		throws Exception {
+    public static void main(String[] args) throws Exception {
+        new ExecCommand().execute(args);
+    }
+
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
         String className = ARG_CLASSNAME.getValue();
         String[] args = ARG_ARG.getValues();
-	    String[] execArgs = new String[args.length + 1];
-	    execArgs[0] = className;
-	    System.arraycopy(args, 0, execArgs, 1, args.length);
-		Runtime.getRuntime().exec(execArgs);
-	}
+        String[] execArgs = new String[args.length + 1];
+        execArgs[0] = className;
+        System.arraycopy(args, 0, execArgs, 1, args.length);
+        Runtime.getRuntime().exec(execArgs);
+    }
 
 }

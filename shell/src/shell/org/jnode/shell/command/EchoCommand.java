@@ -36,31 +36,30 @@ import org.jnode.shell.syntax.StringArgument;
  * @author crawley@jnode.org
  */
 public class EchoCommand extends AbstractCommand {
-    
-    private final StringArgument ARG_WORDS = 
-        new StringArgument("text", Argument.MULTIPLE, "the text to be printed");
-    
+
+    private final StringArgument ARG_WORDS = new StringArgument("text", Argument.MULTIPLE, "the text to be printed");
+
     public EchoCommand() {
         super("Print the argument text to standard output");
         registerArguments(ARG_WORDS);
     }
-    
-	public static void main(String[] args) throws Exception {
-		new EchoCommand().execute(args);
-	}
 
-	/**
-	 * Execute the command
-	 */
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-	throws Exception {
-	    String[] words = ARG_WORDS.getValues();
-	    for (int i = 0; i < words.length; i++) {
-	        if (i > 0) {
-	            out.print(' ');
-	        }
-	        out.print(words[i]);
-	    }
-	    out.println();
-	}
+    public static void main(String[] args) throws Exception {
+        new EchoCommand().execute(args);
+    }
+
+    /**
+     * Execute the command
+     */
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws Exception {
+        String[] words = ARG_WORDS.getValues();
+        for (int i = 0; i < words.length; i++) {
+            if (i > 0) {
+                out.print(' ');
+            }
+            out.print(words[i]);
+        }
+        out.println();
+    }
 }

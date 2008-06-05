@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command;
 
 import java.io.InputStream;
@@ -40,15 +40,15 @@ import org.jnode.vm.classmgr.VmType;
  */
 public class ClassCommand extends AbstractCommand {
 
-	private final ClassNameArgument ARG_CLASS = 
-	    new ClassNameArgument("className", Argument.SINGLE | Argument.MANDATORY, 
-	            "the fully qualified Java name of the class to be viewed");
-	
-	public ClassCommand() {
+    private final ClassNameArgument ARG_CLASS = new ClassNameArgument(
+            "className", Argument.SINGLE | Argument.MANDATORY, 
+            "the fully qualified Java name of the class to be viewed");
+
+    public ClassCommand() {
         super("View a Java class");
         registerArguments(ARG_CLASS);
     }
-	
+
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
         String className = ARG_CLASS.getValue();
@@ -56,8 +56,7 @@ public class ClassCommand extends AbstractCommand {
         try {
             final Class<?> type = cl.loadClass(className);
             showClass(type, out);
-        }
-        catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             err.println("Cannot find the requested class: " + className);
             exit(1);
         }
@@ -65,19 +64,19 @@ public class ClassCommand extends AbstractCommand {
 
     public static void main(String[] args) throws Exception {
         new ClassCommand().execute(args);
-	}
-	
-	private void showClass(final Class<?> type, final PrintStream out) {
-	    final VmType<?> vmType = AccessController.doPrivileged(
-	            new PrivilegedAction<VmType<?>>() {
-	                public VmType<?> run() {
-	                    return type.getVmClass();
-	                }
-	            });
-		out.println("Name             : " + type.getName());
-		// out.println("Is abstract      : " + type.isAbstract());
-		out.println("Is array         : " + type.isArray());
-		out.println("Is primitive     : " + type.isPrimitive());
+    }
+
+    private void showClass(final Class<?> type, final PrintStream out) {
+        final VmType<?> vmType = AccessController.doPrivileged(
+                new PrivilegedAction<VmType<?>>() {
+                    public VmType<?> run() {
+                        return type.getVmClass();
+                    }
+                });
+        out.println("Name             : " + type.getName());
+        // out.println("Is abstract      : " + type.isAbstract());
+        out.println("Is array         : " + type.isArray());
+        out.println("Is primitive     : " + type.isPrimitive());
         out.println("Shared statics   : " + vmType.isSharedStatics());
         out.println("Is initialized   : " + vmType.isInitialized());
         AccessController.doPrivileged(
@@ -87,13 +86,13 @@ public class ClassCommand extends AbstractCommand {
                         return null;
                     }
                 });
-        
+
         if (vmType instanceof VmClassType) {
-            out.println("#Instances       : " + ((VmClassType<?>)vmType).getInstanceCount());
+            out.println("#Instances       : " + ((VmClassType<?>) vmType).getInstanceCount());
         }
         if (vmType instanceof VmArrayClass) {
-            out.println("Total length     : " + ((VmArrayClass<?>)vmType).getTotalLength());            
-            out.println("Maximum length   : " + ((VmArrayClass<?>)vmType).getMaximumLength());            
+            out.println("Total length     : " + ((VmArrayClass<?>) vmType).getTotalLength());            
+            out.println("Maximum length   : " + ((VmArrayClass<?>) vmType).getMaximumLength());            
         }
-	}
+    }
 }

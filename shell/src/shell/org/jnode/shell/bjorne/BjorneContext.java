@@ -224,9 +224,9 @@ public class BjorneContext {
 
     public BjorneContext(BjorneInterpreter interpreter) {
         this(interpreter, new StreamHolder[] {
-                new StreamHolder(CommandLine.DEFAULT_STDIN, false),
-                new StreamHolder(CommandLine.DEFAULT_STDOUT, false),
-                new StreamHolder(CommandLine.DEFAULT_STDERR, false) });
+            new StreamHolder(CommandLine.DEFAULT_STDIN, false),
+            new StreamHolder(CommandLine.DEFAULT_STDOUT, false),
+            new StreamHolder(CommandLine.DEFAULT_STDERR, false)});
     }
 
     /**
@@ -288,8 +288,7 @@ public class BjorneContext {
      * @return the resulting words
      * @throws ShellException
      */
-    public CommandLine expandAndSplit(BjorneToken[] tokens)
-            throws ShellException {
+    public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
         LinkedList<String> words = new LinkedList<String>();
         for (BjorneToken token : tokens) {
             splitAndAppend(expand(token.getText()), words);
@@ -318,8 +317,7 @@ public class BjorneContext {
                 }
                 if (globbing) {
                     globAndAppend(word, globbedWords);
-                }
-                else {
+                } else {
                     globbedWords.add(word);
                 }
             }
@@ -345,15 +343,12 @@ public class BjorneContext {
             String home = (name.length() == 0) ? System.getProperty("user.home", "") : "";
             if (home.length() == 0) {
                 return word;
-            }
-            else if (slashPos == -1) {
+            } else if (slashPos == -1) {
                 return home;
-            }
-            else {
+            } else {
                 return home + word.substring(slashPos);
             }
-        }
-        else {
+        } else {
             return word;
         }
     }
@@ -369,8 +364,7 @@ public class BjorneContext {
         // If it doesn't match anything, a pattern 'expands' to itself.
         if (paths.isEmpty()) {
             globbedWords.add(word);
-        }
-        else {
+        } else {
             globbedWords.addAll(paths);
         }
     }
@@ -392,46 +386,45 @@ public class BjorneContext {
     /**
      * This method does the work of 'split'; see above.
      */
-    private void splitAndAppend(CharSequence text, LinkedList<String> words) 
-    throws ShellException {
+    private void splitAndAppend(CharSequence text, LinkedList<String> words) throws ShellException {
         StringBuffer sb = null;
         int len = text.length();
         int quote = 0;
         for (int i = 0; i < len; i++) {
             char ch = text.charAt(i);
             switch (ch) {
-            case '"':
-            case '\'':
-                if (quote == 0) {
-                    quote = ch;
-                    if (sb == null) {
-                        sb = new StringBuffer();
+                case '"':
+                case '\'':
+                    if (quote == 0) {
+                        quote = ch;
+                        if (sb == null) {
+                            sb = new StringBuffer();
+                        }
+                    } else if (quote == ch) {
+                        quote = 0;
+                    } else {
+                        sb = accumulate(sb, ch);
                     }
-                } else if (quote == ch) {
-                    quote = 0;
-                } else {
-                    sb = accumulate(sb, ch);
-                }
-                break;
-            case ' ':
-            case '\t':
-                if (quote == 0) {
-                    if (sb != null) {
-                        words.add(sb.toString());
-                        sb = null;
+                    break;
+                case ' ':
+                case '\t':
+                    if (quote == 0) {
+                        if (sb != null) {
+                            words.add(sb.toString());
+                            sb = null;
+                        }
+                    } else {
+                        sb = accumulate(sb, ch);
                     }
-                } else {
+                    break;
+                case '\\':
+                    if (i + 1 < len) {
+                        ch = text.charAt(++i);
+                    }
                     sb = accumulate(sb, ch);
-                }
-                break;
-            case '\\':
-                if (i + 1 < len) {
-                    ch = text.charAt(++i);
-                }
-                sb = accumulate(sb, ch);
-                break;
-            default:
-                sb = accumulate(sb, ch);
+                    break;
+                default:
+                    sb = accumulate(sb, ch);
             }
         }
         if (sb != null) {
@@ -469,8 +462,7 @@ public class BjorneContext {
         if (text instanceof String && ((String) text).indexOf('$') == -1) {
             return text;
         }
-        if (text instanceof StringBuffer
-                && ((StringBuffer) text).indexOf("$") == -1) {
+        if (text instanceof StringBuffer && ((StringBuffer) text).indexOf("$") == -1) {
             return text;
         }
         CharIterator ci = new CharIterator(text);
@@ -480,48 +472,47 @@ public class BjorneContext {
         int ch = ci.nextCh();
         while (ch != -1) {
             switch (ch) {
-            case '"':
-            case '\'':
-                if (quote == 0) {
-                    quote = (char) ch;
-                } else if (quote == ch) {
-                    quote = 0;
-                }
-                sb.append((char) ch);
-                break;
-            case '`':
-                if (backtickStart == -1) {
-                    backtickStart = sb.length();
-                }
-                else {
-                    String tmp = runBacktickCommand(sb.substring(backtickStart));
-                    sb.replace(backtickStart, sb.length(), tmp);
-                    backtickStart = -1;
-                }
-                break;
-            case ' ':
-            case '\t':
-                sb.append(' ');
-                while ((ch = ci.peekCh()) == ' ' || ch == '\t') {
-                    ci.nextCh();
-                }
-                break;
-            case '\\':
-                sb.append((char) ch);
-                if ((ch = ci.nextCh()) != -1) {
+                case '"':
+                case '\'':
+                    if (quote == 0) {
+                        quote = (char) ch;
+                    } else if (quote == ch) {
+                        quote = 0;
+                    }
                     sb.append((char) ch);
-                }
-                break;
-            case '$':
-                if (quote == '\'') {
-                    sb.append('$');
-                } else {
-                    sb.append(dollarExpansion(ci, quote));
-                }
-                break;
+                    break;
+                case '`':
+                    if (backtickStart == -1) {
+                        backtickStart = sb.length();
+                    } else {
+                        String tmp = runBacktickCommand(sb.substring(backtickStart));
+                        sb.replace(backtickStart, sb.length(), tmp);
+                        backtickStart = -1;
+                    }
+                    break;
+                case ' ':
+                case '\t':
+                    sb.append(' ');
+                    while ((ch = ci.peekCh()) == ' ' || ch == '\t') {
+                        ci.nextCh();
+                    }
+                    break;
+                case '\\':
+                    sb.append((char) ch);
+                    if ((ch = ci.nextCh()) != -1) {
+                        sb.append((char) ch);
+                    }
+                    break;
+                case '$':
+                    if (quote == '\'') {
+                        sb.append('$');
+                    } else {
+                        sb.append(dollarExpansion(ci, quote));
+                    }
+                    break;
 
-            default:
-                sb.append((char) ch);
+                default:
+                    sb.append((char) ch);
             }
             ch = ci.nextCh();
         }
@@ -531,83 +522,81 @@ public class BjorneContext {
         return sb;
     }
 
-    private String dollarExpansion(CharIterator ci, char quote)
-            throws ShellSyntaxException {
+    private String dollarExpansion(CharIterator ci, char quote) throws ShellSyntaxException {
         int ch = ci.nextCh();
         switch (ch) {
-        case -1:
-            return "$";
-        case '{':
-            return dollarBraceExpansion(ci);
-        case '(':
-            return dollarParenExpansion(ci);
-        case '$':
-        case '#':
-        case '@':
-        case '*':
-        case '?':
-        case '!':
-        case '-':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            return specialVariable(ch);
-        default:
-            StringBuffer sb = new StringBuffer().append((char) ch);
-            ch = ci.peekCh();
-            while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
-                    || (ch >= 'a' && ch <= 'z') || ch == '_') {
-                sb.append((char) ch);
-                ci.nextCh();
+            case -1:
+                return "$";
+            case '{':
+                return dollarBraceExpansion(ci);
+            case '(':
+                return dollarParenExpansion(ci);
+            case '$':
+            case '#':
+            case '@':
+            case '*':
+            case '?':
+            case '!':
+            case '-':
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return specialVariable(ch);
+            default:
+                StringBuffer sb = new StringBuffer().append((char) ch);
                 ch = ci.peekCh();
-            }
-            VariableSlot var = variables.get(sb.toString());
-            return (var != null) ? var.value : "";
+                while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= 'a' && ch <= 'z') || ch == '_') {
+                    sb.append((char) ch);
+                    ci.nextCh();
+                    ch = ci.peekCh();
+                }
+                VariableSlot var = variables.get(sb.toString());
+                return (var != null) ? var.value : "";
         }
     }
 
-    private String dollarBraceExpansion(CharIterator ci)
-            throws ShellSyntaxException {
+    private String dollarBraceExpansion(CharIterator ci) throws ShellSyntaxException {
         // Scan to the '}' that matches the '${'
         StringBuffer sb = new StringBuffer();
         int braceLevel = 1;
         int ch = ci.nextCh();
         int quote = 0;
-        LOOP: while (ch != -1) {
+    LOOP: 
+        while (ch != -1) {
             switch (ch) {
-            case '}':
-                if (quote == 0) {
-                    braceLevel--;
-                    if (braceLevel == 0) {
-                        break LOOP;
+                case '}':
+                    if (quote == 0) {
+                        braceLevel--;
+                        if (braceLevel == 0) {
+                            break LOOP;
+                        }
                     }
-                }
-                break;
-            case '{':
-                if (quote == 0) {
-                    braceLevel++;
-                }
-                break;
-            case '\\':
-                sb.append((char) ch);
-                ch = ci.nextCh();
-                break;
-            case '"':
-            case '\'':
-                if (quote == 0) {
-                    quote = ch;
-                } else if (quote == ch) {
-                    quote = 0;
-                }
-                break;
-            default:
+                    break;
+                case '{':
+                    if (quote == 0) {
+                        braceLevel++;
+                    }
+                    break;
+                case '\\':
+                    sb.append((char) ch);
+                    ch = ci.nextCh();
+                    break;
+                case '"':
+                case '\'':
+                    if (quote == 0) {
+                        quote = ch;
+                    } else if (quote == ch) {
+                        quote = 0;
+                    }
+                    break;
+                default:
             }
             if (ch != -1) {
                 sb.append((char) ch);
@@ -623,25 +612,26 @@ public class BjorneContext {
         // Extract the parameter name, noting a leading '#' operator
         int operator = NONE;
         int i;
-        LOOP: for (i = 0; i < sb.length(); i++) {
+    LOOP: 
+        for (i = 0; i < sb.length(); i++) {
             char ch2 = sb.charAt(i);
             switch (ch2) {
-            case '#':
-                if (i == 0) {
-                    operator = PREHASH;
-                } else {
+                case '#':
+                    if (i == 0) {
+                        operator = PREHASH;
+                    } else {
+                        break LOOP;
+                    }
+                    break;
+                case '%':
+                case ':':
+                case '=':
+                case '?':
+                case '+':
+                case '-':
                     break LOOP;
-                }
-                break;
-            case '%':
-            case ':':
-            case '=':
-            case '?':
-            case '+':
-            case '-':
-                break LOOP;
-            default:
-                // Include this in the parameter name for now.
+                default:
+                    // Include this in the parameter name for now.
             }
         }
 
@@ -653,56 +643,56 @@ public class BjorneContext {
             char opch = sb.charAt(i);
             char opch2 = (i + 1 < sb.length()) ? sb.charAt(i + 1) : (char) 0;
             switch (opch) {
-            case '#':
-                operator = (opch2 == '#') ? DHASH : HASH;
-                break;
-            case '%':
-                operator = (opch2 == '%') ? DPERCENT : PERCENT;
-                break;
-            case ':':
-                switch (opch2) {
-                case '=':
-                    operator = COLONEQUALS;
+                case '#':
+                    operator = (opch2 == '#') ? DHASH : HASH;
                     break;
-                case '+':
-                    operator = COLONPLUS;
+                case '%':
+                    operator = (opch2 == '%') ? DPERCENT : PERCENT;
+                    break;
+                case ':':
+                    switch (opch2) {
+                        case '=':
+                            operator = COLONEQUALS;
+                            break;
+                        case '+':
+                            operator = COLONPLUS;
+                            break;
+                        case '?':
+                            operator = COLONQUERY;
+                            break;
+                        case '-':
+                            operator = COLONHYPHEN;
+                            break;
+                        default:
+                            throw new ShellSyntaxException("bad substitution");
+                    }
+                    break;
+                case '=':
+                    operator = EQUALS;
                     break;
                 case '?':
-                    operator = COLONQUERY;
+                    operator = QUERY;
+                    break;
+                case '+':
+                    operator = PLUS;
                     break;
                 case '-':
-                    operator = COLONHYPHEN;
+                    operator = HYPHEN;
                     break;
                 default:
-                    throw new ShellSyntaxException("bad substitution");
-                }
-                break;
-            case '=':
-                operator = EQUALS;
-                break;
-            case '?':
-                operator = QUERY;
-                break;
-            case '+':
-                operator = PLUS;
-                break;
-            case '-':
-                operator = HYPHEN;
-                break;
-            default:
-                throw new ShellFailureException("bad state");
+                    throw new ShellFailureException("bad state");
             }
             // Adjust for two-character operators
             switch (operator) {
-            case EQUALS:
-            case QUERY:
-            case PLUS:
-            case HYPHEN:
-            case HASH:
-            case PERCENT:
-                break;
-            default:
-                i++;
+                case EQUALS:
+                case QUERY:
+                case PLUS:
+                case HYPHEN:
+                case HASH:
+                case PERCENT:
+                    break;
+                default:
+                    i++;
             }
             // Extract the word
             if (i >= sb.length()) {
@@ -712,12 +702,12 @@ public class BjorneContext {
         }
         String value = variable(parameter);
         switch (operator) {
-        case NONE:
-            return (value != null) ? value : "";
-        case PREHASH:
-            return (value != null) ? Integer.toString(value.length()) : "0";
-        default:
-            throw new ShellFailureException("not implemented");
+            case NONE:
+                return (value != null) ? value : "";
+            case PREHASH:
+                return (value != null) ? Integer.toString(value.length()) : "0";
+            default:
+                throw new ShellFailureException("not implemented");
         }
     }
 
@@ -743,32 +733,32 @@ public class BjorneContext {
 
     private String specialVariable(int ch) {
         switch (ch) {
-        case '$':
-            return Integer.toString(shellPid);
-        case '#':
-            return Integer.toString(args.size());
-        case '@':
-        case '*':
-            throw new ShellFailureException("not implemented");
-        case '?':
-            return Integer.toString(lastReturnCode);
-        case '!':
-            return Integer.toString(lastAsyncPid);
-        case '-':
-            return options;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            return argVariable(ch - '0');
-        default:
-            return null;
+            case '$':
+                return Integer.toString(shellPid);
+            case '#':
+                return Integer.toString(args.size());
+            case '@':
+            case '*':
+                throw new ShellFailureException("not implemented");
+            case '?':
+                return Integer.toString(lastReturnCode);
+            case '!':
+                return Integer.toString(lastAsyncPid);
+            case '-':
+                return options;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return argVariable(ch - '0');
+            default:
+                return null;
         }
     }
 
@@ -790,8 +780,7 @@ public class BjorneContext {
         throw new ShellFailureException("not implemented");
     }
 
-    int execute(CommandLine command, Closeable[] streams) 
-    throws ShellException {
+    int execute(CommandLine command, Closeable[] streams) throws ShellException {
         lastReturnCode = interpreter.executeCommand(command, this, streams);
         return lastReturnCode;
     }
@@ -830,8 +819,7 @@ public class BjorneContext {
         return shellPid;
     }
 
-    void performAssignments(BjorneToken[] assignments) 
-    throws ShellException {
+    void performAssignments(BjorneToken[] assignments) throws ShellException {
         if (assignments != null) {
             for (int i = 0; i < assignments.length; i++) {
                 String assignment = assignments[i].getText();
@@ -854,8 +842,7 @@ public class BjorneContext {
      *         input/outputStreamTuple streams for this command.
      * @throws ShellException
      */
-    StreamHolder[] evaluateRedirections(RedirectionNode[] redirects)
-            throws ShellException {
+    StreamHolder[] evaluateRedirections(RedirectionNode[] redirects) throws ShellException {
         return evaluateRedirections(redirects, copyStreamHolders(holders));
     }
     
@@ -868,8 +855,7 @@ public class BjorneContext {
      * @throws ShellException
      */
     StreamHolder[] evaluateRedirections(
-            RedirectionNode[] redirects, StreamHolder[] holders)
-    throws ShellException {
+            RedirectionNode[] redirects, StreamHolder[] holders) throws ShellException {
         if (redirects == null) {
             return holders;
         }
@@ -882,15 +868,15 @@ public class BjorneContext {
                 BjorneToken io = redir.getIo();
                 if (io == null) {
                     switch (redir.getRedirectionType()) {
-                    case REDIR_DLESS:
-                    case REDIR_DLESSDASH:
-                    case REDIR_LESS:
-                    case REDIR_LESSAND:
-                    case REDIR_LESSGREAT:
-                        fd = 0;
-                        break;
-                    default:
-                        fd = 1;
+                        case REDIR_DLESS:
+                        case REDIR_DLESSDASH:
+                        case REDIR_LESS:
+                        case REDIR_LESSAND:
+                        case REDIR_LESSGREAT:
+                            fd = 0;
+                            break;
+                        default:
+                            fd = 1;
                     }
                 } else {
                     try {
@@ -908,70 +894,65 @@ public class BjorneContext {
 
                 StreamHolder stream;
                 switch (redir.getRedirectionType()) {
-                case REDIR_DLESS:
-                    throw new UnsupportedOperationException("<<");
-                case REDIR_DLESSDASH:
-                    throw new UnsupportedOperationException("<<-");
+                    case REDIR_DLESS:
+                        throw new UnsupportedOperationException("<<");
+                    case REDIR_DLESSDASH:
+                        throw new UnsupportedOperationException("<<-");
 
-                case REDIR_GREAT:
-                    try {
-                        File file = new File(redir.getArg().getText());
-                        if (isNoClobber() && file.exists()) {
-                            throw new ShellException("File already exists");
+                    case REDIR_GREAT:
+                        try {
+                            File file = new File(redir.getArg().getText());
+                            if (isNoClobber() && file.exists()) {
+                                throw new ShellException("File already exists");
+                            }
+                            stream = new StreamHolder(new FileOutputStream(file), true);
+                        } catch (IOException ex) {
+                            throw new ShellException("Cannot open input file", ex);
                         }
-                        stream = new StreamHolder(new FileOutputStream(file),
-                                true);
-                    } catch (IOException ex) {
-                        throw new ShellException("Cannot open input file", ex);
-                    }
-                    break;
+                        break;
 
-                case REDIR_CLOBBER:
-                case REDIR_DGREAT:
-                    try {
-                        stream = new StreamHolder(new FileOutputStream(redir
-                                .getArg().getText(),
-                                redir.getRedirectionType() == REDIR_DGREAT),
-                                true);
-                    } catch (IOException ex) {
-                        throw new ShellException("Cannot open input file", ex);
-                    }
-                    break;
+                    case REDIR_CLOBBER:
+                    case REDIR_DGREAT:
+                        try {
+                            stream =
+                                    new StreamHolder(new FileOutputStream(redir.getArg().getText(), redir
+                                            .getRedirectionType() == REDIR_DGREAT), true);
+                        } catch (IOException ex) {
+                            throw new ShellException("Cannot open input file", ex);
+                        }
+                        break;
 
-                case REDIR_LESS:
-                    try {
-                        File file = new File(redir.getArg().getText());
-                        stream = new StreamHolder(new FileInputStream(file),
-                                true);
-                    } catch (IOException ex) {
-                        throw new ShellException("Cannot open input file", ex);
-                    }
-                    break;
+                    case REDIR_LESS:
+                        try {
+                            File file = new File(redir.getArg().getText());
+                            stream = new StreamHolder(new FileInputStream(file), true);
+                        } catch (IOException ex) {
+                            throw new ShellException("Cannot open input file", ex);
+                        }
+                        break;
 
-                case REDIR_LESSAND:
-                    try {
-                        int fromFd = Integer.parseInt(redir.getArg().getText());
-                        stream = (fromFd >= holders.length) ? null
-                                : new StreamHolder(holders[fromFd]);
-                    } catch (NumberFormatException ex) {
-                        throw new ShellException("Invalid fd after >&");
-                    }
-                    break;
+                    case REDIR_LESSAND:
+                        try {
+                            int fromFd = Integer.parseInt(redir.getArg().getText());
+                            stream = (fromFd >= holders.length) ? null : new StreamHolder(holders[fromFd]);
+                        } catch (NumberFormatException ex) {
+                            throw new ShellException("Invalid fd after >&");
+                        }
+                        break;
 
-                case REDIR_GREATAND:
-                    try {
-                        int fromFd = Integer.parseInt(redir.getArg().getText());
-                        stream = (fromFd >= holders.length) ? null
-                                : new StreamHolder(holders[fromFd]);
-                    } catch (NumberFormatException ex) {
-                        throw new ShellException("Invalid fd after >&");
-                    }
-                    break;
+                    case REDIR_GREATAND:
+                        try {
+                            int fromFd = Integer.parseInt(redir.getArg().getText());
+                            stream = (fromFd >= holders.length) ? null : new StreamHolder(holders[fromFd]);
+                        } catch (NumberFormatException ex) {
+                            throw new ShellException("Invalid fd after >&");
+                        }
+                        break;
 
-                case REDIR_LESSGREAT:
-                    throw new UnsupportedOperationException("<>");
-                default:
-                    throw new ShellFailureException("unknown redirection type");
+                    case REDIR_LESSGREAT:
+                        throw new UnsupportedOperationException("<>");
+                    default:
+                        throw new ShellFailureException("unknown redirection type");
                 }
                 holders[fd] = stream;
             }
@@ -986,8 +967,7 @@ public class BjorneContext {
         return holders;
     }
 
-    public CommandThread fork(CommandLine command, Closeable[] streams) 
-    throws ShellException {
+    public CommandThread fork(CommandLine command, Closeable[] streams)  throws ShellException {
         return interpreter.fork(command, streams);
     }
 

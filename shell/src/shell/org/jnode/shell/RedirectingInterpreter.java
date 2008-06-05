@@ -290,8 +290,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                             } catch (IOException ex) {
                                 // squash
                             }
-                            prev.commandLine.setStreams(new Closeable[] {
-                                    ps[0], CommandLine.DEVNULL, ps[2]});
+                            prev.commandLine.setStreams(
+                                    new Closeable[] {ps[0], CommandLine.DEVNULL, ps[2]});
                         }
                     } else {
                         // the previous stage has explicitly redirected stdout

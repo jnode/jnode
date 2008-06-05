@@ -55,15 +55,14 @@ public class SetCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+        throws Exception {
         String key = keyArg.getValue();
         if (!valueArg.isSet()) {
-            System.out.println("Removing " + key);
+            out.println("Removing " + key);
             System.getProperties().remove(key);
-        }
-        else {
+        } else {
             String value = valueArg.getValue();
-            System.out.println("Setting " + key + " to " + value);
+            out.println("Setting " + key + " to " + value);
             System.getProperties().setProperty(key, value);
         }
     }

@@ -43,7 +43,7 @@ public class CaseCommandNode extends CommandNode {
             for (BjorneToken pattern : caseItem.getPattern()) {
                 CharSequence pat = context.expand(pattern.token);
                 if (context.patternMatch(expandedWord, pat)) {
-                    
+                    throw new ShellException("not implemented yet");
                 }
             }
         }

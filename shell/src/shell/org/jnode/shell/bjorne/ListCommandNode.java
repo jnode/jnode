@@ -58,8 +58,7 @@ public class ListCommandNode extends CommandNode {
             try {
                 rc = runPipeline(stages);
                 done = true;
-            }
-            finally {
+            } finally {
                 if (!done) {
                     // If we are propagating an exception, all streams that
                     // were opened by 'assemblePipeline' must be closed.
@@ -119,8 +118,7 @@ public class ListCommandNode extends CommandNode {
         }
     }
     
-    private int runPipeline(final PipelineStage[] stages) 
-    throws ShellException {
+    private int runPipeline(final PipelineStage[] stages) throws ShellException {
         for (PipelineStage stage : stages) {
             Closeable[] streams = new Closeable[stage.holders.length];
             for (int i = 0; i < streams.length; i++) {
@@ -136,8 +134,7 @@ public class ListCommandNode extends CommandNode {
             while (callback.count > 0) {
                 try {
                     stages.wait();
-                }
-                catch (InterruptedException ex) {
+                } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                     break;
                 }
@@ -146,8 +143,7 @@ public class ListCommandNode extends CommandNode {
         }
     }
 
-    private PipelineStage[] assemblePipeline(BjorneContext context) 
-    throws ShellException {
+    private PipelineStage[] assemblePipeline(BjorneContext context) throws ShellException {
         int len = commands.length;
         final StreamHolder pipeInMarker = new StreamHolder(BjorneContext.PIPE_IN, false);
         final StreamHolder pipeOutMarker = new StreamHolder(BjorneContext.PIPE_OUT, false);
@@ -177,18 +173,15 @@ public class ListCommandNode extends CommandNode {
                     PipedInputStream pipeIn = new PipedInputStream();
                     try {
                         pipeIn.connect(pipeOut);
-                    }
-                    catch (IOException ex) {
+                    } catch (IOException ex) {
                         throw new ShellFailureException("plumbing failure", ex);
                     }
                     newIn = new StreamHolder(pipeIn, true);
                     newOut = new StreamHolder(pipeOut, true);
-                }
-                else {
+                } else {
                     newOut = new StreamHolder(new NullOutputStream(), true);
                 }
-            }
-            else {
+            } else {
                 if (nextStage.holders[0] == pipeInMarker) {
                     newIn = new StreamHolder(new NullInputStream(), true);
                 }

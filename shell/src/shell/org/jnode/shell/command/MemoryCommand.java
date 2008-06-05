@@ -31,24 +31,23 @@ import org.jnode.util.NumberUtils;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MemoryCommand extends AbstractCommand
-{
-	public static void main(String[] args) throws Exception {
-		new MemoryCommand().execute(args);
-	}
-	
-	public MemoryCommand() {
+public class MemoryCommand extends AbstractCommand {
+    public static void main(String[] args) throws Exception {
+        new MemoryCommand().execute(args);
+    }
+
+    public MemoryCommand() {
         super("shows current JNode memory usage");
     }
 
     /**
-	 * Execute this command
-	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) 
-	throws Exception {
-		final Runtime rt = Runtime.getRuntime();
-		out.println("Total memory " + NumberUtils.toBinaryByte(rt.totalMemory()));
-		out.println("Used memory  " + NumberUtils.toBinaryByte(rt.totalMemory() - rt.freeMemory()));
-		out.println("Free memory  " + NumberUtils.toBinaryByte(rt.freeMemory()));
-	}
+     * Execute this command
+     */
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) 
+        throws Exception {
+        final Runtime rt = Runtime.getRuntime();
+        out.println("Total memory " + NumberUtils.toBinaryByte(rt.totalMemory()));
+        out.println("Used memory  " + NumberUtils.toBinaryByte(rt.totalMemory() - rt.freeMemory()));
+        out.println("Free memory  " + NumberUtils.toBinaryByte(rt.freeMemory()));
+    }
 }

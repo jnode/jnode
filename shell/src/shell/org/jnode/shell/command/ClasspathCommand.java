@@ -38,38 +38,35 @@ import org.jnode.shell.syntax.URLArgument;
  * @author crawley@jnode.org
  */
 public class ClasspathCommand extends AbstractCommand {
-    
+
     private final URLArgument ARG_ADD = 
         new URLArgument("addUrl", Argument.OPTIONAL, "the URL to be added to the classpath");
-    
+
     private final FlagArgument ARG_CLEAR =
         new FlagArgument("clear", Argument.OPTIONAL, "when set, clear the classpath");
-    
+
     private final FlagArgument ARG_REFRESH =
         new FlagArgument("refresh", Argument.OPTIONAL, "when set, cause classes to be reloaded on next use");
-    
+
     public ClasspathCommand() {
         super("Print, modify or refresh the classpath");
         registerArguments(ARG_ADD, ARG_CLEAR, ARG_REFRESH);
     }
 
-	public static void main(String[] args) throws Exception {
-	    new ClasspathCommand().execute(args);
-	}
-	
+    public static void main(String[] args) throws Exception {
+        new ClasspathCommand().execute(args);
+    }
+
     @Override
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
         if (ARG_ADD.isSet()) {
             addToClassPath(ARG_ADD.getValueAsURL());
-        }
-        else if (ARG_CLEAR.isSet()) {
+        } else if (ARG_CLEAR.isSet()) {
             clearClassPath();
-        }
-        else if (ARG_REFRESH.isSet()) {
+        } else if (ARG_REFRESH.isSet()) {
             refreshClassPath();
-        } 
-        else {
+        } else {
             printClassPath(out);
         }
     }
@@ -96,46 +93,46 @@ public class ClasspathCommand extends AbstractCommand {
         getClassLoader().add(url);
     }
 
-	private void clearClassPath() {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		if (cl instanceof CPClassLoader) {
-			cl = new CPClassLoader(cl.getParent());
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-	}
+    private void clearClassPath() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl instanceof CPClassLoader) {
+            cl = new CPClassLoader(cl.getParent());
+            Thread.currentThread().setContextClassLoader(cl);
+        }
+    }
 
-	private void printClassPath(PrintStream out) {
-		getClassLoader().print(out);
-	}
+    private void printClassPath(PrintStream out) {
+        getClassLoader().print(out);
+    }
 
-	private CPClassLoader getClassLoader() {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		if (!(cl instanceof CPClassLoader)) {
-			cl = new CPClassLoader(cl);
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-		return (CPClassLoader) cl;
-	}
+    private CPClassLoader getClassLoader() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (!(cl instanceof CPClassLoader)) {
+            cl = new CPClassLoader(cl);
+            Thread.currentThread().setContextClassLoader(cl);
+        }
+        return (CPClassLoader) cl;
+    }
 
-	private static class CPClassLoader extends URLClassLoader {
+    private static class CPClassLoader extends URLClassLoader {
 
-		/**
-		 * @param parent
-		 * @throws SecurityException
-		 */
-		public CPClassLoader(ClassLoader parent) throws SecurityException {
-			super(new URL[0], parent);
-		}
+        /**
+         * @param parent
+         * @throws SecurityException
+         */
+        public CPClassLoader(ClassLoader parent) throws SecurityException {
+            super(new URL[0], parent);
+        }
 
-		public void add(URL url) {
-			addURL(url);
-		}
+        public void add(URL url) {
+            addURL(url);
+        }
 
-		public void print(PrintStream out) {
-			URL[] urls = getURLs();
-			for (int i = 0; i < urls.length; i++) {
-				out.println(urls[i]);
-			}
-		}
-	}
+        public void print(PrintStream out) {
+            URL[] urls = getURLs();
+            for (int i = 0; i < urls.length; i++) {
+                out.println(urls[i]);
+            }
+        }
+    }
 }
