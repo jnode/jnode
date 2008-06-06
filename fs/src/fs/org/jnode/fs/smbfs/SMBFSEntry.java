@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.smbfs;
 
 import org.jnode.fs.FSEntry;
@@ -84,7 +84,14 @@ public abstract class SMBFSEntry implements FSEntry {
      * Gets the name of this entry.
      */
     public String getName() {
-        return smbFile.getName();
+        return getSimpleName(smbFile);
+    }
+
+    static String getSimpleName(SmbFile smbFile) {
+        String name = smbFile.getName();
+        if(name.endsWith("/"))
+            name = name.substring(0, name.length() - 1);
+        return name;
     }
 
     /**
