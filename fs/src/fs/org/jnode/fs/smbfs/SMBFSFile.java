@@ -18,17 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.smbfs;
 
-import org.jnode.fs.FSFile;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
-
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
+import org.jnode.fs.FSFile;
 
 /**
  * @author Levente S\u00e1ntha
@@ -67,7 +64,7 @@ public class SMBFSFile extends SMBFSEntry implements FSFile {
      * @throws java.io.IOException
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
-        if(fileOffset > smbFile.length())
+        if (fileOffset > smbFile.length())
             return;
 
         int b_len = 32 * 1024;
@@ -76,12 +73,12 @@ public class SMBFSFile extends SMBFSEntry implements FSFile {
         SmbFileInputStream is = (SmbFileInputStream) smbFile.getInputStream();
 
         long s = is.skip(fileOffset);
-        if(s < fileOffset)
+        if (s < fileOffset)
             is.skip(fileOffset);
 
         int bc;
         int rem = 1;
-        while((bc = is.read(buf)) > 0 && rem > 0){
+        while ((bc = is.read(buf)) > 0 && rem > 0) {
             dest.put(buf, 0, Math.min(bc, dest.remaining()));
             rem = dest.remaining();
         }

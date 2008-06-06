@@ -24,7 +24,6 @@ package org.jnode.fs.smbfs;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Levente S\u00e1ntha

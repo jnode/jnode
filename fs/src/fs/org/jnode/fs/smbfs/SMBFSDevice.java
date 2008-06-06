@@ -18,11 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.smbfs;
 
-import org.jnode.driver.Device;
 import org.jnode.driver.Bus;
+import org.jnode.driver.Device;
 
 /**
  * @author Levente S\u00e1ntha
@@ -34,12 +34,12 @@ public class SMBFSDevice extends Device {
     private String path;
 
     public SMBFSDevice(String host, String path, String user, String password) {
-        super(null, "smb-(" + host +"," + path + "," + user + ")");
+        super(null, "smb-(" + host + "," + path + "," + user + ")");
         this.host = host;
         this.path = path;
         this.user = user;
         this.password = password;
-        System.setProperty("java.protocol.handler.pkgs","jcifs");
+        System.setProperty("java.protocol.handler.pkgs", "jcifs");
     }
 
     String getHost() {
@@ -57,6 +57,7 @@ public class SMBFSDevice extends Device {
     String getUser() {
         return user;
     }
+
     public SMBFSDevice(Bus bus, String id) {
         super(bus, id);
     }

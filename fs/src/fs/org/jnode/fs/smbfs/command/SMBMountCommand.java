@@ -21,26 +21,23 @@
 
 package org.jnode.fs.smbfs.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+import org.jnode.driver.DeviceManager;
+import org.jnode.driver.DeviceUtils;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.fs.smbfs.SMBFSDevice;
+import org.jnode.fs.smbfs.SMBFSDriver;
+import org.jnode.fs.smbfs.SMBFileSystem;
+import org.jnode.fs.smbfs.SMBFileSystemType;
+import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
-import org.jnode.fs.service.FileSystemService;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.smbfs.SMBFSDevice;
-import org.jnode.fs.smbfs.SMBFSDriver;
-import org.jnode.fs.smbfs.SMBFileSystem;
-import org.jnode.fs.smbfs.SMBFileSystemType;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceUtils;
-import org.jnode.naming.InitialNaming;
-
-import java.io.InputStream;
-import java.io.PrintStream;
 
 /**
  * @author Levente S\u00e1ntha
@@ -52,11 +49,11 @@ public class SMBMountCommand extends AbstractCommand {
     private static final Argument USERNAME_ARG = new Argument("username", "Samba user");
     private static final Argument PASSWORD_ARG = new Argument("password", "Samba password");
     static Help.Info HELP_INFO = new Help.Info("mount", "Mount a Samba filesystem",
-            new Parameter[]{new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
-                    new Parameter(HOST_ARG, Parameter.MANDATORY),
-                    new Parameter(PATH_ARG, Parameter.MANDATORY),
-                    new Parameter(USERNAME_ARG, Parameter.MANDATORY),
-                    new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
+        new Parameter[]{new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
+            new Parameter(HOST_ARG, Parameter.MANDATORY),
+            new Parameter(PATH_ARG, Parameter.MANDATORY),
+            new Parameter(USERNAME_ARG, Parameter.MANDATORY),
+            new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
 
     public static void main(String[] args) throws Exception {
         new SMBMountCommand().execute(args);
