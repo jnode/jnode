@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -177,17 +177,15 @@ public class INode {
      * @param indirectionLevel:
      *            0: direct block, 1: indirect block, ...
      */
-    private final long indirectRead(long dataBlockNr, long offset,
-            int indirectionLevel) throws IOException {
+    private final long indirectRead(long dataBlockNr, long offset, int indirectionLevel)
+        throws IOException {
         byte[] data = fs.getBlock(dataBlockNr);
         if (indirectionLevel == 1)
             //data is a (simple) indirect block
             return Ext2Utils.get32(data, (int) offset * 4);
 
-        long blockIndex = offset
-                / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
-        long blockOffset = offset
-                % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
+        long blockIndex = offset / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
+        long blockOffset = offset % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
         long blockNr = Ext2Utils.get32(data, (int) blockIndex * 4);
 
         return indirectRead(blockNr, blockOffset, indirectionLevel - 1);
@@ -201,11 +199,9 @@ public class INode {
      * @param allocatedBlocks:
      *            (the number of blocks allocated so far)-1
      */
-    private final void indirectWrite(long dataBlockNr, long offset,
-            long allocatedBlocks, long value, int indirectionLevel)
-            throws IOException, FileSystemException {
-        log.debug("indirectWrite(blockNr=" + dataBlockNr + ", offset=" + offset
-                + "...)");
+    private final void indirectWrite(long dataBlockNr, long offset, long allocatedBlocks,
+            long value, int indirectionLevel) throws IOException, FileSystemException {
+        log.debug("indirectWrite(blockNr=" + dataBlockNr + ", offset=" + offset + "...)");
         byte[] data = fs.getBlock(dataBlockNr);
         if (indirectionLevel == 1) {
             //data is a (simple) indirect block
@@ -216,10 +212,8 @@ public class INode {
         }
 
         long blockNr;
-        long blockIndex = offset
-                / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
-        long blockOffset = offset
-                % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
+        long blockIndex = offset / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
+        long blockOffset = offset % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
         if (blockOffset == 0) {
             //need to reserve the indirect block itself
             blockNr = findFreeBlock(allocatedBlocks++);
@@ -230,11 +224,11 @@ public class INode {
             byte[] zeroes = new byte[fs.getBlockSize()]; //blank the block
             Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
             fs.writeBlock(blockNr, zeroes, false);
-        } else
+        } else {
             blockNr = Ext2Utils.get32(data, (int) blockIndex * 4);
+        }
 
-        indirectWrite(blockNr, blockOffset, allocatedBlocks, value,
-                indirectionLevel - 1);
+        indirectWrite(blockNr, blockOffset, allocatedBlocks, value, indirectionLevel - 1);
     }
 
     /**
@@ -245,10 +239,10 @@ public class INode {
      * @param indirectionLevel
      * @throws IOException
      */
-    private final void indirectFree(long dataBlockNr, long offset,
-            int indirectionLevel) throws IOException, FileSystemException {
-        log.debug("indirectFree(datablockNr=" + dataBlockNr + ", offset="
-                + offset + ", ind=" + indirectionLevel + ")");
+    private final void indirectFree(long dataBlockNr, long offset, int indirectionLevel)
+        throws IOException, FileSystemException {
+        log.debug("indirectFree(datablockNr=" + dataBlockNr + ", offset=" + offset + ", ind=" +
+                indirectionLevel + ")");
         if (indirectionLevel == 0) {
             fs.freeBlock(dataBlockNr);
             return;
@@ -256,10 +250,8 @@ public class INode {
 
         byte[] data = fs.getBlock(dataBlockNr);
 
-        long blockIndex = offset
-                / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
-        long blockOffset = offset
-                % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
+        long blockIndex = offset / (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
+        long blockOffset = offset % (long) Math.pow(getIndirectCount(), indirectionLevel - 1);
         long blockNr = Ext2Utils.get32(data, (int) blockIndex * 4);
 
         indirectFree(blockNr, blockOffset, indirectionLevel - 1);
@@ -291,40 +283,41 @@ public class INode {
     private long getDataBlockNr(long i) throws IOException {
         final long blockCount = getAllocatedBlockCount();
         final int indirectCount = getIndirectCount();
-        if (i > blockCount - 1)
-            throw new IOException("Trying to read block " + i
-                    + " (counts from 0), while" + " INode contains only "
-                    + blockCount + " blocks");
+        if (i > blockCount - 1) {
+            throw new IOException("Trying to read block " + i + " (counts from 0), while" +
+                    " INode contains only " + blockCount + " blocks");
+        }
 
         //get the direct blocks (0; 11)
         if (i < 12) {
-            log.debug("getDataBlockNr(): block nr: "
-                    + Ext2Utils.get32(data, 40 + (int) i * 4));
+            log.debug("getDataBlockNr(): block nr: " + Ext2Utils.get32(data, 40 + (int) i * 4));
             return Ext2Utils.get32(data, 40 + (int) i * 4);
         }
 
         //see the indirect blocks (12; indirectCount-1)
         i -= 12;
-        if (i < indirectCount)
+        if (i < indirectCount) {
             //the 12th index points to the indirect block
             return indirectRead(Ext2Utils.get32(data, 40 + 12 * 4), i, 1);
+        }
 
         //see the double indirect blocks (indirectCount; doubleIndirectCount-1)
         i -= indirectCount;
-        if (i < indirectCount * indirectCount)
+        if (i < indirectCount * indirectCount) {
             //the 13th index points to the double indirect block
             return indirectRead(Ext2Utils.get32(data, 40 + 13 * 4), i, 2);
+        }
 
         //see the triple indirect blocks (doubleIndirectCount;
         // tripleIndirectCount-1)
         i -= indirectCount * indirectCount;
-        if (i < indirectCount * indirectCount * indirectCount)
+        if (i < indirectCount * indirectCount * indirectCount) {
             //the 14th index points to the triple indirect block
             return indirectRead(Ext2Utils.get32(data, 40 + 14 * 4), i, 3);
+        }
 
         //shouldn't get here
-        throw new IOException("Internal FS exception: getDataBlockIndex(i=" + i
-                + ")");
+        throw new IOException("Internal FS exception: getDataBlockIndex(i=" + i + ")");
     }
 
     /**
@@ -349,20 +342,18 @@ public class INode {
      * <code>...BlockIndex</code> means an index relative to the beginning of
      * a block]
      * 
-     * @param i:
-     *            the ith block of the inode has been reserved
-     * @param blockNr:
-     *            the block (in the filesystem) that has been reserved
+     * @param i the ith block of the inode has been reserved
+     * @param blockNr the block (in the filesystem) that has been reserved
      */
     private final void registerBlockIndex(long i, long blockNr)
-            throws FileSystemException, IOException {
+        throws FileSystemException, IOException {
         final long blockCount = getSizeInBlocks();
         final int indirectCount = getIndirectCount();
         long allocatedBlocks = i;
-        if (i != blockCount)
-            throw new FileSystemException("Trying to register block " + i
-                    + " (counts from 0), when" + " INode contains only "
-                    + blockCount + " blocks");
+        if (i != blockCount) {
+            throw new FileSystemException("Trying to register block " + i +
+                    " (counts from 0), when INode contains only " + blockCount + " blocks");
+        }
 
         log.debug("registering block #" + blockNr);
 
@@ -391,9 +382,10 @@ public class INode {
                 byte[] zeroes = new byte[fs.getBlockSize()]; //blank the block
                 Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
                 fs.writeBlock(indirectBlockNr, zeroes, false);
-            } else
+            } else {
                 //the indirect block has already been used
                 indirectBlockNr = Ext2Utils.get32(data, 40 + 12 * 4);
+            }
 
             indirectWrite(indirectBlockNr, i, allocatedBlocks, blockNr, 1);
 
@@ -418,8 +410,9 @@ public class INode {
                 byte[] zeroes = new byte[fs.getBlockSize()]; //blank the block
                 Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
                 fs.writeBlock(doubleIndirectBlockNr, zeroes, false);
-            } else
+            } else {
                 doubleIndirectBlockNr = Ext2Utils.get32(data, 40 + 13 * 4);
+            }
 
             indirectWrite(doubleIndirectBlockNr, i, allocatedBlocks, blockNr, 2);
 
@@ -428,8 +421,7 @@ public class INode {
 
         //see the triple indirect blocks (doubleIndirectCount;
         // tripleIndirectCount-1)
-        final int tripleIndirectCount = indirectCount * indirectCount
-                * indirectCount;
+        final int tripleIndirectCount = indirectCount * indirectCount * indirectCount;
         i -= doubleIndirectCount;
         if (i < tripleIndirectCount) {
             long tripleIndirectBlockNr;
@@ -446,16 +438,16 @@ public class INode {
                 byte[] zeroes = new byte[fs.getBlockSize()]; //blank the block
                 Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte) 0);
                 fs.writeBlock(tripleIndirectBlockNr, zeroes, false);
-            } else
+            } else {
                 tripleIndirectBlockNr = Ext2Utils.get32(data, 40 + 14 * 4);
+            }
 
             indirectWrite(tripleIndirectBlockNr, i, allocatedBlocks, blockNr, 3);
             return;
         }
 
         //shouldn't get here
-        throw new FileSystemException(
-                "Internal FS exception: getDataBlockIndex(i=" + i + ")");
+        throw new FileSystemException("Internal FS exception: getDataBlockIndex(i=" + i + ")");
     }
 
     /**
@@ -464,12 +456,11 @@ public class INode {
      * @throws FileSystemException
      * @throws IOException
      */
-    private void freePreallocatedBlocks() throws FileSystemException,
-            IOException {
+    private void freePreallocatedBlocks() throws FileSystemException, IOException {
         int preallocCount = desc.getPreallocCount();
-        if (preallocCount > 0)
+        if (preallocCount > 0) {
             log.debug("Freeing preallocated blocks");
-        else {
+        } else {
             log.debug("No preallocated blocks in the inode");
             return;
         }
@@ -490,17 +481,15 @@ public class INode {
      * @param i
      * @throws IOException
      */
-    protected synchronized void freeDataBlock(long i) throws IOException,
-            FileSystemException {
+    protected synchronized void freeDataBlock(long i) throws IOException, FileSystemException {
         final long blockCount = getAllocatedBlockCount();
         final int indirectCount = getIndirectCount();
 
-        if (i != blockCount - 1)
-            throw new IOException(
-                    "Only the last block of the inode can be freed."
-                            + "You were trying to free block nr. " + i
-                            + ", while inode contains " + +blockCount
-                            + " blocks.");
+        if (i != blockCount - 1) {
+            throw new IOException("Only the last block of the inode can be freed." +
+                    "You were trying to free block nr. " + i + ", while inode contains " +
+                    blockCount + " blocks.");
+        }
 
         desc.setLastAllocatedBlockIndex(i - 1);
 
@@ -529,8 +518,9 @@ public class INode {
             //if this was the last block on the indirect block, then delete the
             // record of
             //the indirect block from the inode
-            if (i == 0)
+            if (i == 0) {
                 Ext2Utils.set32(data, 40 + 12 * 4, 0);
+            }
             return;
         }
 
@@ -542,8 +532,9 @@ public class INode {
             //if this was the last block on the double indirect block, then
             // delete the record of
             //the double indirect block from the inode
-            if (i == 0)
+            if (i == 0) {
                 Ext2Utils.set32(data, 40 + 13 * 4, 0);
+            }
             return;
         }
 
@@ -556,14 +547,14 @@ public class INode {
             //if this was the last block on the triple indirect block, then
             // delete the record of
             //the triple indirect block from the inode
-            if (i == 0)
+            if (i == 0) {
                 Ext2Utils.set32(data, 40 + 14 * 4, 0);
+            }
             return;
         }
 
         //shouldn't get here
-        throw new IOException("Internal FS exception: getDataBlockIndex(i=" + i
-                + ")");
+        throw new IOException("Internal FS exception: getDataBlockIndex(i=" + i + ")");
     }
 
     /**
@@ -583,9 +574,10 @@ public class INode {
             long blockIndex = getDataBlockNr(i);
             //overwrite the block
             fs.writeBlock(blockIndex, data, false);
-        } else
-            throw new UnallocatedBlockException("Block " + i
-                    + " not yet reserved " + "for the inode");
+        } else {
+            throw new UnallocatedBlockException("Block " + i + " not yet reserved " +
+                    "for the inode");
+        }
     }
 
     /**
@@ -597,24 +589,24 @@ public class INode {
      * @return
      */
     protected long getAllocatedBlockCount() {
-        if (desc.getLastAllocatedBlockIndex() != -1)
+        if (desc.getLastAllocatedBlockIndex() != -1) {
             return desc.getLastAllocatedBlockIndex() + 1;
-        else
+        } else {
             return getSizeInBlocks();
+        }
     }
 
     /**
      * Allocate the ith data block of the inode (i is a sequential index from
      * the beginning of the file, and not an absolute block number)
      */
-    public synchronized void allocateDataBlock(long i)
-            throws FileSystemException, IOException {
-        if (i < getAllocatedBlockCount())
-            throw new IOException(i
-                    + " blocks are already allocated for this inode");
-        if (i > getAllocatedBlockCount())
-            throw new IOException("Allocate block " + getAllocatedBlockCount()
-                    + " first!");
+    public synchronized void allocateDataBlock(long i) throws FileSystemException, IOException {
+        if (i < getAllocatedBlockCount()) {
+            throw new IOException(i + " blocks are already allocated for this inode");
+        }
+        if (i > getAllocatedBlockCount()) {
+            throw new IOException("Allocate block " + getAllocatedBlockCount() + " first!");
+        }
 
         long newBlock = findFreeBlock(i);
 
@@ -638,8 +630,7 @@ public class INode {
      *            the block to be found should be around the (index-1)th block
      *            of the inode (which is already allocated, unless index==0)
      */
-    private long findFreeBlock(long index) throws IOException,
-            FileSystemException {
+    private long findFreeBlock(long index) throws IOException, FileSystemException {
         //long newBlock;
         long lastBlock = -1;
         BlockReservation reservation;
@@ -655,14 +646,13 @@ public class INode {
             lastBlock = getDataBlockNr(index - 1);
         if (lastBlock != -1) {
             for (int i = 1; i < 16; i++) {
-                reservation = getExt2FileSystem()
-                        .testAndSetBlock(lastBlock + i);
+                reservation = getExt2FileSystem().testAndSetBlock(lastBlock + i);
                 if (reservation.isSuccessful()) {
                     desc.setPreallocBlock(reservation.getBlock() + 1);
                     desc.setPreallocCount(reservation.getPreallocCount());
 
-                    long prealloc512 = (1 + reservation.getPreallocCount())
-                            * (fs.getBlockSize() / 512);
+                    long prealloc512 =
+                            (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
                     setBlocks(getBlocks() + prealloc512);
 
                     return lastBlock + i;
@@ -670,14 +660,13 @@ public class INode {
             }
 
             for (int i = -15; i < 0; i++) {
-                reservation = getExt2FileSystem()
-                        .testAndSetBlock(lastBlock + i);
+                reservation = getExt2FileSystem().testAndSetBlock(lastBlock + i);
                 if (reservation.isSuccessful()) {
                     desc.setPreallocBlock(reservation.getBlock() + 1);
                     desc.setPreallocCount(reservation.getPreallocCount());
 
-                    long prealloc512 = (1 + reservation.getPreallocCount())
-                            * (fs.getBlockSize() / 512);
+                    long prealloc512 =
+                            (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
                     setBlocks(getBlocks() + prealloc512);
 
                     return lastBlock + i;
@@ -693,8 +682,7 @@ public class INode {
             desc.setPreallocBlock(reservation.getBlock() + 1);
             desc.setPreallocCount(reservation.getPreallocCount());
 
-            long prealloc512 = (1 + reservation.getPreallocCount())
-                    * (fs.getBlockSize() / 512);
+            long prealloc512 = (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
             setBlocks(getBlocks() + prealloc512);
 
             return reservation.getBlock();
@@ -705,39 +693,38 @@ public class INode {
         //but take a note if a non-full group is found
         long nonfullBlockGroup = -1;
         for (int i = 0; i < getExt2FileSystem().getGroupCount(); i++) {
-            if (i == desc.getGroup())
+            if (i == desc.getGroup()) {
                 continue;
-
-            long threshold =(getExt2FileSystem().getSuperblock().getBlocksPerGroup() * 
-            				Ext2Constants.EXT2_BLOCK_THRESHOLD_PERCENT)/100;
+            }
+            long threshold =
+                    (getExt2FileSystem().getSuperblock().getBlocksPerGroup() * 
+                            Ext2Constants.EXT2_BLOCK_THRESHOLD_PERCENT) / 100;
             reservation = getExt2FileSystem().findFreeBlocks(i, threshold);
             if (reservation.isSuccessful()) {
                 desc.setPreallocBlock(reservation.getBlock() + 1);
                 desc.setPreallocCount(reservation.getPreallocCount());
 
-                long prealloc512 = (1 + reservation.getPreallocCount())
-                        * (fs.getBlockSize() / 512);
+                long prealloc512 = (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
                 setBlocks(getBlocks() + prealloc512);
 
                 return reservation.getBlock();
             }
 
-            if (reservation.getFreeBlocksCount() > 0)
+            if (reservation.getFreeBlocksCount() > 0) {
                 nonfullBlockGroup = i;
+            }
         }
 
         //if no block group with at least the threshold number of free blocks
         // is found,
         //then check if there was any nonfull group
         if (nonfullBlockGroup != -1) {
-            reservation = getExt2FileSystem()
-                    .findFreeBlocks(desc.getGroup(), 1);
+            reservation = getExt2FileSystem().findFreeBlocks(desc.getGroup(), 1);
             if (reservation.isSuccessful()) {
                 desc.setPreallocBlock(reservation.getBlock() + 1);
                 desc.setPreallocCount(reservation.getPreallocCount());
 
-                long prealloc512 = (1 + reservation.getPreallocCount())
-                        * (fs.getBlockSize() / 512);
+                long prealloc512 = (1 + reservation.getPreallocCount()) * (fs.getBlockSize() / 512);
                 setBlocks(getBlocks() + prealloc512);
 
                 return reservation.getBlock();
@@ -935,13 +922,13 @@ public class INode {
 
     public synchronized void decLocked() {
         --locked;
-        if (locked == 0)
+        if (locked == 0) {
             this.notifyAll();
+        }
         if (locked < 0) {
             //What!??
             locked = 0;
-            throw new RuntimeException(
-                    "INode has been unlocked more than locked");
+            throw new RuntimeException("INode has been unlocked more than locked");
         }
     }
 }

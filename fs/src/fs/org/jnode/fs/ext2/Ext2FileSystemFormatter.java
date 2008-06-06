@@ -25,7 +25,6 @@ import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.Formatter;
 import org.jnode.fs.service.FileSystemService;
-import org.jnode.util.BinaryScaleFactor;
 import org.jnode.naming.InitialNaming;
 import javax.naming.NameNotFoundException;
 
@@ -39,24 +38,23 @@ public class Ext2FileSystemFormatter extends Formatter<Ext2FileSystem> {
      *
      * @param blockSizeKb size of blocks in KB
      */
-    public Ext2FileSystemFormatter(BlockSize blockSize)
-    {
-    	super(new Ext2FileSystemType());
-    	this.blockSize = blockSize;
+    public Ext2FileSystemFormatter(BlockSize blockSize) {
+        super(new Ext2FileSystemType());
+        this.blockSize = blockSize;
     }
 
-	/**
-	 *
-	 */
-	public synchronized Ext2FileSystem format(Device device) throws FileSystemException {
+    /**
+     *
+     */
+    public synchronized Ext2FileSystem format(Device device) throws FileSystemException {
         try {
             FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
             Ext2FileSystemType type = fSS.getFileSystemType(Ext2FileSystemType.ID);
             Ext2FileSystem fs = type.create(device, false);
             fs.create(blockSize);
             return fs;
-        } catch (NameNotFoundException e){
-    	   	throw new FileSystemException(e);
+        } catch (NameNotFoundException e) {
+            throw new FileSystemException(e);
         }
     }
 }

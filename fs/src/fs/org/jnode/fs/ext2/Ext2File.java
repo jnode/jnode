@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -74,8 +74,7 @@ public class Ext2File extends AbstractFSFile {
      */
     public void setLength(long length) throws IOException {
         if (!canWrite())
-            throw new ReadOnlyFileSystemException(
-                    "FileSystem or File is readonly");
+            throw new ReadOnlyFileSystemException("FileSystem or File is readonly");
 
         long blockSize = iNode.getExt2FileSystem().getBlockSize();
 
@@ -115,8 +114,7 @@ public class Ext2File extends AbstractFSFile {
                         nextBlock = blockNr + 1;
 
                     for (long i = iNode.getAllocatedBlockCount() - 1; i >= nextBlock; i--) {
-                        log.debug("setLength(): freeing up block " + i
-                                + " of inode");
+                        log.debug("setLength(): freeing up block " + i + " of inode");
                         iNode.freeDataBlock(i);
                     }
                     iNode.setSize(length);
@@ -137,12 +135,9 @@ public class Ext2File extends AbstractFSFile {
                     long bytesAllocated = getLength();
                     long bytesCovered = 0;
                     while (bytesCovered < len) {
-                        long blockIndex = (bytesAllocated + bytesCovered)
-                                / blockSize;
-                        long blockOffset = (bytesAllocated + bytesCovered)
-                                % blockSize;
-                        long newSection = Math.min(len - bytesCovered,
-                                blockSize - blockOffset);
+                        long blockIndex = (bytesAllocated + bytesCovered) / blockSize;
+                        long blockOffset = (bytesAllocated + bytesCovered) % blockSize;
+                        long newSection = Math.min(len - bytesCovered, blockSize - blockOffset);
 
                         //allocate a new block if needed
                         if (blockIndex >= blocksAllocated) {
@@ -173,14 +168,13 @@ public class Ext2File extends AbstractFSFile {
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
     //public void read(long fileOffset, byte[] dest, int off, int len)
-    public void read(long fileOffset, ByteBuffer destBuf)    
-            throws IOException {        
+    public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
         final int len = destBuf.remaining();
         final int off = 0;
         //TODO optimize it also to use ByteBuffer at lower level 
         final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         final byte[] dest = destBA.toArray();
-        
+
         //synchronize to the inode cache to make sure that the inode does not
         // get
         //flushed between reading it and locking it
@@ -213,16 +207,14 @@ public class Ext2File extends AbstractFSFile {
                 while (bytesRead < len) {
                     long blockNr = (fileOffset + bytesRead) / blockSize;
                     long blockOffset = (fileOffset + bytesRead) % blockSize;
-                    long copyLength = Math.min(len - bytesRead, blockSize
-                            - blockOffset);
+                    long copyLength = Math.min(len - bytesRead, blockSize - blockOffset);
 
-                    log.debug("blockNr: "+blockNr+", blockOffset: "+blockOffset+
-                    		  ", copyLength: "+copyLength+", bytesRead: "+bytesRead);
+                    log.debug("blockNr: " + blockNr + ", blockOffset: " + blockOffset + ", copyLength: " + copyLength +
+                            ", bytesRead: " + bytesRead);
 
-                    System.arraycopy(iNode.getDataBlock(blockNr),
-                            (int) blockOffset, dest, off + (int) bytesRead,
+                    System.arraycopy(iNode.getDataBlock(blockNr), (int) blockOffset, dest, off + (int) bytesRead,
                             (int) copyLength);
-                    
+
                     bytesRead += copyLength;
                 }
             } catch (Throwable ex) {
@@ -231,11 +223,11 @@ public class Ext2File extends AbstractFSFile {
                 throw ioe;
             } finally {
                 //read done, unlock the inode from the cache
-                iNode.decLocked();                
+                iNode.decLocked();
             }
         }
-        
-        destBA.refreshByteBuffer();        
+
+        destBA.refreshByteBuffer();
     }
 
     /**
@@ -246,18 +238,16 @@ public class Ext2File extends AbstractFSFile {
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
     //public void write(long fileOffset, byte[] src, int off, int len)
-    public void write(long fileOffset, ByteBuffer srcBuf)
-            throws IOException {
+    public void write(long fileOffset, ByteBuffer srcBuf) throws IOException {
         final int len = srcBuf.remaining();
         final int off = 0;
         //TODO optimize it also to use ByteBuffer at lower level                 
         final byte[] src = ByteBufferUtils.toArray(srcBuf);
-        
-		if(getFileSystem().isReadOnly())
-		{
-			throw new ReadOnlyFileSystemException("write in readonly filesystem");
-		}		
-		
+
+        if (getFileSystem().isReadOnly()) {
+            throw new ReadOnlyFileSystemException("write in readonly filesystem");
+        }
+
         //synchronize to the inode cache to make sure that the inode does not
         // get
         //flushed between reading it and locking it
@@ -284,16 +274,12 @@ public class Ext2File extends AbstractFSFile {
             //so synchronize to the inode
             synchronized (iNode) {
                 if (fileOffset > getLength())
-                    throw new IOException(
-                            "Can't write beyond the end of the file! (fileOffset: "
-                                    + fileOffset + ", getLength()"
-                                    + getLength());
+                    throw new IOException("Can't write beyond the end of the file! (fileOffset: " + fileOffset +
+                            ", getLength()" + getLength());
                 if (off + len > src.length)
-                    throw new IOException(
-                            "src is shorter than what you want to write");
+                    throw new IOException("src is shorter than what you want to write");
 
-                log.debug("write(fileOffset=" + fileOffset + ", src, off, len="
-                        + len + ")");
+                log.debug("write(fileOffset=" + fileOffset + ", src, off, len=" + len + ")");
 
                 final long blockSize = iNode.getExt2FileSystem().getBlockSize();
                 long blocksAllocated = iNode.getAllocatedBlockCount();
@@ -301,8 +287,7 @@ public class Ext2File extends AbstractFSFile {
                 while (bytesWritten < len) {
                     long blockIndex = (fileOffset + bytesWritten) / blockSize;
                     long blockOffset = (fileOffset + bytesWritten) % blockSize;
-                    long copyLength = Math.min(len - bytesWritten, blockSize
-                            - blockOffset);
+                    long copyLength = Math.min(len - bytesWritten, blockSize - blockOffset);
 
                     //If only a part of the block is written, then read the
                     // block
@@ -310,14 +295,12 @@ public class Ext2File extends AbstractFSFile {
                     // whole block
                     //is overwritten, then skip reading it.
                     byte[] dest;
-                    if (!((blockOffset == 0) && (copyLength == blockSize))
-                            && (blockIndex < blocksAllocated))
+                    if (!((blockOffset == 0) && (copyLength == blockSize)) && (blockIndex < blocksAllocated))
                         dest = iNode.getDataBlock(blockIndex);
                     else
                         dest = new byte[(int) blockSize];
 
-                    System.arraycopy(src, (int) (off + bytesWritten), dest,
-                            (int) blockOffset, (int) copyLength);
+                    System.arraycopy(src, (int) (off + bytesWritten), dest, (int) blockOffset, (int) copyLength);
 
                     //allocate a new block if needed
                     if (blockIndex >= blocksAllocated) {
@@ -346,7 +329,7 @@ public class Ext2File extends AbstractFSFile {
             throw ioe;
         } finally {
             //write done, unlock the inode from the cache
-            iNode.decLocked();            
+            iNode.decLocked();
         }
     }
 

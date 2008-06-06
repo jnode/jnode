@@ -28,7 +28,6 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.util.FSUtils;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -39,39 +38,41 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
 public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSystem> {
     public static final Class<Ext2FileSystemType> ID = Ext2FileSystemType.class;
 
-	/**
-	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)
-	 */
-	public Ext2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-		Ext2FileSystem fs = new Ext2FileSystem(device, readOnly, this);
-		fs.read();
-		return fs;
-	}
+    /**
+     * @see org.jnode.fs.FileSystemType#create(Device, boolean)
+     */
+    public Ext2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+        Ext2FileSystem fs = new Ext2FileSystem(device, readOnly, this);
+        fs.read();
+        return fs;
+    }
 
-	/**
-	 * @see org.jnode.fs.FileSystemType#getName()
-	 */
-	public String getName() {
-		return "EXT2";
-	}
+    /**
+     * @see org.jnode.fs.FileSystemType#getName()
+     */
+    public String getName() {
+        return "EXT2";
+    }
 
-	/**
-	 * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
-	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-		if(pte!=null) {
-			if (pte instanceof IBMPartitionTableEntry)
-			    if (((IBMPartitionTableEntry)pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE)
-				return false;
-		}
+    /**
+     * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
+     */
+    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+        if (pte != null) {
+            if (pte instanceof IBMPartitionTableEntry) {
+                if (((IBMPartitionTableEntry) pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE) {
+                    return false;
+                }
+            }
+        }
 
-		//need to check the magic
-		ByteBuffer magic = ByteBuffer.allocate(2);
-		try{
-		    devApi.read(1024+56, magic);
-		} catch(IOException e) {
-		    return false;
-		}
-		return (Ext2Utils.get16(magic.array(), 0) == 0xEF53);
-	}
+        //need to check the magic
+        ByteBuffer magic = ByteBuffer.allocate(2);
+        try {
+            devApi.read(1024 + 56, magic);
+        } catch (IOException e) {
+            return false;
+        }
+        return (Ext2Utils.get16(magic.array(), 0) == 0xEF53);
+    }
 }

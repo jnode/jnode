@@ -29,23 +29,26 @@ import java.util.EventObject;
  * 
  * @author Andras Nagy
  */
-public class CacheEvent extends EventObject{
-	public static final int REMOVED=0;
-	private int eventType;
-	public CacheEvent(Object source) {
-		super(source);
-	}
+public class CacheEvent extends EventObject {
+    public static final int REMOVED = 0;
+    private int eventType;
 
-	public CacheEvent(Object source, int type) {
-		super(source);
-		this.eventType = type;
-	}
-	/**
-	 * Returns the eventType.
-	 * @return int
-	 */
-	public int getEventType() {
-		return eventType;
-	}
+    public CacheEvent(Object source) {
+        super(source);
+    }
+
+    public CacheEvent(Object source, int type) {
+        super(source);
+        this.eventType = type;
+    }
+
+    /**
+     * Returns the eventType.
+     * 
+     * @return int
+     */
+    public int getEventType() {
+        return eventType;
+    }
 
 }
