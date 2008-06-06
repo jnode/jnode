@@ -69,7 +69,8 @@ public final class BlockCache extends LinkedHashMap<Object, Block> {
                 log.error("Exception when flushing a block from the cache", e);
             }
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 }

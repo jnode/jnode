@@ -28,11 +28,11 @@ import java.io.IOException;
  *
  */
 public class UnallocatedBlockException extends IOException {
-	public UnallocatedBlockException(String s) {
-		super(s);
-	}
-	
-	public UnallocatedBlockException() {
-		super("Block not yet reserved for the inode");
-	}
+    public UnallocatedBlockException(String s) {
+        super(s);
+    }
+
+    public UnallocatedBlockException() {
+        super("Block not yet reserved for the inode");
+    }
 }

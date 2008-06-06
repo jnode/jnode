@@ -52,7 +52,7 @@ public class TouchCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws Exception {
+        throws Exception {
         File file = ARG_FILE.getValue();
         if (!file.exists()) {
             File parentFile = file.getParentFile();

@@ -75,8 +75,7 @@ public class MountCommand extends AbstractCommand {
                 String type = fs.getType().getName();
                 out.println(device.getId() + " on " + mountPoint + " type " + type + " (" + mode + ')');
             }
-        }
-        else {
+        } else {
             // Get the parameters
             final Device dev = ARG_DEV.getValue();
             final File mountPoint = ARG_DIR.getValue();

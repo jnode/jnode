@@ -27,10 +27,8 @@ import java.util.Map;
 import org.jnode.fs.command.AbstractFormatCommand;
 import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.ext2.Ext2FileSystem;
-import org.jnode.fs.ext2.Ext2FileSystemFormatter;
-import org.jnode.fs.jfat.ClusterSize;
-import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.EnumArgument;
+import org.jnode.fs.ext2.Ext2FileSystemFormatter; 
+import org.jnode.shell.syntax.Argument; 
 import org.jnode.shell.syntax.MappedArgument;
 
 /**
@@ -38,9 +36,9 @@ import org.jnode.shell.syntax.MappedArgument;
  * @author crawley@jnode.org
  */
 public class FormatExt2Command extends AbstractFormatCommand<Ext2FileSystem> {
-    
+
     private static class BlockSizeArgument extends MappedArgument<BlockSize> {
-        private static final Map<String, BlockSize> MAP = new HashMap<String, BlockSize> ();
+        private static final Map<String, BlockSize> MAP = new HashMap<String, BlockSize>();
         static {
             MAP.put("1k", BlockSize._1Kb);
             MAP.put("2k", BlockSize._2Kb);
@@ -56,7 +54,7 @@ public class FormatExt2Command extends AbstractFormatCommand<Ext2FileSystem> {
             return "block size";
         }
     }
-    
+
     private final BlockSizeArgument ARG_BLOCK_SIZE = new BlockSizeArgument();
 
     public FormatExt2Command() {
@@ -65,11 +63,11 @@ public class FormatExt2Command extends AbstractFormatCommand<Ext2FileSystem> {
     }
 
     public static void main(String[] args) throws Exception {
-    	new FormatExt2Command().execute(args);
+        new FormatExt2Command().execute(args);
     }
 
-	@Override
-	protected Ext2FileSystemFormatter getFormatter() {
+    @Override
+    protected Ext2FileSystemFormatter getFormatter() {
         return new Ext2FileSystemFormatter(ARG_BLOCK_SIZE.getValue());
-	}
+    }
 }
