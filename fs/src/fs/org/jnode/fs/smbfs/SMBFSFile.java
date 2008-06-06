@@ -24,9 +24,11 @@ package org.jnode.fs.smbfs;
 import org.jnode.fs.FSFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
 
 /**
  * @author Levente S\u00e1ntha
@@ -65,9 +67,24 @@ public class SMBFSFile extends SMBFSEntry implements FSFile {
      * @throws java.io.IOException
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
-        byte[] data = new byte[(int) getLength()];
-        smbFile.getInputStream().read(data);
-        dest.put(data, (int) fileOffset, dest.remaining());
+        if(fileOffset > smbFile.length())
+            return;
+
+        int b_len = 32 * 1024;
+        byte[] buf = new byte[b_len];
+
+        SmbFileInputStream is = (SmbFileInputStream) smbFile.getInputStream();
+
+        long s = is.skip(fileOffset);
+        if(s < fileOffset)
+            is.skip(fileOffset);
+
+        int bc;
+        int rem = 1;
+        while((bc = is.read(buf)) > 0 && rem > 0){
+            dest.put(buf, 0, Math.min(bc, dest.remaining()));
+            rem = dest.remaining();
+        }
     }
 
     /**

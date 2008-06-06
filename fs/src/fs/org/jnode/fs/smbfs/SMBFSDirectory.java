@@ -86,7 +86,7 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
      * All elements returned by the iterator must be instanceof FSEntry.
      */
     public Iterator<? extends SMBFSEntry> iterator() throws IOException {
-        SmbFile[] smb_list = null;
+        SmbFile[] smb_list;
         try{
             smb_list = smbFile.listFiles();
         } catch(SmbException e){
@@ -94,13 +94,17 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
             throw e;
         }
         entries.clear();
+        
         for(SmbFile f : smb_list){
             if(f.isDirectory()){
-                entries.put(f.getName(), new SMBFSDirectory(this, f));
+                String name = getSimpleName(f);
+                entries.put(name, new SMBFSDirectory(this, f));
             } else if(f.isFile()){
-                entries.put(f.getName(), new SMBFSFile(this, f));
+                String name = getSimpleName(f);
+                entries.put(name, new SMBFSFile(this, f));
             }
         }
+
         return entries.values().iterator();
     }
 

@@ -26,6 +26,7 @@ import java.io.IOException;
 import jcifs.smb.NtlmAuthenticator;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
+import jcifs.smb.SmbException;
 
 import org.jnode.fs.FileSystem;
 
@@ -99,9 +100,12 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
     }
 
 	public long getFreeSpace() {
-		// TODO implement me
-		return 0;
-	}
+        try {
+            return root.smbFile.getDiskFreeSpace();
+        } catch (SmbException e){
+            return 0;
+        }
+    }
 
 	public long getTotalSpace() {
 		// TODO implement me
