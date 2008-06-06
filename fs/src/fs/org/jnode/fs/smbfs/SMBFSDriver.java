@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.smbfs;
 
+import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.DeviceAlreadyRegisteredException;
 
 /**
  * @author Levente S\u00e1ntha

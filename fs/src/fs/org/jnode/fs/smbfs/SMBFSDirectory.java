@@ -18,18 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.smbfs;
 
-import org.jnode.fs.FSDirectory;
-
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
-
-import jcifs.smb.SmbFile;
 import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import org.jnode.fs.FSDirectory;
 
 /**
  * @author Levente S\u00e1ntha
@@ -87,19 +85,19 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
      */
     public Iterator<? extends SMBFSEntry> iterator() throws IOException {
         SmbFile[] smb_list;
-        try{
+        try {
             smb_list = smbFile.listFiles();
-        } catch(SmbException e){
+        } catch (SmbException e) {
             e.printStackTrace();
             throw e;
         }
         entries.clear();
-        
-        for(SmbFile f : smb_list){
-            if(f.isDirectory()){
+
+        for (SmbFile f : smb_list) {
+            if (f.isDirectory()) {
                 String name = getSimpleName(f);
                 entries.put(name, new SMBFSDirectory(this, f));
-            } else if(f.isFile()){
+            } else if (f.isFile()) {
                 String name = getSimpleName(f);
                 entries.put(name, new SMBFSFile(this, f));
             }

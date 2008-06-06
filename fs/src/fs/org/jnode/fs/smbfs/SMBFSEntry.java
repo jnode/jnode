@@ -21,13 +21,11 @@
 
 package org.jnode.fs.smbfs;
 
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSAccessRights;
-
 import java.io.IOException;
-
-import jcifs.smb.SmbFile;
 import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import org.jnode.fs.FSAccessRights;
+import org.jnode.fs.FSEntry;
 
 /**
  * @author Levente S\u00e1ntha
@@ -89,7 +87,7 @@ public abstract class SMBFSEntry implements FSEntry {
 
     static String getSimpleName(SmbFile smbFile) {
         String name = smbFile.getName();
-        if(name.endsWith("/"))
+        if (name.endsWith("/"))
             name = name.substring(0, name.length() - 1);
         return name;
     }
@@ -107,7 +105,7 @@ public abstract class SMBFSEntry implements FSEntry {
     public boolean isDirectory() {
         try {
             return smbFile.isDirectory();
-        } catch(SmbException e){
+        } catch (SmbException e) {
             throw new RuntimeException(e);
         }
     }
@@ -128,7 +126,7 @@ public abstract class SMBFSEntry implements FSEntry {
     public boolean isFile() {
         try {
             return smbFile.isFile();
-        } catch(SmbException e){
+        } catch (SmbException e) {
             throw new RuntimeException(e);
         }
     }

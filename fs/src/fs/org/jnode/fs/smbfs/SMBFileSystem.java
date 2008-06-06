@@ -22,12 +22,10 @@
 package org.jnode.fs.smbfs;
 
 import java.io.IOException;
-
 import jcifs.smb.NtlmAuthenticator;
 import jcifs.smb.NtlmPasswordAuthentication;
-import jcifs.smb.SmbFile;
 import jcifs.smb.SmbException;
-
+import jcifs.smb.SmbFile;
 import org.jnode.fs.FileSystem;
 
 /**
@@ -44,18 +42,19 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
         this.device = device;
         try {
             root = new SMBFSDirectory(null,
-                    new SmbFile("smb://" + device.getUser() + ":" + device.getPassword() + "@" + device.getHost() + "/" + device.getPath() + "/"));
-        }catch(Exception e){
+                new SmbFile("smb://" + device.getUser() + ":" + device.getPassword() + "@" + device.getHost() + "/" +
+                    device.getPath() + "/"));
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-	final public SMBFileSystemType getType() {
-		return type;
-	}
+    public final SMBFileSystemType getType() {
+        return type;
+    }
 
     protected NtlmPasswordAuthentication getNtlmPasswordAuthentication() {
-        return new NtlmPasswordAuthentication( "", device.getUser(), device.getPassword() );
+        return new NtlmPasswordAuthentication("", device.getUser(), device.getPassword());
     }
 
     /**
@@ -99,21 +98,21 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
         return true;
     }
 
-	public long getFreeSpace() {
+    public long getFreeSpace() {
         try {
             return root.smbFile.getDiskFreeSpace();
-        } catch (SmbException e){
+        } catch (SmbException e) {
             return 0;
         }
     }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getUsableSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return 0;
+    }
 }
