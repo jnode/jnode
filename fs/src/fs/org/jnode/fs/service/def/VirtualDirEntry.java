@@ -65,8 +65,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
      * @param parent
      * @throws IOException
      */
-    VirtualDirEntry(VirtualFS fs, String name, VirtualDirEntry parent)
-            throws IOException {
+    VirtualDirEntry(VirtualFS fs, String name, VirtualDirEntry parent) throws IOException {
         this.fs = fs;
         this.lastModified = System.currentTimeMillis();
         this.name = name;
@@ -155,7 +154,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     /**
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return fs;
     }
 
@@ -187,7 +186,8 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
      * @param fs The filesystem to mount
      * @param path The path in the filesystem to use as root.
      */
-    synchronized VirtualMountEntry addMount(String name, FileSystem fs, String path) throws IOException {
+    synchronized VirtualMountEntry addMount(String name, FileSystem<?> fs, String path)
+        throws IOException {
         VirtualFS.log.debug("addMount(" + name + "," + fs + "," + path + ")");
         if (entries.containsKey(name)) {
             throw new IOException(name + " already exists");
@@ -232,7 +232,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     public synchronized void remove(String name) {
         entries.remove(name);
         modified();
-        }
+    }
 
     /**
      * Update the lastmodified flag.
@@ -251,12 +251,12 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
         final Collection<FSEntry> entries = new ArrayList<FSEntry>(this.entries.values());
         for (FSEntry entry : entries) {
             if (entry instanceof VirtualMountEntry) {
-                final VirtualMountEntry vme = (VirtualMountEntry)entry;
+                final VirtualMountEntry vme = (VirtualMountEntry) entry;
                 if (vme.getMountedFS().getDevice() == dev) {
                     remove(vme.getName());
                 }
             } else if (entry instanceof VirtualDirEntry) {
-                ((VirtualDirEntry)entry).unregisterFileSystem(dev);
+                ((VirtualDirEntry) entry).unregisterFileSystem(dev);
             }
         }
     }

@@ -29,7 +29,6 @@ import java.io.VMOpenMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -63,13 +62,13 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
     private final VirtualFS vfs;
 
     /**
-     *  a map (fullPath -> FileSystem) of mount points
+     * a map (fullPath -> FileSystem) of mount points
      */
     private final Map<String, FileSystem<?>> mountPoints;
 
     /**
      * Create a new instance
-     *
+     * 
      * @param fsm
      * @throws IOException
      */
@@ -107,7 +106,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Can the given file be read?
-     *
+     * 
      * @param file
      */
     public boolean canRead(String file) throws IOException {
@@ -117,7 +116,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Can the given file be written to?
-     *
+     * 
      * @param file
      */
     public boolean canWrite(String file) throws IOException {
@@ -127,7 +126,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Can the given file be executed to?
-     *
+     * 
      * @param file
      */
     public boolean canExecute(String file) throws IOException {
@@ -135,47 +134,37 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
         return (rights == null) || rights.canExecute();
     }
 
-
-	public boolean setReadable(String file, boolean enable,
-			boolean owneronly) throws IOException
-	{
+    public boolean setReadable(String file, boolean enable, boolean owneronly) throws IOException {
         final FSAccessRights rights = getAccessRights(file);
-        if(rights == null)
-        {
-        	return false;
+        if (rights == null) {
+            return false;
         }
 
         return rights.setReadable(enable, owneronly);
-	}
+    }
 
-	public boolean setWritable(String file, boolean enable,
-			boolean owneronly) throws IOException
-	{
+    public boolean setWritable(String file, boolean enable, boolean owneronly) throws IOException {
         final FSAccessRights rights = getAccessRights(file);
-        if(rights == null)
-        {
-        	return false;
+        if (rights == null) {
+            return false;
         }
 
         return rights.setWritable(enable, owneronly);
-	}
+    }
 
-	public boolean setExecutable(String file, boolean enable,
-			boolean owneronly) throws IOException
-	{
+    public boolean setExecutable(String file, boolean enable, boolean owneronly) throws IOException {
         final FSAccessRights rights = getAccessRights(file);
-        if(rights == null)
-        {
-        	return false;
+        if (rights == null) {
+            return false;
         }
 
         return rights.setExecutable(enable, owneronly);
-	}
+    }
 
     /**
      * Gets the length in bytes of the given file or 0 if the file does not
      * exist.
-     *
+     * 
      * @param file
      */
     public long getLength(String file) {
@@ -201,7 +190,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Gets the last modification date of the given file.
-     *
+     * 
      * @param file
      */
     public long getLastModified(String file) {
@@ -219,7 +208,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Sets the last modification date of the given file.
-     *
+     * 
      * @param file
      */
     public void setLastModified(String file, long time) throws IOException {
@@ -233,19 +222,19 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Mark the given file as readonly.
-     *
+     * 
      * @param file
      * @throws IOException
      */
     public void setReadOnly(String file) throws IOException {
-    	setReadable(file, true, true);
-    	setWritable(file, false, true);
-    	setExecutable(file, false, true);
+        setReadable(file, true, true);
+        setWritable(file, false, true);
+        setExecutable(file, false, true);
     }
 
     /**
      * Delete the given file.
-     *
+     * 
      * @param file
      * @throws IOException
      */
@@ -263,13 +252,13 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * This method returns an array of filesystem roots.
      */
     public File[] getRoots() {
-        return new File[] { new File("/") };
+        return new File[] {new File("/")};
     }
 
     /**
      * Gets an array of names of all entries of the given directory. All names
      * are relative to the given directory.
-     *
+     * 
      * @param directory
      */
     public String[] list(String directory) throws IOException {
@@ -289,10 +278,11 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             final FSEntry child = i.next();
             final String name = child.getName();
 
-            //never include the parent directory and the current directory in the result
-            //if they exist by any chance
-            if ( name.equals(".") || name.equals("..") )
-               continue;
+            // never include the parent directory and the current directory in
+            // the result
+            // if they exist by any chance
+            if (name.equals(".") || name.equals(".."))
+                continue;
 
             entryPath.append(name);
             entryCache.setEntry(entryPath.toString(), child);
@@ -303,27 +293,26 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
         return list.toArray(new String[list.size()]);
     }
 
-    private FSAccessRights getAccessRights(String path) throws IOException
-    {
-    	FSEntry entry = getEntry(path);
-    	if(entry == null)
-            throw new FileNotFoundException("file not found: "+path);
+    private FSAccessRights getAccessRights(String path) throws IOException {
+        FSEntry entry = getEntry(path);
+        if (entry == null)
+            throw new FileNotFoundException("file not found: " + path);
 
         try {
             return entry.getAccessRights();
-        }catch(UnsupportedOperationException e){
-            //todo review
-            //this feature is not implemented yet in al file system implementations
-            //return null in those cases
+        } catch (UnsupportedOperationException e) {
+            // todo review
+            // this feature is not implemented yet in al file system
+            // implementations
+            // return null in those cases
             return null;
         }
     }
 
     /**
      * Gets the FSEntry for the given path, or null if not found.
-     *
-     * @param path
-     *            must be an absolute canonical path
+     * 
+     * @param path must be an absolute canonical path
      */
     private FSEntry getEntry(String path) {
         try {
@@ -333,8 +322,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
             final int pathLen = path.length();
             if (pathLen > 0) {
-                if ((path.charAt(0) == File.separatorChar)
-                        || (path.charAt(pathLen - 1) == File.separatorChar)) {
+                if ((path.charAt(0) == File.separatorChar) ||
+                        (path.charAt(pathLen - 1) == File.separatorChar)) {
                     throw new IllegalArgumentException("Invalid path: " + path);
                 }
             }
@@ -352,8 +341,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
                 try {
                     entry = parentEntry.getEntry(stripParentPath(path));
 
-                    if(entry==null){
-                    	return null;
+                    if (entry == null) {
+                        return null;
                     }
 
                     entryCache.setEntry(path, entry);
@@ -375,9 +364,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Open a given file
-     *
-     * @param file
-     *            absolute path
+     * 
+     * @param file absolute path
      * @throws IOException
      */
     public VMFileHandle open(String file, VMOpenMode mode) throws IOException {
@@ -390,8 +378,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
                 // Try to create the file
                 FSDirectory parent = getParentDirectoryEntry(file);
                 if (parent == null) {
-                    throw new IOException("Cannot create " + file
-                            + ", parent directory does not exist");
+                    throw new IOException("Cannot create " + file +
+                            ", parent directory does not exist");
                 }
 
                 // Ok, add the file
@@ -406,7 +394,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Make a directory
-     *
+     * 
      * @param file
      * @throws IOException
      */
@@ -427,7 +415,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Make a file
-     *
+     * 
      * @param file
      * @throws IOException
      */
@@ -447,13 +435,12 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
     /**
      * Mount the given filesystem at the fullPath, using the fsPath as root of
      * the to be mounted filesystem.
-     *
+     * 
      * @param fullPath
      * @param fs
      * @param fsPath Null or empty to use the root of the filesystem.
      */
-    void mount(String fullPath, FileSystem fs, String fsPath)
-    throws IOException {
+    void mount(String fullPath, FileSystem<?> fs, String fsPath) throws IOException {
         final String dir = getParentPath(fullPath);
         final String name = stripParentPath(fullPath);
         final FSEntry entry = getEntry(dir);
@@ -463,29 +450,30 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
         if (!(entry instanceof VirtualDirEntry)) {
             throw new IOException("Cannot mount at " + dir);
         }
-        final VirtualDirEntry vde = (VirtualDirEntry)entry;
+        final VirtualDirEntry vde = (VirtualDirEntry) entry;
         vde.addMount(name, fs, fsPath);
 
         // transform fullPath to an absolute path
-        if(fullPath.charAt(0) != File.separatorChar)
-        {
-        	fullPath = File.separatorChar + fullPath;
+        if (fullPath.charAt(0) != File.separatorChar) {
+            fullPath = File.separatorChar + fullPath;
         }
 
-        mountPoints.put(fullPath, fs); //TODO handle removal (+ add unmount method) of filesystems
+        mountPoints.put(fullPath, fs); // TODO handle removal (+ add unmount
+                                        // method) of filesystems
     }
 
     /**
      * Return a map (fullPath -> FileSystem) of mount points
+     * 
      * @return a copy of the internal map, sorted by fullPath
      */
-    Map<String, FileSystem<?>> getMountPoints()
-    {
-    	return new TreeMap<String, FileSystem<?>>(mountPoints);
+    Map<String, FileSystem<?>> getMountPoints() {
+        return new TreeMap<String, FileSystem<?>>(mountPoints);
     }
 
     /**
      * Is the given directory a mount.
+     * 
      * @param fullPath
      * @return
      */
@@ -496,6 +484,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * The filesystem on the given device will be removed.
+     * 
      * @param dev
      */
     final void unregisterFileSystem(Device dev) {
@@ -504,9 +493,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Get the parent entry of a file
-     *
-     * @param file
-     *            absolute path
+     * 
+     * @param file absolute path
      * @return the directory entry, null if not exist or not a directory
      * @throws IOException
      */
@@ -539,7 +527,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Gets the parent path of the given path
-     *
+     * 
      * @param path
      * @return
      */
@@ -554,7 +542,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
     /**
      * Gets the given path without the parent path
-     *
+     * 
      * @param path
      * @return
      */
@@ -567,37 +555,31 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
         }
     }
 
-	public long getTotalSpace(String path) throws IOException
-	{
+    public long getTotalSpace(String path) throws IOException {
         final FSEntry entry = getEntry(path);
         long length = 0L;
-        if(entry != null)
-        {
-        	length = entry.getFileSystem().getTotalSpace();
+        if (entry != null) {
+            length = entry.getFileSystem().getTotalSpace();
         }
         return length;
-	}
+    }
 
-	public long getFreeSpace(String path) throws IOException
-	{
+    public long getFreeSpace(String path) throws IOException {
         final FSEntry entry = getEntry(path);
         long length = 0L;
-        if(entry != null)
-        {
-        	length = entry.getFileSystem().getFreeSpace();
+        if (entry != null) {
+            length = entry.getFileSystem().getFreeSpace();
         }
         return length;
-	}
+    }
 
-	public long getUsableSpace(String path) throws IOException
-	{
+    public long getUsableSpace(String path) throws IOException {
         final FSEntry entry = getEntry(path);
         long length = 0L;
-        if(entry != null)
-        {
-        	length = entry.getFileSystem().getUsableSpace();
+        if (entry != null) {
+            length = entry.getFileSystem().getUsableSpace();
         }
         return length;
-	}
+    }
 
 }

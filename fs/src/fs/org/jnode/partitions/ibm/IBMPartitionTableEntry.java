@@ -31,21 +31,21 @@ import org.jnode.util.NumberUtils;
  */
 public class IBMPartitionTableEntry implements PartitionTableEntry {
 
-	private final byte[] bs;
-	private final int ofs;
+    private final byte[] bs;
+    private final int ofs;
     private final IBMPartitionTable parent;
-	
-	public IBMPartitionTableEntry(IBMPartitionTable parent, byte[] bs, int partNr) {
-        this.parent = parent;
-		this.bs = bs;
-		this.ofs = 446 + (partNr*16);
-	}
-	
-	public boolean isValid() {
-		return !isEmpty();
-	}
 
-	/**
+    public IBMPartitionTableEntry(IBMPartitionTable parent, byte[] bs, int partNr) {
+        this.parent = parent;
+        this.bs = bs;
+        this.ofs = 446 + (partNr * 16);
+    }
+
+    public boolean isValid() {
+        return !isEmpty();
+    }
+
+    /**
      * @see org.jnode.partitions.PartitionTableEntry#getChildPartitionTable()
      */
     public IBMPartitionTable getChildPartitionTable() {
@@ -60,118 +60,109 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
     }
 
     public boolean isEmpty() {
-		return (getSystemIndicator() == IBMPartitionTypes.PARTTYPE_EMPTY);
-	}
-	
+        return (getSystemIndicator() == IBMPartitionTypes.PARTTYPE_EMPTY);
+    }
 
-	public boolean isExtended() {
-		final IBMPartitionTypes id = getSystemIndicator();
-		//pgwiasda
-		//there are more than one type of extended Partitions
-		return (id == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_EXTENDED ||
-				id == IBMPartitionTypes.PARTTYPE_LINUX_EXTENDED ||
-				id == IBMPartitionTypes.PARTTYPE_DOS_EXTENDED);
-	}
-	
-	public boolean getBootIndicator() {
-		return (LittleEndian.getUInt8(bs, ofs+0) == 0x80);
-	}
+    public boolean isExtended() {
+        final IBMPartitionTypes id = getSystemIndicator();
+        // pgwiasda
+        // there are more than one type of extended Partitions
+        return (id == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_EXTENDED ||
+                id == IBMPartitionTypes.PARTTYPE_LINUX_EXTENDED || 
+                id == IBMPartitionTypes.PARTTYPE_DOS_EXTENDED);
+    }
 
-	public void setBootIndicator(boolean active) {
-		LittleEndian.setInt8(bs, ofs+0, (active) ? 0x80 : 0);
-	}
+    public boolean getBootIndicator() {
+        return (LittleEndian.getUInt8(bs, ofs + 0) == 0x80);
+    }
 
-	public CHS getStartCHS() {
-		int v1 = LittleEndian.getUInt8(bs, ofs+1);
-		int v2 = LittleEndian.getUInt8(bs, ofs+2);
-		int v3 = LittleEndian.getUInt8(bs, ofs+3);
-		/*
-		 * h = byte1;
-		 * s = byte2 & 0x3f;
-		 * c = ((byte2 & 0xc0) << 2) + byte3;
-		 */ 
-		return new CHS(((v2 & 0xc0) << 2) + v3, v1, v2 & 0x3f);
-	}
+    public void setBootIndicator(boolean active) {
+        LittleEndian.setInt8(bs, ofs + 0, (active) ? 0x80 : 0);
+    }
 
-	public void setStartCHS(CHS chs) {
-		LittleEndian.setInt8(bs, ofs+1, Math.min(1023, chs.getHead()));
-		LittleEndian.setInt8(bs, ofs+2, ((chs.getCylinder() >> 2) & 0xC0) + (chs.getSector() & 0x3f));
-		LittleEndian.setInt8(bs, ofs+3, chs.getCylinder() & 0xFF);
-	}
+    public CHS getStartCHS() {
+        int v1 = LittleEndian.getUInt8(bs, ofs + 1);
+        int v2 = LittleEndian.getUInt8(bs, ofs + 2);
+        int v3 = LittleEndian.getUInt8(bs, ofs + 3);
+        /*
+         * h = byte1; s = byte2 & 0x3f; c = ((byte2 & 0xc0) << 2) + byte3;
+         */
+        return new CHS(((v2 & 0xc0) << 2) + v3, v1, v2 & 0x3f);
+    }
 
-	public IBMPartitionTypes getSystemIndicator() {		
-		return IBMPartitionTypes.valueOf(LittleEndian.getUInt8(bs, ofs+4));
-	}
+    public void setStartCHS(CHS chs) {
+        LittleEndian.setInt8(bs, ofs + 1, Math.min(1023, chs.getHead()));
+        LittleEndian.setInt8(bs, ofs + 2, ((chs.getCylinder() >> 2) & 0xC0) +
+                (chs.getSector() & 0x3f));
+        LittleEndian.setInt8(bs, ofs + 3, chs.getCylinder() & 0xFF);
+    }
 
-	public void setSystemIndicator(IBMPartitionTypes type) {
-		LittleEndian.setInt8(bs, ofs+4, type.getCode());
-	}
+    public IBMPartitionTypes getSystemIndicator() {
+        return IBMPartitionTypes.valueOf(LittleEndian.getUInt8(bs, ofs + 4));
+    }
 
-	public CHS getEndCHS() {
-		int v1 = LittleEndian.getUInt8(bs, ofs+5);
-		int v2 = LittleEndian.getUInt8(bs, ofs+6);
-		int v3 = LittleEndian.getUInt8(bs, ofs+7);
-		/*
-		 * h = byte1;
-		 * s = byte2 & 0x3f;
-		 * c = ((byte2 & 0xc0) << 2) + byte3;
-		 */ 
-		return new CHS(((v2 & 0xc0) << 2) + v3, v1, v2 & 0x3f);
-	}
+    public void setSystemIndicator(IBMPartitionTypes type) {
+        LittleEndian.setInt8(bs, ofs + 4, type.getCode());
+    }
 
-	public void setEndCHS(CHS chs) {
-		LittleEndian.setInt8(bs, ofs+5, chs.getHead());
-		LittleEndian.setInt8(bs, ofs+6, ((chs.getCylinder() >> 2) & 0xC0) + (chs.getSector() & 0x3f));
-		LittleEndian.setInt8(bs, ofs+7, chs.getCylinder() & 0xFF);
-	}
+    public CHS getEndCHS() {
+        int v1 = LittleEndian.getUInt8(bs, ofs + 5);
+        int v2 = LittleEndian.getUInt8(bs, ofs + 6);
+        int v3 = LittleEndian.getUInt8(bs, ofs + 7);
+        /*
+         * h = byte1; s = byte2 & 0x3f; c = ((byte2 & 0xc0) << 2) + byte3;
+         */
+        return new CHS(((v2 & 0xc0) << 2) + v3, v1, v2 & 0x3f);
+    }
 
-	public long getStartLba() {
-		return LittleEndian.getUInt32(bs, ofs+8);
-	}
+    public void setEndCHS(CHS chs) {
+        LittleEndian.setInt8(bs, ofs + 5, chs.getHead());
+        LittleEndian.setInt8(bs, ofs + 6, ((chs.getCylinder() >> 2) & 0xC0) +
+                (chs.getSector() & 0x3f));
+        LittleEndian.setInt8(bs, ofs + 7, chs.getCylinder() & 0xFF);
+    }
 
-	public void setStartLba(long v) {
-        LittleEndian.setInt32(bs, ofs+8, (int)v);
-	}
+    public long getStartLba() {
+        return LittleEndian.getUInt32(bs, ofs + 8);
+    }
 
-	public long getNrSectors() {
-		return LittleEndian.getUInt32(bs, ofs+12);
-	}
+    public void setStartLba(long v) {
+        LittleEndian.setInt32(bs, ofs + 8, (int) v);
+    }
 
-	public void setNrSectors(long v) {
-        LittleEndian.setInt32(bs, ofs+12, (int)v);
-	}
-	
-	public void clear() {
-		for (int i = 0; i < 16; i++) {
-			LittleEndian.setInt8(bs, ofs+i, 0);
-		}		
-	}
-	
-	public String dump() {
-		StringBuilder b = new StringBuilder(64);
-		for (int i = 0; i < 16; i++) {
-			b.append(NumberUtils.hex(LittleEndian.getUInt8(bs, ofs+i),2));
-			b.append(' ');
-		}
-		return b.toString();
-	}
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
+    public long getNrSectors() {
+        return LittleEndian.getUInt32(bs, ofs + 12);
+    }
+
+    public void setNrSectors(long v) {
+        LittleEndian.setInt32(bs, ofs + 12, (int) v);
+    }
+
+    public void clear() {
+        for (int i = 0; i < 16; i++) {
+            LittleEndian.setInt8(bs, ofs + i, 0);
+        }
+    }
+
+    public String dump() {
+        StringBuilder b = new StringBuilder(64);
+        for (int i = 0; i < 16; i++) {
+            b.append(NumberUtils.hex(LittleEndian.getUInt8(bs, ofs + i), 2));
+            b.append(' ');
+        }
+        return b.toString();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
         StringBuilder b = new StringBuilder(32);
-		b.append('[')
-		.append(getBootIndicator() ? 'A' : ' ')
-		.append(' ')
-		.append(NumberUtils.hex(getSystemIndicator().getCode(), 2))
-		.append(' ')
-		.append("s:")
-		.append(getStartLba())
-		.append(' ')
-		.append("e:")
-		.append(getStartLba() + getNrSectors() - 1)
-		.append(']');
-		return b.toString();
-	}
+        b.append('[').append(getBootIndicator() ? 'A' : ' ').append(' ');
+        b.append(NumberUtils.hex(getSystemIndicator().getCode(), 2)).append(' ');
+        b.append("s:").append(getStartLba()).append(' ');
+        b.append("e:").append(getStartLba() + getNrSectors() - 1).append(']');
+        return b.toString();
+    }
 
 }

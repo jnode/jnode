@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemType;
 
@@ -33,18 +32,17 @@ import org.jnode.fs.FileSystemType;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class VirtualFS implements FileSystem<VirtualDirEntry> {
-
-    final static Logger log = Logger.getLogger(VirtualFS.class);
+    static final Logger log = Logger.getLogger(VirtualFS.class);
     private final Device dev;
     private final VirtualDirEntry root;
 
-	final public FileSystemType<FileSystem<VirtualDirEntry>> getType()
-	{
-		throw new UnsupportedOperationException("should not be called");
-	}
+    public final FileSystemType<FileSystem<VirtualDirEntry>> getType() {
+        throw new UnsupportedOperationException("should not be called");
+    }
 
     /**
      * Initialize this instance.
+     * 
      * @throws IOException
      */
     VirtualFS(Device dev) {
@@ -93,25 +91,25 @@ final class VirtualFS implements FileSystem<VirtualDirEntry> {
 
     /**
      * The filesystem on the given device will be removed.
+     * 
      * @param dev
      */
     final void unregisterFileSystem(Device dev) {
         root.unregisterFileSystem(dev);
     }
 
+    public long getFreeSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getFreeSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return 0;
-	}
-
-	public long getUsableSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return 0;
+    }
 }

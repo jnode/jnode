@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.partitions.help.argument;
+package org.jnode.partitions.command;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -32,9 +32,7 @@ import org.jnode.shell.syntax.CommandSyntaxException;
  * 
  * @author crawley@jnode.org
  */
-public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes>
-{
-   
+public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes> {
     public IBMPartitionTypeArgument(String label, int flags, String description) {
         super(label, flags, new IBMPartitionTypes[0], description);
     }
@@ -44,11 +42,9 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes>
         try {
             int code = Integer.parseInt(value.token, 16);
             return IBMPartitionTypes.valueOf(code);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("Not a valid hexadecimal number");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             throw new CommandSyntaxException(ex.getMessage());
         }
     }
@@ -68,5 +64,4 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes>
     protected String argumentKind() {
         return "partition type";
     }
-	
 }

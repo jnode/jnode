@@ -80,8 +80,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      */
     public FileSystemPlugin(PluginDescriptor descriptor) {
         super(descriptor);
-        this.fsTypeManager = new FileSystemTypeManager(descriptor
-                .getExtensionPoint("types"));
+        this.fsTypeManager = new FileSystemTypeManager(descriptor.getExtensionPoint("types"));
         this.fsm = new FileSystemManager();
         this.vfsDev = new VirtualFSDevice();
         this.vfs = new VirtualFS(vfsDev);
@@ -101,7 +100,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      *
      * @param fs
      */
-    public void registerFileSystem(FileSystem fs) {
+    public void registerFileSystem(FileSystem<?> fs) {
         fsm.registerFileSystem(fs);
     }
 
@@ -110,15 +109,13 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      *
      * @param device
      */
-    public FileSystem unregisterFileSystem(final Device device) {
-        return AccessController
-                .doPrivileged(new PrivilegedAction<FileSystem>() {
-
-                    public FileSystem run() {
-                        api.unregisterFileSystem(device);
-                        return fsm.unregisterFileSystem(device);
-                    }
-                });
+    public FileSystem<?> unregisterFileSystem(final Device device) {
+        return AccessController.doPrivileged(new PrivilegedAction<FileSystem<?>>() {
+            public FileSystem<?> run() {
+                api.unregisterFileSystem(device);
+                return fsm.unregisterFileSystem(device);
+            }
+        });
     }
 
     /**
@@ -127,7 +124,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * @param device
      * @return null if no filesystem was found.
      */
-    public FileSystem getFileSystem(Device device) {
+    public FileSystem<?> getFileSystem(Device device) {
         return fsm.getFileSystem(device);
     }
 
@@ -135,7 +132,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * Gets all registered filesystems. All instances of the returned collection
      * are instanceof FileSystem.
      */
-    public Collection<FileSystem> fileSystems() {
+    public Collection<FileSystem<?>> fileSystems() {
         return fsm.fileSystems();
     }
 
@@ -147,8 +144,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * @param fs
      * @param fsPath Null or empty to use the root of the filesystem.
      */
-    public void mount(String fullPath, FileSystem fs, String fsPath)
-    throws IOException {
+    public void mount(String fullPath, FileSystem<?> fs, String fsPath) throws IOException {
         if (fsPath != null) {
             fsPath = VMFile.getNormalizedPath(fsPath);
         }
@@ -159,25 +155,24 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * Return a map (fullPath -> FileSystem) of mount points
      * @return a copy of the internal map, sorted by fullPath
      */
-    public Map<String, FileSystem<?>> getMountPoints()
-    {
-    	return api.getMountPoints();
+    public Map<String, FileSystem<?>> getMountPoints() {
+        return api.getMountPoints();
     }
-    
+
     /*
-    * (non-Javadoc)
-    * @see org.jnode.fs.service.FileSystemService#getDeviceMountPoints()
-    */
-    public Map<String, String> getDeviceMountPoints(){
-    	Map<String, FileSystem<?>> mounts = api.getMountPoints();
-    	Map<String, String> result = new TreeMap<String, String>();
-    	for(String path: mounts.keySet()){
-    		FileSystem fs = (FileSystem)mounts.get(path);
-    		result.put(fs.getDevice().getId(), path);
-    	}
-    	return result;
-    } 
-    
+     * (non-Javadoc)
+     * @see org.jnode.fs.service.FileSystemService#getDeviceMountPoints()
+     */
+    public Map<String, String> getDeviceMountPoints() {
+        Map<String, FileSystem<?>> mounts = api.getMountPoints();
+        Map<String, String> result = new TreeMap<String, String>();
+        for (String path : mounts.keySet()) {
+            FileSystem<?> fs = (FileSystem<?>) mounts.get(path);
+            result.put(fs.getDevice().getId(), path);
+        }
+        return result;
+    }
+
     /**
      * Is the given directory a mount.
      * @param fullPath
@@ -233,13 +228,11 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     /**
      * @see org.jnode.fs.service.FileSystemService#getFileSystemType(java.lang.String)
      */
-	public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name) throws FileSystemException
-	{
+    public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name)
+        throws FileSystemException {
         T result = fsTypeManager.getSystemType(name);
-        if (result == null)
-        {
-        	throw new FileSystemException("FileSystemType " + name +
-        			" doesn't exist");
+        if (result == null) {
+            throw new FileSystemException("FileSystemType " + name + " doesn't exist");
         }
         return result;
     }

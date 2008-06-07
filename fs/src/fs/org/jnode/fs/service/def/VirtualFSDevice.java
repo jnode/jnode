@@ -40,7 +40,7 @@ final class VirtualFSDevice extends Device {
             throw new RuntimeException(ex);
         }
     }
-    
+
     private static class VirtualFSDriver extends Driver {
 
         /**
@@ -55,6 +55,6 @@ final class VirtualFSDevice extends Device {
          */
         protected void stopDevice() throws DriverException {
             // Nothing
-        }        
+        }
     }
 }

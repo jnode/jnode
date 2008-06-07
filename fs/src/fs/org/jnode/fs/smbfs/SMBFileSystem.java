@@ -41,9 +41,11 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
         this.type = type;
         this.device = device;
         try {
-            root = new SMBFSDirectory(null,
-                new SmbFile("smb://" + device.getUser() + ":" + device.getPassword() + "@" + device.getHost() + "/" +
-                    device.getPath() + "/"));
+            root = new SMBFSDirectory(
+                    null, 
+                    new SmbFile("smb://" + device.getUser() + ":" +
+                            device.getPassword() + "@" + 
+                            device.getHost() + "/" + device.getPath() + "/"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +63,7 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     *
+     * 
      * @throws java.io.IOException
      */
     public void close() throws IOException {

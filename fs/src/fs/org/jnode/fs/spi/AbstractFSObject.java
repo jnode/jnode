@@ -27,52 +27,56 @@ import org.jnode.fs.FSObject;
 import org.jnode.fs.FileSystem;
 
 /**
- * An abstract implementation of FSObject that contains common things
- * among many FileSystems
+ * An abstract implementation of FSObject that contains common things among many
+ * FileSystems
+ * 
  * @author Fabien DUMINY
  */
 public abstract class AbstractFSObject implements FSObject {
 
-	private AbstractFileSystem fileSystem;
+    private AbstractFileSystem fileSystem;
 
-	private boolean valid;
-	private boolean dirty;
-	
-	// should use FSAccessRights for these fields
-	private boolean canRead = true;
-	private boolean canWrite = true;
-		
-	/**
-	 * Create a new AbstracFSObject
-	 * @param fs
-	 */
-	public AbstractFSObject(AbstractFileSystem fs) {
-		this.fileSystem = fs;
-		this.valid = true;
-		this.dirty = false;
-		setRights(true, (fs != null) ? !fs.isReadOnly() : true);
-	}
+    private boolean valid;
+    private boolean dirty;
 
-	/**
-	 * Use it carefully ! Only needed for FSEntryTable.EMPTY_TABLE.
-	 */
-	protected AbstractFSObject() {
-		this.fileSystem = null;
-		this.valid = true;
-		this.dirty = false;
-		setRights(true, true);
-	}
+    // should use FSAccessRights for these fields
+    private boolean canRead = true;
+    private boolean canWrite = true;
 
-	/**
-	 * Is this object still valid ?
-	 * @return if this object is still valid
-	 */
-	public final boolean isValid() {
-		return valid;
-	}
+    /**
+     * Create a new AbstracFSObject
+     * 
+     * @param fs
+     */
+    public AbstractFSObject(AbstractFileSystem fs) {
+        this.fileSystem = fs;
+        this.valid = true;
+        this.dirty = false;
+        setRights(true, (fs != null) ? !fs.isReadOnly() : true);
+    }
+
+    /**
+     * Use it carefully ! Only needed for FSEntryTable.EMPTY_TABLE.
+     */
+    protected AbstractFSObject() {
+        this.fileSystem = null;
+        this.valid = true;
+        this.dirty = false;
+        setRights(true, true);
+    }
+
+    /**
+     * Is this object still valid ?
+     * 
+     * @return if this object is still valid
+     */
+    public final boolean isValid() {
+        return valid;
+    }
 
     /**
      * Set the valid flag.
+     * 
      * @param valid
      */
     protected final void setValid(boolean valid) {
@@ -80,59 +84,63 @@ public abstract class AbstractFSObject implements FSObject {
     }
 
     /**
-	 * Is this object dirty (ie some data need to be saved to device)
-	 * @return if this object is dirty
-	 * @throws IOException
-	 */
-	public boolean isDirty() throws IOException {
-		return dirty;
-	}
-	
-	/**
-	 * Mark this object as dirty.
-	 */
-	final protected void setDirty() {
-		this.dirty = true;
-	}
+     * Is this object dirty (ie some data need to be saved to device)
+     * 
+     * @return if this object is dirty
+     * @throws IOException
+     */
+    public boolean isDirty() throws IOException {
+        return dirty;
+    }
 
-	/**
-	 * Mark this object as not dirty.
-	 */
-	final protected void resetDirty() {
-		this.dirty = false;
-	}
+    /**
+     * Mark this object as dirty.
+     */
+    protected final void setDirty() {
+        this.dirty = true;
+    }
 
-	/**
-	 * Get the file system that this object belong to
-	 * @return the FileSystem this object belongs to
-	 */
-	public final FileSystem getFileSystem() {
-		return fileSystem;
-	}
-	
-	/**
-	 * Specify the rights on this object
-	 * @param read
-	 * @param write
-	 */
-	public final void setRights(boolean read, boolean write) {
-		this.canRead = read;
-		this.canWrite = write;
-	}
-	
-	/**
-	 * Can we read this object on device ?
-	 * @return if we can read this object from device
-	 */
-	public final boolean canRead() {
-		return this.canRead;
-	}
+    /**
+     * Mark this object as not dirty.
+     */
+    protected final void resetDirty() {
+        this.dirty = false;
+    }
 
-	/**
-	 * Can we write this object on device ?
-	 * @return if we can write this object to device
-	 */
-	public final boolean canWrite() {
-		return this.canWrite;
-	}
+    /**
+     * Get the file system that this object belong to
+     * 
+     * @return the FileSystem this object belongs to
+     */
+    public final FileSystem getFileSystem() {
+        return fileSystem;
+    }
+
+    /**
+     * Specify the rights on this object
+     * 
+     * @param read
+     * @param write
+     */
+    public final void setRights(boolean read, boolean write) {
+        this.canRead = read;
+        this.canWrite = write;
+    }
+
+    /**
+     * Can we read this object on device ?
+     * 
+     * @return if we can read this object from device
+     */
+    public final boolean canRead() {
+        return this.canRead;
+    }
+
+    /**
+     * Can we write this object on device ?
+     * @return if we can write this object to device
+     */
+    public final boolean canWrite() {
+        return this.canWrite;
+    }
 }

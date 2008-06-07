@@ -33,7 +33,6 @@ public class SMBFSDriver extends Driver {
      * Start the device.
      *
      * @throws org.jnode.driver.DriverException
-     *
      */
     protected void startDevice() throws DriverException {
         try {
@@ -48,7 +47,6 @@ public class SMBFSDriver extends Driver {
      * Stop the device.
      *
      * @throws org.jnode.driver.DriverException
-     *
      */
     protected void stopDevice() throws DriverException {
 

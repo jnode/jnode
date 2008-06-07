@@ -24,59 +24,58 @@ package org.jnode.fs.util;
 import java.util.Calendar;
 
 /**
- * This class contains some methods for date and time conversions between Java and the 
- * format known from DOS filesystems (e.g. fat)
+ * This class contains some methods for date and time conversions between Java
+ * and the format known from DOS filesystems (e.g. fat)
  * 
  * @author epr
  */
 public class DosUtils {
 
-	/**
-	 * Decode a 16-bit encoded DOS date/time into a java date/time.
-	 * @param dosDate 
-	 * @param dosTime
-	 * @return long
-	 */
-	public static long decodeDateTime(int dosDate, int dosTime) {
-		Calendar cal = Calendar.getInstance();
-		
-		cal.set(Calendar.MILLISECOND, 0);
-    cal.set(Calendar.SECOND, (dosTime & 0x1f) * 2);
-		cal.set(Calendar.MINUTE, (dosTime >> 5) & 0x3f);
-		cal.set(Calendar.HOUR_OF_DAY, dosTime >> 11);
+    /**
+     * Decode a 16-bit encoded DOS date/time into a java date/time.
+     * 
+     * @param dosDate
+     * @param dosTime
+     * @return long
+     */
+    public static long decodeDateTime(int dosDate, int dosTime) {
+        Calendar cal = Calendar.getInstance();
 
-		cal.set(Calendar.DATE, dosDate & 0x1f);
-		cal.set(Calendar.MONTH, ((dosDate >> 5) & 0x0f) - 1 );
-		cal.set(Calendar.YEAR, 1980 + (dosDate >> 9));
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, (dosTime & 0x1f) * 2);
+        cal.set(Calendar.MINUTE, (dosTime >> 5) & 0x3f);
+        cal.set(Calendar.HOUR_OF_DAY, dosTime >> 11);
 
-		return cal.getTimeInMillis();
-	}
+        cal.set(Calendar.DATE, dosDate & 0x1f);
+        cal.set(Calendar.MONTH, ((dosDate >> 5) & 0x0f) - 1);
+        cal.set(Calendar.YEAR, 1980 + (dosDate >> 9));
 
-	/**
-	 * Encode a java date/time into a 16-bit encoded DOS time
-	 * @param javaDateTime
-	 * @return long
-	 */
-	public static int encodeTime(long javaDateTime) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(javaDateTime);
+        return cal.getTimeInMillis();
+    }
 
-		return 2048 * cal.get(Calendar.HOUR_OF_DAY) +
-		        32 * cal.get(Calendar.MINUTE) +
-		        cal.get(Calendar.SECOND) / 2;
-	}
+    /**
+     * Encode a java date/time into a 16-bit encoded DOS time
+     * 
+     * @param javaDateTime
+     * @return long
+     */
+    public static int encodeTime(long javaDateTime) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(javaDateTime);
+        return 2048 * cal.get(Calendar.HOUR_OF_DAY) + 32 * cal.get(Calendar.MINUTE) +
+                cal.get(Calendar.SECOND) / 2;
+    }
 
-	/**
-	 * Encode a java date/time into a 16-bit encoded DOS date
-	 * @param javaDateTime
-	 * @return long
-	 */
-	public static int encodeDate(long javaDateTime) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(javaDateTime);
-
-		return 512 * (cal.get(Calendar.YEAR) - 1980) +
-				32 * ( cal.get(Calendar.MONTH) + 1 ) +
-				cal.get(Calendar.DATE);
-	}
+    /**
+     * Encode a java date/time into a 16-bit encoded DOS date
+     * 
+     * @param javaDateTime
+     * @return long
+     */
+    public static int encodeDate(long javaDateTime) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(javaDateTime);
+        return 512 * (cal.get(Calendar.YEAR) - 1980) + 32 * (cal.get(Calendar.MONTH) + 1) +
+                cal.get(Calendar.DATE);
+    }
 }

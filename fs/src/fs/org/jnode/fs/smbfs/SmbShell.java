@@ -75,7 +75,6 @@ public class SmbShell extends NtlmAuthenticator {
     }
 
     void run() throws Exception {
-        int c;
         String cmd, prompt;
         SmbFile conn, tmp;
         SimpleDateFormat sdf1 = new SimpleDateFormat("EEE MMM");

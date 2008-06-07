@@ -75,7 +75,6 @@ public class Format {
         left_align = false;
         fmt = ' ';
 
-        int state = 0;
         int length = s.length();
         int parse_state = 0;
         // 0 = prefix, 1 = flags, 2 = width, 3 = precision,
@@ -250,7 +249,6 @@ public class Format {
         int i = 0;
         int sign = 1;
         double r = 0; // integer part
-        double f = 0; // fractional part
         double p = 1; // exponent of fractional part
         int state = 0; // 0 = int part, 1 = frac part
 
