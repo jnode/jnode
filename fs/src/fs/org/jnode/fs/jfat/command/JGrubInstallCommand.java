@@ -40,21 +40,21 @@ import org.jnode.shell.syntax.DeviceArgument;
  * @author Tango Devian
  */
 public class JGrubInstallCommand extends AbstractCommand {
-    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.MANDATORY,
-            "device where grub stage 2 will be installed", BlockDeviceAPI.class);
+    private final DeviceArgument ARG_DEVICE =
+            new DeviceArgument("device", Argument.MANDATORY,
+                    "device where grub stage 2 will be installed", BlockDeviceAPI.class);
 
     public JGrubInstallCommand() {
-         super("Install a Grub stage2 loader on a disc device");
-         registerArguments(ARG_DEVICE);
+        super("Install a Grub stage2 loader on a disc device");
+        registerArguments(ARG_DEVICE);
     }
-         
+
     public static void main(String[] args) throws Exception {
         new JGrubInstallCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws GrubException {
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws GrubException {
         Device device = ARG_DEVICE.getValue();
 
         JGrub jgrub = new JGrub(out, err, device);

@@ -32,9 +32,9 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
- *
+ * 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
+ * 
  */
 public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
 
@@ -45,8 +45,7 @@ public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
     /**
      * @see org.jnode.fs.FileSystem#getDevice()
      */
-    public JarFileSystem(JarFileDevice device, JarFileSystemType type)
-            throws FileSystemException {
+    public JarFileSystem(JarFileDevice device, JarFileSystemType type) throws FileSystemException {
         super(device, true, type); // jar file systems are always readOnly
 
         jarFile = device.getJarFile();
@@ -54,46 +53,44 @@ public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
         rootEntry = FSTreeBuilder.build(this, jarFile, cache);
     }
 
-    public JarFile getJarFile()
-    {
+    public JarFile getJarFile() {
         return jarFile;
     }
 
     /**
-     *
+     * 
      */
-	protected FSFile createFile(FSEntry entry) {
-		return new JarFSFile((JarFSEntry) entry);
-	}
+    protected FSFile createFile(FSEntry entry) {
+        return new JarFSFile((JarFSEntry) entry);
+    }
 
-	/**
-	 *
-	 */
-	protected FSDirectory createDirectory(FSEntry entry) {
+    /**
+     * 
+     */
+    protected FSDirectory createDirectory(FSEntry entry) {
         Map<String, JarFSEntry> entries = cache.getChildEntries((JarFSEntry) entry);
         return new JarFSDirectory((JarFSEntry) entry, entries);
-	}
+    }
 
-	/**
-	 *
-	 */
-	protected JarFSEntry createRootEntry() {
-		return rootEntry;
-	}
+    /**
+     * 
+     */
+    protected JarFSEntry createRootEntry() {
+        return rootEntry;
+    }
 
+    public long getFreeSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getFreeSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return 0;
-	}
-
-	public long getUsableSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return 0;
+    }
 }

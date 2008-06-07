@@ -3,12 +3,11 @@
  */
 package org.jnode.fs.jfat;
 
-import java.util.Arrays;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
-import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
 
@@ -16,587 +15,504 @@ import org.jnode.util.NumberUtils;
  * @author gvt
  */
 public class FatShortDirEntry extends FatDirEntry {
-    private static final Logger log =
-        Logger.getLogger ( FatShortDirEntry.class );
+    private static final Logger log = Logger.getLogger(FatShortDirEntry.class);
 
     /*
      * encoded side
      */
     protected byte[] lName;
-    private  int    lAttr;
-    private  int    lNTRes;
-    private  int    lCrtTimeTenth;
-    private  int    lCrtTime;
-    private  int    lCrtDate;
-    private  int    lLstAccDate;
-    private  int    lFstClusHi;
-    private  int    lWrtTime;
-    private  int    lWrtDate; 
-    private  int    lFstClusLo;
-    private  long   lFileSize;
+    private int lAttr;
+    private int lNTRes;
+    private int lCrtTimeTenth;
+    private int lCrtTime;
+    private int lCrtDate;
+    private int lLstAccDate;
+    private int lFstClusHi;
+    private int lWrtTime;
+    private int lWrtDate;
+    private int lFstClusLo;
+    private long lFileSize;
 
     /*
      * decoded side
      */
-    private FatCase  ncase;
-    private FatAttr  attr;
-    private String   base;
-    private String   ext;
-    private long     created;
-    private long     accessed;
-    private long     modified;
-    private int      cluster;
-    private long     length;
+    private FatCase ncase;
+    private FatAttr attr;
+    private String base;
+    private String ext;
+    private long created;
+    private long accessed;
+    private long modified;
+    private int cluster;
+    private long length;
 
-
-    
-    protected FatShortDirEntry ( FatFileSystem fs ) {
-	super ( fs, new FatMarshal ( LENGTH ), 0 );
-    }
-    
-    
-    public FatShortDirEntry ( FatFileSystem fs, FatMarshal entry, int index ) {
-	super ( fs, entry, index );
-	decode();
+    protected FatShortDirEntry(FatFileSystem fs) {
+        super(fs, new FatMarshal(LENGTH), 0);
     }
 
-
-    public FatShortDirEntry ( FatFileSystem fs, FatName name, int index )
-	throws IOException {
-	this ( fs, new FatMarshal ( LENGTH ), index );
-
-	long now = System.currentTimeMillis();
-
-	setNameCase ( name.getShortCase() );
-	setAttr ( new FatAttr() );
-	setName ( name.getName() );
-	setCreated ( now );
-	setLastAccessed ( now );
-	setLastModified ( now );
-	setStartCluster ( 0 );
-	setLength ( 0 );
+    public FatShortDirEntry(FatFileSystem fs, FatMarshal entry, int index) {
+        super(fs, entry, index);
+        decode();
     }
 
+    public FatShortDirEntry(FatFileSystem fs, FatName name, int index) throws IOException {
+        this(fs, new FatMarshal(LENGTH), index);
+
+        long now = System.currentTimeMillis();
+
+        setNameCase(name.getShortCase());
+        setAttr(new FatAttr());
+        setName(name.getName());
+        setCreated(now);
+        setLastAccessed(now);
+        setLastModified(now);
+        setStartCluster(0);
+        setLength(0);
+    }
 
     private void decodeName() {
-	lName = entry.getBytes  ( 0, 11 );
-	/*
-	 * handle the special character 0x05 (page 23)
-	 *  0xE5 is a valid KANJI (japanese) character
-	 *  it cannot stay on persistent storage (as it was choosed for FREE entries)
-	 *  so it will changed from 0x05 to 0xE5 in memory
-	 */
-	if ( lName[0] == (byte)KANJI )
-	    lName[0] = (byte)FREE;
+        lName = entry.getBytes(0, 11);
+        /*
+         * handle the special character 0x05 (page 23) 0xE5 is a valid KANJI
+         * (japanese) character it cannot stay on persistent storage (as it was
+         * choosed for FREE entries) so it will changed from 0x05 to 0xE5 in
+         * memory
+         */
+        if (lName[0] == (byte) KANJI)
+            lName[0] = (byte) FREE;
 
-	decodeBase();
-	decodeExt();
+        decodeBase();
+        decodeExt();
     }
-
 
     protected void encodeName() {
-	/*
-	 * handle the special character 0x05 (page 23)
-	 *  0xE5 is a valid KANJI (japanese) character
-	 *  it cannot stay on persistent storage (as it was choosed for FREE entries)
-	 *  so it will changed from 0x05 to 0xE5 in memory
-	 */
-	if ( lName[0] == (byte)FREE )
-	    lName[0] = (byte)KANJI;
+        /*
+         * handle the special character 0x05 (page 23) 0xE5 is a valid KANJI
+         * (japanese) character it cannot stay on persistent storage (as it was
+         * choosed for FREE entries) so it will changed from 0x05 to 0xE5 in
+         * memory
+         */
+        if (lName[0] == (byte) FREE)
+            lName[0] = (byte) KANJI;
 
-	decodeBase();
-	decodeExt();
-	
-	entry.setBytes ( 0, 11, lName );
+        decodeBase();
+        decodeExt();
+
+        entry.setBytes(0, 11, lName);
     }
-
 
     private void decodeBase() {
-	String baseName;
+        String baseName;
 
-	byte[] basebuf = new byte[8];
-	System.arraycopy ( lName, 0, basebuf, 0, 8 );
+        byte[] basebuf = new byte[8];
+        System.arraycopy(lName, 0, basebuf, 0, 8);
 
-	try {
-	    baseName = getFatFileSystem().getCodePage().
-		newDecoder().decode ( basebuf );
-	}
-	catch ( CharacterCodingException ex ) {
-	    log.debug ( "CharacterCodingException: CodePage error" );
-	    log.debug ( "go on with standard decoding" );
-	    baseName = new String ( base );
-	}
-	
-	if ( ncase.isLowerBase() )
-	    base = baseName.trim().toLowerCase();
-	else
-	    base = baseName.trim().toUpperCase();
+        try {
+            baseName = getFatFileSystem().getCodePage().newDecoder().decode(basebuf);
+        } catch (CharacterCodingException ex) {
+            log.debug("CharacterCodingException: CodePage error");
+            log.debug("go on with standard decoding");
+            baseName = new String(base);
+        }
+
+        if (ncase.isLowerBase())
+            base = baseName.trim().toLowerCase();
+        else
+            base = baseName.trim().toUpperCase();
     }
-
 
     private void decodeExt() {
-	String extName;
+        String extName;
 
-	byte[] extbuf = new byte[3];
-	System.arraycopy ( lName, 8, extbuf, 0, 3 );
+        byte[] extbuf = new byte[3];
+        System.arraycopy(lName, 8, extbuf, 0, 3);
 
-	try {
-	    extName = getFatFileSystem().getCodePage().
-		newDecoder().decode ( extbuf );
-	}
-	catch ( CharacterCodingException ex ) {
-	    log.debug ( "CharacterCodingException: CodePage error" );
-	    log.debug ( "go on with standard decoding" );
-	    extName = new String ( ext );
-	}
+        try {
+            extName = getFatFileSystem().getCodePage().newDecoder().decode(extbuf);
+        } catch (CharacterCodingException ex) {
+            log.debug("CharacterCodingException: CodePage error");
+            log.debug("go on with standard decoding");
+            extName = new String(ext);
+        }
 
-	if ( ncase.isLowerExt() )
-	    ext = extName.trim().toLowerCase();
-	else
-	    ext = extName.trim().toUpperCase();
+        if (ncase.isLowerExt())
+            ext = extName.trim().toLowerCase();
+        else
+            ext = extName.trim().toUpperCase();
     }
-    
 
     private void decodeAttr() {
-	lAttr = entry.getUInt8 ( 11 );
-	attr = new FatAttr ( lAttr );
+        lAttr = entry.getUInt8(11);
+        attr = new FatAttr(lAttr);
     }
-
 
     private void encodeAttr() {
-	lAttr = attr.getAttr();
-	entry.setUInt8 ( 11, lAttr );
+        lAttr = attr.getAttr();
+        entry.setUInt8(11, lAttr);
     }
-
 
     private void decodeNameCase() {
-	lNTRes = entry.getUInt8  ( 12 );
-	ncase = new FatCase ( lNTRes );
-    }
-    
-    
-    private void encodeNameCase() {
-	lNTRes = ncase.getCase();
-	entry.setUInt8 ( 12, lNTRes );
+        lNTRes = entry.getUInt8(12);
+        ncase = new FatCase(lNTRes);
     }
 
+    private void encodeNameCase() {
+        lNTRes = ncase.getCase();
+        entry.setUInt8(12, lNTRes);
+    }
 
     private void decodeCreated() {
-	lCrtTimeTenth  =  entry.getUInt8  ( 13 );
-	lCrtTime       =  entry.getUInt16 ( 14 );
-	lCrtDate       =  entry.getUInt16 ( 16 );
+        lCrtTimeTenth = entry.getUInt8(13);
+        lCrtTime = entry.getUInt16(14);
+        lCrtDate = entry.getUInt16(16);
 
-	created = 
-	    FatUtils.decodeDateTime ( lCrtDate, lCrtTime, lCrtTimeTenth );
+        created = FatUtils.decodeDateTime(lCrtDate, lCrtTime, lCrtTimeTenth);
     }
-
 
     private void encodeCreated() {
-	lCrtDate      =  FatUtils.encodeDate  ( created );
-	lCrtTime      =  FatUtils.encodeTime  ( created );
-	/*
-	 * GVT???: this have to be tested against a real M$ OS
-	 *         how the Tenth is actually handled at entry creation?
-	 *         for now just avoid to store the tenth as Mtools seems to do
-	 */
-	lCrtTimeTenth =  0; //FatUtils.encodeTenth ( created );
+        lCrtDate = FatUtils.encodeDate(created);
+        lCrtTime = FatUtils.encodeTime(created);
+        /*
+         * GVT???: this have to be tested against a real M$ OS how the Tenth is
+         * actually handled at entry creation? for now just avoid to store the
+         * tenth as Mtools seems to do
+         */
+        lCrtTimeTenth = 0; // FatUtils.encodeTenth ( created );
 
-	entry.setUInt8  ( 13, lCrtTimeTenth );
-	entry.setUInt16 ( 14, lCrtTime      );
-	entry.setUInt16 ( 16, lCrtDate      );
+        entry.setUInt8(13, lCrtTimeTenth);
+        entry.setUInt16(14, lCrtTime);
+        entry.setUInt16(16, lCrtDate);
     }
-
 
     private void decodeAccessed() {
-	lLstAccDate = entry.getUInt16 ( 18 );
-	
-	accessed = 
-	    FatUtils.decodeDateTime ( lLstAccDate, 0 );
-    }
+        lLstAccDate = entry.getUInt16(18);
 
+        accessed = FatUtils.decodeDateTime(lLstAccDate, 0);
+    }
 
     private void encodeAccessed() {
-	lLstAccDate = FatUtils.encodeDate ( accessed );
-	entry.setUInt16 ( 18, lLstAccDate );
+        lLstAccDate = FatUtils.encodeDate(accessed);
+        entry.setUInt16(18, lLstAccDate);
     }
-
 
     private void decodeModified() {
-	lWrtTime = entry.getUInt16 ( 22 );
-	lWrtDate = entry.getUInt16 ( 24 );
+        lWrtTime = entry.getUInt16(22);
+        lWrtDate = entry.getUInt16(24);
 
-	modified = 
-	    FatUtils.decodeDateTime ( lWrtDate, lWrtTime );
+        modified = FatUtils.decodeDateTime(lWrtDate, lWrtTime);
     }
-
 
     private void encodeModified() {
-	lWrtDate = FatUtils.encodeDate ( modified );
-	lWrtTime = FatUtils.encodeTime ( modified );
+        lWrtDate = FatUtils.encodeDate(modified);
+        lWrtTime = FatUtils.encodeTime(modified);
 
-	entry.setUInt16 ( 22, lWrtTime );
-	entry.setUInt16 ( 24, lWrtDate );
+        entry.setUInt16(22, lWrtTime);
+        entry.setUInt16(24, lWrtDate);
     }
-
 
     private void decodeCluster() {
-	lFstClusHi = entry.getUInt16 ( 20 );
-	lFstClusLo = entry.getUInt16 ( 26 );
-	
-	/*
-	 * be sure startCluster is not larger than 28 bits
-	 *   FAT32 is actually a FAT28 ;-)
-	 *     should't happen at all ... but who knows?
-	 */
-	if ( lFstClusLo > 0xFFFF )
-	    throw new IllegalArgumentException
-		( "FstClusLo too large: " + NumberUtils.hex ( lFstClusLo, 4 ) );
+        lFstClusHi = entry.getUInt16(20);
+        lFstClusLo = entry.getUInt16(26);
 
-	if ( lFstClusHi > 0xFFF )
-	    throw new IllegalArgumentException
-		( "FstClusHi too large: " + NumberUtils.hex ( lFstClusHi, 4 ) );
+        /*
+         * be sure startCluster is not larger than 28 bits FAT32 is actually a
+         * FAT28 ;-) should't happen at all ... but who knows?
+         */
+        if (lFstClusLo > 0xFFFF)
+            throw new IllegalArgumentException("FstClusLo too large: " +
+                    NumberUtils.hex(lFstClusLo, 4));
 
-	/*
-	 * FstClusHi have to be "zero" for FAT12/FAT16
-	 *    remind to add a check here
-	 */
+        if (lFstClusHi > 0xFFF)
+            throw new IllegalArgumentException("FstClusHi too large: " +
+                    NumberUtils.hex(lFstClusHi, 4));
 
-	cluster = ( lFstClusHi << 16 ) + lFstClusLo;
+        /*
+         * FstClusHi have to be "zero" for FAT12/FAT16 remind to add a check
+         * here
+         */
+
+        cluster = (lFstClusHi << 16) + lFstClusLo;
     }
-
 
     private void encodeCluster() {
-	/*
-	 * be sure startCluster is not larger than 28 bits
-	 *   FAT32 is actually a FAT28 ;-)
-	 *     should't happen at all ... but who knows?
-	 */
-	if ( cluster < 0 || cluster > 0x0FFFFFFF )
-	    throw new IllegalArgumentException
-		( "cluster is invalid: " + NumberUtils.hex ( cluster, 8 ) );
+        /*
+         * be sure startCluster is not larger than 28 bits FAT32 is actually a
+         * FAT28 ;-) should't happen at all ... but who knows?
+         */
+        if (cluster < 0 || cluster > 0x0FFFFFFF)
+            throw new IllegalArgumentException("cluster is invalid: " + NumberUtils.hex(cluster, 8));
 
-	lFstClusLo = cluster & 0x0000FFFF;
-	lFstClusHi = ( cluster >> 16 ) & 0x00000FFF;
+        lFstClusLo = cluster & 0x0000FFFF;
+        lFstClusHi = (cluster >> 16) & 0x00000FFF;
 
-	entry.setUInt16 ( 20, lFstClusHi );
-	entry.setUInt16 ( 26, lFstClusLo );
+        entry.setUInt16(20, lFstClusHi);
+        entry.setUInt16(26, lFstClusLo);
     }
-
 
     private void decodeLength() {
-	lFileSize = entry.getUInt32 ( 28 );
-	length = lFileSize;
+        lFileSize = entry.getUInt32(28);
+        length = lFileSize;
     }
-
 
     private void encodeLength() {
-	if ( length < 0L || length > 0xFFFFFFFFL )
-	    throw new IllegalArgumentException
-		( "length is invalid: " + length );
+        if (length < 0L || length > 0xFFFFFFFFL)
+            throw new IllegalArgumentException("length is invalid: " + length);
 
-	lFileSize = length;
-	entry.setUInt32 ( 28, lFileSize );
+        lFileSize = length;
+        entry.setUInt32(28, lFileSize);
     }
 
-    
     private void decode() {
-	decodeNameCase();
-	decodeAttr();
-	decodeName();
-	decodeCreated();
-	decodeAccessed();
-	decodeModified();
-	decodeCluster();
-	decodeLength();
+        decodeNameCase();
+        decodeAttr();
+        decodeName();
+        decodeCreated();
+        decodeAccessed();
+        decodeModified();
+        decodeCluster();
+        decodeLength();
     }
-
 
     private void encode() {
-	encodeNameCase();
-	encodeAttr();
-	encodeName();
-	encodeCreated();
-	encodeAccessed();
-	encodeModified();
-	encodeCluster();
-	encodeLength();
+        encodeNameCase();
+        encodeAttr();
+        encodeName();
+        encodeCreated();
+        encodeAccessed();
+        encodeModified();
+        encodeCluster();
+        encodeLength();
     }
 
-    
     public boolean isShortDirEntry() {
-	return true;
+        return true;
     }
 
-    
     private FatCase getNameCase() {
-	return ncase;
+        return ncase;
     }
 
-    
     public boolean isBaseLowerCase() {
-	return ncase.isLowerBase();
+        return ncase.isLowerBase();
     }
 
-    
     public boolean isExtLowertCase() {
-	return ncase.isLowerExt();
+        return ncase.isLowerExt();
     }
 
-
-    public void setNameCase ( FatCase value ) {
-	ncase = value;
-	encodeNameCase();
+    public void setNameCase(FatCase value) {
+        ncase = value;
+        encodeNameCase();
     }
 
-    
     protected FatAttr getAttr() {
-	return attr;
+        return attr;
     }
 
-
-    protected void setAttr ( FatAttr value ) {
-	attr = value;
-	encodeAttr();
+    protected void setAttr(FatAttr value) {
+        attr = value;
+        encodeAttr();
     }
-
 
     public boolean isReadOnly() {
-	return attr.isReadOnly();
+        return attr.isReadOnly();
     }
-
 
     public void setReadOnly() {
-	attr.setReadOnly ( true );
-	encodeAttr();
+        attr.setReadOnly(true);
+        encodeAttr();
     }
-
 
     public boolean isHidden() {
-	return attr.isHidden();
+        return attr.isHidden();
     }
-
 
     public void setHidden() {
-	attr.setHidden ( true );
-	encodeAttr();
+        attr.setHidden(true);
+        encodeAttr();
     }
-
 
     public boolean isSystem() {
-	return attr.isSystem();
+        return attr.isSystem();
     }
-
 
     public void setSystem() {
-	attr.setSystem ( true );
-	encodeAttr();
+        attr.setSystem(true);
+        encodeAttr();
     }
-
 
     public boolean isLabel() {
-	return attr.isLabel();
+        return attr.isLabel();
     }
-
 
     public void setLabel() {
-	attr.setLabel ( true );
-	encodeAttr();
+        attr.setLabel(true);
+        encodeAttr();
     }
-
 
     public boolean isDirectory() {
-	return attr.isDirectory();
+        return attr.isDirectory();
     }
-
 
     public void setDirectory() {
-	attr.setDirectory ( true );
-	encodeAttr();
+        attr.setDirectory(true);
+        encodeAttr();
     }
-
 
     public boolean isArchive() {
-	return attr.isArchive();
+        return attr.isArchive();
     }
-
 
     public void setArchive() {
-	attr.setArchive ( true );
-	encodeAttr();
+        attr.setArchive(true);
+        encodeAttr();
     }
-
-
 
     public byte[] getName() {
-	return lName;
+        return lName;
     }
 
-
-    public void setName ( byte[] value ) {
-	if ( value.length != 11 )
-	    throw new
-		IllegalArgumentException ( "illegal shortname length: " + value.length );
-	lName = value;
-	encodeName();
+    public void setName(byte[] value) {
+        if (value.length != 11)
+            throw new IllegalArgumentException("illegal shortname length: " + value.length);
+        lName = value;
+        encodeName();
     }
-
 
     protected void clearName() {
-	byte[] spaces = new byte[11];
-	
-	Arrays.fill ( spaces, 0, spaces.length, (byte)' ' );
-	
-	setName ( spaces );
-    }
+        byte[] spaces = new byte[11];
 
+        Arrays.fill(spaces, 0, spaces.length, (byte) ' ');
+
+        setName(spaces);
+    }
 
     public String getBase() {
-	return base;
+        return base;
     }
-
 
     public String getExt() {
-	return ext;
+        return ext;
     }
-    
-
 
     public String getLabel() {
-	String label;
+        String label;
 
-	try {
-	    label = getFatFileSystem().getCodePage().
-		newDecoder().decode ( lName );
-	}
-	catch ( CharacterCodingException ex ) {
-	    log.debug ( "CharacterCodingException: CodePage error" );
-	    log.debug ( "go on with standard decoding" );
-	    label = new String ( lName );
-	}
+        try {
+            label = getFatFileSystem().getCodePage().newDecoder().decode(lName);
+        } catch (CharacterCodingException ex) {
+            log.debug("CharacterCodingException: CodePage error");
+            log.debug("go on with standard decoding");
+            label = new String(lName);
+        }
 
-	return label;
+        return label;
     }
 
-    
     public String getShortName() {
-	String base = getBase();
-	String ext  = getExt();
+        String base = getBase();
+        String ext = getExt();
 
-	if ( ext.length() > 0 )
+        if (ext.length() > 0)
             return base + "." + ext;
         else
             return base;
     }
 
-
     /*
-     * checksum algorithm on page 28
-     * the mask is to delete byte overwflow bits
+     * checksum algorithm on page 28 the mask is to delete byte overwflow bits
      * Java has not unsigned types (sigh!)
      */
     public byte getChkSum() {
-	int sum = 0;
-
-	for ( int i = 0; i < 11; i++ ) {
-	    sum = ( ((sum & 1)==1) ? 0x80 : 0 ) + (sum >> 1) + lName[i];
-	    sum = sum & 0xFF;
-	}
-
-	return (byte)sum;
+        int sum = 0;
+        for (int i = 0; i < 11; i++) {
+            sum = (((sum & 1) == 1) ? 0x80 : 0) + (sum >> 1) + lName[i];
+            sum = sum & 0xFF;
+        }
+        return (byte) sum;
     }
-
 
     public long getCreated() {
-	return created;
+        return created;
     }
 
-
-    public void setCreated ( long value ) {
-	created = FatUtils.checkDateTime ( value );
-	encodeCreated();
-	decodeCreated();
+    public void setCreated(long value) {
+        created = FatUtils.checkDateTime(value);
+        encodeCreated();
+        decodeCreated();
     }
-
 
     public long getLastAccessed() {
-	return accessed;
+        return accessed;
     }
 
-
-    public void setLastAccessed ( long value ) {
-	accessed = FatUtils.checkDateTime ( value );
-	encodeAccessed();
-	decodeAccessed();
+    public void setLastAccessed(long value) {
+        accessed = FatUtils.checkDateTime(value);
+        encodeAccessed();
+        decodeAccessed();
     }
-    
 
     public long getLastModified() {
-	return modified;
+        return modified;
     }
 
-
-    public void setLastModified ( long value ) {
-	modified = FatUtils.checkDateTime ( value );
-	encodeModified();
-	decodeModified();
+    public void setLastModified(long value) {
+        modified = FatUtils.checkDateTime(value);
+        encodeModified();
+        decodeModified();
     }
-    
 
     public int getStartCluster() {
-	return cluster;
+        return cluster;
     }
 
-
-    public void setStartCluster ( int value ) {
-	cluster = value;
-	encodeCluster();
+    public void setStartCluster(int value) {
+        cluster = value;
+        encodeCluster();
     }
-
 
     public long getLength() {
-	return length;
+        return length;
     }
 
-
-    public void setLength ( long value ) {
-	length = value;
-	encodeLength();
+    public void setLength(long value) {
+        length = value;
+        encodeLength();
     }
-
 
     public String toString() {
-	StrWriter out = new StrWriter();
+        StrWriter out = new StrWriter();
 
-	out.println ( "*******************************************"            );
-	out.println ( "Short Entry\tisDirty[" + isDirty() + "]"                );
-	out.println ( "*******************************************"            );
-	out.println ( "Index\t\t"      +  getIndex()                           );
-	out.println ( "Entry"                                                  );
-	out.println ( entry.getArray()                                         );
-	out.println ( "Name\t\t"       +  "<" + new String ( lName ) + ">"     );
-	out.println ( "Attr\t\t"       +  NumberUtils.hex ( lAttr, 2 )         );
-	out.println ( "NTRes\t\t"      +  NumberUtils.hex ( lNTRes, 2 )        );
-	out.println ( "CrtTimeTenth\t" +  lCrtTimeTenth                        );
-	out.println ( "CrtTime\t\t"    +  lCrtTime                             );
-	out.println ( "CrtDate\t\t"    +  lCrtDate                             );
-	out.println ( "LstAccDate\t"   +  lLstAccDate                          );
-	out.println ( "FstClusHi\t"    +  lFstClusHi                           );
-	out.println ( "WrtTime\t\t"    +  lWrtTime                             );
-	out.println ( "WrtDate\t\t"    +  lWrtDate                             );
-	out.println ( "FstClusLo\t"    +  lFstClusLo                           );
-	out.println ( "FileSize\t"     +  lFileSize                            );
-	out.println ( "*******************************************"            );
-	out.println ( "ShortName\t"    +  getShortName()                       );
-	out.println ( "Attr\t\t"       +  getAttr()                            );
-	out.println ( "Case\t\t"       +  getNameCase()                        );
-	out.println ( "ChkSum\t\t"     +  NumberUtils.hex ( getChkSum(), 2 )   );
-	out.println ( "Created\t\t"    +  FatUtils.fTime ( getCreated() )      );
-	out.println ( "Accessed\t"     +  FatUtils.fDate ( getLastAccessed() ) );
-	out.println ( "Modified\t"     +  FatUtils.fTime ( getLastModified() ) );
-	out.println ( "StartCluster\t" +  getStartCluster()                    );
-	out.println ( "Length\t\t"     +  getLength()                          );
-	out.print   ( "*******************************************"            );
-	
-	return out.toString();
+        out.println("*******************************************");
+        out.println("Short Entry\tisDirty[" + isDirty() + "]");
+        out.println("*******************************************");
+        out.println("Index\t\t" + getIndex());
+        out.println("Entry");
+        out.println(entry.getArray());
+        out.println("Name\t\t" + "<" + new String(lName) + ">");
+        out.println("Attr\t\t" + NumberUtils.hex(lAttr, 2));
+        out.println("NTRes\t\t" + NumberUtils.hex(lNTRes, 2));
+        out.println("CrtTimeTenth\t" + lCrtTimeTenth);
+        out.println("CrtTime\t\t" + lCrtTime);
+        out.println("CrtDate\t\t" + lCrtDate);
+        out.println("LstAccDate\t" + lLstAccDate);
+        out.println("FstClusHi\t" + lFstClusHi);
+        out.println("WrtTime\t\t" + lWrtTime);
+        out.println("WrtDate\t\t" + lWrtDate);
+        out.println("FstClusLo\t" + lFstClusLo);
+        out.println("FileSize\t" + lFileSize);
+        out.println("*******************************************");
+        out.println("ShortName\t" + getShortName());
+        out.println("Attr\t\t" + getAttr());
+        out.println("Case\t\t" + getNameCase());
+        out.println("ChkSum\t\t" + NumberUtils.hex(getChkSum(), 2));
+        out.println("Created\t\t" + FatUtils.fTime(getCreated()));
+        out.println("Accessed\t" + FatUtils.fDate(getLastAccessed()));
+        out.println("Modified\t" + FatUtils.fTime(getLastModified()));
+        out.println("StartCluster\t" + getStartCluster());
+        out.println("Length\t\t" + getLength());
+        out.print("*******************************************");
+
+        return out.toString();
     }
 }

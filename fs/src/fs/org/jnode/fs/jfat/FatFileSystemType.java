@@ -25,7 +25,6 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.util.FSUtils;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -39,42 +38,33 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
     public static final Class<FatFileSystemType> ID = FatFileSystemType.class;
 
     public String getName() {
-	return "JFAT";
+        return "JFAT";
     }
 
+    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+        if (pte != null) {
+            if (!pte.isValid())
+                return false;
 
-    public boolean supports ( PartitionTableEntry pte,
-			      byte[] firstSector,
-			      FSBlockDeviceAPI devApi ) {
-	if ( pte != null ) {
-	    if ( !pte.isValid() )
-		return false;
+            if (!(pte instanceof IBMPartitionTableEntry))
+                return false;
 
-	    if ( ! ( pte instanceof IBMPartitionTableEntry ) )
-		return false;
+            final IBMPartitionTableEntry ipte = (IBMPartitionTableEntry) pte;
 
-	    final IBMPartitionTableEntry ipte =
-	    				(IBMPartitionTableEntry)pte;
+            final IBMPartitionTypes type = ipte.getSystemIndicator();
+            if ((type == IBMPartitionTypes.PARTTYPE_WIN95_FAT32) ||
+                    (type == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_LBA)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
-		final IBMPartitionTypes type = ipte.getSystemIndicator();
-		if((type == IBMPartitionTypes.PARTTYPE_WIN95_FAT32) ||
-		   (type == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_LBA) )
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	return false;
+        return false;
     }
 
-
-    public FatFileSystem create ( Device device, boolean readOnly )
-	throws FileSystemException {
-        return new FatFileSystem ( device, readOnly, this );
+    public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {
+        return new FatFileSystem(device, readOnly, this);
     }
 
 }

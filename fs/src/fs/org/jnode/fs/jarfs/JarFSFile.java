@@ -32,10 +32,8 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
-/**
- * 
+/** 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
  */
 public class JarFSFile implements FSFile {
 
@@ -65,13 +63,12 @@ public class JarFSFile implements FSFile {
     /**
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
-    public void read(long fileOffset, ByteBuffer destBuf)    
-            throws IOException {
-        final JarFileSystem fs =  (JarFileSystem) getFileSystem();
+    public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
+        final JarFileSystem fs = (JarFileSystem) getFileSystem();
         final JarFile jarFile = fs.getJarFile();
         final InputStream is = jarFile.getInputStream(entry.getJarEntry());
         is.skip(fileOffset);
-        InputStreamChannel isc = new InputStreamChannel(is);        
+        InputStreamChannel isc = new InputStreamChannel(is);
         isc.read(destBuf);
         isc.close();
         is.close();
@@ -79,10 +76,8 @@ public class JarFSFile implements FSFile {
 
     /**
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
-     */
-    //public void write(long fileOffset, byte[] src, int off, int len)
-    public void write(long fileOffset, ByteBuffer src)
-            throws IOException {
+     */ 
+    public void write(long fileOffset, ByteBuffer src) throws IOException {
         throw new ReadOnlyFileSystemException("Not yet implemented");
     }
 

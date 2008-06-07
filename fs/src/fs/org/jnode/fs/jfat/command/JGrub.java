@@ -41,61 +41,55 @@ import org.jnode.naming.InitialNaming;
 
 /**
  * The Grub Installer for JNode.
- *
+ * 
  * TODO: Adding more options for supporting JGRUB with user specified File
- * System wise.
- * Adding more command support for grub installation.
- *
+ * System wise. Adding more command support for grub installation.
+ * 
  * @author Tango Devian
  */
 public class JGrub {
     private final PrintStream out;
-    private final PrintStream err;
     private final MBRFormatter stage1;
     private final Stage1_5 stage1_5;
     private final Stage2 stage2;
     private final Device device;
     private final String mountPoint;
 
-    public JGrub(PrintStream out, PrintStream err, Device device) throws GrubException
-    {
-    	this(out, err, device, new MBRFormatter(), new Stage1_5(), new Stage2());
+    public JGrub(PrintStream out, PrintStream err, Device device) throws GrubException {
+        this(out, err, device, new MBRFormatter(), new Stage1_5(), new Stage2());
     }
 
-    protected JGrub(PrintStream out, PrintStream err, Device device, MBRFormatter stage1, Stage1_5 stage1_5, Stage2 stage2) throws GrubException
-    {
-    	this.out = out;
-    	this.err = err;
-    	this.stage1 = stage1;
-    	this.stage1_5 = stage1_5;
-    	this.stage2 = stage2;
-    	this.device = device;
+    protected JGrub(PrintStream out, PrintStream err, Device device, MBRFormatter stage1,
+            Stage1_5 stage1_5, Stage2 stage2) throws GrubException {
+        this.out = out;
+        this.stage1 = stage1;
+        this.stage1_5 = stage1_5;
+        this.stage2 = stage2;
+        this.device = device;
 
-    	mountPoint = getMountPoint(device);
+        mountPoint = getMountPoint(device);
     }
 
-    public String getMountPoint()
-    {
-    	return mountPoint;
+    public String getMountPoint() {
+        return mountPoint;
     }
 
-    public void install() throws GrubException
-    {
+    public void install() throws GrubException {
         final String deviceName = device.getId();
         out.println("Installing GRUB to " + deviceName);
 
-    	DeviceManager dm;
-		try {
-			dm = DeviceUtils.getDeviceManager();
-		} catch (NameNotFoundException e1) {
-			throw new GrubException("can't find device manager", e1);
-		}
+        DeviceManager dm;
+        try {
+            dm = DeviceUtils.getDeviceManager();
+        } catch (NameNotFoundException e1) {
+            throw new GrubException("can't find device manager", e1);
+        }
 
-        // workaround. TODO add a new interface to FileSystemService to find parent device ?
+        // workaround. TODO add a new interface to FileSystemService to find
+        // parent device ?
         int i = deviceName.length() - 1;
-        while((i >= 0) && Character.isDigit(deviceName.charAt(i)))
-        {
-        	i--;
+        while ((i >= 0) && Character.isDigit(deviceName.charAt(i))) {
+            i--;
         }
         final String parentDeviceName = deviceName.substring(0, i + 1);
         final int partitionNumber = Integer.parseInt(deviceName.substring(i + 1));
@@ -114,77 +108,69 @@ public class JGrub {
     }
 
     private String getMountPoint(Device device) throws GrubException {
-    	FileSystemService fss = null;
-    	try {
-			fss = InitialNaming.lookup(FileSystemService.NAME);
-		} catch (NameNotFoundException e) {
-    		throw new GrubException("filesystem not found", e);
-		}
+        FileSystemService fss = null;
+        try {
+            fss = InitialNaming.lookup(FileSystemService.NAME);
+        } catch (NameNotFoundException e) {
+            throw new GrubException("filesystem not found", e);
+        }
 
-		FileSystem<?> filesystem = fss.getFileSystem(device);
-		if(filesystem == null)
-		{
-			throw new GrubException("can't find filesystem for device "+device.getId());
-		}
+        FileSystem<?> filesystem = fss.getFileSystem(device);
+        if (filesystem == null) {
+            throw new GrubException("can't find filesystem for device " + device.getId());
+        }
 
-		Map<String, FileSystem<?>> mountPoints = fss.getMountPoints();
-		String mountPoint = null;
-		for(String fullPath : mountPoints.keySet())
-		{
-			FileSystem<?> fs = mountPoints.get(fullPath);
-			if(fs == filesystem)
-			{
-				mountPoint = fullPath;
-				break;
-			}
-		}
+        Map<String, FileSystem<?>> mountPoints = fss.getMountPoints();
+        String mountPoint = null;
+        for (String fullPath : mountPoints.keySet()) {
+            FileSystem<?> fs = mountPoints.get(fullPath);
+            if (fs == filesystem) {
+                mountPoint = fullPath;
+                break;
+            }
+        }
 
-		if(mountPoint == null)
-		{
-			throw new GrubException("can't find mount point for filesystem "+filesystem);
-		}
+        if (mountPoint == null) {
+            throw new GrubException("can't find mount point for filesystem " + filesystem);
+        }
 
-		if(!mountPoint.endsWith(File.separator))
-		{
-			mountPoint += File.separatorChar;
-		}
+        if (!mountPoint.endsWith(File.separator)) {
+            mountPoint += File.separatorChar;
+        }
 
-		return mountPoint;
-	}
+        return mountPoint;
+    }
 
-	private void restart(DeviceManager dm, Device device) throws GrubException {
+    private void restart(DeviceManager dm, Device device) throws GrubException {
         out.println("Restarting device " + device.getId());
         try {
             dm.stop(device);
             dm.start(device);
         } catch (DeviceNotFoundException e) {
-    		throw new GrubException("device not found : "+device.getId(), e);
-		} catch (DriverException e) {
-    		throw new GrubException("device must be a partition device", e);
-		}
-	}
-
-	private Device getDevice(DeviceManager dm, String deviceName) throws GrubException
-    {
-        Device parentDevice = null;
-		try {
-			parentDevice = dm.getDevice(deviceName);
-		} catch (DeviceNotFoundException e1) {
-			throw new GrubException("can't find device with name "+deviceName, e1);
-		}
-    	return parentDevice;
+            throw new GrubException("device not found : " + device.getId(), e);
+        } catch (DriverException e) {
+            throw new GrubException("device must be a partition device", e);
+        }
     }
 
-    private BlockDeviceAPI getBlockDeviceAPI(Device device) throws GrubException
-    {
-        BlockDeviceAPI deviceApi = null;
-    	try
-    	{
-    		deviceApi = device.getAPI(BlockDeviceAPI.class);
-    	} catch (ApiNotFoundException e) {
-    		throw new GrubException("device must be a partition device", e);
-		}
+    private Device getDevice(DeviceManager dm, String deviceName) throws GrubException {
+        Device parentDevice = null;
+        try {
+            parentDevice = dm.getDevice(deviceName);
+        } catch (DeviceNotFoundException e1) {
+            throw new GrubException("can't find device with name " + deviceName, e1);
+        }
+        return parentDevice;
+    }
 
-    	return deviceApi;
+    private BlockDeviceAPI getBlockDeviceAPI(Device device) throws GrubException {
+        BlockDeviceAPI deviceApi = null;
+        try {
+            deviceApi = device.getAPI(BlockDeviceAPI.class);
+        } catch (ApiNotFoundException e) {
+            throw new GrubException("device must be a partition device", e);
+        }
+
+        return deviceApi;
     }
 }
