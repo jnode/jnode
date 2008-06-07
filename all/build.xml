@@ -891,10 +891,7 @@ clean             Remove all intermediate build results.
             <fileset dir="../gui/src/desktop" includes="**/*.java"/>
             <fileset dir="../gui/src/awt" includes="**/*.java"/>
             <fileset dir="../shell/src/test" includes="**/*.java"/>
-            <!-- todo: the two excluded files make checkstyle fail, investigate it! -->
-            <fileset dir="../shell/src/shell"
-                     includes="**/*.java"
-                     excludes="**/BjorneContext.java,**/BjorneTokenizer.java"/>
+            <fileset dir="../shell/src/shell" includes="**/*.java"/>
         </checkstyle>
     </target>
 

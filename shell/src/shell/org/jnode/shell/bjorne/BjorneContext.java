@@ -425,6 +425,7 @@ public class BjorneContext {
                     break;
                 default:
                     sb = accumulate(sb, ch);
+                    break;
             }
         }
         if (sb != null) {
@@ -513,6 +514,7 @@ public class BjorneContext {
 
                 default:
                     sb.append((char) ch);
+                    break;
             }
             ch = ci.nextCh();
         }
@@ -597,6 +599,8 @@ public class BjorneContext {
                     }
                     break;
                 default:
+                    // Nothing to do
+                    break;
             }
             if (ch != -1) {
                 sb.append((char) ch);
@@ -632,6 +636,7 @@ public class BjorneContext {
                     break LOOP;
                 default:
                     // Include this in the parameter name for now.
+                    break;
             }
         }
 
@@ -693,6 +698,7 @@ public class BjorneContext {
                     break;
                 default:
                     i++;
+                    break;
             }
             // Extract the word
             if (i >= sb.length()) {
@@ -877,6 +883,7 @@ public class BjorneContext {
                             break;
                         default:
                             fd = 1;
+                            break;
                     }
                 } else {
                     try {
