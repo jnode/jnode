@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.UnsupportedEncodingException;
@@ -154,7 +154,8 @@ public abstract class Descriptor implements ISO9660Constants {
      * @param length
      * @return
      */
-    protected static final String getAChars(byte[] buffer, int bp, int length, String encoding) throws UnsupportedEncodingException {
+    protected static final String getAChars(byte[] buffer, int bp, int length, String encoding)
+        throws UnsupportedEncodingException {
         return new String(buffer, bp - 1, length, encoding).trim();
     }
 
@@ -166,7 +167,8 @@ public abstract class Descriptor implements ISO9660Constants {
      * @param length
      * @return
      */
-    protected static final String getDChars(byte[] buffer, int bp, int length, String encoding) throws UnsupportedEncodingException {
+    protected static final String getDChars(byte[] buffer, int bp, int length, String encoding)
+        throws UnsupportedEncodingException {
         return new String(buffer, bp - 1, length, encoding).trim();
     }
 }

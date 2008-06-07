@@ -10,21 +10,21 @@ import org.jnode.naming.InitialNaming;
 
 public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
 
-	protected HfsPlusFileSystemFormatter() {
-		super(new HfsPlusFileSystemType());
-	}
+    protected HfsPlusFileSystemFormatter() {
+        super(new HfsPlusFileSystemType());
+    }
 
-	@Override
-	public final HfsPlusFileSystem format(final Device device) throws FileSystemException {
-		try {
+    @Override
+    public final HfsPlusFileSystem format(final Device device) throws FileSystemException {
+        try {
             FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
             HfsPlusFileSystemType type = fSS.getFileSystemType(HfsPlusFileSystemType.ID);
             HfsPlusFileSystem fs = type.create(device, false);
             fs.create();
             return fs;
-        } catch (NameNotFoundException e){
-    	   	throw new FileSystemException(e);
+        } catch (NameNotFoundException e) {
+            throw new FileSystemException(e);
         }
-	}
+    }
 
 }

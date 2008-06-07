@@ -52,8 +52,7 @@ public final class ISO9660Directory implements FSDirectory {
 
             int offset = 0;
 
-            final EntryRecord parent = ISO9660Directory.this.entry
-                    .getCDFSentry();
+            final EntryRecord parent = ISO9660Directory.this.entry.getCDFSentry();
 
             final byte[] buffer = parent.getExtentData();
 
@@ -63,11 +62,10 @@ public final class ISO9660Directory implements FSDirectory {
 
             public FSEntry next() {
                 final ISO9660Volume volume = parent.getVolume();
-                final EntryRecord fEntry = new EntryRecord(volume, buffer, offset+1,
-                        parent.getEncoding());
+                final EntryRecord fEntry =
+                        new EntryRecord(volume, buffer, offset + 1, parent.getEncoding());
                 offset += fEntry.getLengthOfDirectoryEntry();
-                return new ISO9660Entry((ISO9660FileSystem) entry
-                        .getFileSystem(), fEntry);
+                return new ISO9660Entry((ISO9660FileSystem) entry.getFileSystem(), fEntry);
             }
 
             /**
@@ -85,7 +83,8 @@ public final class ISO9660Directory implements FSDirectory {
     public FSEntry getEntry(String name) throws IOException {
         for (Iterator<FSEntry> it = this.iterator(); it.hasNext();) {
             ISO9660Entry entry = (ISO9660Entry) it.next();
-            if (entry.getName().equalsIgnoreCase(name)) return entry;
+            if (entry.getName().equalsIgnoreCase(name))
+                return entry;
         }
         return null;
     }
@@ -125,12 +124,11 @@ public final class ISO9660Directory implements FSDirectory {
         return entry.getFileSystem();
     }
 
-	/**
-	 * Save all dirty (unsaved) data to the device
-	 * @throws IOException
-	 */
-	public void flush() throws IOException
-	{
-		//TODO
-	}
+    /**
+     * Save all dirty (unsaved) data to the device
+     * @throws IOException
+     */
+    public void flush() throws IOException {
+        // TODO implement
+    }
 }

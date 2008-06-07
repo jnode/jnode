@@ -76,6 +76,6 @@ public abstract class VolumeDescriptor extends Descriptor {
     public final ISO9660Volume getVolume() {
         return this.volume;
     }
-    
+
     public abstract void dump(PrintStream out);
 }

@@ -21,15 +21,15 @@
 
 package org.jnode.fs.ftpfs;
 
-import org.jnode.fs.FileSystem;
-import org.jnode.driver.DeviceListener;
-import org.jnode.driver.Device;
-
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.ParseException;
 import java.util.Date;
-import java.security.PrivilegedAction;
-import java.security.AccessController;
+
+import org.jnode.driver.Device;
+import org.jnode.driver.DeviceListener;
+import org.jnode.fs.FileSystem;
 
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPException;
@@ -44,9 +44,8 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
     private FTPFSDirectory root;
     private boolean closed;
     private Thread thread;
-    final private FTPClient client;
+    private final FTPClient client;
     private final FTPFileSystemType type;
-
 
     FTPFileSystem(final FTPFSDevice device, final FTPFileSystemType type) {
         this.type = type;
@@ -54,76 +53,74 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
         this.device = device;
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {
-                //empty
+                // empty
             }
 
             public void deviceStop(Device device) {
                 try {
                     close();
-                } catch(IOException x){
+                } catch (IOException x) {
+                    // FIXME - bad ... use a logger.
                     x.printStackTrace();
                 }
             }
         });
-        try{
-
-        	client.setRemoteHost(device.getHost());
-        	client.setTimeout(300000);
-            AccessController.doPrivileged(
-            new PrivilegedAction(){
+        try {
+            client.setRemoteHost(device.getHost());
+            client.setTimeout(300000);
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                    try{
+                    try {
                         client.connect();
                         return null;
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
 
-            client.login(device.getUser(),device.getPassword());
-            thread = new Thread(new Runnable(){
+            client.login(device.getUser(), device.getPassword());
+            thread = new Thread(new Runnable() {
                 public void run() {
-                    try{
-                        while(!isClosed()){
+                    try {
+                        while (!isClosed()) {
                             try {
                                 Thread.sleep(100000);
                                 nop();
-                            }catch(InterruptedException x){
-                                //ignore
+                            } catch (InterruptedException x) {
+                                // ignore
                             }
                         }
-                    } catch(Exception x){
+                    } catch (Exception x) {
                         x.printStackTrace();
                     }
                 }
-            },"ftpfs_keepalive");
+            }, "ftpfs_keepalive");
             thread.start();
             FTPFile f = new FTPFile("/", "/", 0, true, new Date(0));
-//            FTPFile f = new FTPFile();
-//            f.setName(printWorkingDirectory());
+            // FTPFile f = new FTPFile();
+            // f.setName(printWorkingDirectory());
             root = new FTPFSDirectory(this, f);
             closed = false;
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
     }
 
-	final public FTPFileSystemType getType() {
-		return type;
-	}
-
-    private synchronized void nop() throws Exception{
-    	client.dir(root.path());
+    public final FTPFileSystemType getType() {
+        return type;
     }
 
+    private synchronized void nop() throws Exception {
+        client.dir(root.path());
+    }
 
     /**
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     *
+     * 
      * @throws java.io.IOException
      */
     public synchronized void close() throws IOException {
@@ -131,7 +128,7 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
             closed = true;
             thread = null;
             client.quit();
-        } catch(Exception e){
+        } catch (Exception e) {
             throw new IOException("Close error");
         }
     }
@@ -165,31 +162,30 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
         return true;
     }
 
+    public long getFreeSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getFreeSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getUsableSpace() {
-		// TODO implement me
-		return 0;
-	}
+    FTPFile[] dirDetails(String path) throws IOException, FTPException, ParseException {
+        return client.dirDetails(path);
+    }
 
-	FTPFile[] dirDetails(String path) throws IOException, FTPException, ParseException {
-		return client.dirDetails(path);
-	}
+    void chdir(String path) throws IOException, FTPException {
+        client.chdir(path);
+    }
 
-	void chdir(String path) throws IOException, FTPException {
-		client.chdir(path);
-	}
-
-	byte[] get(String name) throws IOException, FTPException {
-		return client.get(name);
-	}
+    byte[] get(String name) throws IOException, FTPException {
+        return client.get(name);
+    }
 }

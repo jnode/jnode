@@ -22,7 +22,6 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.jnode.fs.FSAccessRights;
@@ -63,8 +62,9 @@ public final class ISO9660Entry implements FSEntry {
      * @see org.jnode.fs.FSEntry#getLastModified()
      */
     public long getLastModified() throws IOException {
-    	//FIXME Correct implementation to return real last modified time for ISO9660 entry.
-    	Date now = new Date();
+        // FIXME Correct implementation to return real last modified time for
+        // ISO9660 entry.
+        Date now = new Date();
         return now.getTime();
     }
 
@@ -139,19 +139,19 @@ public final class ISO9660Entry implements FSEntry {
     }
 
     /**
-     * @param sentry
-     *            The cDFSentry to set.
+     * @param sentry The cDFSentry to set.
      */
     public void setCDFSentry(EntryRecord sentry) {
         entryRecord = sentry;
     }
 
-	/**
-	 * Indicate if the entry has been modified in memory (ie need to be saved)
-	 * @return true if the entry need to be saved
-	 * @throws IOException
-	 */
-	public boolean isDirty() throws IOException {
-		return true;
-	}
+    /**
+     * Indicate if the entry has been modified in memory (ie need to be saved)
+     * 
+     * @return true if the entry need to be saved
+     * @throws IOException
+     */
+    public boolean isDirty() throws IOException {
+        return true;
+    }
 }

@@ -59,8 +59,8 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      */
     public synchronized void read(long fileOffset, ByteBuffer dest) throws IOException {
         try {
-            if(data == null){
-                synchronized(fileSystem) {
+            if (data == null) {
+                synchronized (fileSystem) {
                     fileSystem.chdir(parent.path());
                     data = fileSystem.get(getName());
                     //InputStream in = fileSystem.retrieveFileStream(getName());
@@ -71,11 +71,11 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
                 }
             }
             int len = dest.remaining();
-            len = Math.min(len,(int) (data.length - fileOffset));
-            if(len > 0){
+            len = Math.min(len, (int) (data.length - fileOffset));
+            if (len > 0) {
                 dest.put(data, (int) fileOffset, len);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new IOException("Read error");
         }
     }
@@ -86,7 +86,7 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      * @throws java.io.IOException
      */
     public void flush() throws IOException {
-
+        // TODO implement me
     }
 
     /**
@@ -96,7 +96,7 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      * @throws java.io.IOException
      */
     public void setLength(long length) throws IOException {
-
+        // TODO implement me
     }
 
     /**
@@ -109,6 +109,6 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      * @throws java.io.IOException
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
-
+        // TODO implement me
     }
 }

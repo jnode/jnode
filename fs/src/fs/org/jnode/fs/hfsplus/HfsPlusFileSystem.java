@@ -15,99 +15,103 @@ import org.jnode.fs.spi.AbstractFileSystem;
 
 
 public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
+    private final Logger log = Logger.getLogger(getClass());
 
-	private final Logger log = Logger.getLogger(getClass());
-	/** HFS volume header */
-	private Superblock sb;
-	/** Catalog special file for this instance */
-	private Catalog catalog;
-	/**
-	 * 
-	 * @param device
-	 * @param readOnly
-	 * @param type
-	 * @throws FileSystemException
-	 */
-	public HfsPlusFileSystem(final Device device, final boolean readOnly, final HfsPlusFileSystemType type) throws FileSystemException {
-		super(device, readOnly, type);
-	}
-	/**
-	 * 
-	 * @throws FileSystemException
-	 */
-	public void create()throws FileSystemException {
-		//TODO implements file system creation.
-	}
-	/**
-	 * 
-	 * @throws FileSystemException
-	 */
-	public final void read() throws FileSystemException {
-		sb = new Superblock(this);
-		
-		log.debug("Superblock informations :\n" + sb.toString());
-		if(!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)){
-			log.info(getDevice().getId()
-                    + " Filesystem has not been cleanly unmounted, mounting it readonly");
-			setReadOnly(true);
-		}
-		if(sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_SOFTLOCK_BIT)){
-			log.info(getDevice().getId()
-                    + " Filesystem is marked locked, mounting it readonly");
-			setReadOnly(true);
-		}
-		if(sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT)){
-			log.info(getDevice().getId()
-                    + " Filesystem is journaled, write access is not supported. Mounting it readonly");
-			setReadOnly(true);
-		}
-		try {
-			catalog = new Catalog(this);
-		} catch (IOException e) {
-			throw new FileSystemException(e);
-		}
-	}
+    /** HFS volume header */
+    private Superblock sb;
 
-	@Override
-	protected final FSDirectory createDirectory(final FSEntry entry) throws IOException {
-		HFSPlusEntry e = (HFSPlusEntry)entry;
-		return new HFSPlusDirectory(e);
-	}
+    /** Catalog special file for this instance */
+    private Catalog catalog;
 
-	@Override
-	protected final FSFile createFile(final FSEntry entry) throws IOException {
-		HFSPlusEntry e = (HFSPlusEntry)entry;
-		return new HFSPlusFile(e);
-	}
+    /**
+     * 
+     * @param device
+     * @param readOnly
+     * @param type
+     * @throws FileSystemException
+     */
+    public HfsPlusFileSystem(final Device device, final boolean readOnly,
+            final HfsPlusFileSystemType type) throws FileSystemException {
+        super(device, readOnly, type);
+    }
 
-	@Override
-	protected final HFSPlusEntry createRootEntry() throws IOException {
-		LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
-		if(record != null) {
-			return new HFSPlusEntry(this,null,null,"/",record);
-		}
-		log.debug("Root entry : No record found.");
-		return null;
-	}
+    /**
+     * 
+     * @throws FileSystemException
+     */
+    public void create() throws FileSystemException {
+        // TODO implements file system creation.
+    }
 
-	public final long getFreeSpace() {
-		return sb.getFreeBlocks() * sb.getBlockSize();
-	}
+    /**
+     * 
+     * @throws FileSystemException
+     */
+    public final void read() throws FileSystemException {
+        sb = new Superblock(this);
 
-	public final long getTotalSpace() {
-		return sb.getTotalBlocks() * sb.getBlockSize();
-	}
+        log.debug("Superblock informations:\n" + sb.toString());
+        if (!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)) {
+            log.info(getDevice().getId() +
+                    " Filesystem has not been cleanly unmounted, mounting it readonly");
+            setReadOnly(true);
+        }
+        if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_SOFTLOCK_BIT)) {
+            log.info(getDevice().getId() + " Filesystem is marked locked, mounting it readonly");
+            setReadOnly(true);
+        }
+        if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT)) {
+            log.info(getDevice().getId() +
+                    " Filesystem is journaled, write access is not supported. Mounting it readonly");
+            setReadOnly(true);
+        }
+        try {
+            catalog = new Catalog(this);
+        } catch (IOException e) {
+            throw new FileSystemException(e);
+        }
+    }
 
-	public final long getUsableSpace() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    protected final FSDirectory createDirectory(final FSEntry entry) throws IOException {
+        HFSPlusEntry e = (HFSPlusEntry) entry;
+        return new HFSPlusDirectory(e);
+    }
 
-	public final Catalog getCatalog() {
-		return catalog;
-	}
+    @Override
+    protected final FSFile createFile(final FSEntry entry) throws IOException {
+        HFSPlusEntry e = (HFSPlusEntry) entry;
+        return new HFSPlusFile(e);
+    }
 
-	public final Superblock getVolumeHeader() {
-		return sb;
-	}
+    @Override
+    protected final HFSPlusEntry createRootEntry() throws IOException {
+        LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
+        if (record != null) {
+            return new HFSPlusEntry(this, null, null, "/", record);
+        }
+        log.debug("Root entry : No record found.");
+        return null;
+    }
+
+    public final long getFreeSpace() {
+        return sb.getFreeBlocks() * sb.getBlockSize();
+    }
+
+    public final long getTotalSpace() {
+        return sb.getTotalBlocks() * sb.getBlockSize();
+    }
+
+    public final long getUsableSpace() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public final Catalog getCatalog() {
+        return catalog;
+    }
+
+    public final Superblock getVolumeHeader() {
+        return sb;
+    }
 }

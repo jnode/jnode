@@ -60,9 +60,8 @@ public class ISO9660File implements FSFile {
     /**
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
-//    public void read(long fileOffset, byte[] dest, int off, int len)
-    public void read(long fileOffset, ByteBuffer destBuf)    
-            throws IOException {
+    //    public void read(long fileOffset, byte[] dest, int off, int len)
+    public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level
         final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         final byte[] dest = destBA.toArray();
@@ -74,8 +73,7 @@ public class ISO9660File implements FSFile {
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
     //public void write(long fileOffset, byte[] src, int off, int len)
-    public void write(long fileOffset, ByteBuffer src)
-            throws IOException {
+    public void write(long fileOffset, ByteBuffer src) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 

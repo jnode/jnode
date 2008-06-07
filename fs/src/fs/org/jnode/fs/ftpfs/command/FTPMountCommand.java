@@ -21,14 +21,19 @@
 
 package org.jnode.fs.ftpfs.command;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.fs.ftpfs.FTPFSDevice;
 import org.jnode.fs.ftpfs.FTPFSDriver;
 import org.jnode.fs.ftpfs.FTPFileSystem;
@@ -37,14 +42,10 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-
-import javax.naming.NameNotFoundException;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.HostNameArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author Levente S\u00e1ntha
@@ -73,8 +74,8 @@ public class FTPMountCommand extends AbstractCommand {
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) 
-    throws DriverException, NameNotFoundException, DeviceAlreadyRegisteredException, 
-        FileSystemException, IOException {
+        throws DriverException, NameNotFoundException, DeviceAlreadyRegisteredException, 
+            FileSystemException, IOException {
         final File mountPoint = MOUNTPOINT_ARG.getValue();
         final String host = HOST_ARG.getValue();
         final String user = USERNAME_ARG.getValue();
@@ -93,8 +94,7 @@ public class FTPMountCommand extends AbstractCommand {
             fss.registerFileSystem(fs);
             fss.mount(mountPoint.getAbsolutePath(), fs, null);
             ok = true;
-        }
-        finally {
+        } finally {
             if (!ok) {
                 try {
                     // If we failed, try to undo the changes that we managed to make
@@ -102,8 +102,7 @@ public class FTPMountCommand extends AbstractCommand {
                         fss.unregisterFileSystem(dev);
                     }
                     dm.unregister(dev);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Logger log = Logger.getLogger(FTPMountCommand.class);
                     log.fatal("Cannot undo failed mount attempt", ex);
                 }
