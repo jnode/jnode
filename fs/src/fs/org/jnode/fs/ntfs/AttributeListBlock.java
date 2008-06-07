@@ -21,9 +21,8 @@
  
 package org.jnode.fs.ntfs;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data structure containing a list of {@link AttributeListEntry} entries.
@@ -62,8 +61,7 @@ final class AttributeListBlock extends NTFSStructure {
         {
             try {
                 int type = getUInt32AsInt(offset + 0x00);
-                if (type == attrTypeID)
-                {
+                if (type == attrTypeID) {
                     entries.add(new AttributeListEntry(this, offset));
                 }
 

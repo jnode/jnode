@@ -31,15 +31,14 @@ import java.util.List;
  *
  * @author Daniel Noll (daniel@nuix.com.au)
  */
-final class AttributeListAttributeRes extends NTFSResidentAttribute
-        implements AttributeListAttribute {
+final class AttributeListAttributeRes extends NTFSResidentAttribute implements
+        AttributeListAttribute {
 
     /**
      * @param fileRecord
      * @param offset
      */
-    public AttributeListAttributeRes(FileRecord fileRecord,
-                                     int offset) {
+    public AttributeListAttributeRes(FileRecord fileRecord, int offset) {
         super(fileRecord, offset);
     }
 
@@ -53,8 +52,7 @@ final class AttributeListAttributeRes extends NTFSResidentAttribute
      * @return the attribute entry.
      * @throws IOException if there is an error reading the attribute's non-resident data.
      */
-    public List<AttributeListEntry> getEntries(int attrTypeID)
-            throws IOException {
+    public List<AttributeListEntry> getEntries(int attrTypeID) throws IOException {
         final byte[] data = new byte[getAttributeLength()];
         getData(getAttributeOffset(), data, 0, data.length);
         AttributeListBlock listBlock = new AttributeListBlock(data, 0, getAttributeLength());

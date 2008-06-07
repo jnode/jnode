@@ -41,10 +41,9 @@ public class NFSHostNameArgument extends Argument<String> {
 
         List<ExportEntry> exportEntryList;
         try {
-            exportEntryList = AccessController
-                    .doPrivileged(new PrivilegedExceptionAction<List<ExportEntry>>() {
-                        public List<ExportEntry> run() 
-                        throws IOException, MountException {
+            exportEntryList = AccessController.doPrivileged(
+                    new PrivilegedExceptionAction<List<ExportEntry>>() {
+                        public List<ExportEntry> run() throws IOException, MountException {
                             Mount1Client client = 
                                 new Mount1Client(host, Protocol.TCP, -1, -1);
                             List<ExportEntry> exportEntryList;
@@ -102,14 +101,11 @@ public class NFSHostNameArgument extends Argument<String> {
         int index = value.token.indexOf(':');
         if (index == -1) {
             throw new CommandSyntaxException("missing ':'");
-        }
-        else if (index == 0) {
+        } else if (index == 0) {
             throw new CommandSyntaxException("no hostname before ':'");
-        }
-        else if (index == value.token.length() - 1) {
+        } else if (index == value.token.length() - 1) {
             throw new CommandSyntaxException("no directory after ':'");
-        }
-        else {
+        } else {
             return value.token;
         }
     }

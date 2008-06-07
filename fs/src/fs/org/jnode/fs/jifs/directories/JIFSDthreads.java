@@ -25,74 +25,76 @@ import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.jifs.*;
-import org.jnode.fs.jifs.files.*;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.jifs.JIFSDirectory;
+import org.jnode.fs.jifs.JIFSFile;
+import org.jnode.fs.jifs.files.JIFSFthread;
 
 
 /**
- * Directory containing one file for each java.lang.thread. Based on the thread command.
+ * Directory containing one file for each java.lang.thread. Based on the thread
+ * command.
  * 
  * @author Andreas H\u00e4nel
  */
 public class JIFSDthreads extends JIFSDirectory {
-	
-	public JIFSDthreads()throws IOException{
-		super("threads");
-		refresh();
-	}
-	
-	public JIFSDthreads(FSDirectory parent)throws IOException{
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.clear();
-		ThreadGroup grp = Thread.currentThread().getThreadGroup();
-		while (grp.getParent() != null) {
-			grp = grp.getParent();
-		}
-		addGroup(grp);
-	}
-	
-	private void addGroup(final ThreadGroup grp) {
 
-		final int max = grp.activeCount() * 2;
-		final Thread[] ts = new Thread[max];
-        AccessController.doPrivileged(new PrivilegedAction() {
+    public JIFSDthreads() throws IOException {
+        super("threads");
+        refresh();
+    }
+
+    public JIFSDthreads(FSDirectory parent) throws IOException {
+        this();
+        setParent(parent);
+    }
+
+    public void refresh() {
+        super.clear();
+        ThreadGroup grp = Thread.currentThread().getThreadGroup();
+        while (grp.getParent() != null) {
+            grp = grp.getParent();
+        }
+        addGroup(grp);
+    }
+
+    private void addGroup(final ThreadGroup grp) {
+
+        final int max = grp.activeCount() * 2;
+        final Thread[] ts = new Thread[max];
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
-                grp.enumerate(ts,false);
+                grp.enumerate(ts, false);
                 return null;
             }
         });
-		for (int i = 0; i < max; i++) {
-			final Thread t = ts[i];
-			if (t != null) {
-				JIFSFile F = new JIFSFthread(t.getName(),t, this);
-	            addFSE(F);
-			}
-		}
-		
-		final int gmax = grp.activeGroupCount() * 2;
-		final ThreadGroup[] tgs = new ThreadGroup[gmax];
+        for (int i = 0; i < max; i++) {
+            final Thread t = ts[i];
+            if (t != null) {
+                JIFSFile F = new JIFSFthread(t.getName(), t, this);
+                addFSE(F);
+            }
+        }
 
-		AccessController.doPrivileged(new PrivilegedAction() {
+        final int gmax = grp.activeGroupCount() * 2;
+        final ThreadGroup[] tgs = new ThreadGroup[gmax];
+
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 grp.enumerate(tgs, false);
                 return null;
             }
         });
-		for (int i = 0; i < gmax; i++) {
-			final ThreadGroup tg = tgs[i];
-			if (tg != null) {
-				addGroup(tg);
-			}
-		}
-	}
-	
-	public FSEntry getEntry(String name){
-		return super.getEntry(name);
-	}
+        for (int i = 0; i < gmax; i++) {
+            final ThreadGroup tg = tgs[i];
+            if (tg != null) {
+                addGroup(tg);
+            }
+        }
+    }
+
+    public FSEntry getEntry(String name) {
+        return super.getEntry(name);
+    }
 }

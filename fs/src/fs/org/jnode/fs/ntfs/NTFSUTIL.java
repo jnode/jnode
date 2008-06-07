@@ -27,7 +27,6 @@ import java.util.Date;
  * @author vali
  */
 public class NTFSUTIL {
-
     /**
      * Converts a 64-bit NTFS time value (number of 100-nanosecond intervals since January 1, 1601 UTC)
      * to a Java time value (number of milliseconds since January 1, 1970 UTC.)
@@ -40,15 +39,11 @@ public class NTFSUTIL {
         filetime -= 116444736000000000L;
 
         // Now convert the time into milliseconds, rather than 100-nanosecond units.
-        if (filetime < 0)
-        {
+        if (filetime < 0) {
             filetime = -1 - ((-filetime - 1) / 10000);
-        }
-        else
-        {
+        } else {
             filetime = filetime / 10000;
         }
-
         return filetime;
     }
 

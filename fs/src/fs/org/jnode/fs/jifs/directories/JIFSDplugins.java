@@ -43,39 +43,39 @@ import org.jnode.plugin.PluginManager;
  * @author Andreas H\u00e4nel
  */
 public class JIFSDplugins extends JIFSDirectory {
-	
-	public JIFSDplugins()throws IOException{
-		super("plugins");
-		refresh();
-	}
-	
-	public JIFSDplugins(FSDirectory parent)throws IOException{
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		// this has to be improved
-		// just add new ones and delete old ones
-		// now it does delete all files and (re)create all ones
-		super.clear();
-		final ArrayList<String> rows = new ArrayList<String>();
-		try {
-			final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
-	        for (PluginDescriptor descr : mgr.getRegistry()) {
-	            rows.add(descr.getId());
-	        }
-	        Collections.sort(rows);
-	        for (Object row : rows) {
-	        	final JIFSFile F = new JIFSFplugin(row.toString(), this);
-	            addFSE(F);
-	        }
-		} catch (NameNotFoundException N){
-			System.err.println(N);
-		}
-	}
-	
-	public FSEntry getEntry(String name){
-		return super.getEntry(name);
-	}
+
+    public JIFSDplugins() throws IOException {
+        super("plugins");
+        refresh();
+    }
+
+    public JIFSDplugins(FSDirectory parent) throws IOException {
+        this();
+        setParent(parent);
+    }
+
+    public void refresh() {
+        // this has to be improved
+        // just add new ones and delete old ones
+        // now it does delete all files and (re)create all ones
+        super.clear();
+        final ArrayList<String> rows = new ArrayList<String>();
+        try {
+            final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
+            for (PluginDescriptor descr : mgr.getRegistry()) {
+                rows.add(descr.getId());
+            }
+            Collections.sort(rows);
+            for (Object row : rows) {
+                final JIFSFile F = new JIFSFplugin(row.toString(), this);
+                addFSE(F);
+            }
+        } catch (NameNotFoundException N) {
+            System.err.println(N);
+        }
+    }
+
+    public FSEntry getEntry(String name) {
+        return super.getEntry(name);
+    }
 }

@@ -21,18 +21,20 @@
 
 package org.jnode.fs.jifs.def;
 
+import java.io.IOException;
+
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
+import org.jnode.driver.DeviceException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.DeviceException;
 import org.jnode.driver.virtual.VirtualDevice;
 import org.jnode.driver.virtual.VirtualDeviceFactory;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.fs.jifs.JIFileSystem;
 import org.jnode.fs.jifs.JIFileSystemType;
 import org.jnode.fs.service.FileSystemService;
@@ -41,9 +43,6 @@ import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-
-import javax.naming.NameNotFoundException;
-import java.io.IOException;
 
 /**
  * @author Andreas H\u00e4nel
@@ -72,7 +71,8 @@ public class JIFSPlugin extends Plugin {
         try {
             JIFileSystemType type = null;
             try {
-                VirtualDevice dev = VirtualDeviceFactory.createDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
+                VirtualDevice dev =
+                        VirtualDeviceFactory.createDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
                 log.info(dev.getId() + " registered");
                 final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
                 type = fSS.getFileSystemType(JIFileSystemType.ID);
@@ -82,15 +82,14 @@ public class JIFSPlugin extends Plugin {
 
                 final String mountPath = "jifs";
                 fSS.mount(mountPath, fs, null);
-                log.info("Mounted " + type.getName() + " on "
-                        + mountPath);
+                log.info("Mounted " + type.getName() + " on " + mountPath);
                 final ExtensionPoint infoEP = getDescriptor().getExtensionPoint("info");
                 jifsExtension = new JIFSExtension(infoEP);
             } catch (DeviceAlreadyRegisteredException ex) {
                 log.error("jifs is currently running.");
             } catch (FileSystemException ex) {
-                log.error("Cannot mount " + (type != null ? type.getName() : "")
-                        + " filesystem ", ex);
+                log.error("Cannot mount " + (type != null ? type.getName() : "") + " filesystem ",
+                        ex);
             } catch (DeviceException e) {
                 log.debug("Got DriverException, maybe jifs is running.");
             } catch (IOException ex) {

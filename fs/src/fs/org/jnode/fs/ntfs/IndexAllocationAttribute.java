@@ -32,8 +32,7 @@ final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
      * @param fileRecord
      * @param offset
      */
-    public IndexAllocationAttribute(FileRecord fileRecord,
-            int offset) {
+    public IndexAllocationAttribute(FileRecord fileRecord, int offset) {
         super(fileRecord, offset);
     }
 
@@ -42,16 +41,14 @@ final class IndexAllocationAttribute extends NTFSNonResidentAttribute {
      * 
      * @param indexRoot
      * @param vcn
-     * @return @throws
-     *         IOException
+     * @return 
+     * @throws IOException
      */
-    public IndexBlock getIndexBlock(IndexRoot indexRoot, long vcn)
-            throws IOException {
+    public IndexBlock getIndexBlock(IndexRoot indexRoot, long vcn) throws IOException {
         log.debug("getIndexBlock(..," + vcn + ")");
         final FileRecord fileRecord = getFileRecord();
         final int nrClusters = indexRoot.getClustersPerIndexBlock();
-        final byte[] data = new byte[ nrClusters
-                * fileRecord.getVolume().getClusterSize()];
+        final byte[] data = new byte[nrClusters * fileRecord.getVolume().getClusterSize()];
         readVCN(vcn, data, 0, nrClusters);
         return new IndexBlock(fileRecord, data, 0);
     }

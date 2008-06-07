@@ -125,10 +125,10 @@ public abstract class NTFSAttribute extends NTFSStructure {
         // if it is named fill the attribute name
         final int nameLength = getNameLength();
         if (nameLength > 0) {
-            final char[] namebuf = new char[ nameLength];
+            final char[] namebuf = new char[nameLength];
             final int nameOffset = getNameOffset();
             for (int i = 0; i < nameLength; i++) {
-                namebuf[ i] = getChar16(nameOffset + (i * 2));
+                namebuf[i] = getChar16(nameOffset + (i * 2));
             }
             return new String(namebuf);
         }
@@ -169,24 +169,23 @@ public abstract class NTFSAttribute extends NTFSStructure {
      * @param offset
      * @return
      */
-    public static NTFSAttribute getAttribute(FileRecord fileRecord,
-            int offset) {
+    public static NTFSAttribute getAttribute(FileRecord fileRecord, int offset) {
         final boolean resident = (fileRecord.getUInt8(offset + 0x08) == 0);
         final int type = fileRecord.getUInt32AsInt(offset + 0x00);
 
         switch (type) {
-        case Types.ATTRIBUTE_LIST:
-            if (resident) {
-                return new AttributeListAttributeRes(fileRecord, offset);
-            } else {
-                return new AttributeListAttributeNonRes(fileRecord, offset);
-            }
-        case Types.FILE_NAME:
-            return new FileNameAttribute(fileRecord, offset);
-        case Types.INDEX_ROOT:
-            return new IndexRootAttribute(fileRecord, offset);
-        case Types.INDEX_ALLOCATION:
-            return new IndexAllocationAttribute(fileRecord, offset);
+            case Types.ATTRIBUTE_LIST:
+                if (resident) {
+                    return new AttributeListAttributeRes(fileRecord, offset);
+                } else {
+                    return new AttributeListAttributeNonRes(fileRecord, offset);
+                }
+            case Types.FILE_NAME:
+                return new FileNameAttribute(fileRecord, offset);
+            case Types.INDEX_ROOT:
+                return new IndexRootAttribute(fileRecord, offset);
+            case Types.INDEX_ALLOCATION:
+                return new IndexAllocationAttribute(fileRecord, offset);
         }
 
         // check the resident flag

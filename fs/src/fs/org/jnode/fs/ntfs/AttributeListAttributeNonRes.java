@@ -31,15 +31,14 @@ import java.util.List;
  *
  * @author Daniel Noll (daniel@nuix.com.au)
  */
-final class AttributeListAttributeNonRes extends NTFSNonResidentAttribute
-        implements AttributeListAttribute {
+final class AttributeListAttributeNonRes extends NTFSNonResidentAttribute implements
+        AttributeListAttribute {
 
     /**
      * @param fileRecord
      * @param offset
      */
-    public AttributeListAttributeNonRes(FileRecord fileRecord,
-                                        int offset) {
+    public AttributeListAttributeNonRes(FileRecord fileRecord, int offset) {
         super(fileRecord, offset);
     }
 
@@ -53,8 +52,7 @@ final class AttributeListAttributeNonRes extends NTFSNonResidentAttribute
      * @return the attribute entry.
      * @throws IOException if there is an error reading the attribute's non-resident data.
      */
-    public List<AttributeListEntry> getEntries(int attrTypeID)
-            throws IOException {
+    public List<AttributeListEntry> getEntries(int attrTypeID) throws IOException {
         // Read the actual data from wherever it happens to be located.
         // TODO: Consider handling multiple data runs separately instead
         //       of "glueing" them all together like this.

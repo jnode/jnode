@@ -32,7 +32,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
  * NTFS filesystem implementation.
- *
+ * 
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -45,7 +45,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
      * @see org.jnode.fs.FileSystem#getDevice()
      */
     public NTFSFileSystem(Device device, boolean readOnly, NTFSFileSystemType type)
-            throws FileSystemException {
+        throws FileSystemException {
         super(device, readOnly, type);
 
         try {
@@ -81,7 +81,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     /**
-     *
+     * 
      */
     protected FSFile createFile(FSEntry entry) throws IOException {
         // TODO Auto-generated method stub
@@ -89,7 +89,7 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     /**
-     *
+     * 
      */
     protected FSDirectory createDirectory(FSEntry entry) throws IOException {
         // TODO Auto-generated method stub
@@ -97,26 +97,25 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     }
 
     /**
-     *
+     * 
      */
     protected NTFSEntry createRootEntry() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
+    public long getFreeSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getFreeSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return 0;
-	}
-
-	public long getUsableSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return 0;
+    }
 }

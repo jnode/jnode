@@ -42,7 +42,5 @@ interface AttributeListAttribute {
      * @return the attribute entry.
      * @throws IOException if there is an error reading the attribute's non-resident data.
      */
-    List<AttributeListEntry> getEntries(int attrTypeID)
-            throws IOException;
-
+    List<AttributeListEntry> getEntries(int attrTypeID) throws IOException;
 }

@@ -50,9 +50,10 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     private String name;
 
     private NFS2AccessRights accessRights;
+    
 
-    NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name,
-            byte[] fileHandle, FileAttribute fileAttribute) {
+    NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name, byte[] fileHandle,
+            FileAttribute fileAttribute) {
         super(fileSystem);
 
         this.parent = parent;
@@ -62,13 +63,10 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
         if (fileAttribute.getType() == FileAttribute.DIRECTORY) {
             directory = new NFS2Directory(this);
-
         } else if (fileAttribute.getType() == FileAttribute.FILE) {
             file = new NFS2File(this);
         }
-
         accessRights = new NFS2AccessRights(fileSystem, this);
-
     }
 
     public FSDirectory getParent() {
@@ -87,7 +85,6 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         if (!isDirectory()) {
             throw new IOException(getName() + " is not a directory");
         }
-
         return directory;
     }
 
@@ -95,7 +92,6 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         if (!isFile()) {
             throw new IOException(getName() + " is not a file");
         }
-
         return file;
     }
 
@@ -104,11 +100,9 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public boolean isDirectory() {
-
         if (fileAttribute.getType() == FileAttribute.DIRECTORY) {
             return true;
         }
-
         return false;
     }
 
@@ -117,41 +111,29 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public boolean isFile() {
-
-        if (fileAttribute.getType() == FileAttribute.FILE) {
-            return true;
-        }
-
-        return false;
+        return fileAttribute.getType() == FileAttribute.FILE;
     }
 
     public void setLastModified(long lastModified) throws IOException {
-
         NFS2Client client = getNFS2Client();
-
         try {
-            client.setAttribute(getFileHandle(), -1, -1, -1, -1, new Time(-1,
-                    -1), new Time((int) (lastModified / 1000), -1));
+            client.setAttribute(getFileHandle(), -1, -1, -1, -1, new Time(-1, -1), 
+                    new Time((int) (lastModified / 1000), -1));
         } catch (NFS2Exception e) {
             throw new IOException(e.getMessage(), e);
         }
-
     }
 
     public void setName(String newName) throws IOException {
-
         NFS2Client client = getNFS2Client();
-
         NFS2Directory parentDirectory = (NFS2Directory) getParent();
-
         try {
-            client.renameFile(parentDirectory.getNFS2Entry().getFileHandle(),
-                    name, parentDirectory.getNFS2Entry().getFileHandle(),
-                    newName);
+            client.renameFile(
+                    parentDirectory.getNFS2Entry().getFileHandle(), name,
+                    parentDirectory.getNFS2Entry().getFileHandle(), newName);
         } catch (NFS2Exception e) {
             throw new IOException("Can not rename ." + e.getMessage(), e);
         }
-
     }
 
     public FileAttribute getFileAttribute() {

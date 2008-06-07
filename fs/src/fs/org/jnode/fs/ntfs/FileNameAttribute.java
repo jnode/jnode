@@ -145,10 +145,10 @@ final class FileNameAttribute extends NTFSResidentAttribute {
         final int attrOffset = getAttributeOffset();
         final int fileNameLength = getUInt8(attrOffset + 0x40);
 
-        final char[] name = new char[ fileNameLength];
+        final char[] name = new char[fileNameLength];
         int ofs = attrOffset + 0x42;
         for (int i = 0; i < fileNameLength; i++) {
-            name[ i] = getChar16(ofs);
+            name[i] = getChar16(ofs);
             ofs += 2;
         }
         return name;

@@ -40,7 +40,7 @@ final class NTFSIndex {
 
     private IndexAllocationAttribute indexAllocationAttribute;
 
-    final static Logger log = Logger.getLogger(NTFSIndex.class);
+    static final Logger log = Logger.getLogger(NTFSIndex.class);
 
     /**
      * Initialize this instance.
@@ -49,8 +49,9 @@ final class NTFSIndex {
      */
     public NTFSIndex(FileRecord fileRecord) throws IOException {
         this.fileRecord = fileRecord;
-        if (!fileRecord.isDirectory()) { throw new IOException(
-                "fileRecord is not a directory"); }
+        if (!fileRecord.isDirectory()) {
+            throw new IOException("fileRecord is not a directory");
+        }
     }
 
     /**
@@ -60,8 +61,8 @@ final class NTFSIndex {
      */
     public IndexRootAttribute getIndexRootAttribute() {
         if (indexRootAttribute == null) {
-            indexRootAttribute = (IndexRootAttribute) fileRecord
-                    .getAttribute(NTFSAttribute.Types.INDEX_ROOT);
+            indexRootAttribute = (IndexRootAttribute) 
+                    fileRecord.getAttribute(NTFSAttribute.Types.INDEX_ROOT);
             log.debug("getIndexRootAttribute: " + indexRootAttribute);
         }
         return indexRootAttribute;
@@ -74,8 +75,8 @@ final class NTFSIndex {
      */
     public IndexAllocationAttribute getIndexAllocationAttribute() {
         if (indexAllocationAttribute == null) {
-            indexAllocationAttribute = (IndexAllocationAttribute) fileRecord
-                    .getAttribute(NTFSAttribute.Types.INDEX_ALLOCATION);
+            indexAllocationAttribute = (IndexAllocationAttribute) 
+                    fileRecord.getAttribute(NTFSAttribute.Types.INDEX_ALLOCATION);
         }
         return indexAllocationAttribute;
     }
@@ -143,7 +144,9 @@ final class NTFSIndex {
                         log.debug("next has subnode");
                         subNodeEntries.add(nextEntry);
                     }
-                    if (!nextEntry.isLastIndexEntryInSubnode()) { return; }
+                    if (!nextEntry.isLastIndexEntryInSubnode()) {
+                        return;
+                    }
                 }
                 nextEntry = null;
 

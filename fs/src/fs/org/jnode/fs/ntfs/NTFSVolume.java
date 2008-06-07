@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class NTFSVolume {
     private FileRecord rootDirectory;
 
     /**
-     * Initialize this instance.  
+     * Initialize this instance.
      */
     public NTFSVolume(BlockDeviceAPI api) throws IOException {
         // I hope this is enaugh..should be
@@ -77,35 +77,29 @@ public class NTFSVolume {
      * 
      * @param cluster
      */
-    public void readCluster(long cluster, byte[] dst, int dstOffset)
-            throws IOException {
+    public void readCluster(long cluster, byte[] dst, int dstOffset) throws IOException {
         final int clusterSize = getClusterSize();
         final long clusterOffset = cluster * clusterSize;
-
         log.debug("readCluster(" + cluster + ") " + (readClusterCount++));
         api.read(clusterOffset, ByteBuffer.wrap(dst, dstOffset, clusterSize));
     }
 
     private int readClusterCount;
     private int readClustersCount;
-    
+
     /**
      * Read a number of clusters.
      * 
      * @param firstCluster
-     * @param nrClusters
-     *            The number of clusters to read.
-     * @param dst
-     *            Must have space for (nrClusters * getClusterSize())
+     * @param nrClusters The number of clusters to read.
+     * @param dst Must have space for (nrClusters * getClusterSize())
      * @param dstOffset
      * @throws IOException
      */
-    public void readClusters(long firstCluster, byte[] dst, int dstOffset,
-            int nrClusters) throws IOException {
+    public void readClusters(long firstCluster, byte[] dst, int dstOffset, int nrClusters)
+        throws IOException {
         log.debug("readClusters(" + firstCluster + ", " + nrClusters + ") " + (readClustersCount++));
-
         final int clusterSize = getClusterSize();
-
         final long clusterOffset = firstCluster * clusterSize;
         api.read(clusterOffset, ByteBuffer.wrap(dst, dstOffset, nrClusters * clusterSize));
     }
@@ -121,6 +115,7 @@ public class NTFSVolume {
 
     /**
      * Gets the MFT.
+     * 
      * @return Returns the mTFRecord.
      */
     public MasterFileTable getMFT() throws IOException {
@@ -135,7 +130,7 @@ public class NTFSVolume {
             } else {
                 nrClusters = bytesPerFileRecord / clusterSize;
             }
-            final byte[] data = new byte[ nrClusters * clusterSize];
+            final byte[] data = new byte[nrClusters * clusterSize];
             readClusters(bootRecord.getMftLcn(), data, 0, nrClusters);
             mftFileRecord = new MasterFileTable(this, data, 0);
         }
@@ -145,6 +140,7 @@ public class NTFSVolume {
 
     /**
      * Gets the root directory on this volume.
+     * 
      * @return
      * @throws IOException
      */
@@ -152,7 +148,6 @@ public class NTFSVolume {
         if (rootDirectory == null) {
             // Read the root directory
             final MasterFileTable mft = getMFT();
-            
             rootDirectory = mft.getRecord(MasterFileTable.SystemFiles.ROOT);
             log.info("getRootDirectory: " + rootDirectory.getFileName());
         }

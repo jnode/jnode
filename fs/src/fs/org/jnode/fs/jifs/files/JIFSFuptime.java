@@ -30,32 +30,29 @@ import org.jnode.vm.VmSystem;
  * 
  * @author Andreas H\u00e4nel
  */
-public class JIFSFuptime extends JIFSFile{
-	
-	public JIFSFuptime(){
-		super("uptime");
-		refresh();
-	}
-	
-	public JIFSFuptime(FSDirectory parent){
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.refresh();
-		String h="";
-		String m="";
-		String s="";
-		long sinceboot = VmSystem.currentKernelMillis();
-		int hours = new Long(sinceboot / (1000 * 60 * 60)).intValue();
-		int minutes = new Long((sinceboot - (hours * (1000 * 60 * 60))) / (1000 * 60)).intValue();
-		int seconds = new Long((sinceboot - (((hours * 60) + minutes) * 1000 * 60)) / 1000).intValue();
-		if (hours<10) h="0";
-		if (minutes<10) m="0";
-		if (seconds<10) s="0";
-		addStringln("Time since booting JNode:");
-		addStringln("\t"+h+new Integer(hours).toString()+":"+m+new Integer(minutes).toString()+":"+s+new Integer(seconds).toString());
-	}	
-	
+public class JIFSFuptime extends JIFSFile {
+
+    public JIFSFuptime() {
+        super("uptime");
+        refresh();
+    }
+
+    public JIFSFuptime(FSDirectory parent) {
+        this();
+        setParent(parent);
+    }
+
+    public void refresh() {
+        super.refresh();
+        long sinceboot = VmSystem.currentKernelMillis();
+        int hours = (int) (sinceboot / (1000 * 60 * 60));
+        int minutes = (int) ((sinceboot / (1000 * 60)) % 60);
+        int seconds = (int) ((sinceboot / 1000) % 60);
+        String h = (hours < 10) ? "0" : "";
+        String m = (minutes < 10) ? "0" : "";
+        String s = (seconds < 10) ? "0" : "";
+        addStringln("Time since booting JNode:");
+        addStringln("\t" + h + hours + ":" + m + minutes + ":" + s + seconds);
+    }
+
 }

@@ -47,9 +47,9 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     public JIFSDirectory() {
         entries = new HashMap<String, FSEntry>();
     }
-    
+
     public JIFSDirectory(String name) {
-    	this();
+        this();
         label = name;
     }
 
@@ -61,9 +61,9 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     public void refresh() {
         return;
     }
-    
+
     protected void clear() {
-    	entries.clear();
+        entries.clear();
     }
 
     public void addFSE(FSEntry entry) {
@@ -74,7 +74,7 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
      * Flush the contents of this directory to the persistent storage
      */
     public void flush() throws IOException {
-    	//TODO -> extended FSEntry maybe have to be flushed
+        // TODO -> extended FSEntry maybe have to be flushed
     }
 
     public FSEntry addDirectory(String name) {
@@ -131,7 +131,7 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     }
 
     public void setName(String name) {
-        this.label=name;
+        this.label = name;
     }
 
     public boolean isDirectory() {
@@ -145,10 +145,10 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     public FSDirectory getParent() {
         return parent;
     }
-    
-    public void setParent(FSDirectory parent){
-		this.parent=parent;
-	}
+
+    public void setParent(FSDirectory parent) {
+        this.parent = parent;
+    }
 
     public String getName() {
         return label;

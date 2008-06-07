@@ -141,13 +141,11 @@ final class MasterFileTable extends FileRecord {
 
         // read the buffer
         final byte[] buffer = new byte[bytesPerFileRecord];
-
         readData(offset, buffer, 0, bytesPerFileRecord);
         return new FileRecord(volume, buffer, 0);
     }
 
-    public FileRecord getIndexedFileRecord(IndexEntry indexEntry)
-            throws IOException {
+    public FileRecord getIndexedFileRecord(IndexEntry indexEntry) throws IOException {
         return getRecord(indexEntry.getFileReferenceNumber());
     }
 }

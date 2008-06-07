@@ -34,48 +34,43 @@ import org.jnode.naming.InitialNaming;
  * 
  * @author Andreas H\u00e4nel
  */
-public class JIFSFdevices extends JIFSFile{
+public class JIFSFdevices extends JIFSFile {
 
-	
-	public JIFSFdevices() {
-		super("devices");
-	}
-	
-	public JIFSFdevices(FSDirectory parent) {
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.refresh();
-		final TreeMap<String, Device> tm = new TreeMap<String, Device>();
-		try{
-			final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-			for (Device dev : dm.getDevices()) {
-				tm.put(dev.getId(), dev);
-			}
-		} catch (javax.naming.NameNotFoundException E) {
-			System.err.println("could not find DeviceManager");
-		}
-		for (Device dev : tm.values()) {
-			addStringln();
-			addString(dev.getId());
-			final String drvClassName = dev.getDriverClassName();
-			if (dev.isStarted()) {
-				addString("\tstarted");
-			} else {
-				addString("\tstopped");
-			}
-			if (drvClassName != null) {
-				addString("\ndriver: " + drvClassName);
-			} else {
-				addString("\ndriver: none");
-			}
-			addStringln();
-		}
+    public JIFSFdevices() {
+        super("devices");
+    }
 
-	}
+    public JIFSFdevices(FSDirectory parent) {
+        this();
+        setParent(parent);
+    }
 
-	
-
+    public void refresh() {
+        super.refresh();
+        final TreeMap<String, Device> tm = new TreeMap<String, Device>();
+        try {
+            final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
+            for (Device dev : dm.getDevices()) {
+                tm.put(dev.getId(), dev);
+            }
+        } catch (javax.naming.NameNotFoundException E) {
+            System.err.println("could not find DeviceManager");
+        }
+        for (Device dev : tm.values()) {
+            addStringln();
+            addString(dev.getId());
+            final String drvClassName = dev.getDriverClassName();
+            if (dev.isStarted()) {
+                addString("\tstarted");
+            } else {
+                addString("\tstopped");
+            }
+            if (drvClassName != null) {
+                addString("\ndriver: " + drvClassName);
+            } else {
+                addString("\ndriver: none");
+            }
+            addStringln();
+        }
+    }
 }

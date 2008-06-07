@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import javax.naming.NameNotFoundException;
 
@@ -54,63 +53,62 @@ import org.jnode.shell.syntax.IntegerArgument;
  * @author crawley@jnode.org
  */
 public class NFSMountCommand extends AbstractCommand {
-    private final FileArgument MOUNTPOINT_ARG = new FileArgument(
-            "directory", Argument.MANDATORY, "the mountpoint");
-    
-    private final NFSHostNameArgument HOST_ARG = new NFSHostNameArgument(
-            "nfsFileSystem", Argument.MANDATORY, "remote NFS host and exported directory (host:dir)");
+    private final FileArgument MOUNTPOINT_ARG =
+            new FileArgument("directory", Argument.MANDATORY, "the mountpoint");
 
-    private final FlagArgument READ_ONLY_FLAG = new FlagArgument(
-            "readOnly", Argument.OPTIONAL, "if set, mount the file system read-only");
-    
-    private final FlagArgument READ_WRITE_FLAG = new FlagArgument(
-            "readWrite", Argument.OPTIONAL, "if set, mount the file system read-write");
+    private final NFSHostNameArgument HOST_ARG =
+            new NFSHostNameArgument("nfsFileSystem", Argument.MANDATORY,
+                    "remote NFS host and exported directory (host:dir)");
 
-    private final FlagArgument TCP_FLAG = new FlagArgument(
-            "tcp", Argument.OPTIONAL, "if set, use tcp protocol");
-    
-    private final FlagArgument UDP_FLAG = new FlagArgument(
-            "udp", Argument.OPTIONAL, "if set, use udp protocol (default)");
+    private final FlagArgument READ_ONLY_FLAG =
+            new FlagArgument("readOnly", Argument.OPTIONAL,
+                    "if set, mount the file system read-only");
 
-    private final IntegerArgument USER_ID_ARG = new IntegerArgument(
-            "uid", Argument.OPTIONAL, "remote user id (default -1)");
-    
-    private final IntegerArgument GROUP_ID_ARG = new IntegerArgument(
-            "gid", Argument.OPTIONAL, "remote group id (default -1)");
+    private final FlagArgument READ_WRITE_FLAG =
+            new FlagArgument("readWrite", Argument.OPTIONAL,
+                    "if set, mount the file system read-write");
+
+    private final FlagArgument TCP_FLAG =
+            new FlagArgument("tcp", Argument.OPTIONAL, "if set, use tcp protocol");
+
+    private final FlagArgument UDP_FLAG =
+            new FlagArgument("udp", Argument.OPTIONAL, "if set, use udp protocol (default)");
+
+    private final IntegerArgument USER_ID_ARG =
+            new IntegerArgument("uid", Argument.OPTIONAL, "remote user id (default -1)");
+
+    private final IntegerArgument GROUP_ID_ARG =
+            new IntegerArgument("gid", Argument.OPTIONAL, "remote group id (default -1)");
 
     public NFSMountCommand() {
         super("mount an NFS filesystem");
-        registerArguments(MOUNTPOINT_ARG, HOST_ARG, READ_ONLY_FLAG, READ_WRITE_FLAG, 
-                TCP_FLAG, UDP_FLAG, USER_ID_ARG, GROUP_ID_ARG);
+        registerArguments(MOUNTPOINT_ARG, HOST_ARG, READ_ONLY_FLAG, READ_WRITE_FLAG, TCP_FLAG,
+                UDP_FLAG, USER_ID_ARG, GROUP_ID_ARG);
     }
 
     public static void main(String[] args) throws Exception {
         new NFSMountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) 
-    throws NameNotFoundException,  DriverException, DeviceAlreadyRegisteredException, 
-            FileSystemException, IOException 
-    {
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException,
+        FileSystemException, IOException {
         final File mountPoint = MOUNTPOINT_ARG.getValue();
         final InetAddress host = HOST_ARG.getAddress();
         final String remoteDirectory = HOST_ARG.getRemoteDirectory();
 
         // Choose the protocol (udp or tcp) the default value it is udp.
-        final Protocol protocol = 
-            UDP_FLAG.isSet() ? Protocol.UDP :
-            TCP_FLAG.isSet() ? Protocol.TCP : Protocol.UDP;
+        final Protocol protocol =
+                UDP_FLAG.isSet() ? Protocol.UDP : TCP_FLAG.isSet() ? Protocol.TCP : Protocol.UDP;
 
         int uid = USER_ID_ARG.isSet() ? USER_ID_ARG.getValue() : -1;
         int gid = GROUP_ID_ARG.isSet() ? GROUP_ID_ARG.getValue() : -1;
-        
+
         // Choose read-only or read-write.  If neither is specified, guess that the
         // file system should be read-only if no uid/gid was specified.
-        boolean readOnly = 
-            READ_ONLY_FLAG.isSet() ? true : 
-            READ_WRITE_FLAG.isSet() ? false :
-            (uid == -1 && gid == -1);
+        boolean readOnly =
+                READ_ONLY_FLAG.isSet() ? true : READ_WRITE_FLAG.isSet() ? false
+                        : (uid == -1 && gid == -1);
 
         // Now do the work of mounting the file system, taking care to undo as much as 
         // we can in the event of a failure.
@@ -127,14 +125,12 @@ public class NFSMountCommand extends AbstractCommand {
             try {
                 fss.mount(mountPoint.getAbsolutePath(), fs, null);
                 ok = true;
-            }
-            finally {
+            } finally {
                 if (!ok) {
                     fss.unregisterFileSystem(dev);
                 }
             }
-        }
-        finally {
+        } finally {
             if (!ok) {
                 dm.unregister(dev);
             }
