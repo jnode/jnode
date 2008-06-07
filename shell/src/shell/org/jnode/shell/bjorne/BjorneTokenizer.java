@@ -232,6 +232,7 @@ public class BjorneTokenizer {
                     break;
                 default:
                     /* empty */
+                    break;
             }
             sb.append((char) ch);
             ch = nextCh();
