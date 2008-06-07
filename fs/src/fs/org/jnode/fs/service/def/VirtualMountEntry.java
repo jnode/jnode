@@ -35,12 +35,12 @@ import org.jnode.fs.FileSystem;
  */
 final class VirtualMountEntry implements FSEntry {
 
-    private final FileSystem mountedFS;
+    private final FileSystem<?> mountedFS;
 
     private final String name;
 
     private final FSDirectory parent;
-    
+
     private final FSEntry root;
 
     /**
@@ -52,8 +52,8 @@ final class VirtualMountEntry implements FSEntry {
      * @param parent
      * @throws IOException
      */
-    VirtualMountEntry(FileSystem mountedFS, String path, String name,
-            VirtualDirEntry parent) throws IOException {
+    VirtualMountEntry(FileSystem<?> mountedFS, String path, String name, VirtualDirEntry parent)
+        throws IOException {
         this.mountedFS = mountedFS;
         this.name = name;
         this.parent = parent.getDirectory();
@@ -66,7 +66,7 @@ final class VirtualMountEntry implements FSEntry {
                 final String dir;
                 if (idx > 0) {
                     dir = path.substring(0, idx);
-                    path = path.substring(idx+1);                    
+                    path = path.substring(idx + 1);
                 } else {
                     dir = path;
                     path = null;
@@ -157,7 +157,7 @@ final class VirtualMountEntry implements FSEntry {
     /**
      * @see org.jnode.fs.FSObject#getFileSystem()
      */
-    public FileSystem getFileSystem() {
+    public FileSystem<?> getFileSystem() {
         return mountedFS;
     }
 
@@ -171,7 +171,7 @@ final class VirtualMountEntry implements FSEntry {
     /**
      * @return Returns the mountedFS.
      */
-    public final FileSystem getMountedFS() {
+    public final FileSystem<?> getMountedFS() {
         return mountedFS;
     }
 }

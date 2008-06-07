@@ -29,27 +29,26 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.*;
+import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSFile;
+import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
 
 /**
  * Abstract class with common things in different FileSystem implementations
- *
+ * 
  * @author Fabien DUMINY
  */
 public abstract class AbstractFileSystem<T extends FSEntry> implements FileSystem<T> {
 
     private static final Logger log = Logger.getLogger(AbstractFileSystem.class);
-
     private boolean readOnly;
-
     private final Device device;
-
     private final BlockDeviceAPI api;
-
     private final FileSystemType<? extends FileSystem<T>> type;
-
     private boolean closed;
-
     private T rootEntry;
 
     // cache of FSFile (key: FSEntry)
@@ -60,13 +59,15 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
 
     /**
      * Construct an AbstractFileSystem in specified readOnly mode
+     * 
      * @param device
      * @param readOnly
      * @throws FileSystemException
      */
-    public AbstractFileSystem(Device device, boolean readOnly, FileSystemType<? extends FileSystem<T>> type)
-            throws FileSystemException {
-        if (device == null) throw new IllegalArgumentException("null device!");
+    public AbstractFileSystem(Device device, boolean readOnly,
+            FileSystemType<? extends FileSystem<T>> type) throws FileSystemException {
+        if (device == null)
+            throw new IllegalArgumentException("null device!");
 
         this.device = device;
 
@@ -84,65 +85,61 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     /**
      * @see org.jnode.fs.FileSystem#getDevice()
      */
-    final public Device getDevice() {
+    public final Device getDevice() {
         return device;
     }
 
-    final public FileSystemType<? extends FileSystem<T>> getType() {
-		return type;
-	}
+    public final FileSystemType<? extends FileSystem<T>> getType() {
+        return type;
+    }
 
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
-    public T getRootEntry() throws IOException
-	{
-    	if(isClosed())
-    		throw new IOException("FileSystem is closed");
+    public T getRootEntry() throws IOException {
+        if (isClosed())
+            throw new IOException("FileSystem is closed");
 
-    	if(rootEntry == null)
-    	{
-   			rootEntry = createRootEntry();
-    	}
-    	return rootEntry;
-	}
+        if (rootEntry == null) {
+            rootEntry = createRootEntry();
+        }
+        return rootEntry;
+    }
 
     /**
      * @see org.jnode.fs.FileSystem#close()
      */
     public void close() throws IOException {
-    	if(!isClosed())
-    	{
-	        // if readOnly, nothing to do
-	        if (!isReadOnly()) {
-	            flush();
-	        }
+        if (!isClosed()) {
+            // if readOnly, nothing to do
+            if (!isReadOnly()) {
+                flush();
+            }
 
-	        api.flush();
-	        files.clear();
-	        directories.clear();
+            api.flush();
+            files.clear();
+            directories.clear();
 
-	        // these fields are final, can't nullify them
-	        //device = null;
-	        //api = null;
+            // these fields are final, can't nullify them
+            // device = null;
+            // api = null;
 
-	        rootEntry = null;
-	        files = null;
-	        directories = null;
-
-	        closed = true;
-    	}
+            rootEntry = null;
+            files = null;
+            directories = null;
+            closed = true;
+        }
     }
 
     /**
      * Save the content that have been altered but not saved in the Device
+     * 
      * @throws IOException
      */
-    public void flush() throws IOException
-	{
-    	flushFiles();
-    	flushDirectories();
-	}
+    public void flush() throws IOException {
+        flushFiles();
+        flushDirectories();
+    }
 
     /**
      * @return Returns the api.
@@ -155,116 +152,116 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
      * @return Returns the FSApi.
      * @throws ApiNotFoundException
      */
-    final public FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
-    	return device.getAPI(FSBlockDeviceAPI.class);
+    public final FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
+        return device.getAPI(FSBlockDeviceAPI.class);
     }
 
     /**
      * @return if filesystem is closed.
      */
-    final public boolean isClosed() {
+    public final boolean isClosed() {
         return closed;
     }
 
     /**
      * @return if filesystem is readOnly.
      */
-    final public boolean isReadOnly() {
+    public final boolean isReadOnly() {
         return readOnly;
     }
 
-    final protected void setReadOnly(boolean readOnly) {
-    	this.readOnly = readOnly;
+    protected final void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 
-	/**
-	 * Gets the file for the given entry.
-	 *
-	 * @param entry
-	 * @return the FSFile object associated with entry
-	 * @throws IOException
-	 */
-	final public synchronized FSFile getFile(FSEntry entry) throws IOException {
-    	if(isClosed())
-    		throw new IOException("FileSystem is closed");
+    /**
+     * Gets the file for the given entry.
+     * 
+     * @param entry
+     * @return the FSFile object associated with entry
+     * @throws IOException
+     */
+    public final synchronized FSFile getFile(FSEntry entry) throws IOException {
+        if (isClosed())
+            throw new IOException("FileSystem is closed");
 
-		FSFile file = files.get(entry);
-		if (file == null) {
-			file = createFile(entry);
-			files.put(entry, file);
-		}
-		return file;
-	}
+        FSFile file = files.get(entry);
+        if (file == null) {
+            file = createFile(entry);
+            files.put(entry, file);
+        }
+        return file;
+    }
 
-	/**
-	 * Abstract method to create a new FSFile from the entry
-	 * @param entry
-	 * @return a new created FSFile
-	 * @throws IOException
-	 */
-	protected abstract FSFile createFile(FSEntry entry) throws IOException;
+    /**
+     * Abstract method to create a new FSFile from the entry
+     * 
+     * @param entry
+     * @return a new created FSFile
+     * @throws IOException
+     */
+    protected abstract FSFile createFile(FSEntry entry) throws IOException;
 
-	/**
-	 * Flush all unsaved FSFile in our cache
-	 * @throws IOException
-	 */
-	final private void flushFiles() throws IOException
-	{
-		log.info("flushing files ...");
-		for (FSFile f : files.values()) {
-            if(log.isDebugEnabled())
-            {
-                log.debug("flush: flushing file "+f);
+    /**
+     * Flush all unsaved FSFile in our cache
+     * 
+     * @throws IOException
+     */
+    private final void flushFiles() throws IOException {
+        log.info("flushing files ...");
+        for (FSFile f : files.values()) {
+            if (log.isDebugEnabled()) {
+                log.debug("flush: flushing file " + f);
             }
 
-			f.flush();
-		}
-	}
+            f.flush();
+        }
+    }
 
-	/**
-	 * Gets the file for the given entry.
-	 *
-	 * @param entry
-	 * @return the FSDirectory object associated with this entry
-	 * @throws IOException
-	 */
-	final public synchronized FSDirectory getDirectory(FSEntry entry) throws IOException {
-    	if(isClosed())
-    		throw new IOException("FileSystem is closed");
+    /**
+     * Gets the file for the given entry.
+     * 
+     * @param entry
+     * @return the FSDirectory object associated with this entry
+     * @throws IOException
+     */
+    public final synchronized FSDirectory getDirectory(FSEntry entry) throws IOException {
+        if (isClosed())
+            throw new IOException("FileSystem is closed");
 
-		FSDirectory dir = directories.get(entry);
-		if (dir == null) {
-			dir = createDirectory(entry);
-			directories.put(entry, dir);
-		}
-		return dir;
-	}
+        FSDirectory dir = directories.get(entry);
+        if (dir == null) {
+            dir = createDirectory(entry);
+            directories.put(entry, dir);
+        }
+        return dir;
+    }
 
-	/**
-	 * Abstract method to create a new directory from the given entry
-	 * @param entry
-	 * @return the new created FSDirectory
-	 * @throws IOException
-	 */
-	protected abstract FSDirectory createDirectory(FSEntry entry) throws IOException;
+    /**
+     * Abstract method to create a new directory from the given entry
+     * 
+     * @param entry
+     * @return the new created FSDirectory
+     * @throws IOException
+     */
+    protected abstract FSDirectory createDirectory(FSEntry entry) throws IOException;
 
-	/**
-	 * Flush all unsaved FSDirectory in our cache
-	 * @throws IOException
-	 */
-	final private void flushDirectories()
-	{
-		log.info("flushing directories ...");
-		for (FSDirectory d : directories.values()) {
-            if(log.isDebugEnabled())
-            {
-                log.debug("flush: flushing directory "+d);
+    /**
+     * Flush all unsaved FSDirectory in our cache
+     * 
+     * @throws IOException
+     */
+    private final void flushDirectories() {
+        log.info("flushing directories ...");
+        for (FSDirectory d : directories.values()) {
+            if (log.isDebugEnabled()) {
+                log.debug("flush: flushing directory " + d);
             }
 
-			//TODO: uncomment this line
-			//d.flush();
-		}
-	}
+            //TODO: uncomment this line
+            //d.flush();
+        }
+    }
 
     /**
      * Abstract method to create a new root entry

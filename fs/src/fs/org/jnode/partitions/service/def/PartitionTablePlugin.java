@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.partitions.PartitionTableType;
 import org.jnode.partitions.service.PartitionTableService;
@@ -34,9 +33,6 @@ import org.jnode.plugin.PluginException;
 
 public class PartitionTablePlugin extends Plugin implements PartitionTableService {
 
-    /** My logger */
-    private static final Logger log = Logger.getLogger(PartitionTablePlugin.class);
-    
     private final PartitionTableTypeManager typeMgr;
 
     /**
@@ -72,5 +68,5 @@ public class PartitionTablePlugin extends Plugin implements PartitionTableServic
      */
     public Collection<PartitionTableType> partitionTableTypes() {
         return typeMgr.partitionTableTypes();
-    }    
+    }
 }

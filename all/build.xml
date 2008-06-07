@@ -884,6 +884,7 @@ clean             Remove all intermediate build results.
             <fileset dir="../core/src/core" includes="**/*.java"/>
             <fileset dir="../core/src/driver" includes="**/*.java"/>
             <fileset dir="../core/src/test" includes="**/*.java"/>
+            <fileset dir="../fs/src/fs" includes="**/*.java"/>
             <fileset dir="../fs/src/driver" includes="**/*.java"/>
             <fileset dir="../fs/src/test" includes="**/*.java"/>
             <fileset dir="../gui/src/test" includes="**/*.java"/>

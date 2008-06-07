@@ -44,11 +44,13 @@ public class FSEntryTable extends AbstractFSObject {
 
     private static final Logger log = Logger.getLogger(FSEntryTable.class);
 
-	/**
+    /**
      * An empty table that's used as a default table (that can't be modified)
-     * for FSDirectory
+     * for FSDirectory.
      */
-    static public final FSEntryTable EMPTY_TABLE = new FSEntryTable() {};
+    public static final FSEntryTable EMPTY_TABLE = new FSEntryTable() {
+        // FIXME ... actually it CAN be modified!!
+    };
 
     /**
      * Map of entries (key=name, value=entry). As a value may be null (a free
@@ -88,8 +90,7 @@ public class FSEntryTable extends AbstractFSObject {
                 entryNames.add(null);
             } else {
                 final String name = normalizeName(entry.getName());
-                log.debug("FSEntryTable: adding entry " + name + " (length=+"
-                        + name.length() + ")");
+                log.debug("FSEntryTable: adding entry " + name + " (length=+" + name.length() + ")");
                 entries.put(name, entry);
                 entryNames.add(name);
             }
@@ -136,14 +137,14 @@ public class FSEntryTable extends AbstractFSObject {
      * @param index
      * @return the FSEntry at index
      */
-    final public FSEntry get(int index) {
+    public final FSEntry get(int index) {
         return get(entryNames.get(index));
     }
 
     /**
      * Get the entry given by its name. The result can be null.
      * 
-     * @param name 
+     * @param name
      * @return the FSEntry with given name
      */
     public FSEntry get(String name) {
@@ -157,11 +158,11 @@ public class FSEntryTable extends AbstractFSObject {
     }
 
     /**
-     * return a list of FSEntry names (ie a list of String)
+     * return a list of FSEntry names
      * 
      * @return a List of FSEntry names
      */
-    protected List getEntryNames() {
+    protected List<String> getEntryNames() {
         return entryNames;
     }
 
@@ -197,8 +198,9 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * Indicate if the table need to be saved to the device.
+     * 
      * @return if the table needs to be saved to the device
-     * @throws IOException 
+     * @throws IOException
      */
     public final boolean isDirty() throws IOException {
         if (super.isDirty()) {
@@ -235,7 +237,7 @@ public class FSEntryTable extends AbstractFSObject {
                 index++;
                 return entry;
             }
-            
+
             /**
              * @see java.util.Iterator#remove()
              */
@@ -283,8 +285,7 @@ public class FSEntryTable extends AbstractFSObject {
      * @return the index of renamed file
      */
     public int rename(String oldName, String newName) {
-        log.debug("<<< BEGIN rename oldName=" + oldName + " newName=" + newName
-                + " >>>");
+        log.debug("<<< BEGIN rename oldName=" + oldName + " newName=" + newName + " >>>");
         log.debug("rename: table=" + toString());
         oldName = normalizeName(oldName);
         newName = normalizeName(newName);
@@ -314,8 +315,7 @@ public class FSEntryTable extends AbstractFSObject {
      * 
      * @param newEntry
      * @return the index of the stored entry
-     * @throws IOException
-     *             if directory is full (can't be resized)
+     * @throws IOException if directory is full (can't be resized)
      */
     public int setFreeEntry(FSEntry newEntry) throws IOException {
         String name = normalizeName(newEntry.getName());
@@ -339,7 +339,7 @@ public class FSEntryTable extends AbstractFSObject {
      * 
      * @return the complete size of the entry table
      */
-    final public int size() {
+    public final int size() {
         return entryNames.size();
     }
 
@@ -377,13 +377,14 @@ public class FSEntryTable extends AbstractFSObject {
 
     /**
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
         int nbEntries = entryNames.size();
         String name;
         StringBuilder sb = new StringBuilder(nbEntries * 16);
-        for (int i = 0; i < nbEntries ; i++) {
+        for (int i = 0; i < nbEntries; i++) {
             name = entryNames.get(i);
             sb.append("name:").append(name);
             sb.append("->entry:").append(entries.get(name));

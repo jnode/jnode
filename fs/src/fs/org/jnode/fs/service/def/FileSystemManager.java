@@ -33,46 +33,45 @@ import org.jnode.fs.FileSystem;
  * @author epr
  */
 final class FileSystemManager {
+    /** All registed filesystems (device, fs) */
+    private final Map<Device, FileSystem<?>> filesystems = new HashMap<Device, FileSystem<?>>();
 
-	/** All registed filesystems (device, fs) */
-	private final Map<Device, FileSystem> filesystems = new HashMap<Device, FileSystem>();
-
-	/**
-	 * Register a mounted filesystem
-	 * 
-	 * @param fs
-	 */
-	public void registerFileSystem(FileSystem fs) {
+    /**
+     * Register a mounted filesystem
+     * 
+     * @param fs
+     */
+    public void registerFileSystem(FileSystem<?> fs) {
         final Device device = fs.getDevice();
         synchronized (this) {
             filesystems.put(device, fs);
         }
-	}
+    }
 
-	/**
-	 * Unregister a mounted filesystem
-	 * 
-	 * @param device
-	 */
-	public synchronized FileSystem unregisterFileSystem(Device device) {
-		return filesystems.remove(device);
-	}
+    /**
+     * Unregister a mounted filesystem
+     * 
+     * @param device
+     */
+    public synchronized FileSystem<?> unregisterFileSystem(Device device) {
+        return filesystems.remove(device);
+    }
 
-	/**
-	 * Gets the filesystem registered on the given device.
-	 * 
-	 * @param device
-	 * @return null if no filesystem was found.
-	 */
-	public synchronized FileSystem getFileSystem(Device device) {
-		return filesystems.get(device);
-	}
+    /**
+     * Gets the filesystem registered on the given device.
+     * 
+     * @param device
+     * @return null if no filesystem was found.
+     */
+    public synchronized FileSystem<?> getFileSystem(Device device) {
+        return filesystems.get(device);
+    }
 
-	/**
-	 * Gets all registered filesystems. All instances of the returned collection
-	 * are instanceof FileSystem.
-	 */
-	public synchronized Collection<FileSystem> fileSystems() {
-		return new ArrayList<FileSystem>(filesystems.values());
-	}
+    /**
+     * Gets all registered filesystems. All instances of the returned collection
+     * are instanceof FileSystem.
+     */
+    public synchronized Collection<FileSystem<?>> fileSystems() {
+        return new ArrayList<FileSystem<?>>(filesystems.values());
+    }
 }

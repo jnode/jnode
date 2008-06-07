@@ -104,7 +104,6 @@ final class FileSystemMounter implements DeviceListener {
             // add it to the queue of devices to be mounted only if the action
             // is not already pending
             WorkUtils.add(new Work("Mounting " + device.getId()) {
-
                 public void execute() {
                     asyncDeviceStarted(device);
                 }
@@ -117,8 +116,7 @@ final class FileSystemMounter implements DeviceListener {
      */
     public final void deviceStop(Device device) {
         if (device.implementsAPI(FSBlockDeviceAPI.class)) {
-            final FileSystem fs = fileSystemService
-                    .unregisterFileSystem(device);
+            final FileSystem<?> fs = fileSystemService.unregisterFileSystem(device);
             if (fs != null) {
                 try {
                     fs.close();
@@ -135,9 +133,8 @@ final class FileSystemMounter implements DeviceListener {
      * @param device
      * @param api
      */
-    protected void tryToMount(Device device, FSBlockDeviceAPI api,
-            boolean removable, boolean readOnly) {
-
+    protected void tryToMount(Device device, FSBlockDeviceAPI api, boolean removable,
+            boolean readOnly) {
         if (fileSystemService.getFileSystem(device) != null) {
             log.info("device already mounted...");
             return;
@@ -157,30 +154,28 @@ final class FileSystemMounter implements DeviceListener {
             final String mountPath = File.separatorChar + MOUNT_ROOT + File.separatorChar;
 
             api.read(0, bs);
-            for (FileSystemType fst : fileSystemService.fileSystemTypes()) {
-            	if(fst instanceof BlockDeviceFileSystemType)
-            	{
-	                if (((BlockDeviceFileSystemType)fst).supports(ptEntry, bs.array(), api)) {
-	                    try {
-	                        final FileSystem fs = fst.create(device, readOnly);
-	                        fileSystemService.registerFileSystem(fs);
+            for (FileSystemType<?> fst : fileSystemService.fileSystemTypes()) {
+                if (fst instanceof BlockDeviceFileSystemType) {
+                    if (((BlockDeviceFileSystemType<?>) fst).supports(ptEntry, bs.array(), api)) {
+                        try {
+                            final FileSystem<?> fs = fst.create(device, readOnly);
+                            fileSystemService.registerFileSystem(fs);
 
-	                        final String fullPath = mountPath + device.getId();
-	                        log.debug("Mounting " + device.getId() + " on " + fullPath);
-	                        fileSystemService.mount(fullPath, fs, null);
+                            final String fullPath = mountPath + device.getId();
+                            log.debug("Mounting " + device.getId() + " on " + fullPath);
+                            fileSystemService.mount(fullPath, fs, null);
 
-	                        log.info("Mounted " + fst.getName() + " on "
-	                                + fullPath);
-	                        return;
-	                    } catch (FileSystemException ex) {
-	                        log.error("Cannot mount " + fst.getName()
-	                                + " filesystem on " + device.getId(), ex);
-	                    } catch (IOException ex) {
-	                        log.error("Cannot mount " + fst.getName()
-	                                + " filesystem on " + device.getId(), ex);
-	                    }
-	                }
-            	}
+                            log.info("Mounted " + fst.getName() + " on " + fullPath);
+                            return;
+                        } catch (FileSystemException ex) {
+                            log.error("Cannot mount " + fst.getName() + " filesystem on " +
+                                    device.getId(), ex);
+                        } catch (IOException ex) {
+                            log.error("Cannot mount " + fst.getName() + " filesystem on " +
+                                    device.getId(), ex);
+                        }
+                    }
+                }
             }
             log.info("No filesystem found for " + device.getId());
         } catch (IOException ex) {
@@ -194,8 +189,7 @@ final class FileSystemMounter implements DeviceListener {
     final void asyncDeviceStarted(Device device) {
         try {
             if (device.isStarted()) {
-                final FSBlockDeviceAPI api = device
-                        .getAPI(FSBlockDeviceAPI.class);
+                final FSBlockDeviceAPI api = device.getAPI(FSBlockDeviceAPI.class);
                 final boolean readOnly = false; // TODO: read from config
                 if (device.implementsAPI(RemovableDeviceAPI.class)) {
                     tryToMount(device, api, true, readOnly);

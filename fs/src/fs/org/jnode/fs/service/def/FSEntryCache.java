@@ -31,68 +31,70 @@ import org.jnode.fs.FSEntry;
 /**
  * @author epr
  */
+@SuppressWarnings("serial")
 final class FSEntryCache {
 
-	/** The actual cache */
-	private final Map<String, FSEntry> entries = new LinkedHashMap<String, FSEntry>(){
+    /** The actual cache */
+    private final Map<String, FSEntry> entries = new LinkedHashMap<String, FSEntry>() {
+        @Override
+        protected boolean removeEldestEntry(Entry<String, FSEntry> eldest) {
+            return size() > 100;
+        }
+    };
 
-		@Override
-		protected boolean removeEldestEntry(Entry<String, FSEntry> eldest) {
-			return size() > 100;
-		}
-		
-	};
-	
-	/**
-	 * Create a new instance
-	 * @param fsm
-	 */
-	public FSEntryCache() {
-	}
-	
-	/**
-	 * Gets a cached entry for a given path.
-	 * @param path must be an absolute path
-	 */
-	public synchronized FSEntry getEntry(String path) {
-		final FSEntry entry = entries.get(path);
-		if (entry != null) {
-			if (entry.isValid()) {
-				return entry; 
-			} else {
-				entries.remove(path);
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-	
-	/**
-	 * Puts an entry in the cache. Any existing entry for the given path
-	 * will be removed.
-	 * @param path must be an absolute path
-	 * @param entry
-	 */
-	public synchronized void setEntry(String path, FSEntry entry) {
-		entries.put(path, entry);
-	}
-	
-	/**
-	 * Remove any entry bound to the given path or a path below the given
-	 * path.
-	 * @param rootPathStr must be an absolute path
-	 */
-	public synchronized void removeEntries(String rootPathStr) {
-		entries.remove(rootPathStr);
-		final ArrayList<String> removePathList = new ArrayList<String>();
-		for (String pathStr : entries.keySet()) {
-			if (pathStr.startsWith(rootPathStr)) {
-				removePathList.add(pathStr);
-			}
-		}
-		for (String path : removePathList) {
-			entries.remove(path);			
-		}
-	}
+    /**
+     * Create a new instance
+     * 
+     * @param fsm
+     */
+    public FSEntryCache() {
+    }
+
+    /**
+     * Gets a cached entry for a given path.
+     * 
+     * @param path must be an absolute path
+     */
+    public synchronized FSEntry getEntry(String path) {
+        final FSEntry entry = entries.get(path);
+        if (entry != null) {
+            if (entry.isValid()) {
+                return entry;
+            } else {
+                entries.remove(path);
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Puts an entry in the cache. Any existing entry for the given path will be
+     * removed.
+     * 
+     * @param path must be an absolute path
+     * @param entry
+     */
+    public synchronized void setEntry(String path, FSEntry entry) {
+        entries.put(path, entry);
+    }
+
+    /**
+     * Remove any entry bound to the given path or a path below the given path.
+     * 
+     * @param rootPathStr must be an absolute path
+     */
+    public synchronized void removeEntries(String rootPathStr) {
+        entries.remove(rootPathStr);
+        final ArrayList<String> removePathList = new ArrayList<String>();
+        for (String pathStr : entries.keySet()) {
+            if (pathStr.startsWith(rootPathStr)) {
+                removePathList.add(pathStr);
+            }
+        }
+        for (String path : removePathList) {
+            entries.remove(path);
+        }
+    }
 }

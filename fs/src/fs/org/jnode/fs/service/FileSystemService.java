@@ -21,11 +21,10 @@
 
 package org.jnode.fs.service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.VMFileSystemAPI;
 import java.util.Collection;
 import java.util.Map;
-
-import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
@@ -37,86 +36,89 @@ import org.jnode.fs.FileSystemType;
  */
 public interface FileSystemService {
 
-	/**
-	 * Name used to lookup a FileSystemTypeManager in the initial namespace.
-	 */
-	public static final Class<FileSystemService> NAME = FileSystemService.class; //"system/FileSystemService";
+    /**
+     * Name used to lookup a FileSystemTypeManager in the initial namespace.
+     */
+    public static final Class<FileSystemService> NAME = FileSystemService.class; // "system/FileSystemService";
 
-	/**
-	 * Gets all registered file system types. All instances of the returned
-	 * collection are instanceof FileSystemType.
-	 */
-	public Collection<FileSystemType<?>> fileSystemTypes();
+    /**
+     * Gets all registered file system types. 
+     */
+    public Collection<FileSystemType<?>> fileSystemTypes();
 
-	/**
-	 * Gets registered file system types with the gicen name.
-	 *
-	 * @param name the name of the FSType you want
-	 * @return the fileSystemType
-	 */
-	public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name) throws FileSystemException;
+    /**
+     * Gets registered file system types with the given name.
+     * 
+     * @param name the name of the FSType you want
+     * @return the fileSystemType
+     */
+    public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name)
+        throws FileSystemException;
 
-	/**
-	 * Register a mounted filesystem
-	 *
-	 * @param fs
-	 */
-	public void registerFileSystem(FileSystem fs) throws FileSystemException;
+    /**
+     * Register a mounted filesystem
+     * 
+     * @param fs
+     */
+    public void registerFileSystem(FileSystem<?> fs) throws FileSystemException;
 
-	/**
-	 * Unregister a mounted filesystem
-	 *
-	 * @param device
-	 * @return The filesystem that was registered for the device, or null if not found.
-	 */
-	public FileSystem unregisterFileSystem(Device device);
+    /**
+     * Unregister a mounted filesystem
+     * 
+     * @param device
+     * @return The filesystem that was registered for the device, or null if not
+     *         found.
+     */
+    public FileSystem<?> unregisterFileSystem(Device device);
 
-	/**
-	 * Gets the filesystem registered on the given device.
-	 *
-	 * @param device
-	 * @return null if no filesystem was found.
-	 */
-	public FileSystem getFileSystem(Device device);
+    /**
+     * Gets the filesystem registered on the given device.
+     * 
+     * @param device
+     * @return null if no filesystem was found.
+     */
+    public FileSystem<?> getFileSystem(Device device);
 
-	/**
-	 * Gets all registered filesystems. All instances of the returned collection
-	 * are instanceof FileSystem.
-	 */
-	public Collection<FileSystem> fileSystems();
+    /**
+     * Gets all registered filesystems. All instances of the returned collection
+     * are instanceof FileSystem.
+     */
+    public Collection<FileSystem<?>> fileSystems();
 
     /**
      * Mount the given filesystem at the fullPath, using the fsPath as root of
      * the to be mounted filesystem.
-     *
+     * 
      * @param fullPath
      * @param fs
      * @param fsPath Null or empty to use the root of the filesystem.
      */
-    public void mount(String fullPath, FileSystem fs, String fsPath)
-    throws IOException;
+    public void mount(String fullPath, FileSystem<?> fs, String fsPath) throws IOException;
 
     /**
      * Return a map (fullPath -> FileSystem) of mount points
+     * 
      * @return a copy of the internal map, sorted by fullPath
      */
     public Map<String, FileSystem<?>> getMountPoints();
 
     /**
      * Return a map of devices and their mount points.
+     * 
      * @return
      */
     public Map<String, String> getDeviceMountPoints();
-    
+
     /**
      * Is the given directory a mount.
+     * 
      * @param fullPath
      * @return
      */
     public boolean isMount(String fullPath);
 
-	/**
-	 * Gets the filesystem API.
-	 */
-	public VMFileSystemAPI getApi();
+    /**
+     * Gets the filesystem API.
+     */
+    public VMFileSystemAPI getApi();
 }
