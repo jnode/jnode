@@ -52,7 +52,7 @@ public class ISO9660Volume implements ISO9660Constants {
         this.api = api;
         this.blockSize = api.getSectorSize();
 
-        final byte[] buffer = new byte[ blockSize];
+        final byte[] buffer = new byte[blockSize];
 
         PrimaryVolumeDescriptor pVD = null;
         SupplementaryVolumeDescriptor sVD = null;
@@ -62,34 +62,35 @@ public class ISO9660Volume implements ISO9660Constants {
             this.readFromLBN(currentLBN, 0, buffer, 0, blockSize);
             final int type = VolumeDescriptor.getType(buffer);
             switch (type) {
-            case VolumeDescriptorType.TERMINATOR:
-                done = true;
-                break;
-            case VolumeDescriptorType.BOOTRECORD:
-                BootLog.debug("Found boot record");
-                break;
-            case VolumeDescriptorType.PRIMARY_DESCRIPTOR:
-                BootLog.debug("Found primary descriptor");
-                pVD = new PrimaryVolumeDescriptor(this, buffer);
-                //pVD.dump(System.out);
-                break;
-            case VolumeDescriptorType.SUPPLEMENTARY_DESCRIPTOR:
-                BootLog.debug("Found supplementatory descriptor");
-                final SupplementaryVolumeDescriptor d = new SupplementaryVolumeDescriptor(
-                        this, buffer);
-                if (d.isEncodingKnown()) {
-                    sVD = d;
-                }
-                break;
-            case VolumeDescriptorType.PARTITION_DESCRIPTOR:
-                BootLog.debug("Found partition descriptor");
-                break;
-            default:
-                BootLog.debug("Found unknown descriptor with type " + type);
+                case VolumeDescriptorType.TERMINATOR:
+                    done = true;
+                    break;
+                case VolumeDescriptorType.BOOTRECORD:
+                    BootLog.debug("Found boot record");
+                    break;
+                case VolumeDescriptorType.PRIMARY_DESCRIPTOR:
+                    BootLog.debug("Found primary descriptor");
+                    pVD = new PrimaryVolumeDescriptor(this, buffer);
+                    // pVD.dump(System.out);
+                    break;
+                case VolumeDescriptorType.SUPPLEMENTARY_DESCRIPTOR:
+                    BootLog.debug("Found supplementatory descriptor");
+                    final SupplementaryVolumeDescriptor d =
+                            new SupplementaryVolumeDescriptor(this, buffer);
+                    if (d.isEncodingKnown()) {
+                        sVD = d;
+                    }
+                    break;
+                case VolumeDescriptorType.PARTITION_DESCRIPTOR:
+                    BootLog.debug("Found partition descriptor");
+                    break;
+                default:
+                    BootLog.debug("Found unknown descriptor with type " + type);
             }
         }
-        if (pVD == null) { throw new IOException(
-                "No primary volume descriptor found"); }
+        if (pVD == null) {
+            throw new IOException("No primary volume descriptor found");
+        }
         this.primaryVolumeDescriptor = pVD;
         this.supplementaryVolumeDescriptor = sVD;
     }
@@ -104,8 +105,8 @@ public class ISO9660Volume implements ISO9660Constants {
      * @param length
      * @throws IOException
      */
-    final void readFromLBN(long startLBN, long offset, byte[] buffer,
-            int bufferOffset, int length) throws IOException {
+    final void readFromLBN(long startLBN, long offset, byte[] buffer, int bufferOffset, int length)
+        throws IOException {
         api.read((startLBN * blockSize) + offset, ByteBuffer.wrap(buffer, bufferOffset, length));
     }
 

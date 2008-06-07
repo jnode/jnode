@@ -66,7 +66,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
             if (entries == null) {
                 entries = new HashMap<String, FTPFSEntry>();
                 FTPFile[] ftpFiles = null;
-                synchronized(fileSystem){
+                synchronized (fileSystem) {
                     ftpFiles = fileSystem.dirDetails(path());
                 }
                 for (FTPFile f : ftpFiles) {
@@ -81,11 +81,11 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
         }
     }
 
-    String path() throws IOException{
+    String path() throws IOException {
         StringBuilder p = new StringBuilder("/");
         FTPFSDirectory root = fileSystem.getRootEntry();
         FTPFSDirectory d = this;
-        while (d != root){
+        while (d != root) {
             p.insert(0, d.getName());
             p.insert(0, '/');
             d = d.parent;
@@ -100,6 +100,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public FTPFSEntry addDirectory(String name) throws IOException {
+        // TODO implement this
         return null;
     }
 
@@ -110,6 +111,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public FTPFSEntry addFile(String name) throws IOException {
+        // TODO implement this
         return null;
     }
 
@@ -119,7 +121,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public void flush() throws IOException {
-
+        // TODO implement me
     }
 
     /**
@@ -129,6 +131,6 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public void remove(String name) throws IOException {
-
+        // TODO implement this
     }
 }

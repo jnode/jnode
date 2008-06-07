@@ -44,7 +44,7 @@ public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
      * @see org.jnode.fs.FileSystem#getDevice()
      */
     public ISO9660FileSystem(Device device, boolean readOnly, ISO9660FileSystemType type)
-            throws FileSystemException {
+        throws FileSystemException {
         super(device, readOnly, type);
 
         try {
@@ -85,42 +85,41 @@ public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
     }
 
     /**
-     *
+     * 
      */
-	protected FSFile createFile(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    protected FSFile createFile(FSEntry entry) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 *
-	 */
-	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * 
+     */
+    protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 *
-	 */
-	protected ISO9660Entry createRootEntry() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * 
+     */
+    protected ISO9660Entry createRootEntry() throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    public long getFreeSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getFreeSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getTotalSpace() {
+        // TODO implement me
+        return 0;
+    }
 
-	public long getTotalSpace() {
-		// TODO implement me
-		return 0;
-	}
-
-	public long getUsableSpace() {
-		// TODO implement me
-		return 0;
-	}
+    public long getUsableSpace() {
+        // TODO implement me
+        return 0;
+    }
 }

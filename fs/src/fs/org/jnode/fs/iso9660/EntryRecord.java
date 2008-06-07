@@ -38,7 +38,7 @@ public class EntryRecord extends Descriptor {
     private final int flags;
     private final int interleaveSize;
     private final String identifier;
-    
+
     private final ISO9660Volume volume;
     private final String encoding;
 
@@ -52,27 +52,25 @@ public class EntryRecord extends Descriptor {
         final int offset = bp - 1;
         this.volume = volume;
         this.encoding = encoding;
-        this.entryLength = getUInt8(buff, offset+1);
-        this.extAttributeLength = getUInt8(buff, offset+2);
-        this.extentLocation = getUInt32LE(buff, offset+3);
-        this.dataLength = (int)getUInt32LE(buff, offset+11);
-        this.fileUnitSize = getUInt8(buff, offset+27);
-        this.interleaveSize = getUInt8(buff, offset+28);
-       	this.flags = getUInt8(buff, offset + 26);
-       	// This must be after flags, because of isDirectory.
-       	this.identifier = getFileIdentifier(buff, offset, isDirectory(), encoding);
+        this.entryLength = getUInt8(buff, offset + 1);
+        this.extAttributeLength = getUInt8(buff, offset + 2);
+        this.extentLocation = getUInt32LE(buff, offset + 3);
+        this.dataLength = (int) getUInt32LE(buff, offset + 11);
+        this.fileUnitSize = getUInt8(buff, offset + 27);
+        this.interleaveSize = getUInt8(buff, offset + 28);
+        this.flags = getUInt8(buff, offset + 26);
+        // This must be after flags, because of isDirectory.
+        this.identifier = getFileIdentifier(buff, offset, isDirectory(), encoding);
     }
 
-    public void readFileData(long offset, byte[] buffer, int bufferOffset,
-            int size) throws IOException {
-        volume.readFromLBN(this.getLocationOfExtent(), offset, buffer,
-                bufferOffset, size);
+    public void readFileData(long offset, byte[] buffer, int bufferOffset, int size)
+        throws IOException {
+        volume.readFromLBN(this.getLocationOfExtent(), offset, buffer, bufferOffset, size);
     }
 
     public byte[] getExtentData() throws IOException {
-        byte[] buffer = new byte[ this.getDataLength()];
-        volume.readFromLBN(this.getLocationOfExtent(), 0, buffer, 0, this
-                .getDataLength());
+        byte[] buffer = new byte[this.getDataLength()];
+        volume.readFromLBN(this.getLocationOfExtent(), 0, buffer, 0, this.getDataLength());
         return buffer;
     }
 
@@ -124,9 +122,9 @@ public class EntryRecord extends Descriptor {
     }
 
     private final String getFileIdentifier(byte[] buff, int offset, boolean isDir, String encoding) {
-        final int fidLength = getUInt8(buff, offset+33);
+        final int fidLength = getUInt8(buff, offset + 33);
         if (isDir) {
-            final int buff34 = getUInt8(buff, offset+34);
+            final int buff34 = getUInt8(buff, offset + 34);
             if ((fidLength == 1) && (buff34 == 0x00)) {
                 return ".";
             } else if ((fidLength == 1) && (buff34 == 0x01)) {
@@ -134,7 +132,7 @@ public class EntryRecord extends Descriptor {
             }
         }
         try {
-            final String id = getDChars(buff, offset+34, fidLength, encoding);
+            final String id = getDChars(buff, offset + 34, fidLength, encoding);
             final int sep2Idx = id.indexOf(SEPARATOR2);
             if (sep2Idx >= 0) {
                 return id.substring(0, sep2Idx);
@@ -145,7 +143,7 @@ public class EntryRecord extends Descriptor {
             throw new RuntimeException(ex);
         }
     }
-    
+
     /**
      * @return Returns the encoding.
      */

@@ -24,7 +24,6 @@ package org.jnode.fs.ftpfs;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Levente S\u00e1ntha
@@ -34,7 +33,7 @@ public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
 
     /**
      * Create a filesystem from a given device.
-     *
+     * 
      * @param device
      * @param readOnly
      */

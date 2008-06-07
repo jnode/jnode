@@ -65,8 +65,7 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
      * @param buffer
      * @throws IOException
      */
-    public PrimaryVolumeDescriptor(ISO9660Volume volume, byte[] buffer)
-            throws IOException {
+    public PrimaryVolumeDescriptor(ISO9660Volume volume, byte[] buffer) throws IOException {
         super(volume, buffer);
         this.systemIdentifier = getAChars(buffer, 9, 41 - 9);
         this.volumeIdentifier = getDChars(buffer, 41, 73 - 41);
@@ -82,46 +81,37 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
         this.locationOfTyp_M_PathTable = getUInt32BE(buffer, 149);
         this.locationOfOptionalTyp_M_PathTable = getUInt32BE(buffer, 153);
 
-        this.rootDirectoryEntry = new EntryRecord(volume, buffer, 157,
-                DEFAULT_ENCODING);
+        this.rootDirectoryEntry = new EntryRecord(volume, buffer, 157, DEFAULT_ENCODING);
     }
 
     public void dump(PrintStream out) {
         out.println("Primary volume information: ");
-        out.println("	- Standard Identifier: " + this.getStandardIdentifier());
-        out.println("	- System Identifier: " + this.getSystemIdentifier());
-        out.println("	- Volume Identifier: " + this.getVolumeIdentifier());
-        out.println("	- Volume set Identifier: "
-                + this.getVolumeSetIdentifier());
-        out.println("	- Volume set size: " + this.getVolumeSetSize());
-        out.println("	- Number of LBs: " + this.getSpaceSize());
-        out.println("	- Size of LBs: " + this.getLBSize());
-        out.println("	- PathTable size: " + this.getPathTableSize());
-        out.println("		- Location of L PathTable : "
-                + this.getLocationOfTyp_L_PathTable());
-        out.println("		- Location of Optional L PathTable : "
-                + this.getLocationOfOptionalTyp_L_PathTable());
-        out.println("		- Location of M PathTable : "
-                + this.getLocationOfTyp_M_PathTable());
-        out.println("		- Location of Optional M PathTable : "
-                + this.getLocationOfOptionalTyp_M_PathTable());
-        out.println("	- Root directory entry: ");
-        out.println("		- Size: "
-                + this.getRootDirectoryEntry().getLengthOfDirectoryEntry());
-        out.println("		- Extended attribute size: "
-                + this.getRootDirectoryEntry().getLengthOfExtendedAttribute());
-        out.println("		- Location of the extent: "
-                + this.getRootDirectoryEntry().getLocationOfExtent());
+        out.println("\t- Standard Identifier: " + this.getStandardIdentifier());
+        out.println("\t- System Identifier: " + this.getSystemIdentifier());
+        out.println("\t- Volume Identifier: " + this.getVolumeIdentifier());
+        out.println("\t- Volume set Identifier: " + this.getVolumeSetIdentifier());
+        out.println("\t- Volume set size: " + this.getVolumeSetSize());
+        out.println("\t- Number of LBs: " + this.getSpaceSize());
+        out.println("\t- Size of LBs: " + this.getLBSize());
+        out.println("\t- PathTable size: " + this.getPathTableSize());
+        out.println("\t\t- Location of L PathTable : " + this.getLocationOfTyp_L_PathTable());
+        out.println("\t\t- Location of Optional L PathTable : " +
+                this.getLocationOfOptionalTyp_L_PathTable());
+        out.println("\t\t- Location of M PathTable : " + this.getLocationOfTyp_M_PathTable());
+        out.println("\t\t- Location of Optional M PathTable : " +
+                this.getLocationOfOptionalTyp_M_PathTable());
+        out.println("\t- Root directory entry: ");
+        out.println("\t\t- Size: " + this.getRootDirectoryEntry().getLengthOfDirectoryEntry());
+        out.println("\t\t- Extended attribute size: " +
+                this.getRootDirectoryEntry().getLengthOfExtendedAttribute());
+        out.println("\t\t- Location of the extent: " +
+                this.getRootDirectoryEntry().getLocationOfExtent());
         //out.println(" - Length of the file identifier: " +
         // this.getRootDirectoryEntry().getLengthOfFileIdentifier());
-        out.println("		- is directory: "
-                + this.getRootDirectoryEntry().isDirectory());
-        out.println("		- File identifier: "
-                + this.getRootDirectoryEntry().getFileIdentifier());
-        out.println("		- Data Length: "
-                + this.getRootDirectoryEntry().getDataLength());
-        out.println("		- File unit size: "
-                + this.getRootDirectoryEntry().getFileUnitSize());
+        out.println("\t\t- is directory: " + this.getRootDirectoryEntry().isDirectory());
+        out.println("\t\t- File identifier: " + this.getRootDirectoryEntry().getFileIdentifier());
+        out.println("\t\t- Data Length: " + this.getRootDirectoryEntry().getDataLength());
+        out.println("\t\t- File unit size: " + this.getRootDirectoryEntry().getFileUnitSize());
 
     }
 

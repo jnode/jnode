@@ -26,12 +26,12 @@ package org.jnode.fs.iso9660;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface ISO9660Constants {
-    
+
     public static final char SEPARATOR1 = '.';
     public static final char SEPARATOR2 = ';';
-    
+
     public static final String DEFAULT_ENCODING = "US-ASCII";
-    
+
     public static interface VolumeDescriptorType {
 
         public static final int TERMINATOR = 255;

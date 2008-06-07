@@ -38,14 +38,14 @@ import org.jnode.shell.syntax.MappedArgument;
  * @author crawley@jnode.org
  */
 public class FormatFatCommand extends AbstractFormatCommand<FatFileSystem> {
-    
+
     private static class FatTypeArgument extends MappedArgument<FatType> {
         private static final Map<String, FatType> MAP = new HashMap<String, FatType>();
         static {
             MAP.put("fat12", FatType.FAT12);
             MAP.put("fat16", FatType.FAT16);
         }
-        
+
         public FatTypeArgument() {
             super("fsType", Argument.MANDATORY, new FatType[0], MAP, 
                     true, "the kind of FAT filesystem to create");
@@ -55,7 +55,7 @@ public class FormatFatCommand extends AbstractFormatCommand<FatFileSystem> {
             return "fat type";
         }
     }
-    
+
     private final FatTypeArgument ARG_FS_TYPE = new FatTypeArgument();
 
     public FormatFatCommand() {
@@ -64,11 +64,11 @@ public class FormatFatCommand extends AbstractFormatCommand<FatFileSystem> {
     }
 
     public static void main(String[] args) throws Exception {
-    	new FormatFatCommand().execute(args);
+        new FormatFatCommand().execute(args);
     }
 
-	@Override
-	protected FatFileSystemFormatter getFormatter() {
+    @Override
+    protected FatFileSystemFormatter getFormatter() {
         return new FatFileSystemFormatter(ARG_FS_TYPE.getValue());
-	}
+    }
 }

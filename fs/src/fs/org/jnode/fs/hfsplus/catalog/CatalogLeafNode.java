@@ -9,45 +9,49 @@ import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogLeafNode extends LeafNode {
-	
-	public CatalogLeafNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize){
-		super(descriptor, nodeData, nodeSize);
-		for(int i = 0; i < records.length; ++i) {
-		    int currentOffset = offsets[i];
-	    	int recordDataSize =  offsets[i+1] - offsets[i];
-		    Key key = new CatalogKey(nodeData, currentOffset);
-		    records[i] = new LeafRecord(key ,nodeData, currentOffset,recordDataSize);
-		}
-	}
-	/**
-	 * 
-	 * @param parentId
-	 * @return
-	 */
-	public final LeafRecord find(final CatalogNodeId parentId){
-		for(LeafRecord rec : records) {
-			Key key = rec.getKey();
-			if(key instanceof CatalogKey) {
-				if(((CatalogKey)key).getParentId().getId() == parentId.getId()) {
-					return rec;
-				}
-			}
-		}
-		return null;
-	}
-	/**
-	 * 
-	 * @param parentId
-	 * @return
-	 */
-	public final LeafRecord[] findAll(final CatalogNodeId parentId){
-		List<LeafRecord> list = new LinkedList<LeafRecord>();
-		for(LeafRecord rec : records) {
-			Key key = rec.getKey();
-			if(key instanceof CatalogKey && ((CatalogKey)key).getParentId().getId() == parentId.getId()) {
-					list.add(rec);
-			}
-		}
-		return list.toArray(new LeafRecord[list.size()]);
-	}
+
+    public CatalogLeafNode(final NodeDescriptor descriptor, final byte[] nodeData,
+            final int nodeSize) {
+        super(descriptor, nodeData, nodeSize);
+        for (int i = 0; i < records.length; ++i) {
+            int currentOffset = offsets[i];
+            int recordDataSize = offsets[i + 1] - offsets[i];
+            Key key = new CatalogKey(nodeData, currentOffset);
+            records[i] = new LeafRecord(key, nodeData, currentOffset, recordDataSize);
+        }
+    }
+
+    /**
+     * 
+     * @param parentId
+     * @return
+     */
+    public final LeafRecord find(final CatalogNodeId parentId) {
+        for (LeafRecord rec : records) {
+            Key key = rec.getKey();
+            if (key instanceof CatalogKey) {
+                if (((CatalogKey) key).getParentId().getId() == parentId.getId()) {
+                    return rec;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param parentId
+     * @return
+     */
+    public final LeafRecord[] findAll(final CatalogNodeId parentId) {
+        List<LeafRecord> list = new LinkedList<LeafRecord>();
+        for (LeafRecord rec : records) {
+            Key key = rec.getKey();
+            if (key instanceof CatalogKey &&
+                    ((CatalogKey) key).getParentId().getId() == parentId.getId()) {
+                list.add(rec);
+            }
+        }
+        return list.toArray(new LeafRecord[list.size()]);
+    }
 }
