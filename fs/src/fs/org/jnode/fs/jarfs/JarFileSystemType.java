@@ -25,12 +25,11 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.JarFileDevice;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.util.FSUtils;
 
 /**
- *
+ * 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
+ * 
  */
 public class JarFileSystemType implements FileSystemType<JarFileSystem> {
     public static final Class<JarFileSystemType> ID = JarFileSystemType.class;

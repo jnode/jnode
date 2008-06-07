@@ -30,46 +30,39 @@ import java.util.jar.JarEntry;
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
  *
  */
-public class JarFSCache
-{
-    private Map<JarEntry,JarFSEntry> jarFSEntries = new java.util.Hashtable<JarEntry,JarFSEntry>();
-    private Map<JarFSEntry,Map<String, JarFSEntry>> childEntries = new java.util.Hashtable<JarFSEntry,Map<String, JarFSEntry>>();
-    
-    public JarFSCache()
-    {
+public class JarFSCache {
+    private Map<JarEntry, JarFSEntry> jarFSEntries =
+            new java.util.Hashtable<JarEntry, JarFSEntry>();
+    private Map<JarFSEntry, Map<String, JarFSEntry>> childEntries =
+            new java.util.Hashtable<JarFSEntry, Map<String, JarFSEntry>>();
+
+    public JarFSCache() {
     }
-    
-    public JarFSEntry get(JarEntry jarEntry)
-    {
+
+    public JarFSEntry get(JarEntry jarEntry) {
         return jarFSEntries.get(jarEntry);
     }
 
-    public Object put(JarEntry jarEntry, JarFSEntry fsEntry)
-    {
+    public Object put(JarEntry jarEntry, JarFSEntry fsEntry) {
         return jarFSEntries.put(jarEntry, fsEntry);
     }
-    
-    public boolean isEmpty()
-    {
+
+    public boolean isEmpty() {
         return (jarFSEntries.size() == 0);
     }
-    
-    public Map<String, JarFSEntry> getChildEntries(JarFSEntry entry)
-    {
+
+    public Map<String, JarFSEntry> getChildEntries(JarFSEntry entry) {
         Map<String, JarFSEntry> children = childEntries.get(entry);
-        if(children == null)
-        {
+        if (children == null) {
             children = new java.util.Hashtable<String, JarFSEntry>();
-            for(JarFSEntry jarFSEntry : jarFSEntries.values())
-            { 
-                if(jarFSEntry.getParentFSEntry().equals(entry))
-                {
+            for (JarFSEntry jarFSEntry : jarFSEntries.values()) {
+                if (jarFSEntry.getParentFSEntry().equals(entry)) {
                     children.put(jarFSEntry.getName(), jarFSEntry);
                 }
             }
             childEntries.put(entry, children);
         }
-        
+
         return children;
     }
 }

@@ -33,7 +33,7 @@ import org.jnode.fs.ReadOnlyFileSystemException;
 /**
  * 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
+ * 
  */
 public final class JarFSDirectory implements FSDirectory {
 
@@ -43,7 +43,7 @@ public final class JarFSDirectory implements FSDirectory {
     /**
      * @param entry
      */
-    public JarFSDirectory(JarFSEntry entry, Map<String, JarFSEntry> entries) {        
+    public JarFSDirectory(JarFSEntry entry, Map<String, JarFSEntry> entries) {
         this.entry = entry;
         this.jarEntries = entries;
     }
@@ -51,8 +51,8 @@ public final class JarFSDirectory implements FSDirectory {
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
-    public Iterator<? extends FSEntry> iterator() {        
-        return jarEntries.values().iterator(); 
+    public Iterator<? extends FSEntry> iterator() {
+        return jarEntries.values().iterator();
     }
 
     /**
@@ -97,12 +97,12 @@ public final class JarFSDirectory implements FSDirectory {
         return entry.getFileSystem();
     }
 
-	/**
-	 * Save all dirty (unsaved) data to the device 
-	 * @throws IOException
-	 */
-	public void flush() throws IOException
-	{
-        //jar file systems are always readOnly
-	}
+    /**
+     * Save all dirty (unsaved) data to the device
+     * 
+     * @throws IOException
+     */
+    public void flush() throws IOException {
+        // jar file systems are always readOnly
+    }
 }

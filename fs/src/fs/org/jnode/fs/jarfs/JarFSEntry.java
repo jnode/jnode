@@ -31,10 +31,8 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
-/**
- * 
+/** 
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
  */
 public final class JarFSEntry implements FSEntry {
 
@@ -50,16 +48,14 @@ public final class JarFSEntry implements FSEntry {
         this.name = name;
     }
 
-    public JarEntry getJarEntry()
-    {
+    public JarEntry getJarEntry() {
         return jarEntry;
     }
 
-    public JarFSEntry getParentFSEntry()
-    {
+    public JarFSEntry getParentFSEntry() {
         return parent;
     }
-    
+
     /**
      * @see org.jnode.fs.FSEntry#getName()
      */
@@ -67,67 +63,55 @@ public final class JarFSEntry implements FSEntry {
         return name;
     }
 
-    public FSDirectory getParent()
-    {
+    public FSDirectory getParent() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public long getLastModified() throws IOException
-    {
+    public long getLastModified() throws IOException {
         return jarEntry.getTime();
     }
 
-    public boolean isFile()
-    {
+    public boolean isFile() {
         return !jarEntry.isDirectory();
     }
 
-    public boolean isDirectory()
-    {
+    public boolean isDirectory() {
         return jarEntry.isDirectory();
     }
 
-    public void setName(String newName) throws IOException
-    {
+    public void setName(String newName) throws IOException {
         throw new ReadOnlyFileSystemException("jar file system is readonly");
     }
 
-    public void setLastModified(long lastModified) throws IOException
-    {
+    public void setLastModified(long lastModified) throws IOException {
         throw new ReadOnlyFileSystemException("jar file system is readonly");
     }
 
-    public FSFile getFile() throws IOException
-    {
+    public FSFile getFile() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public FSDirectory getDirectory() throws IOException
-    {
+    public FSDirectory getDirectory() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public FSAccessRights getAccessRights() throws IOException
-    {
+    public FSAccessRights getAccessRights() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public boolean isDirty() throws IOException
-    {
+    public boolean isDirty() throws IOException {
         return false;
     }
 
-    public boolean isValid()
-    {
+    public boolean isValid() {
         return true;
     }
 
-    public FileSystem getFileSystem()
-    {
+    public FileSystem getFileSystem() {
         return fs;
     }
 }

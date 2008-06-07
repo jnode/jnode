@@ -23,7 +23,6 @@ package org.jnode.fs.jfat.command;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jnode.fs.command.AbstractFormatCommand;
 import org.jnode.fs.jfat.ClusterSize;
 import org.jnode.fs.jfat.FatFileSystem;
@@ -38,10 +37,9 @@ import org.jnode.shell.syntax.MappedArgument;
  * @author crawley@jnode.org
  */
 public class FatFormatCommand extends AbstractFormatCommand<FatFileSystem> {
-    private static final Logger log = Logger.getLogger(FatFormatCommand.class);
     
     private static class ClusterSizeArgument extends MappedArgument<ClusterSize> {
-        private static final Map<String, ClusterSize> MAP = new HashMap<String, ClusterSize> ();
+        private static final Map<String, ClusterSize> MAP = new HashMap<String, ClusterSize>();
         static {
             MAP.put("1k", ClusterSize._1Kb);
             MAP.put("2k", ClusterSize._2Kb);

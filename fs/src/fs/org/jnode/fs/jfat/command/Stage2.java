@@ -23,8 +23,6 @@ package org.jnode.fs.jfat.command;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
-import org.jnode.fs.FileSystemException;
 import org.jnode.util.FileUtils;
 
 
@@ -34,25 +32,19 @@ import org.jnode.util.FileUtils;
  * @author Tango Devian
  */
 public class Stage2 {
-    private static final Logger log = Logger.getLogger(Stage2.class);
     private static final String GRUB_STAGE_2 = MBRFormatter.GRUB_HOME + "grub.s2";
     private static final String GRUB_MENU_LST = MBRFormatter.GRUB_HOME + "menu.lst";
 
-    /**
-     *
-     * @param path
-     * @throws FileSystemException
-     * @throws IOException
-     */
+    
     public void format(String path) throws GrubException {
         // writing of the stage2 and menu.LST
         try {
-        	System.err.println("path="+path);
+            System.err.println("path=" + path);
             File destDir = new File(path + "/boot/grub/").getAbsoluteFile();
-            System.err.println("destDir.parent="+destDir.getParent());
-            System.err.println("destDir.name="+destDir.getName());
+            System.err.println("destDir.parent=" + destDir.getParent());
+            System.err.println("destDir.name=" + destDir.getName());
 
-            if(!destDir.exists()){
+            if (!destDir.exists()) {
                 System.out.print("Creating directory: " + destDir.getAbsolutePath() + " ... ");
                 destDir.mkdirs();
                 System.out.println("done.");
