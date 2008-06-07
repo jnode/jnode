@@ -28,7 +28,7 @@ package org.jnode.fs.ntfs;
 final class IndexRoot extends NTFSStructure {
 
     public static final int SIZE = 0x10;
-    
+
     /**
      * Initialize this instance.
      * @param attr
@@ -36,7 +36,7 @@ final class IndexRoot extends NTFSStructure {
     public IndexRoot(IndexRootAttribute attr) {
         super(attr, attr.getAttributeOffset());
     }
-    
+
     /**
      * Gets the attribute type.
      * @return
@@ -44,7 +44,7 @@ final class IndexRoot extends NTFSStructure {
     public int getAttributeType() {
         return getUInt32AsInt(0x00);
     }
-    
+
     /**
      * Gets the collation rule.
      * @return
@@ -52,7 +52,7 @@ final class IndexRoot extends NTFSStructure {
     public int getCollationRule() {
         return getUInt32AsInt(0x04);
     }
-    
+
     /**
      * Size of each index block in bytes (in the index allocation attribute).
      * @return
@@ -60,7 +60,7 @@ final class IndexRoot extends NTFSStructure {
     public int getIndexBlockSize() {
         return getUInt32AsInt(0x08);
     }
-    
+
     /**
      * Gets the number of clusters per index record.
      * @return
@@ -72,5 +72,5 @@ final class IndexRoot extends NTFSStructure {
         } else {
             return v;
         }
-    }   
+    }
 }

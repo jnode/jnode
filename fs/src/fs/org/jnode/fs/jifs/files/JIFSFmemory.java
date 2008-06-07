@@ -30,25 +30,23 @@ import org.jnode.util.NumberUtils;
  * 
  * @author Andreas H\u00e4nel
  */
-public class JIFSFmemory extends JIFSFile{
+public class JIFSFmemory extends JIFSFile {
 
-	public JIFSFmemory() {
-		super("meminfo");
-	}
-	
-	public JIFSFmemory(FSDirectory parent) {
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.refresh();
-		final Runtime rt = Runtime.getRuntime();
-		addStringln("Memory size: \n\t" + NumberUtils.toBinaryByte(rt.totalMemory()));
-		addStringln("Used memory: \n\t" + NumberUtils.toBinaryByte((rt.totalMemory()-rt.freeMemory())));
-		addStringln("Free memory: \n\t" + NumberUtils.toBinaryByte(rt.freeMemory()));
-	
-	}
+    public JIFSFmemory() {
+        super("meminfo");
+    }
 
-	
+    public JIFSFmemory(FSDirectory parent) {
+        this();
+        setParent(parent);
+    }
+
+    public void refresh() {
+        super.refresh();
+        final Runtime rt = Runtime.getRuntime();
+        addStringln("Memory size: \n\t" + NumberUtils.toBinaryByte(rt.totalMemory()));
+        addStringln("Used memory: \n\t" +
+                NumberUtils.toBinaryByte((rt.totalMemory() - rt.freeMemory())));
+        addStringln("Free memory: \n\t" + NumberUtils.toBinaryByte(rt.freeMemory()));
+    }
 }

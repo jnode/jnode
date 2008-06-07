@@ -44,10 +44,10 @@ final class BootRecord extends NTFSStructure {
 
     /** Size of a filerecord in bytes */
     private final int fileRecordSize;
-    
+
     /** Size of an index record in bytes */
     private final int indexRecordSize;
-    
+
     /** Size of a cluster in bytes */
     private final int clusterSize;
 
@@ -67,11 +67,11 @@ final class BootRecord extends NTFSStructure {
         final int clustersPerMFTRecord = getInt8(0x40);
         final int clustersPerIndexRecord = getInt8(0x44);
         this.totalSectors = getUInt32(0x28);
-       
+
         this.clusterSize = sectorsPerCluster * bytesPerSector;
         this.fileRecordSize = calcByteSize(clustersPerMFTRecord);
         this.indexRecordSize = calcByteSize(clustersPerIndexRecord);
-        
+
         log.debug("FileRecordSize  = " + fileRecordSize);
         log.debug("IndexRecordSize = " + indexRecordSize);
         log.debug("TotalSectors    = " + totalSectors);
@@ -135,7 +135,7 @@ final class BootRecord extends NTFSStructure {
     public int getFileRecordSize() {
         return fileRecordSize;
     }
-    
+
     /**
      * Gets the size of a indexrecord in bytes.
      * @return
@@ -143,7 +143,7 @@ final class BootRecord extends NTFSStructure {
     public int getIndexRecordSize() {
         return indexRecordSize;
     }
-    
+
     /**
      * Gets the size of a cluster bytes.
      * @return
@@ -151,12 +151,12 @@ final class BootRecord extends NTFSStructure {
     public int getClusterSize() {
         return clusterSize;
     }
-    
+
     private final int calcByteSize(int clusters) {
         if (clusters > 0) {
             return clusters * clusterSize;
         } else {
             return (1 << -clusters);
-        }        
+        }
     }
 }

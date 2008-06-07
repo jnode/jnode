@@ -46,8 +46,7 @@ public class NTFSDirectory implements FSDirectory {
      * 
      * @param record
      */
-    public NTFSDirectory(NTFSFileSystem fs, FileRecord record)
-            throws IOException {
+    public NTFSDirectory(NTFSFileSystem fs, FileRecord record) throws IOException {
         this.fs = fs;
         this.index = new NTFSIndex(record);
     }
@@ -66,13 +65,15 @@ public class NTFSDirectory implements FSDirectory {
         log.debug("getEntry(" + name + ")");
         for (Iterator<FSEntry> it = this.iterator(); it.hasNext();) {
             final NTFSEntry entry = (NTFSEntry) it.next();
-            if (entry.getName().equals(name)) { return entry; }
+            if (entry.getName().equals(name)) {
+                return entry;
+            }
         }
         return null;
     }
 
     /**
-     *  
+     * 
      */
     public FSEntry addFile(String name) {
         // TODO Auto-generated method stub
@@ -80,7 +81,7 @@ public class NTFSDirectory implements FSDirectory {
     }
 
     /**
-     *  
+     * 
      */
     public FSEntry addDirectory(String name) {
         // TODO Auto-generated method stub
@@ -103,7 +104,7 @@ public class NTFSDirectory implements FSDirectory {
     }
 
     /**
-     *  
+     * 
      */
     public FileSystem getFileSystem() {
         return fs;

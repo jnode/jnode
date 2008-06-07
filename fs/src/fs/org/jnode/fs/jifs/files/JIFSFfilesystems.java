@@ -30,32 +30,32 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 
 /**
- *  
+ * 
  * @author Andreas H\u00e4nel
  */
-public class JIFSFfilesystems extends JIFSFile{
-	
-	public JIFSFfilesystems(){
-		super("fs");
-	}
-	
-	public JIFSFfilesystems(FSDirectory parent){
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.refresh();
-		try {
-         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-         	addStringln("Registered Filesystems:");
-            for (FileSystemType current : fSS.fileSystemTypes()) {
-            	addStringln("\t"+current.getName());
-            
+public class JIFSFfilesystems extends JIFSFile {
+
+    public JIFSFfilesystems() {
+        super("fs");
+    }
+
+    public JIFSFfilesystems(FSDirectory parent) {
+        this();
+        setParent(parent);
+    }
+
+    public void refresh() {
+        super.refresh();
+        try {
+            FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+            addStringln("Registered Filesystems:");
+            for (FileSystemType<?> current : fSS.fileSystemTypes()) {
+                addStringln("\t" + current.getName());
+
             }
-	    } catch (NameNotFoundException e){
-    	   	System.err.print(e);
-        } 
-	}
-	
+        } catch (NameNotFoundException e) {
+            System.err.print(e);
+        }
+    }
+
 }

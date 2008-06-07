@@ -38,26 +38,25 @@ class NTFSRecord extends NTFSStructure {
     public static class Magic {
         /** Corrupt record */
         public static final int BAAD = 0x44414142;
-        
+
         /** chkdsk ??? */
         public static final int CHKD = 0x424b4843;
-        
+
         /** mft entry */
         public static final int FILE = 0x454c4946;
-        
+
         /** ? (NTFS 3.0+?) */
         public static final int HOLE = 0x454c4f48;
-        
+
         /** index buffer */
         public static final int INDX = 0x58444e49;
     }
-    
+
     /**
      * @param buffer
      * @param offset
      */
-    public NTFSRecord(NTFSVolume volume, byte[] buffer, int offset)
-            throws IOException {
+    public NTFSRecord(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
         super(buffer, offset);
         this.volume = volume;
         fixUp();
@@ -67,8 +66,7 @@ class NTFSRecord extends NTFSStructure {
      * @param parent
      * @param offset
      */
-    public NTFSRecord(NTFSVolume volume, NTFSStructure parent, int offset)
-            throws IOException {
+    public NTFSRecord(NTFSVolume volume, NTFSStructure parent, int offset) throws IOException {
         super(parent, offset);
         this.volume = volume;
         fixUp();

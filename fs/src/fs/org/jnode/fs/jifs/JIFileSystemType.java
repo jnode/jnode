@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
- package org.jnode.fs.jifs;
+package org.jnode.fs.jifs;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
@@ -34,8 +34,8 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 
     public static final String VIRTUAL_DEVICE_NAME = "jifs";
 
-    /**	Logger*/
-	private static final Logger log = Logger.getLogger(JIFileSystemType.class);
+    /** Logger */
+    private static final Logger log = Logger.getLogger(JIFileSystemType.class);
 
     /**
      * Gets the unique name of this file system type.
@@ -44,19 +44,19 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
         return "JIFS";
     }
 
-	/**
-	 * Create a filesystem for a given device.
-	 *
-	 * @param device
-	 * @param readOnly
-	 * @return JIFileSystem(device,readOnly)
-	 * @throws FileSystemException
-	 */
-	public JIFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-		JIFileSystem ret = new JIFileSystem(device, readOnly, this);
-		if (ret== null){
-			log.error("got NULL from the JIFileSystem...");
-		}
-		return ret;
-	}
+    /**
+     * Create a filesystem for a given device.
+     * 
+     * @param device
+     * @param readOnly
+     * @return JIFileSystem(device,readOnly)
+     * @throws FileSystemException
+     */
+    public JIFileSystem create(Device device, boolean readOnly) throws FileSystemException {
+        JIFileSystem ret = new JIFileSystem(device, readOnly, this);
+        if (ret == null) {
+            log.error("got NULL from the JIFileSystem...");
+        }
+        return ret;
+    }
 }

@@ -57,7 +57,7 @@ final class IndexEntry extends NTFSStructure {
     public boolean hasSubNodes() {
         return (getFlags() & 0x01) != 0;
     }
-    
+
     /**
      * Gets the length of this index entry in bytes.
      * @return
@@ -104,7 +104,7 @@ final class IndexEntry extends NTFSStructure {
     }
 
     public long getRealFileSize() {
-        return getInt64( 0x40);
+        return getInt64(0x40);
     }
 
     /**
@@ -117,12 +117,12 @@ final class IndexEntry extends NTFSStructure {
     public long getSubnodeVCN() {
         return getUInt32(getSize() - 8);
     }
-    
+
     private char[] getFileNameAsCharArray() {
         final int len = getUInt8(0x50);
-        final char[] name = new char[ len];
+        final char[] name = new char[len];
         for (int i = 0; i < len; i++) {
-            name[ i] = getChar16(0x52 + (i * 2));
+            name[i] = getChar16(0x52 + (i * 2));
         }
         return name;
     }

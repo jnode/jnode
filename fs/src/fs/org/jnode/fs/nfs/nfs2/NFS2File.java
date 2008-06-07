@@ -63,38 +63,24 @@ public class NFS2File extends NFS2Object implements FSFile {
      * @throws java.io.IOException
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
-
         NFS2Client client = getNFS2Client();
-
         try {
-
             int length;
-
             while (true) {
-
                 length = Math.min(NFS2Client.MAX_DATA, dest.remaining());
-
                 if (length == 0) {
                     return;
                 }
-
-                ReadFileResult result = client.readFile(entry.getFileHandle(),
-                        (int) fileOffset, length);
-
+                ReadFileResult result =
+                        client.readFile(entry.getFileHandle(), (int) fileOffset, length);
                 byte[] data = result.getData();
-
                 length = data.length;
-
                 fileOffset += length;
-
                 dest.put(data);
             }
-
         } catch (NFS2Exception e) {
-            throw new IOException("Error reading file. Reason:"
-                    + e.getMessage(), e);
+            throw new IOException("Error reading file. Reason:" + e.getMessage(), e);
         }
-
     }
 
     /**
@@ -113,16 +99,13 @@ public class NFS2File extends NFS2Object implements FSFile {
      * @throws java.io.IOException
      */
     public void setLength(long length) throws IOException {
-
         NFS2Client client = getNFS2Client();
-
         try {
-            client.setAttribute(entry.getFileHandle(), -1, -1, -1,
-                    (int) length, new Time(-1, -1), new Time(-1, -1));
+            client.setAttribute(entry.getFileHandle(), -1, -1, -1, (int) length, new Time(-1, -1),
+                    new Time(-1, -1));
         } catch (NFS2Exception e) {
             throw new IOException(e.getMessage(), e);
         }
-
     }
 
     /**
@@ -135,33 +118,19 @@ public class NFS2File extends NFS2Object implements FSFile {
      * @throws java.io.IOException
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
-
         NFS2Client client = getNFS2Client();
-
         try {
-
             byte[] data = new byte[NFS2Client.MAX_DATA];
-
             int count;
-
             while (src.remaining() > 0) {
-
                 count = Math.min(NFS2Client.MAX_DATA, src.remaining());
-
                 src.get(data, 0, count);
-
-                FileAttribute fileAttribute = client.writeFile(entry
-                        .getFileHandle(), (int) fileOffset, data, 0, count);
-
+                FileAttribute fileAttribute =
+                        client.writeFile(entry.getFileHandle(), (int) fileOffset, data, 0, count);
                 fileOffset += count;
-
             }
-
         } catch (NFS2Exception e) {
-            throw new IOException("Error writing file . Reason: "
-                    + e.getMessage(), e);
+            throw new IOException("Error writing file . Reason: " + e.getMessage(), e);
         }
-
     }
-
 }

@@ -24,7 +24,6 @@ package org.jnode.fs.nfs.nfs2;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Andrei Dore
@@ -38,8 +37,7 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
      * @param device
      * @param readOnly
      */
-    public NFS2FileSystem create(Device device, boolean readOnly)
-            throws FileSystemException {
+    public NFS2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
         return new NFS2FileSystem((NFS2Device) device, readOnly, this);
     }
 

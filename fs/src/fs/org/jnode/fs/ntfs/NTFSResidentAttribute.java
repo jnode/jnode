@@ -38,7 +38,8 @@ public class NTFSResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * Gets the offset to the actual attribute. 
+     * Gets the offset to the actual attribute.
+     * 
      * @return Returns the attributeOffset.
      */
     public int getAttributeOffset() {

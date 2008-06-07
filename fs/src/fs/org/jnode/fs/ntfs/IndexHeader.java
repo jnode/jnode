@@ -29,11 +29,11 @@ final class IndexHeader extends NTFSStructure {
 
     /** Size of this structure index bytes */
     public static final int SIZE = 0x10;
-    
+
     public static final class Flags {
         public static final int LARGE_INDEX = 0x01;
     }
-    
+
     /**
      * Initialize this instance.
      * @param attr
@@ -41,7 +41,7 @@ final class IndexHeader extends NTFSStructure {
     public IndexHeader(IndexRootAttribute attr) {
         super(attr, attr.getAttributeOffset() + 0x10);
     }
-    
+
     /**
      * Initialize this instance.
      * @param indexBlock
@@ -50,7 +50,7 @@ final class IndexHeader extends NTFSStructure {
     public IndexHeader(IndexBlock indexBlock, int offset) {
         super(indexBlock, offset);
     }
-    
+
     /**
      * Gets the offset of the first index entry.
      * @return
@@ -58,7 +58,7 @@ final class IndexHeader extends NTFSStructure {
     public int getFirstEntryOffset() {
         return getUInt32AsInt(0x00);
     }
-    
+
     /**
      * Gets the total size of the index entries (in bytes???).
      * @return
@@ -66,7 +66,7 @@ final class IndexHeader extends NTFSStructure {
     public int getIndexEntriesSize() {
         return getUInt32AsInt(0x04);
     }
-    
+
     /**
      * Gets the allocated size of the index entries (in bytes???).
      * @return
@@ -74,7 +74,7 @@ final class IndexHeader extends NTFSStructure {
     public int getAllocatedIndexEntriesSize() {
         return getUInt32AsInt(0x08);
     }
-    
+
     /**
      * Gets the flags.
      * @return
@@ -89,5 +89,5 @@ final class IndexHeader extends NTFSStructure {
      */
     public boolean isLargeIndex() {
         return ((getFlags() & Flags.LARGE_INDEX) != 0);
-    }    
+    }
 }

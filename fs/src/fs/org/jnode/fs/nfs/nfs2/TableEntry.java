@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class TableEntry {
-
     private Map<String, EntryInfo> entryMap;
 
     public TableEntry() {
@@ -14,26 +13,19 @@ public class TableEntry {
     }
 
     public synchronized NFS2Entry getEntry(String name) {
-
         EntryInfo entryInfo = entryMap.get(name);
-
         if (entryInfo == null) {
             return null;
         }
-
         if (entryInfo.getExpirationTime() < System.currentTimeMillis()) {
             entryMap.remove(name);
             return null;
         }
-
         return entryInfo.getEntry();
     }
 
     public synchronized void addEntry(NFS2Entry entry) {
-
-        entryMap.put(entry.getName(), new EntryInfo(entry, System
-                .currentTimeMillis() + 30000));
-
+        entryMap.put(entry.getName(), new EntryInfo(entry, System.currentTimeMillis() + 30000));
     }
 
     public synchronized void removeEntry(String name) {
@@ -41,23 +33,18 @@ public class TableEntry {
     }
 
     public synchronized Set<NFS2Entry> getEntrySet() {
-
         if (entryMap.size() == 0) {
             return new HashSet<NFS2Entry>();
         }
 
         Set<NFS2Entry> entrySet = new HashSet<NFS2Entry>(entryMap.size());
         for (String name : entryMap.keySet()) {
-
             NFS2Entry entry = getEntry(name);
             if (entry != null) {
                 entrySet.add(entry);
             }
-
         }
-
         return entrySet;
-
     }
 
     public synchronized void clear() {
@@ -86,7 +73,5 @@ public class TableEntry {
         public long getExpirationTime() {
             return expirationTime;
         }
-
     }
-
 }

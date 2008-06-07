@@ -72,7 +72,7 @@ final class IndexRootAttribute extends NTFSResidentAttribute {
      */
     public Iterator<IndexEntry> iterator() {
         final int headerOffset = getAttributeOffset() + IndexRoot.SIZE;
-        return new IndexEntryIterator(getFileRecord(), this, headerOffset + getHeader()
-                .getFirstEntryOffset());
+        return new IndexEntryIterator(getFileRecord(), this, headerOffset +
+                getHeader().getFirstEntryOffset());
     }
 }

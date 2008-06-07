@@ -91,7 +91,7 @@ final class IndexBlock extends NTFSRecord {
      * @return
      */
     public Iterator<IndexEntry> iterator() {
-        return new IndexEntryIterator(parentFileRecord, this, getHeader()
-                .getFirstEntryOffset() + 0x18);
+        return new IndexEntryIterator(parentFileRecord, this,
+                getHeader().getFirstEntryOffset() + 0x18);
     }
 }

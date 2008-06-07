@@ -126,11 +126,9 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         // check the dataruns
         final int clusterSize = getFileRecord().getVolume().getClusterSize();
         if (this.numberOfVCNs != this.getAttributeAlocatedSize() / clusterSize) {
-            log
-                    .error("ERROR: The number of VCNs from the data runs is different than the allocated size!: - "
-                            + this.numberOfVCNs);
-            log.error("Alocatedsize = " + getAttributeAlocatedSize()
-                    / clusterSize);
+            log.error("ERROR: The number of VCNs from the data runs is different than the allocated size!: - " +
+                    this.numberOfVCNs);
+            log.error("Alocatedsize = " + getAttributeAlocatedSize() / clusterSize);
             log.error("number of data runs = " + dataRuns.size());
         }
     }
@@ -166,8 +164,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @return The number of clusters read.
      * @throws IOException
      */
-    public int readVCN(long vcn, byte[] dst, int dstOffset, int nrClusters)
-            throws IOException {
+    public int readVCN(long vcn, byte[] dst, int dstOffset, int nrClusters) throws IOException {
         final NTFSVolume volume = getFileRecord().getVolume();
         final int clusterSize = volume.getClusterSize();
 

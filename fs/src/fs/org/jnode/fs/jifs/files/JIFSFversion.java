@@ -30,24 +30,22 @@ import org.jnode.fs.jifs.JIFSFile;
  * 
  * @author Andreas H\u00e4nel
  */
-public class JIFSFversion extends JIFSFile{
+public class JIFSFversion extends JIFSFile {
 
-	public JIFSFversion() {
-		super("version");
-		refresh();
-	}
-	
-	public JIFSFversion(FSDirectory parent) {
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.refresh();
-		addStringln("JNode Version :\n\t"+System.getProperty("os.version"));
-		addStringln("JNode Java Version :\n\t"+System.getProperty("java.version"));
-		addStringln("JNode Java Class Version :\n\t"+System.getProperty("java.class.version"));	
-	}
+    public JIFSFversion() {
+        super("version");
+        refresh();
+    }
 
-	
+    public JIFSFversion(FSDirectory parent) {
+        this();
+        setParent(parent);
+    }
+
+    public void refresh() {
+        super.refresh();
+        addStringln("JNode Version :\n\t" + System.getProperty("os.version"));
+        addStringln("JNode Java Version :\n\t" + System.getProperty("java.version"));
+        addStringln("JNode Java Class Version :\n\t" + System.getProperty("java.class.version"));
+    }
 }

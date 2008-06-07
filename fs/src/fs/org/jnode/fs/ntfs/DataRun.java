@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -33,8 +33,8 @@ final class DataRun extends NTFSStructure {
     private final int type;
 
     /**
-     * Cluster number of first cluster of this run.  If this is zero, the run isn't
-     * actually stored as it is all zero.
+     * Cluster number of first cluster of this run. If this is zero, the run
+     * isn't actually stored as it is all zero.
      */
     private final long cluster;
 
@@ -52,12 +52,10 @@ final class DataRun extends NTFSStructure {
      * 
      * @param attr
      * @param offset
-     * @param vcn
-     *            First VCN of this datarun.
+     * @param vcn First VCN of this datarun.
      * @param previousLCN
      */
-    public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn,
-                   long previousLCN) {
+    public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn, long previousLCN) {
         super(attr, offset);
         // read first byte in type attribute
         this.type = getUInt8(0);
@@ -68,45 +66,43 @@ final class DataRun extends NTFSStructure {
         this.vcn = vcn;
 
         switch (lenlen) {
-        case 0x00:
-            length = 0;
-            break;
-        case 0x01:
-            length = getUInt8(1);
-            break;
-        case 0x02:
-            length = getUInt16(1);
-            break;
-        case 0x03:
-            length = getUInt24(1);
-            break;
-        case 0x04:
-            length = getUInt32AsInt(1);
-            break;
-        default:
-            throw new IllegalArgumentException("Invalid length length "
-                    + lenlen);
+            case 0x00:
+                length = 0;
+                break;
+            case 0x01:
+                length = getUInt8(1);
+                break;
+            case 0x02:
+                length = getUInt16(1);
+                break;
+            case 0x03:
+                length = getUInt24(1);
+                break;
+            case 0x04:
+                length = getUInt32AsInt(1);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid length length " + lenlen);
         }
         final int cluster;
         switch (clusterlen) {
-        case 0x00:
-            cluster = 0;
-            break;
-        case 0x01:
-            cluster = getInt8(1 + lenlen);
-            break;
-        case 0x02:
-            cluster = getInt16(1 + lenlen);
-            break;
-        case 0x03:
-            cluster = getInt24(1 + lenlen);
-            break;
-        case 0x04:
-            cluster = getInt32(1 + lenlen);
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown cluster length "
-                    + clusterlen);
+            case 0x00:
+                cluster = 0;
+                break;
+            case 0x01:
+                cluster = getInt8(1 + lenlen);
+                break;
+            case 0x02:
+                cluster = getInt16(1 + lenlen);
+                break;
+            case 0x03:
+                cluster = getInt24(1 + lenlen);
+                break;
+            case 0x04:
+                cluster = getInt32(1 + lenlen);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown cluster length " + clusterlen);
         }
         this.cluster = cluster == 0 ? 0 : cluster + previousLCN;
     }
@@ -147,7 +143,7 @@ final class DataRun extends NTFSStructure {
 
     /**
      * Sets the first VCN of this datarun.
-     *
+     * 
      * @param vcn the new VCN.
      */
     final void setFirstVcn(long vcn) {
@@ -156,6 +152,7 @@ final class DataRun extends NTFSStructure {
 
     /**
      * Read clusters from this datarun.
+     * 
      * @param vcn
      * @param dst
      * @param dstOffset
@@ -165,8 +162,8 @@ final class DataRun extends NTFSStructure {
      * @return The number of clusters read.
      * @throws IOException
      */
-    public int readClusters(long vcn, byte[] dst, int dstOffset,
-                            int nrClusters, int clusterSize, NTFSVolume volume) throws IOException {
+    public int readClusters(long vcn, byte[] dst, int dstOffset, int nrClusters, int clusterSize,
+            NTFSVolume volume) throws IOException {
 
         final long myFirstVcn = getFirstVcn();
         final int myLength = getLength();
@@ -185,13 +182,13 @@ final class DataRun extends NTFSStructure {
         final int count; // #clusters to read
         final int actDstOffset; // Actual dst offset
         if (vcn < myFirstVcn) {
-            final int vcnDelta = (int)(myFirstVcn - vcn);
+            final int vcnDelta = (int) (myFirstVcn - vcn);
             count = Math.min(nrClusters - vcnDelta, myLength);
             actDstOffset = dstOffset + (vcnDelta * clusterSize);
             actCluster = getCluster();
         } else {
             // vcn >= myFirstVcn
-            final int vcnDelta = (int)(vcn - myFirstVcn);
+            final int vcnDelta = (int) (vcn - myFirstVcn);
             count = Math.min(nrClusters, myLength - vcnDelta);
             actDstOffset = dstOffset;
             actCluster = getCluster() + vcnDelta;

@@ -25,7 +25,6 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.util.FSUtils;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -46,13 +45,11 @@ public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSys
      * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[],
      *      FSBlockDeviceAPI)
      */
-    public boolean supports(PartitionTableEntry pte, byte[] firstSector,
-            FSBlockDeviceAPI devApi) {
+    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
         if (pte instanceof IBMPartitionTableEntry) {
             IBMPartitionTableEntry iPte = (IBMPartitionTableEntry) pte;
-            if (iPte.getSystemIndicator() == IBMPartitionTypes.PARTTYPE_NTFS)
-            {
-            	return new String(firstSector, 0x03, 8).startsWith(TAG);
+            if (iPte.getSystemIndicator() == IBMPartitionTypes.PARTTYPE_NTFS) {
+                return new String(firstSector, 0x03, 8).startsWith(TAG);
             }
         }
         return false;
@@ -61,8 +58,7 @@ public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSys
     /**
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
-    public NTFSFileSystem create(Device device, boolean readOnly)
-            throws FileSystemException {
+    public NTFSFileSystem create(Device device, boolean readOnly) throws FileSystemException {
         return new NTFSFileSystem(device, readOnly, this);
     }
 }

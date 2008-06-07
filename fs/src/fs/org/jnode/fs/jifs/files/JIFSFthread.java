@@ -29,56 +29,44 @@ import org.jnode.fs.jifs.JIFSFile;
  * 
  * @author Andreas H\u00e4nel
  */
-public class JIFSFthread extends JIFSFile{
+public class JIFSFthread extends JIFSFile {
 
-	private Thread t;
-	
-	public JIFSFthread() {
-		return;
-	}
-	
-/**
- * Creates the file, which contains information about the given Thread.
- * 
- * @param String name
- * 			Filename.
- * @param Thread t
- * 			The Thread, whose information is presented via this file.
- * @param parent
- *			Parent FSEntry, in this case it is an instance of JIFSDplugins.
- */
-	public JIFSFthread(String name, Thread t, FSDirectory parent) {
-		super(name,parent);
-		this.t = t;
-		refresh();
-	}
-	
-	public void refresh(){
-		if (t == null) {
-			isvalid=false;
-			return;
-		}
-		super.refresh();
-		addStringln("ID:");
-		addStringln("\t"+t.getId());
-		addStringln("Name:");
-		addStringln("\t"+t.getName());
-		addStringln("Priority:");
-		int i = new Integer((60 / (Thread.MAX_PRIORITY - Thread.MIN_PRIORITY)) * t.getPriority()).intValue();
-		String hashes="";
-		String blanks="";
-		int j = 60-i;
-		while (i>0){
-			hashes += "#";
-			i--;
-		}
-		while (j>0){
-			blanks += " ";
-			j--;
-		}
-		addStringln("\tLOW["+hashes+blanks+"]HIGH");
-	}
+    private Thread t;
 
-	
+    public JIFSFthread() {
+        return;
+    }
 
+    /**
+     * Creates the file, which contains information about the given Thread.
+     * 
+     * @param String name Filename.
+     * @param Thread t The Thread, whose information is presented via this file.
+     * @param parent Parent FSEntry, in this case it is an instance of
+     *            JIFSDplugins.
+     */
+    public JIFSFthread(String name, Thread t, FSDirectory parent) {
+        super(name, parent);
+        this.t = t;
+        refresh();
+    }
+
+    public void refresh() {
+        if (t == null) {
+            isvalid = false;
+            return;
+        }
+        super.refresh();
+        addStringln("ID:");
+        addStringln("\t" + t.getId());
+        addStringln("Name:");
+        addStringln("\t" + t.getName());
+        addStringln("Priority:");
+        int i = (60 / (Thread.MAX_PRIORITY - Thread.MIN_PRIORITY)) * t.getPriority();
+        StringBuffer sb = new StringBuffer(60);
+        for (int j = 0; j < 60; j++) {
+            sb.append(j < i ? '#' : ' ');
+        }
+        addStringln("\tLOW[" + sb.toString() + "]HIGH");
+    }
 }

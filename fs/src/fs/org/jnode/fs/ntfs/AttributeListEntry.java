@@ -21,7 +21,6 @@
  
 package org.jnode.fs.ntfs;
 
-import java.io.IOException;
 
 /**
  * @author Daniel Noll (daniel@nuix.com.au)
@@ -30,7 +29,7 @@ final class AttributeListEntry extends NTFSStructure {
 
     /**
      * Creates the entry.
-     *
+     * 
      * @param block the containing attribute list block.
      * @param offset the offset of this attribute within the block.
      */
@@ -40,6 +39,7 @@ final class AttributeListEntry extends NTFSStructure {
 
     /**
      * Gets the type of the attribute.
+     * 
      * @return the type of the attribute.
      */
     public int getType() {
@@ -48,6 +48,7 @@ final class AttributeListEntry extends NTFSStructure {
 
     /**
      * Gets the size of the attribute, in bytes.
+     * 
      * @return the size of the attribute, in bytes.
      */
     public int getSize() {
@@ -55,7 +56,9 @@ final class AttributeListEntry extends NTFSStructure {
     }
 
     /**
-     * Gets the file reference number, which is the lowest 48 bits of the MFT reference.
+     * Gets the file reference number, which is the lowest 48 bits of the MFT
+     * reference.
+     * 
      * @return the file reference number.
      */
     public long getFileReferenceNumber() {
@@ -63,7 +66,9 @@ final class AttributeListEntry extends NTFSStructure {
     }
 
     /**
-     * Gets the file sequence number, which is the highest 16 bits of the MFT reference.
+     * Gets the file sequence number, which is the highest 16 bits of the MFT
+     * reference.
+     * 
      * @return the file sequence number.
      */
     public long getFileSequenceNumber() {
@@ -71,9 +76,9 @@ final class AttributeListEntry extends NTFSStructure {
     }
 
     // TODO:
-    //    0x06 	1 	Name length (N)
-    //    0x07 	1 	Offset to Name (a)
-    //    0x08 	8 	Starting VCN (b)
-    //    0x18 	2 	Attribute Id (c)
-    //    0x1A 	2N 	Name in Unicode (if N >0)
+    // 0x06 1 Name length (N)
+    // 0x07 1 Offset to Name (a)
+    // 0x08 8 Starting VCN (b)
+    // 0x18 2 Attribute Id (c)
+    // 0x1A 2N Name in Unicode (if N >0)
 }

@@ -40,134 +40,135 @@ import org.jnode.fs.FileSystem;
  */
 public class JIFSFile implements ExtFSEntry, FSFile {
 
-	protected String name;
-	protected StringBuffer data = new StringBuffer();
-	protected boolean isvalid = true;
-	
-	private FSDirectory parent = null;
-	
-	public JIFSFile() {
-		refresh();
-	}
-	
-	public JIFSFile(String name) {
-		this.name = name;
-	}
-	
-	public JIFSFile(String name, FSDirectory parent) {
-		this(name);
-		this.parent = parent;
-		refresh();
-	}
+    protected String name;
+    protected StringBuffer data = new StringBuffer();
+    protected boolean isvalid = true;
 
-	/**
-	 * Flush the contents of this file to the persistent storage.<br>
-	 * Does nothing, because the JIFSFile is a virtual File.
-	 */
-	public void flush() throws IOException {
-	}
+    private FSDirectory parent = null;
 
-	public long getLength(){
-		return data.length();
-	}
-	
-	protected void cleardata(){
-		data.delete(0,data.length());
-	}
-	
-	protected void addString(String add){
-		data.append(add);
-	}
-	
-	protected void addStringln(String add){
-		addString(add);
-		addStringln();
-	}
-	
-	protected void addStringln(){
-		addString("\n");
-	}
-	
-	public void refresh(){
-		cleardata();
-		addString("JIFSFile\nFilename :"+name+"\n");
-	}
-	
-	//public void read(long fileOffset, byte[] dest, int off, int len){
-    public void read(long fileOffset, ByteBuffer destBuf){
-		refresh();
-		byte[] readdata = data.toString().getBytes();
-        destBuf.put(readdata, (int)fileOffset, destBuf.remaining());
-	}
-	
-	//public void write(long fileOffset, byte[] src, int off, int len) throws IOException{
-    public void write(long fileOffset, ByteBuffer src) throws IOException{
-		throw new IOException("can not write to JNIFSFile..");
-	}
-	
-	public void setLength(long length){
-		return;
-	}
+    public JIFSFile() {
+        refresh();
+    }
 
-	public boolean isValid(){
-		return isvalid;
-	}
-	
-	public FileSystem getFileSystem(){
-		//TODO
-		return null;
-	}
-	
-	public boolean isDirty(){
-		return false;
-	}
-	
-	public FSAccessRights getAccessRights(){
-		return null;
-	}
-	
-	public FSDirectory getDirectory(){
-		return null;
-	}
-	
-	public FSFile getFile(){
-		return this;
-	}
-	
-	public void setLastModified(long l){
-		return;
-	}
-	
-	public long getLastModified(){
-		return System.currentTimeMillis();
-	}
-	
-	public void setName(String name){
-		this.name=name;
-	}
-	
-	public boolean isDirectory(){
-		return false;
-	}
-	
-	public boolean isFile(){
-		return true;
-	}
-	
-	public FSDirectory getParent(){
-		return parent;
-	}
-	
-	public void setParent(FSDirectory parent){
-		this.parent=parent;
-	}
-	
-	public String getName(){
-		return name;
-	}
-	
-	public Iterator<FSEntry> iterator(){
-		return new JIFSDirIterator(new HashSet<FSEntry>());
-	}
+    public JIFSFile(String name) {
+        this.name = name;
+    }
+
+    public JIFSFile(String name, FSDirectory parent) {
+        this(name);
+        this.parent = parent;
+        refresh();
+    }
+
+    /**
+     * Flush the contents of this file to the persistent storage.<br>
+     * Does nothing, because the JIFSFile is a virtual File.
+     */
+    public void flush() throws IOException {
+    }
+
+    public long getLength() {
+        return data.length();
+    }
+
+    protected void cleardata() {
+        data.delete(0, data.length());
+    }
+
+    protected void addString(String add) {
+        data.append(add);
+    }
+
+    protected void addStringln(String add) {
+        addString(add);
+        addStringln();
+    }
+
+    protected void addStringln() {
+        addString("\n");
+    }
+
+    public void refresh() {
+        cleardata();
+        addString("JIFSFile\nFilename :" + name + "\n");
+    }
+
+    // public void read(long fileOffset, byte[] dest, int off, int len){
+    public void read(long fileOffset, ByteBuffer destBuf) {
+        refresh();
+        byte[] readdata = data.toString().getBytes();
+        destBuf.put(readdata, (int) fileOffset, destBuf.remaining());
+    }
+
+    // public void write(long fileOffset, byte[] src, int off, int len) throws
+    // IOException{
+    public void write(long fileOffset, ByteBuffer src) throws IOException {
+        throw new IOException("can not write to JNIFSFile..");
+    }
+
+    public void setLength(long length) {
+        return;
+    }
+
+    public boolean isValid() {
+        return isvalid;
+    }
+
+    public FileSystem getFileSystem() {
+        // TODO
+        return null;
+    }
+
+    public boolean isDirty() {
+        return false;
+    }
+
+    public FSAccessRights getAccessRights() {
+        return null;
+    }
+
+    public FSDirectory getDirectory() {
+        return null;
+    }
+
+    public FSFile getFile() {
+        return this;
+    }
+
+    public void setLastModified(long l) {
+        return;
+    }
+
+    public long getLastModified() {
+        return System.currentTimeMillis();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isDirectory() {
+        return false;
+    }
+
+    public boolean isFile() {
+        return true;
+    }
+
+    public FSDirectory getParent() {
+        return parent;
+    }
+
+    public void setParent(FSDirectory parent) {
+        this.parent = parent;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Iterator<FSEntry> iterator() {
+        return new JIFSDirIterator(new HashSet<FSEntry>());
+    }
 
 }

@@ -44,9 +44,10 @@ class FileRecord extends NTFSRecord {
      */
     public FileRecord(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
         super(volume, buffer, offset);
-        //  check for the magic numberb to see if we have a filerecord
-        if (getMagic() != Magic.FILE) { throw new IOException(
-                "Invalid magic found: " + getMagic()); }
+        //  check for the magic number to see if we have a filerecord
+        if (getMagic() != Magic.FILE) {
+            throw new IOException("Invalid magic found: " + getMagic());
+        }
     }
 
     /**
@@ -181,50 +182,44 @@ class FileRecord extends NTFSRecord {
         }
 
         if (attrTypeID != NTFSAttribute.Types.ATTRIBUTE_LIST) {
-            final AttributeListAttribute attributeList = (AttributeListAttribute)
-                    getAttribute(NTFSAttribute.Types.ATTRIBUTE_LIST);
+            final AttributeListAttribute attributeList =
+                    (AttributeListAttribute) getAttribute(NTFSAttribute.Types.ATTRIBUTE_LIST);
             if (attributeList != null) {
                 log.info("Has $ATTRIBUTE_LIST attribute");
 
                 try {
                     final List<AttributeListEntry> entries = attributeList.getEntries(attrTypeID);
-                    if (!entries.isEmpty())
-                    {
+                    if (!entries.isEmpty()) {
                         log.debug("Found entries via $ATTRIBUTE_LIST: " + entries);
                         MasterFileTable mft = getVolume().getMFT();
                         NTFSAttribute attribute = null;
-                        for (AttributeListEntry entry : entries)
-                        {
+                        for (AttributeListEntry entry : entries) {
                             // XXX: This is a little crappy as we should already know the exact offset
                             //      of this attribute.  This just makes the best of the API we already
                             //      use everywhere else.
-                            NTFSAttribute attr = mft.getRecord(entry.getFileReferenceNumber())
-                                    .getAttribute(attrTypeID);
+                            NTFSAttribute attr =
+                                    mft.getRecord(entry.getFileReferenceNumber()).getAttribute(
+                                            attrTypeID);
 
-                            if (attribute == null)
-                            {
+                            if (attribute == null) {
                                 // First attribute encountered.
                                 attribute = attr;
-                                if (!(attr instanceof NTFSNonResidentAttribute))
-                                {
-                                    log.info("Don't know how to glue together resident attributes, " +
-                                             "returning the first one alone");
+                                if (!(attr instanceof NTFSNonResidentAttribute)) {
+                                    log
+                                            .info("Don't know how to glue together resident attributes, "
+                                                    + "returning the first one alone");
                                     break;
                                 }
-                            }
-                            else
-                            {
+                            } else {
                                 // Subsequent attribute.
-                                if (attr instanceof NTFSNonResidentAttribute)
-                                {
+                                if (attr instanceof NTFSNonResidentAttribute) {
                                     log.debug("Appending data runs onto parent attribute");
-                                    ((NTFSNonResidentAttribute) attribute).appendDataRuns(
-                                            ((NTFSNonResidentAttribute) attr).getDataRuns());
-                                }
-                                else
-                                {
-                                    log.info("Don't know how to glue a resident attribute onto " +
-                                             "a non-resident one, skipping this attribute.");
+                                    ((NTFSNonResidentAttribute) attribute)
+                                            .appendDataRuns(((NTFSNonResidentAttribute) attr)
+                                                    .getDataRuns());
+                                } else {
+                                    log.info("Don't know how to glue a resident attribute onto "
+                                            + "a non-resident one, skipping this attribute.");
                                 }
                             }
                         }
@@ -237,33 +232,31 @@ class FileRecord extends NTFSRecord {
             }
         }
 
-        log.info("getAttribute(0x" + NumberUtils.hex(attrTypeID, 4)
-                + ") not found");
+        log.info("getAttribute(0x" + NumberUtils.hex(attrTypeID, 4) + ") not found");
         return null;
     }
 
-    public void readData(long fileOffset, byte[] dest, int off, int len)
-            throws IOException {
+    public void readData(long fileOffset, byte[] dest, int off, int len) throws IOException {
         final NTFSAttribute data = this.getAttribute(NTFSAttribute.Types.DATA);
         if (data.isResident()) {
             final NTFSResidentAttribute resData = (NTFSResidentAttribute) data;
             final int attrLength = resData.getAttributeLength();
-            if (attrLength < len) { throw new IOException(
-                    "File data(" + attrLength
-                            + "b) is not large enough to read:" + len + "b"); }
-            resData.getData(resData.getAttributeOffset() + (int) fileOffset,
-                    dest, off, len);
+            if (attrLength < len) {
+                throw new IOException("File data(" + attrLength +
+                        "b) is not large enough to read:" + len + "b");
+            }
+            resData.getData(resData.getAttributeOffset() + (int) fileOffset, dest, off, len);
             return;
         }
 
-        // caclulate start and end cluster
+        // calculate start and end cluster
 
         final int clusterSize = getVolume().getClusterSize();
         final long startCluster = (fileOffset / clusterSize);
         final int nrClusters = (int) ((len + (fileOffset % clusterSize)) / clusterSize) + 1;
         final NTFSNonResidentAttribute nresData = (NTFSNonResidentAttribute) data;
 
-        final byte[] tmp = new byte[ nrClusters * clusterSize];
+        final byte[] tmp = new byte[nrClusters * clusterSize];
         nresData.readVCN(startCluster, tmp, 0, nrClusters);
         System.arraycopy(tmp, (int) fileOffset % clusterSize, dest, off, len);
     }

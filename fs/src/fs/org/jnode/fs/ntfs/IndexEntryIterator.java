@@ -31,14 +31,12 @@ import java.util.NoSuchElementException;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class IndexEntryIterator implements Iterator<IndexEntry> {
-    
-    //private final Logger log = Logger.getLogger(getClass());
+final class IndexEntryIterator implements Iterator<IndexEntry> { 
     private int offset;
     private IndexEntry nextEntry;
     private final NTFSStructure parent;
     private final FileRecord parentFileRecord;
-    
+
     /**
      * Initialize this instance.
      */
@@ -48,7 +46,7 @@ final class IndexEntryIterator implements Iterator<IndexEntry> {
         this.parent = parent;
         readNext();
     }
-    
+
     /**
      * @see java.util.Iterator#hasNext()
      */
@@ -58,33 +56,30 @@ final class IndexEntryIterator implements Iterator<IndexEntry> {
         }
         return !nextEntry.isLastIndexEntryInSubnode() || nextEntry.hasSubNodes();
     }
-    
+
     /**
      * @see java.util.Iterator#next()
      */
-    public IndexEntry next() {
-        //log.debug("next: offset=" + offset);
-        if (nextEntry == null) {
-            //log.debug("next: islast");
+    public IndexEntry next() { 
+        if (nextEntry == null) { 
             throw new NoSuchElementException();
         } else {
             final IndexEntry result = nextEntry;
-            final int size = nextEntry.getSize();
-            //log.debug("next: size=" + size);
+            final int size = nextEntry.getSize(); 
             offset += size;
             // Now read the next next entry
             readNext();
             return result;
         }
     }
-    
+
     /**
      * @see java.util.Iterator#remove()
      */
     public void remove() {
         throw new UnsupportedOperationException();
     }
-    
+
     private void readNext() {
         nextEntry = new IndexEntry(parentFileRecord, parent, offset);
         if (nextEntry.isLastIndexEntryInSubnode() && !nextEntry.hasSubNodes()) {

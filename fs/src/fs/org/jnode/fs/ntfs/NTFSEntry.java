@@ -56,7 +56,8 @@ public class NTFSEntry implements FSEntry {
      * @see org.jnode.fs.FSEntry#getName()
      */
     public String getName() {
-        if (indexEntry != null) return indexEntry.getFileName();
+        if (indexEntry != null)
+            return indexEntry.getFileName();
         return null;
     }
 
@@ -72,7 +73,8 @@ public class NTFSEntry implements FSEntry {
      * @see org.jnode.fs.FSEntry#getLastModified()
      */
     public long getLastModified() throws IOException {
-        return NTFSUTIL.filetimeToMillis(getFileRecord().getFileNameAttribute().getModificationTime());
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getFileNameAttribute()
+                .getModificationTime());
     }
 
     /**
@@ -125,8 +127,9 @@ public class NTFSEntry implements FSEntry {
     public FSDirectory getDirectory() throws IOException {
         if (this.isDirectory()) {
             if (cachedFSObject == null) {
-                cachedFSObject = new NTFSDirectory(fs, getFileRecord()
-                        .getVolume().getMFT().getIndexedFileRecord(indexEntry));
+                cachedFSObject =
+                        new NTFSDirectory(fs, getFileRecord().getVolume().getMFT()
+                                .getIndexedFileRecord(indexEntry));
             }
             return (FSDirectory) cachedFSObject;
         } else
@@ -160,8 +163,8 @@ public class NTFSEntry implements FSEntry {
      * @return Returns the fileRecord.
      */
     public FileRecord getFileRecord() throws IOException {
-        return indexEntry.getParentFileRecord().getVolume().getMFT()
-                .getIndexedFileRecord(indexEntry);
+        return indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(
+                indexEntry);
     }
 
     /**

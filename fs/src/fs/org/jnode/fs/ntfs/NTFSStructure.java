@@ -29,10 +29,10 @@ import org.jnode.util.LittleEndian;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class NTFSStructure {
-    
+
     /** My logger */
     protected static final Logger log = Logger.getLogger(NTFSStructure.class);
-    
+
     private byte[] buffer;
     private int offset;
 
@@ -45,7 +45,7 @@ abstract class NTFSStructure {
         this.buffer = buffer;
         this.offset = offset;
     }
-    
+
     /**
      * Initialize this instance.
      * @param parent
@@ -55,7 +55,7 @@ abstract class NTFSStructure {
         this.buffer = parent.buffer;
         this.offset = parent.offset + offset;
     }
-    
+
     /**
      * Re-initialize this instance.
      * @param buffer
@@ -65,7 +65,7 @@ abstract class NTFSStructure {
         this.buffer = buffer;
         this.offset = offset;
     }
-    
+
     /**
      * Re-initialize this instance.
      * @param parent
@@ -75,7 +75,7 @@ abstract class NTFSStructure {
         this.buffer = parent.buffer;
         this.offset = parent.offset + offset;
     }
-    
+
     /**
      * Read an unsigned 8-bit integer from a given offset.
      * @param offset
@@ -118,7 +118,7 @@ abstract class NTFSStructure {
      * @return
      */
     final int getUInt32AsInt(int offset) {
-        return (int)LittleEndian.getUInt32(buffer, this.offset + offset);
+        return (int) LittleEndian.getUInt32(buffer, this.offset + offset);
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class NTFSStructure {
     final int getInt16(int offset) {
         return LittleEndian.getInt16(buffer, this.offset + offset);
     }
-    
+
     /**
      * Read a signed 24-bit integer from a given offset.
      * @param offset
@@ -156,7 +156,7 @@ abstract class NTFSStructure {
     final int getInt24(int offset) {
         return LittleEndian.getInt24(buffer, this.offset + offset);
     }
-    
+
     /**
      * Read n signed 32-bit integer from a given offset.
      * @param offset
@@ -165,7 +165,7 @@ abstract class NTFSStructure {
     final int getInt32(int offset) {
         return LittleEndian.getInt32(buffer, this.offset + offset);
     }
-    
+
     /**
      * Read n signed 64-bit integer from a given offset.
      * @param offset
@@ -192,8 +192,8 @@ abstract class NTFSStructure {
      * @return
      */
     final char getChar16(int offset) {
-        final int v0 = buffer[ this.offset + offset] & 0xFF;
-        final int v1 = buffer[ this.offset + offset + 1] & 0xFF;
+        final int v0 = buffer[this.offset + offset] & 0xFF;
+        final int v1 = buffer[this.offset + offset + 1] & 0xFF;
         return (char) ((v1 << 8) | v0);
     }
 

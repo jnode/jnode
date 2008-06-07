@@ -33,13 +33,13 @@ import org.jnode.fs.jifs.files.JIFSFversion;
 
 public class JIFSDrootDir extends JIFSDirectory {
 
-	private boolean inited;
-	
+    private boolean inited;
+
     public JIFSDrootDir(String name) {
         super(name);
         inited = false;
     }
-    
+
     private void setup() throws IOException {
         // file
         addFSE(new JIFSFuptime(this));
@@ -50,27 +50,27 @@ public class JIFSDrootDir extends JIFSDirectory {
         addFSE(new JIFSDthreads(this));
         addFSE(new JIFSDplugins(this));
         addFSE(new JIFSDpluginJars(this));
-        addFSE(new JIFSDirectory("extended",this));
+        addFSE(new JIFSDirectory("extended", this));
     }
 
     private void checkInit() {
-    	if (!inited) {
-    		try {
-    			setup();
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-    		inited = true;
-    	}	    	
+        if (!inited) {
+            try {
+                setup();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            inited = true;
+        }
     }
-    
+
     public Iterator<FSEntry> iterator() {
-    	checkInit();
-    	return super.iterator();
+        checkInit();
+        return super.iterator();
     }
 
     public FSEntry getEntry(String name) {
-    	checkInit();
-    	return super.getEntry(name);
+        checkInit();
+        return super.getEntry(name);
     }
 }

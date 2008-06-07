@@ -66,10 +66,9 @@ public class NTFSFile implements FSFile {
      * 
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
-    //public void read(long fileOffset, byte[] dest, int off, int len)
-    public void read(long fileOffset, ByteBuffer destBuf)    
-            throws IOException {
-        //TODO optimize it also to use ByteBuffer at lower level
+    // public void read(long fileOffset, byte[] dest, int off, int len)
+    public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
+        // TODO optimize it also to use ByteBuffer at lower level
         final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         final byte[] dest = destBA.toArray();
         getFileRecord().readData(fileOffset, dest, 0, dest.length);
@@ -81,7 +80,7 @@ public class NTFSFile implements FSFile {
      * 
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
-    //public void write(long fileOffset, byte[] src, int off, int len) {
+    // public void write(long fileOffset, byte[] src, int off, int len) {
     public void write(long fileOffset, ByteBuffer src) {
         // TODO Auto-generated method stub
 
@@ -112,8 +111,9 @@ public class NTFSFile implements FSFile {
     public FileRecord getFileRecord() {
         if (fileRecord == null) {
             try {
-                fileRecord = indexEntry.getParentFileRecord().getVolume()
-                        .getMFT().getIndexedFileRecord(indexEntry);
+                fileRecord =
+                        indexEntry.getParentFileRecord().getVolume().getMFT().getIndexedFileRecord(
+                                indexEntry);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -122,8 +122,7 @@ public class NTFSFile implements FSFile {
     }
 
     /**
-     * @param fileRecord
-     *            The fileRecord to set.
+     * @param fileRecord The fileRecord to set.
      */
     public void setFileRecord(FileRecord fileRecord) {
         this.fileRecord = fileRecord;
