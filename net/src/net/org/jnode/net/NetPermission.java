@@ -35,7 +35,7 @@ public class NetPermission extends BasicPermission {
     public NetPermission(String name) {
         super(name);
     }
-    
+
     /**
      * @param name
      * @param actions

@@ -38,7 +38,8 @@ import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.net.syntax.IPv4AddressArgument;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
 
 /**
  * This command class binds IP addresses to network devices, and displays bindings.
@@ -49,60 +50,58 @@ import org.jnode.shell.syntax.*;
 public class IfconfigCommand extends AbstractCommand {
     // FIXME should support IPv6 and other address families.
 
-	private final DeviceArgument ARG_DEVICE = 
-	    new DeviceArgument("device", Argument.OPTIONAL, "the device", NetDeviceAPI.class);
-	
-	private final IPv4AddressArgument ARG_IP_ADDRESS = 
-	    new IPv4AddressArgument("ipAddress", Argument.OPTIONAL, "the IPv4 address to bind the device to");
-	
-	private final IPv4AddressArgument ARG_SUBNET_MASK =
-	    new IPv4AddressArgument("subnetMask", Argument.OPTIONAL, "the IPv4 subnet mask for the device");
+    private final DeviceArgument ARG_DEVICE = 
+        new DeviceArgument("device", Argument.OPTIONAL, "the device", NetDeviceAPI.class);
 
-	
-	public IfconfigCommand() {
-	    super("List or manage network interface bindings");
-	    registerArguments(ARG_DEVICE, ARG_IP_ADDRESS, ARG_SUBNET_MASK);
-	}
+    private final IPv4AddressArgument ARG_IP_ADDRESS = 
+        new IPv4AddressArgument("ipAddress", Argument.OPTIONAL, "the IPv4 address to bind the device to");
 
-	public static void main(String[] args) throws Exception {
-		new IfconfigCommand().execute(args);
-	}
+    private final IPv4AddressArgument ARG_SUBNET_MASK =
+        new IPv4AddressArgument("subnetMask", Argument.OPTIONAL, "the IPv4 subnet mask for the device");
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-	throws NameNotFoundException, ApiNotFoundException, NetworkException {
-		if (!ARG_DEVICE.isSet()) {
-		    // Print MAC address, MTU and IP address(es) for all network devices.
-			final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
-			for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
-				final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
-				out.println(dev.getId() + ": MAC-Address " + api.getAddress() + " MTU " + api.getMTU());
-				out.println("    " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
-			}
-		} 
-		else {
-			final Device dev = ARG_DEVICE.getValue();
-			final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
 
-			if (!ARG_IP_ADDRESS.isSet()) {
-				// Print IP address(es) for device
-				out.println("IP address(es) for " + dev.getId() + 
-				        " " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
-			} 
-			else {
-				// Set IP address for device
-				final IPv4Address ip = ARG_IP_ADDRESS.getValue();
-				final IPv4Address mask = ARG_SUBNET_MASK.getValue();
-				final IPv4ConfigurationService cfg = (IPv4ConfigurationService) 
-				        InitialNaming.lookup(IPv4ConfigurationService.NAME);
-				cfg.configureDeviceStatic(dev, ip, mask, true);
-				
-				// FIXME ... this doesn't show the device's new address because the
-				// IPv4 ConfigurationServiceImpl calls processor.apply with the 
-				// waitUntilReady parameter == false.  (The comment in the code
-				// talks about avoiding deadlocks.)
-				out.println("IP address for " + dev.getId() + " set to " + 
-				        api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
-			}
-		}
-	}
+    public IfconfigCommand() {
+        super("List or manage network interface bindings");
+        registerArguments(ARG_DEVICE, ARG_IP_ADDRESS, ARG_SUBNET_MASK);
+    }
+
+    public static void main(String[] args) throws Exception {
+        new IfconfigCommand().execute(args);
+    }
+
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws NameNotFoundException, ApiNotFoundException, NetworkException {
+        if (!ARG_DEVICE.isSet()) {
+            // Print MAC address, MTU and IP address(es) for all network devices.
+            final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
+                final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+                out.println(dev.getId() + ": MAC-Address " + api.getAddress() + " MTU " + api.getMTU());
+                out.println("    " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
+            }
+        } else {
+            final Device dev = ARG_DEVICE.getValue();
+            final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+
+            if (!ARG_IP_ADDRESS.isSet()) {
+                // Print IP address(es) for device
+                out.println("IP address(es) for " + dev.getId() + 
+                        " " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
+            } else {
+                // Set IP address for device
+                final IPv4Address ip = ARG_IP_ADDRESS.getValue();
+                final IPv4Address mask = ARG_SUBNET_MASK.getValue();
+                final IPv4ConfigurationService cfg = 
+                    (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+                cfg.configureDeviceStatic(dev, ip, mask, true);
+
+                // FIXME ... this doesn't show the device's new address because the
+                // IPv4 ConfigurationServiceImpl calls processor.apply with the 
+                // waitUntilReady parameter == false.  (The comment in the code
+                // talks about avoiding deadlocks.)
+                out.println("IP address for " + dev.getId() + " set to " + 
+                        api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
+            }
+        }
+    }
 }

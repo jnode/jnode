@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.command;
 
 import java.io.InputStream;
@@ -49,19 +49,19 @@ public class WLanCtlCommand extends AbstractCommand {
 
     private final StringArgument ARG_VALUE = new StringArgument(
             "value", Argument.OPTIONAL, "the value to use in the operation");
-    
-    
+
+
     public WLanCtlCommand() {
         super("Manage a WLan device");
         registerArguments(FLAG_SET_ESSID, ARG_DEVICE, ARG_VALUE);
     }
 
     public static void main(String[] args) throws Exception {
-    	new WLanCtlCommand().execute(args);
+        new WLanCtlCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws ApiNotFoundException, NetworkException {
+        throws ApiNotFoundException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
         final WirelessNetDeviceAPI api;
         api = (WirelessNetDeviceAPI) dev.getAPI(WirelessNetDeviceAPI.class);
@@ -72,5 +72,5 @@ public class WLanCtlCommand extends AbstractCommand {
             out.println("Setting ESSID on " + dev.getId() + " to " + essid);
             api.setESSID(essid);
         }
-	}
+    }
 }

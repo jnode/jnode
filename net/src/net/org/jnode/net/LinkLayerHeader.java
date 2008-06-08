@@ -28,15 +28,15 @@ package org.jnode.net;
  * @see org.jnode.net.LinkLayer
  */
 public interface LinkLayerHeader extends LayerHeader {
-	
-	/**
-	 * Gets the source address of the packet described in this header 
-	 */
-	public HardwareAddress getSourceAddress();
 
-	/**
-	 * Gets the source address of the packet described in this header 
-	 */
-	public HardwareAddress getDestinationAddress();
+    /**
+     * Gets the source address of the packet described in this header
+     */
+    public HardwareAddress getSourceAddress();
+
+    /**
+     * Gets the source address of the packet described in this header
+     */
+    public HardwareAddress getDestinationAddress();
 
 }

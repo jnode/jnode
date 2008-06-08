@@ -40,33 +40,31 @@ import org.jnode.shell.syntax.FlagArgument;
  */
 public class ArpCommand extends AbstractCommand {
 
-	private final FlagArgument FLAG_CLEAR = 
-	    new FlagArgument("clear", Argument.OPTIONAL, "if set, clear the ARP cache");
+    private final FlagArgument FLAG_CLEAR = 
+        new FlagArgument("clear", Argument.OPTIONAL, "if set, clear the ARP cache");
 
-	public ArpCommand() {
-	    super("print or clear the ARP cache");
-	    registerArguments(FLAG_CLEAR);
-	}
+    public ArpCommand() {
+        super("print or clear the ARP cache");
+        registerArguments(FLAG_CLEAR);
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public static void main(String[] args) throws Exception {
-		new ArpCommand().execute(args);
-	}
+    /**
+     * Execute this command
+     */
+    public static void main(String[] args) throws Exception {
+        new ArpCommand().execute(args);
+    }
 
-	public void execute(CommandLine commandLine, InputStream in, 
-	        PrintStream out, PrintStream err) throws NoSuchProtocolException, NetworkException {
-		
-		ARPNetworkLayer arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
-		if (FLAG_CLEAR.isSet()) {
-			arp.getCache().clear();
-			out.println("Cleared the ARP cache");
-		} 
-		else {
-			for (ARPCacheEntry entry : arp.getCache().entries()) {
-				out.println(entry);
-			}
-		}
-	}
+    public void execute(CommandLine commandLine, InputStream in, 
+            PrintStream out, PrintStream err) throws NoSuchProtocolException, NetworkException {
+        ARPNetworkLayer arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
+        if (FLAG_CLEAR.isSet()) {
+            arp.getCache().clear();
+            out.println("Cleared the ARP cache");
+        } else {
+            for (ARPCacheEntry entry : arp.getCache().entries()) {
+                out.println(entry);
+            }
+        }
+    }
 }

@@ -28,36 +28,34 @@ import java.net.SocketException;
  */
 public class LayerAlreadyRegisteredException extends SocketException {
 
-	/**
-	 * 
-	 */
-	public LayerAlreadyRegisteredException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public LayerAlreadyRegisteredException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public LayerAlreadyRegisteredException(
-		String message,
-		Throwable cause) {
-		super(message);
-		initCause(cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public LayerAlreadyRegisteredException(String message, Throwable cause) {
+        super(message);
+        initCause(cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public LayerAlreadyRegisteredException(Throwable cause) {
-		super();
-		initCause(cause);
-	}
+    /**
+     * @param cause
+     */
+    public LayerAlreadyRegisteredException(Throwable cause) {
+        super();
+        initCause(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public LayerAlreadyRegisteredException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public LayerAlreadyRegisteredException(String s) {
+        super(s);
+    }
 }

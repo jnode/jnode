@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
+
 package org.jnode.net.arp;
 
 import org.jnode.net.ethernet.EthernetConstants;
@@ -28,24 +29,24 @@ import org.jnode.net.ethernet.EthernetConstants;
  */
 public class RARPNetworkLayer extends ARPNetworkLayer {
 
-	/**
-	 * Create a new instance
-	 */
-	public RARPNetworkLayer() {
-	}
+    /**
+     * Create a new instance
+     */
+    public RARPNetworkLayer() {
+    }
 
-	/**
-	 * @see org.jnode.net.NetworkLayer#getName()
-	 */
-	public String getName() {
-		return "rarp";
-	}
+    /**
+     * @see org.jnode.net.NetworkLayer#getName()
+     */
+    public String getName() {
+        return "rarp";
+    }
 
-	/**
-	 * @see org.jnode.net.NetworkLayer#getProtocolID()
-	 */
-	public int getProtocolID() {
-		return EthernetConstants.ETH_P_RARP;
-	}
+    /**
+     * @see org.jnode.net.NetworkLayer#getProtocolID()
+     */
+    public int getProtocolID() {
+        return EthernetConstants.ETH_P_RARP;
+    }
 
 }

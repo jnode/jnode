@@ -30,20 +30,20 @@ import org.jnode.shell.help.ParsedArguments;
  */
 public class HostArgument extends Argument {
 
-	public HostArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public HostArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public HostArgument(String name, String description) {
-		super(name, description);
-	}
+    public HostArgument(String name, String description) {
+        super(name, description);
+    }
 
-	// here the specific command line completion would be implemented
+    // here the specific command line completion would be implemented
 
-	public IPv4Address getAddress(ParsedArguments args) {
-		String value = getValue(args);
-		if( value == null )
-			return null;
-		return new IPv4Address(value);
-	}
+    public IPv4Address getAddress(ParsedArguments args) {
+        String value = getValue(args);
+        if (value == null)
+            return null;
+        return new IPv4Address(value);
+    }
 }

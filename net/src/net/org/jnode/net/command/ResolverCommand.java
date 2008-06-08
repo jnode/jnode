@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.command;
 
 import java.io.InputStream;
@@ -39,19 +39,16 @@ import org.jnode.shell.syntax.FlagArgument;
  * 
  * @author hagar-wize
  */
-public class ResolverCommand extends AbstractCommand
-{
+public class ResolverCommand extends AbstractCommand {
     // FIXME this should not be restricted to IPv4 addresses.
-    private final FlagArgument FLAG_ADD = 
-        new FlagArgument("add", Argument.OPTIONAL, "if set, add a DNS server");
+    private final FlagArgument FLAG_ADD =
+            new FlagArgument("add", Argument.OPTIONAL, "if set, add a DNS server");
 
-    private final FlagArgument FLAG_DEL = 
-        new FlagArgument("del", Argument.OPTIONAL, "if set, remove a DNS server");
+    private final FlagArgument FLAG_DEL =
+            new FlagArgument("del", Argument.OPTIONAL, "if set, remove a DNS server");
 
-    private  final IPv4AddressArgument ARG_DNS_SERVER = 
-        new IPv4AddressArgument("server", Argument.OPTIONAL, 
-                "the DNS server's hostname or IP address");
-
+    private final IPv4AddressArgument ARG_DNS_SERVER =
+            new IPv4AddressArgument("server", Argument.OPTIONAL, "the DNS server's hostname or IP address");
 
     public ResolverCommand() {
         super("Manage JNode's DNS resolver");
@@ -62,25 +59,21 @@ public class ResolverCommand extends AbstractCommand
         new ResolverCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, 
-            PrintStream out, PrintStream err) 
-    throws NetworkException {
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws NetworkException {
         IPv4Address server = ARG_DNS_SERVER.getValue();
         if (FLAG_ADD.isSet()) {
             // Add a DNS server
             ResolverImpl.addDnsServer(server);
-        }
-        else if (FLAG_DEL.isSet()) {
+        } else if (FLAG_DEL.isSet()) {
             // Remove a DNS server
             ResolverImpl.removeDnsServer(server);
-        }
-        else {
+        } else {
             // List the DNS servers that the resolver uses
             Collection<String> resolvers = ResolverImpl.getDnsServers();
             if (resolvers.size() == 0) {
                 out.println("No DNS servers found.");
-            }
-            else {
+            } else {
                 out.println("DNS servers");
                 for (String dnsServer : resolvers) {
                     out.println(dnsServer);

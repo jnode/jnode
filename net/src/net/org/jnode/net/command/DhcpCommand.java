@@ -49,9 +49,8 @@ import org.jnode.shell.syntax.DeviceArgument;
  */
 public class DhcpCommand extends AbstractCommand {
 
-    private final DeviceArgument ARG_DEVICE = 
-        new DeviceArgument("device", Argument.MANDATORY, 
-                "the network interface device to be configured", NetDeviceAPI.class);
+    private final DeviceArgument ARG_DEVICE = new DeviceArgument(
+            "device", Argument.MANDATORY, "the network interface device to be configured", NetDeviceAPI.class);
 
     public DhcpCommand() {
         super("Configure a network interface using DHCP");
@@ -63,9 +62,8 @@ public class DhcpCommand extends AbstractCommand {
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-    throws DeviceNotFoundException, NameNotFoundException, ApiNotFoundException, 
-    UnknownHostException, NetworkException
-    {
+        throws DeviceNotFoundException, NameNotFoundException, ApiNotFoundException, 
+        UnknownHostException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
 
         // The DHCP network configuration process will attempt to configure the DNS.  This will only work if

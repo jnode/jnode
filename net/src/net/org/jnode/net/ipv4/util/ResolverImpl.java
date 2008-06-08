@@ -94,7 +94,7 @@ public class ResolverImpl implements Resolver {
     /**
      * Get list all the dns servers
      */
-    public static Collection getDnsServers() {
+    public static Collection<String> getDnsServers() {
         return resolvers.keySet();
     }
 
