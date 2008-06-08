@@ -43,14 +43,14 @@ public class IPv4ConfigurationPlugin extends Plugin {
     private NetDeviceMonitor monitor;
     private DeviceManager devMan;
     private ConfigurationProcessor processor;
-    
+
     /**
      * @param descriptor
      */
     public IPv4ConfigurationPlugin(PluginDescriptor descriptor) {
         super(descriptor);
     }    
-    
+
     /**
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
@@ -67,13 +67,13 @@ public class IPv4ConfigurationPlugin extends Plugin {
                 public void execute() {
                     monitor.configureDevices(devMan);
                 }
-                });
+            });
         } catch (NamingException ex) {
             throw new PluginException(ex);
         }
         processor.start();
     }
-    
+
     /**
      * @see org.jnode.plugin.Plugin#stopPlugin()
      */

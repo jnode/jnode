@@ -61,7 +61,7 @@ public class BOOTPClient extends AbstractBOOTPClient {
         }
 
         try {
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws IOException {
                     // Get the API.
                     try {
@@ -96,22 +96,16 @@ public class BOOTPClient extends AbstractBOOTPClient {
         } catch (NameNotFoundException ex) {
             throw new NetworkException(ex);
         }
-        cfg.configureDeviceStatic(device, new IPv4Address(hdr
-                .getYourIPAddress()), null, false);
+        cfg.configureDeviceStatic(device, new IPv4Address(hdr.getYourIPAddress()), null, false);
 
         final IPv4Address serverAddr = new IPv4Address(hdr.getServerIPAddress());
         final IPv4Address networkAddress = serverAddr.and(serverAddr.getDefaultSubnetmask());
 
         if (hdr.getGatewayIPAddress().isAnyLocalAddress()) {
-            // cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()), null,
-            // device, false);
             cfg.addRoute(serverAddr, null, device, false);
             cfg.addRoute(networkAddress, null, device, false);
         } else {
-            // cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()),
-            // new IPv4Address(hdr.getGatewayIPAddress()), device, false);
-            cfg.addRoute(networkAddress, new IPv4Address(hdr
-                    .getGatewayIPAddress()), device, false);
+            cfg.addRoute(networkAddress, new IPv4Address(hdr.getGatewayIPAddress()), device, false);
         }
     }
 }

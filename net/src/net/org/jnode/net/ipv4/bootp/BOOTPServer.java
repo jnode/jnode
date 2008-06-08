@@ -43,109 +43,116 @@ import org.jnode.net.ipv4.IPv4Address;
  */
 public class BOOTPServer {
 
-	private static final Logger log = Logger.getLogger(BOOTPServer.class);
+    private static final Logger log = Logger.getLogger(BOOTPServer.class);
 
-	public static final int SERVER_PORT = 67;
-	public static final int CLIENT_PORT = 68;
+    public static final int SERVER_PORT = 67;
+    public static final int CLIENT_PORT = 68;
 
-	private DatagramSocket socket;
-	private final Map<String, TableEntry> table = new HashMap<String, TableEntry>();
+    private DatagramSocket socket;
+    private final Map<String, TableEntry> table = new HashMap<String, TableEntry>();
 
-	public static void main(String[] args) {
-		String filename = "bootptab.xml";
-		if(args.length > 0)
-			filename = args[0];
-		BOOTPServer server = new BOOTPServer();
-		try {
-			server.loadTable(filename);
-			server.run();
-		} catch(IOException ex) {
-			Logger.getLogger(BOOTPServer.class).debug("I/O exception", ex);
-		}
-	}
-	private static class TableEntry {
-		final Inet4Address address;
-		final String bootFileName;
+    public static void main(String[] args) {
+        String filename = "bootptab.xml";
+        if (args.length > 0)
+            filename = args[0];
+        BOOTPServer server = new BOOTPServer();
+        try {
+            server.loadTable(filename);
+            server.run();
+        } catch (IOException ex) {
+            Logger.getLogger(BOOTPServer.class).debug("I/O exception", ex);
+        }
+    }
 
-		public TableEntry(XMLElement xml) {
-			try {
-				address = (Inet4Address) InetAddress.getByName(xml.getStringAttribute("ipAddress"));
-			} catch(UnknownHostException ex) {
-				throw new IllegalArgumentException(ex.getMessage());
-			}
-			bootFileName = xml.getStringAttribute("bootFileName");
-		}
-	}
+    private static class TableEntry {
+        final Inet4Address address;
+        final String bootFileName;
 
-	private void loadTable(String filename) throws IOException {
-		FileReader reader = new FileReader(filename);
-		try {
-			XMLElement xml = new XMLElement();
-			xml.parseFromReader(reader);
-			List<XMLElement> children = xml.getChildren();
-			for(int i=0; i<children.size(); i++) {
-				XMLElement child = (XMLElement) children.get(i);
-				try {
-					table.put(child.getStringAttribute("ethernetAddress").toUpperCase(), new TableEntry(child));
-				} catch(IllegalArgumentException ex) {
-					log.debug("Invalid IP address", ex);
-				}
-			}
-		} finally {
-			reader.close();
-		}
-	}
+        public TableEntry(XMLElement xml) {
+            try {
+                address = (Inet4Address) InetAddress.getByName(xml.getStringAttribute("ipAddress"));
+            } catch (UnknownHostException ex) {
+                throw new IllegalArgumentException(ex.getMessage());
+            }
+            bootFileName = xml.getStringAttribute("bootFileName");
+        }
+    }
 
-	private void run() throws SocketException {
-		System.out.println("JNode BOOTP Server");
-		socket = new DatagramSocket(SERVER_PORT);
-		try {
-			socket.setBroadcast(true);
+    private void loadTable(String filename) throws IOException {
+        FileReader reader = new FileReader(filename);
+        try {
+            XMLElement xml = new XMLElement();
+            xml.parseFromReader(reader);
+            List<XMLElement> children = xml.getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                XMLElement child = (XMLElement) children.get(i);
+                try {
+                    table.put(child.getStringAttribute("ethernetAddress").toUpperCase(),
+                            new TableEntry(child));
+                } catch (IllegalArgumentException ex) {
+                    log.debug("Invalid IP address", ex);
+                }
+            }
+        } finally {
+            reader.close();
+        }
+    }
 
-			final byte[] buffer = new byte[BOOTPMessage.SIZE];
-			final DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+    private void run() throws SocketException {
+        System.out.println("JNode BOOTP Server");
+        socket = new DatagramSocket(SERVER_PORT);
+        try {
+            socket.setBroadcast(true);
 
-			boolean doShutdown = false;
-			while(!doShutdown) {
-				try {
-					socket.receive(packet);
-					processRequest(packet);
-				} catch(IOException ex) {
-					log.debug("I/O exception", ex);
-				}
-			}
-		} finally {
-			socket.close();
-		}
-	}
+            final byte[] buffer = new byte[BOOTPMessage.SIZE];
+            final DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-	private void processRequest(DatagramPacket packet) throws IOException {
-		log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort()+" "+new String(packet.getData(), packet.getOffset(), packet.getLength()));
-		BOOTPHeader hdr = new BOOTPHeader(packet);
-		if (hdr.getOpcode() != BOOTPHeader.BOOTREQUEST) {
-			// Not a request
-			return;
-		}
+            boolean doShutdown = false;
+            while (!doShutdown) {
+                try {
+                    socket.receive(packet);
+                    processRequest(packet);
+                } catch (IOException ex) {
+                    log.debug("I/O exception", ex);
+                }
+            }
+        } finally {
+            socket.close();
+        }
+    }
 
-		log.debug("Got Client IP address  : " + hdr.getClientIPAddress());
-		log.debug("Got Your IP address    : " + hdr.getYourIPAddress());
-		log.debug("Got Server IP address  : " + hdr.getServerIPAddress());
-		log.debug("Got Gateway IP address : " + hdr.getGatewayIPAddress());
-		log.debug("Got Hardware address   : " + hdr.getClientHwAddress());
+    private void processRequest(DatagramPacket packet) throws IOException {
+        log.debug("Received packet: " + packet.getAddress() + ":" + packet.getPort() + " " +
+                new String(packet.getData(), packet.getOffset(), packet.getLength()));
+        BOOTPHeader hdr = new BOOTPHeader(packet);
+        if (hdr.getOpcode() != BOOTPHeader.BOOTREQUEST) {
+            // Not a request
+            return;
+        }
 
-		TableEntry entry = (TableEntry) table.get(hdr.getClientHwAddress().toString().toUpperCase());
-		if(entry == null) {
-			// no entry in table
-			log.debug("No match for hardware address found in table");
-			return;
-		}
-		Inet4Address yourIP = entry.address;
-		hdr = new BOOTPHeader(BOOTPHeader.BOOTREPLY, hdr.getTransactionID(), hdr.getTimeElapsedSecs(), hdr.getClientIPAddress(), yourIP, (Inet4Address) InetAddress.getLocalHost(), hdr.getClientHwAddress());
-		hdr.setBootFileName(entry.bootFileName);
-		BOOTPMessage msg = new BOOTPMessage(hdr);
-		packet = msg.toDatagramPacket();
-		packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
-		packet.setPort(CLIENT_PORT);
-		socket.send(packet);
-	}
+        log.debug("Got Client IP address  : " + hdr.getClientIPAddress());
+        log.debug("Got Your IP address    : " + hdr.getYourIPAddress());
+        log.debug("Got Server IP address  : " + hdr.getServerIPAddress());
+        log.debug("Got Gateway IP address : " + hdr.getGatewayIPAddress());
+        log.debug("Got Hardware address   : " + hdr.getClientHwAddress());
+
+        TableEntry entry =
+                (TableEntry) table.get(hdr.getClientHwAddress().toString().toUpperCase());
+        if (entry == null) {
+            // no entry in table
+            log.debug("No match for hardware address found in table");
+            return;
+        }
+        Inet4Address yourIP = entry.address;
+        hdr = new BOOTPHeader(
+                BOOTPHeader.BOOTREPLY, hdr.getTransactionID(), hdr.getTimeElapsedSecs(), 
+                hdr.getClientIPAddress(), yourIP, (Inet4Address) InetAddress.getLocalHost(), 
+                hdr.getClientHwAddress());
+        hdr.setBootFileName(entry.bootFileName);
+        BOOTPMessage msg = new BOOTPMessage(hdr);
+        packet = msg.toDatagramPacket();
+        packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
+        packet.setPort(CLIENT_PORT);
+        socket.send(packet);
+    }
 }

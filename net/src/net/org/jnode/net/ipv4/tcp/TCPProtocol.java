@@ -41,7 +41,6 @@ import org.jnode.net.ipv4.IPv4Header;
 import org.jnode.net.ipv4.IPv4Protocol;
 import org.jnode.net.ipv4.IPv4Service;
 import org.jnode.util.Statistics;
-import org.jnode.util.NumberUtils;
 
 /**
  * @author epr
@@ -52,7 +51,8 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
     private final IPv4Service ipService;
 
     /** The ICMP service */
-    //private final ICMPUtils icmp;
+    // private final ICMPUtils icmp;
+    
     /** My statistics */
     private final TCPStatistics stat = new TCPStatistics();
 
@@ -75,18 +75,18 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
      */
     public TCPProtocol(IPv4Service ipService) throws NetworkException {
         this.ipService = ipService;
-        //this.icmp = new ICMPUtils(ipService);
+        // this.icmp = new ICMPUtils(ipService);
         this.controlBlocks = new TCPControlBlockList(this);
         this.timer = new TCPTimer(controlBlocks);
         try {
             socketImplFactory = new TCPSocketImplFactory(this);
             try {
-                AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                   public Object run() throws IOException {
-                       Socket.setSocketImplFactory(socketImplFactory);
-                       ServerSocket.setSocketFactory(socketImplFactory);
-                       return null;
-                   }
+                AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                    public Object run() throws IOException {
+                        Socket.setSocketImplFactory(socketImplFactory);
+                        ServerSocket.setSocketFactory(socketImplFactory);
+                        return null;
+                    }
                 });
             } catch (SecurityException ex) {
                 log.error("No permission for set socket factory.", ex);
@@ -102,8 +102,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
     /**
      * @see org.jnode.net.TransportLayer#getDatagramSocketImplFactory()
      */
-    public DatagramSocketImplFactory getDatagramSocketImplFactory()
-            throws SocketException {
+    public DatagramSocketImplFactory getDatagramSocketImplFactory() throws SocketException {
         throw new SocketException("TCP is socket based");
     }
 
@@ -167,23 +166,23 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
             }
 
             // Find the corresponding control block
-            final TCPControlBlock cb = (TCPControlBlock) controlBlocks.lookup(
-                    ipHdr.getSource(), hdr.getSrcPort(),
-                    ipHdr.getDestination(), hdr.getDstPort(), true);
+            final TCPControlBlock cb =
+                    (TCPControlBlock) controlBlocks.lookup(ipHdr.getSource(), hdr.getSrcPort(),
+                            ipHdr.getDestination(), hdr.getDstPort(), true);
             if (cb == null) {
-              final boolean ack = hdr.isFlagAcknowledgeSet();
-              final boolean rst = hdr.isFlagResetSet();
+                final boolean ack = hdr.isFlagAcknowledgeSet();
+                final boolean rst = hdr.isFlagResetSet();
 
-              stat.noport.inc();
+                stat.noport.inc();
 
-              // Port unreachable
-              if (ack && rst) {
-                // the source is also unreachable
-                log.debug("Dropping segment due to: connection refused as the source is also unreachable");
-              }
-             else {
-                processPortUnreachable(ipHdr, hdr);
-              }
+                // Port unreachable
+                if (ack && rst) {
+                    // the source is also unreachable
+                    log
+                            .debug("Dropping segment due to: connection refused as the source is also unreachable");
+                } else {
+                    processPortUnreachable(ipHdr, hdr);
+                }
             } else {
                 // Let the cb handle the receive
                 cb.receive(hdr, skbuf);
@@ -204,10 +203,10 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
      * 
      * @param hdr
      */
-    private void processPortUnreachable(IPv4Header ipHdr, TCPHeader hdr)
-            throws SocketException {
-        final TCPHeader replyHdr = new TCPHeader(hdr.getDstPort(), hdr
-                .getSrcPort(), 0, 0, hdr.getSequenceNr() + 1, 0, 0);
+    private void processPortUnreachable(IPv4Header ipHdr, TCPHeader hdr) throws SocketException {
+        final TCPHeader replyHdr =
+                new TCPHeader(hdr.getDstPort(), hdr.getSrcPort(), 0, 0, hdr.getSequenceNr() + 1, 0,
+                        0);
         replyHdr.setFlags(TCPF_ACK | TCPF_RST);
         final IPv4Header replyIpHdr = new IPv4Header(ipHdr);
         replyIpHdr.swapAddresses();
@@ -220,8 +219,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
      * @param lAddr
      * @param lPort
      */
-    public TCPControlBlock bind(IPv4Address lAddr, int lPort)
-            throws BindException {
+    public TCPControlBlock bind(IPv4Address lAddr, int lPort) throws BindException {
         return (TCPControlBlock) controlBlocks.bind(lAddr, lPort);
     }
 
@@ -231,7 +229,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
      * @param skbuf
      */
     protected void send(IPv4Header ipHdr, TCPHeader tcpHdr, SocketBuffer skbuf)
-            throws SocketException {
+        throws SocketException {
         if (log.isDebugEnabled()) {
             log.debug("send(ipHdr, " + tcpHdr + ")");
         }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.icmp;
 
 import java.net.DatagramSocketImplFactory;
@@ -42,8 +42,8 @@ import org.jnode.util.Statistics;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
-        ICMPConstants, QueueProcessor<SocketBuffer> {
+public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
+        QueueProcessor<SocketBuffer> {
 
     /** My logger */
     private Logger log = Logger.getLogger(getClass());
@@ -69,8 +69,8 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
      */
     public ICMPProtocol(IPv4Service ipService) {
         this.ipService = ipService;
-        this.replyRequestsThread = new QueueProcessorThread<SocketBuffer>(
-                "icmp-reply", replyRequestQueue, this);
+        this.replyRequestsThread =
+                new QueueProcessorThread<SocketBuffer>("icmp-reply", replyRequestQueue, this);
         replyRequestsThread.start();
     }
 
@@ -109,16 +109,14 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
             // TODO Process ICMP messages
 
             switch (hdr.getType()) {
-            case ICMP_ECHO:
-                postReplyRequest(skbuf);
-                break;
-            case ICMP_ECHOREPLY:
-                notifyListeners(skbuf);
-                break;
-
-            default:
-                log.debug("GOT ICMP type " + hdr.getType() + ", code "
-                        + hdr.getCode());
+                case ICMP_ECHO:
+                    postReplyRequest(skbuf);
+                    break;
+                case ICMP_ECHOREPLY:
+                    notifyListeners(skbuf);
+                    break;
+                default:
+                    log.debug("GOT ICMP type " + hdr.getType() + ", code " + hdr.getCode());
             }
         } catch (SocketException ex) {
             // TODO fix me
@@ -142,8 +140,7 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
     /**
      * Gets the SocketImplFactory of this protocol.
      * 
-     * @throws SocketException
-     *             If this protocol is not Socket based.
+     * @throws SocketException If this protocol is not Socket based.
      */
     public SocketImplFactory getSocketImplFactory() throws SocketException {
         throw new SocketException("ICMP is packet based");
@@ -152,11 +149,9 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
     /**
      * Gets the DatagramSocketImplFactory of this protocol.
      * 
-     * @throws SocketException
-     *             If this protocol is not DatagramSocket based.
+     * @throws SocketException If this protocol is not DatagramSocket based.
      */
-    public DatagramSocketImplFactory getDatagramSocketImplFactory()
-            throws SocketException {
+    public DatagramSocketImplFactory getDatagramSocketImplFactory() throws SocketException {
         throw new SocketException("Not implemented yet");
     }
 
@@ -166,8 +161,7 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
      * @param skbuf
      */
     protected void send(IPv4Header ipHdr, ICMPHeader icmpHdr, SocketBuffer skbuf)
-            throws SocketException {
-        // Syslog.debug("ICMP.send");
+        throws SocketException {
         stat.opackets.inc();
         skbuf.setTransportLayerHeader(icmpHdr);
         icmpHdr.prefixTo(skbuf);
@@ -180,8 +174,7 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
      * @param hdr
      * @param skbuf
      */
-    private void sendEchoReply(ICMPEchoHeader hdr, SocketBuffer skbuf)
-            throws SocketException {
+    private void sendEchoReply(ICMPEchoHeader hdr, SocketBuffer skbuf) throws SocketException {
         final IPv4Header ipHdr = (IPv4Header) skbuf.getNetworkLayerHeader();
         final IPv4Header ipReplyHdr = new IPv4Header(ipHdr);
         ipReplyHdr.swapAddresses();
@@ -199,30 +192,30 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
     private ICMPHeader createHeader(SocketBuffer skbuf) throws SocketException {
         final int type = skbuf.get(0);
         switch (type) {
-        case ICMP_DEST_UNREACH:
-            return new ICMPUnreachableHeader(skbuf);
+            case ICMP_DEST_UNREACH:
+                return new ICMPUnreachableHeader(skbuf);
 
-        case ICMP_TIMESTAMP:
-        case ICMP_TIMESTAMPREPLY:
-            return new ICMPTimestampHeader(skbuf);
+            case ICMP_TIMESTAMP:
+            case ICMP_TIMESTAMPREPLY:
+                return new ICMPTimestampHeader(skbuf);
 
-        case ICMP_ADDRESS:
-        case ICMP_ADDRESSREPLY:
-            return new ICMPAddressMaskHeader(skbuf);
+            case ICMP_ADDRESS:
+            case ICMP_ADDRESSREPLY:
+                return new ICMPAddressMaskHeader(skbuf);
 
-        case ICMP_ECHOREPLY:
-        case ICMP_ECHO:
-            return new ICMPEchoHeader(skbuf);
+            case ICMP_ECHOREPLY:
+            case ICMP_ECHO:
+                return new ICMPEchoHeader(skbuf);
 
-        case ICMP_SOURCE_QUENCH:
-        case ICMP_REDIRECT:
-        case ICMP_TIME_EXCEEDED:
-        case ICMP_PARAMETERPROB:
-        case ICMP_INFO_REQUEST:
-        case ICMP_INFO_REPLY:
-            throw new SocketException("Not implemented");
-        default:
-            throw new SocketException("Unknown ICMP type " + type);
+            case ICMP_SOURCE_QUENCH:
+            case ICMP_REDIRECT:
+            case ICMP_TIME_EXCEEDED:
+            case ICMP_PARAMETERPROB:
+            case ICMP_INFO_REQUEST:
+            case ICMP_INFO_REPLY:
+                throw new SocketException("Not implemented");
+            default:
+                throw new SocketException("Unknown ICMP type " + type);
         }
     }
 
@@ -251,11 +244,9 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants,
         final ICMPHeader hdr = (ICMPHeader) skbuf.getTransportLayerHeader();
         try {
             switch (hdr.getType()) {
-            case ICMP_ECHO:
-                // Syslog.debug("<Send reply>");
-                sendEchoReply((ICMPEchoHeader) hdr, skbuf);
-                // Syslog.debug("</Send reply>");
-                break;
+                case ICMP_ECHO:
+                    sendEchoReply((ICMPEchoHeader) hdr, skbuf);
+                    break;
             }
         } catch (SocketException ex) {
             log.debug("Error in ICMP reply", ex);

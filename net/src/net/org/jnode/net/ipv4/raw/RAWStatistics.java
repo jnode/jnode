@@ -29,15 +29,13 @@ import org.jnode.util.Statistics;
  */
 public class RAWStatistics implements Statistics {
 
-	/** The list of statistics */
-	private final Statistic[] list = new Statistic[] { 
-	};
+    /** The list of statistics */
+    private final Statistic[] list = new Statistic[] {};
 
-	/**
-	 * Gets all statistics
-	 */
-	public Statistic[] getStatistics() {
-		return list;
-	}
-
+    /**
+     * Gets all statistics
+     */
+    public Statistic[] getStatistics() {
+        return list;
+    }
 }

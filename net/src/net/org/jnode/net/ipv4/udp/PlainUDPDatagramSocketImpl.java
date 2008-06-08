@@ -18,8 +18,10 @@ import java.io.FileDescriptor;
  * @author Levente S\u00e1ntha
  */
 public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
+
     private MyUDPDatagramSocketImpl udp;
-    static class MyUDPDatagramSocketImpl extends UDPDatagramSocketImpl{
+
+    static class MyUDPDatagramSocketImpl extends UDPDatagramSocketImpl {
         MyUDPDatagramSocketImpl(UDPProtocol protocol) {
             super(protocol);
         }
@@ -29,43 +31,43 @@ public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
             super.finalize();
         }
 
-        void setTimeToLive0(int ttl){
+        void setTimeToLive0(int ttl) {
             super.setTimeToLive(ttl);
         }
 
-        int getTimeToLive0() throws IOException{
+        int getTimeToLive0() throws IOException {
             return super.getTimeToLive();
         }
 
-        void receive0(DatagramPacket pack) throws IOException{
+        void receive0(DatagramPacket pack) throws IOException {
             super.receive(pack);
         }
 
-        void close0(){
+        void close0() {
             super.close();
         }
 
-        void join0(InetAddress ineta) throws IOException{
+        void join0(InetAddress ineta) throws IOException {
             super.join(ineta);
         }
 
-        void leave0(InetAddress addr) throws IOException{
+        void leave0(InetAddress addr) throws IOException {
             super.leave(addr);
         }
 
-        public int peek0(InetAddress addr) throws IOException{
+        public int peek0(InetAddress addr) throws IOException {
             return super.peek(addr);
         }
 
-        public int peekData0(DatagramPacket packet) throws IOException{
+        public int peekData0(DatagramPacket packet) throws IOException {
             return super.peekData(packet);
         }
 
-        public void joinGroup0(SocketAddress address, NetworkInterface netIf) throws IOException{
+        public void joinGroup0(SocketAddress address, NetworkInterface netIf) throws IOException {
             super.joinGroup(address, netIf);
         }
 
-        public void leaveGroup0(SocketAddress address, NetworkInterface netIf) throws IOException{
+        public void leaveGroup0(SocketAddress address, NetworkInterface netIf) throws IOException {
             super.leaveGroup(address, netIf);
         }
 
@@ -79,13 +81,11 @@ public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
             return super.getFileDescriptor();
         }
 
-
     }
 
     public PlainUDPDatagramSocketImpl(UDPProtocol proto) {
         this.udp = new MyUDPDatagramSocketImpl(proto);
     }
-
 
     @Override
     protected void connect(InetAddress address, int port) throws SocketException {
@@ -119,19 +119,21 @@ public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
     }
 
     private final Object SEND_LOCK = new Object();
+
     @Override
     protected void send(DatagramPacket packet) throws IOException {
         //synchronized (SEND_LOCK){
-            System.out.println("udp: " + udp);
-            System.out.println("packet: " + packet);
-            udp.send(packet);
+        System.out.println("udp: " + udp);
+        System.out.println("packet: " + packet);
+        udp.send(packet);
         //}
     }
 
     private final Object RECEIVE_LOCK = new Object();
+
     @Override
     protected void receive(DatagramPacket packet) throws IOException {
-        synchronized (RECEIVE_LOCK){
+        synchronized (RECEIVE_LOCK) {
             udp.receive0(packet);
         }
     }
@@ -177,7 +179,7 @@ public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
     }
 
     @Override
-    public int peekData(DatagramPacket packet) throws IOException{
+    public int peekData(DatagramPacket packet) throws IOException {
         return udp.peekData0(packet);
     }
 
@@ -193,7 +195,7 @@ public class PlainUDPDatagramSocketImpl extends PlainDatagramSocketImpl {
 
     @Override
     protected void disconnect() {
-        udp.disconnect();    
+        udp.disconnect();
     }
 
     @Override

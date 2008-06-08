@@ -21,38 +21,39 @@
  
 package org.jnode.net.ipv4.udp;
 
-import java.net.DatagramSocketImpl;
-import java.net.DatagramSocketImplFactory;
 import gnu.java.net.PlainDatagramSocketImpl;
 import gnu.java.net.PlainDatagramSocketImplFactory;
+
+import java.net.DatagramSocketImpl;
 
 /**
  * @author epr
  */
 public class UDPDatagramSocketImplFactory implements PlainDatagramSocketImplFactory {
 
-	private final UDPProtocol protocol;
-	
-	/**
-	 * Create a new instance
-	 * @param protocol
-	 */
-	public UDPDatagramSocketImplFactory(UDPProtocol protocol) {
-		this.protocol = protocol;
-	}
-
-	/**
-	 * @see java.net.DatagramSocketImplFactory#createDatagramSocketImpl()
-	 */
-	public DatagramSocketImpl createDatagramSocketImpl() {
-		return new UDPDatagramSocketImpl(protocol);
-	}
+    private final UDPProtocol protocol;
 
     /**
-	 * @see java.net.DatagramSocketImplFactory#createDatagramSocketImpl()
-	 */
-	public PlainDatagramSocketImpl createPlainDatagramSocketImpl() {
-		return new PlainUDPDatagramSocketImpl(protocol);
-	}
+     * Create a new instance
+     * 
+     * @param protocol
+     */
+    public UDPDatagramSocketImplFactory(UDPProtocol protocol) {
+        this.protocol = protocol;
+    }
+
+    /**
+     * @see java.net.DatagramSocketImplFactory#createDatagramSocketImpl()
+     */
+    public DatagramSocketImpl createDatagramSocketImpl() {
+        return new UDPDatagramSocketImpl(protocol);
+    }
+
+    /**
+     * @see java.net.DatagramSocketImplFactory#createDatagramSocketImpl()
+     */
+    public PlainDatagramSocketImpl createPlainDatagramSocketImpl() {
+        return new PlainUDPDatagramSocketImpl(protocol);
+    }
 
 }

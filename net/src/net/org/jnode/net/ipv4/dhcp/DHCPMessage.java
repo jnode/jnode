@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.dhcp;
 
 import java.io.UnsupportedEncodingException;
@@ -139,7 +139,7 @@ public class DHCPMessage {
 
     /** String URL: JNode specific option */
     public static final int PLUGIN_LOADER_OPTION = 130;
-    
+
     public static final int END_OPTION = 255;
 
     // message types
@@ -196,8 +196,7 @@ public class DHCPMessage {
     }
 
     public DHCPMessage(DatagramPacket packet) {
-        this(new SocketBuffer(packet.getData(), packet.getOffset(), packet
-                .getLength()));
+        this(new SocketBuffer(packet.getData(), packet.getOffset(), packet.getLength()));
     }
 
     public BOOTPHeader getHeader() {
@@ -227,8 +226,7 @@ public class DHCPMessage {
      * Sets a DHCP option with an unsigned 16-bit integer. Convenience method.
      */
     public void setOption16(int code, int value) {
-        byte[] b = new byte[] { (byte) ((value >> 8) & 0xFF),
-                (byte) (value & 0xFF) };
+        byte[] b = new byte[] {(byte) ((value >> 8) & 0xFF), (byte) (value & 0xFF)};
         setOption(code, b);
     }
 
@@ -255,7 +253,7 @@ public class DHCPMessage {
      */
     public byte[] getOption(int code) {
         if (code == MESSAGE_TYPE_OPTION)
-            return new byte[] { (byte) messageType };
+            return new byte[] {(byte) messageType};
         else
             return (byte[]) options.get(new Integer(code));
     }

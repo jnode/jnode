@@ -37,38 +37,47 @@ public class TCPOutChannel {
      * My logger
      */
     private static final Logger log = Logger.getLogger(TCPOutChannel.class);
+
     /**
      * The protocol
      */
     private final TCPProtocol tcp;
+
     /**
      * All unacked segments
      */
     private final LinkedList<TCPOutSegment> unackedSegments = new LinkedList<TCPOutSegment>();
+
     /**
      * The outgoing databuffer
      */
     private final TCPDataBuffer dataBuffer;
+
     /**
      * Send unacknowledged
      */
     private int snd_unack;
+
     /**
      * Send next seq-nr
      */
     private int snd_next;
+
     /**
      * Highest seq-nr sent; used to recognize retransmits
      */
     private int snd_max;
+
     /**
      * Maximum segment size (determined by the foreign part of the connection
      */
     private int mss;
+
     /**
      * The control block I belong to
      */
     private final TCPControlBlock controlBlock;
+
     /**
      * Number of ticks before a retransmit timeout
      */
@@ -151,8 +160,7 @@ public class TCPOutChannel {
      * @param ipHdr
      * @param hdr
      */
-    public void send(IPv4Header ipHdr, TCPHeader hdr)
-            throws SocketException {
+    public void send(IPv4Header ipHdr, TCPHeader hdr) throws SocketException {
         // Check the datalength
         if (hdr.getDataLength() != 0) {
             throw new IllegalArgumentException("dataLength must be 0");
@@ -172,8 +180,8 @@ public class TCPOutChannel {
      * @param offset
      * @param length Must be smaller or equal to mss.
      */
-    public synchronized void send(IPv4Header ipHdr, TCPHeader hdr, byte[] data, int offset, int length)
-            throws SocketException {
+    public synchronized void send(IPv4Header ipHdr, TCPHeader hdr, byte[] data, int offset,
+            int length) throws SocketException {
         log.debug("outChannel.send(ipHdr,hdr,data," + offset + ", " + length + ")");
         // Check for maximum datalength
         if (length > mss) {
@@ -206,7 +214,7 @@ public class TCPOutChannel {
      * @param dataOffset
      */
     private final void sendHelper(IPv4Header ipHdr, TCPHeader hdr, int dataOffset)
-            throws SocketException {
+        throws SocketException {
         // Adjust the sequence numbers
         hdr.setSequenceNr(snd_next);
         if (hdr.isFlagSynchronizeSet() || hdr.isFlagFinishedSet()) {
@@ -217,7 +225,8 @@ public class TCPOutChannel {
         }
         snd_max = snd_next;
         // Create & send the segment
-        final TCPOutSegment seg = new TCPOutSegment(ipHdr, hdr, dataBuffer, dataOffset, timeoutTicks);
+        final TCPOutSegment seg =
+                new TCPOutSegment(ipHdr, hdr, dataBuffer, dataOffset, timeoutTicks);
         seg.send(tcp);
         if (!seg.isAckOnly() && !hdr.isFlagSynchronizeSet()) {
             log.debug("Adding segment " + seg.getSeqNr() + " to unacklist");
