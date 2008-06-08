@@ -29,42 +29,42 @@ import java.net.InetAddress;
  */
 public interface ProtocolAddress {
 
-	/**
-	 * Is this address equal to the given address.
-	 * @param o
-	 */
-	public boolean equals(ProtocolAddress o);
-	
-	/**
-	 * Gets the length of this address in bytes
-	 */
-	public int getLength();
-	
-	/**
-	 * Gets the address-byte at a given index
-	 * @param index
-	 */
-	public byte get(int index);
-	
-	/**
-	 * Write this address to a given offset in the given buffer
-	 * @param skbuf
-	 * @param skbufOffset
-	 */
-	public void writeTo(SocketBuffer skbuf, int skbufOffset);
+    /**
+     * Is this address equal to the given address.
+     * @param o
+     */
+    public boolean equals(ProtocolAddress o);
 
-	/**
-	 * Gets the type of this address.
-	 * This type is used by (e.g.) ARP.
-	 */
-	public int getType();
+    /**
+     * Gets the length of this address in bytes
+     */
+    public int getLength();
 
-	/**
-	 * Convert to a java.net.InetAddress
-	 * @see java.net.InetAddress
-	 * @return This address as java.net.InetAddress
-	 */	
-	public InetAddress toInetAddress();
+    /**
+     * Gets the address-byte at a given index
+     * @param index
+     */
+    public byte get(int index);
+
+    /**
+     * Write this address to a given offset in the given buffer
+     * @param skbuf
+     * @param skbufOffset
+     */
+    public void writeTo(SocketBuffer skbuf, int skbufOffset);
+
+    /**
+     * Gets the type of this address.
+     * This type is used by (e.g.) ARP.
+     */
+    public int getType();
+
+    /**
+     * Convert to a java.net.InetAddress
+     * @see java.net.InetAddress
+     * @return This address as java.net.InetAddress
+     */
+    public InetAddress toInetAddress();
 
     /**
      * Convert to a new byte array.

@@ -52,7 +52,7 @@ public class RpcInfoCommand extends AbstractCommand {
         super("Probe the portmapper on host, and print a list of all registered RPC programs.");
         registerArguments(ARG_HOST);
     }
-        
+
     public static void main(String[] args) throws Exception {
         new RpcInfoCommand().execute(args);
     }

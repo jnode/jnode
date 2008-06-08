@@ -28,18 +28,18 @@ import java.net.SocketException;
  */
 public class InvalidLayerException extends SocketException {
 
-	/**
-	 * 
-	 */
-	public InvalidLayerException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public InvalidLayerException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 */
-	public InvalidLayerException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public InvalidLayerException(String message) {
+        super(message);
+    }
 
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4;
 
 import java.net.InetAddress;
@@ -35,20 +35,17 @@ import org.jnode.net.ProtocolAddressInfo;
 public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
 
     /** Mapping between address and address&mask */
-    private final HashMap<IPv4Address, IPv4IfAddress> addresses = new HashMap<IPv4Address, IPv4IfAddress>();
+    private final HashMap<IPv4Address, IPv4IfAddress> addresses =
+            new HashMap<IPv4Address, IPv4IfAddress>();
 
     /** The default address */
     private IPv4IfAddress defaultAddress;
-
-    //private static final IPv4Address DEFAULT_SUBNET_MASK = new
-    // IPv4Address("255.255.255.0");
 
     /**
      * Create a new instance
      * 
      * @param address
-     * @param mask
-     *            subnetMask
+     * @param mask subnetMask
      */
 
     public IPv4ProtocolAddressInfo(IPv4Address address, IPv4Address mask) {
@@ -59,15 +56,12 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      * Add an IP address + subnet mask
      * 
      * @param address
-     * @param mask
-     *            subnetMask
+     * @param mask subnetMask
      */
     public synchronized IPv4IfAddress add(IPv4Address address, IPv4Address mask) {
-
         addresses.remove(address);
         IPv4IfAddress ifAddress = new IPv4IfAddress(address, mask);
         addresses.put(address, ifAddress);
-
         return ifAddress;
     }
 
@@ -78,9 +72,10 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      */
     public boolean contains(IPv4Address address) {
         for (IPv4IfAddress ipv4IfAddress : addresses.values()) {
-            if (ipv4IfAddress.matches(address)) { return true; }
+            if (ipv4IfAddress.matches(address)) {
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -137,7 +132,7 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      * 
      * @param address
      */
-    //	public void setDefaultAddress(IPv4Address address) {
+    // public void setDefaultAddress(IPv4Address address) {
     public void setDefaultAddress(IPv4Address address, IPv4Address netmask) {
         defaultAddress = new IPv4IfAddress(address, netmask);
     }
@@ -149,7 +144,7 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
         final StringBuilder b = new StringBuilder();
         boolean first = true;
         for (IPv4IfAddress ifa : addresses.values()) {
-            if (!first) {                
+            if (!first) {
                 b.append('\n');
             }
             b.append(ifa);
@@ -157,5 +152,4 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
         }
         return b.toString();
     }
-
 }

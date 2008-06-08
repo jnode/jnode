@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4;
 
 /**
@@ -26,55 +26,55 @@ package org.jnode.net.ipv4;
  */
 public class IPv4AddressAndMask {
 
-	private IPv4Address address;
-	private IPv4Address subnetMask;
-	
-	/**
-	 * Create a new instance
-	 */
-	public IPv4AddressAndMask() {
-	}
+    private IPv4Address address;
+    private IPv4Address subnetMask;
 
-	/**
-	 * Create a new instance
-	 */
-	public IPv4AddressAndMask(IPv4Address address, IPv4Address subnetMask) {
-		this.address = address;
-		this.subnetMask = subnetMask;
-	}
+    /**
+     * Create a new instance
+     */
+    public IPv4AddressAndMask() {
+    }
 
-	/**
-	 * Gets the address
-	 */
-	public IPv4Address getAddress() {
-		return address;
-	}
+    /**
+     * Create a new instance
+     */
+    public IPv4AddressAndMask(IPv4Address address, IPv4Address subnetMask) {
+        this.address = address;
+        this.subnetMask = subnetMask;
+    }
 
-	/**
-	 * Gets the subnet mask
-	 */
-	public IPv4Address getSubnetMask() {
-		return subnetMask;
-	}
+    /**
+     * Gets the address
+     */
+    public IPv4Address getAddress() {
+        return address;
+    }
 
-	/**
-	 * @param address
-	 */
-	public void setAddress(IPv4Address address) {
-		this.address = address;
-	}
+    /**
+     * Gets the subnet mask
+     */
+    public IPv4Address getSubnetMask() {
+        return subnetMask;
+    }
 
-	/**
-	 * @param address
-	 */
-	public void setSubnetMask(IPv4Address address) {
-		subnetMask = address;
-	}
+    /**
+     * @param address
+     */
+    public void setAddress(IPv4Address address) {
+        this.address = address;
+    }
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return address + " mask:" + subnetMask;
-	}
+    /**
+     * @param address
+     */
+    public void setSubnetMask(IPv4Address address) {
+        subnetMask = address;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return address + " mask:" + subnetMask;
+    }
 }

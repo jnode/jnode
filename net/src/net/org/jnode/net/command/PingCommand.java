@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.command;
 
 import java.io.InputStream;
@@ -60,8 +60,8 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
     private long timeout = 5000;
     private int ttl = 255;
 
-    private final HostNameArgument ARG_HOST = 
-        new HostNameArgument("host", Argument.MANDATORY, "the target host");
+    private final HostNameArgument ARG_HOST =
+            new HostNameArgument("host", Argument.MANDATORY, "the target host");
 
     public PingCommand() {
         super("Ping the specified host");
@@ -72,18 +72,17 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         new PingCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) 
-    throws SocketException, InterruptedException {
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws SocketException, InterruptedException {
         this.dst = new IPv4Address(ARG_HOST.getValue());
-        final IPv4Header netHeader = 
-            new IPv4Header(0, this.ttl, IPv4Constants.IPPROTO_ICMP, this.dst, 8);
+        final IPv4Header netHeader =
+                new IPv4Header(0, this.ttl, IPv4Constants.IPPROTO_ICMP, this.dst, 8);
         netHeader.setDontFragment(this.dontFragment);
 
-        final IPv4NetworkLayer netLayer = (IPv4NetworkLayer) NetUtils.getNLM()
-        .getNetworkLayer(EthernetConstants.ETH_P_IP);
-        final ICMPProtocol icmpProtocol = 
-            (ICMPProtocol) netLayer.getProtocol(ICMPProtocol.IPPROTO_ICMP);
+        final IPv4NetworkLayer netLayer =
+                (IPv4NetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_IP);
+        final ICMPProtocol icmpProtocol =
+                (ICMPProtocol) netLayer.getProtocol(ICMPProtocol.IPPROTO_ICMP);
         icmpProtocol.addListener(this);
         try {
             int id_count = 0;
@@ -97,12 +96,12 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
 
                 SocketBuffer packet = new SocketBuffer();
                 packet.insert(this.size);
-                ICMPEchoHeader transportHeader = 
-                    new ICMPEchoHeader(8, id_count, seq_count);
+                ICMPEchoHeader transportHeader = new ICMPEchoHeader(8, id_count, seq_count);
                 transportHeader.prefixTo(packet);
 
-                Request r = new Request(this.stat, this.timeout, 
-                        System.currentTimeMillis(), id_count, seq_count);
+                Request r =
+                        new Request(this.stat, this.timeout, System.currentTimeMillis(), id_count,
+                                seq_count);
                 registerRequest(r);
                 netLayer.transmit(netHeader, packet);
 
@@ -130,8 +129,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
             while (!isEmpty()) {
                 Thread.sleep(100);
             }
-        } 
-        finally {
+        } finally {
             icmpProtocol.removeListener(this);
         }
 
@@ -142,8 +140,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
     private long match(int id, int seq, Request r) {
         if (r != null && id == r.getId()) {
             return r.getTimestamp();
-        }
-        else {
+        } else {
             return -1;
         }
     }
@@ -166,8 +163,8 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         gotResponse(timestamp, hdr1, hdr2, roundtrip);
     }
 
-    private synchronized void gotResponse(
-            long timestamp, IPv4Header hdr1, ICMPEchoHeader hdr2, long roundtrip) {
+    private synchronized void gotResponse(long timestamp, IPv4Header hdr1, ICMPEchoHeader hdr2,
+            long roundtrip) {
         if (timestamp != -1) {
             this.hdr1 = hdr1;
             this.hdr2 = hdr2;
@@ -178,14 +175,15 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         this.stat.recordPacket(roundtrip);
     }
 
-    //response data
+    // response data
     private boolean response;
     private long roundt;
     private IPv4Header hdr1;
     private ICMPEchoHeader hdr2;
 
-    //requests are tracked here
+    // requests are tracked here
     private Map<Integer, Request> requests = new HashMap<Integer, Request>();
+
     private void registerRequest(Request r) {
         requests.put(r.seq, r);
     }
@@ -214,7 +212,6 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
             timer.schedule(this, timeout);
         }
 
-
         public void run() {
             if (!this.Obsolete()) {
                 stat.recordLost();
@@ -227,8 +224,7 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
                 this.obsolete = true;
                 this.timer.cancel();
                 return false;
-            } 
-            else {
+            } else {
                 return true;
             }
         }
@@ -269,11 +265,8 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         String getStatistics() {
             int packets = received + lost;
             float avg = sum / packets;
-            return (packets + " packets transmitted, " + 
-                    received +" packets received\n" + 
-                    "round-trip min/avg/max = " + min + "/" + avg + 
-                    "/" + max + " ms");
+            return (packets + " packets transmitted, " + received + " packets received\n" +
+                    "round-trip min/avg/max = " + min + "/" + avg + "/" + max + " ms");
         }
     }
 }
-

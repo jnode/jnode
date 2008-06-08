@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.command;
 
 import java.io.InputStream;
@@ -39,64 +39,63 @@ import org.jnode.util.Statistics;
  */
 public class NetstatCommand extends AbstractCommand {
 
-	public NetstatCommand() {
-	    super("Print statistics for all network devices");
-	}
+    public NetstatCommand() {
+        super("Print statistics for all network devices");
+    }
 
-	public static void main(String[] args) throws Exception {
-		new NetstatCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new NetstatCommand().execute(args);
+    }
 
-	/**
-	 * Execute this command
-	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-	throws Exception {
-		final NetworkLayerManager nlm = NetUtils.getNLM();
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
+        final NetworkLayerManager nlm = NetUtils.getNLM();
 
-		for (NetworkLayer nl : nlm.getNetworkLayers()) {
-			showStats(out, nl, 80);
-		}
-	}
+        for (NetworkLayer nl : nlm.getNetworkLayers()) {
+            showStats(out, nl, 80);
+        }
+    }
 
-	private void showStats(PrintStream out, NetworkLayer nl, int maxWidth)
-	throws NetworkException {
-		out.println(nl.getName() + ": ID " + nl.getProtocolID());
-		final String prefix = "    ";
-		out.print(prefix);
-		showStats(out, nl.getStatistics(), maxWidth - prefix.length(), prefix);
-		for (TransportLayer tl : nl.getTransportLayers()) {
-			out.println(prefix + tl.getName() + ": ID " + tl.getProtocolID());
-			final String prefix2 = prefix + prefix;
-			out.print(prefix2);
-			showStats(out, tl.getStatistics(), maxWidth - prefix2.length(), prefix2);
-		}
-		out.println();
-	}
+    private void showStats(PrintStream out, NetworkLayer nl, int maxWidth) throws NetworkException {
+        out.println(nl.getName() + ": ID " + nl.getProtocolID());
+        final String prefix = "    ";
+        out.print(prefix);
+        showStats(out, nl.getStatistics(), maxWidth - prefix.length(), prefix);
+        for (TransportLayer tl : nl.getTransportLayers()) {
+            out.println(prefix + tl.getName() + ": ID " + tl.getProtocolID());
+            final String prefix2 = prefix + prefix;
+            out.print(prefix2);
+            showStats(out, tl.getStatistics(), maxWidth - prefix2.length(), prefix2);
+        }
+        out.println();
+    }
 
-	private void showStats(PrintStream out, Statistics stat, int maxWidth, String prefix)
-	throws NetworkException {
-		final Statistic[] list = stat.getStatistics();
-		if (list.length == 0) {
-			out.print("none");
-		} else {
-			int width = 0;
-			for (int i = 0; i < list.length; i++) {
-				final Statistic st = list[i];
-				String msg = st.getName() + " " + st.getValue();
-				if (i+1 < list.length) {
-					msg = msg + ", ";
-				}
-				if (width + msg.length() > maxWidth) {
-					out.println();
-					out.print(prefix);
-					width = 0;
-				}
-				out.print(msg);
-				width += msg.length();
-			}
-		}
-		out.println();
-	}
+    private void showStats(PrintStream out, Statistics stat, int maxWidth, String prefix)
+        throws NetworkException {
+        final Statistic[] list = stat.getStatistics();
+        if (list.length == 0) {
+            out.print("none");
+        } else {
+            int width = 0;
+            for (int i = 0; i < list.length; i++) {
+                final Statistic st = list[i];
+                String msg = st.getName() + " " + st.getValue();
+                if (i + 1 < list.length) {
+                    msg = msg + ", ";
+                }
+                if (width + msg.length() > maxWidth) {
+                    out.println();
+                    out.print(prefix);
+                    width = 0;
+                }
+                out.print(msg);
+                width += msg.length();
+            }
+        }
+        out.println();
+    }
 
 }

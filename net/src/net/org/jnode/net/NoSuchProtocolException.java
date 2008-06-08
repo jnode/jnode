@@ -28,17 +28,17 @@ import java.net.SocketException;
  */
 public class NoSuchProtocolException extends SocketException {
 
-	/**
-	 * 
-	 */
-	public NoSuchProtocolException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public NoSuchProtocolException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 */
-	public NoSuchProtocolException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public NoSuchProtocolException(String message) {
+        super(message);
+    }
 }

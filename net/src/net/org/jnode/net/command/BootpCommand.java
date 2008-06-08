@@ -33,7 +33,8 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
 
 /**
  * @author epr
@@ -41,25 +42,24 @@ import org.jnode.shell.syntax.*;
 public class BootpCommand extends AbstractCommand {
 
     private final DeviceArgument ARG_DEVICE = 
-        new DeviceArgument("device", Argument.MANDATORY, 
-                "", NetDeviceAPI.class);
+        new DeviceArgument("device", Argument.MANDATORY, "", NetDeviceAPI.class);
 
-	public BootpCommand() {
-	    super("Configure a network interface using BOOTP");
-	    registerArguments(ARG_DEVICE);
-	}
+    public BootpCommand() {
+        super("Configure a network interface using BOOTP");
+        registerArguments(ARG_DEVICE);
+    }
 
-	public static void main(String[] args) throws Exception {
-		new BootpCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new BootpCommand().execute(args);
+    }
 
-	public void execute(CommandLine commandLine, InputStream in, 
-	        PrintStream out, PrintStream err) throws NameNotFoundException, NetworkException {
-		final Device dev = ARG_DEVICE.getValue();
-		out.println("Trying to configure " + dev.getId() + "...");
-		final IPv4ConfigurationService cfg = 
-		    (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
-		cfg.configureDeviceBootp(dev, true);
-	}
+    public void execute(CommandLine commandLine, InputStream in, 
+            PrintStream out, PrintStream err) throws NameNotFoundException, NetworkException {
+        final Device dev = ARG_DEVICE.getValue();
+        out.println("Trying to configure " + dev.getId() + "...");
+        final IPv4ConfigurationService cfg = 
+            (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+        cfg.configureDeviceBootp(dev, true);
+    }
 
 }
