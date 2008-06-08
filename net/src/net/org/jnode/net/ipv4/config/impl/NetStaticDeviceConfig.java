@@ -36,21 +36,22 @@ import org.jnode.net.ipv4.IPv4ProtocolAddressInfo;
  */
 public class NetStaticDeviceConfig extends NetDeviceConfig {
 
-    private IPv4Address address; 
-    private IPv4Address netmask;    
-    
+    private IPv4Address address;
+    private IPv4Address netmask;
+
     private static final String ADDRESS_KEY = "address";
     private static final String NETMASK_KEY = "netmask";
-    
+
     /**
      * Initialize this instance.
      */
     public NetStaticDeviceConfig() {
         this(null, null);
     }
-    
+
     /**
      * Initialize this instance.
+     * 
      * @param address
      * @param netmask
      */
@@ -58,30 +59,31 @@ public class NetStaticDeviceConfig extends NetDeviceConfig {
         this.address = address;
         this.netmask = netmask;
     }
-    
+
     /**
      * @throws NetworkException
      * @see org.jnode.net.ipv4.config.impl.NetDeviceConfig#apply(Device)
      */
     public void doApply(Device device) throws NetworkException {
-		final NetDeviceAPI api;
-		try {
-			api = (NetDeviceAPI)device.getAPI(NetDeviceAPI.class);
-		} catch (ApiNotFoundException ex) {
-			throw new NetworkException("Device is not a network device", ex);
-		}
+        final NetDeviceAPI api;
+        try {
+            api = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+        } catch (ApiNotFoundException ex) {
+            throw new NetworkException("Device is not a network device", ex);
+        }
 
-		if (netmask == null) {
-			netmask = address.getDefaultSubnetmask();
-		}
-		IPv4ProtocolAddressInfo addrInfo = (IPv4ProtocolAddressInfo)api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
-		if (addrInfo == null) {
-			addrInfo = new IPv4ProtocolAddressInfo(address, netmask);
-			api.setProtocolAddressInfo(EthernetConstants.ETH_P_IP, addrInfo);
-		} else {
-			addrInfo.add(address, netmask);
-			addrInfo.setDefaultAddress(address, netmask);
-		}
+        if (netmask == null) {
+            netmask = address.getDefaultSubnetmask();
+        }
+        IPv4ProtocolAddressInfo addrInfo =
+                (IPv4ProtocolAddressInfo) api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+        if (addrInfo == null) {
+            addrInfo = new IPv4ProtocolAddressInfo(address, netmask);
+            api.setProtocolAddressInfo(EthernetConstants.ETH_P_IP, addrInfo);
+        } else {
+            addrInfo.add(address, netmask);
+            addrInfo.setDefaultAddress(address, netmask);
+        }
     }
 
     /**
@@ -102,6 +104,7 @@ public class NetStaticDeviceConfig extends NetDeviceConfig {
 
     /**
      * Load a single address from the given preferences.
+     * 
      * @param prefs
      * @param key
      * @return
@@ -114,9 +117,10 @@ public class NetStaticDeviceConfig extends NetDeviceConfig {
             return new IPv4Address(addrStr);
         }
     }
-    
+
     /**
      * Store a single address in the given preferences.
+     * 
      * @param prefs
      * @param key
      * @param address
@@ -126,6 +130,6 @@ public class NetStaticDeviceConfig extends NetDeviceConfig {
             prefs.put(key, address.toString());
         } else {
             prefs.remove(key);
-        }        
+        }
     }
 }

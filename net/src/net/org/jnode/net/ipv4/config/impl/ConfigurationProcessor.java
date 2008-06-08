@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.config.impl;
 
 import org.apache.log4j.Logger;
@@ -34,8 +34,7 @@ public class ConfigurationProcessor implements QueueProcessor<ConfigurationQueue
 
     private final Queue<ConfigurationQueueEntry> queue = new Queue<ConfigurationQueueEntry>();
 
-    static final Logger log = Logger
-            .getLogger(ConfigurationProcessor.class);
+    static final Logger log = Logger.getLogger(ConfigurationProcessor.class);
 
     private QueueProcessorThread<ConfigurationQueueEntry> thread;
 
@@ -46,8 +45,7 @@ public class ConfigurationProcessor implements QueueProcessor<ConfigurationQueue
      * @param device
      * @param config
      */
-    public void apply(Device device, NetDeviceConfig config,
-            boolean waitUntilReady) {
+    public void apply(Device device, NetDeviceConfig config, boolean waitUntilReady) {
         final ConfigurationQueueEntry entry = new ConfigurationQueueEntry(device, config);
         queue.add(entry);
         if (waitUntilReady) {

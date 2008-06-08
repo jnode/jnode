@@ -37,22 +37,27 @@ public class TCPInChannel {
      * My logger
      */
     private static final Logger log = Logger.getLogger(TCPInChannel.class);
+    
     /**
      * Segments that have been received, but are out of order
      */
     private final LinkedList<TCPInSegment> futureSegments = new LinkedList<TCPInSegment>();
+    
     /**
      * The next expected sequence number
      */
     private int rcv_next;
+    
     /**
      * The input data buffer
      */
     private final TCPDataBuffer dataBuffer;
+    
     /**
      * The control block I belong to
      */
     private final TCPControlBlock controlBlock;
+    
     /**
      * Has a FIN been received?
      */

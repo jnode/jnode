@@ -43,8 +43,7 @@ public class AbstractDHCPClient extends AbstractBOOTPClient {
     /**
      * Create a DHCP discovery packet
      */
-    protected DatagramPacket createRequestPacket(BOOTPHeader hdr)
-            throws IOException {
+    protected DatagramPacket createRequestPacket(BOOTPHeader hdr) throws IOException {
         DHCPMessage msg = new DHCPMessage(hdr, DHCPMessage.DHCPDISCOVER);
         return msg.toDatagramPacket();
     }
@@ -73,11 +72,10 @@ public class AbstractDHCPClient extends AbstractBOOTPClient {
                     if (value.length == 1) {
                         log.debug("Option " + n + " : " + (int) (value[0]));
                     } else if (value.length == 2) {
-                        log.debug("Option " + n + " : "
-                                + ((value[0] << 8) | value[1]));
+                        log.debug("Option " + n + " : " + ((value[0] << 8) | value[1]));
                     } else if (value.length == 4) {
-                        log.debug("Option " + n + " : "
-                                + InetAddress.getByAddress(value).toString());
+                        log.debug("Option " + n + " : " +
+                                InetAddress.getByAddress(value).toString());
                     } else {
                         log.debug("Option " + n + " : " + new String(value));
                     }
@@ -87,10 +85,10 @@ public class AbstractDHCPClient extends AbstractBOOTPClient {
 
         switch (msg.getMessageType()) {
             case DHCPMessage.DHCPOFFER:
-                byte[] serverID = msg
-                        .getOption(DHCPMessage.SERVER_IDENTIFIER_OPTION);
+                byte[] serverID = msg.getOption(DHCPMessage.SERVER_IDENTIFIER_OPTION);
                 byte[] requestedIP = hdr.getYourIPAddress().getAddress();
-                hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, 0,
+                hdr = new BOOTPHeader(
+                        BOOTPHeader.BOOTREQUEST, transactionID, 0, 
                         hdr.getClientIPAddress(), hdr.getClientHwAddress());
                 msg = new DHCPMessage(hdr, DHCPMessage.DHCPREQUEST);
                 msg.setOption(DHCPMessage.REQUESTED_IP_ADDRESS_OPTION, requestedIP);

@@ -29,57 +29,60 @@ import org.jnode.net.ipv4.IPv4Address;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface IPv4ConfigurationService {
-    
+
     /** Name used to register this service in the initial naming namespace */
     public static final Class<IPv4ConfigurationService> NAME = IPv4ConfigurationService.class;
 
     /**
      * Configure the device using BOOTP.
+     * 
      * @param device
      * @param persistent
      * @throws NetworkException
      */
-    public void configureDeviceBootp(Device device, boolean persistent)
-    throws NetworkException;
-    
+    public void configureDeviceBootp(Device device, boolean persistent) throws NetworkException;
+
     /**
      * Configure the device using DHCP.
+     * 
      * @param device
      * @param persistent
      * @throws NetworkException
      */
-    public void configureDeviceDhcp(Device device, boolean persistent)
-    throws NetworkException;
-    
+    public void configureDeviceDhcp(Device device, boolean persistent) throws NetworkException;
+
     /**
      * Set a static configuration for the given device.
+     * 
      * @param device
      * @param address
      * @param netmask
      * @param persistent
      * @throws NetworkException
      */
-    public void configureDeviceStatic(Device device, IPv4Address address, IPv4Address netmask, boolean persistent)
-    throws NetworkException;
-    
-	/**
-	 * Add a route
-	 * @param target
-	 * @param gateway
-	 * @param device
-	 * @param persistent
-	 * @throws NetworkException
-	 */
-	public void addRoute(IPv4Address target, IPv4Address gateway, Device device, boolean persistent) 
-	throws NetworkException;
-	
-	/**
-	 * Delete a route
-	 * @param target
-	 * @param gateway
-	 * @param device
-	 * @throws NetworkException
-	 */
-	public void deleteRoute(IPv4Address target, IPv4Address gateway, Device device) 
-	throws NetworkException;
+    public void configureDeviceStatic(Device device, IPv4Address address, IPv4Address netmask,
+            boolean persistent) throws NetworkException;
+
+    /**
+     * Add a route
+     * 
+     * @param target
+     * @param gateway
+     * @param device
+     * @param persistent
+     * @throws NetworkException
+     */
+    public void addRoute(IPv4Address target, IPv4Address gateway, Device device, boolean persistent)
+        throws NetworkException;
+
+    /**
+     * Delete a route
+     * 
+     * @param target
+     * @param gateway
+     * @param device
+     * @throws NetworkException
+     */
+    public void deleteRoute(IPv4Address target, IPv4Address gateway, Device device)
+        throws NetworkException;
 }

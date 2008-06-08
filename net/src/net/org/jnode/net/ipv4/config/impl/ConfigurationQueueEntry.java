@@ -46,8 +46,7 @@ final class ConfigurationQueueEntry {
         try {
             config.apply(device);
         } catch (NetworkException ex) {
-            ConfigurationProcessor.log.error("Cannot configure device "
-                    + device.getId(), ex);
+            ConfigurationProcessor.log.error("Cannot configure device " + device.getId(), ex);
         } finally {
             ready = true;
             this.notifyAll();

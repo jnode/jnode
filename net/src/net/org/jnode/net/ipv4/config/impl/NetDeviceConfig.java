@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.config.impl;
 
 import java.security.AccessController;
@@ -33,7 +33,7 @@ import org.jnode.driver.net.NetworkException;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 abstract class NetDeviceConfig {
-    
+
     /**
      * Initialize this instance.
      */
@@ -43,34 +43,33 @@ abstract class NetDeviceConfig {
     /**
      * Apply this configuration for the device.
      */
-    public final void apply(final Device device)
-    throws NetworkException {
+    public final void apply(final Device device) throws NetworkException {
         try {
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws NetworkException {
                     doApply(device);
                     return null;
-                    }});
+                }
+            });
         } catch (PrivilegedActionException ex) {
-            throw (NetworkException)ex.getException();
+            throw (NetworkException) ex.getException();
         }
     }
 
     /**
      * Apply this configuration for the device.
      */
-    protected abstract void doApply(Device device)
-    throws NetworkException;    
-    
+    protected abstract void doApply(Device device) throws NetworkException;
+
     /**
      * Load the data of this configuration from the given preferences.
      * @param prefs
      */
     public abstract void load(Preferences prefs);
-    
+
     /**
      * Store the data of this configuration into the given preferences.
      * @param prefs
      */
-    public abstract void store(Preferences prefs);    
+    public abstract void store(Preferences prefs);
 }

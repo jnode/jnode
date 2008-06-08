@@ -71,7 +71,7 @@ public class DHCPClient extends AbstractDHCPClient {
         }
 
         try {
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws IOException {
                     // Get the API.
                     try {
@@ -79,9 +79,7 @@ public class DHCPClient extends AbstractDHCPClient {
                     } catch (ApiNotFoundException ex) {
                         throw new NetworkException("Device is not a network device", ex);
                     }
-
                     configureDevice(device.getId(), api.getAddress());
-
                     return null;
                 }
             });
@@ -114,15 +112,10 @@ public class DHCPClient extends AbstractDHCPClient {
         final IPv4Address networkAddress = serverAddr.and(serverAddr.getDefaultSubnetmask());
 
         if (hdr.getGatewayIPAddress().isAnyLocalAddress()) {
-            // cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()), null,
-            // device, false);
             cfg.addRoute(serverAddr, null, device, false);
             cfg.addRoute(networkAddress, null, device, false);
         } else {
-            // cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()),
-            // new IPv4Address(hdr.getGatewayIPAddress()), device, false);
-            cfg.addRoute(networkAddress, new IPv4Address(hdr
-                    .getGatewayIPAddress()), device, false);
+            cfg.addRoute(networkAddress, new IPv4Address(hdr.getGatewayIPAddress()), device, false);
         }
 
         byte[] routerValue = msg.getOption(DHCPMessage.ROUTER_OPTION);
@@ -131,7 +124,6 @@ public class DHCPClient extends AbstractDHCPClient {
             log.info("Got Router IP address : " + routerIP);
             cfg.addRoute(IPv4Address.ANY, routerIP, device, false);
         }
-
 
         // find the dns servers and add to the resolver
         final byte[] dnsValue = msg.getOption(DHCPMessage.DNS_OPTION);
@@ -154,7 +146,7 @@ public class DHCPClient extends AbstractDHCPClient {
         if (pluginLoaderValue != null) {
             final String pluginLoaderURL = new String(pluginLoaderValue, "UTF8");
             log.info("Got plugin loader url : " + pluginLoaderURL);
-            AccessController.doPrivileged(new PrivilegedAction() {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     try {
                         final PluginManager pm = InitialNaming.lookup(PluginManager.class);

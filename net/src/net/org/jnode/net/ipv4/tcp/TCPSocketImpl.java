@@ -21,13 +21,18 @@
  
 package org.jnode.net.ipv4.tcp;
 
-import org.apache.log4j.Logger;
-import org.jnode.net.ipv4.IPv4Address;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.SocketImpl;
+import java.net.SocketOptions;
+
+import org.apache.log4j.Logger;
+import org.jnode.net.ipv4.IPv4Address;
 
 /**
  * @author epr
@@ -61,7 +66,7 @@ public class TCPSocketImpl extends SocketImpl {
 
     /**
      * Initialize a new instance
-     *
+     * 
      * @param protocol
      */
     public TCPSocketImpl(TCPProtocol protocol) {
@@ -70,7 +75,7 @@ public class TCPSocketImpl extends SocketImpl {
 
     /**
      * Accepts a connection on this socket.
-     *
+     * 
      * @param s The implementation object for the accepted connection.
      * @see java.net.SocketImpl#accept(java.net.SocketImpl)
      */
@@ -136,8 +141,7 @@ public class TCPSocketImpl extends SocketImpl {
     /**
      * @see java.net.SocketImpl#connect(java.net.SocketAddress, int)
      */
-    protected void connect(SocketAddress address, int timeout)
-            throws IOException {
+    protected void connect(SocketAddress address, int timeout) throws IOException {
         if (!(address instanceof InetSocketAddress)) {
             throw new IOException("InetSocketAddress expected");
         }
@@ -187,10 +191,11 @@ public class TCPSocketImpl extends SocketImpl {
             case SocketOptions.SO_SNDBUF:
                 return controlBlock.getSendBufferSize();
             case SocketOptions.SO_TIMEOUT:
-                //todo implement it, 0 means disabled
+                // todo implement it, 0 means disabled
                 return 0;
             default:
-                throw new SocketException("Option " + option_id + " is not recognised or not implemented");
+                throw new SocketException("Option " + option_id +
+                        " is not recognised or not implemented");
         }
     }
 
@@ -212,7 +217,7 @@ public class TCPSocketImpl extends SocketImpl {
      * how many pending connections will queue up waiting to be serviced before
      * being accept'ed. If the queue of pending requests exceeds this number,
      * additional connections will be refused.
-     *
+     * 
      * @param backlog The length of the pending connection queue
      * @throws IOException If an error occurs
      * @see java.net.SocketImpl#listen(int)

@@ -35,7 +35,7 @@ import org.jnode.driver.Device;
 final class NetConfigurationData {
     
     /** My logger */
-    final static Logger log = Logger.getLogger(NetConfigurationData.class);
+    static final Logger log = Logger.getLogger(NetConfigurationData.class);
     
     /** The preferences that contain my data */
     private final Preferences prefs;
@@ -79,10 +79,11 @@ final class NetConfigurationData {
                 final Preferences devPrefs = devConfigsPrefs.node(device.getId());
                 final String clsName = devPrefs.get(CONFIG_CLASS_NAME_KEY, null);
                 if (clsName != null) {
-                    final PrivilegedAction action = new PrivilegedAction() {
+                    final PrivilegedAction<Object> action = new PrivilegedAction<Object>() {
                         public Object run() {
                             try {
-                                final Class cls = Thread.currentThread().getContextClassLoader().loadClass(clsName);
+                                final Class<?> cls = 
+                                    Thread.currentThread().getContextClassLoader().loadClass(clsName);
                                 return cls.newInstance();
                             } catch (ClassNotFoundException ex) {
                                 log.warn("NetDeviceConfig class not found", ex);
@@ -96,7 +97,7 @@ final class NetConfigurationData {
                             }
                         }
                     };
-                    cfg = (NetDeviceConfig)AccessController.doPrivileged(action);
+                    cfg = (NetDeviceConfig) AccessController.doPrivileged(action);
                 }
             }
         } catch (BackingStoreException ex) {

@@ -26,52 +26,54 @@ package org.jnode.net.ipv4.tcp;
  */
 public interface TCPConstants {
 
-	/** Length of TCP header length in bytes, without any options */
-	public static final int TCP_HLEN = 20;
+    /** Length of TCP header length in bytes, without any options */
+    public static final int TCP_HLEN = 20;
 
-	/** Default Time to Live for TCP packets */
-	public static final int TCP_DEFAULT_TTL = 64;
+    /** Default Time to Live for TCP packets */
+    public static final int TCP_DEFAULT_TTL = 64;
 
-	/** Default timeout for blocking operations (in ms) */
-	public static final int TCP_DEFAULT_TIMEOUT = 10000;
+    /** Default timeout for blocking operations (in ms) */
+    public static final int TCP_DEFAULT_TIMEOUT = 10000;
 
-	/** Maximum TCP window size */
-	public static final int TCP_MAXWIN = 1024;
-	
-	/** Default Maximum Segment Size */
-	public static final int TCP_DEFAULT_MSS = 536;
-	
-	/** The default buffer size */
-	public static final int TCP_BUFFER_SIZE = 8*1024;
+    /** Maximum TCP window size */
+    public static final int TCP_MAXWIN = 1024;
 
-	/** The maximum connect attempts */
-	public static final int TCP_MAXCONNECT = 3;
-	
-	/** Interval bewteen timer events */
-	public static final int TCP_TIMER_PERIOD = 500;
+    /** Default Maximum Segment Size */
+    public static final int TCP_DEFAULT_MSS = 536;
 
-	// TCP flags
-	public static final int TCPF_FIN = 0x0001;
-	public static final int TCPF_SYN = 0x0002;
-	public static final int TCPF_RST = 0x0004;
-	public static final int TCPF_PSH = 0x0008;
-	public static final int TCPF_ACK = 0x0010;
-	public static final int TCPF_URG = 0x0020;
+    /** The default buffer size */
+    public static final int TCP_BUFFER_SIZE = 8 * 1024;
 
-	// TCP Connection states
-	public static final int TCPS_CLOSED = 0x0001;
-	public static final int TCPS_LISTEN = 0x0002;
-	public static final int TCPS_SYN_RECV = 0x0003;
-	public static final int TCPS_SYN_SENT = 0x0004;
-	public static final int TCPS_ESTABLISHED = 0x0005;
-	public static final int TCPS_CLOSE_WAIT = 0x0006;
-	public static final int TCPS_LAST_ACK = 0x0007;
-	public static final int TCPS_FIN_WAIT_1 = 0x0008;
-	public static final int TCPS_FIN_WAIT_2 = 0x0009;
-	public static final int TCPS_CLOSING = 0x000a;
-	public static final int TCPS_TIME_WAIT = 0x000b;
+    /** The maximum connect attempts */
+    public static final int TCP_MAXCONNECT = 3;
 
-	public static final String TCP_STATE_NAMES[] =
-		{ "?", "CLOSED", "LISTEN", "SYN_RECV", "SYN_SENT", "ESTABLISHED", "CLOSE_WAIT", "LAST_ACK", "FIN_WAIT_1", "FIN_WAIT_2", "CLOSING", "TIME_WAIT" };
+    /** Interval between timer events */
+    public static final int TCP_TIMER_PERIOD = 500;
+
+    // TCP flags
+    public static final int TCPF_FIN = 0x0001;
+    public static final int TCPF_SYN = 0x0002;
+    public static final int TCPF_RST = 0x0004;
+    public static final int TCPF_PSH = 0x0008;
+    public static final int TCPF_ACK = 0x0010;
+    public static final int TCPF_URG = 0x0020;
+
+    // TCP Connection states
+    public static final int TCPS_CLOSED = 0x0001;
+    public static final int TCPS_LISTEN = 0x0002;
+    public static final int TCPS_SYN_RECV = 0x0003;
+    public static final int TCPS_SYN_SENT = 0x0004;
+    public static final int TCPS_ESTABLISHED = 0x0005;
+    public static final int TCPS_CLOSE_WAIT = 0x0006;
+    public static final int TCPS_LAST_ACK = 0x0007;
+    public static final int TCPS_FIN_WAIT_1 = 0x0008;
+    public static final int TCPS_FIN_WAIT_2 = 0x0009;
+    public static final int TCPS_CLOSING = 0x000a;
+    public static final int TCPS_TIME_WAIT = 0x000b;
+
+    public static final String TCP_STATE_NAMES[] = {
+        "?", "CLOSED", "LISTEN", "SYN_RECV", "SYN_SENT", "ESTABLISHED", "CLOSE_WAIT",
+        "LAST_ACK", "FIN_WAIT_1", "FIN_WAIT_2", "CLOSING", "TIME_WAIT"
+    };
 
 }

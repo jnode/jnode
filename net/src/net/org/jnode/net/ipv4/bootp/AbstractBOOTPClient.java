@@ -55,7 +55,8 @@ public class AbstractBOOTPClient {
      *
      * @param deviceName network interface
      */
-    protected final void configureDevice(final String deviceName, final HardwareAddress hwAddress) throws IOException {
+    protected final void configureDevice(final String deviceName, final HardwareAddress hwAddress)
+        throws IOException {
         // Open a socket
         socket = new MulticastSocket(CLIENT_PORT);
         try {
@@ -67,8 +68,8 @@ public class AbstractBOOTPClient {
             // Create the BOOTP header
             final Inet4Address myIP = null; // any address
             final int transactionID = (int) (System.currentTimeMillis() & 0xFFFFFFFF);
-            BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, 0,
-                    myIP, hwAddress);
+            BOOTPHeader hdr =
+                    new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, 0, myIP, hwAddress);
 
             // Send the packet
             final DatagramPacket packet = createRequestPacket(hdr);
@@ -94,8 +95,7 @@ public class AbstractBOOTPClient {
     /**
      * Create a BOOTP request packet
      */
-    protected DatagramPacket createRequestPacket(BOOTPHeader hdr)
-            throws IOException {
+    protected DatagramPacket createRequestPacket(BOOTPHeader hdr) throws IOException {
         return new BOOTPMessage(hdr).toDatagramPacket();
     }
 

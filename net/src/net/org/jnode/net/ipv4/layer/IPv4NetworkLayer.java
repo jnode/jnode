@@ -21,14 +21,34 @@
  
 package org.jnode.net.ipv4.layer;
 
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.driver.net.NetworkException;
-import org.jnode.net.*;
+import org.jnode.net.HardwareAddress;
+import org.jnode.net.InvalidLayerException;
+import org.jnode.net.LayerAlreadyRegisteredException;
+import org.jnode.net.NetworkLayer;
+import org.jnode.net.NoSuchProtocolException;
+import org.jnode.net.ProtocolAddress;
+import org.jnode.net.SocketBuffer;
+import org.jnode.net.TransportLayer;
 import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
-import org.jnode.net.ipv4.*;
+import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.net.ipv4.IPv4Constants;
+import org.jnode.net.ipv4.IPv4FragmentList;
+import org.jnode.net.ipv4.IPv4Header;
+import org.jnode.net.ipv4.IPv4Protocol;
+import org.jnode.net.ipv4.IPv4ProtocolAddressInfo;
+import org.jnode.net.ipv4.IPv4RoutingTable;
+import org.jnode.net.ipv4.IPv4Service;
 import org.jnode.net.ipv4.icmp.ICMPProtocol;
 import org.jnode.net.ipv4.raw.RAWProtocol;
 import org.jnode.net.ipv4.tcp.TCPProtocol;
@@ -38,15 +58,10 @@ import org.jnode.net.util.NetUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.Statistics;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.*;
-
 /**
  * @author epr
  */
-public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
-        IPv4Service {
+public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants, IPv4Service {
 
     /**
      * My logger
@@ -58,7 +73,8 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
     /**
      * List of in-complete fragments
      */
-    private final HashMap<Object, IPv4FragmentList> fragments = new HashMap<Object, IPv4FragmentList>();
+    private final HashMap<Object, IPv4FragmentList> fragments =
+            new HashMap<Object, IPv4FragmentList>();
 
     /**
      * System time of last call to removeDeadFragments
@@ -125,8 +141,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * @param deviceAPI
      * @throws SocketException
      */
-    public void receive(SocketBuffer skbuf, NetDeviceAPI deviceAPI)
-            throws SocketException {
+    public void receive(SocketBuffer skbuf, NetDeviceAPI deviceAPI) throws SocketException {
 
         // Update statistics
         stat.ipackets.inc();
@@ -135,7 +150,6 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
         final IPv4Header hdr = new IPv4Header(skbuf);
         if (!hdr.isChecksumOk()) {
             stat.badsum.inc();
-            // log.debug("Ignored IP packet with invalid checksum");
             return;
         }
         // Set the header object in the buffer-field
@@ -150,18 +164,15 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
         // header, if now ignore the packet
         if (skbuf.getSize() < hdr.getDataLength()) {
             stat.badlen.inc();
-            // log.debug("Ignored IP packet, mismatch between datalength and
-            // buffersize");
             return;
         }
 
         // Update the ARP cache for the source address
-        updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr
-                .getSourceAddress());
+        updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr.getSourceAddress());
 
         // Get my IP address
-        final IPv4ProtocolAddressInfo myAddrInfo = (IPv4ProtocolAddressInfo) deviceAPI
-                .getProtocolAddressInfo(getProtocolID());
+        final IPv4ProtocolAddressInfo myAddrInfo =
+                (IPv4ProtocolAddressInfo) deviceAPI.getProtocolAddressInfo(getProtocolID());
         if (myAddrInfo == null) {
             stat.nodevaddr.inc();
         }
@@ -174,8 +185,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
         } else {
             // I don't have an IP address yet, if the linklayer says
             // it is for me, we'll process it, otherwise we'll drop it.
-            shouldProcess = !skbuf.getLinkLayerHeader().getDestinationAddress()
-                    .isBroadcast();
+            shouldProcess = !skbuf.getLinkLayerHeader().getDestinationAddress().isBroadcast();
         }
         if (!shouldProcess) {
             // log.debug("IPPacket not for me, ignoring (dst=" + dstAddr + ")");
@@ -213,16 +223,14 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * @param hdr
      * @param skbuf
      */
-    private void deliver(IPv4Header hdr, SocketBuffer skbuf)
-            throws SocketException {
+    private void deliver(IPv4Header hdr, SocketBuffer skbuf) throws SocketException {
         final IPv4Protocol protocol;
         try {
             protocol = getProtocol(hdr.getProtocol());
             protocol.receive(skbuf);
         } catch (NoSuchProtocolException ex) {
-            log.debug("Found unknown IP src=" + hdr.getSource() + ", dst="
-                    + hdr.getDestination() + ", prot=0x"
-                    + NumberUtils.hex(hdr.getProtocol(), 2));
+            log.debug("Found unknown IP src=" + hdr.getSource() + ", dst=" + hdr.getDestination() +
+                    ", prot=0x" + NumberUtils.hex(hdr.getProtocol(), 2));
         }
     }
 
@@ -233,13 +241,11 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * @param skbuf
      * @throws NetworkException
      */
-    private void deliverFragment(IPv4Header hdr, SocketBuffer skbuf)
-            throws SocketException {
+    private void deliverFragment(IPv4Header hdr, SocketBuffer skbuf) throws SocketException {
         final Object key = hdr.getFragmentListKey();
         final IPv4FragmentList flist = (IPv4FragmentList) fragments.get(key);
         if (flist == null) {
             // This is a fragment for a new list
-            // log.debug("Created fragmentlist " + key);
             fragments.put(key, new IPv4FragmentList(skbuf));
         } else {
             if (flist.isAlive()) {
@@ -247,16 +253,10 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
                 if (flist.isComplete()) {
                     // The fragmentlist is now complete, deliver it
                     final SocketBuffer pbuf = flist.getPacket();
-                    final IPv4Header phdr = (IPv4Header) pbuf
-                            .getNetworkLayerHeader();
-                    // log.debug("Fragmentlist is complete, delivering");
+                    final IPv4Header phdr = (IPv4Header) pbuf.getNetworkLayerHeader();
                     stat.reassembled.inc();
                     deliver(phdr, pbuf);
-                } else {
-                    // Fragmentlist is not yet complete
-                    // log.debug("Added fragment(" + hdr.getFragmentOffset() +
-                    // ") to list " + key);
-                }
+                } 
             } else {
                 // Timeout of fragmentlist, destroy it
                 fragments.remove(key);
@@ -296,8 +296,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * @throws NoSuchProtocolException
      *             No protocol with the given ID was found.
      */
-    public IPv4Protocol getProtocol(int protocolID)
-            throws NoSuchProtocolException {
+    public IPv4Protocol getProtocol(int protocolID) throws NoSuchProtocolException {
         final IPv4Protocol protocol;
         protocol = (IPv4Protocol) protocols.get(protocolID);
         if (protocol == null) {
@@ -331,7 +330,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * @param layer
      */
     public void registerTransportLayer(TransportLayer layer)
-            throws LayerAlreadyRegisteredException, InvalidLayerException {
+        throws LayerAlreadyRegisteredException, InvalidLayerException {
         if (layer instanceof IPv4Protocol) {
             registerProtocol((IPv4Protocol) layer);
         } else {
@@ -363,8 +362,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * 
      * @param protocolID
      */
-    public TransportLayer getTransportLayer(int protocolID)
-            throws NoSuchProtocolException {
+    public TransportLayer getTransportLayer(int protocolID) throws NoSuchProtocolException {
         return getProtocol(protocolID);
     }
 
@@ -379,8 +377,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
      * @see org.jnode.net.ipv4.IPv4Service#transmit(org.jnode.net.ipv4.IPv4Header,
      *      org.jnode.net.SocketBuffer)
      */
-    public void transmit(IPv4Header hdr, SocketBuffer skbuf)
-            throws SocketException {
+    public void transmit(IPv4Header hdr, SocketBuffer skbuf) throws SocketException {
         sender.transmit(hdr, skbuf);
     }
 
@@ -401,9 +398,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
     private void updateARPCache(HardwareAddress hwAddr, ProtocolAddress pAddr) {
         if (arp == null) {
             try {
-                arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(
-                        EthernetConstants.ETH_P_ARP);
-                // arp = (ARPService)InitialNaming.lookup(ARPService.NAME);
+                arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
             } catch (NoSuchProtocolException ex) {
                 log.error("Cannot find ARP layer", ex);
             } catch (NetworkException ex) {
