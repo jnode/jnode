@@ -39,6 +39,7 @@ public abstract class Ne2000Driver extends AbstractEthernetDriver {
      * The actual device driver
      */
     private Ne2000Core dd;
+    
     /**
      * The device flags
      */
@@ -46,7 +47,7 @@ public abstract class Ne2000Driver extends AbstractEthernetDriver {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param flags
      */
     public Ne2000Driver(Ne2000Flags flags) {
@@ -61,7 +62,8 @@ public abstract class Ne2000Driver extends AbstractEthernetDriver {
     }
 
     /**
-     * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
+     * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer,
+     *      HardwareAddress)
      */
     protected void doTransmitEthernet(SocketBuffer skbuf, HardwareAddress destination)
         throws NetworkException {
@@ -70,7 +72,6 @@ public abstract class Ne2000Driver extends AbstractEthernetDriver {
             if (skbuf.getSize() < ETH_ZLEN) {
                 skbuf.append(ETH_ZLEN - skbuf.getSize());
             }
-
             dd.transmit(skbuf, destination, 5000);
         } catch (InterruptedException ex) {
             throw new NetworkException("Interrupted", ex);
@@ -112,6 +113,6 @@ public abstract class Ne2000Driver extends AbstractEthernetDriver {
      * Gets the device flags
      */
     public Ne2000Flags getFlags() {
-		return flags;
-	}
+        return flags;
+    }
 }

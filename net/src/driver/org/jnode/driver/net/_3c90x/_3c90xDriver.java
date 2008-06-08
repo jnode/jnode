@@ -110,8 +110,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
             dd.initialize();
             super.startDevice();
         } catch (ResourceNotFreeException ex) {
-            throw new DriverException("Cannot claim " + flags.getName()
-                + " resources", ex);
+            throw new DriverException("Cannot claim " + flags.getName() + " resources", ex);
         }
     }
 
@@ -121,13 +120,11 @@ public class _3c90xDriver extends AbstractEthernetDriver {
     protected _3c90xCore newCore(final Device device, final _3c90xFlags flags)
         throws DriverException, ResourceNotFreeException {
         try {
-            return (_3c90xCore) AccessControllerUtils
-                .doPrivileged(new PrivilegedExceptionAction() {
-                    public Object run() throws DriverException, ResourceNotFreeException {
-                        return new _3c90xCore(_3c90xDriver.this, device, (PCIDevice) device,
-                            flags);
-                    }
-                });
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<_3c90xCore>() {
+                public _3c90xCore run() throws DriverException, ResourceNotFreeException {
+                    return new _3c90xCore(_3c90xDriver.this, device, (PCIDevice) device, flags);
+                }
+            });
         } catch (DriverException ex) {
             throw ex;
         } catch (ResourceNotFreeException ex) {

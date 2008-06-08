@@ -29,7 +29,7 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * This class provide access to Receive Descriptor.
- *
+ * 
  * @author flesire
  */
 public class EEPRO100RxFD {
@@ -61,9 +61,6 @@ public class EEPRO100RxFD {
 
     private int nrFrames = 1;
 
-    /**
-     *
-     */
     public EEPRO100RxFD(ResourceManager rm) {
         final int size = (nrFrames * (RxFDSize + FRAME_SIZE)) + 16;
         this.data = new byte[size];
@@ -147,8 +144,8 @@ public class EEPRO100RxFD {
     }
 
     public final void flushHeader() {
-        //SPROCKET_flush64(frameAddress);
-        //SPROCKET_drainWriteBuffer();
+        // SPROCKET_flush64(frameAddress);
+        // SPROCKET_drainWriteBuffer();
     }
 
     public final void cleanHeader() {
@@ -157,12 +154,11 @@ public class EEPRO100RxFD {
          */
     }
 
-
     public final String print() {
-        return (Integer.toHexString(bufferAddress) + ": "
-            + Integer.toHexString(mem.getInt(4)) + ' '
-            + Integer.toHexString(mem.getInt(8)) + ' '
-            + Integer.toHexString(mem.getInt(12)));
+        return (Integer.toHexString(bufferAddress) + ": " + 
+                Integer.toHexString(mem.getInt(4)) + ' ' + 
+                Integer.toHexString(mem.getInt(8)) + ' ' + 
+                Integer.toHexString(mem.getInt(12)));
     }
 
     /**
@@ -188,6 +184,6 @@ public class EEPRO100RxFD {
         int pktLen = this.getCount() & 0x3fff;
         final SocketBuffer skbuf = new SocketBuffer();
         skbuf.append(data, 0, pktLen);
-		return skbuf; 
-	}
+        return skbuf;
+    }
 }

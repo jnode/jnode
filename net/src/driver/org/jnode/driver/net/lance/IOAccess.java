@@ -69,6 +69,6 @@ public abstract class IOAccess {
      * @param bcrnr
      * @param value
      */
-	public abstract void setBCR(int bcrnr, int value);
+    public abstract void setBCR(int bcrnr, int value);
 
 }

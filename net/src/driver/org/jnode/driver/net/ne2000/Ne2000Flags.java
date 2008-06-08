@@ -32,10 +32,12 @@ public class Ne2000Flags {
      * Device name
      */
     private final String name;
+
     /**
      * Size of internal memory
      */
     private final int memSize;
+
     private final boolean b16;
 
     /**
@@ -47,7 +49,7 @@ public class Ne2000Flags {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param name Device name
      */
     public Ne2000Flags(String name) {
@@ -74,7 +76,7 @@ public class Ne2000Flags {
      * Use 16-bit data transfer?
      */
     public boolean is16bit() {
-		return b16;
-	}
+        return b16;
+    }
 
 }

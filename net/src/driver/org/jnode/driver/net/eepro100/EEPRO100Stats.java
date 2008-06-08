@@ -32,7 +32,7 @@ public class EEPRO100Stats implements EEPRO100Constants {
     /**
      * statistic block size (60,72,78) + dword for status information
      */
-    public final static int STATS_BLOCK_SIZE = 60 + 8;
+    public static final int STATS_BLOCK_SIZE = 60 + 8;
 
     private EEPRO100Registers regs;
 
@@ -53,13 +53,8 @@ public class EEPRO100Stats implements EEPRO100Constants {
     private int rx_fifo_errors;
     private int rx_length_errors;
 
-    /**
-     *
-     */
     public EEPRO100Stats(ResourceManager rm, EEPRO100Registers regs) {
-
         this.regs = regs;
-
         this.stats = new byte[STATS_BLOCK_SIZE];
         this.mem = rm.asMemoryResource(this.stats);
         this.memAddr = this.mem.getAddress();
@@ -107,5 +102,4 @@ public class EEPRO100Stats implements EEPRO100Constants {
             regs.setReg8(SCBCmd, CUDumpStats);
         }
     }
-
 }

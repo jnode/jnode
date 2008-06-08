@@ -500,7 +500,8 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     }
 
     /**
-     * @see org.jnode.driver.net.spi.AbstractDeviceCore#transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
+     * @see org.jnode.driver.net.spi.AbstractDeviceCore#transmit(SocketBuffer buf, 
+     * HardwareAddress destination, long timeout)
      */
     public void transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
         throws InterruptedException, TimeoutException {
@@ -693,7 +694,8 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     }
 
     /**
-     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#setAuthenticationMode(org.jnode.net.wireless.AuthenticationMode)
+     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#setAuthenticationMode(
+     * org.jnode.net.wireless.AuthenticationMode)
      */
     protected void setAuthenticationMode(AuthenticationMode mode)
         throws DriverException {

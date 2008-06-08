@@ -50,8 +50,8 @@ import org.jnode.util.TimeoutException;
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-
-public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants, IRQHandler, EthernetConstants {
+public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants, IRQHandler,
+        EthernetConstants {
     /**
      * Start of IO address space
      */
@@ -77,13 +77,13 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
      */
     private final BCM570xDriver driver;
     /** The receive buffer ring */
-//	private final RTL8139RxRing rxRing = null;
+    // private final RTL8139RxRing rxRing = null;
     /** The transmit buffer */
     // private final RTL8139TxBuffer[] txBuffers = new RTL8139TxBuffer[4];
     /**
      * Is a transmission active?
      */
-    //private boolean tx_active;
+    // private boolean tx_active;
     private int txIndex;
     private int txAborted;
     private int txNumberOfPackets;
@@ -91,7 +91,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Create a new instance
-     *
+     * 
      * @param flags
      */
     public BCM570xCore(BCM570xDriver driver, ResourceOwner owner, PCIDevice device, Flags flags)
@@ -130,62 +130,55 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
             throw ex;
         }
 
-/*
-		this.rxRing = new RTL8139RxRing(RX_FRAMES, rm);
-
-		for (int i = 0; i < txBuffers.length; i++) {
-			txBuffers[i] = new RTL8139TxBuffer(rm);
-			setReg32(REG_TX_ADDR0 + (4 * i), txBuffers[i].getFirstDPDAddress().toInt());
-		}
-
-		powerUpDevice();
-		reset();
-
-		byte[] adr1 = i2bsLoHi(getReg32(REG_MAC0));
-		byte[] adr2 = i2bsLoHi(getReg32(REG_MAC0 + 4));
-
-		final byte[] hwAddrArr = new byte[ETH_ALEN];
-
-		hwAddrArr[0] = adr1[0];
-		hwAddrArr[1] = adr1[1];
-		hwAddrArr[2] = adr1[2];
-		hwAddrArr[3] = adr1[3];
-		hwAddrArr[4] = adr2[0];
-		hwAddrArr[5] = adr2[1];
-
-		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
-
-		// disable multicast
-		setReg32(REG_MAR0, 0);
-		setReg32(REG_MAR0 + 4, 0);
-
-		log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" + NumberUtils.hex(iobase) + ", MAC Address=" + hwAddress);
-*/
+        /*
+         * this.rxRing = new RTL8139RxRing(RX_FRAMES, rm);
+         * 
+         * for (int i = 0; i < txBuffers.length; i++) { txBuffers[i] = new
+         * RTL8139TxBuffer(rm); setReg32(REG_TX_ADDR0 + (4 * i),
+         * txBuffers[i].getFirstDPDAddress().toInt()); }
+         * 
+         * powerUpDevice(); reset();
+         * 
+         * byte[] adr1 = i2bsLoHi(getReg32(REG_MAC0)); byte[] adr2 =
+         * i2bsLoHi(getReg32(REG_MAC0 + 4));
+         * 
+         * final byte[] hwAddrArr = new byte[ETH_ALEN];
+         * 
+         * hwAddrArr[0] = adr1[0]; hwAddrArr[1] = adr1[1]; hwAddrArr[2] =
+         * adr1[2]; hwAddrArr[3] = adr1[3]; hwAddrArr[4] = adr2[0]; hwAddrArr[5] =
+         * adr2[1];
+         * 
+         * this.hwAddress = new EthernetAddress(hwAddrArr, 0);
+         *  // disable multicast setReg32(REG_MAR0, 0); setReg32(REG_MAR0 + 4,
+         * 0);
+         * 
+         * log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" +
+         * NumberUtils.hex(iobase) + ", MAC Address=" + hwAddress);
+         */
     }
 
     private void powerUpDevice() {
         setReg8(REG_CFG9346, CFG9346_WE);
-
         setReg8(REG_CONFIG1, 0);
         setReg8(REG_CFG9346, 0);
     }
 
     private void reset() {
+        // FIXME ... what is with all the fixed delays???
         txIndex = 0;
-
         int i;
-
         setReg8(REG_CHIPCMD, CMD_RESET);
-
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
+            // ignore
         }
 
         for (i = 0; i < REPEAT_TIMEOUT_COUNT; i++) {
             try {
                 Thread.sleep(GENERIC_WAIT_TIME);
             } catch (InterruptedException ex) {
+                // ignore
             }
 
             if ((getReg8(REG_CHIPCMD) & CMD_RESET) == 0)
@@ -200,12 +193,14 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
+            // ignore
         }
 
         for (i = 0; i < REPEAT_TIMEOUT_COUNT; i++) {
             try {
                 Thread.sleep(GENERIC_WAIT_TIME);
             } catch (InterruptedException ex) {
+                // ignore
             }
 
             if ((getReg16(BMCR) & BMCR_RESET) == 0)
@@ -221,12 +216,14 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
+            // ignore
         }
 
         for (i = 0; i < REPEAT_TIMEOUT_COUNT; i++) {
             try {
                 Thread.sleep(GENERIC_WAIT_TIME);
             } catch (InterruptedException ex) {
+                // ignore
             }
 
             if ((getReg8(REG_CFG9346) & 0xc0) == 0)
@@ -250,7 +247,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     private void autoNegotiate() {
 
-        //boolean fullDuplex = false;
+        // boolean fullDuplex = false;
 
         // start auto negotiating
         setReg16(REG_INTR_MASK, INTR_MASK);
@@ -274,11 +271,13 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
+                // ignore
             }
 
             bogusCount++;
             if (bogusCount >= AUTO_NEGOTIATE_TIMEOUT) {
-                log.debug("Bogus count: autonegotiating taking too long: " + Integer.toHexString(status));
+                log.debug("Bogus count: autonegotiating taking too long: " +
+                        Integer.toHexString(status));
                 break;
             }
             status = getReg16(BMSR);
@@ -296,24 +295,26 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
         /* int lpar = */
         getReg16(NWAY_LPAR);
 
-        log.debug("MSR: " + Integer.toHexString(getReg8(MSR)) + " BMCR: " + Integer.toHexString(getReg16(BMCR)) +
-            " LPAR: " + Integer.toHexString(getReg16(NWAY_LPAR)));
+        log.debug("MSR: " + Integer.toHexString(getReg8(MSR)) + " BMCR: " +
+                Integer.toHexString(getReg16(BMCR)) + " LPAR: " +
+                Integer.toHexString(getReg16(NWAY_LPAR)));
 
-        // 	if (lpar == 0xffff) {
-        // 	} else if (((lpar & 0x0100) == 0x0100) || ((lpar & 0x00C0) == 0x0040)) {
-        // 	    fullDuplex = true;
-        // 	}
+        // if (lpar == 0xffff) {
+        // } else if (((lpar & 0x0100) == 0x0100) || ((lpar & 0x00C0) ==
+        // 0x0040)) {
+        // fullDuplex = true;
+        // }
 
-        // 	if (fullDuplex) rtl8139.write8(REG_CONFIG1, 0x60); // check
-        // 	else rtl8139.write8(REG_CONFIG1, 0x20);
+        // if (fullDuplex) rtl8139.write8(REG_CONFIG1, 0x60); // check
+        // else rtl8139.write8(REG_CONFIG1, 0x20);
 
         setReg8(REG_CFG9346, 0x00);
 
-        // 	if (fullDuplex) System.out.print("AutoNegotiation: Full Duplex ");
-        // 	else System.out.print("AutoNegotiation: Half Duplex ");
+        // if (fullDuplex) System.out.print("AutoNegotiation: Full Duplex ");
+        // else System.out.print("AutoNegotiation: Half Duplex ");
 
-        // 	if ((lpar & 0x0180) != 0) System.out.println("100 Mbps Mode");
-        // 	else System.out.println("10 Mbps Mode");
+        // if ((lpar & 0x0180) != 0) System.out.println("100 Mbps Mode");
+        // else System.out.println("10 Mbps Mode");
 
         return;
     }
@@ -333,9 +334,9 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
         reset();
 
         // initialize our buffer
-//		rxRing.initialize();
+        // rxRing.initialize();
 
-//		setReg32(REG_RX_BUF, rxRing.getFirstUPDAddress().toInt());
+        // setReg32(REG_RX_BUF, rxRing.getFirstUPDAddress().toInt());
 
         autoNegotiate();
 
@@ -394,50 +395,51 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Transmit the given buffer
-     *
+     * 
      * @param buf
      * @param timeout
      * @throws InterruptedException
      * @throws org.jnode.util.TimeoutException
-     *
+     * 
      */
     public void transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
         throws InterruptedException, TimeoutException {
         // Set the source address
         hwAddress.writeTo(buf, 6);
-        //tx_active = true;
+        // tx_active = true;
 
         txNumberOfPackets++;
         // Set the address of the txBuffer
 
         setReg32(REG_CFG9346, CFG9346_WE);
 
-        // this should be a bug fix, but looking (in Ethereal) at the packes send
+        // this should be a bug fix, but looking (in Ethereal) at the packes
+        // send
         // indicate on my card that this is not true
         // Martin
         /*
-           * if (txIndex == 0) { txBuffers[0].initialize(buf); setReg32(REG_TX_STATUS0, txFlag |
-           * buf.getSize());
-           *
-           * txBuffers[1].initialize(buf); setReg32(REG_TX_STATUS0 + 4, txFlag | buf.getSize());
-           *
-           * txIndex = 2; } else {
-           */
-//		txBuffers[txIndex].initialize(buf);
-
+         * if (txIndex == 0) { txBuffers[0].initialize(buf);
+         * setReg32(REG_TX_STATUS0, txFlag | buf.getSize());
+         * 
+         * txBuffers[1].initialize(buf); setReg32(REG_TX_STATUS0 + 4, txFlag |
+         * buf.getSize());
+         * 
+         * txIndex = 2; } else {
+         */
+        // txBuffers[txIndex].initialize(buf);
         setReg32(REG_TX_STATUS0 + 4 * txIndex, txFlag | buf.getSize());
 
         // Point to the next empty descriptor
         txIndex++;
         txIndex &= 3;
-        //    }
+        // }
 
         setReg32(REG_CFG9346, CFG9346_NORMAL);
     }
 
     /**
-     * Handle a given hardware interrupt. This method is called from the kernel with interrupts
-     * disabled. So keep and handling here as short as possible!
+     * Handle a given hardware interrupt. This method is called from the kernel
+     * with interrupts disabled. So keep and handling here as short as possible!
      */
     public void handleInterrupt(int irq) {
         int bogusCount = 20;
@@ -452,10 +454,9 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
             }
 
             // See if anything needs servicing
-            if ((status
-                & (INTR_RX_OK | INTR_RX_ERR | INTR_TX_OK | INTR_TX_ERR | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO |
-                INTR_TIMEOUT | INTR_SYS_ERR | INTR_RX_UNDERRUN | INTR_LEN_CHG))
-                == 0) {
+            if ((status & (INTR_RX_OK | INTR_RX_ERR | INTR_TX_OK | INTR_TX_ERR |
+                    INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO | INTR_TIMEOUT | INTR_SYS_ERR |
+                    INTR_RX_UNDERRUN | INTR_LEN_CHG)) == 0) {
                 break;
             }
 
@@ -483,11 +484,11 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
             }
 
             // Process the other errors
-            if ((status & (INTR_RX_ERR | INTR_TX_ERR | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO | INTR_TIMEOUT |
-                INTR_SYS_ERR | INTR_RX_UNDERRUN)) != 0) {
+            if ((status & (INTR_RX_ERR | INTR_TX_ERR | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO |
+                    INTR_TIMEOUT | INTR_SYS_ERR | INTR_RX_UNDERRUN)) != 0) {
                 errorInterrupt(status);
 
-                //        log.debug(" error Interupt "+status);
+                // log.debug(" error Interupt "+status);
             }
             if (--bogusCount < 0) {
                 setReg16(REG_INTR_STATUS, 0xffff);
@@ -502,43 +503,40 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
         setReg32(REG_RX_MISSED, 0);
 
         if ((status & (INTR_RX_UNDERRUN | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO | INTR_RX_ERR)) != 0) {
-            //      rxErrors++;
+            // rxErrors++;
         }
         if ((status & INTR_RX_FIFO_OVRFLO) != 0) {
-            //    rxFifoOverflow++;
+            // rxFifoOverflow++;
         }
         if ((status & INTR_RX_UNDERRUN) != 0) {
-            //      rxUnderRun++;
+            // rxUnderRun++;
         }
         if ((status & INTR_RX_BUF_OVRFLO) != 0) {
-            //     rxBufferOverflow++;
-            //      rxBufferOverflow++;
+            // rxBufferOverflow++;
+            // rxBufferOverflow++;
             // following is needed to clear this interrupt
-            //      rxIndex = getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE;
+            // rxIndex = getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE;
 
-/*
-            rxRing.setIndex(getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE);
-            setReg16(REG_RX_BUF_PTR, rxRing.getIndex() - 16);
-*/
+            /*
+             * rxRing.setIndex(getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE);
+             * setReg16(REG_RX_BUF_PTR, rxRing.getIndex() - 16);
+             */
 
         }
         if ((status & INTR_SYS_ERR) != 0) {
+            // ???
         }
         if ((status & INTR_TIMEOUT) != 0) {
-            //      timeoutError++;
+            // timeoutError++;
         }
     }
-
-    /*
-      * private void rxError(int status) {
-      */
 
     private void rxProcess(int status) {
         // Read all packets
         setReg32(REG_CFG9346, CFG9346_WE);
 
         while ((getReg8(REG_CHIPCMD) & CMD_BUFFER_EMPTY) == 0) {
-            final int pktStatus = 0;//rxRing.getPktStatus();
+            final int pktStatus = 0; // rxRing.getPktStatus();
             final int pktLen = (pktStatus >> 16);
 
             if (pktLen == 0xfff0) {
@@ -550,34 +548,30 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
                 // set up rx mode/configuration
                 setReg32(REG_RX_CONFIG, rxConfig);
-
-//				rxRing.setIndex(getReg16(CBR));
-
+                // rxRing.setIndex(getReg16(CBR));
                 setReg16(CAPR, CBR);
-
                 enableTxRx();
-
                 setReg32(REG_RX_CONFIG, rxConfig);
 
                 // Enable interrupts
                 setReg16(REG_INTR_MASK, INTR_MASK);
                 return;
             } else {
-                final SocketBuffer skbuf = null; //rxRing.getPacket(pktLen);
+                final SocketBuffer skbuf = null; // rxRing.getPacket(pktLen);
 
                 try {
                     if (skbuf.getSize() > 0)
                         driver.onReceive(skbuf);
                 } catch (NetworkException e) {
-                    e.printStackTrace(); //To change body of catch statement use Options | File
+                    e.printStackTrace(); // To change body of catch statement
+                                            // use Options | File
                     // Templates.
                 } finally {
+                    // FIXME
                 }
             }
-
-//			setReg16(CAPR, rxRing.getIndex() - 16);
+            // setReg16(CAPR, rxRing.getIndex() - 16);
         }
-
         setReg32(REG_CFG9346, CFG9346_NORMAL);
     }
 
@@ -589,7 +583,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
                 return;
             }
             if ((txStatus & (TX_OWC | TX_TABT)) != 0) {
-                //        txErrors++;
+                // txErrors++;
                 if ((txStatus & TX_TABT) != 0) {
                     txAborted++;
                     // Setting clear abort bit will make the 8139
@@ -598,35 +592,33 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
                     return;
                 }
                 if ((txStatus & TX_CRS) != 0) {
-                    //          txCarrierErrors++;
+                    // txCarrierErrors++;
                 }
                 if ((txStatus & TX_OWC) != 0) {
-                    //		    System.out.println("TX window error");
-                    //          txWindowErrors++;
+                    // System.out.println("TX window error");
+                    // txWindowErrors++;
                 }
             } else {
                 if ((txStatus & TX_TUN) != 0) {
-                    //          txFifoErrors++;
+                    // txFifoErrors++;
                 }
-                //        txCollisions += ((txStatus & TX_NCC) >> 24);
-                //        txBytes += txStatus & 0x7ff;
-                //        txPackets++;
+                // txCollisions += ((txStatus & TX_NCC) >> 24);
+                // txBytes += txStatus & 0x7ff;
+                // txPackets++;
             }
             // txPendingQueue[txPending].free();
             txNumberOfPackets--;
             txPending++;
             txPending &= 3;
         }
-
     }
 
     /**
      * Gets the first IO-Address used by the given device
-     *
+     * 
      * @param device
      * @param flags
      */
-
     protected int getIOBase(Device device, Flags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         final PCIBaseAddress[] addrs = config.getBaseAddresses();
@@ -642,7 +634,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Gets the number of IO-Addresses used by the given device
-     *
+     * 
      * @param device
      * @param flags
      */
@@ -663,11 +655,10 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Gets the IRQ used by the given device
-     *
+     * 
      * @param device
      * @param flags
      */
-
     protected int getIRQ(Device device, Flags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         return config.getInterruptLine();
@@ -675,7 +666,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Reads a 8-bit NIC register
-     *
+     * 
      * @param reg
      */
     protected final int getReg8(int reg) {
@@ -684,7 +675,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Reads a 16-bit NIC register
-     *
+     * 
      * @param reg
      */
     protected final int getReg16(int reg) {
@@ -693,59 +684,55 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 
     /**
      * Reads a 32-bit NIC register
-     *
+     * 
      * @param reg
      */
-
     protected final int getReg32(int reg) {
         return io.inPortDword(iobase + reg);
     }
 
     /**
      * Writes a 8-bit NIC register
-     *
+     * 
      * @param reg
      * @param value
      */
-
     protected final void setReg8(int reg, int value) {
         io.outPortByte(iobase + reg, value);
     }
 
     /**
      * Writes a 16-bit NIC register
-     *
+     * 
      * @param reg
      * @param value
      */
-
     protected final void setReg16(int reg, int value) {
         io.outPortWord(iobase + reg, value);
     }
 
     /**
      * Writes a 32-bit NIC register
-     *
+     * 
      * @param reg
      * @param value
      */
-
     public final void setReg32(int reg, int value) {
         io.outPortDword(iobase + reg, value);
     }
 
-    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length)
-        throws ResourceNotFreeException, DriverException {
+    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
+            final int low, final int length) throws ResourceNotFreeException, DriverException {
         try {
-            return (IOResource) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws ResourceNotFreeException {
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
+                public IOResource run() throws ResourceNotFreeException {
                     return rm.claimIOResource(owner, low, length);
-                    }});
-		} catch (ResourceNotFreeException ex) {
-		    throw ex;
+                }
+            });
+        } catch (ResourceNotFreeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new DriverException("Unknown exception", ex);
         }
-	    
-	}
+    }
 }

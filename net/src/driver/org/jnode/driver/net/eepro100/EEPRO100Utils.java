@@ -31,24 +31,26 @@ public class EEPRO100Utils implements EEPRO100Constants {
     /**
      * Logger
      */
-    protected final static Logger log = Logger.getLogger(EEPRO100Utils.class);
+    protected static final Logger log = Logger.getLogger(EEPRO100Utils.class);
 
     /**
      * Wait for the command unit to accept a command.
-     *
+     * 
      * @param regs
      */
-    final static void waitForCmdDone(EEPRO100Registers regs) {
+    static final void waitForCmdDone(EEPRO100Registers regs) {
         int wait = 0;
         int delayed_cmd;
         do {
-            if (regs.getReg8(SCBCmd) == 0) return;
+            if (regs.getReg8(SCBCmd) == 0)
+                return;
         } while (++wait <= 100);
         delayed_cmd = regs.getReg8(SCBCmd);
         do {
-            if (regs.getReg8(SCBCmd) == 0) break;
+            if (regs.getReg8(SCBCmd) == 0)
+                break;
         } while (++wait <= 10000);
-        log.debug("Command " + NumberUtils.hex(delayed_cmd) + " was not immediately accepted, " + wait + " ticks!");
+        log.debug("Command " + NumberUtils.hex(delayed_cmd) + " was not immediately accepted, " +
+                wait + " ticks!");
     }
-
 }

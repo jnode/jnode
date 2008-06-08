@@ -28,7 +28,7 @@ import org.jnode.util.LittleEndian;
  */
 final class Prism2Record {
 
-    final static int HDR_LENGTH = 4;
+    static final int HDR_LENGTH = 4;
 
     /**
      * Gets the record length from a given record.
@@ -37,7 +37,7 @@ final class Prism2Record {
      * @param srcOfs
      * @return
      */
-    final static int getRecordLength(byte[] src, int srcOfs) {
+    static final int getRecordLength(byte[] src, int srcOfs) {
         return LittleEndian.getInt16(src, srcOfs + 0);
     }
 
@@ -48,7 +48,7 @@ final class Prism2Record {
      * @param dstOfs
      * @return
      */
-    final static void setRecordLength(byte[] dst, int dstOfs, int recordLength) {
+    static final void setRecordLength(byte[] dst, int dstOfs, int recordLength) {
         LittleEndian.setInt16(dst, dstOfs + 0, recordLength);
     }
 
@@ -59,7 +59,7 @@ final class Prism2Record {
      * @param srcOfs
      * @return
      */
-    final static int getRecordRID(byte[] src, int srcOfs) {
+    static final int getRecordRID(byte[] src, int srcOfs) {
         return LittleEndian.getInt16(src, srcOfs + 2);
     }
 
@@ -70,7 +70,7 @@ final class Prism2Record {
      * @param dstOfs
      * @return
      */
-    final static void setRecordRID(byte[] dst, int dstOfs, int rid) {
+    static final void setRecordRID(byte[] dst, int dstOfs, int rid) {
         LittleEndian.setInt16(dst, dstOfs + 2, rid);
     }
 

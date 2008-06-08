@@ -25,7 +25,7 @@ import org.jnode.util.NumberUtils;
 
 /**
  * Represents a packet header of a Ne2000 PCI ringbuffer
- *
+ * 
  * @author epr
  */
 public class Ne2000PacketHeader {
@@ -36,7 +36,7 @@ public class Ne2000PacketHeader {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param hdr
      * @param hdrOffset
      */
@@ -71,9 +71,9 @@ public class Ne2000PacketHeader {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "state:0x" + NumberUtils.hex(status, 2) + ", " +
-            "next:0x" + NumberUtils.hex(nextPacketPage, 2) + ", " +
-            "length:0x" + NumberUtils.hex(length, 4);
-	}
+        return "state:0x" + NumberUtils.hex(status, 2) + ", " + "next:0x" +
+                NumberUtils.hex(nextPacketPage, 2) + ", " + "length:0x" +
+                NumberUtils.hex(length, 4);
+    }
 
 }

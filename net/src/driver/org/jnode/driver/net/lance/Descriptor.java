@@ -29,14 +29,14 @@ import org.jnode.util.NumberUtils;
  * @author Chris Cole
  */
 public class Descriptor {
-    static final public int MESSAGE_DESCRIPTOR_SIZE = 0x10;
-    static final public int STATUS = 0x06;
-    static final public int STATUS_OWN = 0x8000;
-    static final public int STATUS_ERR = 0x4000;
-    static final public int STATUS_STP = 0x0200;
-    static final public int STATUS_ENP = 0x0100;
-    static final public int STATUS_BPE = 0x0080;
-    static final public int BCNT = 0x08;
+    public static final int MESSAGE_DESCRIPTOR_SIZE = 0x10;
+    public static final int STATUS = 0x06;
+    public static final int STATUS_OWN = 0x8000;
+    public static final int STATUS_ERR = 0x4000;
+    public static final int STATUS_STP = 0x0200;
+    public static final int STATUS_ENP = 0x0100;
+    public static final int STATUS_BPE = 0x0080;
+    public static final int BCNT = 0x08;
 
     protected final MemoryResource mem;
 
@@ -71,11 +71,9 @@ public class Descriptor {
 
     public void setOwnerSelf(boolean self) {
         if (self) {
-            mem.setShort(offset + STATUS, (short) (0x7FFF & mem.getShort(offset
-                + STATUS)));
+            mem.setShort(offset + STATUS, (short) (0x7FFF & mem.getShort(offset + STATUS)));
         } else {
-            mem.setShort(offset + STATUS, (short) (STATUS_OWN | mem
-                .getShort(offset + STATUS)));
+            mem.setShort(offset + STATUS, (short) (STATUS_OWN | mem.getShort(offset + STATUS)));
         }
     }
 
@@ -89,10 +87,8 @@ public class Descriptor {
 
     public void dumpData(Logger out) {
         for (int i = 0; i <= MESSAGE_DESCRIPTOR_SIZE - 1; i += 4) {
-            out.debug("0x"
-                + NumberUtils.hex(mem.getAddress().toInt()
-                + offset + i) + " : 0x" + NumberUtils.hex((byte) i)
-                + " : 0x" + NumberUtils.hex(mem.getInt(offset + i)));
+            out.debug("0x" + NumberUtils.hex(mem.getAddress().toInt() + offset + i) + " : 0x" +
+                    NumberUtils.hex((byte) i) + " : 0x" + NumberUtils.hex(mem.getInt(offset + i)));
         }
     }
 }

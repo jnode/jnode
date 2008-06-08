@@ -102,11 +102,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
      *
      * @param flags
      */
-    public _3c90xCore(
-        _3c90xDriver driver,
-        ResourceOwner owner,
-        PCIDevice device,
-        _3c90xFlags flags)
+    public _3c90xCore(_3c90xDriver driver, ResourceOwner owner, PCIDevice device, _3c90xFlags flags)
         throws DriverException, ResourceNotFreeException {
         final int irq = getIRQ(device, flags);
         this.driver = driver;
@@ -137,21 +133,21 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 
         // Determine Brev flag
         switch (readEEProm(0x03)) {
-            case 0x9000: /** 10 Base TPO             **/
-            case 0x9001: /** 10/100 T4               **/
-            case 0x9050: /** 10/100 TPO              **/
-            case 0x9051: /** 10 Base Combo           **/
+            case 0x9000:/** 10 Base TPO             **/
+            case 0x9001:/** 10/100 T4               **/
+            case 0x9050:/** 10/100 TPO              **/
+            case 0x9051:/** 10 Base Combo           **/
                 //case 0x9200: /** 3Com905C-TXM            **/
                 Brev = false;
                 break;
 
-            case 0x9004: /** 10 Base TPO             **/
-            case 0x9005: /** 10 Base Combo           **/
-            case 0x9006: /** 10 Base TPO and Base2   **/
-            case 0x900A: /** 10 Base FL              **/
-            case 0x9055: /** 10/100 TPO              **/
-            case 0x9056: /** 10/100 T4               **/
-            case 0x905A: /** 10 Base FX              **/
+            case 0x9004:/** 10 Base TPO             **/
+            case 0x9005:/** 10 Base Combo           **/
+            case 0x9006:/** 10 Base TPO and Base2   **/
+            case 0x900A:/** 10 Base FL              **/
+            case 0x9055:/** 10/100 TPO              **/
+            case 0x9056:/** 10/100 T4               **/
+            case 0x905A:/** 10 Base FX              **/
             default:
                 Brev = true;
                 break;
@@ -172,15 +168,8 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
         hwAddrArr[5] = (byte) (eeprom[0x0c] & 0xFF);
         this.hwAddress = new EthernetAddress(hwAddrArr, 0);
 
-        log.debug(
-            "Found "
-                + flags.getName()
-                + " IRQ="
-                + irq
-                + ", IOBase=0x"
-                + NumberUtils.hex(iobase)
-                + ", MAC Address="
-                + hwAddress);
+        log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" +
+                NumberUtils.hex(iobase) + ", MAC Address=" + hwAddress);
     }
 
     /**
@@ -264,8 +253,9 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
         /**
          ** set Indication and Interrupt flags , acknowledge any IRQ's
          **/
-        final int intMask = INT_HOSTERROR | INT_TXCOMPLETE | INT_RXCOMPLETE | INT_UPDATESTATS | INT_LINKEVENT |
-            INT_UPCOMPLETE | INT_INTREQUESTED;
+        final int intMask =
+                INT_HOSTERROR | INT_TXCOMPLETE | INT_RXCOMPLETE | INT_UPDATESTATS | INT_LINKEVENT |
+                        INT_UPCOMPLETE | INT_INTREQUESTED;
         issueCommand(cmdSetInterruptEnable, /*0x7FF*/intMask, 0);
         issueCommand(cmdSetIndicationEnable, 0x7FF, 0);
         issueCommand(cmdAcknowledgeInterrupt, 0x661, 0);
@@ -362,7 +352,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
                 issueCommand(cmdAcknowledgeInterrupt, INT_INTERRUPTLATCH, 0);
             } else {
                 log.debug("Unknown IntStatus flags set on " + flags.getName() + ": IntStatus=0x" +
-                    NumberUtils.hex(intStatus, 4));
+                        NumberUtils.hex(intStatus, 4));
                 issueCommand(cmdAcknowledgeInterrupt, intStatus & ~INT_WINDOWNUMBER, 0);
             }
             intStatus = getReg16(regCommandIntStatus_w);
@@ -464,8 +454,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
      * @param device
      * @param flags
      */
-    protected int getIOBase(Device device, _3c90xFlags flags)
-        throws DriverException {
+    protected int getIOBase(Device device, _3c90xFlags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         final PCIBaseAddress[] addrs = config.getBaseAddresses();
         if (addrs.length < 1) {
@@ -483,8 +472,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
      * @param device
      * @param flags
      */
-    protected int getIOLength(Device device, _3c90xFlags flags)
-        throws DriverException {
+    protected int getIOLength(Device device, _3c90xFlags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         final PCIBaseAddress[] addrs = config.getBaseAddresses();
         if (addrs.length < 1) {
@@ -502,8 +490,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
      * @param device
      * @param flags
      */
-    protected int getIRQ(Device device, _3c90xFlags flags)
-        throws DriverException {
+    protected int getIRQ(Device device, _3c90xFlags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         return config.getInterruptLine();
     }
@@ -680,16 +667,16 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
      * @param value
      */
     private final void setReg16(int reg, int value) {
-		io.outPortWord(iobase + reg, value);
-	}
+        io.outPortWord(iobase + reg, value);
+    }
 
-	/**
+    /**
      * Writes a 32-bit NIC register
      *
      * @param reg
      * @param value
      */
-	private final void setReg32(int reg, int value) {
-		io.outPortDword(iobase + reg, value);
-	}
+    private final void setReg32(int reg, int value) {
+        io.outPortDword(iobase + reg, value);
+    }
 }

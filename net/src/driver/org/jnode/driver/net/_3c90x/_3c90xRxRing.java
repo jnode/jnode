@@ -66,14 +66,14 @@ public class _3c90xRxRing implements _3c90xConstants {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param nrFrames The number of complete ethernet frames in this ring.
      * @param rm
      */
     public _3c90xRxRing(int nrFrames, ResourceManager rm) {
 
         // Create a large enough buffer
-        final int size = (nrFrames * (UPD_SIZE + FRAME_SIZE)) + 16/*alignment*/;
+        final int size = (nrFrames * (UPD_SIZE + FRAME_SIZE)) + 16/* alignment */;
         this.data = new byte[size];
         this.nrFrames = nrFrames;
         this.mem = rm.asMemoryResource(data);
@@ -117,7 +117,7 @@ public class _3c90xRxRing implements _3c90xConstants {
 
     /**
      * Gets the packet status of the UPD at the given index
-     *
+     * 
      * @param index
      */
     public int getPktStatus(int index) {
@@ -127,7 +127,7 @@ public class _3c90xRxRing implements _3c90xConstants {
 
     /**
      * Sets the packet status of the UPD at the given index
-     *
+     * 
      * @param index
      * @param value The new pkt status value
      */
@@ -138,7 +138,7 @@ public class _3c90xRxRing implements _3c90xConstants {
 
     /**
      * Gets the packet data of UPD with the given index into a SocketBuffer
-     *
+     * 
      * @param index
      */
     public SocketBuffer getPacket(int index) {
@@ -160,8 +160,8 @@ public class _3c90xRxRing implements _3c90xConstants {
 
     /**
      * Gets the number of frames of this ring
-	 */
-	public int getNrFrames() {
-		return nrFrames;
-	}
+     */
+    public int getNrFrames() {
+        return nrFrames;
+    }
 }

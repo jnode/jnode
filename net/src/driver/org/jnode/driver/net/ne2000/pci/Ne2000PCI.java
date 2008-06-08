@@ -43,8 +43,8 @@ public class Ne2000PCI extends Ne2000Core {
      * @param device
      * @param flags
      */
-    public Ne2000PCI(Ne2000PCIDriver driver, ResourceOwner owner, PCIDevice device, Ne2000Flags flags)
-        throws ResourceNotFreeException, DriverException {
+    public Ne2000PCI(Ne2000PCIDriver driver, ResourceOwner owner, PCIDevice device,
+            Ne2000Flags flags) throws ResourceNotFreeException, DriverException {
         super(driver, owner, device, flags);
     }
 
@@ -54,8 +54,7 @@ public class Ne2000PCI extends Ne2000Core {
      * @param device
      * @param flags
      */
-    protected int getIOBase(Device device, Ne2000Flags flags)
-        throws DriverException {
+    protected int getIOBase(Device device, Ne2000Flags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         final PCIBaseAddress[] addrs = config.getBaseAddresses();
         if (addrs.length < 1) {
@@ -73,8 +72,7 @@ public class Ne2000PCI extends Ne2000Core {
      * @param device
      * @param flags
      */
-    protected int getIOLength(Device device, Ne2000Flags flags)
-        throws DriverException {
+    protected int getIOLength(Device device, Ne2000Flags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
         final PCIBaseAddress[] addrs = config.getBaseAddresses();
         if (addrs.length < 1) {
@@ -92,11 +90,8 @@ public class Ne2000PCI extends Ne2000Core {
      * @param device
      * @param flags
      */
-    protected int getIRQ(Device device, Ne2000Flags flags)
-        throws DriverException {
+    protected int getIRQ(Device device, Ne2000Flags flags) throws DriverException {
         final PCIHeaderType0 config = ((PCIDevice) device).getConfig().asHeaderType0();
-		return config.getInterruptLine();
-	}
-
-
+        return config.getInterruptLine();
+    }
 }

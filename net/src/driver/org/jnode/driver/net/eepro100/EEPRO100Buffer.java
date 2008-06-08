@@ -135,7 +135,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         regs.setReg16(SCBStatus, status & IntrAllNormal);
 
         log.debug("transmitting status = " + NumberUtils.hex(status) + ", cmd=" +
-            NumberUtils.hex(regs.getReg16(SCBStatus)) + "\n");
+                NumberUtils.hex(regs.getReg16(SCBStatus)) + "\n");
 
         txFD.setStatus(0);
         txFD.setCommand(CmdSuspend | CmdTx | CmdTxFlex);
@@ -153,6 +153,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         // TODO wait 10 ms for transmiting;
         long start = System.currentTimeMillis();
         while ((System.currentTimeMillis() <= start + 10) && (txFD.getStatus() != 0)) {
+            // FIXME ... busy wait!!!!
         }
         s2 = regs.getReg16(SCBStatus);
         log.debug("Tx FD :");
@@ -175,8 +176,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
             regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
             EEPRO100Utils.waitForCmdDone(regs);
 
-            log.debug("Got a packet: Len="
-                + NumberUtils.hex(rxPacket.getCount()));
+            log.debug("Got a packet: Len=" + NumberUtils.hex(rxPacket.getCount()));
 
             final SocketBuffer skbuf = rxPacket.getPacket();
             driver.onReceive(skbuf);
@@ -188,7 +188,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
      *
      */
     public void txProcess() {
-
         // Caution: the write order is important here, set the base address with
         // the "ownership" bits last.
 
@@ -200,8 +199,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         txRing[txEntry].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
 
         getNextTx();
-        txRing[txEntry].setLink(txRing[getCurTx() & TX_RING_SIZE - 1]
-            .getBufferAddress());
+        txRing[txEntry].setLink(txRing[getCurTx() & TX_RING_SIZE - 1].getBufferAddress());
         // We may nominally release the lock here.
         txRing[txEntry].setDescriptorAddress(txRing[txEntry].getBufferAddress() + 16);
         // The data region is always in one buffer descriptor.
@@ -302,6 +300,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
      * @param rxMode The rxMode to set.
      */
     public void setRxMode(int rxMode) {
-		this.rxMode = rxMode;
-	}
+        this.rxMode = rxMode;
+    }
 }

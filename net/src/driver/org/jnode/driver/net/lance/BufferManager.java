@@ -33,7 +33,7 @@ import org.jnode.system.ResourceOwner;
  * @author Chris Cole
  */
 public class BufferManager {
-    static final public int DATA_BUFFER_SIZE = 1544;
+    public static final int DATA_BUFFER_SIZE = 1544;
 
     /**
      * MemoryResource to hold initialization block, descriptor rings, and data buffers
@@ -46,30 +46,16 @@ public class BufferManager {
 
     private final int size;
 
-    public BufferManager(
-        int rxRingLength,
-        int txRingLength,
-        int mode,
-        EthernetAddress physicalAddr,
-        long logicalAddr,
-        ResourceManager rm,
-        ResourceOwner owner) {
+    public BufferManager(int rxRingLength, int txRingLength, int mode,
+            EthernetAddress physicalAddr, long logicalAddr, ResourceManager rm, ResourceOwner owner) {
 
         // Compute the required size for the memory resource
-        size =
-            InitializationBlock32Bit.INIT_BLOCK_SIZE
-                + ((rxRingLength + txRingLength)
-                * (Descriptor.MESSAGE_DESCRIPTOR_SIZE
-                + DATA_BUFFER_SIZE));
+        size = InitializationBlock32Bit.INIT_BLOCK_SIZE +
+                (rxRingLength + txRingLength) * (Descriptor.MESSAGE_DESCRIPTOR_SIZE + DATA_BUFFER_SIZE);
 
         // Get the memory
         try {
-            mem =
-                rm.claimMemoryResource(
-                    owner,
-                    null,
-                    size,
-                    ResourceManager.MEMMODE_NORMAL);
+            mem = rm.claimMemoryResource(owner, null, size, ResourceManager.MEMMODE_NORMAL);
         } catch (ResourceNotFreeException e) {
             System.out.println("buffer memory resouce not free exception");
         }
@@ -77,41 +63,22 @@ public class BufferManager {
         // define the offsets into the memory resource for the entities
         final int rxRingOffset = InitializationBlock32Bit.INIT_BLOCK_SIZE;
 
-        final int txRingOffset =
-            rxRingOffset + (rxRingLength * Descriptor.MESSAGE_DESCRIPTOR_SIZE);
+        final int txRingOffset = rxRingOffset + (rxRingLength * Descriptor.MESSAGE_DESCRIPTOR_SIZE);
 
         final int rxDataBufferOffset =
-            txRingOffset + (txRingLength * Descriptor.MESSAGE_DESCRIPTOR_SIZE);
+                txRingOffset + (txRingLength * Descriptor.MESSAGE_DESCRIPTOR_SIZE);
 
-        final int txDataBufferOffset =
-            rxDataBufferOffset + (rxRingLength * DATA_BUFFER_SIZE);
+        final int txDataBufferOffset = rxDataBufferOffset + (rxRingLength * DATA_BUFFER_SIZE);
 
         // Create and initialize the receive ring
-        rxRing =
-            new RxDescriptorRing(
-                mem,
-                rxRingOffset,
-                rxRingLength,
-                rxDataBufferOffset);
+        rxRing = new RxDescriptorRing(mem, rxRingOffset, rxRingLength, rxDataBufferOffset);
 
         // Create and initialize the transmit ring
-        txRing =
-            new TxDescriptorRing(
-                mem,
-                txRingOffset,
-                txRingLength,
-                txDataBufferOffset);
+        txRing = new TxDescriptorRing(mem, txRingOffset, txRingLength, txDataBufferOffset);
 
-        // Create and initialize the initializtion block
-        initBlock =
-            new InitializationBlock32Bit(
-                mem,
-                0,
-                (short) mode,
-                physicalAddr,
-                logicalAddr,
-                rxRing,
-                txRing);
+        // Create and initialize the initialization block
+        initBlock = new InitializationBlock32Bit(
+                mem, 0, (short) mode, physicalAddr, logicalAddr, rxRing, txRing);
     }
 
     /**
@@ -126,7 +93,6 @@ public class BufferManager {
         if (len > DATA_BUFFER_SIZE) {
             System.out.println("Length must be <= " + DATA_BUFFER_SIZE);
         }
-
         txRing.transmit(buf);
     }
 
@@ -138,5 +104,5 @@ public class BufferManager {
         initBlock.dumpData(out);
         rxRing.dumpData(out);
         txRing.dumpData(out);
-	}
+    }
 }

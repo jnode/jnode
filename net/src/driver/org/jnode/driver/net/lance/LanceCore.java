@@ -64,9 +64,8 @@ import org.jnode.util.TimeoutException;
  *
  * @author Chirs Cole
  */
-public class LanceCore
-    extends AbstractDeviceCore
-    implements IRQHandler, LanceConstants, EthernetConstants {
+public class LanceCore extends AbstractDeviceCore implements IRQHandler, LanceConstants,
+        EthernetConstants {
 
     // This is the number of descriptors for the receive and transmit rings
     // Note: Valid numbers are 2^x where x is 0..8 (1, 2, 4, 8, 16, .., 512)
@@ -77,27 +76,33 @@ public class LanceCore
      * Device Driver
      */
     private final LanceDriver driver;
+    
     /**
      * Start of IO address space
      */
     private final int iobase;
+    
     /**
      * IO address space resource
      */
     private final IOResource ioResource;
     private final IOAccess io;
+    
     /**
      * IRQ resource
      */
     private final IRQResource irq;
+    
     /**
      * My ethernet address
      */
     private EthernetAddress hwAddress;
+    
     /**
      * Flags for the specific device found
      */
     private final LanceFlags flags;
+    
     /**
      * Manager for receive and transmit rings as well as data buffers
      */
@@ -108,13 +113,8 @@ public class LanceCore
      *
      * @throws ResourceNotFreeException
      */
-    public LanceCore(
-        LanceDriver driver,
-        ResourceOwner owner,
-        PCIDevice device,
-        Flags flags)
+    public LanceCore(LanceDriver driver, ResourceOwner owner, PCIDevice device, Flags flags)
         throws ResourceNotFreeException, DriverException {
-
         this.driver = driver;
         this.flags = (LanceFlags) flags;
 
@@ -132,11 +132,7 @@ public class LanceCore
         // Get the start of the IO address space
         iobase = addrs[0].getIOBase();
         final int iolength = addrs[0].getSize();
-        log.debug(
-            "Found Lance IOBase: 0x"
-                + NumberUtils.hex(iobase)
-                + ", length: "
-                + iolength);
+        log.debug("Found Lance IOBase: 0x" + NumberUtils.hex(iobase) + ", length: " + iolength);
         ResourceManager rm;
         try {
             rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
@@ -161,24 +157,13 @@ public class LanceCore
         // Load the hw address
         this.hwAddress = loadHWAddress();
 
-        log.info(
-            "Found "
-                + this.flags.getChipName()
-                + " at 0x"
-                + NumberUtils.hex(iobase, 4)
-                + " with MAC Address "
-                + hwAddress);
+        log.info("Found " + this.flags.getChipName() + " at 0x" + NumberUtils.hex(iobase, 4) +
+                " with MAC Address " + hwAddress);
 
         // Create rx & tx descriptor rings, initdata and databuffers
         this.bufferManager =
-            new BufferManager(
-                RX_DESCRIPTOR_LENGTH,
-                TX_DESCRIPTOR_LENGTH,
-                CSR15_DRX | CSR15_DTX,
-                hwAddress,
-                0,
-                rm,
-                owner);
+                new BufferManager(RX_DESCRIPTOR_LENGTH, TX_DESCRIPTOR_LENGTH,
+                        CSR15_DRX | CSR15_DTX, hwAddress, 0, rm, owner);
 
         // Enable device to become a bus master on the PCI bus.
         config.setCommand(config.getCommand() | PCIConstants.PCI_COMMAND_MASTER);
@@ -223,13 +208,7 @@ public class LanceCore
         // Enable full duplex
         io.setBCR(9, BCR9_FDEN);
         io.setCSR(4, CSR4_DMAPLUS | CSR4_APAD_XMT);
-        io.setCSR(
-            5,
-            CSR5_LTINTEN
-                | CSR5_SINTE
-                | CSR5_SLPINTE
-                | CSR5_EXDINTE
-                | CSR5_MPINTE);
+        io.setCSR(5, CSR5_LTINTEN | CSR5_SINTE | CSR5_SLPINTE | CSR5_EXDINTE | CSR5_MPINTE);
 
         // Set the address of the Initialization Block
         final int iaddr = bufferManager.getInitDataAddressAs32Bit();
@@ -269,8 +248,7 @@ public class LanceCore
     private final EthernetAddress loadHWAddress() {
         final byte[] addr = new byte[ETH_ALEN];
         for (int i = 0; i < addr.length; i++) {
-            addr[i] =
-                (byte) ioResource.inPortByte(iobase + R_ETH_ADDR_OFFSET + i);
+            addr[i] = (byte) ioResource.inPortByte(iobase + R_ETH_ADDR_OFFSET + i);
         }
         return new EthernetAddress(addr, 0);
     }
@@ -427,26 +405,22 @@ public class LanceCore
                 if (skbuf != null)
                     driver.onReceive(skbuf);
             } catch (NetworkException e) {
+                // FIXME
                 e.printStackTrace();
             } finally {
+                // FIXME
             }
         }
     }
 
-    private IOResource claimPorts(
-        final ResourceManager rm,
-        final ResourceOwner owner,
-        final int low,
-        final int length)
-        throws ResourceNotFreeException, DriverException {
+    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
+            final int low, final int length) throws ResourceNotFreeException, DriverException {
         try {
-            return (
-                IOResource) AccessControllerUtils
-                .doPrivileged(new PrivilegedExceptionAction() {
-                    public Object run() throws ResourceNotFreeException {
-                        return rm.claimIOResource(owner, low, length);
-                    }
-                });
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
+                public IOResource run() throws ResourceNotFreeException {
+                    return rm.claimIOResource(owner, low, length);
+                }
+            });
         } catch (ResourceNotFreeException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -464,43 +438,13 @@ public class LanceCore
 
         bufferManager.dumpData(log);
 
-        int validVMWareLanceRegs[] =
-            {
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13,
-                14,
-                15,
-                24,
-                25,
-                30,
-                31,
-                58,
-                76,
-                77,
-                80,
-                82,
-                88,
-                89,
-                112,
-                124};
+        int validVMWareLanceRegs[] = {
+            0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 30, 31, 58, 76, 77, 80,
+            82, 88, 89, 112, 124};
 
         for (int i = 0; i < validVMWareLanceRegs.length; i++) {
             int csr_val = io.getCSR(validVMWareLanceRegs[i]);
-            log.debug(
-                "CSR"
-                    + validVMWareLanceRegs[i]
-                    + " : "
-                    + NumberUtils.hex(csr_val, 4));
+            log.debug("CSR" + validVMWareLanceRegs[i] + " : " + NumberUtils.hex(csr_val, 4));
         }
 
         // try to start again, not sure if this works?
@@ -517,6 +461,6 @@ public class LanceCore
               log.debug(
                   "PCI" + NumberUtils.hex(j) + " : " + NumberUtils.hex(pci_val));
           }
-          */
-	}
+         */
+    }
 }

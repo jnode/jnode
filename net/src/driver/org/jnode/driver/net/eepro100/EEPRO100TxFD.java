@@ -34,30 +34,32 @@ import org.vmmagic.unboxed.Address;
 public class EEPRO100TxFD {
     private int TxFDSize = 16;
     private int DataBufferSize = 1536;
+    
     /**
      * The actual data
      */
     private final byte[] data;
+    
     /**
      * MemoryResource mapper around data
      */
     private final MemoryResource mem;
+    
     /**
      * Offset within mem of first DPD
      */
     private final int firstDPDOffset;
+    
     /**
      * 32-bit address first DPD
      */
     private final Address firstDPDAddress;
-    /** */
+    
     private int bufferAddress;
 
-    /**
-     *
-     */
+    
     public EEPRO100TxFD(ResourceManager rm) {
-//		 Create a large enough buffer
+        // Create a large enough buffer
         final int size = (TxFDSize + DataBufferSize) + 16 /* alignment */;
         this.data = new byte[size];
         this.mem = rm.asMemoryResource(data);

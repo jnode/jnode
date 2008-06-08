@@ -44,7 +44,7 @@ public class Ne2000PCIDriver extends Ne2000Driver {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param flags
      */
     public Ne2000PCIDriver(Ne2000Flags flags) {
@@ -53,8 +53,9 @@ public class Ne2000PCIDriver extends Ne2000Driver {
 
     /**
      * Create a new Ne2000Core instance
-     *
-     * @see org.jnode.driver.net.ne2000.Ne2000Driver#newCore(org.jnode.driver.Device, org.jnode.driver.net.ne2000.Ne2000Flags)
+     * 
+     * @see org.jnode.driver.net.ne2000.Ne2000Driver#newCore(org.jnode.driver.Device,
+     *      org.jnode.driver.net.ne2000.Ne2000Flags)
      */
     protected Ne2000Core newCore(Device device, Ne2000Flags flags)
         throws DriverException, ResourceNotFreeException {
@@ -68,6 +69,6 @@ public class Ne2000PCIDriver extends Ne2000Driver {
         super.verifyConnect(device);
         if (!(device instanceof PCIDevice)) {
             throw new DriverException("Only NE2000-PCI devices are supported");
-		}
-	}
+        }
+    }
 }

@@ -30,18 +30,14 @@ import static org.jnode.driver.net.prism2.Prism2Constants.Register.STATUS;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class Prism2CommandResponse {
-
     private int status;
-
     private int response0;
-
     private int response1;
-
     private int response2;
 
     /**
      * Read the status from the device.
-     *
+     * 
      * @param core
      */
     final void initialize(Prism2IO core) {
@@ -74,7 +70,7 @@ final class Prism2CommandResponse {
 
     /**
      * Gets the full status value
-     *
+     * 
      * @return Returns the status.
      */
     public final int getStatus() {
@@ -83,7 +79,7 @@ final class Prism2CommandResponse {
 
     /**
      * Gets the result code.
-     *
+     * 
      * @return
      */
     public final int getResult() {
