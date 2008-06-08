@@ -40,38 +40,29 @@ public abstract class SMBFSEntry implements FSEntry {
     }
 
     /**
-     * Gets the accessrights for this entry.
-     *
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSEntry#getAccessRights()
      */
     public FSAccessRights getAccessRights() throws IOException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        //todo implement it
+        return null;
     }
 
     /**
-     * Gets the directory this entry refers to. This method can only be called
-     * if <code>isDirectory</code> returns true.
-     *
-     * @return The directory described by this entry
+     * @see org.jnode.fs.FSEntry#getDirectory()
      */
     public SMBFSDirectory getDirectory() throws IOException {
         return (SMBFSDirectory) this;
     }
 
     /**
-     * Gets the file this entry refers to. This method can only be called
-     * if <code>isFile</code> returns true.
-     *
-     * @return The file described by this entry
+     * @see org.jnode.fs.FSEntry#getFile()
      */
     public SMBFSFile getFile() throws IOException {
         return (SMBFSFile) this;
     }
 
     /**
-     * Gets the last modification time of this entry.
-     *
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSEntry#getLastModified()
      */
 
     public long getLastModified() throws IOException {
@@ -79,7 +70,7 @@ public abstract class SMBFSEntry implements FSEntry {
     }
 
     /**
-     * Gets the name of this entry.
+     * @see org.jnode.fs.FSEntry#getName()
      */
     public String getName() {
         return getSimpleName(smbFile);
@@ -93,14 +84,14 @@ public abstract class SMBFSEntry implements FSEntry {
     }
 
     /**
-     * Gets the directory this entry is a part of.
+     * @see org.jnode.fs.FSEntry#getParent()
      */
     public SMBFSDirectory getParent() {
-        return null;
+        return parent;
     }
 
     /**
-     * Is this entry refering to a (sub-)directory?
+     * @see org.jnode.fs.FSEntry#isDirectory()
      */
     public boolean isDirectory() {
         try {
@@ -111,17 +102,15 @@ public abstract class SMBFSEntry implements FSEntry {
     }
 
     /**
-     * Indicate if the entry has been modified in memory (ie need to be saved)
-     *
-     * @return true if the entry need to be saved
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSEntry#isDirty()
      */
     public boolean isDirty() throws IOException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        //todo implement it
+        return false;
     }
 
     /**
-     * Is this entry refering to a file?
+     * @see org.jnode.fs.FSEntry#isFile()
      */
     public boolean isFile() {
         try {
@@ -132,36 +121,33 @@ public abstract class SMBFSEntry implements FSEntry {
     }
 
     /**
-     * Gets the last modification time of this entry.
-     *
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSEntry#setLastModified(long)
      */
     public void setLastModified(long lastModified) throws IOException {
-
+        smbFile.setLastModified(lastModified);
     }
 
     /**
-     * Sets the name of this entry.
+     * @see org.jnode.fs.FSEntry#setName(String)
      */
     public void setName(String newName) throws IOException {
-
+        SmbFile f = new SmbFile(smbFile.getParent(), newName);
+        smbFile.renameTo(f);
     }
 
     /**
-     * Gets the filesystem to which this object belongs.
+     * @see org.jnode.fs.FSEntry#getFileSystem()
      */
     public SMBFileSystem getFileSystem() {
+        //todo implement it
         return null;
     }
 
     /**
-     * Is this object still valid.
-     * <p/>
-     * An object is not valid anymore if it has been removed from the filesystem.
-     * All invocations on methods (exception this method) of invalid objects
-     * must throw an IOException.
+     * @see org.jnode.fs.FSEntry#isValid()
      */
     public boolean isValid() {
+        //todo implement it
         return true;
     }
 }

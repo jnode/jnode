@@ -24,86 +24,87 @@ package org.jnode.fs.smbfs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import jcifs.smb.SmbFile;
-import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbRandomAccessFile;
 import org.jnode.fs.FSFile;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class SMBFSFile extends SMBFSEntry implements FSFile {
+    private static final int BUFFER_SIZE = 4 * 1024;
 
     protected SMBFSFile(SMBFSDirectory parent, SmbFile smbFile) {
         super(parent, smbFile);
     }
 
     /**
-     * Flush any cached data to the disk.
-     *
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSFile#flush()
      */
     public void flush() throws IOException {
 
     }
 
     /**
-     * Gets the length (in bytes) of this file
-     *
-     * @return long
+     * @see org.jnode.fs.FSFile#getLength()
      */
     public long getLength() {
-        return smbFile.getContentLength();
+        try {
+            return smbFile.length();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * Read <code>len</code> bytes from the given position.
-     * The read data is read fom this file starting at offset <code>fileOffset</code>
-     * and stored in <code>dest</code> starting at offset <code>ofs</code>.
-     *
-     * @param fileOffset
-     * @param dest
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSFile#read(long, java.nio.ByteBuffer)
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
         if (fileOffset > smbFile.length())
             return;
 
-        int b_len = 32 * 1024;
-        byte[] buf = new byte[b_len];
+        byte[] buf = new byte[BUFFER_SIZE];
 
-        SmbFileInputStream is = (SmbFileInputStream) smbFile.getInputStream();
+        SmbRandomAccessFile raf = new SmbRandomAccessFile(smbFile, "r");
 
-        long s = is.skip(fileOffset);
-        if (s < fileOffset)
-            is.skip(fileOffset);
+        raf.seek(fileOffset);
 
         int bc;
-        int rem = 1;
-        while ((bc = is.read(buf)) > 0 && rem > 0) {
+        int rem = dest.remaining();
+        while ((bc = raf.read(buf)) > 0 && rem > 0) {
             dest.put(buf, 0, Math.min(bc, dest.remaining()));
             rem = dest.remaining();
         }
+        raf.close();
     }
 
     /**
-     * Sets the length of this file.
-     *
-     * @param length
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSFile#setLength(long)
      */
     public void setLength(long length) throws IOException {
-
+        SmbRandomAccessFile raf = new SmbRandomAccessFile(smbFile, "rw");
+        raf.setLength(length);
+        raf.close();
     }
 
     /**
-     * Write <code>len</code> bytes to the given position.
-     * The data is read from <code>src</code> starting at offset
-     * <code>ofs</code> and written to this file starting at offset <code>fileOffset</code>.
-     *
-     * @param fileOffset
-     * @param src
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSFile#write(long, java.nio.ByteBuffer)
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
+        SmbRandomAccessFile raf = new SmbRandomAccessFile(smbFile, "rw");
 
+        if (fileOffset > raf.length())
+            raf.setLength(fileOffset);
+
+        raf.seek(fileOffset);
+
+        byte[] buf = new byte[BUFFER_SIZE];
+
+        while (src.remaining() > 0) {
+            int bc = Math.min(BUFFER_SIZE, src.remaining());
+            src.get(buf, 0, bc);
+            raf.write(buf, 0, bc);
+        }
+
+        raf.close();
     }
 }

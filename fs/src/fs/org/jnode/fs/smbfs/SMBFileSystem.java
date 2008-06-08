@@ -41,12 +41,11 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
         this.type = type;
         this.device = device;
         try {
-            root = new SMBFSDirectory(
-                    null, 
-                    new SmbFile("smb://" + device.getUser() + ":" +
-                            device.getPassword() + "@" + 
-                            device.getHost() + "/" + device.getPath() + "/"));
-        } catch (Exception e) {
+            root = new SMBFSDirectory(null, new SmbFile("smb://" + device.getUser() + ":" + device.getPassword() +
+                "@" + device.getHost() + "/" + device.getPath() + "/"));
+            root.smbFile.setDefaultUseCaches(false);
+            root.smbFile.connect();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -63,10 +62,10 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     * 
+     *
      * @throws java.io.IOException
      */
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         closed = true;
     }
 
@@ -82,14 +81,13 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
      * this is not required.
      */
     public SMBFSEntry getRootEntry() throws IOException {
-        System.out.println("get root");
         return root;
     }
 
     /**
      * Is this filesystem closed.
      */
-    public boolean isClosed() {
+    public synchronized boolean isClosed() {
         return closed;
     }
 
@@ -97,7 +95,7 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
      * Is the filesystem mounted in readonly mode ?
      */
     public boolean isReadOnly() {
-        return true;
+        return false;
     }
 
     public long getFreeSpace() {
@@ -109,12 +107,15 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
     }
 
     public long getTotalSpace() {
-        // TODO implement me
-        return 0;
+        //todo fix it
+        return 1;
     }
 
     public long getUsableSpace() {
-        // TODO implement me
-        return 0;
+        try {
+            return root.smbFile.getDiskFreeSpace();
+        } catch (SmbException e) {
+            return 0;
+        }
     }
 }

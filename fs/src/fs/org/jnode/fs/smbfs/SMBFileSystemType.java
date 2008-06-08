@@ -31,6 +31,11 @@ import org.jnode.fs.FileSystemType;
 public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
     public static final Class<SMBFileSystemType> ID = SMBFileSystemType.class;
 
+    static {
+        System.setProperty("jcifs.smb.client.attrExpirationPeriod", "10");
+        System.setProperty("jcifs.smb.client.responseTimeout", "10000");
+    }
+
     /**
      * Create a filesystem from a given device.
      *
