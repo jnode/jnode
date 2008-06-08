@@ -22,6 +22,9 @@
 package org.jnode.fs.smbfs;
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,6 +36,7 @@ import org.jnode.fs.FSDirectory;
  * @author Levente S\u00e1ntha
  */
 public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
+    private static final long REFRESH_TIMEOUT = 5000;
     private Map<String, SMBFSEntry> entries = new HashMap<String, SMBFSEntry>();
 
     protected SMBFSDirectory(SMBFSDirectory parent, SmbFile smbFile) {
@@ -40,79 +44,132 @@ public class SMBFSDirectory extends SMBFSEntry implements FSDirectory {
     }
 
     /**
-     * Add a new (sub-)directory with a given name to this directory.
-     *
-     * @param name
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSDirectory#addDirectory(String)
      */
-    public SMBFSEntry addDirectory(String name) throws IOException {
-        return null;
+    public SMBFSEntry addDirectory(final String name) throws IOException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<SMBFSEntry>() {
+                public SMBFSEntry run() throws Exception {
+                    SmbFile dir = new SmbFile(smbFile, dirName(name));
+                    dir.mkdir();
+                    SMBFSDirectory sdir = new SMBFSDirectory(SMBFSDirectory.this, dir);
+                    entries.put(name, sdir);
+                    return sdir;
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
-     * Add a new file with a given name to this directory.
-     *
-     * @param name
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSDirectory#addFile(String)
      */
-    public SMBFSEntry addFile(String name) throws IOException {
-        return null;
+    public SMBFSEntry addFile(final String name) throws IOException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<SMBFSEntry>() {
+                public SMBFSEntry run() throws Exception {
+                    SmbFile file = new SmbFile(smbFile, name);
+                    file.createNewFile();
+                    SMBFSFile sfile = new SMBFSFile(SMBFSDirectory.this, file);
+                    entries.put(name, sfile);
+                    return sfile;
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
-     * Save all dirty (unsaved) data to the device
-     *
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSDirectory#flush()
      */
     public void flush() throws IOException {
-
+        //nothing to do here
     }
 
     /**
-     * Gets the entry with the given name.
-     *
-     * @param name
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSDirectory#getEntry(String)
      */
     public SMBFSEntry getEntry(String name) throws IOException {
+        refreshEntries();
         return entries.get(name);
     }
 
     /**
-     * Gets an iterator used to iterate over all the entries of this
-     * directory.
-     * All elements returned by the iterator must be instanceof FSEntry.
+     * @see org.jnode.fs.FSDirectory#iterator()
      */
     public Iterator<? extends SMBFSEntry> iterator() throws IOException {
-        SmbFile[] smb_list;
-        try {
-            smb_list = smbFile.listFiles();
-        } catch (SmbException e) {
-            e.printStackTrace();
-            throw e;
-        }
-        entries.clear();
-
-        for (SmbFile f : smb_list) {
-            if (f.isDirectory()) {
-                String name = getSimpleName(f);
-                entries.put(name, new SMBFSDirectory(this, f));
-            } else if (f.isFile()) {
-                String name = getSimpleName(f);
-                entries.put(name, new SMBFSFile(this, f));
-            }
-        }
-
+        refreshEntries();
         return entries.values().iterator();
     }
 
     /**
-     * Remove the entry with the given name from this directory.
-     *
-     * @param name
-     * @throws java.io.IOException
+     * @see org.jnode.fs.FSDirectory#remove(String)
      */
     public void remove(String name) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        SMBFSEntry ent = entries.get(name);
+        String fname = ent.isDirectory() ? dirName(name) : name;
+        SmbFile file = new SmbFile(smbFile, fname);
+        file.delete();
+        entries.remove(name);
+    }
+
+    private long lastRefresh;
+
+    private void refreshEntries() throws SmbException {
+        if (System.currentTimeMillis() - lastRefresh < REFRESH_TIMEOUT)
+            return;
+
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                public Object run() throws Exception {
+                    SmbFile[] smb_list;
+                    try {
+                        smb_list = smbFile.listFiles();
+                    } catch (SmbException e) {
+                        e.printStackTrace();
+                        throw e;
+                    }
+                    entries.clear();
+
+                    for (SmbFile f : smb_list) {
+                        if (f.isDirectory()) {
+                            String name = getSimpleName(f);
+                            entries.put(name, new SMBFSDirectory(SMBFSDirectory.this, f));
+                        } else if (f.isFile()) {
+                            String name = getSimpleName(f);
+                            entries.put(name, new SMBFSFile(SMBFSDirectory.this, f));
+                        }
+                    }
+                    lastRefresh = System.currentTimeMillis();
+                    return null;
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof SmbException) {
+                throw (SmbException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private String dirName(String name) {
+        String dname = name;
+        if (!dname.endsWith("/"))
+            dname += "/";
+        return dname;
     }
 }
