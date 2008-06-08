@@ -12,7 +12,7 @@ import org.jnode.driver.net.usb.bluetooth.UsbBluetoothDriver;
 
 /**
  * This class define driver finder for USB Wireless device.
- *
+ * 
  * @author fabien L.
  */
 public class UsbNetDeviceToDriverMapper implements DeviceToDriverMapper, UsbNetConstant {

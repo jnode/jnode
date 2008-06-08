@@ -65,8 +65,9 @@ public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNe
             }
         }
         if ((num_bulk_intr != 1) || (num_bulk_intr != 1) || (num_bulk_intr != 1)) {
-            throw new DriverException("Must have one bulk-in (" + num_bulk_in + "), one bulk out (" + num_bulk_out +
-                ") and one interrupt (" + num_bulk_intr + ") endpoints. Driver not bound.");
+            throw new DriverException("Must have one bulk-in (" + num_bulk_in +
+                    "), one bulk out (" + num_bulk_out + ") and one interrupt (" + num_bulk_intr +
+                    ") endpoints. Driver not bound.");
         }
         UsbBtDevice.setBulkInEndpoint(bulkInEndpoint[0]);
         UsbBtDevice.setBulkOutEndpoint(bulkOutEndpoint[0]);
@@ -76,7 +77,9 @@ public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNe
         intPipe.addListener(this);
         try {
             intPipe.open();
-            intData = new USBPacket(UsbBtDevice.getIntrInEndpoint().getDescriptor().getMaxPacketSize());
+            intData =
+                    new USBPacket(UsbBtDevice.getIntrInEndpoint().getDescriptor()
+                            .getMaxPacketSize());
             final USBRequest req = intPipe.createRequest(intData);
             intPipe.asyncSubmit(req);
         } catch (USBException e1) {
@@ -102,7 +105,7 @@ public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNe
     }
 
     public void requestCompleted(USBRequest request) {
-//		log.debug("Bluetooth Completed");
+        // log.debug("Bluetooth Completed");
         final byte[] data = intData.getData();
         StringBuffer buffer = new StringBuffer();
         buffer.append("Data received : ");
