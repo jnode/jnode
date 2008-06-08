@@ -62,13 +62,13 @@ public class _3c90xTxBuffer implements _3c90xConstants {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param rm
      */
     public _3c90xTxBuffer(ResourceManager rm) {
 
         // Create a large enough buffer
-        final int size = (DPD_SIZE + FRAME_SIZE) + 16 /*alignment*/;
+        final int size = (DPD_SIZE + FRAME_SIZE) + 16 /* alignment */;
         this.data = new byte[size];
         this.mem = rm.asMemoryResource(data);
 
@@ -90,8 +90,7 @@ public class _3c90xTxBuffer implements _3c90xConstants {
     /**
      * Initialize this ring to its default (empty) state
      */
-    public void initialize(SocketBuffer src)
-        throws IllegalArgumentException {
+    public void initialize(SocketBuffer src) throws IllegalArgumentException {
         // Setup the DPD
         final int dpdOffset = firstDPDOffset;
 
@@ -115,6 +114,6 @@ public class _3c90xTxBuffer implements _3c90xConstants {
      * Gets the address of the first DPD in this buffer.
      */
     public Address getFirstDPDAddress() {
-		return firstDPDAddress;
-	}
+        return firstDPDAddress;
+    }
 }

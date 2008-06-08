@@ -50,8 +50,8 @@ import org.jnode.util.TimeoutException;
 /**
  * @author epr
  */
-public abstract class Ne2000Core extends AbstractDeviceCore
-    implements IRQHandler, Ne2000Constants, EthernetConstants {
+public abstract class Ne2000Core extends AbstractDeviceCore implements IRQHandler, Ne2000Constants,
+        EthernetConstants {
 
     private static final int TX_PAGES = 6;
 
@@ -115,13 +115,8 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      * @param device
      * @param flags
      */
-    public Ne2000Core(
-        Ne2000PCIDriver driver,
-        ResourceOwner owner,
-        Device device,
-        Ne2000Flags flags)
+    public Ne2000Core(Ne2000PCIDriver driver, ResourceOwner owner, Device device, Ne2000Flags flags)
         throws ResourceNotFreeException, DriverException {
-
         final int irq = getIRQ(device, flags);
         this.driver = driver;
         this.flags = flags;
@@ -169,26 +164,14 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 
         if (flags.is16bit()) {
             this.hwAddress =
-                new EthernetAddress(
-                    saprom[0],
-                    saprom[2],
-                    saprom[4],
-                    saprom[6],
-                    saprom[8],
-                    saprom[10]);
+                    new EthernetAddress(saprom[0], saprom[2], saprom[4], saprom[6], saprom[8],
+                            saprom[10]);
         } else {
             this.hwAddress = new EthernetAddress(saprom, 0);
         }
 
-        log.debug(
-            "Found "
-                + flags.getName()
-                + " IRQ="
-                + irq
-                + ", IOBase=0x"
-                + NumberUtils.hex(iobase)
-                + ", MAC Address="
-                + hwAddress);
+        log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" +
+                NumberUtils.hex(iobase) + ", MAC Address=" + hwAddress);
     }
 
     /**
@@ -197,8 +180,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      * @param device
      * @param flags
      */
-    protected abstract int getIOBase(Device device, Ne2000Flags flags)
-        throws DriverException;
+    protected abstract int getIOBase(Device device, Ne2000Flags flags) throws DriverException;
 
     /**
      * Gets the number of IO-Addresses used by the given device
@@ -206,8 +188,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      * @param device
      * @param flags
      */
-    protected abstract int getIOLength(Device device, Ne2000Flags flags)
-        throws DriverException;
+    protected abstract int getIOLength(Device device, Ne2000Flags flags) throws DriverException;
 
     /**
      * Gets the IRQ used by the given device
@@ -215,8 +196,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      * @param device
      * @param flags
      */
-    protected abstract int getIRQ(Device device, Ne2000Flags flags)
-        throws DriverException;
+    protected abstract int getIRQ(Device device, Ne2000Flags flags) throws DriverException;
 
     /**
      * Initialize the device
@@ -254,13 +234,8 @@ public abstract class Ne2000Core extends AbstractDeviceCore
         setReg(NE_P0_RCR, NE_RXCONFIG);
         setReg(NE_P0_TCR, NE_TXCONFIG);
 
-        log.debug(
-            "Start receiving..rx_start="
-                + rx_start
-                + ", rx_end="
-                + rx_end
-                + ", tx_start="
-                + tx_start);
+        log.debug("Start receiving..rx_start=" + rx_start + ", rx_end=" + rx_end + ", tx_start=" +
+                tx_start);
     }
 
     /**
@@ -322,8 +297,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 
         int isr;
         int loops = 0;
-        while (((isr = getReg(NE_P0_ISR)) != 0)
-            && (loops < NE_MAX_ISR_LOOPS)) {
+        while (((isr = getReg(NE_P0_ISR)) != 0) && (loops < NE_MAX_ISR_LOOPS)) {
             loops++;
             // Receive
             if ((isr & NE_ISR_OVW) != 0) {
@@ -361,18 +335,12 @@ public abstract class Ne2000Core extends AbstractDeviceCore
         if (isr != 0) {
             setReg(NE_P0_CR, NE_CR_NODMA | NE_CR_PS0 | NE_CR_STA);
             if (loops >= NE_MAX_ISR_LOOPS) {
-                log.error(
-                    "Too much work in interrupt handler of "
-                        + flags.getName()
-                        + ", isr=0x"
-                        + NumberUtils.hex(isr, 2));
+                log.error("Too much work in interrupt handler of " + flags.getName() + ", isr=0x" +
+                        NumberUtils.hex(isr, 2));
                 setReg(NE_P0_ISR, NE_ISRCONFIG);
             } else {
-                log.error(
-                    "Unknown interrupt of "
-                        + flags.getName()
-                        + ", isr=0x"
-                        + NumberUtils.hex(isr, 2));
+                log.error("Unknown interrupt of " + flags.getName() + ", isr=0x" +
+                        NumberUtils.hex(isr, 2));
                 setReg(NE_P0_ISR, 0xFF);
             }
         }
@@ -416,8 +384,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
         final boolean mustResend;
         if (wasInTx) {
             final int isr = getReg(NE_P0_ISR);
-            final boolean txCompleted =
-                ((isr & (NE_ISR_TXE | NE_ISR_PTX)) != 0);
+            final boolean txCompleted = ((isr & (NE_ISR_TXE | NE_ISR_PTX)) != 0);
             mustResend = !txCompleted;
         } else {
             mustResend = false;
@@ -476,13 +443,15 @@ public abstract class Ne2000Core extends AbstractDeviceCore
         int curr = getReg(NE_P1_CURR);
         setReg(NE_P0_CR, NE_CR_PS0);
         if (curr == next) {
-            //log.debug("No valid packet, curr==next, rsr=0x" + NumberUtils.hex(rsr, 2) + ", curr=0x" + NumberUtils.hex(curr, 2));
+            //log.debug("No valid packet, curr==next, rsr=0x" + NumberUtils.hex(rsr, 2) + ", 
+            //curr=0x" + NumberUtils.hex(curr, 2));
             return false;
         }
 
         // Get the packet header
         final Ne2000PacketHeader hdr = getHeader(next);
-        //log.debug("curr=0x" + NumberUtils.hex(curr, 2) + ", next=0x" + NumberUtils.hex(next, 2) + ", hdr=" + hdr);
+        //log.debug("curr=0x" + NumberUtils.hex(curr, 2) + ", next=0x" + NumberUtils.hex(next, 2) + ",
+        //hdr=" + hdr);
         final int len = hdr.getLength();
         final byte[] bbuf = new byte[len + 1]; // +1, to allow 16-bit transfer
 
@@ -514,7 +483,8 @@ public abstract class Ne2000Core extends AbstractDeviceCore
             setReg(NE_P0_BOUND, nextBound);
         }
 
-        //log.debug("curr=" + curr + ", next=" + next + ", nextBound=" + nextBound + ", length=" + len + ", hdr.next=" + hdr.getNextPacketPage());
+        //log.debug("curr=" + curr + ", next=" + next + ", nextBound=" + nextBound + ", length=" + len + ",
+        //hdr.next=" + hdr.getNextPacketPage());
 
         // Process the packet
         try {
@@ -522,7 +492,8 @@ public abstract class Ne2000Core extends AbstractDeviceCore
         } catch (NetworkException ex) {
             log.error("Error in onReceive", ex);
         }
-        //log.debug("Received packet length:" + buf.getSize() + ", src:" + srcAddr + ", dst:" + dstAddr + ", data:\n" + NumberUtils.hex(buf.getBuffer(), buf.getBufferOffset(), buf.getSize()));
+        //log.debug("Received packet length:" + buf.getSize() + ", src:" + srcAddr + ", dst:" + dstAddr + ", 
+        //data:\n" + NumberUtils.hex(buf.getBuffer(), buf.getBufferOffset(), buf.getSize()));
         return true;
     }
 
@@ -564,11 +535,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      * @param dst
      * @param length
      */
-    private void getNicData(
-        int nicSrcAddress,
-        byte[] dst,
-        int dstOffset,
-        int length) {
+    private void getNicData(int nicSrcAddress, byte[] dst, int dstOffset, int length) {
 
         if (flags.is16bit()) {
             length = (length + 1) & ~1;
@@ -604,11 +571,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      * @param nicDstAddress
      * @param length
      */
-    protected void setNicData(
-        SocketBuffer skbuf,
-        int skbufOffset,
-        int nicDstAddress,
-        int length) {
+    protected void setNicData(SocketBuffer skbuf, int skbufOffset, int nicDstAddress, int length) {
 
         final int origLength = length;
         if (flags.is16bit()) {
@@ -686,24 +649,10 @@ public abstract class Ne2000Core extends AbstractDeviceCore
      */
     private int probeNicMemoryStart() throws DriverException {
         final SocketBuffer testBuf = new SocketBuffer();
-        final byte[] testData =
-            new byte[]{
-                (byte) 0x23,
-                (byte) 0x34,
-                (byte) 0x56,
-                (byte) 0xf3,
-                (byte) 0x72,
-                (byte) 0xa6,
-                (byte) 0xe2,
-                (byte) 0xa1,
-                (byte) 0x23,
-                (byte) 0x34,
-                (byte) 0x56,
-                (byte) 0xf3,
-                (byte) 0x72,
-                (byte) 0xa6,
-                (byte) 0xe2,
-                (byte) 0xa1};
+        final byte[] testData = new byte[] {
+            (byte) 0x23, (byte) 0x34, (byte) 0x56, (byte) 0xf3, (byte) 0x72,
+            (byte) 0xa6, (byte) 0xe2, (byte) 0xa1, (byte) 0x23, (byte) 0x34, (byte) 0x56,
+            (byte) 0xf3, (byte) 0x72, (byte) 0xa6, (byte) 0xe2, (byte) 0xa1};
         final byte[] returnData = new byte[testData.length];
         testBuf.append(testData, 0, testData.length);
 
@@ -719,22 +668,22 @@ public abstract class Ne2000Core extends AbstractDeviceCore
             //log.debug("Got (on page " + page + "): " + NumberUtils.hex(returnData, 0, returnData.length));
 
         }
-        throw new DriverException(
-            "Cannot find NIC memory of " + flags.getName());
+        throw new DriverException("Cannot find NIC memory of " + flags.getName());
     }
 
-    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length)
-        throws ResourceNotFreeException, DriverException {
+    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
+            final int low, final int length) throws ResourceNotFreeException, DriverException {
         try {
-            return (IOResource) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws ResourceNotFreeException {
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
+                public IOResource run() throws ResourceNotFreeException {
                     return rm.claimIOResource(owner, low, length);
-                    }});
-		} catch (ResourceNotFreeException ex) {
-		    throw ex;
+                }
+            });
+        } catch (ResourceNotFreeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new DriverException("Unknown exception", ex);
         }
-	    
-	}
+
+    }
 }

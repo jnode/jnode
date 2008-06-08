@@ -99,7 +99,8 @@ public interface _3c90xConstants {
     /**
      * Universal with Exception; pg 107   *
      */
-    public static final int regDmaCtrl_l = 0x20;              /** Universal with Exception; pg 106   **/
+    public static final int regDmaCtrl_l = 0x20;
+    /** Universal with Exception; pg 106   **/
     /**                                    **/
     public static final int regIntStatusAuto_w = 0x1e;
     /**
@@ -117,7 +118,8 @@ public interface _3c90xConstants {
     /**
      * 905B Revision Only                 *
      */
-    public static final int regCommandIntStatus_w = 0x0e;     /** Universal (Command Variations)     **/
+    public static final int regCommandIntStatus_w = 0x0e;
+    /** Universal (Command Variations)     **/
 
     /**
      * following are windowed registers *
@@ -251,7 +253,8 @@ public interface _3c90xConstants {
     /**
      * Universal with Exceptions; pg 125  *
      */
-    public static final int regResetMediaOptions_3_w = 0x08;  /** Media Options on B Revision;       **/
+    public static final int regResetMediaOptions_3_w = 0x08;
+    /** Media Options on B Revision;       **/
     /**
      * Reset Options on Non-B Revision    *
      */
@@ -263,7 +266,8 @@ public interface _3c90xConstants {
     /**
      * 905B Revision Only                 *
      */
-    public static final int regInternalConfig_3_l = 0x00;     /** Universal; different bit           **/
+    public static final int regInternalConfig_3_l = 0x00;
+    /** Universal; different bit           **/
     /**
      * definitions; pg 59                 *
      */

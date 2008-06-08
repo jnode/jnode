@@ -27,7 +27,6 @@ import org.jnode.plugin.ConfigurationElement;
 /**
  * @author Martin Husted Hartvig
  */
-
 public class BCM570xFlags implements Flags {
 
     private final String name;
@@ -46,10 +45,9 @@ public class BCM570xFlags implements Flags {
 
     /**
      * Create a new instance of the flags
-     *
+     * 
      * @param name
      */
-
     public BCM570xFlags(String name) {
         this.name = name;
     }
@@ -57,7 +55,6 @@ public class BCM570xFlags implements Flags {
     /**
      * Gets the name of the device
      */
-
     public String getName() {
         return name;
     }

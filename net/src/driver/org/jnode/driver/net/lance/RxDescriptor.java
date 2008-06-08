@@ -28,10 +28,10 @@ import org.jnode.system.MemoryResource;
  * @author Chris Cole
  */
 public class RxDescriptor extends Descriptor {
-    static final public int STATUS_FRAM = 0x2000;
-    static final public int STATUS_OFLO = 0x1000;
-    static final public int STATUS_CRC = 0x0800;
-    static final public int STATUS_BUFF = 0x0400;
+    public static final int STATUS_FRAM = 0x2000;
+    public static final int STATUS_OFLO = 0x1000;
+    public static final int STATUS_CRC = 0x0800;
+    public static final int STATUS_BUFF = 0x0400;
 
     public RxDescriptor(MemoryResource mem, int offset, int dataBufferOffset) {
         super(mem, offset, dataBufferOffset);
@@ -40,7 +40,7 @@ public class RxDescriptor extends Descriptor {
     }
 
     public SocketBuffer getPacket() {
-        //setOwnerSelf()
+        // setOwnerSelf()
         return new SocketBuffer();
     }
 

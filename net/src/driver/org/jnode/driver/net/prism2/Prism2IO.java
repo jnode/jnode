@@ -101,7 +101,7 @@ final class Prism2IO implements Prism2Constants {
      * @return the RESULT code.
      */
     final Result executeCommand(Command cmd, int cmdFlags, int parm0, int parm1, int parm2,
-                                Prism2CommandResponse response) throws TimeoutException {
+            Prism2CommandResponse response) throws TimeoutException {
         // Wait for the busy bit to clear
         waitUntilNotBusy();
 
@@ -167,8 +167,7 @@ final class Prism2IO implements Prism2Constants {
             }
         }
         ;
-        throw new TimeoutException("Prism2 still busy cmd=0x"
-            + NumberUtils.hex(getReg(CMD), 4));
+        throw new TimeoutException("Prism2 still busy cmd=0x" + NumberUtils.hex(getReg(CMD), 4));
     }
 
     /**
@@ -186,8 +185,8 @@ final class Prism2IO implements Prism2Constants {
             }
         }
         ;
-        throw new TimeoutException("Prism2 still busy evstat=0x"
-            + NumberUtils.hex(getReg(EVSTAT), 4));
+        throw new TimeoutException("Prism2 still busy evstat=0x" +
+                NumberUtils.hex(getReg(EVSTAT), 4));
     }
 
     /**
@@ -205,8 +204,8 @@ final class Prism2IO implements Prism2Constants {
             }
         }
         ;
-        throw new TimeoutException("Prism2 still busy offset=0x"
-            + NumberUtils.hex(getReg(OFFSET0), 4));
+        throw new TimeoutException("Prism2 still busy offset=0x" +
+                NumberUtils.hex(getReg(OFFSET0), 4));
     }
 
     /**
@@ -227,8 +226,8 @@ final class Prism2IO implements Prism2Constants {
             case CMD_ERR:
                 throw new DriverException("Command error");
             default:
-                throw new DriverException("Unknown result code 0x"
-                    + NumberUtils.hex(result.getCode(), 2));
+                throw new DriverException("Unknown result code 0x" +
+                        NumberUtils.hex(result.getCode(), 2));
         }
     }
 
@@ -242,8 +241,8 @@ final class Prism2IO implements Prism2Constants {
      * @param len       length of data to transfer in bytes
      * @throws DriverException
      */
-    final void copyFromBAP(int id, int offset, byte[] dst, int dstOffset,
-                           int len) throws DriverException {
+    final void copyFromBAP(int id, int offset, byte[] dst, int dstOffset, int len)
+        throws DriverException {
         // Prepare the BAP
         prepareBAP(id, offset);
 
@@ -270,8 +269,8 @@ final class Prism2IO implements Prism2Constants {
      * @param len       length of data to transfer in bytes
      * @throws DriverException
      */
-    final void copyToBAP(int id, int offset, byte[] src, int srcOffset,
-                         int len) throws DriverException {
+    final void copyToBAP(int id, int offset, byte[] src, int srcOffset, int len)
+        throws DriverException {
         // Prepare the BAP
         prepareBAP(id, offset);
 

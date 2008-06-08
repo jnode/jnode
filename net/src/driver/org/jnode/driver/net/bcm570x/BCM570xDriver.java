@@ -33,7 +33,6 @@ import org.jnode.system.ResourceNotFreeException;
 /**
  * @author Martin Husted Hartvig
  */
-
 public class BCM570xDriver extends BasicEthernetDriver {
 
     /**
@@ -45,7 +44,7 @@ public class BCM570xDriver extends BasicEthernetDriver {
 
     /**
      * Create new driver instance for this device
-     *
+     * 
      * @param flags
      */
     public BCM570xDriver(BCM570xFlags flags) {

@@ -31,12 +31,12 @@ final class Prism2InfoFrame implements Prism2Constants {
     /**
      * Length of the header of an Info frame.
      */
-    final static int HDR_LENGTH = 4;
+    static final int HDR_LENGTH = 4;
 
     /**
      * Maximum lenght on an Info frame
      */
-    final static int MAX_FRAME_LEN = BAP_DATALEN_MAX;
+    static final int MAX_FRAME_LEN = BAP_DATALEN_MAX;
 
     /**
      * Gets the framelength of an Info frame.

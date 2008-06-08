@@ -22,13 +22,11 @@
 package org.jnode.driver.net.bcm570x;
 
 /**
- * Driver constants to the RTL8139 ethernet card.
- * <p/>
- * Build with help of the donation from WebSprocket LLC
- *
+ * Driver constants to the RTL8139 ethernet card. <p/> Build with help of the
+ * donation from WebSprocket LLC
+ * 
  * @author Martin Husted Hartvig
  */
-
 public interface BCM570xConstants {
 
     public static final int MAX_MULTICAST_ADDR = 64;
@@ -45,8 +43,8 @@ public interface BCM570xConstants {
     public static final int REG_TX_ADDR0 = 0x20;
     public static final int REG_RX_BUF = 0x30;
     public static final int REG_RX_EARLY_CNT = 0x34; // 16-bit reg
-    public static final int REG_RX_EARLY_STA = 0x36; //  8-bit reg
-    public static final int REG_CHIPCMD = 0x37; //  8-bit reg
+    public static final int REG_RX_EARLY_STA = 0x36; // 8-bit reg
+    public static final int REG_CHIPCMD = 0x37; // 8-bit reg
     public static final int REG_RX_BUF_PTR = 0x38; // 16-bit reg
     public static final int REG_RX_BUF_CNT = 0x3A; // 16-bit reg
     public static final int CAPR = 0x38; // 16-bit reg
@@ -58,15 +56,15 @@ public interface BCM570xConstants {
     public static final int REG_RX_CONFIG = 0x44;
     public static final int REG_TIMER = 0x48;
     public static final int REG_RX_MISSED = 0x4C;
-    public static final int REG_CFG9346 = 0x50; //  8-bit reg
-    public static final int REG_CONFIG0 = 0x51; //  8-bit reg
-    public static final int REG_CONFIG1 = 0x52; //  8-bit reg
+    public static final int REG_CFG9346 = 0x50; // 8-bit reg
+    public static final int REG_CONFIG0 = 0x51; // 8-bit reg
+    public static final int REG_CONFIG1 = 0x52; // 8-bit reg
     public static final int REG_FLASH = 0x54;
-    public static final int MSR = 0x58; //  8-bit reg
-    public static final int REG_CONFIG3 = 0x59; //  8-bit reg
-    public static final int REG_MII_SMI = 0x5A; //  8-bit reg
+    public static final int MSR = 0x58; // 8-bit reg
+    public static final int REG_CONFIG3 = 0x59; // 8-bit reg
+    public static final int REG_MII_SMI = 0x5A; // 8-bit reg
     public static final int REG_CONFIG4 = 0x5a;
-    public static final int REG_HLT_CLK = 0x5B; //  8-bit reg
+    public static final int REG_HLT_CLK = 0x5B; // 8-bit reg
     public static final int REG_MULTI_INTR = 0x5C;
     public static final int REG_TX_SUMMARY = 0x60; // 16-bit reg
     public static final int BMCR = 0x62; // 16-bit reg
@@ -104,8 +102,9 @@ public interface BCM570xConstants {
     public int txFlag = TX_FIFO_THRESHOLD << 16;
 
     // accept broadcasts and runt packets, wrap around the buffer
-    public int rxConfig = (RX_DMA_BURST << 8) | (RX_FIFO_THRESHOLD << 13)
-        | (RX_RBLEN << 11) | RX_AR | RX_BCAST | RX_MYPHYS;
+    public int rxConfig =
+            (RX_DMA_BURST << 8) | (RX_FIFO_THRESHOLD << 13) | (RX_RBLEN << 11) | RX_AR | RX_BCAST |
+                    RX_MYPHYS;
     public static final int INTR_RX_OK = 0x0001;
     public static final int INTR_RX_ERR = 0x0002;
     public static final int INTR_TX_OK = 0x0004;
@@ -117,9 +116,9 @@ public interface BCM570xConstants {
     public static final int INTR_LEN_CHG = 0x2000;
     public static final int INTR_TIMEOUT = 0x4000;
     public static final int INTR_SYS_ERR = 0x8000;
-    public static final int INTR_MASK = (INTR_SYS_ERR | INTR_TIMEOUT
-        | INTR_LEN_CHG | INTR_RX_UNDERRUN | INTR_RX_BUF_OVRFLO
-        | INTR_RX_FIFO_OVRFLO | INTR_RX_ERR | INTR_RX_OK | INTR_TX_ERR | INTR_TX_OK);
+    public static final int INTR_MASK =
+            (INTR_SYS_ERR | INTR_TIMEOUT | INTR_LEN_CHG | INTR_RX_UNDERRUN | INTR_RX_BUF_OVRFLO |
+                    INTR_RX_FIFO_OVRFLO | INTR_RX_ERR | INTR_RX_OK | INTR_TX_ERR | INTR_TX_OK);
     public static final int CFG1_MMIO = 0x08;
     public static final int CFG1_PIO = 0x04;
     public static final int CSCR_LINKCHANGE = 0x800;
@@ -139,8 +138,7 @@ public interface BCM570xConstants {
     public static final int RX_BUF_SIZE = 8192 << RX_BUF_IDX;
     public static final int RX_BUF_WRAP_PAD = 2048;
     public static final int RX_BUF_EXTRA = 16; // extra room
-    public static final int TOTAL_RX_BUF_SIZE = RX_BUF_SIZE + RX_BUF_EXTRA
-        + RX_BUF_WRAP_PAD;
+    public static final int TOTAL_RX_BUF_SIZE = RX_BUF_SIZE + RX_BUF_EXTRA + RX_BUF_WRAP_PAD;
     public static final int RX_FRAMES = 32;
     public static final int MAX_ETH_FRAME_LEN = 1536;
 
@@ -148,7 +146,8 @@ public interface BCM570xConstants {
     public static final int RX_MAR = 0x8000; // Multicast address received
     public static final int RX_PAM = 0x4000; // Physical address matched
     public static final int RX_BAR = 0x2000; // Broadcast address received
-    public static final int RX_ISE = 0x0020; // Invalid symbol error (100B-TX)
+    public static final int RX_ISE = 0x0020; // Invalid symbol error
+                                                // (100B-TX)
     public static final int RX_RUNT = 0x0010; // runt packet
     public static final int RX_LONG = 0x0008; // long packet (>4k bytes)
     public static final int RX_CRC = 0x0004; // CRC error
@@ -185,7 +184,7 @@ public interface BCM570xConstants {
     public static final int udpChecksumChecked = (1 << 31);
 
     /**
-     * Timeout for autonegotiate in seconds
+     * Timeout for auto-negotiate in seconds
      */
     public static final int AUTO_NEGOTIATE_TIMEOUT = 15;
 }

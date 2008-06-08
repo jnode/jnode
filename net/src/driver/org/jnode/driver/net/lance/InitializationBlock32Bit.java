@@ -30,19 +30,14 @@ import org.jnode.util.NumberUtils;
  * @author Chris Cole
  */
 public class InitializationBlock32Bit {
-    static public final int INIT_BLOCK_SIZE = 0x1C;
+    public static final int INIT_BLOCK_SIZE = 0x1C;
 
     private MemoryResource mem;
     private int offset;
 
-    public InitializationBlock32Bit(
-        MemoryResource mem,
-        int offset,
-        short mode,
-        EthernetAddress physicalAddr,
-        long logicalAddr,
-        RxDescriptorRing rxRing,
-        TxDescriptorRing txRing) {
+    public InitializationBlock32Bit(MemoryResource mem, int offset, short mode,
+            EthernetAddress physicalAddr, long logicalAddr, RxDescriptorRing rxRing,
+            TxDescriptorRing txRing) {
 
         this.mem = mem;
         this.offset = offset;
@@ -76,13 +71,9 @@ public class InitializationBlock32Bit {
         out.debug("Intialization Block - 32 bit mode");
         for (int i = 0; i <= INIT_BLOCK_SIZE - 1; i += 4) {
             out.debug(
-                "0x"
-                    + NumberUtils.hex(
-                    mem.getAddress().toInt() + offset + i)
-                    + " : 0x"
-                    + NumberUtils.hex((byte) i)
-                    + " : 0x"
-                    + NumberUtils.hex(mem.getInt(offset + i)));
+                    "0x" + NumberUtils.hex(mem.getAddress().toInt() + offset + i) + 
+                    " : 0x" + NumberUtils.hex((byte) i) + 
+                    " : 0x" + NumberUtils.hex(mem.getInt(offset + i)));
         }
     }
 }

@@ -39,7 +39,7 @@ public class _3c90xFlags {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param name
      */
     public _3c90xFlags(String name) {
@@ -51,6 +51,5 @@ public class _3c90xFlags {
      */
     public String getName() {
         return name;
-	}
-
+    }
 }

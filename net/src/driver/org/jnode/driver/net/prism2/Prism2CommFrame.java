@@ -35,34 +35,33 @@ public class Prism2CommFrame implements Prism2Constants {
     /**
      * Length of the header of an communication frame.
      */
-    final static int HDR_LENGTH = 60;
+    static final int HDR_LENGTH = 60;
 
     /**
      * Offset in this frame of the 802.11 header
      */
-    final static int p80211HDR_OFF = 14;
+    static final int p80211HDR_OFF = 14;
 
     /**
      * Offset in this frame of the 802.3 header
      */
-    final static int p8023HDR_OFF = 46;
+    static final int p8023HDR_OFF = 46;
 
     /**
      * Maximum lenght on an communication frame
      */
-    final static int MAX_FRAME_LEN = BAP_DATALEN_MAX;
+    static final int MAX_FRAME_LEN = BAP_DATALEN_MAX;
 
     /**
      * Maximum length of a transmit buffer
      */
-    final static int MAX_TXBUF_LEN = HDR_LENGTH
-        + WirelessConstants.WLAN_DATA_MAXLEN
-        - WirelessConstants.WLAN_WEP_IV_LEN
-        - WirelessConstants.WLAN_WEP_ICV_LEN + 2;
+    static final int MAX_TXBUF_LEN =
+            HDR_LENGTH + WirelessConstants.WLAN_DATA_MAXLEN - WirelessConstants.WLAN_WEP_IV_LEN -
+                    WirelessConstants.WLAN_WEP_ICV_LEN + 2;
 
     /**
      * Gets the status field of a comm frame.
-     *
+     * 
      * @param src
      * @param srcOffset
      * @return
@@ -73,7 +72,7 @@ public class Prism2CommFrame implements Prism2Constants {
 
     /**
      * Gets the datalength field of a comm frame.
-     *
+     * 
      * @param src
      * @param srcOffset
      * @return
@@ -84,7 +83,7 @@ public class Prism2CommFrame implements Prism2Constants {
 
     /**
      * Sets the TxControl field.
-     *
+     * 
      * @param dst
      * @param dstOffset
      * @param txControl
@@ -95,7 +94,7 @@ public class Prism2CommFrame implements Prism2Constants {
 
     /**
      * Sets the Address1 field.
-     *
+     * 
      * @param dst
      * @param dstOffset
      * @param addr
@@ -106,7 +105,7 @@ public class Prism2CommFrame implements Prism2Constants {
 
     /**
      * Sets the Address2 field.
-     *
+     * 
      * @param dst
      * @param dstOffset
      * @param addr
@@ -117,7 +116,7 @@ public class Prism2CommFrame implements Prism2Constants {
 
     /**
      * Sets the Address3 field.
-     *
+     * 
      * @param dst
      * @param dstOffset
      * @param addr
@@ -125,5 +124,4 @@ public class Prism2CommFrame implements Prism2Constants {
     public static final void setAddress3(byte[] dst, int dstOffset, EthernetAddress addr) {
         addr.writeTo(dst, dstOffset + 30);
     }
-
 }
