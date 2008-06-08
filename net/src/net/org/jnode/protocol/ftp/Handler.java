@@ -31,11 +31,10 @@ import java.net.URLStreamHandler;
  */
 public class Handler extends URLStreamHandler {
 
-	/**
-	 * @see java.net.URLStreamHandler#openConnection(java.net.URL)
-	 */
-	protected URLConnection openConnection(URL url) throws IOException {
-		return new FTPURLConnection(url);
-	}
-
+    /**
+     * @see java.net.URLStreamHandler#openConnection(java.net.URL)
+     */
+    protected URLConnection openConnection(URL url) throws IOException {
+        return new FTPURLConnection(url);
+    }
 }

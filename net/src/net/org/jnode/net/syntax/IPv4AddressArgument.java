@@ -1,11 +1,8 @@
 package org.jnode.net.syntax;
 
-import java.net.InetAddress;
 import java.util.StringTokenizer;
 
-import org.jnode.driver.console.CompletionInfo;
 import org.jnode.net.ipv4.IPv4Address;
-
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.CommandSyntaxException;
@@ -18,8 +15,7 @@ import org.jnode.shell.syntax.CommandSyntaxException;
  */
 public class IPv4AddressArgument extends Argument<IPv4Address> {
 
-    public IPv4AddressArgument(String label, int flags,
-            String description) {
+    public IPv4AddressArgument(String label, int flags, String description) {
         super(label, flags, new IPv4Address[0], description);
     }
 

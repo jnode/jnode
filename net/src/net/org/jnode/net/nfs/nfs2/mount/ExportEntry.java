@@ -20,5 +20,4 @@ public class ExportEntry {
     public String getDirectory() {
         return directory;
     }
-
 }

@@ -41,43 +41,46 @@ import org.jnode.util.QueueProcessorThread;
  */
 public class NetPlugin extends Plugin {
 
-	/** The packet type manager */
-	private DefaultNetworkLayerManager ptm;
-	/** The processor for the packet queue */
-	private QueueProcessorThread<SocketBuffer> packetProcessorThread;
-	/** The NetAPI implementation */ 
-	private final VMNetAPI api;
+    /** The packet type manager */
+    private DefaultNetworkLayerManager ptm;
+    
+    /** The processor for the packet queue */
+    private QueueProcessorThread<SocketBuffer> packetProcessorThread;
+    
+    /** The NetAPI implementation */
+    private final VMNetAPI api;
 
-	/**
-	 * Create a new instance
-	 */
-	public NetPlugin(PluginDescriptor descriptor) {
-		super(descriptor);
-		ptm = new DefaultNetworkLayerManager(descriptor.getExtensionPoint("networkLayers"));
-		api = new NetAPIImpl(ptm);
-		packetProcessorThread = new QueueProcessorThread<SocketBuffer>("net-packet-processor", ptm.getQueue(), ptm);
-	}
+    /**
+     * Create a new instance
+     */
+    public NetPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
+        ptm = new DefaultNetworkLayerManager(descriptor.getExtensionPoint("networkLayers"));
+        api = new NetAPIImpl(ptm);
+        packetProcessorThread =
+                new QueueProcessorThread<SocketBuffer>("net-packet-processor", ptm.getQueue(), ptm);
+    }
 
-	/**
-	 * Start this plugin
-	 */
-	protected void startPlugin() throws PluginException {
-		try {
-			InitialNaming.bind(NetworkLayerManager.NAME, ptm);
-			packetProcessorThread.start();
-			VMNetUtils.setAPI(api, this);
-		} catch (NamingException ex) {
-			throw new PluginException(ex);
-		}
-	}
+    /**
+     * Start this plugin
+     */
+    protected void startPlugin() throws PluginException {
+        try {
+            InitialNaming.bind(NetworkLayerManager.NAME, ptm);
+            packetProcessorThread.start();
+            VMNetUtils.setAPI(api, this);
+        } catch (NamingException ex) {
+            throw new PluginException(ex);
+        }
+    }
 
-	/**
-	 * Stop this plugin
-	 */
-	protected void stopPlugin() throws PluginException {
-		VMNetUtils.resetAPI(this);
-		InitialNaming.unbind(NetworkLayerManager.NAME);
-		packetProcessorThread.stopProcessor();
-	}
+    /**
+     * Stop this plugin
+     */
+    protected void stopPlugin() throws PluginException {
+        VMNetUtils.resetAPI(this);
+        InitialNaming.unbind(NetworkLayerManager.NAME);
+        packetProcessorThread.stopProcessor();
+    }
 
 }

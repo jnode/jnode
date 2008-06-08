@@ -63,28 +63,22 @@ public class Mount1Client {
         this.protocol = protocol;
         this.uid = uid;
         this.gid = gid;
-
         rpcClientPool = new LinkedList<OncRpcClient>();
-
     }
 
     private OncRpcClient createRpcClient() throws OncRpcException, IOException {
-
-        OncRpcClient client = OncRpcClient.newOncRpcClient(host, MOUNT_CODE,
-                MOUNT_VERSION,
-                protocol == Protocol.UDP ? OncRpcProtocols.ONCRPC_UDP
-                        : OncRpcProtocols.ONCRPC_TCP);
+        OncRpcClient client =
+                OncRpcClient.newOncRpcClient(host, MOUNT_CODE, MOUNT_VERSION,
+                        protocol == Protocol.UDP ? OncRpcProtocols.ONCRPC_UDP
+                                : OncRpcProtocols.ONCRPC_TCP);
         client.setTimeout(10000);
         if (uid != -1 && gid != -1) {
             client.setAuth(new OncRpcClientAuthUnix("test", uid, gid));
         }
-
         return client;
     }
 
-    private synchronized OncRpcClient getRpcClient() throws OncRpcException,
-            IOException {
-
+    private synchronized OncRpcClient getRpcClient() throws OncRpcException, IOException {
         if (closed) {
             throw new IOException("The mount client it is closed");
         }
@@ -93,44 +87,30 @@ public class Mount1Client {
             return createRpcClient();
         } else {
             return rpcClientPool.remove(0);
-
         }
-
     }
 
-    private synchronized void releaseRpcClient(OncRpcClient client)
-            throws IOException {
-
+    private synchronized void releaseRpcClient(OncRpcClient client) throws IOException {
         if (closed) {
             throw new IOException("The mount client it is closed");
         }
-
         if (client != null) {
             rpcClientPool.add(client);
         }
-
     }
 
-    private void call(final int functionId, final XdrAble parameter,
-            final XdrAble result) throws MountException, IOException {
-
+    private void call(final int functionId, final XdrAble parameter, final XdrAble result)
+        throws MountException, IOException {
         int countCall = 0;
-
         OncRpcClient client = null;
 
         while (true) {
             try {
-
                 countCall++;
-
                 client = getRpcClient();
-
                 client.call(functionId, parameter, result);
-
                 break;
-
             } catch (Exception e) {
-
                 // if we receive an exception we will close the client and next
                 // time we will use another rpc client
                 if (client != null) {
@@ -147,14 +127,12 @@ public class Mount1Client {
                 }
 
                 if (e instanceof OncRpcException) {
-
                     if (countCall > 5) {
                         throw new MountException(e.getMessage(), e);
                     } else {
                         LOGGER
-                                .warn("An error occurs when nfs file system try to call the rpc method. Reason : "
-                                        + e.getMessage()
-                                        + ". It will try again");
+                                .warn("An error occurs when nfs file system try to call the rpc method. Reason : " +
+                                        e.getMessage() + ". It will try again");
                         continue;
                     }
 
@@ -163,15 +141,13 @@ public class Mount1Client {
                 }
 
             } finally {
-
                 if (client != null) {
                     try {
                         releaseRpcClient(client);
                     } catch (IOException e) {
-
+                        // ignore
                     }
                 }
-
             }
         }
     }
@@ -201,163 +177,107 @@ public class Mount1Client {
      *                 if an I/O error occurs.
      * @throws MountException
      */
-    public MountResult mount(final String path) throws IOException,
-            MountException {
-
+    public MountResult mount(final String path) throws IOException, MountException {
         XdrAble mountParameter = new Parameter() {
-
             public void xdrEncode(XdrEncodingStream xdrEncodingStream)
-                    throws OncRpcException, IOException {
+                throws OncRpcException, IOException {
                 xdrEncodingStream.xdrEncodeString(path);
             }
-
         };
 
         final MountResult result = new MountResult();
-
         XdrAble mountResult = new Result() {
-
             public void xdrDecode(XdrDecodingStream xdrDecodingStream)
-                    throws OncRpcException, IOException {
+                throws OncRpcException, IOException {
                 result.setFileHandle(readFileHandle(xdrDecodingStream));
-
             }
         };
-
         call(PROCEDURE_MOUNT, mountParameter, new ResultWithCode(mountResult));
-
         return result;
     }
 
-    public List<RemoteMountFileSystem> dump() throws IOException,
-            MountException {
-
-        final List<RemoteMountFileSystem> remoteMountFileSystemList = new ArrayList<RemoteMountFileSystem>();
-
+    public List<RemoteMountFileSystem> dump() throws IOException, MountException {
+        final List<RemoteMountFileSystem> remoteMountFileSystemList =
+                new ArrayList<RemoteMountFileSystem>();
         XdrAble dumpResult = new Result() {
-
             public void xdrDecode(XdrDecodingStream xdrDecodingStream)
-                    throws OncRpcException, IOException {
-
+                throws OncRpcException, IOException {
                 while (xdrDecodingStream.xdrDecodeBoolean()) {
-
                     String host = xdrDecodingStream.xdrDecodeString();
-                    String remoteDirectory = xdrDecodingStream
-                            .xdrDecodeString();
-
-                    RemoteMountFileSystem remoteMountFileSystem = new RemoteMountFileSystem(
-                            host, remoteDirectory);
-
+                    String remoteDirectory = xdrDecodingStream.xdrDecodeString();
+                    RemoteMountFileSystem remoteMountFileSystem =
+                            new RemoteMountFileSystem(host, remoteDirectory);
                     remoteMountFileSystemList.add(remoteMountFileSystem);
-
                 }
-
             }
-
         };
-
         call(PROCEDURE_DUMP, XdrVoid.XDR_VOID, dumpResult);
-
         return remoteMountFileSystemList;
     }
 
     public List<ExportEntry> export() throws IOException, MountException {
-
         final List<ExportEntry> exportEntryList = new ArrayList<ExportEntry>();
-
         XdrAble dumpResult = new Result() {
-
             public void xdrDecode(XdrDecodingStream xdrDecodingStream)
-                    throws OncRpcException, IOException {
-
+                throws OncRpcException, IOException {
                 while (xdrDecodingStream.xdrDecodeBoolean()) {
-
                     String path = readPath(xdrDecodingStream);
                     List<String> groupList = readGroup(xdrDecodingStream);
-
                     ExportEntry exportEntry = new ExportEntry(path, groupList);
-
                     exportEntryList.add(exportEntry);
-
                 }
-
             }
 
             private List<String> readGroup(XdrDecodingStream xdrDecodingStream)
-                    throws OncRpcException, IOException {
-
+                throws OncRpcException, IOException {
                 List<String> groupList = new ArrayList<String>();
-
                 while (xdrDecodingStream.xdrDecodeBoolean()) {
-
                     String group = readName(xdrDecodingStream);
-
                     groupList.add(group);
-
                 }
-
                 return groupList;
-
             }
-
         };
-
         call(PROCEDURE_EXPORT, XdrVoid.XDR_VOID, dumpResult);
-
         return exportEntryList;
     }
 
-    public void unmount(final String dirPath) throws IOException,
-            MountException {
-
+    public void unmount(final String dirPath) throws IOException, MountException {
         XdrAble mountParameter = new Parameter() {
-
             public void xdrEncode(XdrEncodingStream xdrEncodingStream)
-                    throws OncRpcException, IOException {
+                throws OncRpcException, IOException {
                 xdrEncodingStream.xdrEncodeString(dirPath);
             }
-
         };
-
         call(PROCEDURE_UNMOUNT, mountParameter, XdrVoid.XDR_VOID);
-
     }
 
     private String readPath(XdrDecodingStream xdrDecodingStream)
-            throws OncRpcException, IOException {
+        throws OncRpcException, IOException {
         return xdrDecodingStream.xdrDecodeString();
     }
 
     private String readName(XdrDecodingStream xdrDecodingStream)
-            throws OncRpcException, IOException {
+        throws OncRpcException, IOException {
         return xdrDecodingStream.xdrDecodeString();
     }
 
     private byte[] readFileHandle(XdrDecodingStream xdrDecodingStream)
-            throws OncRpcException, IOException {
+        throws OncRpcException, IOException {
         return xdrDecodingStream.xdrDecodeOpaque(Mount1Client.FILE_HANDLE_SIZE);
     }
 
     private abstract class Parameter implements XdrAble {
-
-        public void xdrDecode(XdrDecodingStream arg0) throws OncRpcException,
-                IOException {
-
+        public void xdrDecode(XdrDecodingStream arg0) throws OncRpcException, IOException {
         }
-
     }
 
     private abstract class Result implements XdrAble {
-
-        public void xdrEncode(XdrEncodingStream arg0) throws OncRpcException,
-                IOException {
-
+        public void xdrEncode(XdrEncodingStream arg0) throws OncRpcException, IOException {
         }
-
     }
 
     private class ResultWithCode implements XdrAble {
-
         private int resultCode;
         private XdrAble xdrAble;
 
@@ -365,64 +285,45 @@ public class Mount1Client {
             this.xdrAble = xdrAble;
         }
 
-        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException,
-                IOException {
+        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
         }
 
-        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException,
-                IOException {
+        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
             resultCode = xdr.xdrDecodeInt();
             if (resultCode == 0) {
                 xdrAble.xdrDecode(xdr);
             } else {
-                throw new OncRpcException(
-                        "An error occur when system try to mount . Error code it is "
-                                + resultCode);
+                throw new OncRpcException("An error occur when system try to mount. Error code: " +
+                        resultCode);
             }
-
         }
 
         public int getResultCode() {
             return resultCode;
         }
-
     }
 
     // TODO Remove the synch in the future
     public synchronized void close() throws IOException {
-
         closed = true;
-
         List<OncRpcException> exceptionList = new ArrayList<OncRpcException>();
-
         for (int i = 0; i < rpcClientPool.size(); i++) {
-
             OncRpcClient client = rpcClientPool.get(i);
             try {
                 client.close();
             } catch (OncRpcException e) {
                 exceptionList.add(e);
             }
-
         }
 
         if (exceptionList.size() != 0) {
-
             StringBuilder builder = new StringBuilder();
-            builder
-                    .append("An error occurs when the mount client close connections. Reason:");
-
+            builder.append("An error occurs when the mount client close connections. Reason:");
             for (int i = 0; i < exceptionList.size(); i++) {
-
                 builder.append(exceptionList.get(i).getMessage());
                 builder.append(".");
-
             }
-
             throw new IOException(builder.toString());
-
         }
-
     }
-
 }

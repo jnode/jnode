@@ -52,8 +52,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
         QueueProcessor<SocketBuffer>, ExtensionPointListener {
 
     /** My logger */
-    private static final Logger log = Logger
-            .getLogger(DefaultNetworkLayerManager.class);
+    private static final Logger log = Logger.getLogger(DefaultNetworkLayerManager.class);
 
     /** Registered packet types */
     private final HashMap<Integer, NetworkLayer> layers = new HashMap<Integer, NetworkLayer>();
@@ -81,7 +80,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
      * @param pt
      */
     protected synchronized void registerNetworkLayer(NetworkLayer pt)
-            throws LayerAlreadyRegisteredException {
+        throws LayerAlreadyRegisteredException {
         layers.put(pt.getProtocolID(), pt);
     }
 
@@ -110,10 +109,8 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
      * @param protocolID
      * @throws NoSuchProtocolException
      */
-    public NetworkLayer getNetworkLayer(int protocolID)
-            throws NoSuchProtocolException {
-        final NetworkLayer pt = (NetworkLayer) layers.get(new Integer(
-                protocolID));
+    public NetworkLayer getNetworkLayer(int protocolID) throws NoSuchProtocolException {
+        final NetworkLayer pt = (NetworkLayer) layers.get(new Integer(protocolID));
         if (pt == null) {
             throw new NoSuchProtocolException("protocolID " + protocolID);
         }
@@ -140,7 +137,6 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
     public synchronized void process(SocketBuffer skbuf) {
         try {
             final int protoID = skbuf.getProtocolID();
-            // log.debug("Processing packet for protocol " + protoID);
             final Device dev = skbuf.getDevice();
             if (dev == null) {
                 throw new NetworkException("Device not set on SocketBuffer");
@@ -149,8 +145,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
             try {
                 deviceAPI = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
             } catch (ApiNotFoundException ex) {
-                throw new NetworkException(
-                        "Device in SocketBuffer is not a network device");
+                throw new NetworkException("Device in SocketBuffer is not a network device");
             }
 
             // Find all the packettype that want to process the given packet
@@ -160,8 +155,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
                     pt.receive(skbuf, deviceAPI);
                 }
             } catch (NoSuchProtocolException ex) {
-                log.debug("No network layer handler for protocol 0x"
-                        + NumberUtils.hex(protoID, 4));
+                log.debug("No network layer handler for protocol 0x" + NumberUtils.hex(protoID, 4));
             }
         } catch (SocketException ex) {
             log.error("Cannot process packet", ex);
@@ -184,8 +178,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
             final Extension[] extensions = networkLayersEP.getExtensions();
             for (int i = 0; i < extensions.length; i++) {
                 final Extension ext = extensions[i];
-                final ConfigurationElement[] elements = ext
-                        .getConfigurationElements();
+                final ConfigurationElement[] elements = ext.getConfigurationElements();
                 for (int j = 0; j < elements.length; j++) {
                     configureLayer(layers, elements[j]);
                 }
@@ -198,8 +191,8 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
         final String className = element.getAttribute("class");
         if (className != null) {
             try {
-                final Class<?> cls = Thread.currentThread()
-                        .getContextClassLoader().loadClass(className);
+                final Class<?> cls =
+                        Thread.currentThread().getContextClassLoader().loadClass(className);
                 final NetworkLayer layer = (NetworkLayer) cls.newInstance();
                 layers.put(layer.getProtocolID(), layer);
             } catch (ClassNotFoundException ex) {
@@ -209,8 +202,8 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
             } catch (InstantiationException ex) {
                 log.error("Cannot instantiate networklayer class " + className);
             } catch (ClassCastException ex) {
-                log.error("Networklayer class " + className
-                        + " does not implement the NetworkLayer interface");
+                log.error("Networklayer class " + className +
+                        " does not implement the NetworkLayer interface");
             }
         }
     }

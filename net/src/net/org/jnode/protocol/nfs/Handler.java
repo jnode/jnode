@@ -42,25 +42,17 @@ public class Handler extends URLStreamHandler {
      * @see java.net.URLStreamHandler#openConnection(java.net.URL)
      */
     protected URLConnection openConnection(URL url) throws IOException {
-
         OncRpcPortmapClient client = null;
-
         int version = 0;
-
         try {
-
-            client = new OncRpcPortmapClient(InetAddress.getByName(url
-                    .getHost()), OncRpcProtocols.ONCRPC_TCP);
-
+            client = new OncRpcPortmapClient(
+                    InetAddress.getByName(url.getHost()), OncRpcProtocols.ONCRPC_TCP);
             OncRpcServerIdent[] servers = client.listServers();
-
             for (int i = 0; i < servers.length; i++) {
                 OncRpcServerIdent server = servers[i];
-
                 if (server.program == 100003 && server.version > version) {
                     version = server.version;
                 }
-
             }
         } catch (OncRpcException e) {
             throw new IOException(e);
@@ -69,22 +61,18 @@ public class Handler extends URLStreamHandler {
                 try {
                     client.close();
                 } catch (Exception e) {
+                    // ignore
                 }
             }
         }
 
         switch (version) {
-        case 2:
-        case 3:
-        case 4:
-
-            return new NFS2URLConnection(url);
-        default:
-            throw new IOException("The host " + url.getHost()
-                    + " doesn't have a nfs service .");
-
+            case 2:
+            case 3:
+            case 4:
+                return new NFS2URLConnection(url);
+            default:
+                throw new IOException("The host " + url.getHost() + " doesn't have a nfs service.");
         }
-
     }
-
 }

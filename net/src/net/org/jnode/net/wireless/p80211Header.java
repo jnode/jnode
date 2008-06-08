@@ -57,9 +57,8 @@ public class p80211Header {
      * @param address4
      * @param dataLength
      */
-    public p80211Header(int frameControl, int durationId,
-            EthernetAddress address1, EthernetAddress address2,
-            EthernetAddress address3, int sequenceControl,
+    public p80211Header(int frameControl, int durationId, EthernetAddress address1,
+            EthernetAddress address2, EthernetAddress address3, int sequenceControl,
             EthernetAddress address4) {
         this.frameControl = frameControl;
         this.durationId = durationId;

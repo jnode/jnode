@@ -45,9 +45,9 @@ import org.xbill.DNS.TextParseException;
  */
 public class ResolverImpl implements Resolver {
     // FIXME ... upgrade to a more recent version of xbill?
-    
+
     // FIXME ... this class looks like it is supposed to implement
-    // the Singleton pattern.  So how come the management methods
+    // the Singleton pattern. So how come the management methods
     // and a lot of the state is 'static'?
     private static ExtendedResolver resolver;
 
@@ -61,10 +61,8 @@ public class ResolverImpl implements Resolver {
         // FIXME should this come from a hosts file?
         hosts = new HashMap<String, ProtocolAddress[]>();
         final String localhost = "localhost";
-        ProtocolAddress[] protocolAddresses = 
-            new ProtocolAddress[] { new IPv4Address("127.0.0.1") };
+        ProtocolAddress[] protocolAddresses = new ProtocolAddress[] {new IPv4Address("127.0.0.1")};
         hosts.put(localhost, protocolAddresses);
-        
         resolvers = new HashMap<String, org.xbill.DNS.Resolver>();
     }
 
@@ -73,13 +71,13 @@ public class ResolverImpl implements Resolver {
 
     /**
      * Singleton
-     *
+     * 
      * @return the singleton of the resolver
      */
     public static Resolver getInstance() {
         if (res == null) {
             // FIXME ... do we REALLY have to do this???
-            AccessController.doPrivileged(new PrivilegedAction() {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     System.setProperty("dns.server", "127.0.0.1");
                     System.setProperty("dns.search", "localdomain");
@@ -100,16 +98,14 @@ public class ResolverImpl implements Resolver {
 
     /**
      * Add a dns server
-     *
+     * 
      * @param _dnsserver
      * @throws NetworkException
      */
-
-    public static void addDnsServer(ProtocolAddress _dnsserver)
-            throws NetworkException {
+    public static void addDnsServer(ProtocolAddress _dnsserver) throws NetworkException {
         try {
             if (resolver == null) {
-                final String[] server = new String[]{_dnsserver.toString()};
+                final String[] server = new String[] {_dnsserver.toString()};
                 try {
                     AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                         public Object run() throws Exception {
@@ -122,8 +118,7 @@ public class ResolverImpl implements Resolver {
                     Exception ee = x.getException();
                     if (ee instanceof UnknownHostException) {
                         throw (UnknownHostException) ee;
-                    }
-                    else {
+                    } else {
                         throw new RuntimeException(ee);
                     }
                 }
@@ -135,10 +130,8 @@ public class ResolverImpl implements Resolver {
 
         try {
             String key = _dnsserver.toString();
-
             if (!resolvers.containsKey(key)) {
                 SimpleResolver simpleResolver = new SimpleResolver(key);
-
                 resolver.addResolver(simpleResolver);
                 resolvers.put(key, simpleResolver);
             }
@@ -149,15 +142,13 @@ public class ResolverImpl implements Resolver {
 
     /**
      * removes a dns server
-     *
+     * 
      * @param _dnsserver
      */
     public static void removeDnsServer(ProtocolAddress _dnsserver) {
-
         if (resolver == null) {
             return;
         }
-
         String key = _dnsserver.toString();
         if (resolvers.containsKey(key)) {
             org.xbill.DNS.Resolver resolv = resolvers.remove(key);
@@ -171,7 +162,7 @@ public class ResolverImpl implements Resolver {
 
     /**
      * Get from hosts file.
-     *
+     * 
      * @param _hostname
      * @return
      */
@@ -188,84 +179,81 @@ public class ResolverImpl implements Resolver {
      *         least 1 address long.
      * @throws java.net.UnknownHostException
      */
-    public ProtocolAddress[] getByName(final String hostname)
-            throws UnknownHostException {
+    public ProtocolAddress[] getByName(final String hostname) throws UnknownHostException {
         if (hostname == null) {
             throw new UnknownHostException("null");
         }
         if (hostname.equals("*")) {
-            // FIXME ... why is this a special case?  Comment please or fix it.
+            // FIXME ... why is this a special case? Comment please or fix it.
             throw new UnknownHostException("*");
         }
         if (resolver == null) {
             throw new UnknownHostException(hostname);
         }
 
-        final PrivilegedExceptionAction action = new PrivilegedExceptionAction() {
-            public Object run() throws UnknownHostException {
-                ProtocolAddress[] protocolAddresses;
+        final PrivilegedExceptionAction<ProtocolAddress[]> action =
+                new PrivilegedExceptionAction<ProtocolAddress[]>() {
+                    public ProtocolAddress[] run() throws UnknownHostException {
+                        ProtocolAddress[] protocolAddresses;
 
-                // FIXME ... hard-wired policy that 'hosts' file would be consulted
-                // first.  Should be configurable.
-                protocolAddresses = getFromHostsFile(hostname);
-                if (protocolAddresses != null) {
-                    return protocolAddresses;
-                }
+                        // FIXME ... hard-wired policy that 'hosts' file would
+                        // be consulted
+                        // first. Should be configurable.
+                        protocolAddresses = getFromHostsFile(hostname);
+                        if (protocolAddresses != null) {
+                            return protocolAddresses;
+                        }
 
-                Lookup.setDefaultResolver(resolver);
+                        Lookup.setDefaultResolver(resolver);
 
-                final Lookup lookup;
-                try {
-                    lookup = new Lookup(hostname);
-                } catch (TextParseException e) {
-                    throw new UnknownHostException(hostname);
-                }
+                        final Lookup lookup;
+                        try {
+                            lookup = new Lookup(hostname);
+                        } catch (TextParseException e) {
+                            throw new UnknownHostException(hostname);
+                        }
 
-                lookup.run();
+                        lookup.run();
 
-                if (lookup.getResult() == Lookup.SUCCESSFUL) {
-                    final Record[] records = lookup.getAnswers();
-                    final int recordCount = records.length;
+                        if (lookup.getResult() == Lookup.SUCCESSFUL) {
+                            final Record[] records = lookup.getAnswers();
+                            final int recordCount = records.length;
 
-                    protocolAddresses = new ProtocolAddress[recordCount];
+                            protocolAddresses = new ProtocolAddress[recordCount];
 
-                    for (int i = 0; i < recordCount; i++) {
-                        final Record record = records[i];
-                        protocolAddresses[i] = new IPv4Address(record
-                                .rdataToString());
+                            for (int i = 0; i < recordCount; i++) {
+                                final Record record = records[i];
+                                protocolAddresses[i] = new IPv4Address(record.rdataToString());
+                            }
+                        } else {
+                            throw new UnknownHostException(lookup.getErrorString());
+                        }
+
+                        return protocolAddresses;
                     }
-                } else {
-                    throw new UnknownHostException(lookup.getErrorString());
-                }
-
-                return protocolAddresses;
-            }
-        };
+                };
         try {
-            return (ProtocolAddress[]) AccessController.doPrivileged(action);
+            return AccessController.doPrivileged(action);
         } catch (PrivilegedActionException ex) {
             if (ex.getException() instanceof UnknownHostException) {
                 throw (UnknownHostException) ex.getException();
             } else {
-                throw (UnknownHostException) new UnknownHostException()
-                        .initCause(ex.getException());
+                throw (UnknownHostException) new UnknownHostException().initCause(ex.getException());
             }
         }
     }
 
     /**
      * Gets the hostname of the given address.
-     *
+     * 
      * @param address
      * @return All hostnames of the given hostname. The returned array is at
      *         least 1 hostname long.
      * @throws java.net.UnknownHostException
      */
 
-    public String[] getByAddress(ProtocolAddress address)
-            throws UnknownHostException {
+    public String[] getByAddress(ProtocolAddress address) throws UnknownHostException {
         // FIXME ... implement this method properly.
         return new String[0];
     }
-
 }
