@@ -24,6 +24,7 @@ package org.jnode.net.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -74,7 +75,13 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
         throws SocketException, InterruptedException {
-        this.dst = new IPv4Address(ARG_HOST.getValue());
+        try {
+            this.dst = new IPv4Address(ARG_HOST.getAsInetAddress());
+        }
+        catch (UnknownHostException ex) {
+            err.println("Unknown host: " + ex.getMessage());
+            exit(1);
+        }
         final IPv4Header netHeader =
                 new IPv4Header(0, this.ttl, IPv4Constants.IPPROTO_ICMP, this.dst, 8);
         netHeader.setDontFragment(this.dontFragment);
