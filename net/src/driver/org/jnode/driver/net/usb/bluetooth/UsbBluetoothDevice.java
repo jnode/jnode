@@ -3,7 +3,6 @@ package org.jnode.driver.net.usb.bluetooth;
 import org.jnode.driver.bus.usb.SetupPacket;
 import org.jnode.driver.bus.usb.USBConstants;
 import org.jnode.driver.bus.usb.USBControlPipe;
-import org.jnode.driver.bus.usb.USBDataPipe;
 import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBEndPoint;
 import org.jnode.driver.bus.usb.USBException;
@@ -46,8 +45,8 @@ public class UsbBluetoothDevice implements USBConstants {
 
     public void testCommand() throws USBException {
         final USBControlPipe pipe = usbDevice.getDefaultControlPipe();
-        final USBRequest req =
-            pipe.createRequest(new SetupPacket(USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_DEVICE, 0x20, 0, 0, 0), null);
+        final USBRequest req = pipe.createRequest(
+                new SetupPacket(USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_DEVICE, 0x20, 0, 0, 0), null);
         pipe.syncSubmit(req, GET_TIMEOUT);
     }
 

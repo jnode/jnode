@@ -86,7 +86,8 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
     }
 
     /**
-     * @see org.jnode.driver.net.ethernet.spi.BasicEthernetDriver#newCore(org.jnode.driver.Device, org.jnode.driver.net.ethernet.spi.Flags)
+     * @see org.jnode.driver.net.ethernet.spi.BasicEthernetDriver#newCore(org.jnode.driver.Device, 
+     * org.jnode.driver.net.ethernet.spi.Flags)
      */
     protected final AbstractDeviceCore newCore(Device device, Flags flags)
         throws DriverException, ResourceNotFreeException {
@@ -100,7 +101,8 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
         throws DriverException, ResourceNotFreeException;
 
     /**
-     * @see org.jnode.driver.net.WirelessNetDeviceAPI#setAuthenticationMode(org.jnode.net.wireless.AuthenticationMode)
+     * @see org.jnode.driver.net.WirelessNetDeviceAPI#setAuthenticationMode(
+     * org.jnode.net.wireless.AuthenticationMode)
      */
     public void setAuthenticationMode(AuthenticationMode mode) throws NetworkException {
         try {

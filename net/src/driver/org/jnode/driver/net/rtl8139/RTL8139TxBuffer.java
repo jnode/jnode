@@ -64,7 +64,6 @@ public class RTL8139TxBuffer implements RTL8139Constants {
      */
 
     public RTL8139TxBuffer(ResourceManager rm) {
-
         // Create a large enough buffer
         final int size = (DPD_SIZE + FRAME_SIZE) + 16 /* alignment */;
         this.data = new byte[size];
@@ -87,8 +86,7 @@ public class RTL8139TxBuffer implements RTL8139Constants {
         // Copy the data from the buffer
         final int len = src.getSize();
         if (len > FRAME_SIZE) {
-            throw new IllegalArgumentException(
-                "Length must be <= ETH_FRAME_LEN");
+            throw new IllegalArgumentException("Length must be <= ETH_FRAME_LEN");
         }
 
         src.get(data, firstDPDOffset, 0, len);
@@ -98,6 +96,6 @@ public class RTL8139TxBuffer implements RTL8139Constants {
      * Gets the address of the first DPD in this buffer.
      */
     public Address getFirstDPDAddress() {
-		return firstDPDAddress;
-	}
+        return firstDPDAddress;
+    }
 }

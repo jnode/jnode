@@ -50,11 +50,12 @@ import org.jnode.util.TimeoutException;
 
 /**
  * Build with help of the donation from WebSprocket LLC
- *
+ * 
  * @author Martin Husted Hartvig
  */
 
-public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants, IRQHandler, EthernetConstants {
+public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants, IRQHandler,
+        EthernetConstants {
     /**
      * Start of IO address space
      */
@@ -90,7 +91,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
     /**
      * Is a transmission active?
      */
-    //private boolean tx_active;
+    // private boolean tx_active;
     private int txIndex;
     private int txAborted;
     private int txNumberOfPackets;
@@ -98,7 +99,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Create a new instance
-     *
+     * 
      * @param flags
      */
     public RTL8139Core(RTL8139Driver driver, ResourceOwner owner, PCIDevice device, Flags flags)
@@ -115,7 +116,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         this.iobase = getIOBase(device, this.flags);
 
         final int iolength = getIOLength(device, this.flags);
-        //    log.debug("RTL8139 driver iobase "+iobase+" irq "+irq);
+        // log.debug("RTL8139 driver iobase "+iobase+" irq "+irq);
 
         final ResourceManager rm;
 
@@ -162,8 +163,8 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         setReg32(REG_MAR0, 0);
         setReg32(REG_MAR0 + 4, 0);
 
-        log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" + NumberUtils.hex(iobase) +
-            ", MAC Address=" + hwAddress);
+        log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" +
+                NumberUtils.hex(iobase) + ", MAC Address=" + hwAddress);
     }
 
     private void powerUpDevice() {
@@ -183,12 +184,14 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
+            // FIXME
         }
 
         for (i = 0; i < REPEAT_TIMEOUT_COUNT; i++) {
             try {
                 Thread.sleep(GENERIC_WAIT_TIME);
             } catch (InterruptedException ex) {
+                // FIXME
             }
 
             if ((getReg8(REG_CHIPCMD) & CMD_RESET) == 0)
@@ -203,12 +206,14 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
+            // FIXME
         }
 
         for (i = 0; i < REPEAT_TIMEOUT_COUNT; i++) {
             try {
                 Thread.sleep(GENERIC_WAIT_TIME);
             } catch (InterruptedException ex) {
+                // FIXME
             }
 
             if ((getReg16(BMCR) & BMCR_RESET) == 0)
@@ -224,12 +229,14 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
+            // FIXME
         }
 
         for (i = 0; i < REPEAT_TIMEOUT_COUNT; i++) {
             try {
                 Thread.sleep(GENERIC_WAIT_TIME);
             } catch (InterruptedException ex) {
+                // FIXME
             }
 
             if ((getReg8(REG_CFG9346) & 0xc0) == 0)
@@ -253,7 +260,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     private void autoNegotiate() {
 
-        //boolean fullDuplex = false;
+        // boolean fullDuplex = false;
 
         // start auto negotiating
         setReg16(REG_INTR_MASK, INTR_MASK);
@@ -277,11 +284,13 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
+                // FIXME
             }
 
             bogusCount++;
             if (bogusCount >= AUTO_NEGOTIATE_TIMEOUT) {
-                log.debug("Bogus count: autonegotiating taking too long: " + Integer.toHexString(status));
+                log.debug("Bogus count: autonegotiating taking too long: " +
+                        Integer.toHexString(status));
                 break;
             }
             status = getReg16(BMSR);
@@ -299,24 +308,26 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         /* int lpar = */
         getReg16(NWAY_LPAR);
 
-        log.debug("MSR: " + Integer.toHexString(getReg8(MSR)) + " BMCR: " + Integer.toHexString(getReg16(BMCR)) +
-            " LPAR: " + Integer.toHexString(getReg16(NWAY_LPAR)));
+        log.debug("MSR: " + Integer.toHexString(getReg8(MSR)) + " BMCR: " +
+                Integer.toHexString(getReg16(BMCR)) + " LPAR: " +
+                Integer.toHexString(getReg16(NWAY_LPAR)));
 
-        // 	if (lpar == 0xffff) {
-        // 	} else if (((lpar & 0x0100) == 0x0100) || ((lpar & 0x00C0) == 0x0040)) {
-        // 	    fullDuplex = true;
-        // 	}
+        // if (lpar == 0xffff) {
+        // } else if (((lpar & 0x0100) == 0x0100) || ((lpar & 0x00C0) ==
+        // 0x0040)) {
+        // fullDuplex = true;
+        // }
 
-        // 	if (fullDuplex) rtl8139.write8(REG_CONFIG1, 0x60); // check
-        // 	else rtl8139.write8(REG_CONFIG1, 0x20);
+        // if (fullDuplex) rtl8139.write8(REG_CONFIG1, 0x60); // check
+        // else rtl8139.write8(REG_CONFIG1, 0x20);
 
         setReg8(REG_CFG9346, 0x00);
 
-        // 	if (fullDuplex) System.out.print("AutoNegotiation: Full Duplex ");
-        // 	else System.out.print("AutoNegotiation: Half Duplex ");
+        // if (fullDuplex) System.out.print("AutoNegotiation: Full Duplex ");
+        // else System.out.print("AutoNegotiation: Half Duplex ");
 
-        // 	if ((lpar & 0x0180) != 0) System.out.println("100 Mbps Mode");
-        // 	else System.out.println("10 Mbps Mode");
+        // if ((lpar & 0x0180) != 0) System.out.println("100 Mbps Mode");
+        // else System.out.println("10 Mbps Mode");
 
         return;
     }
@@ -397,7 +408,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Transmit the given buffer
-     *
+     * 
      * @param buf
      * @param timeout
      * @throws InterruptedException
@@ -407,24 +418,26 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         throws InterruptedException, TimeoutException {
         // Set the source address
         hwAddress.writeTo(buf, 6);
-        //tx_active = true;
+        // tx_active = true;
 
         txNumberOfPackets++;
         // Set the address of the txBuffer
 
         setReg32(REG_CFG9346, CFG9346_WE);
 
-        // this should be a bug fix, but looking (in Ethereal) at the packes send
+        // this should be a bug fix, but looking (in Ethereal) at the packes
+        // send
         // indicate on my card that this is not true
         // Martin
         /*
-           * if (txIndex == 0) { txBuffers[0].initialize(buf); setReg32(REG_TX_STATUS0, txFlag |
-           * buf.getSize());
-           *
-           * txBuffers[1].initialize(buf); setReg32(REG_TX_STATUS0 + 4, txFlag | buf.getSize());
-           *
-           * txIndex = 2; } else {
-           */
+         * if (txIndex == 0) { txBuffers[0].initialize(buf);
+         * setReg32(REG_TX_STATUS0, txFlag | buf.getSize());
+         * 
+         * txBuffers[1].initialize(buf); setReg32(REG_TX_STATUS0 + 4, txFlag |
+         * buf.getSize());
+         * 
+         * txIndex = 2; } else {
+         */
         txBuffers[txIndex].initialize(buf);
 
         setReg32(REG_TX_STATUS0 + 4 * txIndex, txFlag | buf.getSize());
@@ -432,14 +445,14 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         // Point to the next empty descriptor
         txIndex++;
         txIndex &= 3;
-        //    }
+        // }
 
         setReg32(REG_CFG9346, CFG9346_NORMAL);
     }
 
     /**
-     * Handle a given hardware interrupt. This method is called from the kernel with interrupts
-     * disabled. So keep and handling here as short as possible!
+     * Handle a given hardware interrupt. This method is called from the kernel
+     * with interrupts disabled. So keep and handling here as short as possible!
      */
     public void handleInterrupt(int irq) {
         int bogusCount = 20;
@@ -454,10 +467,9 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
             }
 
             // See if anything needs servicing
-            if ((status
-                & (INTR_RX_OK | INTR_RX_ERR | INTR_TX_OK | INTR_TX_ERR | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO |
-                INTR_TIMEOUT | INTR_SYS_ERR | INTR_RX_UNDERRUN | INTR_LEN_CHG))
-                == 0) {
+            if ((status & (INTR_RX_OK | INTR_RX_ERR | INTR_TX_OK | INTR_TX_ERR |
+                    INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO | INTR_TIMEOUT | INTR_SYS_ERR |
+                    INTR_RX_UNDERRUN | INTR_LEN_CHG)) == 0) {
                 break;
             }
 
@@ -485,11 +497,11 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
             }
 
             // Process the other errors
-            if ((status & (INTR_RX_ERR | INTR_TX_ERR | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO | INTR_TIMEOUT |
-                INTR_SYS_ERR | INTR_RX_UNDERRUN)) != 0) {
+            if ((status & (INTR_RX_ERR | INTR_TX_ERR | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO |
+                    INTR_TIMEOUT | INTR_SYS_ERR | INTR_RX_UNDERRUN)) != 0) {
                 errorInterrupt(status);
 
-                //        log.debug(" error Interupt "+status);
+                // log.debug(" error Interupt "+status);
             }
             if (--bogusCount < 0) {
                 setReg16(REG_INTR_STATUS, 0xffff);
@@ -504,33 +516,34 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         setReg32(REG_RX_MISSED, 0);
 
         if ((status & (INTR_RX_UNDERRUN | INTR_RX_BUF_OVRFLO | INTR_RX_FIFO_OVRFLO | INTR_RX_ERR)) != 0) {
-            //      rxErrors++;
+            // rxErrors++;
         }
         if ((status & INTR_RX_FIFO_OVRFLO) != 0) {
-            //    rxFifoOverflow++;
+            // rxFifoOverflow++;
         }
         if ((status & INTR_RX_UNDERRUN) != 0) {
-            //      rxUnderRun++;
+            // rxUnderRun++;
         }
         if ((status & INTR_RX_BUF_OVRFLO) != 0) {
-            //     rxBufferOverflow++;
-            //      rxBufferOverflow++;
+            // rxBufferOverflow++;
+            // rxBufferOverflow++;
             // following is needed to clear this interrupt
-            //      rxIndex = getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE;
+            // rxIndex = getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE;
             rxRing.setIndex(getReg16(REG_RX_BUF_CNT) % RX_BUF_SIZE);
             setReg16(REG_RX_BUF_PTR, rxRing.getIndex() - 16);
 
         }
         if ((status & INTR_SYS_ERR) != 0) {
+            // FIXME
         }
         if ((status & INTR_TIMEOUT) != 0) {
-            //      timeoutError++;
+            // timeoutError++;
         }
     }
 
     /*
-      * private void rxError(int status) {
-      */
+     * private void rxError(int status) {
+     */
 
     private void rxProcess(int status) {
         // Read all packets
@@ -568,9 +581,11 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
                     if (skbuf.getSize() > 0)
                         driver.onReceive(skbuf);
                 } catch (NetworkException e) {
-                    e.printStackTrace(); //To change body of catch statement use Options | File
+                    e.printStackTrace(); // To change body of catch statement
+                                            // use Options | File
                     // Templates.
                 } finally {
+                    // FIXME
                 }
             }
 
@@ -588,7 +603,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
                 return;
             }
             if ((txStatus & (TX_OWC | TX_TABT)) != 0) {
-                //        txErrors++;
+                // txErrors++;
                 if ((txStatus & TX_TABT) != 0) {
                     txAborted++;
                     // Setting clear abort bit will make the 8139
@@ -597,19 +612,19 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
                     return;
                 }
                 if ((txStatus & TX_CRS) != 0) {
-                    //          txCarrierErrors++;
+                    // txCarrierErrors++;
                 }
                 if ((txStatus & TX_OWC) != 0) {
-                    //		    System.out.println("TX window error");
-                    //          txWindowErrors++;
+                    // System.out.println("TX window error");
+                    // txWindowErrors++;
                 }
             } else {
                 if ((txStatus & TX_TUN) != 0) {
-                    //          txFifoErrors++;
+                    // txFifoErrors++;
                 }
-                //        txCollisions += ((txStatus & TX_NCC) >> 24);
-                //        txBytes += txStatus & 0x7ff;
-                //        txPackets++;
+                // txCollisions += ((txStatus & TX_NCC) >> 24);
+                // txBytes += txStatus & 0x7ff;
+                // txPackets++;
             }
             // txPendingQueue[txPending].free();
             txNumberOfPackets--;
@@ -621,7 +636,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Gets the first IO-Address used by the given device
-     *
+     * 
      * @param device
      * @param flags
      */
@@ -641,7 +656,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Gets the number of IO-Addresses used by the given device
-     *
+     * 
      * @param device
      * @param flags
      */
@@ -662,7 +677,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Gets the IRQ used by the given device
-     *
+     * 
      * @param device
      * @param flags
      */
@@ -675,7 +690,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Reads a 8-bit NIC register
-     *
+     * 
      * @param reg
      */
     protected final int getReg8(int reg) {
@@ -684,7 +699,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Reads a 16-bit NIC register
-     *
+     * 
      * @param reg
      */
     protected final int getReg16(int reg) {
@@ -693,7 +708,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Reads a 32-bit NIC register
-     *
+     * 
      * @param reg
      */
 
@@ -703,7 +718,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Writes a 8-bit NIC register
-     *
+     * 
      * @param reg
      * @param value
      */
@@ -714,7 +729,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Writes a 16-bit NIC register
-     *
+     * 
      * @param reg
      * @param value
      */
@@ -725,7 +740,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
     /**
      * Writes a 32-bit NIC register
-     *
+     * 
      * @param reg
      * @param value
      */
@@ -734,18 +749,19 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         io.outPortDword(iobase + reg, value);
     }
 
-    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length)
-        throws ResourceNotFreeException, DriverException {
+    private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
+            final int low, final int length) throws ResourceNotFreeException, DriverException {
         try {
-            return (IOResource) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws ResourceNotFreeException {
+            return AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction<IOResource>() {
+                public IOResource run() throws ResourceNotFreeException {
                     return rm.claimIOResource(owner, low, length);
-                    }});
-		} catch (ResourceNotFreeException ex) {
-		    throw ex;
+                }
+            });
+        } catch (ResourceNotFreeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new DriverException("Unknown exception", ex);
         }
-	    
-	}
+
+    }
 }

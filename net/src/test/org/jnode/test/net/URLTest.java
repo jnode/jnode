@@ -29,19 +29,19 @@ import java.net.URL;
  */
 public class URLTest {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-		final URL url = new URL((args.length > 0) ? args[0] : "http://192.168.200.1");
-		final InputStream is = url.openConnection().getInputStream();
-		try {
-			int ch;
-			final StringBuffer buf = new StringBuffer();
-			while ((ch = is.read()) >= 0) {
-				buf.append((char) ch);
-			}
-			System.out.println("Result:\n" + buf);
-		} finally {
-			is.close();
-		}
-	}
+        final URL url = new URL((args.length > 0) ? args[0] : "http://192.168.200.1");
+        final InputStream is = url.openConnection().getInputStream();
+        try {
+            int ch;
+            final StringBuffer buf = new StringBuffer();
+            while ((ch = is.read()) >= 0) {
+                buf.append((char) ch);
+            }
+            System.out.println("Result:\n" + buf);
+        } finally {
+            is.close();
+        }
+    }
 }

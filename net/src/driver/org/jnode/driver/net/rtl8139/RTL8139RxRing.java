@@ -29,7 +29,6 @@ import org.vmmagic.unboxed.Address;
 /**
  * @author Martin Husted Hartvig
  */
-
 public class RTL8139RxRing implements RTL8139Constants {
 
     private static final int UPD_SIZE = 16;
@@ -65,16 +64,14 @@ public class RTL8139RxRing implements RTL8139Constants {
 
     /**
      * Create a new instance
-     *
+     * 
      * @param nrFrames The number of complete ethernet frames in this ring.
      * @param rm
      */
 
     public RTL8139RxRing(int nrFrames, ResourceManager rm) {
-
         // Create a large enough buffer
-        final int size = TOTAL_RX_BUF_SIZE;// (nrFrames * (UPD_SIZE +
-        // FRAME_SIZE)) + 16/*alignment*/;
+        final int size = TOTAL_RX_BUF_SIZE;
         this.data = new byte[size];
         this.nrFrames = nrFrames;
         this.mem = rm.asMemoryResource(data);
@@ -105,7 +102,7 @@ public class RTL8139RxRing implements RTL8139Constants {
 
     /**
      * Sets the packet status of the UPD at the given index
-     *
+     * 
      * @param index
      * @param value The new pkt status value
      */
@@ -130,7 +127,6 @@ public class RTL8139RxRing implements RTL8139Constants {
      */
 
     public SocketBuffer getPacket(int _length) {
-
         final int updOffset = firstUPDOffset + index;
         final SocketBuffer skbuf = new SocketBuffer();
 
@@ -154,9 +150,9 @@ public class RTL8139RxRing implements RTL8139Constants {
 
     /**
      * Gets the number of frames of this ring
-	 */
+     */
 
-	public int getNrFrames() {
-		return nrFrames;
-	}
+    public int getNrFrames() {
+        return nrFrames;
+    }
 }
