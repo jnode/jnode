@@ -23,7 +23,7 @@ package org.jnode.net.wireless;
 
 /** Authentication modes */
 public enum AuthenticationMode {
-    
+
     /** Open system mode */
     OPENSYSTEM,
     /** Shared key mode */

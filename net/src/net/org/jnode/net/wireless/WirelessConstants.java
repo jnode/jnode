@@ -46,11 +46,9 @@ public interface WirelessConstants {
 
     public static final int WLAN_DATA_MAXLEN = 2312;
 
-    public static final int WLAN_A3FR_MAXLEN = (WLAN_HDR_A3_LEN
-            + WLAN_DATA_MAXLEN + WLAN_CRC_LEN);
+    public static final int WLAN_A3FR_MAXLEN = (WLAN_HDR_A3_LEN + WLAN_DATA_MAXLEN + WLAN_CRC_LEN);
 
-    public static final int WLAN_A4FR_MAXLEN = (WLAN_HDR_A4_LEN
-            + WLAN_DATA_MAXLEN + WLAN_CRC_LEN);
+    public static final int WLAN_A4FR_MAXLEN = (WLAN_HDR_A4_LEN + WLAN_DATA_MAXLEN + WLAN_CRC_LEN);
 
     public static final int WLAN_BEACON_FR_MAXLEN = (WLAN_HDR_A3_LEN + 334);
 

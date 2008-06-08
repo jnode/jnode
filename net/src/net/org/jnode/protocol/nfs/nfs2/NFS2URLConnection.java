@@ -31,34 +31,26 @@ import java.net.URLConnection;
  * @author Andrei Dore
  */
 public class NFS2URLConnection extends URLConnection {
-
     /**
      * @param url
      */
     public NFS2URLConnection(URL url) {
         super(url);
-
     }
 
     /**
      * @see java.net.URLConnection#getInputStream()
      */
     public InputStream getInputStream() throws IOException {
-
         return new NFS2InputStream(getURL());
-
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-
         return new NFS2OutputStream(getURL());
-
     }
 
     @Override
     public void connect() throws IOException {
-
     }
-
 }

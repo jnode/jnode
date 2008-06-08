@@ -61,8 +61,7 @@ public class NetAPIImpl implements VMNetAPI {
             final NetDeviceImpl netDeviceImpl = (NetDeviceImpl) netDevice;
             final NetDeviceAPI api = (NetDeviceAPI) netDeviceImpl.getDevice()
                     .getAPI(NetDeviceAPI.class);
-            final ProtocolAddressInfo info = api
-                    .getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+            final ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
 
             for (ProtocolAddress ipaddr : info.addresses()) {
                 if (sm != null) {
@@ -102,14 +101,11 @@ public class NetAPIImpl implements VMNetAPI {
      * @exception NullPointerException
      *                If the specified addess is null
      */
-    public VMNetDevice getByInetAddress(InetAddress addr)
-            throws SocketException {
-
+    public VMNetDevice getByInetAddress(InetAddress addr) throws SocketException {
         for (Device dev : DeviceUtils.getDevicesByAPI(NetDeviceAPI.class)) {
             try {
                 final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
-                final ProtocolAddressInfo info = api
-                        .getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+                final ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
                 if (info.contains(addr)) {
                     return new NetDeviceImpl(dev);
                 }
@@ -117,8 +113,7 @@ public class NetAPIImpl implements VMNetAPI {
                 // Ignore
             }
         }
-        throw new SocketException(
-                "no network interface is bound to such an IP address");
+        throw new SocketException("no network interface is bound to such an IP address");
     }
 
     /**
@@ -147,8 +142,7 @@ public class NetAPIImpl implements VMNetAPI {
         for (Device dev : devices) {
             try {
                 final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
-                final ProtocolAddressInfo addrInfo = api
-                        .getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+                final ProtocolAddressInfo addrInfo = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
                 if (addrInfo != null) {
                     final ProtocolAddress addr = addrInfo.getDefaultAddress();
                     if (addr != null) {
