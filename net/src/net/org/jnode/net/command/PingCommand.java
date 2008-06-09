@@ -77,11 +77,11 @@ public class PingCommand extends AbstractCommand implements ICMPListener {
         throws SocketException, InterruptedException {
         try {
             this.dst = new IPv4Address(ARG_HOST.getAsInetAddress());
-        }
-        catch (UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             err.println("Unknown host: " + ex.getMessage());
             exit(1);
         }
+        
         final IPv4Header netHeader =
                 new IPv4Header(0, this.ttl, IPv4Constants.IPPROTO_ICMP, this.dst, 8);
         netHeader.setDontFragment(this.dontFragment);
