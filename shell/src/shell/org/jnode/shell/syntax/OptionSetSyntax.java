@@ -39,7 +39,6 @@ import org.jnode.shell.CommandLine.Token;
  * </ol>
  * 
  * @author crawley@jnode.org
- *
  */
 public class OptionSetSyntax extends GroupSyntax {
     

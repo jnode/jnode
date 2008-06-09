@@ -22,6 +22,11 @@
 package org.jnode.shell.syntax;
 
 
+/**
+ * This class represents the micro-syntax for a sequence of other elements
+ * 
+ * @author crawley@jnode.org
+ */
 public class MuSequence extends MuSyntax {
     
     private final MuSyntax[] elements;

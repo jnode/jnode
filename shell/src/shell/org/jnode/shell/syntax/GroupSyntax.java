@@ -26,6 +26,13 @@ import java.util.Set;
 
 import org.jnode.nanoxml.XMLElement;
 
+/**
+ * This is the base class for Syntax classes that compose other Syntaxes.  The
+ * interesting behavior (e.g. the <code>prepare</code> method) is implemented
+ * in child classes.
+ * 
+ * @author crawley@jnode.org
+ */
 public abstract class GroupSyntax extends Syntax {
     private static Syntax MY_EMPTY = new EmptySyntax(null, null);
 

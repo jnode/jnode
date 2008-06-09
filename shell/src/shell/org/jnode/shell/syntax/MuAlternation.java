@@ -21,7 +21,11 @@
 
 package org.jnode.shell.syntax;
 
-
+/**
+ * This class represents the micro-syntax for a number of alternative elements.
+ * 
+ * @author crawley@jnode.org
+ */
 public class MuAlternation extends MuSyntax {
     
     private final MuSyntax[] alternatives;

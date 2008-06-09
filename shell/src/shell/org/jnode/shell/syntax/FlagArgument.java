@@ -23,6 +23,11 @@ package org.jnode.shell.syntax;
 
 import org.jnode.shell.CommandLine.Token;
 
+/**
+ * A flag argument accepts any token to indicate that it is present.
+ * 
+ * @author crawley@jnode.org
+ */
 public class FlagArgument extends Argument<Boolean> {
     
     public FlagArgument(String label, int flags, String description) {

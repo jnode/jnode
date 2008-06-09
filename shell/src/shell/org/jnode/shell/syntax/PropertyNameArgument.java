@@ -3,6 +3,13 @@ package org.jnode.shell.syntax;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
+
+/**
+ * This argument class accepts property names, with completion against the
+ * names in the System properties object.
+ * 
+ * @author crawley@jnode.org
+ */
 public class PropertyNameArgument extends Argument<String> {
     
     public PropertyNameArgument(String label, int flags, String description) {

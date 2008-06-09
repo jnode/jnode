@@ -21,6 +21,12 @@
 
 package org.jnode.shell.syntax;
 
+
+/**
+ * This class represents the micro-syntax for a fixed symbol.
+ * 
+ * @author crawley@jnode.org
+ */
 public class MuSymbol extends MuSyntax {
     
     private final String symbol;

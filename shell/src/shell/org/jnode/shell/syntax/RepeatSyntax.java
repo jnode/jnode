@@ -29,7 +29,6 @@ import org.jnode.nanoxml.XMLElement;
  * some number of times.
  * 
  * @author crawley@jnode.org
- *
  */
 public class RepeatSyntax extends GroupSyntax {
     
