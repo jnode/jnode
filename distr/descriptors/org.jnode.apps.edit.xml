@@ -25,4 +25,12 @@
   <extension point="org.jnode.shell.aliases">
       <alias name="edit"  class="org.jnode.apps.edit.EditCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="edit">
+      <optional description="Edit a file">
+        <argument argLabel="file" />
+      </optional>
+    </syntax>
+  </extension>
 </plugin>
