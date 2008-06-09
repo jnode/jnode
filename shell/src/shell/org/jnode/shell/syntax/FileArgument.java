@@ -81,7 +81,7 @@ public class FileArgument extends Argument<File> {
             for (String n : names) {
                 String name = prefix + n;
                 if (name.startsWith(partial)) {
-                    if (new File(f, name).isDirectory()) {
+                    if (new File(f, n).isDirectory()) {
                         name += File.separatorChar;
                         completion.addCompletion(name, true);
                     } else {

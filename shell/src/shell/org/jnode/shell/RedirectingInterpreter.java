@@ -32,7 +32,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
@@ -53,9 +54,6 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             return "redirecting";
         }
     };
-    
-    private static final FileArgument FILE_ARG = new FileArgument("?", null);
-
     
     public String getName() {
         return "redirecting";
@@ -123,7 +121,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                             throw new ShellSyntaxException("no filename after '<'");
                         } else if (completing && 
                                 (from == null || (!tokenizer.hasNext() && !wspAfter))) {
-                            return new ArgumentCompleter(FILE_ARG, from);
+                            return new ArgumentCompleter(
+                                    new FileArgument("?", Argument.MANDATORY, null), from);
                         }
                         continue;
                     } else if (token.token.equals(">")) {
@@ -132,7 +131,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                             throw new ShellSyntaxException("no filename after '>'");
                         } else if (completing && 
                                 (to == null || (!tokenizer.hasNext() && !wspAfter))) {
-                            return new ArgumentCompleter(FILE_ARG, to);
+                            return new ArgumentCompleter(
+                                    new FileArgument("?", Argument.MANDATORY, null), to);
                         }
                         continue;
                     } else if (token.token.equals("|")) {
@@ -281,8 +281,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                             desc.openedStreams.add(pipeIn);
                         } else {
                             // this stage has redirected stdin from a file ...
-                            // so go back and
-                            // replace the previous stage's pipeOut with devnull
+                            // so go back and replace the previous stage's 
+                            // pipeOut with devnull
                             CommandDescriptor prev = descs.get(stageNo - 1);
                             Closeable[] ps = prev.commandLine.getStreams();
                             try {
@@ -297,8 +297,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         // the previous stage has explicitly redirected stdout
                         if (in == CommandLine.DEFAULT_STDIN) {
                             // this stage hasn't redirected stdin, so we need to
-                            // give
-                            // it a NullInputStream to suck on.
+                            // give it a NullInputStream to suck on.
                             in = CommandLine.DEVNULL;
                         }
                     }

@@ -22,8 +22,7 @@
 package org.jnode.shell;
 
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.CompletionException;
+import org.jnode.shell.syntax.Argument;
 
 /**
  * This class wraps an old-style Argument as a Completable for use in a default syntax.
@@ -32,7 +31,7 @@ import org.jnode.shell.help.CompletionException;
  */
 public class ArgumentCompleter implements Completable {
     
-    private final Argument argument;
+    private final Argument<?> argument;
     private final CommandLine.Token token;
     
     /**
@@ -42,13 +41,12 @@ public class ArgumentCompleter implements Completable {
      * @param token a CommandLine.Token supplying a partial value,
      *     or <code>null</code>.
      */
-    public ArgumentCompleter(Argument argument, CommandLine.Token token) {
+    public ArgumentCompleter(Argument<?> argument, CommandLine.Token token) {
         this.argument = argument;
         this.token = token;
     }
 
-    public void complete(CompletionInfo completion, CommandShell shell)
-        throws CompletionException {
+    public void complete(CompletionInfo completion, CommandShell shell) {
         argument.complete(completion, token == null ? "" : token.token);
         if (token != null) {
             completion.setCompletionStart(token.start);
