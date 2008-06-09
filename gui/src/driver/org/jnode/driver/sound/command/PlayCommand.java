@@ -20,35 +20,58 @@
  */
  
 package org.jnode.driver.sound.command;
-import  org.jnode.driver.sound.speaker.SpeakerUtils;
-import  org.jnode.shell.help.Help;
-import  org.jnode.shell.help.Parameter;
-import  org.jnode.shell.help.Argument;
 
-/** Plays a song.
- *  @author Matt Paine
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.HashMap;
+
+import org.jnode.driver.sound.speaker.Note;
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.MappedArgument;
+
+/**
+ * This command plays a tune.
+ * 
+ * @author Matt Paine
  */
-public class PlayCommand
-{
+public class PlayCommand extends AbstractCommand {
+    
+    private static final HashMap<String, Note[]> TUNES = new HashMap<String, Note[]>();
+    
+    static {
+        TUNES.put("scale", SpeakerUtils.SCALE);
+        TUNES.put("aaf", SpeakerUtils.AAF);
+        TUNES.put("beep", SpeakerUtils.stdBeep);
+    }
+    
+    private static class TuneArgument extends MappedArgument<Note[]> {
+        public TuneArgument(String label, int flags, String description) {
+            super(label, flags, new Note[0][], TUNES, false, description);
+        }
 
-	public static final Help.Info HELP_INFO = new Help.Info("play",		//  The command name
-		"Plays a song",													//  description
-		new Parameter[]													//  The parameters
-		{
-			new Parameter(new Argument("aaf", "Plays Advance Australia Fair"), Parameter.OPTIONAL)
-		});
+        @Override
+        protected String argumentKind() {
+            return "tune";
+        }
+    }
+    
+    private final TuneArgument ARG_TUNE = new TuneArgument(
+            "tune", Argument.OPTIONAL, "The name of the tune to be played");
+    
+    public PlayCommand() {
+        super("Plays a tune");
+        registerArguments(ARG_TUNE);
+    }
 
-	/** The main method
-	 *  @param args The arguments for this command.
-	 **/
-	public static void main(String[] args)
-	{
-		if (args.length == 0)
-			SpeakerUtils.play (SpeakerUtils.SCALE);
+	public static void main(String[] args) throws Exception {
+	    new PlayCommand().execute(args);
+    }
 
-		else if ("aaf".equals(args[0]))
-			SpeakerUtils.play(SpeakerUtils.AAF);
-		else
-			SpeakerUtils.play(SpeakerUtils.SCALE);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+        Note[] tune = ARG_TUNE.isSet() ? ARG_TUNE.getValue() : SpeakerUtils.SCALE;
+        SpeakerUtils.play(tune);
 	}
 }

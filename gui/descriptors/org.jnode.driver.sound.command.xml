@@ -22,5 +22,15 @@
     <alias name="beep" class="org.jnode.driver.sound.command.BeepCommand"/>
     <alias name="play" class="org.jnode.driver.sound.command.PlayCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="beep">
+      <empty description="Play a system beep"/>
+    </syntax>
+    <syntax alias="play">
+      <empty description="Play a scale"/>
+      <option argLabel="tune" shortName="t" longName="tune" description="Play a tune"/>
+    </syntax>
+  </extension>
 
 </plugin>

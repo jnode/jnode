@@ -20,28 +20,30 @@
  */
  
 package org.jnode.driver.sound.command;
-import  org.jnode.driver.sound.speaker.SpeakerUtils;
-import  org.jnode.shell.help.Help;
-import  org.jnode.shell.help.Syntax;
 
-/** Plays a system beep.
- *  @author Matt Paine
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+
+/**
+ * This command plays a system beep.
+ * 
+ * @author Matt Paine
  */
-public class BeepCommand
-{
+public class BeepCommand extends AbstractCommand {
 
-	public static final Help.Info HELP_INFO = new Help.Info("beep",	//  The command name
-		new Syntax[]												//	The first syntax option
-		{
-			new Syntax("Plays a system beep")								//	No parameters
-		});
+    public BeepCommand() {
+        super("Plays a system beep");
+    }
 
-	/** The main method
-	 *  @param args The arguments for this command. NOTE: This command does not take any arguments.
-	 **/
-	public static void main(String[] args)
-	{
+    public static void main(String[] args) throws Exception {
+        new BeepCommand().execute(args);
+    }
 
-		SpeakerUtils.beep();
-	}
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+        SpeakerUtils.beep();
+    }
 }
