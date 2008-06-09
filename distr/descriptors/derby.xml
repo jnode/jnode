@@ -38,6 +38,21 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="derby" class="org.jnode.apps.derby.DerbyCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="derby">
+      <sequence description="Start or stop the derby db server">
+        <alternatives>
+          <option argLabel="start" longName="start"/>
+          <option argLabel="stop" longName="stop"/>
+        </alternatives>
+        <optionSet>
+          <option argLabel="home" longName="home" shortName="h"/>
+          <option argLabel="port" longName="port" shortName="p"/>
+        </optionSet>
+      </sequence>
+    </syntax>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="*" actions="read"/>
