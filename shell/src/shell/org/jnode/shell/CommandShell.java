@@ -380,7 +380,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public synchronized void setCommandInvoker(String name) throws IllegalArgumentException {
         if (!name.equals(this.invokerName)) {
             this.invoker = ShellUtils.createInvoker(name, this);
-            errPs.println("Switched to " + name + " invoker");
+            if (this.invokerName != null) {
+                outPs.println("Switched to " + name + " invoker");
+            }
             this.invokerName = name;
             System.setProperty(INVOKER_PROPERTY_NAME, name);
         }
@@ -389,7 +391,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public synchronized void setCommandInterpreter(String name) throws IllegalArgumentException {
         if (!name.equals(this.interpreterName)) {
             this.interpreter = ShellUtils.createInterpreter(name);
-            errPs.println("Switched to " + name + " interpreter");
+            if (this.interpreterName != null) {
+                outPs.println("Switched to " + name + " interpreter");
+            }
             this.interpreterName = name;
             System.setProperty(INTERPRETER_PROPERTY_NAME, name);
         }
