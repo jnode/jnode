@@ -27,4 +27,20 @@
       <alias name="levi"  class="org.jnode.apps.editor.LeviCommand"/>
       <alias name="lv"  class="org.jnode.apps.editor.LeviCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="leed">
+      <argument argLabel="file" description="Edit a file"/>
+    </syntax>
+    <syntax alias="le">
+      <argument argLabel="file" description="Edit a file"/>
+    </syntax>
+    <syntax alias="levi">
+      <argument argLabel="file" description="View a file"/>
+    </syntax>
+    <syntax alias="lv">
+      <argument argLabel="file" description="View a file"/>
+    </syntax>
+  </extension>
+  
 </plugin>

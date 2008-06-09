@@ -99,8 +99,8 @@ public class TextEditor implements KeyboardListener {
             System.out.println("No file.");
             return;
         }
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 try {
                     StringBuilder buf = new StringBuilder();
                     FileWriter fw = new FileWriter(file);
