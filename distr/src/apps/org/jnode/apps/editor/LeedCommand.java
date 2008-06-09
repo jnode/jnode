@@ -1,28 +1,37 @@
 package org.jnode.apps.editor;
 
 import java.io.File;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class LeedCommand {
-    static final FileArgument ARG_EDIT = new FileArgument("file", "the file to edit");
-    public static Help.Info HELP_INFO = new Help.Info(
-            "leed", "LEvi's EDitor\n   Ctrl-S - save\n   Ctrl-Q - quit",
-            new Parameter[]{new Parameter(ARG_EDIT, Parameter.MANDATORY)}
-    );
+public class LeedCommand extends AbstractCommand {
+    private final FileArgument ARG_EDIT = new FileArgument(
+            "file", Argument.MANDATORY, "the file to edit");
+    
+    public LeedCommand() {
+         super("LEvi's EDitor\n   Ctrl-S - save\n   Ctrl-Q - quit");
+         registerArguments(ARG_EDIT);
+    };
 
     public static void main(String[] args) throws Exception {
-        final ParsedArguments cmdLine = HELP_INFO.parse(args);
-        final File file = ARG_EDIT.getFile(cmdLine);
+        new LeedCommand().execute(args);
+    }
+    
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws Exception {
+        final File file = ARG_EDIT.getValue();
         if (file.isDirectory()) {
-            System.err.println(file + " is a directory");
+            err.println(file + " is a directory");
         } else {
-            TextEditor.main(new String[]{args[0]});
+            TextEditor.main(new String[]{file.toString()});
         }
     }
 }
