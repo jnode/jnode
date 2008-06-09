@@ -23,6 +23,11 @@ package org.jnode.shell.syntax;
 
 import org.jnode.nanoxml.XMLElement;
 
+/**
+ * A TokenSyntax matches a given string.
+ * 
+ * @author crawley@jnode.org
+ */
 public class TokenSyntax extends Syntax {
     
     private final String symbol;

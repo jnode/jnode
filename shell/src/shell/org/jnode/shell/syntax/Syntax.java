@@ -27,6 +27,14 @@ import java.util.Set;
 
 import org.jnode.nanoxml.XMLElement;
 
+/**
+ * This is the base class for the syntax elements that are used to specify concrete 
+ * command-line syntaxes for JNode commands.  The key method that a child class must
+ * implement is the <code>prepare</code> method that produces the MuSyntax tree that
+ * the MuParser uses when parsing or completing a command line.
+ * 
+ * @author crawley@jnode.org
+ */
 public abstract class Syntax {
     
     protected final String label;

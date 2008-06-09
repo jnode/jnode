@@ -24,6 +24,13 @@ package org.jnode.shell.syntax;
 import org.jnode.nanoxml.XMLElement;
 
 
+/**
+ * An OptionSyntax matches a short or long option (e.g. '-X' or '--xflag') followed by
+ * a value for the bound Argument.  If the bound Argument is a FlagArgument, the presence
+ * of the option string is sufficient.
+ * 
+ * @author crawley@jnode.org
+ */
 public class OptionSyntax extends ArgumentSyntax {
 
     private final String longOptName;

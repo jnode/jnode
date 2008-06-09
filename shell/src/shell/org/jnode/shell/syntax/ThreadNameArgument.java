@@ -27,7 +27,8 @@ import java.security.PrivilegedAction;
 import org.jnode.driver.console.CompletionInfo;
 
 /**
- * 
+ * This class accepts any string, but completes against the (flat) namespace of 
+ * existing threads
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author crawley@jnode.org

@@ -21,6 +21,12 @@
 
 package org.jnode.shell.syntax;
 
+
+/**
+ * This class represents the micro-syntax for setting an argument without matching any tokens.
+ * 
+ * @author crawley@jnode.org
+ */
 public class MuPreset extends MuSyntax {
     
     private final String argName;

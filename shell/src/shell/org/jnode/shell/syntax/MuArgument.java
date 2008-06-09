@@ -21,6 +21,12 @@
 
 package org.jnode.shell.syntax;
 
+
+/**
+ * This class represents the micro-syntax for an instance of an Argument.
+ * 
+ * @author crawley@jnode.org
+ */
 public class MuArgument extends MuSyntax {
     
     private final String argName;

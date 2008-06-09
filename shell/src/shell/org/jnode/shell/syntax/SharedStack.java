@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  * defers the actual copying until the active stack's size drops below the saved stack's 
  * size.
  * <p>
- * This class is not a complete Deque implementation.  It only implements the small subset of 
+ * This class is not a complete Deque implementation.  It only implements the subset of 
  * the interface that is required by MuParser.  
  * 
  * @author crawley@jnode.org

@@ -28,6 +28,11 @@ import java.security.PrivilegedAction;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
+/**
+ * This argument class performs completion against the file system namespace.
+ * 
+ * @author crawley@jnode.org
+ */
 public class FileArgument extends Argument<File> {
 
     public FileArgument(String label, int flags, String description) {

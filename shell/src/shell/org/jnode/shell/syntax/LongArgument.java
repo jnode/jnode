@@ -23,6 +23,7 @@ package org.jnode.shell.syntax;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
+
 /**
  * This Argument class accepts long values.  If instantiated with 'min' and 'max' values 
  * close together, it can perform completion.
