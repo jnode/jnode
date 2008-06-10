@@ -40,12 +40,24 @@
   	<import plugin="com.sun.tools.javac"/>
     <import plugin="org.apache.jakarta.commons.logging"/>
   	<import plugin="org.apache.jakarta.log4j"/>
-  	<import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
   	<import plugin="org.apache.tools.ant"/>
   </requires>
 
   <extension point="org.jnode.shell.aliases">
     <alias name="jetty" class="org.jnode.apps.jetty.JettyCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="jetty">
+      <sequence description="Run a jetty server">
+        <optionSet>
+          <option argLabel="port" longName="port" shortName="p"/>
+        </optionSet>
+        <argument argLabel="webapp"/>
+      </sequence>
+    </syntax>
   </extension>
 
   <extension point="org.jnode.security.permissions">
