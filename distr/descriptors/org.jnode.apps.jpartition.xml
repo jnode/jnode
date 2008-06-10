@@ -22,6 +22,7 @@
 
   <requires>
     <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
     <import plugin="org.jnode.fs.ext2"/>
     <import plugin="org.jnode.fs.fat"/>
     <import plugin="org.jnode.fs.jfat"/>
