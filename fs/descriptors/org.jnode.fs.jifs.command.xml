@@ -10,6 +10,7 @@
   <requires>
 	<import plugin="org.jnode.fs.jifs"/>
     <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
   </requires>
         
   <runtime>
@@ -20,6 +21,12 @@
   
   <extension point="org.jnode.shell.aliases">
     <alias name="jifs" class="org.jnode.fs.jifs.command.CreateJIFSCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="jifs">
+      <argument argLabel="action" description="Manage the JIFS filesystem plugin"/>
+    </syntax>
   </extension>
   
   <extension point="org.jnode.security.permissions">
