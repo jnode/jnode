@@ -47,19 +47,8 @@ import org.jnode.shell.syntax.EnumArgument;
  * @author crawley@jnode.org
  */
 public class DeviceCommand extends AbstractCommand {
-    private static final int START = 0;
-    private static final int STOP = 1;
-    private static final int RESTART = 2;
-    private static final int REMOVE = 3;
-
     private static enum Action {
-        start(START), stop(STOP), restart(RESTART), remove(REMOVE);
-
-        public final int no;
-
-        Action(int no) {
-            this.no = no;
-        }
+        start, stop, restart, remove;
     }
 
     private static class ActionArgument extends EnumArgument<Action> {
@@ -95,17 +84,17 @@ public class DeviceCommand extends AbstractCommand {
                 err.println("No target device specified");
                 exit(1);
             }
-            switch (ARG_ACTION.getValue().no) {
-                case RESTART:
+            switch (ARG_ACTION.getValue()) {
+                case restart:
                     restartDevice(ARG_DEVICE.getValue());
                     break;
-                case START:
+                case start:
                     startDevice(ARG_DEVICE.getValue());
                     break;
-                case STOP:
+                case stop:
                     stopDevice(ARG_DEVICE.getValue());
                     break;
-                case REMOVE:
+                case remove:
                     removeDevice(ARG_DEVICE.getValue());
                     break;
             }
