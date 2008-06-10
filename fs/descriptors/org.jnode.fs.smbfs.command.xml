@@ -7,9 +7,9 @@
         license-name="lgpl"
         provider-name="JNode.org">
         
-        
   <requires>
     <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
     <import plugin="org.jnode.fs.smbfs"/>
   </requires>
         
@@ -21,6 +21,20 @@
   
   <extension point="org.jnode.shell.aliases">
     <alias name="smbmount" class="org.jnode.fs.smbfs.command.SMBMountCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="smbmount">
+      <sequence description="mount an SMB file system">
+        <argument argLabel="directory"/>
+        <argument argLabel="host"/>
+        <argument argLabel="path"/>
+        <argument argLabel="username"/>
+        <optional>
+          <argument argLabel="password"/>
+        </optional>
+      </sequence>
+    </syntax>
   </extension>
   
   <extension point="org.jnode.security.permissions">

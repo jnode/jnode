@@ -21,10 +21,12 @@
 
 package org.jnode.fs.smbfs.command;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.DriverException;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.smbfs.SMBFSDevice;
 import org.jnode.fs.smbfs.SMBFSDriver;
@@ -33,49 +35,74 @@ import org.jnode.fs.smbfs.SMBFileSystemType;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.HostNameArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
 public class SMBMountCommand extends AbstractCommand {
-    private static final FileArgument MOUNTPOINT_ARG = new FileArgument("directory", "the mountpoint");
-    private static final Argument HOST_ARG = new Argument("host", "Samba host");
-    private static final Argument PATH_ARG = new Argument("path", "Samba path");
-    private static final Argument USERNAME_ARG = new Argument("username", "Samba user");
-    private static final Argument PASSWORD_ARG = new Argument("password", "Samba password");
-    static Help.Info HELP_INFO = new Help.Info("mount", "Mount a Samba filesystem",
-        new Parameter[]{new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
-            new Parameter(HOST_ARG, Parameter.MANDATORY),
-            new Parameter(PATH_ARG, Parameter.MANDATORY),
-            new Parameter(USERNAME_ARG, Parameter.MANDATORY),
-            new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
+    private final FileArgument MOUNTPOINT_ARG = 
+        new FileArgument("directory", Argument.MANDATORY, "the mountpoint");
+    private final HostNameArgument HOST_ARG = 
+        new HostNameArgument("host", Argument.MANDATORY, "Samba host");
+    private final StringArgument PATH_ARG = 
+        new StringArgument("path", Argument.MANDATORY, "Samba path");
+    private static final StringArgument USERNAME_ARG = 
+        new StringArgument("username", Argument.MANDATORY, "Samba user");
+    private static final StringArgument PASSWORD_ARG = 
+        new StringArgument("password", Argument.OPTIONAL, "Samba password");
+    
+    public SMBMountCommand() {
+        super("Mount a Samba filesystem");
+        registerArguments(MOUNTPOINT_ARG, HOST_ARG, PATH_ARG, USERNAME_ARG, PASSWORD_ARG);
+    }
 
     public static void main(String[] args) throws Exception {
         new SMBMountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-
-        final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
-        final String host = HOST_ARG.getValue(cmdLine);
-        final String path = PATH_ARG.getValue(cmdLine);
-        final String user = USERNAME_ARG.getValue(cmdLine);
-        final String password = PASSWORD_ARG.getValue(cmdLine);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+        throws Exception {
+        final File mountPoint = MOUNTPOINT_ARG.getValue();
+        final String host = HOST_ARG.getValue();
+        final String path = PATH_ARG.getValue();
+        final String user = USERNAME_ARG.getValue();
+        final String password = PASSWORD_ARG.getValue();
+        
+        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+        SMBFileSystemType type = fss.getFileSystemType(SMBFileSystemType.ID);
+        
         final SMBFSDevice dev = new SMBFSDevice(host, path, user, password);
         dev.setDriver(new SMBFSDriver());
         final DeviceManager dm = DeviceUtils.getDeviceManager();
         dm.register(dev);
-        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        SMBFileSystemType type = fss.getFileSystemType(SMBFileSystemType.ID);
-        final SMBFileSystem fs = type.create(dev, true);
-        fss.registerFileSystem(fs);
-        fss.mount(mount_point, fs, null);
+        
+        // This controls whether we attempt to undo the effects of the command
+        // e.g. when the 'mount' step fails.
+        boolean ok = false;
+        try {
+            final SMBFileSystem fs = type.create(dev, true);
+            fss.registerFileSystem(fs);
+            try {
+                fss.mount(mountPoint.toString(), fs, null);
+                ok = true;
+            } finally {
+                if (!ok) {
+                    fss.unregisterFileSystem(dev);
+                }
+            }
+        } finally {
+            try {
+                if (!ok) {
+                    dm.unregister(dev);
+                }
+            } catch (DriverException ex) {
+                // ignore
+            }
+        }
     }
 }
