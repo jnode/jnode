@@ -35,10 +35,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
-public final class Rubik extends JPanel {
+public final class Rubik extends JComponent {
     int i, j, k, n, o, p, q, lastX, lastY, dx, dy;
     int rectX[], rectY[];
     Color colList[], bgcolor;
@@ -73,8 +74,16 @@ public final class Rubik extends JPanel {
     public void init() {
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         setFocusable(true);
+        enableEvents(AWTEvent.FOCUS_EVENT_MASK);
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent event) {
+                if (SwingUtilities.isLeftMouseButton(event)) {
+                    if (Rubik.this.contains(event.getX(), event.getY())) {
+                        if (!Rubik.this.hasFocus() && Rubik.this.isRequestFocusEnabled()) {
+                            Rubik.this.requestFocus();
+                        }
+                    }
+                }
                 Rubik.this.mousePressed(event.getX(), event.getY());
             }
 
