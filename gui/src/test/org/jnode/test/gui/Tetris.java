@@ -21,6 +21,7 @@
 
 package org.jnode.test.gui;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,15 +29,17 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Random;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class Tetris extends JPanel implements KeyListener {
+public class Tetris extends JComponent implements KeyListener, MouseListener {
     private static final int[][][][] BLOCKS = {
         // * * *
         //   *
@@ -154,6 +157,12 @@ public class Tetris extends JPanel implements KeyListener {
             }
         }
         addKeyListener(this);
+        addMouseListener(this);
+        setFocusable(true);
+        setRequestFocusEnabled(true);
+        enableEvents(AWTEvent.FOCUS_EVENT_MASK);
+        enableEvents(AWTEvent.KEY_EVENT_MASK);
+        enableEvents(AWTEvent.MOUSE_EVENT_MASK);
     }
 
     private int darken(int i) {
@@ -445,10 +454,38 @@ public class Tetris extends JPanel implements KeyListener {
         return DIM;
     }
 
+    public void mousePressed(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            if (this.contains(e.getX(), e.getY())) {
+                if (!this.hasFocus() && this.isRequestFocusEnabled()) {
+                    this.requestFocus();
+                }
+            }
+        }
+    }
+
     public void keyReleased(KeyEvent e) {
+
     }
 
     public void keyTyped(KeyEvent e) {
+
+    }
+
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    public void mouseReleased(MouseEvent e) {
+
     }
 
     public static void main(final String[] argv) {

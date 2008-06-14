@@ -1,16 +1,5 @@
 package org.jnode.driver.textscreen.swing;
 
-import org.jnode.driver.Bus;
-import org.jnode.driver.Device;
-import org.jnode.driver.Driver;
-import org.jnode.driver.DriverException;
-import org.jnode.driver.input.*;
-import org.jnode.driver.textscreen.TextScreen;
-import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
-
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,10 +7,32 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import org.jnode.driver.Bus;
+import org.jnode.driver.Device;
+import org.jnode.driver.Driver;
+import org.jnode.driver.DriverException;
+import org.jnode.driver.input.KeyboardAPI;
+import org.jnode.driver.input.KeyboardEvent;
+import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.input.PointerAPI;
+import org.jnode.driver.input.PointerEvent;
+import org.jnode.driver.input.PointerListener;
+import org.jnode.driver.textscreen.TextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 
 /**
  * A Swing based emulator for PcTextScreen.
@@ -44,21 +55,21 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     public SwingPcTextScreen() {
         super(SCREEN_WIDTH, SCREEN_HEIGHT);
         buffer = new char[SCREEN_WIDTH * SCREEN_HEIGHT];
-        for (int i = 0; i < buffer.length; i ++) {
+        for (int i = 0; i < buffer.length; i++) {
             buffer[i] = ' ';
         }
 
         screen = new SwingPcScreen();
     }
 
-    public void close(){
+    public void close() {
         screen.removeKeyListener(keyListener);
         screen.removeMouseListener(mouseListener);
         screen.removeMouseMotionListener(mouseListener);
         screen.removeMouseWheelListener(mouseListener);
     }
 
-    public JComponent getScreenComponent(){
+    public JComponent getScreenComponent() {
         return screen;
     }
 
@@ -68,12 +79,26 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         int h;
 
         {
-            Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
+            Font font = new Font(
+                "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN,
+                12);
             //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
             //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--14-100-100-100-P-79-FontSpecific", Font.PLAIN, 12);
             //Font font = Font.decode("MONOSPACED-PLAIN-14");
             setFont(font);
             enableEvents(AWTEvent.KEY_EVENT_MASK);
+            enableEvents(AWTEvent.FOCUS_EVENT_MASK);
+            addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        if (contains(e.getX(), e.getY())) {
+                            if (!hasFocus() && isRequestFocusEnabled()) {
+                                requestFocus();
+                            }
+                        }
+                    }
+                }
+            });
             setFocusable(true);
             setBackground(Color.BLACK);
             Set ftk = new HashSet(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
@@ -89,11 +114,11 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
                 int offset = i * SCREEN_WIDTH;
                 int lenght = SCREEN_WIDTH;
                 if (offset <= cursorOffset && cursorOffset < offset + SCREEN_WIDTH) {
-                	FontMetrics fm = getFontMetrics(getFont());
-                	int x = margin + fm.charsWidth(buffer, offset, cursorOffset - offset);
-                	int y = h + i * h;
-                	int width = fm.charWidth(buffer[cursorOffset]);
-                	g.drawLine(x, y, x+width, y);
+                    FontMetrics fm = getFontMetrics(getFont());
+                    int x = margin + fm.charsWidth(buffer, offset, cursorOffset - offset);
+                    int y = h + i * h;
+                    int width = fm.charWidth(buffer[cursorOffset]);
+                    g.drawLine(x, y, x + width, y);
                 }
                 g.drawChars(buffer, offset, lenght, margin, h + i * h);
 
@@ -131,7 +156,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
                     KeyboardEvent k = new KeyboardEvent(KeyEvent.KEY_PRESSED,
-                            e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
+                        e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
                     keyboardDriver.dispatchEvent(k);
 
                 }
@@ -140,7 +165,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
                     KeyboardEvent k = new KeyboardEvent(KeyEvent.KEY_RELEASED,
-                            e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
+                        e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
                     keyboardDriver.dispatchEvent(k);
                 }
             };
@@ -189,7 +214,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         }
     }
 
-    public Device getPointerDevice(){
+    public Device getPointerDevice() {
         if (pointerDevice == null) {
             pointerDriver = new MyPointerDriver();
             mouseListener = new MouseHandler();
@@ -224,7 +249,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         char[] cha = new char[ch.length];
-        for (int i = 0; i < cha.length; i ++) {
+        for (int i = 0; i < cha.length; i++) {
             char c = (char) (ch[i] & 0xFF);
             cha[i] = c == 0 ? ' ' : c;
         }
@@ -234,7 +259,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
         char[] cha = new char[ch.length];
-        for (int i = 0; i < cha.length; i ++) {
+        for (int i = 0; i < cha.length; i++) {
             char c = (char) (ch[i] & 0xFF);
             cha[i] = c == 0 ? ' ' : c;
         }
@@ -280,7 +305,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             //Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
         }
         char[] cha = new char[rawData.length];
-        for (int i = 0; i < cha.length; i ++) {
+        for (int i = 0; i < cha.length; i++) {
             char c = (char) (rawData[i] & 0xFF);
             cha[i] = c == 0 ? ' ' : c;
         }

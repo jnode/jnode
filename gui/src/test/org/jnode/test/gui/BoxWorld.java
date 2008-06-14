@@ -21,6 +21,7 @@
 
 package org.jnode.test.gui;
 
+import java.awt.AWTEvent;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,13 +46,14 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class BoxWorld extends JPanel implements WindowListener, KeyListener,
+public class BoxWorld extends JComponent implements WindowListener, KeyListener,
     MouseListener, MouseMotionListener, ActionListener, ItemListener {
 
     // ***************** WORLD DATA ****************************
@@ -274,6 +276,8 @@ public class BoxWorld extends JPanel implements WindowListener, KeyListener,
         addKeyListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
+        setFocusable(true);
+        enableEvents(AWTEvent.FOCUS_EVENT_MASK);
 
         requestFocus();
         /*
@@ -402,6 +406,14 @@ public class BoxWorld extends JPanel implements WindowListener, KeyListener,
     // ----------------------------------MOUSE
     // EVENTS---------------------------------------
     public void mousePressed(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            if (this.contains(e.getX(), e.getY())) {
+                if (!this.hasFocus() && this.isRequestFocusEnabled()) {
+                    this.requestFocus();
+                }
+            }
+        }
+
         if (gameMode != PLAY_MODE) {
             changeMode();
         } else {
