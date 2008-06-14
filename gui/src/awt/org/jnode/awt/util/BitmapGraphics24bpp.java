@@ -21,7 +21,7 @@ final class BitmapGraphics24bpp extends AbstractBitmapGraphics {
     public BitmapGraphics24bpp(MemoryResource mem, int width, int height,
                                int offset, int bytesPerLine) {
         super(mem, width, height, offset, bytesPerLine);
-        Unsafe.debug("creating BitmapGraphics32bpp");
+        //Unsafe.debug("creating BitmapGraphics24bpp");
     }
 
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,

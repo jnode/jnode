@@ -30,7 +30,7 @@ final class BitmapGraphics32bpp extends AbstractBitmapGraphics {
                                int offset, int bytesPerLine, int transparency) {
         super(mem, width, height, offset, bytesPerLine);
         this.transparency = transparency;
-        Unsafe.debug("creating BitmapGraphics32bpp");
+        //Unsafe.debug("creating BitmapGraphics32bpp");
     }
 
     @Override

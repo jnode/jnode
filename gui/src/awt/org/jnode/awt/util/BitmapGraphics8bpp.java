@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 import java.awt.image.Raster;
 import org.jnode.driver.video.Surface;
 import org.jnode.system.MemoryResource;
-import org.jnode.vm.Unsafe;
 
 final class BitmapGraphics8bpp extends AbstractBitmapGraphics {
 
@@ -21,7 +20,7 @@ final class BitmapGraphics8bpp extends AbstractBitmapGraphics {
     public BitmapGraphics8bpp(MemoryResource mem, int width, int height,
                               int offset, int bytesPerLine) {
         super(mem, width, height, offset, bytesPerLine);
-        Unsafe.debug("creating BitmapGraphics8bpp");
+        //Unsafe.debug("creating BitmapGraphics8bpp");
     }
 
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
@@ -46,8 +45,8 @@ final class BitmapGraphics8bpp extends AbstractBitmapGraphics {
     }
 
     /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
-     *      int, int, int, int, int, int, int)
+     * @see org.jnode.awt.util.AbstractBitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
+     * int, int, int, int, int, int, int)
      */
     protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
                                      int dstX, int dstY, int width, int height, int color) {
@@ -73,14 +72,14 @@ final class BitmapGraphics8bpp extends AbstractBitmapGraphics {
     public int doGetPixel(int x, int y) {
         // TODO Implement me
         log.error("Not implemented");
-        Unsafe.debug("doGetPixel Not implemented");
+        org.jnode.vm.Unsafe.debug("doGetPixel Not implemented");
         return 0;
     }
 
     public int[] doGetPixels(Rectangle r) {
         // TODO Implement me
         log.error("Not implemented");
-        Unsafe.debug("doGetPixels Not implemented");
+        org.jnode.vm.Unsafe.debug("doGetPixels Not implemented");
         return new int[0];
     }
 
