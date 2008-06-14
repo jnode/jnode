@@ -121,6 +121,9 @@ public class BDFTextRenderer implements TextRenderer {
                                 dst.setLocation(src);
                             }
 
+                            px = (int) dst.getX();
+                            py = (int) dst.getY();
+
                             //compute color
                             int bg_color = surface.getRGBPixel(px, py);
 
@@ -140,8 +143,6 @@ public class BDFTextRenderer implements TextRenderer {
 
                             //clip
                             //if(clip == null || clip.contains(dst)) {
-                            px = (int) dst.getX();
-                            py = (int) dst.getY();
 
                             surface.setRGBPixel(px, py, fPixel);
                             //}
