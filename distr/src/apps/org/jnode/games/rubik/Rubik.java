@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.test.gui;
+package org.jnode.games.rubik;
 // Rubik's Cube 3D simulator
 // Karl H\u00f6rnell, March 11 1996
 // Last modified October 6

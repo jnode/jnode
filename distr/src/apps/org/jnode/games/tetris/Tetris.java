@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.test.gui;
+package org.jnode.games.tetris;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;

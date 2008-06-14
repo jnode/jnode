@@ -27,10 +27,8 @@
     <application name="AWT demo"       class="org.jnode.test.gui.AWTDemo"/>
     <application name="Swing test"     class="org.jnode.test.gui.SwingTest"/>
     <application name="Swing menu test" class="org.jnode.test.gui.SwingMenuTest"/>
-    <application name="Tetris"         class="org.jnode.test.gui.Tetris"/>
     <application name="Console"        class="org.jnode.test.gui.ConsoleTest"/>
     <application name="Console2"        class="org.jnode.test.gui.ConsoleTest2"/>    
-    <!-- application name="BoxWorld"       class="org.jnode.test.gui.BoxWorld"/ -->  
     <!-- application name="Thinlet"        class="thinlet.ThinTest"/ -->
     <!-- application name="GlyphTest"      class="org.jnode.test.gui.GlyphTest"/ -->
   </extension>
@@ -53,10 +51,8 @@
     <alias name="AWTDemo"       class="org.jnode.test.gui.AWTDemo"/>
     <alias name="JTableTest"    class="org.jnode.test.gui.JTableTest"/>
     <alias name="JTreeTest"     class="org.jnode.test.gui.JTreeTest"/>
-    <alias name="BoxWorld"      class="org.jnode.test.gui.BoxWorld"/>      
-    <alias name="DialogTest"    class="org.jnode.test.gui.DialogTest"/>      
+    <alias name="DialogTest"    class="org.jnode.test.gui.DialogTest"/>
     <alias name="FBTest"        class="org.jnode.test.gui.FBTest"/>
-    <alias name="Tetris"        class="org.jnode.test.gui.Tetris"/>
     <alias name="SwingTest"     class="org.jnode.test.gui.SwingTest"/>
     <alias name="MouseEventTest" class="org.jnode.test.gui.MouseEventTest"/>
     <alias name="SwingMenuTest" class="org.jnode.test.gui.SwingMenuTest"/>
@@ -64,7 +60,6 @@
     <alias name="ThinTest"      class="thinlet.ThinTest"/>
     <alias name="GlyphTest"     class="org.jnode.test.gui.GlyphTest"/>
     <alias name="RobotTest"     class="org.jnode.test.gui.RobotTest"/>
-    <alias name="Rubik"         class="org.jnode.test.gui.Rubik"/>
   </extension>
         
   <extension point="org.jnode.shell.syntaxes">
