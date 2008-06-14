@@ -424,8 +424,6 @@ public abstract class KeyboardFocusManager
                 private Window currentFocus;
                 private Component currentFocusOwner;
                 public void setCurrentFocusedWindow(Window win) {
-                    //jnode
-                    org.jnode.vm.Unsafe.debug("KeyboardFocusManager: setCurrentFocusedWindow: " + win + "\n");
                     this.currentFocus = win;
                 }
 
@@ -435,7 +433,6 @@ public abstract class KeyboardFocusManager
 
                 public void setCurrentFocusOwner(Component comp) {
                     //jnode
-                    org.jnode.vm.Unsafe.debug("KeyboardFocusManager: setCurrentFocusOwner: " + comp + "\n");
                     this.currentFocusOwner = comp;
                 }
 
