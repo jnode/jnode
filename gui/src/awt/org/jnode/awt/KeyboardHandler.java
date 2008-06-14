@@ -147,20 +147,20 @@ public class KeyboardHandler implements
         Component source = null;
         KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         if (kfm != null) {
-            //Component fo = kfm.getFocusOwner();
-            //if(fo == null){
-            Window win = kfm.getActiveWindow();
-            if (win == null) {
-                win = kfm.getFocusedWindow();
-                if (win != null) {
+            Component fo = kfm.getFocusOwner();
+            if (fo == null) {
+                Window win = kfm.getActiveWindow();
+                if (win == null) {
+                    win = kfm.getFocusedWindow();
+                    if (win != null) {
+                        source = win;
+                    }
+                } else {
                     source = win;
                 }
             } else {
-                source = win;
+                source = fo;
             }
-            //} else {
-            //  source = fo;
-            //}
         }
 
         if (source == null) {
@@ -175,9 +175,7 @@ public class KeyboardHandler implements
             }
         }
 
-        KeyEvent ke = new KeyEvent(source, id, time, modifiers, keyCode,
-            keyChar);
-        //org.jnode.vm.Unsafe.debug(ke.toString()+"\n");
+        KeyEvent ke = new KeyEvent(source, id, time, modifiers, keyCode, keyChar);
         eventQueue.postEvent(ke);
     }
 
