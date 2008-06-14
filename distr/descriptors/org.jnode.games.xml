@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.games" 
+        name="JNode Games"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.awt.font.truetype"/>
+    <import plugin="org.jnode.desktop"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.games.boxworld.*"/>
+      <export name="org.jnode.games.rubik.*"/>
+      <export name="org.jnode.games.tetris.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.desktop.apps">
+    <application name="BoxWorld"    class="org.jnode.games.boxworld.BoxWorld"/>
+    <application name="Rubik"       class="org.jnode.games.rubik.Rubik"/>
+    <application name="Tetris"      class="org.jnode.games.tetris.Tetris"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="java.awt.AWTPermission" name="createRobot"/>
+    <permission class="java.awt.AWTPermission" name="readDisplayPixels"/>
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>
+  </extension>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="BoxWorld"      class="org.jnode.games.boxworld.BoxWorld"/>
+    <alias name="Rubik"         class="org.jnode.games.rubik.Rubik"/>
+    <alias name="Tetris"        class="org.jnode.games.tetris.Tetris"/>
+  </extension>
+        
+</plugin>
