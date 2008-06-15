@@ -23,6 +23,8 @@ package org.jnode.fs.command;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.naming.NameNotFoundException;
@@ -42,6 +44,7 @@ import org.jnode.shell.syntax.DeviceArgument;
  * 
  * @author galatnm@jnode.org
  * @author crawley@jnode.org
+ * @author Levente S\u00e1ntha
  *
  */
 public class DFCommand extends AbstractCommand {
@@ -59,24 +62,34 @@ public class DFCommand extends AbstractCommand {
             PrintStream out, PrintStream err) throws NameNotFoundException {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
         final Map<String, String> mountPoints = fss.getDeviceMountPoints();
-        out.println("ID\tTotal\tUse\tFree\tMount");
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        format(pw, "ID", true);
+        format(pw, "Size", false);
+        format(pw, "Used", false);
+        format(pw, "Free", false);
+        pw.println("Mount");
+        pw.println();
         if (ARG_DEVICE.isSet()) {
             final Device dev = ARG_DEVICE.getValue();
             FileSystem<?> fs = fss.getFileSystem(dev);
             if (fs == null) {
-                out.println("No filesystem on device");
+                pw.println("No filesystem on device");
             } else {
-                displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
+                displayInfo(pw, dev, fs, mountPoints.get(fs.getDevice().getId()));
             }
         } else {
             final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             for (Device dev : dm.getDevices()) {
                 FileSystem<?> fs = fss.getFileSystem(dev);
                 if (fs != null) {
-                    displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
+                    displayInfo(pw, dev, fs, mountPoints.get(fs.getDevice().getId()));
                 }
             }
         }
+        pw.flush();
+        out.print(sw.toString());
+
     }
     /**
      * 
@@ -85,17 +98,42 @@ public class DFCommand extends AbstractCommand {
      * @param fs
      * @param mountPoint
      */
-    private void displayInfo(PrintStream out, Device dev, FileSystem<?> fs, String mountPoint) {
+    private void displayInfo(PrintWriter out, Device dev, FileSystem<?> fs, String mountPoint) {
         try {
-            long total = fs.getTotalSpace();
-            if (total > 0) {
-                long free = fs.getFreeSpace();
-                long use = total - free;
-                out.println(dev.getId() + "\t" + total + "\t" + use + "\t" + free + "\t" + mountPoint);
-            }
+
+            String str = dev.getId();
+            format(out, str, true);
+
+            final long total = fs.getTotalSpace();
+            str = total < 0 ? "unknown" : String.valueOf(total);
+            format(out, str, false);
+
+            final long free = fs.getFreeSpace();
+            str = total < 0 ? "unknown" : String.valueOf(total - free);
+            format(out, str, false);
+
+            str = free < 0 ? "unknown" : String.valueOf(free);
+            format(out, str, false);
+            
+            out.println(mountPoint);
         } catch (IOException ex) {
-            out.println("\tError getting disk usage information: " + ex.getLocalizedMessage());
+            out.println("\tError getting disk usage information for " + mountPoint + " on " + dev.getId() +
+                " : " + ex.getLocalizedMessage());
         }
     }
 
+    private void format(PrintWriter out, String str, boolean left) {
+        int ln;
+        ln = 15 - str.length();
+        if(ln < 0) str = str.substring(0, 15);
+        else {
+            if(left){
+                out.print(str);
+            }
+            for(int i = 0; i < ln; i++) out.print(' ');
+        }
+        if(!left)
+            out.print(str);
+        out.print(' ');
+    }
 }
