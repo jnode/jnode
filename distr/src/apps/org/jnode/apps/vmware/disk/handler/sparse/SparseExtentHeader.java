@@ -1,157 +1,144 @@
 package org.jnode.apps.vmware.disk.handler.sparse;
 
-
 import org.apache.log4j.Logger;
 
 /**
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
- *
+ * 
  */
-public class SparseExtentHeader 
-{
-	static final Logger LOG = Logger.getLogger(SparseExtentHeader.class);
-		
-	// flags
-	private boolean validNewLineDetectionTest;
-	private boolean redundantGrainTableWillBeUsed;
-	
-	private long capacity;
-	private long grainSize;
-	private long descriptorOffset;
-	private long descriptorSize;
-	private long rgdOffset;
-	
-	// additional/computed fields
-	private long grainTableCoverage;
-	
-	private int numGTEsPerGT = 512;
-	
-	private long gdOffset;
-	private long overHead;
-	private boolean uncleanShutdown;
+public class SparseExtentHeader {
+    static final Logger LOG = Logger.getLogger(SparseExtentHeader.class);
 
-	public int getNumGTEsPerGT() {
-		return numGTEsPerGT;
-	}
+    // flags
+    private boolean validNewLineDetectionTest;
+    private boolean redundantGrainTableWillBeUsed;
 
-	public long getCapacity() {
-		return capacity;
-	}
-	
-	/**
-	 * 
-	 * @return gtCoverage (grain table coverage) in sectors
-	 */
-	public long getGrainTableCoverage()
-	{
-		return grainTableCoverage;
-	}
+    private long capacity;
+    private long grainSize;
+    private long descriptorOffset;
+    private long descriptorSize;
+    private long rgdOffset;
 
-	public long getGrainSize() {
-		return grainSize;
-	}
+    // additional/computed fields
+    private long grainTableCoverage;
 
-	public long getDescriptorOffset() 
-	{
-		return descriptorOffset;
-	}
+    private int numGTEsPerGT = 512;
 
-	public boolean isValidNewLineDetectionTest() {
-		return validNewLineDetectionTest;
-	}
+    private long gdOffset;
+    private long overHead;
+    private boolean uncleanShutdown;
 
-	public void setValidNewLineDetectionTest(boolean validNewLineDetectionTest) {
-		this.validNewLineDetectionTest = validNewLineDetectionTest;
-	}
+    public int getNumGTEsPerGT() {
+        return numGTEsPerGT;
+    }
 
-	public boolean isRedundantGrainTableWillBeUsed() {
-		return redundantGrainTableWillBeUsed;
-	}
+    public long getCapacity() {
+        return capacity;
+    }
 
-	public void setRedundantGrainTableWillBeUsed(
-			boolean redundantGrainTableWillBeUsed) {
-		this.redundantGrainTableWillBeUsed = redundantGrainTableWillBeUsed;
-	}
+    /**
+     * 
+     * @return gtCoverage (grain table coverage) in sectors
+     */
+    public long getGrainTableCoverage() {
+        return grainTableCoverage;
+    }
 
-	public long getDescriptorSize() {
-		return descriptorSize;
-	}
+    public long getGrainSize() {
+        return grainSize;
+    }
 
-	public void setDescriptorSize(long descriptorSize) {
-		this.descriptorSize = descriptorSize;
-	}
+    public long getDescriptorOffset() {
+        return descriptorOffset;
+    }
 
-	public long getRgdOffset() {
-		return rgdOffset;
-	}
+    public boolean isValidNewLineDetectionTest() {
+        return validNewLineDetectionTest;
+    }
 
-	public void setRgdOffset(long rgdOffset) {
-		this.rgdOffset = rgdOffset;
-	}
+    public void setValidNewLineDetectionTest(boolean validNewLineDetectionTest) {
+        this.validNewLineDetectionTest = validNewLineDetectionTest;
+    }
 
-	public long getGdOffset() {
-		return gdOffset;
-	}
+    public boolean isRedundantGrainTableWillBeUsed() {
+        return redundantGrainTableWillBeUsed;
+    }
 
-	public void setGdOffset(long gdOffset) {
-		this.gdOffset = gdOffset;
-	}
+    public void setRedundantGrainTableWillBeUsed(boolean redundantGrainTableWillBeUsed) {
+        this.redundantGrainTableWillBeUsed = redundantGrainTableWillBeUsed;
+    }
 
-	public long getOverHead() {
-		return overHead;
-	}
+    public long getDescriptorSize() {
+        return descriptorSize;
+    }
 
-	public void setOverHead(long overHead) {
-		this.overHead = overHead;
-	}
+    public void setDescriptorSize(long descriptorSize) {
+        this.descriptorSize = descriptorSize;
+    }
 
-	public boolean isUncleanShutdown() {
-		return uncleanShutdown;
-	}
+    public long getRgdOffset() {
+        return rgdOffset;
+    }
 
-	public void setUncleanShutdown(boolean uncleanShutdown) {
-		this.uncleanShutdown = uncleanShutdown;
-	}
+    public void setRgdOffset(long rgdOffset) {
+        this.rgdOffset = rgdOffset;
+    }
 
-	public void setCapacity(long capacity) {
-		this.capacity = capacity;
-	}
+    public long getGdOffset() {
+        return gdOffset;
+    }
 
-	public void setGrainSize(long grainSize) {
-		this.grainSize = grainSize;
-	}
+    public void setGdOffset(long gdOffset) {
+        this.gdOffset = gdOffset;
+    }
 
-	public void setDescriptorOffset(long descriptorOffset) {
-		this.descriptorOffset = descriptorOffset;
-	}
+    public long getOverHead() {
+        return overHead;
+    }
 
-	public void setGrainTableCoverage(long grainTableCoverage) {
-		this.grainTableCoverage = grainTableCoverage;
-	}
+    public void setOverHead(long overHead) {
+        this.overHead = overHead;
+    }
 
-	public void setNumGTEsPerGT(int numGTEsPerGT) {
-		this.numGTEsPerGT = numGTEsPerGT;
-	}
-	
-	
-	
-	@Override
-	public String toString() 
-	{
-		// flags
-		return "SparseExtentHeader[validNewLineDetectionTest="+validNewLineDetectionTest+
-		", redundantGrainTableWillBeUsed="+redundantGrainTableWillBeUsed+		
-		", capacity="+capacity+
-		", grainSize="+grainSize+
-		", descriptorOffset="+descriptorOffset+
-		", descriptorSize="+descriptorSize+
-		", rgdOffset="+rgdOffset+
-		", grainTableCoverage="+grainTableCoverage+
-		", numGTEsPerGT="+numGTEsPerGT+
-		", gdOffset="+gdOffset+
-		", overHead="+overHead+
-		", uncleanShutdown="+uncleanShutdown+"]";
-	}
+    public boolean isUncleanShutdown() {
+        return uncleanShutdown;
+    }
+
+    public void setUncleanShutdown(boolean uncleanShutdown) {
+        this.uncleanShutdown = uncleanShutdown;
+    }
+
+    public void setCapacity(long capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setGrainSize(long grainSize) {
+        this.grainSize = grainSize;
+    }
+
+    public void setDescriptorOffset(long descriptorOffset) {
+        this.descriptorOffset = descriptorOffset;
+    }
+
+    public void setGrainTableCoverage(long grainTableCoverage) {
+        this.grainTableCoverage = grainTableCoverage;
+    }
+
+    public void setNumGTEsPerGT(int numGTEsPerGT) {
+        this.numGTEsPerGT = numGTEsPerGT;
+    }
+
+    @Override
+    public String toString() {
+        // flags
+        return "SparseExtentHeader[validNewLineDetectionTest=" + validNewLineDetectionTest +
+                ", redundantGrainTableWillBeUsed=" + redundantGrainTableWillBeUsed + ", capacity=" +
+                capacity + ", grainSize=" + grainSize + ", descriptorOffset=" + descriptorOffset +
+                ", descriptorSize=" + descriptorSize + ", rgdOffset=" + rgdOffset +
+                ", grainTableCoverage=" + grainTableCoverage + ", numGTEsPerGT=" + numGTEsPerGT +
+                ", gdOffset=" + gdOffset + ", overHead=" + overHead + ", uncleanShutdown=" +
+                uncleanShutdown + "]";
+    }
 }

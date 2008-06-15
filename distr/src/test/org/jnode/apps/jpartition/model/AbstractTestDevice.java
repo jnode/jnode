@@ -6,279 +6,268 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import junit.framework.TestCase;
+public abstract class AbstractTestDevice extends AbstractTest {
+    protected static final int DEVICE_SIZE = 5000;
 
-abstract public class AbstractTestDevice extends AbstractTest {
-	protected static final int DEVICE_SIZE = 5000;
+    protected Device device;
 
-	protected Device device;
+    protected abstract long getStartFreeSpace();
 
-	abstract protected long getStartFreeSpace();
-	abstract protected long getEndFreeSpace();
-	abstract protected int getIndexFreeSpacePartition();
+    protected abstract long getEndFreeSpace();
 
-	final protected long getFreeSpace()
-	{
-		return getEndFreeSpace() - getStartFreeSpace() + 1;
-	}
+    protected abstract int getIndexFreeSpacePartition();
 
-	@Before
-	public void setUp() throws Exception {
-		device = new CustomDevice("dev1", DEVICE_SIZE);
-	}
+    protected final long getFreeSpace() {
+        return getEndFreeSpace() - getStartFreeSpace() + 1;
+    }
 
-	@Test
-	public void testAddPartitionWithIllegalStart()
-	{
-		try {
-			device.addPartition(getStartFreeSpace()-1, getFreeSpace() - 1);
-			Assert.fail("failed case 1");
-		} catch (DeviceException e) {
-			// success
-		}
+    @Before
+    public void setUp() throws Exception {
+        device = new CustomDevice("dev1", DEVICE_SIZE);
+    }
 
-		try {
-			device.addPartition(getStartFreeSpace()-1, getFreeSpace());
-			Assert.fail("failed case 2");
-		} catch (DeviceException e) {
-			// success
-		}
-	}
+    @Test
+    public void testAddPartitionWithIllegalStart() {
+        try {
+            device.addPartition(getStartFreeSpace() - 1, getFreeSpace() - 1);
+            Assert.fail("failed case 1");
+        } catch (DeviceException e) {
+            // success
+        }
 
-	@Test
-	public void testAddPartitionWithIllegalSize()
-	{
-		try {
-			device.addPartition(getStartFreeSpace(), -1);
-			Assert.fail("failed case 1");
-		} catch (DeviceException e) {
-			// success
-		}
+        try {
+            device.addPartition(getStartFreeSpace() - 1, getFreeSpace());
+            Assert.fail("failed case 2");
+        } catch (DeviceException e) {
+            // success
+        }
+    }
 
-		try {
-			device.addPartition(getStartFreeSpace(), 0);
-			Assert.fail("failed case 2");
-		} catch (DeviceException e) {
-			// success
-		}
+    @Test
+    public void testAddPartitionWithIllegalSize() {
+        try {
+            device.addPartition(getStartFreeSpace(), -1);
+            Assert.fail("failed case 1");
+        } catch (DeviceException e) {
+            // success
+        }
 
-		try {
-			device.addPartition(getStartFreeSpace(), getFreeSpace() + 1);
-			Assert.fail("failed case 3");
-		} catch (DeviceException e) {
-			// success
-		}
+        try {
+            device.addPartition(getStartFreeSpace(), 0);
+            Assert.fail("failed case 2");
+        } catch (DeviceException e) {
+            // success
+        }
 
-		try {
-			device.addPartition(getStartFreeSpace(), getFreeSpace() + 2);
-			Assert.fail("failed case 4");
-		} catch (DeviceException e) {
-			// success
-		}
-	}
+        try {
+            device.addPartition(getStartFreeSpace(), getFreeSpace() + 1);
+            Assert.fail("failed case 3");
+        } catch (DeviceException e) {
+            // success
+        }
 
-	@Test
-	public void testAddPartitionAllFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		Partition newPart = device.addPartition(getStartFreeSpace(), getFreeSpace());
-		assertEquals(getStartFreeSpace(), getFreeSpace(), true, newPart);
+        try {
+            device.addPartition(getStartFreeSpace(), getFreeSpace() + 2);
+            Assert.fail("failed case 4");
+        } catch (DeviceException e) {
+            // success
+        }
+    }
 
-		List<Partition> partitions = device.getPartitions();
-		Assert.assertEquals("must have only "+nbPartitions+" partition(s)", nbPartitions, partitions.size());
+    @Test
+    public void testAddPartitionAllFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        Partition newPart = device.addPartition(getStartFreeSpace(), getFreeSpace());
+        assertEquals(getStartFreeSpace(), getFreeSpace(), true, newPart);
 
-		Partition part = partitions.get(getIndexFreeSpacePartition());
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part);
-	}
+        List<Partition> partitions = device.getPartitions();
+        Assert.assertEquals("must have only " + nbPartitions + " partition(s)", nbPartitions,
+                partitions.size());
 
-	@Test
-	public void testAddPartitionBeginFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		final long begin = getStartFreeSpace();
-		final long size = getFreeSpace() - 1500;
+        Partition part = partitions.get(getIndexFreeSpacePartition());
+        Assert.assertTrue("must return the same instance as addPartition", newPart == part);
+    }
 
-		Partition newPart = device.addPartition(begin, size);
-		assertEquals(begin, size, true, newPart);
+    @Test
+    public void testAddPartitionBeginFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        final long begin = getStartFreeSpace();
+        final long size = getFreeSpace() - 1500;
 
-		List<Partition> partitions = device.getPartitions();
-		final int expectedNbPartitions = nbPartitions + 1;
-		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
+        Partition newPart = device.addPartition(begin, size);
+        assertEquals(begin, size, true, newPart);
 
-		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part1);
+        List<Partition> partitions = device.getPartitions();
+        final int expectedNbPartitions = nbPartitions + 1;
+        Assert.assertEquals("must have only " + expectedNbPartitions + " partition(s)",
+                expectedNbPartitions, partitions.size());
 
-		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		long part2Size = getFreeSpace() - part1.getSize();
-		assertEquals(begin + size, part2Size, false, part2);
-	}
+        Partition part1 = partitions.get(getIndexFreeSpacePartition());
+        Assert.assertTrue("must return the same instance as addPartition", newPart == part1);
 
-	@Test
-	public void testAddPartitionMiddleFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		final long shift = 500;
-		final long begin = getStartFreeSpace() + shift;
-		final long size = getFreeSpace() - 1500;
+        Partition part2 = partitions.get(getIndexFreeSpacePartition() + 1);
+        long part2Size = getFreeSpace() - part1.getSize();
+        assertEquals(begin + size, part2Size, false, part2);
+    }
 
-		Partition newPart = device.addPartition(begin, size);
-		assertEquals(begin, size, true, newPart);
+    @Test
+    public void testAddPartitionMiddleFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        final long shift = 500;
+        final long begin = getStartFreeSpace() + shift;
+        final long size = getFreeSpace() - 1500;
 
-		List<Partition> partitions = device.getPartitions();
-		final int expectedNbPartitions = nbPartitions + 2;
-		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
+        Partition newPart = device.addPartition(begin, size);
+        assertEquals(begin, size, true, newPart);
 
-		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		assertEquals(getStartFreeSpace(), shift, false, part1);
+        List<Partition> partitions = device.getPartitions();
+        final int expectedNbPartitions = nbPartitions + 2;
+        Assert.assertEquals("must have only " + expectedNbPartitions + " partition(s)",
+                expectedNbPartitions, partitions.size());
 
-		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part2);
+        Partition part1 = partitions.get(getIndexFreeSpacePartition());
+        assertEquals(getStartFreeSpace(), shift, false, part1);
 
-		Partition part3 = partitions.get(getIndexFreeSpacePartition()+2);
-		long part3Size = getFreeSpace() - part1.getSize() - part2.getSize();
-		assertEquals(begin + size, part3Size, false, part3);
-	}
+        Partition part2 = partitions.get(getIndexFreeSpacePartition() + 1);
+        Assert.assertTrue("must return the same instance as addPartition", newPart == part2);
 
-	@Test
-	public void testAddPartitionEndFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		final long shift = 1500;
-		final long begin = getStartFreeSpace() + shift;
-		final long size = getFreeSpace() - shift;
+        Partition part3 = partitions.get(getIndexFreeSpacePartition() + 2);
+        long part3Size = getFreeSpace() - part1.getSize() - part2.getSize();
+        assertEquals(begin + size, part3Size, false, part3);
+    }
 
-		Partition newPart = device.addPartition(begin, size);
-		assertEquals(begin, size, true, newPart);
+    @Test
+    public void testAddPartitionEndFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        final long shift = 1500;
+        final long begin = getStartFreeSpace() + shift;
+        final long size = getFreeSpace() - shift;
 
-		List<Partition> partitions = device.getPartitions();
-		final int expectedNbPartitions = nbPartitions + 1;
-		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
+        Partition newPart = device.addPartition(begin, size);
+        assertEquals(begin, size, true, newPart);
 
-		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		assertEquals(getStartFreeSpace(), shift, false, part1);
+        List<Partition> partitions = device.getPartitions();
+        final int expectedNbPartitions = nbPartitions + 1;
+        Assert.assertEquals("must have only " + expectedNbPartitions + " partition(s)",
+                expectedNbPartitions, partitions.size());
 
-		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part2);
-	}
+        Partition part1 = partitions.get(getIndexFreeSpacePartition());
+        assertEquals(getStartFreeSpace(), shift, false, part1);
 
-	@Test
-	public void testRemovePartitionAllFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		device.addPartition(getStartFreeSpace(), getFreeSpace());
+        Partition part2 = partitions.get(getIndexFreeSpacePartition() + 1);
+        Assert.assertTrue("must return the same instance as addPartition", newPart == part2);
+    }
 
-		List<Partition> partitions = device.getPartitions();
-		Assert.assertEquals("must have only "+nbPartitions+" partition(s)", nbPartitions, partitions.size());
+    @Test
+    public void testRemovePartitionAllFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        device.addPartition(getStartFreeSpace(), getFreeSpace());
 
-		Partition part = partitions.get(getIndexFreeSpacePartition());
-		assertEquals(getStartFreeSpace(), getFreeSpace(), true, part);
-	}
+        List<Partition> partitions = device.getPartitions();
+        Assert.assertEquals("must have only " + nbPartitions + " partition(s)", nbPartitions,
+                partitions.size());
 
-	@Test
-	public void testRemovePartitionBeginFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		final long begin = getStartFreeSpace();
-		final long size = getFreeSpace() - 1500;
-		device.addPartition(begin, size);
+        Partition part = partitions.get(getIndexFreeSpacePartition());
+        assertEquals(getStartFreeSpace(), getFreeSpace(), true, part);
+    }
 
-		List<Partition> partitions = device.getPartitions();
-		final int expectedNbPartitions = nbPartitions + 1;
-		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
+    @Test
+    public void testRemovePartitionBeginFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        final long begin = getStartFreeSpace();
+        final long size = getFreeSpace() - 1500;
+        device.addPartition(begin, size);
 
-		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		assertEquals(begin, size, true, part1);
+        List<Partition> partitions = device.getPartitions();
+        final int expectedNbPartitions = nbPartitions + 1;
+        Assert.assertEquals("must have only " + expectedNbPartitions + " partition(s)",
+                expectedNbPartitions, partitions.size());
 
-		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		long part2Size = getFreeSpace() - part1.getSize();
-		assertEquals(begin + size, part2Size, false, part2);
-	}
+        Partition part1 = partitions.get(getIndexFreeSpacePartition());
+        assertEquals(begin, size, true, part1);
 
-	@Test
-	public void testRemovePartitionMiddleFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		final long shift = 500;
-		final long begin = getStartFreeSpace() + shift;
-		final long size = getFreeSpace() - 1500;
-		device.addPartition(begin, size);
+        Partition part2 = partitions.get(getIndexFreeSpacePartition() + 1);
+        long part2Size = getFreeSpace() - part1.getSize();
+        assertEquals(begin + size, part2Size, false, part2);
+    }
 
-		List<Partition> partitions = device.getPartitions();
-		final int expectedNbPartitions = nbPartitions + 2;
-		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
+    @Test
+    public void testRemovePartitionMiddleFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        final long shift = 500;
+        final long begin = getStartFreeSpace() + shift;
+        final long size = getFreeSpace() - 1500;
+        device.addPartition(begin, size);
 
-		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		assertEquals(getStartFreeSpace(), shift, false, part1);
+        List<Partition> partitions = device.getPartitions();
+        final int expectedNbPartitions = nbPartitions + 2;
+        Assert.assertEquals("must have only " + expectedNbPartitions + " partition(s)",
+                expectedNbPartitions, partitions.size());
 
-		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		assertEquals(begin, size, true, part2);
+        Partition part1 = partitions.get(getIndexFreeSpacePartition());
+        assertEquals(getStartFreeSpace(), shift, false, part1);
 
-		Partition part3 = partitions.get(getIndexFreeSpacePartition()+2);
-		long part3Size = getFreeSpace() - part1.getSize() - part2.getSize();
-		assertEquals(begin + size, part3Size, false, part3);
-	}
+        Partition part2 = partitions.get(getIndexFreeSpacePartition() + 1);
+        assertEquals(begin, size, true, part2);
 
-	@Test
-	public void testRemovePartitionEndFreeSpace()
-	{
-		final int nbPartitions = device.getPartitions().size();
-		final long shift = 1500;
-		final long begin = getStartFreeSpace() + shift;
-		final long size = getFreeSpace() - shift;
-		device.addPartition(begin, size);
+        Partition part3 = partitions.get(getIndexFreeSpacePartition() + 2);
+        long part3Size = getFreeSpace() - part1.getSize() - part2.getSize();
+        assertEquals(begin + size, part3Size, false, part3);
+    }
 
-		List<Partition> partitions = device.getPartitions();
-		final int expectedNbPartitions = nbPartitions + 1;
-		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
+    @Test
+    public void testRemovePartitionEndFreeSpace() {
+        final int nbPartitions = device.getPartitions().size();
+        final long shift = 1500;
+        final long begin = getStartFreeSpace() + shift;
+        final long size = getFreeSpace() - shift;
+        device.addPartition(begin, size);
 
-		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		assertEquals(getStartFreeSpace(), shift, false, part1);
+        List<Partition> partitions = device.getPartitions();
+        final int expectedNbPartitions = nbPartitions + 1;
+        Assert.assertEquals("must have only " + expectedNbPartitions + " partition(s)",
+                expectedNbPartitions, partitions.size());
 
-		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		assertEquals(begin, size, true, part2);
-	}
+        Partition part1 = partitions.get(getIndexFreeSpacePartition());
+        assertEquals(getStartFreeSpace(), shift, false, part1);
 
-	@Test
-	public void testAddPartitionInNonFreeSpace()
-	{
-		testAddRemoveInBadPartitionKind(true);
-	}
+        Partition part2 = partitions.get(getIndexFreeSpacePartition() + 1);
+        assertEquals(begin, size, true, part2);
+    }
 
-	@Test
-	public void testRemovePartitionInFreeSpace()
-	{
-		testAddRemoveInBadPartitionKind(false);
-	}
+    @Test
+    public void testAddPartitionInNonFreeSpace() {
+        testAddRemoveInBadPartitionKind(true);
+    }
 
-	private void testAddRemoveInBadPartitionKind(boolean usedPartition)
-	{
-		final long nbPartitions = device.getPartitions().size();
-		for(Partition part : device.getPartitions())
-		{
-			if(part.isUsed() == usedPartition)
-			{
-				final long start = part.getStart();
-				final long end = part.getEnd();
-				final long size = part.getSize();
-				final boolean used = part.isUsed();
+    @Test
+    public void testRemovePartitionInFreeSpace() {
+        testAddRemoveInBadPartitionKind(false);
+    }
 
-				try {
-					if(usedPartition)
-					{
-						device.addPartition(start + 1, size - 2);
-					}
-					else
-					{
-						device.removePartition(start + 1);
-					}
-					Assert.fail("must throw an exception");
-				} catch (DeviceException e) {
-					// success
-				}
+    private void testAddRemoveInBadPartitionKind(boolean usedPartition) {
+        final long nbPartitions = device.getPartitions().size();
+        for (Partition part : device.getPartitions()) {
+            if (part.isUsed() == usedPartition) {
+                final long start = part.getStart();
+                final long end = part.getEnd();
+                final long size = part.getSize();
+                final boolean used = part.isUsed();
 
-				Assert.assertEquals(nbPartitions, device.getPartitions().size());
-				assertEquals(start, size, used, part);
-			}
-		}
-	}
+                try {
+                    if (usedPartition) {
+                        device.addPartition(start + 1, size - 2);
+                    } else {
+                        device.removePartition(start + 1);
+                    }
+                    Assert.fail("must throw an exception");
+                } catch (DeviceException e) {
+                    // success
+                }
+
+                Assert.assertEquals(nbPartitions, device.getPartitions().size());
+                assertEquals(start, size, used, part);
+            }
+        }
+    }
 }

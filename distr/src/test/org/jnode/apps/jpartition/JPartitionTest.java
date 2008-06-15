@@ -16,35 +16,34 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({TestNonEmptyDevice.class, TestEmptyDevice.class,TestRemovePartitionFromDevice.class, TestOSFacade.class})
+@SuiteClasses({TestNonEmptyDevice.class, TestEmptyDevice.class,
+    TestRemovePartitionFromDevice.class, TestOSFacade.class })
 public class JPartitionTest extends TestSuite {
-	static
-	{
-		// when not in JNode, must be called before anything
-		// invoking InitialNaming
-		DeviceUtils.initJNodeCore();
-	}
+    static {
+        // when not in JNode, must be called before anything
+        // invoking InitialNaming
+        DeviceUtils.initJNodeCore();
+    }
 
-	public static void main(String[] args) throws Throwable {
-		final ViewFactory vf = new ConsoleViewFactory(System.in, System.out, System.err);
-		final ErrorReporter errorReporter = vf.createErrorReporter();
-		new Thread()
-		{
-			public void run()
-			{
-				try {
-					new FileDeviceView(errorReporter);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
+    public static void main(String[] args) throws Throwable {
+        final ViewFactory vf = new ConsoleViewFactory(System.in, System.out, System.err);
+        final ErrorReporter errorReporter = vf.createErrorReporter();
+        final Thread t = new Thread() {
+            public void run() {
+                try {
+                    new FileDeviceView(errorReporter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        t.start();
 
-		//DeviceUtils.createFakeDevice(new ErrorReporter());
-		AbstractIDEDevice dev = DeviceUtils.createFileDevice();
-		JGrub jgrub = new JGrub(System.out, System.err, dev);
-		jgrub.install();
+        // DeviceUtils.createFakeDevice(new ErrorReporter());
+        AbstractIDEDevice dev = DeviceUtils.createFileDevice();
+        JGrub jgrub = new JGrub(System.out, System.err, dev);
+        jgrub.install();
 
-		JPartitionCommand.main(args);
-	}
+        JPartitionCommand.main(args);
+    }
 }

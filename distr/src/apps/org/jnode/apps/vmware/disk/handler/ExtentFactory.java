@@ -11,43 +11,37 @@ import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
- *
+ * 
  */
-abstract public class ExtentFactory 
-{
-	private static final Logger LOG = Logger.getLogger(SparseExtentFactory.class);
-			
-	public FileDescriptor createFileDescriptor(File file) 
-					throws IOException, UnsupportedFormatException
-	{
-		RandomAccessFile raf = null;
-		FileDescriptor fileDescriptor = null;
+public abstract class ExtentFactory {
+    private static final Logger LOG = Logger.getLogger(SparseExtentFactory.class);
 
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			
-			fileDescriptor = createFileDescriptor(file, raf);
-		}
-		finally
-		{
-			if((fileDescriptor == null) && (raf != null))
-			{
-				// if there was an error but RandomAccessFile has 
-				// been created, then close it
-				raf.close();
-			}
-		}
-		
-		return fileDescriptor;
+    public FileDescriptor createFileDescriptor(File file)
+        throws IOException, UnsupportedFormatException {
+        RandomAccessFile raf = null;
+        FileDescriptor fileDescriptor = null;
 
-	}
-	
-	abstract protected DescriptorRW getDescriptorRW();
-	
-	abstract protected FileDescriptor createFileDescriptor(File file, 
-									RandomAccessFile raf) 
-				throws IOException, UnsupportedFormatException;
+        try {
+            raf = new RandomAccessFile(file, "rw");
 
-	abstract public IOHandler createIOHandler(FileDescriptor fileDescriptor) 
-				throws IOException, UnsupportedFormatException;
+            fileDescriptor = createFileDescriptor(file, raf);
+        } finally {
+            if ((fileDescriptor == null) && (raf != null)) {
+                // if there was an error but RandomAccessFile has
+                // been created, then close it
+                raf.close();
+            }
+        }
+
+        return fileDescriptor;
+
+    }
+
+    protected abstract DescriptorRW getDescriptorRW();
+
+    protected abstract FileDescriptor createFileDescriptor(File file, RandomAccessFile raf)
+        throws IOException, UnsupportedFormatException;
+
+    public abstract IOHandler createIOHandler(FileDescriptor fileDescriptor)
+        throws IOException, UnsupportedFormatException;
 }

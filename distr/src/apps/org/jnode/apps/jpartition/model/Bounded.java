@@ -2,8 +2,8 @@ package org.jnode.apps.jpartition.model;
 
 public interface Bounded {
 
-	long getStart();
+    long getStart();
 
-	long getEnd();
+    long getEnd();
 
 }

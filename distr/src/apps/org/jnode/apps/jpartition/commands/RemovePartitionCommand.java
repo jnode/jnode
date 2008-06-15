@@ -5,18 +5,18 @@ import org.jnode.driver.bus.ide.IDEDevice;
 
 public class RemovePartitionCommand extends BasePartitionCommand {
 
-	public RemovePartitionCommand(IDEDevice device, int partitionNumber) {
-		super("remove partition", device, partitionNumber);
-	}
+    public RemovePartitionCommand(IDEDevice device, int partitionNumber) {
+        super("remove partition", device, partitionNumber);
+    }
 
-	@Override
-	final protected void doExecute() throws CommandException {
-		// TODO Auto-generated method stub
-	}
-		
-	@Override
-	public String toString() {
-		return "remove partition " + partitionNumber + " on device" + device.getId();
-	}		
-	
+    @Override
+    protected final void doExecute() throws CommandException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public String toString() {
+        return "remove partition " + partitionNumber + " on device" + device.getId();
+    }
+
 }
