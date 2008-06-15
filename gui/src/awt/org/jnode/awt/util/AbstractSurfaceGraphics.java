@@ -46,7 +46,6 @@ import java.awt.image.WritableRaster;
 import java.awt.image.renderable.RenderableImage;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.image.JNodeImage;
 import org.jnode.driver.video.Surface;
 import sun.awt.image.ToolkitImage;
 
@@ -169,7 +168,8 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
     public final boolean drawImage(Image image, int x, int y, int width, int height, Color bgcolor,
                                    ImageObserver observer) {
         return drawImage(
-            new ToolkitImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x,
+            new ToolkitImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))),
+            x,
             y, bgcolor, observer);
     }
 
@@ -185,7 +185,8 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
      */
     public final boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
         return drawImage(
-            new ToolkitImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x,
+            new ToolkitImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))),
+            x,
             y, observer);
     }
 
