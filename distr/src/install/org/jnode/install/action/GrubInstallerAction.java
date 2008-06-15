@@ -15,21 +15,23 @@ import org.jnode.install.OutputContext;
 
 /**
  * @author Levente S\u00e1ntha
-*/
+ */
 public class GrubInstallerAction implements InstallerAction {
     private JGrub jgrub;
+
     public ActionInput getInput(final InputContext inContext) {
         return new ActionInput() {
             public AbstractInstaller.Step collect() {
                 try {
-                    String deviceID = inContext.getStringInput("Enter the installation disk device name (example: hda0) : ");
+                    String deviceID =
+                        inContext.getStringInput("Enter the installation disk device name (example: hda0) : ");
 
                     Device disk = DeviceUtils.getDevice(deviceID);
                     JGrub jgrub = new JGrub(System.out, System.err, disk);
 
                     inContext.setStringValue(ActionConstants.INSTALL_ROOT_DIR, jgrub.getMountPoint());
                     return AbstractInstaller.Step.forth;
-                } catch(Exception e){
+                } catch (Exception e) {
                     return AbstractInstaller.Step.back;
                 }
             }

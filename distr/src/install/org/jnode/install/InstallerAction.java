@@ -8,6 +8,8 @@ package org.jnode.install;
  */
 public interface InstallerAction {
     ActionInput getInput(InputContext inContext);
+
     void execute() throws Exception;
+
     ActionOutput getOutput(OutputContext outContext);
 }

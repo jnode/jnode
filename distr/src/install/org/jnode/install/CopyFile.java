@@ -3,7 +3,11 @@
  */
 package org.jnode.install;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -29,7 +33,7 @@ public class CopyFile implements ProgressAware {
 
     public void execute() throws Exception {
         try {
-            if(source == null ||destination == null)
+            if (source == null || destination == null)
                 throw new RuntimeException("Source or destination is null.");
 
             long length = source.length();
@@ -38,20 +42,20 @@ public class CopyFile implements ProgressAware {
             FileOutputStream fos = new FileOutputStream(destination);
             int count;
             long status = 0;
-            while((count = fis.read(buf)) > -1 ){
+            while ((count = fis.read(buf)) > -1) {
                 fos.write(buf, 0, count);
-                if(progessAware){
+                if (progessAware) {
                     status += count;
-                    int val = (int)(100L * status / length);
+                    int val = (int) (100L * status / length);
                     progress.fireProgressEvent(new ProgressEvent(val));
                 }
             }
             fis.close();
             fos.flush();
             fos.close();
-        } catch(FileNotFoundException x){
+        } catch (FileNotFoundException x) {
             x.printStackTrace();
-        } catch(IOException x){
+        } catch (IOException x) {
             x.printStackTrace();
         }
     }

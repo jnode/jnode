@@ -3,12 +3,28 @@
  */
 package org.jnode.apps.commander;
 
-import charvax.swing.*;
+import charva.awt.BorderLayout;
+import charva.awt.Color;
+import charva.awt.EventQueue;
+import charva.awt.Insets;
+import charva.awt.Point;
+import charva.awt.Toolkit;
+import charva.awt.event.ActionEvent;
+import charva.awt.event.ActionListener;
+import charva.awt.event.KeyEvent;
+import charva.awt.event.ScrollEvent;
+import charvax.swing.JButton;
+import charvax.swing.JFrame;
+import charvax.swing.JList;
+import charvax.swing.JOptionPane;
+import charvax.swing.JPanel;
+import charvax.swing.JScrollPane;
 import charvax.swing.border.TitledBorder;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import charva.awt.*;
-import charva.awt.event.*;
 
 /**
  * @author Levente S\u00e1ntha
@@ -119,7 +135,7 @@ public class CharvaCommander extends JFrame {
                     exit();
                 }
             } finally {
-                if(!exitted)
+                if (!exitted)
                     currentPane.requestFocus();
             }
         }
@@ -130,13 +146,14 @@ public class CharvaCommander extends JFrame {
         if (sel == null)
             return;
 
-        int conf = JOptionPane.showConfirmDialog(this, sel + " to " + otherPane.getPath(), "Move ?", JOptionPane.YES_NO_OPTION);
+        int conf = JOptionPane
+            .showConfirmDialog(this, sel + " to " + otherPane.getPath(), "Move ?", JOptionPane.YES_NO_OPTION);
         if (conf != JOptionPane.YES_OPTION)
             return;
 
         try {
             File source = new File(currentPane.getPath(), sel);
-            if(copyRec(source, new File(otherPane.getPath(), sel), true))
+            if (copyRec(source, new File(otherPane.getPath(), sel), true))
                 delete0(source);
         } finally {
             currentPane.setPath(currentPane.getPath());
@@ -165,7 +182,8 @@ public class CharvaCommander extends JFrame {
 
         File file = new File(currentPane.getPath(), str);
         if (file.exists()) {
-            int conf = JOptionPane.showConfirmDialog(this, file.getName(), "Continue? File already exits:", JOptionPane.YES_NO_OPTION);
+            int conf = JOptionPane
+                .showConfirmDialog(this, file.getName(), "Continue? File already exits:", JOptionPane.YES_NO_OPTION);
             if (conf != JOptionPane.YES_OPTION)
                 return;
         }
@@ -176,7 +194,7 @@ public class CharvaCommander extends JFrame {
     private void callViewer(File file) {
         try {
             Class.forName("org.jnode.apps.editor.TextEditor").getMethod("main", String[].class).
-                    invoke(null, new Object[]{new String[]{file.getAbsolutePath(), "ro"}});
+                invoke(null, new Object[]{new String[]{file.getAbsolutePath(), "ro"}});
         } catch (ClassNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Viewer not found", "Warning", JOptionPane.DEFAULT_OPTION);
         } catch (Exception e) {
@@ -201,7 +219,7 @@ public class CharvaCommander extends JFrame {
     private void callEditor(File file) {
         try {
             Class.forName("org.jnode.apps.editor.TextEditor").getMethod("main", String[].class).
-                    invoke(null, new Object[]{new String[]{file.getAbsolutePath()}});
+                invoke(null, new Object[]{new String[]{file.getAbsolutePath()}});
         } catch (ClassNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Editor not found", "Warning", JOptionPane.DEFAULT_OPTION);
         } catch (Exception e) {
@@ -211,12 +229,13 @@ public class CharvaCommander extends JFrame {
     }
 
     private void chdir() {
-        String str = JOptionPane.showInputDialog(this, "Path to directory: ", "Change directory", JOptionPane.OK_CANCEL_OPTION);
+        String str =
+            JOptionPane.showInputDialog(this, "Path to directory: ", "Change directory", JOptionPane.OK_CANCEL_OPTION);
         if (str == null || str.trim().length() == 0)
             return;
 
         File f = str.charAt(0) == '/' ? new File(str) :
-                new File(currentPane.getPath(), str);
+            new File(currentPane.getPath(), str);
 
         if (!f.exists())
             JOptionPane.showMessageDialog(this, f.getAbsolutePath(), "Invalid directory", JOptionPane.DEFAULT_OPTION);
@@ -240,7 +259,8 @@ public class CharvaCommander extends JFrame {
 
         File f = new File(currentPane.getPath(), sel);
         if (f.isDirectory() && f.list().length > 0) {
-            conf = JOptionPane.showConfirmDialog(this, "Directory is not empty: " + sel, "Delete ?", JOptionPane.YES_NO_OPTION);
+            conf = JOptionPane
+                .showConfirmDialog(this, "Directory is not empty: " + sel, "Delete ?", JOptionPane.YES_NO_OPTION);
             if (conf != JOptionPane.YES_OPTION)
                 return;
         }
@@ -271,7 +291,8 @@ public class CharvaCommander extends JFrame {
         if (sel == null)
             return;
 
-        int conf = JOptionPane.showConfirmDialog(this, sel + " to " + otherPane.getPath(), "Copy ?", JOptionPane.YES_NO_OPTION);
+        int conf = JOptionPane
+            .showConfirmDialog(this, sel + " to " + otherPane.getPath(), "Copy ?", JOptionPane.YES_NO_OPTION);
         if (conf != JOptionPane.YES_OPTION)
             return;
 
@@ -339,7 +360,8 @@ public class CharvaCommander extends JFrame {
     }
 
     private void mkdir() {
-        String str = JOptionPane.showInputDialog(this, "Directory name: ", "Create directory", JOptionPane.OK_CANCEL_OPTION);
+        String str =
+            JOptionPane.showInputDialog(this, "Directory name: ", "Create directory", JOptionPane.OK_CANCEL_OPTION);
         if (str != null && str.trim().length() > 0) {
             File file = new File(currentPane.getPath(), str);
             file.mkdir();
@@ -393,15 +415,15 @@ public class CharvaCommander extends JFrame {
                     } else if (keyCode == KeyEvent.VK_HOME) {
                         _currentRow = 0;
                         evtqueue.postEvent(new ScrollEvent(
-                                this, ScrollEvent.DOWN, new Point(0, _currentRow)));
+                            this, ScrollEvent.DOWN, new Point(0, _currentRow)));
                     }
                     super.processKeyEvent(ke);
                     if (keyCode == KeyEvent.VK_UP ||
-                            keyCode == KeyEvent.VK_DOWN ||
-                            keyCode == KeyEvent.VK_PAGE_UP ||
-                            keyCode == KeyEvent.VK_PAGE_DOWN ||
-                            keyCode == KeyEvent.VK_END ||
-                            keyCode == KeyEvent.VK_HOME) {
+                        keyCode == KeyEvent.VK_DOWN ||
+                        keyCode == KeyEvent.VK_PAGE_UP ||
+                        keyCode == KeyEvent.VK_PAGE_DOWN ||
+                        keyCode == KeyEvent.VK_END ||
+                        keyCode == KeyEvent.VK_HOME) {
                         setSelectedIndex(_currentRow);
                     }
                 }

@@ -18,69 +18,60 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.apps.httpd;
 
 import fi.iki.elonen.NanoHTTPD;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Properties;
-
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-public class NanoHTTPDCommand extends AbstractCommand
-{
-  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
-  {
-    File file = new File("/jnode/index.htm");  // ram disk is fat, so no long extension, I guess
+public class NanoHTTPDCommand extends AbstractCommand {
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+        File file = new File("/jnode/index.htm");  // ram disk is fat, so no long extension, I guess
 
-    if (!file.exists())
-    {
-      PrintWriter printWriter = new PrintWriter(new FileOutputStream(file));
-      printWriter.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html><body>JNode - Java New Operating System Design Effort</body></html>\n");
-      printWriter.close();
+        if (!file.exists()) {
+            PrintWriter printWriter = new PrintWriter(new FileOutputStream(file));
+            printWriter.write(
+                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
+                    "<html><body>JNode - Java New Operating System Design Effort</body></html>\n");
+            printWriter.close();
+        }
+
+        NanoHTTPD nanoHTTPD = new NanoHTTPD(80) {
+            public Response serve(String uri, String method, Properties header, Properties parms) {
+                return serveFile(uri, header, new File("/jnode"), true);
+            }
+
+        };
+
+        while (true) {
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
     }
 
-    NanoHTTPD nanoHTTPD = new NanoHTTPD(80)
-    {
-      public Response serve(String uri, String method, Properties header, Properties parms)
-      {
-        return serveFile(uri, header, new File("/jnode"), true);
-      }
 
-    };
+    public static void main(String[] args) {
+        NanoHTTPDCommand nanoHTTPDCommand = new NanoHTTPDCommand();
 
-    while (true)
-    {
-      try
-      {
-        Thread.sleep(250);
-      }
-      catch (InterruptedException e)
-      {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
+        try {
+            nanoHTTPDCommand.execute(null, System.in, System.out, System.err);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
-
-  }
-
-
-  public static void main(String[] args)
-  {
-    NanoHTTPDCommand nanoHTTPDCommand = new NanoHTTPDCommand();
-
-    try
-    {
-      nanoHTTPDCommand.execute(null, System.in, System.out, System.err);
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
-  }
 }

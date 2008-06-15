@@ -20,7 +20,7 @@ import org.jnode.shell.help.def.DefaultHelp;
  */
 public class Emu {
     protected static void initEnv() throws NamingException {
-        if(true){
+        if (true) {
             InitialNaming.setNameSpace(new NameSpace() {
                 private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 

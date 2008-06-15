@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.apps.edit;
 
 import charva.awt.BorderLayout;
@@ -26,10 +26,23 @@ import charva.awt.Color;
 import charva.awt.Toolkit;
 import charva.awt.event.ActionEvent;
 import charva.awt.event.ActionListener;
-import charvax.swing.*;
+import charvax.swing.JFileChooser;
+import charvax.swing.JFrame;
+import charvax.swing.JMenu;
+import charvax.swing.JMenuBar;
+import charvax.swing.JMenuItem;
+import charvax.swing.JOptionPane;
+import charvax.swing.JPanel;
+import charvax.swing.JScrollPane;
+import charvax.swing.JTextArea;
+import charvax.swing.ListSelectionModel;
 import charvax.swing.border.TitledBorder;
 import gnu.java.security.action.GetPropertyAction;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import org.apache.log4j.Logger;
@@ -63,22 +76,22 @@ public class Editor extends JFrame {
         panel.add(sp, BorderLayout.CENTER);
         directory = (String) AccessController.doPrivileged(new GetPropertyAction("user.dir"));
         if (file != null) {
-            Boolean exists = (Boolean) AccessController.doPrivileged(new PrivilegedAction(){
+            Boolean exists = (Boolean) AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
                     return file.exists();
                 }
             });
 
-            if(exists)
+            if (exists)
                 readFile(file);
             else {
-            	try {
-            		file.createNewFile();
-            	} catch (IOException e) {
-            		
-            	}
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    //empty
+                }
             }
-            
+
             updateTitle(file.getName());
             textArea.requestFocus();
         }
@@ -204,7 +217,7 @@ public class Editor extends JFrame {
                     JOptionPane.showMessageDialog(Editor.this, "File not found: " + file);
                 } catch (IOException ioe) {
                     JOptionPane.showMessageDialog(Editor.this, "Error saving file: " + file);
-                } catch (Exception x){
+                } catch (Exception x) {
                     String msg = "Unexpected error wile saving file: " + file;
                     logger.error(msg, x);
                     JOptionPane.showMessageDialog(Editor.this, msg);

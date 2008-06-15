@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.apps.debug;
 
 import java.lang.reflect.Field;
@@ -26,21 +26,23 @@ import java.lang.reflect.Field;
 
 /**
  * Just a bean to store a Field and an object which has that field
+ *
  * @author blind
  */
-class ObjectFieldPair{
-	Object object;
-	Field field;
-	public ObjectFieldPair(Object object, Field field) {
-		this.object = object;
-		this. field = field;
-	}
-	
-	public Field getField() {
-		return field;
-	}
+class ObjectFieldPair {
+    Object object;
+    Field field;
 
-	public Object getObject() {
-		return object;
-	}
+    public ObjectFieldPair(Object object, Field field) {
+        this.object = object;
+        this.field = field;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Object getObject() {
+        return object;
+    }
 }

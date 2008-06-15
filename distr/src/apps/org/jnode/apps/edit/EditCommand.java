@@ -24,7 +24,6 @@ package org.jnode.apps.edit;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
@@ -35,7 +34,7 @@ import org.jnode.shell.syntax.FileArgument;
  */
 public class EditCommand extends AbstractCommand {
     private final FileArgument ARG_EDIT = new FileArgument("file", Argument.OPTIONAL, "the file to edit");
-    
+
     public EditCommand() {
         super("edit a file");
         registerArguments(ARG_EDIT);
@@ -44,7 +43,7 @@ public class EditCommand extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         new EditCommand().execute(args);
     }
-    
+
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
         throws Exception {
         final File file = ARG_EDIT.isSet() ? ARG_EDIT.getValue() : null;

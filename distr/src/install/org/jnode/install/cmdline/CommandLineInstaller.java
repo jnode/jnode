@@ -24,7 +24,7 @@ public class CommandLineInstaller extends AbstractInstaller {
         actionList.add(new CopyFilesAction());
     }
 
-    public static void main(String...argv){
+    public static void main(String... argv) {
         new CommandLineInstaller().start();
     }
 
@@ -32,11 +32,12 @@ public class CommandLineInstaller extends AbstractInstaller {
     protected InputContext getInputContext() {
         return new InputContext() {
             private BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
             public String getStringInput(String message) {
                 try {
                     System.out.println(message);
                     return in.readLine();
-                }catch(IOException e){
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }

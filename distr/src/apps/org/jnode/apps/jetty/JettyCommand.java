@@ -6,7 +6,6 @@ package org.jnode.apps.jetty;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
@@ -21,13 +20,13 @@ import org.mortbay.jetty.webapp.WebAppContext;
  * @author Levente S\u00e1ntha
  */
 public class JettyCommand extends AbstractCommand {
-    private final FileArgument ARG_WEBAPP = 
+    private final FileArgument ARG_WEBAPP =
         new FileArgument("webapp", Argument.MANDATORY, "web application directory");
-    
-    private final PortNumberArgument ARG_PORT = 
+
+    private final PortNumberArgument ARG_PORT =
         new PortNumberArgument("port", Argument.OPTIONAL, "http port (default 8080)");
-    
-    
+
+
     public JettyCommand() {
         super("start the Jetty web server running a web application");
         registerArguments(ARG_PORT, ARG_WEBAPP);
@@ -37,11 +36,11 @@ public class JettyCommand extends AbstractCommand {
         new JettyCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
         throws Exception {
         File webapp_dir = ARG_WEBAPP.getValue();
         int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : 8080;
-        
+
         Server server = new Server(port);
 
         WebAppContext webapp = new WebAppContext();
@@ -50,6 +49,6 @@ public class JettyCommand extends AbstractCommand {
         server.setHandler(webapp);
 
         server.start();
-        server.join();        
+        server.join();
     }
 }

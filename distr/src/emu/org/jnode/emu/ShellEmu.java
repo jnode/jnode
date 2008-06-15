@@ -13,8 +13,8 @@ public class ShellEmu extends Emu {
         initEnv();
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         new Thread(new CommandShell(cm.createConsole(
-        		"Console 1",
-                (ConsoleManager.CreateOptions.TEXT | 
-                		ConsoleManager.CreateOptions.SCROLLABLE)))).start();
+            "Console 1",
+            (ConsoleManager.CreateOptions.TEXT |
+                ConsoleManager.CreateOptions.SCROLLABLE)))).start();
     }
 }
