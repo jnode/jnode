@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vga;
 
 import org.jnode.driver.Bus;
@@ -33,26 +33,25 @@ import org.jnode.driver.DriverException;
  */
 public class VGAFinder implements DeviceFinder {
 
-	/**
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
-		/*try {
-			devMan.register(new VGADevice(bus));
-		} catch (DriverException ex) {
-			throw new DeviceException(ex);
-		}*/
-	}
+    /**
+     * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager,
+     *      org.jnode.driver.Bus)
+     */
+    public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
+        /*
+         * try { devMan.register(new VGADevice(bus)); } catch (DriverException
+         * ex) { throw new DeviceException(ex); }
+         */
+    }
 
-	public static class VGADevice extends Device {
-				
-		/**
-		 * @param bus
-		 */
-		public VGADevice(Bus bus) 
-		throws DriverException {
-			super(bus, "Standard VGA");
-			this.setDriver(new VGADriver());
-		}
-	}
+    public static class VGADevice extends Device {
+
+        /**
+         * @param bus
+         */
+        public VGADevice(Bus bus) throws DriverException {
+            super(bus, "Standard VGA");
+            this.setDriver(new VGADriver());
+        }
+    }
 }

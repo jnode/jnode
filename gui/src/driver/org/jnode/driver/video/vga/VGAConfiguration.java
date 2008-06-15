@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vga;
 
 import java.awt.image.BufferedImage;
@@ -32,29 +32,30 @@ import org.jnode.driver.video.FrameBufferConfiguration;
  */
 public class VGAConfiguration extends FrameBufferConfiguration {
 
-	private final IndexColorModel colorModel;
+    private final IndexColorModel colorModel;
 
-	/**
-	 * @param width
-	 * @param height
-	 * @param colorModel
-	 */
-	public VGAConfiguration(int width, int height, IndexColorModel colorModel) {
-		super(width, height, colorModel);
-		this.colorModel = colorModel;
-	}
+    /**
+     * @param width
+     * @param height
+     * @param colorModel
+     */
+    public VGAConfiguration(int width, int height, IndexColorModel colorModel) {
+        super(width, height, colorModel);
+        this.colorModel = colorModel;
+    }
 
-	/**
-	 * Returns a BufferedImage that supports the specified transparency 
-	 * and has a data layout and color model compatible with this device. 
-	 * This method has nothing to do with memory-mapping a device. 
-	 * The returned BufferedImage has a layout and color model that 
-	 * can be optimally blitted to this device. 
-	 * @see java.awt.Transparency#BITMASK
-	 * @see java.awt.Transparency#OPAQUE
-	 * @see java.awt.Transparency#TRANSLUCENT
-	 */
-	public JNodeBufferedImage createCompatibleImage(int w, int h, int transparency) {
-		return new JNodeBufferedImage(w, h, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
-	}
+    /**
+     * Returns a BufferedImage that supports the specified transparency and has
+     * a data layout and color model compatible with this device. This method
+     * has nothing to do with memory-mapping a device. The returned
+     * BufferedImage has a layout and color model that can be optimally blitted
+     * to this device.
+     * 
+     * @see java.awt.Transparency#BITMASK
+     * @see java.awt.Transparency#OPAQUE
+     * @see java.awt.Transparency#TRANSLUCENT
+     */
+    public JNodeBufferedImage createCompatibleImage(int w, int h, int transparency) {
+        return new JNodeBufferedImage(w, h, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
+    }
 }

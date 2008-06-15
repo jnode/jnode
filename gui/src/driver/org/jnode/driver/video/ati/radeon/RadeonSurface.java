@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.ati.radeon;
 
 import java.awt.Color;
@@ -51,8 +51,7 @@ public class RadeonSurface extends AbstractSurface {
      * Initialize this instance.
      */
     public RadeonSurface(RadeonCore kernel, RadeonConfiguration config,
-            BitmapGraphics bitmapGraphics, MemoryResource screen,
-            RadeonAcceleration accel) {
+            BitmapGraphics bitmapGraphics, MemoryResource screen, RadeonAcceleration accel) {
         super(config.getScreenWidth(), config.getScreenHeight());
         this.kernel = kernel;
         this.bitmapGraphics = bitmapGraphics;
@@ -91,22 +90,21 @@ public class RadeonSurface extends AbstractSurface {
      */
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
             int dstY, int width, int height, Color color) {
-        bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width,
-                height, convertColor(color));
+        bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height,
+                convertColor(color));
     }
 
     /**
      * @see org.jnode.driver.video.Surface#drawCompatibleRaster(java.awt.image.Raster,
      *      int, int, int, int, int, int, java.awt.Color)
      */
-    public void drawCompatibleRaster(Raster raster, int srcX, int srcY,
-            int dstX, int dstY, int width, int height, Color bgColor) {
+    public void drawCompatibleRaster(Raster raster, int srcX, int srcY, int dstX, int dstY,
+            int width, int height, Color bgColor) {
         if (bgColor == null) {
-            bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width,
-                    height);
+            bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height);
         } else {
-            bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width,
-                    height, convertColor(bgColor));
+            bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height,
+                    convertColor(bgColor));
         }
     }
 

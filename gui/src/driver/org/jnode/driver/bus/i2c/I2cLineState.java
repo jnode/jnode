@@ -18,17 +18,17 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.i2c;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class I2cLineState {
-	
-	/** The clock bit */
-	public boolean scl; 
-	/** The data bit */
-	public boolean sda;
+
+    /** The clock bit */
+    public boolean scl;
+    /** The data bit */
+    public boolean sda;
 
 }

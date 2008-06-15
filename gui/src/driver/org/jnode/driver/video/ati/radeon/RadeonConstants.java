@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.ati.radeon;
 
 /**
@@ -49,21 +49,21 @@ public interface RadeonConstants {
 
     public static class MonitorType {
 
-    	public static final int NONE = 0;
-    	public static final int CRT = 1;/* CRT */
-    	public static final int LCD = 2;/* LCD */
-    	public static final int DFP = 3;/* DVI */
-    	public static final int CTV = 4;/* composite TV */
-    	public static final int STV = 5;/* S-Video out */
-    	
-    	private static final String[] NAMES = { "NONE", "CRT", "LCD", "DFP", "CTV", "STV" };
-    	
-    	public static String toString(int monitorType) {
-    		return NAMES[monitorType];
-    	}
-    
+        public static final int NONE = 0;
+        public static final int CRT = 1;/* CRT */
+        public static final int LCD = 2;/* LCD */
+        public static final int DFP = 3;/* DVI */
+        public static final int CTV = 4;/* composite TV */
+        public static final int STV = 5;/* S-Video out */
+
+        private static final String[] NAMES = {"NONE", "CRT", "LCD", "DFP", "CTV", "STV"};
+
+        public static String toString(int monitorType) {
+            return NAMES[monitorType];
+        }
+
     }
-    
+
     public static final int RADEON_REGSIZE = 0x4000;
 
     public static final int MM_INDEX = 0x0000;
@@ -349,7 +349,7 @@ public interface RadeonConstants {
     public static final int CRTC2_V_TOTAL_DISP = 0x0308;
 
     public static final int CRTC_V_SYNC_STRT_WID = 0x020C;
-    public static final int  CRTC2_V_SYNC_STRT_WID = 0x030c;
+    public static final int CRTC2_V_SYNC_STRT_WID = 0x030c;
 
     public static final int CRTC_VLINE_CRNT_VLINE = 0x0210;
 
@@ -427,8 +427,8 @@ public interface RadeonConstants {
 
     public static final int AUX_WINDOW_VERT_CNTL = 0x02DC;
 
-    //    public static final int DDA_CONFIG = 0x02e0;
-    //    public static final int DDA_ON_OFF = 0x02e4;
+    // public static final int DDA_CONFIG = 0x02e0;
+    // public static final int DDA_ON_OFF = 0x02e4;
     public static final int DVI_I2C_CNTL_1 = 0x02e4;
 
     public static final int GRPH_BUFFER_CNTL = 0x02F0;
@@ -966,11 +966,11 @@ public interface RadeonConstants {
 
     /* CLOCK_CNTL_INDEX bit constants */
     public static final int PLL_WR_EN = 0x00000080;
-    public static final int PLL_DIV_SEL_MASK   =   (3 << 8);
-    public static final int PLL_DIV_SEL_DIV0   =   (0 << 8);
-    public static final int PLL_DIV_SEL_DIV1   =   (1 << 8);
-    public static final int PLL_DIV_SEL_DIV2   =   (2 << 8);
-    public static final int PLL_DIV_SEL_DIV3   =   (3 << 8);
+    public static final int PLL_DIV_SEL_MASK = (3 << 8);
+    public static final int PLL_DIV_SEL_DIV0 = (0 << 8);
+    public static final int PLL_DIV_SEL_DIV1 = (1 << 8);
+    public static final int PLL_DIV_SEL_DIV2 = (2 << 8);
+    public static final int PLL_DIV_SEL_DIV3 = (3 << 8);
 
     /* CONFIG_CNTL bit constants */
     public static final int CFG_VGA_RAM_EN = 0x00000100;
@@ -1014,22 +1014,22 @@ public interface RadeonConstants {
     public static final int CRTC_VBLANK = 0x00000001;
 
     /* CRTC2_GEN_CNTL bit constants */
-	public static final int CRTC2_DBL_SCAN_EN      =(1 <<  0);
-	public static final int CRTC2_INTERLACE_EN     =(1 <<  1);
-	public static final int CRTC2_SYNC_TRISTAT     =(1 <<  4);
-	public static final int CRTC2_HSYNC_TRISTAT    =(1 <<  5);
-	public static final int CRTC2_VSYNC_TRISTAT    =(1 <<  6);
-	public static final int CRTC2_CRT2_ON          =(1 <<  7);
-	public static final int CRTC2_PIX_WIDTH_SHIFT  =8;
-	public static final int CRTC2_PIX_WIDTH_MASK   =(0xf << 8);
-	public static final int CRTC2_ICON_EN          =(1 << 15);
-	public static final int CRTC2_CUR_EN           =(1 << 16);
-	public static final int CRTC2_CUR_MODE_MASK    =(7 << 20);
-	public static final int CRTC2_DISP_DIS         =(1 << 23);
-	public static final int CRTC2_EN               =(1 << 25);
-	public static final int CRTC2_DISP_REQ_EN_B    =(1 << 26);
-	public static final int CRTC2_HSYNC_DIS        =(1 << 28);
-	public static final int CRTC2_VSYNC_DIS        =(1 << 29);
+    public static final int CRTC2_DBL_SCAN_EN = (1 << 0);
+    public static final int CRTC2_INTERLACE_EN = (1 << 1);
+    public static final int CRTC2_SYNC_TRISTAT = (1 << 4);
+    public static final int CRTC2_HSYNC_TRISTAT = (1 << 5);
+    public static final int CRTC2_VSYNC_TRISTAT = (1 << 6);
+    public static final int CRTC2_CRT2_ON = (1 << 7);
+    public static final int CRTC2_PIX_WIDTH_SHIFT = 8;
+    public static final int CRTC2_PIX_WIDTH_MASK = (0xf << 8);
+    public static final int CRTC2_ICON_EN = (1 << 15);
+    public static final int CRTC2_CUR_EN = (1 << 16);
+    public static final int CRTC2_CUR_MODE_MASK = (7 << 20);
+    public static final int CRTC2_DISP_DIS = (1 << 23);
+    public static final int CRTC2_EN = (1 << 25);
+    public static final int CRTC2_DISP_REQ_EN_B = (1 << 26);
+    public static final int CRTC2_HSYNC_DIS = (1 << 28);
+    public static final int CRTC2_VSYNC_DIS = (1 << 29);
 
     /* CUR_OFFSET, CUR_HORZ_VERT_POSN, CUR_HORZ_VERT_OFF bit constants */
     public static final int CUR_LOCK = 0x80000000;
@@ -1121,8 +1121,8 @@ public interface RadeonConstants {
 
     public static final int LVDS_SEL_CRTC2 = (1 << 23);
 
-    public static final int LVDS_STATE_MASK = (LVDS_ON | LVDS_DISPLAY_DIS
-            | LVDS_BL_MOD_LEVEL_MASK | LVDS_EN | LVDS_DIGON | LVDS_BLON);
+    public static final int LVDS_STATE_MASK =
+            (LVDS_ON | LVDS_DISPLAY_DIS | LVDS_BL_MOD_LEVEL_MASK | LVDS_EN | LVDS_DIGON | LVDS_BLON);
 
     /* LVDS_PLL_CNTL bit constatns */
     public static final int HSYNC_DELAY_SHIFT = 0x1c;
@@ -1539,15 +1539,15 @@ public interface RadeonConstants {
     public static final int PIXCLK_ALWAYS_ONb = 0x00000040;
 
     public static final int PIXCLK_DAC_ALWAYS_ONb = 0x00000080;
-    public static final int VCLK_SRC_SEL_MASK    = (3 << 0);
-    public static final int VCLK_SRC_CPU_CLK     = (0 << 0);
-    public static final int VCLK_SRC_PSCAN_CLK   = (1 << 0);
-    public static final int VCLK_SRC_BYTE_CLK    = (2 << 0);
-    public static final int VCLK_SRC_PPLL_CLK    = (3 << 0);
-    public static final int ECP_DIV_SHIFT        = 8;
-    public static final int ECP_DIV_MASK         = (3 << 8);
-    public static final int ECP_DIV_VCLK         = (0 << 8);
-    public static final int ECP_DIV_VCLK_2       = (1 << 8);
+    public static final int VCLK_SRC_SEL_MASK = (3 << 0);
+    public static final int VCLK_SRC_CPU_CLK = (0 << 0);
+    public static final int VCLK_SRC_PSCAN_CLK = (1 << 0);
+    public static final int VCLK_SRC_BYTE_CLK = (2 << 0);
+    public static final int VCLK_SRC_PPLL_CLK = (3 << 0);
+    public static final int ECP_DIV_SHIFT = 8;
+    public static final int ECP_DIV_MASK = (3 << 8);
+    public static final int ECP_DIV_VCLK = (0 << 8);
+    public static final int ECP_DIV_VCLK_2 = (1 << 8);
 
     /* BUS_CNTL1 constants */
     public static final int BUS_CNTL1_MOBILE_PLATFORM_SEL_MASK = 0x0c000000;
@@ -1675,6 +1675,6 @@ public interface RadeonConstants {
 
     public static final int GUI_ACTIVE = 0x80000000;
 
-    public static final byte[] BIOS_ROM_SIGNATURE = { 0x55, (byte)0xAA };
-    public static final byte[] ATI_ROM_SIGNATURE = { '7', '6', '1', '2', '9', '5', '5', '2', '0' };
+    public static final byte[] BIOS_ROM_SIGNATURE = {0x55, (byte) 0xAA};
+    public static final byte[] ATI_ROM_SIGNATURE = {'7', '6', '1', '2', '9', '5', '5', '2', '0'};
 }

@@ -18,15 +18,15 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.i2c;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface I2cConstants {
-	
-	public static final int I2C_DELAY = 2;
-	public static final int I2C_TIMEOUT = 100;
+
+    public static final int I2C_DELAY = 2;
+    public static final int I2C_TIMEOUT = 100;
 
 }

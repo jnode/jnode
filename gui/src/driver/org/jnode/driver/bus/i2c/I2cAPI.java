@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.i2c;
 
 import org.jnode.driver.DeviceAPI;
@@ -27,18 +27,20 @@ import org.jnode.driver.DeviceAPI;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface I2cAPI extends DeviceAPI {
-	
-	/**
-	 * Get a single bit
-	 * @param bit
-	 */
-	public void getLines(I2cLineState bit);
 
-	/**
-	 * Write a single bit
-	 * @param scl The clock bit
-	 * @param sda The data line
-	 */
-	public void setLines(int scl, int sda);
+    /**
+     * Get a single bit
+     * 
+     * @param bit
+     */
+    public void getLines(I2cLineState bit);
+
+    /**
+     * Write a single bit
+     * 
+     * @param scl The clock bit
+     * @param sda The data line
+     */
+    public void setLines(int scl, int sda);
 
 }

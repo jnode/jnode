@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vgahw;
 
 import org.jnode.system.MemoryResource;
@@ -28,28 +28,37 @@ import org.jnode.system.MemoryResource;
  */
 public interface VgaIO {
 
-	void setATTIndex(int index);
-	void setATT(int index, int val);
-	int getATT(int index);
+    void setATTIndex(int index);
 
-	void setMISC(int val);
-	int getMISC();
+    void setATT(int index, int val);
 
-	void setSEQ(int index, int val);
-	int getSEQ(int index);
+    int getATT(int index);
 
-	int getSTAT();
+    void setMISC(int val);
 
-	void setGRAF(int index, int val);
-	int getGRAF(int index);
+    int getMISC();
 
-	void setCRT(int index, int val);
-	int getCRT(int index);
+    void setSEQ(int index, int val);
 
-	void setDACReadIndex(int index);
-	void setDACWriteIndex(int index);
-	void setDACData(int data);
-	int getDACData();
-	
-	MemoryResource getVideoMem();
+    int getSEQ(int index);
+
+    int getSTAT();
+
+    void setGRAF(int index, int val);
+
+    int getGRAF(int index);
+
+    void setCRT(int index, int val);
+
+    int getCRT(int index);
+
+    void setDACReadIndex(int index);
+
+    void setDACWriteIndex(int index);
+
+    void setDACData(int data);
+
+    int getDACData();
+
+    MemoryResource getVideoMem();
 }

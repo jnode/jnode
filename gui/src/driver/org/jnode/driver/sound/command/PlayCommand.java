@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.sound.command;
 
 import java.io.InputStream;
@@ -38,15 +38,15 @@ import org.jnode.shell.syntax.MappedArgument;
  * @author Matt Paine
  */
 public class PlayCommand extends AbstractCommand {
-    
+
     private static final HashMap<String, Note[]> TUNES = new HashMap<String, Note[]>();
-    
+
     static {
         TUNES.put("scale", SpeakerUtils.SCALE);
         TUNES.put("aaf", SpeakerUtils.AAF);
         TUNES.put("beep", SpeakerUtils.stdBeep);
     }
-    
+
     private static class TuneArgument extends MappedArgument<Note[]> {
         public TuneArgument(String label, int flags, String description) {
             super(label, flags, new Note[0][], TUNES, false, description);
@@ -57,21 +57,21 @@ public class PlayCommand extends AbstractCommand {
             return "tune";
         }
     }
-    
-    private final TuneArgument ARG_TUNE = new TuneArgument(
-            "tune", Argument.OPTIONAL, "The name of the tune to be played");
-    
+
+    private final TuneArgument ARG_TUNE =
+            new TuneArgument("tune", Argument.OPTIONAL, "The name of the tune to be played");
+
     public PlayCommand() {
         super("Plays a tune");
         registerArguments(ARG_TUNE);
     }
 
-	public static void main(String[] args) throws Exception {
-	    new PlayCommand().execute(args);
+    public static void main(String[] args) throws Exception {
+        new PlayCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
         Note[] tune = ARG_TUNE.isSet() ? ARG_TUNE.getValue() : SpeakerUtils.SCALE;
         SpeakerUtils.play(tune);
-	}
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.driver.video;
  */
 public class AlreadyOpenException extends FrameBufferException {
 
-	/**
-	 * 
-	 */
-	public AlreadyOpenException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public AlreadyOpenException() {
+        super();
+    }
 
-	/**
-	 * @param s
-	 */
-	public AlreadyOpenException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public AlreadyOpenException(String s) {
+        super(s);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public AlreadyOpenException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public AlreadyOpenException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public AlreadyOpenException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public AlreadyOpenException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -18,27 +18,28 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.sound.speaker.pc;
-import  org.jnode.driver.Bus;
-import  org.jnode.driver.Device;
-import  org.jnode.driver.DriverException;
 
-/** Defines the speaker device
- *  @author Matt Paine
- **/
-public class PCSpeakerDevice extends Device
-{
+import org.jnode.driver.Bus;
+import org.jnode.driver.Device;
+import org.jnode.driver.DriverException;
 
-	/** Constructs the device.
-	 *  @param bus The bus that this device is on.
-	 **/
-	public PCSpeakerDevice (Bus bus) throws DriverException
-	{
-		super (bus, "speaker0");
-		setDriver(new PCSpeakerDriver());
-	}
+/**
+ * Defines the speaker device
+ * 
+ * @author Matt Paine
+ */
+public class PCSpeakerDevice extends Device {
 
+    /**
+     * Constructs the device.
+     * 
+     * @param bus The bus that this device is on.
+     */
+    public PCSpeakerDevice(Bus bus) throws DriverException {
+        super(bus, "speaker0");
+        setDriver(new PCSpeakerDriver());
+    }
 
 }
-

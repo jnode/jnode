@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vga;
 
+import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.awt.image.SampleModel;
-import java.awt.image.DataBuffer;
 import java.awt.image.SinglePixelPackedSampleModel;
 
 import org.jnode.driver.DeviceException;
@@ -42,56 +42,53 @@ import org.jnode.system.ResourceNotFreeException;
  */
 public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants {
 
-    static final IndexColorModel COLOR_MODEL = new IndexColorModel(4, 16, REDS, GREENS, BLUES){
+    static final IndexColorModel COLOR_MODEL = new IndexColorModel(4, 16, REDS, GREENS, BLUES) {
         // Typically overridden
         public SampleModel createCompatibleSampleModel(int w, int h) {
-            //return new VGASampleModel(w, h);
+            // return new VGASampleModel(w, h);
             return new SinglePixelPackedSampleModel(DataBuffer.TYPE_BYTE, w, h, new int[] {0xFF});
         }
 
         /**
-         * Converts an sRGB pixel int value to an array containing a
-         * single pixel of the color space of the color model.
-         * <p/>
-         * <p>This method performs the inverse function of
-         * <code>getRGB(Object inData)</code>.
-         * <p/>
-         * Outline of conversion process:
-         * <p/>
+         * Converts an sRGB pixel int value to an array containing a single
+         * pixel of the color space of the color model. <p/>
+         * <p>
+         * This method performs the inverse function of
+         * <code>getRGB(Object inData)</code>. <p/> Outline of conversion
+         * process: <p/>
          * <ol>
          * <p/>
          * <li>Convert rgb to normalized [0.0, 1.0] sRGB values.</li>
          * <p/>
-         * <li>Convert to color space components using fromRGB in
-         * ColorSpace.</li>
+         * <li>Convert to color space components using fromRGB in ColorSpace.</li>
          * <p/>
-         * <li>If color model has alpha and should be premultiplied,
-         * multiply color space components with alpha value</li>
+         * <li>If color model has alpha and should be premultiplied, multiply
+         * color space components with alpha value</li>
          * <p/>
          * <li>Scale the components to the correct number of bits.</li>
          * <p/>
          * <li>Arrange the components in the output array</li>
          * <p/>
          * </ol>
-         *
-         * @param rgb   The color to be converted to dataElements.  A pixel
-         *              in sRGB color space, encoded in default 0xAARRGGBB format,
-         *              assumed not alpha premultiplied.
-         * @param pixel to avoid needless creation of arrays, an array to
-         *              use to return the pixel can be given. If null, a suitable array
-         *              will be created.
-         * @return An array of transferType values representing the color,
-         *         in the color model format. The color model defines whether the
+         * 
+         * @param rgb The color to be converted to dataElements. A pixel in sRGB
+         *            color space, encoded in default 0xAARRGGBB format, assumed
+         *            not alpha premultiplied.
+         * @param pixel to avoid needless creation of arrays, an array to use to
+         *            return the pixel can be given. If null, a suitable array
+         *            will be created.
+         * @return An array of transferType values representing the color, in
+         *         the color model format. The color model defines whether the
          * @see #getRGB(Object)
          */
         public Object getDataElements(int rgb, Object pixel) {
-            //TODO determin the reight color here
+            // TODO determin the reight color here
             byte[] p = new byte[1];
             int min_i = 0;
             int min_rgb = Integer.MAX_VALUE;
-            for(int i = 0; i< 16; i++){
+            for (int i = 0; i < 16; i++) {
                 int c = getRGB(i);
-                if(c == rgb){
+                if (c == rgb) {
                     min_i = i;
                     break;
                 } else {
@@ -101,11 +98,14 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
                     int r2 = (0x00FF0000 & rgb) >> 16;
                     int g2 = (0x0000FF00 & rgb) >> 8;
                     int b2 = (0x000000FF & rgb);
-                    int dr = r1-r2; dr = dr < 0 ? - dr : dr;
-                    int dg = g1-g2; dg = dg < 0 ? - dg : dg;
-                    int db = b1-b2; db = db < 0 ? - db : db;
+                    int dr = r1 - r2;
+                    dr = dr < 0 ? -dr : dr;
+                    int dg = g1 - g2;
+                    dg = dg < 0 ? -dg : dg;
+                    int db = b1 - b2;
+                    db = db < 0 ? -db : db;
                     int v = dr + dg + db;
-                    if(min_rgb < v){
+                    if (min_rgb < v) {
                         min_rgb = v;
                         min_i = i;
                     }
@@ -116,12 +116,11 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
         }
     };
 
-    private static final FrameBufferConfiguration[] CONFIGS = { new VGAConfiguration(640, 480, COLOR_MODEL)};
+    private static final FrameBufferConfiguration[] CONFIGS =
+            {new VGAConfiguration(640, 480, COLOR_MODEL)};
 
     private FrameBufferConfiguration currentConfig;
     private VGASurface vga;
-
-
 
     /**
      * @see org.jnode.driver.Driver#stopDevice()
@@ -150,7 +149,8 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#open(org.jnode.driver.video.FrameBufferConfiguration)
      */
-    public synchronized Surface open(FrameBufferConfiguration config) throws UnknownConfigurationException, AlreadyOpenException, DeviceException {
+    public synchronized Surface open(FrameBufferConfiguration config)
+        throws UnknownConfigurationException, AlreadyOpenException, DeviceException {
         if (currentConfig != null) {
             throw new AlreadyOpenException();
         } else if (config.equals(CONFIGS[0])) {

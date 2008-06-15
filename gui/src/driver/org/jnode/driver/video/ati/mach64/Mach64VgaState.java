@@ -18,9 +18,8 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.driver.video.ati.mach64;
 
+package org.jnode.driver.video.ati.mach64;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -61,6 +60,7 @@ final class Mach64VgaState implements Mach64Constants {
 
     /**
      * Save the current card state into this instance.
+     * 
      * @param io
      */
     public void saveFromVGA(Mach64VgaIO io) {
@@ -96,9 +96,10 @@ final class Mach64VgaState implements Mach64Constants {
 
         gen_test_cntl = io.getReg32(GEN_TEST_CNTL) & ~HWCURSOR_ENABLE;
     }
-    
+
     /**
      * Restore the state of this instance into the card.
+     * 
      * @param io
      */
     public void restoreToVGA(Mach64VgaIO io) {
@@ -134,15 +135,15 @@ final class Mach64VgaState implements Mach64Constants {
 
         io.setReg32(GEN_TEST_CNTL, gen_test_cntl);
     }
-    
+
     /**
      * Set this state up for a given configuration;
+     * 
      * @param config
      * @param io
      */
     final void calcForConfiguration(Mach64Configuration config, Mach64VgaIO io) {
         saveFromVGA(io);
     }
-        
 
 }

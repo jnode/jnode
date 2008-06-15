@@ -18,28 +18,33 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.sound.speaker;
-import  org.jnode.driver.DeviceAPI;
 
-/** This API defines how a speaker should be interfaced with JNode.
- *  @author Matt Paine
- **/
-public interface SpeakerAPI extends DeviceAPI
-{
+import org.jnode.driver.DeviceAPI;
 
-	/** Plays a simple beep **/
-	public void beep();
+/**
+ * This API defines how a speaker should be interfaced with JNode.
+ * 
+ * @author Matt Paine
+ */
+public interface SpeakerAPI extends DeviceAPI {
 
-	/** Plays a single Note.
-	 *  @param n The note to play
-	 **/
-	public void playNote (Note n);
+    /** Plays a simple beep * */
+    public void beep();
 
-	/** Plays a series of notes.
-	 *  @param n The arraw of notes to play
-	 **/
-	public void playNote (Note[] n);
+    /**
+     * Plays a single Note.
+     * 
+     * @param n The note to play
+     */
+    public void playNote(Note n);
+
+    /**
+     * Plays a series of notes.
+     * 
+     * @param n The arraw of notes to play
+     */
+    public void playNote(Note[] n);
 
 }
-
