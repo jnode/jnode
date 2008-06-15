@@ -113,7 +113,7 @@ class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 		final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		if (addrs.length < 1) {
-			throw new DriverException("Cannot find iobase: not base addresses");
+			throw new DriverException("Cannot find iobase: no base address");
 		}
 		if (!addrs[0].isIOSpace()) {
 			throw new DriverException("Cannot find iobase: first address is not I/O");

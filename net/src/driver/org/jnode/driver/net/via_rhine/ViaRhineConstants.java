@@ -351,8 +351,8 @@ interface ViaRhineConstants {
     int NIC_LB_INTERNAL = 0x01;
     int NIC_LB_PHY = 0x02;    /* MII or Internal-10BaseT loopback */
 
-    int TX_RING_SIZE = 2;
-    int RX_RING_SIZE = 2;
+    int TX_RING_SIZE = 16;
+    int RX_RING_SIZE = 16;
     int PKT_BUF_SZ = 1536;    /* Size of each temporary Rx buffer. */
 
     int PCI_REG_MODE3 = 0x53;
