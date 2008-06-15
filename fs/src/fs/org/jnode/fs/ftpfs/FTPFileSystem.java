@@ -164,17 +164,17 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
 
     public long getFreeSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 
     public long getTotalSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 
     public long getUsableSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 
     FTPFile[] dirDetails(String path) throws IOException, FTPException, ParseException {

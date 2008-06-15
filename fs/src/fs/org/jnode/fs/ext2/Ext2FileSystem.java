@@ -947,6 +947,6 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
 
     public long getUsableSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 }

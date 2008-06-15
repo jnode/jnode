@@ -62,9 +62,24 @@ public interface FileSystem<T extends FSEntry> {
      */
     public boolean isClosed();
 
+    /**
+     * The total size of this file system.
+     * @return if -1 this feature is unsupported
+     * @throws IOException if an I/O error occurs
+     */
     public long getTotalSpace() throws IOException;
 
+    /**
+     * The free space of this file system.
+     * @return if -1 this feature is unsupported
+     * @throws IOException if an I/O error occurs
+     */
     public long getFreeSpace() throws IOException;
 
+    /**
+     * The usabe space of this file system.
+     * @return if -1 this feature is unsupported
+     * @throws IOException if an I/O error occurs
+     */
     public long getUsableSpace() throws IOException;
 }

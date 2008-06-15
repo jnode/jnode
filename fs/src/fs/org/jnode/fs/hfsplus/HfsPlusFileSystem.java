@@ -104,7 +104,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
     public final long getUsableSpace() {
         // TODO Auto-generated method stub
-        return 0;
+        return -1;
     }
 
     public final Catalog getCatalog() {
