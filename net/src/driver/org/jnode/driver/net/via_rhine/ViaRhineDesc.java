@@ -3,10 +3,10 @@
  */
 package org.jnode.driver.net.via_rhine;
 
+import org.apache.log4j.Logger;
+import static org.jnode.driver.net.via_rhine.ViaRhineConstants.PKT_BUF_SZ;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import static org.jnode.driver.net.via_rhine.ViaRhineConstants.PKT_BUF_SZ;
-import org.apache.log4j.Logger;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -33,34 +33,35 @@ class ViaRhineDesc {
         dataMr = rm.asMemoryResource(data);
         Address datma = dataMr.getAddress();
         dataOffs = align32(datma);
-        descMr.setInt(descOffs + 8, datma.add(dataOffs).toInt());        
+        descMr.setInt(descOffs + 8, datma.add(dataOffs).toInt());
     }
 
-    void setOwnBit(){
+    void setOwnBit() {
         descMr.setInt(descOffs, descMr.getInt(descOffs) | OWN_BIT_MASK);
     }
 
-    boolean isOwnBit(){
+    boolean isOwnBit() {
         return (descMr.getInt(descOffs) & OWN_BIT_MASK) != 0;
     }
 
-    void setNextDescAddr(int addr){
+    void setNextDescAddr(int addr) {
         descMr.setInt(descOffs + 12, addr);
     }
 
     /**
      * Align an addres on 32-byte boundary.
+     *
      * @param addr the address
      * @return the the aligned address offset relative to addr
      */
-    private int align32(Address addr){
+    private int align32(Address addr) {
         int i_addr = addr.toInt();
-		int offs = 0;
+        int offs = 0;
 
-		while ((i_addr & 31) != 0) {
-			i_addr++;
-			offs++;
-		}
+        while ((i_addr & 31) != 0) {
+            i_addr++;
+            offs++;
+        }
 
         return offs;
     }

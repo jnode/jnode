@@ -3,15 +3,16 @@
  */
 package org.jnode.driver.net.via_rhine;
 
-import static org.jnode.driver.net.via_rhine.ViaRhineConstants.*;
-import org.jnode.system.ResourceManager;
+import static org.jnode.driver.net.via_rhine.ViaRhineConstants.PKT_BUF_SZ;
+import static org.jnode.driver.net.via_rhine.ViaRhineConstants.RX_RING_SIZE;
 import org.jnode.net.SocketBuffer;
+import org.jnode.system.ResourceManager;
 
 /**
  * @author Levente S\u00e1ntha
  */
 class ViaRhineRxRing extends ViaRhineRing<ViaRhineRxRing.RxDesc> {
-    ViaRhineRxRing(ResourceManager rm){
+    ViaRhineRxRing(ResourceManager rm) {
         super(rm, RX_RING_SIZE);
     }
 
@@ -19,8 +20,8 @@ class ViaRhineRxRing extends ViaRhineRing<ViaRhineRxRing.RxDesc> {
         return new RxDesc(rm);
     }
 
-    static class RxDesc extends ViaRhineDesc{
-        RxDesc(ResourceManager rm){
+    static class RxDesc extends ViaRhineDesc {
+        RxDesc(ResourceManager rm) {
             super(rm);
             setOwnBit();
             setDataBufferSize(PKT_BUF_SZ);
@@ -30,11 +31,11 @@ class ViaRhineRxRing extends ViaRhineRing<ViaRhineRxRing.RxDesc> {
             descMr.setInt(descOffs + 4, size);
         }
 
-        int getFrameLength(){
+        int getFrameLength() {
             return descMr.getChar(descOffs + 2) & 0x000007FF;
         }
 
-        SocketBuffer getPacket(){
+        SocketBuffer getPacket() {
             int ln = getFrameLength();
             log.debug("packetlength: " + ln);
             byte[] buf = new byte[ln];
