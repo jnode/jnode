@@ -359,32 +359,61 @@ interface ViaRhineConstants {
     int MODE3_MIION = 0x04;    /* in PCI_REG_MOD3 OF PCI space */
 
     /* Offsets to the device registers. */
-    int StationAddr = 0x00, RxConfig = 0x06, TxConfig = 0x07, ChipCmd = 0x08,
-            IntrStatus = 0x0C, IntrEnable = 0x0E,
-            MulticastFilter0 = 0x10, MulticastFilter1 = 0x14,
-            RxRingPtr = 0x18, TxRingPtr = 0x1C, GFIFOTest = 0x54,
-            MIIPhyAddr = 0x6C, MIIStatus = 0x6D, PCIBusConfig = 0x6E,
-            MIICmd = 0x70, MIIRegAddr = 0x71, MIIData = 0x72, MACRegEEcsr = 0x74,
-            ConfigA = 0x78, ConfigB = 0x79, ConfigC = 0x7A, ConfigD = 0x7B,
-            RxMissed = 0x7C, RxCRCErrs = 0x7E, MiscCmd = 0x81,
-            StickyHW = 0x83, IntrStatus2 = 0x84, WOLcrClr = 0xA4, WOLcgClr = 0xA7,
-            PwrcsrClr = 0xAC;
+    int StationAddr = 0x00;
+    int RxConfig = 0x06;
+    int TxConfig = 0x07;
+    int ChipCmd = 0x08;
+    int IntrStatus = 0x0C;
+    int IntrEnable = 0x0E;
+    int MulticastFilter0 = 0x10;
+    int MulticastFilter1 = 0x14;
+    int RxRingPtr = 0x18;
+    int TxRingPtr = 0x1C;
+    int GFIFOTest = 0x54;
+    int MIIPhyAddr = 0x6C;
+    int MIIStatus = 0x6D;
+    int PCIBusConfig = 0x6E;
+    int MIICmd = 0x70;
+    int MIIRegAddr = 0x71;
+    int MIIData = 0x72;
+    int MACRegEEcsr = 0x74;
+    int ConfigA = 0x78;
+    int ConfigB = 0x79;
+    int ConfigC = 0x7A;
+    int ConfigD = 0x7B;
+    int RxMissed = 0x7C;
+    int RxCRCErrs = 0x7E;
+    int MiscCmd = 0x81;
+    int StickyHW = 0x83;
+    int IntrStatus2 = 0x84;
+    int WOLcrClr = 0xA4;
+    int WOLcgClr = 0xA7;
+    int PwrcsrClr = 0xAC;
 
     /* Bits in the interrupt status/mask registers. */
-    int IntrRxDone = 0x0001, IntrRxErr = 0x0004, IntrRxEmpty = 0x0020,
-            IntrTxDone = 0x0002, IntrTxError = 0x0008, IntrTxUnderrun = 0x0210,
-            IntrPCIErr = 0x0040,
-            IntrStatsMax = 0x0080, IntrRxEarly = 0x0100,
-            IntrRxOverflow = 0x0400, IntrRxDropped = 0x0800, IntrRxNoBuf = 0x1000,
-            IntrTxAborted = 0x2000, IntrLinkChange = 0x4000,
-            IntrRxWakeUp = 0x8000,
-            IntrNormalSummary = 0x0003, IntrAbnormalSummary = 0xC260,
-            IntrTxDescRace = 0x080000,        // mapped from IntrStatus2
-            IntrTxErrSummary = 0x082218;
+    int IntrRxDone = 0x0001;
+    int IntrRxErr = 0x0004;
+    int IntrRxEmpty = 0x0020;
+    int IntrTxDone = 0x0002;
+    int IntrTxError = 0x0008;
+    int IntrTxUnderrun = 0x0210;
+    int IntrPCIErr = 0x0040;
+    int IntrStatsMax = 0x0080;
+    int IntrRxEarly = 0x0100;
+    int IntrRxOverflow = 0x0400;
+    int IntrRxDropped = 0x0800;
+    int IntrRxNoBuf = 0x1000;
+    int IntrTxAborted = 0x2000;
+    int IntrLinkChange = 0x4000;
+    int IntrRxWakeUp = 0x8000;
+    int IntrNormalSummary = 0x0003;
+    int IntrAbnormalSummary = 0xC260;
+    int IntrTxDescRace = 0x080000;        // mapped from IntrStatus2
+    int IntrTxErrSummary = 0x082218;
 
 
     int DEFAULT_INTR = IntrRxDone | IntrRxErr | IntrRxEmpty |
-            IntrRxOverflow | IntrRxDropped | IntrRxNoBuf;
+        IntrRxOverflow | IntrRxDropped | IntrRxNoBuf;
 
     //enum rhine_revs
     int VT86C100A = 0x00;

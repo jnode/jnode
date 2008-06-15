@@ -15,14 +15,15 @@ class ViaRhineFlags implements Flags {
     public ViaRhineFlags(ConfigurationElement config) {
         this(config.getAttribute("name"));
     }
-    
-	/**
-	 * Create a new instance
-	 * @param name
-	 */
-	public ViaRhineFlags(String name) {
-		this.name = name;
-	}
+
+    /**
+     * Create a new instance
+     *
+     * @param name
+     */
+    public ViaRhineFlags(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;

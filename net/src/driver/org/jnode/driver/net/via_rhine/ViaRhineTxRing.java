@@ -4,7 +4,6 @@
 package org.jnode.driver.net.via_rhine;
 
 import java.util.Arrays;
-import static org.jnode.driver.net.via_rhine.ViaRhineConstants.PKT_BUF_SZ;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.TX_RING_SIZE;
 import org.jnode.net.SocketBuffer;
 import static org.jnode.net.ethernet.EthernetConstants.ETH_ZLEN;
