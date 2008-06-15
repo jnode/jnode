@@ -15,23 +15,19 @@ import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
- *
+ * 
  */
-final class SimpleDescriptorRW extends DescriptorRW 
-{
-	@Override
-	public Extent createMainExtent(Descriptor desc, ExtentDeclaration extentDecl)
-	{
-		return new Extent(desc, extentDecl);
-	}
-	
-	@Override
-	public Extent createExtent(FileDescriptor fileDescriptor, ExtentDeclaration extentDecl)
-						throws IOException, UnsupportedFormatException 
-	{
-		Descriptor desc = (fileDescriptor == null) ? null : 
-								fileDescriptor.getDescriptor();
-		return createMainExtent(desc, extentDecl);
-	}
-	
+final class SimpleDescriptorRW extends DescriptorRW {
+    @Override
+    public Extent createMainExtent(Descriptor desc, ExtentDeclaration extentDecl) {
+        return new Extent(desc, extentDecl);
+    }
+
+    @Override
+    public Extent createExtent(FileDescriptor fileDescriptor, ExtentDeclaration extentDecl)
+        throws IOException, UnsupportedFormatException {
+        Descriptor desc = (fileDescriptor == null) ? null : fileDescriptor.getDescriptor();
+        return createMainExtent(desc, extentDecl);
+    }
+
 }

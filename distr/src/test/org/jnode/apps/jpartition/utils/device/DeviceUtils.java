@@ -30,295 +30,274 @@ import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
-import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.util.OsUtils;
 
 public class DeviceUtils {
-	private static final long DEFAULT_FILE_SIZE = 1024*1024;
-	private static final Logger log = Logger.getLogger(FileDeviceView.class);
+    private static final long DEFAULT_FILE_SIZE = 1024 * 1024;
+    private static final Logger log = Logger.getLogger(FileDeviceView.class);
 
-	private static boolean coreInitialized = false;
-	final static public void initJNodeCore()  {
-		if(!OsUtils.isJNode() && !coreInitialized)
-		{
+    private static boolean coreInitialized = false;
 
-	        try {
-				//ShellEmu.main(new String[0]);
-		        NameSpace namespace = new BasicNameSpace();
-		        InitialNaming.setNameSpace(namespace);
+    public static final void initJNodeCore() {
+        if (!OsUtils.isJNode() && !coreInitialized) {
 
-	        	InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
+            try {
+                // ShellEmu.main(new String[0]);
+                NameSpace namespace = new BasicNameSpace();
+                InitialNaming.setNameSpace(namespace);
 
-	        	PluginDescriptor desc = new PluginDescriptor()
-	        	{
+                InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
 
-					public void addListener(PluginDescriptorListener listener) {
-						// TODO Auto-generated method stub
+                PluginDescriptor desc = new PluginDescriptor() {
 
-					}
+                    public void addListener(PluginDescriptorListener listener) {
+                        // TODO Auto-generated method stub
 
-					public boolean depends(String id) {
-						// TODO Auto-generated method stub
-						return false;
-					}
+                    }
 
-					public String getCustomPluginClassName() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public boolean depends(String id) {
+                        // TODO Auto-generated method stub
+                        return false;
+                    }
 
-					public ExtensionPoint getExtensionPoint(
-							String extensionPointId) {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getCustomPluginClassName() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public ExtensionPoint[] getExtensionPoints() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public ExtensionPoint getExtensionPoint(String extensionPointId) {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public Extension[] getExtensions() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public ExtensionPoint[] getExtensionPoints() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public String getId() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public Extension[] getExtensions() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public String getLicenseName() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getId() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public String getLicenseUrl() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getLicenseName() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public String getName() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getLicenseUrl() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public Plugin getPlugin() throws PluginException {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getName() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public ClassLoader getPluginClassLoader() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public Plugin getPlugin() throws PluginException {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public PluginPrerequisite[] getPrerequisites() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public ClassLoader getPluginClassLoader() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public int getPriority() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
+                    public PluginPrerequisite[] getPrerequisites() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public String getProviderName() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public int getPriority() {
+                        // TODO Auto-generated method stub
+                        return 0;
+                    }
 
-					public String getProviderUrl() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getProviderName() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public Runtime getRuntime() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public String getProviderUrl() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public String getVersion() {
-						// TODO Auto-generated method stub
-						return null;
-					}
+                    public Runtime getRuntime() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public boolean hasCustomPluginClass() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+                    public String getVersion() {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
 
-					public boolean isAutoStart() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+                    public boolean hasCustomPluginClass() {
+                        // TODO Auto-generated method stub
+                        return false;
+                    }
 
-					public boolean isFragment() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+                    public boolean isAutoStart() {
+                        // TODO Auto-generated method stub
+                        return false;
+                    }
 
-					public boolean isSystemPlugin() {
-						// TODO Auto-generated method stub
-						return true;
-					}
+                    public boolean isFragment() {
+                        // TODO Auto-generated method stub
+                        return false;
+                    }
 
-					public void removeListener(PluginDescriptorListener listener) {
-						// TODO Auto-generated method stub
+                    public boolean isSystemPlugin() {
+                        // TODO Auto-generated method stub
+                        return true;
+                    }
 
-					}
+                    public void removeListener(PluginDescriptorListener listener) {
+                        // TODO Auto-generated method stub
 
-	        	};
-	        	FileSystemService fss = new FileSystemPlugin(desc);
-	        	namespace.bind(FileSystemService.class, fss);
-			} catch (NameAlreadyBoundException e) {
-				throw new RuntimeException(e);
-			} catch (NamingException e) {
-				throw new RuntimeException(e);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			coreInitialized = true;
-		}
-	}
+                    }
 
-	public static IDEDevice createFakeDevice(ErrorReporter errorReporter)
-	{
-		IDEDevice device = null;
-		try
-		{
-			String name = findUnusedName("fake");
-			FakeIDEDevice fd = new FakeIDEDevice(name, true, true, DEFAULT_FILE_SIZE);
-			if(addDevice(fd))
-			{
-				device = fd;
-			}
-			else
-			{
-				errorReporter.reportError(log, DeviceUtils.class.getName(), "failed to add device");
-			}
-		} catch (Exception e) {
-			log.error(e);
-		}
+                };
+                FileSystemService fss = new FileSystemPlugin(desc);
+                namespace.bind(FileSystemService.class, fss);
+            } catch (NameAlreadyBoundException e) {
+                throw new RuntimeException(e);
+            } catch (NamingException e) {
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            coreInitialized = true;
+        }
+    }
 
-		return device;
-	}
+    public static IDEDevice createFakeDevice(ErrorReporter errorReporter) {
+        IDEDevice device = null;
+        try {
+            String name = findUnusedName("fake");
+            FakeIDEDevice fd = new FakeIDEDevice(name, true, true, DEFAULT_FILE_SIZE);
+            if (addDevice(fd)) {
+                device = fd;
+            } else {
+                errorReporter.reportError(log, DeviceUtils.class.getName(), "failed to add device");
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
 
-	public static IDEDevice createVMWareDevice(ErrorReporter errorReporter) {
-		IDEDevice device = null;
+        return device;
+    }
 
-		try
-		{
-			AbstractIDEDevice fd = createVMWareDevice();
-			if(addDevice(fd))
-			{
-				device = fd;
-			}
-			else
-			{
-				errorReporter.reportError(log, DeviceUtils.class.getName(), "failed to add device");
-			}
-		} catch (Exception e) {
-			log.error(e);
-		}
+    public static IDEDevice createVMWareDevice(ErrorReporter errorReporter) {
+        IDEDevice device = null;
 
-		return device;
-	}
+        try {
+            AbstractIDEDevice fd = createVMWareDevice();
+            if (addDevice(fd)) {
+                device = fd;
+            } else {
+                errorReporter.reportError(log, DeviceUtils.class.getName(), "failed to add device");
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
 
-	private static AbstractIDEDevice createVMWareDevice() throws Exception
-	{
-		File tmpFile = File.createTempFile("disk", "");
-		File directory = tmpFile.getParentFile();
-		String name = tmpFile.getName();
+        return device;
+    }
 
-		File mainFile = DiskFactory.createSparseDisk(directory, name, DEFAULT_FILE_SIZE);
-		VMWareDisk vmwareDisk = new VMWareDisk(mainFile);
+    private static AbstractIDEDevice createVMWareDevice() throws Exception {
+        File tmpFile = File.createTempFile("disk", "");
+        File directory = tmpFile.getParentFile();
+        String name = tmpFile.getName();
 
-		AbstractIDEDevice dev = new VMWareIDEDevice(name,
-				true, true, vmwareDisk);
-		return dev;
-	}
+        File mainFile = DiskFactory.createSparseDisk(directory, name, DEFAULT_FILE_SIZE);
+        VMWareDisk vmwareDisk = new VMWareDisk(mainFile);
 
-	public static AbstractIDEDevice createFileDevice() throws Exception
-	{
-		File tmpFile = File.createTempFile("disk", "");
-		File directory = tmpFile.getParentFile();
-		String name = tmpFile.getName();
+        AbstractIDEDevice dev = new VMWareIDEDevice(name, true, true, vmwareDisk);
+        return dev;
+    }
 
-		AbstractIDEDevice dev = new FileIDEDevice(name,
-				true, true, new File(directory, name), DEFAULT_FILE_SIZE);
-		return dev;
-	}
+    public static AbstractIDEDevice createFileDevice() throws Exception {
+        File tmpFile = File.createTempFile("disk", "");
+        File directory = tmpFile.getParentFile();
+        String name = tmpFile.getName();
 
-	public static void restart(Device device)
-	{
-		DeviceManager devMan;
-		try {
-			devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
+        AbstractIDEDevice dev =
+                new FileIDEDevice(name, true, true, new File(directory, name), DEFAULT_FILE_SIZE);
+        return dev;
+    }
 
-			devMan.stop(device);
-			devMan.start(device);
-		} catch (NameNotFoundException e) {
-			log.error(e);
-		} catch (DeviceNotFoundException e) {
-			log.error(e);
-		} catch (DriverException e) {
-			log.error(e);
-		}
-	}
+    public static void restart(Device device) {
+        DeviceManager devMan;
+        try {
+            devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
 
-	public static boolean addDevice(AbstractIDEDevice device)
-	{
-		boolean success = false;
-		try
-		{
-			DeviceManager devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
-			devMan.register(device);
-			success = true;
+            devMan.stop(device);
+            devMan.start(device);
+        } catch (NameNotFoundException e) {
+            log.error(e);
+        } catch (DeviceNotFoundException e) {
+            log.error(e);
+        } catch (DriverException e) {
+            log.error(e);
+        }
+    }
 
-//			PartitionHelper helper = new PartitionHelper(device);
-//			helper.initMbr();
-//			helper.write();
-//			if(helper.hasValidMBR())
-//			{
-//				helper.modifyPartition(0, true, 0, DEFAULT_FILE_SIZE,
-//						false, IBMPartitionTypes.PARTTYPE_WIN95_FAT32);
-//			}
-		} catch (NameNotFoundException e) {
-			log.error(e);
-		} catch (DeviceAlreadyRegisteredException e) {
-			log.error(e);
-		} catch (DriverException e) {
-			log.error(e);
-//		} catch (DeviceNotFoundException e) {
-//			log.error(e);
-//		} catch (ApiNotFoundException e) {
-//			log.error(e);
-//		} catch (IOException e) {
-//			log.error(e);
-		}
+    public static boolean addDevice(AbstractIDEDevice device) {
+        boolean success = false;
+        try {
+            DeviceManager devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
+            devMan.register(device);
+            success = true;
 
-		return success;
-	}
+            // PartitionHelper helper = new PartitionHelper(device);
+            // helper.initMbr();
+            // helper.write();
+            // if(helper.hasValidMBR())
+            // {
+            // helper.modifyPartition(0, true, 0, DEFAULT_FILE_SIZE,
+            // false, IBMPartitionTypes.PARTTYPE_WIN95_FAT32);
+            // }
+        } catch (NameNotFoundException e) {
+            log.error(e);
+        } catch (DeviceAlreadyRegisteredException e) {
+            log.error(e);
+        } catch (DriverException e) {
+            log.error(e);
+            // } catch (DeviceNotFoundException e) {
+            // log.error(e);
+            // } catch (ApiNotFoundException e) {
+            // log.error(e);
+            // } catch (IOException e) {
+            // log.error(e);
+        }
 
-	public static String findUnusedName(String baseName) throws NameNotFoundException
-	{
-		DeviceManager devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
-		String name = null;
-		int i = 0;
-		do
-		{
-			String newName = baseName + "-" + i;
-			try {
-				devMan.getDevice(newName);
-				i++;
-			} catch (DeviceNotFoundException e) {
-				name = newName;
-			}
-		}
-		while(name == null);
+        return success;
+    }
 
-		return name;
-	}
+    public static String findUnusedName(String baseName) throws NameNotFoundException {
+        DeviceManager devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
+        String name = null;
+        int i = 0;
+        do {
+            String newName = baseName + "-" + i;
+            try {
+                devMan.getDevice(newName);
+                i++;
+            } catch (DeviceNotFoundException e) {
+                name = newName;
+            }
+        } while (name == null);
+
+        return name;
+    }
 }

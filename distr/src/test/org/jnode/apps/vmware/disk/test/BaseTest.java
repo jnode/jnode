@@ -10,33 +10,35 @@ import org.junit.Before;
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
- *
+ * 
  */
-abstract public class BaseTest {
+public abstract class BaseTest {
 
-	protected final File originalDiskFile;
-	protected final boolean copyDisk;
-	protected File diskFile;
+    protected final File originalDiskFile;
+    protected final boolean copyDisk;
+    protected File diskFile;
 
-	public BaseTest(File diskFile, boolean copyDisk) {
-		this.originalDiskFile = diskFile;
-		this.copyDisk = copyDisk;
-	}
+    public BaseTest(File diskFile, boolean copyDisk) {
+        this.originalDiskFile = diskFile;
+        this.copyDisk = copyDisk;
+    }
 
-	@Before
-	public void setUp() throws IOException {
-		this.diskFile = copyDisk ? DiskCopier.copyDisk(originalDiskFile, Utils.createTempDir()) : originalDiskFile;
-	}
+    @Before
+    public void setUp() throws IOException {
+        this.diskFile =
+                copyDisk ? DiskCopier.copyDisk(originalDiskFile, Utils.createTempDir())
+                        : originalDiskFile;
+    }
 
-	@After
-	public void tearDown() throws IOException {
-		Utils.clearTempDir(true);
-		Utils.DO_CLEAR = true;
-	}
+    @After
+    public void tearDown() throws IOException {
+        Utils.clearTempDir(true);
+        Utils.DO_CLEAR = true;
+    }
 
-	@Override
-	public String toString() {
-		return diskFile.getName();
-	}
+    @Override
+    public String toString() {
+        return diskFile.getName();
+    }
 
 }

@@ -9,76 +9,70 @@ import org.jnode.apps.vmware.disk.extent.Extent;
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
- *
+ * 
  */
 public class Descriptor {
-	private static final Logger LOG = Logger.getLogger(Descriptor.class);
-	
-	final private File mainFile;
-	final private Header header;
-	final private List<Extent> extents;
-	final private DiskDatabase diskDatabase;
-	
-	public Descriptor(File mainFile, Header header, List<Extent> extents,
-						DiskDatabase diskDatabase) 
-	{
-		this.mainFile = mainFile;
-		this.header = header;
-		this.extents = extents;
-		this.diskDatabase = diskDatabase;
-	}
+    private static final Logger LOG = Logger.getLogger(Descriptor.class);
 
-	public Header getHeader() {
-		return header;
-	}
+    private final File mainFile;
+    private final Header header;
+    private final List<Extent> extents;
+    private final DiskDatabase diskDatabase;
 
-	public List<Extent> getExtents() {
-		return extents;
-	}
+    public Descriptor(File mainFile, Header header, List<Extent> extents, DiskDatabase diskDatabase) {
+        this.mainFile = mainFile;
+        this.header = header;
+        this.extents = extents;
+        this.diskDatabase = diskDatabase;
+    }
 
-	public DiskDatabase getDiskDatabase() {
-		return diskDatabase;
-	}
+    public Header getHeader() {
+        return header;
+    }
 
-	public File getMainFile() {
-		return mainFile;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof Descriptor))
-		{
-			return false;
-		}
-		
-		Descriptor desc = (Descriptor) obj;
-		
-		String file1 = "";
-		String file2 = "";
-		try {
-			file1 = this.mainFile.getCanonicalPath();
-			file2 = desc.mainFile.getCanonicalPath();
-		} catch (Exception e) {
-			LOG.error("can't compare filenames", e);
-		}
-		
-		return file1.equals(file2) &&
-			   this.header.equals(desc.header) &&
-			   this.extents.equals(desc.extents) &&
-			   this.diskDatabase.equals(desc.diskDatabase);
-	}
-	
-	@Override
-	public String toString() {
-		String file1 = "";
-		try {
-			file1 = this.mainFile.getCanonicalPath();
-		} catch (Exception e) {
-			LOG.error("can't compare filenames", e);
-		}
-		
-		return "Descriptor: file=" + file1 +
-				","+header+",extents="+extents+
-				","+diskDatabase;
-	}
+    public List<Extent> getExtents() {
+        return extents;
+    }
+
+    public DiskDatabase getDiskDatabase() {
+        return diskDatabase;
+    }
+
+    public File getMainFile() {
+        return mainFile;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Descriptor)) {
+            return false;
+        }
+
+        Descriptor desc = (Descriptor) obj;
+
+        String file1 = "";
+        String file2 = "";
+        try {
+            file1 = this.mainFile.getCanonicalPath();
+            file2 = desc.mainFile.getCanonicalPath();
+        } catch (Exception e) {
+            LOG.error("can't compare filenames", e);
+        }
+
+        return file1.equals(file2) && this.header.equals(desc.header) &&
+                this.extents.equals(desc.extents) && this.diskDatabase.equals(desc.diskDatabase);
+    }
+
+    @Override
+    public String toString() {
+        String file1 = "";
+        try {
+            file1 = this.mainFile.getCanonicalPath();
+        } catch (Exception e) {
+            LOG.error("can't compare filenames", e);
+        }
+
+        return "Descriptor: file=" + file1 + "," + header + ",extents=" + extents + "," +
+                diskDatabase;
+    }
 }

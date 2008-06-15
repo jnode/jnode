@@ -17,57 +17,56 @@ import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.model.UserListener;
 
 public class MainView extends JFrame {
-	private static final long serialVersionUID = -7377987617244339590L;
+    private static final long serialVersionUID = -7377987617244339590L;
 
-	final private DefaultComboBoxModel devices;
-	final private DeviceView deviceView;
+    private final DefaultComboBoxModel devices;
+    private final DeviceView deviceView;
 
-	public MainView(ErrorReporter errorReporter, JComponent cmdProcessorView) throws Exception
-	{
-		setTitle("JPartition");
-		setLayout(new BorderLayout());
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public MainView(ErrorReporter errorReporter, JComponent cmdProcessorView) throws Exception {
+        setTitle("JPartition");
+        setLayout(new BorderLayout());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		add(cmdProcessorView, BorderLayout.SOUTH);
+        add(cmdProcessorView, BorderLayout.SOUTH);
 
-		deviceView = new DeviceView(errorReporter);
-		add(deviceView, BorderLayout.CENTER);
+        deviceView = new DeviceView(errorReporter);
+        add(deviceView, BorderLayout.CENTER);
 
-		devices = new DefaultComboBoxModel(UserFacade.getInstance().getDeviceNames());
-		final JComboBox cboDevices = new JComboBox(devices);
-		cboDevices.addItemListener(new ItemListener()
-		{
-			public void itemStateChanged(ItemEvent event) {
-				boolean selected = (event.getStateChange() == ItemEvent.SELECTED);
-				String item = selected ? String.valueOf(event.getItem()) : null;
-				UserFacade.getInstance().selectDevice(item);
-				deviceView.update();
-			}
-		});
+        devices = new DefaultComboBoxModel(UserFacade.getInstance().getDeviceNames());
+        final JComboBox cboDevices = new JComboBox(devices);
+        cboDevices.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent event) {
+                boolean selected = (event.getStateChange() == ItemEvent.SELECTED);
+                String item = selected ? String.valueOf(event.getItem()) : null;
+                UserFacade.getInstance().selectDevice(item);
+                deviceView.update();
+            }
+        });
 
-		JPanel cboPanel = new JPanel(new BorderLayout());
-		cboPanel.add(cboDevices, BorderLayout.CENTER);
-		cboPanel.add(new JLabel("Device : "), BorderLayout.WEST);
-		add(cboPanel, BorderLayout.NORTH);
+        JPanel cboPanel = new JPanel(new BorderLayout());
+        cboPanel.add(cboDevices, BorderLayout.CENTER);
+        cboPanel.add(new JLabel("Device : "), BorderLayout.WEST);
+        add(cboPanel, BorderLayout.NORTH);
 
-		setSize(600, 300);
-		setVisible(true);
-		setLocation(300, 300);
+        setSize(600, 300);
+        setVisible(true);
+        setLocation(300, 300);
 
-		UserFacade.getInstance().setUserListener(new UserListener(){
-			public void deviceAdded(String name) {
-				devices.addElement(name);
-				deviceView.update();
-			}
+        UserFacade.getInstance().setUserListener(new UserListener() {
+            public void deviceAdded(String name) {
+                devices.addElement(name);
+                deviceView.update();
+            }
 
-			public void deviceRemoved(String name) {
-				devices.removeElement(name);
-				deviceView.update();
-			}
+            public void deviceRemoved(String name) {
+                devices.removeElement(name);
+                deviceView.update();
+            }
 
-			public void selectionChanged(Device selectedDevice) {
-				cboDevices.setSelectedItem(selectedDevice.getName());
-				deviceView.update();
-			}});
-	}
+            public void selectionChanged(Device selectedDevice) {
+                cboDevices.setSelectedItem(selectedDevice.getName());
+                deviceView.update();
+            }
+        });
+    }
 }

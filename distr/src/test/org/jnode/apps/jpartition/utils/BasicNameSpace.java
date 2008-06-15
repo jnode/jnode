@@ -12,23 +12,23 @@ import javax.naming.NamingException;
 import org.jnode.naming.NameSpace;
 
 public final class BasicNameSpace implements NameSpace {
-	protected final Map<Class<?>, Object> namespace = new HashMap<Class<?>, Object>();
+    protected final Map<Class<?>, Object> namespace = new HashMap<Class<?>, Object>();
 
-	public <T> void bind(Class<T> name, T service)
-			throws NamingException, NameAlreadyBoundException {
-		namespace.put(name, service);
-	}
+    public <T> void bind(Class<T> name, T service)
+        throws NamingException, NameAlreadyBoundException {
+        namespace.put(name, service);
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T lookup(Class<T> name) throws NameNotFoundException {
-		return (T) namespace.get(name);
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T lookup(Class<T> name) throws NameNotFoundException {
+        return (T) namespace.get(name);
+    }
 
-	public Set<Class<?>> nameSet() {
-		return namespace.keySet();
-	}
+    public Set<Class<?>> nameSet() {
+        return namespace.keySet();
+    }
 
-	public void unbind(Class<?> name) {
-		namespace.remove(name);
-	}
+    public void unbind(Class<?> name) {
+        namespace.remove(name);
+    }
 }

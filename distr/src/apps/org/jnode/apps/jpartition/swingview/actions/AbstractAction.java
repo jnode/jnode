@@ -5,17 +5,18 @@ import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Bounded;
 import org.jnode.apps.jpartition.swingview.DiskAreaView;
 
-abstract class AbstractAction<T extends DiskAreaView<? extends Bounded>>  extends javax.swing.AbstractAction {
-	private static final long serialVersionUID = -8091888570743940797L;
+abstract class AbstractAction<T extends DiskAreaView<? extends Bounded>> extends
+        javax.swing.AbstractAction {
+    private static final long serialVersionUID = -8091888570743940797L;
 
-	protected final Logger log = Logger.getLogger(getClass());
+    protected final Logger log = Logger.getLogger(getClass());
 
-	protected final ErrorReporter errorReporter;
-	protected final T view;
+    protected final ErrorReporter errorReporter;
+    protected final T view;
 
-	public AbstractAction(String name, ErrorReporter errorReporter, T view) {
-		super(name);
-		this.errorReporter = errorReporter;
-		this.view = view;
-	}
+    public AbstractAction(String name, ErrorReporter errorReporter, T view) {
+        super(name);
+        this.errorReporter = errorReporter;
+        this.view = view;
+    }
 }

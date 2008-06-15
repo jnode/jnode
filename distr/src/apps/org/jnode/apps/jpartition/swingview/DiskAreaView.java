@@ -17,99 +17,84 @@ import org.jnode.apps.jpartition.model.Bounded;
 
 import java.awt.Rectangle;
 
-abstract public class DiskAreaView<T extends Bounded> extends JComponent
-{
-	private static final long serialVersionUID = -506634580666065291L;
+public abstract class DiskAreaView<T extends Bounded> extends JComponent {
+    private static final long serialVersionUID = -506634580666065291L;
 
-	final private int DEFAULT_PIXELS_PER_BYTE = 1;
+    private final int DEFAULT_PIXELS_PER_BYTE = 1;
 
-	final protected int borderWidth = 5;
-	final protected ErrorReporter errorReporter;
+    protected final int borderWidth = 5;
+    protected final ErrorReporter errorReporter;
 
-	protected T bounded;
-	protected double pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
+    protected T bounded;
+    protected double pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
 
-	public DiskAreaView(ErrorReporter errorReporter)
-	{
-		this.errorReporter = errorReporter;
-		setLayout(null);
-		setOpaque(true);
+    public DiskAreaView(ErrorReporter errorReporter) {
+        this.errorReporter = errorReporter;
+        setLayout(null);
+        setOpaque(true);
 
-		addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mousePressed(MouseEvent event) {
-				showMenu(event);
-			}
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent event) {
+                showMenu(event);
+            }
 
-			@Override
-			public void mouseReleased(MouseEvent event) {
-				showMenu(event);
-			}
-		});
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                showMenu(event);
+            }
+        });
 
-		update();
-	}
+        update();
+    }
 
-	abstract protected Color getColor(T bounded);
+    protected abstract Color getColor(T bounded);
 
-	protected void setInfos(String infos)
-	{
-		setToolTipText(infos);
-	}
+    protected void setInfos(String infos) {
+        setToolTipText(infos);
+    }
 
-	public void update()
-	{
-		if(bounded == null)
-		{
-			pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
-		}
-		else
-		{
-			double size = (bounded.getEnd() - bounded.getStart() + 1);
-			pixelsPerByte = (double) getWidth() / size;
-		}
+    public void update() {
+        if (bounded == null) {
+            pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
+        } else {
+            double size = (bounded.getEnd() - bounded.getStart() + 1);
+            pixelsPerByte = (double) getWidth() / size;
+        }
 
-		Color borderColor = getColor(bounded);
-		Border line = BorderFactory.createLineBorder(borderColor, borderWidth);
-		//Border space = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-		//setBorder(BorderFactory.createCompoundBorder(space, line));
-		setBorder(line);
-	}
+        Color borderColor = getColor(bounded);
+        Border line = BorderFactory.createLineBorder(borderColor, borderWidth);
+        // Border space = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+        // setBorder(BorderFactory.createCompoundBorder(space, line));
+        setBorder(line);
+    }
 
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-		Rectangle r = g.getClipBounds();
-		g.setColor(getBackground());
-		g.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
-	}
+        Rectangle r = g.getClipBounds();
+        g.setColor(getBackground());
+        g.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
+    }
 
-	protected void showMenu(MouseEvent event)
-	{
-		if(event.isPopupTrigger())
-		{
-			Action[] actions = getActions();
-			if((actions != null) && (actions.length != 0))
-			{
-				JPopupMenu menu = new JPopupMenu("context menu");
-				for(Action action : actions)
-				{
-					if(action == null)
-					{
-						menu.addSeparator();
-					}
-					else
-					{
-						menu.add(new JMenuItem(action));
-					}
-				}
+    protected void showMenu(MouseEvent event) {
+        if (event.isPopupTrigger()) {
+            Action[] actions = getActions();
+            if ((actions != null) && (actions.length != 0)) {
+                JPopupMenu menu = new JPopupMenu("context menu");
+                for (Action action : actions) {
+                    if (action == null) {
+                        menu.addSeparator();
+                    } else {
+                        menu.add(new JMenuItem(action));
+                    }
+                }
 
-				menu.show(event.getComponent(), event.getX(), event.getY());
-			}
-		}
-	}
+                menu.show(event.getComponent(), event.getX(), event.getY());
+            }
+        }
+    }
 
-	abstract protected Action[] getActions();
+    protected abstract Action[] getActions();
 }

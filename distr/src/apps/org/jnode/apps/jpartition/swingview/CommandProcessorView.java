@@ -16,62 +16,57 @@ import org.jnode.apps.jpartition.commands.framework.CommandProcessor;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessorListener;
 import org.jnode.apps.jpartition.model.UserFacade;
 
-public class CommandProcessorView extends JPanel
-			implements CommandProcessorListener
-{
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 4411987954528000167L;
+public class CommandProcessorView extends JPanel implements CommandProcessorListener {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4411987954528000167L;
 
-	private DefaultListModel  commands = new DefaultListModel();
-	private JList commandsUI = new JList(commands);
-	private JButton btnApply = new JButton("Apply");
+    private DefaultListModel commands = new DefaultListModel();
+    private JList commandsUI = new JList(commands);
+    private JButton btnApply = new JButton("Apply");
 
-	public CommandProcessorView()
-	{
-		setBorder(BorderFactory.createTitledBorder("pending commands"));
+    public CommandProcessorView() {
+        setBorder(BorderFactory.createTitledBorder("pending commands"));
 
-		JPanel btnPanel = new JPanel(new BorderLayout());
-		btnPanel.add(btnApply, BorderLayout.NORTH);
+        JPanel btnPanel = new JPanel(new BorderLayout());
+        btnPanel.add(btnApply, BorderLayout.NORTH);
 
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(btnPanel, BorderLayout.EAST);
-		panel.add(new JScrollPane(commandsUI), BorderLayout.CENTER);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(btnPanel, BorderLayout.EAST);
+        panel.add(new JScrollPane(commandsUI), BorderLayout.CENTER);
 
-		setLayout(new BorderLayout());
-		add(panel, BorderLayout.CENTER);
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
 
-		btnApply.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ae_) {
-				CommandProcessorView.this.setEnabled(false);
-				UserFacade.getInstance().applyChanges();
-			}
-		});
+        btnApply.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae_) {
+                CommandProcessorView.this.setEnabled(false);
+                UserFacade.getInstance().applyChanges();
+            }
+        });
 
-		UserFacade.getInstance().addCommandProcessorListener(this);
-	}
-
-    protected void refreshCommand(Object command)
-    {
-    	int index = commands.indexOf(command);
-    	commands.set(index, command);
+        UserFacade.getInstance().addCommandProcessorListener(this);
     }
 
-	public void commandAdded(CommandProcessor processor, Command command) {
-		commands.addElement(command);
-	}
+    protected void refreshCommand(Object command) {
+        int index = commands.indexOf(command);
+        commands.set(index, command);
+    }
 
-	public void commandFinished(CommandProcessor processor, Command command) {
-		refreshCommand(command);
-	}
+    public void commandAdded(CommandProcessor processor, Command command) {
+        commands.addElement(command);
+    }
 
-	public void commandRemoved(CommandProcessor processor, Command command) {
-		commands.removeElement(command);
-	}
+    public void commandFinished(CommandProcessor processor, Command command) {
+        refreshCommand(command);
+    }
 
-	public void commandStarted(CommandProcessor processor, Command command) {
-		refreshCommand(command);
-	}
+    public void commandRemoved(CommandProcessor processor, Command command) {
+        commands.removeElement(command);
+    }
+
+    public void commandStarted(CommandProcessor processor, Command command) {
+        refreshCommand(command);
+    }
 }

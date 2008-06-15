@@ -2,9 +2,9 @@ package org.jnode.apps.jpartition.model;
 
 interface OSListener {
 
-	void deviceAdded(Device addedDevice);
+    void deviceAdded(Device addedDevice);
 
-	void deviceRemoved(Device removedDevice);
+    void deviceRemoved(Device removedDevice);
 
-	void errorHappened(OSFacadeException e);
+    void errorHappened(OSFacadeException e);
 }
