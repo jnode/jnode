@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video;
 
 /**
@@ -26,32 +26,32 @@ package org.jnode.driver.video;
  */
 public class UnknownConfigurationException extends FrameBufferException {
 
-	/**
-	 * 
-	 */
-	public UnknownConfigurationException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public UnknownConfigurationException() {
+        super();
+    }
 
-	/**
-	 * @param s
-	 */
-	public UnknownConfigurationException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public UnknownConfigurationException(String s) {
+        super(s);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public UnknownConfigurationException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public UnknownConfigurationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public UnknownConfigurationException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public UnknownConfigurationException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.input.usb;
 
 import org.jnode.driver.Device;
@@ -33,52 +33,50 @@ import org.jnode.driver.bus.usb.USBInterface;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class USBInputDeviceToDriverMapper implements DeviceToDriverMapper, USBConstants, USBHidConstants {
+public class USBInputDeviceToDriverMapper implements DeviceToDriverMapper, USBConstants,
+        USBHidConstants {
 
-	/**
-	 * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
-	 */
-	public Driver findDriver(Device device) {
-		if (device instanceof USBDevice) {
-			final USBDevice dev = (USBDevice) device;
-			if (dev.getDescriptor().getDeviceClass() == USB_CLASS_PER_INTERFACE) {
-	
-				final USBConfiguration conf = dev.getConfiguration(0);
-				final USBInterface intf = conf.getInterface(0);
-				final InterfaceDescriptor descr = intf.getDescriptor();
-		
-				if (descr.getInterfaceClass() == USB_CLASS_HID) {
-					if (descr.getInterfaceSubClass() == HID_SUBCLASS_BOOT_INTERFACE) {
-						switch (descr.getInterfaceProtocol()) {
-							case HID_PROTOCOL_KEYBOARD :
-								// We found an USB keyboard
-								return new USBKeyboardDriver();
-							case HID_PROTOCOL_MOUSE :
-								// We found an USB mouse
-								return new USBMouseDriver();
-							default :
-								return null;
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Gets the matching level of this mapper.
-	 * The mappers are queried in order of match level. This will ensure
-	 * the best available driver for a device.
-	 * 
-	 * @return One of the MATCH_xxx constants.
-	 * @see #MATCH_DEVICE_REVISION
-	 * @see #MATCH_DEVICE
-	 * @see #MATCH_DEVCLASS
-	 */
-	public int getMatchLevel() {
-		return MATCH_DEVCLASS;
-	}
+    /**
+     * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
+     */
+    public Driver findDriver(Device device) {
+        if (device instanceof USBDevice) {
+            final USBDevice dev = (USBDevice) device;
+            if (dev.getDescriptor().getDeviceClass() == USB_CLASS_PER_INTERFACE) {
+
+                final USBConfiguration conf = dev.getConfiguration(0);
+                final USBInterface intf = conf.getInterface(0);
+                final InterfaceDescriptor descr = intf.getDescriptor();
+
+                if (descr.getInterfaceClass() == USB_CLASS_HID) {
+                    if (descr.getInterfaceSubClass() == HID_SUBCLASS_BOOT_INTERFACE) {
+                        switch (descr.getInterfaceProtocol()) {
+                            case HID_PROTOCOL_KEYBOARD:
+                                // We found an USB keyboard
+                                return new USBKeyboardDriver();
+                            case HID_PROTOCOL_MOUSE:
+                                // We found an USB mouse
+                                return new USBMouseDriver();
+                            default:
+                                return null;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the matching level of this mapper. The mappers are queried in order
+     * of match level. This will ensure the best available driver for a device.
+     * 
+     * @return One of the MATCH_xxx constants.
+     * @see #MATCH_DEVICE_REVISION
+     * @see #MATCH_DEVICE
+     * @see #MATCH_DEVCLASS
+     */
+    public int getMatchLevel() {
+        return MATCH_DEVCLASS;
+    }
 }
-
-

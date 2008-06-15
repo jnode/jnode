@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.ps2;
 
 import org.jnode.driver.Device;
@@ -28,16 +28,17 @@ import org.jnode.driver.Device;
  */
 public class PS2Device extends Device {
 
-	public PS2Device(PS2Bus bus, String id) {
-		super(bus, id);
-	}
-	
-	/**
-	 * Gets the PS2 bus to which this device is attached
-	 * @return The bus
-	 */
-	public PS2Bus getPS2Bus() {
-		return (PS2Bus)getBus();
-	}
+    public PS2Device(PS2Bus bus, String id) {
+        super(bus, id);
+    }
+
+    /**
+     * Gets the PS2 bus to which this device is attached
+     * 
+     * @return The bus
+     */
+    public PS2Bus getPS2Bus() {
+        return (PS2Bus) getBus();
+    }
 
 }

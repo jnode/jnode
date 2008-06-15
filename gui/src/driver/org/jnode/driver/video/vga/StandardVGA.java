@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vga;
 
 import java.awt.image.IndexColorModel;
@@ -40,60 +40,67 @@ import org.vmmagic.unboxed.Address;
  */
 public class StandardVGA {
 
-	/* The SEQuencer, CRT, GRA, and ATTribute register sets
-	 * for 640x480x16 color mode. */
-	private final static int[] seq = { 0x03, 0x01, 0x0F, 0x00, 0x06 };
-	private final static int[] crt =
-		{ 0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0x0B, 0x3E, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEA, 0x8C, 0xDF, 0x28, 0x00, 0xE7, 0x04, 0xE3, 0xFF };
-	private final static int[] gra = { 0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x05, 0x0F, 0xFF };
-	private final static int[] att = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x01, 0x00, 0x0F, 0x00, 0x00 };
+    /*
+     * The SEQuencer, CRT, GRA, and ATTribute register sets for 640x480x16 color
+     * mode.
+     */
+    private final static int[] seq = {0x03, 0x01, 0x0F, 0x00, 0x06};
+    private final static int[] crt =
+            {0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0x0B, 0x3E, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0xEA, 0x8C, 0xDF, 0x28, 0x00, 0xE7, 0x04, 0xE3, 0xFF};
+    private final static int[] gra = {0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x05, 0x0F, 0xFF};
+    private final static int[] att =
+            {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D,
+                0x0E, 0x0F, 0x01, 0x00, 0x0F, 0x00, 0x00};
 
-	private final MemoryResource vgaMem;
-	private final VgaState state640x480x16;
-	private final VgaState oldState;
+    private final MemoryResource vgaMem;
+    private final VgaState state640x480x16;
+    private final VgaState oldState;
 
-	public StandardVGA(ResourceOwner owner, IndexColorModel cm) throws ResourceNotFreeException {
-		try {
-			ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
-			vgaMem = rm.claimMemoryResource(owner, Address.fromIntZeroExtend(0xa0000), 0x9600, ResourceManager.MEMMODE_NORMAL);
-			state640x480x16 = new VgaState(seq, crt, gra, att, 0xe3, cm);
-			oldState = new VgaState();
-		} catch (NameNotFoundException ex) {
-			throw new ResourceNotFreeException("ResourceManager not found", ex);
-		}
-	}
+    public StandardVGA(ResourceOwner owner, IndexColorModel cm) throws ResourceNotFreeException {
+        try {
+            ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            vgaMem =
+                    rm.claimMemoryResource(owner, Address.fromIntZeroExtend(0xa0000), 0x9600,
+                            ResourceManager.MEMMODE_NORMAL);
+            state640x480x16 = new VgaState(seq, crt, gra, att, 0xe3, cm);
+            oldState = new VgaState();
+        } catch (NameNotFoundException ex) {
+            throw new ResourceNotFreeException("ResourceManager not found", ex);
+        }
+    }
 
-	public void startService(VgaIO io) {
-		VgaUtils.screenOff(io);
-		oldState.saveFromVGA(io);
-		state640x480x16.restoreToVGA(io);
-		VgaUtils.screenOn(io);
-		cls(io);
-	} 
+    public void startService(VgaIO io) {
+        VgaUtils.screenOff(io);
+        oldState.saveFromVGA(io);
+        state640x480x16.restoreToVGA(io);
+        VgaUtils.screenOn(io);
+        cls(io);
+    }
 
-	public void stopService(VgaIO io) {
-		VgaUtils.screenOff(io);
-		oldState.restoreToVGA(io);
-		VgaUtils.screenOn(io);
-	} 
+    public void stopService(VgaIO io) {
+        VgaUtils.screenOff(io);
+        oldState.restoreToVGA(io);
+        VgaUtils.screenOn(io);
+    }
 
-	/**
-	 * Release all resources
-	 */
-	public void release() {
-		vgaMem.release();
-	}
+    /**
+     * Release all resources
+     */
+    public void release() {
+        vgaMem.release();
+    }
 
-	private final void cls(VgaIO io) {
-		io.setGRAF(0x08, 0xFF);
-		vgaMem.clear(0, (int) vgaMem.getSize().toInt());
-	} 
+    private final void cls(VgaIO io) {
+        io.setGRAF(0x08, 0xFF);
+        vgaMem.clear(0, (int) vgaMem.getSize().toInt());
+    }
 
-	/**
-	 * @return
-	 */
-	final MemoryResource getVgaMem() {
-		return this.vgaMem;
-	}
+    /**
+     * @return
+     */
+    final MemoryResource getVgaMem() {
+        return this.vgaMem;
+    }
 
 }

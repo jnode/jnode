@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.bus.i2c;
 
 /**
@@ -26,33 +26,33 @@ package org.jnode.driver.bus.i2c;
  */
 public class I2cException extends Exception {
 
-	/**
-	 * 
-	 */
-	public I2cException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public I2cException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public I2cException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public I2cException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public I2cException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public I2cException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public I2cException(String s) {
-		super(s);
-	}
+    /**
+     * @param s
+     */
+    public I2cException(String s) {
+        super(s);
+    }
 
 }

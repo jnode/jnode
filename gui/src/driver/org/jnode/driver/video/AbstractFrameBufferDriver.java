@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video;
 
 import javax.naming.NameNotFoundException;
@@ -36,42 +36,43 @@ import org.jnode.naming.InitialNaming;
  */
 public abstract class AbstractFrameBufferDriver extends Driver implements FrameBufferAPI {
 
-	/** My logger */
-	private static final Logger log = Logger.getLogger(AbstractFrameBufferDriver.class);
+    /** My logger */
+    private static final Logger log = Logger.getLogger(AbstractFrameBufferDriver.class);
 
-	/**Device name prefix of framebuffer devices */
-	public static final String FB_DEVICE_PREFIX = "fb";
+    /** Device name prefix of framebuffer devices */
+    public static final String FB_DEVICE_PREFIX = "fb";
 
-	/**
-	 * @see org.jnode.driver.Driver#startDevice()
-	 */
-	protected void startDevice() throws DriverException {
-		final Device device = getDevice();
-		try {
-			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
-			dm.rename(device, getDevicePrefix() + "-" + device.getId(), false);
-		} catch (DeviceAlreadyRegisteredException ex) {
-			log.error("Cannot rename device", ex);
-		} catch (NameNotFoundException ex) {
-			throw new DriverException("Cannot find DeviceManager", ex);
-		}
-		device.registerAPI(FrameBufferAPI.class, this);
-	}
+    /**
+     * @see org.jnode.driver.Driver#startDevice()
+     */
+    protected void startDevice() throws DriverException {
+        final Device device = getDevice();
+        try {
+            final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            dm.rename(device, getDevicePrefix() + "-" + device.getId(), false);
+        } catch (DeviceAlreadyRegisteredException ex) {
+            log.error("Cannot rename device", ex);
+        } catch (NameNotFoundException ex) {
+            throw new DriverException("Cannot find DeviceManager", ex);
+        }
+        device.registerAPI(FrameBufferAPI.class, this);
+    }
 
-	/**
-	 * @see org.jnode.driver.Driver#stopDevice()
-	 */
-	protected void stopDevice() throws DriverException {
-		final Device dev = getDevice();
-		dev.unregisterAPI(FrameBufferAPI.class);
-	}
+    /**
+     * @see org.jnode.driver.Driver#stopDevice()
+     */
+    protected void stopDevice() throws DriverException {
+        final Device dev = getDevice();
+        dev.unregisterAPI(FrameBufferAPI.class);
+    }
 
-	/**
-	 * Gets the prefix for the device name
-	 * @see #FB_DEVICE_PREFIX
-	 */
-	protected String getDevicePrefix() {
-		return FB_DEVICE_PREFIX;
-	}
-	
+    /**
+     * Gets the prefix for the device name
+     * 
+     * @see #FB_DEVICE_PREFIX
+     */
+    protected String getDevicePrefix() {
+        return FB_DEVICE_PREFIX;
+    }
+
 }

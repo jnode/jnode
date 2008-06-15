@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video;
 
 /**
@@ -33,109 +33,116 @@ public class HardwareCursorImage {
     /** Transparent */
     private static final int T = 0x00000000;
 
-	private final int width;
-	private final int height;
-	private final int[] image;
-	private final int hotSpotX;
-	private final int hotSpotY;
-	
-	/**
-	 * Initialize this instance.
-	 * @param width
-	 * @param height
-	 * @param image
-	 * @param hotSpotX
-	 * @param hotSpotY
-	 */
-	public HardwareCursorImage(int width, int height, int[] image, int hotSpotX, int hotSpotY) {
-		if (image.length != width * height) {
-			throw new IllegalArgumentException("Invalid image length");
-		}
-		this.width = width;
-		this.height = height;
-		this.image = image;
-		this.hotSpotX = hotSpotX;
-		this.hotSpotY = hotSpotY;
-	}
+    private final int width;
+    private final int height;
+    private final int[] image;
+    private final int hotSpotX;
+    private final int hotSpotY;
 
-	/**
-	 * Initialize this instance by parsing the pixels from a given String.
-	 * @param width
-	 * @param height
-	 * @param image
-	 * @param hotSpotX
-	 * @param hotSpotY
-	 */
-	public HardwareCursorImage(int width, int height, String image, int hotSpotX, int hotSpotY) {
-		if (image.length() != width * height) {
-			throw new IllegalArgumentException("Invalid image length");
-		}
-		this.width = width;
-		this.height = height;
-		this.image = parse(image);
-		this.hotSpotX = hotSpotX;
-		this.hotSpotY = hotSpotY;
-	}
+    /**
+     * Initialize this instance.
+     * 
+     * @param width
+     * @param height
+     * @param image
+     * @param hotSpotX
+     * @param hotSpotY
+     */
+    public HardwareCursorImage(int width, int height, int[] image, int hotSpotX, int hotSpotY) {
+        if (image.length != width * height) {
+            throw new IllegalArgumentException("Invalid image length");
+        }
+        this.width = width;
+        this.height = height;
+        this.image = image;
+        this.hotSpotX = hotSpotX;
+        this.hotSpotY = hotSpotY;
+    }
 
-	private int[] parse(String image) {
-		int[] res = new int[image.length()];
-		int i = 0;
-		for( char c : image.toCharArray() ) {
-			switch( c ) {
-			case 'T':
-				res[i++] = T;
-				break;
-			case 'B':
-				res[i++] = B;
-				break;
-			case 'W':
-				res[i++] = W;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown pixel color indicator '" + c + "'");
-			}
-		}
-		return res;
-	}
+    /**
+     * Initialize this instance by parsing the pixels from a given String.
+     * 
+     * @param width
+     * @param height
+     * @param image
+     * @param hotSpotX
+     * @param hotSpotY
+     */
+    public HardwareCursorImage(int width, int height, String image, int hotSpotX, int hotSpotY) {
+        if (image.length() != width * height) {
+            throw new IllegalArgumentException("Invalid image length");
+        }
+        this.width = width;
+        this.height = height;
+        this.image = parse(image);
+        this.hotSpotX = hotSpotX;
+        this.hotSpotY = hotSpotY;
+    }
 
-	/**
-	 * Gets the argb image.
-	 * @return int[]
-	 */
-	public int[] getImage() {
-		return image;
-	}
-	
-	/**
-	 * Gets the hotspot X coordinate
-	 * @return int
-	 */
-	public int getHotSpotX() {
-		return hotSpotX;
-	}
-	
-	/**
-	 * Gets the hotspot Y coordinate
-	 * @return int
-	 */
-	public int getHotSpotY() {
-		return hotSpotY;
-	}
-	
-	/**
-	 * Gets the height of the image
-	 * @return Returns the height.
-	 */
-	public final int getHeight() {
-		return this.height;
-	}
+    private int[] parse(String image) {
+        int[] res = new int[image.length()];
+        int i = 0;
+        for (char c : image.toCharArray()) {
+            switch (c) {
+                case 'T':
+                    res[i++] = T;
+                    break;
+                case 'B':
+                    res[i++] = B;
+                    break;
+                case 'W':
+                    res[i++] = W;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown pixel color indicator '" + c + "'");
+            }
+        }
+        return res;
+    }
 
-	/**
-	 * Gets the width of the image
-	 * @return Returns the width.
-	 */
-	public final int getWidth() {
-		return this.width;
-	}
+    /**
+     * Gets the argb image.
+     * 
+     * @return int[]
+     */
+    public int[] getImage() {
+        return image;
+    }
+
+    /**
+     * Gets the hotspot X coordinate
+     * 
+     * @return int
+     */
+    public int getHotSpotX() {
+        return hotSpotX;
+    }
+
+    /**
+     * Gets the hotspot Y coordinate
+     * 
+     * @return int
+     */
+    public int getHotSpotY() {
+        return hotSpotY;
+    }
+
+    /**
+     * Gets the height of the image
+     * 
+     * @return Returns the height.
+     */
+    public final int getHeight() {
+        return this.height;
+    }
+
+    /**
+     * Gets the width of the image
+     * 
+     * @return Returns the width.
+     */
+    public final int getWidth() {
+        return this.width;
+    }
 
 }
