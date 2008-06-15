@@ -23,12 +23,10 @@ package org.jnode.fs.command;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Map;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.fs.FileSystem;
@@ -41,25 +39,24 @@ import org.jnode.shell.syntax.DeviceArgument;
 
 /**
  * The DF command prints disk usage information for devices with filesystems.
- * 
+ *
  * @author galatnm@jnode.org
  * @author crawley@jnode.org
  * @author Levente S\u00e1ntha
- *
  */
 public class DFCommand extends AbstractCommand {
-    
+
     private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.OPTIONAL, 
-            "The device for which disk usage inforrmation should be displayed");
+        "device", Argument.OPTIONAL,
+        "The device for which disk usage inforrmation should be displayed");
 
     public DFCommand() {
         super("Print file system usage information");
         registerArguments(ARG_DEVICE);
     }
-   
+
     public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws NameNotFoundException {
+                        PrintStream out, PrintStream err) throws NameNotFoundException {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
         final Map<String, String> mountPoints = fss.getDeviceMountPoints();
         StringWriter sw = new StringWriter();
@@ -91,8 +88,8 @@ public class DFCommand extends AbstractCommand {
         out.print(sw.toString());
 
     }
+
     /**
-     * 
      * @param out
      * @param dev
      * @param fs
@@ -114,7 +111,7 @@ public class DFCommand extends AbstractCommand {
 
             str = free < 0 ? "unknown" : String.valueOf(free);
             format(out, str, false);
-            
+
             out.println(mountPoint);
         } catch (IOException ex) {
             out.println("\tError getting disk usage information for " + mountPoint + " on " + dev.getId() +
@@ -125,14 +122,14 @@ public class DFCommand extends AbstractCommand {
     private void format(PrintWriter out, String str, boolean left) {
         int ln;
         ln = 15 - str.length();
-        if(ln < 0) str = str.substring(0, 15);
+        if (ln < 0) str = str.substring(0, 15);
         else {
-            if(left){
+            if (left) {
                 out.print(str);
             }
-            for(int i = 0; i < ln; i++) out.print(' ');
+            for (int i = 0; i < ln; i++) out.print(' ');
         }
-        if(!left)
+        if (!left)
             out.print(str);
         out.print(' ');
     }

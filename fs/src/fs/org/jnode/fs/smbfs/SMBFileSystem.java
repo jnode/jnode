@@ -24,7 +24,6 @@ package org.jnode.fs.smbfs;
 import java.io.IOException;
 import jcifs.smb.NtlmAuthenticator;
 import jcifs.smb.NtlmPasswordAuthentication;
-import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import org.jnode.fs.FileSystem;
 
