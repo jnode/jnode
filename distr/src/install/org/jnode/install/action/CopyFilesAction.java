@@ -4,13 +4,22 @@
 package org.jnode.install.action;
 
 import java.io.File;
-import org.jnode.install.*;
+import org.jnode.install.AbstractInstaller;
+import org.jnode.install.ActionInput;
+import org.jnode.install.ActionOutput;
+import org.jnode.install.CopyFile;
+import org.jnode.install.InputContext;
+import org.jnode.install.InstallerAction;
+import org.jnode.install.OutputContext;
+import org.jnode.install.ProgressEvent;
+import org.jnode.install.ProgressListener;
 
 /**
  * @author Levente S\u00e1ntha
-*/
+ */
 public class CopyFilesAction implements InstallerAction {
     private String targetDirectory;
+
     public ActionInput getInput(final InputContext inContext) {
         return new ActionInput() {
             public AbstractInstaller.Step collect() {

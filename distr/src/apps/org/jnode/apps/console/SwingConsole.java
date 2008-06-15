@@ -2,7 +2,7 @@ package org.jnode.apps.console;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.*;
+import javax.swing.JFrame;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
@@ -16,9 +16,10 @@ import org.jnode.shell.ShellManager;
  */
 public class SwingConsole {
     private static JFrame frame;
+
     public static void main(String[] argv) throws Exception {
-        synchronized(SwingConsole.class){
-            if(frame != null){
+        synchronized (SwingConsole.class) {
+            if (frame != null) {
                 System.out.println("SwingConsole is running. Only one SwingConsole can run at this time.");
                 return;
             }
@@ -28,18 +29,18 @@ public class SwingConsole {
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         cm.setParent(manager);
         TextConsole console = cm.createConsole(
-        		null,
-                (ConsoleManager.CreateOptions.TEXT | 
-                		ConsoleManager.CreateOptions.SCROLLABLE));
+            null,
+            (ConsoleManager.CreateOptions.TEXT |
+                ConsoleManager.CreateOptions.SCROLLABLE));
         new Thread(new CommandShell(console), "SwingConsoleCommandShell").start();
 
-        synchronized(SwingConsole.class){
+        synchronized (SwingConsole.class) {
             frame = cm.getFrame();
         }
 
-        frame.addWindowListener(new WindowAdapter(){
+        frame.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
-                synchronized(SwingConsole.class){
+                synchronized (SwingConsole.class) {
                     frame = null;
                 }
             }
