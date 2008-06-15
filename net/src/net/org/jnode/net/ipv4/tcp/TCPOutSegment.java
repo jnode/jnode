@@ -18,12 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 
 package org.jnode.net.ipv4.tcp;
 
 import java.net.SocketException;
-
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ipv4.IPv4Header;
@@ -32,17 +31,24 @@ import org.jnode.net.ipv4.IPv4Header;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class TCPOutSegment extends TCPSegment {
+    private static final boolean DEBUG = false;
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(TCPOutSegment.class);
-    
+
     private final TCPDataBuffer buffer;
     private int dataOffset;
-    
-    /** Timeout counter, if 0, re-transmit */
+
+    /**
+     * Timeout counter, if 0, re-transmit
+     */
     private int timeout;
-    
-    /** Number of timeout ticks (usually grows) */
+
+    /**
+     * Number of timeout ticks (usually grows)
+     */
     private int timeoutTicks;
 
     /**
@@ -51,7 +57,7 @@ public class TCPOutSegment extends TCPSegment {
      * @param dataOffset
      */
     public TCPOutSegment(IPv4Header ipHdr, TCPHeader hdr, TCPDataBuffer buffer, int dataOffset,
-            int timeout) {
+                         int timeout) {
         super(ipHdr, hdr);
         this.buffer = buffer;
         this.dataOffset = dataOffset;
@@ -65,7 +71,9 @@ public class TCPOutSegment extends TCPSegment {
     public void timeout(TCPProtocol tcp) throws SocketException {
         timeout--;
         if (timeout == 0) {
-            log.debug("Resend segment " + getSeqNr());
+            if (DEBUG) {
+                log.debug("Resend segment " + getSeqNr());
+            }
             send(tcp);
             timeoutTicks = timeoutTicks * 2;
             timeout = timeoutTicks;
@@ -74,7 +82,7 @@ public class TCPOutSegment extends TCPSegment {
 
     /**
      * Send this segment
-     * 
+     *
      * @param tcp
      */
     public void send(TCPProtocol tcp) throws SocketException {
@@ -102,6 +110,7 @@ public class TCPOutSegment extends TCPSegment {
 
     /**
      * Does this segment only contain an ACK?
+     *
      * @return True if this segment contains only an acknowledgment, false otherwise
      */
     public boolean isAckOnly() {

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.tcp;
 
 import java.io.IOException;
@@ -30,7 +30,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketImpl;
 import java.net.SocketOptions;
-
 import org.apache.log4j.Logger;
 import org.jnode.net.ipv4.IPv4Address;
 
@@ -38,6 +37,7 @@ import org.jnode.net.ipv4.IPv4Address;
  * @author epr
  */
 public class TCPSocketImpl extends SocketImpl {
+    private static final boolean DEBUG = false;
 
     /**
      * The protocol I'm using
@@ -66,7 +66,7 @@ public class TCPSocketImpl extends SocketImpl {
 
     /**
      * Initialize a new instance
-     * 
+     *
      * @param protocol
      */
     public TCPSocketImpl(TCPProtocol protocol) {
@@ -75,23 +75,31 @@ public class TCPSocketImpl extends SocketImpl {
 
     /**
      * Accepts a connection on this socket.
-     * 
+     *
      * @param s The implementation object for the accepted connection.
      * @see java.net.SocketImpl#accept(java.net.SocketImpl)
      */
     protected void accept(SocketImpl s) throws IOException {
-        log.debug("accept " + s);
+        if (DEBUG) {
+            log.debug("accept " + s);
+        }
         if (controlBlock == null) {
             throw new IOException("Not listening");
         }
         final TCPSocketImpl impl = (TCPSocketImpl) s;
-        log.debug("accept: blocking");
+        if (DEBUG) {
+            log.debug("accept: blocking");
+        }
         impl.controlBlock = controlBlock.appAccept();
-        log.debug("accept: got one");
+        if (DEBUG) {
+            log.debug("accept: got one");
+        }
     }
 
     protected int getLocalPort() {
-        log.debug("getLocalPort: controlBlock.getLocalPort()");
+        if (DEBUG) {
+            log.debug("getLocalPort: controlBlock.getLocalPort()");
+        }
         return controlBlock.getLocalPort();
     }
 
@@ -195,7 +203,7 @@ public class TCPSocketImpl extends SocketImpl {
                 return 0;
             default:
                 throw new SocketException("Option " + option_id +
-                        " is not recognised or not implemented");
+                    " is not recognised or not implemented");
         }
     }
 
@@ -217,7 +225,7 @@ public class TCPSocketImpl extends SocketImpl {
      * how many pending connections will queue up waiting to be serviced before
      * being accept'ed. If the queue of pending requests exceeds this number,
      * additional connections will be refused.
-     * 
+     *
      * @param backlog The length of the pending connection queue
      * @throws IOException If an error occurs
      * @see java.net.SocketImpl#listen(int)
