@@ -884,6 +884,10 @@ clean             Remove all intermediate build results.
             <fileset dir="../core/src/core" includes="**/*.java"/>
             <fileset dir="../core/src/driver" includes="**/*.java"/>
             <fileset dir="../core/src/test" includes="**/*.java"/>
+            <fileset dir="../distr/src/apps" includes="**/*.java"
+                     excludes="**/jpartition/**/*.java,**/telnetd/**/*.java,**/vmware/**/*.java"/>
+            <fileset dir="../distr/src/emu" includes="**/*.java"/>
+            <fileset dir="../distr/src/install" includes="**/*.java"/>
             <fileset dir="../fs/src/fs" includes="**/*.java"/>
             <fileset dir="../fs/src/driver" includes="**/*.java"/>
             <fileset dir="../fs/src/test" includes="**/*.java"/>
