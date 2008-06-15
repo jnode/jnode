@@ -53,11 +53,28 @@ public class Ext2Entry extends AbstractFSEntry {
                 (isFile() ? " is a file " : ""));
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#getLastModified()
-     */
+    public long getLastChanged() throws IOException {
+        return iNode.getCtime();
+    }
+
     public long getLastModified() throws IOException {
         return iNode.getMtime();
+    }
+
+    public long getLastAccessed() throws IOException {
+        return iNode.getAtime();
+    }
+
+    public void setLastChanged(long lastChanged) throws IOException {
+        iNode.setCtime(lastChanged);
+    }
+
+    public void setLastModified(long lastModified) throws IOException {
+        iNode.setMtime(lastModified);
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
+        iNode.setAtime(lastAccessed);
     }
 
     /**

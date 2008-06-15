@@ -135,12 +135,11 @@ public class JIFSFile implements ExtFSEntry, FSFile {
         return this;
     }
 
-    public void setLastModified(long l) {
-        return;
+    public long getLastModified() {
+        return 0;
     }
 
-    public long getLastModified() {
-        return System.currentTimeMillis();
+    public void setLastModified(long lastModified) {
     }
 
     public void setName(String name) {

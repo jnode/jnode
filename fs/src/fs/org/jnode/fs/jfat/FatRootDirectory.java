@@ -54,16 +54,30 @@ public class FatRootDirectory extends FatDirectory {
             return "";
     }
 
+    public long getCreated() throws IOException {
+        FatShortDirEntry label = getEntry();
+        return label == null ? 0 : label.getCreated();
+    }
+
     public long getLastModified() throws IOException {
         FatShortDirEntry label = getEntry();
+        return label == null ? 0 : label.getLastModified();
+    }
 
-        if (label != null)
-            return label.getLastModified();
-        else
-            return FatUtils.getMinDateTime();
+    public long getLastAccessed() throws IOException {
+        FatShortDirEntry label = getEntry();
+        return label == null ? 0 : label.getLastAccessed();
+    }
+
+    public void setCreated(long created) throws IOException {
+        throw new UnsupportedOperationException("cannot change root time");
     }
 
     public void setLastModified(long lastModified) throws IOException {
+        throw new UnsupportedOperationException("cannot change root time");
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
         throw new UnsupportedOperationException("cannot change root time");
     }
 

@@ -23,7 +23,9 @@ public class RAMFile implements FSEntry, FSFile {
     private String filename;
     private ByteBuffer buffer;
 
+    private long created;
     private long lastModified;
+    private long lastAccessed;
     private FSAccessRights accessRights;
 
     private boolean isValid = true;
@@ -37,7 +39,7 @@ public class RAMFile implements FSEntry, FSFile {
     public RAMFile(RAMDirectory parent, String filename) {
         this.parent = parent;
         this.filename = filename;
-        this.lastModified = System.currentTimeMillis();
+        this.created = this.lastModified = this.lastAccessed = System.currentTimeMillis();
 
         // TODO accessRights
 
@@ -97,13 +99,16 @@ public class RAMFile implements FSEntry, FSFile {
         return parent;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.jnode.fs.FSEntry#getLastModified()
-     */
+    public long getCreated() throws IOException {
+        return created;
+    }
+
     public long getLastModified() throws IOException {
         return lastModified;
+    }
+
+    public long getLastAccessed() throws IOException {
+        return lastAccessed;
     }
 
     /**
@@ -135,13 +140,16 @@ public class RAMFile implements FSEntry, FSFile {
         setLastModified(System.currentTimeMillis());
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.jnode.fs.FSEntry#setLastModified(long)
-     */
+    public void setCreated(long created) throws IOException {
+        this.created = created;
+    }
+
     public void setLastModified(long lastModified) throws IOException {
         this.lastModified = lastModified;
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
+        this.lastAccessed = lastAccessed;
     }
 
     /**

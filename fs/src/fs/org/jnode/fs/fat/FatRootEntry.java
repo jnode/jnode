@@ -55,12 +55,8 @@ public class FatRootEntry extends FatObject implements FSEntry {
         return null;
     }
 
-    /**
-     * Gets the last modification time of this entry.
-     */
-
     public long getLastModified() {
-        return System.currentTimeMillis();
+        return 0;
     }
 
     /**

@@ -95,8 +95,16 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         return file;
     }
 
+    public long getLastChanged() throws IOException {
+        return fileAttribute.getLastStatusChanged().toJavaMillis();
+    }
+
     public long getLastModified() throws IOException {
-        return (long) fileAttribute.getLastModified().getSeconds() * 1000;
+        return fileAttribute.getLastModified().toJavaMillis();
+    }
+
+    public long getLastAccessed() throws IOException {
+        return fileAttribute.getLastAccessed().toJavaMillis();
     }
 
     public boolean isDirectory() {
@@ -114,11 +122,25 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         return fileAttribute.getType() == FileAttribute.FILE;
     }
 
+    public void setLastChanged(long lastChanged) throws IOException {
+        // TODO: The setAttribute API appears to have no way to do this.
+    }
+
     public void setLastModified(long lastModified) throws IOException {
         NFS2Client client = getNFS2Client();
         try {
-            client.setAttribute(getFileHandle(), -1, -1, -1, -1, new Time(-1, -1), 
-                    new Time((int) (lastModified / 1000), -1));
+            client.setAttribute(getFileHandle(), -1, -1, -1, -1,
+                new Time(-1, -1), new Time(lastModified));
+        } catch (NFS2Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
+        NFS2Client client = getNFS2Client();
+        try {
+            client.setAttribute(getFileHandle(), -1, -1, -1, -1,
+                new Time(lastAccessed), new Time(-1, -1));
         } catch (NFS2Exception e) {
             throw new IOException(e.getMessage(), e);
         }

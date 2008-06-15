@@ -69,12 +69,19 @@ public class NTFSEntry implements FSEntry {
         return null;
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#getLastModified()
-     */
+    public long getCreated() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getFileNameAttribute()
+                .getCreationTime());
+    }
+
     public long getLastModified() throws IOException {
         return NTFSUTIL.filetimeToMillis(getFileRecord().getFileNameAttribute()
                 .getModificationTime());
+    }
+
+    public long getLastAccessed() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getFileNameAttribute()
+                .getAccessTime());
     }
 
     /**
@@ -99,12 +106,16 @@ public class NTFSEntry implements FSEntry {
 
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#setLastModified(long)
-     */
-    public void setLastModified(long lastModified) {
-        // TODO Auto-generated method stub
+    public void setCreated(long created) {
+        // TODO: Implement write support.
+    }
 
+    public void setLastModified(long lastModified) {
+        // TODO: Implement write support.
+    }
+
+    public void setLastAccessed(long lastAccessed) {
+        // TODO: Implement write support.
     }
 
     /**
