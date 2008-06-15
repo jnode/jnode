@@ -364,7 +364,10 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param mode
 	 */
 	public final void fillRect(int x, int y, int width, int height, int color, int mode) {
-		if (x < 0) {
+        super.fillRect(x,y,width, height, color, mode);
+        //todo optimize it
+        /*
+        if (x < 0) {
 			width = Math.max(0, x + width);
 			x = 0;
 		}
@@ -390,6 +393,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 				writeWordToFIFO(height);
 			}
 		}
+		*/
 	}
 
 	/**
@@ -447,7 +451,10 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param mode
 	 */
 	public final void drawLine(int x1, int y1, int x2, int y2, int c, int mode) {
-		if (x1 == x2) {
+        super.drawLine(x1,y1,x2,y2,c,mode);
+        //todo optimize it
+        /*
+        if (x1 == x2) {
 			// Vertical line
 			fillRect(x1, Math.min(y1, y2), 1, Math.abs(y2 - y1), c, mode);
 		} else if (y1 == y2) {
@@ -457,6 +464,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		} else {
 			super.drawLine(x1, y1, x2, y2, c, mode);
 		}
+		*/
 	}
 
 	protected final void drawHorizontalLine(int x, int y, int w, int color, int mode) {
@@ -526,7 +534,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param index
 	 * @return
 	 */
-	private final int getReg32(int index) {
+	private int getReg32(int index) {
 		ports.outPortDword(indexPort, index);
 		return ports.inPortDword(valuePort);
 	}
@@ -537,7 +545,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param index
 	 * @param value
 	 */
-	private final void setReg32(int index, int value) {
+	private void setReg32(int index, int value) {
 		ports.outPortDword(indexPort, index);
 		ports.outPortDword(valuePort, value);
 	}
@@ -547,7 +555,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * 
 	 * @param value
 	 */
-	private final void writeWordToFIFO(int value) {
+	private void writeWordToFIFO(int value) {
 		fifoDirty = true;
 		//Debug.out.println ("VMWare::WriteWordToFIFO(" + Integer.toHexString(nValue) + ") pos: "
 		// + ReadFIFO (SVGA_FIFO_NEXT_CMD));
@@ -628,7 +636,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * Gets the SVGA_ID of the VMware SVGA adapter. This function should hide any backward
 	 * compatibility mess.
 	 */
-	private final int getVMWareID() {
+	private int getVMWareID() {
 		int vmware_svga_id;
 
 		/*******************************************************************************************
@@ -732,7 +740,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param mask
 	 * @return
 	 */
-	private final int getMaskShift(int mask) {
+	private int getMaskShift(int mask) {
         if(mask == 0) return 0;
         int count = 0;
 		while ((mask & 1) == 0) {
@@ -918,7 +926,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		setReg32(SVGA_REG_CURSOR_ON, visible ? 1 : 0);
 	}
 
-	private final boolean hasCapability(int cap) {
+	private boolean hasCapability(int cap) {
 		return ((this.capabilities & cap) == cap);
 	}
 
@@ -951,5 +959,11 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     @Override
     public int[] getRGBPixels(Rectangle region) {
         return bitmapGraphics.doGetPixels(region);
+    }
+
+    @Override
+    public void update(int x, int y, int width, int height) {
+        syncFIFO();
+        updateScreen(x, y, width, height);
     }
 }

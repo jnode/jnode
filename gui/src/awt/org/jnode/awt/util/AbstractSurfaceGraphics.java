@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.image.JNodeImage;
 import org.jnode.driver.video.Surface;
+import sun.awt.image.ToolkitImage;
 
 /**
  * @author epr
@@ -168,7 +169,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
     public final boolean drawImage(Image image, int x, int y, int width, int height, Color bgcolor,
                                    ImageObserver observer) {
         return drawImage(
-            new JNodeImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x,
+            new ToolkitImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x,
             y, bgcolor, observer);
     }
 
@@ -184,7 +185,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
      */
     public final boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
         return drawImage(
-            new JNodeImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x,
+            new ToolkitImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x,
             y, observer);
     }
 
@@ -254,8 +255,8 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
         }
 
         // Extract the image with a CropImageFilter
-        final Image imageArea = new JNodeImage(
-            new FilteredImageSource(image.getSource(), new CropImageFilter(xImage, yImage, widthImage, heightImage)));
+        final Image imageArea = new ToolkitImage(new FilteredImageSource(image.getSource(),
+            new CropImageFilter(xImage, yImage, widthImage, heightImage)));
         if (bgColor == null) {
             return drawImage(imageArea, xDest, yDest, widthDest, heightDest, observer);
         } else {
@@ -478,8 +479,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
                     return;
                 }
 
-                tk.getFontManager()
-                    .drawText(surface, this.clip, this.transform, text, font, x, y, getColor());
+                tk.getFontManager().drawText(surface, this.clip, this.transform, text, font, x, y, getColor());
             }
         } catch (Throwable t) {
             log.error("error in drawString", t);

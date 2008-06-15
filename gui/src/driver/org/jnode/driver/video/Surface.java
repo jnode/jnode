@@ -135,4 +135,13 @@ public interface Surface {
 	 * Close this surface
 	 */
 	public void close();
+
+    /**
+     * Update a region of the screen.
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
+    public void update(int x, int y, int width, int height);
 }

@@ -85,6 +85,7 @@ import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.naming.InitialNaming;
+import sun.awt.image.ToolkitImage;
 
 /**
  * @author epr
@@ -276,7 +277,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
      * @see java.awt.Toolkit#createImage(java.awt.image.ImageProducer)
      */
     public Image createImage(ImageProducer producer) {
-        return new JNodeImage(producer);
+        return new ToolkitImage(producer);        
     }
 
     /**
@@ -515,7 +516,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
             public Image run() {
                 try {
-                    final String userDir = (String) AccessController.doPrivileged(new GetPropertyAction("user.dir"));
+                    final String userDir = AccessController.doPrivileged(new GetPropertyAction("user.dir"));
                     Image image = getImage(new URL("file:" + new File(userDir, filename)));
                     return image != null ? image : getImage(new URL("file:" + new File(filename).getAbsolutePath()));
                 } catch (Exception ex) {

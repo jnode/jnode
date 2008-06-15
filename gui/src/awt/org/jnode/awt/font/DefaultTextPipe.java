@@ -132,6 +132,9 @@ public class DefaultTextPipe implements TextPipe {
                 public void close() {
                     org.jnode.vm.Unsafe.debug("DTP close\n");
                 }
+                public void update(int x, int y, int width, int height) {
+                    //do nothing
+                }
             }, g2d.getClip(), g2d.getTransform(), s, font, (int) x, (int) y, g2d.getColor());
 
         }
