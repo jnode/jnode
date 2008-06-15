@@ -8,7 +8,6 @@ import java.awt.Transparency;
 import java.awt.image.Raster;
 import org.jnode.driver.video.Surface;
 import org.jnode.system.MemoryResource;
-import org.jnode.vm.Unsafe;
 
 final class BitmapGraphics32bpp extends AbstractBitmapGraphics {
 
@@ -72,7 +71,7 @@ final class BitmapGraphics32bpp extends AbstractBitmapGraphics {
     }
 
     /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
+     * @see org.jnode.awt.util.AbstractBitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
      *      int, int, int, int, int, int, int)
      */
     protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
