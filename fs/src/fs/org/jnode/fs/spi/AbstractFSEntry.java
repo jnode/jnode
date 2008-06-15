@@ -192,13 +192,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
         log.debug("<<< END setName newName=" + newName + " >>>");
     }
 
-    /**
-     * Change the date of the last modification of this entry
-     * 
-     * @param lastModified
-     * @throws IOException
-     */
-    public final void setLastModified(long lastModified) throws IOException {
+    public void setLastModified(long lastModified) throws IOException {
         /*
          * if(isRoot()) { throw new IOException("Cannot change last modified of
          * root directory"); }

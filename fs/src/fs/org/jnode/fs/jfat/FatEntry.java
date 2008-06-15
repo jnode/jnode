@@ -105,12 +105,28 @@ public class FatEntry extends FatObject implements FSEntry {
         return entry.getIndex();
     }
 
+    public long getCreated() throws IOException {
+        return entry.getCreated();
+    }
+
     public long getLastModified() throws IOException {
         return entry.getLastModified();
     }
 
+    public long getLastAccessed() throws IOException {
+        return entry.getLastAccessed();
+    }
+
+    public void setCreated(long created) throws IOException {
+        entry.setCreated(created);
+    }
+
     public void setLastModified(long lastModified) throws IOException {
         entry.setLastModified(lastModified);
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
+        entry.setLastAccessed(lastAccessed);
     }
 
     public FatShortDirEntry getEntry() {

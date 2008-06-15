@@ -117,8 +117,16 @@ class LfnEntry implements FSEntry {
         return realEntry.getParent();
     }
 
+    public long getCreated() {
+        return realEntry.getCreated();
+    }
+
     public long getLastModified() {
         return realEntry.getLastModified();
+    }
+
+    public long getLastAccessed() {
+        return realEntry.getLastAccessed();
     }
 
     public boolean isFile() {
@@ -134,8 +142,16 @@ class LfnEntry implements FSEntry {
         realEntry.setName(parent.generateShortNameFor(newName));
     }
 
+    public void setCreated(long created) {
+        realEntry.setCreated(created);
+    }
+
     public void setLastModified(long lastModified) {
         realEntry.setLastModified(lastModified);
+    }
+
+    public void setLastAccessed(long lastAccessed) {
+        realEntry.setLastAccessed(lastAccessed);
     }
 
     public FSFile getFile() throws IOException {

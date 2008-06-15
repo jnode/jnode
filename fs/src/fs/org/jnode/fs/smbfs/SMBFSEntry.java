@@ -61,9 +61,9 @@ public abstract class SMBFSEntry implements FSEntry {
         return (SMBFSFile) this;
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#getLastModified()
-     */
+    public long getCreated() throws IOException {
+        return smbFile.createTime();
+    }
 
     public long getLastModified() throws IOException {
         return smbFile.getLastModified();
@@ -120,9 +120,10 @@ public abstract class SMBFSEntry implements FSEntry {
         }
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#setLastModified(long)
-     */
+    public void setCreated(long created) throws IOException {
+        smbFile.setCreateTime(created);
+    }
+
     public void setLastModified(long lastModified) throws IOException {
         smbFile.setLastModified(lastModified);
     }

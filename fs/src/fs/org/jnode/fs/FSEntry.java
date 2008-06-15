@@ -46,10 +46,11 @@ public interface FSEntry extends FSObject {
 
     /**
      * Gets the last modification time of this entry.
-     * 
-     * @throws IOException
+     *
+     * @return the last modification time of the entry as milliseconds since 1970, or {@code 0}
+     *         if this filesystem does not support getting the last modified time.
+     * @throws IOException if an error occurs retrieving the timestamp.
      */
-
     public long getLastModified() throws IOException;
 
     /**

@@ -52,10 +52,16 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
     
     /** Flags of this entry */
     private int flags;
-    
-    /** Modification date */
+
+    /** Time of creation. */
+    private long created;
+
+    /** Time of last modification. */
     private long lastModified;
-    
+
+    /** Time of last access. */
+    private long lastAccessed;
+
     /** First cluster of the data of this entry */
     private int startCluster;
     
@@ -109,7 +115,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
         setName(name);
         setExt(ext);
         this.flags = F_ARCHIVE;
-        this.lastModified = System.currentTimeMillis();
+        this.created = this.lastModified = this.lastAccessed = System.currentTimeMillis();
         this._dirty = false;
         this.rights = new UnixFSAccessRights(getFileSystem());
     }
@@ -144,9 +150,14 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
         setExt(new String(extArr).trim());
 
         this.flags = LittleEndian.getUInt8(src, offset + 0x0b);
+        this.created =
+                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x10),
+                                        LittleEndian.getUInt16(src, offset + 0x0e));
         this.lastModified =
-                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x18), LittleEndian
-                        .getUInt16(src, offset + 0x16));
+                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x18),
+                                        LittleEndian.getUInt16(src, offset + 0x16));
+        this.lastAccessed =
+                DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x12), 0); // time not stored
         this.startCluster = LittleEndian.getUInt16(src, offset + 0x1a);
         this.length = LittleEndian.getUInt32(src, offset + 0x1c);
         this._dirty = false;
@@ -162,13 +173,16 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
         return flags;
     }
 
-    /**
-     * Returns the changeDate.
-     * 
-     * @return long
-     */
+    public long getCreated() {
+        return created;
+    }
+
     public long getLastModified() {
         return lastModified;
+    }
+
+    public long getLastAccessed() {
+        return lastAccessed;
     }
 
     /**
@@ -243,13 +257,18 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
         setDirty();
     }
 
-    /**
-     * Sets the last modification date.
-     * 
-     * @param lastModified
-     */
+    public void setCreated(long created) {
+        this.created = created;
+        setDirty();
+    }
+
     public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
+        setDirty();
+    }
+
+    public void setLastAccessed(long lastAccessed) {
+        this.lastAccessed = lastAccessed;
         setDirty();
     }
 
@@ -454,6 +473,9 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
         }
 
         LittleEndian.setInt8(dest, offset + 0x0b, flags);
+        LittleEndian.setInt16(dest, offset + 0x0e, DosUtils.encodeTime(created));
+        LittleEndian.setInt16(dest, offset + 0x10, DosUtils.encodeDate(created));
+        LittleEndian.setInt16(dest, offset + 0x12, DosUtils.encodeDate(lastAccessed));
         LittleEndian.setInt16(dest, offset + 0x16, DosUtils.encodeTime(lastModified));
         LittleEndian.setInt16(dest, offset + 0x18, DosUtils.encodeDate(lastModified));
         LittleEndian.setInt16(dest, offset + 0x1a, startCluster);
@@ -489,8 +511,12 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
         b.append(NumberUtils.hex(flags, 2));
         b.append(")");
 
-        b.append(" date=");
+        b.append(" created=");
+        b.append(new Date(getCreated()));
+        b.append(" lastModified=");
         b.append(new Date(getLastModified()));
+        b.append(" lastAccessed=");
+        b.append(new Date(getLastAccessed()));
         b.append(" startCluster=");
         b.append(getStartCluster());
         b.append(" length=");

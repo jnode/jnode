@@ -45,8 +45,14 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     /** The filesystem */
     private final VirtualFS fs;
 
-    /** The last modification time of this entry */
+    /** The creation time of this entry. */
+    private long created;
+
+    /** The last modification time of this entry. */
     private long lastModified;
+
+    /** The last access time of this entry. */
+    private long lastAccessed;
 
     /** The name of this entry */
     private final String name;
@@ -67,7 +73,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
      */
     VirtualDirEntry(VirtualFS fs, String name, VirtualDirEntry parent) throws IOException {
         this.fs = fs;
-        this.lastModified = System.currentTimeMillis();
+        this.created = this.lastModified = this.lastAccessed = System.currentTimeMillis();
         this.name = name;
         this.parent = (parent != null) ? parent.getDirectory() : null;
         this.entries = new TreeMap<String, FSEntry>();
@@ -95,11 +101,16 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
         throw new IOException("Not a file");
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#getLastModified()
-     */
+    public long getCreated() throws IOException {
+        return created;
+    }
+
     public long getLastModified() throws IOException {
         return lastModified;
+    }
+
+    public long getLastAccessed() throws IOException {
+        return lastAccessed;
     }
 
     /**
@@ -137,11 +148,16 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
         return false;
     }
 
-    /**
-     * @see org.jnode.fs.FSEntry#setLastModified(long)
-     */
+    public void setCreated(long created) throws IOException {
+        this.created = created;
+    }
+
     public void setLastModified(long lastModified) throws IOException {
         this.lastModified = lastModified;
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
+        this.lastAccessed = lastAccessed;
     }
 
     /**
@@ -273,23 +289,14 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
             this.i = entries.iterator();
         }
 
-        /**
-         * @see org.jnode.fs.FSEntryIterator#hasNext()
-         */
         public boolean hasNext() {
             return i.hasNext();
         }
 
-        /**
-         * @see org.jnode.fs.FSEntryIterator#next()
-         */
         public FSEntry next() {
             return i.next();
         }
 
-        /**
-         * @see java.util.Iterator#remove()
-         */
         public void remove() {
             throw new UnsupportedOperationException();
         }

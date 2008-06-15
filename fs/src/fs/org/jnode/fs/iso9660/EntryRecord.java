@@ -34,6 +34,7 @@ public class EntryRecord extends Descriptor {
     private final int extAttributeLength;
     private final long extentLocation;
     private final int dataLength;
+    private final ISO9660DTime recordingTime;
     private final int fileUnitSize;
     private final int flags;
     private final int interleaveSize;
@@ -56,9 +57,10 @@ public class EntryRecord extends Descriptor {
         this.extAttributeLength = getUInt8(buff, offset + 2);
         this.extentLocation = getUInt32LE(buff, offset + 3);
         this.dataLength = (int) getUInt32LE(buff, offset + 11);
+        this.recordingTime = new ISO9660DTime(buff, offset + 19);
+        this.flags = getUInt8(buff, offset + 26);
         this.fileUnitSize = getUInt8(buff, offset + 27);
         this.interleaveSize = getUInt8(buff, offset + 28);
-        this.flags = getUInt8(buff, offset + 26);
         // This must be after flags, because of isDirectory.
         this.identifier = getFileIdentifier(buff, offset, isDirectory(), encoding);
     }
@@ -88,6 +90,10 @@ public class EntryRecord extends Descriptor {
 
     public int getDataLength() {
         return dataLength;
+    }
+
+    public ISO9660DTime getRecordingTime() {
+        return recordingTime;
     }
 
     public final boolean isDirectory() {

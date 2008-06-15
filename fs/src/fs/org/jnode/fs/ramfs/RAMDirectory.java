@@ -22,7 +22,9 @@ public class RAMDirectory implements FSEntry, FSDirectory {
     private RAMDirectory parent;
     private String directoryName;
 
+    private long created;
     private long lastModified;
+    private long lastAccessed;
     private FSAccessRights accessRights;
 
     /* if file is deleted, it is no longer valid */
@@ -43,7 +45,7 @@ public class RAMDirectory implements FSEntry, FSDirectory {
         this.parent = parent;
 
         this.directoryName = name;
-        this.lastModified = System.currentTimeMillis();
+        this.created = this.lastModified = this.lastAccessed = System.currentTimeMillis();
 
         // TODO: accessRights
 
@@ -68,13 +70,16 @@ public class RAMDirectory implements FSEntry, FSDirectory {
         return parent;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.jnode.fs.FSEntry#getLastModified()
-     */
+    public long getCreated() throws IOException {
+        return created;
+    }
+
     public long getLastModified() throws IOException {
         return lastModified;
+    }
+
+    public long getLastAccessed() throws IOException {
+        return lastAccessed;
     }
 
     /**
@@ -105,13 +110,16 @@ public class RAMDirectory implements FSEntry, FSDirectory {
         directoryName = newName;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.jnode.fs.FSEntry#setLastModified(long)
-     */
+    public void setCreated(long created) throws IOException {
+        this.created = created;
+    }
+
     public void setLastModified(long lastModified) throws IOException {
         this.lastModified = lastModified;
+    }
+
+    public void setLastAccessed(long lastAccessed) throws IOException {
+        this.lastAccessed = lastAccessed;
     }
 
     /**
