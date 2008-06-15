@@ -98,24 +98,16 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
         return false;
     }
 
-    public long getFreeSpace() {
-        try {
-            return root.smbFile.getDiskFreeSpace();
-        } catch (SmbException e) {
-            return 0;
-        }
+    public long getFreeSpace() throws IOException {
+        return root.smbFile.getDiskFreeSpace();
     }
 
-    public long getTotalSpace() {
+    public long getTotalSpace() throws IOException {
         //todo fix it
-        return 1;
+        return -1;
     }
 
-    public long getUsableSpace() {
-        try {
-            return root.smbFile.getDiskFreeSpace();
-        } catch (SmbException e) {
-            return 0;
-        }
+    public long getUsableSpace() throws IOException {
+        return root.smbFile.getDiskFreeSpace();
     }
 }

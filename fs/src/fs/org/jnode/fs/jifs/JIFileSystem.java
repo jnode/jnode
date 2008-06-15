@@ -120,17 +120,17 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
 
     public long getFreeSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 
     public long getTotalSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 
     public long getUsableSpace() {
         // TODO implement me
-        return 0;
+        return -1;
     }
 
 }
