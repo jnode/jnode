@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.util;
 
 import java.awt.Color;
@@ -33,7 +33,7 @@ import org.jnode.driver.video.Surface;
 
 /**
  * Abstract and generic implementation of a Surface.
- * 
+ *
  * @author epr
  */
 public abstract class AbstractSurface implements Surface {
@@ -42,7 +42,7 @@ public abstract class AbstractSurface implements Surface {
 	protected int height;
 
 	private double[] curvesData = new double[200];
-	
+
 	public AbstractSurface(int width, int height) {
 		this.width = width;
 		this.height = height;
@@ -64,7 +64,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Fill the given shape with the given color
-	 * 
+	 *
 	 * @param shape
 	 *            The shape to fill
 	 * @param clip
@@ -116,29 +116,30 @@ public abstract class AbstractSurface implements Surface {
 		if (txShape instanceof Rectangle2D) {
 			if (txClip != null) {
 				bounds = bounds.createIntersection(txClip.getBounds2D()).getBounds();
-//				System.out.println("Clipped bounds " + bounds);
 			}
 			if ((bounds.width > 0) && (bounds.height > 0)) {
 				bounds.translate((int) tx, (int) ty);
 				fillRect(bounds.x, bounds.y, bounds.width, bounds.height, c, mode);
 			}
 		} else {
-			//log.debug("Fill " + shape + ", bounds " + bounds);
-			for (int row = 0; row < bounds.height; row++) {
-				final int y = (int) (ty + bounds.y + row);
-				for (int col = 0; col < bounds.width; col++) {
-					final int x = (int) (tx + bounds.x + col);
-					if (txShape.contains(x, y) && ((txClip == null) || txClip.contains(x, y))) {
-						drawPixel(x, y, c, mode);
-					}
-				}
-			}
-		}
+            //todo optimize for the ellipse
+            for (int row = 0; row < bounds.height; row++) {
+                final int y = bounds.y + row;
+                for (int col = 0; col < bounds.width; col++) {
+                    final int x = bounds.x + col;
+                    if (txShape.contains(x, y)) {
+                        if ((txClip == null) || txClip.contains(x, y)) {
+                            drawPixel((int) (tx + x), (int) (ty + y), c, mode);
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	/**
 	 * Fill a rectangle with the given color.
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -154,7 +155,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Set a pixel at the given location
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param color
@@ -164,7 +165,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Draw a line between (x1,y1) and (x2,y2)
-	 * 
+	 *
 	 * @param x1
 	 * @param y1
 	 * @param x2
@@ -223,7 +224,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Draw a bezier curve
-	 * 
+	 *
 	 * @param x0
 	 * @param y0
 	 * @param x1
@@ -246,7 +247,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Draw a quadratic parametric curve
-	 * 
+	 *
 	 * @param x0
 	 * @param y0
 	 * @param x1
@@ -267,7 +268,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Draw the given shape
-	 * 
+	 *
 	 * @param shape
 	 * @param clip
 	 * @param color
@@ -354,7 +355,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Convert the given color to an int representation
-	 * 
+	 *
 	 * @param color
 	 */
 	protected abstract int convertColor(Color color);
@@ -371,13 +372,13 @@ public abstract class AbstractSurface implements Surface {
      * Sets the color of the pixel at the specified screen coordinates.
      * @param x the x coordinate
      * @param y the y coordinate
-     * @param color the new color of the pixel 
+     * @param color the new color of the pixel
      */
     public void setRGBPixel (int x, int y, int color)
     {
     	drawPixel(x, y, color, PAINT_MODE);
     }
-	
+
 	/**
 	 * @see org.jnode.driver.video.Surface#getRGBPixels(java.awt.Rectangle)
 	 */
@@ -421,4 +422,8 @@ public abstract class AbstractSurface implements Surface {
 			return gp.getBounds();
 		}
 	}
+
+    public void update(int x, int y, int width, int height) {
+        //do nothing
+    }
 }

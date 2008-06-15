@@ -64,16 +64,16 @@ public class BDFTextRenderer implements TextRenderer {
      * @param color   string color
      * @see java.awt.Graphics
      */
-    public final void render(Surface surface, Shape clip, AffineTransform tx,
-                             CharSequence str, int x, int y, Color color) {
+    public final void render(Surface surface, Shape clip, AffineTransform tx, CharSequence str, int x, int y,
+                             Color color) {
         if (str == null || str.length() == 0)
             return;
 
-        BDFMetrics fm = bdfFont.getFontMetrics();
-        y -= fm.getDescent();
         int charsCount = str.length();
 
         if ((bdfFont != null) && (charsCount > 0)) {
+            BDFMetrics fm = bdfFont.getFontMetrics();
+            y -= fm.getDescent();
             int offset = 0;
 
             final int bdfFontDepth = bdfFont.getDepth();
@@ -84,6 +84,11 @@ public class BDFTextRenderer implements TextRenderer {
             BDFParser.Rectangle b_rect = new BDFParser.Rectangle();
             final Point2D src = new Point2D.Double();
             final Point2D dst = new Point2D.Double();
+
+            int x_min = Integer.MAX_VALUE;
+            int y_min = Integer.MAX_VALUE;
+            int x_max = Integer.MIN_VALUE;
+            int y_max = Integer.MIN_VALUE;
 
             for (int i = 0; i < charsCount; i++) {
                 int base = fm.getDescent();
@@ -145,12 +150,21 @@ public class BDFTextRenderer implements TextRenderer {
                             //if(clip == null || clip.contains(dst)) {
 
                             surface.setRGBPixel(px, py, fPixel);
+
+                            if (x_min > px) x_min = px;
+                            if (y_min > py) y_min = py;
+                            if (x_max < px) x_max = px;
+                            if (y_max < py) y_max = py;
+
                             //}
                         }
                     }
                 }
                 offset += glyph.getDWidth().width - glyph.getBbx(b_rect).x;
             }
+            if (x_min < Integer.MAX_VALUE && y_min < Integer.MAX_VALUE &&
+                x_max > Integer.MIN_VALUE && y_max > Integer.MIN_VALUE)
+                surface.update(x_min, y_min, x_max - x_min + 1, y_max - y_min + 1);
         }
     }
 }

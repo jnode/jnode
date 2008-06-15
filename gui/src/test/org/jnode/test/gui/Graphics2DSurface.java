@@ -77,6 +77,10 @@ public class Graphics2DSurface implements Surface {
         graph.drawLine(x, y, x, y);
     }
 
+    public void update(int x, int y, int width, int height) {
+        //do nothing
+    }
+
     public static void main(String[] argv) {
         FontProvider fp = new BDFFontProvider();
         Set<Font> obj = fp.getAllFonts();
