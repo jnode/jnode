@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.tcp;
 
 import java.io.IOException;
@@ -31,7 +31,6 @@ import java.net.SocketImplFactory;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.SocketBuffer;
@@ -46,31 +45,44 @@ import org.jnode.util.Statistics;
  * @author epr
  */
 public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
+    private static final boolean DEBUG = false;
 
-    /** The IP service I'm a part of */
+    /**
+     * The IP service I'm a part of
+     */
     private final IPv4Service ipService;
 
     /** The ICMP service */
     // private final ICMPUtils icmp;
-    
-    /** My statistics */
+
+    /**
+     * My statistics
+     */
     private final TCPStatistics stat = new TCPStatistics();
 
-    /** The SocketImpl factory for TCP */
+    /**
+     * The SocketImpl factory for TCP
+     */
     private final TCPSocketImplFactory socketImplFactory;
 
-    /** My control blocks */
+    /**
+     * My control blocks
+     */
     private final TCPControlBlockList controlBlocks;
 
-    /** The timer */
+    /**
+     * The timer
+     */
     private final TCPTimer timer;
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(TCPProtocol.class);
 
     /**
      * Initialize a new instance
-     * 
+     *
      * @param ipService
      */
     public TCPProtocol(IPv4Service ipService) throws NetworkException {
@@ -156,19 +168,23 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
         skbuf.trim(hdr.getDataLength());
 
         if (!hdr.isChecksumOk()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Receive: badsum: " + hdr);
+            if (DEBUG) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Receive: badsum: " + hdr);
+                }
             }
             stat.badsum.inc();
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Receive: " + hdr);
+            if (DEBUG) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Receive: " + hdr);
+                }
             }
 
             // Find the corresponding control block
             final TCPControlBlock cb =
-                    (TCPControlBlock) controlBlocks.lookup(ipHdr.getSource(), hdr.getSrcPort(),
-                            ipHdr.getDestination(), hdr.getDstPort(), true);
+                (TCPControlBlock) controlBlocks.lookup(ipHdr.getSource(), hdr.getSrcPort(),
+                    ipHdr.getDestination(), hdr.getDstPort(), true);
             if (cb == null) {
                 final boolean ack = hdr.isFlagAcknowledgeSet();
                 final boolean rst = hdr.isFlagResetSet();
@@ -178,8 +194,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
                 // Port unreachable
                 if (ack && rst) {
                     // the source is also unreachable
-                    log
-                            .debug("Dropping segment due to: connection refused as the source is also unreachable");
+                    log.debug("Dropping segment due to: connection refused as the source is also unreachable");
                 } else {
                     processPortUnreachable(ipHdr, hdr);
                 }
@@ -200,13 +215,13 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
 
     /**
      * Process a segment whose destination port is unreachable
-     * 
+     *
      * @param hdr
      */
     private void processPortUnreachable(IPv4Header ipHdr, TCPHeader hdr) throws SocketException {
         final TCPHeader replyHdr =
-                new TCPHeader(hdr.getDstPort(), hdr.getSrcPort(), 0, 0, hdr.getSequenceNr() + 1, 0,
-                        0);
+            new TCPHeader(hdr.getDstPort(), hdr.getSrcPort(), 0, 0, hdr.getSequenceNr() + 1, 0,
+                0);
         replyHdr.setFlags(TCPF_ACK | TCPF_RST);
         final IPv4Header replyIpHdr = new IPv4Header(ipHdr);
         replyIpHdr.swapAddresses();
@@ -215,7 +230,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
 
     /**
      * Create a binding for a local address
-     * 
+     *
      * @param lAddr
      * @param lPort
      */
@@ -225,13 +240,15 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
 
     /**
      * Send an TCP packet
-     * 
+     *
      * @param skbuf
      */
     protected void send(IPv4Header ipHdr, TCPHeader tcpHdr, SocketBuffer skbuf)
         throws SocketException {
-        if (log.isDebugEnabled()) {
-            log.debug("send(ipHdr, " + tcpHdr + ")");
+        if (DEBUG) {
+            if (log.isDebugEnabled()) {
+                log.debug("send(ipHdr, " + tcpHdr + ")");
+            }
         }
         skbuf.setTransportLayerHeader(tcpHdr);
         tcpHdr.prefixTo(skbuf);

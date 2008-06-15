@@ -24,7 +24,6 @@ package org.jnode.net.arp;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -49,12 +48,19 @@ import org.jnode.vm.annotation.SharedStatics;
  */
 @SharedStatics
 public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
+    private static final boolean DEBUG = false;
 
-    /** My logger */
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(ARPNetworkLayer.class);
-    /** My statistics */
+    /**
+     * My statistics
+     */
     private final ARPStatistics stat = new ARPStatistics();
-    /** ARP cache */
+    /**
+     * ARP cache
+     */
     private static final ARPCache cache = new ARPCache();
 
     /**
@@ -87,7 +93,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Process a packet that has been received and matches getType()
-     * 
+     *
      * @param skbuf
      * @param deviceAPI
      * @throws SocketException
@@ -126,7 +132,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Process and ARP request.
-     * 
+     *
      * @param skbuf
      * @param hdr
      * @param deviceAPI
@@ -154,7 +160,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Process and ARP reply
-     * 
+     *
      * @param skbuf
      * @param hdr
      * @param deviceAPI
@@ -167,7 +173,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Process and RARP request
-     * 
+     *
      * @param skbuf
      * @param hdr
      * @param deviceAPI
@@ -181,7 +187,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Process and RARP reply
-     * 
+     *
      * @param skbuf
      * @param hdr
      * @param deviceAPI
@@ -230,7 +236,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Gets a registered transportlayer by its protocol ID.
-     * 
+     *
      * @param protocolID
      */
     public TransportLayer getTransportLayer(int protocolID) throws NoSuchProtocolException {
@@ -239,7 +245,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Gets the hardware address for a given protocol address.
-     * 
+     *
      * @param address
      * @param myAddress
      * @param device
@@ -248,13 +254,15 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
      * @throws NetworkException
      */
     public HardwareAddress getHardwareAddress(ProtocolAddress address, ProtocolAddress myAddress,
-            Device device, long timeout) throws TimeoutException, NetworkException {
+                                              Device device, long timeout) throws TimeoutException, NetworkException {
         final long start = System.currentTimeMillis();
         long lastReq = 0;
 
-        if (log.isDebugEnabled()) {
-            log.debug("getHardwareAddress(" + address + ", " + myAddress + ", " + device.getId() +
+        if (DEBUG) {
+            if (log.isDebugEnabled()) {
+                log.debug("getHardwareAddress(" + address + ", " + myAddress + ", " + device.getId() +
                     ", " + timeout + ")");
+            }
         }
 
         if (address.equals(myAddress)) {
@@ -285,7 +293,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Gets the protocol addresses for a given name, or null if not found.
-     * 
+     *
      * @param hostname
      * @return
      */
@@ -295,7 +303,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Create and transmit an ARP request
-     * 
+     *
      * @param address
      * @param myAddress
      * @param device
@@ -310,8 +318,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
         final int hwtype = srcHwAddr.getType();
         final int ptype = address.getType();
 
-        final ARPHeader hdr =
-                new ARPHeader(srcHwAddr, myAddress, trgHwAddr, address, op, hwtype, ptype);
+        final ARPHeader hdr = new ARPHeader(srcHwAddr, myAddress, trgHwAddr, address, op, hwtype, ptype);
         final SocketBuffer skbuf = new SocketBuffer();
         skbuf.setProtocolID(EthernetConstants.ETH_P_ARP);
         hdr.prefixTo(skbuf);
@@ -321,7 +328,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
     /**
      * Gets the NetDeviceAPI for a given device
-     * 
+     *
      * @param device
      */
     private NetDeviceAPI getAPI(Device device) {

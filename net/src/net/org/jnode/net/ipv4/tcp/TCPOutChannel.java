@@ -18,13 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.tcp;
 
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.jnode.net.ipv4.IPv4Header;
 
@@ -32,6 +31,7 @@ import org.jnode.net.ipv4.IPv4Header;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class TCPOutChannel {
+    private static final boolean DEBUG = false;
 
     /**
      * My logger
@@ -181,8 +181,10 @@ public class TCPOutChannel {
      * @param length Must be smaller or equal to mss.
      */
     public synchronized void send(IPv4Header ipHdr, TCPHeader hdr, byte[] data, int offset,
-            int length) throws SocketException {
-        log.debug("outChannel.send(ipHdr,hdr,data," + offset + ", " + length + ")");
+                                  int length) throws SocketException {
+        if (DEBUG) {
+            log.debug("outChannel.send(ipHdr,hdr,data," + offset + ", " + length + ")");
+        }
         // Check for maximum datalength
         if (length > mss) {
             throw new IllegalArgumentException("dataLength must be <= mss");
@@ -213,7 +215,7 @@ public class TCPOutChannel {
      * @param hdr
      * @param dataOffset
      */
-    private final void sendHelper(IPv4Header ipHdr, TCPHeader hdr, int dataOffset)
+    private void sendHelper(IPv4Header ipHdr, TCPHeader hdr, int dataOffset)
         throws SocketException {
         // Adjust the sequence numbers
         hdr.setSequenceNr(snd_next);
@@ -226,10 +228,12 @@ public class TCPOutChannel {
         snd_max = snd_next;
         // Create & send the segment
         final TCPOutSegment seg =
-                new TCPOutSegment(ipHdr, hdr, dataBuffer, dataOffset, timeoutTicks);
+            new TCPOutSegment(ipHdr, hdr, dataBuffer, dataOffset, timeoutTicks);
         seg.send(tcp);
         if (!seg.isAckOnly() && !hdr.isFlagSynchronizeSet()) {
-            log.debug("Adding segment " + seg.getSeqNr() + " to unacklist");
+            if (DEBUG) {
+                log.debug("Adding segment " + seg.getSeqNr() + " to unacklist");
+            }
             unackedSegments.add(seg);
         }
     }
