@@ -108,7 +108,7 @@ public class NVidiaDriver extends AbstractFrameBufferDriver implements NVidiaCon
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
      */
-    public synchronized final boolean isOpen() {
+    public final synchronized boolean isOpen() {
         return (currentConfig != null);
     }
 

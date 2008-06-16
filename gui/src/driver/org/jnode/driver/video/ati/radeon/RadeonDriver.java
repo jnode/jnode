@@ -105,7 +105,7 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
      */
-    public synchronized final boolean isOpen() {
+    public final synchronized boolean isOpen() {
         return (currentConfig != null);
     }
 

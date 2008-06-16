@@ -49,7 +49,7 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
     final void initCursor() {
 
         /* set cursor bitmap adress ... */
-        if (architecture <= NV04A) /* or laptop */{
+        if (architecture <= NV04A) { /* or laptop */
             /* must be used this way on pre-NV10 and on all 'Go' cards! */
             /* cursorbitmap must start on 2Kbyte boundary: */
             /* set adress bit11-16, and set 'no doublescan' (registerbit 1 = 0) */

@@ -82,8 +82,10 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             Font font = new Font(
                 "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN,
                 12);
-            //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
-            //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--14-100-100-100-P-79-FontSpecific", Font.PLAIN, 12);
+            //Font font = new Font("-FontForge-Bitstream Vera Sans
+            // Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
+            //Font font = new Font("-FontForge-Bitstream Vera Sans
+            // Mono-Book-R-Normal-SansMono--14-100-100-100-P-79-FontSpecific", Font.PLAIN, 12);
             //Font font = Font.decode("MONOSPACED-PLAIN-14");
             setFont(font);
             enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -314,7 +316,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     }
 
     private static class MyPointerDriver extends Driver implements PointerAPI {
-        final private ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
+        private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
         protected synchronized void startDevice() throws DriverException {
             getDevice().registerAPI(PointerAPI.class, this);
@@ -343,7 +345,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     }
 
     private static class MyKeyboardDriver extends Driver implements KeyboardAPI {
-        final private ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
+        private final ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
 
         protected synchronized void startDevice() throws DriverException {
             getDevice().registerAPI(KeyboardAPI.class, this);

@@ -50,11 +50,11 @@ public interface RadeonConstants {
     public static class MonitorType {
 
         public static final int NONE = 0;
-        public static final int CRT = 1;/* CRT */
-        public static final int LCD = 2;/* LCD */
-        public static final int DFP = 3;/* DVI */
-        public static final int CTV = 4;/* composite TV */
-        public static final int STV = 5;/* S-Video out */
+        public static final int CRT = 1; /* CRT */
+        public static final int LCD = 2; /* LCD */
+        public static final int DFP = 3; /* DVI */
+        public static final int CTV = 4; /* composite TV */
+        public static final int STV = 5; /* S-Video out */
 
         private static final String[] NAMES = {"NONE", "CRT", "LCD", "DFP", "CTV", "STV"};
 

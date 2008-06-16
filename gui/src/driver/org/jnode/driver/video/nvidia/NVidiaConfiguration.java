@@ -52,12 +52,13 @@ public class NVidiaConfiguration extends FrameBufferConfiguration {
      * 0, 14 }, 43 }
      */
     public static final NVidiaConfiguration VESA_115 =
-            new NVidiaConfiguration(32, 0, 0, 3, 16, 162571, new NVidiaVgaState(new int[] {3, 1,
-                15, 0, 14}, new int[] {127, 99, 99, 131, 106, 26, 114, 240, 0, 96, 0, 0, 0, 0, 0,
-                0, 89, 13, 87, 144, 0, 87, 115, 227, 255},
-                    new int[] {0, 0, 0, 0, 0, 64, 5, 15, 255}, new int[] {0, 1, 2, 3, 4, 5, 6, 7,
-                        8, 9, 10, 11, 12, 13, 14, 15, 65, 0, 15, 0, 0}, 0x2B), new DisplayMode(
-                    "40000 800 840 968 1056 600 601 605 628"));
+        new NVidiaConfiguration(32, 0, 0, 3, 16, 162571,
+            new NVidiaVgaState(new int[]{3, 1, 15, 0, 14},
+                new int[]{127, 99, 99, 131, 106, 26, 114, 240, 0, 96, 0, 0, 0, 0, 0,
+                    0, 89, 13, 87, 144, 0, 87, 115, 227, 255},
+                new int[]{0, 0, 0, 0, 0, 64, 5, 15, 255},
+                new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 65, 0, 15, 0, 0}, 0x2B),
+            new DisplayMode("40000 800 840 968 1056 600 601 605 628"));
 
     /*
      * { 0x118, 32, 1024, 768, 0, 0, 3, 17, 95757, { crt { 163, 127, 127, 135,
@@ -68,11 +69,13 @@ public class NVidiaConfiguration extends FrameBufferConfiguration {
      * 
      */
     public static final NVidiaConfiguration VESA_118 =
-            new NVidiaConfiguration(32, 0, 0, 3, 17, 95757, new NVidiaVgaState(new int[] {3, 1, 15,
-                0, 14}, new int[] {163, 127, 127, 135, 132, 149, 36, 245, 0, 96, 0, 0, 0, 0, 0, 0,
-                3, 9, 255, 0, 0, 255, 37, 227, 255}, new int[] {0, 0, 0, 0, 0, 64, 5, 15, 255},
-                    new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 65, 0, 15, 0,
-                        0}, 0xEB), new DisplayMode("65000 1024 1048 1184 1344 768 771 777 806"));
+        new NVidiaConfiguration(32, 0, 0, 3, 17, 95757,
+            new NVidiaVgaState(new int[]{3, 1, 15, 0, 14},
+                new int[]{163, 127, 127, 135, 132, 149, 36, 245, 0, 96, 0, 0, 0, 0, 0, 0, 3, 9, 255, 0,
+                    0, 255, 37, 227, 255},
+                new int[]{0, 0, 0, 0, 0, 64, 5, 15, 255},
+                new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 65, 0, 15, 0, 0}, 0xEB),
+            new DisplayMode("65000 1024 1048 1184 1344 768 771 777 806"));
 
     /**
      * @param bpp

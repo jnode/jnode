@@ -103,7 +103,7 @@ public class Mach64Driver extends AbstractFrameBufferDriver implements Mach64Con
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
      */
-    public synchronized final boolean isOpen() {
+    public final synchronized boolean isOpen() {
         return (currentConfig != null);
     }
 

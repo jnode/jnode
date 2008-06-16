@@ -90,7 +90,7 @@ final class RadeonCore implements RadeonConstants {
      * @param device
      */
     public RadeonCore(RadeonDriver driver, int architecture, String model, PCIDevice device)
-            throws ResourceNotFreeException, DriverException {
+        throws ResourceNotFreeException, DriverException {
         this.driver = driver;
         this.fbinfo = new FBInfo(architecture);
 

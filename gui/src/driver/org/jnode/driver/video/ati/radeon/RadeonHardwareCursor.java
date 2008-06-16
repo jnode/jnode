@@ -55,7 +55,7 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
      * @param io
      */
     public RadeonHardwareCursor(RadeonCore kernel, RadeonVgaIO io)
-            throws IndexOutOfBoundsException, ResourceNotFreeException {
+        throws IndexOutOfBoundsException, ResourceNotFreeException {
         this.io = io;
         this.cursorMem = kernel.claimDeviceMemory(4096, 16);
         log.debug("Cursor memory at offset 0x" + NumberUtils.hex(cursorMem.getOffset().toInt()));

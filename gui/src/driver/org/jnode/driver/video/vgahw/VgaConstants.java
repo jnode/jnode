@@ -26,15 +26,12 @@ package org.jnode.driver.video.vgahw;
  */
 public interface VgaConstants {
 
-    public static final byte[] REDS =
-            {0, 0, 0, 0, (byte) 168, (byte) 168, (byte) 168, (byte) 168, (byte) 84, (byte) 84,
-                (byte) 84, (byte) 84, (byte) 255, (byte) 255, (byte) 255, (byte) 255};
-    public static final byte[] GREENS =
-            {0, 0, (byte) 168, (byte) 168, 0, 0, (byte) 84, (byte) 168, (byte) 84, (byte) 84,
-                (byte) 255, (byte) 255, (byte) 84, (byte) 84, (byte) 255, (byte) 255};
-    public static final byte[] BLUES =
-            {0, (byte) 168, 0, (byte) 168, 0, (byte) 168, 0, (byte) 168, (byte) 84, (byte) 255,
-                (byte) 84, (byte) 255, (byte) 84, (byte) 255, (byte) 84, (byte) 255};
+    public static final byte[] REDS = {0, 0, 0, 0, (byte) 168, (byte) 168, (byte) 168, (byte) 168, (byte) 84, (byte) 84,
+        (byte) 84, (byte) 84, (byte) 255, (byte) 255, (byte) 255, (byte) 255};
+    public static final byte[] GREENS = {0, 0, (byte) 168, (byte) 168, 0, 0, (byte) 84, (byte) 168, (byte) 84,
+        (byte) 84, (byte) 255, (byte) 255, (byte) 84, (byte) 84, (byte) 255, (byte) 255};
+    public static final byte[] BLUES = {0, (byte) 168, 0, (byte) 168, 0, (byte) 168, 0, (byte) 168, (byte) 84,
+        (byte) 255, (byte) 84, (byte) 255, (byte) 84, (byte) 255, (byte) 84, (byte) 255};
 
     public static final int VGA_FIRST_PORT = 0x3b0;
     public static final int VGA_LAST_PORT = VGA_FIRST_PORT + 0x2f;

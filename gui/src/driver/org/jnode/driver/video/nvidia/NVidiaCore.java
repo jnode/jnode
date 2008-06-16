@@ -82,7 +82,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
      * @param device
      */
     public NVidiaCore(NVidiaDriver driver, int architecture, String model, PCIDevice device)
-            throws ResourceNotFreeException, DriverException {
+        throws ResourceNotFreeException, DriverException {
         super(640, 480);
         this.driver = driver;
         this.architecture = architecture;

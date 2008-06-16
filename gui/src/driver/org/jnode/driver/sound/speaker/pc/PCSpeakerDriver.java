@@ -47,16 +47,16 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI {
     // ********** constants **********//
 
     /** The port for the speaker * */
-    public final static int SPEAKER_PORT = 0x61;
+    public static final int SPEAKER_PORT = 0x61;
 
     /** The PIT Control Port * */
-    public final static int CONTROL_PORT = 0x43;
+    public static final int CONTROL_PORT = 0x43;
 
     /** The PIT Channel 2 Port * */
-    public final static int CHANNEL2_PORT = 0x42;
+    public static final int CHANNEL2_PORT = 0x42;
 
     /** The base frequency for the PIT * */
-    public final static int BASE_FREQUENCY = 1193100;
+    public static final int BASE_FREQUENCY = 1193100;
 
     // ********** private variables **********//
 
@@ -104,6 +104,7 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI {
         try {
             Thread.sleep(125);
         } catch (InterruptedException iex) {
+            //empty
         }
 
         // restore the speaker port
@@ -135,6 +136,7 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI {
         try {
             Thread.sleep(length);
         } catch (InterruptedException iex) {
+            //empty
         }
 
         // restore the speaker port

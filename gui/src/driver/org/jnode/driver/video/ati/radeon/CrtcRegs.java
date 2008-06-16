@@ -226,7 +226,7 @@ final class CrtcRegs implements RadeonConstants {
     /**
      * round virtual width up to next valid size
      */
-    final static int roundVWidth(int virtual_width, int bpp) {
+    static int roundVWidth(int virtual_width, int bpp) {
         // we have to make both the CRTC and the accelerator happy:
         // - the CRTC wants virtual width in pixels to be a multiple of 8
         // - the accelerator expects width in bytes to be a multiple of 64
