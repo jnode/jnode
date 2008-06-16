@@ -125,8 +125,8 @@ final class FpRegs implements RadeonConstants {
             fp_vert_stretch &= ~(VERT_AUTO_RATIO_EN | VERT_PANEL_SIZE);
             fp_vert_stretch |= ((yres - 1) << 12);
         } else {
-            fp_vert_stretch =
-                    (((((int) (vRatio * VERT_STRETCH_RATIO_MAX + 0.5)) & VERT_STRETCH_RATIO_MASK)) | (fp_vert_stretch & (VERT_PANEL_SIZE | VERT_STRETCH_RESERVED)));
+            fp_vert_stretch = (((((int) (vRatio * VERT_STRETCH_RATIO_MAX + 0.5)) & VERT_STRETCH_RATIO_MASK)) |
+                (fp_vert_stretch & (VERT_PANEL_SIZE | VERT_STRETCH_RESERVED)));
             fp_vert_stretch |= (VERT_STRETCH_ENABLE | VERT_STRETCH_BLEND);
 
             fp_vert_stretch &= ~(VERT_AUTO_RATIO_EN | VERT_PANEL_SIZE);
@@ -134,11 +134,8 @@ final class FpRegs implements RadeonConstants {
 
         }
 
-        fp_gen_cntl &=
-                ~(FP_SEL_CRTC2 | FP_RMX_HVSYNC_CONTROL_EN | FP_DFP_SYNC_SEL | FP_CRT_SYNC_SEL | /*
-                                                                                                 * FP_CRTC_LOCK_8DOT |
-                                                                                                 * FP_USE_SHADOW_EN |
-                                                                                                 */FP_CRTC_USE_SHADOW_VEND | FP_CRT_SYNC_ALT);
+        fp_gen_cntl &= ~(FP_SEL_CRTC2 | FP_RMX_HVSYNC_CONTROL_EN | FP_DFP_SYNC_SEL | FP_CRT_SYNC_SEL |
+            /* FP_CRTC_LOCK_8DOT | FP_USE_SHADOW_EN | */ FP_CRTC_USE_SHADOW_VEND | FP_CRT_SYNC_ALT);
 
         fp_gen_cntl |= (FP_CRTC_DONT_SHADOW_VPAR | FP_CRTC_DONT_SHADOW_HEND);
 

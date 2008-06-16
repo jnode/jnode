@@ -93,7 +93,7 @@ public class VMWareDriver extends AbstractFrameBufferDriver implements VMWareCon
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
      */
-    public synchronized final boolean isOpen() {
+    public final synchronized boolean isOpen() {
         return (currentConfig != null);
     }
 

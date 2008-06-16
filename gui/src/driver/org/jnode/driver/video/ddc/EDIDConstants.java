@@ -33,9 +33,8 @@ public interface EDIDConstants {
     public static final int STD_TIMINGS = 8;
     public static final int DET_TIMINGS = 4;
 
-    public static final byte[] HEADER_SIGNATURE =
-            {0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-                0x00};
+    public static final byte[] HEADER_SIGNATURE = {0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+        (byte) 0xFF, (byte) 0xFF, 0x00};
 
     /* header: 0x00 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0x00 */
     public static final int HEADER_SECTION = 0;

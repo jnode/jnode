@@ -12,7 +12,7 @@ public final class SwingTextScreenManager implements TextScreenManager {
      * @see org.jnode.driver.textscreen.TextScreenManager#getSystemScreen()
      */
     public SwingPcTextScreen getSystemScreen() {
-        if(systemScreen == null){
+        if (systemScreen == null) {
             systemScreen = new SwingPcTextScreen();
         }
         return systemScreen;

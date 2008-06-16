@@ -549,7 +549,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
         // + ReadFIFO (SVGA_FIFO_NEXT_CMD));
         /* Need to sync? */
         if ((getFIFO(SVGA_FIFO_NEXT_CMD) + 4 == getFIFO(SVGA_FIFO_STOP)) ||
-                (getFIFO(SVGA_FIFO_NEXT_CMD) == getFIFO(SVGA_FIFO_MAX) - 4 && getFIFO(SVGA_FIFO_STOP) == getFIFO(SVGA_FIFO_MIN))) {
+                (getFIFO(SVGA_FIFO_NEXT_CMD) == getFIFO(SVGA_FIFO_MAX) - 4 &&
+                    getFIFO(SVGA_FIFO_STOP) == getFIFO(SVGA_FIFO_MIN))) {
             log.debug("VMWare::WriteWordToFIFO() syncing FIFO");
             setReg32(SVGA_REG_SYNC, 1);
             while (getReg32(SVGA_REG_BUSY) != 0) {

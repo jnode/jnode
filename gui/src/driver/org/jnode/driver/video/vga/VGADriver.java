@@ -116,8 +116,7 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
         }
     };
 
-    private static final FrameBufferConfiguration[] CONFIGS =
-            {new VGAConfiguration(640, 480, COLOR_MODEL)};
+    private static final FrameBufferConfiguration[] CONFIGS = {new VGAConfiguration(640, 480, COLOR_MODEL)};
 
     private FrameBufferConfiguration currentConfig;
     private VGASurface vga;
@@ -183,7 +182,7 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
      */
-    public synchronized final boolean isOpen() {
+    public final synchronized boolean isOpen() {
         return (currentConfig != null);
     }
 
@@ -191,7 +190,6 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
      * The given surface is closed.
      */
     synchronized void close(VGASurface vga) {
-        vga = null;
         currentConfig = null;
     }
 }

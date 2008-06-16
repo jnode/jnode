@@ -33,7 +33,7 @@ final class PllRegs implements RadeonConstants {
 
     private final boolean crtc2;
 
-    private static final int[] DIVIDERS = {1, 2, 4, 8, 3, 16, 6, 12,};
+    private static final int[] DIVIDERS = {1, 2, 4, 8, 3, 16, 6, 12};
 
     /* PLL regs */
     private int ppll_div_3;

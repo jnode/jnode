@@ -110,7 +110,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
      * 
      * @see org.jnode.system.IRQHandler#handleInterrupt(int)
      */
-    public synchronized final void handleInterrupt(int irq) {
+    public final synchronized void handleInterrupt(int irq) {
         processQueues();
     }
 

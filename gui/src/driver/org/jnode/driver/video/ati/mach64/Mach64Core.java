@@ -76,7 +76,7 @@ final class Mach64Core implements Mach64Constants {
      * @throws DriverException
      */
     public Mach64Core(Mach64Driver driver, String model, PCIDevice device)
-            throws ResourceNotFreeException, DriverException {
+        throws ResourceNotFreeException, DriverException {
         this.driver = driver;
 
         final PCIDeviceConfig pciCfg = device.getConfig();
@@ -91,7 +91,7 @@ final class Mach64Core implements Mach64Constants {
         log.info("Found ATI " + model + ", pci " + pciCfg);
 
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
 
             final int fbBase = (int) fbAddr.getMemoryBase() /* & 0xFF800000 */;
             final int memSize = fbAddr.getSize();
