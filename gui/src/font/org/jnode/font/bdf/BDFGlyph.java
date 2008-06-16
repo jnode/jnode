@@ -35,70 +35,83 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. 
- */
+*/
 package org.jnode.font.bdf;
+
 
 /**
  * Represents a single font Glyph.
- * 
  * @author Stephane Meslin-Weber
  */
 public class BDFGlyph {
-    public String name;
-    public BDFParser.Rectangle bbx = new BDFParser.Rectangle();
-    public int[] data;
+	public String name;
+	public BDFParser.Rectangle bbx = new BDFParser.Rectangle();
+	public int[] data;
     public StringBuffer rawData;
-    private BDFFontContainer font;
+	private BDFFontContainer font;
 
     /**
      * Decodes a BDF font BITMAP/ENDCHAR sequence of packed bits.
-     * 
      * @param depth bits per pixel from parent font
      * @param data bit data encoded in text bytes
      * @return raw bit values
      */
     public int[] decode(int depth, StringBuffer data) {
-        int[] result = new int[(data.length() / 2) * (8 / depth)];
+        int[] result = new int[(data.length()/2)*(8 / depth)];
 
-        for (int i = 0, offset = 0; i < data.length(); i += 2, offset += (8 / depth)) {
-            String cut = data.substring(i, i + 2);
-            int value = Integer.parseInt(cut, 16);
+        for (int i = 0, offset=0; i < data.length(); i+=2,offset+=(8 / depth)) {
+            String cut = data.substring(i, i+2);
+            int value = Integer.parseInt(cut,16);
 
             int bits[] = null;
 
             //
             // Bit long, and not optimised...
             //
-            switch (depth) {
-                case 1:
-                    bits =
-                            new int[] {(value & 0x80) >> 7, (value & 0x40) >> 6,
-                                (value & 0x20) >> 5, (value & 0x10) >> 4, (value & 0x08) >> 3,
-                                (value & 0x04) >> 2, (value & 0x02) >> 1, (value & 0x01), };
-                    break;
-                case 2:
-                    bits =
-                            new int[] {(value & 0xC0) >> 6, (value & 0x30) >> 4,
-                                (value & 0x0C) >> 2, (value & 0x03),};
-                    break;
-                case 4:
-                    bits = new int[] {(value & 0xF0) >> 4, (value & 0x0F),};
-                    break;
-                case 8:
-                    bits = new int[] {value & 0xFF,};
-                    break;
+            switch(depth) {
+            case 1:
+                bits = new int[] {
+                    (value & 0x80) >> 7,
+                    (value & 0x40) >> 6,
+                    (value & 0x20) >> 5,
+                    (value & 0x10) >> 4,
+                    (value & 0x08) >> 3,
+                    (value & 0x04) >> 2,
+                    (value & 0x02) >> 1,
+                    (value & 0x01),
+                };
+                break;
+            case 2:
+                bits = new int[] {
+                    (value & 0xC0) >> 6,
+                    (value & 0x30) >> 4,
+                    (value & 0x0C) >> 2,
+                    (value & 0x03),
+                };
+                break;
+            case 4:
+                bits = new int[] {
+                    (value & 0xF0) >> 4,
+                    (value & 0x0F),
+                };
+                break;
+            case 8:
+                bits = new int[] {
+                    value & 0xFF,
+                };
+                break;
             }
 
-            for (int k = 0; k < bits.length; k++)
-                result[offset + k] = bits[k];
+            for(int k=0;k<bits.length;k++)
+                result[offset+k] = bits[k];
         }
 
         return result;
     }
 
-    public BDFParser.Rectangle getBbx() {
-        return new BDFParser.Rectangle(bbx);
-    }
+	public BDFParser.Rectangle getBbx() {
+		return new BDFParser.Rectangle(bbx);
+	}
 
     public BDFParser.Rectangle getBbx(BDFParser.Rectangle rec) {
         rec.x = bbx.x;
@@ -106,7 +119,7 @@ public class BDFGlyph {
         rec.width = bbx.width;
         rec.height = bbx.height;
         return rec;
-    }
+	}
 
     void init(BDFFontContainer font) {
         this.font = font;
@@ -114,53 +127,52 @@ public class BDFGlyph {
         rawData = null;
     }
 
-    public void setBbx(BDFParser.Rectangle bbx) {
-        this.bbx = bbx;
-    }
+	public void setBbx(BDFParser.Rectangle bbx) {
+		this.bbx = bbx;
+	}
 
-    public int[] getData() {
-        return data;
-    }
+	public int[] getData() {
+		return data;
+	}
 
     public void setRawData(StringBuffer rawData) {
         this.rawData = rawData;
     }
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public BDFFontContainer getFont() {
-        return font;
-    }
+	public BDFFontContainer getFont() {
+		return font;
+	}
 
-    public BDFGlyph(String name) {
-        this.name = name;
-    }
+	public BDFGlyph(String name) {
+		this.name = name;
+	}
 
-    public void setSWidth(int swx0, int swy0) {
-        // System.err.println("SWidth: "+swx0+","+swy0);
-    }
+	public void setSWidth(int swx0, int swy0) {
+//		System.err.println("SWidth: "+swx0+","+swy0);
+	}
 
-    private BDFParser.Dimension dsize = new BDFParser.Dimension();
-
-    public void setDWidth(int dwx0, int dwy0) {
-        dsize.setSize(dwx0, dwy0);
-    }
+	private BDFParser.Dimension dsize = new BDFParser.Dimension();
+	public void setDWidth(int dwx0, int dwy0) {
+		dsize.setSize(dwx0,dwy0);
+	}
 
     public BDFParser.Dimension getDWidth() {
         return dsize;
     }
 
-    public void setBBX(int x, int y, int width, int height) {
-        bbx.setBounds(x, y, width, height);
-    }
+	public void setBBX(int x, int y, int width, int height) {
+		bbx.setBounds(x, y, width, height);
+	}
 
     public String toString() {
-        return "BDFGlyph[name=" + name + ", bbx=" + bbx + ", dsize=" + dsize + "]";
+        return "BDFGlyph[name="+name+", bbx="+bbx+", dsize="+dsize+"]";
     }
 }

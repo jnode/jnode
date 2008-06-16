@@ -35,7 +35,7 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. 
- */
+*/
 package org.jnode.font.bdf;
 
 import java.io.Reader;
@@ -45,23 +45,24 @@ import java.util.PropertyResourceBundle;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+
 public class BDFFontContainer {
-    private static final Logger log = Logger.getLogger(BDFFontContainer.class);
-    static {
-        log.setLevel(Level.DEBUG);
-    }
+	private static final Logger log = Logger.getLogger(BDFFontContainer.class);
+	static
+	{
+		log.setLevel(Level.DEBUG);
+	}
 
     private static final PropertyResourceBundle charMapper =
-            (PropertyResourceBundle) PropertyResourceBundle.getBundle(BDFFontContainer.class
-                    .getPackage().getName() +
-                    ".mappings");
+    	(PropertyResourceBundle)PropertyResourceBundle.getBundle(
+    				BDFFontContainer.class.getPackage().getName()+".mappings");
 
     static final Object LOCK = new Object();
     private static final long serialVersionUID = -2156798287434571634L;
 
     // Actual names of defined PostScript name fields:
-    // fndry fmly wght slant sWdth adstyl pxlsz ptSz resx resy
-    // spc avgWdth rgstry encdng
+    //   fndry fmly wght slant sWdth adstyl pxlsz ptSz resx resy
+    //   spc avgWdth rgstry encdng
     // decoded into english below
 
     public static final int FOUNDRY = 0;
@@ -79,17 +80,17 @@ public class BDFFontContainer {
     public static final int REGISTRY = 12;
     public static final int ENCODING = 13;
 
-    // static int bitSwap(int n) {
-    // n = ((n >> 1) & 0x55) | ((n << 1) & 0xaa);
-    // n = ((n >> 2) & 0x33) | ((n << 2) & 0xcc);
-    // n = ((n >> 4) & 0x0f) | ((n << 4) & 0xf0);
-    // return n;
-    // }
+//  static int bitSwap(int n) {
+//      n = ((n >> 1) & 0x55) | ((n << 1) & 0xaa);
+//      n = ((n >> 2) & 0x33) | ((n << 2) & 0xcc);
+//      n = ((n >> 4) & 0x0f) | ((n << 4) & 0xf0);
+//      return n;
+//  }
 
     private int style;
 
     public static final BDFFontContainer createFont(Reader r) throws Exception {
-        log.debug("<<< BEGIN createFont >>>");
+    	log.debug("<<< BEGIN createFont >>>");
         BDFParser parser = new BDFParser(r);
         log.debug("createFont: before parser.createFont");
         BDFFontContainer font = parser.createFont();
@@ -98,16 +99,16 @@ public class BDFFontContainer {
     }
 
     public static int fill(int num) {
-        return (1 << num + 1) - 1;
+        return (1 << num+1)-1;
     }
 
     public static void init() {
-        synchronized (LOCK) {
+        synchronized(LOCK) {
         }
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof BDFFontContainer) {
+        if(obj instanceof BDFFontContainer) {
 
         }
         return false;
@@ -191,9 +192,9 @@ public class BDFFontContainer {
     }
 
     public BDFGlyph getGlyph(char ch) {
-        BDFGlyph g = (BDFGlyph) glyphMapper.get(String.valueOf(ch));
-        if (g == null) {
-            g = (BDFGlyph) glyphMapper.get(String.valueOf('\u0020'));
+        BDFGlyph g = (BDFGlyph)glyphMapper.get(String.valueOf(ch));
+        if(g==null) {
+            g = (BDFGlyph)glyphMapper.get(String.valueOf('\u0020'));
         }
         return g;
     }
@@ -206,7 +207,7 @@ public class BDFFontContainer {
         return properties;
     }
 
-    public BDFParser.Dimension getResolution() {
+	public BDFParser.Dimension getResolution() {
         return resolution;
     }
 
@@ -216,10 +217,10 @@ public class BDFFontContainer {
 
     String lookup(String s) {
         String result = charMapper.getString(".undef");
-        if (s.length() == 1) {
-            result = "" + (s.charAt(0));
-        } else if (charMapper.handleGetObject(s) != null) {
-            result = charMapper.getString(s);
+        if(s.length()==1) {
+            result = ""+(s.charAt(0));
+        } else if(charMapper.handleGetObject(s)!=null) {
+            result =charMapper.getString(s);
         }
 
         return result;
@@ -251,9 +252,9 @@ public class BDFFontContainer {
 
     public void setGlyphs(BDFGlyph[] glyphs) {
         this.glyphs = glyphs;
-        for (int i = 0; i < glyphs.length; i++) {
+        for(int i=0;i<glyphs.length;i++) {
             glyphs[i].init(this);
-            glyphMapper.put(lookup(glyphs[i].getName()), glyphs[i]);
+            glyphMapper.put(lookup(glyphs[i].getName()),glyphs[i]);
         }
     }
 
@@ -265,13 +266,13 @@ public class BDFFontContainer {
         this.properties = properties;
     }
 
-    public void setResolution(BDFParser.Dimension resolution) {
-        this.resolution = resolution;
-    }
+	public void setResolution(BDFParser.Dimension resolution) {
+		this.resolution = resolution;
+	}
 
     public void setResolution(int xres, int yres) {
-        resolution.setSize(xres, yres);
-    }
+		resolution.setSize(xres, yres);
+	}
 
     public void setVersion(BDFParser.Version version) {
         this.version = version;
@@ -283,7 +284,7 @@ public class BDFFontContainer {
 
     public static final String getPostScriptName(String[] str) {
         StringBuffer string = new StringBuffer();
-        for (int i = 0; i < str.length; i++) {
+        for(int i=0;i<str.length;i++) {
             string.append("-");
             string.append(str[i]);
         }
@@ -291,15 +292,14 @@ public class BDFFontContainer {
     }
 
     public String toString() {
-        String styleStr =
-                ((style & BDFParser.BOLD) != 0 ? "Bold " : "") +
-                        ((style & BDFParser.ITALIC) != 0 ? "Italic" : "");
+        String styleStr = ((style & BDFParser.BOLD) != 0 ? "Bold " : "")
+                + ((style & BDFParser.ITALIC) != 0 ? "Italic" : "");
 
         if ("".equals(styleStr)) {
             styleStr = "Plain";
         }
 
-        return getClass().getName() + "[name=" + fontName[FAMILY] + ", style=" + styleStr +
-                ", size=" + size + "pt, depth=" + depth + "bpp]";
+        return getClass().getName() + "[name=" + fontName[FAMILY] + ", style="
+                + styleStr + ", size=" + size + "pt, depth=" + depth + "bpp]";
     }
 }

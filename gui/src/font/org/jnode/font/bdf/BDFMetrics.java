@@ -35,12 +35,11 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. 
- */
+*/
 package org.jnode.font.bdf;
 
 /**
  * Represents a FontMetrics for BDF fonts.
- * 
  * @author Stephane Meslin-Weber
  */
 public class BDFMetrics {
@@ -87,19 +86,18 @@ public class BDFMetrics {
     public int[] charsWidths(char[] chars, final int start, final int end) {
         int[] advances = new int[chars.length];
         int adv_idx = 0;
-        int last = (advances.length - 1);
+        int last = (advances.length-1);
 
         BDFParser.Rectangle b_rec = new BDFParser.Rectangle();
-        for (int i = start; i < start + end; i++) {
+        for(int i=start;i<start+end;i++) {
             BDFGlyph glyph = font.getGlyph(chars[i]);
-            if (adv_idx == 0) {
+            if(adv_idx==0) {
                 advances[adv_idx++] = glyph.getBbx(b_rec).x;
-            } else if (adv_idx != last) {
-                advances[adv_idx++] =
-                        (advances[adv_idx - 1] + glyph.getDWidth().width) - glyph.getBbx(b_rec).x;
+            } else if(adv_idx!=last) {
+                advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width) - glyph.getBbx(b_rec).x;
             } else {
                 // FIXME: what's this 12 doing here?
-                advances[adv_idx++] = (advances[adv_idx - 1] + glyph.getDWidth().width) + 12;
+                advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width)+12;
             }
         }
 
@@ -109,9 +107,9 @@ public class BDFMetrics {
     public int charsWidth(char[] chars, int start, int end) {
         int total = 0;
 
-        int[] lengths = charsWidths(chars, start, end);
-        for (int i = 0; i < lengths.length; i++)
-            total += lengths[i];
+        int[] lengths = charsWidths(chars,start,end);
+        for(int i=0;i<lengths.length;i++)
+            total+=lengths[i];
 
         return total;
     }
