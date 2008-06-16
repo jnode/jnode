@@ -119,6 +119,17 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         helper.stopThreadsAtSafePoint();
         heapManager.setGcActive(true);
         try {
+            // Pre-GC verification
+            if (debug) {
+                if (false) {
+                    // Turn back to true in case of problems in the GC.
+                    if (verbose) {
+                        heapManager.debug("<preverify/>");
+                    }
+                    verify(bootHeap, firstHeap);
+                }
+            }
+            
             // Mark
             //helper.stopThreadsAtSafePoint();
             //heapManager.setGcActive(true);
@@ -146,11 +157,11 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
             // Verification
             if (debug) {
-                if (verbose) {
-                    heapManager.debug("<verify/>");
-                }
                 if (false) {
                     // Turn back to true in case of problems in the GC.
+                    if (verbose) {
+                        heapManager.debug("<verify/>");
+                    }
                     verify(bootHeap, firstHeap);
                 }
             }

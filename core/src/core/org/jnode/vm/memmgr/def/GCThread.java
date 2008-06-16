@@ -22,6 +22,8 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.system.BootLog;
+
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.scheduler.Monitor;
 
 /**
@@ -120,7 +122,10 @@ final class GCThread extends Thread {
                 }
             } catch (Throwable ex) {
                 try {
-                    BootLog.error("Error in GCThread", ex);
+                    Unsafe.debug(ex.getMessage());
+                    Unsafe.debug('\n');
+                    Unsafe.debugStackTrace(ex);
+                    Unsafe.die("GCThread failed");
                 } catch (Throwable ex2) {
                     // Ignore
                 }

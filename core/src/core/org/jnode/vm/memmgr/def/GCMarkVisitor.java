@@ -37,6 +37,7 @@ import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * @author epr
@@ -65,7 +66,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
 //    private final int slotSize;
 
-//    private final DefaultHeapManager heapManager;
+    private final DefaultHeapManager heapManager;
 
     private final HeapHelper helper;
 
@@ -78,7 +79,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     public GCMarkVisitor(DefaultHeapManager heapManager, VmArchitecture arch,
                          GCStack stack) {
-//        this.heapManager = heapManager;
+        this.heapManager = heapManager;
         this.stack = stack;
         this.markedObjects = 0;
         this.rootSet = false;
@@ -94,16 +95,6 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     public boolean visit(Object object) {
 
-        // Be very paranoia for now
-        /*
-         * if (!heapManager.isObject(helper.addressOf(object))) {
-         * Unsafe.debug("visit got non-object");
-         * Unsafe.debug(helper.addressToLong(helper.addressOf(object)));
-         * Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
-         * .debugStackTrace(); helper.die("Internal error"); return false;
-         */
-
-        //testObject(object, Unsafe.getVmClass(object));
         // Check the current color first, since a stackoverflow of
         // the mark stack results in another iteration of visits.
         final int gcColor = VmMagic.getObjectColor(object);
@@ -153,7 +144,30 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         while (!stack.isEmpty()) {
             final Object object = stack.pop();
             markedObjects++;
-            final VmType vmClass = VmMagic.getObjectType(object);
+            VmType vmClass;
+            try {
+                vmClass = VmMagic.getObjectType(object);
+            } catch (NullPointerException ex) {
+                // This is a symptom of heap corruption
+                if (object == null) {
+                    helper.die("GCMarkError: null object");
+                } else {
+                    final Address objAddr = ObjectReference.fromObject(object).toAddress();
+                    Unsafe.debug("Object address is ");
+                    Unsafe.debug(objAddr);
+                    Unsafe.debug(", tib is ");
+                    Object[] tib = VmMagic.getTIB(object);
+                    Unsafe.debug(ObjectReference.fromObject(tib).toAddress());
+                    Unsafe.debug(", flags word is ");
+                    Word flags = VmMagic.getObjectFlags(object);
+                    Unsafe.debug(flags);
+                    Unsafe.debug(", markedObjects is ");
+                    Unsafe.debug(markedObjects);
+                    Unsafe.debug('\n');
+                    helper.die("GCMarkError: NPE");
+                }
+                throw ex;
+            }
             if (vmClass == null) {
                 Unsafe.debug("Oops vmClass == null in (");
                 Unsafe.debug(markedObjects);
@@ -190,6 +204,11 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             for (int i = 0; i < length; i++) {
                 final Object child = arr[i];
                 if (child != null) {
+                    // Enable the following in the case of heap corruption
+                    if (true) {
+                        verifyChild(child, object, "array child", i, i);
+                    }
+                    
                     processChild(child);
                 }
             }
@@ -225,8 +244,36 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             } else {
                 final ObjectReference child = objAddr.loadObjectReference(Offset.fromIntZeroExtend(offset));
                 if (child != null) {
+                    // Enable the following in the case of heap corruption
+                    if (false) {
+                        verifyChild(child, object, "object child", i, offset);
+                    }
+                    
                     processChild(child);
                 }
+            }
+        }
+    }
+
+    @Inline
+    private final void verifyChild(Object child, Object parent, String where, int i, int offset) {
+        if (child != null) {
+            final ObjectReference childRef = ObjectReference.fromObject(child);
+            if (!heapManager.isObject(childRef.toAddress())) {
+                Unsafe.debug("GCMarkError: in ");
+                Unsafe.debug(where);
+                Unsafe.debug(", i ");
+                Unsafe.debug(i);
+                Unsafe.debug(", offset ");
+                Unsafe.debug(offset);
+                Unsafe.debug(", parent type ");
+                Unsafe.debug(VmMagic.getObjectType(parent).getName());
+                Unsafe.debug(VmMagic.getObjectColor(parent));
+                Unsafe.debug("; child (");
+                Unsafe.debug(childRef.toAddress().toInt());
+                Unsafe.debug(") is not an object ");
+                Unsafe.debug(VmMagic.getObjectColor(childRef));
+                helper.die("Corrupted heap");
             }
         }
     }
