@@ -67,7 +67,21 @@ final class GCVerifyVisitor extends ObjectVisitor {
             // Ignore objects that need to be finalized.
             return true;
         }
-        final VmType vmClass = VmMagic.getObjectType(object);
+        VmType vmClass;
+        try {        
+            vmClass = VmMagic.getObjectType(object);
+        }
+        catch (NullPointerException ex) {
+            if (object == null) {
+                helper.die("GCVerifyError: null object");
+            } else if (VmMagic.getTIB(object) == null) {
+                helper.die("GCVerifyError: null TIB");
+            } else {
+                helper.die("GCVerifyError: other NPE");
+            }
+            /* not reached */
+            throw ex;
+        }
         if (vmClass == null) {
             helper.die("GCVerifyError: vmClass");
         } else if (vmClass.isArray()) {
