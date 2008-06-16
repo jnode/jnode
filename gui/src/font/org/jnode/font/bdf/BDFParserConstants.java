@@ -35,57 +35,84 @@
  or based on this library.  If you modify this library, you may extend
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
- exception statement from your version. 
- */
+ exception statement from your version.
+*/
 package org.jnode.font.bdf;
 
 public interface BDFParserConstants {
 
-    int EOF = 0;
-    int SKIPPED = 2;
-    int INT = 3;
-    int STARTFONT = 4;
-    int ENDFONT = 5;
-    int CONTENTVERSION = 6;
-    int FONTBOUNDINGBOX = 7;
-    int METRICSSET = 8;
-    int SIZE = 9;
-    int CHARS = 10;
-    int STARTCHAR = 11;
-    int CHARTEXT = 13;
-    int ENCODING = 15;
-    int SWIDTH = 16;
-    int DWIDTH = 17;
-    int BBX = 18;
-    int BITMAP = 19;
-    int HEX = 20;
-    int ENDCHAR = 21;
-    int STARTPROPERTIES = 23;
-    int PROPERTYCOUNT = 25;
-    int ENDPROPERTIES = 26;
-    int PROPERTYTEXT = 27;
-    int COMMENT = 29;
-    int CONTENTSTRING = 30;
-    int FONTNAME = 31;
-    int FONTFAMILYSTRING = 32;
+  int EOF = 0;
+  int SKIPPED = 2;
+  int INT = 3;
+  int STARTFONT = 4;
+  int ENDFONT = 5;
+  int CONTENTVERSION = 6;
+  int FONTBOUNDINGBOX = 7;
+  int METRICSSET = 8;
+  int SIZE = 9;
+  int CHARS = 10;
+  int STARTCHAR = 11;
+  int CHARTEXT = 13;
+  int ENCODING = 15;
+  int SWIDTH = 16;
+  int DWIDTH = 17;
+  int BBX = 18;
+  int BITMAP = 19;
+  int HEX = 20;
+  int ENDCHAR = 21;
+  int STARTPROPERTIES = 23;
+  int PROPERTYCOUNT = 25;
+  int ENDPROPERTIES = 26;
+  int PROPERTYTEXT = 27;
+  int COMMENT = 29;
+  int CONTENTSTRING = 30;
+  int FONTNAME = 31;
+  int FONTFAMILYSTRING = 32;
 
-    int DEFAULT = 0;
-    int STARTCHARSTATE = 1;
-    int CHARTEXTSTATE = 2;
-    int CHARSTATE = 3;
-    int BITMAPSTATE = 4;
-    int PROPERTYCOUNTSTATE = 5;
-    int PROPERTYSTATE = 6;
-    int COMMENTSTATE = 7;
-    int FONTSTATE = 8;
+  int DEFAULT = 0;
+  int STARTCHARSTATE = 1;
+  int CHARTEXTSTATE = 2;
+  int CHARSTATE = 3;
+  int BITMAPSTATE = 4;
+  int PROPERTYCOUNTSTATE = 5;
+  int PROPERTYSTATE = 6;
+  int COMMENTSTATE = 7;
+  int FONTSTATE = 8;
 
-    String[] tokenImage =
-            {"<EOF>", "\".\"", "<SKIPPED>", "<INT>", "\"STARTFONT\"", "\"ENDFONT\"",
-                "\"CONTENTVERSION\"", "\"FONTBOUNDINGBOX\"", "\"METRICSSET\"", "\"SIZE\"",
-                "\"CHARS\"", "\"STARTCHAR\"", "\" \"", "<CHARTEXT>", "<token of kind 14>",
-                "\"ENCODING\"", "\"SWIDTH\"", "\"DWIDTH\"", "\"BBX\"", "\"BITMAP\"", "<HEX>",
-                "\"ENDCHAR\"", "<token of kind 22>", "\"STARTPROPERTIES\"", "\" \"",
-                "<PROPERTYCOUNT>", "\"ENDPROPERTIES\"", "<PROPERTYTEXT>", "<token of kind 28>",
-                "\"COMMENT\"", "<CONTENTSTRING>", "\"FONT\"", "<FONTFAMILYSTRING>",};
+  String[] tokenImage = {
+    "<EOF>",
+    "\".\"",
+    "<SKIPPED>",
+    "<INT>",
+    "\"STARTFONT\"",
+    "\"ENDFONT\"",
+    "\"CONTENTVERSION\"",
+    "\"FONTBOUNDINGBOX\"",
+    "\"METRICSSET\"",
+    "\"SIZE\"",
+    "\"CHARS\"",
+    "\"STARTCHAR\"",
+    "\" \"",
+    "<CHARTEXT>",
+    "<token of kind 14>",
+    "\"ENCODING\"",
+    "\"SWIDTH\"",
+    "\"DWIDTH\"",
+    "\"BBX\"",
+    "\"BITMAP\"",
+    "<HEX>",
+    "\"ENDCHAR\"",
+    "<token of kind 22>",
+    "\"STARTPROPERTIES\"",
+    "\" \"",
+    "<PROPERTYCOUNT>",
+    "\"ENDPROPERTIES\"",
+    "<PROPERTYTEXT>",
+    "<token of kind 28>",
+    "\"COMMENT\"",
+    "<CONTENTSTRING>",
+    "\"FONT\"",
+    "<FONTFAMILYSTRING>",
+  };
 
 }
