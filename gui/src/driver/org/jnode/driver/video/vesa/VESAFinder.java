@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.video.vesa;
 
 import org.jnode.driver.Bus;
@@ -32,38 +32,38 @@ import org.jnode.vm.Unsafe;
 /**
  * 
  * @author Fabien DUMINY (fduminy at jnode.org)
- *
+ * 
  */
 public class VESAFinder implements DeviceFinder {
 
-	public VESAFinder() {
-		Unsafe.debug("created VESAFinder");
-	}
-	
-	/**
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
-	 */
-	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
-		try {
-			Unsafe.debug("enter findDevices");
-			devMan.register(new VESADevice(bus));
-			Unsafe.debug("exit findDevices");
-		} catch (DriverException ex) {
-    		Unsafe.debug("error in VESAFinder");
-    		Unsafe.debugStackTrace();			
-			throw new DeviceException(ex);
-		}
-	}
+    public VESAFinder() {
+        Unsafe.debug("created VESAFinder");
+    }
 
-	public static class VESADevice extends Device {
-				
-		/**
-		 * @param bus
-		 */
-		public VESADevice(Bus bus) 
-		throws DriverException {
-			super(bus, "VESA");
-			this.setDriver(new VESADriver());
-		}
-	}
+    /**
+     * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager,
+     *      org.jnode.driver.Bus)
+     */
+    public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
+        try {
+            Unsafe.debug("enter findDevices");
+            devMan.register(new VESADevice(bus));
+            Unsafe.debug("exit findDevices");
+        } catch (DriverException ex) {
+            Unsafe.debug("error in VESAFinder");
+            Unsafe.debugStackTrace();
+            throw new DeviceException(ex);
+        }
+    }
+
+    public static class VESADevice extends Device {
+
+        /**
+         * @param bus
+         */
+        public VESADevice(Bus bus) throws DriverException {
+            super(bus, "VESA");
+            this.setDriver(new VESADriver());
+        }
+    }
 }
