@@ -892,7 +892,7 @@ clean             Remove all intermediate build results.
             <fileset dir="../fs/src/test" includes="**/*.java"/>
             <fileset dir="../gui/src/test" includes="**/*.java"/>
             <fileset dir="../gui/src/desktop" includes="**/*.java"/>
-            <fileset dir="../gui/src/driver" includes="**/*.java" excludes="**/vesa/**/*.java,**/console/swing/**/*.java"/>
+            <fileset dir="../gui/src/driver" includes="**/*.java" excludes="**/console/swing/**/*.java"/>
             <fileset dir="../gui/src/awt" includes="**/*.java"/>
             <fileset dir="../net/src/net" includes="**/*.java"/>
             <fileset dir="../net/src/driver" includes="**/*.java"/>
