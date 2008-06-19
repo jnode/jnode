@@ -70,8 +70,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         VmType vmClass;
         try {        
             vmClass = VmMagic.getObjectType(object);
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             if (object == null) {
                 helper.die("GCVerifyError: null object");
             } else if (VmMagic.getTIB(object) == null) {
