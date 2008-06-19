@@ -44,8 +44,7 @@ import org.jnode.driver.textscreen.TextScreen;
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
  * 
  */
-public class JTextAreaTextScreen implements TextScreen
-{
+public class JTextAreaTextScreen implements TextScreen {
     private StyledDocument document;
     private AttributeSet attributes;
     private JTextArea textArea;
@@ -57,8 +56,7 @@ public class JTextAreaTextScreen implements TextScreen
      * @param width
      * @param height
      */
-    public JTextAreaTextScreen(int width, int height)    
-    {
+    public JTextAreaTextScreen(int width, int height) {
         context = StyleContext.getDefaultStyleContext();
         style = context.addStyle("defaultStyle", null);
 
@@ -72,14 +70,10 @@ public class JTextAreaTextScreen implements TextScreen
         System.out.println("new JTextAreaTextScreen" + width + "x" + height);
     }
 
-    public char getChar(int offset)
-    {
-        try
-        {
+    public char getChar(int offset) {
+        try {
             return document.getText(offset, 1).charAt(0);
-        }
-        catch (BadLocationException e)
-        {
+        } catch (BadLocationException e) {
             e.printStackTrace();
             return ' ';
         }
