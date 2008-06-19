@@ -21,8 +21,6 @@
 
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.system.BootLog;
-
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.scheduler.Monitor;
 
