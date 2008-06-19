@@ -109,7 +109,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int)
      */
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
-        maxValidY = Math.max(maxValidY, (offset + length-1) / getWidth());
+        maxValidY = Math.max(maxValidY, (offset + length - 1) / getWidth());
         super.set(offset, ch, chOfs, length, color);
     }
     /**
@@ -117,7 +117,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
      */
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
-        maxValidY = Math.max(maxValidY, (offset + length-1) / getWidth());
+        maxValidY = Math.max(maxValidY, (offset + length - 1) / getWidth());
         super.set(offset, ch, chOfs, length, colors, colorsOfs);
     }
 }
