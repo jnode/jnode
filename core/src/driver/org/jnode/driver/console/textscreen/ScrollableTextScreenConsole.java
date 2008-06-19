@@ -18,11 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.driver.console.textscreen;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.PointerEvent;
@@ -39,58 +40,60 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
      * @param screen
      */
     public ScrollableTextScreenConsole(ConsoleManager mgr, String name,
-                                       ScrollableTextScreen screen, int options) {
+            ScrollableTextScreen screen, int options) {
         super(mgr, name, screen, options);
     }
-
+    
     /**
      * Scroll a given number of rows up.
      *
      * @param rows
      */
     public void scrollUp(int rows) {
-        final ScrollableTextScreen screen = (ScrollableTextScreen) getScreen();
+	    final ScrollableTextScreen screen = (ScrollableTextScreen)getScreen();
         screen.scrollUp(rows);
-        screen.sync();
+        
+        final int length = rows * screen.getWidth();
+	    screen.sync(screen.getHeight() * screen.getWidth() - length, length);
     }
-
+    
     /**
      * Scroll a given number of rows down.
      *
      * @param rows
      */
     public void scrollDown(int rows) {
-        final ScrollableTextScreen screen = (ScrollableTextScreen) getScreen();
-        screen.scrollDown(rows);
-        screen.sync();
+	    final ScrollableTextScreen screen = (ScrollableTextScreen)getScreen();
+	    screen.scrollDown(rows);
+	    screen.sync(0, rows * screen.getWidth());
     }
-
+    
     /**
      * @see org.jnode.driver.input.KeyboardListener#keyPressed(org.jnode.driver.input.KeyboardEvent)
      */
     public void keyPressed(KeyboardEvent event) {
         if (isFocused() && !event.isConsumed()) {
-            final int modifiers = event.getModifiers();
-            if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
-                switch (event.getKeyCode()) {
-                    case KeyEvent.VK_PAGE_UP:
-                        scrollUp(10);
-                        event.consume();
-                        break;
-                    case KeyEvent.VK_PAGE_DOWN:
-                        scrollDown(10);
-                        event.consume();
-                        break;
-                    case KeyEvent.VK_UP:
-                        scrollUp(1);
-                        event.consume();
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        scrollDown(1);
-                        event.consume();
-                        break;
-                }
-            }
+    		final int modifiers = event.getModifiers();
+    		if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
+    			switch (event.getKeyCode()) {
+    				case KeyEvent.VK_PAGE_UP :
+    					scrollUp(10);
+    					event.consume();
+    					break;
+    				case KeyEvent.VK_PAGE_DOWN :
+    				    scrollDown(10);
+    					event.consume();
+    					break;
+    				case KeyEvent.VK_UP :
+    				    scrollUp(1);
+    					event.consume();
+    					break;
+    				case KeyEvent.VK_DOWN :
+    				    scrollDown(1);
+    					event.consume();
+    					break;
+    			}
+    		}            
         }
         if (!event.isConsumed()) {
             super.keyPressed(event);
@@ -104,7 +107,7 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
         if (isFocused() && (event.getZ() != 0)) {
             final int z = event.getZ();
             if (z < 0) {
-                scrollUp(Math.abs(z));
+                scrollUp(Math.abs(z));                
             } else {
                 scrollDown(Math.abs(z));
             }

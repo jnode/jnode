@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.driver.textscreen.x86;
 
 import org.jnode.driver.textscreen.ScrollableTextScreen;
@@ -42,25 +42,25 @@ public abstract class AbstractPcTextScreen implements TextScreen {
         this.width = width;
         this.height = height;
     }
-
+    
     /**
      * Gets the height of the screen in letters.
-     *
+     * 
      * @return Returns the height.
      */
     public int getHeight() {
-        return height;
+        return height;        
     }
 
     /**
      * Gets the width of the screen in letters.
-     *
+     * 
      * @return Returns the width.
      */
     public int getWidth() {
         return width;
     }
-
+    
     /**
      * Calculate the offset for a given x,y coordinate.
      *
@@ -86,7 +86,7 @@ public abstract class AbstractPcTextScreen implements TextScreen {
     public TextScreen createCompatibleBufferScreen() {
         return new PcBufferTextScreen(getWidth(), getHeight(), this);
     }
-
+        
     /**
      * Create an in-memory buffer text screen that is compatible
      * with the system screen, but larges and supports scrolling.
@@ -97,15 +97,15 @@ public abstract class AbstractPcTextScreen implements TextScreen {
         if (height < getHeight()) {
             throw new IllegalArgumentException("Invalid height " + height);
         }
-        return new PcScrollableTextScreen(getWidth(), height, this);
+        return new PcScrollableTextScreen(getWidth(), height, this);        
     }
-
+        
     /**
      * Ensure that the given row is visible.
      *
      * @param row
      */
-    public void ensureVisible(int row) {
+    public void ensureVisible(int row, boolean sync) {
         // do nothing by default
     }
 }

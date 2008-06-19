@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.driver.textscreen.x86;
 
 import org.jnode.driver.textscreen.TextScreen;
@@ -26,7 +26,7 @@ import org.jnode.driver.textscreen.TextScreen;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PcBufferTextScreen extends AbstractPcBufferTextScreen implements TextScreen {
+public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
 
     /**
      * My parent
@@ -47,11 +47,11 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen implements Te
     /**
      * Synchronize the state with the actual device.
      */
-    public void sync() {
-        copyTo(parent);
+    public void sync(int offset, int length) {
+        copyTo(parent, offset, length);
     }
 
-    protected void setParentCursor(int x, int y) {
+    protected void setParentCursor( int x, int y ) {
         parent.setCursor(x, y);
     }
 

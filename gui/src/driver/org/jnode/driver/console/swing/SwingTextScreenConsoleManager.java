@@ -1,20 +1,21 @@
 package org.jnode.driver.console.swing;
 
-import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
-import org.jnode.driver.console.ConsoleException;
-import org.jnode.driver.console.Console;
-import org.jnode.driver.textscreen.swing.SwingTextScreenManager;
-import org.jnode.driver.textscreen.swing.SwingPcTextScreen;
-import org.jnode.driver.DeviceManager;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.JComponent;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import org.jnode.driver.DeviceManager;
+import org.jnode.driver.console.Console;
+import org.jnode.driver.console.ConsoleException;
+import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
+import org.jnode.driver.textscreen.swing.SwingPcTextScreen;
+import org.jnode.driver.textscreen.swing.SwingTextScreenManager;
 
 /**
  * @author Levente S\u00e1ntha
@@ -37,7 +38,7 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
                 addPointerDevice(systemScreen.getPointerDevice());
                 frame = new JFrame("Console");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.addWindowListener(new WindowAdapter(){
+                frame.addWindowListener(new WindowAdapter() {
                     public void windowClosed(WindowEvent e) {
                         closeAll();
                     }
@@ -60,18 +61,18 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
     @Override
     public void unregisterConsole(Console console) {
         super.unregisterConsole(console);
-        if(getFocus() == null)
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                textScreenManager.getSystemScreen().close();
-                frame.dispose();
-            }
-        });
+        if (getFocus() == null)
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    textScreenManager.getSystemScreen().close();
+                    frame.dispose();
+                }
+            });
     }
 
     @Override
     protected SwingTextScreenManager getTextScreenManager() {
-        if(textScreenManager == null){
+        if (textScreenManager == null) {
             this.textScreenManager = new SwingTextScreenManager();
         }
         return textScreenManager;

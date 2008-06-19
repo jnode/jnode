@@ -2,61 +2,60 @@ package org.jnode.apps.telnetd;
 
 import java.io.IOException;
 
+import net.wimpi.telnetd.io.TelnetIO;
 import net.wimpi.telnetd.io.TerminalIO;
 
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 
 /**
- *
+ * 
  * @author Fabien DUMINY (fduminy at jnode.org)
- *
+ * 
  */
-public class RemoteTextScreen extends AbstractPcTextScreen implements TextScreen {
-	private final TerminalIO terminalIO;
-	private final char[] buffer;
+public class RemoteTextScreen extends AbstractPcTextScreen {
+    private final TerminalIO terminalIO;
+    private final char[] buffer;
     private int cursorOffset;
 
-	public RemoteTextScreen(TerminalIO terminalIO)
-	{
-		super(terminalIO.getColumns(), terminalIO.getRows());
-		this.terminalIO = terminalIO;
+    public RemoteTextScreen(TerminalIO terminalIO) {
+        super(terminalIO.getColumns(), terminalIO.getRows());
+        this.terminalIO = terminalIO;
 
         buffer = new char[terminalIO.getColumns() * terminalIO.getRows()];
-        for (int i = 0; i < buffer.length; i ++) {
+        for (int i = 0; i < buffer.length; i++) {
             buffer[i] = ' ';
         }
-	}
+    }
 
     /**
      * Copy the content of the given rawData into this screen.
-     *
+     * 
      * @param rawData
      * @param rawDataOffset
      */
-	@Override
+    @Override
     public void copyFrom(char[] rawData, int rawDataOffset) {
         if (rawDataOffset < 0) {
-            //Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
+            // Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
         }
         char[] cha = new char[rawData.length];
-        for (int i = 0; i < cha.length; i ++) {
-            char c = (char) (rawData[i] & 0xFF);
-            cha[i] = (c == 0) ? ' ' : c;
+        for (int i = 0; i < cha.length; i++) {
+            cha[i] = getCharacter(rawData[i]);
         }
-        System.arraycopy(cha, rawDataOffset, buffer, 0, getWidth() * getHeight());
-        sync();
+        System.arraycopy(cha, rawDataOffset, buffer, 0, buffer.length);
+        sync(0, buffer.length);
     }
 
-	public void copyContent(int srcOffset, int destOffset, int length) {
+    public void copyContent(int srcOffset, int destOffset, int length) {
         System.arraycopy(buffer, srcOffset * 2, buffer, destOffset * 2, length * 2);
-        sync();
-	}
+        sync(destOffset * 2, length * 2);
+    }
 
-	public void copyTo(TextScreen dst) {
-		// TODO Auto-generated method stub
+    public void copyTo(TextScreen dst, int offset, int length) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
     public char getChar(int offset) {
         return buffer[offset];
@@ -67,62 +66,62 @@ public class RemoteTextScreen extends AbstractPcTextScreen implements TextScreen
     }
 
     public void set(int offset, char ch, int count, int color) {
+        buffer[offset] = getCharacter(ch);
+        sync(offset, 1);
+    }
+
+    private char getCharacter(char ch) {
         char c = (char) (ch & 0xFF);
-        buffer[offset] = c == 0 ? ' ' : c;
-        sync();
+        return (c == 0) ? ' ' : c;
     }
 
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         char[] cha = new char[ch.length];
-        for (int i = 0; i < cha.length; i ++) {
-            char c = (char) (ch[i] & 0xFF);
-            cha[i] = c == 0 ? ' ' : c;
+        for (int i = 0; i < cha.length; i++) {
+            cha[i] = getCharacter(ch[i]);
         }
         System.arraycopy(cha, chOfs, buffer, offset, length);
-        sync();
+        sync(offset, length);
     }
 
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
-        char[] cha = new char[ch.length];
-        for (int i = 0; i < cha.length; i ++) {
-            char c = (char) (ch[i] & 0xFF);
-            cha[i] = c == 0 ? ' ' : c;
-        }
-        System.arraycopy(cha, chOfs, buffer, offset, length);
-        sync();
+        set(offset, ch, chOfs, length, 0);
     }
 
-	public void setCursor(int x, int y) {
-		try {
-			terminalIO.setCursor(x, y);
-	        cursorOffset = getOffset(x, y);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public int setCursor(int x, int y) {
+        try {
+            terminalIO.setCursor(y, x);
+            cursorOffset = getOffset(x, y);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-	public void setCursorVisible(boolean visible) {
-		// ignore : cursor will allways be visible
-	}
+        return cursorOffset;
+    }
 
-	public void sync() {
-		int offset = 0;
-		try {
-			terminalIO.setCursor(0, 0);
-			for(int y = 0 ; y < getHeight() ; y++)
-			{
-				for(int x = 0 ; x < getWidth() ; x++)
-				{
-					terminalIO.getTelnetIO().write(buffer[offset++]);
-				}
-			}
-			if(terminalIO.isAutoflushing())
-			{
-				terminalIO.flush();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    public int setCursorVisible(boolean visible) {
+        // ignore : cursor will allways be visible
+        return cursorOffset;
+    }
+
+    public void sync(int offset, int length) {
+        try {
+            final int y = offset / getWidth();
+            final int x = offset % getWidth();
+            terminalIO.setCursor(y, x);
+
+            final TelnetIO telnetIO = terminalIO.getTelnetIO();
+
+            int offs = offset;
+            for (int i = 0; i < length; i++) {
+                telnetIO.write(buffer[offs++]);
+            }
+            if (terminalIO.isAutoflushing()) {
+                terminalIO.flush();
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

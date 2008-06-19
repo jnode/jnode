@@ -21,59 +21,40 @@
 
 package org.jnode.apps.telnetd;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-import net.wimpi.telnetd.io.TerminalIO;
 
 /**
- *
+ * 
  * @author Fabien DUMINY (fduminy at jnode.org)
- *
+ * 
  */
-public class RemoteConsoleOutputStream extends OutputStream {
-
-	private final TerminalIO terminalIO;
-
-	public RemoteConsoleOutputStream(TerminalIO terminalIO) {
-		this.terminalIO = terminalIO;
-	}
-
-	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
-		if (b == null) {
-		    throw new NullPointerException("byte array is null");
-		} else if ((off < 0) || (off > b.length) || (len < 0) ||
-			   ((off + len) > b.length) || ((off + len) < 0)) {
-		    throw new IndexOutOfBoundsException("bad offset or length");
-		} else if (len == 0) {
-		    return;
-		}
-
-		TelnetUtils.write(terminalIO, b, off, len);
-	}
-
-	@Override
-	public void write(byte[] b) throws IOException {
-		if (b == null) {
-		    throw new NullPointerException("byte array is null");
-		}
-
-		TelnetUtils.write(terminalIO, b);
-	}
-
-	@Override
-	public void write(int b) throws IOException {
-		terminalIO.write((byte) b);
-	}
-
-	@Override
-	public void flush() throws IOException {
-		terminalIO.flush();
-	}
-
-	@Override
-	public void close() throws IOException {
-		//terminalIO.close();
-	}
+public class RemoteConsoleOutputStream {
+    /*
+     * public class RemoteConsoleOutputStream extends OutputStream {
+     * 
+     * private final TerminalIO terminalIO;
+     * 
+     * public RemoteConsoleOutputStream(TerminalIO terminalIO) { this.terminalIO =
+     * terminalIO; }
+     * 
+     * @Override public void write(byte[] b, int off, int len) throws
+     * IOException { if (b == null) { throw new NullPointerException("byte array
+     * is null"); } else if ((off < 0) || (off > b.length) || (len < 0) || ((off +
+     * len) > b.length) || ((off + len) < 0)) { throw new
+     * IndexOutOfBoundsException("bad offset or length"); } else if (len == 0) {
+     * return; }
+     * 
+     * TelnetUtils.write(terminalIO, b, off, len); }
+     * 
+     * @Override public void write(byte[] b) throws IOException { if (b == null) {
+     * throw new NullPointerException("byte array is null"); }
+     * 
+     * TelnetUtils.write(terminalIO, b); }
+     * 
+     * @Override public void write(int b) throws IOException {
+     * terminalIO.write((byte) b); }
+     * 
+     * @Override public void flush() throws IOException { terminalIO.flush(); }
+     * 
+     * @Override public void close() throws IOException { //terminalIO.close(); }
+     */
 }

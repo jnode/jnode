@@ -18,10 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.driver.textscreen.x86;
 
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.BootLog;
@@ -36,7 +37,7 @@ import org.vmmagic.unboxed.Address;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
+public class PcTextScreen extends AbstractPcTextScreen {
 
     /**
      * The MemoryResource we use to store (and display) characters.
@@ -57,10 +58,10 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
         Address ptr = Address.fromIntZeroExtend(0xb8000);
         try {
             final ResourceManager rm = (ResourceManager) InitialNaming
-                .lookup(ResourceManager.NAME);
+                    .lookup(ResourceManager.NAME);
             final ResourceOwner owner = new SimpleResourceOwner("Screen");
             memory = rm.claimMemoryResource(owner, ptr, getWidth()
-                * getHeight() * 2, ResourceManager.MEMMODE_NORMAL);
+                    * getHeight() * 2, ResourceManager.MEMMODE_NORMAL);
         } catch (NameNotFoundException ex) {
             throw new ResourceNotFreeException("ResourceManager not found", ex);
         }
@@ -68,7 +69,7 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
 
     /**
      * Get the singleton instance and create it if necessary.
-     *
+     * 
      * @return @throws
      *         PragmaUninterruptible
      */
@@ -132,17 +133,17 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
      *      int[], int)
      */
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
-                    int colorsOfs) {
+            int colorsOfs) {
         for (int i = 0; i < length; i++) {
             final int v = (ch[chOfs + i] & 0xFF)
-                | ((colors[colorsOfs + i] & 0xFF) << 8);
+                    | ((colors[colorsOfs + i] & 0xFF) << 8);
             memory.setChar((offset + i) * 2, (char) v);
         }
     }
 
     /**
      * Copy the content of the given rawData into this screen.
-     *
+     * 
      * @param rawData
      * @param rawDataOffset
      */
@@ -156,25 +157,26 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
     /**
      * Copies the entire screen to the given destination. For this operation to
      * succeed, the screens involved must be compatible.
-     *
+     * 
      * @param dst
      */
-    public void copyTo(TextScreen dst) {
+    public void copyTo(TextScreen dst, int offset, int length) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * Synchronize the state with the actual device.
      */
-    public void sync() {
+    public void sync(int offset, int length) {
         // Nothing to do here
     }
 
-    public void setCursor(int x, int y) {
+    public int setCursor( int x, int y ) {
         //instance.setCursor( x,y);
+    	return 0; // TODO what should we return if we don't call instance.setCursor ?
     }
 
-    public void setCursorVisible(boolean visible) {
-        instance.setCursorVisible(visible);
+    public int setCursorVisible( boolean visible ) {
+        return instance.setCursorVisible( visible );
     }
 }

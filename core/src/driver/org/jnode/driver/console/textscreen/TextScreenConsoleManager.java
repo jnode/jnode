@@ -18,11 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.driver.console.textscreen;
 
 import java.io.InputStream;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.spi.AbstractConsoleManager;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
@@ -36,22 +38,22 @@ import org.jnode.naming.InitialNaming;
 public class TextScreenConsoleManager extends AbstractConsoleManager {
 
     private int SCROLLABLE_HEIGHT = 500;
-
+    
     /**
      * Initialize this instance.
      *
      * @throws ConsoleException
      */
     public TextScreenConsoleManager()
-        throws ConsoleException {
+            throws ConsoleException {
     }
-
-
+    
+    
     /**
      * @see org.jnode.driver.console.ConsoleManager#createConsole(String, int)
      */
     public TextScreenConsole createConsole(String name, int options) {
-        if ((options & CreateOptions.TEXT) != 0) {
+    	if ((options & CreateOptions.TEXT) != 0) {
             final TextScreenManager tsm;
             tsm = getTextScreenManager();
             final TextScreenConsole console;
@@ -67,12 +69,9 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
                 screen = tsm.getSystemScreen().createCompatibleBufferScreen();
                 console = new TextScreenConsole(this, name, screen, options);
             }
-            InputStream in = System.in;
-            if ((options & CreateOptions.NO_LINE_EDITTING) == 0) {
-                in = new KeyboardInputStream(getKeyboardApi(), console);
-            }
-            console.setIn(in);
-            if ((options & CreateOptions.STACKED) != 0) {
+            InputStream in = getInputStream(options, console);
+        	console.setIn(in);
+            if ((options & CreateOptions.STACKED) != 0){
                 stackConsole(console);
             } else {
                 setAccelerator(console);
@@ -84,7 +83,18 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
             throw new IllegalArgumentException("Unknown option " + options);
         }
     }
-
+    
+    protected InputStream getInputStream(int options, TextScreenConsole console)
+    {
+        InputStream in = System.in;
+        if ((options & CreateOptions.NO_LINE_EDITTING) == 0) {
+        	KeyboardHandler kbHandler = new DefaultKeyboardHandler(getKeyboardApi());
+        	in = new KeyboardInputStream(kbHandler, console);
+        }
+        
+        return in;
+    }
+    
     protected TextScreenManager getTextScreenManager() {
         TextScreenManager tsm;
         try {
