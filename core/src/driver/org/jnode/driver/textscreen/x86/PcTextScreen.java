@@ -171,12 +171,12 @@ public class PcTextScreen extends AbstractPcTextScreen {
         // Nothing to do here
     }
 
-    public int setCursor( int x, int y ) {
+    public int setCursor(int x, int y) {
         //instance.setCursor( x,y);
-    	return 0; // TODO what should we return if we don't call instance.setCursor ?
+        return 0; // TODO what should we return if we don't call instance.setCursor ?
     }
 
-    public int setCursorVisible( boolean visible ) {
-        return instance.setCursorVisible( visible );
+    public int setCursorVisible(boolean visible) {
+        return instance.setCursorVisible(visible);
     }
 }

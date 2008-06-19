@@ -41,8 +41,8 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      * the cursor was over, as in previous versions.
      */
     private final char[]screenBuffer;
-    private int cursorIndex=0;
-    private boolean cursorVisible=true;
+    private int cursorIndex = 0;
+    private boolean cursorVisible = true;
 
     /**
      * Initialize this instance.
@@ -53,7 +53,7 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
     public AbstractPcBufferTextScreen(int width, int height) {
         super(width, height);
         this.buffer = new char[width * height];
-        this.screenBuffer=new char[buffer.length];
+        this.screenBuffer = new char[buffer.length];
     }
 
     /**
@@ -67,82 +67,84 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
      */
     public char getChar(int offset) {
-        return (char)(buffer[offset] & 0xFF);
+        return (char) (buffer[offset] & 0xFF);
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
      */
     public int getColor(int offset) {
-        return (char)((buffer[offset] >> 8) & 0xFF);
+        return (char) ((buffer[offset] >> 8) & 0xFF);
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
     public void set(int offset, char ch, int count, int color) {
-        final char v = (char)((ch & 0xFF) | ((color & 0xFF) << 8));
+        final char v = (char) ((ch & 0xFF) | ((color & 0xFF) << 8));
         count = Math.min(count, buffer.length - offset);
         for (int i = 0; i < count; i++) {
-            buffer[offset+i] = v;
+            buffer[offset + i] = v;
         }
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int)
+     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
+     *      int)
      */
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         color = (color & 0xFF) << 8;
         length = Math.min(length, buffer.length - offset);
         for (int i = 0; i < length; i++) {
-            buffer[offset+i] = (char)((ch[chOfs+i] & 0xFF) | color);
+            buffer[offset + i] = (char) ((ch[chOfs + i] & 0xFF) | color);
         }
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int[], int)
+     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
+     *      int[], int)
      */
-    public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
-            int colorsOfs) {
+    public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
         length = Math.min(length, buffer.length - offset);
         for (int i = 0; i < length; i++) {
-            buffer[offset+i] = (char)((ch[chOfs+i] & 0xFF) | (colors[colorsOfs+i] & 0xFF) << 8);
+            buffer[offset + i] =
+                    (char) ((ch[chOfs + i] & 0xFF) | (colors[colorsOfs + i] & 0xFF) << 8);
         }
     }
 
     /**
-     * Copies the entire screen to the given destination.
-     * For this operation to succeed, the screens involved must be
-     * compatible.
-     *
+     * Copies the entire screen to the given destination. For this operation to
+     * succeed, the screens involved must be compatible.
+     * 
      * @param dst
      */
-    public void copyTo( TextScreen dst, int offset, int length ) {
-        if( dst instanceof AbstractPcTextScreen ) {
+    public void copyTo(TextScreen dst, int offset, int length) {
+        if (dst instanceof AbstractPcTextScreen) {
             char[] toScreen = buffer;
-            if( cursorVisible&&cursorIndex<buffer.length&&cursorIndex>=0 ) {
-                System.arraycopy( buffer, 0, screenBuffer, 0, buffer.length );
+            if (cursorVisible && cursorIndex < buffer.length && cursorIndex >= 0) {
+                System.arraycopy(buffer, 0, screenBuffer, 0, buffer.length);
                 char origValue = buffer[cursorIndex];
-                //origValue |= 0x7000;//from december 2003 jnode code.
+                // origValue |= 0x7000;//from december 2003 jnode code.
 
-                //exchange the background with the foreground
-                int color = (origValue >>8) & 0xFF;
+                // exchange the background with the foreground
+                int color = (origValue >> 8) & 0xFF;
                 color = ((color >> 4) & 0xF) | ((color << 4) & 0xF0);
                 origValue &= 0x00FF;
                 origValue |= (color << 8) & 0xFF00;
-                
+
                 screenBuffer[cursorIndex] = origValue;
                 toScreen = screenBuffer;
             }
-            ( (AbstractPcTextScreen)dst ).copyFrom( toScreen, getTopOffset() );
+            ((AbstractPcTextScreen) dst).copyFrom(toScreen, getTopOffset());
         } else {
-            throw new IllegalArgumentException( "Unknown destination type " + dst.getClass().getName() );
+            throw new IllegalArgumentException("Unknown destination type " +
+                    dst.getClass().getName());
         }
     }
 
     /**
      * Return the offset in the buffer of the first visible row.
-     *
+     * 
      * @return the offset
      */
     protected int getTopOffset() {
@@ -151,7 +153,7 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
 
     /**
      * Copy the content of the given rawData into this screen.
-     *
+     * 
      * @param rawData
      * @param rawDataOffset
      */
@@ -167,16 +169,16 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      */
     public abstract void sync(int offset, int length);
 
-    public int setCursor( int x, int y ) {
-        this.cursorIndex=getOffset( x,y);
+    public int setCursor(int x, int y) {
+        this.cursorIndex = getOffset(x, y);
         setParentCursor(x, y);
         return cursorIndex;
     }
-    
-    protected abstract void setParentCursor( int x, int y );
+
+    protected abstract void setParentCursor(int x, int y);
 
     public int setCursorVisible(boolean visible) {
-        this.cursorVisible=visible;
+        this.cursorVisible = visible;
         return cursorIndex;
     }
 }

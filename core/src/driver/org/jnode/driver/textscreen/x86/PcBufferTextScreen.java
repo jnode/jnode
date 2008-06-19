@@ -21,7 +21,6 @@
  
 package org.jnode.driver.textscreen.x86;
 
-import org.jnode.driver.textscreen.TextScreen;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -51,7 +50,7 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
         copyTo(parent, offset, length);
     }
 
-    protected void setParentCursor( int x, int y ) {
+    protected void setParentCursor(int x, int y) {
         parent.setCursor(x, y);
     }
 

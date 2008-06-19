@@ -154,12 +154,12 @@ public interface TextScreen {
      * @param y
      * @return offset of the cursor
      */
-    public int setCursor( int x, int y );
+    public int setCursor(int x, int y);
 
     /**
      * 
      * @param visible
      * @return offset of the cursor
      */
-    int setCursorVisible( boolean visible );
+    int setCursorVisible(boolean visible);
 }
