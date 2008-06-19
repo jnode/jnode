@@ -41,7 +41,6 @@ package java.nio.charset;
 import gnu.classpath.ServiceFactory;
 import gnu.classpath.SystemProperties;
 import gnu.java.nio.charset.Provider;
-import gnu.java.nio.charset.iconv.IconvProvider;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -244,12 +243,6 @@ public abstract class Charset implements Comparable<Charset>
 
   private static CharsetProvider provider()
       {
-    String useIconv = SystemProperties.getProperty
-      ("gnu.classpath.nio.charset.provider.iconv");
-
-    if (useIconv != null)
-      return IconvProvider.provider();
-
     return Provider.provider();
 		}
 
