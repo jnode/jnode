@@ -110,6 +110,8 @@
       <export name="sun.security.util.*"/>
 
       <export name="sun.reflect.misc.*"/>
+      <export name="sun.text.resources.*"/>
+      <export name="sun.util.resources.*"/>
     </library>
   </runtime>
   

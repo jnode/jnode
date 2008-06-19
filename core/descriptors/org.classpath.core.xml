@@ -44,10 +44,20 @@
       <export name="sun.nio.cs.ThreadLocalCoders"/>
       <export name="sun.text.*"/>
       <export name="sun.text.normalizer.*"/>
-      <export name="sun.text.resources.*"/>
+
+      <export name="sun.text.resources.BreakIteratorInfo"/>
+      <export name="sun.text.resources.BreakIteratorRules"/>
+      <export name="sun.text.resources.CollationData"/>
+      <export name="sun.text.resources.FormatData"/>
       <export name="sun.util.calendar.*"/>
       <export name="sun.util.*"/>
-      <export name="sun.util.resources.*"/>
+      <export name="sun.util.resources.LocaleData"/>
+      <export name="sun.util.resources.LocaleNames"/>
+      <export name="sun.util.resources.LocaleNamesBundle"/>
+      <export name="sun.util.resources.OpenListResourceBundle"/>
+      <export name="sun.util.resources.CalendarData"/>
+      <export name="sun.util.resources.CurrencyNames"/>
+      <export name="sun.util.resources.TimeZoneNames"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
@@ -67,8 +77,7 @@
       <export name="gnu.java.nio.*"/>
       <export name="gnu.java.nio.channels.*"/>
       <export name="gnu.java.nio.charset.*"/>
-      <export name="gnu.java.nio.charset.iconv.*"/>
-      <export name="gnu.java.lang.*"/>      
+      <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.reflect.*"/>
 
       <export name="gnu.java.security.*"/>
@@ -87,13 +96,11 @@
       <export name="gnu.java.security.x509.ext.*"/>
 
       <export name="gnu.java.util.*"/>
-      <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.java.util.jar.*"/>
       <export name="gnu.javax.crypto.*"/>
       <export name="gnu.javax.crypto.jce.*"/>
       <export name="gnu.javax.net.ssl.provider.*"/>
 
-      <export name="java.applet.Applet"/>
       <export name="java.awt.AWTPermission"/>
       <export name="java.beans.PropertyChangeListener" />
       <export name="java.beans.PropertyChangeListenerProxy" />
