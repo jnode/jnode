@@ -186,8 +186,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             outPs = new PrintStream(out);
             errPs = new PrintStream(err);
             in = console.getIn();
-            if(in == null) {
-            	throw new ShellException("console input stream is null");
+            if (in == null) {
+                throw new ShellException("console input stream is null");
             }
             SystemInputStream.getInstance().initialize(this.in);
             cons.setCompleter(this);
@@ -460,7 +460,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @throws ShellException
      */
     public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
-            throws ShellException {
+        throws ShellException {
         return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
     }
 
@@ -476,16 +476,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
     
     protected ArgumentBundle getCommandArgumentBundle(CommandInfo commandInfo) {
-		if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
-			try {
-				Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
-				return cmd.getArgumentBundle();
+        if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
+            try {
+                Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
+                return cmd.getArgumentBundle();
             } catch (Exception ex) {
-				// drop through
-			}
-		}
-		return null;
-	}
+                // drop through
+            }
+        }
+        return null;
+    }
 
     boolean isDebugEnabled() {
         return debugEnabled;
@@ -531,27 +531,27 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 char c = (char) i;
                 if (commandMode) {
                     switch (c) {
-                    case 'P':
+                        case 'P':
                             result.append(new File(System.getProperty(DIRECTORY_PROPERTY_NAME, "")));
-                        break;
-                    case 'G':
-                        result.append("> ");
-                        break;
-                    case 'D':
-                        final Date now = new Date();
+                            break;
+                        case 'G':
+                            result.append("> ");
+                            break;
+                        case 'D':
+                            final Date now = new Date();
                             DateFormat.getDateTimeInstance().format(now, result, null);
-                        break;
-                    default:
-                        result.append(c);
+                            break;
+                        default:
+                            result.append(c);
                     }
                     commandMode = false;
                 } else {
                     switch (c) {
-                    case '$':
-                        commandMode = true;
-                        break;
-                    default:
-                        result.append(c);
+                        case '$':
+                            commandMode = true;
+                            break;
+                        default:
+                            result.append(c);
                     }
                 }
             }
@@ -563,7 +563,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public Completable parseCommandLine(String cmdLineStr)
-            throws ShellSyntaxException {
+        throws ShellSyntaxException {
         return interpreter.parsePartial(this, cmdLineStr);
     }
     
