@@ -45,7 +45,7 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
      * @throws ConsoleException
      */
     public TextScreenConsoleManager()
-            throws ConsoleException {
+        throws ConsoleException {
     }
     
     
@@ -53,7 +53,7 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
      * @see org.jnode.driver.console.ConsoleManager#createConsole(String, int)
      */
     public TextScreenConsole createConsole(String name, int options) {
-    	if ((options & CreateOptions.TEXT) != 0) {
+        if ((options & CreateOptions.TEXT) != 0) {
             final TextScreenManager tsm;
             tsm = getTextScreenManager();
             final TextScreenConsole console;
@@ -70,8 +70,8 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
                 console = new TextScreenConsole(this, name, screen, options);
             }
             InputStream in = getInputStream(options, console);
-        	console.setIn(in);
-            if ((options & CreateOptions.STACKED) != 0){
+            console.setIn(in);
+            if ((options & CreateOptions.STACKED) != 0) {
                 stackConsole(console);
             } else {
                 setAccelerator(console);
@@ -88,8 +88,8 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
     {
         InputStream in = System.in;
         if ((options & CreateOptions.NO_LINE_EDITTING) == 0) {
-        	KeyboardHandler kbHandler = new DefaultKeyboardHandler(getKeyboardApi());
-        	in = new KeyboardInputStream(kbHandler, console);
+            KeyboardHandler kbHandler = new DefaultKeyboardHandler(getKeyboardApi());
+            in = new KeyboardInputStream(kbHandler, console);
         }
         
         return in;

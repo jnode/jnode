@@ -50,11 +50,11 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
      * @param rows
      */
     public void scrollUp(int rows) {
-	    final ScrollableTextScreen screen = (ScrollableTextScreen)getScreen();
+        final ScrollableTextScreen screen = (ScrollableTextScreen) getScreen();
         screen.scrollUp(rows);
         
         final int length = rows * screen.getWidth();
-	    screen.sync(screen.getHeight() * screen.getWidth() - length, length);
+        screen.sync(screen.getHeight() * screen.getWidth() - length, length);
     }
     
     /**
@@ -63,9 +63,9 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
      * @param rows
      */
     public void scrollDown(int rows) {
-	    final ScrollableTextScreen screen = (ScrollableTextScreen)getScreen();
-	    screen.scrollDown(rows);
-	    screen.sync(0, rows * screen.getWidth());
+        final ScrollableTextScreen screen = (ScrollableTextScreen) getScreen();
+        screen.scrollDown(rows);
+        screen.sync(0, rows * screen.getWidth());
     }
     
     /**
@@ -73,27 +73,27 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
      */
     public void keyPressed(KeyboardEvent event) {
         if (isFocused() && !event.isConsumed()) {
-    		final int modifiers = event.getModifiers();
-    		if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
-    			switch (event.getKeyCode()) {
-    				case KeyEvent.VK_PAGE_UP :
-    					scrollUp(10);
-    					event.consume();
-    					break;
-    				case KeyEvent.VK_PAGE_DOWN :
-    				    scrollDown(10);
-    					event.consume();
-    					break;
-    				case KeyEvent.VK_UP :
-    				    scrollUp(1);
-    					event.consume();
-    					break;
-    				case KeyEvent.VK_DOWN :
-    				    scrollDown(1);
-    					event.consume();
-    					break;
-    			}
-    		}            
+            final int modifiers = event.getModifiers();
+            if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.VK_PAGE_UP:
+                        scrollUp(10);
+                        event.consume();
+                        break;
+                    case KeyEvent.VK_PAGE_DOWN:
+                        scrollDown(10);
+                        event.consume();
+                        break;
+                    case KeyEvent.VK_UP:
+                        scrollUp(1);
+                        event.consume();
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        scrollDown(1);
+                        event.consume();
+                        break;
+                }
+            }            
         }
         if (!event.isConsumed()) {
             super.keyPressed(event);

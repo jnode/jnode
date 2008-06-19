@@ -2,19 +2,7 @@ package org.jnode.driver.console.textscreen;
 
 import java.io.IOException;
 
-import javax.naming.NameNotFoundException;
-
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.Device;
-import org.jnode.driver.DeviceListener;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.driver.input.KeyboardListener;
-import org.jnode.naming.InitialNaming;
-import org.jnode.system.BootLog;
-import org.jnode.system.event.FocusEvent;
-import org.jnode.system.event.FocusListener;
 import org.jnode.util.Queue;
 
 
@@ -46,25 +34,24 @@ import org.jnode.util.Queue;
  * @author crawley@jnode.org
  *
  */
-abstract public class KeyboardHandler {
-	
-	/** The queue of keyboard events */
-	private final Queue<KeyboardEvent> queue = new Queue<KeyboardEvent>();
+public abstract class KeyboardHandler {
 
-	protected void postEvent(KeyboardEvent event)
-	{
-		queue.add(event);
-	}
+    /** The queue of keyboard events */
+    private final Queue<KeyboardEvent> queue = new Queue<KeyboardEvent>();
 
-	/**
-	 * Get the next KeyboardEvent from the internal queue (and wait if none is available).
-	 *  
-	 * @return
-	 */
-	public final KeyboardEvent getEvent()
-	{
-		return queue.get();		
-	}
-	
-	abstract public void close() throws IOException;	
+    protected void postEvent(KeyboardEvent event) {
+        queue.add(event);
+    }
+
+    /**
+     * Get the next KeyboardEvent from the internal queue (and wait if none is
+     * available).
+     * 
+     * @return
+     */
+    public final KeyboardEvent getEvent() {
+        return queue.get();
+    }
+
+    public abstract void close() throws IOException;
 }
