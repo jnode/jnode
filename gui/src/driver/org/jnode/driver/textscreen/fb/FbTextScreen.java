@@ -18,20 +18,19 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.textscreen.fb;
 
 import org.jnode.driver.textscreen.ScrollableTextScreen;
 import org.jnode.driver.textscreen.TextScreen;
 
-
 class FbTextScreen implements TextScreen {
-    
+
     private final int width;
     private final int height;
     private final char[] data;
     private final FbTextScreen parent;
-    
+
     public FbTextScreen(int width, int height, FbTextScreen parent) {
         this.width = width;
         this.height = height;
@@ -47,11 +46,12 @@ class FbTextScreen implements TextScreen {
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#copyTo(org.jnode.driver.textscreen.TextScreen)
+     * @see org.jnode.driver.textscreen.TextScreen#copyTo(org.jnode.driver.textscreen.TextScreen,
+     *      int, int)
      */
-    public void copyTo(TextScreen dst) {
+    public void copyTo(TextScreen dst, int offset, int length) {
         // TODO Auto-generated method stub
-        
+
     }
 
     /**
@@ -69,11 +69,10 @@ class FbTextScreen implements TextScreen {
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#ensureVisible(int)
+     * @see org.jnode.driver.textscreen.TextScreen#ensureVisible(int, boolean)
      */
-    public void ensureVisible(int row) {
+    public void ensureVisible(int row, boolean sync) {
         // TODO Auto-generated method stub
-        
     }
 
     /**
@@ -120,52 +119,54 @@ class FbTextScreen implements TextScreen {
         for (int i = count - 1; i >= 0; i--) {
             data[offset + i] = ch;
         }
-        // TODO Set color        
+        // TODO Set color
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int)
+     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
+     *      int)
      */
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         length = Math.min(length, data.length - offset);
         for (int i = length - 1; i >= 0; i--) {
             data[offset + i] = ch[chOfs + i];
         }
-        // TODO Set color        
+        // TODO Set color
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int[], int)
+     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
+     *      int[], int)
      */
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
         length = Math.min(length, data.length - offset);
         for (int i = length - 1; i >= 0; i--) {
             data[offset + i] = ch[chOfs + i];
         }
-        // TODO Set color        
+        // TODO Set color
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#setCursor(int, int)
      */
-    public void setCursor(int x, int y) {
+    public int setCursor(int x, int y) {
         // TODO Auto-generated method stub
-        
+        return 0; // TODO find proper offset
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#setCursorVisible(boolean)
      */
-    public void setCursorVisible(boolean visible) {
+    public int setCursorVisible(boolean visible) {
         // TODO Auto-generated method stub
-        
+        return 0; // TODO find proper offset
     }
 
     /**
-     * @see org.jnode.driver.textscreen.TextScreen#sync()
+     * @see org.jnode.driver.textscreen.TextScreen#sync(int, int)
      */
-    public void sync() {
+    public void sync(int offset, int length) {
         // TODO Auto-generated method stub
-        
+
     }
 }

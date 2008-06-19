@@ -186,6 +186,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             outPs = new PrintStream(out);
             errPs = new PrintStream(err);
             in = console.getIn();
+            if(in == null) {
+            	throw new ShellException("console input stream is null");
+            }
             SystemInputStream.getInstance().initialize(this.in);
             cons.setCompleter(this);
 
@@ -200,29 +203,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    protected CommandShell(TextConsole console, InputStream in,
-            PrintStream out, PrintStream err) throws ShellException {
-        try {
-            this.console = console;
-            // FIXME ... kludging the OutputStreams.
-            this.out = out;
-            this.err = err;
-            this.outPs = out;
-            this.errPs = err;
-            this.in = in;
-            SystemInputStream.getInstance().initialize(this.in);
-            // cons.setCompleter(this);
-
-            // console.addConsoleListener(this);
-            aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
-                    .createAliasManager();
-            System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
-        } catch (NameNotFoundException ex) {
-            throw new ShellException("Cannot find required resource", ex);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
     
     /**
      * This constructor builds a partial command shell for test purposes only.
@@ -480,7 +460,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @throws ShellException
      */
     public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
-        throws ShellException {
+            throws ShellException {
         return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
     }
 
@@ -494,18 +474,18 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             return new CommandInfo(cl.loadClass(cmd), false);
         }
     }
-
+    
     protected ArgumentBundle getCommandArgumentBundle(CommandInfo commandInfo) {
-        if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
-            try {
-                Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
-                return cmd.getArgumentBundle();
+		if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
+			try {
+				Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
+				return cmd.getArgumentBundle();
             } catch (Exception ex) {
-                // drop through
-            }
-        }
-        return null;
-    }
+				// drop through
+			}
+		}
+		return null;
+	}
 
     boolean isDebugEnabled() {
         return debugEnabled;
@@ -541,7 +521,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      */
     protected String prompt() {
         String prompt = System
-        .getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+                .getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         final StringBuffer result = new StringBuffer();
         boolean commandMode = false;
         try {
@@ -551,27 +531,27 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 char c = (char) i;
                 if (commandMode) {
                     switch (c) {
-                        case 'P':
+                    case 'P':
                             result.append(new File(System.getProperty(DIRECTORY_PROPERTY_NAME, "")));
-                            break;
-                        case 'G':
-                            result.append("> ");
-                            break;
-                        case 'D':
-                            final Date now = new Date();
+                        break;
+                    case 'G':
+                        result.append("> ");
+                        break;
+                    case 'D':
+                        final Date now = new Date();
                             DateFormat.getDateTimeInstance().format(now, result, null);
-                            break;
-                        default:
-                            result.append(c);
+                        break;
+                    default:
+                        result.append(c);
                     }
                     commandMode = false;
                 } else {
                     switch (c) {
-                        case '$':
-                            commandMode = true;
-                            break;
-                        default:
-                            result.append(c);
+                    case '$':
+                        commandMode = true;
+                        break;
+                    default:
+                        result.append(c);
                     }
                 }
             }
@@ -583,10 +563,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public Completable parseCommandLine(String cmdLineStr)
-        throws ShellSyntaxException {
+            throws ShellSyntaxException {
         return interpreter.parsePartial(this, cmdLineStr);
     }
-
+    
     /**
      * This method is called by the console input driver to perform command line
      * completion in response to a TAB character.
@@ -628,7 +608,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         completion = null;
         return myCompletion;
     }
-
+    
     public void addCommandToHistory(String cmdLineStr) {
         // Add this command to the command history.
         if (isHistoryEnabled() && !cmdLineStr.equals(lastCommandLine)) {
@@ -727,7 +707,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             final BufferedReader br = new BufferedReader(new FileReader(file));
             int rc = 0;
             for (String line = br.readLine(); line != null; 
-            line = br.readLine()) {
+                    line = br.readLine()) {
                 line = line.trim();
 
                 if (line.startsWith("#") || line.equals("")) {

@@ -1,4 +1,4 @@
-package org.jnode.test.gui;
+package org.jnode.driver.textscreen.fb;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -6,14 +6,14 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.textscreen.ScrollableTextScreenConsole;
+import org.jnode.driver.console.textscreen.TextScreenConsole;
 import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
-import org.jnode.driver.textscreen.ScrollableTextScreen;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 import org.jnode.driver.video.FrameBufferAPI;
@@ -21,6 +21,7 @@ import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.CommandShell;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author Levente S\u00e1ntha
@@ -28,25 +29,22 @@ import org.jnode.shell.CommandShell;
 public class FBConsole {
     private static final Logger log = Logger.getLogger(FBConsole.class);
 
-    public static void main(String[] args) throws Exception {
-
-        final String devId = (args.length > 0) ? args[0] : "" /*"fb0"*/;
+    public static void start() throws Exception {
 
         Surface g = null;
         try {
             Device dev = null;
-            if ("".equals(devId)) {
-                final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
-                int dev_count = devs.size();
-                if (dev_count > 0) {
-                    Device[] dev_a = devs.toArray(new Device[dev_count]);
-                    dev = dev_a[0];
-                }
+            final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
+            int dev_count = devs.size();
+            if (dev_count > 0) {
+                Device[] dev_a = devs.toArray(new Device[dev_count]);
+                dev = dev_a[0];
             }
 
             if (dev == null) {
                 final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-                dev = dm.getDevice(devId);
+                Unsafe.debug("no framebuffer device found, skipping");
+                return;
             }
 
             final FrameBufferAPI api = dev.getAPI(FrameBufferAPI.class);
@@ -54,22 +52,35 @@ public class FBConsole {
 
             g = api.open(conf);
 
-            TextScreenConsoleManager mgr = new TextScreenConsoleManager();
+            // final int options = ConsoleManager.CreateOptions.TEXT |
+            // ConsoleManager.CreateOptions.SCROLLABLE;
+            // TextScreenConsoleManager mgr = new TextScreenConsoleManager();
+            //
+            // ScrollableTextScreen ts = new
+            // FBConsole.FBPcTextScreen(g).createCompatibleScrollableBufferScreen(500);
+            //
+            // ScrollableTextScreenConsole first =
+            // new ScrollableTextScreenConsole(mgr, "console", ts, options);
+            //
+            // mgr.registerConsole(first);
+            // mgr.focus(first);
 
-            ScrollableTextScreen ts = new FBConsole.FBPcTextScreen(g).createCompatibleScrollableBufferScreen(500);
-
-            ScrollableTextScreenConsole first =
-                new ScrollableTextScreenConsole(mgr, "console", ts,
-                    ConsoleManager.CreateOptions.TEXT |
-                        ConsoleManager.CreateOptions.SCROLLABLE);
-
-            mgr.registerConsole(first);
+            TextScreenConsoleManager mgr =
+                    (TextScreenConsoleManager) InitialNaming.lookup(ConsoleManager.NAME);
+            TextScreenConsole first =
+                    mgr.createConsole("FBConsole", ConsoleManager.CreateOptions.TEXT |
+                            ConsoleManager.CreateOptions.SCROLLABLE);
             mgr.focus(first);
+
+            if (first.getIn() == null) {
+                throw new Exception("console input is null");
+            }
 
             new CommandShell(first).run();
             Thread.sleep(60 * 1000);
 
         } catch (Throwable ex) {
+            Unsafe.debugStackTrace(ex);
             log.error("Error in FBConsole", ex);
         } finally {
             if (g != null) {
@@ -78,7 +89,6 @@ public class FBConsole {
             }
         }
     }
-
 
     static class FBPcTextScreen extends AbstractPcTextScreen {
         private static final int SCREEN_WIDTH = 80;
@@ -91,16 +101,18 @@ public class FBConsole {
 
         public FBPcTextScreen(Surface g) {
             super(FBConsole.FBPcTextScreen.SCREEN_WIDTH, FBConsole.FBPcTextScreen.SCREEN_HEIGHT);
-            buffer = new char[FBConsole.FBPcTextScreen.SCREEN_WIDTH * FBConsole.FBPcTextScreen.SCREEN_HEIGHT];
+            buffer =
+                    new char[FBConsole.FBPcTextScreen.SCREEN_WIDTH *
+                            FBConsole.FBPcTextScreen.SCREEN_HEIGHT];
             screen = new FBScreen(g);
             for (int i = 0; i < buffer.length; i++) {
                 buffer[i] = ' ';
             }
-            for (String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+            for (String s : GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getAvailableFontFamilyNames()) {
                 System.out.println(s);
             }
         }
-
 
         public char getChar(int offset) {
             return buffer[offset];
@@ -145,7 +157,6 @@ public class FBConsole {
 
         }
 
-
         public void sync(int offset, int length) {
             screen.repaint();
         }
@@ -161,20 +172,20 @@ public class FBConsole {
 
         /**
          * Copy the content of the given rawData into this screen.
-         *
-         * @param rawData       the data as a char array
+         * 
+         * @param rawData the data as a char array
          * @param rawDataOffset the offset in the data array
          */
         public void copyFrom(char[] rawData, int rawDataOffset) {
             if (rawDataOffset < 0) {
-                //Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
+                // Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
             }
             char[] cha = new char[rawData.length];
             for (int i = 0; i < cha.length; i++) {
                 char c = (char) (rawData[i] & 0xFF);
                 cha[i] = c == 0 ? ' ' : c;
             }
-            
+
             final int length = getWidth() * getHeight();
             System.arraycopy(cha, rawDataOffset, buffer, 0, length);
             sync(0, length);
@@ -199,22 +210,17 @@ public class FBConsole {
                 bi = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
                 ig = bi.getGraphics();
                 font = new Font(
-                    "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
-                    Font.PLAIN, 12);
+                        "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
+                        Font.PLAIN, 12);
 
                 /*
-                try{
-                    FontProvider fm = new BDFFontProvider();
-                    if(!fm.provides(font)){
-                        throw new RuntimeException(fm + " does not provide" + font);
-                    }
-                    TextRenderer tr = fm.getTextRenderer(font);
-                    if(tr == null)
-                        new NullPointerException("Text renderer is null");
-                }catch(Exception e){
-                    new RuntimeException(e);
-                }
-                */
+                 * try{ FontProvider fm = new BDFFontProvider();
+                 * if(!fm.provides(font)){ throw new RuntimeException(fm + "
+                 * does not provide" + font); } TextRenderer tr =
+                 * fm.getTextRenderer(font); if(tr == null) new
+                 * NullPointerException("Text renderer is null");
+                 * }catch(Exception e){ new RuntimeException(e); }
+                 */
                 new Thread(new Runnable() {
                     public void run() {
                         while (true) {

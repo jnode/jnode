@@ -18,39 +18,51 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.driver.textscreen.fb;
 
-import javax.naming.NamingException;
+package org.jnode.driver.textscreen.fb;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.vm.Unsafe;
 
 public final class FbTextScreenPlugin extends Plugin {
 
-    private final FbTextScreenManager mgr;
-    
+    // private final FbTextScreenManager mgr;
+
     /**
      * @param descriptor
      */
     public FbTextScreenPlugin(PluginDescriptor descriptor) {
         super(descriptor);
-        this.mgr = new FbTextScreenManager();
+        // this.mgr = new FbTextScreenManager();
     }
-    
+
     /**
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
     protected void startPlugin() throws PluginException {
-        try {
-            InitialNaming.bind(FbTextScreenManager.NAME, mgr);
-        } catch (NamingException ex) {
-            throw new PluginException(ex);
-        }
+        // try {
+        // InitialNaming.bind(FbTextScreenManager.NAME, mgr);
+        // } catch (NamingException ex) {
+        // throw new PluginException(ex);
+        // }
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Unsafe.debug("before FBConsole.start()");
+                    FBConsole.start();
+                    Unsafe.debug("after FBConsole.start()");
+                } catch (Exception e) {
+                    Unsafe.debugStackTrace(e);
+                }
+            }
+        };
+        t.start();
     }
-    
+
     /**
      * @see org.jnode.plugin.Plugin#stopPlugin()
      */

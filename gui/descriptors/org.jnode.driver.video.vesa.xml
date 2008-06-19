@@ -14,6 +14,9 @@
     <!-- import plugin="org.jnode.driver"/ -->
     <import plugin="org.jnode.driver.bus.pci"/>
     <import plugin="org.jnode.driver.video"/>
+    <import plugin="org.jnode.awt.font.bdf"/>
+    
+    <import plugin="org.jnode.shell"/>
   </requires>
         
   <runtime>

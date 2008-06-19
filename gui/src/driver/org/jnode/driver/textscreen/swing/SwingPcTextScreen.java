@@ -17,9 +17,11 @@ import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+
 import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
@@ -36,7 +38,7 @@ import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 
 /**
  * A Swing based emulator for PcTextScreen.
- *
+ * 
  * @author Levente S\u00e1ntha
  */
 public class SwingPcTextScreen extends AbstractPcTextScreen {
@@ -79,6 +81,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         int h;
 
         {
+
             Font font = new Font(
                 "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN,
                 12);
@@ -86,7 +89,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             // Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
             //Font font = new Font("-FontForge-Bitstream Vera Sans
             // Mono-Book-R-Normal-SansMono--14-100-100-100-P-79-FontSpecific", Font.PLAIN, 12);
-            //Font font = Font.decode("MONOSPACED-PLAIN-14");
+            // Font font = Font.decode("MONOSPACED-PLAIN-14");
             setFont(font);
             enableEvents(AWTEvent.KEY_EVENT_MASK);
             enableEvents(AWTEvent.FOCUS_EVENT_MASK);
@@ -134,7 +137,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             FontMetrics fm = getGraphics().getFontMetrics();
             w = fm.getMaxAdvance();
             h = fm.getHeight() + 1;
-            */
+             */
 
             w = 7;
             h = 15;
@@ -186,31 +189,31 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
     private class MouseHandler extends MouseAdapter implements MouseMotionListener, MouseWheelListener {
         public void mousePressed(MouseEvent e) {
-            //todo complete event parameters
+            // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
         public void mouseReleased(MouseEvent e) {
-            //todo complete event parameters
+            // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
         public void mouseDragged(MouseEvent e) {
-            //todo complete event parameters
+            // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
         public void mouseMoved(MouseEvent e) {
-            //todo complete event parameters
+            // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {
-            //todo complete event parameters
+            // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), e.getWheelRotation(), true);
             pointerDriver.dispatchEvent(p);
         }
@@ -245,8 +248,11 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
     public void set(int offset, char ch, int count, int color) {
         char c = (char) (ch & 0xFF);
-        buffer[offset] = c == 0 ? ' ' : c;
-        sync();
+        c = ((c == 0) ? ' ' : c);
+        for (int i = 0; i < count; i++) {
+            buffer[offset] = c;
+        }
+        sync(offset, count);
     }
 
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
@@ -256,7 +262,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             cha[i] = c == 0 ? ' ' : c;
         }
         System.arraycopy(cha, chOfs, buffer, offset, length);
-        sync();
+        sync(offset, length);
     }
 
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
@@ -266,15 +272,15 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             cha[i] = c == 0 ? ' ' : c;
         }
         System.arraycopy(cha, chOfs, buffer, offset, length);
-        sync();
+        sync(offset, length);
     }
 
     public void copyContent(int srcOffset, int destOffset, int length) {
         System.arraycopy(buffer, srcOffset * 2, buffer, destOffset * 2, length * 2);
-        sync();
+        sync(destOffset * 2, length * 2);
     }
 
-    public void copyTo(TextScreen dst) {
+    public void copyTo(TextScreen dst, int offset, int length) {
 
     }
 
@@ -284,27 +290,28 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         }
     };
 
-    public void sync() {
+    public void sync(int offset, int length) {
         SwingUtilities.invokeLater(repaintCmd);
     }
 
-    public void setCursor(int x, int y) {
+    public int setCursor(int x, int y) {
         cursorOffset = getOffset(x, y);
+        return cursorOffset;
     }
 
-    public void setCursorVisible(boolean visible) {
-
+    public int setCursorVisible(boolean visible) {
+        return cursorOffset;
     }
 
     /**
      * Copy the content of the given rawData into this screen.
-     *
+     * 
      * @param rawData
      * @param rawDataOffset
      */
     public void copyFrom(char[] rawData, int rawDataOffset) {
         if (rawDataOffset < 0) {
-            //Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
+            // Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
         }
         char[] cha = new char[rawData.length];
         for (int i = 0; i < cha.length; i++) {
@@ -312,7 +319,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             cha[i] = c == 0 ? ' ' : c;
         }
         System.arraycopy(cha, rawDataOffset, buffer, 0, getWidth() * getHeight());
-        sync();
+        sync(0, getWidth() * getHeight());
     }
 
     private static class MyPointerDriver extends Driver implements PointerAPI {
