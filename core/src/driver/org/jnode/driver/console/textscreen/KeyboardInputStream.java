@@ -4,21 +4,12 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import javax.naming.NameNotFoundException;
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.Device;
-import org.jnode.driver.DeviceListener;
-import org.jnode.driver.DeviceManager;
+
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.driver.input.KeyboardListener;
-import org.jnode.naming.InitialNaming;
-import org.jnode.system.BootLog;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
-import org.jnode.util.Queue;
 
 
 /**
@@ -35,21 +26,21 @@ import org.jnode.util.Queue;
  * <li>a "raw" mode in which characters and other keyboard events are delivered without line editing,
  * <li>a "no echo" mode in which line editting occurs without echoing of input characters,
  * <li>making the active characters and keycodes "soft",
- * <li>making completion and history context sensitive; e.g. when switching between a shell and
+ * <li>making completion and history context sensitive; e.g. when switching between a shell and 
  * an application, and
  * <li>code refactoring to support classical terminal devices and remote consoles.
  * </ul>
  * <p/>
  * Bugs:
  * <ul>
- * <li>The current method of echoing the input is suboptimal, and is broken in the case where an
+ * <li>The current method of echoing the input is suboptimal, and is broken in the case where an 
  * application outputs a prompt string to stdout or stderr.
  * </ul>
- *
+ * 
  * @author crawley@jnode.org
  */
 public class KeyboardInputStream extends InputStream
-    implements KeyboardListener, FocusListener, DeviceListener {
+    implements FocusListener {
 
     public static final byte CTRL_L = 12;
     public static final byte CTRL_D = 4;
@@ -62,25 +53,16 @@ public class KeyboardInputStream extends InputStream
 
     private static final char NO_CHAR = 0;
 
-    private KeyboardAPI api;
-    private DeviceManager devMan;
-
-    /**
-     * The queue of keyboard events
-     */
-    private final Queue<KeyboardEvent> queue = new Queue<KeyboardEvent>();
-
     private final Line currentLine;
     private final TextConsole console;
     private InputCompleter completer;
     private final PrintStream out;
-    private boolean hasFocus;
 
     private String currentPrompt;
 
     /**
-     * Contains an index to the current history line, counting from zero.  The value
-     * -1 denotes the current line.
+     * Contains an index to the current history line, counting from zero. The
+     * value -1 denotes the current line.
      */
     private int historyIndex = -1;
 
@@ -89,33 +71,20 @@ public class KeyboardInputStream extends InputStream
      */
     private String savedCurrentLine;
 
-    public KeyboardInputStream(KeyboardAPI api, TextConsole console) {
-        if (api != null) {
-            this.api = api;
-            this.api.addKeyboardListener(this);
-        } else {
-            try {
-                this.devMan = InitialNaming.lookup(DeviceManager.NAME);
-                this.devMan.addListener(this);
-            } catch (NameNotFoundException ex) {
-                BootLog.error("DeviceManager not found", ex);
-            }
-        }
+    private final KeyboardHandler keyboardHandler;
+    private final FocusListener focusListener;
+
+    public KeyboardInputStream(KeyboardHandler kbHandler, TextConsole console) {
+        this.keyboardHandler = kbHandler;
         this.console = console;
         this.out = new PrintStream(console.getOut());
         this.currentLine = new Line(console);
         this.pos = this.lim = 0;
-    }
 
-    private void registerKeyboardApi(Device device) {
-        if (this.api == null) {
-            try {
-                this.api = device.getAPI(KeyboardAPI.class);
-                this.api.addKeyboardListener(this);
-            } catch (ApiNotFoundException ex) {
-                BootLog.error("KeyboardAPI not found", ex);
-            }
-            this.devMan.removeListener(this);
+        if (keyboardHandler instanceof FocusListener) {
+            this.focusListener = (FocusListener) keyboardHandler;
+        } else {
+            this.focusListener = null;
         }
     }
 
@@ -139,37 +108,20 @@ public class KeyboardInputStream extends InputStream
     }
 
     /**
-     * @see org.jnode.driver.input.KeyboardListener#keyPressed(org.jnode.driver.input.KeyboardEvent)
-     */
-    public void keyPressed(KeyboardEvent event) {
-        if (hasFocus) {
-            queue.add(event);
-        }
-    }
-
-    /**
-     * @see org.jnode.driver.input.KeyboardListener#keyReleased(org.jnode.driver.input.KeyboardEvent)
-     */
-    public void keyReleased(KeyboardEvent event) {
-    }
-
-    /**
      * @see java.io.InputStream#close()
      */
     public void close() throws IOException {
-        if (api != null) {
-            api.removeKeyboardListener(this);
-        }
+        keyboardHandler.close();
         super.close();
     }
 
     /**
      * Pull a keyboard event from the queue and process it.
-     *
+     * 
      * @return true if the event was processed
      */
     private boolean processEvent() {
-        KeyboardEvent event = queue.get();
+        KeyboardEvent event = keyboardHandler.getEvent();
         if (!event.isConsumed()) {
             char ch = event.getKeyChar();
             if (ch != NO_CHAR) {
@@ -190,23 +142,25 @@ public class KeyboardInputStream extends InputStream
 
     /**
      * Process a keystroke interpretted as a character.
-     *
+     * 
      * @param ch the character to process
-     * @return <code>true</code> if the character should cause the current line
-     *         buffer contents to be returned to the user.
+     * @return <code>true</code> if the character should cause the current
+     *         line buffer contents to be returned to the user.
      */
     private boolean processChar(char ch) {
         boolean breakChar = false;
         switch (ch) {
-            // if its a backspace we want to remove one from the end of our current
+            // if its a backspace we want to remove one from the end of our
+            // current
             // line
             case KeyEvent.VK_BACK_SPACE:
                 if (currentLine.backspace()) {
                     refreshCurrentLine();
                 }
                 break;
-                // if its an enter key we want to process the command, and then resume
-                // the thread
+            // if its an enter key we want to process the command, and then
+            // resume
+            // the thread
             case '\n':
                 currentLine.moveEnd();
                 refreshCurrentLine();
@@ -215,7 +169,7 @@ public class KeyboardInputStream extends InputStream
                 breakChar = true;
                 historyIndex = -1;
                 break;
-                // if it's the tab key, we want to trigger command line completion
+            // if it's the tab key, we want to trigger command line completion
             case '\t':
                 if (completer != null) {
                     if (currentLine.complete()) {
@@ -225,8 +179,8 @@ public class KeyboardInputStream extends InputStream
                     refreshCurrentLine();
                 }
                 break;
-                // interpret ^D as a soft EOF
-                // FIXME - behavior correct?  cf bash's treatment of ^D
+            // interpret ^D as a soft EOF
+            // FIXME - behavior correct? cf bash's treatment of ^D
             case CTRL_D:
                 currentLine.moveEnd();
                 refreshCurrentLine();
@@ -234,8 +188,8 @@ public class KeyboardInputStream extends InputStream
                 eof = true;
                 breakChar = true;
                 break;
-                // ^L means kill current line and redraw screen.
-                // FIXME - is this behavior useful?
+            // ^L means kill current line and redraw screen.
+            // FIXME - is this behavior useful?
             case CTRL_L:
                 this.console.clear();
                 this.console.setCursor(0, 0);
@@ -254,8 +208,8 @@ public class KeyboardInputStream extends InputStream
 
     /**
      * Process a keystroke that doesn't have an associated char value.
-     *
-     * @param code      key code
+     * 
+     * @param code key code
      * @param modifiers key modifiers
      * @return <code>true</code> if the keystroke has been recognized and
      *         acted on, <code>false</code> otherwise.
@@ -314,7 +268,7 @@ public class KeyboardInputStream extends InputStream
                 currentLine.moveEnd();
                 refreshCurrentLine();
                 break;
-                // if its a delete we want to remove one under the cursor
+            // if its a delete we want to remove one under the cursor
             case KeyEvent.VK_DELETE:
                 currentLine.delete();
                 refreshCurrentLine();
@@ -350,7 +304,8 @@ public class KeyboardInputStream extends InputStream
         currentPrompt = sb.toString();
 
         currentLine.start();
-        while (processEvent()) { /* */ }
+        while (processEvent()) { /* */
+        }
         buffer = currentLine.consumeBytes();
         lim = buffer.length;
         pos = 0;
@@ -422,26 +377,14 @@ public class KeyboardInputStream extends InputStream
     }
 
     public void focusGained(FocusEvent event) {
-        hasFocus = true;
-    }
-
-    public void focusLost(FocusEvent event) {
-        hasFocus = false;
-    }
-
-    /**
-     * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
-     */
-    public void deviceStarted(Device device) {
-        if (device.implementsAPI(KeyboardAPI.class)) {
-            registerKeyboardApi(device);
+        if (focusListener != null) {
+            focusListener.focusGained(event);
         }
     }
 
-    /**
-     * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
-     */
-    public void deviceStop(Device device) {
-        /* Do nothing */
+    public void focusLost(FocusEvent event) {
+        if (focusListener != null) {
+            focusListener.focusLost(event);
+        }
     }
 }
