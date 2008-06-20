@@ -43,29 +43,6 @@ public class DerbyCommand extends AbstractCommand {
         new DerbyCommand().execute(args);
     }
 
-    final void find(long fixedDate) {
-        long d0;
-        int d1, d2, d3, d4;
-        int n400, n100, n4, n1;
-        int year;
-
-        if (fixedDate > 0) {
-            d0 = fixedDate - 1;
-
-            n400 = (int) (d0 / 146097);
-
-            d1 = (int) (d0 % 146097);
-            n100 = d1 / 36524;
-            d2 = d1 % 36524;
-            n4 = d2 / 1461;
-            d3 = d2 % 1461;
-            n1 = d3 / 365;
-            d4 = (d3 % 365) + 1;
-
-            System.out.println(n400);
-        }
-    }
-
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
         throws Exception {
         File home_dir = ARG_HOME.getValue();
@@ -78,9 +55,15 @@ public class DerbyCommand extends AbstractCommand {
 
         try {
             int server_command = server.parseArgs(new String[]{command});
-            PrintWriter printWriter = new PrintWriter(out);
-            server.setLogWriter(printWriter);
-            server.start(printWriter);
+
+            if (server_command == NetworkServerControlImpl.COMMAND_START) {
+                PrintWriter printWriter = new PrintWriter(out);
+                server.setLogWriter(printWriter);
+                server.start(printWriter);
+            } else if (server_command == NetworkServerControlImpl.COMMAND_SHUTDOWN) {
+                server.shutdown();
+            }
+
         } catch (Exception e) {
             // FIXME ... don't do this!
             e.printStackTrace();
