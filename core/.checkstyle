@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fileset-config file-format-version="1.2.0" simple-config="true">
+    <local-check-config name="JNode checkstyle" location="/JNode-All/jnode_checks.xml" type="project" description="">
+        <additional-data name="protect-config-file" value="true"/>
+    </local-check-config>
+    <fileset name="tous" enabled="true" check-config-name="JNode checkstyle" local="true">
+        <file-match-pattern match-pattern="." include-pattern="true"/>
+    </fileset>
+    <filter name="FileTypesFilter" enabled="true">
+        <filter-data value="java"/>
+    </filter>
+    <filter name="FilesFromPackage" enabled="true">
+        <filter-data value="src/openjdk/vm"/>
+        <filter-data value="src/endorsed/nanoxml"/>
+        <filter-data value="src/openjdk/sun"/>
+        <filter-data value="src/openjdk/org"/>
+        <filter-data value="src/openjdk/com"/>
+        <filter-data value="src/icedtea"/>
+        <filter-data value="src/classpath/gnu"/>
+        <filter-data value="src/openjdk/java"/>
+        <filter-data value="src/openjdk/javax"/>
+        <filter-data value="src/classpath/tools"/>
+        <filter-data value="src/classpath/java"/>
+        <filter-data value="src/classpath/javax"/>
+        <filter-data value="src/classpath/ext"/>
+        <filter-data value="src/classpath/vm"/>
+        <filter-data value="src/vmmagic"/>
+        <filter-data value="src/mmtk-vm"/>
+    </filter>
+    <filter name="NonSrcDirs" enabled="true"/>
+</fileset-config>
