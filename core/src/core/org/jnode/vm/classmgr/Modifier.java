@@ -123,6 +123,10 @@ public class Modifier {
         return ((modifier & ACC_ENUM) != 0);
     }
 
+    public static boolean isAnnotation(int modifier) {
+        return ((modifier & ACC_ANNOTATION) != 0);
+    }
+
     public static boolean isAbstract(int modifier) {
         return ((modifier & ACC_ABSTRACT) != 0);
     }
