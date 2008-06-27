@@ -73,6 +73,7 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmClassLoader;
+import sun.reflect.annotation.AnnotationType;
 
 /**
  * A Class represents a Java type.  There will never be multiple Class
@@ -161,8 +162,8 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
     }
 
     public static Class forName(String className, boolean initialize,
-            ClassLoader loader) throws ClassNotFoundException {
-        return VmSystem.forName(className);
+                                ClassLoader loader) throws ClassNotFoundException {
+        return (loader == null) ? VmSystem.forName(className) : loader.loadClass(className, initialize);
     }
 
     /**
@@ -1295,30 +1296,29 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      */
     public boolean isAnnotation()
     {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        return vmClass.isAnnotation();
     }
 
     public String getCanonicalName() {
-        //todo implement it
-        throw new UnsupportedOperationException();
-        /*
-      if (vmClass.isArray())
-        {
-      String componentName = vmClass.getComponentType().getCanonicalName();
-      if (componentName != null)
-        return componentName + "[]";
+        if (isArray()) {
+            String canonicalName = getComponentType().getCanonicalName();
+            if (canonicalName != null)
+                return canonicalName + "[]";
+            else
+                return null;
         }
-      if (vmClass.isMemberClass(klass))
-        {
-      String memberName = getDeclaringClass(klass).getCanonicalName();
-      if (memberName != null)
-        return memberName + "." + getSimpleName(klass);
+        if (isLocalOrAnonymousClass())
+            return null;
+        Class<?> enclosingClass = getEnclosingClass();
+        if (enclosingClass == null) { // top level class
+            return getName();
+        } else {
+            String enclosingName = enclosingClass.getCanonicalName();
+            if (enclosingName == null)
+                return null;
+            return enclosingName + "." + getSimpleName();
         }
-      if (isLocalClass(klass) || vmClass.isAnonymousClass(klass))
-        return null;
-      return getName(klass);
-      */
+
     }
 
     /**
@@ -1420,7 +1420,8 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * identical to getEnumConstantsShared except that
      * the result is uncloned, cached, and shared by all callers.
      */
-    T[] getEnumConstantsShared() {
+    //todo make it package private
+    public T[] getEnumConstantsShared() {
         if (enumConstants == null) {
             if (!isEnum()) return null;
             try {
@@ -1601,5 +1602,18 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      */
     public boolean isSynthetic() {
 	    return vmClass.isSynthetic();
+    }
+
+    // Annotation types cache their internal (AnnotationType) form
+    private AnnotationType annotationType;
+
+    //todo change this to package private
+    public void setAnnotationType(AnnotationType type) {
+        annotationType = type;
+    }
+
+    //todo change this to package private
+    public AnnotationType getAnnotationType() {
+        return annotationType;
     }
 }

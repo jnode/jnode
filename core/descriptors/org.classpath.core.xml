@@ -11,6 +11,8 @@
 
   <runtime>
     <library name="jnode-core.jar">
+	  <export name="com.sun.beans.*"/>
+	  <export name="com.sun.beans.finder.*"/>
 	  <export name="com.sun.java.util.jar.pack.*"/>
 	  <export name="com.sun.naming.internal.*"/>
       <export name="com.sun.security.auth.UserPrincipal"/>
@@ -20,6 +22,15 @@
       <export name="sun.misc.*"/>
       <export name="sun.reflect.*"/>
       <export name="sun.reflect.annotation.*"/>
+      <export name="sun.reflect.generics.*"/>
+      <export name="sun.reflect.generics.factory.*"/>
+      <export name="sun.reflect.generics.parser.*"/>
+      <export name="sun.reflect.generics.reflectiveObjects.*"/>
+      <export name="sun.reflect.generics.repository.*"/>
+      <export name="sun.reflect.generics.scope.*"/>
+      <export name="sun.reflect.generics.tree.*"/>
+      <export name="sun.reflect.generics.visitor.*"/>
+      <export name="sun.reflect.misc.*"/>
       <export name="sun.net.InetAddressCachePolicy"/>
       <export name="sun.net.util.IPAddressUtil"/>
       <export name="sun.net.www.ParseUtil"/>

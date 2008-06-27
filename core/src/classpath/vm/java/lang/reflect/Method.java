@@ -40,6 +40,7 @@ package java.lang.reflect;
 
 import gnu.java.lang.ClassHelper;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 
 import org.jnode.vm.VmReflection;
@@ -48,7 +49,12 @@ import org.jnode.vm.classmgr.VmMethod;
 import gnu.java.lang.reflect.MethodSignatureParser;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.nio.ByteBuffer;
 import sun.reflect.MethodAccessor;
+import sun.reflect.annotation.AnnotationParser;
+import sun.reflect.annotation.AnnotationType;
+import sun.misc.SharedSecrets;
 
 /**
  * The Method class represents a member method of a class. It also allows
@@ -95,14 +101,17 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
       | Modifier.STATIC | Modifier.STRICT | Modifier.SYNCHRONIZED;
 
     /**
-     * This class is uninstantiable.
+     *
      */
     public Method(VmMethod vmMethod) {
         this.vmMethod = vmMethod;
+        this.annotationDefault = vmMethod.getRawAnnotationDefault();
+        this.annotations = vmMethod.getRawAnnotations();
+        this.parameterAnnotations = vmMethod.getRawParameterAnnotations();
     }
 
     public Method(Class declaringClass, String name, Class[] parameterTypes, Class returnType, Class[] checkedExceptions, int modifiers, int slot, String signature, byte[] annotations, byte[] parameterAnnotations, byte[] annotationDefault) {
-        //todo implement it
+
         throw new UnsupportedOperationException();
     }
 
@@ -471,32 +480,90 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
      */
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        return vmMethod.getAnnotation(annotationClass);
-    }
-
-
-    /**
-     * @see java.lang.reflect.AnnotatedElement#getAnnotations()
-     */
-    public Annotation[] getAnnotations() {
-        return vmMethod.getAnnotations();
-    }
-
-    /**
-     * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
-     */
-    public Annotation[] getDeclaredAnnotations() {
-        return vmMethod.getDeclaredAnnotations();
-    }
-
-    /**
-     * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
-     */
-    public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
-        return vmMethod.isAnnotationPresent(annotationClass);
+        if(annotationClass.getName().equals(org.jnode.vm.annotation.AllowedPackages.class.getName())) {
+            return vmMethod.getAnnotation(annotationClass);
+        } else {
+            return _getAnnotation(annotationClass);
+        }
     }
 
     //jnode openjdk
+    public MethodAccessor getMethodAccessor() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public void setMethodAccessor(MethodAccessor accessor) {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public Method copy() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    private transient Map<Class, Annotation> declaredAnnotations;
+    private byte[]              annotations;
+    private byte[]              parameterAnnotations;
+    private byte[]              annotationDefault;
+
+    private synchronized  Map<Class, Annotation> declaredAnnotations() {
+
+        if (declaredAnnotations == null) {
+            declaredAnnotations = AnnotationParser.parseAnnotations(annotations,
+                SharedSecrets.getJavaLangAccess().getConstantPool(getDeclaringClass()), getDeclaringClass());
+        }
+
+        return declaredAnnotations;
+    }
+
+    /**
+     * If this method is an annotation method, returns the default
+     * value for the method.  If there is no default value, or if the
+     * method is not a member of an annotation type, returns null.
+     * Primitive types are wrapped.
+     *
+     * @throws TypeNotPresentException if the method returns a Class,
+     * and the class cannot be found
+     *
+     * @since 1.5
+     */
+    public Object getDefaultValue() {
+        if  (annotationDefault == null)
+            return null;
+
+        Class memberType = AnnotationType.invocationHandlerReturnType(getReturnType());
+
+        Object result = AnnotationParser.parseMemberValue(memberType, ByteBuffer.wrap(annotationDefault),
+            SharedSecrets.getJavaLangAccess().getConstantPool(getDeclaringClass()), getDeclaringClass());
+
+        if (result instanceof sun.reflect.annotation.ExceptionProxy)
+            throw new AnnotationFormatError("Invalid default: " + this);
+
+        return result;
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @since 1.5
+     */
+    public <T extends Annotation> T _getAnnotation(Class<T> annotationClass) {
+        if (annotationClass == null)
+            throw new NullPointerException();
+
+        return (T) declaredAnnotations().get(annotationClass);
+    }
+
+    /**
+     * @since 1.5
+     */
+    public Annotation[] getDeclaredAnnotations()  {
+        return declaredAnnotations().values().toArray(EMPTY_ANNOTATION_ARRAY);
+    }
+
+    private static final Annotation[] EMPTY_ANNOTATION_ARRAY=new Annotation[0];
+
     /**
      * Returns an array of arrays that represent the annotations on the formal
      * parameters, in declaration order, of the method represented by
@@ -514,37 +581,19 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * @since 1.5
      */
     public Annotation[][] getParameterAnnotations() {
-        return new Annotation[vmMethod.getNoArguments()][];
+
+        int numParameters = vmMethod.getNoArguments();
+
+        if (parameterAnnotations == null)
+            return new Annotation[numParameters][0];
+
+        Annotation[][] result = AnnotationParser.parseParameterAnnotations(parameterAnnotations,
+            SharedSecrets.getJavaLangAccess().getConstantPool(getDeclaringClass()), getDeclaringClass());
+
+        if (result.length != numParameters)
+            throw new AnnotationFormatError("Parameter annotations don't match number of parameters");
+
+        return result;
     }
 
-    /**
-     * If this method is an annotation method, returns the default
-     * value for the method.  If there is no default value, or if the
-     * method is not a member of an annotation type, returns null.
-     * Primitive types are wrapped.
-     *
-     * @throws TypeNotPresentException if the method returns a Class,
-     * and the class cannot be found
-     *
-     * @since 1.5
-     */
-    public Object getDefaultValue(){
-        //todo implement it
-        return null;
-    }
-
-    public MethodAccessor getMethodAccessor() {
-        //todo implement it
-        throw new UnsupportedOperationException();
-    }
-
-    public void setMethodAccessor(MethodAccessor accessor) {
-        //todo implement it
-        throw new UnsupportedOperationException();
-    }
-
-    public Method copy() {
-        //todo implement it
-        throw new UnsupportedOperationException();
-    }
 }

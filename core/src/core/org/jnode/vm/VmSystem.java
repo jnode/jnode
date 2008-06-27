@@ -57,6 +57,7 @@ import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.VmConstantPool;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
@@ -123,8 +124,7 @@ public final class VmSystem {
             VmSystem.out = getSystemOut();
 
             /* Initialize the system classloader */
-            VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor
-                .current()).getLoader());
+            VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor.current()).getLoader());
             systemLoader = loader;
             loader.initialize();
 
@@ -166,8 +166,7 @@ public final class VmSystem {
 
             // Initialize log4j
             final Logger root = Logger.getRootLogger();
-            final ConsoleAppender infoApp = new ConsoleAppender(
-                new PatternLayout(LAYOUT));
+            final ConsoleAppender infoApp = new ConsoleAppender(new PatternLayout(LAYOUT));
             root.addAppender(infoApp);
 
             initOpenJDKSpeciffics();
@@ -178,24 +177,19 @@ public final class VmSystem {
         //todo this will be moved to java.lang.System during openjdk integration
         sun.misc.SharedSecrets.setJavaLangAccess(new sun.misc.JavaLangAccess() {
             public sun.reflect.ConstantPool getConstantPool(Class klass) {
-                //return klass.getConstantPool();
-                throw new UnsupportedOperationException();
+                return new VmConstantPool(klass.getVmClass());
             }
 
             public void setAnnotationType(Class klass, AnnotationType type) {
-                //klass.setAnnotationType(type);
-                throw new UnsupportedOperationException();
+                klass.setAnnotationType(type);
             }
 
             public AnnotationType getAnnotationType(Class klass) {
-                //return klass.getAnnotationType();
-                throw new UnsupportedOperationException();
+                return klass.getAnnotationType();
             }
 
-            public <E extends Enum<E>>
-            E[] getEnumConstantsShared(Class<E> klass) {
-                //return klass.getEnumConstantsShared();
-                return klass.getEnumConstants();
+            public <E extends Enum<E>> E[] getEnumConstantsShared(Class<E> klass) {
+                return klass.getEnumConstantsShared();
             }
 
             public void blockedOn(Thread t, Interruptible b) {
@@ -233,7 +227,7 @@ public final class VmSystem {
     /**
      * Load the initial jarfile.
      *
-     * @param rm
+     * @param rm the resource manager
      * @return The initial jarfile resource, or null if no initial jarfile is
      *         available.
      */
@@ -265,7 +259,7 @@ public final class VmSystem {
     /**
      * This method adds some default system properties
      *
-     * @param res
+     * @param res the system properties object
      */
     public static void insertSystemProperties(Properties res) {
 
