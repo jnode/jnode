@@ -25,7 +25,11 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.jnode.vm.VmSystemObject;
+import sun.reflect.annotation.AnnotationParser;
 
 /**
  * VM representation of a single annotation.
@@ -47,7 +51,7 @@ public final class VmAnnotation extends VmSystemObject {
     /**
      * The element values
      */
-    private final ElementValue[] values;
+    private ElementValue[] values;
 
     /**
      * The type of this annotation
@@ -57,13 +61,13 @@ public final class VmAnnotation extends VmSystemObject {
     /**
      * The type implementing this annotation
      */
-    private transient ImplBase value;
+    private transient Annotation value;
 
     /**
-     * @param runtimeVisible
+     * @param typeDescr the annotation type descriptor
+     * @param values    annotation parameter name-value pairs
      */
-    public VmAnnotation(String typeDescr,
-                        ElementValue[] values) {
+    public VmAnnotation(String typeDescr, ElementValue[] values) {
         this.typeDescr = typeDescr;
         this.values = values;
     }
@@ -95,17 +99,65 @@ public final class VmAnnotation extends VmSystemObject {
         throws ClassNotFoundException {
         if (value == null) {
             final VmType<? extends Annotation> annType = annotationType(loader);
-            final VmType<? extends ImplBase> implType = getImplClass(annType);
-            final ImplBase value;
-            try {
-                value = (ImplBase) implType.asClass().newInstance();
-            } catch (InstantiationException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
+            //todo will be obsolate when annotation paring is migrated to openjdk
+            if (!annType.getName().equals(org.jnode.vm.annotation.AllowedPackages.class.getName())) {
+                int dmc = annType.getNoDeclaredMethods();
+                Map vmap = new HashMap();
+                for (int i = 0; i < dmc; i++) {
+                    VmMethod met = annType.getDeclaredMethod(i);
+                    Object o = met.getAnnotationDefault();
+                    if (o != null) {
+                        String name = met.getName();
+                        vmap.put(name, o);
+                    }
+                }
+
+
+                for (int i = 0; i < values.length; i++) {
+                    vmap.put(values[i].name, values[i].value);
+                }
+
+                Set<Map.Entry> set = vmap.entrySet();
+                values = new ElementValue[set.size()];
+                int i = 0;
+                for (Map.Entry e : set) {
+                    values[i++] = new ElementValue((String) e.getKey(), e.getValue());
+                }
+
+                for (Map.Entry e : set) {
+                    Object o = e.getValue();
+                    if (o != null && o.getClass().isArray()) {
+                        Object[] arr = (Object[]) o;
+                        if (arr.length > 0) {
+                            Object el = arr[0];
+                            Class elc = el.getClass();
+                            Object[] ar2 = (Object[]) Array.newInstance(elc, arr.length);
+                            for (int v = 0; v < arr.length; v++) {
+                                ar2[v] = elc.cast(arr[v]);
+                            }
+                            e.setValue(ar2);
+                        }
+                    }
+                }
+
+                //try {
+                /*value =*/
+                return AnnotationParser.annotationForMap(loader.asClassLoader().loadClass(annType.getName()), vmap);
+
+            } else {
+
+                final VmType<? extends ImplBase> implType = getImplClass(annType);
+                final ImplBase value;
+                try {
+                    value = implType.asClass().newInstance();
+                } catch (InstantiationException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                }
+                value.initialize(annType, values, loader);
+                this.value = value;
             }
-            value.initialize(annType, values, loader);
-            this.value = value;
         }
         return value;
     }

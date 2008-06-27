@@ -26,6 +26,7 @@ import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import org.jnode.system.BootLog;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.VmUtils;
 import org.jnode.vm.annotation.AllowedPackages;
 import org.jnode.vm.annotation.CheckPermission;
@@ -43,6 +44,8 @@ import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import sun.reflect.annotation.AnnotationParser;
+import sun.reflect.annotation.ExceptionProxy;
 
 /**
  * Decoder of .class files into VmType instances.
@@ -76,6 +79,8 @@ public final class ClassDecoder {
     private static char[] RuntimeVisibleParameterAnnotationsAttrName;
 
     private static char[] RuntimeInvisibleParameterAnnotationsAttrName;
+
+    private static char[] AnnotationDefaultAttrName;
 
     @SuppressWarnings("deprecation")
     private static final MethodPragmaException[] METHOD_PRAGMA_EXCEPTIONS = new MethodPragmaException[]{
@@ -208,6 +213,7 @@ public final class ClassDecoder {
                 .toCharArray();
             RuntimeInvisibleParameterAnnotationsAttrName = "RuntimeInvisibleParameterAnnotations"
                 .toCharArray();
+            AnnotationDefaultAttrName = "AnnotationDefault".toCharArray();
         }
     }
 
@@ -404,7 +410,7 @@ public final class ClassDecoder {
         cls.addPragmaFlags(readInterfaces(data, cls, cp));
 
         // Field table
-        final FieldData[] fieldData = readFields(data, cp, slotSize);
+        final FieldData[] fieldData = readFields(data, cp, slotSize, clc);
 
         // Method Table
         readMethods(data, rejectNatives, cls, cp, sharedStatics, clc);
@@ -419,10 +425,10 @@ public final class ClassDecoder {
             final String attrName = cp.getUTF8(data.getChar());
             final int length = data.getInt();
             if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
-                rVisAnn = readRuntimeAnnotations(data, cp, true);
+                rVisAnn = readRuntimeAnnotations(data, cp, true, clc);
             } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName,
                 attrName)) {
-                rInvisAnn = readRuntimeAnnotations(data, cp, false);
+                rInvisAnn = readRuntimeAnnotations(data, cp, false, clc);
             } else if (VmArray.equals(SourceFileAttrName, attrName)) {
                 sourceFile = cp.getUTF8(data.getChar());
             } else if (VmArray.equals(SignatureAttrName, attrName)) {
@@ -621,7 +627,7 @@ public final class ClassDecoder {
      * @param pragmaFlags
      */
     private static FieldData[] readFields(ByteBuffer data, VmCP cp,
-                                          int slotSize) {
+                                          int slotSize, VmClassLoader loader) {
         final int fcount = data.getChar();
         if (fcount > 0) {
             final FieldData[] ftable = new FieldData[fcount];
@@ -644,10 +650,10 @@ public final class ClassDecoder {
                         constantValue = cp.getAny(data.getChar());
                     } else if (VmArray.equals(
                         RuntimeVisibleAnnotationsAttrName, attrName)) {
-                        rVisAnn = readRuntimeAnnotations(data, cp, true);
+                        rVisAnn = readRuntimeAnnotations(data, cp, true, loader);
                     } else if (VmArray.equals(
                         RuntimeInvisibleAnnotationsAttrName, attrName)) {
-                        readRuntimeAnnotations(data, cp, false);
+                        readRuntimeAnnotations(data, cp, false, loader);
                     } else {
                         skip(data, length);
                     }
@@ -947,18 +953,78 @@ public final class ClassDecoder {
                         mts.setExceptions(readExceptions(data, cls, cp));
                     } else if (VmArray.equals(
                         RuntimeVisibleAnnotationsAttrName, attrName)) {
-                        rVisAnn = readRuntimeAnnotations(data, cp, true);
+
+                        byte[] buf = new byte[length];
+                        data.slice().get(buf);
+                        mts.setRawAnnotations(buf);
+
+                        //todo will get obsolate with openjdk based annotation support
+                        //rVisAnn = readRuntimeAnnotations(data, cp, true, cl);
+                        rVisAnn = readRuntimeAnnotations2(data, cp, true, cl, cls);
+
                     } else if (VmArray.equals(
                         RuntimeInvisibleAnnotationsAttrName, attrName)) {
-                        rInvisAnn = readRuntimeAnnotations(data, cp, false);
+                        rInvisAnn = readRuntimeAnnotations(data, cp, false, cl);
                     } else if (VmArray.equals(
                         RuntimeVisibleParameterAnnotationsAttrName,
                         attrName)) {
-                        readRuntimeParameterAnnotations(data, cp, true);
+
+                        byte[] buf = new byte[length];
+                        data.slice().get(buf);
+                        mts.setRawParameterAnnotations(buf);
+                        //todo will get obsolate with openjdk based annotation support
+                        readRuntimeParameterAnnotations(data, cp, true, cl);
                     } else if (VmArray.equals(
                         RuntimeInvisibleParameterAnnotationsAttrName,
                         attrName)) {
-                        readRuntimeParameterAnnotations(data, cp, false);
+                        readRuntimeParameterAnnotations(data, cp, false, cl);
+                    } else if (VmArray.equals(AnnotationDefaultAttrName, attrName)) {
+                        //todo will get obsolate with openjdk based annotation support
+                        byte[] buf = new byte[length];
+                        data.slice().get(buf);
+                        mts.setRawAnnotationDefault(buf);
+
+                        Class r_class;
+                        VmType vtm = mts.getReturnType();
+                        if (vtm.isPrimitive()) {
+                            switch (vtm.getJvmType()) {
+                                case JvmType.BOOLEAN:
+                                    vtm = Boolean.class.getVmClass();
+                                    break;
+                                case JvmType.BYTE:
+                                    vtm = Byte.class.getVmClass();
+                                    break;
+                                case JvmType.SHORT:
+                                    vtm = Short.class.getVmClass();
+                                    break;
+                                case JvmType.CHAR:
+                                    vtm = Character.class.getVmClass();
+                                    break;
+                                case JvmType.INT:
+                                    vtm = Integer.class.getVmClass();
+                                    break;
+                                case JvmType.FLOAT:
+                                    vtm = Float.class.getVmClass();
+                                    break;
+                                case JvmType.LONG:
+                                    vtm = Long.class.getVmClass();
+                                    break;
+                                case JvmType.DOUBLE:
+                                    vtm = Double.class.getVmClass();
+                                    break;
+
+                            }
+                            r_class = new Class(vtm);
+                        } else {
+                            try {
+                                r_class = Class.forName(vtm.getName(), false, vtm.getLoader().asClassLoader());
+                            } catch (ClassNotFoundException cnf) {
+                                throw new RuntimeException(cnf);
+                            }
+                        }
+                        Object defo = AnnotationParser.parseMemberValue(r_class, data, new VmConstantPool(cls),
+                            new Class(cls));
+                        mts.setAnnotationDefault(defo);
                     } else {
                         skip(data, length);
                     }
@@ -996,11 +1062,11 @@ public final class ClassDecoder {
      * @param cp
      */
     private static VmAnnotation[][] readRuntimeParameterAnnotations(
-        ByteBuffer data, VmCP cp, boolean visible) {
+        ByteBuffer data, VmCP cp, boolean visible, VmClassLoader loader) {
         final int numParams = data.get();
         final VmAnnotation[][] arr = new VmAnnotation[numParams][];
         for (int i = 0; i < numParams; i++) {
-            arr[i] = readRuntimeAnnotations(data, cp, visible);
+            arr[i] = readRuntimeAnnotations(data, cp, visible, loader);
         }
         return arr;
     }
@@ -1012,11 +1078,28 @@ public final class ClassDecoder {
      * @param cp
      */
     private static VmAnnotation[] readRuntimeAnnotations(ByteBuffer data,
-                                                         VmCP cp, boolean visible) {
+                                                         VmCP cp, boolean visible, VmClassLoader loader) {
         final int numAnn = data.getChar();
         final VmAnnotation[] arr = new VmAnnotation[numAnn];
         for (int i = 0; i < numAnn; i++) {
             arr[i] = readAnnotation(data, cp, visible);
+        }
+        return arr;
+    }
+
+    /**
+     * Read a runtime annotations attributes.
+     *
+     * @param data
+     * @param cp
+     */
+    private static VmAnnotation[] readRuntimeAnnotations2(ByteBuffer data,
+                                                          VmCP cp, boolean visible, VmClassLoader loader,
+                                                          VmType vmtype) {
+        final int numAnn = data.getChar();
+        final VmAnnotation[] arr = new VmAnnotation[numAnn];
+        for (int i = 0; i < numAnn; i++) {
+            arr[i] = readAnnotation2(data, cp, visible, loader, vmtype);
         }
         return arr;
     }
@@ -1092,8 +1175,7 @@ public final class ClassDecoder {
      * @param data
      * @param cp
      */
-    private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp,
-                                               boolean visible) {
+    private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp, boolean visible) {
         final String typeDescr = cp.getUTF8(data.getChar());
         final int numElemValuePairs = data.getChar();
         final VmAnnotation.ElementValue[] values;
@@ -1104,6 +1186,109 @@ public final class ClassDecoder {
             for (int i = 0; i < numElemValuePairs; i++) {
                 final String elemName = cp.getUTF8(data.getChar());
                 final Object value = readElementValue(data, cp);
+                values[i] = new VmAnnotation.ElementValue(elemName, value);
+            }
+        } else {
+            values = VmAnnotation.ElementValue.EMPTY_ARR;
+            for (int i = 0; i < numElemValuePairs; i++) {
+                data.getChar(); // Skip name ref
+                skipElementValue(data, cp);
+            }
+        }
+        return new VmAnnotation(typeDescr, values);
+    }
+
+    //todo will get obsolate with openjdk based annotation support
+    /**
+     * Read a single annotation structure.
+     *
+     * @param data
+     * @param cp
+     */
+    private static VmAnnotation readAnnotation2(ByteBuffer data, VmCP cp,
+                                                boolean visible, VmClassLoader loader, VmType vmType) {
+        final String typeDescr = cp.getUTF8(data.getChar());
+        final int numElemValuePairs = data.getChar();
+        final VmAnnotation.ElementValue[] values;
+        if (numElemValuePairs == 0) {
+            values = VmAnnotation.ElementValue.EMPTY_ARR;
+        } else if (visible) {
+            values = new VmAnnotation.ElementValue[numElemValuePairs];
+            for (int i = 0; i < numElemValuePairs; i++) {
+                final String elemName = cp.getUTF8(data.getChar());
+
+                Object defo = null; //readElementValue(data, cp);
+
+                try {
+                    VmType annType = new Signature(typeDescr, loader).getType();
+
+                    VmMethod mts = null;
+                    int dmc = annType.getNoDeclaredMethods();
+                    for (int v = 0; v < dmc; v++) {
+                        VmMethod m = annType.getDeclaredMethod(v);
+                        if (elemName.equals(m.getName())) {
+                            mts = m;
+                            break;
+                        }
+                    }
+
+                    Class r_class;
+                    VmType vtm = mts.getReturnType();
+                    if (vtm.isPrimitive()) {
+                        switch (vtm.getJvmType()) {
+                            case JvmType.BOOLEAN:
+                                vtm = Boolean.class.getVmClass();
+                                break;
+                            case JvmType.BYTE:
+                                vtm = Byte.class.getVmClass();
+                                break;
+                            case JvmType.SHORT:
+                                vtm = Short.class.getVmClass();
+                                break;
+                            case JvmType.CHAR:
+                                vtm = Character.class.getVmClass();
+                                break;
+                            case JvmType.INT:
+                                vtm = Integer.class.getVmClass();
+                                break;
+                            case JvmType.FLOAT:
+                                vtm = Float.class.getVmClass();
+                                break;
+                            case JvmType.LONG:
+                                vtm = Long.class.getVmClass();
+                                break;
+                            case JvmType.DOUBLE:
+                                vtm = Double.class.getVmClass();
+                                break;
+
+                        }
+                        r_class = new Class(vtm);
+                    } else {
+                        try {
+                            r_class = vtm.getLoader().asClassLoader().loadClass(vtm.getName());
+                        } catch (ClassNotFoundException cnf) {
+                            throw new RuntimeException(cnf);
+                        }
+                    }
+                    Class container;
+                    try {
+
+                        container = annType.getLoader().asClassLoader().loadClass(annType.getName());
+                    } catch (ClassNotFoundException cnf) {
+                        throw new RuntimeException(cnf);
+                    }
+                    defo = AnnotationParser.parseMemberValue(r_class, data, new VmConstantPool(vmType), container);
+
+                    if (defo instanceof ExceptionProxy)
+                        throw new RuntimeException("Error parsing annotation parameter value (annotation= " +
+                            annType.getName() + ", parameter=" + mts.getName() + ")");
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+
+                final Object value = defo; //readElementValue(data, cp);
                 values[i] = new VmAnnotation.ElementValue(elemName, value);
             }
         } else {

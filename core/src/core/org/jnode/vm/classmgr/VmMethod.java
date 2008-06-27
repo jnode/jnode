@@ -99,6 +99,11 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     private char pragmaFlags;
 
+    private Object annotationDefault;
+    private byte[] rawAnnotationDefault;
+    private byte[] rawAnnotations;
+    private byte[] rawParameterAnnotations;
+
     /**
      * Constructor for VmMethod.
      *
@@ -636,5 +641,37 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                     + getDeclaringClass().isCompiled());
             }
         }
+    }
+
+    public Object getAnnotationDefault() {
+        return annotationDefault;
+    }
+
+    public void setAnnotationDefault(Object annotationDefault) {
+        this.annotationDefault = annotationDefault;
+    }
+
+    public byte[] getRawAnnotationDefault() {
+        return rawAnnotationDefault;
+    }
+
+    public void setRawAnnotationDefault(byte[] rawAnnotationDefault) {
+        this.rawAnnotationDefault = rawAnnotationDefault;
+    }
+
+    public byte[] getRawAnnotations() {
+        return rawAnnotations;
+    }
+
+    public void setRawAnnotations(byte[] rawAnnotations) {
+        this.rawAnnotations = rawAnnotations;
+    }
+
+    public byte[] getRawParameterAnnotations() {
+        return rawParameterAnnotations;
+    }
+
+    public void setRawParameterAnnotations(byte[] rawParameterAnnotations) {
+        this.rawParameterAnnotations = rawParameterAnnotations;
     }
 }

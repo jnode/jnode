@@ -243,6 +243,8 @@ public class ObjectEmitter {
                 bis.writeObjectRef(null);
                 // enumConstantsDirectory
                 bis.writeObjectRef(null);
+                // annotationType
+                bis.writeObjectRef(null);
             }
         } catch (ClassNotFoundException ex) {
             throw new BuildException("emitting object: [" + c + "]", ex);
