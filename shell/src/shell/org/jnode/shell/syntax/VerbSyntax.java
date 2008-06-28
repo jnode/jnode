@@ -23,61 +23,56 @@ package org.jnode.shell.syntax;
 
 import org.jnode.nanoxml.XMLElement;
 
-
 /**
- * An ArgumentSyntax instance allows an Argument to appear exactly once.
+ * A VerbSyntax matches a given string setting an argument to the string
+ * "true" if it succeeds.  The behavior is similar to an OptionSyntax
+ * with a 'longName', except that we don't prepend "--" to the symbol. 
  * 
  * @author crawley@jnode.org
- *
  */
-public class ArgumentSyntax extends Syntax {
-
+public class VerbSyntax extends ArgumentSyntax {
+    
+    private final String symbol;
     private final String argName;
     
-    public ArgumentSyntax(String label, String argName, String description) {
-        super(label, description);
+    public VerbSyntax(String label, String symbol, String argName, String description) {
+        super(label, argName, description);
+        this.symbol = symbol;
+        if (symbol.length() == 0) {
+            throw new IllegalArgumentException("empty symbol");
+        }
         this.argName = argName;
         if (argName.length() == 0) {
             throw new IllegalArgumentException("empty argName");
         }
     }
 
-    public ArgumentSyntax(String label, String argName) {
-        this(label, argName, null);
-    }
-
-    public ArgumentSyntax(String argName) {
-        this(null, argName, null);
-    }
-
     @Override
     public String format(ArgumentBundle bundle) {
-        try {
-            Argument<?> arg = bundle.getArgument(this);
-            return "<" + arg.format() + ">";
-        } catch (SyntaxFailureException ex) {
-            return "<" + label + "> (Unmatched syntax label!)";
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "ArgumentSyntax{" + super.toString() + ",argName=" + argName + "}";
+        // Hmmmm
+        return symbol;
     }
 
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
-        return new MuArgument(label, argName);
-    }
-
-    public String getArgName() {
-        return argName;
+        Argument<?> arg = bundle.getArgument(this);
+        return new MuSequence(
+                new MuSymbol(symbol), 
+                new MuPreset(arg.getLabel(), "true"));
     }
 
     @Override
     public XMLElement toXML() {
-        XMLElement element = basicElement("argument");
-        element.setAttribute("argLabel", argName);
+        XMLElement element = basicElement("verb");
+        element.setAttribute("symbol", symbol);
+        element.setAttribute("argName", argName);
         return element;
     }
+
+    @Override
+    public String toString() {
+        return "VerbSyntax{" + super.toString() + ",symbol=" + symbol + 
+                ",argName=" + argName + "}";
+    }
+
 }

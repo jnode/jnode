@@ -139,12 +139,23 @@ public class SyntaxSpecLoader {
                 throw new SyntaxFailureException("<argument> element has no 'argLabel' attribute");
             }
             return new ArgumentSyntax(label, argLabel, description);
+        } else if (kind.equals("verb")) {
+            String symbol = syntaxElement.getAttribute("symbol");
+            if (symbol == null) {
+                throw new SyntaxFailureException("<verb> element has no 'symbol' attribute");
+            }
+            String argLabel = syntaxElement.getAttribute("argLabel");
+            if (argLabel == null) {
+                System.out.println(syntaxElement);
+                throw new SyntaxFailureException("<argument> element has no 'argLabel' attribute");
+            }
+            return new VerbSyntax(label, symbol, argLabel, description);
         } else if (kind.equals("symbol")) {
             String symbol = syntaxElement.getAttribute("symbol");
             if (symbol == null) {
                 throw new SyntaxFailureException("<symbol> element has no 'symbol' attribute");
             }
-            return new TokenSyntax(label, symbol, description);
+            return new SymbolSyntax(label, symbol, description);
         } else {
             throw new SyntaxFailureException("<" + kind + "> element does not represent a known syntax");
         }
