@@ -24,27 +24,23 @@ package org.jnode.shell.syntax;
 import org.jnode.nanoxml.XMLElement;
 
 /**
- * A TokenSyntax matches a given string.
+ * A SymbolSyntax matches a given string without setting any of
+ * the command's arguments.
  * 
  * @author crawley@jnode.org
  */
-public class TokenSyntax extends Syntax {
+public class SymbolSyntax extends Syntax {
     
     private final String symbol;
     
-    public TokenSyntax(String label, String symbol, String description) {
+    public SymbolSyntax(String label, String symbol, String description) {
         super(label, description);
         this.symbol = symbol;
+        if (symbol.length() == 0) {
+            throw new IllegalArgumentException("empty symbol");
+        }
     }
-
-    public TokenSyntax(String label, String symbol) {
-        this(label, symbol, null);
-    }
-
-    public TokenSyntax(String symbol) {
-        this(null, symbol, null);
-    }
-
+    
     @Override
     public String format(ArgumentBundle bundle) {
         return symbol;
@@ -61,5 +57,11 @@ public class TokenSyntax extends Syntax {
         element.setAttribute("symbol", symbol);
         return element;
     }
+
+    @Override
+    public String toString() {
+        return "SymbolSyntax{" + super.toString() + ",symbol=" + symbol + "}";
+    }
+
 
 }
