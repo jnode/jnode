@@ -67,6 +67,12 @@ final class GCVerifyVisitor extends ObjectVisitor {
             // Ignore objects that need to be finalized.
             return true;
         }
+
+        if (VmMagic.isFinalized(object)) {
+            // Ignore finalized objects that need to be freed
+            return true;
+        }
+
         VmType vmClass;
         try {        
             vmClass = VmMagic.getObjectType(object);
