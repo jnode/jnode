@@ -89,6 +89,14 @@ public abstract class Argument<V> {
         this.multiple = (flags & MULTIPLE) != 0;
         this.vArray = vArray;
     }
+    
+    /**
+     * Reconstruct and return this Arguments flags as passed to the constructor.
+     * @return the flags.
+     */
+    public int getFlags() {
+        return (mandatory ? MANDATORY : 0) | (multiple ? MULTIPLE : 0);
+    }
 
     /**
      * If this method returns <code>true</code>, this Argument must be bound to an
