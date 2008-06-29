@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -104,13 +103,8 @@ public class Log4jCommand extends AbstractCommand {
             }
         } else if (ARG_URL.isSet()) {
             // Set configuration from a URL
-            try {
-                final URL configURL = new URL(ARG_URL.getValue());
-                PropertyConfigurator.configure(configURL);
-            } catch (MalformedURLException ex) {
-                err.println("Malformed configuration URL: " + ex.getMessage());
-                exit(1);
-            }
+            final URL configURL = ARG_URL.getValue();
+            PropertyConfigurator.configure(configURL);
         } else if (FLAG_LIST.isSet()) {
             // List current loggers and their levels.  Effective levels are shown
             // in parentheses.

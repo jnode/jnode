@@ -54,15 +54,11 @@ public class HexdumpCommand extends AbstractCommand {
                     exit(1);
                 }
             } else if (ARG_URL.isSet()) {
-                String urlStr = ARG_URL.getValue();
+                URL url = ARG_URL.getValue();
                 try {
-                    URL url = new URL(urlStr);
                     is = url.openStream();
-                } catch (MalformedURLException ex) {
-                    err.println("Malformed URL '" + urlStr + "': " + ex.getMessage());
-                    exit(1);
                 } catch (IOException ex) {
-                    err.println("Cannot access URL '" + urlStr + "': " + ex.getMessage());
+                    err.println("Cannot access URL '" + url + "': " + ex.getMessage());
                     exit(1);
                 }
             } else {

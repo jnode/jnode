@@ -23,16 +23,18 @@ package org.jnode.shell.syntax;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jnode.shell.CommandLine.Token;
+
 /**
  * This class implements URL-valued command line arguments.  At the moment, it performs
  * no special syntax checking and does no completion.
  * 
  * @author crawley@jnode.org
  */
-public class URLArgument extends StringArgument {
+public class URLArgument extends Argument<URL> {
 
     public URLArgument(String label, int flags, String description) {
-        super(label, flags, description);
+        super(label, flags, new URL[0], description);
     }
 
     public URLArgument(String label, int flags) {
@@ -43,12 +45,21 @@ public class URLArgument extends StringArgument {
         this(label, 0, null);
     }
     
-    public URL getValueAsURL() throws MalformedURLException {
-        return new URL(getValue());
-    }
+//    public URL getValueAsURL() throws MalformedURLException {
+//        return getValue();
+//    }
     
     @Override
     protected String argumentKind() {
         return "url";
+    }
+
+    @Override
+    protected URL doAccept(Token value) throws CommandSyntaxException {
+        try {
+            return new URL(value.token);
+        } catch (MalformedURLException ex) {
+            throw new CommandSyntaxException(ex.getMessage(), ex);
+        }
     }
 }
