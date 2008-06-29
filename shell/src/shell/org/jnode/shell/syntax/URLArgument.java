@@ -23,6 +23,7 @@ package org.jnode.shell.syntax;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 /**
@@ -45,10 +46,6 @@ public class URLArgument extends Argument<URL> {
         this(label, 0, null);
     }
     
-//    public URL getValueAsURL() throws MalformedURLException {
-//        return getValue();
-//    }
-    
     @Override
     protected String argumentKind() {
         return "url";
@@ -60,6 +57,31 @@ public class URLArgument extends Argument<URL> {
             return new URL(value.token);
         } catch (MalformedURLException ex) {
             throw new CommandSyntaxException(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void complete(final CompletionInfo completion, final String partial) {
+        try {
+            // If 'partial' is a well-formed "file:" URL with no host, port, 
+            // user or query, do completion on the path component.
+            URL url = new URL(partial);
+            if (url.getProtocol().equals("file") && 
+                    (url.getAuthority() == null || url.getAuthority().length() == 0) &&
+                    (url.getQuery() == null || url.getQuery().length() == 0)) {
+                // Use a FileArgument to do the work of completing the pathname, 
+                // capturing the results using our own CompletionInfo object.
+                CompletionInfo myCompletion = new CompletionInfo();
+                new FileArgument(null, getFlags()).complete(myCompletion, url.getPath());
+                // Then turn the completions back into "file:" URLs
+                for (String c : myCompletion.getCompletions()) {
+                    // (Kludge - the 'true' argument prevents an extra space
+                    // character from being appended to the completions.)
+                    completion.addCompletion("file:" + c, true);
+                }
+            }
+        } catch (MalformedURLException ex) {
+            // No completion possible
         }
     }
 }
