@@ -55,7 +55,7 @@ public class FileArgument extends Argument<File> {
 
     @Override
     public void complete(CompletionInfo completion, String partial) {
-        // Get last full directory
+        // Get last full directory from the partial pathname.
         final int idx = partial.lastIndexOf(File.separatorChar);
         final String dir;
         if (idx == 0) {
@@ -66,7 +66,7 @@ public class FileArgument extends Argument<File> {
             dir = "";
         }
 
-        // Get the contents of the directory.  (Note that the call to getProperty()
+        // Get the contents of that directory.  (Note that the call to getProperty()
         // is needed because new File("").exists() returns false.  According to Sun, this
         // behavior is "not a bug".)
         final File f = dir.isEmpty() ? new File(System.getProperty("user.dir")) : new File(dir);
@@ -80,20 +80,29 @@ public class FileArgument extends Argument<File> {
                         }
                     }
                 });
-        if (names != null && names.length > 0) {
-            final String prefix = 
-                (dir.length() == 0) ? "" : dir.equals("/") ? "/" : dir + File.separatorChar;
-            for (String n : names) {
-                String name = prefix + n;
-                if (name.startsWith(partial)) {
-                    if (new File(f, n).isDirectory()) {
-                        name += File.separatorChar;
-                        completion.addCompletion(name, true);
-                    } else {
-                        completion.addCompletion(name);
-                    }
+        if (names == null) {
+            // The dir (or user.dir) denotes a non-existent directory.  
+            // No completions are possible for this path name.
+            return;
+        }
+        final String prefix = 
+            (dir.length() == 0) ? "" : dir.equals("/") ? "/" : dir + File.separatorChar;
+        for (String n : names) {
+            String name = prefix + n;
+            if (name.startsWith(partial)) {
+                if (new File(f, n).isDirectory()) {
+                    completion.addCompletion(name + File.separatorChar, true);
+                } else {
+                    completion.addCompletion(name);
                 }
             }
+        }
+        // Completion of "." and ".." as the last pathname component have to be dealt with 
+        // explicitly.  The 'f.list()' call does not include "." and ".." in the result array.
+        int tmp = partial.length() - idx;
+        if ((tmp == 3 && partial.endsWith("..")) ||
+            (tmp == 2 && partial.endsWith("."))) {
+            completion.addCompletion(partial + File.separatorChar, true);
         }
     }
 
