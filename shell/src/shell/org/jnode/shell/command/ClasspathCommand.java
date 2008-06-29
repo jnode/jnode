@@ -61,7 +61,7 @@ public class ClasspathCommand extends AbstractCommand {
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
         if (ARG_ADD.isSet()) {
-            addToClassPath(ARG_ADD.getValueAsURL());
+            addToClassPath(ARG_ADD.getValue());
         } else if (ARG_CLEAR.isSet()) {
             clearClassPath();
         } else if (ARG_REFRESH.isSet()) {

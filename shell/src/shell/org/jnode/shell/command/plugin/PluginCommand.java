@@ -74,7 +74,7 @@ public class PluginCommand extends AbstractCommand {
     private final StringArgument ARG_VERSION =
         new StringArgument("version", Argument.OPTIONAL, "plugin version");
 
-    private PrintStream out, err;
+    private PrintStream out;
     private PluginManager mgr;
     
 
@@ -94,7 +94,6 @@ public class PluginCommand extends AbstractCommand {
     public void execute(CommandLine commandLine, InputStream in, PrintStream out,
             PrintStream err) throws Exception {
         this.out = out;
-        this.err = err;
         try {
             AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws Exception {
@@ -107,18 +106,13 @@ public class PluginCommand extends AbstractCommand {
         }
     }
 
-    private void doRun() throws NameNotFoundException, SyntaxMultiplicityException, PluginException {
+    private void doRun() 
+    throws NameNotFoundException, SyntaxMultiplicityException, PluginException, MalformedURLException {
         mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
         final String version = ARG_VERSION.isSet() ? ARG_VERSION.getValue() : Vm.getVm().getVersion();
         final String pluginId = ARG_PLUGIN_ID.getValue();
         if (ARG_LOADER_URL.isSet()) {
-            try {
-                final URL url = new URL(ARG_LOADER_URL.getValue());
-                addPluginLoader(url);
-            } catch (MalformedURLException ex) {
-                err.println("Malformed plugin loader URL");
-                exit(1);
-            }
+            addPluginLoader(ARG_LOADER_URL.getValue());
         } else if (FLAG_LOAD.isSet()) {
             loadPlugin(pluginId, version);
         } else if (FLAG_RELOAD.isSet()) {

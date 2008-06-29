@@ -71,23 +71,19 @@ public class CatCommand extends AbstractCommand {
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws IOException {
         File[] files = ARG_FILE.getValues();
-        String[] urls = ARG_URL.getValues();
+        URL[] urls = ARG_URL.getValues();
         boolean ok = true;
         if (urls != null && urls.length > 0) {
-            for (String urlString : urls) {
+            for (URL url : urls) {
                 InputStream is = null;
-                try {
-                    URL url = new URL(urlString);
-                    is = url.openStream();
+                try {is = url.openStream();
                     if (is == null) {
                         ok = false;
                     } else {
                         process(is, out);
                     }
-                } catch (MalformedURLException ex) {
-                    err.println("Malformed url '" + urlString + "': " + ex.getMessage());
                 } catch (IOException ex) {
-                    err.println("Can't fetch url '" + urlString + "': " + ex.getMessage());
+                    err.println("Can't fetch url '" + url + "': " + ex.getMessage());
                 } finally {
                     if (is != null) {
                         try { 
