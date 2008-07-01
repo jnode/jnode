@@ -102,10 +102,10 @@ public class FatLfnDirEntry extends FatBasicDirEntry {
         unicodechar[10] = (char) LittleEndian.getUInt16(rawData, 24);
         unicodechar[11] = (char) LittleEndian.getUInt16(rawData, 28);
         unicodechar[12] = (char) LittleEndian.getUInt16(rawData, 30);
-        int index = 12;
-        while (unicodechar[index] == 0)
-            index--;
-        return (new String(unicodechar)).substring(0, index + 1);
+        int index = 0;
+        while (index < 13 && unicodechar[index] != '\0')
+            index++;
+        return new String(unicodechar).substring(0, index);
     }
 
     public String toString() {
