@@ -714,6 +714,17 @@ public final class Unsafe {
             .debugStackTrace();
     }
 
+    /**
+     * List the current stacktrace on the kernel debug output.
+     *
+     * @throws UninterruptiblePragma
+     */
+    @Inline
+    public static final void debugStackTrace(String message, Throwable t) throws UninterruptiblePragma {
+        Unsafe.debug(message);
+        Unsafe.debug("\n");
+        Unsafe.debugStackTrace(t);
+    }
 
     /**
      * List the current stacktrace on the kernel debug output.
