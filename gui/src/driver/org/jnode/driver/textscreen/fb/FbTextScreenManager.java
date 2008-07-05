@@ -26,12 +26,13 @@ import org.jnode.driver.textscreen.TextScreenManager;
 
 final class FbTextScreenManager implements TextScreenManager {
 
+    private final FbTextScreen systemScreen = new FbTextScreen(80, 25, null);
+    
     /**
      * @see org.jnode.driver.textscreen.TextScreenManager#getSystemScreen()
      */
     public TextScreen getSystemScreen() {
-        // TODO Auto-generated method stub
-        return null;
+        return systemScreen;
     }
 
 }

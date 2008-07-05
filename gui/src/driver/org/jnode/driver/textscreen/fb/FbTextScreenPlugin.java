@@ -21,6 +21,7 @@
 
 package org.jnode.driver.textscreen.fb;
 
+import org.jnode.driver.textscreen.TextScreenManager;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -43,19 +44,17 @@ public final class FbTextScreenPlugin extends Plugin {
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
     protected void startPlugin() throws PluginException {
-        // try {
-        // InitialNaming.bind(FbTextScreenManager.NAME, mgr);
-        // } catch (NamingException ex) {
-        // throw new PluginException(ex);
-        // }
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
+                    InitialNaming.unbind(TextScreenManager.NAME);
+                    InitialNaming.bind(TextScreenManager.NAME, new FbTextScreenManager());
+                        
                     Unsafe.debug("before FBConsole.start()");
                     FBConsole.start();
                     Unsafe.debug("after FBConsole.start()");
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     Unsafe.debugStackTrace(e);
                 }
             }
@@ -67,6 +66,6 @@ public final class FbTextScreenPlugin extends Plugin {
      * @see org.jnode.plugin.Plugin#stopPlugin()
      */
     protected void stopPlugin() throws PluginException {
-        InitialNaming.unbind(FbTextScreenManager.NAME);
+        InitialNaming.unbind(TextScreenManager.NAME);
     }
 }

@@ -53,8 +53,6 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
      * Create a new instance
      */
     public VESADriver() {
-        Unsafe.debug("created VESADriver");
-        System.err.println("created VESADriver");
     }
 
     /**
@@ -119,8 +117,6 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
      * @see org.jnode.driver.Driver#startDevice()
      */
     protected void startDevice() throws DriverException {
-        Unsafe.debug("\nbegin VESADriver.startDevice");
-        System.err.println("\nbegin VESADriver.startDevice");
         ModeInfoBlock modeInfoBlock = null;
         try {
             Address vbeControlInfo = UnsafeX86.getVbeControlInfos();
@@ -138,53 +134,25 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
                         "can't start device (modeInfoBlock is empty): grub haven't switched to graphic mode");
             }
 
-            kernel = new VESACore(this, vbeInfoBlock, modeInfoBlock, (PCIDevice) getDevice());
-
-            Unsafe.debug("\nVESADriver.startDevice: will call kernel.getConfigs()");
-            System.err.println("\nVESADriver.startDevice: will call kernel.getConfigs()");
-
+            kernel = new VESACore(this, vbeInfoBlock, modeInfoBlock, (PCIDevice) getDevice());            
             configs = kernel.getConfigs();
-
-            Unsafe.debug("\nVESADriver.startDevice: called kernel.getConfigs()");
-            System.err.println("\nVESADriver.startDevice: called kernel.getConfigs()");
         } catch (ResourceNotFreeException ex) {
-            Unsafe.debug("\nerror in VESADriver.startDevice");
-            Unsafe.debugStackTrace();
-            ex.printStackTrace(System.err);
+            Unsafe.debugStackTrace("error in VESADriver.startDevice", ex);
             throw new DriverException(ex);
+        } catch (Throwable t) {
+            Unsafe.debugStackTrace("error in VESADriver.startDevice", t);
+            throw new DriverException(t);
         }
-        // Unsafe.debug("\nVESADriver.startDevice: will call getDevice");
-        // System.err.println("\nVESADriver.startDevice: will call getDevice");
         final Device dev = getDevice();
-
-        // Unsafe.debug("\nVESADriver.startDevice: will call
-        // super.startDevice()");
-        // System.err.println("\nVESADriver.startDevice: will call
-        // super.startDevice()");
         super.startDevice();
 
-        // Unsafe.debug("\nVESADriver.startDevice: will call registerAPI");
-        // System.err.println("\nVESADriver.startDevice: will call
-        // registerAPI");
         dev.registerAPI(HardwareCursorAPI.class, kernel);
-
-        Unsafe.debug("\nend VESADriver.startDevice");
-        System.err.println("\nend VESADriver.startDevice");
-
-        // try {
-        // console = new FBConsole(kernel, modeInfoBlock.getXResolution(),
-        // modeInfoBlock.getYResolution());
-        // } catch (Throwable e) {
-        // Unsafe.debugStackTrace(e);
-        // throw new DriverException(e);
-        // }
     }
 
     /**
      * @see org.jnode.driver.Driver#stopDevice()
      */
     protected void stopDevice() throws DriverException {
-        Unsafe.debug("\nbegin VESADriver.stopDevice");
         final Device dev = getDevice();
         dev.unregisterAPI(HardwareCursorAPI.class);
         if (currentConfig != null) {
@@ -195,6 +163,5 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
             kernel = null;
         }
         super.stopDevice();
-        Unsafe.debug("\nend VESADriver.stopDevice");
     }
 }

@@ -46,12 +46,9 @@ public class VESAFinder implements DeviceFinder {
      */
     public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
         try {
-            Unsafe.debug("enter findDevices");
             devMan.register(new VESADevice(bus));
-            Unsafe.debug("exit findDevices");
         } catch (DriverException ex) {
-            Unsafe.debug("error in VESAFinder");
-            Unsafe.debugStackTrace();
+            Unsafe.debugStackTrace("error in findDevices", ex);
             throw new DeviceException(ex);
         }
     }

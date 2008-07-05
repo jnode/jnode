@@ -20,6 +20,8 @@
 
 package org.jnode.driver.video.vesa;
 
+import gnu.classpath.SystemProperties;
+
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -38,6 +40,7 @@ import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.cursor.SoftwareCursor;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.MemoryResource;
@@ -87,7 +90,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
             PCIDevice device) throws ResourceNotFreeException, DriverException {
         super(modeInfoBlock.getXResolution(), modeInfoBlock.getYResolution());
 
-        Unsafe.debug("\ncreating VESACore");
         this.driver = driver;
         Address address = Address.fromIntZeroExtend(modeInfoBlock.getRamBase());
 
@@ -113,11 +115,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
                     rm.claimMemoryResource(device, address, videoRamSize,
                             ResourceManager.MEMMODE_NORMAL);
 
-            Unsafe.debug("\nVESACore : maxWidth=" + maxWidth + " maxHeight=" + maxHeight +
-                    " bitsPerPixel=" + bitsPerPixel + " bytesPerLine=" + bytesPerLine +
-                    " videoRam=" + NumberUtils.hex(modeInfoBlock.getRamBase()) + " videRamSize=" +
-                    videoRamSize);
-
             BitmapGraphics graphics;
             switch (bitsPerPixel) {
                 case 8:
@@ -127,8 +124,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
 
                     // 8 bits color depth
                     this.redMask = 0x00000003; // TODO get from modeInfoBlock
-                    this.greenMask = 0x0000000C; // TODO get from
-                    // modeInfoBlock
+                    this.greenMask = 0x0000000C; // TODO get from modeInfoBlock
                     this.blueMask = 0x00000030; // TODO get from modeInfoBlock
                     break;
                 case 16:
@@ -138,8 +134,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
 
                     // 16 bits color depth
                     this.redMask = 0x00007C00; // TODO get from modeInfoBlock
-                    this.greenMask = 0x000003E0; // TODO get from
-                    // modeInfoBlock
+                    this.greenMask = 0x000003E0; // TODO get from modeInfoBlock
                     this.blueMask = 0x0000001F; // TODO get from modeInfoBlock
                     break;
                 case 24:
@@ -149,8 +144,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
 
                     // 24 bits color depth
                     this.redMask = 0x00FF0000; // TODO get from modeInfoBlock
-                    this.greenMask = 0x0000FF00; // TODO get from
-                    // modeInfoBlock
+                    this.greenMask = 0x0000FF00; // TODO get from modeInfoBlock
                     this.blueMask = 0x000000FF; // TODO get from modeInfoBlock
                     break;
                 case 32:
@@ -160,8 +154,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
 
                     // 32 bits color depth
                     this.redMask = 0x00FF0000; // TODO get from modeInfoBlock
-                    this.greenMask = 0x0000FF00; // TODO get from
-                    // modeInfoBlock
+                    this.greenMask = 0x0000FF00; // TODO get from modeInfoBlock
                     this.blueMask = 0x000000FF; // TODO get from modeInfoBlock
                     break;
                 default:
@@ -169,58 +162,20 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
             }
             bitmapGraphics = new SoftwareCursor(graphics);
 
-            // String transparency =
-            // SystemProperties.getProperty("org.jnode.awt.transparency");
-            // if((bitsPerPixel == 32) && (transparency != null) &&
-            // "true".equals(transparency)) {
-            // this.alphaMask = 0xff000000; // - transparency enabled
-            // } else {
-            this.alphaMask = 0x00000000; // - transparency disabled
-            // }
+            String transparency = SystemProperties.getProperty("org.jnode.awt.transparency");
+            if ((bitsPerPixel == 32) && (transparency != null) && "true".equals(transparency)) {
+                this.alphaMask = 0xff000000; // - transparency enabled
+            } else {
+                this.alphaMask = 0x00000000; // - transparency disabled
+            }
             this.redMaskShift = getMaskShift(redMask);
             this.greenMaskShift = getMaskShift(greenMask);
             this.blueMaskShift = getMaskShift(blueMask);
             this.alphaMaskShift = getMaskShift(alphaMask);
         } catch (NameNotFoundException ex) {
-            Unsafe.debug("\nerror in VESACore");
-            Unsafe.debugStackTrace();
+            Unsafe.debugStackTrace("error in VESACore", ex);
             throw new ResourceNotFreeException(ex);
         }
-
-        // Unsafe.debug("\nFilling area with direct memory access");
-        // int size = modeInfoBlock.getXResolution() * 10;
-        // Address addr = address;
-        // for(int i = 0 ; i < size ; i++)
-        // {
-        // addr.store(0x00FF0000);
-        // addr = addr.add(4);
-        // }
-        // Unsafe.debug("\nstep 1 done");
-        //
-        // for(int i = 0 ; i < size ; i++)
-        // {
-        // addr.store(0x0000FF00);
-        // addr = addr.add(4);
-        // }
-        // Unsafe.debug("\nstep 2 done");
-        //
-        // for(int i = 0 ; i < size ; i++)
-        // {
-        // addr.store(0x000000FF);
-        // addr = addr.add(4);
-        // }
-        // Unsafe.debug("\nstep 3 done");
-        //
-        // Unsafe.debug("\nFilling area with bitmapGraphics");
-        // for(int i = 0 ; i < 10 ; i++)
-        // {
-        // bitmapGraphics.drawLine(200, 100+i,
-        // modeInfoBlock.getXResolution()-400, 0x000000FF, 0);
-        // bitmapGraphics.drawLine(200, 110+i,
-        // modeInfoBlock.getXResolution()-400, 0x00FF0000, 0);
-        // bitmapGraphics.drawLine(200, 120+i,
-        // modeInfoBlock.getXResolution()-400, 0x0000FF00, 0);
-        // }
 
         Unsafe.debug("\nVESACore created");
     }
@@ -238,7 +193,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
      * @param config
      */
     public void open(FrameBufferConfiguration config) {
-        Unsafe.debug("\nopen");
         final int w = config.getScreenWidth();
         final int h = config.getScreenHeight();
         setMode(w, h, config.getColorModel());
@@ -300,17 +254,11 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
 
     public FrameBufferConfiguration[] getConfigs() {
         try {
-            Unsafe.debug("\ngetConfigs : begin creation of DirectColorModel");
-            Unsafe.debug("\nbitsPerPixel=" + bitsPerPixel + " redMask=" + NumberUtils.hex(redMask) +
-                    " greenMask=" + NumberUtils.hex(greenMask) + " blueMask=" +
-                    NumberUtils.hex(blueMask) + " alphaMask=" + NumberUtils.hex(alphaMask));
             final ColorModel cm =
                     new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask, alphaMask);
-            Unsafe.debug("\ngetConfigs : after creation of DirectColorModel");
             return new FrameBufferConfiguration[] {new VESAConfiguration(maxWidth, maxHeight, cm), };
         } catch (Throwable t) {
-            Unsafe.debug("error in getConfigs() " + t.getMessage());
-            Unsafe.debugStackTrace();
+            Unsafe.debugStackTrace("error in getConfigs()", t);
             throw new RuntimeException(t);
         }
     }
@@ -405,9 +353,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
      * @param mode
      */
     public final void fillRect(int x, int y, int width, int height, int color, int mode) {
-        Unsafe.debug("\nfillRect x=" + x + " y=" + y + " width=" + width + " height=" + height +
-                " color=" + color + " mode=" + mode);
-
         if (x < 0) {
             width = Math.max(0, x + width);
             x = 0;
@@ -418,12 +363,9 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
         }
         if ((width > 0) && (height > 0)) {
             // TODO optimize it like in VMWareCore ?
-            Unsafe.debug("\nfillRect : begin loop");
             for (int line = y + height - 1; line >= y; line--) {
-                // Unsafe.debug("\nline="+line);
                 bitmapGraphics.drawPixels(x, line, width, color, mode);
             }
-            Unsafe.debug("\nfillRect : end loop");
         }
     }
 
@@ -451,8 +393,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
      * @param color
      */
     protected final void drawPixel(int x, int y, int color, int mode) {
-        // Unsafe.debug("\ndrawPixel : x="+x+" y="+y+" color="+color+"
-        // mode="+mode);
         bitmapGraphics.drawPixels(x, y, 1, color, mode);
     }
 
@@ -467,8 +407,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
      * @param mode
      */
     public final void drawLine(int x1, int y1, int x2, int y2, int c, int mode) {
-        Unsafe.debug("\ndrawLine x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2 + " c=" + c +
-                " mode=" + mode);
         if (x1 == x2) {
             // Vertical line
             fillRect(x1, Math.min(y1, y2), 1, Math.abs(y2 - y1), c, mode);
