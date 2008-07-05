@@ -38,7 +38,8 @@ import org.vmmagic.unboxed.Address;
  * 
  */
 public class VESAPlugin extends Plugin {
-
+    static final boolean DEBUG = false;
+    
     /**
      * @param descriptor
      */
@@ -53,9 +54,12 @@ public class VESAPlugin extends Plugin {
      */
     protected void startPlugin() throws PluginException {
         /*
-         * 72 | vbe_control_info | (present if flags[11] is set) 76 |
-         * vbe_mode_info | 80 | vbe_mode | 82 | vbe_interface_seg | 84 |
-         * vbe_interface_off | 86 | vbe_interface_len
+         * 72 | vbe_control_info | (present if flags[11] is set) 
+         * 76 | vbe_mode_info | 
+         * 80 | vbe_mode | 
+         * 82 | vbe_interface_seg | 
+         * 84 | vbe_interface_off | 
+         * 86 | vbe_interface_len
          */
         Unsafe.debug("\nstartPlugin. address=");
         Address vbeInfos = UnsafeX86.getVbeInfos();
@@ -96,21 +100,13 @@ public class VESAPlugin extends Plugin {
         Address vbeMemory = Address.fromInt(physBasePtr);
 
         Unsafe.debug(NumberUtils.hex(vbeMemory.toInt()));
-        /*
-         * short color = (short) 0x0000FFFF; Address addr = vbeMemory; for(int i =
-         * 0 ; i < 0xFFFFF ; i++) { addr.store((short) color); //color++; addr =
-         * addr.add(2); }
-         */
-        Unsafe.debug("\nend\n");
 
         try {
             System.out.println("VESA detected : " + VESACommand.detect());
         } catch (NameNotFoundException e) {
-            Unsafe.debugStackTrace();
-            Unsafe.debug("error : " + e.getMessage());
+            Unsafe.debugStackTrace("error in startPlugin", e);
         } catch (ResourceNotFreeException e) {
-            Unsafe.debugStackTrace();
-            Unsafe.debug("error : " + e.getMessage());
+            Unsafe.debugStackTrace("error in startPlugin", e);
         }
     }
 
@@ -124,28 +120,28 @@ public class VESAPlugin extends Plugin {
     }
 
     private void dump(String message, Address address, int size) {
-        // StringBuilder sb = new StringBuilder("\n");
-        // sb.append(message).append(" at address ");
-        //
-        // if(address.isZero())
-        // {
-        // sb.append("NULL");
-        // }
-        // else
-        // {
-        // sb.append(NumberUtils.hex(address.toInt())).append(" :\n");
-        //
-        // Address addr = address;
-        // for(int i = 0 ; i < size ; i++) {
-        // String str = NumberUtils.hex((byte) (addr.loadByte() & 0xFF) );
-        // str = str.substring(str.length() - 2);
-        // sb.append(str).append(' ');
-        // if((i%16) == 0) sb.append('\n');
-        //
-        // addr = addr.add(1);
-        // }
-        // }
-        //
-        // Unsafe.debug(sb.append("\n").toString());
+        if (DEBUG) {
+            StringBuilder sb = new StringBuilder("\n");
+            sb.append(message).append(" at address ");
+    
+            if (address.isZero()) {
+                sb.append("NULL");
+            } else {
+                sb.append(NumberUtils.hex(address.toInt())).append(" :\n");
+    
+                Address addr = address;
+                for (int i = 0; i < size; i++) {
+                    String str = NumberUtils.hex((byte) (addr.loadByte() & 0xFF));
+                    str = str.substring(str.length() - 2);
+                    sb.append(str).append(' ');
+                    if ((i % 16) == 0)
+                        sb.append('\n');
+    
+                    addr = addr.add(1);
+                }
+            }
+    
+            Unsafe.debug(sb.append("\n").toString());
+        }
     }
 }

@@ -10,13 +10,10 @@
         auto-start="true">
         
   <requires>
-    <import plugin="org.jnode.awt"/>
-    <!-- import plugin="org.jnode.driver"/ -->
     <import plugin="org.jnode.driver.bus.pci"/>
     <import plugin="org.jnode.driver.video"/>
-    <import plugin="org.jnode.awt.font.bdf"/>
-    
-    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.driver.video.cursor"/>
   </requires>
         
   <runtime>

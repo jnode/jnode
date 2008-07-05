@@ -9,7 +9,13 @@
         class="org.jnode.driver.textscreen.fb.FbTextScreenPlugin">
         
   <requires>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.driver.console.core"/>
+    <import plugin="org.jnode.driver.console.textscreen"/>
     <import plugin="org.jnode.driver.textscreen.core"/>
+    <import plugin="org.jnode.driver.textscreen"/>
+    <import plugin="org.jnode.driver.video"/>
   </requires>
         
   <runtime>

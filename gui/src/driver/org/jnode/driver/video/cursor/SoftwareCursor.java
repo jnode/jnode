@@ -1,4 +1,4 @@
-package org.jnode.driver.video.vesa;
+package org.jnode.driver.video.cursor;
 
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
