@@ -21,152 +21,112 @@
 
 package org.jnode.driver.textscreen.fb;
 
-import org.jnode.driver.textscreen.ScrollableTextScreen;
+import java.util.Arrays;
+
 import org.jnode.driver.textscreen.TextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
+import org.jnode.driver.video.Surface;
 
-class FbTextScreen implements TextScreen {
 
-    private final int width;
-    private final int height;
-    private final char[] data;
-    private final FbTextScreen parent;
+class FbTextScreen extends AbstractPcTextScreen {
+    private static final int SCREEN_WIDTH = 80;
+    private static final int SCREEN_HEIGHT = 25;
+    
+    private final char[] buffer;
 
-    public FbTextScreen(int width, int height, FbTextScreen parent) {
-        this.width = width;
-        this.height = height;
-        this.data = new char[width * height];
-        this.parent = parent;
+    private int cursorOffset;
+    private boolean cursorVisible = true;
+
+    private final FbScreenPainter painter;
+
+    public FbTextScreen(Surface g) {
+        super(SCREEN_WIDTH, SCREEN_HEIGHT);
+        buffer = new char[SCREEN_WIDTH * SCREEN_HEIGHT];
+        painter = new FbScreenPainter(this, g);
+        Arrays.fill(buffer, ' ');
     }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#copyContent(int, int, int)
-     */
-    public final void copyContent(int srcOffset, int destOffset, int length) {
-        System.arraycopy(data, srcOffset, data, destOffset, length);
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#copyTo(org.jnode.driver.textscreen.TextScreen,
-     *      int, int)
-     */
-    public void copyTo(TextScreen dst, int offset, int length) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#createCompatibleBufferScreen()
-     */
-    public TextScreen createCompatibleBufferScreen() {
-        return new FbTextScreen(getWidth(), getHeight(), this);
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#createCompatibleScrollableBufferScreen(int)
-     */
-    public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {
-        return new FbScrollableTextScreen(getWidth(), height, this);
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#ensureVisible(int, boolean)
-     */
-    public void ensureVisible(int row, boolean sync) {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
-     */
+    
     public char getChar(int offset) {
-        return data[offset];
+        return buffer[offset];
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
-     */
     public int getColor(int offset) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#getHeight()
-     */
-    public final int getHeight() {
-        return height;
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#getOffset(int, int)
-     */
-    public final int getOffset(int x, int y) {
-        return (y * width) + x;
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#getWidth()
-     */
-    public final int getWidth() {
-        return width;
-    }
-
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
-     */
     public void set(int offset, char ch, int count, int color) {
-        count = Math.min(count, data.length - offset);
-        for (int i = count - 1; i >= 0; i--) {
-            data[offset + i] = ch;
-        }
-        // TODO Set color
+        char c = (char) (ch & 0xFF);
+        buffer[offset] = c == 0 ? ' ' : c;
+        sync(offset, count);
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
-     *      int)
-     */
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
-        length = Math.min(length, data.length - offset);
-        for (int i = length - 1; i >= 0; i--) {
-            data[offset + i] = ch[chOfs + i];
+        char[] cha = new char[ch.length];
+        for (int i = 0; i < cha.length; i++) {
+            char c = (char) (ch[i] & 0xFF);
+            cha[i] = c == 0 ? ' ' : c;
         }
-        // TODO Set color
+        System.arraycopy(cha, chOfs, buffer, offset, length);
+        sync(offset, length);
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
-     *      int[], int)
-     */
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
-        length = Math.min(length, data.length - offset);
-        for (int i = length - 1; i >= 0; i--) {
-            data[offset + i] = ch[chOfs + i];
+        char[] cha = new char[ch.length];
+        for (int i = 0; i < cha.length; i++) {
+            char c = (char) (ch[i] & 0xFF);
+            cha[i] = c == 0 ? ' ' : c;
         }
-        // TODO Set color
+        System.arraycopy(cha, chOfs, buffer, offset, length);
+        sync(offset, length);
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#setCursor(int, int)
-     */
-    public int setCursor(int x, int y) {
-        // TODO Auto-generated method stub
-        return 0; // TODO find proper offset
+    public void copyContent(int srcOffset, int destOffset, int length) {
+        System.arraycopy(buffer, srcOffset * 2, buffer, destOffset * 2, length * 2);
+        sync(destOffset, length);
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#setCursorVisible(boolean)
-     */
-    public int setCursorVisible(boolean visible) {
-        // TODO Auto-generated method stub
-        return 0; // TODO find proper offset
+    public void copyTo(TextScreen dst, int offset, int length) {
+
     }
 
-    /**
-     * @see org.jnode.driver.textscreen.TextScreen#sync(int, int)
-     */
     public void sync(int offset, int length) {
-        // TODO Auto-generated method stub
-
+        painter.repaint();
     }
+
+    public int setCursor(int x, int y) {
+        cursorOffset = getOffset(x, y);
+        return cursorOffset;
+    }
+
+    public int setCursorVisible(boolean visible) {
+        cursorVisible = visible;
+        return cursorOffset;
+    }
+    
+    /**
+     * Copy the content of the given rawData into this screen.
+     * 
+     * @param rawData the data as a char array
+     * @param rawDataOffset the offset in the data array
+     */
+    @Override
+    public void copyFrom(char[] rawData, int rawDataOffset) {
+        if (rawDataOffset < 0) {
+            // Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
+        }
+        char[] cha = new char[rawData.length];
+        for (int i = 0; i < cha.length; i++) {
+            char c = (char) (rawData[i] & 0xFF);
+            cha[i] = c == 0 ? ' ' : c;
+        }
+
+        final int length = getWidth() * getHeight();
+        System.arraycopy(cha, rawDataOffset, buffer, 0, length);
+        sync(0, length);
+    }
+
+    char[] getBuffer() {
+        return buffer;
+    }
+
 }
