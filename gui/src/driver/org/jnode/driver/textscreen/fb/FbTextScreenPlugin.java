@@ -48,9 +48,6 @@ public final class FbTextScreenPlugin extends Plugin {
             @Override
             public void run() {
                 try {
-                    InitialNaming.unbind(TextScreenManager.NAME);
-                    InitialNaming.bind(TextScreenManager.NAME, new FbTextScreenManager());
-                        
                     Unsafe.debug("before FBConsole.start()");
                     FBConsole.start();
                     Unsafe.debug("after FBConsole.start()");

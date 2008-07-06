@@ -23,10 +23,15 @@ package org.jnode.driver.textscreen.fb;
 
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.TextScreenManager;
+import org.jnode.driver.video.Surface;
 
 final class FbTextScreenManager implements TextScreenManager {
 
-    private final FbTextScreen systemScreen = new FbTextScreen(80, 25, null);
+    private final FbTextScreen systemScreen;
+    
+    FbTextScreenManager(Surface g) {
+        systemScreen = new FbTextScreen(g);    
+    }
     
     /**
      * @see org.jnode.driver.textscreen.TextScreenManager#getSystemScreen()
