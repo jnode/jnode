@@ -64,24 +64,21 @@ public class BDFTextRenderer implements TextRenderer {
      * @param color   string color
      * @see java.awt.Graphics
      */
-    public final void render(Surface surface, Shape clip, AffineTransform tx, CharSequence str, int x, int y,
-                             Color color) {
+    public final void render(Surface surface, Shape clip, AffineTransform tx, CharSequence str,
+                             final int x, final int y,Color color) {
         if (str == null || str.length() == 0)
             return;
 
         int charsCount = str.length();
 
         if ((bdfFont != null) && (charsCount > 0)) {
-            BDFMetrics fm = bdfFont.getFontMetrics();
-            y -= fm.getDescent();
             int offset = 0;
-
             final int bdfFontDepth = bdfFont.getDepth();
 
             float f_max = (1 << bdfFontDepth) - 1;
             if (f_max == 0) f_max = 1;
 
-            BDFParser.Rectangle b_rect = new BDFParser.Rectangle();
+            BDFParser.Rectangle glyph_box = new BDFParser.Rectangle();
             final Point2D src = new Point2D.Double();
             final Point2D dst = new Point2D.Double();
 
@@ -91,21 +88,24 @@ public class BDFTextRenderer implements TextRenderer {
             int y_max = Integer.MIN_VALUE;
 
             for (int i = 0; i < charsCount; i++) {
-                int base = fm.getDescent();
                 BDFGlyph glyph = bdfFont.getGlyph(str.charAt(i));
                 if (glyph == null) {
                     continue;
                 }
 
-                final int fHeight = glyph.getBbx(b_rect).height;
-                final int glyphBbxY = glyph.getBbx(b_rect).y;
-//                final int bdfFontBbxHeight = bdfFont.getBoundingBox().height;
-                final int[] fData = glyph.getData();
+                glyph_box = glyph.getBbx(glyph_box);
+
+                final int fHeight = glyph_box.height;
+                final int[] fData = glyph.getData();               
                 final int scan = fData.length / fHeight;
 
                 int fg_r = color.getRed();
                 int fg_g = color.getGreen();
                 int fg_b = color.getBlue();
+
+                //box location
+                final int bx = x + offset + glyph_box.x;
+                final int by = y - fHeight - glyph_box.y;
 
                 for (int k = 0; k < fHeight; k++) {
                     final int offsetLine = k * scan;
@@ -113,54 +113,47 @@ public class BDFTextRenderer implements TextRenderer {
                         int fPixel = fData[offsetLine + j];
                         if (fPixel != 0) {
 
-                            //compute location
-                            int px = x + offset + j;
-                            //int py = y+(bdfFontBbxHeight+base-fHeight)+k-glyphBbxY;
-                            int py = y + (base - fHeight) + k - glyphBbxY;
+                            //pixel location
+                            int px = bx + j;
+                            int py = by + k;
 
-
-                            src.setLocation(px, py);
-                            if (tx != null)
+                            if (tx != null) {
+                                src.setLocation(px, py);
                                 tx.transform(src, dst);
-                            else {
-                                dst.setLocation(src);
+                                px = (int) dst.getX();
+                                py = (int) dst.getY();
                             }
 
-                            px = (int) dst.getX();
-                            py = (int) dst.getY();
-
-                            //compute color
-                            int bg_color = surface.getRGBPixel(px, py);
-
-                            int bg_r = (bg_color & 0x00FF0000) >> 16;
-                            int bg_g = (bg_color & 0x0000FF00) >> 8;
-                            int bg_b = (bg_color & 0x000000FF);
-
-                            //todo improve this pixel composition
-
-                            float alpha = fPixel / f_max;
-
-                            int r = bg_r + ((int) ((fg_r - bg_r) * alpha)) & 0xFF;
-                            int g = bg_g + ((int) ((fg_g - bg_g) * alpha)) & 0xFF;
-                            int b = bg_b + ((int) ((fg_b - bg_b) * alpha)) & 0xFF;
-
-                            fPixel = (((r << 16) + (g << 8) + b) | 0xFF000000);
-
                             //clip
-                            //if(clip == null || clip.contains(dst)) {
+                            if(clip == null || clip.contains(px, py)) {
+                                //compute color
+                                int bg_color = surface.getRGBPixel(px, py);
 
-                            surface.setRGBPixel(px, py, fPixel);
+                                int bg_r = (bg_color & 0x00FF0000) >> 16;
+                                int bg_g = (bg_color & 0x0000FF00) >> 8;
+                                int bg_b = (bg_color & 0x000000FF);
 
-                            if (x_min > px) x_min = px;
-                            if (y_min > py) y_min = py;
-                            if (x_max < px) x_max = px;
-                            if (y_max < py) y_max = py;
+                                //todo improve this pixel composition
 
-                            //}
+                                float alpha = fPixel / f_max;
+
+                                int r = bg_r + ((int) ((fg_r - bg_r) * alpha)) & 0xFF;
+                                int g = bg_g + ((int) ((fg_g - bg_g) * alpha)) & 0xFF;
+                                int b = bg_b + ((int) ((fg_b - bg_b) * alpha)) & 0xFF;
+
+                                fPixel = (((r << 16) + (g << 8) + b) | 0xFF000000);
+
+                                surface.setRGBPixel(px, py, fPixel);
+
+                                if (x_min > px) x_min = px;
+                                if (y_min > py) y_min = py;
+                                if (x_max < px) x_max = px;
+                                if (y_max < py) y_max = py;
+                            }
                         }
                     }
                 }
-                offset += glyph.getDWidth().width - glyph.getBbx(b_rect).x;
+                offset += glyph.getDWidth().width;
             }
             if (x_min < Integer.MAX_VALUE && y_min < Integer.MAX_VALUE &&
                 x_max > Integer.MIN_VALUE && y_max > Integer.MIN_VALUE)
