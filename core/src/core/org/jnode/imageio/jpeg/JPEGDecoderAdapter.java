@@ -40,7 +40,7 @@ public class JPEGDecoderAdapter implements JPEGDecoder.PixelArray {
         return im;
     }
 
-    public void decode() throws JPEGException{
+    public void decode() throws JPEGException {
         if (im == null) {
             try {
                 dec.decode(is, this);
