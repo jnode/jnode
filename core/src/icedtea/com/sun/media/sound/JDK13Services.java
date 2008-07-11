@@ -38,6 +38,7 @@ exception statement from your version.
 package com.sun.media.sound;
 
 import java.util.List;
+import java.util.Collections;
 
 public class JDK13Services {
 
@@ -54,9 +55,8 @@ public class JDK13Services {
 	}
 
 	public static List getProviders(Class providerClass) {
-		throw new RuntimeException("Not implemented.");
-		// TODO Auto-generated method stub
-
+		// TODO implement it
+        return Collections.EMPTY_LIST;
 	}
 
 }
