@@ -30,6 +30,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -101,9 +102,6 @@ public final class Rubik extends JComponent {
                 Rubik.this.keyPressed(event.getKeyChar());
             }
         });
-        // Double buffer
-        offImage = createImage(120, 120);
-        offGraphics = offImage.getGraphics();
         rectX = new int[4];
         rectY = new int[4];
         // Projected co-ordinates (on screen)
@@ -475,8 +473,13 @@ public final class Rubik extends JComponent {
         }
     }
 
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         dragReg = 0;
+        if(offGraphics == null) {
+            // Double buffer
+            offImage = createImage(120, 120);
+            offGraphics = offImage.getGraphics();
+        }
         offGraphics.setColor(bgcolor); // Clear drawing buffer
         offGraphics.fillRect(0, 0, 120, 120);
         if (naturalState)
@@ -667,10 +670,12 @@ public final class Rubik extends JComponent {
     public static void main(String[] argv) {
         JFrame f = new JFrame("Rubik's Cube");
         Rubik rubik = new Rubik();
+        rubik.init();
+        rubik.setPreferredSize(new Dimension(120,120));
         f.add(rubik, BorderLayout.CENTER);
         rubik.requestFocus();
-        f.setSize(130, 160);
+        f.pack();
         f.setVisible(true);
-        rubik.init();
+
     }
 }
