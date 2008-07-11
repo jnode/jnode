@@ -80,7 +80,7 @@ public class RobotTest extends JPanel {
     }
 
     public static void main(String[] argv) throws AWTException {
-        final JFrame f = new JFrame();
+        final JFrame f = new JFrame("Robot Test");
         final JButton b = new JButton("Click me");
         final JTextField tf = new JTextField();
         final RobotTest t = new RobotTest();
