@@ -1,5 +1,5 @@
 /*
- * $
+ * $Id$
  */
 package org.jnode.imageio.jpeg;
 
@@ -26,12 +26,12 @@ public class JPEGDecoderAdapter implements JPEGDecoder.PixelArray {
         });
     }
 
-    public int getHeight() {
+    public int getHeight() throws JPEGException {
         decode();
         return im.getHeight();
     }
 
-    public int getWidth() {
+    public int getWidth() throws JPEGException {
         decode();
         return im.getWidth();
     }
@@ -40,12 +40,12 @@ public class JPEGDecoderAdapter implements JPEGDecoder.PixelArray {
         return im;
     }
 
-    public void decode() {
+    public void decode() throws JPEGException{
         if (im == null) {
             try {
                 dec.decode(is, this);
             } catch (Exception x) {
-                throw new RuntimeException(x);
+                throw new JPEGException(x.getMessage());
             }
         }
     }
