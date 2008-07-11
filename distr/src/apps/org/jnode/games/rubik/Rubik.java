@@ -475,7 +475,7 @@ public final class Rubik extends JComponent {
 
     public void paintComponent(Graphics g) {
         dragReg = 0;
-        if(offGraphics == null) {
+        if (offGraphics == null) {
             // Double buffer
             offImage = createImage(120, 120);
             offGraphics = offImage.getGraphics();
@@ -671,7 +671,7 @@ public final class Rubik extends JComponent {
         JFrame f = new JFrame("Rubik's Cube");
         Rubik rubik = new Rubik();
         rubik.init();
-        rubik.setPreferredSize(new Dimension(120,120));
+        rubik.setPreferredSize(new Dimension(120, 120));
         f.add(rubik, BorderLayout.CENTER);
         rubik.requestFocus();
         f.pack();
