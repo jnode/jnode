@@ -45,32 +45,32 @@ package org.jnode.font.bdf;
 public class BDFMetrics {
     private static final long serialVersionUID = -4874492191748367800L;
 
-    private BDFFontContainer font;
+    private final BDFFontContainer font;
+    private final BDFParser.Rectangle box;
 
     protected BDFMetrics(BDFFontContainer font) {
-
         this.font = font;
-
+        this.box = font.getBoundingBox();
     }
 
     public int getAscent() {
-        return font.getBoundingBox().height + getDescent();
+        return box.height - getDescent();
     }
 
     public int getDescent() {
-        return font.getBoundingBox().y;
+        return Math.abs(box.y);
     }
 
     public int getLeading() {
-        return font.getBoundingBox().x;
+        return Math.abs(box.x);
     }
 
     public int getMaxAdvance() {
-        return font.getBoundingBox().width;
+        return box.width;
     }
 
     public int getHeight() {
-        return font.getBoundingBox().height;
+        return box.height;
     }
 
     public int charWidth(char ch) {
@@ -83,21 +83,16 @@ public class BDFMetrics {
         return 0;
     }
 
-    public int[] charsWidths(char[] chars, final int start, final int end) {
-        int[] advances = new int[chars.length];
+    public int[] charsWidths(char[] chars, final int start, final int length) {
+        int[] advances = new int[length];
         int adv_idx = 0;
-        int last = (advances.length-1);
 
-        BDFParser.Rectangle b_rec = new BDFParser.Rectangle();
-        for(int i=start;i<start+end;i++) {
+        for(int i = start; i < start + length; i++) {
             BDFGlyph glyph = font.getGlyph(chars[i]);
             if(adv_idx==0) {
-                advances[adv_idx++] = glyph.getBbx(b_rec).x;
-            } else if(adv_idx!=last) {
-                advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width) - glyph.getBbx(b_rec).x;
+                advances[adv_idx++] = glyph.getDWidth().width;
             } else {
-                // FIXME: what's this 12 doing here?
-                advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width)+12;
+                advances[adv_idx++] = advances[adv_idx - 1] + glyph.getDWidth().width;
             }
         }
 
@@ -106,7 +101,6 @@ public class BDFMetrics {
 
     public int charsWidth(char[] chars, int start, int end) {
         int total = 0;
-
         int[] lengths = charsWidths(chars,start,end);
         for(int i=0;i<lengths.length;i++)
             total+=lengths[i];

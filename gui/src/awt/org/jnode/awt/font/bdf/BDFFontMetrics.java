@@ -39,7 +39,7 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.FontMetrics;
-import org.jnode.font.bdf.BDFFontContainer;
+import org.jnode.font.bdf.BDFMetrics;
 
 /**
  * Represents a FontMetrics for BDF fonts.
@@ -49,43 +49,42 @@ import org.jnode.font.bdf.BDFFontContainer;
  */
 public class BDFFontMetrics extends FontMetrics {
     private static final long serialVersionUID = -4874492191748367800L;
-
-    private BDFFontContainer container;
+    private final BDFMetrics metrics;
 
     protected BDFFontMetrics(BDFFont font) {
         super(font);
-        this.container = font.getContainer();
+        this.metrics = font.getContainer().getFontMetrics();
     }
 
     public int getHeight() {
-        return container.getFontMetrics().getHeight();
+        return metrics.getHeight();
     }
 
     public int getAscent() {
-        return container.getBoundingBox().height + getDescent();
+        return metrics.getAscent();
     }
 
     public int getDescent() {
-        return container.getBoundingBox().y;
+        return metrics.getDescent();
     }
 
     public int getLeading() {
-        return container.getBoundingBox().x;
+        return metrics.getLeading();
     }
 
     public int getMaxAdvance() {
-        return container.getBoundingBox().width;
+        return metrics.getMaxAdvance();
     }
 
     public int charWidth(char ch) {
-        return container.getFontMetrics().charWidth(ch);
+        return metrics.charWidth(ch);
     }
 
-    public int[] charsWidths(char[] chars, final int start, final int end) {
-        return container.getFontMetrics().charsWidths(chars, start, end);
+    public int[] charsWidths(char[] chars, final int start, final int len) {
+        return metrics.charsWidths(chars, start, len);
     }
 
-    public int charsWidth(char[] chars, int start, int end) {
-        return container.getFontMetrics().charsWidth(chars, start, end);
+    public int charsWidth(char[] chars, int start, int len) {
+        return metrics.charsWidth(chars, start, len);
     }
 }
