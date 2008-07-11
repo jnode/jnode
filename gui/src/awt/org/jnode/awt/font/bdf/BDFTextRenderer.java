@@ -125,7 +125,7 @@ public class BDFTextRenderer implements TextRenderer {
                             }
 
                             //clip
-                            if(clip == null || clip.contains(px, py)) {
+//                            if(clip == null || clip.contains(px, py)) {
                                 //compute color
                                 int bg_color = surface.getRGBPixel(px, py);
 
@@ -149,7 +149,7 @@ public class BDFTextRenderer implements TextRenderer {
                                 if (y_min > py) y_min = py;
                                 if (x_max < px) x_max = px;
                                 if (y_max < py) y_max = py;
-                            }
+//                            }
                         }
                     }
                 }
