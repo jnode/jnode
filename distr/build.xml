@@ -29,6 +29,7 @@
 <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
+    <mkdir dir="${my-build.dir}"/>
   	<jnode.copy-descriptors/>
   </target>
 
@@ -50,8 +51,12 @@
     </copy>
   </target>
 
-<!-- Assemble the jarfile -->
-  <target name="assemble" depends="compile"/>
+<!-- Assemble the jarfile(s) -->
+  <target name="assemble" depends="compile">
+  	<jar jarfile="${jnode-configure.jar}"
+  	    basedir="${my-classes.dir}"
+        includes="org/jnode/configure/**"/>
+  </target>
 
 <!-- Do it all -->
   <target name="all" depends="assemble"/>
