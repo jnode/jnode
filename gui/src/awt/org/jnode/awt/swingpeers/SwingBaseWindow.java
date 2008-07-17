@@ -26,7 +26,6 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.VMAwtAPI;
 import java.awt.Window;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -69,10 +68,8 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
      * @see javax.swing.JInternalFrame#reshape(int, int, int, int)
      */
     public void reshape(int x, int y, int width, int height) {
-        VMAwtAPI.setBoundsCallback(target, x, y, width, height);
-        VMAwtAPI.invalidateTree(target);
         super.reshape(x, y, width, height);
-        validate();
+        target.reshape(x, y, width, height);
     }
 
     /**
