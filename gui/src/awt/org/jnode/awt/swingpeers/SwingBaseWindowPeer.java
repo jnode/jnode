@@ -54,6 +54,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         jComponent.setSize(targetComponent.getSize());
         this.eventDispatcher = new WindowEventDispatcher();
         jComponent.addInternalFrameListener(eventDispatcher);
+        jComponent.validatePeerOnly();
     }
 
     /**
@@ -102,29 +103,17 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      */
     public final Insets getInsets() {
         final Container contentPane = peerComponent.getContentPane();
-        // if ((contentPane.getWidth() == 0) || (contentPane.getHeight() == 0))
-        // {
-        // peerComponent.doLayout();
-        // peerComponent.getRootPane().doLayout();
-        // }
-        final int cpWidth = contentPane.getWidth();
-        final int cpHeight = contentPane.getHeight();
-        final Insets insets;
-        if ((cpWidth > 0) && (cpHeight > 0)) {
-            insets = new Insets(0, 0, 0, 0);
-            Component c = contentPane;
-            while (c != peerComponent) {
-                insets.left += c.getX();
-                insets.top += c.getY();
-                c = c.getParent();
-            }
-            final int dw = peerComponent.getWidth() - contentPane.getWidth();
-            final int dh = peerComponent.getHeight() - contentPane.getHeight();
-            insets.right = dw - insets.left;
-            insets.bottom = dh - insets.top;
-        } else {
-            insets = peerComponent.getInsets();
+        final Insets insets = new Insets(0, 0, 0, 0);
+        Component c = contentPane;
+        while (c != peerComponent) {
+            insets.left += c.getX();
+            insets.top += c.getY();
+            c = c.getParent();
         }
+        final int dw = peerComponent.getWidth() - contentPane.getWidth();
+        final int dh = peerComponent.getHeight() - contentPane.getHeight();
+        insets.right = dw - insets.left;
+        insets.bottom = dh - insets.top;
         return insets;
     }
 

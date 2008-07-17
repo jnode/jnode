@@ -23,6 +23,8 @@ package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Choice;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.peer.ChoicePeer;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -41,7 +43,8 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
 
     public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
         super(toolkit, choice, new SwingChoice(choice));
-        final JComboBox combo = (JComboBox) peerComponent;
+        peerComponent.setPeer(this);
+        final JComboBox combo = peerComponent;
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         final int cnt = choice.getItemCount();
         for (int i = 0; i < cnt; i++) {
@@ -79,23 +82,52 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
     }
 
     public void select(int index) {
-        ((JComboBox) peerComponent).setSelectedIndex(index);
+        if (!peersSelection)
+            peerComponent.setSelectedIndex(index);
+    }
+
+    private boolean peersSelection = false;
+
+    void peerSelect(int index) {
+        try {
+            peersSelection = true;
+            targetComponent.select(index);
+        } finally {
+            peersSelection = false;
+        }
     }
 
 }
 
 final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
     private final Choice awtComponent;
+    private SwingChoicePeer peer;
 
     public SwingChoice(Choice awtComponent) {
         this.awtComponent = awtComponent;
     }
 
-    /**
-     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-     */
+    public void setPeer(SwingChoicePeer peer) {
+        this.peer = peer;
+    }
+
     public Choice getAWTComponent() {
         return awtComponent;
+    }
+
+    @Override
+    protected void fireActionEvent() {
+        super.fireActionEvent();
+        awtComponent.dispatchEvent(new ActionEvent(awtComponent, ActionEvent.ACTION_PERFORMED, getActionCommand()));
+    }
+
+    @Override
+    protected void fireItemStateChanged(ItemEvent e) {
+        super.fireItemStateChanged(e);
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            peer.peerSelect(getSelectedIndex());
+            awtComponent.dispatchEvent(SwingToolkit.convertEvent(e, awtComponent));
+        }
     }
 
     /**
@@ -107,18 +139,10 @@ final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
         awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
 
-    /**
-     * Process an event within this swingpeer
-     *
-     * @param event
-     */
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
 
-    /**
-     * @see org.jnode.awt.swingpeers.ISwingPeer#validatePeerOnly()
-     */
     public final void validatePeerOnly() {
         super.validate();
     }

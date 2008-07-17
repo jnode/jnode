@@ -24,7 +24,7 @@ package org.jnode.awt.swingpeers;
 import java.awt.AWTEvent;
 import java.awt.Button;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.peer.ButtonPeer;
 import javax.swing.JButton;
 
@@ -50,8 +50,7 @@ final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> impl
 }
 
 
-final class SwingButton extends JButton implements ISwingPeer<Button>,
-    ActionListener {
+final class SwingButton extends JButton implements ISwingPeer<Button> {
     private final Button awtComponent;
 
     /**
@@ -61,25 +60,18 @@ final class SwingButton extends JButton implements ISwingPeer<Button>,
      */
     public SwingButton(Button awtComponent) {
         this.awtComponent = awtComponent;
-        addActionListener(this);
     }
 
-    /**
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    public void actionPerformed(ActionEvent event) {
-        //awtComponent.dispatchEvent(new ActionEvent(awtComponent,
-        //          ActionEvent.ACTION_PERFORMED, awtComponent.getActionCommand()));
-        //todo use dispatchEvent when awt is migrated to openjdk 
-        ActionListener[] l = awtComponent.getActionListeners();
-        if (l.length == 0)
-            return;
+    @Override
+    protected void fireActionPerformed(ActionEvent event) {
+        super.fireActionPerformed(event);
+        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
+    }
 
-        ActionEvent ev = new ActionEvent(awtComponent, ActionEvent.ACTION_PERFORMED, (awtComponent).getActionCommand());
-        for (int i = 0; i < l.length; ++i)
-            l[i].actionPerformed(ev);
-
-
+    @Override
+    protected void fireItemStateChanged(ItemEvent event) {
+        super.fireItemStateChanged(event);
+        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
 
     /**

@@ -39,6 +39,7 @@ import java.awt.peer.WindowPeer;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
+import javax.swing.RootPaneContainer;
 
 /**
  * @author Levente S\u00e1ntha
@@ -152,7 +153,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
     @Override
     public void paint(Graphics g) {
         //super.paint(g);
-        if (target != null) {
+        if (target instanceof RootPaneContainer && isVisible()) {
             target.paint(g);
         }
     }
