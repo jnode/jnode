@@ -28,6 +28,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.util.Hashtable;
+import org.jnode.awt.GraphicsFactory;
 
 /**
  * @author epr
@@ -70,6 +71,6 @@ public class JNodeBufferedImage extends BufferedImage {
      */
     public Graphics2D createGraphics() {
         return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-            new JNodeBufferedImageGraphics2D(this) : new JNodeBufferedImageGraphics(this);
+            new JNodeBufferedImageGraphics2D(this) : GraphicsFactory.getInstance().createGraphics(this);
     }
 }

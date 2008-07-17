@@ -51,8 +51,8 @@ import java.awt.peer.ContainerPeer;
 import java.awt.peer.FramePeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.JNodeGraphics;
 import org.jnode.awt.JNodeGraphics2D;
+import org.jnode.awt.GraphicsFactory;
 import sun.awt.CausedFocusEvent;
 
 /**
@@ -319,7 +319,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      */
     public Graphics getGraphics() {
         return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-            new JNodeGraphics2D(this) : new JNodeGraphics(this);
+            new JNodeGraphics2D(this) : GraphicsFactory.getInstance().createGraphics(this);
     }
 
     /**
