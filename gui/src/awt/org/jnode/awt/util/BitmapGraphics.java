@@ -139,9 +139,15 @@ public abstract class BitmapGraphics {
      * @see org.jnode.driver.video.Surface#PAINT_MODE
      * @see org.jnode.driver.video.Surface#XOR_MODE
      */
-    public abstract void drawPixels(int x, int y, int count,
-                                    int color, int mode);
+    public abstract void drawPixels(int x, int y, int count, int color, int mode);
 
+    //todo investigate it
+    //though a potential performance improvement, this method is not used because it makes JNode unstable 
+    public void fillRect(int x, int y, int width, int height, int color, int mode) {
+        for (int i = 0; i < height; i++)
+            drawPixels(x, y + i, width, color, mode);
+
+    }
 
     /**
      * Create a new instance for 16 bits/pixel layout
