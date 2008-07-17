@@ -51,6 +51,7 @@ import org.jnode.configure.adapter.FileAdapter;
  */
 public class ScriptParser {
     public static final String SCRIPT = "configureScript";
+    public static final String BASE_DIR = "baseDir";
     public static final String INCLUDE = "include";
     public static final String TYPE = "type";
     public static final String CONTROL_PROPS = "controlProps";
@@ -81,7 +82,7 @@ public class ScriptParser {
     
     public static class ParseContext {
     	private final File file;
-    	private final File baseDir;
+    	private File baseDir;
     	private XMLElement element;
     	
 		public ParseContext(File file) {
@@ -105,6 +106,10 @@ public class ScriptParser {
 		public File getBaseDir() {
 			return baseDir;
 		}
+
+        public void setBaseDir(File baseDir) {
+            this.baseDir = baseDir;
+        }
     }
     
     private LinkedList<ParseContext> stack = new LinkedList<ParseContext>();
@@ -153,7 +158,12 @@ public class ScriptParser {
     private void parseScript(XMLElement root, ConfigureScript script) 
     	throws ConfigureException {
         if (!root.getName().equals(SCRIPT)) {
-            error("Root element of script file should be '" + SCRIPT + "'", root);
+            error("Root element of a script file should be '" + SCRIPT + "'", root);
+        }
+        String baseDirName = root.getAttribute(BASE_DIR, "");
+        if (baseDirName.length() > 0) {
+            File baseDir = new File(stack.getLast().getBaseDir(), baseDirName);
+            stack.getLast().setBaseDir(baseDir);
         }
         for (Enumeration<?> en = root.enumerateChildren(); en.hasMoreElements(); /**/ ) {
             XMLElement element = (XMLElement) en.nextElement();
