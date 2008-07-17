@@ -72,10 +72,17 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
 		this.saveSupported = saveSupported;
 	}
 	
+	/**
+	 * Return <code>true</code> if this adapter supports loading of properties.
+	 */
 	public boolean isLoadSupported() {
 		return loadSupported;
 	}
 
+	/**
+     * Return <code>true</code> if this adapter supports saving of properties.
+     * (If not, the file format requires the use of a template file.)
+     */
 	public boolean isSaveSupported() {
 		return saveSupported;
 	}
