@@ -1,0 +1,94 @@
+# This file contain custom JNode properties used in the JNode build process.
+#
+# Copy this file to jnode.properties and edit that file as needed.
+#
+
+# -----------------------------------------------
+# Settings for initjar building
+
+# Set this directory to the directory containing custom plugin lists 
+# if you have custom initjars to build.
+# custom.plugin-list.dir = ${root.dir}/local/plugin-lists/
+
+# In non-empty, no default initjars will be built.
+no.default.initjars=@no.default.initjars@
+
+# -----------------------------------------------
+# Settings for the bootdisk image
+
+# If non-empty, no bootdisk image will be built.
+no.bootdisk=@no.bootdisk@
+
+# -----------------------------------------------
+# Settings for the netboot build
+
+# If non-empty, no netboot directory will be built.
+no.netboot=@no.netboot@
+
+# -----------------------------------------------
+# Settings for the memory manager
+
+# Default memory manager: org.jnode.vm.memmgr.def
+# MMTk NoGC based memory manager (still very beta): org.jnode.vm.memmgr.mmtk.nogc
+# MMTk GenRC based memory manager (still very alpha):  org.jnode.vm.memmgr.mmtk.genrc
+jnode.memmgr.plugin.id=@jnode.memmgr.plugin.id@
+
+# -----------------------------------------------
+# Settings for the document-plugins task
+
+# Uncomment this if you want the document-plugins task to include a tree page.
+# You must have dot installed for this, see http://www.graphviz.org/
+# jnode.plugin.doc.tree = true
+
+# -----------------------------------------------
+# Settings for use of NT bootloader (NT/Me/XP)
+
+# Changes these values to match the disk/partition where windows is installed.
+# the value is of the form (hdx,y) where :
+# - x is the disk number (starting from 0)
+# - y is the partition number (starting from 0)
+partition-nt=(hd0,1)
+
+# Path to install jnode. The drive must be where is installed windows
+jnode.install-nt.dir=C:\jnode
+
+# -----------------------------------------------
+# Settings for the compiler
+
+# Uncomment this if you want use custom compiler arguments
+#compilerarg=-Xlint:unchecked
+
+# -----------------------------------------------
+# Set up the host and port where the JNode debugger server is available.
+# This is needed by the hotswap ant target.
+jnode.debugger.host=
+jnode.debugger.port=6789
+
+
+# -----------------------------------------------
+# Settings for the kernel
+# -----------------------------------------------
+
+# Should grub setup a vbe/vesa graphics mode for us ?
+# - define an empty value for NO
+# - define a value of the form <width>x<height>x<depth> for YES
+jnode.vbeMode=@jnode.vbeMode@
+
+# -----------------------------------------------
+# Settings for a VMware virtual machine
+# -----------------------------------------------
+
+# Uncomment and edit this line if you want to override the settings
+# in the 'jnode-x86-*.vmx' file.  For example, you may want to include
+# settings to configure a VMware virtual hard drive, or real hard drive.
+# Refer to the maintainers pages on the JNode website for details.
+# Notes:
+# - Settings in the override file should be in standard VMX syntax.
+# - The settings override the default settings, including (if you
+#   set them) the memSize and/or logFile parameters set in the
+#   ant build.xml files.
+# - Any non-absolute pathnames in the VMX settings are resolved relative
+#   to the VMX file's location!
+
+#vmware.vmx.overrides=<some-file-containing-vmx-settings>
+

@@ -1,0 +1,100 @@
+<configureScript>
+  <type name="integer.type" pattern="[0-9]+"/>
+  <type name="yesno.type">
+    <alt value="yes"/>
+    <alt value="no"/>
+  </type>
+  <type name="oneblank.type">
+    <alt value="1" token="yes"/>
+    <alt value="" token="no"/>
+  </type>
+  <type name="vdisk.type">
+    <alt value="none"/>
+    <alt value="ext2"/>
+    <alt value="jfat"/>
+  </type>
+  <type name="vplatform.type">
+    <alt value="none"/>
+    <alt value="vmware"/>
+  </type>
+  <type name="vbemode.type" emptyToken="disabled" pattern="([0-9]+x[0-9]+x[0-9]+)|"/>
+  <type name="memmgr.type">
+    <alt name="def" value="org.jnode.vm.memmgr.def"/>
+    <alt name="mmtk.nogc" value="org.jnode.vm.memmgr.mmtk.nogc"/>
+    <alt name="mmgt.genrc" value="org.jnode.vm.memmgr.mmtk.genrc"/>
+  </type>
+
+  <controlProps>
+    <property name="expert.mode" type="yesno.type"
+	      description="Configure expert settings"
+	      default="no"/>
+  </controlProps>
+
+  <propFile name="../../test.jnode.properties" defaultFile="jnode.properties.defaults"
+            templateFile="jnode.properties.template">
+    <property name="jnode.virtual.memsize" type="integer.type"
+	      description="Enter virtual hardware memory size in Mbytes"
+	      default="512"/>
+    <property name="jnode.virtual.disk" type="vdisk.type"
+	      description="Select a prebuilt virtual disk"
+	      default="none"/>
+    <property name="jnode.virtualization.platform" type="vplatform.type"
+	      description="Select the PC emulation/virtualization platform"
+	      default="vmware"/>
+    <property name="jnode.memmgr.plugin.id" type="memmgr.type"
+	      description="Select the memory manager"
+	      default="org.jnode.vm.memmgr.def"/>
+    <property name="jnode.vbeMode" type="vbemode.type"
+	      description="Enter the boot-time VBE/VESA mode"
+	      default=""/>
+    <property name="no.default.initjars" type="oneblank.type"
+          description="Disable building of default init JARs"
+          default=""/>
+    <property name="no.bootdisk" type="oneblank.type"
+          description="Disable building of a boot disk image"
+          default=""/>
+    <property name="no.netboot" type="oneblank.type"
+          description="Disable creation of a netboot directory"
+          default=""/>
+  </propFile>
+
+  <screen title="Main JNode Build Settings">
+    <item property="jnode.virtualization.platform">
+      The JNode build can generate configuration files for running on a
+      hardware emulation / virtualization platform.
+    </item>
+    <item property="expert.mode">
+      A number of JNode build settings are only of interest to experts.
+    </item>
+  </screen>
+  
+  <screen title="Virtualization Platform Settings"
+	  guardProp="jnode.virtualization.platform" valueIsNot="none">
+    <item property="jnode.virtual.memsize">
+      Specify the memory size for the virtual PC; at least 512 Mbytes 
+      is recommended.
+    </item>
+    <item property="jnode.virtual.disk">
+      Select a disk image to be mounted as a virtual hard drive.
+    </item>
+  </screen>
+
+  <screen title="Expert Mode Build Settings" 
+	  guardProp="expert.mode" valueIs="yes">
+    <item property="jnode.memmgr.plugin.id">
+      Select the memory manager / garbage collector: 'def' is the default
+      memory manager, 'mmtk.nogc' is a MMTk NoGC memory manager (beta), 
+      and 'mmtk.genrc' is a MMTk GenRC memory manager (alpha).
+    </item>
+    <item property="jnode.vbeMode">
+      Should grub setup a vbe/vesa graphics mode when booting JNode?
+        * 'disabled' disables vbe/vesa graphics mode
+        * a value of the form &lt;width&gt;x&lt;height&gt;x&lt;depth&gt;
+          (for example 1024x768x32) enables graphics mode.
+    </item>
+    <item property="no.default.initjars"/>
+    <item property="no.bootdisk"/>
+    <item property="no.netboot"/>
+  </screen>
+  
+</configureScript>
