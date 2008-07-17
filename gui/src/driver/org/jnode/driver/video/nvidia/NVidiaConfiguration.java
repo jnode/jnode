@@ -100,7 +100,7 @@ public class NVidiaConfiguration extends FrameBufferConfiguration {
      *      int, int)
      */
     public JNodeBufferedImage createCompatibleImage(int w, int h, int transparency) {
-        return new JNodeBufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        return new JNodeBufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
     }
 
     /** Gets the number of bits/pixel for this configuration */
