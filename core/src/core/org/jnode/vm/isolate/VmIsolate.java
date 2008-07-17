@@ -483,6 +483,7 @@ public final class VmIsolate {
     */
 
     public void invokeAndWait(final Runnable task) {
+        //TODO implement VmIsolate.invokeAndWait(Runnable)
         /*
         if(this == StaticData.rootIsolate){
             task.run();
