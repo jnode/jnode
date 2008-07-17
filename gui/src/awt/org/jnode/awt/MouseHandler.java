@@ -337,6 +337,9 @@ public class MouseHandler implements PointerListener {
         } else {
             event = new MouseEvent(source, id, time, modifiers, ex, ey,
                 clickCount, popupTrigger, button);
+            if (id == MouseEvent.MOUSE_PRESSED) {
+                ((JNodeToolkit) Toolkit.getDefaultToolkit()).activateWindow(source);
+            }
             //if(id==MouseEvent.MOUSE_PRESSED)
             //    System.out.println("MouseEvent.MOUSE_PRESSED");
             //System.out.println("postEvent:"+event);

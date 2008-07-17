@@ -965,6 +965,10 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         return super.getMouseNumberOfButtons();
     }
 
+    public void activateWindow(Component source) {
+
+    }
+
     /**
      * A helper class to return to clients in cases where a BufferedImage is
      * desired but its construction fails.

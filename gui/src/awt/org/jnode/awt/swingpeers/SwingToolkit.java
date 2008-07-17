@@ -36,6 +36,7 @@ import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Menu;
@@ -53,6 +54,7 @@ import java.awt.TextField;
 import java.awt.Window;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
+import java.awt.image.BufferedImage;
 import java.awt.peer.ButtonPeer;
 import java.awt.peer.CanvasPeer;
 import java.awt.peer.CheckboxMenuItemPeer;
@@ -75,8 +77,12 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
+import java.beans.PropertyVetoException;
+import java.util.WeakHashMap;
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -101,7 +107,7 @@ public final class SwingToolkit extends JNodeToolkit {
     /**
      * My repaint manager.  Only valid between onInitialize and onClose
      */
-    private SwingRepaintManager repaintManager;
+    private RepaintManager repaintManager;
 
     public static void add(Component component, JComponent peer) {
         final ISwingContainerPeer containerPeer = getContainerPeer(component);
@@ -389,6 +395,25 @@ public final class SwingToolkit extends JNodeToolkit {
         return comp;
     }
 
+    public void activateWindow(Component comp) {
+        if (comp == null) return;
+
+        Window w = SwingUtilities.getWindowAncestor(comp);
+        if (w == null) return;
+
+        WindowPeer p = (WindowPeer) w.getPeer();
+        if (p instanceof SwingBaseWindowPeer) {
+            JInternalFrame f = (JInternalFrame) ((SwingBaseWindowPeer) p).peerComponent;
+            if (f.isShowing() && !f.isSelected()) {
+                try {
+                    f.setSelected(true);
+                } catch (PropertyVetoException pve) {
+                    //ignore
+                }
+            }
+        }
+    }
+
     /**
      * @see org.jnode.awt.JNodeToolkit#onClose()
      */
@@ -396,7 +421,7 @@ public final class SwingToolkit extends JNodeToolkit {
         log.debug("onClose");
         // Stop the repaint manager
         if (repaintManager != null) {
-            repaintManager.shutdown();
+            //repaintManager.shutdown();
             repaintManager = null;
         }
 
@@ -423,37 +448,27 @@ public final class SwingToolkit extends JNodeToolkit {
         log.debug("onInitialize");
 
         // Set the repaint manager
-        /*
-        RepaintManager.setCurrentManager(repaintManager = new SwingRepaintManager(new JNodeAwtContext() {
 
-            public JComponent getAwtRoot() {
-                final JNodeAwtContext ctx = getAwtContext();
-                return (ctx == null) ? null : ctx.getAwtRoot();
-            }
+        RepaintManager.setCurrentManager(repaintManager = new RepaintManager() {
+            private WeakHashMap<Component, BufferedImage> bufferMap = new WeakHashMap<Component, BufferedImage>();
+            private final Component DEFA_KEY = new Component() {
+            };
 
-            public JDesktopPane getDesktop() {
-                final JNodeAwtContext ctx = getAwtContext();
-                return (ctx == null) ? null : ctx.getDesktop();
-            }
+            @Override
+            public Image getOffscreenBuffer(Component c, int proposedWidth, int proposedHeight) {
+                BufferedImage buffer = bufferMap.get(c);
+                if (buffer == null || buffer.getWidth() < proposedWidth || buffer.getHeight() < proposedHeight) {
+                    buffer = new BufferedImage(proposedWidth, proposedHeight, BufferedImage.TYPE_INT_ARGB);
+                    bufferMap.put(c, buffer);
+                }
 
-            public void adjustDesktopSize(int width, int height) {
-                final JNodeAwtContext ctx = getAwtContext();
-                if(ctx != null) ctx.adjustDesktopSize(width, height);
+                return buffer;
             }
+        });
 
-            public void setBackgroundImage(BufferedImage img) {
-                final JNodeAwtContext ctx = getAwtContext();
-                if(ctx != null) ctx.setBackgroundImage(img);
-            }
-
-            public Component getTopLevelRootComponent() {
-                final JNodeAwtContext ctx = getAwtContext();
-                return (ctx == null) ? null : ctx.getTopLevelRootComponent();
-            }
-        }));
-        */
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+            //UIManager.setLookAndFeel("com.digitprop.tonic.TonicLookAndFeel");
         } catch (Exception x) {
             log.warn("Look And Feel not found: ", x);
         }
