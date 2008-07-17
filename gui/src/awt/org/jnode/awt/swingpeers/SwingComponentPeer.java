@@ -40,6 +40,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
@@ -52,8 +53,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.JNodeGraphics;
 import org.jnode.awt.JNodeGraphics2D;
+import org.jnode.awt.GraphicsFactory;
 import sun.awt.CausedFocusEvent;
 
 /**
@@ -170,7 +171,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         final int width = peerComponent.getWidth();
         final int height = peerComponent.getHeight();
         Graphics g = SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-            new JNodeGraphics2D(this) : new JNodeGraphics(this);
+            new JNodeGraphics2D(this) : GraphicsFactory.getInstance().createGraphics(this);
         g.translate(x, y);
         g.clipRect(0, 0, width, height);
 
@@ -225,8 +226,12 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
             //Point p = component.getLocationOnScreen();
             //g.translate(p.x, p.y);
             if (event.getID() == PaintEvent.PAINT) {
+                if (!(targetComponent instanceof java.awt.Window))
+                    peerComponent.paint(g);
                 targetComponent.paint(g);
             } else {
+                if (!(targetComponent instanceof java.awt.Window))
+                    peerComponent.update(g);
                 targetComponent.update(g);
             }
             //g.translate(-p.x, -p.y);
@@ -242,12 +247,24 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         switch (id) {
             case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
-                //processPaintEvent((PaintEvent)event);
+                processPaintEvent((PaintEvent) event);
                 break;
             }
             default: {
                 if (event.getSource() == targetComponent) {
                     event.setSource(peerComponent);
+                }
+                if (event.getID() == MouseEvent.MOUSE_ENTERED) {
+                    Object source = event.getSource();
+                    if (source instanceof Component) {
+                        Component comp = (Component) source;
+                        Cursor cur = comp.getCursor();
+                        if (cur != null) {
+                            comp.setCursor(cur);
+                        } else {
+                            comp.setCursor(Cursor.getDefaultCursor());
+                        }
+                    }
                 }
                 ((ISwingPeer<awtT>) peerComponent).processAWTEvent(event);
                 break;
@@ -289,8 +306,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final void paint(Graphics g) {
-        //peerComponent.paint(g);
-        toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent.getBounds()));
+        if (!(targetComponent instanceof java.awt.Window)) {
+            peerComponent.paint(g);
+            targetComponent.paint(g);
+        } else
+            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent.getBounds()));
     }
 
     // Deprecated
@@ -474,7 +494,12 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     // Cursor
 
     public final void updateCursorImmediately() {
-        toolkit.updateCursor(peerComponent.getCursor());
+
+        Cursor cur = targetComponent.getCursor();
+//        org.jnode.vm.Unsafe.debug("JNodeToolkit.updateCursor()-2 " + cur +  " for " + targetComponent + "\n");
+//        org.jnode.vm.Unsafe.debugStackTrace(100);
+        peerComponent.setCursor(cur);
+        toolkit.updateCursor(cur);
     }
 
     /**

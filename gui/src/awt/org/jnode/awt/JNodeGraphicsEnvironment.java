@@ -35,7 +35,6 @@ import java.util.Locale;
 import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
-import org.jnode.awt.image.JNodeBufferedImageGraphics;
 import org.jnode.awt.image.JNodeBufferedImageGraphics2D;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
@@ -57,13 +56,13 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
     private GraphicsDevice defaultDevice;
 
     /**
-     * @param image
+     * @param image the target image
      * @return The graphics
      * @see java.awt.GraphicsEnvironment#createGraphics(java.awt.image.BufferedImage)
      */
     public Graphics2D createGraphics(BufferedImage image) {
         return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
-            new JNodeBufferedImageGraphics2D(image) : new JNodeBufferedImageGraphics(image);
+            new JNodeBufferedImageGraphics2D(image) : GraphicsFactory.getInstance().createGraphics(image);
 
         /*
         ..future transition to SunGraphics2D based buffered image graphics

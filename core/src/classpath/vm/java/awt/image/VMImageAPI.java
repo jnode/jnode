@@ -23,6 +23,7 @@ package java.awt.image;
 
 import java.awt.Graphics2D;
 
+//todo: is it useful?
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
