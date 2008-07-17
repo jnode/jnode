@@ -37,7 +37,7 @@ import org.jnode.driver.video.util.AbstractSurface;
  */
 public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
 
-    private JNodeGenericPeer component;
+    private JNodeGenericPeer<?, ?> component;
     private JNodeToolkit toolkit;
 
     /**
@@ -70,12 +70,13 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      * @return The configuration
      * @see java.awt.Graphics2D#getDeviceConfiguration()
      */
+    @Override
     public GraphicsConfiguration getDeviceConfiguration() {
-        // TODO Auto-generated method stub
-        return null;
+        return toolkit.getGraphicsConfiguration();
     }
 
-    public final Object clone() {
+    @Override
+    public final JNodeGraphics2D clone() {
         JNodeGraphics2D copy = (JNodeGraphics2D) super.clone();
 
         copy.component = component;
@@ -91,6 +92,7 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      *
      * @return the color model of this Graphics object
      */
+    @Override
     protected ColorModel getColorModel() {
         return toolkit.getColorModel();
     }
@@ -102,6 +104,7 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      *         FIXME: needed or remove??
      * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
      */
+    @Override
     public FontMetrics getFontMetrics(Font font) {
         return toolkit.getFontMetrics(font);
     }
@@ -114,6 +117,7 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      *
      * @return the destination raster
      */
+    @Override
     protected final WritableRaster getDestinationRaster() {
         if (image == null)
             image = new BufferedImage(((Component) component.getTargetComponent()).getWidth(),
@@ -137,9 +141,9 @@ public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {
      * @param w      the width of the updated region
      * @param h      the height of the updated region
      */
+    @Override
     protected void updateRaster(Raster raster, int x, int y, int w, int h) {
         //rawDrawImage(image, 0, 0, null);
-        System.err.println("JNodeGraphics#updateRaster(...)");
         rawUpdateRaster(raster, x, y, w, h);
     }
 }
