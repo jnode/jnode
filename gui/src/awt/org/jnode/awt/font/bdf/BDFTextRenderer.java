@@ -124,31 +124,31 @@ public class BDFTextRenderer implements TextRenderer {
                             }
 
                             //clip
-//                            if(clip == null || clip.contains(px, py)) {
-                            //compute color
-                            int bg_color = surface.getRGBPixel(px, py);
+                            if (clip == null || clip.contains(px, py)) {
+                                //compute color
+                                int bg_color = surface.getRGBPixel(px, py);
 
-                            int bg_r = (bg_color & 0x00FF0000) >> 16;
-                            int bg_g = (bg_color & 0x0000FF00) >> 8;
-                            int bg_b = (bg_color & 0x000000FF);
+                                int bg_r = (bg_color & 0x00FF0000) >> 16;
+                                int bg_g = (bg_color & 0x0000FF00) >> 8;
+                                int bg_b = (bg_color & 0x000000FF);
 
-                            //todo improve this pixel composition
+                                //todo improve this pixel composition
 
-                            float alpha = fPixel / f_max;
+                                float alpha = fPixel / f_max;
 
-                            int r = bg_r + ((int) ((fg_r - bg_r) * alpha)) & 0xFF;
-                            int g = bg_g + ((int) ((fg_g - bg_g) * alpha)) & 0xFF;
-                            int b = bg_b + ((int) ((fg_b - bg_b) * alpha)) & 0xFF;
+                                int r = bg_r + ((int) ((fg_r - bg_r) * alpha)) & 0xFF;
+                                int g = bg_g + ((int) ((fg_g - bg_g) * alpha)) & 0xFF;
+                                int b = bg_b + ((int) ((fg_b - bg_b) * alpha)) & 0xFF;
 
-                            fPixel = (((r << 16) + (g << 8) + b) | 0xFF000000);
+                                fPixel = (((r << 16) + (g << 8) + b) | 0xFF000000);
 
-                            surface.setRGBPixel(px, py, fPixel);
+                                surface.setRGBPixel(px, py, fPixel);
 
-                            if (x_min > px) x_min = px;
-                            if (y_min > py) y_min = py;
-                            if (x_max < px) x_max = px;
-                            if (y_max < py) y_max = py;
-//                            }
+                                if (x_min > px) x_min = px;
+                                if (y_min > py) y_min = py;
+                                if (x_max < px) x_max = px;
+                                if (y_max < py) y_max = py;
+                            }
                         }
                     }
                 }
