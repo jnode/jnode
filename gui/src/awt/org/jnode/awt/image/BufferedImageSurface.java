@@ -67,7 +67,7 @@ public class BufferedImageSurface extends AbstractSurface {
      * @param color
      * @param mode
      */
-    protected void drawPixel(int x, int y, int color, int mode) {
+    public void drawPixel(int x, int y, int color, int mode) {
         if (bitmapGraphics != null) {
             bitmapGraphics.drawPixels(x, y, 1, color, mode);
         } else {
@@ -132,6 +132,22 @@ public class BufferedImageSurface extends AbstractSurface {
     }
 
     /**
+     * Fill a rectangle with the given color.
+     *
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @param color
+     * @param mode
+     */
+    @Override
+    public void fillRect(int x, int y, int w, int h, int color, int mode) {
+        super.fillRect(x, y, w, h, color, mode);
+        //bitmapGraphics.fillRect(x, y, w, h, color, mode);
+    }
+
+    /**
      * @return the color model
      * @see org.jnode.driver.video.Surface#getColorModel()
      */
@@ -141,7 +157,7 @@ public class BufferedImageSurface extends AbstractSurface {
 
     /**
      * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, java.awt.geom.AffineTransform,
-     * int, int, int, int, int, int, java.awt.Color)
+     *      int, int, int, int, int, int, java.awt.Color)
      */
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY,
                                 int dstX, int dstY, int width, int height, Color color) {
@@ -153,8 +169,13 @@ public class BufferedImageSurface extends AbstractSurface {
     }
 
     @Override
-    public int getRGBPixel(int x, int y) {
-        return bitmapGraphics.doGetPixel(x, y);
+    public int getRGBPixel(final int x, final int y) {
+        if (0 <= x && x < bitmapGraphics.getWidth() && 0 <= y && y < bitmapGraphics.getHeight()) {
+            return bitmapGraphics.doGetPixel(x, y);
+        } else {
+            //todo investigate this case
+            return 0;
+        }
     }
 
     @Override

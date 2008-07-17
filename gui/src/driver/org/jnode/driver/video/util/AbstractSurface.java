@@ -147,7 +147,7 @@ public abstract class AbstractSurface implements Surface {
      */
     public void fillRect(int x, int y, int w, int h, int color, int mode) {
         for (int row = 0; row < h; row++) {
-            drawLine(x, y + row, x + w, y + row, color, mode);
+            drawLine(x, y + row, x + w - 1, y + row, color, mode);
         }
     }
 
@@ -159,7 +159,7 @@ public abstract class AbstractSurface implements Surface {
      * @param color
      * @param mode
      */
-    protected abstract void drawPixel(int x, int y, int color, int mode);
+    public abstract void drawPixel(int x, int y, int color, int mode);
 
     /**
      * Draw a line between (x1,y1) and (x2,y2)
@@ -195,7 +195,7 @@ public abstract class AbstractSurface implements Surface {
         drawPixel(x1, y1, color, mode);
         if (sizex >= sizey) {
             int y = sizex >> 1;
-            final int loops = sizex - 1;
+            final int loops = sizex;
             for (int i = 0; i < loops; i++) {
                 y += sizey;
                 if (y >= sizex) {
@@ -207,7 +207,7 @@ public abstract class AbstractSurface implements Surface {
             }
         } else {
             int x = sizey >> 1;
-            final int loops = sizey - 1;
+            final int loops = sizey;
             for (int i = 0; i < loops; i++) {
                 x += sizex;
                 if (x >= sizey) {

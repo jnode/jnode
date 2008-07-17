@@ -73,7 +73,7 @@ final class Mach64Surface extends AbstractSurface {
         return color.getRGB();
     }
 
-    protected void drawPixel(int x, int y, int color, int mode) {
+    public void drawPixel(int x, int y, int color, int mode) {
         bitmapGraphics.drawPixels(x, y, 1, color, mode);
     }
 

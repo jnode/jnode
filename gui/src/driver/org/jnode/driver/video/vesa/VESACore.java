@@ -392,7 +392,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
      * @param y
      * @param color
      */
-    protected final void drawPixel(int x, int y, int color, int mode) {
+    public final void drawPixel(int x, int y, int color, int mode) {
         bitmapGraphics.drawPixels(x, y, 1, color, mode);
     }
 

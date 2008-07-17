@@ -112,7 +112,7 @@ public class RadeonSurface extends AbstractSurface {
      * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int,
      *      int)
      */
-    protected void drawPixel(int x, int y, int color, int mode) {
+    public void drawPixel(int x, int y, int color, int mode) {
         bitmapGraphics.drawPixels(x, y, 1, color, mode);
     }
 
