@@ -62,8 +62,35 @@ public abstract class AbstractBitmapGraphics extends BitmapGraphics {
      * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int,
      *      int)
      */
-    public final void copyArea(int srcX, int srcY, int w, int h, int dstX,
-                               int dstY) {
+    public final void copyArea(final int srcX, final int srcY, final int w, final int h,
+                               final int deltaX, final int deltaY) {
+        if (w < 1 || h < 1)
+            return;
+
+        final int dstX = srcX + deltaX;
+        final int dstY = srcY + deltaY;
+
+        final int bytesForWidth = getBytesForWidth(w);
+
+        if (deltaY < 0) {
+            int srcOfs = getOffset(srcX, srcY);
+            int dstOfs = getOffset(dstX, dstY);
+            for (int row = 0; row < h; row++) {
+                mem.copy(srcOfs, dstOfs, bytesForWidth);
+                srcOfs += bytesPerLine;
+                dstOfs += bytesPerLine;
+            }
+        } else {
+            int srcOfs = getOffset(srcX, srcY + h - 1);
+            int dstOfs = getOffset(dstX, dstY + h - 1);
+            for (int row = 0; row < h; row++) {
+                mem.copy(srcOfs, dstOfs, bytesForWidth);
+                srcOfs -= bytesPerLine;
+                dstOfs -= bytesPerLine;
+            }
+        }
+
+        /*
         if ((dstY < this.height) && (dstX < this.width)) {
             if (dstX < 0) {
                 srcX -= dstX;
@@ -81,7 +108,7 @@ public abstract class AbstractBitmapGraphics extends BitmapGraphics {
                 doCopyArea(srcX, srcY, w, h, dstX, dstY);
             }
         }
-        // TODO Auto-generated method stub
+        */
 
     }
 
@@ -236,6 +263,19 @@ public abstract class AbstractBitmapGraphics extends BitmapGraphics {
         } catch (IndexOutOfBoundsException ex) {
             log.error("Index out of bounds: x=" + x + ", y=" + y + ", width=" +
                 width + ", height=" + height);
+        }
+    }
+
+    @Override
+    public void fillRect(int x, int y, int width, int height, int color, int mode) {
+        if ((x >= 0) && (x < this.width) && (y >= 0) && (y < this.height) &&
+            (x + width >= 0) && (x + width < this.width) && (y + height >= 0) && (y + height < this.height)) {
+
+            for (int i = 0; i < height; i++)
+                doDrawPixels(x, y + i, width, color, mode);
+
+        } else {
+            // super.fillRect(x, y, width, height, color, mode);
         }
     }
 

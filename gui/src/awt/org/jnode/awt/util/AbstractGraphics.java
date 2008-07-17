@@ -402,6 +402,7 @@ public abstract class AbstractGraphics extends Graphics2D {
     public void transform(AffineTransform tx) {
         transform.concatenate(tx);
         // Adjust clip
+        /*
         Rectangle2D r = clip.getBounds2D();
         double[] coords = new double[]{r.getX(), r.getY(),
             r.getX() + r.getWidth(), r.getY() + r.getHeight()};
@@ -412,6 +413,7 @@ public abstract class AbstractGraphics extends Graphics2D {
         } catch (java.awt.geom.NoninvertibleTransformException e) {
             e.printStackTrace();
         }
+        */
     }
 
     /**
@@ -420,7 +422,9 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @see java.awt.Graphics2D#translate(double, double)
      */
     public void translate(double tx, double ty) {
-        transform(AffineTransform.getTranslateInstance(tx, ty));
+        //transform(AffineTransform.getTranslateInstance(tx, ty));
+        //transform.translate(tx,ty);
+        translate((int) tx, (int) ty);
     }
 
     /**
@@ -429,7 +433,16 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @see java.awt.Graphics#translate(int, int)
      */
     public void translate(int x, int y) {
-        transform(AffineTransform.getTranslateInstance(x, y));
+        transform.translate(x, y);
+        //adjust clip
+        if (clip != null) {
+            if (clip instanceof Rectangle) {
+                Rectangle r = (Rectangle) clip;
+                r.translate(x, y);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
     }
 
     /**
@@ -454,7 +467,17 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @see java.awt.Graphics#clipRect(int, int, int, int)
      */
     public void clipRect(int x, int y, int width, int height) {
-        clip(new Rectangle(x, y, width, height));
+        Rectangle r = new Rectangle(x, y, width, height);
+        if (transform != null)
+            r.translate((int) transform.getTranslateX(), (int) transform.getTranslateY());
+
+        if (clip == null)
+            clip = r;
+        else if (clip instanceof Rectangle) {
+            clip = ((Rectangle) clip).intersection(r);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -791,6 +814,9 @@ public abstract class AbstractGraphics extends Graphics2D {
      * @see java.awt.Graphics#setClip(int, int, int, int)
      */
     public void setClip(int x, int y, int width, int height) {
+        Rectangle r = new Rectangle(x, y, width, height);
+        if (transform != null)
+            r.translate((int) transform.getTranslateX(), (int) transform.getTranslateY());
         clip = new Rectangle(x, y, width, height);
     }
 

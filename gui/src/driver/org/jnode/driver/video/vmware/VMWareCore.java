@@ -314,7 +314,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      */
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         bitmapGraphics.copyArea(x, y, width, height, dx, dy);
-        updateScreen(dx, dy, width, height);
+        updateScreen(x + dx, y + dy, width, height);
     }
 
     /**
@@ -371,6 +371,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      * @param mode
      */
     public final void fillRect(int x, int y, int width, int height, int color, int mode) {
+        //bitmapGraphics.fillRect(x, y, width, height, color, mode);
         super.fillRect(x, y, width, height, color, mode);
         // todo optimize it
         /*
@@ -411,7 +412,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
      * @param y
      * @param color
      */
-    protected final void drawPixel(int x, int y, int color, int mode) {
+    public final void drawPixel(int x, int y, int color, int mode) {
         bitmapGraphics.drawPixels(x, y, 1, color, mode);
         /*
          * if ((x >= 0) && (x < width) && (y > = 0) && (y < height)) { y; final

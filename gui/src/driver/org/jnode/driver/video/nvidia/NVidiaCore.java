@@ -259,7 +259,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
      * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int,
      *      int)
      */
-    protected final void drawPixel(int x, int y, int color, int mode) {
+    public final void drawPixel(int x, int y, int color, int mode) {
         bitmapGraphics.drawPixels(x, y, 1, color, mode);
     }
 
