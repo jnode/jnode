@@ -1,0 +1,26 @@
+
+# custom.plugin-list.dir = ${root.dir}/local/plugin-lists/
+
+no.default.initjars=
+
+no.bootdisk=
+
+no.netboot=
+
+jnode.memmgr.plugin.id=org.jnode.vm.memmgr.def
+
+# jnode.plugin.doc.tree = true
+
+partition-nt=(hd0,1)
+
+jnode.install-nt.dir=C:\jnode
+
+#compilerarg=-Xlint:unchecked
+
+jnode.debugger.host=
+jnode.debugger.port=6789
+
+jnode.vbeMode=
+
+#vmware.vmx.overrides=<some-file-containing-vmx-settings>
+
