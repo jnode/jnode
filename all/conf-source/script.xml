@@ -17,7 +17,6 @@
     <alt value="none"/>
     <alt value="vmware"/>
   </type>
-  <type name="vbemode.type" emptyToken="disabled" pattern="([0-9]+x[0-9]+x[0-9]+)|"/>
   <type name="memmgr.type">
     <alt name="def" value="org.jnode.vm.memmgr.def"/>
     <alt name="mmtk.nogc" value="org.jnode.vm.memmgr.mmtk.nogc"/>
@@ -44,9 +43,6 @@
     <property name="jnode.memmgr.plugin.id" type="memmgr.type"
 	      description="Select the memory manager"
 	      default="org.jnode.vm.memmgr.def"/>
-    <property name="jnode.vbeMode" type="vbemode.type"
-	      description="Enter the boot-time VBE/VESA mode"
-	      default=""/>
     <property name="no.default.initjars" type="oneblank.type"
           description="Disable building of default init JARs"
           default=""/>
@@ -85,12 +81,6 @@
       Select the memory manager / garbage collector: 'def' is the default
       memory manager, 'mmtk.nogc' is a MMTk NoGC memory manager (beta), 
       and 'mmtk.genrc' is a MMTk GenRC memory manager (alpha).
-    </item>
-    <item property="jnode.vbeMode">
-      Should grub setup a vbe/vesa graphics mode when booting JNode?
-        * 'disabled' disables vbe/vesa graphics mode
-        * a value of the form &lt;width&gt;x&lt;height&gt;x&lt;depth&gt;
-          (for example 1024x768x32) enables graphics mode.
     </item>
     <item property="no.default.initjars"/>
     <item property="no.bootdisk"/>
