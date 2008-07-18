@@ -20,7 +20,5 @@ jnode.install-nt.dir=C:\jnode
 jnode.debugger.host=
 jnode.debugger.port=6789
 
-jnode.vbeMode=
-
 #vmware.vmx.overrides=<some-file-containing-vmx-settings>
 

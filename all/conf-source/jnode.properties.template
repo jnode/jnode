@@ -69,10 +69,6 @@ jnode.debugger.port=6789
 # Settings for the kernel
 # -----------------------------------------------
 
-# Should grub setup a vbe/vesa graphics mode for us ?
-# - define an empty value for NO
-# - define a value of the form <width>x<height>x<depth> for YES
-jnode.vbeMode=@jnode.vbeMode@
 
 # -----------------------------------------------
 # Settings for a VMware virtual machine
