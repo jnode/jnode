@@ -95,7 +95,7 @@ multiboot_mmap_copy:
 	jb multiboot_mmap_copy
 multiboot_mmap_done:
 
-%ifdef SETUP_VBE
+; setup the vbe infos
 	; Are vbe informations available ? 
 	test dword [multiboot_info+MBI_FLAGS],MBF_VBE
 	jz vbe_info_done ; no vbe info, jump to end
@@ -125,7 +125,7 @@ multiboot_mmap_done:
 	mov ecx,VBEMODEINFO_SIZE
 	rep movsb	
 vbe_info_done:
-%endif
+
 
 	; Initialize initial jarfile
 	mov esi,[multiboot_info+MBI_MODSCOUNT]
@@ -314,7 +314,7 @@ multiboot_mmap:
 	dd 0				; Entries
 	times (MBI_MMAP_MAX * MBMMAP_ESIZE) db 0
 
-%ifdef SETUP_VBE
+; vbe informations
 multiboot_vbe:
 	times (VBE_ESIZE) db 0
 	
@@ -323,4 +323,3 @@ vbe_control_info:
 
 vbe_mode_info:	
 	times (VBEMODEINFO_SIZE) db 0
-%endif
