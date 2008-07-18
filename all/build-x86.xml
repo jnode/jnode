@@ -21,7 +21,6 @@
 	<property name="grub.stage2.name" value="stage2" />
 	<property name="grub.menu" value="${my-conf.dir}/menu.lst" />
 	<property name="grub.menu.cdrom" value="${my-conf.dir}/menu-cdrom.lst" />
-	<property name="jnode.vbeMode" value=""/> <!-- define a default value in case none is given in jnode.properties -->
 
   <!-- Properties for building the boot files for windows NT/2K/XP -->
   <property name="jnode.install-nt.dir" value="C:\jnode" />
@@ -151,7 +150,6 @@
 			bits="${jnode.bits}" 
 			listfile="${build.native.dir}/jnodenative.lst"
 			enablejnasm="${jnode.enable.jnasm}"
-			vbeMode="${jnode.vbeMode}"
 			version="${jnode-ver} ${TODAY}">
 				<includedir dir="${src.native.dir}/x86" />
 				<includedir dir="${build.native.dir}/src" />
@@ -176,7 +174,6 @@
 			version="${jnode-ver}" 
 			jnodeCompiler="${jnode.compiler}" 
 			bits="${jnode.bits}"
-			vbeMode="${jnode.vbeMode}"
 			enableJNasm="${jnode.enable.jnasm}">
 
 			<nanokernelsources srcfile="${src.native.dir}/x86/jnode.asm">
