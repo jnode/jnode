@@ -1,6 +1,12 @@
 #!/bin/sh
-cmd=`type -p $0`
-dir=`dirname $cmd`
-cp=$dir/all/build/descriptors/jnode-configure.jar:$dir/distr/lib/nanoxml-2.2.3.jar
+CMD=`type -p $0`
+DIR=`dirname $CMD`
 
-java -cp $cp org.jnode.configure.Configure "$@"
+# Belt and braces classpath to get the most recent version
+# of the 'configure' classes that we can find.
+CP=$DIR/distr/build/classes:\
+$DIR/all/build/descriptors/jnode-configure.jar:\
+$DIR/distr/lib/jnode-configure-dist.jar:\
+$DIR/distr/lib/nanoxml-2.2.3.jar
+
+java -cp $CP org.jnode.configure.Configure "$@"
