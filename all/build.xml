@@ -21,6 +21,7 @@
     <property name="backup.dir" value="${build.dir}/backup"/>
 
     <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
+    <property name="jnode-configure.jar" value="${build.dir}/descriptors/jnode-configure.jar"/>
     <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
     <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
     <property name="jnode-fs.jar" value="${root.dir}/fs/build/classes"/>
@@ -887,7 +888,8 @@ clean             Remove all intermediate build results.
             <fileset dir="../distr/src/apps" includes="**/*.java"/>
             <fileset dir="../distr/src/emu" includes="**/*.java"/>
             <fileset dir="../distr/src/install" includes="**/*.java"/>
-        	<fileset dir="../distr/src/test" includes="**/*.java"/>
+            <fileset dir="../distr/src/configure" includes="**/*.java"/>
+            <fileset dir="../distr/src/test" includes="**/*.java"/>
             <fileset dir="../fs/src/fs" includes="**/*.java"/>
             <fileset dir="../fs/src/driver" includes="**/*.java"/>
             <fileset dir="../fs/src/test" includes="**/*.java"/>
