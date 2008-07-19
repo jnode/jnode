@@ -25,13 +25,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-
 /**
  * The main class for the JNode configuration tool (command line version).
  * <p>
- * The command currently does not use the JNode Command / Syntax APIs.  This
- * should be addressed when we have a compatibility library.  A version with
- * a GUI-based interface would be a good idea too.
+ * The command currently does not use the JNode Command / Syntax APIs. This
+ * should be addressed when we have a compatibility library. A version with a
+ * GUI-based interface would be a good idea too.
  * 
  * @author crawley@jnode.org
  */
@@ -39,22 +38,22 @@ public class Configure {
     public static final int DISPLAY_NORMAL = 0;
     public static final int DISPLAY_HIGHLIGHT = 1;
     public static final int DISPLAY_PROMPT = 2;
-    
+
     public static final String NEW_LINE = System.getProperty("line.separator");
     public static final int TAB_WIDTH = 8;
-    
+
     private final BufferedReader in;
     private final PrintStream out;
     private final PrintStream err;
     private String scriptFile;
     private boolean debug;
-    
+
     private Configure() {
         this.in = new BufferedReader(new InputStreamReader(System.in));
         this.out = System.out;
         this.err = System.err;
     }
-    
+
     private void run(String[] args) {
         try {
             parseArguments(args);
@@ -75,7 +74,7 @@ public class Configure {
             System.exit(1);
         }
     }
-    
+
     /**
      * Parse the command line.
      * 
@@ -102,7 +101,7 @@ public class Configure {
             throw new ConfigureException("Unexpected command argument: " + scriptFile);
         }
     }
-    
+
     public String input(String prompt) throws ConfigureException {
         output(prompt, DISPLAY_PROMPT);
         try {
@@ -123,7 +122,7 @@ public class Configure {
     public void error(String message) {
         format(err, message, DISPLAY_NORMAL);
     }
-    
+
     private void format(PrintStream stream, String text, int displayAttributes) {
         switch (displayAttributes) {
             case DISPLAY_PROMPT:
@@ -174,5 +173,5 @@ public class Configure {
     public static void main(String[] args) {
         new Configure().run(args);
     }
-    
+
 }

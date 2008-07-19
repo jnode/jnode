@@ -30,20 +30,20 @@ import org.jnode.configure.PropertySet.Value;
  * @author crawley@jnode.org
  */
 public class EnumeratedType extends PropertyType {
-    
+
     public static class Alternate {
         public final String token;
         public final String value;
-        
+
         public Alternate(String token, String value) {
             super();
             this.token = token;
             this.value = value;
         }
     }
-    
+
     private final List<Alternate> alternates;
-    
+
     public EnumeratedType(String typeName, List<Alternate> alternates) {
         super(typeName);
         this.alternates = alternates;

@@ -41,8 +41,7 @@ public final class FileAdapterFactory {
                 Class<?> clazz = Class.forName(fileFormat);
                 return (FileAdapter) clazz.newInstance();
             } catch (Exception ex) {
-                throw new ConfigureException(
-                        "Problem instantiating FileAdapter class '" + 
+                throw new ConfigureException("Problem instantiating FileAdapter class '" +
                         fileFormat + "': " + ex.getMessage(), ex);
             }
         }

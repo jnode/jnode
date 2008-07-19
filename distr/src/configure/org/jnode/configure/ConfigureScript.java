@@ -31,35 +31,35 @@ import java.util.Map;
 import org.jnode.configure.PropertySet.Property;
 
 /**
- * This class provides the in-memory representation corresponding to an 
- * XML configure script.  The 'execute' method runs the script.
+ * This class provides the in-memory representation corresponding to an XML
+ * configure script. The 'execute' method runs the script.
  * 
  * @author crawley@jnode.org
  */
 public class ConfigureScript {
-	private final File baseDir;
-	private final File scriptFile;
+    private final File baseDir;
+    private final File scriptFile;
     private final ArrayList<PropertySet> propsFiles = new ArrayList<PropertySet>();
     private PropertySet controlProps;
     private final ArrayList<Screen> screens = new ArrayList<Screen>();
     private final HashMap<String, PropertyType> types = new HashMap<String, PropertyType>();
     private final HashMap<String, Property> allProperties = new HashMap<String, Property>();
-    
+
     public ConfigureScript(File scriptFile) {
         super();
         this.scriptFile = scriptFile;
         this.baseDir = scriptFile.getAbsoluteFile().getParentFile();
     }
-    
-	public File getBaseDir() {
-		return baseDir;
-	}
 
-	public File getScriptFile() {
-		return scriptFile;
-	}
-	
-	public PropertySet getControlProps() {
+    public File getBaseDir() {
+        return baseDir;
+    }
+
+    public File getScriptFile() {
+        return scriptFile;
+    }
+
+    public PropertySet getControlProps() {
         return controlProps;
     }
 
@@ -70,11 +70,11 @@ public class ConfigureScript {
     public List<PropertySet> getPropsFiles() {
         return propsFiles;
     }
-    
+
     public void addPropsFile(PropertySet propsFile) {
         propsFiles.add(propsFile);
     }
-    
+
     public void addScreen(Screen screen) {
         screens.add(screen);
     }
@@ -82,7 +82,7 @@ public class ConfigureScript {
     public Map<String, PropertyType> getTypes() {
         return types;
     }
-    
+
     public void addType(PropertyType type) {
         types.put(type.getTypeName(), type);
     }
@@ -94,24 +94,25 @@ public class ConfigureScript {
      * @return a property or <code>null</code>
      */
     public Property getProperty(String propName) {
-       return allProperties.get(propName);
+        return allProperties.get(propName);
     }
 
     /**
      * Add a property to the script's property namespace
+     * 
      * @param prop the property to be added.
      */
     public void addProperty(Property prop) {
-       allProperties.put(prop.getName(), prop);
+        allProperties.put(prop.getName(), prop);
     }
 
     /**
-     * Execute this script using the supplied IConfigure to interact
-     * with the user.  We create a work list of screens, then repeatedly scan 
-     * the list looking for the first screen that is ready to be executed.
-     * When a screen is found, we remove it from the work list and execute
-     * it.  The process stops when the work list is empty, or none of the
-     * remaining screens are executable. 
+     * Execute this script using the supplied IConfigure to interact with the
+     * user. We create a work list of screens, then repeatedly scan the list
+     * looking for the first screen that is ready to be executed. When a screen
+     * is found, we remove it from the work list and execute it. The process
+     * stops when the work list is empty, or none of the remaining screens are
+     * executable.
      * 
      * @param configure
      */
@@ -121,7 +122,7 @@ public class ConfigureScript {
         boolean progress;
         do {
             progress = false;
-            for (Iterator<Screen> it = workList.iterator(); it.hasNext(); /**/ ) {
+            for (Iterator<Screen> it = workList.iterator(); it.hasNext(); /**/) {
                 Screen screen = it.next();
                 if (screen.isExecutable(this)) {
                     screen.execute(configure, this);
@@ -132,4 +133,4 @@ public class ConfigureScript {
             }
         } while (!workList.isEmpty() && progress);
     }
-} 
+}

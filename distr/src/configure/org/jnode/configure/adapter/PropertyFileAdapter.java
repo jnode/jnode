@@ -30,27 +30,25 @@ import java.util.Properties;
  * property file format (ISO 8859-1).
  * 
  * @author crawley@jnode.org
- */		
+ */
 public class PropertyFileAdapter extends BasePropertyFileAdapter {
-	
-	private static BasePropertyFileAdapter.ValueCodec PROPERTY_VALUE_CODEC = 
-	    new PropertyValueCodec();
-	
-	public PropertyFileAdapter() {
-		super(PROPERTY_VALUE_CODEC, true, true);
-	}
 
-	@Override
-	protected void loadFromFile(Properties props, InputStream input)
-			throws IOException {
-		props.load(input);
-	}
+    private static BasePropertyFileAdapter.ValueCodec PROPERTY_VALUE_CODEC =
+            new PropertyValueCodec();
 
-	@Override
-	protected void saveToFile(Properties props, OutputStream output, String comment)
-			throws IOException {
-		props.store(output, comment);
-	}
+    public PropertyFileAdapter() {
+        super(PROPERTY_VALUE_CODEC, true, true);
+    }
 
-	
+    @Override
+    protected void loadFromFile(Properties props, InputStream input) throws IOException {
+        props.load(input);
+    }
+
+    @Override
+    protected void saveToFile(Properties props, OutputStream output, String comment)
+        throws IOException {
+        props.store(output, comment);
+    }
+
 }

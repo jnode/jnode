@@ -34,9 +34,9 @@ public abstract class PropertyType {
         super();
         this.typeName = typeName;
     }
-    
+
     public abstract Value fromInput(String token);
-    
+
     public abstract Value fromValue(String value);
 
     public String getTypeName() {
@@ -44,5 +44,5 @@ public abstract class PropertyType {
     }
 
     public abstract String describe(Value defaultValue);
-    
+
 }

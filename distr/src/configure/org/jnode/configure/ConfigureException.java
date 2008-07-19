@@ -29,13 +29,13 @@ package org.jnode.configure;
 public class ConfigureException extends Exception {
 
     private static final long serialVersionUID = 349388505334474279L;
-    
+
     private ScriptParser.ParseContext[] stack;
 
     public ConfigureException(String message, Throwable cause) {
         super(message + ": " + cause.getLocalizedMessage(), cause);
         this.stack = null;
-    }  
+    }
 
     public ConfigureException(String message) {
         super(message);
@@ -47,11 +47,11 @@ public class ConfigureException extends Exception {
         this.stack = stack;
     }
 
-	public ScriptParser.ParseContext[] getStack() {
-		return stack;
-	}
+    public ScriptParser.ParseContext[] getStack() {
+        return stack;
+    }
 
-	public void setStack(ScriptParser.ParseContext[] stack) {
-		this.stack = stack;
-	}
+    public void setStack(ScriptParser.ParseContext[] stack) {
+        this.stack = stack;
+    }
 }

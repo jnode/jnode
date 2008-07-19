@@ -23,18 +23,14 @@ package org.jnode.configure;
 import java.io.File;
 import java.util.LinkedHashMap;
 
-import org.jnode.configure.adapter.FileAdapter;
-import org.jnode.configure.adapter.FileAdapterFactory;
-import org.jnode.configure.adapter.JavaSourceFileAdapter;
-import org.jnode.configure.adapter.PropertyFileAdapter;
-import org.jnode.configure.adapter.TextFileAdapter;
-import org.jnode.configure.adapter.XMLFileAdapter;
-import org.jnode.configure.adapter.XMLPropertyFileAdapter;
-
 import net.n3.nanoxml.XMLElement;
 
+import org.jnode.configure.adapter.FileAdapter;
+import org.jnode.configure.adapter.FileAdapterFactory;
+
 /**
- * A property set denotes a group of properties, typically associated with a file.
+ * A property set denotes a group of properties, typically associated with a
+ * file.
  * 
  * @author crawley@jnode.org
  */
@@ -47,7 +43,7 @@ public class PropertySet {
         private Value value;
         private final XMLElement definingElement;
         private final File definingFile;
-        
+
         public Property(String name, PropertyType type, String description, Value defaultValue,
                 XMLElement definingElement, File definingFile) {
             super();
@@ -103,15 +99,15 @@ public class PropertySet {
             this.defaultValue = defaultValue;
         }
     }
-    
+
     public static class Value {
         private final String token;
         private final String text;
-        
+
         public Value(String token, String text) {
             super();
             if (token.equals("")) {
-            	throw new IllegalArgumentException("Empty 'token' string");
+                throw new IllegalArgumentException("Empty 'token' string");
             }
             this.token = token;
             this.text = text;
@@ -124,13 +120,12 @@ public class PropertySet {
         public String getText() {
             return text;
         }
-        
+
         public String toString() {
-        	return "'" + token + "'/'" + text + "'";
+            return "'" + token + "'/'" + text + "'";
         }
     }
 
-    
     private final File file;
     private final File defaultFile;
     private final File templateFile;
@@ -138,12 +133,10 @@ public class PropertySet {
     private final ConfigureScript script;
     private final FileAdapter adapter;
     private final LinkedHashMap<String, Property> properties =
-        new LinkedHashMap<String, Property>();
-    
-    
-    public PropertySet(ConfigureScript script, File file, File defaultFile,
-    		File templateFile, String fileFormat, char marker) 
-        throws ConfigureException {
+            new LinkedHashMap<String, Property>();
+
+    public PropertySet(ConfigureScript script, File file, File defaultFile, File templateFile,
+            String fileFormat, char marker) throws ConfigureException {
         this.file = file;
         this.defaultFile = defaultFile;
         this.templateFile = templateFile;
@@ -151,21 +144,20 @@ public class PropertySet {
         this.script = script;
         this.adapter = fileFormat == null ? null : FileAdapterFactory.createAdapter(fileFormat);
         if (adapter != null) {
-        	if (!adapter.isLoadSupported() && defaultFile != null) {
-        		throw new ConfigureException(
-						"A '" + ScriptParser.DEFAULT_FILE + "' attribute cannot be used with " +
-						" format '" + fileFormat + "': the format does not support property loading.");
-        	}
-        	if (!adapter.isSaveSupported() && templateFile == null) {
-        		throw new ConfigureException(
-						"A '" + ScriptParser.TEMPLATE_FILE + "' attribute is required with " +
-						" format '" + fileFormat + "': the format does not support property saving.");
-        	}
+            if (!adapter.isLoadSupported() && defaultFile != null) {
+                throw new ConfigureException("A '" + ScriptParser.DEFAULT_FILE +
+                        "' attribute cannot be used with " + " format '" + fileFormat +
+                        "': the format does not support property loading.");
+            }
+            if (!adapter.isSaveSupported() && templateFile == null) {
+                throw new ConfigureException("A '" + ScriptParser.TEMPLATE_FILE +
+                        "' attribute is required with " + " format '" + fileFormat +
+                        "': the format does not support property saving.");
+            }
         }
     }
-    
-    public PropertySet(ConfigureScript script) 
-        throws ConfigureException {
+
+    public PropertySet(ConfigureScript script) throws ConfigureException {
         this.file = null;
         this.defaultFile = null;
         this.templateFile = null;
@@ -174,8 +166,8 @@ public class PropertySet {
         this.adapter = null;
     }
 
-	public void load(Configure configure) throws ConfigureException {
-    	adapter.load(this, configure);
+    public void load(Configure configure) throws ConfigureException {
+        adapter.load(this, configure);
     }
 
     public void save(Configure configure) throws ConfigureException {
@@ -186,13 +178,13 @@ public class PropertySet {
         return file;
     }
 
-	public File getDefaultFile() {
-		return defaultFile;
-	}
+    public File getDefaultFile() {
+        return defaultFile;
+    }
 
-	public File getTemplateFile() {
-		return templateFile;
-	}
+    public File getTemplateFile() {
+        return templateFile;
+    }
 
     public char getMarker() {
         return marker;
@@ -201,25 +193,26 @@ public class PropertySet {
     public LinkedHashMap<String, Property> getProperties() {
         return properties;
     }
-    
-    public void addProperty(String name, PropertyType propType, String description, 
-        Value defaultValue, XMLElement definingElement, File definingFile) 
+
+    public void addProperty(String name, PropertyType propType, String description,
+            Value defaultValue, XMLElement definingElement, File definingFile)
         throws ConfigureException {
         Property oldProp = script.getProperty(name);
         if (oldProp != null) {
-            // FIXME ... alternatively, we could allow properties to be defined in multiple
+            // FIXME ... alternatively, we could allow properties to be defined
+            // in multiple
             // contexts and have them refer to the same value.
             throw new ConfigureException("Property '" + name + "' already declared at line " +
                     oldProp.getDefiningElement().getLineNr() + " of " + oldProp.getDefiningFile());
         }
-        Property prop = new Property(
-        		name, propType, description, defaultValue, definingElement, definingFile);
+        Property prop =
+                new Property(name, propType, description, defaultValue, definingElement,
+                        definingFile);
         properties.put(name, prop);
         script.addProperty(prop);
     }
 
-    public void setProperty(String name, Value value) 
-        throws ConfigureException {
+    public void setProperty(String name, Value value) throws ConfigureException {
         Property property = properties.get(name);
         if (property == null) {
             throw new ConfigureException("Property not declared: '" + name + "'");
@@ -227,7 +220,7 @@ public class PropertySet {
         property.setValue(value);
     }
 
-	public Property getProperty(String name) {
-		return properties.get(name);
-	}
-} 
+    public Property getProperty(String name) {
+        return properties.get(name);
+    }
+}
