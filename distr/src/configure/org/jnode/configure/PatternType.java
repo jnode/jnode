@@ -26,26 +26,27 @@ import java.util.regex.Pattern;
 import org.jnode.configure.PropertySet.Value;
 
 /**
- * This class represents a property type defined by a regex.  The constructor
- * allows you to provide an "emptyToken" value.  If provided, this value defines
- * a special token that will be mapped to the empty string by the {@link fromToken}
- * method.
+ * This class represents a property type defined by a regex. The constructor
+ * allows you to provide an "emptyToken" value. If provided, this value defines
+ * a special token that will be mapped to the empty string by the
+ * {@link fromToken} method.
  * 
  * @author crawley@jnode.org
  */
 public class PatternType extends PropertyType {
-    
-	private final Pattern pattern;
-	private final String emptyToken;
 
-	/**
-	 * Construct a Pattern type.
-	 * @param name the type's name.
-	 * @param pattern the Java regex that defines the type's value space
-	 * @param emptyToken if non-null, this specifies a input token that will
-	 *        be mapped to the empty string value.  You should avoid using
-	 *        characters that would require escaping in a Java regex.
-	 */
+    private final Pattern pattern;
+    private final String emptyToken;
+
+    /**
+     * Construct a Pattern type.
+     * 
+     * @param name the type's name.
+     * @param pattern the Java regex that defines the type's value space
+     * @param emptyToken if non-null, this specifies a input token that will be
+     *            mapped to the empty string value. You should avoid using
+     *            characters that would require escaping in a Java regex.
+     */
     public PatternType(String name, Pattern pattern, String emptyToken) {
         super(name);
         this.pattern = pattern;
@@ -54,22 +55,22 @@ public class PatternType extends PropertyType {
 
     @Override
     public Value fromInput(String token) {
-    	if (token.equals(emptyToken)) {
-    		return new Value(token, "");
-    	} else {
-    		return fromValue(token);
+        if (token.equals(emptyToken)) {
+            return new Value(token, "");
+        } else {
+            return fromValue(token);
         }
     }
 
     @Override
     public Value fromValue(String value) {
-    	Matcher matcher = pattern.matcher(value);
+        Matcher matcher = pattern.matcher(value);
         if (matcher.matches()) {
-        	if (value.equals("") && emptyToken != null) {
+            if (value.equals("") && emptyToken != null) {
                 return new Value(emptyToken, value);
-        	} else {
+            } else {
                 return new Value(value, value);
-        	}
+            }
         } else {
             return null;
         }
@@ -77,14 +78,14 @@ public class PatternType extends PropertyType {
 
     @Override
     public String describe(Value defaultValue) {
-    	StringBuffer sb = new StringBuffer();
-    	sb.append("(/").append(pattern.toString()).append("/");
-    	if (emptyToken != null) {
-    		sb.append(" or '").append(emptyToken).append("'");
-    	}
+        StringBuffer sb = new StringBuffer();
+        sb.append("(/").append(pattern.toString()).append("/");
+        if (emptyToken != null) {
+            sb.append(" or '").append(emptyToken).append("'");
+        }
         if (defaultValue != null) {
-        	String dv = defaultValue.getToken();
-        	sb.append(" [").append(dv).append("]");
+            String dv = defaultValue.getToken();
+            sb.append(" [").append(dv).append("]");
         }
         sb.append(")");
         return sb.toString();

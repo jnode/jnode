@@ -60,7 +60,7 @@ public class Screen {
     private final Value valueIs;
     private final Value valueIsNot;
     private final List<Item> items = new ArrayList<Item>();
-    
+
     public Screen(String title, String guardProp, Value valueIs, Value valueIsNot) {
         this.title = title;
         this.guardProp = guardProp;
@@ -87,16 +87,16 @@ public class Screen {
     public List<Item> getItems() {
         return items;
     }
-    
+
     public void addItem(Item item) {
         items.add(item);
     }
 
     /**
-     * Test to see if this script is executable (yet).  A screen is
-     * executable if it has no guard property, or its guard property
-     * is set, and has the appropriate value.  Note that we test using
-     * the PropertyValue's 'value' attribute, not the 'token' attribute.
+     * Test to see if this script is executable (yet). A screen is executable if
+     * it has no guard property, or its guard property is set, and has the
+     * appropriate value. Note that we test using the PropertyValue's 'value'
+     * attribute, not the 'token' attribute.
      * 
      * @param script this gives us the context for property lookup
      * @return <code>true</true> if the screen is executable, <code>false</code> otherwise.
@@ -123,22 +123,21 @@ public class Screen {
         configure.output("");
         configure.output(title, Configure.DISPLAY_HIGHLIGHT);
         for (Item item : items) {
-        	String text = item.getText();
-        	if (text != null) {
-        		configure.output(text);
-        	}
-        	PropertySet.Property prop = script.getProperty(item.getPropName());
+            String text = item.getText();
+            if (text != null) {
+                configure.output(text);
+            }
+            PropertySet.Property prop = script.getProperty(item.getPropName());
             Value value = null;
             do {
                 String info = prop.getType().describe(prop.getDefaultValue());
-                String input = configure.input(
-                        prop.getDescription() + " " + info + ":");
+                String input = configure.input(prop.getDescription() + " " + info + ":");
                 if (input == null) {
-                	throw new ConfigureException("Unexpected EOF on input");
+                    throw new ConfigureException("Unexpected EOF on input");
                 }
                 value = prop.getType().fromInput(input);
                 if (value == null && input.length() == 0 && prop.hasDefaultValue()) {
-                	value = prop.getDefaultValue();
+                    value = prop.getDefaultValue();
                 }
             } while (value == null);
             if (value != null) {

@@ -28,29 +28,31 @@ import org.jnode.configure.ConfigureException;
  * @author crawley@jnode.org
  */
 class XMLValueCodec implements BasePropertyFileAdapter.ValueCodec {
-	public String decodeText(String encoded) throws ConfigureException {
-		throw new UnsupportedOperationException("decodeText not supported (or used)");
-	}
+    public String decodeText(String encoded) throws ConfigureException {
+        throw new UnsupportedOperationException("decodeText not supported (or used)");
+    }
 
-	public String encodeText(String raw) throws ConfigureException {
-		StringBuffer sb = new StringBuffer(raw.length());
-		for (char ch : raw.toCharArray()) {
-			switch (ch) {
-			case '<':
-				sb.append("&lt;");
-				break;
-			case '>':
-				sb.append("&gt;");
-				break;
-			case '&':
-				sb.append("&amp;");
-				break;
-			default:
-				// Theoretically we should throw exceptions for characters that
-				// are 'forbidden' by the XML specification; e.g. most control codes.
-				sb.append(ch);
-			}
-		}
-		return sb.toString();
-	}
+    public String encodeText(String raw) throws ConfigureException {
+        StringBuffer sb = new StringBuffer(raw.length());
+        for (char ch : raw.toCharArray()) {
+            switch (ch) {
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                default:
+                    // Theoretically we should throw exceptions for characters
+                    // that
+                    // are 'forbidden' by the XML specification; e.g. most
+                    // control codes.
+                    sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
 }

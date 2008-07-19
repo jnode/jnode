@@ -23,18 +23,18 @@ package org.jnode.configure.adapter;
 import org.jnode.configure.ConfigureException;
 
 /**
- * Dummy property value encoder / decoder.  Performs the identity transform.
+ * Dummy property value encoder / decoder. Performs the identity transform.
  * 
  * @author crawley@jnode.org
  */
 class DummyValueCodec implements BasePropertyFileAdapter.ValueCodec {
 
-	public String decodeText(String encoded) throws ConfigureException {
-		return encoded;
-	}
+    public String decodeText(String encoded) throws ConfigureException {
+        return encoded;
+    }
 
-	public String encodeText(String raw) throws ConfigureException {
-		return raw;
-	}
+    public String encodeText(String raw) throws ConfigureException {
+        return raw;
+    }
 
 }

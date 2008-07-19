@@ -29,24 +29,22 @@ import java.util.Properties;
  * Property file adapter that loads and saves property files in XML format.
  * 
  * @author crawley@jnode.org
- */		
+ */
 public class XMLPropertyFileAdapter extends BasePropertyFileAdapter {
-	private static BasePropertyFileAdapter.ValueCodec XML_VALUE_CODEC =
-	    new XMLValueCodec();
+    private static BasePropertyFileAdapter.ValueCodec XML_VALUE_CODEC = new XMLValueCodec();
 
-	public XMLPropertyFileAdapter() {
-		super(XML_VALUE_CODEC, true, true);
-	}
+    public XMLPropertyFileAdapter() {
+        super(XML_VALUE_CODEC, true, true);
+    }
 
-	@Override
-	protected void loadFromFile(Properties props, InputStream input)
-		throws IOException {
-		props.loadFromXML(input);
-	}
+    @Override
+    protected void loadFromFile(Properties props, InputStream input) throws IOException {
+        props.loadFromXML(input);
+    }
 
-	@Override
-	protected void saveToFile(Properties props, OutputStream output, String comment)
-		throws IOException {
-		props.storeToXML(output, comment);
-	}
+    @Override
+    protected void saveToFile(Properties props, OutputStream output, String comment)
+        throws IOException {
+        props.storeToXML(output, comment);
+    }
 }

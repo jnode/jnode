@@ -26,28 +26,26 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 /**
- * Property file adapter for XML files with unspecified syntax.  Loading is not supported, 
- * and saving is done by template expansion only.
+ * Property file adapter for XML files with unspecified syntax. Loading is not
+ * supported, and saving is done by template expansion only.
  * 
  * @author crawley@jnode.org
- */		
+ */
 public class XMLFileAdapter extends BasePropertyFileAdapter {
-	private static BasePropertyFileAdapter.ValueCodec XML_VALUE_CODEC = 
-	    new XMLValueCodec();
+    private static BasePropertyFileAdapter.ValueCodec XML_VALUE_CODEC = new XMLValueCodec();
 
-	public XMLFileAdapter() {
-		super(XML_VALUE_CODEC, false, false);
-	}
+    public XMLFileAdapter() {
+        super(XML_VALUE_CODEC, false, false);
+    }
 
-	@Override
-	protected void loadFromFile(Properties props, InputStream input)
-		throws IOException {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    protected void loadFromFile(Properties props, InputStream input) throws IOException {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	protected void saveToFile(Properties props, OutputStream output, String comment)
-		throws IOException {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    protected void saveToFile(Properties props, OutputStream output, String comment)
+        throws IOException {
+        throw new UnsupportedOperationException();
+    }
 }
