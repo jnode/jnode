@@ -221,10 +221,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * Response on paint events.
      */
     private void processPaintEvent(PaintEvent event) {
+        if(!targetComponent.isVisible() || !peerComponent.isVisible())
+            return;
+        
         final Graphics g = peerComponent.getGraphics();
         if (g != null) {
-            //Point p = component.getLocationOnScreen();
-            //g.translate(p.x, p.y);
             if (event.getID() == PaintEvent.PAINT) {
                 if (!(targetComponent instanceof java.awt.Window))
                     peerComponent.paint(g);
@@ -234,7 +235,6 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
                     peerComponent.update(g);
                 targetComponent.update(g);
             }
-            //g.translate(-p.x, -p.y);
             g.dispose();
         }
     }
