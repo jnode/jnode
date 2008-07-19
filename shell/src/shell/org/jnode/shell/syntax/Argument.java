@@ -68,7 +68,7 @@ public abstract class Argument<V> {
     
     protected final List<V> values = new ArrayList<V>();
     
-    private final V[] vArray;
+    final V[] vArray;
     
     private ArgumentBundle bundle;
     
