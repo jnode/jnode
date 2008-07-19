@@ -383,11 +383,14 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             Raster rast = getCompatibleRaster(img);
             Rectangle r = new Rectangle(x, y, rast.getWidth(), rast.getHeight());
             _transform(r);
+            final int tx = r.x, ty = r.y;
             if (clip != null)
                 r = clip.intersection(r);
 
-            surface.drawCompatibleRaster(rast, 0, 0, r.x, r.y, r.width, r.height, bgcolor);
-            surface.update(r.x, r.y, r.width + 2, r.height + 2);
+            if(!r.isEmpty()){
+                surface.drawCompatibleRaster(rast, r.x - tx, r.y - ty, r.x, r.y, r.width, r.height, bgcolor);
+                surface.update(r.x, r.y, r.width, r.height);
+            }
             return true;
         } catch (InterruptedException ie) {
             return false;
@@ -433,11 +436,14 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             Raster rast = getCompatibleRaster(img);
             Rectangle r = new Rectangle(x, y, rast.getWidth(), rast.getHeight());
             _transform(r);
+            final int tx = r.x, ty = r.y;
             if (clip != null)
                 r = clip.intersection(r);
 
-            surface.drawCompatibleRaster(rast, 0, 0, r.x, r.y, r.width, r.height, null);
-            surface.update(r.x, r.y, r.width + 2, r.height + 2);
+            if(!r.isEmpty()){
+                surface.drawCompatibleRaster(rast, r.x - tx, r.y - ty, r.x, r.y, r.width, r.height, null);
+                surface.update(r.x, r.y, r.width, r.height);
+            }
             return true;
         } catch (InterruptedException ie) {
             return false;
@@ -966,7 +972,9 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             // Convert it to a raster
             final PixelGrabber grabber =
                 new PixelGrabber(image, 0, 0, image.getWidth(null), image.getHeight(null), true);
-            if (grabber.grabPixels()) {
+            org.jnode.vm.Unsafe.debug("BasicSurfaceGraphics.getCompatibleRaster() " + image + ", " +
+                image.getWidth(null) + ", " + image.getHeight(null) + "\n");
+            if (grabber.grabPixels(10000)) {
                 final int w = grabber.getWidth();
                 final int h = grabber.getHeight();
                 final WritableRaster raster = dstModel.createCompatibleWritableRaster(w, h);
@@ -982,6 +990,7 @@ public class BasicSurfaceGraphics extends BasicGraphics {
                 }
                 return raster;
             } else {
+                org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-1\n");
                 throw new IllegalArgumentException("Cannot grab pixels");
             }
         }

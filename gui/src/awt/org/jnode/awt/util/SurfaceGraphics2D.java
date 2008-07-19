@@ -43,10 +43,10 @@ import org.jnode.driver.video.util.AbstractSurface;
  */
 public abstract class SurfaceGraphics2D extends Graphics2D {
     private static final BasicStroke DEFAULT_STROKE = new BasicStroke();
-    private static final HashMap DEFAULT_HINTS;
+    private static final HashMap<RenderingHints.Key, ?> DEFAULT_HINTS;
 
     static {
-        HashMap hints = new HashMap();
+        HashMap<RenderingHints.Key, Object> hints = new HashMap<RenderingHints.Key, Object>();
         hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
         hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
         DEFAULT_HINTS = hints;
@@ -206,7 +206,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage() - 0 not implemented\n");
     }
 
     /**
@@ -238,7 +238,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public boolean drawImage(Image img, AffineTransform xform, ImageObserver obs) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage2() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage() - 00 not implemented\n");
         return false;
     }
 
@@ -1008,28 +1008,34 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
     }
 
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
+//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-1\n");
         return simpleGraphics.drawImage(img, x, y, observer);
     }
 
     public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
+//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-2\n");
         return simpleGraphics.drawImage(img, x, y, width, height, observer);
     }
 
     public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
+//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-3\n");
         return simpleGraphics.drawImage(img, x, y, bgcolor, observer);
     }
 
     public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-4\n");
         return simpleGraphics.drawImage(img, x, y, width, height, bgcolor, observer);
     }
 
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2,
                              ImageObserver observer) {
+//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-5\n");
         return simpleGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
     }
 
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2,
                              Color bgcolor, ImageObserver observer) {
+//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-6\n");
         return simpleGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
     }
 

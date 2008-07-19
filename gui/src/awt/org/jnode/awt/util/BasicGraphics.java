@@ -212,10 +212,6 @@ public abstract class BasicGraphics extends Graphics {
             this.clip = clip.getBounds();
             _transform(this.clip);
         }
-        if (this.clip.width == 0 && this.clip.height == 0) {
-            org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics: zero clip " + clip + "\n");
-            org.jnode.vm.Unsafe.debugStackTrace();
-        }
     }
 
     /**
@@ -237,10 +233,6 @@ public abstract class BasicGraphics extends Graphics {
     public void setClip(int x, int y, int width, int height) {
         this.clip = new Rectangle(x, y, width, height);
         _transform(this.clip);
-        if (clip.width == 0 && clip.height == 0) {
-            org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics: zero clip " + clip + "\n");
-            org.jnode.vm.Unsafe.debugStackTrace();
-        }
     }
 
     /**
