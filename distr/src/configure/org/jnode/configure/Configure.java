@@ -36,6 +36,13 @@ import java.io.PrintStream;
  * @author crawley@jnode.org
  */
 public class Configure {
+    public static final int DISPLAY_NORMAL = 0;
+    public static final int DISPLAY_HIGHLIGHT = 1;
+    public static final int DISPLAY_PROMPT = 2;
+    
+    public static final String NEW_LINE = System.getProperty("line.separator");
+    public static final int TAB_WIDTH = 8;
+    
     private final BufferedReader in;
     private final PrintStream out;
     private final PrintStream err;
@@ -97,7 +104,7 @@ public class Configure {
     }
     
     public String input(String prompt) throws ConfigureException {
-        out.print(prompt);
+        output(prompt, DISPLAY_PROMPT);
         try {
             return in.readLine();
         } catch (IOException ex) {
@@ -105,12 +112,59 @@ public class Configure {
         }
     }
 
+    public void output(String message, int displayAttributes) {
+        format(err, message, displayAttributes);
+    }
+
     public void output(String message) {
-        out.println(message);
+        format(err, message, DISPLAY_NORMAL);
     }
 
     public void error(String message) {
-        err.println(message);
+        format(err, message, DISPLAY_NORMAL);
+    }
+    
+    private void format(PrintStream stream, String text, int displayAttributes) {
+        switch (displayAttributes) {
+            case DISPLAY_PROMPT:
+            case DISPLAY_HIGHLIGHT | DISPLAY_PROMPT:
+                stream.print(text + " ");
+                break;
+            case DISPLAY_HIGHLIGHT:
+                stream.println(text);
+                int textWidth = computeTextWidth(text);
+                StringBuffer sb = new StringBuffer(textWidth);
+                for (int i = 0; i < textWidth; i++) {
+                    sb.append('-');
+                }
+                stream.println(sb.toString());
+                break;
+            case DISPLAY_NORMAL:
+            default:
+                stream.println(text);
+                break;
+        }
+    }
+
+    private int computeTextWidth(String text) {
+        int count = 0;
+        int len = text.length();
+        for (int i = 0; i < len; i++) {
+            char ch = text.charAt(i);
+            if (ch == '\t') {
+                count = ((count / TAB_WIDTH) + 1) * TAB_WIDTH;
+                break;
+            } else if (ch == '\n' || ch == '\r') {
+                if (i + NEW_LINE.length() != len) {
+                    throw new IllegalArgumentException("Embedded CR or NL in line text");
+                }
+            } else if (ch < ' ' || ch == '\177') {
+                throw new IllegalArgumentException("Bad character in line text");
+            } else {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void saveProperties(PropertySet propSet) throws ConfigureException {

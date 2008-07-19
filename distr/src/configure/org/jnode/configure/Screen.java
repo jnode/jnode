@@ -31,7 +31,6 @@ import org.jnode.configure.PropertySet.Value;
  * @author crawley@jnode.org
  */
 public class Screen {
-    
     public static class Item {
         private final ConfigureScript script;
         private final String propName;
@@ -121,7 +120,8 @@ public class Screen {
     }
 
     public void execute(Configure configure, ConfigureScript script) throws ConfigureException {
-        configure.output(title);
+        configure.output("");
+        configure.output(title, Configure.DISPLAY_HIGHLIGHT);
         for (Item item : items) {
         	String text = item.getText();
         	if (text != null) {
@@ -132,7 +132,7 @@ public class Screen {
             do {
                 String info = prop.getType().describe(prop.getDefaultValue());
                 String input = configure.input(
-                        prop.getDescription() + " " + info + ": ");
+                        prop.getDescription() + " " + info + ":");
                 if (input == null) {
                 	throw new ConfigureException("Unexpected EOF on input");
                 }
