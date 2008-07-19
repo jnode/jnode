@@ -80,6 +80,19 @@ public class ScriptParser {
     public static final String VALUE_IS_NOT = "valueIsNot";
     public static final String EMPTY_TOKEN = "emptyToken";
     
+    private static final String TAB_SPACES;
+    private static final Pattern LINE_SPLITTER = 
+        Pattern.compile("\r\n|\r(?!\n)|\n");
+    
+    static {
+        StringBuffer sb = new StringBuffer(Configure.TAB_WIDTH);
+        for (int i = 0; i < Configure.TAB_WIDTH; i++) {
+            sb.append(' ');
+        }
+        TAB_SPACES = sb.toString();
+    }
+    
+    
     public static class ParseContext {
     	private final File file;
     	private File baseDir;
@@ -395,11 +408,78 @@ public class ScriptParser {
             if (script.getProperty(propName) == null) {
                 error("Use of undeclared property '" + propName + "'", child);
             }
-            String text = child.getContent();
-            screen.addItem(new Item(script, propName, text));
+            screen.addItem(new Item(script, propName, unindent(child.getContent())));
         }
     }
     
+
+    
+    /**
+     * Take string consisting of one or more lines of text, and "unindent" all
+     * lines by an equal amount such that at least one line has a non-whitespace,
+     * character as the first character.
+     *
+     * @param content the text to be unindented
+     * @return the unindented text.
+     */
+    private String unindent(String content) {
+        if (content == null || content.length() == 0) {
+            return content;
+        }
+        String[] lines = LINE_SPLITTER.split(content, -1);
+        int minLeadingSpaces = Integer.MAX_VALUE;
+        for (String line : lines) {
+            int count, i;
+            boolean seenNonWhitespace = false;
+            int len = Math.min(minLeadingSpaces, line.length());
+            for (i = 0, count = 0; i < len && !seenNonWhitespace; i++) {
+                switch (line.charAt(i)) {
+                    case ' ':
+                        count++;
+                        break;
+                    case '\t':
+                        count = ((count / Configure.TAB_WIDTH) + 1) * Configure.TAB_WIDTH;
+                        break;
+                    default:
+                        seenNonWhitespace = true;
+                }
+            }
+            if (seenNonWhitespace && count < minLeadingSpaces) {
+                minLeadingSpaces = count;
+            }
+        }
+        if (minLeadingSpaces == 0 || minLeadingSpaces == Integer.MAX_VALUE) {
+            return content;
+        }
+        StringBuffer sb = new StringBuffer(content.length());
+        for (String line : lines) {
+            if (sb.length() > 0) {
+                sb.append(Configure.NEW_LINE);
+            }
+            int i, count;
+            int len = line.length();
+            for (i = 0, count = 0; i < len && count < minLeadingSpaces; i++) {
+                switch (line.charAt(i)) {
+                    case ' ':
+                        count++;
+                        break;
+                    case '\t':
+                        count = ((count / Configure.TAB_WIDTH) + 1) * Configure.TAB_WIDTH;
+                        break;
+                }
+            }
+            if (i < len) {
+                if (count > minLeadingSpaces) {
+                    for (int j = count - minLeadingSpaces; j > 0; j--) {
+                        sb.append(' ');
+                    }
+                }
+                sb.append(line.substring(i));
+            }
+        }
+        return sb.toString();
+    }
+
     private void addStack(ConfigureException ex, XMLElement element) {
     	stack.getLast().setElement(element);
     	ParseContext[] stackCopy = new ParseContext[stack.size()];
