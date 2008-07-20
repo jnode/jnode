@@ -52,9 +52,9 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import org.apache.log4j.Logger;
+import org.jnode.awt.GraphicsFactory;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics2D;
-import org.jnode.awt.GraphicsFactory;
 import sun.awt.CausedFocusEvent;
 
 /**
@@ -221,9 +221,9 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * Response on paint events.
      */
     private void processPaintEvent(PaintEvent event) {
-        if(!targetComponent.isVisible() || !peerComponent.isVisible())
+        if (!targetComponent.isVisible() || !peerComponent.isVisible())
             return;
-        
+
         final Graphics g = peerComponent.getGraphics();
         if (g != null) {
             if (event.getID() == PaintEvent.PAINT) {
