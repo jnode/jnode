@@ -33,6 +33,7 @@ import org.jnode.awt.util.AbstractSurfaceGraphics2D;
 import org.jnode.driver.video.util.AbstractSurface;
 
 /**
+ * @deprecated
  * @author epr
  */
 public class JNodeGraphics2D extends AbstractSurfaceGraphics2D {

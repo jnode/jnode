@@ -25,6 +25,9 @@ public abstract class GraphicsFactory {
 
     public abstract Graphics2D createGraphics(JNodeGenericPeer<?, ?> peer);
 
+    /**
+     * @deprecated
+     */
     private static class OldGraphicsFactory extends GraphicsFactory {
         public Graphics2D createGraphics(BufferedImage image) {
             return new JNodeBufferedImageGraphics(image);
