@@ -23,8 +23,7 @@
   </runtime>
 
   <extension point="org.jnode.driver.mappers">
-    <!-- laptop Ideo Technologies -->
-	<mapper id="03:00:00" driver-class="org.jnode.driver.video.vesa.VESADriver" class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"/>
+	<mapper class="org.jnode.driver.video.vesa.VESADeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">

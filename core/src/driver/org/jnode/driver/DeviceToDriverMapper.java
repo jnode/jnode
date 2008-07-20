@@ -32,6 +32,11 @@ package org.jnode.driver;
 public interface DeviceToDriverMapper {
 
     /**
+     * Match devices in a custom predefined way by the mapper.
+     */
+    public static final int MATCH_DEVICE_PREDEFINED = -1;
+
+    /**
      * Match on exact device and exact revision, best possible match.
      */
     public static final int MATCH_DEVICE_REVISION = 0;
