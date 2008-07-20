@@ -387,7 +387,7 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             if (clip != null)
                 r = clip.intersection(r);
 
-            if(!r.isEmpty()){
+            if (!r.isEmpty()) {
                 surface.drawCompatibleRaster(rast, r.x - tx, r.y - ty, r.x, r.y, r.width, r.height, bgcolor);
                 surface.update(r.x, r.y, r.width, r.height);
             }
@@ -440,7 +440,7 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             if (clip != null)
                 r = clip.intersection(r);
 
-            if(!r.isEmpty()){
+            if (!r.isEmpty()) {
                 surface.drawCompatibleRaster(rast, r.x - tx, r.y - ty, r.x, r.y, r.width, r.height, null);
                 surface.update(r.x, r.y, r.width, r.height);
             }
