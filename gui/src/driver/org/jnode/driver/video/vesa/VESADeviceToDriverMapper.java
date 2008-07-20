@@ -14,6 +14,7 @@ import org.vmmagic.unboxed.Address;
  * @author Levente S\u00e1ntha
  */
 public class VESADeviceToDriverMapper implements DeviceToDriverMapper {
+    private static final int DISPLAY_CONTROLLER_PCI_DEVICE_CLASS = 0x03;
 
     public Driver findDriver(Device device) {
         //PCI device needed
@@ -23,7 +24,7 @@ public class VESADeviceToDriverMapper implements DeviceToDriverMapper {
         //checking display controller device class
         final PCIDevice pciDev = (PCIDevice) device;
         final PCIDeviceConfig cfg = pciDev.getConfig();
-        if ((cfg.getBaseClass() & 0xFFFFFF) != 0x03)
+        if ((cfg.getBaseClass() & 0xFFFFFF) != DISPLAY_CONTROLLER_PCI_DEVICE_CLASS)
             return null;
 
         //checking the VESA mode set up by GRUB
