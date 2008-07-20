@@ -44,12 +44,13 @@ import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 
 /**
+ * @deprecated
  * @author epr
  */
 public abstract class AbstractSurfaceGraphics2D extends AbstractGraphics2D {
 
     private AbstractSurface surface;
-    private static final Logger log = Logger.getLogger(AbstractSurfaceGraphics.class);
+    private static final Logger log = Logger.getLogger(AbstractSurfaceGraphics2D.class);
     private int mode = Surface.PAINT_MODE;
 
     private int width;

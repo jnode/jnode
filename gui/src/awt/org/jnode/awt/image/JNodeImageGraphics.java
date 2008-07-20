@@ -29,6 +29,7 @@ import java.awt.image.WritableRaster;
 import org.jnode.awt.util.AbstractGraphics;
 
 /**
+ * @deprecated
  * @author epr
  */
 public class JNodeImageGraphics extends AbstractGraphics {

@@ -28,6 +28,7 @@ import java.awt.image.WritableRaster;
 import org.jnode.awt.util.AbstractSurfaceGraphics2D;
 
 /**
+ * @deprecated
  * @author epr
  */
 public class JNodeBufferedImageGraphics2D extends AbstractSurfaceGraphics2D {

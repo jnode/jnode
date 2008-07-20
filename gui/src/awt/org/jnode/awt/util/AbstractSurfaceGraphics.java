@@ -50,6 +50,7 @@ import org.jnode.driver.video.Surface;
 import sun.awt.image.ToolkitImage;
 
 /**
+ * @deprecated
  * @author epr
  * @author Levente S\u00e1ntha
  */

@@ -56,6 +56,7 @@ import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
 /**
+ * @deprecated 
  * @author epr
  */
 public abstract class AbstractGraphics extends Graphics2D {
