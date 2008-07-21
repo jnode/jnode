@@ -51,9 +51,10 @@ import org.jnode.configure.PropertySet.Property;
 public abstract class BasePropertyFileAdapter implements FileAdapter {
 
     interface ValueCodec {
-        public String encodeText(String raw) throws ConfigureException;
+        public String getValidModifiers();
 
-        public String decodeText(String encoded) throws ConfigureException;
+        public String encodeProperty(String propName, String propValue, String modifiers) 
+            throws ConfigureException;
     }
 
     private final ValueCodec codec;
@@ -218,15 +219,10 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
                     if (sb.length() == 0) {
                         w.write(marker);
                     } else {
+                        String modifiers = removeModifiers(sb);
                         String propName = sb.toString();
                         String propValue = props.getProperty(propName);
-                        if (propValue == null) {
-                            w.write(marker);
-                            w.write(propName);
-                            w.write(marker);
-                        } else {
-                            w.write(codec.encodeText(propValue));
-                        }
+                        w.write(codec.encodeProperty(propName, propValue, modifiers));
                     }
                 } else {
                     // FIXME ... make this aware of the host OS newline
@@ -240,5 +236,20 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
         } finally {
             w.flush();
         }
+    }
+
+    private String removeModifiers(StringBuffer sb) {
+        String validModifiers = codec.getValidModifiers();
+        StringBuffer sb2 = new StringBuffer(1);
+        for (int i = sb.length() - 1; i >= 0; i--) {
+            char ch = sb.charAt(i);
+            if (validModifiers.contains(Character.toString(ch))) {
+                sb2.insert(0, ch);
+                sb.setLength(i);
+            } else {
+                break;
+            }
+        }
+        return sb2.toString();
     }
 }

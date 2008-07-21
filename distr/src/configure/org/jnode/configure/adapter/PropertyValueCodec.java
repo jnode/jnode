@@ -10,15 +10,45 @@ import org.jnode.configure.ConfigureException;
  * will be used when a property file is written by template expansion. If it is
  * read or written using a {@link java.util.Properties} "load" or "save" method,
  * the method will take care of encoding / decoding.)
+ * <p>
+ * This codec supports the following modifiers:
+ * <ul>
+ * <li>'=' says to expand as &lt;propName&gt;=&lt;propValue&gt; rather than &lt;propValue&gt;.
+ *     Properties that are not set (explicitly or by defaulting) will be suppressed.
+ * <li>'#' (with '=') says to comment out suppressed properties rather than entirely omitting them.
+ * <li>'!' (with '=') says to suppress a property whose value is an empty string.
+ * </ul>
  * 
  * @author crawley@jnode.org
  */
 class PropertyValueCodec implements BasePropertyFileAdapter.ValueCodec {
-    public String decodeText(String encoded) throws ConfigureException {
-        throw new UnsupportedOperationException("decodeText not supported (or used)");
+
+    public String encodeProperty(String propName, String propValue, String modifiers)  {
+        if (modifiers.contains("=")) {
+            if (propValue == null || propValue.equals("") && modifiers.contains("!")) {
+                if (modifiers.contains("#")) {
+                    return "#" + encodeText(propName) + "=";
+                } else {
+                    return "";
+                }
+            } else {
+                return encodeText(propName) + "=" + encodeText(propValue);
+            }
+        } else {
+            if (propValue == null) {
+                return "";
+            } else {
+                return encodeText(propValue);
+            }
+        }
     }
 
-    public String encodeText(String raw) throws ConfigureException {
+    @Override
+    public String getValidModifiers() {
+        return "=!#";
+    }
+
+    private String encodeText(String raw) {
         StringBuffer sb = new StringBuffer(raw.length());
         for (char ch : raw.toCharArray()) {
             switch (ch) {

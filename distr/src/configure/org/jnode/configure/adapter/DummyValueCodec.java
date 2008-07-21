@@ -28,13 +28,12 @@ import org.jnode.configure.ConfigureException;
  * @author crawley@jnode.org
  */
 class DummyValueCodec implements BasePropertyFileAdapter.ValueCodec {
-
-    public String decodeText(String encoded) throws ConfigureException {
-        return encoded;
+    
+    public String encodeProperty(String propName, String propValue, String modifiers) {
+        return propValue;
     }
 
-    public String encodeText(String raw) throws ConfigureException {
-        return raw;
+    public String getValidModifiers() {
+        return "";
     }
-
 }

@@ -32,11 +32,15 @@ class JavaStringLiteralCodec implements BasePropertyFileAdapter.ValueCodec {
     private static char[] HEX_DIGITS = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-    public String decodeText(String encoded) throws ConfigureException {
-        throw new UnsupportedOperationException("decodeText not supported (or used)");
+    public String encodeProperty(String propName, String propValue, String modifiers) {
+        return propValue == null ? "" : encodeText(propValue);
     }
 
-    public String encodeText(String raw) throws ConfigureException {
+    public String getValidModifiers() {
+        return "";
+    }
+    
+    private String encodeText(String raw) {
         StringBuffer sb = new StringBuffer(raw.length());
         for (char ch : raw.toCharArray()) {
             switch (ch) {
