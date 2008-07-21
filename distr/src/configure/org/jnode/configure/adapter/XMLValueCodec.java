@@ -28,11 +28,15 @@ import org.jnode.configure.ConfigureException;
  * @author crawley@jnode.org
  */
 class XMLValueCodec implements BasePropertyFileAdapter.ValueCodec {
-    public String decodeText(String encoded) throws ConfigureException {
-        throw new UnsupportedOperationException("decodeText not supported (or used)");
+    public String encodeProperty(String propName, String propValue, String modifiers) {
+        return propValue == null ? "" : encodeText(propValue);
     }
 
-    public String encodeText(String raw) throws ConfigureException {
+    public String getValidModifiers() {
+        return "";
+    }
+    
+    private String encodeText(String raw) {
         StringBuffer sb = new StringBuffer(raw.length());
         for (char ch : raw.toCharArray()) {
             switch (ch) {
@@ -47,8 +51,7 @@ class XMLValueCodec implements BasePropertyFileAdapter.ValueCodec {
                     break;
                 default:
                     // Theoretically we should throw exceptions for characters
-                    // that
-                    // are 'forbidden' by the XML specification; e.g. most
+                    // that are 'forbidden' by the XML specification; e.g. most
                     // control codes.
                     sb.append(ch);
             }

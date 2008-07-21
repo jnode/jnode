@@ -32,8 +32,7 @@
   <propFile name="../../test.jnode.properties" defaultFile="jnode.properties.defaults"
             templateFile="jnode.properties.template">
     <property name="jnode.virtual.memsize" type="integer.type"
-	      description="Enter virtual hardware memory size in Mbytes"
-	      default="512"/>
+	      description="Enter virtual hardware memory size in Mbytes"/>
     <property name="jnode.virtual.disk" type="vdisk.type"
 	      description="Select a prebuilt virtual disk"
 	      default="none"/>

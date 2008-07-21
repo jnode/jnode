@@ -10,20 +10,20 @@
 # if you have custom initjars to build.
 # custom.plugin-list.dir = ${root.dir}/local/plugin-lists/
 
-# In non-empty, no default initjars will be built.
-no.default.initjars=@no.default.initjars@
+# If non-empty, no default initjars will be built.
+@no.default.initjars=#!@
 
 # -----------------------------------------------
 # Settings for the bootdisk image
 
 # If non-empty, no bootdisk image will be built.
-no.bootdisk=@no.bootdisk@
+@no.bootdisk=#!@
 
 # -----------------------------------------------
 # Settings for the netboot build
 
 # If non-empty, no netboot directory will be built.
-no.netboot=@no.netboot@
+@no.netboot=#!@
 
 # -----------------------------------------------
 # Settings for the memory manager
@@ -31,7 +31,7 @@ no.netboot=@no.netboot@
 # Default memory manager: org.jnode.vm.memmgr.def
 # MMTk NoGC based memory manager (still very beta): org.jnode.vm.memmgr.mmtk.nogc
 # MMTk GenRC based memory manager (still very alpha):  org.jnode.vm.memmgr.mmtk.genrc
-jnode.memmgr.plugin.id=@jnode.memmgr.plugin.id@
+@jnode.memmgr.plugin.id=@
 
 # -----------------------------------------------
 # Settings for the document-plugins task
@@ -73,6 +73,10 @@ jnode.debugger.port=6789
 # -----------------------------------------------
 # Settings for a VMware virtual machine
 # -----------------------------------------------
+
+# -----------------------------------------------
+# The virtual PC's memory size in Mbytes
+@jnode.virtual.memsize=@
 
 # Uncomment and edit this line if you want to override the settings
 # in the 'jnode-x86-*.vmx' file.  For example, you may want to include
