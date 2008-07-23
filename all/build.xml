@@ -62,6 +62,7 @@
     <property name="derby.jar" value="${root.dir}/distr/lib/derby.jar" />
     <property name="derbynet.jar" value="${root.dir}/distr/lib/derbynet.jar" />
     <property name="derbytools.jar" value="${root.dir}/distr/lib/derbytools.jar" />
+    <property name="nanoxml-java.jar" value="${root.dir}/builder/lib/nanoxml-2.2.3.jar" />
 
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
@@ -882,13 +883,13 @@ clean             Remove all intermediate build results.
         <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
         <checkstyle config="jnode_checks.xml">
             <fileset dir="../builder/src/builder" includes="**/*.java"/>
+            <fileset dir="../builder/src/configure" includes="**/*.java"/>
             <fileset dir="../core/src/core" includes="**/*.java"/>
             <fileset dir="../core/src/driver" includes="**/*.java"/>
             <fileset dir="../core/src/test" includes="**/*.java"/>
             <fileset dir="../distr/src/apps" includes="**/*.java"/>
             <fileset dir="../distr/src/emu" includes="**/*.java"/>
             <fileset dir="../distr/src/install" includes="**/*.java"/>
-            <fileset dir="../distr/src/configure" includes="**/*.java"/>
             <fileset dir="../distr/src/test" includes="**/*.java"/>
             <fileset dir="../fs/src/fs" includes="**/*.java"/>
             <fileset dir="../fs/src/driver" includes="**/*.java"/>
