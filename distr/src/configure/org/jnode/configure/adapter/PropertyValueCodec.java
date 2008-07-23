@@ -25,15 +25,14 @@ class PropertyValueCodec implements BasePropertyFileAdapter.ValueCodec {
 
     public String encodeProperty(String propName, String propValue, String modifiers)  {
         if (modifiers.contains("=")) {
-            if (propValue == null || propValue.equals("") && modifiers.contains("!")) {
+            if (propValue == null || propValue.equals("")) {
                 if (modifiers.contains("#")) {
                     return "#" + encodeText(propName) + "=";
-                } else {
+                } else if (modifiers.contains("!")) {
                     return "";
                 }
-            } else {
-                return encodeText(propName) + "=" + encodeText(propValue);
             }
+            return encodeText(propName) + "=" + encodeText(propValue);
         } else {
             if (propValue == null) {
                 return "";
@@ -63,6 +62,12 @@ class PropertyValueCodec implements BasePropertyFileAdapter.ValueCodec {
                     break;
                 case '\f':
                     sb.append("\\f");
+                    break;
+                case '=':
+                    sb.append("\\=");
+                    break;
+                case ':':
+                    sb.append("\\:");
                     break;
                 default:
                     if (ch < ' ' || (ch >= 127 && ch < 160) || ch > 255) {
