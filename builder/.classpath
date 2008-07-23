@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/builder"/>
+	<classpathentry kind="src" path="src/configure"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="src" path="/JNode-FS"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
@@ -8,5 +9,6 @@
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
+	<classpathentry kind="lib" path="lib/nanoxml-2.2.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
