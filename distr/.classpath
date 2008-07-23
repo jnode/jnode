@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/install"/>
-	<classpathentry kind="src" path="src/configure"/>
 	<classpathentry kind="src" path="src/emu"/>
 	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
@@ -21,6 +20,5 @@
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/derby.jar"/>
 	<classpathentry kind="lib" path="lib/derbynet.jar"/>
-	<classpathentry kind="lib" path="lib/nanoxml-2.2.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
