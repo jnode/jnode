@@ -239,17 +239,13 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
     }
 
     private String removeModifiers(StringBuffer sb) {
-        String validModifiers = codec.getValidModifiers();
-        StringBuffer sb2 = new StringBuffer(1);
-        for (int i = sb.length() - 1; i >= 0; i--) {
-            char ch = sb.charAt(i);
-            if (validModifiers.contains(Character.toString(ch))) {
-                sb2.insert(0, ch);
-                sb.setLength(i);
-            } else {
-                break;
-            }
+        int index = sb.lastIndexOf("/");
+        if (index >= 0) {
+            String modifiers = sb.substring(index + 1);
+            sb.setLength(index);
+            return modifiers;
+        } else {
+            return "";
         }
-        return sb2.toString();
     }
 }
