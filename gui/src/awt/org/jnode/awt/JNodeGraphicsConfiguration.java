@@ -89,8 +89,8 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
      * @see java.awt.GraphicsConfiguration#getColorModel(int)
      */
     public ColorModel getColorModel(int transparency) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO review this, normally transparency should be respected        
+        return colorModel;
     }
 
     /**
