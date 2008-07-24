@@ -84,7 +84,7 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
      * @see java.awt.GraphicsConfiguration#getBounds()
      */
     public Rectangle getBounds() {
-        return bounds;
+        return (Rectangle) bounds.clone();
     }
 
     /**
