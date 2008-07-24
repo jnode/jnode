@@ -47,7 +47,6 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Unsafe;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -55,7 +54,7 @@ import org.vmmagic.unboxed.Address;
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
  */
-public class VESACore extends AbstractSurface implements VESAConstants, HardwareCursorAPI {
+public class VESACore extends AbstractSurface implements HardwareCursorAPI {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(VESACore.class);
@@ -173,11 +172,8 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
             this.blueMaskShift = getMaskShift(blueMask);
             this.alphaMaskShift = getMaskShift(alphaMask);
         } catch (NameNotFoundException ex) {
-            Unsafe.debugStackTrace("error in VESACore", ex);
             throw new ResourceNotFreeException(ex);
         }
-
-        Unsafe.debug("\nVESACore created");
     }
 
     /**
@@ -258,7 +254,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, Hardware
                     new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask, alphaMask);
             return new FrameBufferConfiguration[] {new VESAConfiguration(maxWidth, maxHeight, cm), };
         } catch (Throwable t) {
-            Unsafe.debugStackTrace("error in getConfigs()", t);
             throw new RuntimeException(t);
         }
     }
