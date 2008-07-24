@@ -48,7 +48,8 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      * 
      * @return Returns the height.
      */
-    public int getHeight() {
+    @Override
+    public final int getHeight() {
         return height;        
     }
 
@@ -57,7 +58,8 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      * 
      * @return Returns the width.
      */
-    public int getWidth() {
+    @Override
+    public final int getWidth() {
         return width;
     }
     
@@ -68,7 +70,8 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      * @param y
      * @return
      */
-    public int getOffset(int x, int y) {
+    @Override
+    public final int getOffset(int x, int y) {
         return (y * width) + x;
     }
 
@@ -83,8 +86,9 @@ public abstract class AbstractPcTextScreen implements TextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#createCompatibleBufferScreen()
      */
-    public TextScreen createCompatibleBufferScreen() {
-        return new PcBufferTextScreen(getWidth(), getHeight(), this);
+    @Override
+    public final TextScreen createCompatibleBufferScreen() {
+        return new PcBufferTextScreen(this);
     }
         
     /**
@@ -93,19 +97,11 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      *
      * @return
      */
-    public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {
+    @Override
+    public final ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {
         if (height < getHeight()) {
             throw new IllegalArgumentException("Invalid height " + height);
         }
         return new PcScrollableTextScreen(getWidth(), height, this);        
-    }
-        
-    /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     */
-    public void ensureVisible(int row, boolean sync) {
-        // do nothing by default
     }
 }

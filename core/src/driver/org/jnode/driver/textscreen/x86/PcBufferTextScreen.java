@@ -22,6 +22,7 @@
 package org.jnode.driver.textscreen.x86;
 
 
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -31,6 +32,10 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
      * My parent
      */
     private final AbstractPcTextScreen parent;
+    
+    private final NoDisplayTextScreen noDisplay;
+    
+    private AbstractPcTextScreen actualParent;
 
     /**
      * Initialize this instance.
@@ -38,26 +43,38 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
      * @param width
      * @param height
      */
-    public PcBufferTextScreen(int width, int height, AbstractPcTextScreen parent) {
-        super(width, height);
-        this.parent = parent;
+    public PcBufferTextScreen(AbstractPcTextScreen parent) {
+        this(parent.getWidth(), parent.getHeight(), parent);
     }
 
+    /**
+     * Initialize this instance.
+     *
+     * @param width
+     * @param height
+     */
+    protected PcBufferTextScreen(int width, int height, AbstractPcTextScreen parent) {
+        super(width, height);
+        this.parent = parent;
+        this.noDisplay = new NoDisplayTextScreen(width, height);
+        setDisplayed(false);
+    }
+    
+    
+    public final void setDisplayed(boolean displayed) {
+        if (displayed) {
+            actualParent = parent;
+            sync(0, getWidth() * getHeight());
+        } else {
+            actualParent = noDisplay;
+        }
+    }
+    
     /**
      * Synchronize the state with the actual device.
      */
-    public void sync(int offset, int length) {
-        copyTo(parent, offset, length);
-    }
-
-    protected void setParentCursor(int x, int y) {
-        parent.setCursor(x, y);
-    }
-
-    /**
-     * @return Returns the parent.
-     */
-    protected final AbstractPcTextScreen getParent() {
-        return this.parent;
+    @Override
+    protected final void sync(int offset, int length) {
+        copyTo(actualParent, offset, length);
     }
 }

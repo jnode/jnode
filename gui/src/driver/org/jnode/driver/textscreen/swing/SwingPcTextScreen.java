@@ -33,19 +33,17 @@ import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
-import org.jnode.driver.textscreen.TextScreen;
-import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcBufferTextScreen;
 
 /**
  * A Swing based emulator for PcTextScreen.
  * 
  * @author Levente S\u00e1ntha
  */
-public class SwingPcTextScreen extends AbstractPcTextScreen {
+public class SwingPcTextScreen extends AbstractPcBufferTextScreen {
     private static final int SCREEN_WIDTH = 80;
     private static final int SCREEN_HEIGHT = 25;
-    char[] buffer;
-    private int cursorOffset;
+    
     private JComponent screen;
     private MyKeyboardDriver keyboardDriver = null;
     private Device keyboardDevice;
@@ -55,11 +53,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     private MouseHandler mouseListener;
 
     public SwingPcTextScreen() {
-        super(SCREEN_WIDTH, SCREEN_HEIGHT);
-        buffer = new char[SCREEN_WIDTH * SCREEN_HEIGHT];
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = ' ';
-        }
+        super(SCREEN_WIDTH, SCREEN_HEIGHT, true); // true = ignoreColors
 
         screen = new SwingPcScreen();
     }
@@ -94,6 +88,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             enableEvents(AWTEvent.KEY_EVENT_MASK);
             enableEvents(AWTEvent.FOCUS_EVENT_MASK);
             addMouseListener(new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
                         if (contains(e.getX(), e.getY())) {
@@ -111,10 +106,14 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, ftk);
         }
 
+        @Override
         protected void paintComponent(Graphics g) {
             g.setColor(getBackground());
             g.fillRect(0, 0, getWidth(), getHeight());
             g.setColor(Color.WHITE);
+            final int cursorOffset = getCursorOffset();
+            final char[] buffer = getBuffer();
+            
             for (int i = 0; i < SCREEN_HEIGHT; i++) {
                 int offset = i * SCREEN_WIDTH;
                 int lenght = SCREEN_WIDTH;
@@ -130,6 +129,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             }
         }
 
+        @Override
         public void addNotify() {
             super.addNotify();
 
@@ -144,10 +144,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             screen.setSize(screen.getMaximumSize());
         }
 
+        @Override
         public Dimension getPreferredSize() {
             return new Dimension(w * SCREEN_WIDTH + 2 * margin, (h + 1) * SCREEN_HEIGHT + 2 * margin);
         }
 
+        @Override
         public Dimension getMaximumSize() {
             return getPreferredSize();
         }
@@ -157,6 +159,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         if (keyboardDevice == null) {
             keyboardDriver = new MyKeyboardDriver();
             keyListener = new KeyAdapter() {
+                @Override
                 public void keyPressed(KeyEvent e) {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
@@ -166,6 +169,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
                 }
 
+                @Override
                 public void keyReleased(KeyEvent e) {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
@@ -188,30 +192,35 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     }
 
     private class MouseHandler extends MouseAdapter implements MouseMotionListener, MouseWheelListener {
+        @Override
         public void mousePressed(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseDragged(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), e.getWheelRotation(), true);
@@ -238,97 +247,26 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         return pointerDevice;
     }
 
-    public char getChar(int offset) {
-        return buffer[offset];
-    }
-
-    public int getColor(int offset) {
-        return 0;
-    }
-
-    public void set(int offset, char ch, int count, int color) {
-        char c = (char) (ch & 0xFF);
-        c = ((c == 0) ? ' ' : c);
-        for (int i = 0; i < count; i++) {
-            buffer[offset] = c;
-        }
-        sync(offset, count);
-    }
-
-    public void set(int offset, char[] ch, int chOfs, int length, int color) {
-        char[] cha = new char[ch.length];
-        for (int i = 0; i < cha.length; i++) {
-            char c = (char) (ch[i] & 0xFF);
-            cha[i] = c == 0 ? ' ' : c;
-        }
-        System.arraycopy(cha, chOfs, buffer, offset, length);
-        sync(offset, length);
-    }
-
-    public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
-        char[] cha = new char[ch.length];
-        for (int i = 0; i < cha.length; i++) {
-            char c = (char) (ch[i] & 0xFF);
-            cha[i] = c == 0 ? ' ' : c;
-        }
-        System.arraycopy(cha, chOfs, buffer, offset, length);
-        sync(offset, length);
-    }
-
-    public void copyContent(int srcOffset, int destOffset, int length) {
-        System.arraycopy(buffer, srcOffset * 2, buffer, destOffset * 2, length * 2);
-        sync(destOffset * 2, length * 2);
-    }
-
-    public void copyTo(TextScreen dst, int offset, int length) {
-
-    }
-
     Runnable repaintCmd = new Runnable() {
         public void run() {
             screen.repaint();
         }
     };
 
-    public void sync(int offset, int length) {
+    @Override
+    protected void sync(int offset, int length) {
         SwingUtilities.invokeLater(repaintCmd);
-    }
-
-    public int setCursor(int x, int y) {
-        cursorOffset = getOffset(x, y);
-        return cursorOffset;
-    }
-
-    public int setCursorVisible(boolean visible) {
-        return cursorOffset;
-    }
-
-    /**
-     * Copy the content of the given rawData into this screen.
-     * 
-     * @param rawData
-     * @param rawDataOffset
-     */
-    public void copyFrom(char[] rawData, int rawDataOffset) {
-        if (rawDataOffset < 0) {
-            // Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
-        }
-        char[] cha = new char[rawData.length];
-        for (int i = 0; i < cha.length; i++) {
-            char c = (char) (rawData[i] & 0xFF);
-            cha[i] = c == 0 ? ' ' : c;
-        }
-        System.arraycopy(cha, rawDataOffset, buffer, 0, getWidth() * getHeight());
-        sync(0, getWidth() * getHeight());
     }
 
     private static class MyPointerDriver extends Driver implements PointerAPI {
         private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
+        @Override
         protected synchronized void startDevice() throws DriverException {
             getDevice().registerAPI(PointerAPI.class, this);
         }
 
+        @Override
         protected synchronized void stopDevice() throws DriverException {
 
         }
@@ -342,10 +280,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             }
         }
 
+        @Override
         public void addPointerListener(PointerListener l) {
             listeners.add(l);
         }
 
+        @Override
         public void removePointerListener(PointerListener l) {
             listeners.remove(l);
         }
@@ -358,6 +298,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
          *
          * @param listener the prefered pointer listener
          */
+        @Override
         public void setPreferredListener(PointerListener listener) {
             
         }
@@ -366,10 +307,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     private static class MyKeyboardDriver extends Driver implements KeyboardAPI {
         private final ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
 
+        @Override
         protected synchronized void startDevice() throws DriverException {
             getDevice().registerAPI(KeyboardAPI.class, this);
         }
 
+        @Override
         protected synchronized void stopDevice() throws DriverException {
 
         }
@@ -391,22 +334,27 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             }
         }
 
+        @Override
         public void addKeyboardListener(KeyboardListener l) {
             listeners.add(l);
         }
 
+        @Override
         public KeyboardInterpreter getKbInterpreter() {
             return null;
         }
 
+        @Override
         public void removeKeyboardListener(KeyboardListener l) {
             listeners.remove(l);
         }
 
+        @Override
         public void setKbInterpreter(KeyboardInterpreter kbInterpreter) {
 
         }
 
+        @Override
         public void setPreferredListener(KeyboardListener l) {
 
         }

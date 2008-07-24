@@ -38,7 +38,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
      * Height of the parent screen
      */
     private final int parentHeight;
-    
+
     /**
      * Maximum row that has valid data
      */
@@ -56,6 +56,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     /**
      * @see org.jnode.driver.textscreen.ScrollableTextScreen#ensureVisible(int, boolean)
      */
+    @Override
     public void ensureVisible(int row, boolean sync) {
         if (row < ofsY) {
             ofsY = row;
@@ -67,6 +68,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     /**
      * @see org.jnode.driver.textscreen.ScrollableTextScreen#scrollDown(int)
      */
+    @Override
     public void scrollDown(int rows) {
         if (rows < 0) {
             throw new IllegalArgumentException("rows < 0");
@@ -75,11 +77,14 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
         if (ofsY + parentHeight < height) {
             ofsY = ofsY + Math.min(rows, height - (ofsY + parentHeight));
         }
+        
+        sync(0, rows * getWidth());        
     }
 
     /**
      * @see org.jnode.driver.textscreen.ScrollableTextScreen#scrollUp(int)
      */
+    @Override
     public void scrollUp(int rows) {
         if (rows < 0) {
             throw new IllegalArgumentException("rows < 0");
@@ -87,6 +92,9 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
         if (ofsY > 0) {
             ofsY = ofsY - Math.min(ofsY, rows);
         }
+        
+        final int length = rows * getWidth();
+        sync(getHeight() * getWidth() - length, length);        
     }
 
     /**
@@ -94,6 +102,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
      * 
      * @return
      */
+    @Override
     protected int getTopOffset() {
         return ofsY * getWidth();
     }  
@@ -101,6 +110,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
+    @Override
     public void set(int offset, char ch, int count, int color) {
         maxValidY = Math.max(maxValidY, offset / getWidth());
         super.set(offset, ch, count, color);
@@ -108,6 +118,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int)
      */
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         maxValidY = Math.max(maxValidY, (offset + length - 1) / getWidth());
         super.set(offset, ch, chOfs, length, color);
@@ -115,6 +126,7 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int[], int)
      */
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
         maxValidY = Math.max(maxValidY, (offset + length - 1) / getWidth());

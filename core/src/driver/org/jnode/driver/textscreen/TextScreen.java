@@ -23,7 +23,7 @@ package org.jnode.driver.textscreen;
 
 /**
  * Abstract class that represents different kinds of screens : - physical screen
- * (video memory) - buffered screen (system memory, faster that video memory) -
+ * (video memory) - buffered screen (system memory, faster than video memory) -
  * remote screen, shared screen, multiple screens ... - recording screen (movies
  * for demos or tutorials)
  * 
@@ -118,13 +118,6 @@ public interface TextScreen {
     public int getOffset(int x, int y);
     
     /**
-     * Synchronize the state with the actual device.
-     * @param offset
-     * @param length
-     */
-    public void sync(int offset, int length);
-    
-    /**
      * Create an in-memory buffer text screen that is compatible
      * with this screen.
      *
@@ -140,14 +133,6 @@ public interface TextScreen {
      */
     public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height);
     
-    /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     * @param sync true if screen should synchronize
-     */
-    public void ensureVisible(int row, boolean sync);
-
     /**
      * 
      * @param x

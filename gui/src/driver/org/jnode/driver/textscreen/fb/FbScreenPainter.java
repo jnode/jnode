@@ -7,32 +7,35 @@ import java.awt.image.BufferedImage;
 
 import org.jnode.driver.video.Surface;
 
-class FbScreenPainter extends Thread {
+class FbScreenPainter {
     private static final int margin = 5;
     private static final int w = 7;
     private static final int h = 18;
     
-    private final Surface g;
+    private final Surface surface;
     private final int sw;
     private final int sh;
-    private final BufferedImage bi;
-    private final Graphics ig;
+    private final BufferedImage buffer;
+    private final Graphics graphics;
     private final Font font;
     private final FbTextScreen screen;
     private final Thread painterThread;
 
-    //private final Background background = new DefaultBackground(Color.BLACK);
-    private final Background background = new GradientBackground();
+    private final Background background;
         
     private boolean update;
 
     public FbScreenPainter(FbTextScreen screen, Surface g) {
         this.screen = screen;
-        this.g = g;
+        this.surface = g;
         sh = h * screen.getHeight() + 2 * margin;
         sw = w * screen.getWidth() + 2 * margin;
-        bi = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
-        ig = bi.getGraphics();
+        
+        //background = new DefaultBackground(Color.BLACK);
+        background = new GradientBackground(sw, sh);
+        
+        buffer = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
+        graphics = buffer.getGraphics();
         font = new Font(
                 "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
                 Font.PLAIN, 12);
@@ -58,27 +61,28 @@ class FbScreenPainter extends Thread {
     }
         
     protected void paintComponent() {
-        background.paint(ig);
+        background.paint(graphics);
         
-        ig.setColor(Color.WHITE);
-        ig.setFont(font);
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(font);
         
-        final char[] buffer = screen.getBuffer();
+        final char[] textBuffer = screen.getScreenBuffer();        
         final int length = screen.getWidth();
         int offset = 0;
         final int x = margin;
         int y = h;
         
         for (int i = 0; i < screen.getHeight(); i++) {
-            ig.drawChars(buffer, offset, length, x, y);
+            graphics.drawChars(textBuffer, offset, length, x, y);
             
             offset += length;
             y += h;
         }
-        g.drawCompatibleRaster(bi.getRaster(), 0, 0, 0, 0, sw, sh, Color.BLACK);
+        surface.drawCompatibleRaster(buffer.getRaster(), 0, 0, 0, 0, sw, sh, Color.BLACK);
     }
     
     public synchronized void repaint() {
+        //Unsafe.debug("repaint");
         if (!update) {
             update = true;
             notifyAll();
