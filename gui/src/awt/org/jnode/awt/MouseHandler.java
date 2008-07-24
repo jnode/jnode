@@ -26,11 +26,9 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Collection;
-import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -79,10 +77,12 @@ public class MouseHandler implements PointerListener {
     private int y;
 
     /**
-     * Create a new instance
+     * Create a new instance.
      *
-     * @param fbDevice
-     * @param screenSize
+     * @param fbDevice        a frame buffer device
+     * @param screenSize      screen size
+     * @param eventQueue      the event queue instance
+     * @param keyboardHandler keyboard handler
      */
     public MouseHandler(Device fbDevice, Dimension screenSize,
                         EventQueue eventQueue, KeyboardHandler keyboardHandler) {
@@ -119,13 +119,16 @@ public class MouseHandler implements PointerListener {
                 hwCursor.setCursorPosition(0, 0);
             }
             pointerAPI.addPointerListener(this);
+            pointerAPI.setPreferredListener(this);
         }
     }
 
     void setCursorImage(HardwareCursor ci) {
         if (hwCursor != null) {
-            hwCursor.setCursorImage(ci);
-            hwCursor.setCursorVisible(true);
+            synchronized (this) {
+                hwCursor.setCursorImage(ci);
+                hwCursor.setCursorVisible(true);
+            }
         }
     }
 
@@ -221,16 +224,13 @@ public class MouseHandler implements PointerListener {
     }
 
     /**
-     * TODO handle wheel mouse events (given by newZ)
-     *
-     * @param buttons
+     * @param buttons  a vlaue encoding the state of mouse buttons
      * @param newX     a relative or absolute value for x coordinate
      * @param newY     a relative or absolute value for y coordinate
      * @param newZ     a relative or absolute value for wheel mouse
      * @param absolute are newX, newY and newZ relative or absolute values ?
      */
-    void pointerStateChanged(int buttons, int newX, int newY, int newZ,
-                             boolean absolute) {
+    void pointerStateChanged(int buttons, int newX, int newY, int newZ, boolean absolute) {
         long time = System.currentTimeMillis();
         final int newAbsX = absolute ? newX : x + newX;
         final int newAbsY = absolute ? newY : y + newY;
@@ -282,9 +282,14 @@ public class MouseHandler implements PointerListener {
             if (lastSource != null) {
                 // Notify mouse exited
                 postEvent(lastSource, MouseEvent.MOUSE_EXITED, time, 0, MouseEvent.NOBUTTON, 0);
+                if (lastSource.isCursorSet())
+                    lastSource.setCursor(lastSource.getCursor());
             }
             // Notify mouse entered
             postEvent(source, MouseEvent.MOUSE_ENTERED, time, 0, MouseEvent.NOBUTTON, 0);
+            if (source.isCursorSet())
+                source.setCursor(source.getCursor());
+
             for (int i = buttonClickTime.length; --i > 0; buttonClickTime[i] = 0) ;
             eventFired = true;
             postClicked = false;
@@ -306,20 +311,24 @@ public class MouseHandler implements PointerListener {
     }
 
     /**
-     * Post a mouse event with the given id and button.
+     * Post a mouse event with the given properties.
      *
-     * @param id
-     * @param button
+     * @param source     the source component of the event
+     * @param id         the event identifier
+     * @param time       the time of occurence of this event
+     * @param clickCount the number of mouse clicks
+     * @param button     the mouse button in action
+     * @param wheelAmt   the amount that the mouse wheel was rotated
      */
     private void postEvent(Component source, int id, long time, int clickCount, int button, int wheelAmt) {
         if (!source.isShowing()) return;
-        final Window w = SwingUtilities.getWindowAncestor(source);
-        Point pwo = null;
-        if (w != null && w.isShowing()) {
-            pwo = w.getLocationOnScreen();
-        } else {
-            pwo = new Point(0, 0);
-        }
+//        final Window w = SwingUtilities.getWindowAncestor(source);
+//        Point pwo;
+//        if (w != null && w.isShowing()) {
+//            pwo = w.getLocationOnScreen();
+//        } else {
+//            pwo = new Point(0, 0);
+//        }
 
         final Point p = source.getLocationOnScreen();
         final boolean popupTrigger = (button == MouseEvent.BUTTON2);
@@ -340,24 +349,27 @@ public class MouseHandler implements PointerListener {
             if (id == MouseEvent.MOUSE_PRESSED) {
                 ((JNodeToolkit) Toolkit.getDefaultToolkit()).activateWindow(source);
             }
-            //if(id==MouseEvent.MOUSE_PRESSED)
-            //    System.out.println("MouseEvent.MOUSE_PRESSED");
-            //System.out.println("postEvent:"+event);
         }
 
         //debug
-        if (id == MouseEvent.MOUSE_PRESSED ||
+        /*
+        if (
+            id == MouseEvent.MOUSE_PRESSED ||
             id == MouseEvent.MOUSE_RELEASED ||
-            id == MouseEvent.MOUSE_CLICKED) {
+            id == MouseEvent.MOUSE_CLICKED ||
+            id == MouseEvent.MOUSE_ENTERED ||
+            id == MouseEvent.MOUSE_EXITED
+            ) {
 
-//              org.jnode.vm.Unsafe.debug(event.toString()+"\n");
-//              org.jnode.vm.Unsafe.debug("x="+ x + " y=" + y +" ex="+ ex + " ey=" + ey + 
-//                  " p.x=" + p.x + " p.y=" + p.y +"\n");
+              org.jnode.vm.Unsafe.debug(event.toString()+"\n");
+              org.jnode.vm.Unsafe.debug("x="+ x + " y=" + y +" ex="+ ex + " ey=" + ey +
+                  " p.x=" + p.x + " p.y=" + p.y +"\n");
         }
+        */
         eventQueue.postEvent(event);
     }
 
-    private final Component findSource() {
+    private Component findSource() {
         final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
         Component source = tk.getTopComponentAt(x, y);
         if ((source != null) && source.isShowing()) {
@@ -367,7 +379,7 @@ public class MouseHandler implements PointerListener {
         }
     }
 
-    private final int getModifiers() {
+    private int getModifiers() {
         int modifiers = 0;
         if (buttonPressed[0]) modifiers |= MouseEvent.BUTTON1_MASK;
         if (buttonPressed[1]) modifiers |= MouseEvent.BUTTON2_MASK;
