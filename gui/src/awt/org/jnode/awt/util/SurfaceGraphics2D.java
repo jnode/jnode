@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Paint;
+import java.awt.PaintContext;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -29,8 +30,11 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
@@ -120,7 +124,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void clip(Shape s) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.clip() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.clip() not implemented\n");
     }
 
     /**
@@ -142,7 +146,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void draw(Shape s) {
         //todo G2D clip & transfom
-        //org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.draw() not implemented\n");
+        //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.draw() not implemented\n");
         Point p = simpleGraphics.origin;
         AffineTransform t = AffineTransform.getTranslateInstance(p.x, p.y);
         surface.draw(s, simpleGraphics.getClip(), t, getColor(), mode);
@@ -176,7 +180,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void drawGlyphVector(GlyphVector g, float x, float y) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawGlyphVector() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawGlyphVector() not implemented\n");
     }
 
     /**
@@ -276,7 +280,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void drawRenderableImage(RenderableImage img, AffineTransform xform) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawRenderableImage() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawRenderableImage() not implemented\n");
     }
 
     /**
@@ -303,7 +307,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawRenderedImage() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawRenderedImage() not implemented\n");
     }
 
     /**
@@ -332,7 +336,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void drawString(AttributedCharacterIterator iterator, float x, float y) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawString() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawString() not implemented\n");
     }
 
     /**
@@ -363,7 +367,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public void drawString(String str, float x, float y) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawString2() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawString2() not implemented\n");
     }
 
     /**
@@ -382,7 +386,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see #setClip
      */
     public void fill(Shape s) {
-        //org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.fill() todo G2D clip & transfom\n");
+        //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.fill() todo G2D clip & transfom\n");
         //todo G2D clip & transfom
         Point p = simpleGraphics.origin;
         AffineTransform t = AffineTransform.getTranslateInstance(p.x, p.y);
@@ -447,7 +451,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
 
     public FontRenderContext getFontRenderContext() {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.getFontRendererContext() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.getFontRendererContext() not implemented\n");
         return null;
     }
 
@@ -560,7 +564,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      */
     public boolean hit(Rectangle rect, Shape s, boolean onStroke) {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.hit() not implemented\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.hit() not implemented\n");
         return false;
     }
 
@@ -582,7 +586,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @param theta the angle of rotation in radians
      */
     public void rotate(double theta) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.rotate1() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.rotate1() invoked\n");
         transform.concatenate(AffineTransform.getRotateInstance(theta));
     }
 
@@ -607,7 +611,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @param y     the y coordinate of the origin of the rotation
      */
     public void rotate(double theta, double x, double y) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.rotate2() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.rotate2() invoked\n");
         transform.concatenate(AffineTransform.getRotateInstance(theta, x, y));
     }
 
@@ -632,7 +636,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      *           rendering operations.
      */
     public void scale(double sx, double sy) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.scale() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.scale() invoked\n");
         transform.concatenate(AffineTransform.getScaleInstance(sx, sy));
     }
 
@@ -793,7 +797,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see java.awt.geom.AffineTransform
      */
     public void setTransform(AffineTransform Tx) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.setTransform() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.setTransform() invoked\n");
         this.transform = new AffineTransform(Tx);
     }
 
@@ -817,7 +821,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      *            the positive Y axis direction as a function of their X coordinate
      */
     public void shear(double shx, double shy) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.shear() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.shear() invoked\n");
         transform.concatenate(AffineTransform.getShearInstance(shx, shy));
     }
 
@@ -840,7 +844,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see java.awt.geom.AffineTransform
      */
     public void transform(AffineTransform Tx) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.transform() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.transform() invoked\n");
         transform.concatenate(Tx);
     }
 
@@ -862,7 +866,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @param ty the distance to translate along the y-axis
      */
     public void translate(double tx, double ty) {
-        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.translate() invoked\n");
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.translate() invoked\n");
         transform.concatenate(AffineTransform.getTranslateInstance(tx, ty));
     }
 
@@ -933,7 +937,35 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
     }
 
     public void fillRect(int x, int y, int width, int height) {
-        simpleGraphics.fillRect(x, y, width, height);
+        if (paint == null) {
+            simpleGraphics.fillRect(x, y, width, height);
+        } else {
+            ColorModel scm = surface.getColorModel();
+            PaintContext pc = paint.createContext(scm, new Rectangle(0, 0, 800, 600),
+                new Rectangle(0, 0, 800, 600), new AffineTransform(), renderingHints);
+
+            x = x + simpleGraphics.origin.x;
+            y = y + simpleGraphics.origin.y;
+            Raster raster = pc.getRaster(x, y, width, height);
+
+            ColorModel cm = pc.getColorModel();
+
+            WritableRaster raster2 = scm.createCompatibleWritableRaster(width, height);
+            Object de1 = null;
+            Object de2 = null;
+            int[] comps = new int[4];
+            for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++) {
+                    de1 = raster.getDataElements(i, j, de1);
+                    comps = cm.getComponents(de1, comps, 0);
+                    comps[3] = 0xFF;
+                    de2 = scm.getDataElements(comps, 0, de2);
+                    raster2.setDataElements(i, j, de2);
+                }
+
+            BufferedImage img = new BufferedImage(scm, raster2, cm.isAlphaPremultiplied(), null);
+            drawImage(img, x, y, background, null);
+        }
     }
 
     public void clearRect(int x, int y, int width, int height) {
@@ -1008,34 +1040,34 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
     }
 
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
-//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-1\n");
+//        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage()-1\n");
         return simpleGraphics.drawImage(img, x, y, observer);
     }
 
     public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
-//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-2\n");
+//        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage()-2\n");
         return simpleGraphics.drawImage(img, x, y, width, height, observer);
     }
 
     public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
-//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-3\n");
+//        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage()-3\n");
         return simpleGraphics.drawImage(img, x, y, bgcolor, observer);
     }
 
     public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
-//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-4\n");
+//        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage()-4\n");
         return simpleGraphics.drawImage(img, x, y, width, height, bgcolor, observer);
     }
 
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2,
                              ImageObserver observer) {
-//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-5\n");
+//        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage()-5\n");
         return simpleGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
     }
 
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2,
                              Color bgcolor, ImageObserver observer) {
-//        org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-6\n");
+//        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawImage()-6\n");
         return simpleGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
     }
 
