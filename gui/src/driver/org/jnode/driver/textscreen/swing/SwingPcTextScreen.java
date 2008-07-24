@@ -349,6 +349,18 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         public void removePointerListener(PointerListener l) {
             listeners.remove(l);
         }
+
+        /**
+         * Claim to be the preferred listener.
+         * The given listener must have been added by addPointerListener.
+         * If there is a security manager, this method will call
+         * <code>checkPermission(new DriverPermission("setPreferredListener"))</code>.
+         *
+         * @param listener the prefered pointer listener
+         */
+        public void setPreferredListener(PointerListener listener) {
+            
+        }
     }
 
     private static class MyKeyboardDriver extends Driver implements KeyboardAPI {

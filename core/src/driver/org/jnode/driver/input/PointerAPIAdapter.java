@@ -40,21 +40,31 @@ public class PointerAPIAdapter implements PointerAPI {
     private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
     /**
-     * Add a pointer listener
+     * Add a pointer listener.
      *
-     * @param l
+     * @param listener the pointer listener to be added
      */
-    public synchronized void addPointerListener(PointerListener l) {
-        listeners.add(l);
+    public synchronized void addPointerListener(PointerListener listener) {
+        listeners.add(listener);
     }
 
     /**
-     * Remove a pointer listener
+     * Remove a pointer listener.
      *
-     * @param l
+     * @param listener the pointer listener to be removed
      */
-    public synchronized void removePointerListener(PointerListener l) {
-        listeners.remove(l);
+    public synchronized void removePointerListener(PointerListener listener) {
+        listeners.remove(listener);
+    }
+
+    public synchronized void setPreferredListener(PointerListener l) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(SET_PREFERRED_LISTENER_PERMISSION);
+        }
+        if (listeners.remove(l)) {
+            listeners.add(0, l);
+        }
     }
 
     /**
@@ -67,7 +77,7 @@ public class PointerAPIAdapter implements PointerAPI {
     /**
      * Fire a given pointer event to all known listeners.
      *
-     * @param event
+     * @param event the event to be fired
      */
     public synchronized void fireEvent(PointerEvent event) {
         for (PointerListener l : listeners) {

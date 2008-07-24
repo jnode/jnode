@@ -49,6 +49,14 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
         super.removeListener(l);
     }
 
+    public synchronized void setPreferredListener(PointerListener l) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(SET_PREFERRED_LISTENER_PERMISSION);
+        }
+        super.setPreferredListener(l);
+    }
+
     /**
      * Start the pointer device.
      */
@@ -117,14 +125,14 @@ public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerE
     }
 
     /**
-     * Send a given keyboard event to the given listener.
+     * Send a given pointer event to the given listener.
      *
-     * @param l
-     * @param event
+     * @param listener the pointer listener to recieve the event
+     * @param event the pointer event
      */
     @Override
-    protected void sendEvent(SystemListener l, PointerEvent event) {
-        PointerListener ml = (PointerListener) l;
+    protected void sendEvent(SystemListener listener, PointerEvent event) {
+        PointerListener ml = (PointerListener) listener;
         ml.pointerStateChanged(event);
     }
 
