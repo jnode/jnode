@@ -90,6 +90,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#copyContent(int, int, int)
      */
+    @Override
     public void copyContent(int srcOffset, int destOffset, int length) {
         memory.copy(srcOffset * 2, destOffset * 2, length * 2);
     }
@@ -97,22 +98,25 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
      */
+    @Override
     public char getChar(int offset) {
-        return (char) (memory.getByte(offset * 2) & 0xFF);
+        return (char) PcTextScreenUtils.decodeCharacter(memory.getByte(offset * 2));
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
      */
+    @Override
     public int getColor(int offset) {
-        return memory.getByte(offset * 2 + 1) & 0xFF;
+        return PcTextScreenUtils.decodeColor((char) memory.getByte(offset * 2 + 1));
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
+    @Override
     public void set(int offset, char ch, int count, int color) {
-        final char v = (char) ((ch & 0xFF) | ((color & 0xFF) << 8));
+        final char v = PcTextScreenUtils.encodeCharacterAndColor(ch, color);
         memory.setChar(offset * 2, v, count);
     }
 
@@ -120,10 +124,11 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int)
      */
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
-        color = (color & 0xFF) << 8;
+        color = PcTextScreenUtils.encodeColor(color);
         for (int i = 0; i < length; i++) {
-            final int v = (ch[chOfs + i] & 0xFF) | color;
+            final int v = PcTextScreenUtils.encodeCharacter(ch[chOfs + i]) | color;
             memory.setChar((offset + i) * 2, (char) v);
         }
     }
@@ -132,12 +137,12 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int[], int)
      */
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
         for (int i = 0; i < length; i++) {
-            final int v = (ch[chOfs + i] & 0xFF)
-                    | ((colors[colorsOfs + i] & 0xFF) << 8);
-            memory.setChar((offset + i) * 2, (char) v);
+            final char v = PcTextScreenUtils.encodeCharacterAndColor(ch[chOfs + i], colors[colorsOfs + i]);
+            memory.setChar((offset + i) * 2, v);
         }
     }
 
@@ -147,6 +152,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @param rawData
      * @param rawDataOffset
      */
+    @Override
     public final void copyFrom(char[] rawData, int rawDataOffset) {
         if (rawDataOffset < 0) {
             Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
@@ -160,23 +166,18 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * 
      * @param dst
      */
+    @Override
     public void copyTo(TextScreen dst, int offset, int length) {
         throw new UnsupportedOperationException();
     }
-
-    /**
-     * Synchronize the state with the actual device.
-     */
-    public void sync(int offset, int length) {
-        // Nothing to do here
-    }
-
+    
+    @Override
     public int setCursor(int x, int y) {
-        //instance.setCursor( x,y);
-        return 0; // TODO what should we return if we don't call instance.setCursor ?
+        return 0; 
     }
 
+    @Override
     public int setCursorVisible(boolean visible) {
-        return instance.setCursorVisible(visible);
+        return 0;
     }
 }

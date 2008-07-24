@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -51,6 +53,7 @@ import org.jnode.driver.input.PointerEvent;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.BootLog;
 import org.jnode.system.event.FocusEvent;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
@@ -207,14 +210,14 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * @param console
      */
     public synchronized void focus(Console console) {
-        log.debug("focus(" + console.getConsoleName() + ")");
+        Unsafe.debug("focus(" + console.getConsoleName() + ")");
         if (this.current != null && this.current != console) {
-            log.debug("Sending focusLost to " + current.getConsoleName());
+            Unsafe.debug("Sending focusLost to " + current.getConsoleName());
             this.current.focusLost(new FocusEvent(FocusEvent.FOCUS_LOST));
         }
         this.current = console;
         if (this.current != null) {
-            log.debug("Sending focusGained to " + current.getConsoleName());
+            Unsafe.debug("Sending focusGained to " + current.getConsoleName());
             current.focusGained(new FocusEvent(FocusEvent.FOCUS_GAINED));
         }
     }

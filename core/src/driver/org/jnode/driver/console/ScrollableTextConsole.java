@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: TextConsole.java 4153 2008-05-30 12:20:45Z lsantha $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -19,29 +19,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.driver.textscreen.fb;
-
-import org.jnode.driver.textscreen.x86.AbstractPcBufferTextScreen;
-import org.jnode.driver.video.Surface;
+package org.jnode.driver.console;
 
 
-class FbTextScreen extends AbstractPcBufferTextScreen {
-    private static final int SCREEN_WIDTH = 80;
-    private static final int SCREEN_HEIGHT = 25;
-    
-    private final FbScreenPainter painter;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
+ */
+public interface ScrollableTextConsole extends TextConsole {
 
-    public FbTextScreen(Surface g) {
-        super(SCREEN_WIDTH, SCREEN_HEIGHT, true); // true = ignore colors
-        painter = new FbScreenPainter(this, g);
-    }
-
-    @Override
-    protected void sync(int offset, int length) {
-        painter.repaint();
-    }
-
-    public char[] getScreenBuffer() {
-        return getBuffer();
-    }
+    /**
+     * Ensure that the given row is visible.
+     *
+     * @param row
+     */
+    public void ensureVisible(int row);
 }
