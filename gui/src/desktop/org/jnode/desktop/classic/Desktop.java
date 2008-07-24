@@ -186,18 +186,13 @@ public class Desktop implements Runnable {
                 };
                 taskBar.desktopColorMI.addActionListener(desktopColorAction);
 
-
                 awtRoot.removeAll();
                 awtRoot.setLayout(new BorderLayout());
                 final int controlBarHeight = 36;
                 final int w = awtRoot.getWidth();
                 taskBar.setPreferredSize(new Dimension(w, controlBarHeight));
                 awtRoot.add(taskBar, BorderLayout.SOUTH);
-
-                //desktopFrame.setBackgroundImage(loadImage());
-
                 awtRoot.add(desktopPane, BorderLayout.CENTER);
-
 
                 awtRoot.invalidate();
                 awtRoot.repaint();
@@ -242,8 +237,6 @@ public class Desktop implements Runnable {
             final Component c = event.getChild();
             if (c instanceof JInternalFrame && !JNodeToolkit.getJNodeToolkit().isWindow(c)) {
                 taskBar.windowBar.addFrame((JInternalFrame) c);
-            } else {
-                log.info("componentAdded: " + c.getClass().getName());
             }
         }
 
@@ -254,9 +247,7 @@ public class Desktop implements Runnable {
             final Component c = event.getChild();
             if (c instanceof JInternalFrame) {
                 taskBar.windowBar.removeFrame((JInternalFrame) c);
-            } else {
-                log.info("componentRemoved: " + c.getClass().getName());
-            }
+            } 
         }
     }
 
