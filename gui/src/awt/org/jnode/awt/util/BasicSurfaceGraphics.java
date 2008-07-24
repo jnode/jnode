@@ -278,6 +278,81 @@ public class BasicSurfaceGraphics extends BasicGraphics {
      */
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2,
                              Color bgcolor, ImageObserver observer) {
+        if (img == null)
+            return true;
+
+        if (dx1 == dx2 || dy1 == dy2 || sx1 == sx2 || sy1 == sy2)
+            return true;
+
+
+        final int widthImage;
+        final int heightImage;
+        final int xImage;
+        final int yImage;
+        if (sx2 > sx1) {
+            widthImage = sx2 - sx1 + 1;
+            xImage = sx1;
+        } else {
+            widthImage = sx1 - sx2 + 1;
+            xImage = sx2;
+        }
+
+        if (sy2 > sy1) {
+            heightImage = sy2 - sy1 + 1;
+            yImage = sy1;
+        } else {
+            heightImage = sy1 - sy2 + 1;
+            yImage = sy2;
+        }
+
+        final int widthDest;
+        final int heightDest;
+        final int xDest;
+        final int yDest;
+        if (dx2 > dx1) {
+            widthDest = dx2 - dx1 + 1;
+            xDest = dx1;
+        } else {
+            widthDest = dx1 - dx2 + 1;
+            xDest = dx2;
+        }
+
+        if (dy2 > dy1) {
+            heightDest = dy2 - dy1 + 1;
+            yDest = dy1;
+        } else {
+            heightDest = dy1 - dy2 + 1;
+            yDest = dy2;
+        }
+
+
+        final Image imageArea;
+        if (img.getWidth(observer) == widthImage && img.getHeight(observer) == heightImage) {
+            imageArea = img;
+        } else {
+            // Extract the image with a CropImageFilter
+            imageArea = new ToolkitImage(new FilteredImageSource(img.getSource(),
+                new CropImageFilter(xImage, yImage, widthImage, heightImage)));
+        }
+
+        if (widthImage == widthDest && heightImage == heightDest) {
+            if (bgcolor == null) {
+                return drawImage(imageArea, xDest, yDest, observer);
+            } else {
+                return drawImage(imageArea, xDest, yDest, bgcolor, observer);
+            }
+        } else {
+            if (bgcolor == null) {
+                return drawImage(imageArea, xDest, yDest, widthDest, heightDest, observer);
+            } else {
+                return drawImage(imageArea, xDest, yDest, widthDest, heightDest, bgcolor, observer);
+            }
+        }
+    }
+
+    /*
+    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2,
+                             Color bgcolor, ImageObserver observer) {
         if (img == null) return true;
 
         if (dx1 == dx2 || dy1 == dy2) {
@@ -337,7 +412,7 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             return drawImage(imageArea, xDest, yDest, widthDest, heightDest, bgcolor, observer);
         }
     }
-
+     */
     /**
      * Draws as much of the specified image as is currently available.
      * The image is drawn with its top-left corner at
@@ -493,7 +568,13 @@ public class BasicSurfaceGraphics extends BasicGraphics {
      * @see java.awt.image.ImageObserver#imageUpdate(java.awt.Image, int, int, int, int, int)
      */
     public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
-        return img == null || drawImage(new ToolkitImage(new FilteredImageSource(img.getSource(),
+        if (img == null)
+            return true;
+
+        if (img.getWidth(observer) == width && img.getHeight(observer) == height)
+            return drawImage(img, x, y, bgcolor, observer);
+
+        return drawImage(new ToolkitImage(new FilteredImageSource(img.getSource(),
             new AreaAveragingScaleFilter(width, height))), x, y, bgcolor, observer);
     }
 
@@ -535,7 +616,13 @@ public class BasicSurfaceGraphics extends BasicGraphics {
      * @see java.awt.image.ImageObserver#imageUpdate(java.awt.Image, int, int, int, int, int)
      */
     public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
-        return img == null || drawImage(new ToolkitImage(new FilteredImageSource(img.getSource(),
+        if (img == null)
+            return true;
+
+        if (img.getWidth(observer) == width && img.getHeight(observer) == height)
+            return drawImage(img, x, y, observer);
+
+        return drawImage(new ToolkitImage(new FilteredImageSource(img.getSource(),
             new AreaAveragingScaleFilter(width, height))), x, y, observer);
     }
 
@@ -970,10 +1057,8 @@ public class BasicSurfaceGraphics extends BasicGraphics {
             }
         } else {
             // Convert it to a raster
-            final PixelGrabber grabber =
-                new PixelGrabber(image, 0, 0, image.getWidth(null), image.getHeight(null), true);
-            org.jnode.vm.Unsafe.debug("BasicSurfaceGraphics.getCompatibleRaster() " + image + ", " +
-                image.getWidth(null) + ", " + image.getHeight(null) + "\n");
+            final PixelGrabber grabber = new PixelGrabber(image, 0, 0, image.getWidth(null),
+                image.getHeight(null), true);
             if (grabber.grabPixels(10000)) {
                 final int w = grabber.getWidth();
                 final int h = grabber.getHeight();
@@ -990,7 +1075,6 @@ public class BasicSurfaceGraphics extends BasicGraphics {
                 }
                 return raster;
             } else {
-                org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics2D.drawImage()-1\n");
                 throw new IllegalArgumentException("Cannot grab pixels");
             }
         }
