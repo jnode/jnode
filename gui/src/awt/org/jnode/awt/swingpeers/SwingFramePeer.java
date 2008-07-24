@@ -254,6 +254,14 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
             setMenuBar(mb);
         }
 
+        if (!target.isBackgroundSet()) {
+            Color bg = peerComponent.getBackground();
+            if (bg == null) bg = UIManager.getColor("window");
+            if (bg == null) bg = UIManager.getColor("control");
+            if (bg == null) bg = Color.GRAY;
+            target.setBackground(bg);
+        }
+
         addToDesktop();
     }
 
