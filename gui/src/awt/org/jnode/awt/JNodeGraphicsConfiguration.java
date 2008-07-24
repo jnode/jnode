@@ -48,10 +48,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @param w
-     * @param h
-     * @param transparency
-     * @return The image
      * @see java.awt.GraphicsConfiguration#createCompatibleImage(int, int, int)
      */
     public BufferedImage createCompatibleImage(int w, int h, int transparency) {
@@ -59,9 +55,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @param w
-     * @param h
-     * @return The image
      * @see java.awt.GraphicsConfiguration#createCompatibleImage(int, int)
      */
     public BufferedImage createCompatibleImage(int w, int h) {
@@ -69,9 +62,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @param w
-     * @param h
-     * @return The image
      * @see java.awt.GraphicsConfiguration#createCompatibleVolatileImage(int, int)
      */
     public VolatileImage createCompatibleVolatileImage(int w, int h) {
@@ -96,8 +86,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @param transparency
-     * @return The color model
      * @see java.awt.GraphicsConfiguration#getColorModel(int)
      */
     public ColorModel getColorModel(int transparency) {
@@ -106,7 +94,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @return The default transform
      * @see java.awt.GraphicsConfiguration#getDefaultTransform()
      */
     public AffineTransform getDefaultTransform() {
@@ -115,7 +102,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @return The device
      * @see java.awt.GraphicsConfiguration#getDevice()
      */
     public GraphicsDevice getDevice() {
@@ -123,7 +109,6 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     }
 
     /**
-     * @return The transform
      * @see java.awt.GraphicsConfiguration#getNormalizingTransform()
      */
     public AffineTransform getNormalizingTransform() {
