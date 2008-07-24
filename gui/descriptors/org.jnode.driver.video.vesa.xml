@@ -5,9 +5,7 @@
         name="JNode Video VESA driver"
         version="@VERSION@"
         license-name="lgpl"
-        provider-name="JNode.org"
-        class="org.jnode.driver.video.vesa.VESAPlugin"
-        auto-start="true">
+        provider-name="JNode.org">
         
   <requires>
     <import plugin="org.jnode.driver.bus.pci"/>

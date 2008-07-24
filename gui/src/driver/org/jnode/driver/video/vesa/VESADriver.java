@@ -33,7 +33,6 @@ import org.jnode.driver.video.NotOpenException;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.system.ResourceNotFreeException;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.x86.UnsafeX86;
 import org.vmmagic.unboxed.Address;
 
@@ -42,7 +41,7 @@ import org.vmmagic.unboxed.Address;
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
  */
-public class VESADriver extends AbstractFrameBufferDriver implements VESAConstants {
+public class VESADriver extends AbstractFrameBufferDriver {
 
     private FrameBufferConfiguration currentConfig;
     private VESACore kernel;
@@ -82,7 +81,6 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
             }
         }
 
-        Unsafe.debug("\nthrowing UnknownConfigurationException");
         throw new UnknownConfigurationException();
     }
 
@@ -125,7 +123,6 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
                 throw new DriverException(
                         "can't start device (vbeInfoBlock is empty): grub haven't switched to graphic mode");
             }
-            Unsafe.debug("vbeInfoBlock=" + vbeInfoBlock);
 
             Address vbeModeInfo = UnsafeX86.getVbeModeInfos();
             modeInfoBlock = new ModeInfoBlock(vbeModeInfo);
@@ -137,10 +134,8 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
             kernel = new VESACore(this, vbeInfoBlock, modeInfoBlock, (PCIDevice) getDevice());            
             configs = kernel.getConfigs();
         } catch (ResourceNotFreeException ex) {
-            Unsafe.debugStackTrace("error in VESADriver.startDevice", ex);
             throw new DriverException(ex);
         } catch (Throwable t) {
-            Unsafe.debugStackTrace("error in VESADriver.startDevice", t);
             throw new DriverException(t);
         }
         final Device dev = getDevice();
