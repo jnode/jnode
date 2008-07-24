@@ -277,7 +277,10 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
      * @see java.awt.Toolkit#createImage(java.awt.image.ImageProducer)
      */
     public Image createImage(ImageProducer producer) {
-        return new ToolkitImage(producer);        
+        ToolkitImage image = new ToolkitImage(producer);
+        //force preloading
+        image.getWidth();
+        return image;
     }
 
     /**
