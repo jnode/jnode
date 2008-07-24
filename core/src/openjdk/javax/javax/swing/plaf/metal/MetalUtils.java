@@ -211,7 +211,6 @@ class MetalUtils {
      */
     static boolean drawGradient(Component c, Graphics g, String key,
                                 int x, int y, int w, int h, boolean vertical) {
-        /* jnode
         java.util.List gradient = (java.util.List)UIManager.get(key);
         if (gradient == null || !(g instanceof Graphics2D)) {
             return false;
@@ -223,7 +222,6 @@ class MetalUtils {
 
         GradientPainter.INSTANCE.paint(
                 c, (Graphics2D)g, gradient, x, y, w, h, vertical);
-        */
         return true;
     }
 
