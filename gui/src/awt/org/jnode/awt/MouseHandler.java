@@ -342,7 +342,6 @@ public class MouseHandler implements PointerListener {
                 1, popupTrigger, MouseWheelEvent.WHEEL_UNIT_SCROLL,
                 wheelAmt, //TODO check what to put here
                 wheelAmt); //TODO check what to put here
-            System.out.println("MouseWheelEvent");
         } else {
             event = new MouseEvent(source, id, time, modifiers, ex, ey,
                 clickCount, popupTrigger, button);
