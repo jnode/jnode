@@ -47,8 +47,13 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
 
     @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
-        item.addNotify();
-        jComponent.add(((SwingBaseMenuItemPeer) item.getPeer()).jComponent);
+        //the current awt way of adding a separator appears to be adding an item with "-" as the label
+        if ("-".equals(item.getLabel())) {
+            addSeparator();
+        } else {
+            item.addNotify();
+            jComponent.add(((SwingBaseMenuItemPeer) item.getPeer()).jComponent);
+        }
     }
 
     public void delItem(int index) {
