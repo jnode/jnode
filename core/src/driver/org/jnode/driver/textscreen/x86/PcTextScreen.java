@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.textscreen.x86;
 
 import javax.naming.NameNotFoundException;
@@ -69,7 +69,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
 
     /**
      * Get the singleton instance and create it if necessary.
-     * 
+     *
      * @return @throws
      *         PragmaUninterruptible
      */
@@ -90,7 +90,6 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#copyContent(int, int, int)
      */
-    @Override
     public void copyContent(int srcOffset, int destOffset, int length) {
         memory.copy(srcOffset * 2, destOffset * 2, length * 2);
     }
@@ -98,25 +97,22 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
      */
-    @Override
     public char getChar(int offset) {
-        return (char) PcTextScreenUtils.decodeCharacter(memory.getByte(offset * 2));
+        return (char) (memory.getByte(offset * 2) & 0xFF);
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
      */
-    @Override
     public int getColor(int offset) {
-        return PcTextScreenUtils.decodeColor((char) memory.getByte(offset * 2 + 1));
+        return memory.getByte(offset * 2 + 1) & 0xFF;
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
-    @Override
     public void set(int offset, char ch, int count, int color) {
-        final char v = PcTextScreenUtils.encodeCharacterAndColor(ch, color);
+        final char v = (char) ((ch & 0xFF) | ((color & 0xFF) << 8));
         memory.setChar(offset * 2, v, count);
     }
 
@@ -124,11 +120,10 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int)
      */
-    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
-        color = PcTextScreenUtils.encodeColor(color);
+        color = (color & 0xFF) << 8;
         for (int i = 0; i < length; i++) {
-            final int v = PcTextScreenUtils.encodeCharacter(ch[chOfs + i]) | color;
+            final int v = (ch[chOfs + i] & 0xFF) | color;
             memory.setChar((offset + i) * 2, (char) v);
         }
     }
@@ -137,22 +132,21 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int[], int)
      */
-    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
         for (int i = 0; i < length; i++) {
-            final char v = PcTextScreenUtils.encodeCharacterAndColor(ch[chOfs + i], colors[colorsOfs + i]);
-            memory.setChar((offset + i) * 2, v);
+            final int v = (ch[chOfs + i] & 0xFF)
+                    | ((colors[colorsOfs + i] & 0xFF) << 8);
+            memory.setChar((offset + i) * 2, (char) v);
         }
     }
 
     /**
      * Copy the content of the given rawData into this screen.
-     * 
+     *
      * @param rawData
      * @param rawDataOffset
      */
-    @Override
     public final void copyFrom(char[] rawData, int rawDataOffset) {
         if (rawDataOffset < 0) {
             Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
@@ -163,21 +157,26 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * Copies the entire screen to the given destination. For this operation to
      * succeed, the screens involved must be compatible.
-     * 
+     *
      * @param dst
      */
-    @Override
     public void copyTo(TextScreen dst, int offset, int length) {
         throw new UnsupportedOperationException();
     }
-    
-    @Override
-    public int setCursor(int x, int y) {
-        return 0; 
+
+    /**
+     * Synchronize the state with the actual device.
+     */
+    public void sync(int offset, int length) {
+        // Nothing to do here
     }
 
-    @Override
+    public int setCursor(int x, int y) {
+        //instance.setCursor( x,y);
+        return 0; // TODO what should we return if we don't call instance.setCursor ?
+    }
+
     public int setCursorVisible(boolean visible) {
-        return 0;
+        return instance.setCursorVisible(visible);
     }
 }

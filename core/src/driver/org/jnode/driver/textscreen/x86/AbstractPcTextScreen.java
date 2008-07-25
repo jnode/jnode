@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.textscreen.x86;
 
 import org.jnode.driver.textscreen.ScrollableTextScreen;
@@ -42,27 +42,25 @@ public abstract class AbstractPcTextScreen implements TextScreen {
         this.width = width;
         this.height = height;
     }
-    
+
     /**
      * Gets the height of the screen in letters.
-     * 
+     *
      * @return Returns the height.
      */
-    @Override
-    public final int getHeight() {
-        return height;        
+    public int getHeight() {
+        return height;
     }
 
     /**
      * Gets the width of the screen in letters.
-     * 
+     *
      * @return Returns the width.
      */
-    @Override
-    public final int getWidth() {
+    public int getWidth() {
         return width;
     }
-    
+
     /**
      * Calculate the offset for a given x,y coordinate.
      *
@@ -70,8 +68,7 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      * @param y
      * @return
      */
-    @Override
-    public final int getOffset(int x, int y) {
+    public int getOffset(int x, int y) {
         return (y * width) + x;
     }
 
@@ -86,22 +83,29 @@ public abstract class AbstractPcTextScreen implements TextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#createCompatibleBufferScreen()
      */
-    @Override
-    public final TextScreen createCompatibleBufferScreen() {
-        return new PcBufferTextScreen(this);
+    public TextScreen createCompatibleBufferScreen() {
+        return new PcBufferTextScreen(getWidth(), getHeight(), this);
     }
-        
+
     /**
      * Create an in-memory buffer text screen that is compatible
      * with the system screen, but larges and supports scrolling.
      *
      * @return
      */
-    @Override
-    public final ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {
+    public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {
         if (height < getHeight()) {
             throw new IllegalArgumentException("Invalid height " + height);
         }
-        return new PcScrollableTextScreen(getWidth(), height, this);        
+        return new PcScrollableTextScreen(getWidth(), height, this);
+    }
+
+    /**
+     * Ensure that the given row is visible.
+     *
+     * @param row
+     */
+    public void ensureVisible(int row, boolean sync) {
+        // do nothing by default
     }
 }

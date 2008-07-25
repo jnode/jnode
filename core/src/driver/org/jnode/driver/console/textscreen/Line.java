@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.SortedSet;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
-import org.jnode.driver.console.ScrollableTextConsole;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.ConsolePrintStream;
 
@@ -203,7 +202,7 @@ class Line {
         for (String item : list) {
             // item may actually be a single item or in fact multiple items
             if (item.length() % SCREEN_WIDTH == 0) {
-                // we are already at the first column of the next line 
+                // we are already at the first column of the next line
                 out.print(item);
             } else {
                 // we aren't at the first column of the next line
@@ -334,12 +333,7 @@ class Line {
             // if the line has not been shortened (delete, backspace...)
             if (!shortened) {
                 // ensure that the location of the input cursor is included.
-                if (console instanceof ScrollableTextConsole) {
-                    ((ScrollableTextConsole) console).ensureVisible(inputCursorY);
-                } else {
-                    // since the console is not scrollable, we can't do anything
-                    // if the row is not visible (the row is completely lost)
-                }
+                console.ensureVisible(inputCursorY);
             }
             console.setCursorVisible(true);
         } catch (Exception e) {

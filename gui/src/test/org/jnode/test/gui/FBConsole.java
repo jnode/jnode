@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
@@ -15,7 +14,8 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.textscreen.ScrollableTextScreenConsole;
 import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
-import org.jnode.driver.textscreen.x86.AbstractPcBufferTextScreen;
+import org.jnode.driver.textscreen.TextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
@@ -80,25 +80,104 @@ public class FBConsole {
     }
 
 
-    static class FBPcTextScreen extends AbstractPcBufferTextScreen {
+    static class FBPcTextScreen extends AbstractPcTextScreen {
         private static final int SCREEN_WIDTH = 80;
         private static final int SCREEN_HEIGHT = 25;
+        char[] buffer;
 
-        private final FBScreen screen;
+        int cursorOffset;
+
+        FBScreen screen;
 
         public FBPcTextScreen(Surface g) {
-            // true = ignoreColors
-            super(FBConsole.FBPcTextScreen.SCREEN_WIDTH, FBConsole.FBPcTextScreen.SCREEN_HEIGHT, true);
-            
+            super(FBConsole.FBPcTextScreen.SCREEN_WIDTH, FBConsole.FBPcTextScreen.SCREEN_HEIGHT);
+            buffer = new char[FBConsole.FBPcTextScreen.SCREEN_WIDTH * FBConsole.FBPcTextScreen.SCREEN_HEIGHT];
             screen = new FBScreen(g);
+            for (int i = 0; i < buffer.length; i++) {
+                buffer[i] = ' ';
+            }
             for (String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
                 System.out.println(s);
             }
         }
 
-        @Override
+
+        public char getChar(int offset) {
+            return buffer[offset];
+        }
+
+        public int getColor(int offset) {
+            return 0;
+        }
+
+        public void set(int offset, char ch, int count, int color) {
+            char c = (char) (ch & 0xFF);
+            buffer[offset] = c == 0 ? ' ' : c;
+            sync(offset, count);
+        }
+
+        public void set(int offset, char[] ch, int chOfs, int length, int color) {
+            char[] cha = new char[ch.length];
+            for (int i = 0; i < cha.length; i++) {
+                char c = (char) (ch[i] & 0xFF);
+                cha[i] = c == 0 ? ' ' : c;
+            }
+            System.arraycopy(cha, chOfs, buffer, offset, length);
+            sync(offset, length);
+        }
+
+        public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
+            char[] cha = new char[ch.length];
+            for (int i = 0; i < cha.length; i++) {
+                char c = (char) (ch[i] & 0xFF);
+                cha[i] = c == 0 ? ' ' : c;
+            }
+            System.arraycopy(cha, chOfs, buffer, offset, length);
+            sync(offset, length);
+        }
+
+        public void copyContent(int srcOffset, int destOffset, int length) {
+            System.arraycopy(buffer, srcOffset * 2, buffer, destOffset * 2, length * 2);
+            sync(destOffset, length);
+        }
+
+        public void copyTo(TextScreen dst, int offset, int length) {
+
+        }
+
+
         public void sync(int offset, int length) {
             screen.repaint();
+        }
+
+        public int setCursor(int x, int y) {
+            cursorOffset = getOffset(x, y);
+            return cursorOffset;
+        }
+
+        public int setCursorVisible(boolean visible) {
+            return cursorOffset;
+        }
+
+        /**
+         * Copy the content of the given rawData into this screen.
+         *
+         * @param rawData       the data as a char array
+         * @param rawDataOffset the offset in the data array
+         */
+        public void copyFrom(char[] rawData, int rawDataOffset) {
+            if (rawDataOffset < 0) {
+                //Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
+            }
+            char[] cha = new char[rawData.length];
+            for (int i = 0; i < cha.length; i++) {
+                char c = (char) (rawData[i] & 0xFF);
+                cha[i] = c == 0 ? ' ' : c;
+            }
+
+            final int length = getWidth() * getHeight();
+            System.arraycopy(cha, rawDataOffset, buffer, 0, length);
+            sync(0, length);
         }
 
         private class FBScreen {
@@ -137,7 +216,6 @@ public class FBConsole {
                 }
                 */
                 new Thread(new Runnable() {
-                    @Override
                     public void run() {
                         while (true) {
                             try {
@@ -157,8 +235,6 @@ public class FBConsole {
             }
 
             protected void paintComponent() {
-                final char[] buffer = getBuffer();
-                
                 ig.setColor(Color.BLACK);
                 ig.fillRect(0, 0, sw, sh);
                 ig.setColor(Color.WHITE);
