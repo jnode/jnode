@@ -64,6 +64,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
     private Composite composite = AlphaComposite.SrcOver;
     private Stroke stroke = DEFAULT_STROKE;
     private Paint paint;
+    private Shape clip2D;
     private RenderingHints renderingHints = new RenderingHints(DEFAULT_HINTS);
 
     protected SurfaceGraphics2D(AbstractSurface surface) {
@@ -80,6 +81,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
         this.composite = g.composite;
         this.stroke = g.stroke;
         this.paint = g.paint;
+        this.clip2D = g.clip2D;
         this.renderingHints = g.renderingHints;
     }
 
@@ -125,6 +127,29 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
     public void clip(Shape s) {
         //todo implement it
         org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.clip() not implemented\n");
+/*
+//        todo attempt to fix metal ocean slider painting
+        AffineTransform t = new AffineTransform();
+        t.translate(simpleGraphics.origin.x, simpleGraphics.origin.y);
+        s = t.createTransformedShape(s);
+        Shape clip = simpleGraphics.getClip();
+        if(clip != null){
+            Area as = new Area(s);
+            Area ac = new Area(clip);
+            as.intersect(ac);
+            s = as;
+        }
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.clip() 1 "+ s + "\n");
+        if(clip2D != null){
+            Area as = new Area(s);
+            Area ac = new Area(clip2D);
+            as.intersect(ac);
+            s = as;
+        }
+        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.clip() 2 "+ s + "\n");
+        clip2D = s;
+
+         */
     }
 
     /**
@@ -926,6 +951,8 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
 
     public void setClip(Shape clip) {
         simpleGraphics.setClip(clip);
+        //todo improve support for Graphics2D
+        //clip2D = null;
     }
 
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
@@ -937,35 +964,83 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
     }
 
     public void fillRect(int x, int y, int width, int height) {
-        if (paint == null) {
-            simpleGraphics.fillRect(x, y, width, height);
+//        if(clip2D == null){
+            if (paint == null) {
+                simpleGraphics.fillRect(x, y, width, height);
+            } else {
+                x = x + simpleGraphics.origin.x;
+                y = y + simpleGraphics.origin.y;
+
+                BufferedImage img = getFillerImage(x, y, width, height);
+                //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 2\n");
+                drawImage(img, x, y, background, null);
+            }
+/*
+todo attempt to fix metal ocean slider painting
+(Graphics2D.clip() is used with non-rectangular shape + fillRect() with gradient paint)
         } else {
-            ColorModel scm = surface.getColorModel();
-            PaintContext pc = paint.createContext(scm, new Rectangle(0, 0, 800, 600),
-                new Rectangle(0, 0, 800, 600), new AffineTransform(), renderingHints);
 
-            x = x + simpleGraphics.origin.x;
-            y = y + simpleGraphics.origin.y;
-            Raster raster = pc.getRaster(x, y, width, height);
+            AffineTransform af = new AffineTransform();
+            af.translate(simpleGraphics.origin.x, simpleGraphics.origin.y);
+            if(paint == null){
+                org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 3\n");
+                //surface.fill(new Rectangle(x, y, width, height), clip2D, af, simpleGraphics.getColor(), Surface.PAINT_MODE);
+                x = x + simpleGraphics.origin.x;
+                y = y + simpleGraphics.origin.y;
 
-            ColorModel cm = pc.getColorModel();
-
-            WritableRaster raster2 = scm.createCompatibleWritableRaster(width, height);
-            Object de1 = null;
-            Object de2 = null;
-            int[] comps = new int[4];
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++) {
-                    de1 = raster.getDataElements(i, j, de1);
-                    comps = cm.getComponents(de1, comps, 0);
-                    comps[3] = 0xFF;
-                    de2 = scm.getDataElements(comps, 0, de2);
-                    raster2.setDataElements(i, j, de2);
+                org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 4\n");
+                int rgb = simpleGraphics.getColor().getRGB();
+                for(int i = 0; i < width; i++){
+                    for(int j = 0; j < height; j++){
+                        if(clip2D.contains(x + i , y + j)){                            
+                            surface.drawPixel(x + i, y + j, rgb, Surface.PAINT_MODE);
+                        }
+                    }
                 }
+            } else {
 
-            BufferedImage img = new BufferedImage(scm, raster2, cm.isAlphaPremultiplied(), null);
-            drawImage(img, x, y, background, null);
+                x = x + simpleGraphics.origin.x;
+                y = y + simpleGraphics.origin.y;
+
+                org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 4\n");
+                BufferedImage img = getFillerImage(x, y, width, height);
+                for(int i = 0; i < width; i++){
+                    for(int j = 0; j < height; j++){
+                        if(clip2D.contains(x + i , y + j)){
+                            int rgb = img.getRGB(i, j);
+                            surface.drawPixel(x + i, y + j, rgb, Surface.PAINT_MODE);
+                        }
+                    }
+                }
+            }
         }
+        */
+    }
+
+    private BufferedImage getFillerImage(int x, int y, int width, int height) {
+        ColorModel scm = surface.getColorModel();
+        PaintContext pc = paint.createContext(scm, new Rectangle(0, 0, 800, 600),
+            new Rectangle(0, 0, 800, 600), new AffineTransform(), renderingHints);
+
+
+        Raster raster = pc.getRaster(x, y, width, height);
+
+        ColorModel cm = pc.getColorModel();
+
+        WritableRaster raster2 = scm.createCompatibleWritableRaster(width, height);
+        Object de1 = null;
+        Object de2 = null;
+        int[] comps = new int[4];
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++) {
+                de1 = raster.getDataElements(i, j, de1);
+                comps = cm.getComponents(de1, comps, 0);
+                comps[3] = 0xFF;
+                de2 = scm.getDataElements(comps, 0, de2);
+                raster2.setDataElements(i, j, de2);
+            }
+
+        return new BufferedImage(scm, raster2, cm.isAlphaPremultiplied(), null);
     }
 
     public void clearRect(int x, int y, int width, int height) {
