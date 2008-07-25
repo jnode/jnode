@@ -2565,11 +2565,14 @@ private static class HorizontalSliderThumbIcon implements Icon, Serializable, UI
         protected Image createImage(Component c, int w, int h,
                                     GraphicsConfiguration config,
                                     Object[] args) {
+            return new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
+/*jnode
             if (config == null) {
                 return new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
             }
             return config.createCompatibleImage(
                                 w, h, Transparency.BITMASK);
+*/
         }
     }
 
@@ -2601,11 +2604,14 @@ private static class HorizontalSliderThumbIcon implements Icon, Serializable, UI
         protected Image createImage(Component c, int w, int h,
                                     GraphicsConfiguration config,
                                     Object[] args) {
+            return new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
+/*jnode            
             if (config == null) {
                 return new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
             }
             return config.createCompatibleImage(
                                 w, h, Transparency.BITMASK);
+                                */
         }
 
         protected void paintToImage(Component c, Image image, Graphics g2,
