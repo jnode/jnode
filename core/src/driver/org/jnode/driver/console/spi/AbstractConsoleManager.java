@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
@@ -35,9 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -53,7 +51,6 @@ import org.jnode.driver.input.PointerEvent;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.BootLog;
 import org.jnode.system.event.FocusEvent;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
@@ -210,14 +207,14 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * @param console
      */
     public synchronized void focus(Console console) {
-        Unsafe.debug("focus(" + console.getConsoleName() + ")");
+        log.debug("focus(" + console.getConsoleName() + ")");
         if (this.current != null && this.current != console) {
-            Unsafe.debug("Sending focusLost to " + current.getConsoleName());
+            log.debug("Sending focusLost to " + current.getConsoleName());
             this.current.focusLost(new FocusEvent(FocusEvent.FOCUS_LOST));
         }
         this.current = console;
         if (this.current != null) {
-            Unsafe.debug("Sending focusGained to " + current.getConsoleName());
+            log.debug("Sending focusGained to " + current.getConsoleName());
             current.focusGained(new FocusEvent(FocusEvent.FOCUS_GAINED));
         }
     }

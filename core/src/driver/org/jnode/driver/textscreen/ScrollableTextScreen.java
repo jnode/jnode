@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
@@ -30,14 +30,6 @@ package org.jnode.driver.textscreen;
  */
 public interface ScrollableTextScreen extends TextScreen {
 
-    /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     * @param sync true if screen should synchronize
-     */
-    public void ensureVisible(int row, boolean sync);
-    
     /**
      * Scroll a given number of rows up.
      *

@@ -66,7 +66,7 @@ class FbScreenPainter {
         graphics.setColor(Color.WHITE);
         graphics.setFont(font);
         
-        final char[] textBuffer = screen.getScreenBuffer();        
+        final char[] textBuffer = screen.getBuffer();
         final int length = screen.getWidth();
         int offset = 0;
         final int x = margin;

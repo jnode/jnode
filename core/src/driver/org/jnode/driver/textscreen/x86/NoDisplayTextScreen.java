@@ -138,4 +138,14 @@ public class NoDisplayTextScreen extends AbstractPcTextScreen {
         Unsafe.debug("\nNoDisplayTextScreen.setCursorVisible: visible=" + visible + " return 0");
         return 0;
     }
+
+    /**
+     * Synchronize the state with the actual device.
+     *
+     * @param offset
+     * @param length
+     */
+    public void sync(int offset, int length) {
+        //todo implement it
+    }
 }
