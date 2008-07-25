@@ -235,6 +235,8 @@ public final class LoadCompileService {
                 }
             }
             if (exception != null) {
+                //todo debug
+                exception.printStackTrace();
                 throw new RuntimeException(errorMessage(), exception);
             }
         }
