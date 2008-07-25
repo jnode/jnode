@@ -26,6 +26,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.MagicUtils;
 import org.vmmagic.unboxed.Offset;
@@ -35,6 +36,7 @@ import org.vmmagic.unboxed.Offset;
  *
  * @author Francois-Frederic Ozog
  */
+@MagicPermission
 public abstract class AcpiTable {
 
     protected final Logger log = Logger.getLogger(getClass());
