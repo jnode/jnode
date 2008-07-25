@@ -329,18 +329,17 @@ public class ScriptParser {
                 }
                 String description = child.getAttribute(DESCRIPTION, null);
                 if (name == null) {
-                    error(
-                            "A '" + PROPERTY + "' element requires a '" + DESCRIPTION +
-                                    "' attribute", child);
+                    error("A '" + PROPERTY + "' element requires a '" + DESCRIPTION +
+                            "' attribute", child);
                 }
-                String defaultValue = child.getAttribute(DEFAULT, null);
+                String defaultText = child.getAttribute(DEFAULT, null);
                 PropertyType type = script.getTypes().get(typeName);
                 if (type == null) {
                     error("Use of undeclared type '" + typeName + "'", child);
                 }
-                Value value = defaultValue == null ? null : type.fromValue(defaultValue);
+                Value defaultValue = (defaultText == null) ? null : type.fromValue(defaultText);
                 try {
-                    propSet.addProperty(name, type, description, value, child, stack.getLast()
+                    propSet.addProperty(name, type, description, defaultValue, child, stack.getLast()
                             .getFile());
                 } catch (ConfigureException ex) {
                     addStack(ex, child);

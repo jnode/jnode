@@ -80,7 +80,8 @@ public class EnumeratedType extends PropertyType {
             } else {
                 sb.append(",");
             }
-            boolean isDefault = alternate.value.equals(defaultValue.getText());
+            boolean isDefault = alternate.value.equals(
+                    defaultValue == null ? "" : defaultValue.getText());
             if (isDefault) {
                 sb.append("[");
             }
