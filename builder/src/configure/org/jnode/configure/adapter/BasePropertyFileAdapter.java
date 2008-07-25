@@ -135,8 +135,9 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
         // Harvest the properties to be written into a Properties Object
         Properties properties = new Properties();
         for (Map.Entry<String, Property> entry : propSet.getProperties().entrySet()) {
-            Property prop = entry.getValue();
-            properties.setProperty(entry.getKey(), prop.getValue().getText());
+            PropertySet.Value propValue = entry.getValue().getValue();
+            String text = (propValue == null) ? "" : propValue.getText();
+            properties.setProperty(entry.getKey(), text);
         }
         OutputStream os = null;
         InputStream is = null;
