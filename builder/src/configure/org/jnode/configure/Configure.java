@@ -57,7 +57,7 @@ public class Configure {
     private void run(String[] args) {
         try {
             parseArguments(args);
-            ConfigureScript script = new ScriptParser().loadScript(scriptFile);
+            ConfigureScript script = new ScriptParser(this).loadScript(scriptFile);
             for (PropertySet propFile : script.getPropsFiles()) {
                 propFile.load(this);
             }
@@ -121,6 +121,12 @@ public class Configure {
 
     public void error(String message) {
         format(err, message, DISPLAY_NORMAL);
+    }
+
+    public void debug(String message) {
+        if (debug) {
+            format(err, message, DISPLAY_NORMAL);
+        }
     }
 
     private void format(PrintStream stream, String text, int displayAttributes) {

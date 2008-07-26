@@ -98,7 +98,7 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
             try {
                 if (!file.exists() && defaultFile != null) {
                     if (defaultFile.exists()) {
-                        configure.output("Taking initial values for the '" + file +
+                        configure.debug("Taking initial values for the '" + file +
                                 "' properties from '" + defaultFile + "'.");
                         file = defaultFile;
                     }
@@ -107,7 +107,7 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
                 loadFromFile(properties, in);
             } catch (FileNotFoundException ex) {
                 // Fall back to the builtin default property values
-                configure.output("Taking initial values for the '" + file +
+                configure.debug("Taking initial values for the '" + file +
                         "' properties from the builtin defaults.");
             } catch (IOException ex) {
                 throw new ConfigureException("Problem loading properties from '" + file + "'.", ex);
@@ -125,20 +125,29 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
             String value = (String) properties.get(key);
             Property prop = propSet.getProperty((String) key);
             if (prop != null) {
-                PropertyType type = prop.getType();
-                prop.setDefaultValue(type.fromValue(value));
+                PropertySet.Value defaultValue = prop.getType().fromValue(value);
+                configure.debug("Setting default value for " + key + " to " + 
+                        (defaultValue == null ? "null" : defaultValue.toString()));
+                prop.setDefaultValue(defaultValue);
             }
         }
     }
 
     public void save(PropertySet propSet, Configure configure) throws ConfigureException {
-        // Harvest the properties to be written into a Properties Object
+        // Harvest the properties to be written into a temporary Properties Object
         Properties properties = new Properties();
         for (Map.Entry<String, Property> entry : propSet.getProperties().entrySet()) {
             PropertySet.Value propValue = entry.getValue().getValue();
+            if (propValue == null) {
+                configure.debug("Using default for unset property " + entry.getKey());
+                propValue = entry.getValue().getDefaultValue();
+            }
             String text = (propValue == null) ? "" : propValue.getText();
+            configure.debug("Property " + entry.getKey() + " is \"" + text + "\"");
             properties.setProperty(entry.getKey(), text);
         }
+        // Output properties, either using the child class'es saveToFile method
+        // or by using the template expansion mechanism.
         OutputStream os = null;
         InputStream is = null;
         File toFile = propSet.getFile();
