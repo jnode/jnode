@@ -54,10 +54,10 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
+import org.jnode.vm.classmgr.VmConstantPool;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.VmConstantPool;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
@@ -90,7 +90,7 @@ public final class VmSystem {
 
     private static volatile long currentTimeMillis;
 
-    private static long mhz = -1;
+    private static long ghz = -1;
 
     private static long rtcIncrement;
 
@@ -823,19 +823,31 @@ public final class VmSystem {
      * @since 1.5
      */
     public static long nanoTime() {
-        if (mhz == -1) {
+        if (ghz == -1) {
             long start = Unsafe.getCpuCycles();
+            long ms_start = currentTimeMillis();
+            long ms_end;
             try {
                 Thread.sleep(1000);
-            } catch (Exception e) {
-                // set some "random" value
-                mhz = 1000;
+            } catch (InterruptedException e) {
+                //ignore
+            } finally {
+                ms_end = currentTimeMillis();
             }
             long end = Unsafe.getCpuCycles();
-            mhz = end - start;
-            mhz = mhz / 1000000;
+            long ms = ms_end - ms_start;
+            if (ms <= 0)
+                ms = 1000;
+
+            ghz = (end - start) / (ms * 1000000L);
+            if (ghz <= 0)
+                ghz = 0;
+
+        } else if (ghz == 0) {
+            //todo these are CPUs under 1GHz, improve this case
+            return currentTimeMillis() * 1000000L;
         }
-        return Unsafe.getCpuCycles() / mhz;
+        return Unsafe.getCpuCycles() / ghz;
     }
 
     /**
@@ -846,6 +858,7 @@ public final class VmSystem {
      *
      * @return The current time of the kernel
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     @KernelSpace
     @Uninterruptible
