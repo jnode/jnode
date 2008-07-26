@@ -137,12 +137,11 @@ public class Screen {
                 }
                 value = prop.getType().fromInput(input);
                 if (value == null && input.length() == 0 && prop.hasDefaultValue()) {
+                    configure.debug("Trying default");
                     value = prop.getDefaultValue();
                 }
             } while (value == null);
-            if (value != null) {
-                prop.setValue(value);
-            }
+            prop.setValue(value);
         }
     }
 }

@@ -121,7 +121,12 @@ public class ScriptParser {
         }
     }
 
-    private LinkedList<ParseContext> stack = new LinkedList<ParseContext>();
+    private final LinkedList<ParseContext> stack = new LinkedList<ParseContext>();
+    private final Configure configure;
+    
+    public ScriptParser(Configure configure) {
+        this.configure = configure;
+    }
 
     public ConfigureScript loadScript(String fileName) throws ConfigureException {
         final File file = new File(fileName);
@@ -338,6 +343,8 @@ public class ScriptParser {
                     error("Use of undeclared type '" + typeName + "'", child);
                 }
                 Value defaultValue = (defaultText == null) ? null : type.fromValue(defaultText);
+                configure.debug("Default value for " + name + " is " + 
+                        (defaultValue == null ? "null" : defaultValue.toString()));
                 try {
                     propSet.addProperty(name, type, description, defaultValue, child, stack.getLast()
                             .getFile());
