@@ -41,8 +41,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.ByteOrder;
 import java.util.List;
+import java.util.ArrayList;
 
-import org.jnode.util.EmptyInputStream;
 import org.jnode.util.SystemInputStream;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
@@ -196,7 +196,7 @@ public final class VMSystem {
    */
   public static long nanoTime(){
       return VmSystem.nanoTime();
-    };
+    }
 
     /**
    * Returns a list of 'name=value' pairs representing the current environment
@@ -205,8 +205,8 @@ public final class VMSystem {
    * @return a list of 'name=value' pairs.
    */
   static List environ(){
-        //TODO implement it
-        throw new UnsupportedOperationException();
+        //todo implement it
+        return new ArrayList();
     }
     /**
 	 * Helper method which creates the standard input stream. VM implementors

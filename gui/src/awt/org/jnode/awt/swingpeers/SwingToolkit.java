@@ -359,7 +359,7 @@ public final class SwingToolkit extends JNodeToolkit {
                         Point p = new Point(x, y);
                         SwingUtilities.convertPointFromScreen(p, jmb);
                         comp = SwingUtilities.getDeepestComponentAt(jmb, p.x, p.y);
-                        if (comp != null && (comp != jmb || comp == jmb && jmb.contains(p.x, p.y))) {
+                        if (comp != null && (comp != jmb || jmb.contains(p.x, p.y))) {
                             return comp;
                         }
                     }
@@ -375,17 +375,16 @@ public final class SwingToolkit extends JNodeToolkit {
             }
         } else {
             comp = super.getTopComponentAt(x, y);
-            SwingFrame sfp = (SwingFrame) SwingUtilities.getAncestorOfClass(
-                SwingFrame.class, comp);
-            if (sfp != null) {
-                Rectangle r = sfp.getBounds();
-                Insets ins = sfp.getSwingPeer().getInsets();
+            SwingBaseWindow window = (SwingBaseWindow) SwingUtilities.getAncestorOfClass(SwingBaseWindow.class, comp);
+            if (window != null) {
+                Rectangle r = window.getBounds();
+                Insets ins = window.getSwingPeer().getInsets();
                 r.x = r.x + ins.left;
                 r.y = r.y + ins.top;
                 r.width = r.width - ins.left - ins.right;
                 r.height = r.height - ins.top - ins.bottom;
                 if (r.contains(x, y)) {
-                    Component c = sfp.getAWTComponent().findComponentAt(x - r.x + ins.left, y - r.y + ins.top);
+                    Component c = window.getAWTComponent().findComponentAt(x - r.x + ins.left, y - r.y + ins.top);
                     if (c != null) {
                         comp = c;
                     }
