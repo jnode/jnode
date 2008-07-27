@@ -21,23 +21,15 @@
 
 package org.jnode.awt.swingpeers;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MenuBar;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JRootPane;
-import javax.swing.RootPaneContainer;
-import javax.swing.UIManager;
 
 final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
 
@@ -56,12 +48,6 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
     }
 
     @Override
-    public void setMaximum(boolean b) throws PropertyVetoException {
-        super.setMaximum(b);
-        target.setBounds(this.getBounds());
-    }
-
-    @Override
     public void setIcon(boolean b) throws PropertyVetoException {
         super.setIcon(b);
         target.setBounds(this.getBounds());
@@ -72,24 +58,10 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
         super.paintAll(g);
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        if (target instanceof RootPaneContainer && isVisible()) {
-            target.paint(g.create());
-        }
-    }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-    }
-
-    /**
-     * @see javax.swing.JInternalFrame#createRootPane()
-     */
-    protected JRootPane createRootPane() {
-        return new NoContentRootPane();
     }
 
     @Override
@@ -166,60 +138,7 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
         }
     }
 
-    final class NullContentPane extends JComponent {
-        @Override
-        public void update(Graphics g) {
-            //org.jnode.vm.Unsafe.debug("NullContantPane.update()\n");
-        }
 
-        @Override
-        public void paint(Graphics g) {
-            if (target instanceof Frame && !(target instanceof JFrame)) {
-                SwingFrame sf = SwingFrame.this;
-                Frame f = target;
-
-                Color bg = f.getBackground();
-                if (bg == null) bg = UIManager.getColor("window");
-                if (bg == null) bg = UIManager.getColor("control");
-                if (bg == null) bg = Color.GRAY;
-
-                g.setColor(bg);
-                g.fillRect(0, 0, getWidth(), getHeight());
-
-                Point f_loc = sf.getLocationOnScreen();
-                Point p_loc = this.getLocationOnScreen();
-
-                int dx = p_loc.x - f_loc.x;
-                int dy = p_loc.y - f_loc.y;
-
-
-                for (Component c : f.getComponents()) {
-                    Graphics cg = g.create(c.getX() - dx, c.getY() - dy, c.getWidth(), c.getHeight());
-                    c.paintAll(cg);
-                    cg.dispose();
-                }
-            }
-        }
-
-        @Override
-        public void repaint() {
-
-        }
-
-        @Override
-        public void repaint(long tm, int x, int y, int width, int height) {
-
-        }
-    }
-
-    final class NoContentRootPane extends JRootPane {
-        /**
-         * @see javax.swing.JRootPane#createContentPane()
-         */
-        protected Container createContentPane() {
-            return new NullContentPane();
-        }
-    }
 }
 
 /**
@@ -252,14 +171,6 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
         MenuBar mb = target.getMenuBar();
         if (mb != null) {
             setMenuBar(mb);
-        }
-
-        if (!target.isBackgroundSet()) {
-            Color bg = peerComponent.getBackground();
-            if (bg == null) bg = UIManager.getColor("window");
-            if (bg == null) bg = UIManager.getColor("control");
-            if (bg == null) bg = Color.GRAY;
-            target.setBackground(bg);
         }
 
         addToDesktop();

@@ -22,15 +22,23 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
+import java.beans.PropertyVetoException;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
+import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * Base class for peer implementation that subclass {@link java.awt.Window}.
@@ -72,6 +80,29 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         target.reshape(x, y, width, height);
     }
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (target instanceof RootPaneContainer && isVisible()) {
+            target.paint(g.create());
+        }
+    }
+
+    @Override
+    public void setMaximum(boolean b) throws PropertyVetoException {
+        super.setMaximum(b);
+        target.setBounds(this.getBounds());
+    }
+
+    @Override
+    protected void validateTree() {
+        super.validateTree();
+        if (target instanceof JFrame)
+            ((JFrame) target).getRootPane().validate();
+        else if (target instanceof JDialog)
+            ((JDialog) target).getRootPane().validate();
+    }
+
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
@@ -85,8 +116,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
-        target.dispatchEvent(SwingToolkit.convertEvent(event,
-            target));
+        target.dispatchEvent(SwingToolkit.convertEvent(event, target));
     }
 
     /**
@@ -111,7 +141,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
      * @see javax.swing.JInternalFrame#createRootPane()
      */
     protected JRootPane createRootPane() {
-        return new RootPane();
+        return new NoContentRootPane();
     }
 
     /**
@@ -164,6 +194,61 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         //this can be dangerous, find a better solution
         if (target != null)
             SwingUtilities.updateComponentTreeUI(target);
+    }
+
+    final class NullContentPane extends JComponent {
+        @Override
+        public void update(Graphics g) {
+            //org.jnode.vm.Unsafe.debug("NullContantPane.update()\n");
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            if (target instanceof Frame && !(target instanceof JFrame)) {
+                SwingBaseWindow sf = SwingBaseWindow.this;
+                Frame f = (Frame) target;
+
+                Color bg = f.getBackground();
+                if (bg == null) bg = UIManager.getColor("window");
+                if (bg == null) bg = UIManager.getColor("control");
+                if (bg == null) bg = Color.GRAY;
+
+                g.setColor(bg);
+                g.fillRect(0, 0, getWidth(), getHeight());
+
+                Point f_loc = sf.getLocationOnScreen();
+                Point p_loc = this.getLocationOnScreen();
+
+                int dx = p_loc.x - f_loc.x;
+                int dy = p_loc.y - f_loc.y;
+
+
+                for (Component c : f.getComponents()) {
+                    Graphics cg = g.create(c.getX() - dx, c.getY() - dy, c.getWidth(), c.getHeight());
+                    c.paintAll(cg);
+                    cg.dispose();
+                }
+            }
+        }
+
+        @Override
+        public void repaint() {
+
+        }
+
+        @Override
+        public void repaint(long tm, int x, int y, int width, int height) {
+
+        }
+    }
+
+    final class NoContentRootPane extends JRootPane {
+        /**
+         * @see javax.swing.JRootPane#createContentPane()
+         */
+        protected Container createContentPane() {
+            return new NullContentPane();
+        }
     }
 
     private final class ContentPane extends JComponent {

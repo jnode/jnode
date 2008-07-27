@@ -28,12 +28,14 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.Color;
 import java.awt.event.WindowEvent;
 import java.awt.peer.WindowPeer;
 import java.beans.PropertyVetoException;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
@@ -55,6 +57,13 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         this.eventDispatcher = new WindowEventDispatcher();
         jComponent.addInternalFrameListener(eventDispatcher);
         jComponent.validatePeerOnly();
+        if (!window.isBackgroundSet()) {
+            Color bg = peerComponent.getBackground();
+            if (bg == null) bg = UIManager.getColor("window");
+            if (bg == null) bg = UIManager.getColor("control");
+            if (bg == null) bg = Color.GRAY;
+            window.setBackground(bg);
+        }
     }
 
     /**
