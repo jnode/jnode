@@ -1,5 +1,6 @@
 <configureScript>
   <type name="integer.type" pattern="[0-9]+"/>
+  <type name="string.type" pattern=".*" emptyToken="none"/>
   <type name="yesno.type">
     <alt value="yes"/>
     <alt value="no"/>
@@ -29,19 +30,17 @@
 	      default="no"/>
   </controlProps>
 
-  <propFile name="../../test.jnode.properties" defaultFile="jnode.properties.defaults"
+  <propFile fileName="../../test.jnode.properties" 
+            defaultFile="jnode.properties.defaults"
             templateFile="jnode.properties.template">
     <property name="jnode.virtual.memsize" type="integer.type"
 	      description="Enter virtual hardware memory size in Mbytes"/>
     <property name="jnode.virtual.disk" type="vdisk.type"
-	      description="Select a prebuilt virtual disk"
-	      default="none"/>
+	      description="Select a prebuilt virtual disk"/>
     <property name="jnode.virtualization.platform" type="vplatform.type"
-	      description="Select the PC emulation/virtualization platform"
-	      default="vmware"/>
+	      description="Select the PC emulation/virtualization platform"/>
     <property name="jnode.memmgr.plugin.id" type="memmgr.type"
-	      description="Select the memory manager"
-	      default="org.jnode.vm.memmgr.def"/>
+	      description="Select the memory manager"/>
     <property name="no.default.initjars" type="oneblank.type"
           description="Disable building of default init JARs"
           default=""/>
@@ -51,12 +50,24 @@
     <property name="no.netboot" type="oneblank.type"
           description="Disable creation of a netboot directory"
           default=""/>
+    <property name="compilerarg" type="string.type"
+          description="Custom Java compiler arguments"/>
+    <property name="jnode.debugger.host" type="string.type"
+          description="Remote debugger host"/>
+    <property name="jnode.debugger.port" type="integer.type"
+          description="Remote debugger port"/>
+    <property name="custom.plugin-list.dir" type="string.type"
+          description="Custom plugin-list directory"/>
   </propFile>
 
   <screen title="Main JNode Build Settings">
     <item property="jnode.virtualization.platform">
       The JNode build can generate configuration files for running on a
       hardware emulation / virtualization platform.
+    </item>
+    <item property="compilerarg">
+      Specify any custom Java compilation arguments; run "javac -help" 
+      and "javac -X" for details.
     </item>
     <item property="expert.mode">
       A number of JNode build settings are only of interest to experts.
@@ -76,10 +87,21 @@
 
   <screen title="Expert Mode Build Settings" 
 	  guardProp="expert.mode" valueIs="yes">
+	<item property="custom.plugin-list.dir">
+	  You can specify a directory containing plugin lists for custom initjars.
+	  The path can include Ant variables; e.g. "${root.dir}/my/plugin-lists/"
+	</item>
     <item property="jnode.memmgr.plugin.id">
       Select the memory manager / garbage collector: 'def' is the default
       memory manager, 'mmtk.nogc' is a MMTk NoGC memory manager (beta), 
       and 'mmtk.genrc' is a MMTk GenRC memory manager (alpha).
+    </item>
+    <item property="jnode.debugger.host">
+      Select a remote debugger host.  This is used by the Ant 'hotswap' task.
+      Use "none" if you don't need to enable remote debugging.
+    </item>
+    <item property="jnode.debugger.port">
+      Select a remote debugger port.
     </item>
     <item property="no.default.initjars"/>
     <item property="no.bootdisk"/>
