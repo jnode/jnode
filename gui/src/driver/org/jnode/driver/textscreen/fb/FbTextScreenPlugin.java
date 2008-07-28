@@ -27,6 +27,7 @@ import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmSystem;
 
 public final class FbTextScreenPlugin extends Plugin {
 
@@ -44,13 +45,17 @@ public final class FbTextScreenPlugin extends Plugin {
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
     protected void startPlugin() throws PluginException {
+        //this plugin start up if the "fb" parameter was specified in the GRUB command line
+        if (VmSystem.getCmdLine().indexOf(" fb") < 0)
+            return;
+
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    Unsafe.debug("before FBConsole.start()");
+                    Unsafe.debug("before FBConsole.start()\n");
                     FBConsole.start();
-                    Unsafe.debug("after FBConsole.start()");
+                    Unsafe.debug("after FBConsole.start()\n");
                 } catch (Throwable e) {
                     Unsafe.debugStackTrace(e);
                 }
