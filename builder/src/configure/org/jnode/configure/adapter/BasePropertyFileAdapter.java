@@ -35,11 +35,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jnode.configure.Configure;
 import org.jnode.configure.ConfigureException;
 import org.jnode.configure.PropertySet;
 import org.jnode.configure.PropertyType;
+import org.jnode.configure.ScriptParser;
 import org.jnode.configure.PropertySet.Property;
 
 /**
@@ -60,6 +63,9 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
     private final ValueCodec codec;
     private final boolean loadSupported;
     private final boolean saveSupported;
+    
+    private static final Pattern AT_AT_CONTENTS_PATTERN = 
+        Pattern.compile("(" + ScriptParser.NAME_PATTERN.pattern() + ")/?(\\W*)");
 
     protected abstract void loadFromFile(Properties props, InputStream imput) throws IOException;
 
@@ -202,8 +208,9 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
      * @throws IOException
      * @throws ConfigureException
      */
-    private void expandToTemplate(Properties props, InputStream is, OutputStream os, char marker,
-            File file) throws IOException, ConfigureException {
+    private void expandToTemplate(
+        Properties props, InputStream is, OutputStream os, char marker, File file) 
+        throws IOException, ConfigureException {
         int ch;
         int lineNo = 1;
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -216,7 +223,8 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
                         switch (ch) {
                             case -1:
                                 throw new ConfigureException("Encountered EOF in a " + marker +
-                                        "..." + marker + " sequence");
+                                        "..." + marker + " sequence: at " + file +
+                                        " line " + lineNo);
                             case '\r':
                             case '\n':
                                 throw new ConfigureException("Encountered end-of-line in a " +
@@ -229,10 +237,16 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
                     if (sb.length() == 0) {
                         w.write(marker);
                     } else {
-                        String modifiers = removeModifiers(sb);
-                        String propName = sb.toString();
-                        String propValue = props.getProperty(propName);
-                        w.write(codec.encodeProperty(propName, propValue, modifiers));
+                        Matcher matcher = AT_AT_CONTENTS_PATTERN.matcher(sb);
+                        if (!matcher.matches()) {
+                            throw new ConfigureException("Malformed @...@ sequence: at " + file +
+                                    " line " + lineNo);
+                        }
+                        String name = matcher.group(1);
+                        String modifiers = matcher.group(2);
+                        modifiers = (modifiers == null) ? "" : modifiers;
+                        String propValue = props.getProperty(name);
+                        w.write(codec.encodeProperty(name, propValue, modifiers));
                     }
                 } else {
                     // FIXME ... make this aware of the host OS newline
@@ -245,17 +259,6 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
             }
         } finally {
             w.flush();
-        }
-    }
-
-    private String removeModifiers(StringBuffer sb) {
-        int index = sb.lastIndexOf("/");
-        if (index >= 0) {
-            String modifiers = sb.substring(index + 1);
-            sb.setLength(index);
-            return modifiers;
-        } else {
-            return "";
         }
     }
 }

@@ -54,6 +54,7 @@ public class ScriptParser {
     public static final String TYPE = "type";
     public static final String CONTROL_PROPS = "controlProps";
     public static final String PROP_FILE = "propFile";
+    public static final String FILE_NAME = "fileName";
     public static final String SCRIPT_FILE = "scriptFile";
     public static final String DEFAULT_FILE = "defaultFile";
     public static final String TEMPLATE_FILE = "templateFile";
@@ -78,9 +79,11 @@ public class ScriptParser {
     public static final String VALUE_IS_NOT = "valueIsNot";
     public static final String EMPTY_TOKEN = "emptyToken";
 
+    public static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9.\\-_]+");
+    
+    private static final Pattern LINE_SPLITTER_PATTERN = Pattern.compile("\r\n|\r(?!\n)|\n");
     private static final String TAB_SPACES;
-    private static final Pattern LINE_SPLITTER = Pattern.compile("\r\n|\r(?!\n)|\n");
-
+    
     static {
         StringBuffer sb = new StringBuffer(Configure.TAB_WIDTH);
         for (int i = 0; i < Configure.TAB_WIDTH; i++) {
@@ -225,6 +228,7 @@ public class ScriptParser {
 
     private void parseType(XMLElement element, ConfigureScript script) throws ConfigureException {
         String name = element.getAttribute(NAME, null);
+        checkName(name, NAME, TYPE, element);
         String patternString = element.getAttribute(PATTERN, null);
         List<EnumeratedType.Alternate> alternates = new LinkedList<EnumeratedType.Alternate>();
         for (Enumeration<?> en = element.enumerateChildren(); en.hasMoreElements(); /**/) {
@@ -279,6 +283,18 @@ public class ScriptParser {
         script.addType(type);
     }
 
+    private void checkName(String name, String attrName, String elementName, XMLElement element)
+        throws ConfigureException {
+        if (name == null) {
+            error("A '" + attrName + "' attribute is required for a '" + 
+                    elementName + "' element", element);
+        }
+        if (!NAME_PATTERN.matcher(name).matches()) {
+            error("This value (" + name + ") is not a valid value for a '" + 
+                    attrName + "' attribute", element);
+        }
+    }
+
     private void parseControlProps(XMLElement element, ConfigureScript script)
         throws ConfigureException {
         PropertySet propSet = new PropertySet(script);
@@ -288,9 +304,9 @@ public class ScriptParser {
 
     private void parsePropsFile(XMLElement element, ConfigureScript script)
         throws ConfigureException {
-        String propFileName = element.getAttribute(NAME, null);
+        String propFileName = element.getAttribute(FILE_NAME, null);
         if (propFileName == null) {
-            error("A '" + PROP_FILE + "' element requires a '" + NAME + "' attribute", element);
+            error("A '" + PROP_FILE + "' element requires a '" + FILE_NAME + "' attribute", element);
         }
         File propFile = resolvePath(propFileName);
         String defaultPropFileName = element.getAttribute(DEFAULT_FILE, null);
@@ -325,9 +341,7 @@ public class ScriptParser {
             XMLElement child = (XMLElement) en.nextElement();
             if (child.getName().equals(PROPERTY)) {
                 String name = child.getAttribute(NAME, null);
-                if (name == null) {
-                    error("A '" + PROPERTY + "' element requires a '" + NAME + "' attribute", child);
-                }
+                checkName(name, NAME, PROPERTY, child);
                 String typeName = child.getAttribute(TYPE, null);
                 if (name == null) {
                     error("A '" + PROPERTY + "' element requires a '" + TYPE + "' attribute", child);
@@ -426,7 +440,7 @@ public class ScriptParser {
         if (content == null || content.length() == 0) {
             return content;
         }
-        String[] lines = LINE_SPLITTER.split(content, -1);
+        String[] lines = LINE_SPLITTER_PATTERN.split(content, -1);
         int minLeadingSpaces = Integer.MAX_VALUE;
         for (String line : lines) {
             int count, i;
