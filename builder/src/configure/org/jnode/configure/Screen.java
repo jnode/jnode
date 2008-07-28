@@ -125,6 +125,9 @@ public class Screen {
         for (Item item : items) {
             String text = item.getText();
             if (text != null) {
+                if (text.endsWith("\n")) {
+                    text = text.substring(0, text.length() - 1);
+                }
                 configure.output(text);
             }
             PropertySet.Property prop = script.getProperty(item.getPropName());
@@ -142,6 +145,7 @@ public class Screen {
                 }
             } while (value == null);
             prop.setValue(value);
+            configure.output("");
         }
     }
 }
