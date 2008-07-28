@@ -8,7 +8,7 @@
 
 # Set this directory to the directory containing custom plugin lists 
 # if you have custom initjars to build.
-# custom.plugin-list.dir = ${root.dir}/local/plugin-lists/
+@custom.plugin-list.dir/=#@
 
 # If non-empty, no default initjars will be built.
 @no.default.initjars/=#@
@@ -55,32 +55,33 @@ jnode.install-nt.dir=C:\jnode
 # -----------------------------------------------
 # Settings for the compiler
 
-# Uncomment this if you want use custom compiler arguments
-#compilerarg=-Xlint:unchecked
+# Add any custom Java compilation options here
+@compilerarg/=#@
 
 # -----------------------------------------------
 # Set up the host and port where the JNode debugger server is available.
 # This is needed by the hotswap ant target.
-jnode.debugger.host=
-jnode.debugger.port=6789
+@jnode.debugger.host/=@
+@jnode.debugger.port/=@
 
 
 # -----------------------------------------------
-# Settings for the kernel
+# Generic virtualization settings
 # -----------------------------------------------
 
+@jnode.virtualization.platform/=#@
+@jnode.virtual.disk/=#@
+
+# -----------------------------------------------
+# The virtual PC's memory size in Mbytes
+@jnode.virtual.memsize/=#@
 
 # -----------------------------------------------
 # Settings for a VMware virtual machine
 # -----------------------------------------------
 
 # -----------------------------------------------
-# The virtual PC's memory size in Mbytes
-@jnode.virtual.memsize/=@
-
-# Uncomment and edit this line if you want to override the settings
-# in the 'jnode-x86-*.vmx' file.  For example, you may want to include
-# settings to configure a VMware virtual hard drive, or real hard drive.
+# Specify a file containing overrides for the default VMX settings
 # Refer to the maintainers pages on the JNode website for details.
 # Notes:
 # - Settings in the override file should be in standard VMX syntax.
@@ -90,5 +91,5 @@ jnode.debugger.port=6789
 # - Any non-absolute pathnames in the VMX settings are resolved relative
 #   to the VMX file's location!
 
-#vmware.vmx.overrides=<some-file-containing-vmx-settings>
+@vmware.vmx.overrides/=#@
 
