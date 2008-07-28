@@ -25,10 +25,10 @@ module /shell.jgz
 
 # ---------------------------
 # -- disabled
-#title JNode GUI (all plugins) (VESA mode)
-#kernel /jnode32.gz mp=no
-#vbematch 800 600 32
-#module /fullgui.jgz
+title JNode (all plugins) (VESA mode)
+kernel /jnode32.gz mp=no fb
+vbematch 800 600 32
+module /full.jgz
 
 # ---------------------------
 title JNode (default with MP)
