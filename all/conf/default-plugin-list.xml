@@ -38,6 +38,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.console.textscreen"/>
     <plugin id="org.jnode.driver.console.swing"/>
     <plugin id="org.jnode.driver.textscreen"/>
+    <plugin id="org.jnode.driver.textscreen.fb" />
     <plugin id="org.jnode.driver.textscreen.swing"/>
     <plugin id="org.jnode.driver.textscreen.core"/>
 
