@@ -43,7 +43,7 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes> {
             int code = Integer.parseInt(value.token, 16);
             return IBMPartitionTypes.valueOf(code);
         } catch (NumberFormatException ex) {
-            throw new CommandSyntaxException("Not a valid hexadecimal number");
+            throw new CommandSyntaxException("not a valid hexadecimal number");
         } catch (IllegalArgumentException ex) {
             throw new CommandSyntaxException(ex.getMessage());
         }

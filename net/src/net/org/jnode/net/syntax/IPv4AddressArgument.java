@@ -31,7 +31,7 @@ public class IPv4AddressArgument extends Argument<IPv4Address> {
         }
         final StringTokenizer tok = new StringTokenizer(value.token, ".");
         if (tok.countTokens() != 4) {
-            throw new CommandSyntaxException("Wrong number of components for an IPv4 address");
+            throw new CommandSyntaxException("wrong number of components for an IPv4 address");
         }
         try {
             final byte b1 = parseUnsignedByte(tok.nextToken());
@@ -40,7 +40,7 @@ public class IPv4AddressArgument extends Argument<IPv4Address> {
             final byte b4 = parseUnsignedByte(tok.nextToken());
             return new IPv4Address(new byte[]{b1, b2, b3, b4}, 0);
         } catch (NumberFormatException ex) {
-            throw new CommandSyntaxException("Invalid component in IPv4 address");
+            throw new CommandSyntaxException("invalid component in IPv4 address");
         }
     }
     
