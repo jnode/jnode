@@ -162,7 +162,6 @@ public final class DefaultPluginManager extends PluginManager {
             while (!isStartPluginsFinished() && (now - start < START_TIMEOUT)) {
                 try {
                     if (++loop == 10) {
-                        System.out.print('.');
                         loop = 0;
                     }
                     Thread.sleep(100);

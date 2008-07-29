@@ -207,14 +207,11 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * @param console
      */
     public synchronized void focus(Console console) {
-        log.debug("focus(" + console.getConsoleName() + ")");
         if (this.current != null && this.current != console) {
-            log.debug("Sending focusLost to " + current.getConsoleName());
             this.current.focusLost(new FocusEvent(FocusEvent.FOCUS_LOST));
         }
         this.current = console;
         if (this.current != null) {
-            log.debug("Sending focusGained to " + current.getConsoleName());
             current.focusGained(new FocusEvent(FocusEvent.FOCUS_GAINED));
         }
     }
@@ -338,7 +335,6 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     }
 
     public void registerConsole(Console console) {
-        log.debug("registerConsole(" + console.getConsoleName() + ")");
         consoles.put(console.getConsoleName(), console);
         if (current == null) {
             current = console;

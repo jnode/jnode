@@ -124,7 +124,6 @@ public class WorkPlugin extends Plugin implements WorkManager {
      * @see org.jnode.work.WorkManager#add(org.jnode.work.Work)
      */
     public final synchronized void add(Work work) {
-        log.debug("#free workers: " + getFreeProcessors());
         workCounter++;
         queue.add(work);
     }
