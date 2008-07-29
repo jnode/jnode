@@ -27,7 +27,7 @@ public class IPv4HostArgument extends Argument<IPv4Address> {
         try {
             return new IPv4Address(value.token);
         } catch (IllegalArgumentException ex) {
-            throw new CommandSyntaxException("Inval;id hostname or IPv4 address");
+            throw new CommandSyntaxException("invalid hostname or IPv4 address");
         }
     }
 }

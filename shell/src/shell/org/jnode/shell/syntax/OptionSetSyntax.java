@@ -58,7 +58,7 @@ public class OptionSetSyntax extends GroupSyntax {
             String value = token.token;
             int len = value.length();
             if (len < 2 || value.charAt(0) != '-') {
-                throw new CommandSyntaxException("'" + value + "' is not a flag set");
+                throw new CommandSyntaxException("not a flag set");
             }
             for (int i = 1; i < len; i++) {
                 char ch = value.charAt(i);
