@@ -62,11 +62,11 @@ public class DeviceArgument extends Argument<Device> {
             if (apiClass == null || device.implementsAPI(apiClass)) {
                 return device;
             } else {
-                throw new CommandSyntaxException("Device '" + token.token + "' does not implement " +
-                        apiClass.getSimpleName());
+                throw new CommandSyntaxException("this device does not implement the " +
+                        apiClass.getSimpleName() + " API");
             }
         } catch (DeviceNotFoundException ex) {
-            throw new CommandSyntaxException("Unknown device: '" + token.token + "'");
+            throw new CommandSyntaxException("unknown device");
         } 
     }
 

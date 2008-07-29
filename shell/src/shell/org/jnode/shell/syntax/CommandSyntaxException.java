@@ -21,7 +21,11 @@
  
 package org.jnode.shell.syntax;
 
+import java.util.List;
+
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
+import org.jnode.shell.CommandLine.Token;
 
 /**
  * This exception is thrown when the supplied command line arguments are not
@@ -30,13 +34,33 @@ import org.jnode.shell.ShellException;
  * @author crawley@jnode.org
  */
 public class CommandSyntaxException extends ShellException {
+    public static class Context {
+        public final CommandLine.Token token;
+        public final MuSyntax syntax;
+        public final CommandSyntaxException exception;
+        
+        public Context(Token token, MuSyntax syntax, CommandSyntaxException exception) {
+            super();
+            this.token = token;
+            this.syntax = syntax;
+            this.exception = exception;
+        }
+    }
+    
     private static final long serialVersionUID = 1L;
 
+    private List<Context> argErrors;
+    
     public CommandSyntaxException(String message) {
         super(message);
     }
 
-    public CommandSyntaxException(String message, Throwable cause) {
-        super(message, cause);
+    public CommandSyntaxException(String message, List<Context> argErrors) {
+        super(message);
+        this.argErrors = argErrors;
+    }
+
+    public List<Context> getArgErrors() {
+        return argErrors;
     }
 }

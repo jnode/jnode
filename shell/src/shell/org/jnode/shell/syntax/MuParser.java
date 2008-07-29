@@ -30,6 +30,7 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.syntax.CommandSyntaxException.Context;
 
 /**
  * This class implements parsing of a token stream against a MuSyntax graph.  The parser 
@@ -140,6 +141,7 @@ public class MuParser {
             }
             return;
         }
+        List<Context> argFailures = new LinkedList<Context>();
         syntaxStack.addFirst(rootSyntax);
         int stepCount = 0;
         while (!syntaxStack.isEmpty()) {
@@ -160,7 +162,7 @@ public class MuParser {
                     log.debug("source at end");
                 }
             }
-            CommandLine.Token token;
+            CommandLine.Token token = null;
             switch (syntax.getKind()) {
                 case MuSyntax.SYMBOL:
                     String symbol = ((MuSymbol) syntax).getSymbol();
@@ -211,6 +213,7 @@ public class MuParser {
                             backtrack = true;
                         }
                     } catch (CommandSyntaxException ex) {
+                        argFailures.add(new Context(token, syntax, ex));
                         if (DEBUG) {
                             log.debug("accept for arg " + argName + " threw SyntaxErrorException('" + 
                                     ex.getMessage() + "'");
@@ -230,6 +233,7 @@ public class MuParser {
                             }
                         }
                     } catch (CommandSyntaxException ex) {
+                        argFailures.add(new Context(null, syntax, ex));
                         backtrack = true;
                     }
                     break;
@@ -333,7 +337,7 @@ public class MuParser {
                 // If we are still backtracking and we are out of choices ...
                 if (backtrack) {
                     if (completion == null) {
-                        throw new CommandSyntaxException("ran out of alternatives");
+                        throw new CommandSyntaxException("ran out of alternatives", argFailures);
                     } else {
                         if (DEBUG) {
                             log.debug("end completion");

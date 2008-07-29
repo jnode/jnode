@@ -56,7 +56,7 @@ public class SizeArgument extends Argument<Long> {
             long tmp = Long.parseLong(str);
             return new Long(tmp * factor.getMultiplier());
         } catch (NumberFormatException ex) {
-            throw new CommandSyntaxException("invalid number '" + token.token + "'");
+            throw new CommandSyntaxException("invalid size");
         }
     }
     

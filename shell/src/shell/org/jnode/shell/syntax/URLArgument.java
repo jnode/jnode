@@ -56,7 +56,7 @@ public class URLArgument extends Argument<URL> {
         try {
             return new URL(value.token);
         } catch (MalformedURLException ex) {
-            throw new CommandSyntaxException(ex.getMessage(), ex);
+            throw new CommandSyntaxException(ex.getMessage());
         }
     }
 

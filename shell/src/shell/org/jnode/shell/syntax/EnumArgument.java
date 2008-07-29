@@ -65,7 +65,7 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
         try {
             return E.valueOf(clazz, token.token);
         } catch (IllegalArgumentException ex) {
-            throw new CommandSyntaxException("invalid value for enum " + clazz.getSimpleName());
+            throw new CommandSyntaxException("not a valid <" + argumentKind() + ">");
         }
     }
     

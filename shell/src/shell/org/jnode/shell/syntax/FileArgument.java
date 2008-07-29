@@ -49,7 +49,7 @@ public class FileArgument extends Argument<File> {
         if (token.token.length() > 0) {
             return new File(token.token);
         } else {
-            throw new CommandSyntaxException("invalid file name '" + token.token + "'");
+            throw new CommandSyntaxException("invalid file name");
         }
     }
 
