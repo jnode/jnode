@@ -102,7 +102,7 @@ public abstract class Plugin {
         }
         if (!started) {
             if (descriptor.hasCustomPluginClass()) {
-                BootLog.debug("__Starting " + descriptor.getId());
+                BootLog.debug("Starting plugin: " + descriptor.getId());
             }
             started = true;
             try {

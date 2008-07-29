@@ -41,8 +41,7 @@ import org.jnode.work.WorkUtils;
  *
  * @author epr
  */
-public final class DefaultDeviceManager extends AbstractDeviceManager
-    implements ExtensionPointListener {
+public final class DefaultDeviceManager extends AbstractDeviceManager implements ExtensionPointListener {
 
     /**
      * finder extension-point
@@ -162,8 +161,6 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * @param element
      */
     private void configureFinder(List<DeviceFinder> finders, ConfigurationElement element) {
-        BootLog.debug("Configure finder: " + element);
-
         final String elementName = element.getName();
         if (!elementName.equals("finder")) {
             BootLog.warn("Ignoring unrecognised descriptor element: " + elementName);
@@ -173,8 +170,8 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         final String className = element.getAttribute("class");
         if (className != null) {
             try {
-                final Class cls = Thread.currentThread()
-                    .getContextClassLoader().loadClass(className);
+                BootLog.debug("Configuring finder: " + className);
+                final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 final DeviceFinder finder = (DeviceFinder) cls.newInstance();
                 finders.add(finder);
             } catch (ClassNotFoundException ex) {
@@ -184,8 +181,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
             } catch (InstantiationException ex) {
                 BootLog.error("Cannot instantiate finder class " + className);
             } catch (ClassCastException ex) {
-                BootLog.error("Finder class " + className
-                    + " does not implement the DeviceFinder interface");
+                BootLog.error("Finder class " + className + " does not implement the DeviceFinder interface");
             }
         }
     }
@@ -198,8 +194,6 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * @param element
      */
     private void configureMapper(List<DeviceToDriverMapper> mappers, ConfigurationElement element) {
-        BootLog.debug("Configure mapper: " + element);
-
         final String elementName = element.getName();
         if (!elementName.equals("mapper")) {
             BootLog.warn("Ignoring unrecognised descriptor element: " + elementName);
@@ -209,8 +203,8 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         final String className = element.getAttribute("class");
         if (className != null) {
             try {
-                final Class cls = Thread.currentThread()
-                    .getContextClassLoader().loadClass(className);
+                BootLog.debug("Configuring mapper: " + className);
+                final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 final DeviceToDriverMapper mapper = newMapperInstance(cls, element);
                 mappers.add(mapper);
             } catch (ClassNotFoundException ex) {
@@ -220,10 +214,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
             } catch (InstantiationException ex) {
                 BootLog.error("Cannot instantiate mapper class " + className, ex);
             } catch (ClassCastException ex) {
-                BootLog
-                    .error("Mapper class "
-                        + className
-                        + " does not implement the DeviceToDriverMapper interface");
+                BootLog.error("Mapper class " + className + " does not implement the DeviceToDriverMapper interface");
             }
         } else {
             BootLog.error("class attribute required in mapper");
