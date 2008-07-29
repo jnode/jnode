@@ -29,6 +29,8 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Collection;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -119,7 +121,12 @@ public class MouseHandler implements PointerListener {
                 hwCursor.setCursorPosition(0, 0);
             }
             pointerAPI.addPointerListener(this);
-            pointerAPI.setPreferredListener(this);
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run() {
+                    MouseHandler.this.pointerAPI.setPreferredListener(MouseHandler.this);
+                    return null;
+                }
+            });
         }
     }
 
@@ -268,7 +275,7 @@ public class MouseHandler implements PointerListener {
                 }
             } else if (buttonPressed[i]) {
                 postEvent(dragSource, MouseEvent.MOUSE_RELEASED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
-                if (postClicked || !postClicked && buttonClickCount[i] > 0) {
+                if (postClicked || buttonClickCount[i] > 0) {
                     postEvent(source, MouseEvent.MOUSE_CLICKED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
                     postClicked = false;
                 }
