@@ -46,7 +46,7 @@ public class CountryArgument extends Argument<String> {
         if (validCountries.contains(token.token)) {
             return token.token;
         } else {
-            throw new CommandSyntaxException("Invalid country code");
+            throw new CommandSyntaxException("invalid country code");
         }
     }
     

@@ -60,11 +60,11 @@ public class IntegerArgument extends Argument<Integer> {
         try {
             int tmp = Integer.parseInt(token.token);
             if (tmp < min || tmp > max) {
-                throw new CommandSyntaxException("number '" + token.token + "' is out of range");
+                throw new CommandSyntaxException("number is out of range");
             }
             return new Integer(token.token);
         } catch (NumberFormatException ex) {
-            throw new CommandSyntaxException("invalid number '" + token.token + "'");
+            throw new CommandSyntaxException("invalid number");
         }
     }
   
@@ -75,7 +75,6 @@ public class IntegerArgument extends Argument<Integer> {
         if (max - min >= 0 && max - min < COMPLETION_THRESHOLD) {
             for (int i = min; i <= max; i++) {
                 String candidate = Integer.toString(i);
-                System.err.println("Testing completion '" + candidate + "'");
                 if (candidate.startsWith(partial)) {
                     completion.addCompletion(candidate);
                 }

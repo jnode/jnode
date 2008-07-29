@@ -61,11 +61,11 @@ public class LongArgument extends Argument<Long> {
         try {
             long tmp = Long.parseLong(token.token);
             if (tmp < min || tmp > max) {
-                throw new CommandSyntaxException("number '" + token.token + "' is out of range");
+                throw new CommandSyntaxException("number is out of range");
             }
             return new Long(token.token);
         } catch (NumberFormatException ex) {
-            throw new CommandSyntaxException("invalid number '" + token.token + "'");
+            throw new CommandSyntaxException("invalid number");
         }
     }
   

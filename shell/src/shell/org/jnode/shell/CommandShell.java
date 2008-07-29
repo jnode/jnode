@@ -37,6 +37,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.naming.NameNotFoundException;
@@ -54,6 +55,8 @@ import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.CommandSyntaxException;
+import org.jnode.shell.syntax.CommandSyntaxException.Context;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.util.SystemInputStream;
 import org.jnode.vm.VmSystem;
@@ -415,7 +418,30 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         try {
             rc = interpreter.interpret(this, cmdLineStr);
         } catch (ShellException ex) {
-            errPs.println("Shell exception: " + ex.getMessage());
+            Throwable cause = ex.getCause();
+            // Try to turn this into something that is moderately intelligible
+            // for the common cases ...
+            if (cause != null) {
+                errPs.println(ex.getMessage());
+                if (cause instanceof CommandSyntaxException) {
+                    List<Context> argErrors = ((CommandSyntaxException) cause).getArgErrors();
+                    if (argErrors != null) {
+                        for (Context context : argErrors) {
+                            if (context.token != null) {
+                                errPs.println("   " + context.exception.getMessage() + ": " +
+                                        context.token.token);
+                            } else {
+                                errPs.println("   " + context.exception.getMessage() + ": " +
+                                        context.syntax.format());
+                            }
+                        }
+                    }
+                } else {
+                    errPs.println(cause.getMessage());
+                }
+            } else {
+                errPs.println("Shell exception: " + ex.getMessage());
+            }
             rc = -1;
             stackTrace(ex);
         }

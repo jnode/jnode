@@ -52,7 +52,7 @@ public class AliasArgument extends Argument<String> {
     @Override
     public String doAccept(Token value) throws CommandSyntaxException {
         if (value.token.length() == 0) {
-            throw new CommandSyntaxException("Empty alias name '" + value.token + "'");
+            throw new CommandSyntaxException("empty alias name");
         }
         return value.token;
     }
