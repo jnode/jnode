@@ -9,4 +9,9 @@ $DIR/all/build/descriptors/jnode-configure.jar:\
 $DIR/builder/lib/jnode-configure-dist.jar:\
 $DIR/builder/lib/nanoxml-2.2.3.jar
 
-java -cp $CP org.jnode.configure.Configure "$@"
+if [ $# = 0 ] ; then
+    java -cp $CP org.jnode.configure.Configure all/conf-source/script.xml
+else
+    java -cp $CP org.jnode.configure.Configure "$@"
+fi
+
