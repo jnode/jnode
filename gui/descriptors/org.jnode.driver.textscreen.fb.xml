@@ -23,5 +23,12 @@
       <export name="org.jnode.driver.textscreen.fb.*"/>
     </library>
   </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+
+      <!-- fb console is experimental, TODO: fix security -->
+    <permission class="java.security.AllPermission" />
+  </extension>
         
 </plugin>
