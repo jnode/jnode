@@ -35,11 +35,13 @@ public class Screen {
         private final ConfigureScript script;
         private final String propName;
         private final String text;
+        private final String changed;
 
-        public Item(ConfigureScript script, String propName, String text) {
+        public Item(ConfigureScript script, String propName, String text, String changed) {
             this.script = script;
             this.propName = propName;
             this.text = text;
+            this.changed = changed;
         }
 
         public ConfigureScript getScript() {
@@ -52,6 +54,10 @@ public class Screen {
 
         public String getText() {
             return text;
+        }
+
+        public String getChanged() {
+            return changed;
         }
     }
 
@@ -122,7 +128,9 @@ public class Screen {
     public void execute(Configure configure, ConfigureScript script) throws ConfigureException {
         configure.output("");
         configure.output(title, Configure.DISPLAY_HIGHLIGHT);
+        // Process the items in order 
         for (Item item : items) {
+            // Output the item text if provided.
             String text = item.getText();
             if (text != null) {
                 if (text.endsWith("\n")) {
@@ -130,22 +138,34 @@ public class Screen {
                 }
                 configure.output(text);
             }
+            // Capture the value for the item property
             PropertySet.Property prop = script.getProperty(item.getPropName());
             Value value = null;
+            Value defaultValue = prop.getDefaultValue();
             do {
-                String info = prop.getType().describe(prop.getDefaultValue());
+                String info = prop.getType().describe(defaultValue);
                 String input = configure.input(prop.getDescription() + " " + info + ":");
                 if (input == null) {
                     throw new ConfigureException("Unexpected EOF on input");
                 }
                 value = prop.getType().fromInput(input);
-                if (value == null && input.length() == 0 && prop.hasDefaultValue()) {
-                    configure.debug("Trying default");
-                    value = prop.getDefaultValue();
+                if (value == null && input.length() == 0 && defaultValue != null) {
+                    configure.debug("Using default");
+                    value = defaultValue;
                 }
+                // Loop until we get a permissible value.
             } while (value == null);
             prop.setValue(value);
             configure.output("");
+            if (item.getChanged() != null) {
+                // Display message if property value has changed.
+                String oldValue = (defaultValue == null) ? "" : defaultValue.getText();
+                String newValue = value.getText();
+                if (!oldValue.equals(newValue)) {
+                    configure.output(item.getChanged());
+                    configure.output("");
+                }
+            }
         }
     }
 }

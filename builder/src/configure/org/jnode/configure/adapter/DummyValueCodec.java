@@ -20,7 +20,6 @@
  */
 package org.jnode.configure.adapter;
 
-import org.jnode.configure.ConfigureException;
 
 /**
  * Dummy property value encoder / decoder. Performs the identity transform.

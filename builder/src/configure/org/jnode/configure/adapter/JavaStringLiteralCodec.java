@@ -20,7 +20,6 @@
  */
 package org.jnode.configure.adapter;
 
-import org.jnode.configure.ConfigureException;
 
 /**
  * Encoder / decoder for properties embedded in Java code in literal strings or

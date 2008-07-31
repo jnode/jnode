@@ -20,7 +20,6 @@
  */
 package org.jnode.configure.adapter;
 
-import org.jnode.configure.ConfigureException;
 
 /**
  * Encode / decode for the context of text contents of an XML element.
