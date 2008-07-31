@@ -19,9 +19,9 @@
     <alt value="vmware"/>
   </type>
   <type name="memmgr.type">
-    <alt name="def" value="org.jnode.vm.memmgr.def"/>
-    <alt name="mmtk.nogc" value="org.jnode.vm.memmgr.mmtk.nogc"/>
-    <alt name="mmgt.genrc" value="org.jnode.vm.memmgr.mmtk.genrc"/>
+    <alt token="default" value="org.jnode.vm.memmgr.def"/>
+    <alt token="mmtk.nogc" value="org.jnode.vm.memmgr.mmtk.nogc"/>
+    <alt token="mmgt.genrc" value="org.jnode.vm.memmgr.mmtk.genrc"/>
   </type>
 
   <controlProps>
@@ -91,10 +91,11 @@
 	  You can specify a directory containing plugin lists for custom initjars.
 	  The path can include Ant variables; e.g. "${root.dir}/my/plugin-lists/"
 	</item>
-    <item property="jnode.memmgr.plugin.id">
-      Select the memory manager / garbage collector: 'def' is the default
-      memory manager, 'mmtk.nogc' is a MMTk NoGC memory manager (beta), 
-      and 'mmtk.genrc' is a MMTk GenRC memory manager (alpha).
+    <item property="jnode.memmgr.plugin.id" 
+          changed="******* A full rebuild is recommended after a change to the memory manager!! ">
+      Select the memory manager / garbage collector: 'default' is the default
+      JNode memory manager, 'mmtk.nogc' is the MMTk NoGC memory manager (beta), 
+      and 'mmtk.genrc' is the MMTk GenRC memory manager (alpha).
     </item>
     <item property="jnode.debugger.host">
       Select a remote debugger host.  This is used by the Ant 'hotswap' task.
