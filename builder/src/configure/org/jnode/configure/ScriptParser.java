@@ -63,6 +63,7 @@ public class ScriptParser {
     public static final String DEFAULT_MARKER = "@";
     public static final String VALIDATION_CLASS = "validationClass";
     public static final String SCREEN = "screen";
+    public static final String CHANGED = "changed";
     public static final String NAME = "name";
     public static final String PATTERN = "pattern";
     public static final String ALT = "alt";
@@ -421,10 +422,11 @@ public class ScriptParser {
                 error("The '" + PROPERTY + "' attribute is required for an '" + ITEM + "' element",
                         child);
             }
+            String changed = child.getAttribute(CHANGED, null);
             if (script.getProperty(propName) == null) {
                 error("Use of undeclared property '" + propName + "'", child);
             }
-            screen.addItem(new Item(script, propName, unindent(child.getContent())));
+            screen.addItem(new Item(script, propName, unindent(child.getContent()), changed));
         }
     }
 

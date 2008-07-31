@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 import org.jnode.configure.Configure;
 import org.jnode.configure.ConfigureException;
 import org.jnode.configure.PropertySet;
-import org.jnode.configure.PropertyType;
 import org.jnode.configure.ScriptParser;
 import org.jnode.configure.PropertySet.Property;
 

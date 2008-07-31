@@ -3,7 +3,6 @@
  */
 package org.jnode.configure.adapter;
 
-import org.jnode.configure.ConfigureException;
 
 /**
  * Encode / decode for property values in classic Java property files. (This
