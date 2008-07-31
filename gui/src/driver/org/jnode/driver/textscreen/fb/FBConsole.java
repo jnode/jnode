@@ -1,10 +1,10 @@
 package org.jnode.driver.textscreen.fb;
 
 import java.io.PrintStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collection;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManagerListener;
@@ -29,7 +29,7 @@ class FBConsole {
     private static final Logger log = Logger.getLogger(FBConsole.class);
 
     /**
-     * TODO use a listener mechanism instead 
+     * TODO use a listener mechanism instead
      */
     private static void waitShellManagerAvailable() {
         Unsafe.debug("waiting registration of a ShellManager");
@@ -43,12 +43,12 @@ class FBConsole {
             } catch (NameNotFoundException e) {
                 // not yet available                
             }
-            
+
             // not yet available
             Thread.yield();
         }
     }
-    
+
     public static void start() throws Exception {
 
         waitShellManagerAvailable();
@@ -68,7 +68,7 @@ class FBConsole {
 
                 public void deviceRegistered(Device device) {
                     Unsafe.debug("device=" + device + "\n");
-                    if (device.implementsAPI(FrameBufferAPI.class)) {                        
+                    if (device.implementsAPI(FrameBufferAPI.class)) {
                         Unsafe.debug("got a FrameBufferDevice\n");
                         startFBConsole(device);
                     }
@@ -83,7 +83,7 @@ class FBConsole {
             startFBConsole(dev);
         }
     }
-    
+
     private static void startFBConsole(Device dev) {
         Unsafe.debug("startFBConsole\n");
         Surface g = null;
@@ -95,21 +95,26 @@ class FBConsole {
 
             InitialNaming.unbind(TextScreenManager.NAME);
             InitialNaming.bind(TextScreenManager.NAME, new FbTextScreenManager(g));
-                            
+
             ////
             ConsoleManager mgr = InitialNaming.lookup(ConsoleManager.NAME);
-            
+
             //
             final int options = ConsoleManager.CreateOptions.TEXT |
                 ConsoleManager.CreateOptions.SCROLLABLE;
 
             final TextConsole first = (TextConsole) mgr.createConsole(
-                    null, options);
-            
-            mgr.registerConsole(first);            
+                null, options);
+
+            mgr.registerConsole(first);
             mgr.focus(first);
-            System.setOut(new PrintStream(first.getOut()));
-            System.setErr(new PrintStream(first.getErr()));
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    System.setOut(new PrintStream(first.getOut()));
+                    System.setErr(new PrintStream(first.getErr()));
+                    return null;
+                }
+            });
             System.out.println(VmSystem.getBootLog());
 
             if (first.getIn() == null) {
@@ -122,11 +127,11 @@ class FBConsole {
         } catch (Throwable ex) {
             Unsafe.debugStackTrace("Error in FBConsole", ex);
         } finally {
-            Unsafe.debug("FINALLY\n");            
+            Unsafe.debug("FINALLY\n");
             if (g != null) {
                 log.info("Close graphics");
                 g.close();
             }
-        }        
+        }
     }
 }
