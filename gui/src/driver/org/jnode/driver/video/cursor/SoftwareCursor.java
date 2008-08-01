@@ -160,7 +160,7 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
         }
 
         try {
-            final HardwareCursorImage cursImage = cursor.getImage(16, 16);
+            final HardwareCursorImage cursImage = cursor.getImage(20, 20);
 
             if ((cursImage != null) && (this.cursorImage != cursImage)) {
                 hideCursor();
