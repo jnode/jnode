@@ -14,7 +14,7 @@
   </requires>
         
   <extension point="org.jnode.fs.jifs.def.info">
-    <info class="org.jnode.fs.jifs.JIFSDirectory"/>
+    <info class="org.jnode.fs.jifs.JIFSDirectory" name="testdir"/>
     <info class="org.jnode.fs.jifs.JIFSFile" name="testfile"/>
   </extension>
           
