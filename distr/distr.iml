@@ -36,7 +36,7 @@
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="distr" level="application" />
+    <orderEntry type="module" module-name="gui" />
     <orderEntryProperties />
   </component>
 </module>
