@@ -57,7 +57,24 @@ public interface FrameBufferAPI extends DeviceAPI {
      * @return
      */
     public boolean isOpen();
+    
+    /**
+     * Request to be the owner of the underlying FrameBuffer device.
+     * The old owner (if any) will receive a request to stop using the underlying FrameBuffer device.
+     * 
+     * @param owner
+     * @return true if owner can now start using exclusively the underlying FrameBuffer device.
+     */
+    public void requestOwnership(FrameBufferAPIOwner owner);
 
+    /**
+     * Request the ownership on the underlying FrameBuffer device.
+     * 
+     * @param owner
+     * @return true if owner can now start using exclusively the underlying FrameBuffer device.
+     */
+    public void releaseOwnership(FrameBufferAPIOwner owner);
+    
     /**
      * Gets the currently opened framebuffer configuration.
      * 

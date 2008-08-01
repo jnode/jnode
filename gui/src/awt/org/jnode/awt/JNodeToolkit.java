@@ -82,17 +82,21 @@ import org.jnode.driver.DeviceException;
 import org.jnode.driver.sound.speaker.SpeakerUtils;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.FrameBufferAPIOwner;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.naming.InitialNaming;
+import org.jnode.vm.Unsafe;
+
 import sun.awt.image.ToolkitImage;
 
 /**
  * @author epr
  * @author Levente S\u00e1ntha
  */
-public abstract class JNodeToolkit extends ClasspathToolkit {
-    protected final Logger log = Logger.getLogger(getClass());
+public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBufferAPIOwner {
+    protected static final Logger log = Logger.getLogger(JNodeToolkit.class);
+    
     private final Object initCloseLock = new Object();
     private EventQueue waitingNativeQueue;
     private Clipboard systemClipboard;
@@ -332,6 +336,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
                 graphics.close();
             }
 
+            final FrameBufferAPI savedApi = this.api;
             this.api = null;
             this.graphics = null;
             this.keyboardHandler = null;
@@ -352,6 +357,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
                 graphicsMode = false;
                 initCloseLock.notifyAll();
             }
+            savedApi.releaseOwnership(this);
             return 0;
         } else {
             return rc;
@@ -669,6 +675,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             this.api = fbDevice.getAPI();
             try {
                 log.debug("Opening AWT: Using fbDevice " + fbDevice.getIDstring());
+                api.requestOwnership(this);
                 this.graphics = api.open(config.getConfig());
                 if (graphics == null) {
                     log.debug("No Graphics for fbDevice: " + fbDevice.getIDstring());
@@ -859,6 +866,14 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             graphicsMode = false;
             initCloseLock.notifyAll();
         }
+        
+        try {
+            Unsafe.debug("leaveGUI : before releaseOwnership");        
+            api.releaseOwnership(this);
+            Unsafe.debug("leaveGUI : after releaseOwnership");
+        } catch (Throwable t) {
+            Unsafe.debugStackTrace(t);        
+        }
     }
 
     /**
@@ -866,7 +881,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
      */
     public final void joinGUI() {
         try {
-
+            api.requestOwnership(this);
+            
             this.graphics = api.open(config.getConfig());
             this.keyboardHandler = new KeyboardHandler(_eventQueue);
             this.mouseHandler = new MouseHandler(fbDevice.getDevice(),
@@ -1057,5 +1073,46 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
     protected DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
         //todo implementit
         return null;
+    }
+    
+    @Override
+    public void ownershipLost() {
+        if (isGuiActive()) {
+            leaveGUI();
+        }
+    }
+    
+    @Override
+    public void ownershipGained() {
+        startAwt();
+    }
+
+    static void startAwt() {
+        if (JNodeToolkit.isGuiActive()) {
+            ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).joinGUI();
+            JNodeToolkit.waitUntilStopped();
+        } else {
+            JNodeToolkit.startGui();
+            try {
+                final String desktopClassName = System.getProperty("jnode.desktop");
+                if (desktopClassName != null) {
+                    final Class<?> desktopClass =
+                        Thread.currentThread().getContextClassLoader().loadClass(desktopClassName);
+                    final Object desktop = desktopClass.newInstance();
+                    if (desktop instanceof Runnable) {
+                        final Thread t = new Thread((Runnable) desktop);
+                        t.start();
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
+                log.error("Cannot find desktop class", ex);
+            } catch (InstantiationException ex) {
+                log.error("Cannot instantiate desktop class", ex);
+            } catch (IllegalAccessException ex) {
+                log.error("Cannot access desktop class", ex);
+            } finally {
+                JNodeToolkit.waitUntilStopped();
+            }
+        }
     }
 }

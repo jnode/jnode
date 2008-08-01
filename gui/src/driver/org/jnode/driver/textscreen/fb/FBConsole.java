@@ -4,7 +4,9 @@ import java.io.PrintStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManagerListener;
@@ -14,12 +16,10 @@ import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.textscreen.TextScreenManager;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.FrameBufferConfiguration;
-import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.ShellUtils;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -29,31 +29,28 @@ class FBConsole {
     private static final Logger log = Logger.getLogger(FBConsole.class);
 
     /**
-     * TODO use a listener mechanism instead
+     * TODO use a listener mechanism instead 
      */
     private static void waitShellManagerAvailable() {
-        Unsafe.debug("waiting registration of a ShellManager");
         while (true) {
             try {
                 ShellManager mgr = ShellUtils.getShellManager();
                 if (mgr != null) {
-                    Unsafe.debug("got a ShellManager");
                     break;
                 }
             } catch (NameNotFoundException e) {
                 // not yet available                
             }
-
+            
             // not yet available
             Thread.yield();
         }
     }
-
+    
     public static void start() throws Exception {
 
         waitShellManagerAvailable();
 
-        Unsafe.debug("searching for already registered FrameBufferDevice\n");
         Device dev = null;
         final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
         int dev_count = devs.size();
@@ -63,13 +60,10 @@ class FBConsole {
         }
 
         if (dev == null) {
-            Unsafe.debug("waiting registration of a FrameBufferDevice\n");
             DeviceUtils.getDeviceManager().addListener(new DeviceManagerListener() {
 
                 public void deviceRegistered(Device device) {
-                    Unsafe.debug("device=" + device + "\n");
-                    if (device.implementsAPI(FrameBufferAPI.class)) {
-                        Unsafe.debug("got a FrameBufferDevice\n");
+                    if (device.implementsAPI(FrameBufferAPI.class)) {                        
                         startFBConsole(device);
                     }
                 }
@@ -79,34 +73,31 @@ class FBConsole {
                 }
             });
         } else {
-            Unsafe.debug("FrameBufferDevice already available\n");
             startFBConsole(dev);
         }
     }
-
+    
     private static void startFBConsole(Device dev) {
-        Unsafe.debug("startFBConsole\n");
-        Surface g = null;
+        FbTextScreenManager fbTsMgr = null;
         try {
             final FrameBufferAPI api = dev.getAPI(FrameBufferAPI.class);
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
 
-            g = api.open(conf);
-
+            fbTsMgr = new FbTextScreenManager(api, conf);
             InitialNaming.unbind(TextScreenManager.NAME);
-            InitialNaming.bind(TextScreenManager.NAME, new FbTextScreenManager(g));
-
+            InitialNaming.bind(TextScreenManager.NAME, fbTsMgr);
+                            
             ////
             ConsoleManager mgr = InitialNaming.lookup(ConsoleManager.NAME);
-
+            
             //
             final int options = ConsoleManager.CreateOptions.TEXT |
                 ConsoleManager.CreateOptions.SCROLLABLE;
 
             final TextConsole first = (TextConsole) mgr.createConsole(
-                null, options);
-
-            mgr.registerConsole(first);
+                    null, options);
+            
+            mgr.registerConsole(first);            
             mgr.focus(first);
             AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
@@ -125,13 +116,12 @@ class FBConsole {
             Thread.sleep(60 * 1000);
 
         } catch (Throwable ex) {
-            Unsafe.debugStackTrace("Error in FBConsole", ex);
+            log.error("Error in FBConsole", ex);
         } finally {
-            Unsafe.debug("FINALLY\n");
-            if (g != null) {
+            if (fbTsMgr != null) {
                 log.info("Close graphics");
-                g.close();
+                fbTsMgr.ownershipLost();
             }
-        }
+        }        
     }
 }

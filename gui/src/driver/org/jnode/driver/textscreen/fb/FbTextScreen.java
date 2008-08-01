@@ -21,6 +21,10 @@
 
 package org.jnode.driver.textscreen.fb;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 import org.jnode.driver.textscreen.TextScreen;
@@ -29,21 +33,41 @@ import org.jnode.driver.video.Surface;
 
 
 class FbTextScreen extends AbstractPcTextScreen {
-    private static final int SCREEN_WIDTH = 80;
-    private static final int SCREEN_HEIGHT = 25;
-
+    private final Font font;
     private final char[] buffer;
 
     private int cursorOffset;
     private boolean cursorVisible = true;
 
-    private final FbScreenPainter painter;
-
-    public FbTextScreen(Surface g) {
-        super(SCREEN_WIDTH, SCREEN_HEIGHT);
-        buffer = new char[SCREEN_WIDTH * SCREEN_HEIGHT];
-        painter = new FbScreenPainter(this, g);
+    private FbScreenPainter painter;
+    private final Surface surface;
+    private final Background background;
+    private final BufferedImage bufferedImage;
+    private final Graphics graphics;
+    private final int margin;
+    
+    /**
+     * 
+     * @param g
+     * @param width in pixels
+     * @param height in pixels
+     */
+    public FbTextScreen(Surface g, BufferedImage bufferedImage, Graphics graphics, Font font, int nbColumns, 
+            int nbRows, int margin) {
+        super(nbColumns, nbRows);
+        buffer = new char[getWidth() * getHeight()];        
         Arrays.fill(buffer, ' ');
+        
+        //this.background = new DefaultBackground(Color.BLACK);
+        this.background = new GradientBackground(bufferedImage.getWidth(), bufferedImage.getHeight());
+        
+        this.surface = g;
+        this.bufferedImage = bufferedImage;
+        this.graphics = graphics;
+        this.font = font;
+        this.margin = margin;
+        
+        open();
     }
 
     public char getChar(int offset) {
@@ -90,7 +114,9 @@ class FbTextScreen extends AbstractPcTextScreen {
     }
 
     public void sync(int offset, int length) {
-        painter.repaint();
+        if (painter != null) {
+            painter.repaint();
+        }
     }
 
     public int setCursor(int x, int y) {
@@ -129,4 +155,79 @@ class FbTextScreen extends AbstractPcTextScreen {
         return buffer;
     }
 
+    class FbScreenPainter {
+        private final Thread painterThread;
+
+        private boolean stop = false;
+        private boolean update = true;
+
+        public FbScreenPainter() {
+            painterThread = new Thread(new Runnable() {
+                public void run() {
+                    while (!stop) {
+                        try {
+                            paintComponent();
+                            synchronized (FbScreenPainter.this) {
+                                if (update) {
+                                    update = false;
+                                    FbScreenPainter.this.wait();
+                                }
+                            }
+                        } catch (InterruptedException x) {
+                            break;
+                        }
+                    }
+                }
+            }, "FbScreenPainter");
+            painterThread.start();
+        }
+        
+        private void stop() {
+            this.stop = true; 
+        }
+            
+        protected void paintComponent() {
+            background.paint(graphics);
+            
+            graphics.setColor(Color.WHITE);
+            graphics.setFont(font);
+            
+            final int fontHeight = graphics.getFontMetrics().getHeight();
+            
+            final char[] textBuffer = getBuffer();
+            final int length = getWidth();
+            int offset = 0;
+            final int x = margin;
+            int y = fontHeight + margin;            
+            
+            for (int i = 0; i < getHeight(); i++) {
+                graphics.drawChars(textBuffer, offset, length, x, y);
+                
+                offset += length;
+                y += fontHeight;
+            }
+            surface.drawCompatibleRaster(bufferedImage.getRaster(), 0, 0, 0, 0, bufferedImage.getWidth(), 
+                    bufferedImage.getHeight(), Color.BLACK);
+        }
+        
+        public synchronized void repaint() {
+            if (!update) {
+                update = true;
+                notifyAll();
+            }
+        }
+    }
+
+    void close() {
+        if (painter != null) {
+            painter.stop();
+            painter = null;
+        }
+    }
+    
+    void open() {
+        if (painter == null) {
+            painter = new FbScreenPainter();
+        }
+    }    
 }

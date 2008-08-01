@@ -21,16 +21,66 @@
  
 package org.jnode.driver.textscreen.fb;
 
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+import org.jnode.driver.DeviceException;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.TextScreenManager;
+import org.jnode.driver.video.AlreadyOpenException;
+import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.FrameBufferAPIOwner;
+import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.UnknownConfigurationException;
 
-final class FbTextScreenManager implements TextScreenManager {
-
+final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwner {
+    /**
+     * The font to use for rendering characters in the console : 
+     * it must be a mono spaced font (=a font with fixed width)
+     */
+    private static final Font FONT = new Font(
+            "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
+            Font.PLAIN, 12);
+    private static final int MARGIN = 5;
+        
     private final FbTextScreen systemScreen;
     
-    FbTextScreenManager(Surface g) {
-        systemScreen = new FbTextScreen(g);    
+    /**
+     * 
+     * @param g
+     * @param width in pixels
+     * @param height in pixels
+     * @throws DeviceException 
+     * @throws AlreadyOpenException 
+     * @throws UnknownConfigurationException 
+     */
+    FbTextScreenManager(FrameBufferAPI api, FrameBufferConfiguration conf) 
+        throws UnknownConfigurationException, AlreadyOpenException, DeviceException {
+        BufferedImage bufferedImage = new BufferedImage(conf.getScreenWidth(), conf.getScreenHeight(), 
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics graphics = bufferedImage.getGraphics();
+        
+        //TODO wait for SurfaceGraphics2D implementation + textscreen supporting something else that 80x25
+/*        
+        final Rectangle2D bounds = graphics.getFontMetrics().getStringBounds("Z", graphics);
+        final int fontHeight = (int) bounds.getHeight();
+        final int fontWidth = (int) bounds.getWidth();
+        
+        int nbColumns = (width - 2 * MARGIN) / fontWidth;
+        Unsafe.debug("getHeight: height=" + height + " font.width=" + fontWidth + " result=" + nbColumns);
+        
+        int nbRows = (height - 2 * MARGIN) / fontHeight;
+        Unsafe.debug("getWidth: width=" + width + " font.height=" + fontHeight + " result=" + nbRows);        
+*/
+        final int nbColumns = 80;
+        final int nbRows = 25;
+        
+        api.requestOwnership(this);     
+        Surface g = api.open(conf);                     
+
+        systemScreen = new FbTextScreen(g, bufferedImage, graphics, FONT, nbColumns, nbRows, MARGIN);
     }
     
     /**
@@ -40,4 +90,19 @@ final class FbTextScreenManager implements TextScreenManager {
         return systemScreen;
     }
 
+    @Override
+    public void ownershipLost() {
+        // systemScreen might be null at construction time
+        if (systemScreen != null) {
+            systemScreen.close();
+        }
+    }
+    
+    @Override
+    public void ownershipGained() {
+        // systemScreen might be null at construction time
+        if (systemScreen != null) {
+            systemScreen.open();
+        }
+    }
 }

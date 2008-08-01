@@ -21,6 +21,8 @@
 
 package org.jnode.driver.video;
 
+import java.util.Stack;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
@@ -42,6 +44,8 @@ public abstract class AbstractFrameBufferDriver extends Driver implements FrameB
     /** Device name prefix of framebuffer devices */
     public static final String FB_DEVICE_PREFIX = "fb";
 
+    private Stack<FrameBufferAPIOwner> owners = new Stack<FrameBufferAPIOwner>();
+    
     /**
      * @see org.jnode.driver.Driver#startDevice()
      */
@@ -56,6 +60,59 @@ public abstract class AbstractFrameBufferDriver extends Driver implements FrameB
             throw new DriverException("Cannot find DeviceManager", ex);
         }
         device.registerAPI(FrameBufferAPI.class, this);
+    }
+
+    
+    /**
+     * Request to be the owner of the underlying FrameBuffer device.
+     * The old owner (if any) will receive a request to stop using the underlying FrameBuffer device.
+     * 
+     * @param owner
+     */
+    @Override
+    public final void requestOwnership(FrameBufferAPIOwner owner) {
+        FrameBufferAPIOwner oldOwner = null;
+        if (!owners.isEmpty()) {
+            oldOwner = owners.peek();
+        }
+        
+        owners.push(owner);        
+        
+        if (oldOwner != null) {
+            oldOwner.ownershipLost();
+        }
+
+        // the owner doesn't need to be notified since the caller knows it
+        // ...
+    }
+
+    /**
+     * Request to be the owner of the underlying FrameBuffer device.
+     * The old owner (if any) will receive a request to stop using the underlying FrameBuffer device.
+     * 
+     * @param owner
+     */
+    @Override
+    public final void releaseOwnership(FrameBufferAPIOwner owner) {
+        FrameBufferAPIOwner newOwner = null;
+        
+        if (!owners.isEmpty()) {
+            if (owners.peek().equals(owner)) {
+                // the owner doesn't need to be notified since the caller knows it
+                // simply remove it from the stack
+                owners.pop();
+                if (!owners.isEmpty()) {
+                    newOwner = owners.peek();
+                }
+            } else {
+                throw new IllegalArgumentException("parameter is not the current owner");
+            }
+        }            
+        
+        // notify new owner (if any) that he gained ownership
+        if (newOwner != null) {
+            newOwner.ownershipGained();
+        }
     }
 
     /**
