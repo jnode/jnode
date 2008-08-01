@@ -31,14 +31,11 @@ import org.jnode.vm.VmSystem;
 
 public final class FbTextScreenPlugin extends Plugin {
 
-    // private final FbTextScreenManager mgr;
-
     /**
      * @param descriptor
      */
     public FbTextScreenPlugin(PluginDescriptor descriptor) {
         super(descriptor);
-        // this.mgr = new FbTextScreenManager();
     }
 
     /**
@@ -53,9 +50,7 @@ public final class FbTextScreenPlugin extends Plugin {
             @Override
             public void run() {
                 try {
-                    Unsafe.debug("before FBConsole.start()\n");
                     FBConsole.start();
-                    Unsafe.debug("after FBConsole.start()\n");
                 } catch (Throwable e) {
                     Unsafe.debugStackTrace(e);
                 }
