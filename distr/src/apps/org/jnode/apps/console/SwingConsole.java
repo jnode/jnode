@@ -2,7 +2,10 @@ package org.jnode.apps.console;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.naming.NameNotFoundException;
 import javax.swing.JFrame;
+
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
@@ -24,10 +27,13 @@ public class SwingConsole {
                 return;
             }
         }
-        ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
-        TextScreenConsoleManager manager = (TextScreenConsoleManager) sm.getCurrentShell().getConsole().getManager();
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
-        cm.setParent(manager);
+        
+        TextScreenConsoleManager manager = getParentManager();
+        if (manager != null) {
+            cm.setParent(manager);
+        }
+        
         TextConsole console = cm.createConsole(
             null,
             (ConsoleManager.CreateOptions.TEXT |
@@ -45,5 +51,20 @@ public class SwingConsole {
                 }
             }
         });
+    }
+    
+    private static TextScreenConsoleManager getParentManager() throws NameNotFoundException {
+        TextScreenConsoleManager manager = null;
+        
+        ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
+        if (sm != null) {
+            // current shell is null when JNode boot directly in GUI mode, without going 
+            // through command line
+            if (sm.getCurrentShell() != null) {
+                manager = (TextScreenConsoleManager) sm.getCurrentShell().getConsole().getManager();
+            }
+        }
+        
+        return manager;
     }
 }
