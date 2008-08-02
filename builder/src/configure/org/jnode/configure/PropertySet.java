@@ -35,7 +35,7 @@ import org.jnode.configure.adapter.FileAdapterFactory;
  * @author crawley@jnode.org
  */
 public class PropertySet {
-    public static class Property {
+    public class Property {
         private final String name;
         private final PropertyType type;
         private final String description;
@@ -97,6 +97,14 @@ public class PropertySet {
 
         public void setDefaultValue(Value defaultValue) {
             this.defaultValue = defaultValue;
+        }
+
+        public boolean isControlProperty() {
+            return getPropertySet().getFile() == null;
+        }
+        
+        public PropertySet getPropertySet() {
+            return PropertySet.this;
         }
     }
 
@@ -171,7 +179,23 @@ public class PropertySet {
     }
 
     public void save(Configure configure) throws ConfigureException {
+        if (file.exists()) {
+            File file = this.file.getAbsoluteFile();
+            File backup = new File(file.getParentFile(), file.getName() + ".bak");
+            if (backup.exists()) {
+                if (!backup.delete()) {
+                    throw new ConfigureException(
+                            "Cannot delete existing '" + backup + "'");
+                }
+            }
+            if (!file.renameTo(backup)) {
+                throw new ConfigureException(
+                        "Cannot rename existing '" + file + "' as '" + backup + "'");
+            }
+            configure.verbose("Renamed existing '" + file + "' as '" + backup + "'");
+        }
         adapter.save(this, configure);
+        configure.verbose("Saved properties to '" + file + "'");
     }
 
     public File getFile() {

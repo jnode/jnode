@@ -166,6 +166,11 @@ public class Screen {
                     configure.output("");
                 }
             }
+            if (!prop.isControlProperty()) {
+                configure.verbose(
+                        "Setting property " + prop.getName() + " to " + 
+                        "\"" + value.getText() + "\"");
+            }
         }
     }
 }

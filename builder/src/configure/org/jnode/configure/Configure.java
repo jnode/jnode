@@ -47,6 +47,29 @@ public class Configure {
     private final PrintStream err;
     private String scriptFile;
     private boolean debug;
+    private boolean verbose;
+    private boolean help;
+    
+    private static String USAGE =
+        "configure.sh [--debug] [--verbose] [--help] [<script>]";
+    private static String[] DESCRIPTION = new String[] {
+        "Capture configuration properties based on the supplied <script>.",
+        "    If no arguments or options are provided, defaults are supplied",
+        "    by the wrapper script.  A copy of the previous state of each",
+        "    <file> updated is saved in '<file>.bak.'",
+        "Options:",
+        "    --verbose   output more information to help the user understand",
+        "                what is happening.",
+        "    --help      output command help then exit",
+        "    --debug     enable debug output"
+    };
+    private static String[] UI_HELP = new String[] {
+        "The program will prompt you for values for a series of properties,",
+        "showing a list of legal values or a regex.  If there is a default",
+        "value, it will be shown in square brackets.  At the prompt, type",
+        "an acceptable value for the property followed by ENTER.  If you just",
+        "type ENTER, the default value (if any) will be used for the property."
+    };
 
     private Configure() {
         this.in = new BufferedReader(new InputStreamReader(System.in));
@@ -57,10 +80,15 @@ public class Configure {
     private void run(String[] args) {
         try {
             parseArguments(args);
+            if (help) {
+                printHelp();
+                return;
+            }
             ConfigureScript script = new ScriptParser(this).loadScript(scriptFile);
             for (PropertySet propFile : script.getPropsFiles()) {
                 propFile.load(this);
             }
+            printUIHelp();
             script.execute(this);
             for (PropertySet propFile : script.getPropsFiles()) {
                 saveProperties(propFile);
@@ -72,6 +100,28 @@ public class Configure {
                 ex.printStackTrace(err);
             }
             System.exit(1);
+        }
+    }
+
+    private void printUIHelp() {
+        if (verbose) {
+            print(UI_HELP, out);
+        }
+    }
+
+    private void printHelp() {
+        print(USAGE, err);
+        print(DESCRIPTION, err);
+        print(UI_HELP, err);
+    }
+    
+    private void print(String line, PrintStream stream) {
+        format(stream, line, DISPLAY_NORMAL);
+    }
+
+    private void print(String[] lines, PrintStream stream) {
+        for (String line: lines) {
+            format(stream, line, DISPLAY_NORMAL);
         }
     }
 
@@ -89,6 +139,11 @@ public class Configure {
             }
             if (arg.equals("--debug")) {
                 debug = true;
+            } else if (arg.equals("--help")) {
+                help = true;
+                return;
+            } else if (arg.equals("--verbose")) {
+                verbose = true;
             } else {
                 throw new ConfigureException("Unrecognized option: " + args[i]);
             }
@@ -116,7 +171,7 @@ public class Configure {
     }
 
     public void output(String message) {
-        format(err, message, DISPLAY_NORMAL);
+        format(out, message, DISPLAY_NORMAL);
     }
 
     public void error(String message) {
@@ -125,7 +180,13 @@ public class Configure {
 
     public void debug(String message) {
         if (debug) {
-            format(err, message, DISPLAY_NORMAL);
+            format(err, "[DEBUG] " + message, DISPLAY_NORMAL);
+        }
+    }
+
+    public void verbose(String message) {
+        if (verbose) {
+            format(out, "[VERBOSE] " + message, DISPLAY_NORMAL);
         }
     }
 
