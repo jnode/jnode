@@ -502,6 +502,13 @@ public final class Unsafe {
     /**
      * Print the given value on the screen.
      */
+    public static final void debug(boolean value) {
+        debug(value ? "true" : "false");
+    }
+
+    /**
+     * Print the given value on the screen.
+     */
     @KernelSpace
     public static native void debug(Address value);
 
