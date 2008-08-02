@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
@@ -47,7 +48,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * The screen I'm writing on
      */
-    private final TextScreen screen;
+    private TextScreen screen;
 
     /**
      * Width of the screen
@@ -89,6 +90,11 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     private final boolean claimSystemOutErr;
 
     private VmIsolate myIsolate;
+    
+    /**
+     * The options used to create this {@link TextScreenConsole}
+     */
+    private final int options;
 
     /**
      * @param mgr
@@ -97,6 +103,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      */
     public TextScreenConsole(ConsoleManager mgr, String name, TextScreen screen, int options) {
         super(mgr, name);
+        this.options = options;
         this.screen = screen;
         this.scrWidth = screen.getWidth();
         this.scrHeight = screen.getHeight();
@@ -411,5 +418,32 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      */
     protected final TextScreen getScreen() {
         return this.screen;
+    }
+
+    /**
+     * Get the options used to create this {@link TextScreenConsole}
+     * @return
+     */
+    final int getOptions() {
+        return options;
+    }
+    
+    /**
+     * @see Console#systemScreenChanged(TextScreen)
+     */
+    @Override
+    public void systemScreenChanged(TextScreen systemScreen) {
+        // ensure that old and new screens are compatible
+        if ((systemScreen.getWidth() != screen.getWidth()) || (systemScreen.getHeight() != screen.getHeight())) {
+            throw new IllegalArgumentException("old and new screen have different sizes");
+        }
+    
+        TextScreen oldScreen = screen;
+        screen = systemScreen;
+        
+        final int size = oldScreen.getWidth() * oldScreen.getHeight();
+        oldScreen.ensureVisible(0, isFocused());
+        oldScreen.copyTo(screen, 0, size);
+        syncScreen(0, size);
     }
 }

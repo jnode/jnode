@@ -23,6 +23,7 @@ package org.jnode.driver.console;
 
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerListener;
+import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusListener;
 
 /**
@@ -111,4 +112,10 @@ public interface Console extends FocusListener, KeyboardListener,
      * @return
      */
     public ConsoleManager getManager();
+
+    /**
+     * Method called to notify the {@link Console} that the system {@link TextScreen} has changed
+     * @param textScreen the new system {@link TextScreen}
+     */
+    public void systemScreenChanged(TextScreen textScreen);
 }

@@ -25,6 +25,7 @@ import java.io.InputStream;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.spi.AbstractConsoleManager;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
@@ -54,8 +55,7 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
      */
     public TextScreenConsole createConsole(String name, int options) {
         if ((options & CreateOptions.TEXT) != 0) {
-            final TextScreenManager tsm;
-            tsm = getTextScreenManager();
+            final TextScreenManager tsm = getTextScreenManager();
             final TextScreenConsole console;
             if (name == null) {
                 name = autoName();
@@ -119,6 +119,24 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
             } else {
                 i++;
             }
+        }
+    }
+
+
+    @Override
+    public void textScreenManagerChanged() {
+        final TextScreen systemScreen = getTextScreenManager().getSystemScreen();
+                
+        for (Console c : getConsoles()) {
+            TextScreenConsole console = (TextScreenConsole) c;
+            
+            final TextScreen screen;            
+            if ((console.getOptions() & CreateOptions.SCROLLABLE) != 0) {
+                screen = systemScreen.createCompatibleScrollableBufferScreen(SCROLLABLE_HEIGHT);
+            } else {
+                screen = systemScreen.createCompatibleBufferScreen();
+            }
+            console.systemScreenChanged(screen);
         }
     }
 
