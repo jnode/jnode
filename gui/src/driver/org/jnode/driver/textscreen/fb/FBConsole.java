@@ -20,7 +20,6 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.ShellUtils;
-import org.jnode.vm.VmSystem;
 
 /**
  * @author Levente S\u00e1ntha
@@ -87,34 +86,21 @@ class FBConsole {
             InitialNaming.unbind(TextScreenManager.NAME);
             InitialNaming.bind(TextScreenManager.NAME, fbTsMgr);
                             
-            ////
+            //// FIXME we shouldn't be forced to call that : a better (and more generic) solution would be to use a listener on InitialNaming binding changes 
             ConsoleManager mgr = InitialNaming.lookup(ConsoleManager.NAME);
+            mgr.textScreenManagerChanged();
+            ////
             
-            //
-            final int options = ConsoleManager.CreateOptions.TEXT |
-                ConsoleManager.CreateOptions.SCROLLABLE;
-
-            final TextConsole first = (TextConsole) mgr.createConsole(
-                    null, options);
-            
-            mgr.registerConsole(first);            
-            mgr.focus(first);
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                    System.setOut(new PrintStream(first.getOut()));
-                    System.setErr(new PrintStream(first.getErr()));
-                    return null;
-                }
-            });
-            System.out.println(VmSystem.getBootLog());
-
-            if (first.getIn() == null) {
-                throw new Exception("console input is null");
-            }
-
+            //// FIXME we shouldn't need that code since command shell is already created elsewhere
+            // but without that code :
+            // - it's impossible to scroll nor to type anything that is displayed in the console
+            // - it's also impossible to switch between consoles
+            // NB : I have checked and the scrollUp/ScrollDown method are called properly 
+            final TextConsole first = (TextConsole) mgr.getFocus();                
             new CommandShell(first).run();
             Thread.sleep(60 * 1000);
-
+            //// end of FIXME
+            
         } catch (Throwable ex) {
             log.error("Error in FBConsole", ex);
         } finally {

@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.util.Set;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerListener;
+import org.jnode.driver.textscreen.TextScreenManager;
 
 /**
  * @author epr
@@ -151,4 +152,10 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
     public Console createConsole(String name, int options);
 
     public void printConsoles(PrintStream ps);
+
+    /**
+     * That method is called when the system {@link TextScreenManager} has changed
+     * It's a temporary workaround. FIXME : create and use a listener mechanism in InitialNaming instead 
+     */
+    public void textScreenManagerChanged();
 }
