@@ -116,21 +116,30 @@ public class Desktop implements Runnable {
                 taskBar.quitMI.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         taskBar.startMenu.setVisible(false);
+                        JNodeToolkit.setExitAction(null);
                         JNodeToolkit.stopGui();
                     }
                 });
 
                 taskBar.haltMI.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        JNodeToolkit.setExitAction(new Runnable() {
+                            public void run() {
+                                VmSystem.halt(false);
+                            }
+                        });
                         JNodeToolkit.stopGui();
-                        VmSystem.halt(false);
                     }
                 });
 
                 taskBar.restartMI.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        JNodeToolkit.setExitAction(new Runnable() {
+                            public void run() {
+                                VmSystem.halt(true);
+                            }
+                        });
                         JNodeToolkit.stopGui();
-                        VmSystem.halt(true);
                     }
                 });
 
