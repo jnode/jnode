@@ -133,10 +133,12 @@ public class ScriptParser {
     }
 
     public ConfigureScript loadScript(String fileName) throws ConfigureException {
+        configure.verbose("Loading configure script from " + fileName);
         final File file = new File(fileName);
         stack.add(new ParseContext(file));
         try {
             final XMLElement root = loadXML(file);
+            configure.debug("Parsing script");
             return parseScript(root, file);
         } finally {
             stack.removeLast();
