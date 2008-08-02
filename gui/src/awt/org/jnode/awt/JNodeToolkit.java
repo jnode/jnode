@@ -112,6 +112,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     private int refCount = 0;
     private final Dimension screenSize = new Dimension(640, 480);
     private Frame top;
+    private Runnable exitAction;
 
     public JNodeToolkit() {
         refCount = 0;
@@ -1113,6 +1114,27 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
             } finally {
                 JNodeToolkit.waitUntilStopped();
             }
+        }
+        ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).runExitAction();
+    }
+    
+    /**
+     * Set the action to be performed after the GUI has been shutdown, and
+     * before control is returned to (for instance) the CommandShell.
+     * 
+     * @param exitAction an action, or <code>null</code>.
+     */
+    public static void setExitAction(Runnable exitAction) {
+        // FIXME ... This method probably needs a security check.  (The way it
+        // is currently used potentially offers a small window for some other
+        // thread to insert an action that would then be executed in the security
+        // context of the GUI's owner.)
+        ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).exitAction = exitAction;
+    }
+
+    private synchronized void runExitAction() {
+        if (exitAction != null) {
+            exitAction.run();
         }
     }
 }
