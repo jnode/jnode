@@ -21,8 +21,11 @@
  
 package org.jnode.driver.textscreen.fb;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import org.jnode.driver.DeviceException;
@@ -43,9 +46,10 @@ final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwne
     private static final Font FONT = new Font(
             "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
             Font.PLAIN, 12);
-    private static final int MARGIN = 5;
         
     private final FbTextScreen systemScreen;
+    private final Surface surface; 
+    private FrameBufferConfiguration conf;
     
     /**
      * 
@@ -58,7 +62,15 @@ final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwne
      */
     FbTextScreenManager(FrameBufferAPI api, FrameBufferConfiguration conf) 
         throws UnknownConfigurationException, AlreadyOpenException, DeviceException {
-        BufferedImage bufferedImage = new BufferedImage(conf.getScreenWidth(), conf.getScreenHeight(), 
+
+        // compute x and y offsets to center the console in the screen
+        // FIXME for now it's only an approximation
+        final int consoleWidth = 567;
+        final int consoleHeight = 355;
+        final int xOffset = (conf.getScreenWidth() - consoleWidth) / 2;
+        final int yOffset = (conf.getScreenHeight() - consoleHeight) / 2;
+        
+        BufferedImage bufferedImage = new BufferedImage(consoleWidth, consoleHeight, 
                 BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = bufferedImage.getGraphics();
         
@@ -78,9 +90,19 @@ final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwne
         final int nbRows = 25;
         
         api.requestOwnership(this);     
-        Surface g = api.open(conf);                     
+        surface = api.open(conf);
+        this.conf = conf;
 
-        systemScreen = new FbTextScreen(g, bufferedImage, graphics, FONT, nbColumns, nbRows, MARGIN);
+        // initial painting of all the screen area
+        clearScreen();
+
+        systemScreen = new FbTextScreen(surface, bufferedImage, graphics, FONT, nbColumns, nbRows, xOffset, yOffset);
+    }
+    
+    private final void clearScreen() {
+        // initial painting of all the screen area
+        final Rectangle r = new Rectangle(0, 0, conf.getScreenWidth(), conf.getScreenHeight());
+        surface.fill(r, null, new AffineTransform(), Color.BLACK, Surface.PAINT_MODE);
     }
     
     /**
@@ -94,6 +116,7 @@ final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwne
     public void ownershipLost() {
         // systemScreen might be null at construction time
         if (systemScreen != null) {
+            clearScreen();            
             systemScreen.close();
         }
     }
@@ -102,6 +125,7 @@ final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwne
     public void ownershipGained() {
         // systemScreen might be null at construction time
         if (systemScreen != null) {
+            clearScreen();
             systemScreen.open();
         }
     }

@@ -30,6 +30,7 @@ import java.util.Arrays;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 import org.jnode.driver.video.Surface;
+import org.jnode.vm.Unsafe;
 
 
 class FbTextScreen extends AbstractPcTextScreen {
@@ -44,7 +45,8 @@ class FbTextScreen extends AbstractPcTextScreen {
     private final Background background;
     private final BufferedImage bufferedImage;
     private final Graphics graphics;
-    private final int margin;
+    private final int xOffset;
+    private final int yOffset;
     
     /**
      * 
@@ -53,11 +55,14 @@ class FbTextScreen extends AbstractPcTextScreen {
      * @param height in pixels
      */
     public FbTextScreen(Surface g, BufferedImage bufferedImage, Graphics graphics, Font font, int nbColumns, 
-            int nbRows, int margin) {
+            int nbRows, int xOffset, int yOffset) {
         super(nbColumns, nbRows);
         buffer = new char[getWidth() * getHeight()];        
         Arrays.fill(buffer, ' ');
         
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+
         //this.background = new DefaultBackground(Color.BLACK);
         this.background = new GradientBackground(bufferedImage.getWidth(), bufferedImage.getHeight());
         
@@ -65,7 +70,6 @@ class FbTextScreen extends AbstractPcTextScreen {
         this.bufferedImage = bufferedImage;
         this.graphics = graphics;
         this.font = font;
-        this.margin = margin;
         
         open();
     }
@@ -121,6 +125,12 @@ class FbTextScreen extends AbstractPcTextScreen {
 
     public int setCursor(int x, int y) {
         cursorOffset = getOffset(x, y);
+        if (cursorOffset >= buffer.length) {
+            //FIXME : this is a workaround since the cursor offset is always
+            // out of buffer bounds and thus the cursor is not printed            
+            cursorOffset = buffer.length - 1;
+        }
+        
         return cursorOffset;
     }
 
@@ -137,9 +147,6 @@ class FbTextScreen extends AbstractPcTextScreen {
      */
     @Override
     public void copyFrom(char[] rawData, int rawDataOffset) {
-        if (rawDataOffset < 0) {
-            // Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
-        }
         char[] cha = new char[rawData.length];
         for (int i = 0; i < cha.length; i++) {
             char c = (char) (rawData[i] & 0xFF);
@@ -187,26 +194,38 @@ class FbTextScreen extends AbstractPcTextScreen {
         }
             
         protected void paintComponent() {
+            // first draw the background
             background.paint(graphics);
             
             graphics.setColor(Color.WHITE);
             graphics.setFont(font);
             
             final int fontHeight = graphics.getFontMetrics().getHeight();
+            final int fontWidth = graphics.getFontMetrics().getMaxAdvance();
             
             final char[] textBuffer = getBuffer();
             final int length = getWidth();
             int offset = 0;
-            final int x = margin;
-            int y = fontHeight + margin;            
+            int y = fontHeight;
             
+            Unsafe.debug("\ncursorOffset=" + cursorOffset + "\n");
+            
+            // draw the text of the console
             for (int i = 0; i < getHeight(); i++) {
-                graphics.drawChars(textBuffer, offset, length, x, y);
+                graphics.drawChars(textBuffer, offset, length, 0, y);
+            
+                // draw the cursor
+                if (cursorVisible && (cursorOffset >= offset) && (cursorOffset < (offset + length))) {
+                    final int x1 = (cursorOffset - offset) *  fontWidth;
+                    graphics.setColor(Color.GREEN);
+                    graphics.drawLine(x1, y, x1 + fontWidth - 1, y);
+                    graphics.setColor(Color.WHITE);
+                }
                 
                 offset += length;
                 y += fontHeight;
             }
-            surface.drawCompatibleRaster(bufferedImage.getRaster(), 0, 0, 0, 0, bufferedImage.getWidth(), 
+            surface.drawCompatibleRaster(bufferedImage.getRaster(), 0, 0, xOffset, yOffset, bufferedImage.getWidth(), 
                     bufferedImage.getHeight(), Color.BLACK);
         }
         
