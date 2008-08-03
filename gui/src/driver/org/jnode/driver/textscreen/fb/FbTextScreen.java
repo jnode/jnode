@@ -23,6 +23,7 @@ package org.jnode.driver.textscreen.fb;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -30,7 +31,6 @@ import java.util.Arrays;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 import org.jnode.driver.video.Surface;
-import org.jnode.vm.Unsafe;
 
 
 class FbTextScreen extends AbstractPcTextScreen {
@@ -125,17 +125,14 @@ class FbTextScreen extends AbstractPcTextScreen {
 
     public int setCursor(int x, int y) {
         cursorOffset = getOffset(x, y);
-        if (cursorOffset >= buffer.length) {
-            //FIXME : this is a workaround since the cursor offset is always
-            // out of buffer bounds and thus the cursor is not printed            
-            cursorOffset = buffer.length - 1;
-        }
-        
+        sync(cursorOffset, 1);
         return cursorOffset;
     }
 
     public int setCursorVisible(boolean visible) {
         cursorVisible = visible;
+        
+        sync(cursorOffset, 1);
         return cursorOffset;
     }
 
@@ -156,10 +153,6 @@ class FbTextScreen extends AbstractPcTextScreen {
         final int length = getWidth() * getHeight();
         System.arraycopy(cha, rawDataOffset, buffer, 0, length);
         sync(0, length);
-    }
-
-    char[] getBuffer() {
-        return buffer;
     }
 
     class FbScreenPainter {
@@ -200,15 +193,13 @@ class FbTextScreen extends AbstractPcTextScreen {
             graphics.setColor(Color.WHITE);
             graphics.setFont(font);
             
-            final int fontHeight = graphics.getFontMetrics().getHeight();
-            final int fontWidth = graphics.getFontMetrics().getMaxAdvance();
+            final FontMetrics fm = graphics.getFontMetrics();
+            final int fontHeight = fm.getHeight();
             
-            final char[] textBuffer = getBuffer();
+            final char[] textBuffer = buffer;
             final int length = getWidth();
             int offset = 0;
             int y = fontHeight;
-            
-            Unsafe.debug("\ncursorOffset=" + cursorOffset + "\n");
             
             // draw the text of the console
             for (int i = 0; i < getHeight(); i++) {
@@ -216,12 +207,18 @@ class FbTextScreen extends AbstractPcTextScreen {
             
                 // draw the cursor
                 if (cursorVisible && (cursorOffset >= offset) && (cursorOffset < (offset + length))) {
-                    final int x1 = (cursorOffset - offset) *  fontWidth;
-                    graphics.setColor(Color.GREEN);
-                    graphics.drawLine(x1, y, x1 + fontWidth - 1, y);
-                    graphics.setColor(Color.WHITE);
+                    final int x1 = fm.charsWidth(buffer, offset, cursorOffset - offset);
+                    final char charUnderCursor = buffer[cursorOffset];
+                    final int width = fm.charWidth(charUnderCursor);
+                    
+                    graphics.fillRect(x1, y - fontHeight + 1, width, fontHeight);
+                    if (charUnderCursor >= ' ') {
+                        graphics.setColor(Color.BLACK);
+                        graphics.drawChars(textBuffer, cursorOffset, 1, x1, y);
+                        graphics.setColor(Color.WHITE);
+                    }
                 }
-                
+
                 offset += length;
                 y += fontHeight;
             }
