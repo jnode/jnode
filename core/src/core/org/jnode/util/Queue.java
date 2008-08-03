@@ -170,5 +170,13 @@ public class Queue<T> {
         this.closed = true;
         notifyAll();
     }
+    
+    /**
+     * Is this queue closed.
+     * @return
+     */
+    public boolean isClosed() {
+        return closed;
+    }
 }
 

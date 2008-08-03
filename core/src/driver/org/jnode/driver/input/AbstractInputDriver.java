@@ -148,6 +148,12 @@ public abstract class AbstractInputDriver<E extends SystemEvent> extends Driver 
                     final byte scancode = buf.get(0);
                     E event = handleScancode(scancode);
                     if ((event != null) && !event.isConsumed()) {
+                        if (eventQueue.isClosed()) {
+                            // the queue is closed : it usually happen while JNode is halting
+                            // simply stop processing the events
+                            break;
+                        }
+                        
                         eventQueue.add(event);
                     }
                 } catch (Throwable ex) {
