@@ -74,6 +74,12 @@ public abstract class AbstractFrameBufferDriver extends Driver implements FrameB
         FrameBufferAPIOwner oldOwner = null;
         if (!owners.isEmpty()) {
             oldOwner = owners.peek();
+            
+            if (oldOwner == owner) {
+                // already the owner, simply skip
+                // (avoid infinite loop with requestOwnership & releaseOwnership)
+                return;
+            }
         }
         
         owners.push(owner);        
