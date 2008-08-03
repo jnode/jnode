@@ -170,17 +170,19 @@ MBMMAP_LENGTH	equ 8		; 64-bit length
 MBMMAP_TYPE		equ 16		; 32-bit type
 MBMMAP_ESIZE	equ 20
 
+; VBE offsets in grub multiboot header (see grub multiboot doc)
 VBECTRLINFO	equ 0
 VBEMODEINFO	equ 4
 VBE_MODE	equ 8
 VBE_INT_SEG	equ 10
 VBE_INT_OFF	equ 12
 VBE_INT_LEN	equ 14
-VBE_ESIZE	equ 16
 
+; VBE structure sizes (see vbe specifications)
 VBECTRLINFO_SIZE	equ 512
 VBEMODEINFO_SIZE	equ 256
 
+;
 MBF_MEM			equ (1 << 0)
 MBF_BOOTDEVICE	equ (1 << 1)
 MBF_CMDLINE		equ (1 << 2)

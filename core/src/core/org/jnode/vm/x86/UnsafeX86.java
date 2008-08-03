@@ -83,8 +83,6 @@ public final class UnsafeX86 {
      */
     static final native int getMultibootMMapLength();
 
-    public static final native Address getVbeInfos();
-
     public static final native Address getVbeControlInfos();
 
     public static final native Address getVbeModeInfos();

@@ -100,29 +100,16 @@ multiboot_mmap_done:
 	test dword [multiboot_info+MBI_FLAGS],MBF_VBE
 	jz vbe_info_done ; no vbe info, jump to end
 	
-	; Copy vbe infos
-	; Get start address
-	mov esi,[multiboot_info+MBI_VBECTRLINFO]
-	; Get destination address
-	mov edi,multiboot_vbe
-	; Copy the VBE_ESIZE bytes
-	mov ecx,VBE_ESIZE
-	rep movsb
-
-	; Get start address
-	mov esi,[multiboot_info+MBI_VBECTRLINFO]
-	; Get destination address
-	mov edi,vbe_control_info
-	; Copy the VBECTRLINFO_SIZE bytes
-	mov ecx,VBECTRLINFO_SIZE
+    ; Copy VBE control informations
+	mov esi,[multiboot_info+MBI_VBECTRLINFO] ; Get start address	
+	mov edi,vbe_control_info                 ; Get destination address	
+	mov ecx,VBECTRLINFO_SIZE                 ; Copy the VBECTRLINFO_SIZE bytes
 	rep movsb
 	
-	; Get start address
-	mov esi,[multiboot_info+MBI_VBEMODEINFO]
-	; Get destination address
-	mov edi,vbe_mode_info
-	; Copy the VBEMODEINFO_SIZE bytes
-	mov ecx,VBEMODEINFO_SIZE
+	; Copy VBE mode informations
+	mov esi,[multiboot_info+MBI_VBEMODEINFO]  ; Get start address	
+	mov edi,vbe_mode_info                     ; Get destination address	
+	mov ecx,VBEMODEINFO_SIZE                  ; Copy the VBEMODEINFO_SIZE bytes
 	rep movsb	
 vbe_info_done:
 
@@ -314,10 +301,7 @@ multiboot_mmap:
 	dd 0				; Entries
 	times (MBI_MMAP_MAX * MBMMAP_ESIZE) db 0
 
-; vbe informations
-multiboot_vbe:
-	times (VBE_ESIZE) db 0
-	
+; vbe informations in multiboot header
 vbe_control_info:	
 	times (VBECTRLINFO_SIZE) db 0
 

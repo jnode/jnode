@@ -82,11 +82,6 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getMultibootMMapLength2e2829I
 	mov eax,[multiboot_mmap]
 	ret
 
-; Address getVbeInfos();
-GLABEL Q53org5jnode2vm3x869UnsafeX8623getVbeInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
-	mov AAX,multiboot_vbe
-	ret
-
 ; Address getVbeControlInfos();
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getVbeControlInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
 	mov AAX,vbe_control_info
