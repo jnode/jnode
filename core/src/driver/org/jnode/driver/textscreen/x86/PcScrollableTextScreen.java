@@ -77,6 +77,13 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
         }
     }
 
+    @Override
+    protected void setParentCursor(int x, int y) {
+        // the parent is a view of this scrollable text screen
+        // we need to substract the offset on y axis (ofsY)
+        super.setParentCursor(x, y - ofsY);
+    }
+
     /**
      * @see org.jnode.driver.textscreen.ScrollableTextScreen#scrollUp(int)
      */
