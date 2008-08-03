@@ -86,7 +86,6 @@ import org.jnode.driver.video.FrameBufferAPIOwner;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.vm.Unsafe;
 
 import sun.awt.image.ToolkitImage;
 
@@ -868,13 +867,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
             initCloseLock.notifyAll();
         }
         
-        try {
-            Unsafe.debug("leaveGUI : before releaseOwnership");        
-            api.releaseOwnership(this);
-            Unsafe.debug("leaveGUI : after releaseOwnership");
-        } catch (Throwable t) {
-            Unsafe.debugStackTrace(t);        
-        }
+        api.releaseOwnership(this);
     }
 
     /**
