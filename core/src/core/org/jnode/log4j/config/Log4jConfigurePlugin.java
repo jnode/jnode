@@ -24,11 +24,12 @@ package org.jnode.log4j.config;
 import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.Enumeration;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.jnode.driver.console.ConsoleManager;
@@ -98,7 +99,9 @@ public class Log4jConfigurePlugin extends Plugin {
      * @see org.jnode.plugin.Plugin#stopPlugin()
      */
     protected void stopPlugin() throws PluginException {
-        LogManager.resetConfiguration();
+        // Using LogManager.resetConfiguration() or LogManager.shutdown() 
+        // can't avoid log4j WARN message about log4j not being properly configured.        
+        // So, simply do nothing
     }
 
 }
