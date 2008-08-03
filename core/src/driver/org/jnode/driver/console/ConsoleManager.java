@@ -23,9 +23,9 @@ package org.jnode.driver.console;
 
 import java.io.PrintStream;
 import java.util.Set;
+
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerListener;
-import org.jnode.driver.textscreen.TextScreenManager;
 
 /**
  * @author epr
