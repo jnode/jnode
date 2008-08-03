@@ -1,8 +1,5 @@
 package org.jnode.driver.textscreen.fb;
 
-import java.io.PrintStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collection;
 
 import javax.naming.NameNotFoundException;
@@ -86,7 +83,8 @@ class FBConsole {
             InitialNaming.unbind(TextScreenManager.NAME);
             InitialNaming.bind(TextScreenManager.NAME, fbTsMgr);
                             
-            //// FIXME we shouldn't be forced to call that : a better (and more generic) solution would be to use a listener on InitialNaming binding changes 
+            //// FIXME we shouldn't be forced to call that : a better (and more generic) solution 
+            //// would be to use a listener on InitialNaming binding changes 
             ConsoleManager mgr = InitialNaming.lookup(ConsoleManager.NAME);
             mgr.textScreenManagerChanged();
             ////
