@@ -10,6 +10,7 @@
         
   <requires>
     <import plugin="org.jnode.net"/>
+    <import plugin="org.jnode.protocol" />  
   </requires>
         
   <runtime>
@@ -23,5 +24,9 @@
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.net.NetPermission" name="specifyStreamHandler"/>  
   </extension>
-        
+
+  <extension point="org.jnode.protocol.handlers">
+    <handler protocol="smb" class="jcifs.smb.Handler" />
+  </extension>
+
 </plugin>

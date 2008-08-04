@@ -7,6 +7,7 @@
 	<requires>
 		<import plugin="org.jnode.net.ipv4" />
 		<import plugin="org.jnode.net.nfs" />
+		<import plugin="org.jnode.protocol" />
 	</requires>
 
 	<runtime>
@@ -16,7 +17,11 @@
 		</library>
 	</runtime>
 
-	<extension point="org.jnode.security.permissions">
+    <extension point="org.jnode.protocol.handlers">
+        <handler protocol="nfs" class="org.jnode.protocol.nfs.Handler" />            
+    </extension>
+
+    <extension point="org.jnode.security.permissions">
 		<permission class="java.net.SocketPermission" name="*"
 			actions="connect,resolve" />
 	</extension>
