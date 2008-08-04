@@ -26,6 +26,7 @@ import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
+
 import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.Color;
@@ -66,13 +67,17 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.imageio.ImageIO;
 import javax.naming.NamingException;
+
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.JNodeFontPeer;
@@ -781,28 +786,57 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
                 config.getBounds().height - 2 * (100 + i)), null, tx, (i % 2 == 0) ? Color.RED : Color.BLUE,
                 Surface.PAINT_MODE);
     }
-
-    public Dimension changeScreenSize(String screenSizeId) {
+    
+    private JNodeFrameBufferDevice getDevice() {
         final JNodeFrameBufferDevice device =
             (JNodeFrameBufferDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (device == null) {
             throw new AWTError("No framebuffer fbDevice found");
         }
-        GraphicsConfiguration[] configurations = device.getConfigurations();
-        JNodeGraphicsConfiguration conf = null;
-        for (GraphicsConfiguration g_conf : configurations) {
-            if (screenSizeId.equals(g_conf.toString())) {
-                conf = (JNodeGraphicsConfiguration) g_conf;
-                break;
-            }
-        }
+        
+        return device;
+    }
 
-        if (conf == null) {
-            log.warn("Configuration not found " + screenSizeId);
-            return getScreenSize();
+    private GraphicsConfiguration[] configs;
+    public GraphicsConfiguration[] getConfigurations() {
+        if (configs == null) {
+            final GraphicsConfiguration[] configurations = getDevice().getConfigurations();
+            
+            configs = new GraphicsConfiguration[configurations.length];
+            System.arraycopy(configurations, 0, configs, 0, configurations.length);
+            Arrays.sort(configs, new Comparator<GraphicsConfiguration>() {
+                @Override
+                public int compare(GraphicsConfiguration o1, GraphicsConfiguration o2) {
+                    final Rectangle b1 = o1.getBounds();
+                    final Rectangle b2 = o2.getBounds();
+                    
+                    int comp;
+                    if (b1.getWidth() > b2.getWidth()) {
+                        comp = +1;
+                    } else if (b1.getWidth() < b2.getWidth()) {
+                        comp = -1;
+                    } else {
+                        if (b1.getHeight() > b2.getHeight()) {
+                            comp = +1;
+                        } else if (b1.getHeight() < b2.getHeight()) {
+                            comp = -1;
+                        } else {
+                            comp = 0;
+                        }
+                    }
+                    
+                    return comp;
+                }
+                
+            });
         }
+        return configs;
+    }
+    
+    public Dimension changeScreenSize(JNodeGraphicsConfiguration config) {
+        final JNodeFrameBufferDevice device = getDevice();
 
-        this.config = conf;
+        this.config = config;
         log.info("Using: " + config);
         this.api = device.getAPI();
         try {

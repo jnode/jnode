@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JButton;
@@ -50,6 +51,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
@@ -214,10 +216,11 @@ public class Desktop implements Runnable {
                 JMenuItem desktopColor = new JMenuItem("Desktop color");
                 desktopColor.addActionListener(desktopColorAction);
                 desktopMenu.add(desktopColor);
-                desktopMenu.add(taskBar.changeResMI1);
-                desktopMenu.add(taskBar.changeResMI2);
-                desktopMenu.add(taskBar.changeResMI3);
-                desktopMenu.add(taskBar.changeResMI4);
+                
+                for (JMenuItem item : taskBar.chgSizeMenuItem) {
+                    desktopMenu.add(item);
+                }
+                
                 desktopPane.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent event) {
                         if (event.getButton() == MouseEvent.BUTTON2) {
