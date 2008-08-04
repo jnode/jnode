@@ -22,8 +22,10 @@
 package org.jnode.desktop.classic;
 
 import gnu.java.security.action.SetPropertyAction;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GraphicsConfiguration;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +36,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -51,7 +56,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
+
 import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeGraphicsConfiguration;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.plugin.ExtensionPoint;
 
@@ -68,12 +75,9 @@ public class TaskBar extends JPanel {
     JMenuItem haltMI;
     JMenuItem restartMI;
     JMenuItem desktopColorMI;
-    JMenuItem changeResMI1;
-    JMenuItem changeResMI2;
-    JMenuItem changeResMI3;
-    JMenuItem changeResMI4;
     Desktop desktop;
     Clock clock;
+    JMenuItem[] chgSizeMenuItem;
 
     public TaskBar(Desktop desk, ExtensionPoint appsEP) {
         this.desktop = desk;
@@ -123,30 +127,20 @@ public class TaskBar extends JPanel {
         startMenu.add(settingsMenu);
         JMenu resMenu = new JMenu("Screen Resolution");
         settingsMenu.add(resMenu);
-        resMenu.add(changeResMI1 = new JMenuItem("Set to 640x480/32"));
-        resMenu.add(changeResMI2 = new JMenuItem("Set to 800x600/32"));
-        resMenu.add(changeResMI3 = new JMenuItem("Set to 1024x768/32"));
-        resMenu.add(changeResMI4 = new JMenuItem("Set to 1280x1024/32"));
-
-        changeResMI1.addActionListener(new ChangeScreenResolution("640x480/32"));
-        changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
-        changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
-        changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
-
-        //these instances are used int the desktop popup menu
-        changeResMI1 = new JMenuItem("Set to 640x480/32");
-        changeResMI2 = new JMenuItem("Set to 800x600/32");
-        changeResMI3 = new JMenuItem("Set to 1024x768/32");
-        changeResMI4 = new JMenuItem("Set to 1280x1024/32");
-        changeResMI1.addActionListener(new ChangeScreenResolution("640x480/32"));
-        changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
-        changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
-        changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
+        
+        int i = 0;
+        GraphicsConfiguration[] configs = ((JNodeToolkit) Toolkit.getDefaultToolkit()).getConfigurations();
+        chgSizeMenuItem = new JMenuItem[configs.length];
+        for (GraphicsConfiguration config : configs) {
+            Action a = new ChangeScreenResolution((JNodeGraphicsConfiguration) config);
+            resMenu.add(new JMenuItem(a));
+            chgSizeMenuItem[i++] = new JMenuItem(a);
+        }
 
         JMenu lfMenu = new JMenu("Look & Feel");
         settingsMenu.add(lfMenu);
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
-        for (int i = 0; i < lafs.length; ++i) {
+        for (i = 0; i < lafs.length; ++i) {
             final UIManager.LookAndFeelInfo laf = lafs[i];
             String name = laf.getName();
             if (!"Metal".equals(name)) {
@@ -190,7 +184,7 @@ public class TaskBar extends JPanel {
         clock = new Clock();
         add(clock, BorderLayout.EAST);
     }
-
+    
     private class SetLFAction implements ActionListener {
         private LookAndFeel lf;
 
@@ -240,18 +234,21 @@ public class TaskBar extends JPanel {
         }
     }
 
-    class ChangeScreenResolution implements ActionListener, Runnable {
-        private String resolution;
+    class ChangeScreenResolution extends AbstractAction implements Runnable {
+        private final JNodeGraphicsConfiguration config;
 
-        public ChangeScreenResolution(String resolution) {
-            this.resolution = resolution;
+        public ChangeScreenResolution(JNodeGraphicsConfiguration config) {
+            super("Set to " + config.toString());
+            this.config = config;
         }
 
+        @Override
         public void run() {
-            ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
-            AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
+            ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(config);
+            AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", config.toString()));
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             SwingUtilities.invokeLater(this);
         }
