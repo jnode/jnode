@@ -67,3 +67,21 @@ jnode.install-nt.dir=C:\jnode
 # This is needed by the hotswap ant target.
 jnode.debugger.host=
 jnode.debugger.port=6789
+
+# -----------------------------------------------
+# Settings for a VMware virtual machine
+# -----------------------------------------------
+
+# Uncomment and edit this line if you want to override the settings
+# in the 'jnode-x86-*.vmx' file.  For example, you may want to include
+# settings to configure a VMware virtual hard drive, or real hard drive.
+# Refer to the maintainers pages on the JNode website for details.
+# Notes:
+# - Settings in the override file should be in standard VMX syntax.
+# - The settings override the default settings, including (if you
+#   set them) the memSize and/or logFile parameters set in the
+#   ant build.xml files.
+# - Any non-absolute pathnames in the VMX settings are resolved relative
+#   to the VMX file's location!
+
+#vmware.vmx.overrides=<some-file-containing-vmx-settings>

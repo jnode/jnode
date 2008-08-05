@@ -78,6 +78,11 @@
 
 		<property name="build.native.dir" value="${my-build.dir}/${jnode.bits}bits/native" />
 		<property name="build.bootimage.dir" value="${my-build.dir}/${jnode.bits}bits/bootimage" />
+		<condition property="vmware.vmx.overrides" value="">
+	        <not>
+	        	<isset property="vmware.vmx.overrides"/>
+	        </not>
+	    </condition>
 	</target>
 
 	<!-- Initialize all project directories -->
@@ -276,6 +281,7 @@
 			isofile="${jnode-x86.iso}"
 			logFile="${logFile}"
 			memsize="${jnode.virtual.memsize}"
+			overrideFile="${vmware.vmx.overrides}"
 		/>
 	</target>
 
@@ -284,11 +290,11 @@
 		<create-cdrom destfile="${jnode-x86-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
 
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
-		
 		<vmware 
 			isofile="${jnode-x86-lite.iso}"
 			logFile="${logFile}"
 			memsize="${jnode.virtual.memsize}"
+            overrideFile="${vmware.vmx.overrides}"
 		/>
 	</target>
 
@@ -296,11 +302,11 @@
 		<create-cdrom destfile="${jnode-x86_64-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
 
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
-
 		<vmware
 			isofile="${jnode-x86_64-lite.iso}"
 			logFile="${logFile}"
 			memsize="${jnode.virtual.memsize}"
+            overrideFile="${vmware.vmx.overrides}"
 		/>
 	</target>
 
