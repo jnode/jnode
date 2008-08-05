@@ -21,18 +21,33 @@
 
 package org.jnode.build;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
+/**
+ * This task builds a VMWare '.vmx' file to allow JNode to be run using VMWare player.
+ * 
+ * @author ...
+ * @author crawley@jnode.org
+ */
 public class VMwareBuilderTask extends Task {
 
     private String logFile; // log file use for kernel debugger messages
     private String isoFile;
     private int memorySize;
+    private String overrideFile;
 
     /**
      * @return Returns the memorySize.
@@ -63,71 +78,139 @@ public class VMwareBuilderTask extends Task {
     }
 
     /**
+     * The override file is a Java Properties file containing VMX settings
+     * to override the default ones hard-wired into this class.
+     * 
+     * @return Returns the override file or <code>null</code>
+     */
+    public String getOverrideFile() {
+        return overrideFile;
+    }
+
+    /**
+     * @param overrideFile The override file to set.
+     */
+    public void setOverrideFile(String overrideFile) {
+        this.overrideFile = overrideFile;
+    }
+
+    /**
      * @see org.apache.tools.ant.Task#execute()
      */
     @Override
     public void execute() throws BuildException {
+        // Build the default properties, based on the supplied memSize and logFile.
+        Properties props = new Properties();
+        buildDefaultProperties(props);
+
+        if (overrideFile != null && overrideFile.length() > 0) {
+            // If VMX overrides are provided, read them and add them to the properties;
+            BufferedReader br = null;
+            try {
+                // Unfortunately, we cannot use java.util.Property#load(...) because
+                // VMX properties can have ':' in the property name.
+                br = new BufferedReader(new FileReader(overrideFile));
+                String line; 
+                final Pattern propertyPattern = Pattern.compile("^([a-zA-Z0-9\\.:]+)\\s*=\\s*\"([^\"]*)\"");
+                final Pattern commentPattern = Pattern.compile("^#");
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if (line.isEmpty() || commentPattern.matcher(line).find()) {
+                        continue;
+                    }
+                    Matcher matcher = propertyPattern.matcher(line);
+                    if (!matcher.find()) {
+                        throw new BuildException(
+                                "Cannot parse this VMX override: '" + line + "'");
+                    }
+                    props.put(matcher.group(1), matcher.group(2));
+                }
+            } catch (FileNotFoundException ex) {
+                throw new BuildException(
+                        "Cannot open the VMX override file: " + overrideFile, ex);
+            } catch (IOException ex) {
+                throw new BuildException(
+                        "Problem reading the VMX override file: " + overrideFile, ex);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException ex) {
+                        /* ignore it */
+                    }
+                }
+            }
+        }
+
+        // Now output the VMX file from the properties, sorted in key order for neatness.
+        File vmxFile = new File(isoFile + ".vmx");
         try {
-            FileWriter out = new FileWriter(new File(isoFile + ".vmx"));
+            FileWriter out = new FileWriter(vmxFile);
             try {
                 PrintWriter w = new PrintWriter(out);
-
-                put(w, "config.version", "8");
-                put(w, "virtualHW.version", "4");
-                put(w, "memsize", String.valueOf(memorySize));
-                put(w, "MemAllowAutoScaleDown", "FALSE");
-                put(w, "ide0:0.present", "TRUE");
-                put(w, "ide0:0.fileName", new File(isoFile).getName());
-                put(w, "ide0:0.deviceType", "cdrom-image");
-                put(w, "ide1:0.present", "FALSE");
-                put(w, "floppy0.present", "FALSE");
-                put(w, "usb.present", "TRUE");
-                put(w, "sound.present", "FALSE");
-                put(w, "sound.virtualDev", "es1371");
-                put(w, "displayName", "JNode");
-                put(w, "guestOS", "dos");
-
-                put(w, "nvram", "JNode.nvram");
-                put(w, "MemTrimRate", "-1");
-                put(w, "ide0:0.redo", "");
-
-                final String osName = System.getProperty("os.name").toLowerCase();
-                if (osName.contains("linux") || osName.contains("unix") ||
-                    osName.contains("bsd")) {
-                    put(w, "ethernet0.connectionType", "bridged");
-                    put(w, "ethernet0.vnet", "/dev/vmnet1");
+                TreeSet<Object> keys = new TreeSet<Object>();
+                keys.addAll(props.keySet());
+                for (Object key : keys) {
+                    Object value = props.get(key);
+                    w.println(key + " = \"" + value + "\"");
                 }
-                put(w, "ethernet0.addressType", "generated");
-                put(w, "ethernet0.generatedAddress", "00:0c:29:2a:96:30");
-                put(w, "ethernet0.generatedAddressOffset", "0");
-                put(w, "ethernet0.present", "TRUE");
-                put(w, "ethernet0.startConnected", "TRUE");
-
-                put(w, "uuid.location", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
-                put(w, "uuid.bios", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
-
-
-                if ((logFile != null) && (logFile.trim().length() != 0)) {
-                    put(w, "serial0.present", "TRUE");
-                    put(w, "serial0.fileType", "file");
-                    put(w, "serial0.fileName", logFile);
-                }
-
-                put(w, "tools.syncTime", "TRUE");
-                put(w, "ide1:0.startConnected", "TRUE");
-                put(w, "uuid.action", "create");
-                put(w, "checkpoint.vmState", "");
-
             } finally {
                 out.close();
             }
         } catch (IOException ex) {
-            throw new BuildException(ex);
+            throw new BuildException("Problem writing the VMX file: " + vmxFile);
         }
     }
 
-    private void put(PrintWriter w, String key, String value) {
-        w.println(key + " = \"" + value + "\"");
+    private void buildDefaultProperties(Properties props) {
+        props.put("config.version", "8");
+        props.put("virtualHW.version", "4");
+        props.put("memsize", String.valueOf(memorySize));
+        props.put("MemAllowAutoScaleDown", "FALSE");
+
+        props.put("ide0:0.present", "TRUE");
+        props.put("ide0:0.startConnected", "TRUE");
+        props.put("ide0:0.fileName", new File(isoFile).getName());
+        props.put("ide0:0.deviceType", "cdrom-image");
+        props.put("ide0:0.redo", "");
+
+        props.put("ide1:0.present", "FALSE");
+        props.put("ide1:0.startConnected", "TRUE");
+
+        props.put("floppy0.present", "FALSE");
+        props.put("usb.present", "TRUE");
+        props.put("sound.present", "FALSE");
+        props.put("sound.virtualDev", "es1371");
+        props.put("displayName", "JNode");
+        props.put("guestOS", "dos");
+
+        props.put("nvram", "JNode.nvram");  
+        props.put("MemTrimRate", "-1");  
+
+        final String osName = System.getProperty("os.name").toLowerCase(); 
+        if (osName.contains("linux") || osName.contains("unix") || 
+                osName.contains("bsd")) {
+            props.put("ethernet0.connectionType", "bridged");
+            props.put("ethernet0.vnet", "/dev/vmnet1");
+        }
+        props.put("ethernet0.addressType", "generated");
+        props.put("ethernet0.generatedAddress", "00:0c:29:2a:96:30");
+        props.put("ethernet0.generatedAddressOffset", "0");
+        props.put("ethernet0.present", "TRUE");
+        props.put("ethernet0.startConnected", "TRUE");
+
+        props.put("uuid.location", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
+        props.put("uuid.bios", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
+
+        if (logFile != null && logFile.trim().length() != 0) {
+            props.put("serial0.present", "TRUE");
+            props.put("serial0.fileType", "file");
+            props.put("serial0.fileName", logFile);
+        }
+
+        props.put("tools.syncTime", "TRUE");  
+        props.put("uuid.action", "create");  
+        props.put("checkpoint.vmState", "");
     }
 
     /**
@@ -138,7 +221,8 @@ public class VMwareBuilderTask extends Task {
     }
 
     /**
-     * @param isoFile The isoFile to set.
+     * @param isoFile
+     *            The isoFile to set.
      */
     public final void setIsoFile(String isoFile) {
         this.isoFile = isoFile;
