@@ -43,9 +43,8 @@ final class FbTextScreenManager implements TextScreenManager, FrameBufferAPIOwne
      * The font to use for rendering characters in the console : 
      * it must be a mono spaced font (=a font with fixed width)
      */
-    private static final Font FONT = new Font(
-            "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646",
-            Font.PLAIN, 12);
+    private static final Font FONT = new Font("-Misc-Fixed-Medium-R-SemiCondensed--12-110-75-75-C-60-437-",
+        Font.PLAIN, 12);
         
     private final FbTextScreen systemScreen;
     private final Surface surface; 
