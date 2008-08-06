@@ -27,11 +27,11 @@ import java.io.PrintStream;
 
 /**
  * The main class for the JNode configuration tool (command line version).
- * <p>
+ * <p/>
  * The command currently does not use the JNode Command / Syntax APIs. This
  * should be addressed when we have a compatibility library. A version with a
  * GUI-based interface would be a good idea too.
- * 
+ *
  * @author crawley@jnode.org
  */
 public class Configure {
@@ -49,10 +49,10 @@ public class Configure {
     private boolean debug;
     private boolean verbose;
     private boolean help;
-    
+
     private static String USAGE =
         "configure.sh [--debug] [--verbose] [--help] [<script>]";
-    private static String[] DESCRIPTION = new String[] {
+    private static String[] DESCRIPTION = new String[]{
         "Capture configuration properties based on the supplied <script>.",
         "    If no arguments or options are provided, defaults are supplied",
         "    by the wrapper script.  A copy of the previous state of each",
@@ -63,7 +63,7 @@ public class Configure {
         "    --help      output command help then exit",
         "    --debug     enable debug output"
     };
-    private static String[] UI_HELP = new String[] {
+    private static String[] UI_HELP = new String[]{
         "The program will prompt you for values for a series of properties,",
         "showing a list of legal values or a regex.  If there is a default",
         "value, it will be shown in square brackets.  At the prompt, type",
@@ -114,20 +114,20 @@ public class Configure {
         print(DESCRIPTION, err);
         print(UI_HELP, err);
     }
-    
+
     private void print(String line, PrintStream stream) {
         format(stream, line, DISPLAY_NORMAL);
     }
 
     private void print(String[] lines, PrintStream stream) {
-        for (String line: lines) {
+        for (String line : lines) {
             format(stream, line, DISPLAY_NORMAL);
         }
     }
 
     /**
      * Parse the command line.
-     * 
+     *
      * @param args
      */
     private void parseArguments(String[] args) throws ConfigureException {

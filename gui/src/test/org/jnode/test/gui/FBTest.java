@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
@@ -51,16 +50,16 @@ import org.jnode.shell.syntax.StringArgument;
  * @author epr
  */
 public class FBTest extends AbstractCommand {
-    
+
     private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.OPTIONAL, "the FrameBuffer device to use", FrameBufferAPI.class);
-    
+        "device", Argument.OPTIONAL, "the FrameBuffer device to use", FrameBufferAPI.class);
+
     private final IntegerArgument ARG_LOOPS = new IntegerArgument(
-            "loops", Argument.OPTIONAL, "how many loops each test should perform");
-    
+        "loops", Argument.OPTIONAL, "how many loops each test should perform");
+
     private final StringArgument ARG_TESTS = new StringArgument(
-            "tests", Argument.OPTIONAL, "tests to be perform (lREAQ)");
-    
+        "tests", Argument.OPTIONAL, "tests to be perform (lREAQ)");
+
     public FBTest() {
         super("Performs tests on the FrameBuffer implementation and outputs performance data");
         registerArguments(ARG_DEVICE, ARG_LOOPS, ARG_TESTS);
@@ -100,7 +99,7 @@ public class FBTest extends AbstractCommand {
         if (tests.indexOf('Q') >= 0) {
             log.info("Shape QuadCurve PAINT " + performTest(new DrawShapeQuadTest(), Surface.PAINT_MODE));
             //log.info("Shape Arc XOR       " + performTest(new DrawShapeArcTest(), Surface.XOR_MODE));
-        }        
+        }
         if (tests.indexOf('C') >= 0) {
             log.info("Colors " + performTest(new ColorsTest(), Surface.PAINT_MODE));
         }
@@ -109,10 +108,10 @@ public class FBTest extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         new FBTest().execute(args);
     }
-    
+
     public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) {
-        
+                        PrintStream out, PrintStream err) {
+
         Device dev = ARG_DEVICE.getValue();
         count = ARG_LOOPS.isSet() ? ARG_LOOPS.getValue() : 100;
         tests = ARG_TESTS.isSet() ? ARG_TESTS.getValue() : "lREAQC";
@@ -134,9 +133,9 @@ public class FBTest extends AbstractCommand {
             g = api.open(conf);
             this.width = conf.getScreenWidth();
             this.height = conf.getScreenHeight();
-            
+
             perform();
-            
+
             Thread.sleep(30000);
         } catch (Throwable ex) {
             log.error("Error in FBTest", ex);
@@ -228,16 +227,16 @@ public class FBTest extends AbstractCommand {
         public void perform() {
             int x = 0;
             final int width = 50;
-            for(Color color : colors) {
-                for(int i = 0 ; i < 10 ; i++) {
-                    final int w = width - 2 * i;  
+            for (Color color : colors) {
+                for (int i = 0; i < 10; i++) {
+                    final int w = width - 2 * i;
                     g.draw(new Rectangle2D.Double(x + i, i, w, w), null, tx, color, paintMode);
-                }                    
+                }
                 x += width;
             }
         }
     }
-    
+
     class DrawShapeArcTest implements Test {
         public void perform() {
             final int x1 = randomX();

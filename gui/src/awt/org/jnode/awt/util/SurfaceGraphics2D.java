@@ -965,16 +965,16 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
 
     public void fillRect(int x, int y, int width, int height) {
 //        if(clip2D == null){
-            if (paint == null) {
-                simpleGraphics.fillRect(x, y, width, height);
-            } else {
-                x = x + simpleGraphics.origin.x;
-                y = y + simpleGraphics.origin.y;
+        if (paint == null) {
+            simpleGraphics.fillRect(x, y, width, height);
+        } else {
+            x = x + simpleGraphics.origin.x;
+            y = y + simpleGraphics.origin.y;
 
-                BufferedImage img = getFillerImage(x, y, width, height);
-                //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 2\n");
-                drawImage(img, x, y, background, null);
-            }
+            BufferedImage img = getFillerImage(x, y, width, height);
+            //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 2\n");
+            drawImage(img, x, y, background, null);
+        }
 /*
 todo attempt to fix metal ocean slider painting
 (Graphics2D.clip() is used with non-rectangular shape + fillRect() with gradient paint)
@@ -984,7 +984,8 @@ todo attempt to fix metal ocean slider painting
             af.translate(simpleGraphics.origin.x, simpleGraphics.origin.y);
             if(paint == null){
                 org.jnode.vm.Unsafe.debug("SurfaceGraphics2D - 3\n");
-                //surface.fill(new Rectangle(x, y, width, height), clip2D, af, simpleGraphics.getColor(), Surface.PAINT_MODE);
+                //surface.fill(new Rectangle(x, y, width, height), clip2D, af, simpleGraphics.getColor(),
+                // Surface.PAINT_MODE);
                 x = x + simpleGraphics.origin.x;
                 y = y + simpleGraphics.origin.y;
 
