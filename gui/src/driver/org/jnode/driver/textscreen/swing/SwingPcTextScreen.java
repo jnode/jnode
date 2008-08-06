@@ -81,10 +81,9 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         int h;
 
         {
-
-            Font font = new Font(
-                "-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN,
-                12);
+            Font font = new Font("-Misc-Fixed-Medium-R-SemiCondensed--12-110-75-75-C-60-437-", Font.PLAIN, 12);
+            //Font font = new Font(
+            //"-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
             //Font font = new Font("-FontForge-Bitstream Vera Sans
             // Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
             //Font font = new Font("-FontForge-Bitstream Vera Sans
@@ -132,15 +131,9 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
         public void addNotify() {
             super.addNotify();
-
-            /*
             FontMetrics fm = getGraphics().getFontMetrics();
             w = fm.getMaxAdvance();
-            h = fm.getHeight() + 1;
-             */
-
-            w = 7;
-            h = 15;
+            h = fm.getHeight();
             screen.setSize(screen.getMaximumSize());
         }
 
