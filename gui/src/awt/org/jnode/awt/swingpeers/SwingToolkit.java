@@ -85,6 +85,8 @@ import javax.swing.JMenuBar;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import org.jnode.awt.JNodeAwtContext;
@@ -466,8 +468,8 @@ public final class SwingToolkit extends JNodeToolkit {
         });
 
         try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-            //UIManager.setLookAndFeel("com.digitprop.tonic.TonicLookAndFeel");
+            MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+            UIManager.setLookAndFeel(new MetalLookAndFeel());            
         } catch (Exception x) {
             log.warn("Look And Feel not found: ", x);
         }

@@ -87,6 +87,7 @@ public class TaskBar extends JPanel {
         setLayout(layout);
         setBorder(new BevelBorder(BevelBorder.RAISED));
         startButton = new JButton("JNode", new ImageIcon(Desktop.loadImage("jnode_icon.png")));
+        startButton.setToolTipText("JNode Menu");
         startButton.setBorder(new EmptyBorder(1, 3, 1, 3));
 
         add(startButton, BorderLayout.WEST);
@@ -149,17 +150,19 @@ public class TaskBar extends JPanel {
                 lfMenu.add(item);
             }
         }
+
         JMenuItem metal_theme = new JMenuItem("Metal Default");
         lfMenu.add(metal_theme);
-        metal_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()) {
+        metal_theme.addActionListener(new SetLFAction("javax.swing.plaf.metal.MetalLookAndFeel") {
             public void actionPerformed(ActionEvent e) {
                 MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
                 super.actionPerformed(e);
             }
         });
+
         JMenuItem ocean_theme = new JMenuItem("Metal Ocean");
         lfMenu.add(ocean_theme);
-        ocean_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()) {
+        ocean_theme.addActionListener(new SetLFAction("javax.swing.plaf.metal.MetalLookAndFeel") {
             public void actionPerformed(ActionEvent e) {
                 MetalLookAndFeel.setCurrentTheme(new OceanTheme());
                 super.actionPerformed(e);
@@ -187,21 +190,27 @@ public class TaskBar extends JPanel {
     
     private class SetLFAction implements ActionListener {
         private LookAndFeel lf;
+        private final String lfName;
 
         public SetLFAction(UIManager.LookAndFeelInfo lfInfo) {
-            try {
-                Class c = Thread.currentThread().getContextClassLoader().loadClass(lfInfo.getClassName());
-                this.lf = (LookAndFeel) c.newInstance();
-            } catch (Exception e) {
-                log.error("Error crating look & feel " + lfInfo, e);
-            }
+            this.lfName = lfInfo.getClassName();
         }
 
-        public SetLFAction(LookAndFeel lf) {
-            this.lf = lf;
+        public SetLFAction(String lfName) {
+            this.lfName = lfName;
         }
 
         public void actionPerformed(ActionEvent e) {
+            if (lf == null) {
+                try {
+                    Class c = Thread.currentThread().getContextClassLoader().loadClass(lfName);
+                    this.lf = (LookAndFeel) c.newInstance();
+                } catch (Exception ex) {
+                    log.error("Error crating look & feel " + lfName, ex);
+                    return;
+                }
+            }
+
             try {
                 UIManager.setLookAndFeel(lf);
             } catch (UnsupportedLookAndFeelException ex) {
