@@ -42,21 +42,24 @@ The various sub-projects must be imported into eclipse. Since they reference eac
 
 Building
 --------
-Execute build.bat/sh
 
-Or from within Eclipse, execute the "all" target of all/build.xml.
+Execute:
+
+On Windows:  build.bat cd-x86-lite
+On Linux:    build.sh cd-x86-lite
+
+Or in Eclipse, execute the "cd-x86-lite" target of all/build.xml.
 
 The build will result in the following files:
 
-all/build/jnodedisk.pln           A disk image for use in VMWare 3.0
-all/build/x86/netboot/jnodesys.gz A  bootable kernel image for use in Grub.
+all/build/cdroms/jnode-x86-lite.iso         bootable CD image
+all/build/cdroms/jnode-x86-lite.iso.vmx     VMWare configuration file
 
 Questions
 ---------
 
-If you have any questions, please post them on the jnode-devel@lists.sourceforge.net mailing list of contact the author.
+If you have any questions, please post them to the forums at www.jnode.org
+or to the IRC channel #JNode.org@irc.oftc.net
  
-Ewout Prangsma
-epr@users.sourceforge.net
-
-
+ -- The JNode Team --
+ 
