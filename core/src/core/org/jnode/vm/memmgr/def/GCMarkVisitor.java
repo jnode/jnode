@@ -103,11 +103,14 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         } else if (rootSet || (gcColor == GC_GREY)) {
             switch (gcColor) {
                 case GC_YELLOW:
-                    Unsafe.debug("Yellow Object in the rootset.\n");
-                    Unsafe.debug("Perhaps corrupted Heap or bad luck.\n");
-                    Unsafe.debug("Continue as long as we don't have a");
-                    Unsafe.debug("gc map for the stack.\n Panic JNode once");
-                    Unsafe.debug("we have an exact GC.\n");
+
+                    //Avoid telling such stories in a garbage collector!!! 
+                    //Unsafe.debug("Yellow Object in the rootset.\n");
+                    //Unsafe.debug("Perhaps corrupted Heap or bad luck.\n");
+                    //Unsafe.debug("Continue as long as we don't have a");
+                    //Unsafe.debug("gc map for the stack.\n Panic JNode once");
+                    //Unsafe.debug("we have an exact GC.\n");
+
                     //Unsafe.die("Corrupted Heap\n");
                     return true;
                 case GC_WHITE: {
