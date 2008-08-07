@@ -43,7 +43,7 @@ import org.jnode.awt.JNodeAwtContext;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class DesktopFrame extends JFrame implements JNodeAwtContext {
-    private static final Color DESKTOP_BACKGROUND_COLOR = new Color(70, 130, 180);
+    private static final Color DESKTOP_BACKGROUND_COLOR = new Color(110, 190, 235);
     private final JDesktopPane desktop;
     private static final Logger log = Logger.getLogger(DesktopFrame.class);
 
@@ -77,9 +77,16 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
                 super.paintComponent(g);
                 if (backgroundImage != null) {
                     Dimension ds = desktop.getSize();
+                    /* cnetered
                     int iw = backgroundImage.getWidth();
                     int ih = backgroundImage.getHeight();
                     g.drawImage(backgroundImage, (ds.width - iw) / 2, (ds.height - ih) / 2, desktop);
+                    */
+
+                    // bottom right
+                    int iw = backgroundImage.getWidth();
+                    int ih = backgroundImage.getHeight();
+                    g.drawImage(backgroundImage, ds.width - iw - 30, ds.height - ih - 20, desktop);                    
                 }
             }
         };
