@@ -24,7 +24,6 @@ module /shell.jgz
 #module /fullgui.jgz
 
 # ---------------------------
-# -- disabled
 title JNode (all plugins) (VESA mode)
 kernel /jnode32.gz mp=no fb
 vbematch 800 600 32
@@ -71,14 +70,16 @@ kernel /jnode32.gz
 module /tests.jgz
 
 # ---------------------------
-title JNode for AMD64 (development) (all plugins)
-kernel /jnode64.gz mp=no
-module /full.jgz
+# -- disabled
+#title JNode for AMD64 (development) (all plugins)
+#kernel /jnode64.gz mp=no
+#module /full.jgz
 
 # ---------------------------
-title JNode for AMD64 (development) (all plugins with MP)
-kernel /jnode64.gz
-module /full.jgz
+# -- disabled
+#title JNode for AMD64 (development) (all plugins with MP)
+#kernel /jnode64.gz
+#module /full.jgz
 
 # ---------------------------
 # -- disabled
