@@ -31,7 +31,6 @@
     <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
     <alias name="exit" class="org.jnode.shell.command.ExitCommand"/>
     <alias name="set" class="org.jnode.shell.command.SetCommand"/>
-    <alias name="exec" class="org.jnode.shell.command.ExecCommand"/>
     <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
     <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
     <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
@@ -92,14 +91,6 @@
       </repeat>
     </syntax>
     <syntax alias="env" description="Print the system properties"/>
-    <syntax alias="exec" description="Execute a class in a new Process">
-      <sequence>
-        <argument argLabel="className"/>
-        <repeat>
-          <argument argLabel="arg"/>
-        </repeat>
-      </sequence>
-    </syntax>
     <syntax alias="exit" description="Exit the current shell"/>
     <syntax alias="gc">
       <empty description="Run the garbage collector"/>
