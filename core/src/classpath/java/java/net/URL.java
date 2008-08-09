@@ -571,7 +571,9 @@ public final class URL implements Serializable
   public String getHost()
   {
         int at = (host == null) ? -1 : host.indexOf('@');
-        return at < 0 ? host : host.substring(at + 1, host.length());
+      String h = at < 0 ? this.host : host.substring(at + 1, host.length());
+      //jnode
+      return (h != null && h.trim().length() == 0) ? null : h;
     }
 
     /**
