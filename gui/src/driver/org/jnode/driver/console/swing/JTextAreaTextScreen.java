@@ -70,6 +70,7 @@ public class JTextAreaTextScreen implements TextScreen {
         System.out.println("new JTextAreaTextScreen" + width + "x" + height);
     }
 
+    @Override
     public char getChar(int offset) {
         try {
             return document.getText(offset, 1).charAt(0);
@@ -79,11 +80,13 @@ public class JTextAreaTextScreen implements TextScreen {
         }
     }
 
+    @Override
     public int getColor(int offset) {
         AttributeSet as = document.getCharacterElement(offset).getAttributes();
         return ((Color) as.getAttribute(ColorConstants.Foreground)).getRGB();
     }
 
+    @Override
     public void set(int offset, char ch, int count, int color) {
         System.out.println("set1 " + offset);
         try {
@@ -97,6 +100,7 @@ public class JTextAreaTextScreen implements TextScreen {
         }
     }
 
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         System.out.println("set2 " + offset);
         try {
@@ -109,6 +113,7 @@ public class JTextAreaTextScreen implements TextScreen {
         }
     }
 
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
         System.out.println("set3 " + offset);
         try {
@@ -127,18 +132,22 @@ public class JTextAreaTextScreen implements TextScreen {
         }
     }
 
+    @Override
     public void copyContent(int srcOffset, int destOffset, int length) {
         // TODO Auto-generated method stub
     }
 
+    @Override
     public void copyTo(TextScreen dst, int offset, int length) {
         // TODO Auto-generated method stub
     }
 
+    @Override
     public int getHeight() {
         return textArea.getRows();
     }
 
+    @Override
     public int getWidth() {
         return textArea.getColumns();
     }
@@ -151,6 +160,7 @@ public class JTextAreaTextScreen implements TextScreen {
      * @param y
      * @return
      */
+    @Override
     public int getOffset(int x, int y) {
         return (y * getWidth()) + x;
     }
@@ -160,11 +170,13 @@ public class JTextAreaTextScreen implements TextScreen {
 
     }
 
+    @Override
     public TextScreen createCompatibleBufferScreen() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {
         // TODO Auto-generated method stub
         return null;
@@ -173,12 +185,14 @@ public class JTextAreaTextScreen implements TextScreen {
     public void ensureVisible(int row, boolean sync) {
     }
 
+    @Override
     public int setCursor(int x, int y) {
         int offset = x + y * textArea.getColumns();
         textArea.setCaretPosition(offset);
         return offset;
     }
 
+    @Override
     public int setCursorVisible(boolean visible) {
         textArea.getCaret().setVisible(visible);
         return textArea.getCaretPosition();
