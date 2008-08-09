@@ -93,6 +93,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             enableEvents(AWTEvent.KEY_EVENT_MASK);
             enableEvents(AWTEvent.FOCUS_EVENT_MASK);
             addMouseListener(new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
                         if (contains(e.getX(), e.getY())) {
@@ -110,6 +111,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, ftk);
         }
 
+        @Override
         protected void paintComponent(Graphics g) {
             g.setColor(getBackground());
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -129,6 +131,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             }
         }
 
+        @Override
         public void addNotify() {
             super.addNotify();
             FontMetrics fm = getGraphics().getFontMetrics();
@@ -137,10 +140,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             screen.setSize(screen.getMaximumSize());
         }
 
+        @Override
         public Dimension getPreferredSize() {
             return new Dimension(w * SCREEN_WIDTH + 2 * margin, (h + 1) * SCREEN_HEIGHT + 2 * margin);
         }
 
+        @Override
         public Dimension getMaximumSize() {
             return getPreferredSize();
         }
@@ -150,6 +155,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         if (keyboardDevice == null) {
             keyboardDriver = new MyKeyboardDriver();
             keyListener = new KeyAdapter() {
+                @Override
                 public void keyPressed(KeyEvent e) {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
@@ -159,6 +165,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
                 }
 
+                @Override
                 public void keyReleased(KeyEvent e) {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
@@ -181,30 +188,35 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     }
 
     private class MouseHandler extends MouseAdapter implements MouseMotionListener, MouseWheelListener {
+        @Override
         public void mousePressed(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseDragged(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
             pointerDriver.dispatchEvent(p);
         }
 
+        @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             // todo complete event parameters
             PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), e.getWheelRotation(), true);
@@ -283,6 +295,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         }
     };
 
+    @Override
     public void sync(int offset, int length) {
         SwingUtilities.invokeLater(repaintCmd);
     }
@@ -318,10 +331,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     private static class MyPointerDriver extends Driver implements PointerAPI {
         private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
+        @Override
         protected synchronized void startDevice() throws DriverException {
             getDevice().registerAPI(PointerAPI.class, this);
         }
 
+        @Override
         protected synchronized void stopDevice() throws DriverException {
 
         }
@@ -335,10 +350,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             }
         }
 
+        @Override
         public void addPointerListener(PointerListener l) {
             listeners.add(l);
         }
 
+        @Override
         public void removePointerListener(PointerListener l) {
             listeners.remove(l);
         }
@@ -351,6 +368,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
          *
          * @param listener the prefered pointer listener
          */
+        @Override
         public void setPreferredListener(PointerListener listener) {
 
         }
@@ -359,10 +377,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     private static class MyKeyboardDriver extends Driver implements KeyboardAPI {
         private final ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
 
+        @Override
         protected synchronized void startDevice() throws DriverException {
             getDevice().registerAPI(KeyboardAPI.class, this);
         }
 
+        @Override
         protected synchronized void stopDevice() throws DriverException {
 
         }
@@ -384,22 +404,27 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             }
         }
 
+        @Override
         public void addKeyboardListener(KeyboardListener l) {
             listeners.add(l);
         }
 
+        @Override
         public KeyboardInterpreter getKbInterpreter() {
             return null;
         }
 
+        @Override
         public void removeKeyboardListener(KeyboardListener l) {
             listeners.remove(l);
         }
 
+        @Override
         public void setKbInterpreter(KeyboardInterpreter kbInterpreter) {
 
         }
 
+        @Override
         public void setPreferredListener(KeyboardListener l) {
 
         }

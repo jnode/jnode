@@ -146,6 +146,7 @@ public class FBConsole {
         }
 
 
+        @Override
         public void sync(int offset, int length) {
             screen.repaint();
         }
@@ -216,6 +217,7 @@ public class FBConsole {
                 }
                 */
                 new Thread(new Runnable() {
+                    @Override
                     public void run() {
                         while (true) {
                             try {
