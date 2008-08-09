@@ -120,6 +120,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      *
      * @see org.jnode.driver.console.TextConsole#clear()
      */
+    @Override
     public void clear() {
         final int size = screen.getWidth() * screen.getHeight();
         screen.set(0, ' ', size, 0x07);
@@ -129,6 +130,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * Clear a given row
      */
+    @Override
     public void clearRow(int row) {
         final int size = screen.getWidth();
         final int offset = screen.getOffset(0, row);
@@ -144,6 +146,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      * @param lenght
      * @param color
      */
+    @Override
     public void putChar(char v[], int offset, int lenght, int color) {
         int mark = 0;
         for (int i = 0; i < lenght; i++) {
@@ -171,6 +174,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      * @param v
      * @param color
      */
+    @Override
     public void putChar(char v, int color) {
         doPutChar(v, color);
         screen.ensureVisible(curY, isFocused()); // synchronize if focused
@@ -214,6 +218,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @return Returns the tabSize.
      */
+    @Override
     public int getTabSize() {
         return tabSize;
     }
@@ -221,6 +226,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @param tabSize The tabSize to set.
      */
+    @Override
     public void setTabSize(int tabSize) {
         this.tabSize = tabSize;
     }
@@ -228,6 +234,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getColor(int, int)
      */
+    @Override
     public int getColor(int x, int y) {
         return screen.getColor(screen.getOffset(x, y));
     }
@@ -235,6 +242,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getChar(int, int)
      */
+    @Override
     public char getChar(int x, int y) {
         return screen.getChar(screen.getOffset(x, y));
     }
@@ -242,6 +250,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getCursorX()
      */
+    @Override
     public int getCursorX() {
         return curX;
     }
@@ -249,6 +258,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getCursorY()
      */
+    @Override
     public int getCursorY() {
         return curY;
     }
@@ -256,6 +266,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getHeight()
      */
+    @Override
     public int getHeight() {
         return screen.getHeight();
     }
@@ -263,6 +274,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getWidth()
      */
+    @Override
     public int getWidth() {
         return screen.getWidth();
     }
@@ -270,18 +282,21 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#setChar(int, int, char, int)
      */
+    @Override
     public void setChar(int x, int y, char ch, int color) {
         int offset = screen.getOffset(x, y);
         screen.set(offset, ch, 1, color);
         syncScreen(offset, 1);
     }
 
+    @Override
     public void setChar(int x, int y, char[] ch, int color) {
         int offset = screen.getOffset(x, y);
         screen.set(offset, ch, 0, ch.length, color);
         syncScreen(offset, ch.length);
     }
 
+    @Override
     public void setChar(int x, int y, char[] ch, int cOfset, int cLength, int color) {
         int offset = screen.getOffset(x, y);
         screen.set(offset, ch, cOfset, cLength, color);
@@ -291,6 +306,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#setCursor(int, int)
      */
+    @Override
     public void setCursor(int x, int y) {
         this.curX = x;
         this.curY = y;
@@ -313,6 +329,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         screen.ensureVisible(row, isFocused()); // synchronize if focused
     }
 
+    @Override
     public InputCompleter getCompleter() {
         if (in instanceof KeyboardInputStream) {
             return ((KeyboardInputStream) in).getCompleter();
@@ -321,6 +338,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         }
     }
 
+    @Override
     public void setCompleter(InputCompleter completer) {
         if (in instanceof KeyboardInputStream) {
             ((KeyboardInputStream) in).setCompleter(completer);
@@ -330,6 +348,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getIn()
      */
+    @Override
     public InputStream getIn() {
         return in;
     }
@@ -341,6 +360,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getErr()
      */
+    @Override
     public PrintStream getErr() {
         return err;
     }
@@ -348,6 +368,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.driver.console.TextConsole#getOut()
      */
+    @Override
     public PrintStream getOut() {
         return out;
     }
@@ -355,6 +376,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * Is the cursor visible.
      */
+    @Override
     public boolean isCursorVisible() {
         return cursorVisible;
     }
@@ -364,6 +386,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      *
      * @param visible
      */
+    @Override
     public void setCursorVisible(boolean visible) {
         this.cursorVisible = visible;
         int offset = screen.setCursorVisible(visible);
@@ -373,6 +396,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.system.event.FocusListener#focusGained(org.jnode.system.event.FocusEvent)
      */
+    @Override
     public void focusGained(FocusEvent event) {
         super.focusGained(event);
         syncScreen(0, screen.getWidth() * screen.getHeight());
@@ -397,6 +421,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     /**
      * @see org.jnode.system.event.FocusListener#focusLost(org.jnode.system.event.FocusEvent)
      */
+    @Override
     public void focusLost(FocusEvent event) {
         if (in instanceof FocusListener) {
             ((FocusListener) in).focusLost(event);

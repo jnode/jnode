@@ -90,6 +90,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#copyContent(int, int, int)
      */
+    @Override
     public void copyContent(int srcOffset, int destOffset, int length) {
         memory.copy(srcOffset * 2, destOffset * 2, length * 2);
     }
@@ -97,6 +98,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
      */
+    @Override
     public char getChar(int offset) {
         return (char) (memory.getByte(offset * 2) & 0xFF);
     }
@@ -104,6 +106,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
      */
+    @Override
     public int getColor(int offset) {
         return memory.getByte(offset * 2 + 1) & 0xFF;
     }
@@ -111,6 +114,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
+    @Override
     public void set(int offset, char ch, int count, int color) {
         final char v = (char) ((ch & 0xFF) | ((color & 0xFF) << 8));
         memory.setChar(offset * 2, v, count);
@@ -120,6 +124,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int)
      */
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         color = (color & 0xFF) << 8;
         for (int i = 0; i < length; i++) {
@@ -132,6 +137,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int[], int)
      */
+    @Override
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
         for (int i = 0; i < length; i++) {
@@ -147,6 +153,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
      * @param rawData
      * @param rawDataOffset
      */
+    @Override
     public final void copyFrom(char[] rawData, int rawDataOffset) {
         if (rawDataOffset < 0) {
             Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
@@ -160,6 +167,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
      *
      * @param dst
      */
+    @Override
     public void copyTo(TextScreen dst, int offset, int length) {
         throw new UnsupportedOperationException();
     }
@@ -176,6 +184,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
         return 0; // TODO what should we return if we don't call instance.setCursor ?
     }
 
+    @Override
     public int setCursorVisible(boolean visible) {
         return instance.setCursorVisible(visible);
     }

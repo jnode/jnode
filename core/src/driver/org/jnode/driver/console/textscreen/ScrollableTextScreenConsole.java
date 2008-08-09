@@ -71,6 +71,7 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
     /**
      * @see org.jnode.driver.input.KeyboardListener#keyPressed(org.jnode.driver.input.KeyboardEvent)
      */
+    @Override
     public void keyPressed(KeyboardEvent event) {
         if (isFocused() && !event.isConsumed()) {
             final int modifiers = event.getModifiers();
@@ -103,6 +104,7 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
     /**
      * @see org.jnode.driver.input.PointerListener#pointerStateChanged(org.jnode.driver.input.PointerEvent)
      */
+    @Override
     public void pointerStateChanged(PointerEvent event) {
         if (isFocused() && (event.getZ() != 0)) {
             final int z = event.getZ();
