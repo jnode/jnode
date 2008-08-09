@@ -65,7 +65,7 @@ public class SelectorMap extends VmSystemObject {
             return selector.intValue();
         } else {
             final int sel = ++lastSelector;
-            map.put(id, new Integer(sel));
+            map.put(id, sel);
             return sel;
         }
     }
