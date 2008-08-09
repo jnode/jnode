@@ -62,7 +62,8 @@ import java.util.logging.Logger;
  */
 public abstract class JarUtils
 {
-  private static final Logger log = Logger.getLogger(JarUtils.class.getName());
+    //jnode
+  //private static final Logger log = Logger.getLogger(JarUtils.class.getName());
   public static final String META_INF = "META-INF/";
   public static final String DSA_SUFFIX = ".DSA";
   public static final String SF_SUFFIX = ".SF";
@@ -112,9 +113,11 @@ public abstract class JarUtils
       {
         String version = expectHeader(version_header, br);
         attr.putValue(SIGNATURE_VERSION, version);
-        if (! DEFAULT_SF_VERSION.equals(version))
-          log.warning("Unexpected version number: " + version
-                      + ". Continue (but may fail later)");
+        if (! DEFAULT_SF_VERSION.equals(version)){
+            //jnode
+          //log.warning("Unexpected version number: " + version + ". Continue (but may fail later)");
+            System.out.println("Unexpected version number: " + version + ". Continue (but may fail later)");
+        }
       }
     catch (IOException ioe)
       {
