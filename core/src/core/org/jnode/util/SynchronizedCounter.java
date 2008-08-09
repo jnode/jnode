@@ -45,7 +45,7 @@ public final class SynchronizedCounter extends Statistic {
     }
 
     public Object getValue() {
-        return new Integer(counter);
+        return counter;
     }
 
     /**

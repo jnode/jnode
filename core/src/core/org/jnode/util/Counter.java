@@ -57,7 +57,7 @@ public final class Counter extends Statistic implements Comparable<Counter> {
     }
 
     public Object getValue() {
-        return new Integer(counter);
+        return counter;
     }
 
     /**

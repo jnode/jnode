@@ -61,7 +61,7 @@ public final class TIBBuilder implements TIBLayout {
         final int length = src.length;
         for (int i = FIRST_METHOD_INDEX; i < length; i++) {
             tibAsList.add(src[i]);
-            nameSignature2Index.put(getNameSignature((VmInstanceMethod) src[i]), new Integer(i));
+            nameSignature2Index.put(getNameSignature((VmInstanceMethod) src[i]), i);
         }
     }
 
@@ -78,7 +78,7 @@ public final class TIBBuilder implements TIBLayout {
         }
         final int idx = tibAsList.size();
         tibAsList.add(method);
-        nameSignature2Index.put(getNameSignature(method), new Integer(idx));
+        nameSignature2Index.put(getNameSignature(method), idx);
         method.setTibOffset(idx);
     }
 
@@ -99,7 +99,7 @@ public final class TIBBuilder implements TIBLayout {
                 "Index (" + index + ")must be >= " + FIRST_METHOD_INDEX);
         }
         tibAsList.set(index, method);
-        nameSignature2Index.put(getNameSignature(method), new Integer(index));
+        nameSignature2Index.put(getNameSignature(method), index);
         method.setTibOffset(index);
     }
 

@@ -447,7 +447,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
             nextFollowsTypeStack = true;
         }
         if (isStartOfBB(address)) {
-            this.current = (BasicBlock) blocks.get(new Integer(address));
+            this.current = blocks.get(address);
             if (debug) BootLog.debug("\tcurrent\t" + current);
             final TypeStack bbTStack = current.getStartStack();
             if (bbTStack != null) {
@@ -475,14 +475,14 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
         if ((opcodeFlags[address] & F_START_OF_BASICBLOCK) == 0) {
             opcodeFlags[address] |= F_START_OF_BASICBLOCK;
             final BasicBlock bb = new BasicBlock(address);
-            blocks.put(new Integer(address), bb);
+            blocks.put(address, bb);
             if (setTypeStack) {
                 bb.addEntryBlock(current);
                 bb.setStartStack(new TypeStack(tstack));
             }
         } else if (setTypeStack) {
             // Verify stack
-            final BasicBlock bb = (BasicBlock) blocks.get(new Integer(address));
+            final BasicBlock bb = blocks.get(address);
             final TypeStack bbTStack = bb.getStartStack();
             if (bbTStack == null) {
                 bb.setStartStack(tstack);
