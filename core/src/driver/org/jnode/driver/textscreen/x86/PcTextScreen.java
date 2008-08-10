@@ -175,17 +175,18 @@ public class PcTextScreen extends AbstractPcTextScreen {
     /**
      * Synchronize the state with the actual device.
      */
+    @Override
     public void sync(int offset, int length) {
         // Nothing to do here
     }
 
+    @Override
     public int setCursor(int x, int y) {
-        //instance.setCursor( x,y);
         return 0; // TODO what should we return if we don't call instance.setCursor ?
     }
 
     @Override
     public int setCursorVisible(boolean visible) {
-        return instance.setCursorVisible(visible);
+        return 0; //TODO
     }
 }
