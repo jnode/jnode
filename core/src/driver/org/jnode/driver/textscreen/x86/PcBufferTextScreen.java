@@ -46,18 +46,13 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
     /**
      * Synchronize the state with the actual device.
      */
+    @Override
     public void sync(int offset, int length) {
         copyTo(parent, offset, length);
     }
 
+    @Override
     protected void setParentCursor(int x, int y) {
         parent.setCursor(x, y);
-    }
-
-    /**
-     * @return Returns the parent.
-     */
-    protected final AbstractPcTextScreen getParent() {
-        return this.parent;
     }
 }
