@@ -23,7 +23,7 @@ package org.jnode.driver.textscreen;
 
 /**
  * Abstract class that represents different kinds of screens : - physical screen
- * (video memory) - buffered screen (system memory, faster that video memory) -
+ * (video memory) - buffered screen (system memory, faster than video memory) -
  * remote screen, shared screen, multiple screens ... - recording screen (movies
  * for demos or tutorials)
  *
