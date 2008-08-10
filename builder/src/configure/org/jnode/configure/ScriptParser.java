@@ -354,12 +354,12 @@ public class ScriptParser {
                     error("A '" + PROPERTY + "' element requires a '" + DESCRIPTION +
                             "' attribute", child);
                 }
-                String defaultText = child.getAttribute(DEFAULT, null);
+                String defaultText = child.getAttribute(DEFAULT, "");
                 PropertyType type = script.getTypes().get(typeName);
                 if (type == null) {
                     error("Use of undeclared type '" + typeName + "'", child);
                 }
-                Value defaultValue = (defaultText == null) ? null : type.fromValue(defaultText);
+                Value defaultValue = type.fromValue(defaultText);
                 configure.debug("Default value for " + name + " is " + 
                         (defaultValue == null ? "null" : defaultValue.toString()));
                 try {
