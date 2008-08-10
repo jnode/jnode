@@ -148,10 +148,13 @@ public class Screen {
                 if (input == null) {
                     throw new ConfigureException("Unexpected EOF on input");
                 }
-                value = prop.getType().fromInput(input);
-                if (value == null && input.length() == 0 && defaultValue != null) {
-                    configure.debug("Using default");
-                    value = defaultValue;
+                if (input.length() == 0) {
+                    if (defaultValue != null) {
+                        configure.debug("Using default");
+                        value = defaultValue;
+                    }
+                } else {
+                    value = prop.getType().fromInput(input);
                 }
                 // Loop until we get a permissible value.
             } while (value == null);
