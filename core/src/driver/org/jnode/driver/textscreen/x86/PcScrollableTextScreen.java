@@ -56,7 +56,6 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     /**
      * @see org.jnode.driver.textscreen.ScrollableTextScreen#ensureVisible(int, boolean)
      */
-    @Override
     public void ensureVisible(int row, boolean sync) {
         if (row < ofsY) {
             ofsY = row;

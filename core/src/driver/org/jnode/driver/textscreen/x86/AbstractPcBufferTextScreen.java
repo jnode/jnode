@@ -104,7 +104,8 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int[], int)
      */
-    public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
+    @Override
+    public void set(final int offset, char[] ch, final int chOfs, int length, int[] colors, int colorsOfs) {
         length = Math.min(length, buffer.length - offset);
         for (int i = 0; i < length; i++) {
             buffer[offset + i] =
@@ -118,7 +119,8 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      *
      * @param dst
      */
-    public void copyTo(TextScreen dst, int offset, int length) {
+    @Override
+    public final void copyTo(TextScreen dst, int offset, int length) {
         if (dst instanceof AbstractPcTextScreen) {
             char[] toScreen = buffer;
             if (cursorVisible && cursorIndex < buffer.length && cursorIndex >= 0) {
@@ -157,7 +159,8 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      * @param rawData
      * @param rawDataOffset
      */
-    public final void copyFrom(char[] rawData, int rawDataOffset) {
+    @Override
+    public final void copyFrom(char[] rawData, final int rawDataOffset) {
         if (rawDataOffset < 0) {
             Unsafe.die("Buffer:rawDataOffset = " + rawDataOffset);
         }
@@ -166,9 +169,12 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
 
     /**
      * Synchronize the state with the actual device.
+     * @param offset
+     * @param length
      */
     public abstract void sync(int offset, int length);
 
+    @Override
     public int setCursor(int x, int y) {
         this.cursorIndex = getOffset(x, y);
         setParentCursor(x, y);
