@@ -28,7 +28,6 @@
     <application name="Swing test"     class="org.jnode.test.gui.SwingTest"/>
     <application name="Swing menu test" class="org.jnode.test.gui.SwingMenuTest"/>
     <application name="Console"        class="org.jnode.test.gui.ConsoleTest"/>
-    <application name="Console2"        class="org.jnode.test.gui.ConsoleTest2"/>    
     <!-- application name="Thinlet"        class="thinlet.ThinTest"/ -->
     <!-- application name="GlyphTest"      class="org.jnode.test.gui.GlyphTest"/ -->
   </extension>
