@@ -141,14 +141,6 @@ public interface TextScreen {
     public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height);
 
     /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     * @param sync true if screen should synchronize
-     */
-    public void ensureVisible(int row, boolean sync);
-
-    /**
      * 
      * @param x
      * @param y

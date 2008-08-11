@@ -31,6 +31,14 @@ package org.jnode.driver.textscreen;
 public interface ScrollableTextScreen extends TextScreen {
 
     /**
+     * Ensure that the given row is visible.
+     *
+     * @param row
+     * @param sync true if screen should synchronize
+     */
+    public void ensureVisible(int row, boolean sync);
+    
+    /**
      * Scroll a given number of rows up.
      *
      * @param rows

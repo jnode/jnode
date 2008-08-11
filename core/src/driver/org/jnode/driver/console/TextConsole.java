@@ -155,13 +155,6 @@ public interface TextConsole extends Console {
     public void setTabSize(int tabSize);
 
     /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     */
-    public void ensureVisible(int row);
-
-    /**
      * Gets the input stream of this console.
      *
      * @return
