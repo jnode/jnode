@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.SortedSet;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
+import org.jnode.driver.console.ScrollableTextConsole;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.ConsolePrintStream;
 
@@ -333,7 +334,12 @@ class Line {
             // if the line has not been shortened (delete, backspace...)
             if (!shortened) {
                 // ensure that the location of the input cursor is included.
-                console.ensureVisible(inputCursorY);
+                if (console instanceof ScrollableTextConsole) {
+                    ((ScrollableTextConsole) console).ensureVisible(inputCursorY);
+                } else {
+                    // since the console is not scrollable, we can't do anything
+                    // if the row is not visible (the row is completely lost)
+                }
             }
             console.setCursorVisible(true);
         } catch (Exception e) {

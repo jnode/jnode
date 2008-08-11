@@ -25,6 +25,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.ScrollableTextConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
@@ -32,7 +33,7 @@ import org.jnode.driver.textscreen.ScrollableTextScreen;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class ScrollableTextScreenConsole extends TextScreenConsole {
+public class ScrollableTextScreenConsole extends TextScreenConsole implements ScrollableTextConsole {
 
     /**
      * @param mgr
@@ -50,7 +51,7 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
      * @param rows
      */
     public void scrollUp(int rows) {
-        final ScrollableTextScreen screen = (ScrollableTextScreen) getScreen();
+        final ScrollableTextScreen screen = getScrollableTextScreen();
         screen.scrollUp(rows);
 
         final int length = rows * screen.getWidth();
@@ -63,9 +64,19 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
      * @param rows
      */
     public void scrollDown(int rows) {
-        final ScrollableTextScreen screen = (ScrollableTextScreen) getScreen();
+        final ScrollableTextScreen screen = getScrollableTextScreen();
         screen.scrollDown(rows);
         screen.sync(0, rows * screen.getWidth());
+    }
+
+    /**
+     * Ensure that the given row is visible.
+     * 
+     * @param row
+     */
+    @Override
+    public void ensureVisible(int row) {
+        getScrollableTextScreen().ensureVisible(row, isFocused());
     }
 
     /**
@@ -118,5 +129,9 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
         if (!event.isConsumed()) {
             super.pointerStateChanged(event);
         }
+    }
+    
+    private final ScrollableTextScreen getScrollableTextScreen() {
+        return (ScrollableTextScreen) getScreen();
     }
 }

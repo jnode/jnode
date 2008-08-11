@@ -32,6 +32,7 @@ import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.AbstractConsole;
 import org.jnode.driver.console.spi.ConsoleOutputStream;
 import org.jnode.driver.console.spi.ConsolePrintStream;
+import org.jnode.driver.textscreen.ScrollableTextScreen;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
@@ -165,7 +166,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
                 doPutChar(c, color);
             }
         }
-        screen.ensureVisible(curY, isFocused()); // synchronize if focused
+        ensureVisible(screen, curY);
     }
 
     /**
@@ -177,7 +178,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     @Override
     public void putChar(char v, int color) {
         doPutChar(v, color);
-        screen.ensureVisible(curY, isFocused()); // synchronize if focused
+        ensureVisible(screen, curY);
     }
 
     private void doPutChar(char v, int color) {
@@ -320,15 +321,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         }
     }
 
-    /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     */
-    public void ensureVisible(int row) {
-        screen.ensureVisible(row, isFocused()); // synchronize if focused
-    }
-
     @Override
     public InputCompleter getCompleter() {
         if (in instanceof KeyboardInputStream) {
@@ -466,8 +458,14 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         screen = systemScreen;
         
         final int size = oldScreen.getWidth() * oldScreen.getHeight();
-        oldScreen.ensureVisible(0, isFocused());
+        ensureVisible(oldScreen, 0);
         oldScreen.copyTo(screen, 0, size);
         syncScreen(0, size);
+    }
+    
+    private final void ensureVisible(TextScreen scr, int row) {
+        if(scr instanceof ScrollableTextScreen) {
+            ((ScrollableTextScreen) scr).ensureVisible(row, isFocused());
+        }
     }
 }

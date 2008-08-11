@@ -104,14 +104,4 @@ public abstract class AbstractPcTextScreen implements TextScreen {
         }
         return new PcScrollableTextScreen(getWidth(), height, this);        
     }
-
-    /**
-     * Ensure that the given row is visible.
-     *
-     * @param row
-     */
-    @Override
-    public void ensureVisible(int row, boolean sync) {
-        // do nothing by default
-    }
 }
