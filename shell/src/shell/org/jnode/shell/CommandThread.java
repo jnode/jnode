@@ -58,4 +58,9 @@ public interface CommandThread {
      * @param threadDeath
      */
     public void stop(ThreadDeath threadDeath);
+
+    /**
+     * The invoker will wait for this thread to terminate.
+     */
+    public void waitFor();
 }

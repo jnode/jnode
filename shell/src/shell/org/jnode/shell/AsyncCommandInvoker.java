@@ -164,6 +164,8 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
 
                 threadProcess.start(null);
 
+                threadProcess.waitFor();
+                /*
                 while (this.blocking) {
                     try {
                         Thread.sleep(6000);
@@ -176,6 +178,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                         }
                     }
                 }
+                */
             }
             return cr.getRC();
         } catch (Exception ex) {
