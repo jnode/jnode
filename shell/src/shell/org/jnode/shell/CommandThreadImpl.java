@@ -94,4 +94,12 @@ public class CommandThreadImpl extends Thread implements CommandThread {
     public void stop(ThreadDeath threadDeath) {
         super.stop(threadDeath);
     }
+
+    public void waitFor() {
+        try {
+            join();
+        } catch (InterruptedException ie){
+            //ignore
+        }
+    }
 }
