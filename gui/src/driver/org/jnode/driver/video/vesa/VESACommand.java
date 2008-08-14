@@ -49,14 +49,17 @@ public class VESACommand {
         int size = 0x10000; // 64 Kb
         int mode = ResourceManager.MEMMODE_NORMAL;
         MemoryResource resource = manager.claimMemoryResource(owner, start, size, mode);
-        ByteBuffer buffer = ByteBuffer.allocate(size);
-        for (int i = 0; i < size; i++) {
-            buffer.put(resource.getByte(i));
+        ByteBuffer buffer = null;
+        try {
+            buffer = ByteBuffer.allocate(size);
+            for (int i = 0; i < size; i++) {
+                buffer.put(resource.getByte(i));
+            }
+            buffer.rewind();
+        } finally {
+            resource.release();
         }
-
-        // manager.
-
-        buffer.rewind();
+        
         return buffer;
     }
 
