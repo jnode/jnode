@@ -19,7 +19,7 @@
   </runtime>
         
   <extension point="org.jnode.shell.aliases">
-    <alias name="udpout" class="org.jnode.shell.command.debug.UDPOutputCommand"/>
+    <alias name="netout" class="org.jnode.shell.command.debug.RemoteOutputCommand"/>
     <alias name="debug" class="org.jnode.shell.command.debug.DebugCommand"/>
   </extension>
 
