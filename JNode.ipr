@@ -300,10 +300,11 @@
       <module fileurl="file://$PROJECT_DIR$/jnode.iml" filepath="$PROJECT_DIR$/jnode.iml" />
       <module fileurl="file://$PROJECT_DIR$/net/net.iml" filepath="$PROJECT_DIR$/net/net.iml" />
       <module fileurl="file://$PROJECT_DIR$/shell/shell.iml" filepath="$PROJECT_DIR$/shell/shell.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sound/sound.iml" filepath="$PROJECT_DIR$/sound/sound.iml" />
       <module fileurl="file://$PROJECT_DIR$/textui/textui.iml" filepath="$PROJECT_DIR$/textui/textui.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 - jnode" project-jdk-type="JavaSDK" />
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">
       <value>
@@ -317,6 +318,25 @@
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="GENERATE_IIOP_STUBS" value="false" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://jnode.svn.sourceforge.net/svnroot/jnode/branches" />
+                  <option value="https://jnode.svn.sourceforge.net/svnroot/jnode/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://jnode.svn.sourceforge.net/svnroot/jnode/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />
