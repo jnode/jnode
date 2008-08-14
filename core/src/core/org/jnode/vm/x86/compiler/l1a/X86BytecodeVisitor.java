@@ -4289,6 +4289,8 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Verify
         checkBounds(ref, idx);
 
+        //todo spec issue: add type compatibility check (elemType <- valueType), throw ArrayStoreException
+
         // Store
         if (idx.isConstant()) {
             final int offset = idx.getValue() * scale;
