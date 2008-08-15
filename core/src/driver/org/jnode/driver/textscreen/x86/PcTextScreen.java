@@ -127,9 +127,13 @@ public class PcTextScreen extends AbstractPcTextScreen {
     @Override
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         color = (color & 0xFF) << 8;
+        
+        int chOffset = chOfs;
+        int ofs = offset * 2;
         for (int i = 0; i < length; i++) {
-            final int v = (ch[chOfs + i] & 0xFF) | color;
-            memory.setChar((offset + i) * 2, (char) v);
+            final int v = (ch[chOffset++] & 0xFF) | color;
+            memory.setChar(ofs, (char) v);
+            ofs += 2;
         }
     }
 
@@ -140,10 +144,14 @@ public class PcTextScreen extends AbstractPcTextScreen {
     @Override
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
+        int chOffset = chOfs;
+        int ofs = offset * 2;
+        int colOfs = colorsOfs;        
         for (int i = 0; i < length; i++) {
-            final int v = (ch[chOfs + i] & 0xFF)
-                    | ((colors[colorsOfs + i] & 0xFF) << 8);
-            memory.setChar((offset + i) * 2, (char) v);
+            final int v = (ch[chOffset++] & 0xFF)
+                    | ((colors[colOfs++] & 0xFF) << 8);
+            memory.setChar((ofs, (char) v);
+            ofs += 2;
         }
     }
 
