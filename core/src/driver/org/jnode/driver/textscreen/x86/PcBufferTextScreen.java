@@ -47,7 +47,7 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
      * Synchronize the state with the actual device.
      */
     @Override
-    public final void sync(int offset, int length) {
+    public void sync(int offset, int length) {
         copyTo(parent, offset, length);
     }
 

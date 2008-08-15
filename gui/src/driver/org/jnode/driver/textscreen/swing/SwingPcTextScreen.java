@@ -295,6 +295,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         }
     };
 
+    @Override
     public void sync(int offset, int length) {
         SwingUtilities.invokeLater(repaintCmd);
     }

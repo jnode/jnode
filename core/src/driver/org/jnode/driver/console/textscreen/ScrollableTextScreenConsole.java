@@ -29,7 +29,6 @@ import org.jnode.driver.console.ScrollableTextConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
-import org.jnode.driver.textscreen.x86.AbstractPcBufferTextScreen;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -55,11 +54,8 @@ public class ScrollableTextScreenConsole extends TextScreenConsole implements Sc
         final ScrollableTextScreen screen = getScrollableTextScreen();
         screen.scrollUp(rows);
 
-        //FIXME : the need to explicitly do the following call will be removed a bit later
-        if(screen instanceof AbstractPcBufferTextScreen) {
-            final int length = rows * screen.getWidth();
-            ((AbstractPcBufferTextScreen) screen).sync(screen.getHeight() * screen.getWidth() - length, length);
-        }
+        final int length = rows * screen.getWidth();
+        screen.sync(screen.getHeight() * screen.getWidth() - length, length);
     }
 
     /**
@@ -70,11 +66,7 @@ public class ScrollableTextScreenConsole extends TextScreenConsole implements Sc
     public void scrollDown(int rows) {
         final ScrollableTextScreen screen = getScrollableTextScreen();
         screen.scrollDown(rows);
-        
-        //FIXME : the need to explicitly do the following call will be removed a bit later
-        if(screen instanceof AbstractPcBufferTextScreen) {
-            ((AbstractPcBufferTextScreen) screen).sync(0, rows * screen.getWidth());
-        }
+        screen.sync(0, rows * screen.getWidth());
     }
 
     /**
