@@ -20,7 +20,7 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="nanohttpd" class="org.jnode.net.command.NanoHTTPDCommand"/>
+    <alias name="nanohttpd" class="fi.iki.elonen.NanoHTTPD"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">

@@ -111,7 +111,7 @@ public class NanoHTTPD {
                 parms.getProperty(value) + "'");
         }
 
-        return serveFile(uri, header, new File("."), true);
+        return serveFile(uri, header, myFileDir, true);
     }
 
     /**
@@ -250,10 +250,9 @@ public class NanoHTTPD {
             ioe.printStackTrace();
             System.exit(-1);
         }
-        nh.myFileDir = new File("");
+        nh.myFileDir = new File("").getAbsoluteFile();
 
-        System.out.println("Now serving files in port " + port + " from \"" +
-            new File("").getAbsolutePath() + "\"");
+        System.out.println("Now serving files in port " + port + " from \"" + nh.myFileDir + "\"");
         System.out.println("Hit Enter to stop.\n");
 
         try {
