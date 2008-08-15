@@ -59,27 +59,31 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
     /**
      * @see org.jnode.driver.textscreen.TextScreen#copyContent(int, int, int)
      */
-    public void copyContent(int srcOffset, int destOffset, int length) {
+    @Override
+    public final void copyContent(int srcOffset, int destOffset, int length) {
         System.arraycopy(buffer, srcOffset, buffer, destOffset, length);
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
      */
-    public char getChar(int offset) {
+    @Override
+    public final char getChar(int offset) {
         return (char) (buffer[offset] & 0xFF);
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
      */
-    public int getColor(int offset) {
+    @Override
+    public final int getColor(int offset) {
         return (char) ((buffer[offset] >> 8) & 0xFF);
     }
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
+    @Override
     public void set(int offset, char ch, int count, int color) {
         final char v = (char) ((ch & 0xFF) | ((color & 0xFF) << 8));
         count = Math.min(count, buffer.length - offset);
@@ -92,7 +96,8 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int,
      *      int)
      */
-    public void set(int offset, char[] ch, int chOfs, int length, int color) {
+    @Override
+    public void set(final int offset, final char[] ch, final int chOfs, int length, int color) {
         color = (color & 0xFF) << 8;
         length = Math.min(length, buffer.length - offset);
         for (int i = 0; i < length; i++) {
@@ -175,7 +180,7 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
     public abstract void sync(int offset, int length);
 
     @Override
-    public int setCursor(int x, int y) {
+    public final int setCursor(int x, int y) {
         this.cursorIndex = getOffset(x, y);
         setParentCursor(x, y);
         return cursorIndex;
@@ -183,7 +188,8 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
 
     protected abstract void setParentCursor(int x, int y);
 
-    public int setCursorVisible(boolean visible) {
+    @Override
+    public final int setCursorVisible(boolean visible) {
         this.cursorVisible = visible;
         return cursorIndex;
     }
