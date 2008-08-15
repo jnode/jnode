@@ -207,12 +207,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     public CommandThread fork(CommandLine command, Closeable[] streams) 
         throws ShellException {
         command.setStreams(streams);
-        CommandInfo cmdInfo;
-        try {
-            cmdInfo = shell.getCommandInfo(command.getCommandName());
-        } catch (ClassNotFoundException ex) {
-            throw new ShellInvocationException(ex.getMessage(), ex);
-        }
+        CommandInfo cmdInfo = command.parseCommandLine(shell);
         return shell.invokeAsynchronous(command, cmdInfo);
     }
 }

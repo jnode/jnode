@@ -313,15 +313,12 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 }
                 desc.commandLine.setStreams(new Closeable[] {in, out, err});
                 try {
-                    CommandInfo cmdInfo = 
-                        shell.getCommandInfo(desc.commandLine.getCommandName());
+                    CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
                     desc.thread =
                         shell.invokeAsynchronous(desc.commandLine, cmdInfo);
                 } catch (UnsupportedOperationException ex) {
                     throw new ShellInvocationException(
                             "The current invoker does not support pipelines", ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new ShellInvocationException(ex.getMessage(), ex);
                 }
                 stageNo++;
             }
