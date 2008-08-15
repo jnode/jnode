@@ -150,7 +150,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
         for (int i = 0; i < length; i++) {
             final int v = (ch[chOffset++] & 0xFF)
                     | ((colors[colOfs++] & 0xFF) << 8);
-            memory.setChar((ofs, (char) v);
+            memory.setChar(ofs, (char) v);
             ofs += 2;
         }
     }
