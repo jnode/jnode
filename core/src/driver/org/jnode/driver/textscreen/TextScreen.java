@@ -118,13 +118,6 @@ public interface TextScreen {
     public int getOffset(int x, int y);
 
     /**
-     * Synchronize the state with the actual device.
-     * @param offset
-     * @param length
-     */
-    public void sync(int offset, int length);
-
-    /**
      * Create an in-memory buffer text screen that is compatible
      * with this screen.
      *

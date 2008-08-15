@@ -34,6 +34,7 @@ import org.jnode.driver.console.spi.ConsoleOutputStream;
 import org.jnode.driver.console.spi.ConsolePrintStream;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
 import org.jnode.driver.textscreen.TextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcBufferTextScreen;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
 import org.jnode.vm.VmSystem;
@@ -317,7 +318,10 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
     private void syncScreen(int offset, int size) {
         if (isFocused()) {
-            screen.sync(offset, size);
+            //FIXME : the need to explicitly do the following call will be removed a bit later
+            if(screen instanceof AbstractPcBufferTextScreen) {
+                ((AbstractPcBufferTextScreen) screen).sync(offset, size);
+            }
         }
     }
 

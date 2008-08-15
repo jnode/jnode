@@ -172,14 +172,6 @@ public class PcTextScreen extends AbstractPcTextScreen {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Synchronize the state with the actual device.
-     */
-    @Override
-    public void sync(int offset, int length) {
-        // Nothing to do here
-    }
-
     @Override
     public int setCursor(int x, int y) {
         return 0; // TODO what should we return if we don't call instance.setCursor ?
