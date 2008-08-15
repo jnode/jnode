@@ -117,12 +117,6 @@ class FbTextScreen extends AbstractPcTextScreen {
 
     }
 
-    public void sync(int offset, int length) {
-        if (painter != null) {
-            painter.repaint();
-        }
-    }
-
     public int setCursor(int x, int y) {
         cursorOffset = getOffset(x, y);
         sync(cursorOffset, 1);
@@ -134,6 +128,13 @@ class FbTextScreen extends AbstractPcTextScreen {
         
         sync(cursorOffset, 1);
         return cursorOffset;
+    }
+
+    @Override
+    public void sync(int offset, int length) {
+        if (painter != null) {
+            painter.repaint();
+        }
     }
 
     /**
