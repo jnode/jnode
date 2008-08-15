@@ -21,6 +21,8 @@
  
 package org.jnode.driver.textscreen.x86;
 
+import java.util.Arrays;
+
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.vm.Unsafe;
 
