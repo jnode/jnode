@@ -145,6 +145,8 @@ public class FBConsole {
 
         }
 
+
+        @Override
         public void sync(int offset, int length) {
             screen.repaint();
         }
