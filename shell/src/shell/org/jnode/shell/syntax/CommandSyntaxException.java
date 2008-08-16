@@ -37,12 +37,15 @@ public class CommandSyntaxException extends ShellException {
     public static class Context {
         public final CommandLine.Token token;
         public final MuSyntax syntax;
+        public final int sourcePos;
         public final CommandSyntaxException exception;
         
-        public Context(Token token, MuSyntax syntax, CommandSyntaxException exception) {
+        public Context(Token token, MuSyntax syntax, int sourcePos, 
+                CommandSyntaxException exception) {
             super();
             this.token = token;
             this.syntax = syntax;
+            this.sourcePos = sourcePos;
             this.exception = exception;
         }
     }

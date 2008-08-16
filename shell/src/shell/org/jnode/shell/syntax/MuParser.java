@@ -213,7 +213,7 @@ public class MuParser {
                             backtrack = true;
                         }
                     } catch (CommandSyntaxException ex) {
-                        argFailures.add(new Context(token, syntax, ex));
+                        argFailures.add(new Context(token, syntax, source.tell(), ex));
                         if (DEBUG) {
                             log.debug("accept for arg " + argName + " threw SyntaxErrorException('" + 
                                     ex.getMessage() + "'");
@@ -233,7 +233,7 @@ public class MuParser {
                             }
                         }
                     } catch (CommandSyntaxException ex) {
-                        argFailures.add(new Context(null, syntax, ex));
+                        argFailures.add(new Context(null, syntax, source.tell(), ex));
                         backtrack = true;
                     }
                     break;
