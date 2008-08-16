@@ -2,6 +2,9 @@ package org.jnode.shell.help.argument;
 
 import java.util.Collection;
 
+/**
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
+ */
 public abstract class StringListArgument extends ListArgument<String> {
     public StringListArgument(String name, String description, boolean multi) {
         super(name, description, multi);

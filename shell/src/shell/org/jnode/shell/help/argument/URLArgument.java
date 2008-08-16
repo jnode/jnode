@@ -29,6 +29,7 @@ import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class URLArgument extends Argument {
 

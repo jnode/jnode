@@ -28,7 +28,7 @@ import org.jnode.shell.help.ParsedArguments;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
- * TODO should be factorized with LongArgument
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class IntegerArgument extends Argument {
     private int min;

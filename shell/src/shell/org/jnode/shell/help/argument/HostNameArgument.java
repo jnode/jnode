@@ -29,6 +29,7 @@ import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author Martin Hartvig
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 
 public class HostNameArgument extends Argument {

@@ -9,6 +9,9 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
 
+/**
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
+ */
 public abstract class ListArgument<T> extends Argument implements Comparator<T> {
     private static final Logger log = Logger.getLogger(ListArgument.class);
 

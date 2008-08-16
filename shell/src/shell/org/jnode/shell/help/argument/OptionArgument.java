@@ -30,6 +30,7 @@ import org.jnode.shell.help.Parameter;
 
 /**
  * @author qades
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class OptionArgument extends Argument {
 

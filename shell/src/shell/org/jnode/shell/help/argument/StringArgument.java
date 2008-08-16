@@ -27,6 +27,7 @@ import org.jnode.shell.help.Argument;
 
 /**
  * @author qades
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class StringArgument extends Argument {
 
