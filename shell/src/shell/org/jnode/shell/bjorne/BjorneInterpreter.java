@@ -24,7 +24,6 @@ import org.jnode.shell.CommandThread;
 import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
-import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
