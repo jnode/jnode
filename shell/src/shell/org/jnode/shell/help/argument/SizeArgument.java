@@ -31,7 +31,7 @@ import org.jnode.util.NumberUtils;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
- * TODO should be factorized with IntegerArgument
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class SizeArgument extends LongArgument {
     public SizeArgument(String name, String description, boolean multi, String min, String max) {

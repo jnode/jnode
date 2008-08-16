@@ -28,6 +28,7 @@ import java.util.Locale;
 
 /**
  * @author Fabien DUMINY (fduminy@jnode.org)
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class CountryArgument extends StringListArgument {
 

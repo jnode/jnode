@@ -31,6 +31,7 @@ import org.jnode.shell.help.Argument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class PluginArgument extends Argument {
 

@@ -29,6 +29,7 @@ import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class InetAddressArgument extends Argument {
 

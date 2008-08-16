@@ -35,6 +35,7 @@ import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * @author qades
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class DeviceArgument extends Argument {
 

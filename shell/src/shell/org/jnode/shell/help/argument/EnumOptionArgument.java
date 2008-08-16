@@ -32,6 +32,7 @@ import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author qades
+ * @deprecated use the org.jnode.shell.syntax.* classes instead.
  */
 public class EnumOptionArgument<T extends Enum<?>> extends Argument {
 
