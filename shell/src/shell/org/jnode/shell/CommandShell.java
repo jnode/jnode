@@ -426,7 +426,20 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 if (cause instanceof CommandSyntaxException) {
                     List<Context> argErrors = ((CommandSyntaxException) cause).getArgErrors();
                     if (argErrors != null) {
+                        // The parser can produce many errors as each of the alternatives
+                        // in the tree are explored.  The following assumes that errors
+                        // produced when we get farthest along in the token stream are most
+                        // likely to be the "real" errors.
+                        int rightmostPos = 0;
                         for (Context context : argErrors) {
+                            if (context.sourcePos > rightmostPos) {
+                                rightmostPos = context.sourcePos;
+                            }
+                        }
+                        for (Context context : argErrors) {
+                            if (context.sourcePos < rightmostPos) {
+                                continue;
+                            }
                             if (context.token != null) {
                                 errPs.println("   " + context.exception.getMessage() + ": " +
                                         context.token.token);
