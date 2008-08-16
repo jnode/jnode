@@ -32,6 +32,7 @@ import org.jnode.shell.help.argument.FileArgument;
 /**
  * Cut down test class ... dir done the old way
  */
+@SuppressWarnings("deprecation")
 public class MyDirCommand extends AbstractCommand {
     static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
     public static Help.Info HELP_INFO =

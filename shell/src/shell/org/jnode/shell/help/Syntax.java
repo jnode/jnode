@@ -35,6 +35,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  * @author qades
  * @author crawley@jnode.org
  */
+@SuppressWarnings("deprecation")
 public class Syntax {
 
     public static final boolean DEBUG = false;
