@@ -163,7 +163,8 @@ public class DefaultHelp extends Help {
     @Override
     public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out) {
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
-                new String[]{arg.getLabel(), arg.getDescription()});
+                new String[]{arg.getLabel(), 
+                        "(" + arg.getTypeDescription() + ") " + arg.getDescription()});
     }
 
     protected void format(PrintStream out, Cell[] cells, String[] texts) {

@@ -86,7 +86,7 @@ public class OptionSyntax extends ArgumentSyntax {
             sb.append(shortOptName);
         }
         if (!(arg instanceof FlagArgument)) {
-            sb.append(" <").append(arg.format()).append('>');
+            sb.append(" <").append(arg.formatForUsage()).append('>');
         }
         return sb.toString();
     }
