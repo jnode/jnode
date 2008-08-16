@@ -75,8 +75,7 @@ public class BjorneParser {
     /**
      * Parse 'complete_command ::= list separator | list'
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the complete command.
      * @throws ShellSyntaxException
      */
     public CommandNode parse() throws ShellSyntaxException {
@@ -93,8 +92,7 @@ public class BjorneParser {
     /**
      * Parse 'list ::= list separator_op and_or | and_or'
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the list.
      * @throws ShellSyntaxException
      */
     private CommandNode parseList() throws ShellSyntaxException {
@@ -125,8 +123,7 @@ public class BjorneParser {
      * Parse 'and_or ::= pipeline | and_or AND_IF linebreak pipeline | and_or
      * OR_IF linebreak pipeline'
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the and_or.
      * @throws ShellSyntaxException
      */
     private CommandNode parseAndOr() throws ShellSyntaxException {
@@ -184,8 +181,7 @@ public class BjorneParser {
     /**
      * Parse 'pipeline ::= '!' pipe_sequence | pipe_sequence'
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the pipeline.
      */
     private CommandNode parsePipeline() throws ShellSyntaxException {
         boolean bang = (tokens.peek().getTokenType() == TOK_BANG);
@@ -202,8 +198,7 @@ public class BjorneParser {
     /**
      * Parse 'pipe_sequence ::= command | pipe_sequence '|' linebreak command'
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the pipe_sequence.
      */
     private CommandNode parsePipeSequence() throws ShellSyntaxException {
         List<CommandNode> commands = new LinkedList<CommandNode>();
@@ -224,8 +219,7 @@ public class BjorneParser {
      * Parse 'command ::= simple_command_or_function_definition |
      * compound_command_with_opt_redirects '
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the command.
      * @throws ShellSyntaxException
      */
     private CommandNode parseCommand() throws ShellSyntaxException {
@@ -356,8 +350,7 @@ public class BjorneParser {
      * while_command | until_command | for_command | case_command | brace_group |
      * subshell ) [ redirects ]
      * 
-     * @param tokens
-     * @return
+     * @return the CommandNode representing the compound command.
      * @throws ShellSyntaxException
      */
     private CommandNode parseCompoundCommand() throws ShellSyntaxException {
