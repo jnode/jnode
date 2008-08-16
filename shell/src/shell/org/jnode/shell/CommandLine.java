@@ -43,6 +43,7 @@ import org.jnode.shell.syntax.SyntaxBundle;
  * 
  * @author crawley@jnode.org
  */
+@SuppressWarnings("deprecation")
 public class CommandLine implements Completable, Iterable<String> {
 
     public static final Closeable DEFAULT_STDIN = new StreamMarker("STDIN");
@@ -92,6 +93,7 @@ public class CommandLine implements Completable, Iterable<String> {
     private static final String[] NO_ARGS = new String[0];
     private static final Token[] NO_TOKENS = new Token[0];
 
+    @SuppressWarnings("deprecation")
     private final Help.Info defaultInfo = new Help.Info("file",
             "default parameter for command line completion", 
             new Parameter(

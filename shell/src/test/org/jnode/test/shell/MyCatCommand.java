@@ -34,6 +34,7 @@ import org.jnode.shell.help.argument.URLArgument;
 /**
  * Cut down test class
  */
+@SuppressWarnings("deprecation")
 public class MyCatCommand extends AbstractCommand {
 
     static final FileArgument ARG_FILE = new FileArgument("file",
