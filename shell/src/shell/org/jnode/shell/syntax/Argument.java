@@ -248,10 +248,10 @@ public abstract class Argument<V> {
     }
 
     /**
-     * Format this argument for use in 'help' messages, and so on.
+     * Format this argument for a usage message.
      */
-    public final String format() {
-        return label + ":" + argumentKind();
+    public final String formatForUsage() {
+        return label;
     }
     
     /**
@@ -267,4 +267,12 @@ public abstract class Argument<V> {
      * "class name" or an "integer".
      */
     protected abstract String argumentKind();
+
+    /**
+     * Get a description of the argument's type
+     * @return the argument type description.
+     */
+    public String getTypeDescription() {
+        return argumentKind();
+    }
 }
