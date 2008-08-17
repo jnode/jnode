@@ -23,7 +23,8 @@ public abstract class BaseDeviceCommand extends BaseCommand {
 
     protected final PartitionHelper createPartitionHelper() throws CommandException {
         try {
-            return new PartitionHelper(device);
+            //FIXME replace System.out by output stream from (Console)ViewFactory 
+            return new PartitionHelper(device, System.out);
         } catch (DeviceNotFoundException e) {
             throw new CommandException(e);
         } catch (ApiNotFoundException e) {

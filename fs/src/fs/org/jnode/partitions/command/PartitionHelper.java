@@ -1,6 +1,7 @@
 package org.jnode.partitions.command;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import javax.naming.NameNotFoundException;
 
@@ -30,30 +31,32 @@ public class PartitionHelper {
 
     private final MasterBootRecord MBR;
     private BootSector bs;
+    
+    private final PrintStream out;
 
-    public PartitionHelper(String deviceId) throws DeviceNotFoundException, ApiNotFoundException,
+    public PartitionHelper(String deviceId, PrintStream out) throws DeviceNotFoundException, ApiNotFoundException,
             IOException, NameNotFoundException {
-        this((IDEDevice) DeviceUtils.getDeviceManager().getDevice(deviceId));
+        this((IDEDevice) DeviceUtils.getDeviceManager().getDevice(deviceId), out);
     }
 
-    public PartitionHelper(IDEDevice device) throws DeviceNotFoundException, ApiNotFoundException,
+    public PartitionHelper(IDEDevice device, PrintStream out) throws DeviceNotFoundException, ApiNotFoundException,
             IOException {
         this.current = device;
         this.api = current.getAPI(BlockDeviceAPI.class);
         this.MBR = new MasterBootRecord(api);
+        this.out = out;
 
         reloadMBR();
     }
 
     public void initMbr() throws DeviceNotFoundException, ApiNotFoundException, IOException {
-        System.out.println("Initialize MBR ...");
+        out.println("Initialize MBR ...");
 
         BootSector oldMBR = bs;
         bs = new GrubBootSector(PLAIN_MASTER_BOOT_SECTOR);
 
         if (MBR.containsPartitionTable()) {
-            System.out
-                    .println("This device already contains a partition table. Copy the already existing partitions.");
+            out.println("This device already contains a partition table. Copy the already existing partitions.");
 
             for (int i = 0; i < 4; i++) {
                 final IBMPartitionTableEntry oldEntry = oldMBR.getPartition(i);
@@ -70,7 +73,7 @@ public class PartitionHelper {
         // reloadMBR();
     }
 
-    public void write() throws IOException {
+    public void write() throws IOException, Exception {
         bs.write(api);
 
         reloadMBR();
@@ -81,11 +84,11 @@ public class PartitionHelper {
             devMan.stop(current);
             devMan.start(current);
         } catch (DeviceNotFoundException e) {
-            e.printStackTrace();
+            throw new Exception("error while restarting device", e);
         } catch (DriverException e) {
-            e.printStackTrace();
+            throw new Exception("error while restarting device", e);
         } catch (NameNotFoundException e) {
-            e.printStackTrace();
+            throw new Exception("error while restarting device", e);
         }
     }
 
