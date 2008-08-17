@@ -116,7 +116,7 @@ public class FdiskCommand extends AbstractCommand {
             err.println(dev.getId() + " is not an IDE device");
             exit(1);
         }
-        final PartitionHelper helper = new PartitionHelper(dev.getId()); 
+        final PartitionHelper helper = new PartitionHelper(dev.getId(), out); 
 
         if (FLAG_BOOTABLE.isSet()) {
             helper.toggleBootable(getPartitionNumber(helper));

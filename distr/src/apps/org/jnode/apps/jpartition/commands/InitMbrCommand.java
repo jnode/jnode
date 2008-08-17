@@ -14,7 +14,8 @@ public class InitMbrCommand extends BaseDeviceCommand {
     protected void doExecute() throws CommandException {
         PartitionHelper helper;
         try {
-            helper = new PartitionHelper(device);
+            //FIXME replace System.out by output stream from (Console)ViewFactory 
+            helper = new PartitionHelper(device, System.out);
             helper.initMbr();
         } catch (Throwable t) {
             throw new CommandException(t);
