@@ -23,10 +23,14 @@ package org.jnode.build;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -46,35 +50,53 @@ public class VMwareBuilderTask extends Task {
 
     private String logFile; // log file use for kernel debugger messages
     private String isoFile;
-    private int memorySize;
+    private int memSize;
     private String overrideFile;
+    private String vmdkImageFile;
+    private String saveDir;
 
     /**
-     * @return Returns the memorySize.
+     * @return Returns the memory size.
      */
     public final int getMemSize() {
-        return memorySize;
+        return memSize;
     }
 
     /**
-     * @param memorySize The memorySize to set.
+     * @param memSize The memory size to set.
      */
-    public final void setMemSize(int memorySize) {
-        this.memorySize = memorySize;
+    public final void setMemSize(int memSize) {
+        this.memSize = memSize;
     }
 
     /**
-     * @return Returns the memorySize.
+     * @return Returns the log file.
      */
     public final String getLogFile() {
         return logFile;
     }
 
     /**
-     * @param memorySize The memorySize to set.
+     * @param logFile The log file to set.
      */
     public final void setLogFile(String logFile) {
         this.logFile = logFile;
+    }
+
+    /**
+     * The VmdkImage file is a VMX virtual disk image file
+     * 
+     * @return Returns the VmdkImage file or <code>null</code>
+     */
+    public String getVmdkImageFile() {
+        return vmdkImageFile;
+    }
+
+    /**
+     * @param vmdkImage The VmdkImage file to set.
+     */
+    public void setVmdkImageFile(String vmdkImageFile) {
+        this.vmdkImageFile = vmdkImageFile;
     }
 
     /**
@@ -92,6 +114,23 @@ public class VMwareBuilderTask extends Task {
      */
     public void setOverrideFile(String overrideFile) {
         this.overrideFile = overrideFile;
+    }
+    
+    /**
+     * The save directory is used to preserve certain VMWare state
+     * files across 'clean' builds.
+     * 
+     * @return the save directory
+     */
+    public String getSaveDir() {
+        return saveDir;
+    }
+
+    /**
+     * @param saveDir the save directory to set
+     */
+    public void setSaveDir(String saveDir) {
+        this.saveDir = saveDir;
     }
 
     /**
@@ -142,6 +181,23 @@ public class VMwareBuilderTask extends Task {
             }
         }
 
+        if (vmdkImageFile != null && vmdkImageFile.length() > 0) {
+            File file = new File(vmdkImageFile);
+            if (!file.exists()) {
+                System.err.println(vmdkImageFile + " does not exists");
+            } else if (file.length() == 0) {
+                System.err.println(vmdkImageFile + " is empty");
+            } else {
+                // Add VMX properties to configure a virtual disk
+                props.setProperty("ide1:0.present", "TRUE");
+                props.setProperty("ide1:0.fileName", vmdkImageFile);
+                props.setProperty("ide1:0.mode", "persistent");
+                props.setProperty("ide1:0.startConnected", "TRUE");
+                props.setProperty("ide1:0.writeThrough", "TRUE");
+                props.setProperty("ide1:0.redo", "");
+            }
+        }
+
         // Now output the VMX file from the properties, sorted in key order for neatness.
         File vmxFile = new File(isoFile + ".vmx");
         try {
@@ -158,14 +214,50 @@ public class VMwareBuilderTask extends Task {
                 out.close();
             }
         } catch (IOException ex) {
-            throw new BuildException("Problem writing the VMX file: " + vmxFile);
+            throw new BuildException("Cannot write the VMX file: " + vmxFile);
+        }
+        
+        // Finally reinstate the saved JNode.nvram file if we have one.
+        if (saveDir != null) {
+            File savedNVRam = new File(saveDir, "JNode.nvram");
+            File nvram = new File(new File(isoFile).getParentFile(), "JNode.nvram"); 
+            if (savedNVRam.exists() && !nvram.exists()) {
+                InputStream is = null;
+                OutputStream os = null;
+                try {
+                    is = new FileInputStream(savedNVRam);
+                    os = new FileOutputStream(nvram);
+                    byte[] buffer = new byte[(int) savedNVRam.length()];
+                    is.read(buffer);
+                    os.write(buffer);
+                    os.flush();
+                } catch (IOException ex) {
+                    throw new BuildException("Cannot copy the saved 'JNode.nvram' file: " +
+                            ex.getMessage());
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException ex) {
+                            // ignore
+                        }
+                    }
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException ex) {
+                            // ignore
+                        }
+                    }
+                }
+            }
         }
     }
 
     private void buildDefaultProperties(Properties props) {
         props.put("config.version", "8");
         props.put("virtualHW.version", "4");
-        props.put("memsize", String.valueOf(memorySize));
+        props.put("memsize", String.valueOf(memSize));
         props.put("MemAllowAutoScaleDown", "FALSE");
 
         props.put("ide0:0.present", "TRUE");
@@ -221,8 +313,7 @@ public class VMwareBuilderTask extends Task {
     }
 
     /**
-     * @param isoFile
-     *            The isoFile to set.
+     * @param isoFile The isoFile to set.
      */
     public final void setIsoFile(String isoFile) {
         this.isoFile = isoFile;
