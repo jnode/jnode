@@ -27,12 +27,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import org.jnode.nanoxml.XMLElement;
-import org.jnode.nanoxml.XMLParseException;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.types.ZipFileSet;
+import org.jnode.nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLParseException;
 import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -86,7 +87,7 @@ public abstract class AbstractPluginTask extends Task {
     }
 
     protected void processLibrary(Jar jarTask, Library lib, HashMap<File, ZipFileSet> fileSets, File srcDir) {
-
+        final String jarName = jarTask.getDestFile().getName();
         final LibAlias libAlias = getAlias(lib.getName());
         final File f;
         if (libAlias == null) {
@@ -116,14 +117,38 @@ public abstract class AbstractPluginTask extends Task {
         for (int i = 0; i < exports.length; i++) {
             final String export = exports[i];
             if (export.equals("*")) {
-                fs.createInclude().setName("**/*");
+                checkPackageExists(jarName, export, f);
+                fs.createInclude().setName("**/*");                
             } else {
-                fs.createInclude().setName(export.replace('.', '/') + ".*");
                 String exp = export.replace('.', '/');
-                if (!exp.endsWith("*"))
+                fs.createInclude().setName(exp + ".*");
+                if (!exp.endsWith("*")) {
+                    checkPackageExists(jarName, exp, f);
                     fs.createInclude().setName(exp + "*");
-                else
+                } else {
+                    checkPackageExists(jarName, exp, f);
                     fs.createInclude().setName(exp);
+                }
+            }
+        }
+    }
+    
+    private void checkPackageExists(String jarName, final String export, File src) {
+        String packageDir = export;
+        
+        if (!src.isFile()) {
+            if (packageDir.endsWith("/*")) {
+                packageDir = packageDir.substring(0, packageDir.length() - 2);
+            } else if (packageDir.endsWith("*")) {
+                packageDir = packageDir.substring(0, packageDir.length() - 1);
+            }
+            
+            File f = new File(src, packageDir);
+            if (!f.exists()) {
+                f = new File(src, packageDir + ".class");
+                if (!f.exists()) {
+                    System.err.println("WARNING : " + jarName + " doesn't contain package " + export);
+                }
             }
         }
     }
