@@ -11,8 +11,8 @@
   </type>
   <type name="vdisk.type">
     <alt value="none"/>
-    <alt value="ext2"/>
-    <alt value="jfat"/>
+    <alt value="test32.vmdk"/>
+    <alt value="testext2.vmdk"/>
   </type>
   <type name="vplatform.type">
     <alt value="none"/>
@@ -35,8 +35,10 @@
             templateFile="jnode.properties.template">
     <property name="jnode.virtual.memsize" type="integer.type"
 	      description="Enter virtual hardware memory size in Mbytes"/>
+    <property name="jnode.virtual.disk.dir" type="string.type"
+          description="Select the virtual disk image directory"/>
     <property name="jnode.virtual.disk" type="vdisk.type"
-	      description="Select a prebuilt virtual disk"/>
+          description="Select a virtual disk image"/>
     <property name="jnode.virtualization.platform" type="vplatform.type"
 	      description="Select the PC emulation/virtualization platform"/>
     <property name="jnode.memmgr.plugin.id" type="memmgr.type"
@@ -79,6 +81,9 @@
     <item property="jnode.virtual.memsize">
       Specify the memory size for the virtual PC; at least 512 Mbytes 
       is recommended.
+    </item>
+    <item property="jnode.virtual.disk.dir">
+      Select the directory containing virtual disk images.
     </item>
     <item property="jnode.virtual.disk">
       Select a disk image to be mounted as a virtual hard drive.

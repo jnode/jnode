@@ -18,6 +18,7 @@
     <property name="descriptors.dir" value="${build.dir}/descriptors"/>
     <property name="plugins.dir" value="${build.dir}/plugins"/>
     <property name="initjars.dir" value="${build.dir}/initjars"/>
+    <property name="save.dir" value="${basedir}/save"/>
     <property name="backup.dir" value="${build.dir}/backup"/>
 
     <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
@@ -204,6 +205,7 @@
         <!-- Create basic build directories -->
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${reports.dir}"/>
+        <mkdir dir="${save.dir}"/>
         <mkdir dir="${cdroms.dir}"/>
         <mkdir dir="${descriptors.dir}"/>
         <mkdir dir="${plugins.dir}"/>
@@ -422,9 +424,14 @@ clean             Remove all intermediate build results.
             <fileset dir="${upload.dir}"/>
         </ftp>
     </target>
+	
+	<!-- Save virtualization etc state across 'clean' -->
+	<target name="save">
+	   <copy file="${cdroms.dir}/JNode.nvram" todir="${save.dir}"/>
+	</target>
 
     <!-- Clean everything files -->
-    <target name="clean">
+    <target name="clean" depends="save">
         <jnode.antall target="clean"/>
         <delete dir="${build.dir}" quiet="on"/>
     </target>

@@ -11,6 +11,7 @@ jnode.debugger.host=
 jnode.debugger.port=6789
 jnode.virtual.memsize=512
 jnode.virtualization.platform=vmware
-jnode.virtual.disk=none
+jnode.virtual.disk.dir=
+jnode.virtual.disk=
 vmware.vmx.overrides=
 
