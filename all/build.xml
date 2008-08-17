@@ -427,7 +427,7 @@ clean             Remove all intermediate build results.
 	
 	<!-- Save virtualization etc state across 'clean' -->
 	<target name="save">
-	   <copy file="${cdroms.dir}/JNode.nvram" todir="${save.dir}"/>
+	   <copy file="${cdroms.dir}/JNode.nvram" todir="${save.dir}" failonerror="no"/>
 	</target>
 
     <!-- Clean everything files -->
