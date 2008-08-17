@@ -70,6 +70,7 @@ jnode.install-nt.dir=C:\jnode
 # -----------------------------------------------
 
 @jnode.virtualization.platform/=#@
+@jnode.virtual.disk.dir/=#@
 @jnode.virtual.disk/=#@
 
 # -----------------------------------------------

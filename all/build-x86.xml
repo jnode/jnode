@@ -78,10 +78,20 @@
 
 		<property name="build.native.dir" value="${my-build.dir}/${jnode.bits}bits/native" />
 		<property name="build.bootimage.dir" value="${my-build.dir}/${jnode.bits}bits/bootimage" />
-		<condition property="vmware.vmx.overrides" value="">
-	        <not>
-	        	<isset property="vmware.vmx.overrides"/>
-	        </not>
+        <condition property="vmware.vmx.overrides" value="">
+        	<and>
+                <not>
+        	        <isset property="vmware.vmx.overrides"/>
+        	    </not>
+        	</and>
+        </condition>
+	    <condition property="vmware.vmx.vmdk.image" 
+	    	value="${jnode.virtual.disk.dir}/${jnode.virtual.disk}" else="">
+	        <and>
+	        	<equals arg1="${jnode.virtualization.platform}" arg2="vmware" casesensitive="false"/>
+                <isset property="jnode.virtual.disk.dir"/>
+                <isset property="jnode.virtual.disk"/>
+	        </and>
 	    </condition>
 	</target>
 
@@ -278,10 +288,12 @@
 
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
 		<vmware 
-			isofile="${jnode-x86.iso}"
+			isoFile="${jnode-x86.iso}"
 			logFile="${logFile}"
-			memsize="${jnode.virtual.memsize}"
-			overrideFile="${vmware.vmx.overrides}"
+			memSize="${jnode.virtual.memsize}"
+            saveDir="${save.dir}"
+			vmdkImageFile="${vmware.vmx.vmdk.image}"
+		    overrideFile="${vmware.vmx.overrides}"
 		/>
 	</target>
 
@@ -291,9 +303,11 @@
 
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
 		<vmware 
-			isofile="${jnode-x86-lite.iso}"
+			isoFile="${jnode-x86-lite.iso}"
 			logFile="${logFile}"
-			memsize="${jnode.virtual.memsize}"
+			memSize="${jnode.virtual.memsize}"
+            saveDir="${save.dir}"
+			vmdkImageFile="${vmware.vmx.vmdk.image}"
             overrideFile="${vmware.vmx.overrides}"
 		/>
 	</target>
@@ -303,9 +317,11 @@
 
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
 		<vmware
-			isofile="${jnode-x86_64-lite.iso}"
+			isoFile="${jnode-x86_64-lite.iso}"
 			logFile="${logFile}"
-			memsize="${jnode.virtual.memsize}"
+			memSize="${jnode.virtual.memsize}"
+			saveDir="${save.dir}"
+			vmdkImageFile="${vmware.vmx.vmdk.image}"
             overrideFile="${vmware.vmx.overrides}"
 		/>
 	</target>
