@@ -30,7 +30,7 @@
 	      default="no"/>
   </controlProps>
 
-  <propFile fileName="../../test.jnode.properties" 
+  <propFile fileName="../../jnode.properties" 
             defaultFile="jnode.properties.defaults"
             templateFile="jnode.properties.template">
     <property name="jnode.virtual.memsize" type="integer.type"
