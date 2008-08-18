@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -92,6 +93,66 @@ public abstract class BasePropertyFileAdapter implements FileAdapter {
      */
     public boolean isSaveSupported() {
         return saveSupported;
+    }
+    
+    public final boolean wasSourceGenerated(PropertySet propSet) throws ConfigureException {
+        File propFile = propSet.getFile();
+        if (!propFile.exists()) {
+            return false;
+        }
+        String expectedFirstLine;
+        File templateFile = propSet.getTemplateFile();
+        if (templateFile != null && templateFile.exists()) {
+            expectedFirstLine = readFirstLine(templateFile);
+        } else {
+            expectedFirstLine = getSignatureLine();
+        }
+        String firstLine = readFirstLine(propFile);
+        return (firstLine == null || expectedFirstLine == null || 
+                firstLine.equals(expectedFirstLine.trim()));
+    }
+    
+    /**
+     * Return the first non-trivial line in the file; i.e. the first line of the
+     * file whose length is > 3 after trimming.  (A trimmed line with 1 to 3 
+     * characters is most likely to be some kind of comment marker.)
+     * 
+     * @param file the file to be read.
+     * @return the line or <code>null</code>.
+     */
+    private String readFirstLine(File file) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.length() > 3) {
+                    return line;
+                }
+            }
+            return null;
+        } catch (IOException ex) {
+            return null;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
+        }
+    }
+    
+    /**
+     * Override this method to return a fixed 'signature' line that a generated
+     * file will started.
+     * 
+     * @return the signature line or <code>null</code>.
+     */
+    protected String getSignatureLine() {
+        return null;
     }
 
     public void load(PropertySet propSet, Configure configure) throws ConfigureException {

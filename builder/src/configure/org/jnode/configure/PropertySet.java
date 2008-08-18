@@ -178,15 +178,33 @@ public class PropertySet {
         adapter.load(this, configure);
     }
 
+    /**
+     * Save the properties in this property set to the property file.  This
+     * method takes care of creating a backup file
+     * 
+     * @param configure
+     * @throws ConfigureException
+     */
     public void save(Configure configure) throws ConfigureException {
         if (file.exists()) {
             File file = this.file.getAbsoluteFile();
-            File backup = new File(file.getParentFile(), file.getName() + ".bak");
-            if (backup.exists()) {
-                if (!backup.delete()) {
-                    throw new ConfigureException(
-                            "Cannot delete existing '" + backup + "'");
+            File backup;
+            if (adapter.wasSourceGenerated(this)) {
+                backup = new File(file.getParentFile(), file.getName() + ".bak");
+                if (backup.exists()) {
+                    if (!backup.delete()) {
+                        throw new ConfigureException(
+                                "Cannot delete existing '" + backup + "'");
+                    }
                 }
+            } else {
+                backup = new File(file.getParentFile(), file.getName() + ".orig");
+                int no = 1;
+                while (backup.exists()) {
+                    backup = new File(file.getParentFile(), file.getName() + ".orig" + ++no);
+                }
+                configure.output("Saving the current (non-generated!) " + file.getName() + " file");
+                configure.output("as " + backup);
             }
             if (!file.renameTo(backup)) {
                 throw new ConfigureException(
@@ -247,4 +265,5 @@ public class PropertySet {
     public Property getProperty(String name) {
         return properties.get(name);
     }
+    
 }
