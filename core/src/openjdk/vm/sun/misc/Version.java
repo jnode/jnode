@@ -30,16 +30,16 @@ public class Version {
 
 
     private static final String launcher_name =
-	"@@launcher_name@@";
+	"openjdk";
 
     private static final String java_version =
-	"@@java_version@@";
+	"1.6.0-jnode";
 	
     private static final String java_runtime_name =
-	"@@java_runtime_name@@";
+	"OpenJDK Runtime Environment";
 
     private static final String java_runtime_version =
-	"@@java_runtime_version@@";
+	"1.6.0-jnode";
 
     static {
 	init();

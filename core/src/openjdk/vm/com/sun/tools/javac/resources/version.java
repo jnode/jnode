@@ -7,9 +7,9 @@ import java.util.ListResourceBundle;
 
 public final class version extends ListResourceBundle {
     private static final Object[][] contents = {
-	{ "jdk", "$(JDK_VERSION)" },
-	{ "full", "$(FULL_VERSION)" },
-	{ "release", "$(RELEASE)" },
+	{ "jdk", "openjdk-1.6.0" },
+	{ "full", "openjdk-1.6.0-jnode" },
+	{ "release", "openjdk-1.6.0-jnode" },
     };
 
     protected final Object[][] getContents() {
