@@ -98,7 +98,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
     public void waitFor() {
         try {
             join();
-        } catch (InterruptedException ie){
+        } catch (InterruptedException ie) {
             //ignore
         }
     }
