@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/classes" />
+    <output url="file://$MODULE_DIR$/build/classes" />
     <exclude-output />
     <exclude-exploded />
     <content url="file://$MODULE_DIR$">
@@ -13,6 +13,15 @@
     <orderEntry type="library" name="shell" level="project" />
     <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module" module-name="core" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/bsh-2.0b5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntryProperties />
   </component>
 </module>
