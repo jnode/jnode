@@ -464,7 +464,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     }
     
     private final void ensureVisible(TextScreen scr, int row) {
-        if(scr instanceof ScrollableTextScreen) {
+        if (scr instanceof ScrollableTextScreen) {
             ((ScrollableTextScreen) scr).ensureVisible(row, isFocused());
         }
     }
