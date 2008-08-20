@@ -17,7 +17,6 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.partitions.command.*"/>
-      <export name="org.jnode.partitions.help.argument.*"/>      
     </library>
   </runtime>
         

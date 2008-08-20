@@ -44,20 +44,6 @@
       <export name="org.omg.PortableServer.ServantLocatorPackage.*"/>
       <export name="org.omg.SendingContext.*"/>
       <export name="org.omg.stub.java.rmi.*"/>
-
-      <export name="gnu.javax.rmi.CORBA.*"/>
-
-      <export name="gnu.CORBA.*"/>
-      <export name="gnu.CORBA.CDR.*"/>
-      <export name="gnu.CORBA.DynAn.*"/>
-      <export name="gnu.CORBA.GIOP.*"/>
-      <export name="gnu.CORBA.GIOP.v1_0.*"/>
-      <export name="gnu.CORBA.GIOP.v1_2.*"/>
-      <export name="gnu.CORBA.Interceptor.*"/>
-      <export name="gnu.CORBA.interfaces.*"/>
-      <export name="gnu.CORBA.NamingService.*"/>
-      <export name="gnu.CORBA.Poa.*"/>
-      <export name="gnu.CORBA.typecodes.*"/>
     </library>
   </runtime>
   

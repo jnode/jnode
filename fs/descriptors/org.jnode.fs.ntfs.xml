@@ -16,7 +16,6 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.ntfs.*"/>
-      <export name="org.jnode.fs.ntfs.attributes.*"/>
     </library>
   </runtime>
   

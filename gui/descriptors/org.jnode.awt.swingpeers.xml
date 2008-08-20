@@ -15,7 +15,6 @@
   <runtime>
     <library name="jnode-gui.jar">
       <export name="org.jnode.awt.swingpeers.*"/>
-      <export name="org.jnode.awt.swingpeers.event.*"/>
     </library>
   </runtime>
 

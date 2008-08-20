@@ -14,9 +14,6 @@
   <runtime>
     <library name="jnode-shell.jar">
       <export name="org.jnode.shell.command.*"/>
-      <export name="org.jnode.shell.command.benchmark.*"/>
-      <export name="org.jnode.shell.command.benchmark.jgfutil.*"/>
-      <export name="org.jnode.shell.command.benchmark.section1.*"/>
     </library>
   </runtime>
 
