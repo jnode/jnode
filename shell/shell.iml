@@ -13,7 +13,7 @@
     <orderEntry type="library" name="shell" level="project" />
     <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module" module-name="core" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/bsh-2.0b5.jar!/" />
