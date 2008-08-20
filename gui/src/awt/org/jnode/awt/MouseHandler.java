@@ -144,7 +144,13 @@ public class MouseHandler implements PointerListener {
      */
     public void close() {
         if (pointerAPI != null) {
-            pointerAPI.removePointerListener(this);
+            pointerAPI.removePointerListener(this);            
+        }
+        
+        if (hwCursor != null) {
+            // hide the cursor so that it won't stay displayed
+            // if we stay in graphic mode
+            hwCursor.setCursorVisible(false);
         }
     }
 
