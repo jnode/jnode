@@ -176,13 +176,11 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
                     cursorArea.setLocation(newX, newY);
                 }
                 this.cursorImage = cursImage;
-
+                
                 showCursor();
             }
         } catch (Throwable t) {
-            Unsafe.debugStackTrace();
-            Unsafe.debug("\nerror in setCursorImage (" + t.getClass().getName() + ") " +
-                    t.getMessage() + "\n");
+            Unsafe.debugStackTrace("error in setCursorImage (" + t.getClass().getName() + ")", t);
         }
     }
 
@@ -209,9 +207,7 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
                 showCursor();
             }
         } catch (Throwable t) {
-            Unsafe.debugStackTrace();
-            Unsafe.debug("\nerror in setCursorPosition (" + t.getClass().getName() + ") " +
-                    t.getMessage() + "\n");
+            Unsafe.debugStackTrace("error in setCursorPosition", t);
         }
     }
 
@@ -227,9 +223,7 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
                 }
             }
         } catch (Throwable t) {
-            Unsafe.debugStackTrace();
-            Unsafe.debug("\nerror in setCursorVisible (" + t.getClass().getName() + ") " +
-                    t.getMessage() + "\n");
+            Unsafe.debugStackTrace("error in setCursorVisible", t);
         }
     }
 
