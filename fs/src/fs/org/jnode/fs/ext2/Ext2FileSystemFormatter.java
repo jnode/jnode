@@ -43,14 +43,15 @@ public class Ext2FileSystemFormatter extends Formatter<Ext2FileSystem> {
         this.blockSize = blockSize;
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.Formatter#format(org.jnode.driver.Device)
      */
     public synchronized Ext2FileSystem format(Device device) throws FileSystemException {
         try {
             FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
             Ext2FileSystemType type = fSS.getFileSystemType(Ext2FileSystemType.ID);
-            Ext2FileSystem fs = type.create(device, false);
+            Ext2FileSystem fs = new Ext2FileSystem(device, false, type);
             fs.create(blockSize);
             return fs;
         } catch (NameNotFoundException e) {
