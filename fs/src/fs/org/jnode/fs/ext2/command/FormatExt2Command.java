@@ -68,6 +68,10 @@ public class FormatExt2Command extends AbstractFormatCommand<Ext2FileSystem> {
 
     @Override
     protected Ext2FileSystemFormatter getFormatter() {
-        return new Ext2FileSystemFormatter(ARG_BLOCK_SIZE.getValue());
+    	if(ARG_BLOCK_SIZE.isSet()){
+    		return new Ext2FileSystemFormatter(ARG_BLOCK_SIZE.getValue());
+    	} else {
+    		return new Ext2FileSystemFormatter(BlockSize._4Kb);
+    	}
     }
 }
