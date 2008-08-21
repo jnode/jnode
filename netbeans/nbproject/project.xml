@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.java.j2seproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
+            <name>JNode</name>
+            <minimum-ant-version>1.6.5</minimum-ant-version>
+            <source-roots>
+                <root id="src.core.dir"/>
+                <root id="src.apps.dir"/>
+                <root id="src.emu.dir"/>
+                <root id="src.install.dir"/>
+                <root id="src.test.dir"/>
+                <root id="src.driver.dir"/>
+                <root id="src.fs.dir"/>
+                <root id="src.test2.dir"/>
+                <root id="src.awt.dir"/>
+                <root id="src.desktop.dir"/>
+                <root id="src.driver2.dir"/>
+                <root id="src.font.dir"/>
+                <root id="src.test3.dir"/>
+                <root id="src.thinlet.dir"/>
+                <root id="src.driver3.dir"/>
+                <root id="src.net.dir"/>
+                <root id="src.test4.dir"/>
+                <root id="src.shell.dir"/>
+                <root id="src.test5.dir"/>
+                <root id="src.driver4.dir"/>
+                <root id="src.sound.dir"/>
+                <root id="src.test6.dir"/>
+                <root id="src.textui.dir"/>
+                <root id="src.driver5.dir"/>
+                <root id="src.nanoxml.dir"/>
+                <root id="src.icedtea.dir"/>
+                <root id="src.mmtk-vm.dir"/>
+                <root id="src.com.dir"/>
+                <root id="src.java.dir"/>
+                <root id="src.javax.dir"/>
+                <root id="src.org.dir"/>
+                <root id="src.sun.dir"/>
+                <root id="src.vm.dir"/>
+                <root id="src.test7.dir"/>
+                <root id="src.vmmagic.dir"/>
+                <root id="src.dir" name="/mnt/sda6/devel/jnode6/builder/src/builder"/>
+                <root id="configure.dir"/>
+                <root id="ext.dir"/>
+                <root id="gnu.dir"/>
+                <root id="java.dir"/>
+                <root id="javax.dir"/>
+                <root id="tools.dir"/>
+                <root id="vm.dir"/>
+            </source-roots>
+            <test-roots/>
+        </data>
+    </configuration>
+</project>
