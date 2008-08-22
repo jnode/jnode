@@ -22,12 +22,17 @@
 package org.jnode.shell.help.def;
 
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.OptionSyntax;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
@@ -71,13 +76,59 @@ public class DefaultHelp extends Help {
             format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)}, 
                     new String[]{bundle.getDescription()});
         }
+        Map<String, TreeSet<String>> flagMap = buildFlagMap(syntaxes);
         boolean first = true;
         for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
-            if (first) {
-                out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
-                first = false;
+            if (arg instanceof FlagArgument) {
+                if (first) {
+                    out.println("\n" + Help.getLocalizedHelp("help.options") + ":");
+                    first = false;
+                }
+                describeOption((FlagArgument) arg, flagMap.get(arg.getLabel()), out);
             }
-            describeArgument(arg, out);
+        }
+        first = true;
+        for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
+            if (!(arg instanceof FlagArgument)) {
+                if (first) {
+                    out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
+                    first = false;
+                }
+                describeArgument(arg, out);
+            }
+        }
+    }
+
+    private Map<String, TreeSet<String>> buildFlagMap(SyntaxBundle syntaxes) {
+        HashMap<String, TreeSet<String>> res = new HashMap<String, TreeSet<String>>();
+        for (org.jnode.shell.syntax.Syntax syntax: syntaxes.getSyntaxes()) {
+            buildFlagMap(syntax, res);
+        }
+        return res;
+    }
+
+    private void buildFlagMap(org.jnode.shell.syntax.Syntax syntax, 
+            HashMap<String, TreeSet<String>> res) {
+        if (syntax instanceof OptionSyntax) {
+            OptionSyntax os = (OptionSyntax) syntax;
+            String key = os.getArgName();
+            TreeSet<String> options = res.get(key);
+            if (options == null) {
+                options = new TreeSet<String>();
+                res.put(key, options);
+            }
+            String shortOptName = os.getShortOptName();
+            if (shortOptName != null) {
+                options.add(shortOptName);
+            }
+            String longOptName = os.getLongOptName();
+            if (longOptName != null) {
+                options.add(longOptName);
+            }
+        } else {
+            for (org.jnode.shell.syntax.Syntax child : syntax.getChildren()) {
+                buildFlagMap(child, res);
+            }
         }
     }
 
@@ -162,8 +213,22 @@ public class DefaultHelp extends Help {
 
     @Override
     public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out) {
+        String description = "(" + arg.getTypeDescription() + ") " + arg.getDescription();
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
-                new String[]{arg.getLabel(), "(" + arg.getTypeDescription() + ") " + arg.getDescription()});
+                new String[]{"<" + arg.getLabel() + ">", description});
+    }
+
+    @Override
+    public void describeOption(FlagArgument arg, TreeSet<String> flagTokens, PrintStream out) {
+        StringBuffer sb = new StringBuffer();
+        for (String flagToken: flagTokens) {
+            if (sb.length() > 0) {
+                sb.append(" | ");
+            }
+            sb.append(flagToken);
+        }
+        format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
+                new String[]{sb.toString(), arg.getDescription()});
     }
 
     protected void format(PrintStream out, Cell[] cells, String[] texts) {

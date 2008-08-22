@@ -53,7 +53,7 @@ public class PowersetSyntax extends GroupSyntax {
 
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
-        Syntax[] children = getChildSyntaxes();
+        Syntax[] children = getChildren();
         MuSyntax[] childMuSyntaxes = new MuSyntax[children.length];
         for (int i = 0; i < children.length; i++) {
             childMuSyntaxes[i] = children[i].prepare(bundle);
@@ -69,7 +69,7 @@ public class PowersetSyntax extends GroupSyntax {
     @Override
     public String format(ArgumentBundle bundle) {
         StringBuilder sb = new StringBuilder();
-        for (Syntax childSyntax : getChildSyntaxes()) {
+        for (Syntax childSyntax : getChildren()) {
             if (sb.length() > 0) {
                 sb.append(" | ");
             } else {

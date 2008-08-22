@@ -133,11 +133,11 @@ public class OptionSyntax extends ArgumentSyntax {
         }
     }
 
-    String getShortOptName() {
+    public String getShortOptName() {
         return shortOptName;
     }
 
-    String getLongOptName() {
+    public String getLongOptName() {
         return longOptName;
     }
 

@@ -68,7 +68,8 @@ public abstract class GroupSyntax extends Syntax {
         return childLabels;
     }
 
-    protected Syntax[] getChildSyntaxes() {
+    @Override
+    public Syntax[] getChildren() {
         return this.syntaxes;
     }
 
