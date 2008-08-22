@@ -47,18 +47,21 @@ public class ICMPListenerCriteria implements ICMPConstants {
     }
 
     public boolean equals(Object obj) {
-        // FIXME ... this method throws class-cast if obj is not a listener
-        // criteria instance.  This violates the 'contract' for equals!!!
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ICMPListenerCriteria)) {
+            return false;
+        }
+        
         ICMPListenerCriteria c = (ICMPListenerCriteria) obj;
-
-        boolean result = true;
-
-        if (src != null)
-            result = result & src.equals(c.getSrc());
-        if (icmp_type != ANY_TYPE)
-            result = result & icmp_type == c.getIcmpType();
-
-        return result;
+        if (src != null && !src.equals(c.getSrc())) {
+            return false;
+        }
+        if (icmp_type != ANY_TYPE && icmp_type != c.getIcmpType()) {
+            return false;
+        }
+        return true;
     }
 
     public IPv4Address getSrc() {
