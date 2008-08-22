@@ -9,6 +9,8 @@ import javax.naming.NamingException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
 import org.jnode.shell.ShellManager;
+import org.jnode.shell.syntax.SyntaxManager;
+import org.jnode.shell.syntax.DefaultSyntaxManager;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.def.DefaultAliasManager;
 import org.jnode.shell.def.DefaultShellManager;
@@ -52,8 +54,10 @@ public class Emu {
             alias_mgr.add("edit", "org.jnode.apps.edit.EditCommand");
             alias_mgr.add("leed", "org.jnode.apps.editor.LeedCommand");
             alias_mgr.add("sconsole", "org.jnode.apps.console.SwingConsole");
+            System.setProperty("jnode.invoker", "default");
             InitialNaming.bind(AliasManager.NAME, alias_mgr);
             InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
+            InitialNaming.bind(SyntaxManager.NAME, new DefaultSyntaxManager(new DummyExtensionPoint()));
             InitialNaming.bind(Help.NAME, new DefaultHelp());
         }
     }
