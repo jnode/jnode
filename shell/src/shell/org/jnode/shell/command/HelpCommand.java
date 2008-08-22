@@ -33,6 +33,7 @@ import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
 import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
@@ -98,9 +99,12 @@ public class HelpCommand extends AbstractCommand {
         } catch (SecurityException ex) {
             err.println("Access to class prevented by security manager");
             exit(2);
-        } catch (NameNotFoundException e) {
+        } catch (NameNotFoundException ex) {
             err.println("Can't find the shell manager");
             exit(2);
+        } catch (HelpException ex) {
+            err.println("No help information available for alias " + alias);
+            exit(1);
         }
 
         if (syntaxes != null) {
