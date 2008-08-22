@@ -401,7 +401,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <!-- Create a bootable CDROM image for x86 32-bits -->
-    <target name="cd-x86-lite" depends="assemble">
+    <target name="cd-x86-lite" depends="assemble" description="create a bootable JNode CD image">
         <x86-build bits="32" target="java-image"/>
         <property name="jnode.bits" value="32" />
         <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite"/>
@@ -750,8 +750,7 @@ clean             Remove all intermediate build results.
             </cp-compare>
         </target>
 
-    <target name="openjdk-annotate" depends="assemble-projects" 
-    				description="add annotations to compiled openjdk classes">
+    <target name="openjdk-annotate" depends="assemble-projects">
     	<echo message="openjdk-annotate"/>
         <taskdef name="oj-annotate" classname="org.jnode.ant.taskdefs.AnnotateTask" 
         		classpathref="cp-jnode"/>
@@ -886,7 +885,7 @@ clean             Remove all intermediate build results.
 
     </target>
 
-    <target name="checkstyle" description="Generates a report of code convention violations.">
+    <target name="checkstyle" description="check the mandatory code conventions">
         <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
         <checkstyle config="jnode_checks.xml">
             <fileset dir="../builder/src/builder" includes="**/*.java"/>
@@ -910,6 +909,37 @@ clean             Remove all intermediate build results.
             <fileset dir="../net/src/test" includes="**/*.java"/>
             <fileset dir="../shell/src/test" includes="**/*.java"/>
             <fileset dir="../shell/src/shell" includes="**/*.java"/>
+        </checkstyle>
+    </target>
+
+    <target name="checkstyle-new" description="check the recommanded code conventions">
+        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
+        <checkstyle config="new_checks.xml">
+            <!--
+            <fileset dir="../builder/src/builder" includes="**/*.java"/>
+            <fileset dir="../builder/src/configure" includes="**/*.java"/>
+            <fileset dir="../core/src/core" includes="**/*.java"/>
+            <fileset dir="../core/src/driver" includes="**/*.java"/>
+            <fileset dir="../core/src/test" includes="**/*.java"/>
+            -->
+            <fileset dir="../distr/src/apps" includes="**/*.java"/>
+            <fileset dir="../distr/src/emu" includes="**/*.java"/>
+            <fileset dir="../distr/src/install" includes="**/*.java"/>
+            <fileset dir="../distr/src/test" includes="**/*.java"/>
+            <!--
+            <fileset dir="../fs/src/fs" includes="**/*.java"/>
+            <fileset dir="../fs/src/driver" includes="**/*.java"/>
+            <fileset dir="../fs/src/test" includes="**/*.java"/>
+            <fileset dir="../gui/src/test" includes="**/*.java"/>
+            <fileset dir="../gui/src/desktop" includes="**/*.java"/>
+            <fileset dir="../gui/src/driver" includes="**/*.java"/>
+            <fileset dir="../gui/src/awt" includes="**/*.java"/>
+            <fileset dir="../net/src/net" includes="**/*.java"/>
+            <fileset dir="../net/src/driver" includes="**/*.java"/>
+            <fileset dir="../net/src/test" includes="**/*.java"/>
+            <fileset dir="../shell/src/test" includes="**/*.java"/>
+            <fileset dir="../shell/src/shell" includes="**/*.java"/>
+            -->
         </checkstyle>
     </target>
 
