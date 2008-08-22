@@ -51,7 +51,7 @@ public class OptionalSyntax extends GroupSyntax {
 
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
-        Syntax[] children = getChildSyntaxes();
+        Syntax[] children = getChildren();
         MuSyntax tmp;
         if (children.length == 0) {
             return null;
@@ -70,7 +70,7 @@ public class OptionalSyntax extends GroupSyntax {
     @Override
     public String format(ArgumentBundle bundle) {
         StringBuilder sb = new StringBuilder();
-        for (Syntax childSyntax : getChildSyntaxes()) {
+        for (Syntax childSyntax : getChildren()) {
             if (sb.length() > 0) {
                 sb.append(" ");
             } else {

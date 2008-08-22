@@ -46,7 +46,7 @@ public class SequenceSyntax extends GroupSyntax {
 
     public String format(ArgumentBundle bundle) {
         StringBuilder sb = new StringBuilder();
-        for (Syntax child : getChildSyntaxes()) {
+        for (Syntax child : getChildren()) {
             if (sb.length() > 0) {
                 sb.append(' ');
             }
@@ -57,7 +57,7 @@ public class SequenceSyntax extends GroupSyntax {
 
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
-        Syntax[] childSyntaxes = getChildSyntaxes();
+        Syntax[] childSyntaxes = getChildren();
         MuSyntax[] muSyntaxes = new MuSyntax[childSyntaxes.length];
         for (int i = 0; i < childSyntaxes.length; i++) {
             muSyntaxes[i] = childSyntaxes[i].prepare(bundle);

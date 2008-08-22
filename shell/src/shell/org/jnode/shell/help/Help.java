@@ -23,6 +23,7 @@ package org.jnode.shell.help;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.util.TreeSet;
 
 import javax.naming.NamingException;
 
@@ -31,6 +32,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
@@ -114,6 +116,13 @@ public abstract class Help {
      * {@link Argument#describe(Help)}.
      */
     public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out);
+
+    /**
+     * Shows the description of a single FlagArgument. Used as a callback in
+     * {@link Argument#describe(Help)}.
+     */
+    public abstract void describeOption(FlagArgument arg, 
+            TreeSet<String> flagTokens, PrintStream out);
 
     /**
      * Shows the description of a single parameter. Used as a callback in

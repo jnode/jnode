@@ -37,6 +37,8 @@ import org.jnode.nanoxml.XMLElement;
  */
 public abstract class Syntax {
     
+    private static final Syntax[] NO_CHILDREN = new Syntax[0];
+    
     protected final String label;
     private Syntax parent;
     private String description;
@@ -122,5 +124,9 @@ public abstract class Syntax {
             element.setAttribute("description", description);
         }
         return element;
+    }
+
+    public Syntax[] getChildren() {
+        return NO_CHILDREN;
     }
 }
