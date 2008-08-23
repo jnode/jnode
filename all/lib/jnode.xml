@@ -62,11 +62,11 @@
   <macrodef name="jnode.antall">
     <attribute name="target"/>
     <sequential>
-		<ant target="@{target}" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
+        <ant target="@{target}" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
+        <ant target="@{target}" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
 		<ant target="@{target}" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
 		<ant target="@{target}" dir="${root.dir}/net" inheritall="on" inheritrefs="on" />
 		<ant target="@{target}" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
-		<ant target="@{target}" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
 		<ant target="@{target}" dir="${root.dir}/gui" inheritall="on" inheritrefs="on" />
 		<ant target="@{target}" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
 		<ant target="@{target}" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
