@@ -6,6 +6,7 @@ package org.jnode.fs.jfat;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import org.jnode.util.TimeUtils;
 
 /**
  * @author gvt
@@ -16,9 +17,7 @@ public class FatUtils {
 
     private static final SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 
-    public static long decodeDateTime(int dosDate, int dosTime, int dosTenth) {
-        Calendar cal = Calendar.getInstance();
-
+    public static long decodeDateTime(final int dosDate, final int dosTime, final int dosTenth) {
         if (dosDate < 0 || dosDate > 0xFFFF)
             throw new IllegalArgumentException("dosDate is invalid: " + dosDate);
 
@@ -28,20 +27,15 @@ public class FatUtils {
         if (dosTenth < 0 || dosTenth > 199)
             throw new IllegalArgumentException("dosTime is invalid: " + dosTenth);
 
-        int seconds = dosTenth / 100;
         int milliseconds = (dosTenth % 100) * 10;
+        int seconds = (dosTime & 0x1f) * 2 + dosTenth / 100;
+        int minutes = (dosTime >> 5) & 0x3f;
+        int hours = dosTime >> 11;
+        int days = dosDate & 0x1f;
+        int months = ((dosDate >> 5) & 0x0f);
+        int years = 1980 + (dosDate >> 9);
 
-        cal.set(Calendar.MILLISECOND, milliseconds);
-
-        cal.set(Calendar.SECOND, (dosTime & 0x1f) * 2 + seconds);
-        cal.set(Calendar.MINUTE, (dosTime >> 5) & 0x3f);
-        cal.set(Calendar.HOUR_OF_DAY, dosTime >> 11);
-
-        cal.set(Calendar.DATE, dosDate & 0x1f);
-        cal.set(Calendar.MONTH, ((dosDate >> 5) & 0x0f) - 1);
-        cal.set(Calendar.YEAR, 1980 + (dosDate >> 9));
-
-        return cal.getTimeInMillis();
+        return TimeUtils.time2millis(years, months, days, hours, minutes, seconds) + milliseconds;
     }
 
     public static long decodeDateTime(int dosDate, int dosTime) {
@@ -49,23 +43,13 @@ public class FatUtils {
     }
 
     public static long getMinDateTime() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MILLISECOND, 0);
-        /*
-         * dos Minimum DateTime is: January 1, 1980 00:00:00
-         */
-        cal.set(1980, 0, 1, 0, 0, 0);
-        return cal.getTimeInMillis();
+        //dos Minimum DateTime is: January 1, 1980 00:00:00
+        return TimeUtils.time2millis(1980, 1, 1, 0, 0, 0);
     }
 
     public static long getMaxDateTime() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MILLISECOND, 0);
-        /*
-         * dos Maximum DateTime is: December 31, 2107 23:59:58
-         */
-        cal.set(2107, 11, 31, 23, 59, 58);
-        return cal.getTimeInMillis();
+        //dos Maximum DateTime is: December 31, 2107 23:59:58
+        return TimeUtils.time2millis(2107, 12, 31, 23, 59, 58);
     }
 
     public static long checkDateTime(long javaDateTime) {
@@ -82,8 +66,7 @@ public class FatUtils {
 
         cal.setTimeInMillis(checkDateTime(javaDateTime));
 
-        return 2048 * cal.get(Calendar.HOUR_OF_DAY) + 32 * cal.get(Calendar.MINUTE) +
-                cal.get(Calendar.SECOND) / 2;
+        return 2048 * cal.get(Calendar.HOUR_OF_DAY) + 32 * cal.get(Calendar.MINUTE) + cal.get(Calendar.SECOND) / 2;
     }
 
     public static int encodeDate(long javaDateTime) {
@@ -91,8 +74,7 @@ public class FatUtils {
 
         cal.setTimeInMillis(checkDateTime(javaDateTime));
 
-        return 512 * (cal.get(Calendar.YEAR) - 1980) + 32 * (cal.get(Calendar.MONTH) + 1) +
-                cal.get(Calendar.DATE);
+        return 512 * (cal.get(Calendar.YEAR) - 1980) + 32 * (cal.get(Calendar.MONTH) + 1) + cal.get(Calendar.DATE);
     }
 
     public static int encodeTenth(long javaDateTime) {
