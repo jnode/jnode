@@ -13,6 +13,10 @@
 # Uncomment this property if you do not want the default initjars to be build.
 # no.default.initjars = 1
 
+# Set this property to the directory containing user applications for the 
+# jar packager (tool to easily create a jnode plugin from a regular jar file)
+# user.applications.dir = ${root.dir}/local/applications/
+
 # -----------------------------------------------
 # Settings for the bootdisk image
 
