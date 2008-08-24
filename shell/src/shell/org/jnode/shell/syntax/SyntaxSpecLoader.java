@@ -120,14 +120,14 @@ public class SyntaxSpecLoader {
             return new RepeatSyntax(label, childSyntax, minCount, maxCount, description);
         } else if (kind.equals("sequence")) {
             int nos = syntaxElement.getNosChildren();
-            Syntax[] seq = new OptionSyntax[nos];
+            Syntax[] seq = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
                 seq[i] = doLoad(syntaxElement.getChild(i));
             }
             return new SequenceSyntax(label, description, seq);
         } else if (kind.equals("optional")) {
             int nos = syntaxElement.getNosChildren();
-            Syntax[] seq = new OptionSyntax[nos];
+            Syntax[] seq = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
                 seq[i] = doLoad(syntaxElement.getChild(i));
             }

@@ -11,13 +11,12 @@ import org.jnode.driver.console.textscreen.TextScreenConsole;
  */
 public class EditEmu extends Emu {
     public static void main(String[] argv) throws Exception {
-        initEnv();
-
-
-        if (argv.length == 0) {
-            System.out.println("No file specified");
+        if (argv.length == 0 || argv[0].startsWith("-")) {
+            System.err.println("Usage: editEmu <file> [<jnode-home>]");
             return;
         }
+
+        initEnv(argv.length > 1 ? new File(argv[1]) : null);
 
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         final TextScreenConsole console = cm.createConsole(

@@ -36,7 +36,7 @@ public interface SyntaxManager {
      */
     public static final Class<SyntaxManager> NAME = SyntaxManager.class;
 
-    public static final String ALIASES_EP_NAME = "org.jnode.shell.syntaxes";
+    public static final String SYNTAXES_EP_NAME = "org.jnode.shell.syntaxes";
 
     /**
      * Add a syntax bundle
