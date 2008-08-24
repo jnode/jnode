@@ -115,17 +115,12 @@ public class DefaultSyntaxManager implements SyntaxManager, ExtensionPointListen
         System.out.println("Refreshing syntax list");
         if (syntaxEP != null) {
             syntaxes.clear();
-            final Extension[] extensions = syntaxEP.getExtensions();
-            for (int i = 0; i < extensions.length; i++) {
-                final Extension ext = extensions[i];
-                final ConfigurationElement[] elements = 
-                    ext.getConfigurationElements();
+            for (Extension ext : syntaxEP.getExtensions()) {
                 SyntaxSpecLoader loader = new SyntaxSpecLoader();
-                
-                for (int j = 0; j < elements.length; j++) {
-                    SyntaxSpecAdapter element = new PluginSyntaxSpecAdapter(elements[j]);
+                for (ConfigurationElement element : ext.getConfigurationElements()) {
+                    SyntaxSpecAdapter adaptedElement = new PluginSyntaxSpecAdapter(element);
                     try {
-                        SyntaxBundle bundle = loader.loadSyntax(element);
+                        SyntaxBundle bundle = loader.loadSyntax(adaptedElement);
                         if (bundle != null) {
                             syntaxes.put(bundle.getAlias(), bundle);
                         }

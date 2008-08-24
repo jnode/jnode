@@ -1,5 +1,7 @@
 package org.jnode.emu;
 
+import java.io.File;
+
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
 import org.jnode.shell.CommandShell;
@@ -10,7 +12,11 @@ import org.jnode.shell.CommandShell;
 public class ShellEmu extends Emu {
 
     public static void main(String[] argv) throws Exception {
-        initEnv();
+        if (argv.length > 0 && argv[0].startsWith("-")) {
+            System.err.println("Usage: shellemu [<jnode-home>]");
+            return;
+        }
+        initEnv(argv.length > 0 ? new File(argv[0]) : null);
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         new Thread(new CommandShell(cm.createConsole(
             "Console 1",
