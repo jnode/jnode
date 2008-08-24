@@ -19,6 +19,7 @@
 	<classpathentry kind="src" path="src/mmtk-vm"/>
 	<classpathentry kind="src" path="src/driver"/>
 	<classpathentry kind="src" path="src/test"/>
+	<classpathentry kind="src" path="src/template"/>
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
