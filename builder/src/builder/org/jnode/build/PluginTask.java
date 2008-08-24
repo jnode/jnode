@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import org.jnode.nanoxml.XMLElement;
-import org.jnode.nanoxml.XMLParseException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Jar;
@@ -42,6 +42,8 @@ import org.apache.tools.ant.taskdefs.ManifestException;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.apache.tools.ant.util.FileUtils;
+import org.jnode.nanoxml.XMLElement;
+import org.jnode.nanoxml.XMLParseException;
 import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.Runtime;
@@ -54,7 +56,7 @@ public class PluginTask extends AbstractPluginTask {
     private LinkedList<ZipFileSet> descriptorSets = new LinkedList<ZipFileSet>();
     private File todir;
     private File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-
+    
     public ZipFileSet createDescriptors() {
         final ZipFileSet fs = new ZipFileSet();
         descriptorSets.add(fs);
@@ -85,8 +87,18 @@ public class PluginTask extends AbstractPluginTask {
         int max_thread_count = 10;
         int max_plugin_count = 500;
 
+        final AtomicBoolean failure = new AtomicBoolean(false);
         ThreadPoolExecutor executor = new ThreadPoolExecutor(max_thread_count, max_thread_count, 60, TimeUnit.SECONDS,
-            new ArrayBlockingQueue<Runnable>(max_plugin_count));
+            new ArrayBlockingQueue<Runnable>(max_plugin_count)) {
+            @Override
+            protected void afterExecute(Runnable r, Throwable t) {
+                if (t != null) {
+                    // at least one plugin task failed
+                    failure.set(true);
+                }
+            }
+        };
+        
         final Map<String, File> descriptors = new HashMap<String, File>();
         for (FileSet fs : descriptorSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
@@ -105,8 +117,12 @@ public class PluginTask extends AbstractPluginTask {
         } catch (InterruptedException ie) {
             throw new RuntimeException("Building plugins interrupted");
         }
+        
+        if (failure.get()) {
+            throw new RuntimeException("At least one plugin task failed : see above errors");
+        }
     }
-
+    
     /**
      * @param descriptors map of fullPluginId to File descriptor
      * @param descriptor  the plugin descriptor XML
