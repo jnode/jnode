@@ -231,9 +231,9 @@ class Line {
         final int nbLines = (items.length / nbColumns) + (lastLineIsFull ? 0 : 1);
 
         String[] lines = new String[nbLines];
-        StringBuilder line = new StringBuilder(SCREEN_WIDTH);
         int lineNum = 0;
         for (int itemNum = 0; itemNum < items.length;) {
+            StringBuilder line = new StringBuilder(SCREEN_WIDTH);
             for (int c = 0; c < nbColumns; c++) {
                 final String item = items[itemNum++];
                 line.append(item);
@@ -246,9 +246,7 @@ class Line {
 
                 if (itemNum >= items.length) break;
             }
-
             lines[lineNum++] = line.toString();
-            line.setLength(0); // clear the buffer
         }
 
         return lines;
