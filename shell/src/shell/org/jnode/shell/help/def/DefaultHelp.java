@@ -18,14 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help.def;
 
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -44,7 +43,7 @@ public class DefaultHelp extends Help {
     public static final String RESOURCE_NAME = "messages.properties";
     private static final int NOMINAL_WIDTH = 75;
     /* start with 80 spaces ... */
-    private static String spaces = 
+    private static String spaces =
         "                                                                                ";
 
     /**
@@ -55,7 +54,8 @@ public class DefaultHelp extends Help {
 
     /**
      * Shows the complete help for a command.
-     * @see Help#help(org.jnode.shell.help.Help.Info, String) 
+     *
+     * @see Help#help(org.jnode.shell.help.Help.Info, String)
      */
     public void help(Info info, String command, PrintStream out) {
         final Syntax[] syntaxes = info.getSyntaxes();
@@ -73,8 +73,8 @@ public class DefaultHelp extends Help {
         usage(syntaxes, bundle, out);
         if (bundle.getDescription() != null) {
             out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
-            format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)}, 
-                    new String[]{bundle.getDescription()});
+            format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)},
+                new String[]{bundle.getDescription()});
         }
         Map<String, TreeSet<String>> flagMap = buildFlagMap(syntaxes);
         boolean first = true;
@@ -101,14 +101,14 @@ public class DefaultHelp extends Help {
 
     private Map<String, TreeSet<String>> buildFlagMap(SyntaxBundle syntaxes) {
         HashMap<String, TreeSet<String>> res = new HashMap<String, TreeSet<String>>();
-        for (org.jnode.shell.syntax.Syntax syntax: syntaxes.getSyntaxes()) {
+        for (org.jnode.shell.syntax.Syntax syntax : syntaxes.getSyntaxes()) {
             buildFlagMap(syntax, res);
         }
         return res;
     }
 
-    private void buildFlagMap(org.jnode.shell.syntax.Syntax syntax, 
-            HashMap<String, TreeSet<String>> res) {
+    private void buildFlagMap(org.jnode.shell.syntax.Syntax syntax,
+                              HashMap<String, TreeSet<String>> res) {
         if (syntax instanceof OptionSyntax) {
             OptionSyntax os = (OptionSyntax) syntax;
             String key = os.getArgName();
@@ -140,7 +140,7 @@ public class DefaultHelp extends Help {
         if (syntax.getDescription() != null) {
             out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
             format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)},
-                    new String[]{syntax.getDescription()});
+                new String[]{syntax.getDescription()});
         }
         final Parameter[] params = syntax.getParams();
         if (params.length != 0) {
@@ -180,8 +180,8 @@ public class DefaultHelp extends Help {
         int usageLength = usageText.length();
         int commandLength = command.length();
         Cell[] cells =
-                new Cell[] {new Cell(0, usageLength), new Cell(1, commandLength),
-                    new Cell(1, NOMINAL_WIDTH - 2 - usageLength - commandLength)};
+            new Cell[]{new Cell(0, usageLength), new Cell(1, commandLength),
+                new Cell(1, NOMINAL_WIDTH - 2 - usageLength - commandLength)};
         String[] texts = new String[]{usageText, command, null};
         String[] texts2 = new String[]{"", "", null};
         org.jnode.shell.syntax.Syntax[] syntaxes = syntaxBundle.getSyntaxes();
@@ -202,33 +202,33 @@ public class DefaultHelp extends Help {
     }
 
     public void describeParameter(Parameter param, PrintStream out) {
-        format(out, new Cell[]{new Cell(2, 18), new Cell(2, NOMINAL_WIDTH - 22)}, 
-                new String[]{param.getName(), param.getDescription()});
+        format(out, new Cell[]{new Cell(2, 18), new Cell(2, NOMINAL_WIDTH - 22)},
+            new String[]{param.getName(), param.getDescription()});
     }
 
     public void describeArgument(Argument arg, PrintStream out) {
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
-                new String[]{arg.getName(), arg.getDescription()});
+            new String[]{arg.getName(), arg.getDescription()});
     }
 
     @Override
     public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out) {
         String description = "(" + arg.getTypeDescription() + ") " + arg.getDescription();
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
-                new String[]{"<" + arg.getLabel() + ">", description});
+            new String[]{"<" + arg.getLabel() + ">", description});
     }
 
     @Override
     public void describeOption(FlagArgument arg, TreeSet<String> flagTokens, PrintStream out) {
         StringBuffer sb = new StringBuffer();
-        for (String flagToken: flagTokens) {
+        for (String flagToken : flagTokens) {
             if (sb.length() > 0) {
                 sb.append(" | ");
             }
             sb.append(flagToken);
         }
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
-                new String[]{sb.toString(), arg.getDescription()});
+            new String[]{sb.toString(), arg.getDescription()});
     }
 
     protected void format(PrintStream out, Cell[] cells, String[] texts) {
@@ -265,6 +265,7 @@ public class DefaultHelp extends Help {
 
     /**
      * Get a String consisting of 'count' spaces.
+     *
      * @param count the number of spaces
      * @return the string
      */
@@ -299,8 +300,9 @@ public class DefaultHelp extends Help {
 
         /**
          * Construct a Cell with a leading margin and a text width.
+         *
          * @param margin the number of leading spaces for the Cell
-         * @param width the width of the text part of the Cell
+         * @param width  the width of the text part of the Cell
          */
         protected Cell(int margin, int width) {
             this.margin = margin;
@@ -311,7 +313,7 @@ public class DefaultHelp extends Help {
         }
 
         /**
-         * Heuristically, split of a head substring of 'text' to fit within this Cell's width.  We try 
+         * Heuristically, split of a head substring of 'text' to fit within this Cell's width.  We try
          * to split at a space character, but if this will make the text too ragged, we simply chop.
          */
         protected String fit(String text) {

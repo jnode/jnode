@@ -79,7 +79,7 @@ public class AnnotateTask extends FileSetTask {
 
         try {
             if (readProperties()) {
-                for(String file : classesFiles){
+                for (String file : classesFiles) {
                     File classFile = new File(baseDir, file);
                     processFile(classFile);
                 }
@@ -206,7 +206,7 @@ public class AnnotateTask extends FileSetTask {
         if (classFile.lastModified() < startTime) {
             return;
         }
-        
+
         String annotations = getAnnotations(classFile);
         if (annotations == null) {
             return;
