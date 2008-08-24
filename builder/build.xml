@@ -28,6 +28,28 @@
     <mkdir dir="${jnasm-assembler-gen.dir}"/>
   </target>
 
+  <!-- Compile the Template ANT task needed for compiling the core -->
+  <target name="pre-compile" depends="prepare">
+    <javac destdir="${my-classes.dir}"
+	       debug="on"
+	       optimize="on"
+           fork="off"
+           compiler="modern"
+	       includeJavaRuntime="true"
+           target="${java.target}"
+           source="${java.source}"
+           encoding="${java.encoding}"
+           excludes="**/*-template.java,**/package-info.java"
+           srcdir="${my-src.dir}/builder/">
+	  <bootclasspath path="${jnode-core.jar}"/>
+      <compilerarg value="${compilerarg}"/>
+        <filename name="org/jnode/ant/taskdefs/TemplateTask.java" />
+    </javac>
+    <jar jarfile="${jnode-builder.jar}"
+        basedir="${my-classes.dir}"
+        includes="org/jnode/ant/taskdefs/**"/>        
+  </target>  
+
 <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
     <javacc target="${jnasm-src.dir}/preprocessor/gen/JNAsmPP.jj"

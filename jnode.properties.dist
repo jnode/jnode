@@ -85,3 +85,11 @@ jnode.debugger.port=6789
 #   to the VMX file's location!
 
 #vmware.vmx.overrides=<some-file-containing-vmx-settings>
+
+# -----------------------------------------------
+# Custom system properties 
+# -----------------------------------------------
+
+jnode.java.home=/jnode
+jnode.java.io.tmpdir=/jnode/tmp
+jnode.user.home=/jnode/home
