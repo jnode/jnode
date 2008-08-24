@@ -33,9 +33,10 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import org.jnode.nanoxml.XMLElement;
+
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
+import org.jnode.nanoxml.XMLElement;
 import org.jnode.plugin.PluginException;
 
 /**
@@ -43,12 +44,12 @@ import org.jnode.plugin.PluginException;
  */
 public final class PluginList {
 
-    private final URL[] descrList;
+    private final List<URL> descrList;
 
-    private final URL[] pluginList;
+    private final List<URL> pluginList;
 
     private final String name;
-
+    
     private Manifest manifest;
 
     private List<PluginList> includes = new ArrayList<PluginList>();
@@ -58,8 +59,8 @@ public final class PluginList {
     public PluginList(File file, File defaultDir, String targetArch)
         throws PluginException, MalformedURLException {
         this.defaultDir = defaultDir;
-        final ArrayList<URL> descrList = new ArrayList<URL>();
-        final ArrayList<URL> pluginList = new ArrayList<URL>();
+        descrList = new ArrayList<URL>();
+        pluginList = new ArrayList<URL>();
         final XMLElement root = new XMLElement(new Hashtable(), true, false);
         try {
             final FileReader r = new FileReader(file);
@@ -86,24 +87,12 @@ public final class PluginList {
             if (e.getName().equals("plugin")) {
                 final String id = e.getStringAttribute("id");
 
-                final URL descrUrl;
-                final URL pluginUrl;
-                if (id != null) {
-                    File f = findPlugin(defaultDir, id);
-                    pluginUrl = f.toURL();
-                    descrUrl = new URL("jar:" + pluginUrl + "!/plugin.xml");
-                } else {
+                if (id == null) {
                     throw new PluginException("id attribute expected on "
                         + e.getName());
                 }
 
-                if (pluginList.contains(pluginUrl)) {
-                    throw new PluginException("can't use the same id(" + id
-                        + ") for multiple plugins");
-                }
-
-                descrList.add(descrUrl);
-                pluginList.add(pluginUrl);
+                addPlugin(descrList, pluginList, id);
             } else if (e.getName().equals("manifest")) {
                 manifest = parseManifest(e);
             } else if (e.getName().equals("include")) {
@@ -113,9 +102,20 @@ public final class PluginList {
                 throw new PluginException("Unknown element " + e.getName());
             }
         }
-        this.descrList = descrList.toArray(new URL[descrList.size()]);
-        this.pluginList = pluginList
-            .toArray(new URL[pluginList.size()]);
+    }
+    
+    private void addPlugin(List<URL> descrList, List<URL> pluginList, String id)
+        throws MalformedURLException, PluginException {
+        final File f = findPlugin(defaultDir, id);
+        final URL pluginUrl = f.toURL();
+        final URL descrUrl = new URL("jar:" + pluginUrl + "!/plugin.xml");
+
+        if (pluginList.contains(pluginUrl)) {
+            throw new PluginException("can't use the same id(" + id + ") for multiple plugins");
+        }
+
+        descrList.add(descrUrl);
+        pluginList.add(pluginUrl);
     }
 
     private File findPlugin(File dir, final String id) {
@@ -181,8 +181,8 @@ public final class PluginList {
             }
         }
 
-        descrList.addAll(Arrays.asList(inc.descrList));
-        pluginList.addAll(Arrays.asList(inc.pluginList));
+        descrList.addAll(inc.descrList);
+        pluginList.addAll(inc.pluginList);
     }
 
     /**
@@ -193,8 +193,8 @@ public final class PluginList {
      */
     public long lastModified() throws IOException {
         long max = 0;
-        for (int i = 0; i < descrList.length; i++) {
-            final URLConnection conn2 = pluginList[i].openConnection();
+        for (URL url : descrList) {
+            final URLConnection conn2 = url.openConnection();
             max = Math.max(max, conn2.getLastModified());
         }
         for (PluginList inc : includes) {
@@ -209,7 +209,7 @@ public final class PluginList {
      * @return URL[]
      */
     public URL[] getDescriptorUrlList() {
-        return descrList;
+        return descrList.toArray(new URL[descrList.size()]);
     }
 
     /**
@@ -218,7 +218,7 @@ public final class PluginList {
      * @return URL[]
      */
     public URL[] getPluginList() {
-        return pluginList;
+        return pluginList.toArray(new URL[pluginList.size()]);
     }
 
     /**
@@ -243,6 +243,19 @@ public final class PluginList {
             return findPlugin(defaultDir, id).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * Add user plugins to the list
+     * @param userPlugins
+     * @throws MalformedURLException
+     * @throws PluginException
+     */
+    public void processUserPlugins(String userPlugins) throws MalformedURLException, PluginException {
+        for (String pluginId : userPlugins.split(",")) {
+            System.out.println("Adding user plugin " + pluginId);
+            addPlugin(descrList, pluginList, pluginId);
         }
     }
 }
