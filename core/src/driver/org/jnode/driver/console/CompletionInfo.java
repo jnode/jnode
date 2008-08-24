@@ -21,9 +21,7 @@
 
 package org.jnode.driver.console;
 
-import java.util.Collections;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
