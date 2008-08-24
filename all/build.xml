@@ -223,7 +223,8 @@
     <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate">
         <!-- Now assemble all plugins -->
         <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
-        <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
+        <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}"
+        	userApplicationsDir="${user.applications.dir}" userApplicationsProperty="userApplications">
             <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
             <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
             <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
@@ -294,7 +295,8 @@
         <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
         <initjars destdir="${initjars.dir}"
             pluginDir="${plugins.dir}"
-            systemPluginList="${basedir}/conf/system-plugin-list.xml">
+            systemPluginList="${basedir}/conf/system-plugin-list.xml"
+        	userPlugins="${userApplications}">
             <fileset dir="${basedir}/conf">
                 <exclude name="system-plugin-list.xml"/>
                 <include name="*plugin-list.xml"/>

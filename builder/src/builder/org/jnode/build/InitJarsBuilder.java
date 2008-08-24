@@ -42,7 +42,9 @@ public class InitJarsBuilder extends Task {
     private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
     private File pluginDir;
     private File systemPluginListFile;
-
+    
+    private String userPlugins;
+    
     /**
      * Add a fileset to this task.
      *
@@ -72,6 +74,11 @@ public class InitJarsBuilder extends Task {
                 builder.setSystemPluginList(systemPluginListFile);
                 builder.setPluginList(listFile);
                 builder.setDestDir(getDestDir());
+                
+                // FIXME we should put the plugin list ("full-plugin-list.xml") outside
+                if (listFiles[j].equals("full-plugin-list.xml") && (userPlugins != null)) {
+                    builder.setUserPlugins(userPlugins);
+                }
 
                 builder.execute();
             }
@@ -120,5 +127,8 @@ public class InitJarsBuilder extends Task {
     public final void setSystemPluginList(File systemPluginListFile) {
         this.systemPluginListFile = systemPluginListFile;
     }
-
+    
+    public void setUserPlugins(String userPlugins) {
+        this.userPlugins = userPlugins;
+    }
 }

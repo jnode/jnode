@@ -47,6 +47,8 @@ public class InitJarBuilder extends AbstractPluginsTask {
     private File destDir;
 
     private File destFile;
+    
+    private String userPlugins;
 
     public void execute() throws BuildException {
 
@@ -57,6 +59,11 @@ public class InitJarBuilder extends AbstractPluginsTask {
         final long lmPI;
         try {
             piList = getPluginList();
+            
+            if ((userPlugins != null) && !userPlugins.isEmpty()) {
+                piList.processUserPlugins(userPlugins);
+            }
+            
             systemPluginList = getSystemPluginList();
             if ((destFile == null) && (destDir != null)) {
                 destFile = new File(destDir, piList.getName() + ".jgz");
@@ -281,4 +288,8 @@ public class InitJarBuilder extends AbstractPluginsTask {
     public final void setDestDir(File destDir) {
         this.destDir = destDir;
     }
+        
+    public void setUserPlugins(String userPlugins) {
+        this.userPlugins = userPlugins;
+    }    
 }
