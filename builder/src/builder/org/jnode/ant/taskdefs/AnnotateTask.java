@@ -65,6 +65,7 @@ public class AnnotateTask extends FileSetTask {
     private String buildStartTime = "";
     private String pattern = "";
     private long startTime = 0;
+    private String baseDir;
 
     private Properties annotations = new Properties();
 
@@ -76,8 +77,15 @@ public class AnnotateTask extends FileSetTask {
             throw new BuildException("invalid buildStartTime or pattern", e);
         }
 
-        if (readProperties()) {
-            processFiles();
+        try {
+            if (readProperties()) {
+                for(String file : classesFiles){
+                    File classFile = new File(baseDir, file);
+                    processFile(classFile);
+                }
+            }
+        } catch (IOException ioe) {
+            throw new BuildException(ioe);
         }
     }
 
@@ -106,6 +114,10 @@ public class AnnotateTask extends FileSetTask {
      */
     public final void setPattern(String pattern) {
         this.pattern = pattern;
+    }
+
+    public void setBaseDir(String baseDir) {
+        this.baseDir = baseDir;
     }
 
     /**
@@ -191,13 +203,12 @@ public class AnnotateTask extends FileSetTask {
      */
     @Override
     protected void processFile(File classFile) throws IOException {
-        String annotations = getAnnotations(classFile);
-        if (annotations == null) {
+        if (classFile.lastModified() < startTime) {
             return;
         }
-
-        if (classFile.lastModified() < startTime) {
-            System.out.println("Skipping already annotated file " + classFile.getName());
+        
+        String annotations = getAnnotations(classFile);
+        if (annotations == null) {
             return;
         }
 
