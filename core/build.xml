@@ -109,6 +109,14 @@
     <ExpandTest classname="PrimitiveLongTest" type="long"/>
     <ExpandTest classname="PrimitiveFloatTest" type="float"/>
     <ExpandTest classname="PrimitiveDoubleTest" type="double"/>
+
+    <taskdef name="template" classname="org.jnode.ant.taskdefs.TemplateTask" classpathref="cp-jnode"/>
+    <template file="${my-src.dir}/template/org/jnode/vm/VmSystemSettings.java"
+          tofile="${my-gen.dir}/org/jnode/vm/VmSystemSettings.java">
+        <token name="@java.home@" value="${jnode.java.home}"/>
+        <token name="@java.io.tmpdir@" value="${jnode.java.io.tmpdir}"/>
+        <token name="@user.home@" value="${jnode.user.home}"/>
+    </template>
   </target>
 
   <!-- Compile all subproject java files -->

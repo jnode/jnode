@@ -214,6 +214,8 @@
 
     <!-- Call the assemble target of all subprojects -->
     <target name="assemble-projects" depends="prepare">
+        <!-- pre compile tasks needed for compilation -->
+        <ant target="pre-compile" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
         <jnode.antall target="assemble"/>
     </target>
 

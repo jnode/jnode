@@ -324,6 +324,7 @@ public final class VmSystem {
 
         res.put("swing.handleTopLevelPaint", "false");
 
+        VmSystemSettings.insertSystemProperties(res);
     }
 
     /**
