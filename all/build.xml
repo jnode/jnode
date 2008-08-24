@@ -751,17 +751,15 @@ clean             Remove all intermediate build results.
         </target>
 
     <target name="openjdk-annotate" depends="assemble-projects">
-    	<echo message="openjdk-annotate"/>
         <taskdef name="oj-annotate" classname="org.jnode.ant.taskdefs.AnnotateTask" 
         		classpathref="cp-jnode"/>
 
         <oj-annotate annotationFile="${root.dir}/all/conf/openjdk-annotations.properties"
-        			 buildStartTime="${hotswap.class.tstamp}" pattern="${hotswap.class.tstamp.pattern}"
-        			 trace="false" failonerror="true">
-            <fileset dir="${root.dir}/core/build/classes">
-                <patternset includes="**/*.class"/>
-            </fileset>        	
-        </oj-annotate>
+        			 buildStartTime="${hotswap.class.tstamp}"
+                     pattern="${hotswap.class.tstamp.pattern}"
+        			 trace="false"
+                     failonerror="true"
+                     basedir="${root.dir}/core/build/classes"/>
     </target>
 
 	<!-- check that all native methods are properly implemented for JNode -->
