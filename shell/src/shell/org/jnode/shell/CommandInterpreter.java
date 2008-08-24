@@ -64,4 +64,14 @@ public interface CommandInterpreter {
      * @return the name
      */
     String getName();
+
+    /**
+     * Add escape sequences (or quotes) to protect any characters in the
+     * supplied word so that it can (for example) be appended to a partial
+     * command line by the completer.
+     * 
+     * @param word the word to be escaped
+     * @return the word with any necessary escaping or quoting added.
+     */
+    String escapeWord(String word);
 }

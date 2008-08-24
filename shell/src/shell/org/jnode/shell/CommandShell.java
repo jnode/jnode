@@ -613,7 +613,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public CompletionInfo complete(String partial) {
         if (!readingCommand) {
             // dummy completion behavior for application input.
-            return new CompletionInfo();
+            return new CommandCompletions();
         }
 
         // workaround to set the currentShell to this shell
@@ -625,7 +625,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
 
         // do command completion
-        completion = new CompletionInfo();
+        completion = new CommandCompletions(interpreter);
         try {
             Completable cl = parseCommandLine(partial);
             if (cl != null) {

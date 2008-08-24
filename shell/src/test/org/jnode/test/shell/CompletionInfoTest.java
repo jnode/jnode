@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import junit.framework.TestCase;
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.CommandCompletions;
 
 /**
  * Test key methods of the CompletionInfo class.
@@ -33,11 +34,11 @@ import org.jnode.driver.console.CompletionInfo;
 public class CompletionInfoTest extends TestCase {
 
     public void testConstructor() {
-        new CompletionInfo();
+        new CommandCompletions();
     }
 
     public void testAddCompletion() {
-        CompletionInfo ci = new CompletionInfo();
+        CompletionInfo ci = new CommandCompletions();
 
         ci.addCompletion("full-1");
         ci.addCompletion("full-2", false);
@@ -52,7 +53,7 @@ public class CompletionInfoTest extends TestCase {
     }
 
     public void testSetCompletionStart() {
-        CompletionInfo ci = new CompletionInfo();
+        CompletionInfo ci = new CommandCompletions();
         assertEquals(-1, ci.getCompletionStart());
         ci.setCompletionStart(-1);
         assertEquals(-1, ci.getCompletionStart());
@@ -69,7 +70,7 @@ public class CompletionInfoTest extends TestCase {
     }
 
     public void testGetCompletion() {
-        CompletionInfo ci = new CompletionInfo();
+        CompletionInfo ci = new CommandCompletions();
         assertEquals(null, ci.getCompletion());
 
         ci.addCompletion("full-1");

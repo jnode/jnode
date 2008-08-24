@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.CommandCompletions;
 import org.jnode.shell.CommandLine.Token;
 
 /**
@@ -71,7 +72,7 @@ public class URLArgument extends Argument<URL> {
                     (url.getQuery() == null || url.getQuery().length() == 0)) {
                 // Use a FileArgument to do the work of completing the pathname, 
                 // capturing the results using our own CompletionInfo object.
-                CompletionInfo myCompletion = new CompletionInfo();
+                CompletionInfo myCompletion = new CommandCompletions();
                 new FileArgument(null, getFlags()).complete(myCompletion, url.getPath());
                 // Then turn the completions back into "file:" URLs
                 for (String c : myCompletion.getCompletions()) {

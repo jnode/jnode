@@ -128,6 +128,72 @@ public class DefaultInterpreter implements CommandInterpreter {
         res.setArgumentAnticipated(tokenizer.whitespaceAfterLast());
         return res;
     }
+    
+    @Override
+    public String escapeWord(String word) {
+        return escapeWord(word, false);
+    }
+
+    protected String escapeWord(String word, boolean escapeRedirects) {
+        final int len = word.length();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            char ch = word.charAt(i);
+            switch (ch) {
+                case ESCAPE_B:
+                    sb.append(ESCAPE_CHAR).append(B); 
+                    break;
+                case ESCAPE_N:
+                    sb.append(ESCAPE_CHAR).append(N); 
+                    break;
+                case ESCAPE_R:
+                    sb.append(ESCAPE_CHAR).append(R); 
+                    break;
+                case ESCAPE_T:
+                    sb.append(ESCAPE_CHAR).append(T); 
+                    break;
+                case ESCAPE_CHAR:
+                    sb.append(ESCAPE_CHAR).append(ESCAPE_CHAR); 
+                    break;
+                case FULL_ESCAPE_CHAR:
+                    sb.append(ESCAPE_CHAR).append(FULL_ESCAPE_CHAR); 
+                    break;
+                case QUOTE_CHAR:
+                    sb.append(ESCAPE_CHAR).append(QUOTE_CHAR); 
+                    break;
+                case COMMENT_CHAR:
+                    sb.append(ESCAPE_CHAR).append(COMMENT_CHAR); 
+                    break;
+                case SPACE_CHAR:
+                    sb.append(ESCAPE_CHAR).append(SPACE_CHAR); 
+                    break;
+                case PIPE_CHAR:
+                    if (escapeRedirects) {
+                        sb.append(ESCAPE_CHAR).append(PIPE_CHAR); 
+                    } else {
+                        sb.append(PIPE_CHAR);
+                    }
+                    break;
+                case SEND_OUTPUT_TO_CHAR:
+                    if (escapeRedirects) {
+                        sb.append(ESCAPE_CHAR).append(SEND_OUTPUT_TO_CHAR); 
+                    } else {
+                        sb.append(SEND_OUTPUT_TO_CHAR);
+                    }
+                    break;
+                case GET_INPUT_FROM_CHAR:
+                    if (escapeRedirects) {
+                        sb.append(ESCAPE_CHAR).append(GET_INPUT_FROM_CHAR); 
+                    } else {
+                        sb.append(GET_INPUT_FROM_CHAR);
+                    }
+                    break;
+                default:
+                    sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * A simple command line tokenizer for the 'built-in' interpreters. It

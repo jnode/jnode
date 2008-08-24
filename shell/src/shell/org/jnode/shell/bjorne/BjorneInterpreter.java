@@ -132,6 +132,12 @@ public class BjorneInterpreter implements CommandInterpreter {
         // TODO Auto-generated method stub
         return null;
     }
+    
+    @Override
+    public String escapeWord(String word) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     int interpret(CommandShell shell, String command, OutputStream capture, boolean source) 
         throws ShellException {

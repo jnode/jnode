@@ -81,6 +81,11 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
         return parse(tokenizer, commands, true);
     }
+    
+    @Override
+    public String escapeWord(String word) {
+        return escapeWord(word, true);
+    }
 
     /**
      * This method parses the shell input into command lines.  If we are completing,

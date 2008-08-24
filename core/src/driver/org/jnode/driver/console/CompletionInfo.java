@@ -29,13 +29,7 @@ import java.util.TreeSet;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author crawley@jnode.org
  */
-public class CompletionInfo {
-    private static final SortedSet<String> NO_COMPLETIONS =
-        Collections.unmodifiableSortedSet(new TreeSet<String>());
-
-    private TreeSet<String> completions;
-
-    private int completionStart = -1;
+public interface CompletionInfo {
 
     /**
      * This method is called to register a possible completion. A null or empty
@@ -45,18 +39,7 @@ public class CompletionInfo {
      * @param partial    if <code>true</code>, further completions of the
      *                   completion string may be possible.
      */
-    public void addCompletion(String completion, boolean partial) {
-        if (completion == null || completion.length() == 0) {
-            return;
-        }
-        if (completions == null) {
-            completions = new TreeSet<String>();
-        }
-        if (!partial) {
-            completion += ' ';
-        }
-        completions.add(completion);
-    }
+    public void addCompletion(String completion, boolean partial);
 
     /**
      * This method is called to register a completion than cannot be completed
@@ -64,43 +47,14 @@ public class CompletionInfo {
      *
      * @param completion the completion string
      */
-    public void addCompletion(String completion) {
-        addCompletion(completion, false);
-    }
+    public void addCompletion(String completion);
 
     /**
      * Retrieve the completion details.
      *
      * @return a TreeSet consisting of all possible completions
      */
-    public SortedSet<String> getCompletions() {
-        return completions == null ? NO_COMPLETIONS : completions;
-    }
-
-    /**
-     * Render for debug purposes
-     */
-    public String toString() {
-        StringBuilder sb = new StringBuilder("CompletionInfo{");
-        sb.append("competionStart=").append(completionStart);
-        sb.append(",completions=");
-        if (completions == null) {
-            sb.append("null");
-        } else {
-            sb.append("{");
-            boolean first = true;
-            for (String completion : completions) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(",");
-                }
-                sb.append(completion);
-            }
-            sb.append("]");
-        }
-        return sb.toString();
-    }
+    public SortedSet<String> getCompletions();
 
     /**
      * The completion start is the offset in the original string of the first
@@ -108,9 +62,7 @@ public class CompletionInfo {
      *
      * @return the completion start position, or <code>-1</code>
      */
-    public int getCompletionStart() {
-        return completionStart;
-    }
+    public int getCompletionStart();
 
     /**
      * Set the completion start position. This can only be set once. After that,
@@ -118,15 +70,7 @@ public class CompletionInfo {
      *
      * @param completionStart
      */
-    public void setCompletionStart(int completionStart) {
-        if (this.completionStart != completionStart) {
-            if (this.completionStart != -1) {
-                throw new IllegalArgumentException(
-                    "completionStart cannot be changed");
-            }
-            this.completionStart = completionStart;
-        }
-    }
+    public void setCompletionStart(int completionStart);
 
     /**
      * Get the combined completion string. If there are multiple alternatives,
@@ -136,31 +80,5 @@ public class CompletionInfo {
      *
      * @return the combined completion, or <code>null</code>.
      */
-    public String getCompletion() {
-        if (completions == null) {
-            return null;
-        }
-        int nos = completions.size();
-        if (nos == 0) {
-            return null;
-        }
-        if (nos == 1) {
-            return completions.first();
-        }
-        String common = completions.first();
-        for (String completion : completions) {
-            if (common != completion && !completion.startsWith(common)) {
-                for (int i = 0; i < common.length(); i++) {
-                    if (common.charAt(i) != completion.charAt(i)) {
-                        if (i == 0) {
-                            return null;
-                        }
-                        common = common.substring(0, i);
-                        break;
-                    }
-                }
-            }
-        }
-        return common;
-    }
+    public String getCompletion();
 }
