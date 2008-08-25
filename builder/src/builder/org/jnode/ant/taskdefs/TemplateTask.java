@@ -120,17 +120,15 @@ public class TemplateTask extends Task {
     }
 
     public Token createToken() {
-        return new Token();
-    }
-
-    public void addToken(Token t) {
-        tokens.add(t);
+        Token token = new Token();
+        tokens.add(token);
+        return token;
     }
 
     public static class Token {
         String name;
         String value;
-
+        
         public String getName() {
             return name;
         }
