@@ -4,10 +4,11 @@
 package org.jnode.fs.jfat;
 
 import java.util.Iterator;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FatTable {
-    private final Hashtable<FatKey, FatEntry> table = new Hashtable<FatKey, FatEntry>();
+    private final Map<FatKey, FatEntry> table = new HashMap<FatKey, FatEntry>();
 
     public FatTable() {
     }

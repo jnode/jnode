@@ -129,7 +129,7 @@ public class FatDirectory extends FatEntry implements FSDirectory {
             f.createNextEntry();
     }
 
-    public FSEntry getEntry(String name) {
+    public synchronized FSEntry getEntry(String name) {
         FatEntry child = children.get(name);
 
         if (child == null) {
@@ -197,7 +197,7 @@ public class FatDirectory extends FatEntry implements FSDirectory {
         return true;
     }
 
-    public FSEntry addFile(String name) throws IOException {
+    public synchronized FSEntry addFile(String name) throws IOException {
         FatName fatName = new FatName(this, name);
         if (collide(fatName.getLongName()))
             throw new IOException("File [" + fatName.getLongName() + "] already exists");
@@ -208,7 +208,7 @@ public class FatDirectory extends FatEntry implements FSDirectory {
         return children.put(file);
     }
 
-    public FSEntry addDirectory(String name) throws IOException {
+    public synchronized FSEntry addDirectory(String name) throws IOException {
         FatFileSystem fs = getFatFileSystem();
         FatName fatName = new FatName(this, name);
         if (collide(fatName.getLongName()))
@@ -221,7 +221,7 @@ public class FatDirectory extends FatEntry implements FSDirectory {
         return children.put(dir);
     }
 
-    public void remove(String name) throws IOException {
+    public synchronized void remove(String name) throws IOException {
         FatEntry entry = (FatEntry) getEntry(name);
         if (entry == null)
             throw new FileNotFoundException(name);
