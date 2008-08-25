@@ -108,6 +108,9 @@ final class NetConfigurationData {
         if ((cfg == null) && isAutoConfigureUsingDhcp()) {
             return new NetDhcpConfig();
         } else {
+            if (cfg != null) {
+                cfg.load(devConfigsPrefs.node(device.getId()));
+            }
             return cfg;
         }
     }    
