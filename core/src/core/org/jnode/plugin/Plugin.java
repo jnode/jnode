@@ -78,15 +78,15 @@ public abstract class Plugin {
     public final Preferences getPreferences() {
         if (pluginPrefs == null) {
             final Preferences root;
-            root = (Preferences) AccessController
-                .doPrivileged(new PrivilegedAction() {
-                    public Object run() {
+            root = AccessController
+                .doPrivileged(new PrivilegedAction<Preferences>() {
+                    public Preferences run() {
                         return Preferences.systemRoot();
                     }
                 });
             pluginPrefs = root.node("plugins");
         }
-        return pluginPrefs.node(getDescriptor().getId());
+        return pluginPrefs.node(getDescriptor().getId().replace('.', '-'));
     }
 
     /**
