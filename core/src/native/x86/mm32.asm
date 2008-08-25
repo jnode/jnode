@@ -29,6 +29,14 @@ free_mem_start	dd 0	; Start address of free memory heap
 ; ---------------------------
 
 Lsetup_mm:
+;-- heap limitation code starts here
+;Limit heap to the memory region under 2G that JNode can handle
+;TODO remove this limitation when large heaps (> 2G) are supported
+	cmp ebx,0x7fffffff
+	jna Lmem_size_ok
+	mov ebx,0x7fffffff
+Lmem_size_ok:
+;-- heap limitation code ends here
 	mov [mem_size],ebx
 	mov eax,rmc_memstart
 	; Page align
