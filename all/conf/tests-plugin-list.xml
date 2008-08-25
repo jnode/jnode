@@ -3,6 +3,7 @@
 <plugin-list name="tests">
     <manifest>
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+            <attribute key="Main-Class-Arg" value="boot"/>
     </manifest>
 
   <include file="full-plugin-list.xml"/>

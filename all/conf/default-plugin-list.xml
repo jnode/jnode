@@ -7,6 +7,7 @@ The default list of (non-system) plugins to be included in the init-jar.
 <plugin-list name="default">
     <manifest>
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+        <attribute key="Main-Class-Arg" value="boot"/>
     </manifest>
 
     <plugin id="org.jnode.work"/>
