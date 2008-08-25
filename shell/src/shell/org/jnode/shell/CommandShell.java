@@ -78,7 +78,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static final String HISTORY_PROPERTY_NAME = "jnode.history";
     public static final String HISTORY_DEFAULT = "true";
 
-    public static final String HOME_PROPERTY_NAME = "user.home";
+    public static final String USER_HOME_PROPERTY_NAME = "user.home";
+    public static final String JAVA_HOME_PROPERTY_NAME = "java.home";
     public static final String DIRECTORY_PROPERTY_NAME = "user.dir";
 
     public static final String INITIAL_INVOKER = "proclet";
@@ -161,6 +162,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private Thread ownThread;
 
+    private boolean bootShell;
+
     public TextConsole getConsole() {
         return console;
     }
@@ -168,6 +171,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static void main(String[] args) 
         throws NameNotFoundException, ShellException {
         CommandShell shell = new CommandShell();
+        for (String arg : args) {
+            if ("boot".equals(arg)) {
+                shell.bootShell = true;
+                break;
+            }
+        }
         shell.run();
     }
 
@@ -274,18 +283,34 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
         }
 
-        final String user_home = System.getProperty(HOME_PROPERTY_NAME, "");
+        if (bootShell) {
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run() {
+                    final String java_home = System.getProperty(JAVA_HOME_PROPERTY_NAME, "");
+                    final File jnode_ini = new File(java_home + "/jnode.ini");
+                    try {
+                        if (jnode_ini.exists()) {
+                            runCommandFile(jnode_ini);
+                        }
+                    } catch (IOException ex) {
+                        errPs.println("Error while reading " + jnode_ini + ": " + ex.getMessage());
+                        stackTrace(ex);
+                    }
+                    return null;
+                }
+            });
+        }
 
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
+                final String user_home = System.getProperty(USER_HOME_PROPERTY_NAME, "");
                 final File shell_ini = new File(user_home + "/shell.ini");
                 try {
                     if (shell_ini.exists()) {
                         runCommandFile(shell_ini);
                     }
                 } catch (IOException ex) {
-                    errPs.println("Error while reading " + shell_ini + ": "
-                            + ex.getMessage());
+                    errPs.println("Error while reading " + shell_ini + ": " + ex.getMessage());
                     stackTrace(ex);
                 }
                 return null;
