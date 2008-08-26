@@ -132,7 +132,7 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
         }
         registered = true;
         conMan.registerConsole(console);
-        System.out.println("Registering charva Toolkit with consoleManager.");
+        //System.out.println("Registering charva Toolkit with consoleManager.");
         //        pause();
         conMan.focus(console);
 
