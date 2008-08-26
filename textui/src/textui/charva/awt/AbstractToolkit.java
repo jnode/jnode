@@ -660,7 +660,8 @@ public abstract class AbstractToolkit
             {
 //                throw new RuntimeException(
 //                        "trying to remove window not in windowlist");
-                System.err.println( "Trying to remove window not in list" );
+                //todo why does it happen this case?
+//                System.err.println( "Trying to remove window not in list" );
             }
 //                throw new RuntimeException(
 //                        "trying to remove window not in windowlist");
