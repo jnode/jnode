@@ -77,12 +77,12 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
         // TODO -> extended FSEntry maybe have to be flushed
     }
 
-    public FSEntry addDirectory(String name) {
-        return null;
+    public FSEntry addDirectory(String name) throws IOException {
+        throw new ReadOnlyFileSystemException();
     }
 
-    public FSEntry addFile(String name) {
-        return null;
+    public FSEntry addFile(String name) throws IOException {
+        throw new ReadOnlyFileSystemException();
     }
 
     public Iterator<FSEntry> iterator() {
@@ -90,7 +90,7 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     }
 
     public void remove(String name) throws IOException {
-        throw new ReadOnlyFileSystemException("you can not remove from JNIFS..");
+        throw new ReadOnlyFileSystemException();
     }
 
     public boolean isValid() {

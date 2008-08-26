@@ -21,12 +21,7 @@
 
 package org.jnode.fs.jifs;
 
-import java.io.IOException;
-
 import org.jnode.driver.Device;
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.jifs.directories.JIFSDrootDir;
@@ -61,11 +56,12 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
      * Is the filesystem mounted in readonly mode ?
      */
     public boolean isReadOnly() {
-        return true; // always readOnly
+        // always readOnly
+        return true;
     }
 
     public void close() {
-        return;
+        //nothing to do
     }
 
     public boolean isClosed() {
@@ -74,16 +70,6 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
 
     public Device getDevice() {
         return device;
-    }
-
-    /**
-     * Flush all changed structures to the device. Since JIFS is readonly, this
-     * method does nothing.
-     * 
-     * @throws IOException
-     */
-    public void flush() throws IOException {
-        return;
     }
 
     /**
@@ -96,41 +82,15 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
         return rootDir;
     }
 
-    /**
-     * Gets the file for the given entry.
-     * 
-     * @return null
-     * @param entry
-     */
-    public synchronized JIFSFile getFile(FSEntry entry) {
-        return null;
-    }
-
-    protected FSFile createFile(FSEntry entry) throws IOException {
-        return null;
-    }
-
-    protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-        return null;
-    }
-
-    protected FSEntry createRootEntry() throws IOException {
-        return null;
-    }
-
     public long getFreeSpace() {
-        // TODO implement me
         return -1;
     }
 
     public long getTotalSpace() {
-        // TODO implement me
         return -1;
     }
 
     public long getUsableSpace() {
-        // TODO implement me
         return -1;
     }
-
 }

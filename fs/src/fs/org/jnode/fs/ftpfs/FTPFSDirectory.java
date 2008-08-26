@@ -22,6 +22,7 @@
 package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.ReadOnlyFileSystemException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -100,8 +101,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public FTPFSEntry addDirectory(String name) throws IOException {
-        // TODO implement this
-        return null;
+        throw new ReadOnlyFileSystemException();
     }
 
     /**
@@ -111,8 +111,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public FTPFSEntry addFile(String name) throws IOException {
-        // TODO implement this
-        return null;
+        throw new ReadOnlyFileSystemException();
     }
 
     /**
@@ -121,7 +120,7 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public void flush() throws IOException {
-        // TODO implement me
+        //nothing to do
     }
 
     /**
@@ -131,6 +130,6 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
      * @throws java.io.IOException
      */
     public void remove(String name) throws IOException {
-        // TODO implement this
+        throw new ReadOnlyFileSystemException();
     }
 }
