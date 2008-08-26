@@ -269,13 +269,15 @@ public final class VmSystem {
         // Standard Java properties
         res.put("file.separator", "/");
         res.put("java.awt.graphicsenv", "org.jnode.awt.JNodeGraphicsEnvironment");
-        res.put("java.awt.printerjob", "");
-        res.put("java.class.path", "");
+        //todo
+//        res.put("java.awt.printerjob", "");
+        //todo
+        res.put("java.class.path", ":");
         res.put("java.class.version", "50.0");
         res.put("java.compiler", "Internal"); //todo is this needed?
         res.put("java.endorsed.dirs", "/jifs/lib/");
         res.put("java.ext.dirs", "/jifs/lib/");
-        res.put("java.home", "/jnode/");
+        res.put("java.home", "/jnode");
         res.put("java.io.tmpdir", "/jnode/tmp");
         res.put("java.library.path", "/jnode/tmp"); //dummy value but needed by Runtime.loadLibrary
         res.put("java.runtime.name", "JNode");
@@ -287,7 +289,7 @@ public final class VmSystem {
         res.put("java.vendor.url", "http://jnode.org");
         res.put("java.vendor.url.bug", "http://jnode.org");
         res.put("java.version", "1.6");
-        res.put("java.vm.info", "");
+        res.put("java.vm.info", "JNode");
         res.put("java.vm.name", "JNode");
         res.put("java.vm.specification.name", "Java Virtual Machine Specification");
         res.put("java.vm.specification.vendor", "Sun Microsystems Inc.");
@@ -299,12 +301,14 @@ public final class VmSystem {
         res.put("os.name", "JNode");
         res.put("os.version", vm.getVersion());
         res.put("path.separator", ":");
-        res.put("user.country", "");
+        //todo
+//        res.put("user.country", "");
         res.put("user.dir", "/");
         res.put("user.home", "/jnode/home");
-        res.put("user.language", "");
-        res.put("user.name", "System");
-        res.put("user.timezone", "");
+        res.put("user.language", "en");
+        res.put("user.name", "admin");
+        //todo
+//        res.put("user.timezone", "");
 
         // GNU properties
         res.put("gnu.cpu.endian", (arch.getByteOrder() == ByteOrder.BIG_ENDIAN) ? "big" : "little");
