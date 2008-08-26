@@ -89,7 +89,10 @@ public abstract class AbstractPcBufferTextScreen extends AbstractPcTextScreen {
     public void set(int offset, char ch, int count, int color) {
         final char v = (char) ((ch & 0xFF) | ((color & 0xFF) << 8));
         count = Math.min(count, buffer.length - offset);
-        Arrays.fill(buffer, offset, offset + count, v);
+        //todo apparently count is negative sometimes, investigate it
+        for (int i = 0; i < count; i++) {
+            buffer[offset + i] = v;
+        }
     }
 
     /**
