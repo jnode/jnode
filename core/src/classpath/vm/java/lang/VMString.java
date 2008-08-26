@@ -23,6 +23,7 @@ package java.lang;
 
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
+import org.jnode.vm.annotation.SharedStatics;
 
 /*
  * This class is a reference version, mainly for compiling a class library jar.
@@ -35,6 +36,7 @@ import java.util.WeakHashMap;
  * 
  * @author Dave Grove <groved@us.ibm.com>
  */
+@SharedStatics
 final class VMString {
 
     /**
