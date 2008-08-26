@@ -203,6 +203,7 @@ public class PluginTask extends AbstractPluginTask {
     
     private void buildDescriptor(File userJar, File descriptorFile, String pluginId, String alias) {
         PrintStream out = null;
+        boolean success = false;
         try {
             out = new PrintStream(descriptorFile);
             
@@ -241,11 +242,17 @@ public class PluginTask extends AbstractPluginTask {
             out.println("  </extension>");
             
             out.println("</plugin>");
+            success = true;
         } catch (IOException ioe) {
             throw new BuildException(ioe);
         } finally {
             if (out != null) {
                 out.close();
+            }
+            
+            if (!success) {
+                // in case of failure, remove the incomplete descriptor file
+                descriptorFile.delete();
             }
         }
     }
@@ -258,10 +265,20 @@ public class PluginTask extends AbstractPluginTask {
             jarFile = new JarFile(userJar);
             
             // try to find the main class from the manifest
-            Object value = jarFile.getManifest().getMainAttributes().get(Attributes.Name.MAIN_CLASS);
-            if (value == null) {
-                String name = Attributes.Name.MAIN_CLASS.toString();
-                value = jarFile.getManifest().getAttributes(name).get(Attributes.Name.MAIN_CLASS);
+            Object value = null;
+            
+            // do we have a manifest ?
+            if (jarFile.getManifest() != null) {
+                value = jarFile.getManifest().getMainAttributes().get(Attributes.Name.MAIN_CLASS);
+                if (value == null) {
+                    String name = Attributes.Name.MAIN_CLASS.toString();
+                    final Attributes attr = jarFile.getManifest().getAttributes(name);
+                    
+                    // we have a manifest but do we have a main class defined inside ?
+                    if (attr != null) {
+                        value = attr.get(Attributes.Name.MAIN_CLASS);
+                    }
+                }
             }
             
             if (value != null) {
