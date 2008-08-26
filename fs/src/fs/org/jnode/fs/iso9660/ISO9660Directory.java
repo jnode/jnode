@@ -27,6 +27,7 @@ import java.util.Iterator;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.util.LittleEndian;
 
 /**
@@ -93,21 +94,21 @@ public final class ISO9660Directory implements FSDirectory {
      * @see org.jnode.fs.FSDirectory#addFile(java.lang.String)
      */
     public FSEntry addFile(String name) throws IOException {
-        throw new UnsupportedOperationException("Not yet implemented");
+        throw new ReadOnlyFileSystemException();
     }
 
     /**
      * @see org.jnode.fs.FSDirectory#addDirectory(java.lang.String)
      */
     public FSEntry addDirectory(String name) throws IOException {
-        throw new UnsupportedOperationException("Not yet implemented");
+        throw new ReadOnlyFileSystemException();
     }
 
     /**
      * @see org.jnode.fs.FSDirectory#remove(java.lang.String)
      */
     public void remove(String name) throws IOException {
-        throw new UnsupportedOperationException("Not yet implemented");
+        throw new ReadOnlyFileSystemException();
     }
 
     /**

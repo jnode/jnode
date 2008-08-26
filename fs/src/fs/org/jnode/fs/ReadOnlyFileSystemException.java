@@ -29,7 +29,10 @@ import java.io.IOException;
  * New exception allowing to handle cases where a FileSystem is mounted readOnly
  */
 public class ReadOnlyFileSystemException extends IOException {
-    
+
+    public ReadOnlyFileSystemException() {
+        super("read-only file system");
+    }
     /**
      * @param message
      * @param cause

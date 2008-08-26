@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
@@ -31,14 +32,16 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 
     @Override
     protected final FSEntry createDirectoryEntry(final String name) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ReadOnlyFileSystemException();
     }
 
     @Override
     protected final FSEntry createFileEntry(final String name) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ReadOnlyFileSystemException();
+    }
+
+    public synchronized void remove(String name) throws IOException {
+        throw new ReadOnlyFileSystemException();
     }
 
     @Override

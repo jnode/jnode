@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
  * @author vali
@@ -75,25 +76,22 @@ public class NTFSDirectory implements FSDirectory {
     /**
      * 
      */
-    public FSEntry addFile(String name) {
-        // TODO Auto-generated method stub
-        return null;
+    public FSEntry addFile(String name) throws IOException {
+        throw new ReadOnlyFileSystemException();
     }
 
     /**
      * 
      */
-    public FSEntry addDirectory(String name) {
-        // TODO Auto-generated method stub
-        return null;
+    public FSEntry addDirectory(String name) throws IOException {
+        throw new ReadOnlyFileSystemException();
     }
 
     /**
      * Remove the entry with the given name from this directory.
      */
-    public void remove(String name) {
-        // TODO Auto-generated method stub
-
+    public void remove(String name) throws IOException {
+        throw new ReadOnlyFileSystemException();
     }
 
     /**

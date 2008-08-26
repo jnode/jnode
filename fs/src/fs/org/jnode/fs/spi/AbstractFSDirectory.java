@@ -143,7 +143,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject implements FS
      * @param name
      * @throws IOException
      */
-    public final synchronized void remove(String name) throws IOException {
+    public synchronized void remove(String name) throws IOException {
         if (!canWrite())
             throw new IOException("Filesystem or directory is mounted read-only!");
         if (entries.remove(name) >= 0) {
