@@ -38,6 +38,7 @@
         <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
         <alias name="tcpinout" class="org.jnode.net.command.TcpInoutCommand"/>
         <alias name="rpcinfo" class="org.jnode.net.command.RpcInfoCommand"/>
+		<alias name="wget" class="org.jnode.net.command.WgetCommand"/>
     </extension>
     
     <extension point="org.jnode.shell.syntaxes">
@@ -117,6 +118,11 @@
           <argument argLabel="value"/>
         </sequence>
       </syntax>
+	  <syntax alias="wget">
+        <sequence description="Download locally content describe by an URL.">
+          <argument argLabel="url"/>
+        </sequence>
+      </syntax>
     </extension>
   
     <extension point="org.jnode.security.permissions">
@@ -124,11 +130,13 @@
 		<permission class="java.net.SocketPermission" name="*:1024-" actions="listen,accept"/>
         <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
         <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen,connect"/>
+        <permission class="java.net.SocketPermission" name="*:8080" actions="resolve,listen,connect"/>
         <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
         <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
         <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
         <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
         <permission class="org.jnode.net.NetPermission" name="dhcpClient"/>
+        <permission class="org.jnode.net.NetPermission" name="wget"/>
         <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     </extension>
 </plugin>
