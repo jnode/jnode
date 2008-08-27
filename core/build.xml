@@ -117,6 +117,10 @@
         <token name="@java.io.tmpdir@" value="${jnode.java.io.tmpdir}"/>
         <token name="@user.home@" value="${jnode.user.home}"/>
     </template>
+    <template file="${my-src.dir}/template/org/jnode/security/JNodeSecurityManagerSettings.java"
+          tofile="${my-gen.dir}/org/jnode/security/JNodeSecurityManagerSettings.java">
+        <token name="@jnode.security.enabled@" value="${jnode.security.enabled}"/>
+    </template>
   </target>
 
   <!-- Compile all subproject java files -->

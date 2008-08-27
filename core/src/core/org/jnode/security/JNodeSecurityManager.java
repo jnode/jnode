@@ -36,12 +36,13 @@ public final class JNodeSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPermission(Permission perm) {
+        JNodeSecurityManagerSettings.checkPermission(perm, this);
+    }
 
+    void defaultCheckPermission(Permission perm) {
         if (perm.implies(SET_SECURITY_MANAGER)) {
             throw new SecurityException("Cannot override security manager");
         }
         super.checkPermission(perm);
-
     }
-
 }

@@ -97,3 +97,9 @@ jnode.debugger.port=6789
 jnode.java.home=/jnode
 jnode.java.io.tmpdir=/jnode/tmp
 jnode.user.home=/jnode/home
+
+# -----------------------------------------------
+# Enable or disable security under JNode
+# -----------------------------------------------
+
+#jnode.security.enabled=true
