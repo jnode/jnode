@@ -51,7 +51,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
      * @throws PluginException
      * @throws MalformedURLException
      */
-    protected PluginList getPluginList() throws PluginException,
+    public PluginList getPluginList() throws PluginException,
         MalformedURLException {
         if (pluginList == null) {
             pluginList = new PluginList(pluginListFile, pluginDir, targetArch);

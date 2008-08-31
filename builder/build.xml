@@ -26,6 +26,10 @@
     <mkdir dir="${my-classes.dir}"/>
     <mkdir dir="${jnasm-preprocessor-gen.dir}"/>
     <mkdir dir="${jnasm-assembler-gen.dir}"/>
+  	
+    <copy todir="${my-classes.dir}">
+      <fileset dir="${my-src.dir}/builder" includes="**/*.properties"/>
+    </copy>  	
   </target>
 
   <!-- Compile the Template ANT task needed for compiling the core -->

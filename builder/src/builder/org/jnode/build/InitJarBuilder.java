@@ -29,11 +29,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.GZip;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.types.FileSet;
+import org.jnode.build.packager.PluginListInsertor;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
@@ -48,7 +50,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
 
     private File destFile;
     
-    private String userPlugins;
+    private PluginListInsertor insertor;
 
     public void execute() throws BuildException {
 
@@ -59,11 +61,11 @@ public class InitJarBuilder extends AbstractPluginsTask {
         final long lmPI;
         try {
             piList = getPluginList();
-            
-            if ((userPlugins != null) && !userPlugins.isEmpty()) {
-                piList.processUserPlugins(userPlugins);
+
+            if (insertor != null) {
+                insertor.insertInto(piList);
             }
-            
+
             systemPluginList = getSystemPluginList();
             if ((destFile == null) && (destDir != null)) {
                 destFile = new File(destDir, piList.getName() + ".jgz");
@@ -289,7 +291,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
         this.destDir = destDir;
     }
         
-    public void setUserPlugins(String userPlugins) {
-        this.userPlugins = userPlugins;
+    public void setPackager(PluginListInsertor insertor) {
+        this.insertor = insertor;        
     }    
 }
