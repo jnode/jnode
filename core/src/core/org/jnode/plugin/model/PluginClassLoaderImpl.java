@@ -22,6 +22,7 @@
 package org.jnode.plugin.model;
 
 import gnu.java.security.action.GetPolicyAction;
+
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
@@ -30,11 +31,13 @@ import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -112,6 +115,15 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
         return classNames;
     }
 
+    /**
+     * Gets the names of the resources contained in this plugin.
+     *
+     * @return the set of contained resources
+     */
+    public Collection<String> getResources() {
+        return jar.resourceNames();
+    }
+    
     /**
      * Finds the specified class. This method should be overridden by class
      * loader implementations that follow the new delegation model for loading

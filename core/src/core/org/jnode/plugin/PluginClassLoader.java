@@ -21,6 +21,7 @@
 
 package org.jnode.plugin;
 
+import java.util.Collection;
 import java.util.Set;
 import org.jnode.vm.classmgr.VmClassLoader;
 
@@ -61,6 +62,13 @@ public abstract class PluginClassLoader extends ClassLoader {
      */
     public abstract Set<String> getClassNames();
 
+    /**
+     * Gets the names of the resources contained in this plugin.
+     *
+     * @return the set of contained resources
+     */
+    public abstract Collection<String> getResources();
+    
     public String toString() {
         return getClass().getName() + "(" + getDeclaringPluginDescriptor().getId() + ")";
     }
