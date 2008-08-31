@@ -10,7 +10,6 @@ The default list of (non-system) plugins to be included in the init-jar.
         <attribute key="Main-Class-Arg" value="boot"/>
     </manifest>
 
-    <plugin id="org.jnode.work"/>
     <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.block"/>
     <plugin id="org.jnode.partitions"/>

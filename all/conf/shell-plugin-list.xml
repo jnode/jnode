@@ -4,7 +4,6 @@
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
     </manifest>
 
-    <plugin id="org.jnode.work"/>
     <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.block"/>
     <plugin id="org.jnode.partitions"/>
