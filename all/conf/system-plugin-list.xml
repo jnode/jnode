@@ -16,7 +16,7 @@ These (system) plugins are always included in the init-jar.
     <plugin id="org.jnode.util"/>
     <plugin id="org.jnode.vm"/>
     <plugin id="org.jnode.vm.core"/>
-
+    <plugin id="org.jnode.work"/>
 
             
     <!--
