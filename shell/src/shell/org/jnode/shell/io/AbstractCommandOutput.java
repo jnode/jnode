@@ -1,18 +1,12 @@
 package org.jnode.shell.io;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
-// FIXME implement our own one ...
-import org.apache.tools.ant.util.ReaderInputStream;
 
 public abstract class AbstractCommandOutput implements CommandOutput {
-    
     private Writer writer;
     private OutputStream outputStream;
 
@@ -24,7 +18,8 @@ public abstract class AbstractCommandOutput implements CommandOutput {
     @Override
     public synchronized OutputStream getOutputStream() {
         if (outputStream == null) {
-            outputStream = new WriterOutputStream(writer, getEncoding());
+            //FIXME : WriterOutputStream class is unknown
+            //outputStream = new WriterOutputStream(writer, getEncoding());
         }
         return outputStream;
     }
@@ -56,5 +51,4 @@ public abstract class AbstractCommandOutput implements CommandOutput {
         // TODO Auto-generated method stub
         return false;
     }
-
 }
