@@ -104,6 +104,10 @@ public final class PluginList {
         }
     }
     
+    public void addPlugin(String id) throws MalformedURLException, PluginException {
+        addPlugin(descrList, pluginList, id);
+    }
+    
     private void addPlugin(List<URL> descrList, List<URL> pluginList, String id)
         throws MalformedURLException, PluginException {
         final File f = findPlugin(defaultDir, id);
@@ -243,19 +247,6 @@ public final class PluginList {
             return findPlugin(defaultDir, id).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
-        }
-    }
-    
-    /**
-     * Add user plugins to the list
-     * @param userPlugins
-     * @throws MalformedURLException
-     * @throws PluginException
-     */
-    public void processUserPlugins(String userPlugins) throws MalformedURLException, PluginException {
-        for (String pluginId : userPlugins.split(",")) {
-            System.out.println("Adding user plugin " + pluginId);
-            addPlugin(descrList, pluginList, pluginId);
         }
     }
 }

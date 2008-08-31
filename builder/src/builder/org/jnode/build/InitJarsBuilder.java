@@ -23,10 +23,12 @@ package org.jnode.build;
 
 import java.io.File;
 import java.util.ArrayList;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
+import org.jnode.build.packager.PluginListInsertor;
 
 /**
  * Task used to build several initjars.
@@ -43,7 +45,7 @@ public class InitJarsBuilder extends Task {
     private File pluginDir;
     private File systemPluginListFile;
     
-    private String userPlugins;
+    private PluginListInsertor insertor;
     
     /**
      * Add a fileset to this task.
@@ -75,9 +77,8 @@ public class InitJarsBuilder extends Task {
                 builder.setPluginList(listFile);
                 builder.setDestDir(getDestDir());
                 
-                // FIXME we should put the plugin list ("full-plugin-list.xml") outside
-                if (listFiles[j].equals("full-plugin-list.xml") && (userPlugins != null)) {
-                    builder.setUserPlugins(userPlugins);
+                if (insertor != null) {
+                    builder.setPackager(insertor);
                 }
 
                 builder.execute();
@@ -128,7 +129,9 @@ public class InitJarsBuilder extends Task {
         this.systemPluginListFile = systemPluginListFile;
     }
     
-    public void setUserPlugins(String userPlugins) {
-        this.userPlugins = userPlugins;
+    public PluginListInsertor createInsert() {
+        insertor = new PluginListInsertor();
+        insertor.setProject(getProject());
+        return insertor;
     }
 }
