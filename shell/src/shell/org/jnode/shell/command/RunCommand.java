@@ -52,6 +52,7 @@ public class RunCommand extends AbstractCommand {
         new RunCommand().execute(args);
     }
 
+	@Override
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
         final File file = ARG_FILE.getValue();
@@ -60,12 +61,12 @@ public class RunCommand extends AbstractCommand {
         try {
             shell = ShellUtils.getShellManager().getCurrentShell();
         } catch (NameNotFoundException e) {
-            e.printStackTrace();
+            e.printStackTrace(err);
             exit(2);
         }
 
         if (shell == null) {
-            System.err.println("Shell is null.");
+            err.println("Shell is null.");
             exit(2);
         }
 

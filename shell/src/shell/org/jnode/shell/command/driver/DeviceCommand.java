@@ -99,9 +99,9 @@ public class DeviceCommand extends AbstractCommand {
                     break;
             }
         } else if (ARG_DEVICE.isSet()) {
-            showDevice(System.out, ARG_DEVICE.getValue());
+            showDevice(out, ARG_DEVICE.getValue());
         } else {
-            showDevices(System.out);
+            showDevices(out);
         } 
     }
 
