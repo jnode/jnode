@@ -36,6 +36,7 @@ import org.jnode.shell.CommandLine;
  */
 
 public class NanoHTTPDCommand extends AbstractCommand {
+    @Override
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
         File file = new File("/jnode/index.htm");  // ram disk is fat, so no long extension, I guess
 
@@ -58,20 +59,14 @@ public class NanoHTTPDCommand extends AbstractCommand {
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace(err);
             }
         }
 
     }
 
 
-    public static void main(String[] args) {
-        NanoHTTPDCommand nanoHTTPDCommand = new NanoHTTPDCommand();
-
-        try {
-            nanoHTTPDCommand.execute(null, System.in, System.out, System.err);
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+    public static void main(String[] args) throws Exception {
+        new NanoHTTPDCommand().execute(args);
     }
 }

@@ -82,7 +82,7 @@ public class ConsoleCommand extends AbstractCommand {
         boolean test = FLAG_TEST.isSet();
 
         if (listConsoles) {
-            conMgr.printConsoles(System.out);
+            conMgr.printConsoles(out);
         } else if (newConsole) {
             if (isolateNewConsole) {
                 try {

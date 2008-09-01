@@ -49,12 +49,13 @@ public class OnHeapCommand extends AbstractCommand {
     }
 
     public static void main(String[] args) throws Exception {
-        new OnHeapCommand().execute(null, System.in, System.out, System.err);
+        new OnHeapCommand().execute(args);
     }
 
     /**
      * Execute this command
      */
+    @Override
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
         out.println("on heap:");
