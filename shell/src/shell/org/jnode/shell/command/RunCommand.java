@@ -52,7 +52,7 @@ public class RunCommand extends AbstractCommand {
         new RunCommand().execute(args);
     }
 
-	@Override
+    @Override
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
         final File file = ARG_FILE.getValue();
