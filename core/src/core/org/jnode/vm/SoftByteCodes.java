@@ -329,8 +329,14 @@ public final class SoftByteCodes {
                 throw new ClassCastException(object.getClass().getName()
                     + " superClasses==null");
             }
-            final StringBuilder sb = new StringBuilder();
+            
+            final StringBuilder sb = new StringBuilder("expected : ");
+            sb.append(expected.getName());
+            
+            sb.append(" actual class : ");            
             sb.append(object.getClass().getName());
+            
+            sb.append(" superClasses : ");
             for (Object sc : superClasses) {
                 sb.append(',');
                 sb.append(sc);
