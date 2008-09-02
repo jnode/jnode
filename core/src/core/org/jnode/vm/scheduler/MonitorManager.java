@@ -174,6 +174,7 @@ public final class MonitorManager {
                 Unsafe.debug(exMsg);
                 Unsafe.debug(object.getClass().getName());
                 // Extra debug info
+                Unsafe.debug("\n");
                 Unsafe.debug(oldlockword);
                 Unsafe.debug(objectPtr);
                 Unsafe.debug(statusPtr);
