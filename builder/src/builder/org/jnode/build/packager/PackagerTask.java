@@ -38,11 +38,14 @@ public class PackagerTask extends Task {
     // properties names
     protected static final String USER_PLUGIN_IDS = "user.plugin.ids";
     protected static final String PLUGIN_LIST_NAME = "plugin.list.name";
+    protected static final String FORCE_OVERWRITE_SCRIPTS = "force.overwrite.scripts";
     
     /**
      * Directory for suer plugins/resources
      */
     protected File userApplicationsDir = null;
+    
+    private Properties properties = null;
 
     /**
      * Define the directory where user put its own plugins/resources to add in jnode cdrom
@@ -73,12 +76,33 @@ public class PackagerTask extends Task {
     }
     
     /**
+     * Get the properties and if necessary read it from the file
+     * @return
+     */
+    protected final synchronized Properties getProperties() {
+        if (properties == null) {
+            properties = readProperties();
+        }
+        
+        return properties;
+    }
+
+    /**
      * Read the properties file used to configure the packager tool
      * @return
      */
-    protected final Properties readProperties() {
+    private final Properties readProperties() {
         try {
-            return readProperties(new FileInputStream(getPropertiesFile()), DEFAULT_PROPERTIES);
+            final Properties properties;
+            
+            final File file = getPropertiesFile();
+            if (file.exists()) {
+                properties = readProperties(new FileInputStream(file), DEFAULT_PROPERTIES);
+            } else {
+                properties = new Properties(DEFAULT_PROPERTIES);
+            }
+            
+            return properties; 
         } catch (FileNotFoundException e) {
             throw new BuildException("failed to read properties file", e);
         }

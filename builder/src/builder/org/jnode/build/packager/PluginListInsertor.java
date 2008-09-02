@@ -42,7 +42,7 @@ public class PluginListInsertor extends PackagerTask {
     private List<String> readPluginIds(String pluginListName) {
         List<String> pluginIds = new ArrayList<String>();
         
-        final Properties properties = readProperties();
+        final Properties properties = getProperties();
         final String targetName = properties.getProperty(PLUGIN_LIST_NAME, null); 
         if (targetName == null) {
             log("property " + PLUGIN_LIST_NAME + " not specified in " +
