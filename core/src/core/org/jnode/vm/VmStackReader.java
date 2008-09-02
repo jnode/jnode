@@ -198,7 +198,7 @@ public abstract class VmStackReader extends VmSystemObject {
     @KernelSpace
     public final void debugStackTrace(int max) {
         Address f = VmMagic.getCurrentFrame();
-        Unsafe.debug("Debug stacktrace: ");
+        Unsafe.debug("\nDebug stacktrace: ");
         boolean first = true;
         while (isValid(f) && (max > 0)) {
             if (first) {
