@@ -37,6 +37,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
+ * Simple Tetris game.
  * @author Levente S\u00e1ntha
  */
 public class Tetris extends JComponent implements KeyListener, MouseListener {
@@ -146,7 +147,7 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         }
     };
 
-    public Tetris() {
+    Tetris() {
         setOpaque(false);
         for (int i = 0; i < WIDTH_C + 2; i++) {
             for (int j = 0; j < HEIGHT_C + 2; j++) {
@@ -175,7 +176,7 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         return r > 255 ? 255 : r;
     }
 
-    public void paintBox(Graphics g, int i, int j, Color c) {
+    private void paintBox(Graphics g, int i, int j, Color c) {
         Color dc = new Color(darken(c.getRed()), darken(c.getGreen()), darken(c
             .getBlue()));
         Color lc = new Color(lighten(c.getRed()), lighten(c.getGreen()),
@@ -190,10 +191,21 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         g.drawLine(i * CELL, j * CELL, (i + 1) * CELL - 1, j * CELL);
     }
 
+    /**
+     * Update the screen.
+     *
+     * @param g the graphics context
+     * @see javax.swing.JComponent#update(java.awt.Graphics)
+     */
     public void update(Graphics g) {
         paint(g);
     }
 
+    /**
+     * Paint the game graphics.
+     * @param g the graphics context
+     * @see javax.swing.JComponent#paint(java.awt.Graphics)
+     */
     public void paint(Graphics g) {
         if (img == null) {
             img = createImage(DIM.width, DIM.height);
@@ -266,6 +278,10 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         thread.interrupt();
     }
 
+    /**
+     * Handle keys.
+     * @param e the key event
+     */
     public void keyPressed(KeyEvent e) {
         int kc = e.getKeyCode();
         if (kc == KeyEvent.VK_N) {
@@ -306,7 +322,7 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         SwingUtilities.invokeLater(runRepaint);
     }
 
-    public void newGame() {
+    private void newGame() {
         setUp(false);
         if (thread != null) {
             if (pause) {
@@ -442,18 +458,32 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         return hasRoom;
     }
 
+    /**
+     * @see javax.swing.JComponent#getPreferredSize()
+     */
     public Dimension getPreferredSize() {
         return DIM;
     }
 
+    /**
+     * @see javax.swing.JComponent#getMinimumSize()
+     * @return
+     */
     public Dimension getMinimumSize() {
         return DIM;
     }
 
+    /**
+     * @see javax.swing.JComponent#getMaximumSize()
+     * @return
+     */
     public Dimension getMaximumSize() {
         return DIM;
     }
 
+    /**
+     * Handle mouse input.
+     */
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e)) {
             if (this.contains(e.getX(), e.getY())) {
@@ -464,30 +494,51 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
         }
     }
 
+    /**
+     * Unused.
+     */
     public void keyReleased(KeyEvent e) {
 
     }
 
+    /**
+     * Unused.
+     */
     public void keyTyped(KeyEvent e) {
 
     }
 
+    /**
+     * Unused.
+     */
     public void mouseClicked(MouseEvent e) {
 
     }
 
+    /**
+     * Unused.
+     */
     public void mouseEntered(MouseEvent e) {
 
     }
 
+    /**
+     * Unused.
+     */
     public void mouseExited(MouseEvent e) {
 
     }
 
+    /**
+     * Unused.
+     */
     public void mouseReleased(MouseEvent e) {
 
     }
 
+    /**
+     * Start Tetris.
+     */
     public static void main(final String[] argv) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
