@@ -37,6 +37,12 @@ public class PluginBuilder extends PackagerTask {
      */
     private Path path;
     
+    /**
+     * Construct a PluginBuilder from the given {@link Task}, 
+     * which will be used as a delegate to access ant context.
+     * 
+     * @param parent
+     */
     public PluginBuilder(Task parent) {
         this.parent = parent;
     }
