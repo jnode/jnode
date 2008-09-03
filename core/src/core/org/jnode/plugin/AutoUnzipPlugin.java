@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.jnode.work.Work;
-import org.jnode.work.WorkUtils;
-
 
 /**
  * This is a special implementation of {@link Plugin} for plugins that want 
@@ -28,12 +25,12 @@ public class AutoUnzipPlugin extends Plugin {
     @Override
     protected void startPlugin() throws PluginException {
         startFinished = false;
-        WorkUtils.add(new Work("unzip plugin " + getDescriptor().getId()) {
+        new Thread() {
             @Override
-            public void execute() {
+            public void run() {
                 copyResources();
             }
-        });
+        } .start();
     }
     
     public boolean isStartFinished() {
@@ -71,7 +68,7 @@ public class AutoUnzipPlugin extends Plugin {
             final byte[] buffer = new byte[10240];
             
             for (String resName : cl.getResources()) {
-                InputStream input = cl.getResourceAsStream(resName);
+                final InputStream input = cl.getResourceAsStream(resName);
                 
                 try {
                     copy(input, pluginRoot, resName, buffer);
