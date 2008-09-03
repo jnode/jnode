@@ -18,8 +18,7 @@ public abstract class AbstractCommandOutput implements CommandOutput {
     @Override
     public synchronized OutputStream getOutputStream() {
         if (outputStream == null) {
-            //FIXME : WriterOutputStream class is unknown
-            //outputStream = new WriterOutputStream(writer, getEncoding());
+            outputStream = new WriterOutputStream(writer, getEncoding());
         }
         return outputStream;
     }
