@@ -15,10 +15,24 @@ import java.util.Properties;
 
 import org.jnode.build.BuildException;
 
+/**
+ * Build a jnode scripts from both a linux/unix scripts, from msdos scripts or, if none is found,
+ * from scratch (with the help of {@link MainFinder})
+ * 
+ * @author fabien
+ *
+ */
 public class ScriptBuilder extends PackagerTask {
     static final String JAVA = "java ";
     static final String DEFINE_SYS_PROPERTY = "-D";
     
+    /**
+     * Main method : search for existing (unix/linux, msdos) scripts and build jnode scripts
+     * for launching the application given by its root directory.
+     * 
+     * @param applicationDir
+     * @param properties
+     */
     public static void build(File applicationDir, Properties properties) {
         List<Command> commands = new ArrayList<Command>();
         
@@ -47,6 +61,15 @@ public class ScriptBuilder extends PackagerTask {
         }
     }
 
+    /**
+     * Build a jnode script for the given {@link Command} and application directory.
+     * The generated script will be written in the given file.
+     * 
+     * @param applicationDir
+     * @param cmd
+     * @param file
+     * @throws IOException
+     */
     private static void build(File applicationDir, Command cmd, File file) throws IOException {
         //FIXME shouldn't be hard coded but use java.home system property instead
         // also see class AutoUnzipPlugin, which has the same problem.
@@ -100,6 +123,12 @@ public class ScriptBuilder extends PackagerTask {
         }
     }
 
+    /**
+     * 
+     * @param applicationDir
+     * @param commands
+     * @throws IOException
+     */
     private static void buildFromScratch(File applicationDir, List<Command> commands) throws IOException {
         final List<String> jars = new ArrayList<String>();
         final List<String> mains = new ArrayList<String>();
@@ -144,6 +173,20 @@ public class ScriptBuilder extends PackagerTask {
         }        
     }
 
+    /**
+     * Search for scripts with given extension, which uses the given comment, pathSeparator conventions
+     * (depending on provided parameters, it can be msdos, linux/unix conventions or anything else).
+     * Each found script, will be scanned for a "java" command line and will be used to build a new 
+     * {@link Command} that will be added to the provided list.
+     * 
+     * @param applicationDir directory of the application
+     * @param extension script's extension
+     * @param comment {@link String} used for comments in the script (example for unix/linux : "#")
+     * @param pathSeparator path separator for the classpath (example for unix/linux : ":")
+     * @param commands list in which new commands will be added
+     * @return
+     * @throws IOException
+     */
     private static boolean buildFromScripts(File applicationDir, final String extension, 
             String comment, String pathSeparator, List<Command> commands) throws IOException {
         File[] scripts = applicationDir.listFiles(new FilenameFilter() {
@@ -161,7 +204,18 @@ public class ScriptBuilder extends PackagerTask {
             
         return (scripts.length > 0);
     }
-    
+
+    /**
+     * Build a command from the given script file and add it to the provided list. 
+     * 
+     * @param applicationDir
+     * @param script
+     * @param extension
+     * @param comment
+     * @param pathSeparator
+     * @param commands
+     * @throws IOException
+     */
     private static void buildFromScript(File applicationDir, File script, String extension, 
             String comment, String pathSeparator, List<Command> commands) throws IOException {
         String line;
@@ -199,6 +253,14 @@ public class ScriptBuilder extends PackagerTask {
         }
     }
 
+    /**
+     * Build a new command from the given parameters
+     * @param script
+     * @param extension
+     * @param pathSeparator
+     * @param tokens
+     * @return
+     */
     private static Command buildCommand(File script, String extension, String pathSeparator, String[] tokens) {
         Command cmd = new Command();
         
@@ -237,6 +299,14 @@ public class ScriptBuilder extends PackagerTask {
         return cmd;
     }
 
+    /**
+     * That class is used to represent a "java" command in a script.
+     * It contains what's needed to build a classpath, define system properties 
+     * and launch the main class. 
+     *  
+     * @author fabien
+     *
+     */
     private static class Command {
         private final List<String> classpath = new ArrayList<String>();
         private final Map<String, String> systemProperties = new HashMap<String, String>(); 

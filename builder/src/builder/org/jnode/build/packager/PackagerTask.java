@@ -41,10 +41,13 @@ public class PackagerTask extends Task {
     protected static final String FORCE_OVERWRITE_SCRIPTS = "force.overwrite.scripts";
     
     /**
-     * Directory for suer plugins/resources
+     * Directory for user plugins/resources
      */
     protected File userApplicationsDir = null;
     
+    /**
+     * actual properties for the packager
+     */
     private Properties properties = null;
 
     /**
