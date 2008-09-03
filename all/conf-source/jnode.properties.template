@@ -95,3 +95,7 @@ jnode.install-nt.dir=C:\jnode
 
 @vmware.vmx.overrides/=#@
 
+# -----------------------------------------------
+# Set this property to the directory containing user applications for the
+# jar packager (tool to easily create a jnode plugin from a regular jar file)
+@user.applications.dir/=#@

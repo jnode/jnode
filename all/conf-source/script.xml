@@ -60,6 +60,9 @@
           description="Remote debugger port"/>
     <property name="custom.plugin-list.dir" type="string.type"
           description="Custom plugin-list directory"/>
+    <property name="user.applications.dir" type="string.type"
+          description="Select the directory containing external application"
+	  default=""/>
   </propFile>
 
   <screen title="Main JNode Build Settings">
@@ -112,6 +115,11 @@
     <item property="no.default.initjars"/>
     <item property="no.bootdisk"/>
     <item property="no.netboot"/>
+    <item property="user.applications.dir">
+      Specify the directory containing user applications for the jar packager (tool to 
+      easily create a jnode plugin from a regular jar file)
+      The path may include Ant variables; e.g. "${root.dir}/local/applications/"
+    </item>
   </screen>
   
 </configureScript>
