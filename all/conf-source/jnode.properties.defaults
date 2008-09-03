@@ -14,4 +14,4 @@ jnode.virtualization.platform=vmware
 jnode.virtual.disk.dir=
 jnode.virtual.disk=
 vmware.vmx.overrides=
-
+jnode.applications.dir=
