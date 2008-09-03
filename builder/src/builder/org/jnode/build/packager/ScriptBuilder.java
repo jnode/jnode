@@ -23,8 +23,13 @@ import org.jnode.build.BuildException;
  *
  */
 public class ScriptBuilder extends PackagerTask {
-    static final String JAVA = "java ";
-    static final String DEFINE_SYS_PROPERTY = "-D";
+    private static final String JAVA = "java ";
+    private static final String DEFINE_SYS_PROPERTY = "-D";
+    
+    /**
+     * jnode script extension
+     */
+    private static final String JNODE_SCRIPT = ".jns";
     
     /**
      * Main method : search for existing (unix/linux, msdos) scripts and build jnode scripts
@@ -137,14 +142,14 @@ public class ScriptBuilder extends PackagerTask {
         
         for (String main : mains) {
             int idx = main.lastIndexOf('.') + 1;
-            File file = new File(applicationDir, main.substring(idx));            
+            File file = new File(applicationDir, main.substring(idx) + JNODE_SCRIPT);            
+            
             
             Command cmd = new Command(main, file);
-            commands.add(cmd);
-            
             for (String jar : jars) {
                 cmd.addToClasspath(jar);
             }
+            addCommand(commands, cmd, applicationDir);
         }
     }
 
@@ -235,8 +240,7 @@ public class ScriptBuilder extends PackagerTask {
                         
                         // build the Command from the line
                         Command cmd = buildCommand(script, extension, pathSeparator, tokens);
-                        cmd.setApplicationName(applicationDir.getName());
-                        commands.add(cmd);
+                        addCommand(commands, cmd, applicationDir);
                         
                         break;
                     }
@@ -251,6 +255,19 @@ public class ScriptBuilder extends PackagerTask {
                 fr.close();
             }
         }
+    }
+    
+    /**
+     * Complete the command fill in and do additional checks regarding existing commands
+     * in the list. 
+     * 
+     * @param commands
+     * @param cmd
+     * @param applicationDir
+     */
+    private static void addCommand(List<Command> commands, Command cmd, File applicationDir) {
+        cmd.setApplicationName(applicationDir.getName());
+        commands.add(cmd);
     }
 
     /**
@@ -290,7 +307,7 @@ public class ScriptBuilder extends PackagerTask {
                 
                 String path = script.getAbsolutePath();
                 path = path.substring(0, path.length() - extension.length());
-                path += ".jns"; // jnode script extension
+                path += JNODE_SCRIPT;
                 cmd.setScriptFile(new File(path));
                 break;
             }
