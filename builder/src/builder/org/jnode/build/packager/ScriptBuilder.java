@@ -80,7 +80,6 @@ public class ScriptBuilder extends PackagerTask {
             fw.write("# TODO : add permissions\n");
             fw.write("\n");
             
-            System.out.println("mainClass="+cmd.getMainClass());
             fw.write("# launch the application\n");                
             fw.write("java " + cmd.getMainClass());
             for (String arg : cmd.getArguments()) {
@@ -163,8 +162,8 @@ public class ScriptBuilder extends PackagerTask {
         return (scripts.length > 0);
     }
     
-    private static void buildFromScript(File applicationDir, File script, String extension, String comment, String pathSeparator, 
-            List<Command> commands) throws IOException {
+    private static void buildFromScript(File applicationDir, File script, String extension, 
+            String comment, String pathSeparator, List<Command> commands) throws IOException {
         String line;
         FileReader fr = null;
         BufferedReader br = null;
@@ -205,7 +204,6 @@ public class ScriptBuilder extends PackagerTask {
         
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i];
-            System.out.println("arg="+token);
             if (token.startsWith("-")) {
                 if ("-cp".equals(token) || "-classpath".equals(token)) {
                     token = tokens[++i];
@@ -221,12 +219,10 @@ public class ScriptBuilder extends PackagerTask {
                             token.substring(equalPosition + 1));
                 }
             } else {
-                System.out.println("main="+token);
                 cmd.setMainClass(token);
                                             
                 // add command arguments
                 for (int j = (i + 1); j < tokens.length; j++) {
-                    System.out.println("mainArg="+tokens[j]);
                     cmd.addArgument(tokens[j]);
                 }
                 
