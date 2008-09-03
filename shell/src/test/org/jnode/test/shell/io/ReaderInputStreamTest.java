@@ -1,9 +1,31 @@
+/*
+ * $Id: ThreadCommandInvoker.java 3374 2007-08-02 18:15:27Z lsantha $
+ *
+ * JNode.org
+ * Copyright (C) 2007 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.test.shell.io;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
 import org.jnode.shell.io.ReaderInputStream;
@@ -93,7 +115,7 @@ public class ReaderInputStreamTest extends TestCase {
             assertEquals((byte) i, buffer[i]);
         }
     }
-    
+
     public void testBadLatin1All() throws Exception {
         char[] chars = new char[257];
         for (int i = 0; i < 257; i++) {
@@ -108,6 +130,163 @@ public class ReaderInputStreamTest extends TestCase {
             fail("No exception raised");
         } catch (UnmappableCharacterException ex) {
             // expected
+        }
+    }
+    
+    public void testUnicode() throws Exception {
+        char[] chars = new char[1024];
+        for (int i = 0; i < 1024; i++) {
+            chars[i] = (char) i;
+        }
+        final String LINE = new String(chars);
+        Reader r = new StringReader(LINE);
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        char[] buffer = new char[1024];
+        isr.read(buffer);
+        for (int i = 0; i < 1024; i++) {
+            assertEquals(chars[i], buffer[i]);
+        }
+    }
+    
+    public void testUnicode2() throws Exception {
+        char[] chars = new char[]{'\ud800', '\udc00'};
+        final String LINE = new String(chars);
+        Reader r = new StringReader(LINE);
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        assertEquals(chars[0], isr.read());
+        assertEquals(chars[1], isr.read());
+    }
+    
+    public void testBadUnicode() throws Exception {
+        char[] chars = new char[]{'\ud800'};
+        final String LINE = new String(chars);
+        Reader r = new StringReader(LINE);
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        try {
+            isr.read();
+            fail("No exception raised");
+        } catch (MalformedInputException ex) {
+            // expected
+        }
+    }
+    
+    public void testBadUnicode2() throws Exception {
+        char[] chars = new char[]{'a', '\ud800'};
+        final String LINE = new String(chars);
+        Reader r = new StringReader(LINE);
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        assertEquals(chars[0], isr.read());
+        try {
+            isr.read();
+            fail("No exception raised");
+        } catch (MalformedInputException ex) {
+            // expected
+        }
+    }
+    
+    public void testBadUnicode3() throws Exception {
+        char[] chars = new char[]{'\udc00'};
+        final String LINE = new String(chars);
+        Reader r = new StringReader(LINE);
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        try {
+            isr.read();
+            fail("No exception raised");
+        } catch (MalformedInputException ex) {
+            // expected
+        }
+    }
+    
+    public void testUnicode3() throws Exception {
+        char[] chars = new char[]{'\ud800', '\udc00'};
+        final String LINE = new String(chars);
+        Reader r = new OneCharAtATimeReader(new StringReader(LINE));
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        assertEquals(chars[0], isr.read());
+        assertEquals(chars[1], isr.read());
+    }
+    
+    public void testBadUnicode4() throws Exception {
+        char[] chars = new char[]{'\ud800'};
+        final String LINE = new String(chars);
+        Reader r = new OneCharAtATimeReader(new StringReader(LINE));
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        try {
+            isr.read();
+            fail("No exception raised");
+        } catch (MalformedInputException ex) {
+            // expected
+        }
+    }
+    
+    public void testBadUnicode5() throws Exception {
+        char[] chars = new char[]{'a', '\ud800'};
+        final String LINE = new String(chars);
+        Reader r = new OneCharAtATimeReader(new StringReader(LINE));
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        assertEquals(chars[0], isr.read());
+        try {
+            isr.read();
+            fail("No exception raised");
+        } catch (MalformedInputException ex) {
+            // expected
+        }
+    }
+    
+    public void testBadUnicode6() throws Exception {
+        char[] chars = new char[]{'\udc00'};
+        final String LINE = new String(chars);
+        Reader r = new OneCharAtATimeReader(new StringReader(LINE));
+        ReaderInputStream ris = new ReaderInputStream(r, "UTF-8");
+        InputStreamReader isr = new InputStreamReader(ris);
+        try {
+            isr.read();
+            fail("No exception raised");
+        } catch (MalformedInputException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * This wrapper class delivers characters from a Reader one at a time, no matter
+     * what the client asks for.
+     */
+    private class OneCharAtATimeReader extends Reader {
+        
+        private Reader reader;
+
+        public OneCharAtATimeReader(Reader reader) {
+            this.reader = reader;
+        }
+
+        @Override
+        public void close() throws IOException {
+            this.reader.close();
+        }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            if (off < 0 || off > cbuf.length || len < 0 || off + len > cbuf.length || off + len < 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            if (len == 0) {
+                return 0;
+            }
+            int ch = reader.read();
+            if (ch == -1) {
+                return -1;
+            } else {
+                cbuf[off] = (char) ch;
+                return 1;
+            }
         }
     }
 }

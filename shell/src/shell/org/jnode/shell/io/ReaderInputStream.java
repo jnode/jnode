@@ -1,3 +1,23 @@
+/*
+ * $Id: ThreadCommandInvoker.java 3374 2007-08-02 18:15:27Z lsantha $
+ *
+ * JNode.org
+ * Copyright (C) 2007 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.shell.io;
 
 import java.io.IOException;
@@ -27,7 +47,7 @@ public class ReaderInputStream extends InputStream {
     @Override
     public synchronized int read() throws IOException {
         if (bytes.remaining() == 0) {
-            if (!fillBuffer(true)) {
+            if (fillBuffer(true) == -1) {
                 return -1;
             }
         }
@@ -42,19 +62,19 @@ public class ReaderInputStream extends InputStream {
         // This implementation is simple-minded.  I'm sure we could recode it to avoid
         // the 'bytes.get' copying step if we thought about it.
         int count = 0;
-        while (count < len) {
+        do {
             if (bytes.remaining() == 0) {
-                if (!fillBuffer(count == 0)) {
-                    return count == 0 ? -1 : count;
+                int nosRead = fillBuffer(count == 0);
+                if (nosRead <= 0) {
+                    return count > 0 ? count : -1;
                 }
             }
-            int copied = Math.min(bytes.remaining(), len);
-            bytes.get(b, off, copied);
-            System.err.println("Copied " + copied);
-            count += copied;
-            len -= copied;
-            off += copied;
-        }
+            int toCopy = Math.min(bytes.remaining(), len);
+            bytes.get(b, off, toCopy);
+            count += toCopy;
+            len -= toCopy;
+            off += toCopy;
+        } while (count < len);
         return count;
     }
 
@@ -69,33 +89,39 @@ public class ReaderInputStream extends InputStream {
      * would have blocked or because it returned <code>-1</code>.  
      * 
      * @param wait if <code>true</code> allow the reader to block.
-     * @return <code>true</code> if we've added some data to 'bytes'.
+     * @return the number of bytes added; <code>-1</code> if none were added
+     *       and the reader is at the EOF.
      * @throws IOException
      */
-    private boolean fillBuffer(boolean wait) throws IOException {
+    private int fillBuffer(boolean wait) throws IOException {
         bytes.clear();
         // The loop is necessary because the way that the encoder has to deal
-        // with UTF-16 surrogate pairs.  If the one and only character returned
-        // by the reader is the first char of a surrogate pair, the encoder won't
-        // (can't) put anything into the 'bytes' buffer.  So if 'wait' is true, 
-        // we must go around a second time to get the second character of the
-        // surrogate pair.
+        // with UTF-16 surrogate pairs.
+        CoderResult cr = null;
+        int count;
         do {
-            CoderResult cr;
-            if (chars.remaining() == 0) {
-                chars.clear();
-                if (!reader.ready() && !wait) {
-                    bytes.flip();
-                    return false;
+            if (chars.remaining() == 0 || cr == CoderResult.UNDERFLOW) {
+                if (chars.remaining() == 0) {
+                    if (!reader.ready() && !wait) {
+                        bytes.flip();
+                        return 0;
+                    }
+                    chars.clear();
+                } else {
+                    char[] tmp = new char[chars.remaining()];
+                    chars.get(tmp);
+                    chars.clear();
+                    chars.put(tmp);
                 }
                 if (reader.read(chars) == -1) {
-                    System.err.println("Reached EOF");
-                    bytes.flip();
+                    chars.flip();
                     cr = encoder.encode(chars, bytes, true);
                     if (cr.isError()) {
                         cr.throwException();
                     }
-                    return bytes.remaining() > 0;
+                    count = bytes.position();
+                    bytes.flip();
+                    return count > 0 ? count : -1;
                 }
                 chars.flip();
             }
@@ -103,8 +129,9 @@ public class ReaderInputStream extends InputStream {
             if (cr.isError()) {
                 cr.throwException();
             }
-        } while (wait && bytes.position() == 0);
+            count = bytes.position();
+        } while (wait && count == 0);
         bytes.flip();
-        return true;
+        return count;
     }
 }
