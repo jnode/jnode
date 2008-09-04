@@ -7,12 +7,13 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 
 public class WriterOutputStream extends OutputStream {
     // TODO deal with decoder errors.
     
     private ByteBuffer bytes = ByteBuffer.allocate(2048);
-    private CharBuffer chars = CharBuffer.allocate(1024);
+    private CharBuffer chars = CharBuffer.allocate(2048);
     
     private Writer writer;
     private CharsetDecoder decoder;
@@ -20,24 +21,53 @@ public class WriterOutputStream extends OutputStream {
     public WriterOutputStream(Writer writer, String encoding) {
         this.writer = writer;
         this.decoder = Charset.forName(encoding).newDecoder();
+        bytes.clear();
+        chars.clear();
     }
 
     @Override
     public void write(int b) throws IOException {
         bytes.put((byte) b);
         if (bytes.remaining() == 0) {
-            decoder.decode(bytes, chars, false);
-            flush();
+            flush(false);
         }
     }
 
     @Override
     public void flush() throws IOException {
-        if (chars.position() > 0) {
-            int len = chars.position();
-            int pos = chars.arrayOffset();
-            writer.write(chars.array(), pos, len);
+        flush(false);
+    }
+    
+    @Override
+    public void close() throws IOException {
+        flush(true);
+        writer.close();
+    }
+
+    private int flush(boolean all) throws IOException {
+        if (bytes.position() > 0) {
+            bytes.flip();
             chars.clear();
+            CoderResult cr = decoder.decode(bytes, chars, all);
+            int count = chars.position();
+            if (count > 0) {
+                int pos = chars.arrayOffset();
+                writer.write(chars.array(), pos, count);
+            }
+            if (cr.isError() || (all && cr == CoderResult.UNDERFLOW)) {
+                cr.throwException();
+            }
+            if (bytes.remaining() > 0) {
+                byte[] tmp = new byte[bytes.remaining()];
+                bytes.get(tmp);
+                bytes.clear();
+                bytes.put(tmp);
+            } else {
+                bytes.clear();
+            }
+            return count;
+        } else {
+            return 0;
         }
     }
 
@@ -47,13 +77,13 @@ public class WriterOutputStream extends OutputStream {
             throw new IndexOutOfBoundsException();
         }
         while (len > 0) {
-            int pos = bytes.position();
-            bytes.put(b, off, len);
-            int count = bytes.position() - pos;
-            off += count;
-            len -= count;
-            decoder.decode(bytes, chars, false);
-            flush();
+            int toWrite = Math.min(len, bytes.remaining());
+            bytes.put(b, off, toWrite);
+            off += toWrite;
+            len -= toWrite;
+            if (bytes.remaining() == 0) {
+                flush(false);
+            }
         }
     }
 
