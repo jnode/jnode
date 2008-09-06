@@ -24,6 +24,7 @@ package org.jnode.awt.font.truetype;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.io.IOException;
+
 import org.jnode.awt.font.truetype.tables.CMapTable;
 import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 
@@ -73,6 +74,24 @@ public class TTFFontMetrics extends FontMetrics {
         } catch (IOException ex) {
             return 0;
         }
+    }
+
+    /**
+     * Note : We must override that method from {@link FontMetrics}. 
+     * If we don't override {@link FontMetrics#charsWidth(char[], int, int)} 
+     * or {@link FontMetrics#stringWidth(String)} then a stack overflow will
+     * happen since they are calling each other without any exit way !!!
+     * 
+     */
+    @Override
+    public int charsWidth(char[] data, int off, int len) {
+        int total = 0;
+        
+        for (int i = off; i < (off + len); i++) {
+            total += charWidth(data[i]);
+        }
+
+        return total;
     }
 
     /**
