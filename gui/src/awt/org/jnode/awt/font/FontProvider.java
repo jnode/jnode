@@ -68,7 +68,7 @@ public interface FontProvider {
      * Gets a text renderer for the given font.
      *
      * @param font
-     * @return The text renderen for the given font
+     * @return The text renderer for the given font
      */
     public TextRenderer getTextRenderer(Font font);
 
