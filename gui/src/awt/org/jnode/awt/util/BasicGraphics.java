@@ -62,7 +62,8 @@ public abstract class BasicGraphics extends Graphics {
             clip = clip.intersection(r);
 
         if (this.clip.width == 0 && this.clip.height == 0) {
-            org.jnode.vm.Unsafe.debug("SimpleSurfaceGraphics: zero clip " + clip + "\n");
+            //TODO it's probably a normal use case since a GUI (swing/awt) component can have width=0 and height=0
+            org.jnode.vm.Unsafe.debug(getClass().getSimpleName() + ": zero clip\n");
             org.jnode.vm.Unsafe.debugStackTrace();
         }
     }
