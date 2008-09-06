@@ -11,7 +11,6 @@ import static org.jnode.shell.bjorne.BjorneInterpreter.REDIR_LESSAND;
 import static org.jnode.shell.bjorne.BjorneInterpreter.REDIR_LESSGREAT;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,7 +29,10 @@ import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
-import org.jnode.shell.StreamMarker;
+import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandIOMarker;
+import org.jnode.shell.io.CommandInput;
+import org.jnode.shell.io.CommandOutput;
 
 /**
  * This class holds the shell variable and stream state for a bjorne shell
@@ -43,9 +45,9 @@ import org.jnode.shell.StreamMarker;
  */
 public class BjorneContext {
     
-    public static final StreamMarker PIPE_IN = new StreamMarker("PIPEIN");
+    public static final CommandIOMarker PIPE_IN = new CommandIOMarker("PIPEIN");
     
-    public static final StreamMarker PIPE_OUT = new StreamMarker("PIPEOUT");
+    public static final CommandIOMarker PIPE_OUT = new CommandIOMarker("PIPEOUT");
 
     private static final int NONE = 0;
 
@@ -117,11 +119,11 @@ public class BjorneContext {
     }
 
     static class StreamHolder {
-        public final Closeable stream;
+        public final CommandIO stream;
 
         private boolean isMine;
 
-        public StreamHolder(Closeable stream, boolean isMine) {
+        public StreamHolder(CommandIO stream, boolean isMine) {
             this.stream = stream;
             this.isMine = isMine;
         }
@@ -786,20 +788,20 @@ public class BjorneContext {
         throw new ShellFailureException("not implemented");
     }
 
-    int execute(CommandLine command, Closeable[] streams) throws ShellException {
+    int execute(CommandLine command, CommandIO[] streams) throws ShellException {
         lastReturnCode = interpreter.executeCommand(command, this, streams);
         return lastReturnCode;
     }
 
-    PrintStream resolvePrintStream(Closeable stream) {
-        return interpreter.resolvePrintStream(stream);
+    PrintStream resolvePrintStream(CommandIO commandIOIF) {
+        return interpreter.resolvePrintStream(commandIOIF);
     }
 
-    InputStream resolveInputStream(Closeable stream) {
+    InputStream resolveInputStream(CommandIO stream) {
         return interpreter.resolveInputStream(stream);
     }
 
-    Closeable getStream(int index) {
+    CommandIO getStream(int index) {
         if (index < 0) {
             throw new ShellFailureException("negative stream index");
         } else if (index < holders.length) {
@@ -912,7 +914,8 @@ public class BjorneContext {
                             if (isNoClobber() && file.exists()) {
                                 throw new ShellException("File already exists");
                             }
-                            stream = new StreamHolder(new FileOutputStream(file), true);
+                            CommandOutput tmp = new CommandOutput(new FileOutputStream(file));
+                            stream = new StreamHolder(tmp, true);
                         } catch (IOException ex) {
                             throw new ShellException("Cannot open input file", ex);
                         }
@@ -921,9 +924,9 @@ public class BjorneContext {
                     case REDIR_CLOBBER:
                     case REDIR_DGREAT:
                         try {
-                            stream =
-                                    new StreamHolder(new FileOutputStream(redir.getArg().getText(), redir
-                                            .getRedirectionType() == REDIR_DGREAT), true);
+                            FileOutputStream tmp = new FileOutputStream(redir.getArg().getText(), 
+                                    redir.getRedirectionType() == REDIR_DGREAT);
+                            stream = new StreamHolder(new CommandOutput(tmp), true);
                         } catch (IOException ex) {
                             throw new ShellException("Cannot open input file", ex);
                         }
@@ -932,7 +935,8 @@ public class BjorneContext {
                     case REDIR_LESS:
                         try {
                             File file = new File(redir.getArg().getText());
-                            stream = new StreamHolder(new FileInputStream(file), true);
+                            CommandInput tmp = new CommandInput(new FileInputStream(file));
+                            stream = new StreamHolder(tmp, true);
                         } catch (IOException ex) {
                             throw new ShellException("Cannot open input file", ex);
                         }
@@ -974,8 +978,8 @@ public class BjorneContext {
         return holders;
     }
 
-    public CommandThread fork(CommandLine command, Closeable[] streams)  throws ShellException {
-        return interpreter.fork(command, streams);
+    public CommandThread fork(CommandLine command, CommandIO[] ios)  throws ShellException {
+        return interpreter.fork(command, ios);
     }
 
     public boolean patternMatch(CharSequence expandedWord, CharSequence pat) {

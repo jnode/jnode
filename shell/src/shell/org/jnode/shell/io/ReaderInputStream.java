@@ -29,6 +29,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
+/**
+ * This class wraps a Reader with the InputStream API.  It is used internally
+ * by the JNode shell, and is not recommended for general use.
+ * 
+ * @author crawley@jnode.org
+ */
 public class ReaderInputStream extends InputStream {
     private final Reader reader;
     

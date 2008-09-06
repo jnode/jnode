@@ -22,6 +22,7 @@
       <export name="org.jnode.shell.help.*"/>
       <export name="org.jnode.shell.help.argument.*"/>
       <export name="org.jnode.shell.help.def.*"/>
+      <export name="org.jnode.shell.io.*"/>
       <export name="org.jnode.shell.proclet.*"/>
       <export name="org.jnode.shell.syntax.*"/>
     </library>

@@ -21,7 +21,6 @@
 
 package org.jnode.shell;
 
-import java.io.Closeable;
 import java.util.NoSuchElementException;
 
 import org.jnode.driver.console.CompletionInfo;
@@ -29,6 +28,8 @@ import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
+import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandIOMarker;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.SyntaxBundle;
@@ -46,13 +47,13 @@ import org.jnode.shell.syntax.SyntaxBundle;
 @SuppressWarnings("deprecation")
 public class CommandLine implements Completable, Iterable<String> {
 
-    public static final Closeable DEFAULT_STDIN = new StreamMarker("STDIN");
+    public static final CommandIO DEFAULT_STDIN = new CommandIOMarker("STDIN");
 
-    public static final Closeable DEFAULT_STDOUT = new StreamMarker("STDOUT");
+    public static final CommandIO DEFAULT_STDOUT = new CommandIOMarker("STDOUT");
 
-    public static final Closeable DEFAULT_STDERR = new StreamMarker("STDERR");
+    public static final CommandIO DEFAULT_STDERR = new CommandIOMarker("STDERR");
 
-    public static final Closeable DEVNULL = new StreamMarker("DEVNULL");
+    public static final CommandIO DEVNULL = new CommandIOMarker("DEVNULL");
 
     public static final int LITERAL = 0;
 
@@ -113,7 +114,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     private final Token[] argumentTokens;
 
-    private Closeable[] streams;
+    private CommandIO[] ios;
 
     private boolean argumentAnticipated = false;
 
@@ -122,14 +123,14 @@ public class CommandLine implements Completable, Iterable<String> {
      * 
      * @param commandToken the command name token or <code>null</code>.
      * @param argumentTokens the argument token list or <code>null</code>.
-     * @param streams the io stream array or <code>null</code>.
+     * @param ios the io stream array or <code>null</code>.
      */
     public CommandLine(Token commandToken, Token[] argumentTokens,
-            Closeable[] streams) {
+            CommandIO[] ios) {
         this.commandToken = commandToken;
         this.argumentTokens = (argumentTokens == null || argumentTokens.length == 0) ? NO_TOKENS
                 : argumentTokens.clone();
-        this.streams = setupStreams(streams);
+        this.ios = setupStreams(ios);
     }
 
     /**
@@ -141,10 +142,10 @@ public class CommandLine implements Completable, Iterable<String> {
      * 
      * @param commandName the command name or <code>null</code>.
      * @param arguments the argument list or <code>null</code>.
-     * @param streams the io stream array or <code>null</code>.
+     * @param ios the io stream array or <code>null</code>.
      */
     public CommandLine(String commandName, String[] arguments,
-            Closeable[] streams) {
+            CommandIO[] ios) {
         this.commandToken = commandName == null ? null : new Token(commandName);
         if (arguments == null || arguments.length == 0) {
             this.argumentTokens = NO_TOKENS;
@@ -155,7 +156,7 @@ public class CommandLine implements Completable, Iterable<String> {
                 this.argumentTokens[i] = new Token(arguments[i]);
             }
         }
-        this.streams = setupStreams(streams);
+        this.ios = setupStreams(ios);
     }
 
     /**
@@ -179,13 +180,13 @@ public class CommandLine implements Completable, Iterable<String> {
         this(null, arguments, null /* FIXME */);
     }
 
-    private Closeable[] setupStreams(Closeable[] streams) {
-        if (streams == null) {
-            return new Closeable[] {DEFAULT_STDIN, DEFAULT_STDOUT, DEFAULT_STDERR};
-        } else if (streams.length < 3) {
+    private CommandIO[] setupStreams(CommandIO[] ios) {
+        if (ios == null) {
+            return new CommandIO[] {DEFAULT_STDIN, DEFAULT_STDOUT, DEFAULT_STDERR};
+        } else if (ios.length < 3) {
             throw new IllegalArgumentException("streams.length < 3");
         } else {
-            return streams.clone();
+            return ios.clone();
         }
     }
 
@@ -550,17 +551,17 @@ public class CommandLine implements Completable, Iterable<String> {
      * 
      * @return the stream context as described above.
      */
-    public Closeable[] getStreams() {
-        return streams.clone();
+    public CommandIO[] getStreams() {
+        return ios.clone();
     }
 
     /**
      * Set the IO stream context for executing the command.
      * 
-     * @param streams the command's new stream context.
+     * @param ios the command's new stream context.
      */
-    public void setStreams(Closeable[] streams) {
-        this.streams = streams.clone();
+    public void setStreams(CommandIO[] ios) {
+        this.ios = ios.clone();
     }
 
     /**

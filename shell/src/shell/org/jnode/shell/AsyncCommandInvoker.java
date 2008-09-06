@@ -22,7 +22,6 @@
 package org.jnode.shell;
 
 import java.awt.event.KeyEvent;
-import java.io.Closeable;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
@@ -32,6 +31,7 @@ import java.security.PrivilegedAction;
 
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
+import org.jnode.shell.io.CommandIO;
 
 /*
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -74,6 +74,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     public AsyncCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
         this.err = commandShell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
+        
         // listen for ctrl-c
         commandShell.getConsole().addKeyboardListener(this);
     }
@@ -94,13 +95,9 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         Method method;
         CommandRunner cr = null;
 
-        Closeable[] streams = cmdLine.getStreams();
-        InputStream in;
-        PrintStream out, err;
+        CommandIO[] ios = cmdLine.getStreams();
         try {
-            in = commandShell.resolveInputStream(streams[0]);
-            out = commandShell.resolvePrintStream(streams[1]);
-            err = commandShell.resolvePrintStream(streams[2]);
+            ios = commandShell.resolveStreams(ios);
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
@@ -111,22 +108,22 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
         if (command != null) {
-            cr = new CommandRunner(commandShell, this, cmdInfo, cmdLine, in, out, err);
+            cr = new CommandRunner(commandShell, this, cmdInfo, cmdLine, ios);
         } else {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
                 if ((method.getModifiers() & Modifier.STATIC) != 0) {
-                    if (streams[0] != CommandLine.DEFAULT_STDIN
-                            || streams[1] != CommandLine.DEFAULT_STDOUT
-                            || streams[2] != CommandLine.DEFAULT_STDERR) {
+                    if (ios[0] != CommandLine.DEFAULT_STDIN
+                            || ios[1] != CommandLine.DEFAULT_STDOUT
+                            || ios[2] != CommandLine.DEFAULT_STDERR) {
                         throw new ShellInvocationException(
                                 "Entry point method for "
                                         + cmdInfo.getCommandClass()
                                         + " does not allow redirection or pipelining");
                     }
-                    cr = new CommandRunner(commandShell, this, cmdInfo, cmdInfo.getCommandClass(), method,
-                            new Object[] {cmdLine.getArguments()}, 
-                            in, out, err);
+                    cr = new CommandRunner(
+                            commandShell, this, cmdInfo, cmdInfo.getCommandClass(), method,
+                            new Object[] {cmdLine.getArguments()}, ios);
                 }
             } catch (NoSuchMethodException e) {
                 // continue;
@@ -139,7 +136,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
         
         // These are now the real streams ...
-        cmdLine.setStreams(new Closeable[] {in, out, err});
+        cmdLine.setStreams(ios);
         return cr;
     }
 

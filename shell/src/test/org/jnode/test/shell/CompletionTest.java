@@ -20,13 +20,18 @@
  */
 package org.jnode.test.shell;
 
+import static org.jnode.test.shell.CompletionHelper.checkCompletions;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeSet;
+
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
 import junit.framework.TestCase;
+
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.DefaultCommandInvoker;
 import org.jnode.shell.DefaultInterpreter;
@@ -41,7 +46,6 @@ import org.jnode.shell.syntax.OptionSyntax;
 import org.jnode.shell.syntax.SequenceSyntax;
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
-import static org.jnode.test.shell.CompletionHelper.checkCompletions;
 import org.jnode.test.shell.syntax.TestAliasManager;
 import org.jnode.test.shell.syntax.TestSyntaxManager;
 

@@ -22,7 +22,9 @@ package org.jnode.test.shell;
 
 import java.util.Iterator;
 import java.util.SortedSet;
+
 import junit.framework.TestCase;
+
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandCompletions;
 

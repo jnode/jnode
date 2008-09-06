@@ -23,7 +23,6 @@ package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
 
-import java.io.Closeable;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,6 +32,7 @@ import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.io.CommandIO;
 import org.jnode.vm.VmExit;
 
 /*
@@ -52,7 +52,7 @@ import org.jnode.vm.VmExit;
 public class DefaultCommandInvoker implements CommandInvoker {
 
     private final PrintStream err;
-    private final CommandShell commandShell;
+    private final CommandShell shell;
 
     private static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
 
@@ -66,9 +66,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
         }
     };
 
-    public DefaultCommandInvoker(CommandShell commandShell) {
-        this.commandShell = commandShell;
-        this.err = commandShell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
+    public DefaultCommandInvoker(CommandShell shell) {
+        this.shell = shell;
+        this.err = shell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
     }
 
     public String getName() {
@@ -84,10 +84,10 @@ public class DefaultCommandInvoker implements CommandInvoker {
             return 0;
         }
         try {
-            final Closeable[] streams = cmdLine.getStreams();
-            if (streams[0] != CommandLine.DEFAULT_STDIN
-                    || streams[1] != CommandLine.DEFAULT_STDOUT
-                    || streams[2] != CommandLine.DEFAULT_STDERR) {
+            final CommandIO[] ios = cmdLine.getStreams();
+            if (ios[0] != CommandLine.DEFAULT_STDIN
+                    || ios[1] != CommandLine.DEFAULT_STDOUT
+                    || ios[2] != CommandLine.DEFAULT_STDERR) {
                 err.println("Warning: redirections ignored by the '"
                         + getName() + "' invoker");
             }
@@ -97,12 +97,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
                 try {
                     AccessController.doPrivileged(new PrivilegedAction<Void>() {
                         public Void run() {
-                            System.setOut(commandShell
-                                    .resolvePrintStream(streams[1]));
-                            System.setErr(commandShell
-                                    .resolvePrintStream(streams[2]));
-                            System.setIn(commandShell
-                                    .resolveInputStream(streams[0]));
+                            System.setOut(shell.resolvePrintStream(ios[1]));
+                            System.setErr(shell.resolvePrintStream(ios[2]));
+                            System.setIn(shell.resolveInputStream(ios[0]));
                             return null;
                         }
                     });
@@ -152,7 +149,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
     }
 
     private void stackTrace(Throwable ex) {
-        if (ex != null && commandShell.isDebugEnabled()) {
+        if (ex != null && shell.isDebugEnabled()) {
             ex.printStackTrace(err);
         }
     }

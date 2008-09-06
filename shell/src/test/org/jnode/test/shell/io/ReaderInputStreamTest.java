@@ -28,9 +28,9 @@ import java.io.StringReader;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
-import org.jnode.shell.io.ReaderInputStream;
-
 import junit.framework.TestCase;
+
+import org.jnode.shell.io.ReaderInputStream;
 
 public class ReaderInputStreamTest extends TestCase {
 

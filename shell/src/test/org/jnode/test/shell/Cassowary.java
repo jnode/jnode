@@ -23,9 +23,11 @@ package org.jnode.test.shell;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
 import org.apache.log4j.BasicConfigurator;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;

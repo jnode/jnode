@@ -10,7 +10,6 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 
-import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -25,6 +24,7 @@ import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
+import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
@@ -176,7 +176,8 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
     }
 
-    int executeCommand(CommandLine cmdLine, BjorneContext context, Closeable[] streams) throws ShellException {
+    int executeCommand(CommandLine cmdLine, BjorneContext context, CommandIO[] streams) 
+        throws ShellException {
         BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
         if (builtin != null) {
             // FIXME ... built-in commands should use the Syntax mechanisms so
@@ -201,15 +202,15 @@ public class BjorneInterpreter implements CommandInterpreter {
         return shell;
     }
 
-    public PrintStream resolvePrintStream(Closeable stream) {
-        return shell.resolvePrintStream(stream);
+    public PrintStream resolvePrintStream(CommandIO commandIOIF) {
+        return shell.resolvePrintStream(commandIOIF);
     }
 
-    public InputStream resolveInputStream(Closeable stream) {
+    public InputStream resolveInputStream(CommandIO stream) {
         return shell.resolveInputStream(stream);
     }
 
-    public CommandThread fork(CommandLine command, Closeable[] streams) 
+    public CommandThread fork(CommandLine command, CommandIO[] streams) 
         throws ShellException {
         command.setStreams(streams);
         CommandInfo cmdInfo = command.parseCommandLine(shell);

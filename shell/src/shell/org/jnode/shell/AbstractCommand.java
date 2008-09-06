@@ -21,24 +21,47 @@
 
 package org.jnode.shell;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandInput;
+import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.vm.VmExit;
 
 /**
- * This base class for Command objects just provides some convenience methods.
+ * This a base class for JNode native command objects.  It provides default implementations 
+ * of the 'execute' entry points, and other methods defined by the Command API.  It also
+ * provides 'getter' methods for retrieving the CommandLine and CommandIO stream
+ * objects, and an 'exit' method.
+ * <p>
+ * The class also provides some infrastructure that allows native commands to implement
+ * a lightweight 'public static void main(String[])' entry point.  This allows them to be
+ * executed by the minimalist 'DefaultCommandInvoker', and (in the future) will allow them
+ * to be run on a classic JVM.
  * 
  * @author crawley@jnode.org
- * 
  */
 public abstract class AbstractCommand implements Command {
 
     private ArgumentBundle bundle;
+    private CommandLine commandLine;
+    private CommandIO[] ios;
 
+    /**
+     * A child class that uses this constructor won't have an argument
+     * bundle (in the first instant); see getArgumentBundle.
+     */
     public AbstractCommand() {
         this.bundle = null;
     }
 
+    /**
+     * A child class that uses this constructor will have an initially
+     * empty argument; see getArgumentBundle.
+     */
     public AbstractCommand(String description) {
         this.bundle = new ArgumentBundle(description);
     }
@@ -70,18 +93,33 @@ public abstract class AbstractCommand implements Command {
     }
 
     /**
-     * Exit this command with the given return code.
+     * This method causes the command to 'exit' with the supplied return code.
+     * This method will never return.  (The current implementation works by throwing
+     * a subclass of 'java.lang.Error', so an application command must allow
+     * 'Error' or 'Throwable' exceptions to propagate if it wants 'exit' to work.)
      * 
-     * @param rc
+     * @param rc the return code.
      */
     protected void exit(int rc) {
         throw new VmExit(rc);
     }
 
+    /**
+     * Get the bundle comprising the command's registered Arguments.  If
+     * this method returns <code>null</null>, it indicates to the command
+     * shell that this command does not use the (new) command syntax parser.
+     */
     public final ArgumentBundle getArgumentBundle() {
         return bundle;
     }
 
+    /**
+     * A child command class should call this method to register Arguments
+     * for use by the Syntax system.
+     * 
+     * @param args Argument objects to be registered for use in command syntax
+     * parsing and completion.
+     */
     protected final void registerArguments(Argument<?> ... args) {
         if (bundle == null) {
             bundle = new ArgumentBundle();
@@ -90,6 +128,84 @@ public abstract class AbstractCommand implements Command {
             bundle.addArgument(arg);
         }
     }
+    
+    /**
+     * The default implementation of the 'execute()' entry point delegates to 
+     * the older 'execute(...)' entry point.  A new command class should override
+     * this method.
+     */
+    @Override
+    public void execute() throws Exception {
+        execute(commandLine, 
+                ((CommandInput) ios[0]).getInputStream(),
+                ((CommandOutput) ios[1]).getPrintStream(),
+                ((CommandOutput) ios[2]).getPrintStream());
+    }
+    
+    /**
+     * The default implementation of the 'execute(...)' entry point complains that
+     * you haven't implemented it.  A command class must override either this method
+     * or (ideally) the 'execute()' entry point method.
+     */
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+        throws Exception {
+        throw new UnsupportedOperationException(
+                "A JNode command class MUST implement one of the 'execute(...)' methods.");
+    }
+    
+    /**
+     * Get the CommandLine object representing the command name and arguments
+     * in String form.
+     * 
+     * @return the CommandLine object.
+     */
+    public final CommandLine getCommandLine() {
+        return commandLine;
+    }
+
+    /**
+     * Get the CommandIO object representing the 'error' stream; i.e. fd '2'.
+     * 
+     * @return the CommandIO for the command's error stream.
+     */
+    public final CommandOutput getError() {
+        return (CommandOutput) ios[2];
+    }
+
+    /**
+     * Get the CommandIO object representing the 'input' stream; i.e. fd '0'.
+     * 
+     * @return the CommandIO for the command's input stream.
+     */
+    public final CommandInput getInput() {
+        return (CommandInput) ios[0];
+    }
+    
+    /**
+     * Get the Command's stream indexed by the 'fd' number.
+     * 
+     * @param fd a non-negative 'file descriptor' number.
+     * @return the requested CommandIO object.
+     */
+    public final CommandIO getIO(int fd) {
+        return ios[fd];
+    }
+    
+    /**
+     * Get the CommandIO object representing the 'output' stream; i.e. fd '1'.
+     * 
+     * @return the CommandIO for the command's output stream.
+     */
+    public final CommandOutput getOutput() {
+        return (CommandOutput) ios[1];
+    }
+
+    @Override
+    public final void initialize(CommandLine commandLine, CommandIO[] ios) {
+        this.commandLine = commandLine;
+        this.ios = ios;
+    }
+
 
     static ThreadLocal<Command> currentCommand = new ThreadLocal<Command>();
 
@@ -102,4 +218,5 @@ public abstract class AbstractCommand implements Command {
         currentCommand.set(null);
         return res;
     }
+
 }
