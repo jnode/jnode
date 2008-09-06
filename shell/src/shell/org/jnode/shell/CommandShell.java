@@ -22,7 +22,6 @@
 package org.jnode.shell;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilterInputStream;
@@ -54,10 +53,17 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.CompletionException;
+import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandInput;
+import org.jnode.shell.io.CommandInputOutput;
+import org.jnode.shell.io.CommandOutput;
+import org.jnode.shell.io.FanoutOutputStream;
+import org.jnode.shell.io.NullInputStream;
+import org.jnode.shell.io.NullOutputStream;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
-import org.jnode.shell.syntax.CommandSyntaxException.Context;
 import org.jnode.shell.syntax.SyntaxManager;
+import org.jnode.shell.syntax.CommandSyntaxException.Context;
 import org.jnode.util.SystemInputStream;
 import org.jnode.vm.VmSystem;
 
@@ -98,13 +104,19 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private OutputStream out;
     
     private OutputStream err;
-    
-    private PrintStream outPs;
-    
-    private PrintStream errPs;
 
     private InputStream in;
 
+    private CommandInput cin;
+    
+    private CommandOutput cout;
+    
+    private CommandOutput cerr;
+
+    private PrintStream outPs;
+    
+    private PrintStream errPs;
+    
     private AliasManager aliasMgr;
 
     private SyntaxManager syntaxMgr;
@@ -193,15 +205,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public CommandShell(TextConsole cons) throws ShellException {
         try {
             console = cons;
-            out = console.getOut();
-            err = console.getErr();
-            outPs = new PrintStream(out);
-            errPs = new PrintStream(err);
-            in = console.getIn();
+            InputStream in = console.getIn();
             if (in == null) {
                 throw new ShellException("console input stream is null");
             }
-            SystemInputStream.getInstance().initialize(this.in);
+            setupStreams(in, console.getOut(), console.getErr());
+            SystemInputStream.getInstance().initialize(in);
             cons.setCompleter(this);
 
             console.addConsoleListener(this);
@@ -214,6 +223,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             ex.printStackTrace();
         }
     }
+    
+    private void setupStreams(InputStream in, OutputStream out, OutputStream err) {
+        this.in = in;
+        this.out = out;
+        this.err = err;
+        this.cout = new CommandOutput(out);
+        this.cerr = new CommandOutput(err);
+        this.cin = new CommandInput(in);
+        this.outPs = cout.getPrintStream();
+        this.errPs = cerr.getPrintStream();
+    }
 
     
     /**
@@ -225,8 +245,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
         this.aliasMgr = aliasMgr;
         this.syntaxMgr = syntaxMgr;
-        this.errPs = System.err;
-        this.outPs = System.out;
+        setupStreams(System.in, System.out, System.err);
         this.readingCommand = true;
         this.debugEnabled = true;
     }
@@ -692,7 +711,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    private InputStream getInputStream() {
+    private CommandInput getInputStream() {
         if (isHistoryEnabled()) {
             // Insert a filter on the input stream that adds completed input
             // lines
@@ -702,9 +721,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // need
             // to bind the history object in the history input stream
             // constructor.
-            return new HistoryInputStream(in);
+            return new CommandInput(new HistoryInputStream(cin.getInputStream()));
         } else {
-            return in;
+            return cin;
         }
     }
 
@@ -832,52 +851,38 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * maps to a NullInputStream or NullOutputStream.
      * 
      * @param stream A real stream or a stream marker
-     * @param input If <code>true</code>, we want an input stream.
      * @return the real stream that the first argument maps to.
      */
-    private Object resolveStream(Closeable stream, boolean input) {
+    CommandIO resolveStream(CommandIO stream) {
         if (stream == CommandLine.DEFAULT_STDIN) {
             return getInputStream();
         } else if (stream == CommandLine.DEFAULT_STDOUT) {
-            return outPs;
+            return cout;
         } else if (stream == CommandLine.DEFAULT_STDERR) {
-            return errPs;
+            return cerr;
         } else if (stream == CommandLine.DEVNULL || stream == null) {
-            return input ? new NullInputStream() : new NullOutputStream();
+            return new CommandInputOutput(new NullInputStream(), new NullOutputStream());
         } else {
             return stream;
         }
     }
 
-    /**
-     * Resolve a stream as a real (usable) InputStream.
-     * 
-     * @param stream the stream to be resolved
-     * @return the resolved InputStream.
-     */
-    public InputStream resolveInputStream(Closeable stream) {
-        return (InputStream) resolveStream(stream, true);
+    public CommandIO[] resolveStreams(CommandIO[] ios) {
+        CommandIO[] res = new CommandIO[ios.length];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = resolveStream(ios[i]);
+        }
+        return res;
     }
 
-    /**
-     * Resolve a stream as a real (usable) PrintStream. If the argument is an
-     * OutputStream, we wrap it in a PrintStream. This means that if you call
-     * this method twice on the same stream argument, you may get different
-     * result objects.
-     * 
-     * @param stream the stream to be resolved
-     * @return the resolved PrintStream.
-     */
-    public PrintStream resolvePrintStream(Closeable stream) {
-        Object tmp = resolveStream(stream, false);
-        if (tmp instanceof PrintStream) {
-            return (PrintStream) tmp;
-        } else {
-            // We could try to maintain a cache of PrintStream wrappers,
-            // but this is liable to extend the lifetime of the wrapped streams,
-            // which is a bad thing.
-            return new PrintStream((OutputStream) tmp);
-        }
+    public PrintStream resolvePrintStream(CommandIO io) {
+        CommandIO tmp = resolveStream(io);
+        return ((CommandOutput) tmp).getPrintStream();
+    }
+
+    public InputStream resolveInputStream(CommandIO io) {
+        CommandIO tmp = resolveStream(io);
+        return ((CommandInput) tmp).getInputStream();
     }
 
     public SyntaxManager getSyntaxManager() {

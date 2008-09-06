@@ -22,8 +22,6 @@ package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,6 +31,7 @@ import java.security.PrivilegedActionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.io.CommandIO;
 import org.jnode.vm.VmExit;
 
 /**
@@ -45,9 +44,7 @@ import org.jnode.vm.VmExit;
 class CommandRunner implements Runnable {
     private final CommandShell shell;
     private final CommandInvoker invoker;
-    final InputStream in;
-    final PrintStream out;
-    final PrintStream err;
+    final CommandIO[] ios;
     final Class<?> cx;
     final Method method;
     final Object[] args;
@@ -58,7 +55,7 @@ class CommandRunner implements Runnable {
 
     public CommandRunner(CommandShell shell, CommandInvoker invoker,
             CommandInfo cmdInfo, Class<?> cx, Method method, Object[] args,
-            InputStream in, PrintStream out, PrintStream err) {
+            CommandIO[] ios) {
         this.shell = shell;
         this.invoker = invoker;
         this.cx = cx;
@@ -66,14 +63,11 @@ class CommandRunner implements Runnable {
         this.cmdInfo = cmdInfo;
         this.commandLine = null;
         this.args = args;
-        this.in = in;
-        this.out = out;
-        this.err = err;
+        this.ios = ios;
     }
 
     public CommandRunner(CommandShell shell, CommandInvoker invoker, 
-            CommandInfo cmdInfo, CommandLine commandLine, 
-            InputStream in, PrintStream out, PrintStream err) {
+            CommandInfo cmdInfo, CommandLine commandLine, CommandIO[] ios) {
         this.shell = shell;
         this.invoker = invoker;
         this.cx = null;
@@ -81,9 +75,7 @@ class CommandRunner implements Runnable {
         this.args = null;
         this.cmdInfo = cmdInfo;
         this.commandLine = commandLine;
-        this.in = in;
-        this.out = out;
-        this.err = err;
+        this.ios = ios;
     }
 
     public void run() {
@@ -103,14 +95,9 @@ class CommandRunner implements Runnable {
                         AbstractCommand.retrieveCurrentCommand();
                     }
                 } else {
-                    // FIXME ... it would be nice if we could avoid all of this use of
-                    // the reflection APIs ...
-                    Method method = cmdInfo.getCommandClass().getMethod(
-                            "execute", CommandLine.class, InputStream.class, 
-                            PrintStream.class, PrintStream.class);
-                    Object obj = cmdInfo.createCommandInstance();
-                    AccessController.doPrivileged(new InvokeAction(method, obj, 
-                        new Object[]{commandLine, in, out, err}));
+                    Command cmd = cmdInfo.createCommandInstance();
+                    cmd.initialize(commandLine, ios);
+                    cmd.execute();
                 }
             } catch (PrivilegedActionException ex) {
                 Exception ex2 = ex.getException();

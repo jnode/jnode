@@ -21,7 +21,6 @@
 
 package org.jnode.shell;
 
-import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,9 +31,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandInput;
+import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.CommandSyntaxException;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * This command interpreter supports simple input and output redirection and
@@ -190,13 +192,13 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
 
     private int runCommand(CommandShell shell, CommandDescriptor desc)
         throws ShellException {
-        Closeable in = CommandLine.DEFAULT_STDIN;
-        Closeable out = CommandLine.DEFAULT_STDOUT;
-        Closeable err = CommandLine.DEFAULT_STDERR;
+        CommandIO in = CommandLine.DEFAULT_STDIN;
+        CommandIO out = CommandLine.DEFAULT_STDOUT;
+        CommandIO err = CommandLine.DEFAULT_STDERR;
         try {
             try {
                 if (desc.fromFileName != null) {
-                    in = new FileInputStream(desc.fromFileName.token);
+                    in = new CommandInput(new FileInputStream(desc.fromFileName.token));
                 }
             } catch (IOException ex) {
                 throw new ShellInvocationException("cannot open '" +
@@ -204,13 +206,13 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             }
             try {
                 if (desc.toFileName != null) {
-                    out = new FileOutputStream(desc.toFileName.token);
+                    out = new CommandOutput(new FileOutputStream(desc.toFileName.token));
                 }
             } catch (IOException ex) {
                 throw new ShellInvocationException("cannot open '" +
                         desc.toFileName.token + "': " + ex.getMessage());
             }
-            desc.commandLine.setStreams(new Closeable[] {in, out, err});
+            desc.commandLine.setStreams(new CommandIO[] {in, out, err});
             try {
                 CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
                 return shell.invoke(desc.commandLine, cmdInfo);
@@ -245,14 +247,14 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             int stageNo = 0;
             PipedOutputStream pipeOut = null;
             for (CommandDescriptor desc : descs) {
-                Closeable in = CommandLine.DEFAULT_STDIN;
-                Closeable out = CommandLine.DEFAULT_STDOUT;
-                Closeable err = CommandLine.DEFAULT_STDERR;
-                desc.openedStreams = new ArrayList<Closeable>(2);
+                CommandIO in = CommandLine.DEFAULT_STDIN;
+                CommandIO out = CommandLine.DEFAULT_STDOUT;
+                CommandIO err = CommandLine.DEFAULT_STDERR;
+                desc.openedStreams = new ArrayList<CommandIO>(2);
                 try {
                     // redirect from
                     if (desc.fromFileName != null) {
-                        in = new FileInputStream(desc.fromFileName.token);
+                        in = new CommandInput(new FileInputStream(desc.fromFileName.token));
                         desc.openedStreams.add(in);
                     }
                 } catch (IOException ex) {
@@ -262,7 +264,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 try {
                     // redirect to
                     if (desc.toFileName != null) {
-                        out = new FileOutputStream(desc.toFileName.token);
+                        out = new CommandOutput(new FileOutputStream(desc.toFileName.token));
                         desc.openedStreams.add(out);
                     }
                 } catch (IOException ex) {
@@ -282,21 +284,21 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                                 throw new ShellInvocationException(
                                         "Problem connecting pipe", ex);
                             }
-                            in = pipeIn;
-                            desc.openedStreams.add(pipeIn);
+                            in = new CommandInput(pipeIn);
+                            desc.openedStreams.add(in);
                         } else {
                             // this stage has redirected stdin from a file ...
                             // so go back and replace the previous stage's 
                             // pipeOut with devnull
                             CommandDescriptor prev = descs.get(stageNo - 1);
-                            Closeable[] ps = prev.commandLine.getStreams();
+                            CommandIO[] prevIOs = prev.commandLine.getStreams();
                             try {
                                 pipeOut.close();
                             } catch (IOException ex) {
                                 // squash
                             }
-                            prev.commandLine.setStreams(
-                                    new Closeable[] {ps[0], CommandLine.DEVNULL, ps[2]});
+                            prevIOs[1] = CommandLine.DEVNULL;
+                            prev.commandLine.setStreams(prevIOs);
                         }
                     } else {
                         // the previous stage has explicitly redirected stdout
@@ -312,11 +314,11 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                     // its stdout, so it will write to a pipe
                     if (out == CommandLine.DEFAULT_STDOUT) {
                         pipeOut = new PipedOutputStream();
-                        out = new PrintStream(pipeOut);
+                        out = new CommandOutput(new PrintStream(pipeOut));
                         desc.openedStreams.add(out);
                     }
                 }
-                desc.commandLine.setStreams(new Closeable[] {in, out, err});
+                desc.commandLine.setStreams(new CommandIO[] {in, out, err});
                 try {
                     CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
                     desc.thread =
@@ -350,7 +352,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             // Close any remaining streams.
             for (CommandDescriptor desc : descs) {
                 if (desc.openedStreams != null) {
-                    for (Closeable stream : desc.openedStreams) {
+                    for (CommandIO stream : desc.openedStreams) {
                         try {
                             stream.close();
                         } catch (IOException ex) {
@@ -380,7 +382,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 if (desc.openedStreams == null) {
                     throw new ShellFailureException("bad thread exit callback");
                 }
-                for (Closeable stream : desc.openedStreams) {
+                for (CommandIO stream : desc.openedStreams) {
                     try {
                         stream.close();
                     } catch (IOException ex) {
@@ -400,7 +402,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         public final CommandLine.Token fromFileName;
         public final CommandLine.Token toFileName;
         public final boolean pipeTo;
-        public List<Closeable> openedStreams;
+        public List<CommandIO> openedStreams;
         public CommandThread thread;
 
         public CommandDescriptor(CommandLine commandLine, 

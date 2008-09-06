@@ -23,6 +23,7 @@ package org.jnode.test.shell;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;

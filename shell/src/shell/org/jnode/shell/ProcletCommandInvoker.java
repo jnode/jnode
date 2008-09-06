@@ -21,8 +21,7 @@
 
 package org.jnode.shell;
 
-import java.io.Closeable;
-
+import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.proclet.ProcletContext;
 import org.jnode.shell.proclet.ProcletIOContext;
 import org.jnode.vm.VmSystem;
@@ -57,9 +56,12 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
     }
 
     CommandThreadImpl createThread(CommandLine cmdLine, CommandRunner cr) {
-        Closeable[] streams = cmdLine.getStreams();
+        CommandIO[] ios = cmdLine.getStreams();
         return ProcletContext.createProclet(cr, null, null, 
-                new Object[] {streams[0], streams[1], streams[2]}, 
+                new Object[] {
+                    ios[0].getInputStream(), 
+                    ios[1].getOutputStream(),
+                    ios[2].getOutputStream()}, 
                 cmdLine.getCommandName());
     }
     

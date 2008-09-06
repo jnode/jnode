@@ -3,7 +3,9 @@ package org.jnode.test.shell;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.SortedSet;
+
 import junit.framework.TestCase;
+
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandShell;
 

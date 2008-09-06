@@ -3,11 +3,10 @@
  */
 package org.jnode.shell.bjorne;
 
-import java.io.Closeable;
-
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
+import org.jnode.shell.io.CommandIO;
 
 public class SimpleCommandNode extends CommandNode {
 
@@ -66,7 +65,7 @@ public class SimpleCommandNode extends CommandNode {
                 context.performAssignments(assignments);
                 holders = context.evaluateRedirections(getRedirects());
                 CommandLine command = context.expandAndSplit(words);
-                Closeable[] streams = new Closeable[holders.length];
+                CommandIO[] streams = new CommandIO[holders.length];
                 for (int i = 0; i < streams.length; i++) {
                     streams[i] = holders[i].stream;
                 }

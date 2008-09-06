@@ -18,29 +18,36 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.shell;
+package org.jnode.shell.io;
 
-import java.io.Closeable;
+import java.io.IOException;
 
-/**
- * Instances of this class are used to denote well known streams (e.g. standard
- * input, etc) when building a CommandLine. They should be translated into real
- * streams before the command is actually invoked.
- * 
- * @author crawley@jnode.org
- */
-public final class StreamMarker implements Closeable {
-    private final String name;
-
-    public StreamMarker(String name) {
-        this.name = name;
+abstract class BaseCommandIO implements CommandIO {
+    
+    private String assignedEncoding;
+    private final Object systemObject;
+    
+    BaseCommandIO(Object systemObject) {
+        this.systemObject = systemObject;
+    }
+    
+    public final String getAssignedEncoding() {
+        return assignedEncoding;
     }
 
-    public void close() {
-        // Dummy operation
+    public abstract int getDirection();
+
+    public final String getEncoding() {
+        return assignedEncoding != null ? assignedEncoding : getImpliedEncoding();
     }
 
-    public String toString() {
-        return name;
+    protected abstract String getImpliedEncoding();
+
+    public final Object getSystemObject() {
+        return systemObject;
     }
+
+    public abstract boolean isTTY();
+    
+    public abstract void close() throws IOException;
 }

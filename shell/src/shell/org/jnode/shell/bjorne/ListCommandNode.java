@@ -1,6 +1,5 @@
 package org.jnode.shell.bjorne;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -8,12 +7,15 @@ import java.util.List;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandThread;
-import org.jnode.shell.NullInputStream;
-import org.jnode.shell.NullOutputStream;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ThreadExitListener;
 import org.jnode.shell.bjorne.BjorneContext.StreamHolder;
+import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandInput;
+import org.jnode.shell.io.CommandOutput;
+import org.jnode.shell.io.NullInputStream;
+import org.jnode.shell.io.NullOutputStream;
 
 
 public class ListCommandNode extends CommandNode {
@@ -120,7 +122,7 @@ public class ListCommandNode extends CommandNode {
     
     private int runPipeline(final PipelineStage[] stages) throws ShellException {
         for (PipelineStage stage : stages) {
-            Closeable[] streams = new Closeable[stage.holders.length];
+            CommandIO[] streams = new CommandIO[stage.holders.length];
             for (int i = 0; i < streams.length; i++) {
                 streams[i] = stage.holders[i].stream;
             }
@@ -176,14 +178,14 @@ public class ListCommandNode extends CommandNode {
                     } catch (IOException ex) {
                         throw new ShellFailureException("plumbing failure", ex);
                     }
-                    newIn = new StreamHolder(pipeIn, true);
-                    newOut = new StreamHolder(pipeOut, true);
+                    newIn = new StreamHolder(new CommandInput(pipeIn), true);
+                    newOut = new StreamHolder(new CommandOutput(pipeOut), true);
                 } else {
-                    newOut = new StreamHolder(new NullOutputStream(), true);
+                    newOut = new StreamHolder(new CommandOutput(new NullOutputStream()), true);
                 }
             } else {
                 if (nextStage.holders[0] == pipeInMarker) {
-                    newIn = new StreamHolder(new NullInputStream(), true);
+                    newIn = new StreamHolder(new CommandInput(new NullInputStream()), true);
                 }
             }
             if (newOut != null) {

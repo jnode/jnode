@@ -20,15 +20,11 @@
  */
 package org.jnode.test.shell.io;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.MalformedInputException;
-import java.nio.charset.UnmappableCharacterException;
 
 import junit.framework.TestCase;
 
-import org.jnode.shell.io.ReaderInputStream;
 import org.jnode.shell.io.WriterOutputStream;
 
 public class WriterOutputStreamTest extends TestCase {
