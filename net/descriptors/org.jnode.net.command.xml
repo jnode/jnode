@@ -119,8 +119,9 @@
         </sequence>
       </syntax>
 	  <syntax alias="wget">
-        <sequence description="Download locally content describe by an URL.">
-          <argument argLabel="url"/>
+	    <sequence description="Fetch the contents of one or more URLs">
+          <optional><option argLabel="debug" shortName="d" longName="debug"/></optional>
+          <repeat minCount="1"><argument argLabel="url"/></repeat>
         </sequence>
       </syntax>
     </extension>
