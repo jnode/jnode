@@ -32,7 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 /**
- * This CommandIO implementation supports bidirectional IO.  (It is not yet used by any shell.)
+ * This CommandIO implementation supports bidirectional IO.
  * 
  * @author crawley@jnode.org
  */
