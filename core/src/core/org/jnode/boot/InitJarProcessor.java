@@ -30,6 +30,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;

@@ -22,7 +22,9 @@
 package org.jnode.system.x86;
 
 import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.DMAException;
 import org.jnode.system.IOResource;

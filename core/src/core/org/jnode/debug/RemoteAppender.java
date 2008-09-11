@@ -23,6 +23,7 @@ package org.jnode.debug;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;

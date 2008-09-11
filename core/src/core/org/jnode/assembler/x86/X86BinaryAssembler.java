@@ -21,29 +21,31 @@
 
 package org.jnode.assembler.x86;
 
+import static org.jnode.assembler.x86.X86Register.CS;
+import static org.jnode.assembler.x86.X86Register.DS;
+import static org.jnode.assembler.x86.X86Register.ES;
+import static org.jnode.assembler.x86.X86Register.FS;
+import static org.jnode.assembler.x86.X86Register.GS;
+import static org.jnode.assembler.x86.X86Register.SS;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
 import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86Register.CRX;
-import static org.jnode.assembler.x86.X86Register.CS;
-import static org.jnode.assembler.x86.X86Register.DS;
-import static org.jnode.assembler.x86.X86Register.ES;
-import static org.jnode.assembler.x86.X86Register.FS;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import static org.jnode.assembler.x86.X86Register.GS;
 import org.jnode.assembler.x86.X86Register.MMX;
 import org.jnode.assembler.x86.X86Register.SR;
-import static org.jnode.assembler.x86.X86Register.SS;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;

@@ -22,10 +22,12 @@
 package org.jnode.system.repository.plugins;
 
 import java.nio.ByteBuffer;
+
 import javax.naming.CompositeName;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginLoader;

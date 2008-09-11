@@ -22,6 +22,7 @@
 package org.jnode.work;
 
 import javax.naming.NameNotFoundException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.BootLog;
 

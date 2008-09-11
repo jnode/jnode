@@ -23,6 +23,7 @@ package org.jnode.debugger;
 
 import java.io.PrintStream;
 import java.util.Map;
+
 import org.jnode.driver.input.KeyboardEvent;
 
 

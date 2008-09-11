@@ -23,7 +23,9 @@ package org.jnode.work;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.naming.NamingException;
+
 import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;

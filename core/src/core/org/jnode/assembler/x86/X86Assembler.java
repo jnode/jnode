@@ -24,6 +24,7 @@ package org.jnode.assembler.x86;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
