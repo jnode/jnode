@@ -22,6 +22,7 @@
 package org.jnode.plugin.model;
 
 import java.net.URL;
+
 import org.jnode.plugin.PluginDescriptor;
 
 /**

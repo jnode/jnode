@@ -22,6 +22,7 @@
 package org.jnode.plugin.manager;
 
 import gnu.java.security.action.GetPropertyAction;
+
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +31,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.naming.NamingException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;

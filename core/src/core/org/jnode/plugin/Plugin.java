@@ -24,6 +24,7 @@ package org.jnode.plugin;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.prefs.Preferences;
+
 import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.system.BootLog;
 
