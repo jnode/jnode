@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;

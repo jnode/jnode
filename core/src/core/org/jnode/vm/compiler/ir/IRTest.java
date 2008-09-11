@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Map;
+
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;

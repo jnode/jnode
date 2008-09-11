@@ -31,6 +31,7 @@ import static org.jnode.vm.performance.PresetEvent.TLB_IM;
 import static org.jnode.vm.performance.PresetEvent.TLB_TL;
 import static org.jnode.vm.performance.PresetEvent.TOT_CYC;
 import static org.jnode.vm.performance.PresetEvent.TOT_INS;
+
 import org.jnode.vm.x86.VmX86Processor;
 
 final class Pentium4PerformanceCounters extends P4FamilyPerformanceCounters {

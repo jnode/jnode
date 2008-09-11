@@ -28,6 +28,7 @@ import static org.jnode.vm.performance.PresetEvent.BR_TKN_MIS;
 import static org.jnode.vm.performance.PresetEvent.FP_INS;
 import static org.jnode.vm.performance.PresetEvent.TOT_CYC;
 import static org.jnode.vm.performance.PresetEvent.TOT_INS;
+
 import org.jnode.vm.x86.VmX86Processor;
 
 /**

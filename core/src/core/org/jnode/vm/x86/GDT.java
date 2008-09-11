@@ -22,6 +22,7 @@
 package org.jnode.vm.x86;
 
 import java.io.PrintStream;
+
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;

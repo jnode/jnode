@@ -22,6 +22,7 @@
 package org.jnode.vm.x86;
 
 import java.io.PrintStream;
+
 import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;

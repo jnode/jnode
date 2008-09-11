@@ -4,6 +4,7 @@
 package org.jnode.vm.x86;
 
 import javax.naming.NameNotFoundException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.IOResource;
 import org.jnode.system.ResourceManager;

@@ -23,6 +23,7 @@ package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
 import java.util.HashMap;
+
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;

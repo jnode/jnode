@@ -23,6 +23,7 @@ package org.jnode.vm.x86.performance;
 
 import java.util.Collections;
 import java.util.Set;
+
 import org.jnode.vm.performance.PerformanceCounterEvent;
 import org.jnode.vm.performance.PerformanceCounters;
 import org.jnode.vm.x86.UnsafeX86;

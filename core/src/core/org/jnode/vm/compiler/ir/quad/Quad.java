@@ -22,6 +22,7 @@
 package org.jnode.vm.compiler.ir.quad;
 
 import java.util.Map;
+
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;

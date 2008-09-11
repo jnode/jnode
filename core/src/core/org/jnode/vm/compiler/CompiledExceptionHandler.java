@@ -22,6 +22,7 @@
 package org.jnode.vm.compiler;
 
 import java.io.PrintStream;
+
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.util.NumberUtils;

@@ -25,6 +25,7 @@ import java.io.UTFDataFormatException;
 import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
+
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.VmUtils;
@@ -44,6 +45,7 @@ import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
+
 import sun.reflect.annotation.AnnotationParser;
 import sun.reflect.annotation.ExceptionProxy;
 

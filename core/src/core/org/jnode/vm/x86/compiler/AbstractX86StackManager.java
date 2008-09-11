@@ -22,6 +22,7 @@
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.vm.JvmType;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

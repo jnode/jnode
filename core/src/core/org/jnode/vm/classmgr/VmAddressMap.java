@@ -23,6 +23,7 @@ package org.jnode.vm.classmgr;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmSystemObject;
 

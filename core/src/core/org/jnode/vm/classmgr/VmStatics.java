@@ -23,6 +23,7 @@ package org.jnode.vm.classmgr;
 
 import java.io.PrintStream;
 import java.nio.ByteOrder;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.ObjectVisitor;

@@ -24,6 +24,7 @@ package org.jnode.vm.classmgr;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashSet;
+
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**

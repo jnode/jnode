@@ -22,6 +22,7 @@
 package org.jnode.vm.x86.compiler;
 
 import java.io.Writer;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;

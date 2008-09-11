@@ -24,6 +24,7 @@ package org.jnode.vm.x86;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;

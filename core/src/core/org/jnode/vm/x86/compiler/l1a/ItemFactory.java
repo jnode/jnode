@@ -22,6 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import java.util.ArrayList;
+
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
