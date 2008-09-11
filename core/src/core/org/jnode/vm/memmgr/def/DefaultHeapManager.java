@@ -22,6 +22,7 @@
 package org.jnode.vm.memmgr.def;
 
 import java.io.PrintStream;
+
 import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;

@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginRegistry;
@@ -50,6 +51,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
+import org.vmmagic.pragma.NoInlinePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

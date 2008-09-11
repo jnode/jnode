@@ -23,6 +23,7 @@ package org.jnode.vm.bytecode;
 
 import java.util.Comparator;
 import java.util.TreeMap;
+
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmByteCode;

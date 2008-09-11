@@ -5,6 +5,7 @@ package org.jnode.vm.isolate.link;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+
 import javax.isolate.ClosedLinkException;
 import javax.isolate.Isolate;
 import javax.isolate.Link;

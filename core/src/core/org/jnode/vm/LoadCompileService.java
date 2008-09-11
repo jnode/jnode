@@ -6,6 +6,7 @@ package org.jnode.vm;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.Internal;

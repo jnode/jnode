@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;

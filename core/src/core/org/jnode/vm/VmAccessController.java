@@ -27,6 +27,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
+
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.annotation.MagicPermission;

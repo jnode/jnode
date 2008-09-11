@@ -22,6 +22,7 @@
 package org.jnode.vm.bytecode;
 
 import java.util.Iterator;
+
 import org.jnode.util.ObjectArrayIterator;
 import org.jnode.vm.classmgr.VmByteCode;
 

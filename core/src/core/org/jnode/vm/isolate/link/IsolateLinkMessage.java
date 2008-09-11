@@ -4,6 +4,7 @@
 package org.jnode.vm.isolate.link;
 
 import javax.isolate.Isolate;
+
 import org.jnode.vm.isolate.VmIsolate;
 
 

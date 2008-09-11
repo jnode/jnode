@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.LinkedList;
 import java.util.Queue;
+
 import javax.isolate.ClosedLinkException;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
+
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.isolate.VmIsolateLocal;
 

@@ -22,6 +22,7 @@
 package org.jnode.vm.bytecode;
 
 import java.nio.ByteBuffer;
+
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCP;
 import org.jnode.vm.classmgr.VmConstClass;

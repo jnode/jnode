@@ -28,7 +28,9 @@ import java.io.PrintStream;
 import java.nio.ByteOrder;
 import java.util.Locale;
 import java.util.Properties;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -66,6 +68,7 @@ import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
+
 import sun.nio.ch.Interruptible;
 import sun.reflect.annotation.AnnotationType;
 

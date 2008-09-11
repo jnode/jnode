@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import java.nio.ByteBuffer;
 import java.nio.VMDirectByteBuffer;
+
 import org.jnode.system.MemoryResource;
 import org.jnode.system.MultiMediaMemoryResource;
 import org.jnode.system.Resource;

@@ -22,6 +22,7 @@
 package org.jnode.vm.bytecode;
 
 import java.io.PrintStream;
+
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;

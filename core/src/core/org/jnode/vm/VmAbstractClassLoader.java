@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
+
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
