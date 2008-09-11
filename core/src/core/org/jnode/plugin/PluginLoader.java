@@ -22,6 +22,7 @@
 package org.jnode.plugin;
 
 import java.nio.ByteBuffer;
+
 import org.jnode.security.JNodePermission;
 
 

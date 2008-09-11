@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginDescriptor;

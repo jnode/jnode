@@ -23,6 +23,7 @@ package org.jnode.plugin;
 
 import java.util.Collection;
 import java.util.Set;
+
 import org.jnode.vm.classmgr.VmClassLoader;
 
 /**
