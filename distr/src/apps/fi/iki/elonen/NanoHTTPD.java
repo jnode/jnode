@@ -120,7 +120,7 @@ public class NanoHTTPD {
      */
     public class Response {
         /**
-         * Default constructor: response = HTTP_OK, data = mime = 'null'
+         * Default constructor: response = HTTP_OK, data = mime = 'null'.
          */
         public Response() {
             this.status = HTTP_OK;
@@ -175,22 +175,22 @@ public class NanoHTTPD {
     }
 
     /**
-     * Some HTTP response status codes
+     * Some HTTP response status codes.
      */
-    public static final String HTTP_OK = "200 OK";
-    public static final String HTTP_REDIRECT = "301 Moved Permanently";
-    public static final String HTTP_FORBIDDEN = "403 Forbidden";
-    public static final String HTTP_NOTFOUND = "404 Not Found";
-    public static final String HTTP_BADREQUEST = "400 Bad Request";
-    public static final String HTTP_INTERNALERROR = "500 Internal Server Error";
-    public static final String HTTP_NOTIMPLEMENTED = "501 Not Implemented";
+    static final String HTTP_OK = "200 OK";
+    static final String HTTP_REDIRECT = "301 Moved Permanently";
+    static final String HTTP_FORBIDDEN = "403 Forbidden";
+    static final String HTTP_NOTFOUND = "404 Not Found";
+    static final String HTTP_BADREQUEST = "400 Bad Request";
+    static final String HTTP_INTERNALERROR = "500 Internal Server Error";
+    static final String HTTP_NOTIMPLEMENTED = "501 Not Implemented";
 
     /**
-     * Common mime types for dynamic content
+     * Common mime types for dynamic content.
      */
-    public static final String MIME_PLAINTEXT = "text/plain";
-    public static final String MIME_HTML = "text/html";
-    public static final String MIME_DEFAULT_BINARY = "application/octet-stream";
+    static final String MIME_PLAINTEXT = "text/plain";
+    static final String MIME_HTML = "text/html";
+    static final String MIME_DEFAULT_BINARY = "application/octet-stream";
 
     // ==================================================
     // Socket & server code
@@ -618,7 +618,7 @@ public class NanoHTTPD {
     }
 
     /**
-     * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE
+     * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE.
      */
     private static Hashtable theMimeTypes = new Hashtable();
 
@@ -645,7 +645,7 @@ public class NanoHTTPD {
     }
 
     /**
-     * GMT date formatter
+     * GMT date formatter.
      */
     private static java.text.SimpleDateFormat gmtFrmt;
 
@@ -655,7 +655,7 @@ public class NanoHTTPD {
     }
 
     /**
-     * The distribution licence
+     * The distribution licence.
      */
     private static final String LICENCE =
         "Copyright (c) 2001 Jarno Elonen <elonen@iki.fi>\n" +
