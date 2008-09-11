@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
+ * Charva based file manager.
  * @author Levente S\u00e1ntha
  */
 public class CharvaCommander extends JFrame {
@@ -34,6 +35,9 @@ public class CharvaCommander extends JFrame {
     private Pane otherPane;
     private boolean exitted;
 
+    /**
+     * Startup method.
+     */
     public static void main(String[] argv) {
         CharvaCommander cmd = null;
         try {
@@ -50,7 +54,7 @@ public class CharvaCommander extends JFrame {
         }
     }
 
-    public CharvaCommander() {
+    private CharvaCommander() {
         this._insets = new Insets(0, 0, 0, 0);
         setBackground(Color.black);
         setForeground(Color.cyan);

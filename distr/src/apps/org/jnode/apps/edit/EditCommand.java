@@ -35,7 +35,7 @@ import org.jnode.shell.syntax.FileArgument;
 public class EditCommand extends AbstractCommand {
     private final FileArgument ARG_EDIT = new FileArgument("file", Argument.OPTIONAL, "the file to edit");
 
-    public EditCommand() {
+    EditCommand() {
         super("edit a file");
         registerArguments(ARG_EDIT);
     }

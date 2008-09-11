@@ -58,7 +58,7 @@ public class Editor extends JFrame {
     private File file;
     private TitledBorder border;
 
-    public Editor(final File file) {
+    private Editor(final File file) {
         super("JNote - JNode Text Editor");
         this.file = file;
         setBackground(Color.black);
@@ -253,6 +253,9 @@ public class Editor extends JFrame {
         ed.setVisible(true);
     }
 
+    /**
+     * Startup method.
+     */
     public static void main(String[] argv) {
         editFile(null);
     }

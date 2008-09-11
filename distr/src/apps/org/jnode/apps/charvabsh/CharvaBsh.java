@@ -62,14 +62,14 @@ import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellUtils;
 
 /**
- * User: Sam Reid
- * Date: Mar 19, 2004
- * Time: 10:47:29 PM
- * Copyright (c) Mar 19, 2004 by Sam Reid
+ * A charva based beanshell interface.
  */
 public class CharvaBsh {
     static String example = "int i=0;\nfor (i=0;i<2;i++)\nprint(i+\".\");\n return i;\n";
 
+    /**
+     * Startup method.
+     */
     public static void main(String[] args) {
         Toolkit.getDefaultToolkit().register();
         System.err.println("Starting Charva Shell");
@@ -404,7 +404,7 @@ public class CharvaBsh {
 
     }
 
-    public static class CharvaBshCommandInvoker {
+    static class CharvaBshCommandInvoker {
         private Shell shell;
 
         public CharvaBshCommandInvoker() {

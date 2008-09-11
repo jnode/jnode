@@ -15,11 +15,15 @@ import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellManager;
 
 /**
+ * Swing based text console.
  * @author Levente S\u00e1ntha
  */
 public class SwingConsole {
     private static JFrame frame;
 
+    /**
+     * Startup method.
+     */
     public static void main(String[] argv) throws Exception {
         synchronized (SwingConsole.class) {
             if (frame != null) {
