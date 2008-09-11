@@ -22,6 +22,7 @@
 package org.jnode.system;
 
 import java.io.PrintStream;
+
 import org.jnode.vm.Unsafe;
 
 /**

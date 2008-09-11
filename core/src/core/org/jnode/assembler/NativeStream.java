@@ -24,6 +24,7 @@ package org.jnode.assembler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 

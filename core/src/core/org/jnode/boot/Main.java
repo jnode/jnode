@@ -23,6 +23,7 @@ package org.jnode.boot;
 
 import java.lang.reflect.Method;
 import java.util.List;
+
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.manager.DefaultPluginManager;

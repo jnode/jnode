@@ -22,6 +22,7 @@
 package org.jnode.system.x86;
 
 import javax.naming.NamingException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;

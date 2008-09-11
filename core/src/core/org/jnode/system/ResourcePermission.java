@@ -22,6 +22,7 @@
 package org.jnode.system;
 
 import gnu.java.security.util.SimplePermissionCollection;
+
 import java.security.Permission;
 import java.security.PermissionCollection;
 

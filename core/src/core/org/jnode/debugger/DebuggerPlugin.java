@@ -23,7 +23,9 @@ package org.jnode.debugger;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;

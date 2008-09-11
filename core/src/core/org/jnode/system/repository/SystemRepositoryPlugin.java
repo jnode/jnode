@@ -23,7 +23,9 @@ package org.jnode.system.repository;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
 import javax.naming.NamingException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
