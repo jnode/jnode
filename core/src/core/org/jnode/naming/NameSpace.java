@@ -22,6 +22,7 @@
 package org.jnode.naming;
 
 import java.util.Set;
+
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;

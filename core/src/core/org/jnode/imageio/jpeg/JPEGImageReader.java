@@ -3,6 +3,7 @@ package org.jnode.imageio.jpeg;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Iterator;
+
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
