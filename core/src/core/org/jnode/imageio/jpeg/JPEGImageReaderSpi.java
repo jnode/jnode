@@ -39,6 +39,7 @@ package org.jnode.imageio.jpeg;
 
 import java.io.IOException;
 import java.util.Locale;
+
 import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;

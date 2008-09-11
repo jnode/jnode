@@ -22,6 +22,7 @@
 package org.jnode.security;
 
 import gnu.java.security.PolicyFile;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -35,6 +36,7 @@ import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
