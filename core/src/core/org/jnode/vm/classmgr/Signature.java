@@ -22,6 +22,7 @@
 package org.jnode.vm.classmgr;
 
 import java.util.ArrayList;
+
 import org.jnode.vm.JvmType;
 
 /**

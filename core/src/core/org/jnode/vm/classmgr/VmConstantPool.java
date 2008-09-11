@@ -5,6 +5,7 @@ package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+
 import sun.reflect.ConstantPool;
 
 /**

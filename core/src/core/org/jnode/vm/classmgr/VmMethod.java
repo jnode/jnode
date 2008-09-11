@@ -24,6 +24,7 @@ package org.jnode.vm.classmgr;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+
 import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;

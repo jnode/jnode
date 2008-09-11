@@ -21,15 +21,16 @@
 
 package org.jnode.vm.x86.compiler.l2;
 
+import static org.jnode.vm.compiler.ir.AddressingMode.CONSTANT;
+import static org.jnode.vm.compiler.ir.AddressingMode.REGISTER;
+import static org.jnode.vm.compiler.ir.AddressingMode.STACK;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.compiler.ir.AddressingMode;
-import static org.jnode.vm.compiler.ir.AddressingMode.CONSTANT;
-import static org.jnode.vm.compiler.ir.AddressingMode.REGISTER;
-import static org.jnode.vm.compiler.ir.AddressingMode.STACK;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IntConstant;

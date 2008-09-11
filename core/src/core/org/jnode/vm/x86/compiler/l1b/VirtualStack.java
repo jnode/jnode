@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler.l1b;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.TypeStack;

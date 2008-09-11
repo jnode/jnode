@@ -23,6 +23,7 @@ package org.jnode.vm.compiler.ir;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.ObjectArrayIterator;
 import org.jnode.vm.bytecode.BytecodeParser;

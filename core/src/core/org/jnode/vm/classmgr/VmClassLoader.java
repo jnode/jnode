@@ -24,6 +24,7 @@ package org.jnode.vm.classmgr;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
+
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.CompiledIMT;

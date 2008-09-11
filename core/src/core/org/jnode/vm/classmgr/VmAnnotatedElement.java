@@ -23,6 +23,7 @@ package org.jnode.vm.classmgr;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 

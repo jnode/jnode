@@ -22,6 +22,7 @@
 package org.jnode.vm.compiler.ir;
 
 import java.util.List;
+
 import org.jnode.util.BootableArrayList;
 
 /**
