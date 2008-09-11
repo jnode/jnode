@@ -25,6 +25,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.Uninterruptible;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Queue entry for VmThread's.

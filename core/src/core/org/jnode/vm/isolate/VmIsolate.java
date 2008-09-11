@@ -30,10 +30,12 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
+
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.Link;
 import javax.naming.NameNotFoundException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.util.BootableHashMap;

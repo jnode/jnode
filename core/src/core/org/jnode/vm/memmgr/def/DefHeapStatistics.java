@@ -22,6 +22,7 @@
 package org.jnode.vm.memmgr.def;
 
 import java.util.TreeMap;
+
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.memmgr.HeapStatistics;
 

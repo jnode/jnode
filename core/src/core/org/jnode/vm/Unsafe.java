@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.annotation.Inline;

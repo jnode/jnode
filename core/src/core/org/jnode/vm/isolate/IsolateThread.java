@@ -5,6 +5,7 @@ package org.jnode.vm.isolate;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+
 import org.jnode.plugin.PluginManager;
 
 /**

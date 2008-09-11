@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import javax.naming.NamingException;
+
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.IOResource;
 import org.jnode.system.IRQHandler;

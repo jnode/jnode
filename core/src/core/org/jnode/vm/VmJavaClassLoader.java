@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import java.io.Writer;
 import java.util.HashMap;
+
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;

@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import java.nio.ByteOrder;
+
 import org.jnode.security.JNodePermission;
 import org.jnode.system.ResourceManager;
 import org.jnode.vm.annotation.Internal;

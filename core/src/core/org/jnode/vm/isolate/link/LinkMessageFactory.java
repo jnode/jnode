@@ -5,8 +5,10 @@ package org.jnode.vm.isolate.link;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
+
 import org.jnode.vm.isolate.VmIsolate;
 
 public final class LinkMessageFactory {

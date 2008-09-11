@@ -22,6 +22,7 @@
 package org.jnode.vm.memmgr;
 
 import java.io.PrintStream;
+
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;

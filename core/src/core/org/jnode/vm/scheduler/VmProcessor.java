@@ -22,6 +22,7 @@
 package org.jnode.vm.scheduler;
 
 import java.io.PrintStream;
+
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.MathSupport;

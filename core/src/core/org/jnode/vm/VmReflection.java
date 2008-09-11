@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import java.lang.reflect.InvocationTargetException;
+
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmConstString;
