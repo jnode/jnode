@@ -21,7 +21,6 @@
 
 package org.jnode.log4j.config;
 
-import java.io.OutputStreamWriter;
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
 import org.jnode.driver.console.TextConsole;
@@ -38,6 +37,6 @@ public class VirtualConsoleAppender extends WriterAppender {
      */
     public VirtualConsoleAppender(TextConsole console, Layout layout) {
         setLayout(layout);
-        setWriter(new OutputStreamWriter(console.getOut()));
+        setWriter(console.getOut());
     }
 }

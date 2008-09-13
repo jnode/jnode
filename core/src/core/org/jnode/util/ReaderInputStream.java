@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.shell.io;
+package org.jnode.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +42,10 @@ public class ReaderInputStream extends InputStream {
     private ByteBuffer bytes = ByteBuffer.allocate(2048);
     
     private CharsetEncoder encoder;
+    
+    public ReaderInputStream(Reader reader) {
+        this(reader, Charset.defaultCharset().name());
+    }
 
     public ReaderInputStream(Reader reader, String encoding) {
         this.reader = reader;
@@ -101,7 +105,7 @@ public class ReaderInputStream extends InputStream {
      */
     private int fillBuffer(boolean wait) throws IOException {
         bytes.clear();
-        // The loop is necessary because the way that the encoder has to deal
+        // The loop is necessary because of the way that an encoder has to deal
         // with UTF-16 surrogate pairs.
         CoderResult cr = null;
         int count;

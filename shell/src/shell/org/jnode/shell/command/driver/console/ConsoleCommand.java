@@ -23,6 +23,7 @@ package org.jnode.shell.command.driver.console;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
@@ -38,6 +39,8 @@ import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.util.ReaderInputStream;
+import org.jnode.util.WriterOutputStream;
 
 /**
  * ConsoleCommand starts a new console.
@@ -118,9 +121,9 @@ public class ConsoleCommand extends AbstractCommand {
                 final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
                 final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
                 TextConsole console = createConsoleWithShell(conMgr, System.out);
-                System.setIn(console.getIn());
-                System.setOut(new PrintStream(console.getOut()));
-                System.setErr(new PrintStream(console.getErr()));
+                System.setIn(new ReaderInputStream(console.getIn()));
+                System.setOut(new PrintStream(new WriterOutputStream(console.getOut()), true));
+                System.setErr(new PrintStream(new WriterOutputStream(console.getErr()), true));
             } catch (Exception ex) {
                 // FIXME
                 System.out.println("Problem creating the isolated console");
@@ -144,7 +147,7 @@ public class ConsoleCommand extends AbstractCommand {
         String invokerName = System.getProperty(CommandShell.INVOKER_PROPERTY_NAME, "");
         // FIXME this is a temporary hack until we decide what to do about these invokers
         if ("thread".equals(invokerName) || "default".equals(invokerName)) {
-            PrintStream err = new PrintStream(console.getErr());
+            PrintWriter err = new PrintWriter(console.getErr());
             err.println(
                     "Warning: any commands run in this console via their main(String[]) will " +
                     "have the 'wrong' System.out and System.err.");

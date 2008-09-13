@@ -153,30 +153,12 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                     throw new ShellInvocationException(
                             "Exception while creating command thread", ex);
                 }
-                // FIXME this method for waiting for the command to finish is
-                // really lame ... and theoretically incorrect.  We should 
-                // wait / notify.
                 this.blocking = true;
                 this.blockingThread = Thread.currentThread();
                 this.cmdName = cmdLine.getCommandName();
 
                 threadProcess.start(null);
-
                 threadProcess.waitFor();
-                /*
-                while (this.blocking) {
-                    try {
-                        Thread.sleep(6000);
-                    } catch (InterruptedException interrupted) {
-                        if (!blocking) {
-                            // interruption was okay, break normally.
-                        } else {
-                            throw new ShellFailureException(
-                                    "unexpected interrupt", interrupted);
-                        }
-                    }
-                }
-                */
             }
             return cr.getRC();
         } catch (Exception ex) {

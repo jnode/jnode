@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -36,8 +37,6 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.StringArgument;
-
-import java.lang.reflect.Modifier;
 
 /**
  * This command runs a Java class by calling its 'public static void

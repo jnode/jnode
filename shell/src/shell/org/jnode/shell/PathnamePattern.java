@@ -90,7 +90,7 @@ public class PathnamePattern {
      * When set, this flag causes the '.' and '..' directories to be included in
      * domain of objects to be matched. (You probably don't want to set this
      * flag without setting HIDE_DOT_FILENAMES as well. Under normal
-     * circumastances a user doesn't expect '.' and '..' to be returned in a
+     * circumstances a user doesn't expect '.' and '..' to be returned in a
      * pattern match.)
      */
     public static final int INCLUDE_DOT_AND_DOTDOT = 0x04;

@@ -21,10 +21,11 @@
 
 package org.jnode.shell.help.def;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
+
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -57,7 +58,7 @@ public class DefaultHelp extends Help {
      *
      * @see Help#help(org.jnode.shell.help.Help.Info, String)
      */
-    public void help(Info info, String command, PrintStream out) {
+    public void help(Info info, String command, PrintWriter out) {
         final Syntax[] syntaxes = info.getSyntaxes();
         final String name = command == null ? info.getName() : command;
         for (int i = 0; i < syntaxes.length; i++) {
@@ -69,7 +70,7 @@ public class DefaultHelp extends Help {
     }
 
     @Override
-    public void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out) {
+    public void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out) {
         usage(syntaxes, bundle, out);
         if (bundle.getDescription() != null) {
             out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
@@ -135,7 +136,7 @@ public class DefaultHelp extends Help {
     /**
      * Shows the help for a command syntax.
      */
-    public void help(String name, Syntax syntax, PrintStream out) {
+    public void help(String name, Syntax syntax, PrintWriter out) {
         usage(name, syntax, out);
         if (syntax.getDescription() != null) {
             out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
@@ -154,7 +155,7 @@ public class DefaultHelp extends Help {
     /**
      * Shows the usage information of a command.
      */
-    public void usage(Info info, PrintStream out) {
+    public void usage(Info info, PrintWriter out) {
         final Syntax[] syntaxes = info.getSyntaxes();
         for (int i = 0; i < syntaxes.length; i++) {
             usage(info.getName(), syntaxes[i], out);
@@ -164,7 +165,7 @@ public class DefaultHelp extends Help {
     /**
      * Shows the usage information of a command.
      */
-    public void usage(String name, Syntax syntax, PrintStream out) {
+    public void usage(String name, Syntax syntax, PrintWriter out) {
         StringBuilder line = new StringBuilder(name);
         final Parameter[] params = syntax.getParams();
         for (int i = 0; i < params.length; i++) {
@@ -174,7 +175,7 @@ public class DefaultHelp extends Help {
     }
 
     @Override
-    public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, PrintStream out) {
+    public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, PrintWriter out) {
         String command = syntaxBundle.getAlias();
         String usageText = Help.getLocalizedHelp("help.usage") + ":";
         int usageLength = usageText.length();
@@ -201,25 +202,25 @@ public class DefaultHelp extends Help {
         }
     }
 
-    public void describeParameter(Parameter param, PrintStream out) {
+    public void describeParameter(Parameter param, PrintWriter out) {
         format(out, new Cell[]{new Cell(2, 18), new Cell(2, NOMINAL_WIDTH - 22)},
             new String[]{param.getName(), param.getDescription()});
     }
 
-    public void describeArgument(Argument arg, PrintStream out) {
+    public void describeArgument(Argument arg, PrintWriter out) {
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
             new String[]{arg.getName(), arg.getDescription()});
     }
 
     @Override
-    public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out) {
+    public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintWriter out) {
         String description = "(" + arg.getTypeDescription() + ") " + arg.getDescription();
         format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
             new String[]{"<" + arg.getLabel() + ">", description});
     }
 
     @Override
-    public void describeOption(FlagArgument arg, TreeSet<String> flagTokens, PrintStream out) {
+    public void describeOption(FlagArgument arg, TreeSet<String> flagTokens, PrintWriter out) {
         StringBuffer sb = new StringBuffer();
         for (String flagToken : flagTokens) {
             if (sb.length() > 0) {
@@ -231,7 +232,7 @@ public class DefaultHelp extends Help {
             new String[]{sb.toString(), arg.getDescription()});
     }
 
-    protected void format(PrintStream out, Cell[] cells, String[] texts) {
+    protected void format(PrintWriter out, Cell[] cells, String[] texts) {
         if (cells.length != texts.length) {
             throw new IllegalArgumentException("Number of cells and texts must match");
         }

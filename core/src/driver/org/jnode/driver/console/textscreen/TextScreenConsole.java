@@ -21,8 +21,9 @@
 
 package org.jnode.driver.console.textscreen;
 
-import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -30,12 +31,12 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.AbstractConsole;
-import org.jnode.driver.console.spi.ConsoleOutputStream;
-import org.jnode.driver.console.spi.ConsolePrintStream;
+import org.jnode.driver.console.spi.ConsoleWriter;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
+import org.jnode.util.WriterOutputStream;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.isolate.VmIsolate;
 
@@ -75,11 +76,11 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      */
     private int curY;
 
-    private InputStream in;
+    private Reader in;
 
-    private final ConsolePrintStream out;
+    private final Writer out;
 
-    private final ConsolePrintStream err;
+    private final Writer err;
 
     private PrintStream savedOut;
 
@@ -107,11 +108,10 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         this.screen = screen;
         this.scrWidth = screen.getWidth();
         this.scrHeight = screen.getHeight();
-        this.savedOut = this.out = new ConsolePrintStream(new ConsoleOutputStream(this, 0x07));
-        this.savedErr = this.err = new ConsolePrintStream(new ConsoleOutputStream(this, 0x04));
-        // todo crawley, will the console not set System.out/err any more?
-        // this.claimSystemOutErr = ((options &
-        // ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR) == 0);
+        this.out = new ConsoleWriter(this, 0x07);
+        this.err = new ConsoleWriter(this, 0x04);
+        this.savedOut = new PrintStream(new WriterOutputStream(this.out), true);
+        this.savedErr = new PrintStream(new WriterOutputStream(this.err), true);
         this.claimSystemOutErr = false;
         this.myIsolate = VmIsolate.currentIsolate();
     }
@@ -144,15 +144,15 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      *
      * @param v
      * @param offset
-     * @param lenght
+     * @param length
      * @param color
      */
     @Override
-    public void putChar(char v[], int offset, int lenght, int color) {
+    public void putChar(char v[], int offset, int length, int color) {
         int mark = 0;
-        for (int i = 0; i < lenght; i++) {
+        for (int i = 0; i < length; i++) {
             char c = v[i + offset];
-            if (c == '\n' || c == '\b' || c == '\t' || curX + i == scrWidth - 1 || i == lenght - 1) {
+            if (c == '\n' || c == '\b' || c == '\t' || curX + i == scrWidth - 1 || i == length - 1) {
                 final int ln = i - mark;
                 if (ln > 0) {
                     screen.set(screen.getOffset(curX, curY), v, offset + mark, ln, color);
@@ -323,8 +323,8 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
     @Override
     public InputCompleter getCompleter() {
-        if (in instanceof KeyboardInputStream) {
-            return ((KeyboardInputStream) in).getCompleter();
+        if (in instanceof KeyboardReader) {
+            return ((KeyboardReader) in).getCompleter();
         } else {
             return null;
         }
@@ -332,8 +332,8 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
     @Override
     public void setCompleter(InputCompleter completer) {
-        if (in instanceof KeyboardInputStream) {
-            ((KeyboardInputStream) in).setCompleter(completer);
+        if (in instanceof KeyboardReader) {
+            ((KeyboardReader) in).setCompleter(completer);
         }
     }
 
@@ -341,11 +341,11 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      * @see org.jnode.driver.console.TextConsole#getIn()
      */
     @Override
-    public InputStream getIn() {
+    public Reader getIn() {
         return in;
     }
 
-    void setIn(InputStream in) {
+    void setIn(Reader in) {
         this.in = in;
     }
 
@@ -353,7 +353,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      * @see org.jnode.driver.console.TextConsole#getErr()
      */
     @Override
-    public PrintStream getErr() {
+    public Writer getErr() {
         return err;
     }
 
@@ -361,7 +361,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
      * @see org.jnode.driver.console.TextConsole#getOut()
      */
     @Override
-    public PrintStream getOut() {
+    public Writer getOut() {
         return out;
     }
 

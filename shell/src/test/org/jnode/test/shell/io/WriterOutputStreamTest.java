@@ -25,7 +25,7 @@ import java.nio.charset.MalformedInputException;
 
 import junit.framework.TestCase;
 
-import org.jnode.shell.io.WriterOutputStream;
+import org.jnode.util.WriterOutputStream;
 
 public class WriterOutputStreamTest extends TestCase {
     

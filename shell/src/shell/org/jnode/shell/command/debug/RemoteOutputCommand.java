@@ -24,7 +24,9 @@ package org.jnode.shell.command.debug;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Writer;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -33,8 +35,8 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.jnode.debug.RemoteReceiver;
 import org.jnode.debug.RemoteAppender;
+import org.jnode.debug.RemoteReceiver;
 import org.jnode.debug.UDPOutputStream;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
@@ -76,9 +78,9 @@ public class RemoteOutputCommand extends AbstractCommand {
             final boolean udp = FLAG_UDP.isSet();
             OutputStream remoteOut = udp ? new UDPOutputStream(sockAddr) :
                 createTCPOutputStream(addr, port);
-
+            Writer remoteWriter = new OutputStreamWriter(remoteOut);
             try {
-                ShellUtils.getCurrentShell().addConsoleOuputRecorder(remoteOut);
+                ShellUtils.getCurrentShell().addConsoleOuputRecorder(remoteWriter);
             } catch (UnsupportedOperationException ex) {
                 err.println("Cannot capture output from the current shell");
                 remoteOut.close();

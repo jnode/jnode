@@ -27,6 +27,8 @@ import java.util.ArrayList;
  * @author epr
  */
 public class Queue<T> {
+    
+    public static final int NO_WAIT = -1;
 
     /**
      * The actual queue
@@ -47,7 +49,7 @@ public class Queue<T> {
      */
     public synchronized T get(boolean ignoreInteruptions, long timeout) {
         while (queue.isEmpty()) {
-            if (closed) {
+            if (closed || timeout == NO_WAIT) {
                 return null;
             }
             try {
@@ -62,7 +64,6 @@ public class Queue<T> {
                 return null;
             }
         }
-        //T result = queue.get(0);
         return queue.remove(0);
     }
 

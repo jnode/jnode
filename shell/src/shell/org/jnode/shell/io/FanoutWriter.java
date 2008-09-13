@@ -21,60 +21,59 @@
 package org.jnode.shell.io;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * The FanoutOutputStream writes its output to multiple print streams.  This implementation
  * makes no attempt to you from adding the same OutputStream multiple times in the fanout.
- * If you do this, the close method will attempt to close some streams more than once.
  * 
  * @author crawley@jnode.org
  */
-public class FanoutOutputStream extends OutputStream {
+public class FanoutWriter extends Writer {
 
-    private OutputStream[] streams;
+    private Writer[] writers;
     private final boolean ignoreClose;
 
     /**
      * Construct a FanoutOutputStream for an an initial set of streams
      * @param ignoreClose if <code>true</code>, a close all just does a flush.  In other words
      * the responsibility of closing the individual streams remains with the caller.
-     * @param streams The initial set of streams.
+     * @param writers The initial set of streams.
      */
-    public FanoutOutputStream(boolean ignoreClose, OutputStream ... streams) {
-        this.streams = streams;
+    public FanoutWriter(boolean ignoreClose, Writer ... writers) {
+        this.writers = writers;
         this.ignoreClose = ignoreClose;
     }
     
     /**
-     * Add another OutputStream to the fanout.
+     * Add another Writer to the fanout.
      * 
-     * @param os the stream to be added.
+     * @param writer the writer to be added.
      */
-    public synchronized void addStream(OutputStream os) {
-        int len = streams.length;
-        OutputStream[] tmp = new OutputStream[len + 1];
-        System.arraycopy(streams, 0, tmp, 0, len);
-        tmp[len] = os;
-        streams = tmp;
+    public synchronized void addStream(Writer writer) {
+        int len = writers.length;
+        Writer[] tmp = new Writer[len + 1];
+        System.arraycopy(writers, 0, tmp, 0, len);
+        tmp[len] = writer;
+        writers = tmp;
     }
     
     /**
-     * Remove a OutputStream from the fanout.
-     * @param os the stream to be removed.
+     * Remove a Writer from the fanout.
+     * @param writer the Writer to be removed.
      * @return returns <code>true</code> if the stream to be removed was removed.
      */
-    public synchronized boolean removeStream(OutputStream os) {
-        int len = streams.length;
+    public synchronized boolean removeStream(Writer writer) {
+        int len = writers.length;
         for (int i = 0; i < len; i++) {
-            if (streams[i] == os) {
-                int len2 = streams.length - 1;
-                OutputStream[] tmp = new OutputStream[len2];
+            if (writers[i] == writer) {
+                int len2 = writers.length - 1;
+                Writer[] tmp = new Writer[len2];
                 for (int j = 0; j < len2; j++) {
                     if (j < i) {
-                        tmp[j] = streams[j];
+                        tmp[j] = writers[j];
                     } else {
-                        tmp[j] = streams[j + 1];
+                        tmp[j] = writers[j + 1];
                     }
                 }
                 return true;
@@ -85,47 +84,36 @@ public class FanoutOutputStream extends OutputStream {
 
     @Override
     public synchronized void close() throws IOException {
-        if (streams == null) {
+        if (writers == null) {
             // already closed.
         } else if (ignoreClose) {
             flush();
         } else {
-            for (OutputStream os : streams) {
-                os.close();
+            for (Writer writer : writers) {
+                writer.close();
             }
-            streams = null;
+            writers = null;
         }
     }
 
     @Override
     public void flush() throws IOException {
-        OutputStream[] streams = this.streams;
-        for (OutputStream os : streams) {
-            os.flush();
+        for (Writer writer : this.writers) {
+            writer.flush();
         }
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        OutputStream[] streams = this.streams;
-        for (OutputStream os : streams) {
-            os.write(b, off, len);
-        }
-    }
-
-    @Override
-    public void write(byte[] b) throws IOException  {
-        OutputStream[] streams = this.streams;
-        for (OutputStream os : streams) {
-            os.write(b);
+    public void write(char[] cbuf, int off, int len) throws IOException {
+        for (Writer writer : this.writers) {
+            writer.write(cbuf, off, len);
         }
     }
 
     @Override
     public void write(int b) throws IOException {
-        OutputStream[] streams = this.streams;
-        for (OutputStream os : streams) {
-            os.write(b);
+        for (Writer writer : this.writers) {
+            writer.write(b);
         }
     }
 }

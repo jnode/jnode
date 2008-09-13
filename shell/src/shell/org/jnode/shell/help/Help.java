@@ -21,7 +21,7 @@
  
 package org.jnode.shell.help;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.TreeSet;
 
@@ -77,7 +77,7 @@ public abstract class Help {
      * @param command a command name or alias which appears in the help
      * @param out the destination for help output.
      */
-    public abstract void help(Info info, String command, PrintStream out);
+    public abstract void help(Info info, String command, PrintWriter out);
 
     /**
      * Shows the help page for a command
@@ -86,7 +86,7 @@ public abstract class Help {
      * @param bundle the command's argument bundle
      * @param out the destination for help output.
      */
-    public abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out);
+    public abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out);
 
     /**
      * Shows the usage line for a command
@@ -94,7 +94,7 @@ public abstract class Help {
      * @param info the command information
      * @param out the destination for help output.
      */
-    public abstract void usage(Info info, PrintStream out);
+    public abstract void usage(Info info, PrintWriter out);
 
     /**
      * Shows the usage line for a command
@@ -103,32 +103,32 @@ public abstract class Help {
      * @param bundle the command's argument bundle
      * @param out the destination for help output.
      */
-    public abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out);
+    public abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out);
 
     /**
      * Shows the description of a single argument. Used as a callback in
      * {@link Argument#describe(Help)}.
      */
-    public abstract void describeArgument(Argument arg, PrintStream out);
+    public abstract void describeArgument(Argument arg, PrintWriter out);
 
     /**
      * Shows the description of a single argument. Used as a callback in
      * {@link Argument#describe(Help)}.
      */
-    public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out);
+    public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintWriter out);
 
     /**
      * Shows the description of a single FlagArgument. Used as a callback in
      * {@link Argument#describe(Help)}.
      */
     public abstract void describeOption(FlagArgument arg, 
-            TreeSet<String> flagTokens, PrintStream out);
+            TreeSet<String> flagTokens, PrintWriter out);
 
     /**
      * Shows the description of a single parameter. Used as a callback in
      * {@link Parameter#describe(Help)}.
      */
-    public abstract void describeParameter(Parameter param, PrintStream out);
+    public abstract void describeParameter(Parameter param, PrintWriter out);
 
     public static class Info {
 
@@ -159,7 +159,7 @@ public abstract class Help {
             return syntaxes;
         }
 
-        public void usage(PrintStream out) {
+        public void usage(PrintWriter out) {
             try {
                 Help.getHelp().usage(this, out);
             } catch (HelpException ex) {
@@ -172,11 +172,12 @@ public abstract class Help {
          * @param command command name or alias which appears in the help message
          * @throws HelpException
          */
-        public void help(String command, PrintStream out) throws HelpException {
+        public void help(String command, PrintWriter out) throws HelpException {
             Help.getHelp().help(this, command, out);
         }
 
-        public String complete(CompletionInfo completion, CommandLine partial) throws CompletionException {
+        public String complete(CompletionInfo completion, CommandLine partial, 
+                PrintWriter out) throws CompletionException {
             // The completion strategy is to try to complete each of the
             // syntaxes, and return the longest completion string.
             String max = "";
@@ -191,8 +192,8 @@ public abstract class Help {
                 }
             }
             if (!foundCompletion) {
-                System.out.println();
-                usage(System.out);
+                out.println();
+                usage(out);
                 throw new CompletionException("Invalid command syntax");
             }
             return max;

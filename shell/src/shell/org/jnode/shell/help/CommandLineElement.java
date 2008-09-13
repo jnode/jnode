@@ -21,7 +21,7 @@
  
 package org.jnode.shell.help;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.driver.console.CompletionInfo;
 
@@ -46,7 +46,7 @@ abstract class CommandLineElement {
     }
 
     public abstract String format();
-    public abstract void describe(Help help, PrintStream out);
+    public abstract void describe(Help help, PrintWriter out);
     public abstract void complete(CompletionInfo completion, String partial);
 
     /** 

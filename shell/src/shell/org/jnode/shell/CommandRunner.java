@@ -22,6 +22,7 @@ package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -80,31 +81,63 @@ class CommandRunner implements Runnable {
 
     public void run() {
         try {
+            boolean ok = false;
             try {
                 if (method != null) {
                     try {
+                        // This saves the Command instance that has the commandline state
+                        // associated in a thread-local so that the Abstract.execute(String[])
+                        // method can get hold of it.  This is the magic that allows a command
+                        // that implements 'main' as "new MyCommand().execute(args)" to get the
+                        // parsed commandline arguments, etc.
                         AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
+                        
+                        // Call the command's entry point method reflectively
                         Object obj = Modifier.isStatic(method.getModifiers()) ? null
                                 : cx.newInstance();
                         AccessController.doPrivileged(new InvokeAction(method, obj,
                                 args));
                     } finally {
-                        // This clears the current command to prevent leakage.  (This
-                        // is only necessary if the current thread could be used to
-                        // execute other commands.  But we'll do it anyway ... for now.)
+                        // This clears the current command to prevent possible leakage of
+                        // commands arguments, etc to the next command.
                         AbstractCommand.retrieveCurrentCommand();
                     }
                 } else {
+                    // For a command that implements the Command API, call the 'new'
+                    // execute method.  If it is not 'execute()' is not overridden by the
+                    // command class, the default implementation from AbstractCommand will
+                    // bounce us to the older execute(CommandLine, InputStream, PrintStream,
+                    // PrintStream) method.
                     Command cmd = cmdInfo.createCommandInstance();
                     cmd.initialize(commandLine, ios);
                     cmd.execute();
                 }
+                ok = true;
             } catch (PrivilegedActionException ex) {
                 Exception ex2 = ex.getException();
                 if (ex2 instanceof InvocationTargetException) {
                     throw ex2.getCause();
                 } else {
                     throw ex2;
+                }
+            } finally {
+                IOException savedEx = null;
+                // Make sure that we try to flush all IOs, even if some of the flushes
+                // result in IOExceptions.
+                for (CommandIO io : ios) {
+                    try {
+                        io.flush();
+                    } catch (IOException ex) {
+                        shell.getErr().println("Failed to flush output: " + ex.getMessage());
+                        if (ok) {
+                            savedEx = ex;
+                        }
+                    }
+                }
+                if (savedEx != null) {
+                    // If we were'nt already propagating an exception, and the flush failed,
+                    // propagate one of the IOExceptions.
+                    throw savedEx;
                 }
             }
             invoker.unblock();

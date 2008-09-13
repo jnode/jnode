@@ -23,7 +23,7 @@ package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -51,7 +51,7 @@ import org.jnode.vm.VmExit;
  */
 public class DefaultCommandInvoker implements CommandInvoker {
 
-    private final PrintStream err;
+    private final PrintWriter err;
     private final CommandShell shell;
 
     private static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
@@ -68,7 +68,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
 
     public DefaultCommandInvoker(CommandShell shell) {
         this.shell = shell;
-        this.err = shell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
+        this.err = shell.resolveStream(CommandLine.DEFAULT_STDERR).getPrintWriter();
     }
 
     public String getName() {

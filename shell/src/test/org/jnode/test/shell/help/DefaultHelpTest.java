@@ -21,7 +21,8 @@
 package org.jnode.test.shell.help;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+
 import junit.framework.TestCase;
 import org.jnode.shell.help.def.DefaultHelp;
 
@@ -48,7 +49,7 @@ public class DefaultHelpTest extends TestCase {
             }
         }
 
-        public void format(PrintStream out, MyCell[] cells, String[] texts) {
+        public void format(PrintWriter out, MyCell[] cells, String[] texts) {
             super.format(out, cells, texts);
         }
     }
@@ -76,7 +77,7 @@ public class DefaultHelpTest extends TestCase {
 
     public void testFormat() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(bos);
+        PrintWriter ps = new PrintWriter(bos);
         new MyDefaultHelp().format(ps,
             new MyDefaultHelp.MyCell[]{
                 new MyDefaultHelp.MyCell(3, 5), new MyDefaultHelp.MyCell(3, 20)},

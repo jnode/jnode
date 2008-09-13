@@ -32,6 +32,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.naming.InitialNaming;
@@ -39,6 +40,7 @@ import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
+import org.jnode.util.WriterOutputStream;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -58,6 +60,7 @@ public class Log4jConfigurePlugin extends Plugin {
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
     protected void startPlugin() throws PluginException {
+        System.err.println("Running in Log4jConfigurePlugin.startPlugin");
         final Logger root = Logger.getRootLogger();
         try {
             // Create the appenders
@@ -72,12 +75,23 @@ public class Log4jConfigurePlugin extends Plugin {
             conMgr.registerConsole(console);
 
             console.setAcceleratorKeyCode(KeyEvent.VK_F7);
-            final VirtualConsoleAppender debugApp = new VirtualConsoleAppender(console, new PatternLayout(LAYOUT));
+            final VirtualConsoleAppender debugApp =
+                new VirtualConsoleAppender(console, new PatternLayout(LAYOUT));
             debugApp.setThreshold(Level.DEBUG);
-            BootLog.setDebugOut(new PrintStream(console.getOut()));
+            BootLog.setDebugOut(new PrintStream(new WriterOutputStream(console.getOut()), true));
 
-            final ConsoleAppender infoApp = new ConsoleAppender(new PatternLayout(LAYOUT));
+            // This doesn't work yet.  It sends to the F7 console, whereas we really want to send
+            // the log messages to the current active console.
+//            final WriterAppender infoApp = 
+//                new JNodeConsoleAppender(new PatternLayout(LAYOUT), console, false);
+            
+            // This kind of works.  It sends to whatever System.out currently is at the point
+            // that the appender is created.  But if this plugin is started too late, this will
+            // could be almost anything.
+            final WriterAppender infoApp = 
+                new ConsoleAppender(new PatternLayout(LAYOUT));
             infoApp.setThreshold(Level.INFO);
+            infoApp.setImmediateFlush(true);
 
             // Add the new appenders
             root.addAppender(debugApp);
@@ -86,10 +100,12 @@ public class Log4jConfigurePlugin extends Plugin {
             // Remove the existing appenders.
             for (Enumeration<?> appEnum = root.getAllAppenders(); appEnum.hasMoreElements();) {
                 final Appender appender = (Appender) appEnum.nextElement();
-                if ((appender != debugApp) && (appender != infoApp)) {
+                if (appender != debugApp && appender != infoApp) {
                     root.removeAppender(appender);
                 }
             }
+            System.err.println("Sending a test log message");
+            root.error("Test log message");
         } catch (NameNotFoundException ex) {
             root.error("ConsoleManager not found", ex);
         }

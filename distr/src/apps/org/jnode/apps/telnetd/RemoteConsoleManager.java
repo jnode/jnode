@@ -1,12 +1,13 @@
 package org.jnode.apps.telnetd;
 
 import java.io.InputStream;
+import java.io.Reader;
 
 import net.wimpi.telnetd.io.TerminalIO;
 
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.textscreen.KeyboardHandler;
-import org.jnode.driver.console.textscreen.KeyboardInputStream;
+import org.jnode.driver.console.textscreen.KeyboardReader;
 import org.jnode.driver.console.textscreen.TextScreenConsole;
 import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
 
@@ -29,7 +30,7 @@ public class RemoteConsoleManager extends TextScreenConsoleManager {
     }
 
     @Override
-    protected InputStream getInputStream(int options, TextScreenConsole console) {
+    protected Reader getReader(int options, TextScreenConsole console) {
         // InputStream in = System.in;
         // if ((options & CreateOptions.NO_LINE_EDITTING) == 0) {
         // KeyboardHandler kbHandler = new DefaultKeyboardHandler(null);
@@ -39,7 +40,7 @@ public class RemoteConsoleManager extends TextScreenConsoleManager {
         // return in;
 
         KeyboardHandler kbHandler = new RemoteKeyboardHandler(terminalIO);
-        return new KeyboardInputStream(kbHandler, console);
+        return new KeyboardReader(kbHandler, console);
     }
 
     @Override

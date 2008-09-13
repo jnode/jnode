@@ -31,6 +31,9 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
+import org.jnode.util.ReaderInputStream;
+import org.jnode.util.WriterOutputStream;
+
 /**
  * This CommandIO implementation supports bidirectional IO.
  * 
@@ -74,7 +77,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
             if (outputStream instanceof PrintStream) {
                 printStream = (PrintStream) outputStream;
             } else {
-                printStream = new PrintStream(getOutputStream());
+                printStream = new PrintStream(getOutputStream(), true);
             }
         }
         return printStream;
@@ -102,7 +105,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
             if (writer instanceof PrintWriter) {
                 printWriter = (PrintWriter) writer;
             } else {
-                printWriter = new PrintWriter(getWriter());
+                printWriter = new PrintWriter(getWriter(), true);
             }
         }
         return printWriter;
@@ -147,21 +150,18 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         return false;
     }
 
-    @Override
-    protected String getImpliedEncoding() {
-        return "UTF-8";
-    }
-
     /* (non-Javadoc)
      * @see org.jnode.shell.io.CommandIOIF#close()
      */
     @Override
     public void close() throws IOException {
-        if (writer != null) {
-            writer.flush();
+        flush();
+
+        if (printWriter != null) {
+            printWriter.close();
         }
-        if (outputStream != null) {
-            outputStream.flush();
+        if (printStream != null) {
+            printStream.close();
         }
         if (writer != null) {
             writer.close();
@@ -177,5 +177,18 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         }
     }
     
-    
+    public void flush() throws IOException {
+        if (writer != null) {
+            writer.flush();
+        }
+        if (outputStream != null) {
+            outputStream.flush();
+        }
+        if (printWriter != null) {
+            printWriter.flush();
+        }
+        if (printStream != null) {
+            printStream.flush();
+        }
+    }
 }

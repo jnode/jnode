@@ -109,4 +109,12 @@ public interface CommandIO {
      * @throws IOException
      */
     public void close() throws IOException;
+    
+    /**
+     * Flush this CommandIO's associated byte and / or character output streams.
+     * This is a no-op for an input-only or closed CommandIO.
+     * 
+     * @throws IOException
+     */
+    public void flush() throws IOException;
 }
