@@ -29,7 +29,9 @@ import org.jnode.system.event.SystemEvent;
  * @author epr
  */
 public class KeyboardEvent extends SystemEvent {
-
+    /** This value is returned by getKeyChar() when a KeyboardEvent has no char */
+    public static final int NO_CHAR = 0;
+    
     private int modifiers;
     private int keyCode;
     private char keyChar;

@@ -30,6 +30,8 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
+import org.jnode.util.ReaderInputStream;
+
 /**
  * This CommandIO implementation supports input streams.
  * 
@@ -77,11 +79,6 @@ public class CommandInput extends BaseCommandIO {
     public boolean isTTY() {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    protected String getImpliedEncoding() {
-        return "UTF-8";
     }
 
     public void close() throws IOException {

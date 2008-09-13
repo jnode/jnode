@@ -21,8 +21,8 @@
 
 package org.jnode.driver.console;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -155,25 +155,27 @@ public interface TextConsole extends Console {
     public void setTabSize(int tabSize);
 
     /**
-     * Gets the input stream of this console.
+     * Gets the Reader that delivers input characters from this console.  These
+     * characters are the result of processing keyboard events, performing line
+     * editing and completion.
      *
      * @return
      */
-    public InputStream getIn();
+    public Reader getIn();
 
     /**
-     * Gets the error stream of this console.
+     * Gets the Writer that receives 'error' output for this console.
      *
      * @return
      */
-    public OutputStream getErr();
+    public Writer getErr();
 
     /**
-     * Gets the output stream of this console.
+     * Gets the Writer that receives 'normal' output for this console.
      *
      * @return
      */
-    public OutputStream getOut();
+    public Writer getOut();
 
     /**
      * Is the cursor visible.
@@ -196,7 +198,7 @@ public interface TextConsole extends Console {
     public InputCompleter getCompleter();
 
     /**
-     * Ges the console's input completer
+     * Set the console's input completer
      *
      * @param The new completer or <code>null</code>.
      */

@@ -2,8 +2,9 @@ package org.jnode.driver.console.textscreen;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.io.PrintStream;
+import java.io.Writer;
 
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
@@ -13,18 +14,18 @@ import org.jnode.system.event.FocusListener;
 
 
 /**
- * KeyInputStream maps keyboard events into a stream of characters.  Current functionality includes:
+ * KeyboardInputStream maps keyboard events into a stream of characters.  Current functionality includes:
  * <ul>
  * <li>line buffering and line editing, using a text console,
  * <li>integrated input history and completion,
- * <li>CTRL-D is interpretted as a 'soft' EOF mark,KeyboardInputStream
+ * <li>CTRL-D is interpreted as a 'soft' EOF mark,KeyboardInputStream
  * <li>listens to keyboard focus events.
  * </ul>
  * <p/>
  * Future enhancements include:
  * <ul>
  * <li>a "raw" mode in which characters and other keyboard events are delivered without line editing,
- * <li>a "no echo" mode in which line editting occurs without echoing of input characters,
+ * <li>a "no echo" mode in which line editing occurs without echoing of input characters,
  * <li>making the active characters and keycodes "soft",
  * <li>making completion and history context sensitive; e.g. when switching between a shell and 
  * an application, and
@@ -39,7 +40,7 @@ import org.jnode.system.event.FocusListener;
  * 
  * @author crawley@jnode.org
  */
-public class KeyboardInputStream extends InputStream
+public class KeyboardReader extends Reader
     implements FocusListener {
 
     public static final byte CTRL_L = 12;
@@ -47,7 +48,7 @@ public class KeyboardInputStream extends InputStream
 
     private boolean eof;
 
-    private byte[] buffer;
+    private char[] buffer;
     private int pos;
     private int lim;
 
@@ -56,7 +57,7 @@ public class KeyboardInputStream extends InputStream
     private final Line currentLine;
     private final TextConsole console;
     private InputCompleter completer;
-    private final PrintStream out;
+    private final Writer out;
 
     private String currentPrompt;
 
@@ -74,10 +75,10 @@ public class KeyboardInputStream extends InputStream
     private final KeyboardHandler keyboardHandler;
     private final FocusListener focusListener;
 
-    public KeyboardInputStream(KeyboardHandler kbHandler, TextConsole console) {
+    public KeyboardReader(KeyboardHandler kbHandler, TextConsole console) {
         this.keyboardHandler = kbHandler;
         this.console = console;
-        this.out = new PrintStream(console.getOut());
+        this.out = console.getOut();
         this.currentLine = new Line(console);
         this.pos = this.lim = 0;
 
@@ -97,22 +98,15 @@ public class KeyboardInputStream extends InputStream
     }
 
     @Override
-    public int available() throws IOException {
-        if (eof) {
-            return 0; /* per the JDK 1.6 API docs */
-        } else {
-            // FIXME - what about the case where the line buffer is empty
-            // and there are unconsumed input events in the queue?
-            return currentLine.getLineLength();
-        }
+    public boolean ready() throws IOException {
+        return eof || currentLine.getLineLength() > 0;
     }
 
     /**
-     * @see java.io.InputStream#close()
+     * @see java.io.Reader#close()
      */
     public void close() throws IOException {
         keyboardHandler.close();
-        super.close();
     }
 
     /**
@@ -120,7 +114,7 @@ public class KeyboardInputStream extends InputStream
      * 
      * @return true if the event was processed
      */
-    private boolean processEvent() {
+    private boolean processEvent() throws IOException {
         KeyboardEvent event = keyboardHandler.getEvent();
         if (!event.isConsumed()) {
             char ch = event.getKeyChar();
@@ -141,13 +135,13 @@ public class KeyboardInputStream extends InputStream
     }
 
     /**
-     * Process a keystroke interpretted as a character.
+     * Process a keystroke interpreted as a character.
      * 
      * @param ch the character to process
      * @return <code>true</code> if the character should cause the current
      *         line buffer contents to be returned to the user.
      */
-    private boolean processChar(char ch) {
+    private boolean processChar(char ch) throws IOException {
         boolean breakChar = false;
         switch (ch) {
             // if its a backspace we want to remove one from the end of our
@@ -164,7 +158,7 @@ public class KeyboardInputStream extends InputStream
             case '\n':
                 currentLine.moveEnd();
                 refreshCurrentLine();
-                out.println();
+                out.write('\n');
                 currentLine.appendChar(ch);
                 breakChar = true;
                 historyIndex = -1;
@@ -175,7 +169,7 @@ public class KeyboardInputStream extends InputStream
                     if (currentLine.complete()) {
                         currentLine.start(true);
                     }
-                    out.print(currentPrompt);
+                    out.write(currentPrompt);
                     refreshCurrentLine();
                 }
                 break;
@@ -184,7 +178,7 @@ public class KeyboardInputStream extends InputStream
             case CTRL_D:
                 currentLine.moveEnd();
                 refreshCurrentLine();
-                out.println();
+                out.write('\n');
                 eof = true;
                 breakChar = true;
                 break;
@@ -193,7 +187,7 @@ public class KeyboardInputStream extends InputStream
             case CTRL_L:
                 this.console.clear();
                 this.console.setCursor(0, 0);
-                out.print(currentPrompt);
+                out.write(currentPrompt);
                 currentLine.start();
                 refreshCurrentLine();
                 break;
@@ -213,8 +207,9 @@ public class KeyboardInputStream extends InputStream
      * @param modifiers key modifiers
      * @return <code>true</code> if the keystroke has been recognized and
      *         acted on, <code>false</code> otherwise.
+     * @throws IOException 
      */
-    private boolean processVirtualKeystroke(int code, int modifiers) {
+    private boolean processVirtualKeystroke(int code, int modifiers) throws IOException {
         if (modifiers != 0) {
             return false;
         }
@@ -280,7 +275,7 @@ public class KeyboardInputStream extends InputStream
         return true;
     }
 
-    private void updateCurrentLine() {
+    private void updateCurrentLine() throws IOException {
         if (historyIndex > -1) {
             currentLine.setContent(completer.getInputHistory().getLineAt(historyIndex));
         } else {
@@ -290,7 +285,7 @@ public class KeyboardInputStream extends InputStream
         currentLine.moveEnd();
     }
 
-    private void refreshCurrentLine() {
+    private void refreshCurrentLine() throws IOException {
         currentLine.refreshCurrentLine();
     }
 
@@ -306,7 +301,7 @@ public class KeyboardInputStream extends InputStream
         currentLine.start();
         while (processEvent()) { /* */
         }
-        buffer = currentLine.consumeBytes();
+        buffer = currentLine.consumeChars();
         lim = buffer.length;
         pos = 0;
         return pos < lim;
@@ -323,7 +318,7 @@ public class KeyboardInputStream extends InputStream
     }
 
     @Override
-    public int read(byte[] buff, int off, int len) throws IOException {
+    public int read(char[] buff, int off, int len) throws IOException {
         int nosRead = 0;
         if (pos >= lim) {
             if (eof || !fillBuffer()) {
@@ -339,7 +334,7 @@ public class KeyboardInputStream extends InputStream
     }
 
     @Override
-    public int read(byte[] buff) throws IOException {
+    public int read(char[] buff) throws IOException {
         return read(buff, 0, buff.length);
     }
 

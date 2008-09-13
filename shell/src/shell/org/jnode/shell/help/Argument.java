@@ -21,7 +21,7 @@
  
 package org.jnode.shell.help;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.driver.console.CompletionInfo;
 
@@ -55,7 +55,7 @@ public class Argument extends CommandLineElement {
         return "<" + getName() + ">" + (isMulti() ? " ..." : "");
     }
 
-    public void describe(Help help, PrintStream out) {
+    public void describe(Help help, PrintWriter out) {
         help.describeArgument(this, out);
     }
 

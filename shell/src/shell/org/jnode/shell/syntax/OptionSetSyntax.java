@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.jnode.nanoxml.XMLElement;
-
 import org.jnode.shell.CommandLine.Token;
 
 

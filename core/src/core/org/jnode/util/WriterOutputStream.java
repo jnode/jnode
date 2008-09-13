@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.shell.io;
+package org.jnode.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +42,10 @@ public class WriterOutputStream extends OutputStream {
     
     private Writer writer;
     private CharsetDecoder decoder;
+    
+    public WriterOutputStream(Writer writer) {
+        this(writer, Charset.defaultCharset().name());
+    }
 
     public WriterOutputStream(Writer writer, String encoding) {
         this.writer = writer;
@@ -51,7 +55,7 @@ public class WriterOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public synchronized void write(int b) throws IOException {
         bytes.put((byte) b);
         if (bytes.remaining() == 0) {
             flush(false);
@@ -61,6 +65,7 @@ public class WriterOutputStream extends OutputStream {
     @Override
     public void flush() throws IOException {
         flush(false);
+        writer.flush();
     }
     
     @Override
@@ -69,7 +74,7 @@ public class WriterOutputStream extends OutputStream {
         writer.close();
     }
 
-    private int flush(boolean all) throws IOException {
+    private synchronized int flush(boolean all) throws IOException {
         if (bytes.position() > 0) {
             bytes.flip();
             chars.clear();
@@ -97,7 +102,7 @@ public class WriterOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public synchronized void write(byte[] b, int off, int len) throws IOException {
         if (off < 0 || off > b.length || len < 0 || off + len > b.length || off + len < 0) {
             throw new IndexOutOfBoundsException();
         }

@@ -21,6 +21,7 @@
 package org.jnode.shell.io;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 abstract class BaseCommandIO implements CommandIO {
     
@@ -41,7 +42,9 @@ abstract class BaseCommandIO implements CommandIO {
         return assignedEncoding != null ? assignedEncoding : getImpliedEncoding();
     }
 
-    protected abstract String getImpliedEncoding();
+    protected String getImpliedEncoding() {
+        return Charset.defaultCharset().name();
+    }
 
     public final Object getSystemObject() {
         return systemObject;
@@ -50,4 +53,8 @@ abstract class BaseCommandIO implements CommandIO {
     public abstract boolean isTTY();
     
     public abstract void close() throws IOException;
+    
+    public void flush() throws IOException {
+    }
+    
 }

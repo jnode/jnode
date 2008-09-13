@@ -30,6 +30,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.util.WriterOutputStream;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -60,8 +61,8 @@ public class TextScreenConsolePlugin extends Plugin {
                 (ConsoleManager.CreateOptions.TEXT |
                     ConsoleManager.CreateOptions.SCROLLABLE));
             mgr.focus(first);
-            System.setOut(new PrintStream(first.getOut()));
-            System.setErr(new PrintStream(first.getErr()));
+            System.setOut(new PrintStream(new WriterOutputStream(first.getOut()), true));
+            System.setErr(new PrintStream(new WriterOutputStream(first.getErr()), true));
             System.out.println(VmSystem.getBootLog());
         } catch (ConsoleException ex) {
             throw new PluginException(ex);

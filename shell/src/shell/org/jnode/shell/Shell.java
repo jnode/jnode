@@ -23,7 +23,7 @@ package org.jnode.shell;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputCompleter;
@@ -55,9 +55,9 @@ public interface Shell extends InputCompleter {
     /**
      * Record all console output from the shell and commands launched by the shell.
      * 
-     * @param os The stream for recording output.
+     * @param writer The stream for recording output.
      */
-    public void addConsoleOuputRecorder(OutputStream os);
+    public void addConsoleOuputRecorder(Writer writer);
     
     /**
      * Returns the console where the shell is running.

@@ -30,7 +30,7 @@ import java.nio.charset.UnmappableCharacterException;
 
 import junit.framework.TestCase;
 
-import org.jnode.shell.io.ReaderInputStream;
+import org.jnode.util.ReaderInputStream;
 
 public class ReaderInputStreamTest extends TestCase {
 

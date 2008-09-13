@@ -28,10 +28,12 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
@@ -48,7 +50,7 @@ import org.jnode.driver.console.ConsoleListener;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.console.textscreen.KeyboardInputStream;
+import org.jnode.driver.console.textscreen.KeyboardReader;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -57,13 +59,14 @@ import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandInputOutput;
 import org.jnode.shell.io.CommandOutput;
-import org.jnode.shell.io.FanoutOutputStream;
+import org.jnode.shell.io.FanoutWriter;
 import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.shell.syntax.CommandSyntaxException.Context;
+import org.jnode.util.ReaderInputStream;
 import org.jnode.util.SystemInputStream;
 import org.jnode.vm.VmSystem;
 
@@ -101,21 +104,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      */
     private static final Logger log = Logger.getLogger(CommandShell.class);
 
-    private OutputStream out;
-    
-    private OutputStream err;
-
-    private InputStream in;
-
     private CommandInput cin;
     
     private CommandOutput cout;
     
     private CommandOutput cerr;
-
-    private PrintStream outPs;
     
-    private PrintStream errPs;
+    private Reader in;
+
+    private PrintWriter outPW;
+    
+    private PrintWriter errPW;
     
     private AliasManager aliasMgr;
 
@@ -205,12 +204,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public CommandShell(TextConsole cons) throws ShellException {
         try {
             console = cons;
-            InputStream in = console.getIn();
+            Reader in = console.getIn();
             if (in == null) {
                 throw new ShellException("console input stream is null");
             }
             setupStreams(in, console.getOut(), console.getErr());
-            SystemInputStream.getInstance().initialize(in);
+            SystemInputStream.getInstance().initialize(new ReaderInputStream(in));
             cons.setCompleter(this);
 
             console.addConsoleListener(this);
@@ -224,15 +223,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
     
-    private void setupStreams(InputStream in, OutputStream out, OutputStream err) {
-        this.in = in;
-        this.out = out;
-        this.err = err;
+    private void setupStreams(Reader in, Writer out, Writer err) {
         this.cout = new CommandOutput(out);
         this.cerr = new CommandOutput(err);
         this.cin = new CommandInput(in);
-        this.outPs = cout.getPrintStream();
-        this.errPs = cerr.getPrintStream();
+        this.in = cin.getReader();
+        this.outPW = cout.getPrintWriter();
+        this.errPW = cerr.getPrintWriter();
     }
 
     
@@ -245,7 +242,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
         this.aliasMgr = aliasMgr;
         this.syntaxMgr = syntaxMgr;
-        setupStreams(System.in, System.out, System.err);
+        setupStreams(
+                new InputStreamReader(System.in), 
+                new OutputStreamWriter(System.out), 
+                new OutputStreamWriter(System.err));
         this.readingCommand = true;
         this.debugEnabled = true;
     }
@@ -292,11 +292,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             try {
                 if (e.startsWith(COMMAND_KEY)) {
                     final String cmd = e.substring(COMMAND_KEY.length());
-                    outPs.println(prompt() + cmd);
+                    outPW.println(prompt() + cmd);
                     processCommand(cmd, false);
                 }
             } catch (Throwable ex) {
-                errPs.println("Error while processing bootarg commands: "
+                errPW.println("Error while processing bootarg commands: "
                         + ex.getMessage());
                 stackTrace(ex);
             }
@@ -312,7 +312,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                             runCommandFile(jnode_ini);
                         }
                     } catch (IOException ex) {
-                        errPs.println("Error while reading " + jnode_ini + ": " + ex.getMessage());
+                        errPW.println("Error while reading " + jnode_ini + ": " + ex.getMessage());
                         stackTrace(ex);
                     }
                     return null;
@@ -329,7 +329,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         runCommandFile(shell_ini);
                     }
                 } catch (IOException ex) {
-                    errPs.println("Error while reading " + shell_ini + ": " + ex.getMessage());
+                    errPW.println("Error while reading " + shell_ini + ": " + ex.getMessage());
                     stackTrace(ex);
                 }
                 return null;
@@ -341,7 +341,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 refreshFromProperties();
 
                 clearEof();
-                outPs.print(prompt());
+                outPW.print(prompt());
                 readingCommand = true;
                 String line = readInputLine().trim();
                 if (line.length() > 0) {
@@ -352,7 +352,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     exited = true;
                 }
             } catch (Throwable ex) {
-                errPs.println("Uncaught exception while processing command(s): "
+                errPW.println("Uncaught exception while processing command(s): "
                         + ex.getMessage());
                 stackTrace(ex);
             }
@@ -368,7 +368,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME,
                     INITIAL_INVOKER));
         } catch (Exception ex) {
-            errPs.println(ex.getMessage());
+            errPW.println(ex.getMessage());
             stackTrace(ex);
             // Use the fallback invoker
             setCommandInvoker(FALLBACK_INVOKER);
@@ -377,7 +377,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
                     INITIAL_INTERPRETER));
         } catch (Exception ex) {
-            errPs.println(ex.getMessage());
+            errPW.println(ex.getMessage());
             stackTrace(ex);
             // Use the fallback interpreter
             setCommandInterpreter(FALLBACK_INTERPRETER);
@@ -393,13 +393,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
                     ""));
         } catch (Exception ex) {
-            errPs.println(ex.getMessage());
+            errPW.println(ex.getMessage());
             stackTrace(ex);
         }
         try {
             setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME, ""));
         } catch (Exception ex) {
-            errPs.println(ex.getMessage());
+            errPW.println(ex.getMessage());
             stackTrace(ex);
         }
     }
@@ -408,7 +408,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         if (!name.equals(this.invokerName)) {
             this.invoker = ShellUtils.createInvoker(name, this);
             if (this.invokerName != null) {
-                outPs.println("Switched to " + name + " invoker");
+                outPW.println("Switched to " + name + " invoker");
             }
             this.invokerName = name;
             System.setProperty(INVOKER_PROPERTY_NAME, name);
@@ -419,7 +419,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         if (!name.equals(this.interpreterName)) {
             this.interpreter = ShellUtils.createInterpreter(name);
             if (this.interpreterName != null) {
-                outPs.println("Switched to " + name + " interpreter");
+                outPW.println("Switched to " + name + " interpreter");
             }
             this.interpreterName = name;
             System.setProperty(INTERPRETER_PROPERTY_NAME, name);
@@ -428,15 +428,14 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private void stackTrace(Throwable ex) {
         if (this.debugEnabled) {
-            ex.printStackTrace(errPs);
+            ex.printStackTrace(errPW);
         }
     }
 
     private String readInputLine() throws IOException {
         StringBuffer sb = new StringBuffer(40);
-        Reader r = new InputStreamReader(in);
         while (true) {
-            int ch = r.read();
+            int ch = in.read();
             if (ch == -1 || ch == '\n') {
                 return sb.toString();
             }
@@ -445,8 +444,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     private void clearEof() {
-        if (in instanceof KeyboardInputStream) {
-            ((KeyboardInputStream) in).clearSoftEOF();
+        if (in instanceof KeyboardReader) {
+            ((KeyboardReader) in).clearSoftEOF();
         }
     }
 
@@ -466,7 +465,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // Try to turn this into something that is moderately intelligible
             // for the common cases ...
             if (cause != null) {
-                errPs.println(ex.getMessage());
+                errPW.println(ex.getMessage());
                 if (cause instanceof CommandSyntaxException) {
                     List<Context> argErrors = ((CommandSyntaxException) cause).getArgErrors();
                     if (argErrors != null) {
@@ -485,19 +484,19 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                                 continue;
                             }
                             if (context.token != null) {
-                                errPs.println("   " + context.exception.getMessage() + ": " +
+                                errPW.println("   " + context.exception.getMessage() + ": " +
                                         context.token.token);
                             } else {
-                                errPs.println("   " + context.exception.getMessage() + ": " +
+                                errPW.println("   " + context.exception.getMessage() + ": " +
                                         context.syntax.format());
                             }
                         }
                     }
                 } else {
-                    errPs.println(cause.getMessage());
+                    errPW.println(cause.getMessage());
                 }
             } else {
-                errPs.println("Shell exception: " + ex.getMessage());
+                errPW.println("Shell exception: " + ex.getMessage());
             }
             rc = -1;
             stackTrace(ex);
@@ -676,13 +675,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 cl.complete(completion, this);
             }
         } catch (ShellSyntaxException ex) {
-            outPs.println(); // next line
-            errPs.println("Cannot parse: " + ex.getMessage());
+            outPW.println(); // next line
+            errPW.println("Cannot parse: " + ex.getMessage());
             stackTrace(ex);
 
         } catch (CompletionException ex) {
-            outPs.println(); // next line
-            errPs.println("Problem in completer: " + ex.getMessage());
+            outPW.println(); // next line
+            errPW.println("Problem in completer: " + ex.getMessage());
             stackTrace(ex);
         }
 
@@ -782,7 +781,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public int runCommandFile(File file) throws IOException {
         if (!file.exists()) {
-            errPs.println("File does not exist: " + file);
+            errPW.println("File does not exist: " + file);
             return -1;
         }
         try {
@@ -799,7 +798,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 try {
                     rc = invokeCommand(line);
                 } catch (ShellException ex) {
-                    errPs.println("Shell exception: " + ex.getMessage());
+                    errPW.println("Shell exception: " + ex.getMessage());
                     stackTrace(ex);
                 }
             }
@@ -889,26 +888,28 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return syntaxMgr;
     }
 
-    public PrintStream getErr() {
-        return errPs;
+    public PrintWriter getOut() {
+        return outPW;
+    }
+
+    public PrintWriter getErr() {
+        return errPW;
     }
 
     @Override
-    public void addConsoleOuputRecorder(OutputStream os) {
+    public void addConsoleOuputRecorder(Writer writer) {
         // FIXME do security check
-        if (out == null || err == null) {
-            throw new UnsupportedOperationException(
-                    "Cannot intercept console output for this shell instance");
-        }
-        if (out instanceof FanoutOutputStream) {
-            ((FanoutOutputStream) out).addStream(os);
-            ((FanoutOutputStream) err).addStream(os);
+        Writer out = cout.getWriter();
+        Writer err = cerr.getWriter();
+        if (out instanceof FanoutWriter) {
+            ((FanoutWriter) out).addStream(writer);
+            ((FanoutWriter) err).addStream(writer);
         } else {
-            out = new FanoutOutputStream(true, out, os);
-            outPs = new PrintStream(out);
-            err = new FanoutOutputStream(true, err, os);
-            errPs = new PrintStream(err);
+            cout = new CommandOutput(new FanoutWriter(true, out, writer));
+            outPW = cout.getPrintWriter();
+            cerr = new CommandOutput(new FanoutWriter(true, err, writer));
+            errPW = cerr.getPrintWriter();
         }
-        errPs.println("Testing");
+        errPW.println("Testing");
     }
 }

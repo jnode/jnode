@@ -52,11 +52,6 @@ public final class CommandIOMarker extends BaseCommandIO {
     }
 
     @Override
-    protected String getImpliedEncoding() {
-        return null;
-    }
-
-    @Override
     public boolean isTTY() {
         return false;
     }

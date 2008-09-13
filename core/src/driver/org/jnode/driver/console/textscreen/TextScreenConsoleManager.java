@@ -22,6 +22,7 @@
 package org.jnode.driver.console.textscreen;
 
 import java.io.InputStream;
+import java.io.Reader;
 
 import javax.naming.NameNotFoundException;
 
@@ -69,8 +70,7 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
                 screen = tsm.getSystemScreen().createCompatibleBufferScreen();
                 console = new TextScreenConsole(this, name, screen, options);
             }
-            InputStream in = getInputStream(options, console);
-            console.setIn(in);
+            console.setIn(getReader(options, console));
             if ((options & CreateOptions.STACKED) != 0) {
                 stackConsole(console);
             } else {
@@ -84,14 +84,12 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
         }
     }
     
-    protected InputStream getInputStream(int options, TextScreenConsole console)
-    {
-        InputStream in = System.in;
+    protected Reader getReader(int options, TextScreenConsole console) {
+        Reader in = null;
         if ((options & CreateOptions.NO_LINE_EDITTING) == 0) {
             KeyboardHandler kbHandler = new DefaultKeyboardHandler(getKeyboardApi());
-            in = new KeyboardInputStream(kbHandler, console);
+            in = new KeyboardReader(kbHandler, console);
         }
-        
         return in;
     }
     

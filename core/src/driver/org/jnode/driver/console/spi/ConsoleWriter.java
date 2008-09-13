@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ConsoleOutputStream.java 4153 2008-05-30 12:20:45Z lsantha $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -22,14 +22,14 @@
 package org.jnode.driver.console.spi;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import org.jnode.driver.console.TextConsole;
 
 /**
  * @author epr
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-public class ConsoleOutputStream extends OutputStream {
+public class ConsoleWriter extends Writer {
 
     private static final int BUFFER_SIZE = 160;
     private final char[] buffer = new char[BUFFER_SIZE];
@@ -43,23 +43,19 @@ public class ConsoleOutputStream extends OutputStream {
      * @param console
      * @param fgColor
      */
-    public ConsoleOutputStream(TextConsole console, int fgColor) {
+    public ConsoleWriter(TextConsole console, int fgColor) {
         this.console = console;
         this.fgColor = fgColor;
     }
 
-    /**
-     * @param b
-     * @throws IOException
-     * @see java.io.OutputStream#write(int)
-     */
+    @Override
     public void write(int b) throws IOException {
         console.putChar((char) b, fgColor);
     }
 
-    public void write(byte[] b, int off, int len)
+    public void write(char[] cbuf, int off, int len)
         throws IOException, NullPointerException, IndexOutOfBoundsException {
-        if (off < 0 || len < 0 || off + len > b.length)
+        if (off < 0 || len < 0 || off + len > cbuf.length)
             throw new ArrayIndexOutOfBoundsException();
 
         int bi = 0;
@@ -68,12 +64,20 @@ public class ConsoleOutputStream extends OutputStream {
                 console.putChar(buffer, 0, BUFFER_SIZE, fgColor);
                 bi = 0;
             }
-            buffer[bi++] = (char) b[off + i];
+            buffer[bi++] = (char) cbuf[off + i];
         }
 
         console.putChar(buffer, 0, bi, fgColor);
     }
 
+
+    @Override
+    public void close() throws IOException {
+    }
+
+    @Override
+    public void flush() throws IOException {
+    }
 
     /**
      * @return int

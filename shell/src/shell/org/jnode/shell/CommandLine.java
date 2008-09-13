@@ -637,12 +637,12 @@ public class CommandLine implements Completable, Iterable<String> {
                     // Otherwise, try old-style completion using the command's INFO
                     try {
                         Help.Info info = Help.getInfo(cmdClass.getCommandClass());
-                        info.complete(completion, this);
+                        info.complete(completion, this, shell.getOut());
                     } catch (HelpException ex) {
                         // And fall back to old-style completion with an 'info' that
                         // specifies a sequence of 'file' names.
                         // FIXME ...
-                        defaultInfo.complete(completion, this);
+                        defaultInfo.complete(completion, this, shell.getOut());
                     }
                 }
             } catch (CommandSyntaxException ex) {

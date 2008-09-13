@@ -21,8 +21,7 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import javax.naming.NameNotFoundException;
 
@@ -60,9 +59,11 @@ public class HelpCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         String alias;
+        CommandLine commandLine = getCommandLine();
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         if (ARG_ALIAS.isSet()) {
             alias = ARG_ALIAS.getValue();
         } else if (commandLine.getCommandName() != null) {
@@ -80,7 +81,6 @@ public class HelpCommand extends AbstractCommand {
             final AliasManager aliasManager = shell.getAliasManager(); 
             final SyntaxManager syntaxManager = shell.getSyntaxManager();
             Class<?> clazz = getCommandClass(aliasManager, alias);
-
             bundle = getBundle(clazz, err);
             if (bundle != null) {
                 syntaxes = syntaxManager.getSyntaxBundle(alias);
@@ -119,7 +119,7 @@ public class HelpCommand extends AbstractCommand {
         }
     }
 
-    private ArgumentBundle getBundle(Class<?> clazz, PrintStream err) {
+    private ArgumentBundle getBundle(Class<?> clazz, PrintWriter err) {
         try {
             AbstractCommand command = (AbstractCommand) clazz.newInstance();
             return command.getArgumentBundle();

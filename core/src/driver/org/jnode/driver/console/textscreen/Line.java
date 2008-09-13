@@ -21,13 +21,14 @@
 
 package org.jnode.driver.console.textscreen;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.SortedSet;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.ScrollableTextConsole;
 import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.console.spi.ConsolePrintStream;
+import org.jnode.driver.console.spi.ConsoleWriter;
 
 
 /**
@@ -68,11 +69,11 @@ class Line {
 
     private final TextConsole console;
 
-    private ConsolePrintStream out;
+    private ConsoleWriter out;
 
     public Line(TextConsole console) {
         this.console = console;
-        this.out = (ConsolePrintStream) console.getOut();
+        this.out = (ConsoleWriter) console.getOut();
     }
 
     public void start() {
@@ -101,12 +102,14 @@ class Line {
         return currentLine.toString();
     }
 
-    public byte[] getBytes() {
-        return currentLine.toString().getBytes();
+    public char[] getChars() {
+        char[] res = new char[currentLine.length()];
+        currentLine.getChars(0, currentLine.length(), res, 0);
+        return res;
     }
 
-    public byte[] consumeBytes() {
-        byte[] res = getBytes();
+    public char[] consumeChars() {
+        char[] res = getChars();
         currentLine.setLength(0);
         return res;
     }
@@ -161,7 +164,7 @@ class Line {
         }
     }
 
-    public boolean complete() {
+    public boolean complete() throws IOException {
         CompletionInfo info = null;
         InputCompleter completer = console.getCompleter();
         String ending =
@@ -182,7 +185,7 @@ class Line {
         return res;
     }
 
-    protected boolean printList(CompletionInfo info) {
+    protected boolean printList(CompletionInfo info) throws IOException {
         SortedSet<String> completions = info.getCompletions();
         if (completions == null || completions.size() <= 1) {
             return false;
@@ -191,7 +194,7 @@ class Line {
         moveEnd();
         refreshCurrentLine();
 
-        out.println();
+        out.write('\n');
         String[] list = completions.toArray(new String[completions.size()]);
 
         final int minItemsToSplit = 5;
@@ -204,10 +207,11 @@ class Line {
             // item may actually be a single item or in fact multiple items
             if (item.length() % SCREEN_WIDTH == 0) {
                 // we are already at the first column of the next line
-                out.print(item);
+                out.write(item);
             } else {
                 // we aren't at the first column of the next line
-                out.println(item);
+                out.write(item);
+                out.write('\n');
             }
         }
         posOnCurrentLine = oldPosOnCurrentLine;
@@ -286,7 +290,7 @@ class Line {
         return res;
     }
 
-    public void refreshCurrentLine() {
+    public void refreshCurrentLine() throws IOException {
         try {
             int x = consoleX;
             int width = console.getWidth();
@@ -298,7 +302,7 @@ class Line {
             // output the input line buffer contents with the screen cursor hidden
             console.setCursorVisible(false);
             console.setCursor(consoleX, consoleY);
-            out.print(currentLine);
+            out.write(currentLine.toString());
 
             // get position of end of line
             // FIXME ... there's a problem here if some application simultaneously
