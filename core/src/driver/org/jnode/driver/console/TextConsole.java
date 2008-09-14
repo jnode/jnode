@@ -31,7 +31,7 @@ import java.io.Writer;
 public interface TextConsole extends Console {
 
     /**
-     * Sets the cursor at the given location.
+     * Sets the cursor to the given location.
      *
      * @param x
      * @param y
@@ -53,7 +53,7 @@ public interface TextConsole extends Console {
     public int getCursorY();
 
     /**
-     * Set a character at a given location.
+     * Set the character at a given location.
      *
      * @param x
      * @param y
@@ -63,26 +63,26 @@ public interface TextConsole extends Console {
     public void setChar(int x, int y, char ch, int color);
 
     /**
-     * Set the characters at the given location.
+     * Set characters starting at the given location.
      *
      * @param x
      * @param y
-     * @param ch
+     * @param cbuf
      * @param color
      */
-    public void setChar(int x, int y, char[] ch, int color);
+    public void setChar(int x, int y, char[] cbuf, int color);
 
     /**
-     * Set the characters at the given location.
+     * Set characters starting at the given location.
      *
      * @param x
      * @param y
-     * @param ch
-     * @param cOfset
-     * @param cLength
+     * @param cbuf
+     * @param offset
+     * @param length
      * @param color
      */
-    public void setChar(int x, int y, char[] ch, int cOfset, int cLength, int color);
+    public void setChar(int x, int y, char[] cbuf, int offset, int length, int color);
 
     /**
      * Get the character at a given location.
@@ -93,7 +93,7 @@ public interface TextConsole extends Console {
     public char getChar(int x, int y);
 
     /**
-     * Get the color at a given location.
+     * Get the color of at a given location.
      *
      * @param x
      * @param y
@@ -139,10 +139,10 @@ public interface TextConsole extends Console {
      *
      * @param v
      * @param offset
-     * @param lenght
+     * @param length
      * @param color
      */
-    public void putChar(char v[], int offset, int lenght, int color);
+    public void putChar(char v[], int offset, int length, int color);
 
     /**
      * @return Returns the tabSize.
