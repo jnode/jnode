@@ -29,23 +29,101 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Collection;
+import java.util.HashSet;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.DeviceListener;
+import org.jnode.driver.DeviceManager;
 import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
+import javax.naming.NameNotFoundException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha
  */
 public class MouseHandler implements PointerListener {
+    //todo refactor this pattern to be generally available in JNode for AWT and text consoles as well
+    private static class PointerAPIHandler implements PointerAPI, DeviceListener {
+        private Collection<PointerAPI> pointerList = new HashSet<PointerAPI>();
+        private Collection<PointerListener> listenerList = new HashSet<PointerListener>();
+
+        PointerAPIHandler() {
+            try {
+                DeviceManager dm = DeviceUtils.getDeviceManager();
+                dm.addListener(this);
+                for (Device device : dm.getDevicesByAPI(PointerAPI.class)) {
+                    try {
+                        pointerList.add(device.getAPI(PointerAPI.class));
+                    } catch (ApiNotFoundException anfe) {
+                        //ignore
+                    }
+                }
+            } catch (NameNotFoundException nfe) {
+                //todo handle it
+            }
+        }
+
+        public void addPointerListener(PointerListener listener) {
+            listenerList.add(listener);
+            for (PointerAPI api : pointerList) {
+                api.addPointerListener(listener);
+            }
+        }
+
+        public void removePointerListener(PointerListener listener) {
+            listenerList.remove(listener);
+            for (PointerAPI api : pointerList) {
+                api.removePointerListener(listener);
+            }
+        }
+
+        public void setPreferredListener(PointerListener listener) {
+            for (PointerAPI api : pointerList) {
+                api.setPreferredListener(listener);
+            }
+        }
+
+        public void deviceStarted(Device device) {
+            if (device.implementsAPI(PointerAPI.class)) {
+                try {
+                    PointerAPI api = device.getAPI(PointerAPI.class);
+                    pointerList.add(api);
+                    for (PointerListener listener : listenerList) {
+                        api.addPointerListener(listener);
+                    }
+                } catch (ApiNotFoundException anfe) {
+                    //ignore
+                }
+            }
+        }
+
+        public void deviceStop(Device device) {
+            if (device.implementsAPI(PointerAPI.class)) {
+                try {
+                    PointerAPI api = device.getAPI(PointerAPI.class);
+                    pointerList.remove(api);
+                    for (PointerListener listener : listenerList) {
+                        api.removePointerListener(listener);
+                    }
+                } catch (ApiNotFoundException anfe) {
+                    //ignore
+                }
+            }
+        }
+
+        boolean hasPointer() {
+            return !pointerList.isEmpty();
+        }
+    }
+
     private final PointerAPI pointerAPI;
 
     private static final int[] BUTTON_MASK = {
@@ -90,44 +168,30 @@ public class MouseHandler implements PointerListener {
                         EventQueue eventQueue, KeyboardHandler keyboardHandler) {
         this.eventQueue = eventQueue;
         HardwareCursorAPI hwCursor = null;
-        Device pointerDevice = null;
-        PointerAPI pointerAPI = null;
+
         try {
             hwCursor = fbDevice.getAPI(HardwareCursorAPI.class);
         } catch (ApiNotFoundException ex) {
             log.info("No hardware-cursor found on device " + fbDevice.getId());
         }
-        //if (hwCursor != null) {
-        try {
-            final Collection<Device> pointers = DeviceUtils
-                .getDevicesByAPI(PointerAPI.class);
-            if (!pointers.isEmpty()) {
-                pointerDevice = pointers.iterator().next();
-                pointerAPI = pointerDevice.getAPI(PointerAPI.class);
-            }
-        } catch (ApiNotFoundException ex) {
-            log.error("Strange...", ex);
-        }
-        //}
+
         this.keyboardHandler = keyboardHandler;
         this.hwCursor = hwCursor;
-        this.pointerAPI = pointerAPI;
         this.screenSize = screenSize;
-        if (pointerAPI != null) {
-            log.debug("Using PointerDevice " + pointerDevice.getId());
-            if (hwCursor != null) {
-                hwCursor.setCursorImage(JNodeCursors.ARROW);
-                hwCursor.setCursorVisible(true);
-                hwCursor.setCursorPosition(0, 0);
-            }
-            pointerAPI.addPointerListener(this);
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                public Void run() {
-                    MouseHandler.this.pointerAPI.setPreferredListener(MouseHandler.this);
-                    return null;
-                }
-            });
+
+        if (hwCursor != null) {
+            hwCursor.setCursorImage(JNodeCursors.ARROW);
+            hwCursor.setCursorVisible(true);
+            hwCursor.setCursorPosition(0, 0);
         }
+        this.pointerAPI = new PointerAPIHandler();
+        pointerAPI.addPointerListener(this);
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                MouseHandler.this.pointerAPI.setPreferredListener(MouseHandler.this);
+                return null;
+            }
+        });
     }
 
     void setCursorImage(HardwareCursor ci) {

@@ -36,20 +36,110 @@ import java.io.File;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
+import java.util.HashSet;
 import javax.imageio.ImageIO;
+import javax.naming.NameNotFoundException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceListener;
+import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.input.KeyboardInterpreter;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class KeyboardHandler implements
-    KeyboardListener {
+public class KeyboardHandler implements KeyboardListener {
+    //todo refactor this pattern to be generally available in JNode for AWT and text consoles as well
+    private static class KeyboardAPIHandler implements KeyboardAPI, DeviceListener {
+        private Collection<KeyboardAPI> keyboardList = new HashSet<KeyboardAPI>();
+        private Collection<KeyboardListener> listenerList = new HashSet<KeyboardListener>();
+        private KeyboardInterpreter interpreter;
+
+        KeyboardAPIHandler() {
+            try {
+                DeviceManager dm = DeviceUtils.getDeviceManager();
+                dm.addListener(this);
+                for (Device device : dm.getDevicesByAPI(KeyboardAPI.class)) {
+                    try {
+                        keyboardList.add(device.getAPI(KeyboardAPI.class));
+                    } catch (ApiNotFoundException anfe) {
+                        //ignore
+                    }
+                }
+            } catch (NameNotFoundException nfe) {
+                //todo handle it
+            }
+        }
+
+        public void addKeyboardListener(KeyboardListener listener) {
+            listenerList.add(listener);
+            for (KeyboardAPI api : keyboardList) {
+                api.addKeyboardListener(listener);
+            }
+        }
+
+        public void removeKeyboardListener(KeyboardListener listener) {
+            listenerList.remove(listener);
+            for (KeyboardAPI api : keyboardList) {
+                api.removeKeyboardListener(listener);
+            }
+        }
+
+        public void setPreferredListener(KeyboardListener listener) {
+            for (KeyboardAPI api : keyboardList) {
+                api.setPreferredListener(listener);
+            }
+        }
+
+        public KeyboardInterpreter getKbInterpreter() {
+            return interpreter;
+        }
+
+        public void setKbInterpreter(KeyboardInterpreter kbInterpreter) {
+            this.interpreter = kbInterpreter;
+            for (KeyboardAPI api : keyboardList) {
+                api.setKbInterpreter(interpreter);
+            }
+        }
+
+        public void deviceStarted(Device device) {
+            if (device.implementsAPI(KeyboardAPI.class)) {
+                try {
+                    KeyboardAPI api = device.getAPI(KeyboardAPI.class);
+                    keyboardList.add(api);
+                    for (KeyboardListener listener : listenerList) {
+                        api.addKeyboardListener(listener);
+                    }
+                } catch (ApiNotFoundException anfe) {
+                    //ignore
+                }
+            }
+        }
+
+        public void deviceStop(Device device) {
+            if (device.implementsAPI(KeyboardAPI.class)) {
+                try {
+                    KeyboardAPI api = device.getAPI(KeyboardAPI.class);
+                    keyboardList.remove(api);
+                    for (KeyboardListener listener : listenerList) {
+                        api.removeKeyboardListener(listener);
+                    }
+                } catch (ApiNotFoundException anfe) {
+                    //ignore
+                }
+            }
+        }
+
+        boolean hasPointer() {
+            return !keyboardList.isEmpty();
+        }
+    }
+
 
     /**
      * My logger
@@ -76,24 +166,14 @@ public class KeyboardHandler implements
      */
     public KeyboardHandler(EventQueue eventQueue) {
         this.eventQueue = eventQueue;
-        try {
-            final Collection<Device> keyboards = DeviceUtils
-                .getDevicesByAPI(KeyboardAPI.class);
-            if (!keyboards.isEmpty()) {
-                Device keyboardDevice = (Device) keyboards.iterator().next();
-                keyboardAPI = (KeyboardAPI) keyboardDevice
-                    .getAPI(KeyboardAPI.class);
-                keyboardAPI.addKeyboardListener(this);
-                AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                    public Void run() {
-                        keyboardAPI.setPreferredListener(KeyboardHandler.this);
-                        return null;
-                    }
-                });
+        this.keyboardAPI = new KeyboardAPIHandler();
+        this.keyboardAPI.addKeyboardListener(this);
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                keyboardAPI.setPreferredListener(KeyboardHandler.this);
+                return null;
             }
-        } catch (ApiNotFoundException ex) {
-            log.error("Strange...", ex);
-        }
+        });
     }
 
     /**
