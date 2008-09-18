@@ -30,6 +30,22 @@ import javax.naming.NamingException;
 
 public interface NameSpace {
     /**
+     * Add a {@link NameSpaceListener} to the NameSpace
+     * @param <T>
+     * @param name
+     * @param l
+     */
+    public <T> void addNameSpaceListener(Class<T> name, NameSpaceListener<T> l);
+    
+    /**
+     * Remove a {@link NameSpaceListener} from the NameSpace
+     * @param <T>
+     * @param name
+     * @param l
+     */
+    public <T> void removeNameSpaceListener(Class<T> name, NameSpaceListener<T> l);
+    
+    /**
      * Bind a given service in the namespace under a given name.
      *
      * @param name

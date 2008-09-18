@@ -29,8 +29,8 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.apache.log4j.BasicConfigurator;
+import org.jnode.naming.AbstractNameSpace;
 import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.def.DefaultAliasManager;
@@ -51,7 +51,7 @@ public class Cassowary {
         if (initialized) {
             return;
         }
-        InitialNaming.setNameSpace(new NameSpace() {
+        InitialNaming.setNameSpace(new AbstractNameSpace() {
             private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 
             public <T> void bind(Class<T> name, T service)
