@@ -10,6 +10,8 @@ import java.util.Set;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
+import org.jnode.naming.AbstractNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
 import org.jnode.nanoxml.XMLElement;
@@ -55,7 +57,7 @@ public abstract class Emu {
                 root = new File("").getAbsoluteFile();
                 System.err.println("Assuming that the JNode root is '" + root + "'");
             }
-            InitialNaming.setNameSpace(new NameSpace() {
+            InitialNaming.setNameSpace(new AbstractNameSpace() {
                 private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 
                 public <T> void bind(Class<T> name, T service) throws NamingException, NameAlreadyBoundException {

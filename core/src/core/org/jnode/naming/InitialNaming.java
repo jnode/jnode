@@ -48,6 +48,31 @@ public final class InitialNaming {
      */
     private static NameSpace namespace;
 
+    /**
+     * Add a {@link NameSpaceListener} to the NameSpace
+     * @param <T>
+     * @param name
+     * @param l
+     */
+    public static <T> void addNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
+        getNameSpace().addNameSpaceListener(name, l);
+    }
+    
+    /**
+     * Remove a {@link NameSpaceListener} from the NameSpace
+     * @param <T>
+     * @param name
+     * @param l
+     */
+    public static <T> void removeNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
+        getNameSpace().removeNameSpaceListener(name, l);        
+    }
+
+    /**
+     * Define the {@link NameSpace} used for storing services.
+     * If a {@link NameSpace} is already defined, then a {@link SecurityException} is thrown.
+     * @param namespace
+     */
     public static void setNameSpace(NameSpace namespace) {
         if (InitialNaming.namespace != null) {
             throw new SecurityException(
@@ -95,6 +120,11 @@ public final class InitialNaming {
         return getNameSpace().nameSet();
     }
 
+    /**
+     * Get the actual {@link NameSpace} and use a default one 
+     * if none was yet defined.
+     * @return
+     */
     private static NameSpace getNameSpace() {
         if (namespace == null) {
             namespace = new DefaultNameSpace();

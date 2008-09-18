@@ -21,7 +21,6 @@
  
 package org.jnode.driver.console.textscreen;
 
-import java.io.InputStream;
 import java.io.Reader;
 
 import javax.naming.NameNotFoundException;
@@ -33,6 +32,8 @@ import org.jnode.driver.textscreen.ScrollableTextScreen;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.TextScreenManager;
 import org.jnode.naming.InitialNaming;
+import org.jnode.naming.NameSpaceListener;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -48,6 +49,32 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
      */
     public TextScreenConsoleManager()
         throws ConsoleException {
+        
+        InitialNaming.addNameSpaceListener(TextScreenManager.NAME, new NameSpaceListener<TextScreenManager>() {
+
+            @Override
+            public void serviceBound(TextScreenManager service) {
+                final TextScreen systemScreen = service.getSystemScreen();
+                
+                for (Console c : getConsoles()) {
+                    TextScreenConsole console = (TextScreenConsole) c;
+                    
+                    final TextScreen screen;            
+                    if ((console.getOptions() & CreateOptions.SCROLLABLE) != 0) {
+                        screen = systemScreen.createCompatibleScrollableBufferScreen(SCROLLABLE_HEIGHT);
+                    } else {
+                        screen = systemScreen.createCompatibleBufferScreen();
+                    }
+                    console.systemScreenChanged(screen);
+                }
+            }
+
+            @Override
+            public void serviceUnbound(TextScreenManager service) {
+                // nothing
+            }
+            
+        });
     }
     
     
@@ -117,24 +144,6 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
             } else {
                 i++;
             }
-        }
-    }
-
-
-    @Override
-    public void textScreenManagerChanged() {
-        final TextScreen systemScreen = getTextScreenManager().getSystemScreen();
-                
-        for (Console c : getConsoles()) {
-            TextScreenConsole console = (TextScreenConsole) c;
-            
-            final TextScreen screen;            
-            if ((console.getOptions() & CreateOptions.SCROLLABLE) != 0) {
-                screen = systemScreen.createCompatibleScrollableBufferScreen(SCROLLABLE_HEIGHT);
-            } else {
-                screen = systemScreen.createCompatibleBufferScreen();
-            }
-            console.systemScreenChanged(screen);
         }
     }
 

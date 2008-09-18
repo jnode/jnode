@@ -6,17 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.AbstractDeviceManager;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.DriverException;
+import org.jnode.naming.AbstractNameSpace;
 import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
@@ -32,7 +34,7 @@ import org.jnode.shell.def.DefaultShellManager;
 public class Emu {
     protected static void initEnv() throws NamingException {
         if (true) {
-            InitialNaming.setNameSpace(new NameSpace() {
+            InitialNaming.setNameSpace(new AbstractNameSpace() {
                 private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 
                 public <T> void bind(Class<T> name, T service) throws NamingException, NameAlreadyBoundException {

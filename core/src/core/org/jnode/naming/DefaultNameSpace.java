@@ -33,7 +33,7 @@ import javax.naming.NamingException;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmType;
 
-public class DefaultNameSpace implements NameSpace {
+public class DefaultNameSpace extends AbstractNameSpace {
 
     /**
      * All bound names+services
@@ -59,6 +59,9 @@ public class DefaultNameSpace implements NameSpace {
             }
             namespace.put(name.getVmClass(), service);
         }
+        
+        // notify listeners
+        fireServiceBound(name, service);
     }
 
     /**
@@ -69,9 +72,13 @@ public class DefaultNameSpace implements NameSpace {
      */
     @PrivilegedActionPragma
     public void unbind(Class<?> name) {
+        final Object service;
         synchronized (namespace) {
-            namespace.remove(name.getVmClass());
+            service = namespace.remove(name.getVmClass());
         }
+                
+        // notify listeners
+        fireServiceUnbound(name, service);
     }
 
     /**

@@ -152,10 +152,4 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
     public Console createConsole(String name, int options);
 
     public void printConsoles(PrintStream ps);
-
-    /**
-     * That method is called when the system {@link TextScreenManager} has changed
-     * It's a temporary workaround. FIXME : create and use a listener mechanism in InitialNaming instead 
-     */
-    public void textScreenManagerChanged();
 }
