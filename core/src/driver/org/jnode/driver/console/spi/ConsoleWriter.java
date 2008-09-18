@@ -24,6 +24,7 @@ package org.jnode.driver.console.spi;
 import java.io.IOException;
 import java.io.Writer;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
@@ -31,8 +32,6 @@ import org.jnode.driver.console.TextConsole;
  */
 public class ConsoleWriter extends Writer {
 
-    private static final int BUFFER_SIZE = 160;
-    private final char[] buffer = new char[BUFFER_SIZE];
     private TextConsole console;
     private int fgColor;
 
@@ -57,17 +56,7 @@ public class ConsoleWriter extends Writer {
         throws IOException, NullPointerException, IndexOutOfBoundsException {
         if (off < 0 || len < 0 || off + len > cbuf.length)
             throw new ArrayIndexOutOfBoundsException();
-
-        int bi = 0;
-        for (int i = 0; i < len; ++i) {
-            if (bi >= BUFFER_SIZE) {
-                console.putChar(buffer, 0, BUFFER_SIZE, fgColor);
-                bi = 0;
-            }
-            buffer[bi++] = (char) cbuf[off + i];
-        }
-
-        console.putChar(buffer, 0, bi, fgColor);
+        console.putChar(cbuf, off, len, fgColor);
     }
 
 
