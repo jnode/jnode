@@ -60,8 +60,14 @@ class PcScrollableTextScreen extends PcBufferTextScreen implements
     public void ensureVisible(int row, boolean sync) {
         if (row < ofsY) {
             ofsY = row;
+            if (sync) {
+                sync(0, getHeight() * getWidth());
+            }
         } else if (row >= ofsY + parentHeight) {
             ofsY = (row - parentHeight) + 1;
+            if (sync) {
+                sync(0, getHeight() * getWidth());
+            }
         }
     }
 
