@@ -60,8 +60,8 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         return ProcletContext.createProclet(cr, null, null, 
                 new Object[] {
                     ios[0].getInputStream(), 
-                    ios[1].getOutputStream(),
-                    ios[2].getOutputStream()}, 
+                    ios[1].getPrintStream(),
+                    ios[2].getPrintStream()}, 
                 cmdLine.getCommandName());
     }
     
