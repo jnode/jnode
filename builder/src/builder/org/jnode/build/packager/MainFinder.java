@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.ClassAdapter;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.CodeVisitor;
 
 /**
  * Class for searching main methods in a jar
@@ -58,6 +62,7 @@ public class MainFinder {
             if (value != null) {
                 mainList.add(String.valueOf(value));
             } else {
+
                 // scan the jar to find the main classes
                 for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); ) {
                     final JarEntry entry = e.nextElement(); 
@@ -70,10 +75,7 @@ public class MainFinder {
                             className = className.replace('/', '.');
 
                             is = jarFile.getInputStream(entry);
-                            ClassLoader cl = new InputStreamLoader(is, (int) entry.getSize());
-                            Class<?> clazz = Class.forName(className, false, cl);
-                            Method m = clazz.getMethod("main", new Class<?>[]{String[].class});
-                            if ((m.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
+                            if (isMainClass(is, entry, className)) {
                                 mainList.add(className);
                             }
                         }
@@ -104,59 +106,75 @@ public class MainFinder {
         return mainList;
     }
     
+    private static boolean isMainClass(InputStream classStream, JarEntry entry, String className) 
+        throws ClassNotFoundException, SecurityException, NoSuchMethodException, IOException {
+        ClassReader cr = new ClassReader(classStream);
+        MainClassVisitor mcv = new MainClassVisitor(NullClassVisitor.INSTANCE);
+        cr.accept(mcv, true);
+        
+        return mcv.hasMainMethod();
+    }
+
     /**
-     * Custom {@link ClassLoader} used to load classes from an InputStream. 
+     * Custom {@link ClassVisitor} used to parse a class from an InputStream. 
      * It helps finding a main class in a jar file. 
      * @author fabien
      *
      */
-    private static class InputStreamLoader extends ClassLoader {
-        private InputStream inputStream;
-        private int size;
-
-        public InputStreamLoader(InputStream inputStream, int size) {
-            this.inputStream = inputStream;
-            this.size = size;
+    static class MainClassVisitor extends ClassAdapter {
+        private boolean mainMethod = false;
+        
+        public MainClassVisitor(ClassVisitor visitor) {
+            super(visitor);
         }
 
-        public Class loadClass(String className) throws ClassNotFoundException {
-            return loadClass(className, true);
-        }
-
-        public synchronized Class loadClass(String className, boolean resolve)
-            throws ClassNotFoundException {
-            Class<?> result;
-
-            try {
-
-                result = super.findSystemClass(className);
-
-            } catch (ClassNotFoundException e) {
-                byte[] classData = null;
-                
-                try {
-                    classData = new byte[size];
-                    inputStream.read(classData);
-                } catch (IOException ioe) {
-                    throw new ClassNotFoundException(className, ioe);
-                }
-                
-                if (classData == null) {
-                    throw new ClassNotFoundException(className);
-                }
-
-                result = defineClass(className, classData, 0, classData.length);
-
-                if (result == null) {
-                    throw new ClassFormatError();
-                }
-
-                if (resolve) {
-                    resolveClass(result);
-                }
+        @Override
+        public CodeVisitor visitMethod(int access, String name, String signature, String[] exceptions,
+                Attribute arg4) {
+            if ("main".equals(name) && "([Ljava/lang/String;)V".equals(signature)) {
+                mainMethod = true;
             }
-
-            return result;
+            return null;
         }
+        
+        public boolean hasMainMethod() {
+            return mainMethod;
+        }
+    }
+    
+    /**
+     * ClassVisitor doing nothing but that's needed by MainClassVisitor constructor.
+     * @author fabien
+     *
+     */
+    static class NullClassVisitor implements ClassVisitor {
+        private static final NullClassVisitor INSTANCE = new NullClassVisitor();
+        
+        @Override
+        public void visit(int arg0, int arg1, String arg2, String arg3, String[] arg4, String arg5) {
+        }
+
+        @Override
+        public void visitAttribute(Attribute arg0) {
+        }
+
+        @Override
+        public void visitEnd() {
+        }
+
+        @Override
+        public void visitField(int arg0, String arg1, String arg2, Object arg3, Attribute arg4) {
+        }
+
+        @Override
+        public void visitInnerClass(String arg0, String arg1, String arg2, int arg3) {
+        }
+
+        @Override
+        public CodeVisitor visitMethod(int arg0, String arg1, String arg2, String[] arg3,
+                Attribute arg4) {
+            return null;
+        }
+        
     }
 }
