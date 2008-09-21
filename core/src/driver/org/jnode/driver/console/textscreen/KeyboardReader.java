@@ -379,7 +379,7 @@ public class KeyboardReader extends Reader
      * 
      * @return the associated TextConsole object.
      */
-    public TextConsole getConsole() {
+    public TextConsole getTextConsole() {
         return console;
     }
 
