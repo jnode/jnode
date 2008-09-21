@@ -20,6 +20,7 @@
  */
 package org.jnode.shell.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -101,6 +102,16 @@ public interface CommandIO {
      * @return <code>true</code> if the associated stream is interactive.
      */
     public boolean isTTY();
+
+    /**
+     * Obtain the 'base' stream object for this CommandIO.  This will be
+     * as close as we can get to the real device Reader, Writer, InputStream
+     * or OutputStream.
+     * 
+     * @return the base stream, or <code>null</code> if there is a problem
+     * resolving the stream.
+     */
+    public Closeable findBaseStream();
 
     /**
      * Close this CommandIO's associated byte and / or character streams,

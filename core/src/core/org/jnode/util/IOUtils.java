@@ -77,6 +77,32 @@ public class IOUtils {
         }
     }
     
+    public static Closeable findBaseStream(Closeable stream) {
+        if (stream instanceof ConsoleStream) {
+            return stream;
+        } else if (stream instanceof ProxyStream<?>) {
+            try {
+                return findBaseStream(((ProxyStream<?>) stream).getRealStream());
+            } catch (ProxyStreamException ex) {
+                return null;
+            }
+        } else if (stream instanceof OutputStreamWriter) {
+            return findBaseStream(findOutputStream((OutputStreamWriter) stream));
+        } else if (stream instanceof InputStreamReader) {
+            return findBaseStream(findInputStream((InputStreamReader) stream));
+        } else if (stream instanceof ReaderInputStream) {
+            return findBaseStream(((ReaderInputStream) stream).getReader());
+        } else if (stream instanceof WriterOutputStream) {
+            return findBaseStream(((WriterOutputStream) stream).getWriter());
+        } else if (stream instanceof FilterInputStream) {
+            return findBaseStream(findInputStream((FilterInputStream) stream));
+        } else if (stream instanceof FilterOutputStream) {
+            return findBaseStream(findOutputStream((FilterOutputStream) stream));
+        } else {
+            return stream;
+        }
+    }
+    
     private static InputStream findInputStream(final FilterInputStream inputStream) {
         return new PrivilegedAction<InputStream>() {
             public InputStream run() {

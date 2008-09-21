@@ -20,15 +20,18 @@
  */
 package org.jnode.shell.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import org.jnode.util.IOUtils;
 
 abstract class BaseCommandIO implements CommandIO {
     
     private String assignedEncoding;
-    private final Object systemObject;
+    private final Closeable systemObject;
     
-    BaseCommandIO(Object systemObject) {
+    BaseCommandIO(Closeable systemObject) {
         this.systemObject = systemObject;
     }
     
@@ -46,11 +49,22 @@ abstract class BaseCommandIO implements CommandIO {
         return Charset.defaultCharset().name();
     }
 
-    public final Object getSystemObject() {
+    public final Closeable getSystemObject() {
         return systemObject;
     }
+    
+    @Override
+    public Closeable findBaseStream() {
+        return IOUtils.findBaseStream(systemObject);
+    }
 
-    public abstract boolean isTTY();
+    public final boolean isTTY() {
+        if (systemObject == null) {
+            return false;
+        } else {
+            return IOUtils.isTTY(systemObject);
+        }
+    }
     
     public abstract void close() throws IOException;
     
