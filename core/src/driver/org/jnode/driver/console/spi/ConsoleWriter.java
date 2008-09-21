@@ -84,5 +84,14 @@ public class ConsoleWriter extends Writer implements ConsoleStream {
     public void setFgColor(int fgColor) {
         this.fgColor = fgColor;
     }
+    
+    /**
+     * Return the stream's console.
+     * 
+     * @return the TextConsole that this stream writes to.
+     */
+    public TextConsole getTextConsole() {
+        return console;
+    }
 
 }

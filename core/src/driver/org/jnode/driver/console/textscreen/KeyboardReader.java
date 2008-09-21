@@ -363,6 +363,10 @@ public class KeyboardReader extends Reader
         }
         return n;
     }
+    
+    public TextConsole getConsole() {
+        return console;
+    }
 
     public InputCompleter getCompleter() {
         return completer;
