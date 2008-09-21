@@ -24,6 +24,8 @@ package org.jnode.shell.proclet;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.jnode.util.ProxyStream;
+import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.VmSystem;
 
 /**

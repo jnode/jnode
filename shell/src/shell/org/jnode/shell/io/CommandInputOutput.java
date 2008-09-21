@@ -31,6 +31,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
+import org.jnode.util.IOUtils;
 import org.jnode.util.ReaderInputStream;
 import org.jnode.util.WriterOutputStream;
 
@@ -58,10 +59,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         this.reader = reader;
         this.writer = writer;
     }
-
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getOutputStream()
-     */
+    
     public synchronized OutputStream getOutputStream() {
         if (outputStream == null) {
             outputStream = new WriterOutputStream(writer, getEncoding());
@@ -69,9 +67,6 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         return outputStream;
     }
     
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getPrintStream()
-     */
     public PrintStream getPrintStream() {
         if (printStream == null) {
             if (outputStream instanceof PrintStream) {
@@ -82,10 +77,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         }
         return printStream;
     }
-
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getWriter()
-     */
+    
     public synchronized Writer getWriter() throws CommandIOException {
         if (writer == null) {
             try {
@@ -97,9 +89,6 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         return writer;
     }
     
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getPrintWriter()
-     */
     public PrintWriter getPrintWriter() {
         if (printWriter == null) {
             if (writer instanceof PrintWriter) {
@@ -110,20 +99,14 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         }
         return printWriter;
     }
-
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getInputStream()
-     */
+    
     public synchronized InputStream getInputStream() {
         if (inputStream == null) {
             inputStream = new ReaderInputStream(reader, getEncoding());
         }
         return inputStream;
     }
-
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getReader()
-     */
+    
     public Reader getReader() throws CommandIOException {
         if (reader == null) {
             try {
@@ -134,25 +117,21 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         }
         return reader;
     }
-
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#getDirection()
-     */
+    
     public final int getDirection() {
         return DIRECTION_INOUT;
     }
 
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#isTTY()
-     */
     @Override
     public boolean isTTY() {
-        return false;
+        Object obj = getSystemObject();
+        if (obj instanceof Writer) {
+            return IOUtils.isTTY((Writer) obj);
+        } else {
+            return IOUtils.isTTY((OutputStream) obj);
+        }
     }
 
-    /* (non-Javadoc)
-     * @see org.jnode.shell.io.CommandIOIF#close()
-     */
     @Override
     public void close() throws IOException {
         flush();

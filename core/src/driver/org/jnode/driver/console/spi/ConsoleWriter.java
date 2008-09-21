@@ -24,13 +24,14 @@ package org.jnode.driver.console.spi;
 import java.io.IOException;
 import java.io.Writer;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.util.ConsoleStream;
 import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-public class ConsoleWriter extends Writer {
+public class ConsoleWriter extends Writer implements ConsoleStream {
 
     private TextConsole console;
     private int fgColor;

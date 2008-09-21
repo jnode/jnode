@@ -121,4 +121,8 @@ public class WriterOutputStream extends OutputStream {
     public void write(byte[] b) throws IOException {
         this.write(b, 0, b.length);
     }
+
+    Writer getWriter() {
+        return writer;
+    }
 }

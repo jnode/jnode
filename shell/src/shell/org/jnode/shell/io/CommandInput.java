@@ -30,6 +30,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
+import org.jnode.util.IOUtils;
 import org.jnode.util.ReaderInputStream;
 
 /**
@@ -77,8 +78,12 @@ public class CommandInput extends BaseCommandIO {
 
     @Override
     public boolean isTTY() {
-        // TODO Auto-generated method stub
-        return false;
+        Object obj = getSystemObject();
+        if (obj instanceof Reader) {
+            return IOUtils.isTTY((Reader) obj);
+        } else {
+            return IOUtils.isTTY((InputStream) obj);
+        }
     }
 
     public void close() throws IOException {
@@ -109,6 +114,4 @@ public class CommandInput extends BaseCommandIO {
     public Writer getWriter() throws CommandIOException {
         throw new CommandIOException("Output not supported");
     }
-    
-    
 }

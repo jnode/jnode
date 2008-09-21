@@ -23,6 +23,8 @@ package org.jnode.shell.proclet;
 
 import java.io.PrintStream;
 
+import org.jnode.util.ProxyStream;
+import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.VmSystem;
 
 /**

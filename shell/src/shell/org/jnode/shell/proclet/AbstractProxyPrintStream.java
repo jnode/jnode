@@ -53,6 +53,8 @@ import java.io.PrintStream;
 import java.util.Formatter;
 import java.util.Locale;
 
+import org.jnode.util.ProxyStream;
+
 /**
  * This class provides some infrastructure for PrintStream proxies.
  * 
