@@ -19,7 +19,7 @@ import org.jnode.util.ConsoleStream;
  * <ul>
  * <li>line buffering and line editing, using a text console,
  * <li>integrated input history and completion,
- * <li>CTRL-D is interpreted as a 'soft' EOF mark,KeyboardInputStream
+ * <li>CTRL-D is interpreted as a 'soft' EOF mark,
  * <li>listens to keyboard focus events.
  * </ul>
  * <p/>
@@ -90,10 +90,20 @@ public class KeyboardReader extends Reader
         }
     }
 
+    /**
+     * When we process a 'soft EOF' character; e.g. CTRL-D we go into a state where 
+     * all subsequent 'read' calls will return <code>-1</code> until the {@link #clearSoftEOF()}
+     * method is called.  This method tests if we are in that state.
+     * 
+     * @return Return <code>true</code> if we are in 'soft EOF' state; otherwise <code>false</code>.
+     */
     public boolean isSoftEOF() {
         return eof;
     }
 
+    /**
+     * Clear the 'soft EOF' state; see {@link #isSoftEOF()}.
+     */
     public void clearSoftEOF() {
         eof = false;
     }
@@ -364,14 +374,30 @@ public class KeyboardReader extends Reader
         return n;
     }
     
+    /**
+     * Get the TextConsole associated with this KeyboardReader.
+     * 
+     * @return the associated TextConsole object.
+     */
     public TextConsole getConsole() {
         return console;
     }
 
+    /**
+     * Get the InputCompleter associated with this KeyboardReader.  This
+     * is typically the CommandShell.
+     * 
+     * @return the associated InputCompleter object.
+     */
     public InputCompleter getCompleter() {
         return completer;
     }
 
+    /**
+     * Set this KeyboardReader's InputCompleter.
+     * 
+     * @param completer the new completer value
+     */
     public void setCompleter(InputCompleter completer) {
         this.completer = completer;
     }
