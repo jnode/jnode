@@ -31,7 +31,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
-import org.jnode.util.IOUtils;
 import org.jnode.util.ReaderInputStream;
 import org.jnode.util.WriterOutputStream;
 
@@ -121,17 +120,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
     public final int getDirection() {
         return DIRECTION_INOUT;
     }
-
-    @Override
-    public boolean isTTY() {
-        Object obj = getSystemObject();
-        if (obj instanceof Writer) {
-            return IOUtils.isTTY((Writer) obj);
-        } else {
-            return IOUtils.isTTY((OutputStream) obj);
-        }
-    }
-
+    
     @Override
     public void close() throws IOException {
         flush();

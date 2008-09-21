@@ -50,11 +50,6 @@ public final class CommandIOMarker extends BaseCommandIO {
     public int getDirection() {
         return DIRECTION_UNSPECIFIED;
     }
-
-    @Override
-    public boolean isTTY() {
-        return false;
-    }
     
     public void close() {
         // do nothing.
