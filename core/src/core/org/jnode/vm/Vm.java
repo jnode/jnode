@@ -51,7 +51,6 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmScheduler;
-import org.vmmagic.pragma.NoInlinePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

@@ -3,7 +3,6 @@ package org.jnode.driver.console.textscreen;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.PrintStream;
 import java.io.Writer;
 
 import org.jnode.driver.console.InputCompleter;

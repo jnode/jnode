@@ -23,9 +23,9 @@ package org.jnode.driver.console.spi;
 
 import java.io.IOException;
 import java.io.Writer;
+
 import org.jnode.driver.console.TextConsole;
 import org.jnode.util.ConsoleStream;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author epr

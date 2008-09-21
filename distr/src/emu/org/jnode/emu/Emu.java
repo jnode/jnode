@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.jnode.naming.AbstractNameSpace;
 import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;

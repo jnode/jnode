@@ -27,15 +27,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.security.PrivilegedAction;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.console.spi.ConsoleWriter;
-import org.jnode.driver.console.textscreen.KeyboardReader;
 
 /**
  * Common utility code for higher-level operations on IO streams.  Notwithstanding the
@@ -104,7 +101,7 @@ public class IOUtils {
     }
     
     private static InputStream findInputStream(final FilterInputStream inputStream) {
-        return new PrivilegedAction<InputStream>() {
+        PrivilegedAction<InputStream> pa = new PrivilegedAction<InputStream>() {
             public InputStream run() {
                 try {
                     Class<FilterInputStream> cls = FilterInputStream.class;
@@ -115,11 +112,13 @@ public class IOUtils {
                     Logger.getLogger(IOUtils.class).error("Cannot extract the 'in' field", ex);
                     return null;
                 }
-            }}.run();
+            }
+        };
+        return pa.run();
     }
     
     private static OutputStream findOutputStream(final FilterOutputStream outputStream) {
-        return new PrivilegedAction<OutputStream>() {
+        PrivilegedAction<OutputStream> pa = new PrivilegedAction<OutputStream>() {
             public OutputStream run() {
                 try {
                     Class<FilterOutputStream> cls = FilterOutputStream.class;
@@ -130,14 +129,16 @@ public class IOUtils {
                     Logger.getLogger(IOUtils.class).error("Cannot extract the 'out' field", ex);
                     return null;
                 }
-            }}.run();
+            }
+        };
+        return pa.run();
     }
 
     
     private static OutputStream findOutputStream(final OutputStreamWriter writer) {
         // This implementation is based on the knowledge that an OutputStreamWriter
         // uses the underlying OutputStream as its 'lock' object.
-        return new PrivilegedAction<OutputStream>() {
+        PrivilegedAction<OutputStream> pa = new PrivilegedAction<OutputStream>() {
             public OutputStream run() {
                 try {
                     Class<Writer> cls = Writer.class;
@@ -148,13 +149,15 @@ public class IOUtils {
                     Logger.getLogger(IOUtils.class).error("Cannot extract the 'lock' field", ex);
                     return null;
                 }
-            }}.run();
+            }
+        };
+        return pa.run();
     }
 
     private static InputStream findInputStream(final InputStreamReader reader) {
         // This implementation is based on the knowledge that an InputStreamReader
         // uses the underlying InputStream as its 'lock' object.
-        return new PrivilegedAction<InputStream>() {
+        PrivilegedAction<InputStream> pa = new PrivilegedAction<InputStream>() {
             public InputStream run() {
                 try {
                     Class<Reader> cls = Reader.class;
@@ -165,7 +168,9 @@ public class IOUtils {
                     Logger.getLogger(IOUtils.class).error("Cannot extract the 'lock' field", ex);
                     return null;
                 }
-            }}.run();
+            }
+        };
+        return pa.run();
     }
 
 }

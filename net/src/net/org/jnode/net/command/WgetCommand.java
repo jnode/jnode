@@ -42,7 +42,7 @@ public class WgetCommand extends AbstractCommand {
     private PrintStream out;
     private PrintStream err;
     
-    public WgetCommand(){
+    public WgetCommand() {
         super("Fetch the contents of one or more URLs.");
         registerArguments(ARG_SOURCE, ARG_DEBUG);
     }
@@ -121,10 +121,10 @@ public class WgetCommand extends AbstractCommand {
             }
             is.close();
         } finally {
-            if (is != null){
+            if (is != null) {
                 is.close();
             }
-            if (bos != null){
+            if (bos != null) {
                 bos.close();
             }
         }
