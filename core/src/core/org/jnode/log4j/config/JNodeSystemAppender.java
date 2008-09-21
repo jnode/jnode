@@ -25,11 +25,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
-import org.jnode.driver.console.TextConsole;
-import org.jnode.util.WriterOutputStream;
 
 /**
  * Custom Log4j appender class for appending to the current System.out or System.err.

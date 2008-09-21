@@ -1,10 +1,8 @@
 package org.jnode.driver.console;
 
-import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.CharBuffer;
 
 /**
  * This virtual console class operates on the console that has the current focus.

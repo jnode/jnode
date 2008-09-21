@@ -1,6 +1,5 @@
 package org.jnode.apps.telnetd;
 
-import java.io.InputStream;
 import java.io.Reader;
 
 import net.wimpi.telnetd.io.TerminalIO;

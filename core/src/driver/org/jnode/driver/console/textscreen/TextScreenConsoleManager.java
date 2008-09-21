@@ -33,7 +33,6 @@ import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.TextScreenManager;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpaceListener;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

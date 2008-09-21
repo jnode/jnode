@@ -22,19 +22,15 @@
 package org.jnode.log4j.config;
 
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Writer;
 import java.util.Enumeration;
 
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
 import org.jnode.driver.console.ActiveTextConsole;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
