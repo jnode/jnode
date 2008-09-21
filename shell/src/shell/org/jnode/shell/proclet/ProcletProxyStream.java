@@ -23,6 +23,8 @@ package org.jnode.shell.proclet;
 
 import java.io.Closeable;
 
+import org.jnode.util.ProxyStream;
+
 interface ProcletProxyStream<T extends Closeable> extends ProxyStream<T> {
 
 }

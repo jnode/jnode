@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.shell.proclet;
+package org.jnode.util;
 
 import java.io.Closeable;
 
@@ -29,7 +29,7 @@ import java.io.Closeable;
  * 
  * @author crawley@jnode.org
  */
-public interface ProxyStream<T extends Closeable> {
+public interface ProxyStream<T extends Closeable> extends Closeable {
 
     /**
      * Get the underlying (non-proxy) stream for this proxy. If there are

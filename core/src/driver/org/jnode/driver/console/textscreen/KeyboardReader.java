@@ -11,6 +11,7 @@ import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
+import org.jnode.util.ConsoleStream;
 
 
 /**
@@ -22,7 +23,7 @@ import org.jnode.system.event.FocusListener;
  * <li>listens to keyboard focus events.
  * </ul>
  * <p/>
- * Future enhancements include:
+ * Possible future enhancements include:
  * <ul>
  * <li>a "raw" mode in which characters and other keyboard events are delivered without line editing,
  * <li>a "no echo" mode in which line editing occurs without echoing of input characters,
@@ -40,8 +41,8 @@ import org.jnode.system.event.FocusListener;
  * 
  * @author crawley@jnode.org
  */
-public class KeyboardReader extends Reader
-    implements FocusListener {
+public class KeyboardReader extends Reader 
+    implements FocusListener, ConsoleStream {
 
     public static final byte CTRL_L = 12;
     public static final byte CTRL_D = 4;

@@ -30,6 +30,8 @@ import java.util.Properties;
 
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
+import org.jnode.util.ProxyStream;
+import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.VmExit;
 import org.jnode.vm.VmSystem;
 

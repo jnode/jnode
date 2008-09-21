@@ -89,6 +89,4 @@ public final class CommandIOMarker extends BaseCommandIO {
     public Writer getWriter() throws CommandIOException {
         throw new CommandIOException("I/O not supported on CommandIOMarker");
     }
-    
-    
 }
