@@ -30,6 +30,8 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketImpl;
 import java.net.SocketOptions;
+import java.nio.channels.UnresolvedAddressException;
+
 import org.apache.log4j.Logger;
 import org.jnode.net.ipv4.IPv4Address;
 
@@ -154,6 +156,9 @@ public class TCPSocketImpl extends SocketImpl {
             throw new IOException("InetSocketAddress expected");
         }
         final InetSocketAddress sa = (InetSocketAddress) address;
+        if (sa.isUnresolved()) {
+            throw new UnresolvedAddressException();
+        }
         if (controlBlock == null) {
             bind(InetAddress.getLocalHost(), 0);
         }
