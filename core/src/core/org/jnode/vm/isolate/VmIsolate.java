@@ -315,6 +315,14 @@ public final class VmIsolate {
      */
     public final void exit(Isolate isolate, int status) {
         testIsolate(isolate);
+        if(threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
+            return;
+        
+        try {
+            threadGroup.destroy();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         state = State.EXITED;
         StaticData.isolates.remove(this);
     }
@@ -333,6 +341,11 @@ public final class VmIsolate {
                 break;
         }
 
+        try {
+            threadGroup.destroy();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         this.state = State.TERMINATED;
         StaticData.isolates.remove(this);
     }
@@ -547,7 +560,6 @@ public final class VmIsolate {
      */
     @PrivilegedActionPragma
     final void run(IsolateThread thread) {
-        VmIsolate o_current = IsolatedStaticData.current;
         try {
             Unsafe.debug("isolated run ");
             // Set current
@@ -613,8 +625,6 @@ public final class VmIsolate {
                 Unsafe.debug("Exception in catch block.. giving up: ");
                 Unsafe.debug(ex2.getMessage());
             }
-        } finally {
-            IsolatedStaticData.current = o_current;
         }
     }
 
