@@ -8,7 +8,7 @@
 	       debug="on"
 	       optimize="on"
            fork="on"
-           memoryMaximumSize="768m"
+           memoryMaximumSize="${memoryMaximumSize}"
            compiler="modern"
 	       includeJavaRuntime="false"
            target="${java.target}"
