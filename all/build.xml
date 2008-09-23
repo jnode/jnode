@@ -1,5 +1,11 @@
 <project name="JNode" default="help" basedir=".">
 
+	<!-- before including jnode.xml, we must set this property -->
+    <condition property="memoryMaximumSize" value="1512m" else="768m">
+      <os arch="amd64"/>      
+    </condition>
+    <echo message="Setting memoryMaximumSize to ${memoryMaximumSize}"/>
+	
     <!-- Include antlib -->
     <typedef file="${basedir}/lib/jnode.xml"/>
 
