@@ -244,7 +244,13 @@ public class Device implements ResourceOwner {
      * @return boolean
      */
     public final boolean implementsAPI(Class<? extends DeviceAPI> apiInterface) {
-        return apis.containsKey(apiInterface);
+        //lookup is classname based to handle multi isolate uscases
+        for(Class clazz : apis.keySet()) {
+            if(clazz.getName().equals(apiInterface.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -264,7 +270,15 @@ public class Device implements ResourceOwner {
      * @throws ApiNotFoundException The given api has not been found
      */
     public final <T extends DeviceAPI> T getAPI(Class<T> apiInterface) throws ApiNotFoundException {
-        final T impl = apiInterface.cast(apis.get(apiInterface));
+        //lookup is classname based to handle multi isolate uscases
+        Class apiInterface2 = null;
+        for(Class clazz : apis.keySet()) {
+            if(clazz.getName().equals(apiInterface.getName())) {
+                apiInterface2 = clazz;
+                break;
+            }
+        }
+        final T impl = apiInterface.cast(apis.get(apiInterface2));
         if (impl == null) {
             throw new ApiNotFoundException(apiInterface.getName());
         }
