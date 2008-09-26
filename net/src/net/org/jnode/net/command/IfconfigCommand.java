@@ -73,15 +73,15 @@ public class IfconfigCommand extends AbstractCommand {
         throws NameNotFoundException, ApiNotFoundException, NetworkException {
         if (!ARG_DEVICE.isSet()) {
             // Print MAC address, MTU and IP address(es) for all network devices.
-            final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
-                final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+                final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
                 out.println(dev.getId() + ": MAC-Address " + api.getAddress() + " MTU " + api.getMTU());
                 out.println("    " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
             }
         } else {
             final Device dev = ARG_DEVICE.getValue();
-            final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+            final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
 
             if (!ARG_IP_ADDRESS.isSet()) {
                 // Print IP address(es) for device
@@ -91,8 +91,7 @@ public class IfconfigCommand extends AbstractCommand {
                 // Set IP address for device
                 final IPv4Address ip = ARG_IP_ADDRESS.getValue();
                 final IPv4Address mask = ARG_SUBNET_MASK.getValue();
-                final IPv4ConfigurationService cfg = 
-                    (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+                final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
                 cfg.configureDeviceStatic(dev, ip, mask, true);
 
                 // FIXME ... this doesn't show the device's new address because the
