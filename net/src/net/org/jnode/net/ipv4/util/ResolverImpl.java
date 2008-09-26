@@ -34,6 +34,7 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.net.ProtocolAddress;
 import org.jnode.net.Resolver;
 import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.vm.annotation.SharedStatics;
 import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
@@ -43,6 +44,7 @@ import org.xbill.DNS.TextParseException;
 /**
  * @author Martin Hartvig
  */
+@SharedStatics
 public class ResolverImpl implements Resolver {
     // FIXME ... upgrade to a more recent version of xbill?
 
