@@ -135,6 +135,16 @@ public final class VmIsolate {
     private Properties initProperties;
 
     /**
+     * Unique identifier.
+     */
+    private final int id;
+
+    /**
+     * Mapping between internal VmType and per isolate Class instance.
+     */
+    private BootableHashMap<VmIsolateLocal<?>, ?> isolateLocalMap = new BootableHashMap<VmIsolateLocal<?>, Object>();
+
+    /**
      * Isolate states.
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -184,11 +194,17 @@ public final class VmIsolate {
          */
         private static final ArrayList<VmIsolate> isolates = new ArrayList<VmIsolate>();
 
+        private static int nextId = 0;
+
         static final VmIsolate getRoot() {
             if (rootIsolate == null) {
                 rootIsolate = new VmIsolate();
             }
             return rootIsolate;
+        }
+
+        static synchronized int nextId() {
+            return nextId ++;
         }
     }
 
@@ -213,6 +229,7 @@ public final class VmIsolate {
      * Constructor for the root isolate.
      */
     private VmIsolate() {
+        this.id = StaticData.nextId();
         this.isolate = new Isolate(this);
         this.mainClass = null;
         this.args = null;
@@ -237,17 +254,17 @@ public final class VmIsolate {
      */
     public VmIsolate(Isolate isolate, VmStreamBindings bindings,
                      Properties properties, String mainClass, String[] args) {
-        StaticData.isolates.add(this);
+        this.id = StaticData.nextId();
         this.initProperties = properties;
         this.isolate = isolate;
         this.mainClass = mainClass;
         this.args = args;
         this.bindings = bindings;
         final VmArchitecture arch = Vm.getArch();
-        this.isolatedStaticsTable = new VmIsolatedStatics(VmMagic
-            .currentProcessor().getIsolatedStatics(), arch,
-            new Unsafe.UnsafeObjectResolver());
+        this.isolatedStaticsTable = new VmIsolatedStatics(VmMagic.currentProcessor().getIsolatedStatics(),
+            arch, new Unsafe.UnsafeObjectResolver());
         this.creator = currentIsolate();
+        StaticData.isolates.add(this);
     }
 
     /**
@@ -262,10 +279,19 @@ public final class VmIsolate {
     }
 
     /**
-     * Is the current thread running in the root isolate
+     * @return the root isolate
      */
     public static VmIsolate getRoot() {
+        //todo security
         return StaticData.getRoot();
+    }
+
+    /**
+     * @return an array of isolates without the root isolate
+     */
+    public static VmIsolate[] getVmIsolates() {
+        //todo security
+        return StaticData.isolates.toArray(new VmIsolate[0]);
     }
 
     /**
@@ -561,7 +587,6 @@ public final class VmIsolate {
     @PrivilegedActionPragma
     final void run(IsolateThread thread) {
         try {
-            Unsafe.debug("isolated run ");
             // Set current
             IsolatedStaticData.current = VmIsolate.this;
 
@@ -653,7 +678,7 @@ public final class VmIsolate {
      *
      * @return the main class name
      */
-    final String getMainClassName() {
+    public final String getMainClassName() {
         return mainClass;
     }
 
@@ -689,5 +714,37 @@ public final class VmIsolate {
 
     public void resetIOContext() {
         ioContext = vmIoContext;
+    }
+
+    /**
+     * Returns the identifier of this isolate.
+     * @return the unique identifier
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Returns the state of this isolate.
+     * @return the current state
+     */
+    public State getState() {
+        return state;
+    }
+
+    /**
+     * Returns the VmIsolate instance which created this VmIsolate instance.
+     * @return
+     */
+    public VmIsolate getCreator() {
+        return creator;
+    }
+
+    /**
+     * Returns the map of isolate locals belonging to this isolate.
+     * @return the isolate local map
+     */
+    BootableHashMap getIsolateLocalMap() {
+        return isolateLocalMap;
     }
 }

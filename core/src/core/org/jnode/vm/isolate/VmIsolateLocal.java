@@ -20,11 +20,6 @@ public final class VmIsolateLocal<T> extends VmSystemObject {
     private T rootObject;
 
     /**
-     * Map used for non-root isolates
-     */
-    private BootableHashMap<VmIsolate, T> map;
-
-    /**
      * Gets the stored object reference.
      *
      * @return
@@ -33,11 +28,7 @@ public final class VmIsolateLocal<T> extends VmSystemObject {
         if (VmIsolate.isRoot()) {
             return rootObject;
         } else {
-            if (map != null) {
-                return map.get(VmIsolate.currentIsolate());
-            } else {
-                return null;
-            }
+            return (T) VmIsolate.currentIsolate().getIsolateLocalMap().get(this);
         }
     }
 
@@ -48,10 +39,7 @@ public final class VmIsolateLocal<T> extends VmSystemObject {
         if (VmIsolate.isRoot()) {
             rootObject = object;
         } else {
-            if (map == null) {
-                map = new BootableHashMap<VmIsolate, T>();
-            }
-            map.put(VmIsolate.currentIsolate(), object);
+            VmIsolate.currentIsolate().getIsolateLocalMap().put(this, object);
         }
     }
 }
