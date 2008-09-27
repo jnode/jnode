@@ -21,10 +21,12 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.RoundRectangle2D;
@@ -39,6 +41,9 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.font.FontManager;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 
@@ -133,14 +138,14 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
         t.translate(simpleGraphics.origin.x, simpleGraphics.origin.y);
         s = t.createTransformedShape(s);
         Shape clip = simpleGraphics.getClip();
-        if(clip != null){
+        if (clip != null) {
             Area as = new Area(s);
             Area ac = new Area(clip);
             as.intersect(ac);
             s = as;
         }
         org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.clip() 1 "+ s + "\n");
-        if(clip2D != null){
+        if (clip2D != null) {
             Area as = new Area(s);
             Area ac = new Area(clip2D);
             as.intersect(ac);
@@ -360,8 +365,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see #setClip
      */
     public void drawString(AttributedCharacterIterator iterator, float x, float y) {
-        //todo implement it
-        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawString() not implemented\n");
+        simpleGraphics.drawString(iterator, (int) x, (int) y);
     }
 
     /**
@@ -391,8 +395,12 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see #setClip
      */
     public void drawString(String str, float x, float y) {
-        //todo implement it
-        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawString2() not implemented\n");
+        // we should call "simpleGraphics.drawString(str, (int) x, (int) y);"
+        // but since it doesn't handle transform, we have to implement ourself the rendering
+        // TODO should we move that code to simpleGraphics implementation ?
+        JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
+        FontManager fm = tk.getFontManager();
+        fm.drawText(surface, getClip(), getTransform(), str, getFont(), (int) x, (int) y, getColor());
     }
 
     /**
@@ -476,8 +484,9 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
 
     public FontRenderContext getFontRenderContext() {
         //todo implement it
-        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.getFontRendererContext() not implemented\n");
-        return null;
+        //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.getFontRendererContext() not implemented\n");
+        //return null;
+        return new FontRenderContext(getTransform(), true, false);
     }
 
     /**
@@ -822,7 +831,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see java.awt.geom.AffineTransform
      */
     public void setTransform(AffineTransform Tx) {
-        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.setTransform() invoked\n");
+        //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.setTransform() invoked\n");
         this.transform = new AffineTransform(Tx);
     }
 
@@ -869,7 +878,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see java.awt.geom.AffineTransform
      */
     public void transform(AffineTransform Tx) {
-        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.transform() invoked\n");
+        //org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.transform() invoked\n");
         transform.concatenate(Tx);
     }
 

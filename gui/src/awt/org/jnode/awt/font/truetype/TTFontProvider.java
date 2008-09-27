@@ -25,7 +25,11 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
@@ -34,7 +38,7 @@ import org.jnode.awt.font.spi.AbstractFontProvider;
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class TTFontProvider extends AbstractFontProvider {
+public class TTFontProvider extends AbstractFontProvider<TTFFont> {
     /**
      * My logger
      */
@@ -67,6 +71,21 @@ public class TTFontProvider extends AbstractFontProvider {
         return new TTFFontMetrics(font, getFontData(font));
     }
 
+    
+    /**
+     * Creates a font peer from the given name or return null if not supported/provided.
+     * As said in {@link JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc : 
+     * "We don't know what kind of "name" the user requested (logical, face, family)".
+     * 
+     * @param name
+     * @param attrs
+     * @return
+     */
+    @Override
+    public JNodeFontPeer createFontPeer(String name, Map attrs) {
+        return null; //TODO
+    }
+
     /**
      * Gets the font data for the given font
      *
@@ -77,7 +96,7 @@ public class TTFontProvider extends AbstractFontProvider {
         if (font instanceof TTFFont) {
             return ((TTFFont) font).getFontData();
         } else {
-            final TTFFont ttf = (TTFFont) getCompatibleFont(font);
+            final TTFFont ttf = getCompatibleFont(font);
             if (ttf != null) {
                 return ttf.getFontData();
             } else {
@@ -87,7 +106,7 @@ public class TTFontProvider extends AbstractFontProvider {
         }
     }
 
-    protected Font loadFont(URL url) throws IOException {
+    protected TTFFont loadFont(URL url) throws IOException {
         log.debug("<<< loadFont(" + url + ") >>>");
         final TTFFontData fontData = new TTFFontDataFile(url);
         return new TTFFont(fontData, 10);

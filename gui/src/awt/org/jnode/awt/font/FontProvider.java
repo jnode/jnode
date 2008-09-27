@@ -23,7 +23,10 @@ package org.jnode.awt.font;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.util.Map;
 import java.util.Set;
+
+import org.jnode.awt.JNodeToolkit;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -79,4 +82,15 @@ public interface FontProvider {
      * @return The font metrics for the given font
      */
     public FontMetrics getFontMetrics(Font font);
+    
+    /**
+     * Creates a font peer from the given name or return null if not supported/provided.
+     * As said in {@link JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc : 
+     * "We don't know what kind of "name" the user requested (logical, face, family)".
+     * 
+     * @param name
+     * @param attrs
+     * @return
+     */
+    public JNodeFontPeer createFontPeer(String name, Map attrs);    
 }

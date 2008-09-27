@@ -21,12 +21,16 @@
 
 package org.jnode.awt.font;
 
+import gnu.java.awt.peer.ClasspathFontPeer;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.io.InputStream;
+import java.util.Map;
+
 import org.jnode.driver.video.Surface;
 
 /**
@@ -81,4 +85,15 @@ public interface FontManager {
      *
      */
     public Font createFont(int format, InputStream stream);
+
+    public ClasspathFontPeer createFontPeer(String name, Map attrs);
+    
+    /**
+     * Translates the font into a font that is provided by a provider.
+     *
+     * @param font
+     * @param providerName
+     * @return
+     */
+    public Font getClosestProvidedFont(Font font, String providerName);    
 }

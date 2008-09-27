@@ -35,12 +35,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.FontProvider;
+import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
@@ -132,18 +134,8 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @return The font metrics for the given font
      */
     public FontMetrics getFontMetrics(Font font) {
-        FontProvider prv = getProvider(font);
-        Font txFont = font;
-        if (prv == null) {
-            txFont = getTranslatedFont(font);
-            prv = getProvider(txFont);
-        }
-        if (prv != null) {
-            return prv.getFontMetrics(txFont);
-        } else {
-            log.error("No provider found for font " + txFont);
-            return new EmptyFontMetrics(txFont);
-        }
+        Font txFont = getTranslatedFont(font);
+        return getProvider(txFont).getFontMetrics(txFont);
     }
 
     /**
@@ -158,18 +150,9 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      */
     public void drawText(Surface g, Shape clip, AffineTransform tx, CharSequence text, Font font, int x, int y,
                          Color color) {
-        FontProvider prv = getProvider(font);
-        Font txFont = font;
-        if (prv == null) {
-            txFont = getTranslatedFont(font);
-            prv = getProvider(txFont);
-        }
-        if (prv != null) {
-            final TextRenderer renderer = prv.getTextRenderer(txFont);
-            renderer.render(g, clip, tx, text, x, y, color);
-        } else {
-            log.error("No provider found for font " + txFont);
-        }
+        Font txFont = getTranslatedFont(font);
+        final TextRenderer renderer = getProvider(txFont).getTextRenderer(txFont);
+        renderer.render(g, clip, tx, text, x, y, color);
     }
 
     /**
@@ -217,6 +200,18 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
 
         throw new IllegalArgumentException("can't create font with format " + name);
+    }
+
+    @Override
+    public JNodeFontPeer createFontPeer(String name, Map attrs) {
+        for (FontProvider prv : getProviders()) {
+            JNodeFontPeer peer = prv.createFontPeer(name, attrs);
+            if (peer != null) {
+                return peer;
+            }
+        }
+
+        throw new IllegalArgumentException("can't create font peer from name " + name);
     }
 
     /**
@@ -269,15 +264,41 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     }
 
     /**
-     * Translated the font into a font that is provided by a provider.
+     * Translates the font into a font that is provided by a provider.
      *
      * @param font
      * @return
      */
     private Font getTranslatedFont(Font font) {
-        return new Font("Luxi Sans", Font.PLAIN, font.getSize());
+        Font txFont = font;
+        
+        if (getProvider(font) == null) {
+            txFont = getClosestProvidedFont(font, null);
+        }
+        
+        return txFont;
     }
 
+    /**
+     * Translates the font into a font that is provided by a provider.
+     *
+     * @param font
+     * @return
+     */
+    @Override
+    public Font getClosestProvidedFont(Font font, String providerName) {
+        for (FontProvider prv : getProviders()) {
+            if ((providerName == null) || (prv.getName().equals(providerName))) {
+                //TODO find the closest possible Font (size, style, ...) among provided ones.
+                //font = new Font("Luxi Sans", Font.PLAIN, font.getSize());
+                font = prv.getAllFonts().iterator().next();
+                break;
+            }
+        }            
+        
+        return font;
+    }
+    
     private synchronized void updateFontProviders() {
         final Extension[] extensions = providersEP.getExtensions();
         

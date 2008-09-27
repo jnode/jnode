@@ -404,7 +404,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
         if (fontCache.containsKey(keyMap))
             return fontCache.get(keyMap);
         else {
-            ClasspathFontPeer newPeer = new JNodeFontPeer(name, attrs);
+            ClasspathFontPeer newPeer = getFontManager().createFontPeer(name, attrs);
             fontCache.put(keyMap, newPeer);
             return newPeer;
         }

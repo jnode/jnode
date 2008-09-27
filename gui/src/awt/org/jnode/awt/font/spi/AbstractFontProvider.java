@@ -34,12 +34,13 @@ import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.renderer.RenderContext;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public abstract class AbstractFontProvider implements FontProvider {
+public abstract class AbstractFontProvider<T extends Font> implements FontProvider {
 
     /**
      * My logger
@@ -59,9 +60,9 @@ public abstract class AbstractFontProvider implements FontProvider {
      */
     private final HashMap<Font, FontMetrics> metrics = new HashMap<Font, FontMetrics>();
     /**
-     * All loaded fonts (name, TTFFont)
+     * All loaded fonts (name, Font)
      */
-    private final HashMap<String, Font> fontsByName = new HashMap<String, Font>();
+    private final HashMap<String, T> fontsByName = new HashMap<String, T>();
     /**
      * Have the system fonts been loaded yet
      */
@@ -101,8 +102,8 @@ public abstract class AbstractFontProvider implements FontProvider {
             log.debug("provides, !fontsLoaded");
             loadFonts();
         }
-        final Font f = getCompatibleFont(font);
-        return (f != null);
+        
+        return (getCompatibleFont(font) != null);
     }
 
     /**
@@ -130,8 +131,9 @@ public abstract class AbstractFontProvider implements FontProvider {
      * @param font
      * @return The renderer
      */
+    @Override
     public final TextRenderer getTextRenderer(Font font) {
-        TextRenderer r = (TextRenderer) renderers.get(font);
+        TextRenderer r = renderers.get(font);
         if (r == null) {
             r = createTextRenderer(renderCache, font);
             renderers.put(font, r);
@@ -149,20 +151,16 @@ public abstract class AbstractFontProvider implements FontProvider {
      */
     public final FontMetrics getFontMetrics(Font font) {
         FontMetrics fm = (FontMetrics) metrics.get(font);
-/*
-        if(log.isDebugEnabled()) log.debug("FontMetrics got from cache: "+fm+" font="+font);
-*/
+        
         if (fm == null) {
             try {
                 fm = createFontMetrics(font);
                 metrics.put(font, fm);
-/*
-        if(log.isDebugEnabled()) log.debug("created FontMetrics"+fm+" font="+font);
-*/
             } catch (IOException ex) {
                 log.error("Cannot create font metrics for " + font, ex);
             }
         }
+        
         return fm;
     }
 
@@ -170,10 +168,10 @@ public abstract class AbstractFontProvider implements FontProvider {
 
     protected abstract String[] getSystemFonts();
 
-    protected abstract Font loadFont(URL url) throws IOException;
-
-    protected final Font getCompatibleFont(Font font) {
-        Font f = null;
+    protected abstract T loadFont(URL url) throws IOException;
+    
+    protected final T getCompatibleFont(Font font) {
+        T f = null;
         try {
             f = fontsByName.get(font.getFamily());
             if (f == null) {
@@ -197,28 +195,21 @@ public abstract class AbstractFontProvider implements FontProvider {
      * Load all default fonts.
      */
     private final void loadFonts() {
-        log.debug("<<< BEGIN loadFonts >>>");
-        final String[] fontNames = getSystemFonts();
-        if (log.isDebugEnabled())
-            log.debug("loadFonts for " + getClass().getName() + " (" + fontNames.length + " fonts)");
-        final int max = fontNames.length;
-        for (int i = 0; i < max; i++) {
-            loadFont(fontNames[i]);
+        for (String font : getSystemFonts()) {
+            loadFont(font);
         }
         fontsLoaded = true;
-        log.debug("<<< END loadFonts >>>");
     }
 
     private final void loadFont(String resName) {
-        log.debug("<<< BEGIN loadFont(" + resName + ") >>>");
         try {
             final ClassLoader cl = Thread.currentThread().getContextClassLoader();
             final URL url = cl.getResource(resName);
             if (url != null) {
-                final Font font = loadFont(url);
+                final T font = loadFont(url);
                 //fontsByName.put(font.getName(), font);
                 fontsByName.put(font.getFamily(), font);
-                log.debug("loadFont font=" + font);
+                //fontsByName.put(font.getFontName(), font);
             } else {
                 log.error("Cannot find font resource " + resName);
             }
@@ -227,6 +218,5 @@ public abstract class AbstractFontProvider implements FontProvider {
         } catch (Throwable ex) {
             log.error("Cannot find font " + resName, ex);
         }
-        log.debug("<<< END loadFont(" + resName + ") >>>");
     }
 }
