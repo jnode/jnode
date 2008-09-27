@@ -67,7 +67,7 @@ public class NetStaticDeviceConfig extends NetDeviceConfig {
     public void doApply(Device device) throws NetworkException {
         final NetDeviceAPI api;
         try {
-            api = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+            api = device.getAPI(NetDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
             throw new NetworkException("Device is not a network device", ex);
         }

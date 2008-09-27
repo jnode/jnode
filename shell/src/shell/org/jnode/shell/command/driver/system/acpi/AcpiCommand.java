@@ -68,7 +68,7 @@ public class AcpiCommand extends AbstractCommand {
             exit(1);
         } else {
             for (Device dev : acpiDevs) {
-                final AcpiAPI api = (AcpiAPI) dev.getAPI(AcpiAPI.class);
+                final AcpiAPI api = dev.getAPI(AcpiAPI.class);
 
                 if (FLAG_DUMP.isSet()) {
                     api.dump(new PrintWriter(out));

@@ -127,7 +127,7 @@ public class FBTest extends AbstractCommand {
             }
 
             log.info("Using device " + dev.getId());
-            final FrameBufferAPI api = (FrameBufferAPI) dev.getAPI(FrameBufferAPI.class);
+            final FrameBufferAPI api = dev.getAPI(FrameBufferAPI.class);
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
 
             g = api.open(conf);

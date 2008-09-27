@@ -131,7 +131,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      */
     protected final void addPointerDevice(Device pDev) {
         try {
-            final PointerAPI pApi = (PointerAPI) pDev.getAPI(PointerAPI.class);
+            final PointerAPI pApi = pDev.getAPI(PointerAPI.class);
             pointerDevs.add(pDev);
             pApi.addPointerListener(this);
         } catch (ApiNotFoundException ex) {
@@ -159,8 +159,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     final void removePointer(Device pDev) {
         if (pointerDevs.remove(pDev)) {
             try {
-                final PointerAPI pApi = (PointerAPI) pDev
-                    .getAPI(PointerAPI.class);
+                final PointerAPI pApi = pDev.getAPI(PointerAPI.class);
                 pApi.removePointerListener(this);
             } catch (ApiNotFoundException ex) {
                 BootLog.error("PointerAPI not found", ex);

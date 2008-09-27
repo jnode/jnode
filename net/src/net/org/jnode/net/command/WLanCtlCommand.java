@@ -64,7 +64,7 @@ public class WLanCtlCommand extends AbstractCommand {
         throws ApiNotFoundException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
         final WirelessNetDeviceAPI api;
-        api = (WirelessNetDeviceAPI) dev.getAPI(WirelessNetDeviceAPI.class);
+        api = dev.getAPI(WirelessNetDeviceAPI.class);
 
         // Perform the selected operation
         if (FLAG_SET_ESSID.isSet()) {

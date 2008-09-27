@@ -59,8 +59,7 @@ public class NetAPIImpl implements VMNetAPI {
         final SecurityManager sm = System.getSecurityManager();
         try {
             final NetDeviceImpl netDeviceImpl = (NetDeviceImpl) netDevice;
-            final NetDeviceAPI api = (NetDeviceAPI) netDeviceImpl.getDevice()
-                    .getAPI(NetDeviceAPI.class);
+            final NetDeviceAPI api = netDeviceImpl.getDevice().getAPI(NetDeviceAPI.class);
             final ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
 
             for (ProtocolAddress ipaddr : info.addresses()) {

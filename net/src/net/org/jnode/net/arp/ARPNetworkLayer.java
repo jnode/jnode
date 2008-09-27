@@ -333,7 +333,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
      */
     private NetDeviceAPI getAPI(Device device) {
         try {
-            return (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+            return device.getAPI(NetDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
             throw new IllegalArgumentException("Not a network device " + device.getId());
         }

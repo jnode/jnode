@@ -51,7 +51,7 @@ final class Ifconfig {
         throws NetworkException {
         final NetDeviceAPI api;
         try {
-            api = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+            api = device.getAPI(NetDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
             throw new NetworkException("Device is not a network device", ex);
         }
@@ -80,7 +80,7 @@ final class Ifconfig {
         final Collection<Device> devices = DeviceUtils.getDevicesByAPI(NetDeviceAPI.class);
         for (Device dev : devices) {
             try {
-                final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+                final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
                 final IPv4ProtocolAddressInfo addrInfo =
                         (IPv4ProtocolAddressInfo) api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
                 if (addrInfo != null) {

@@ -40,8 +40,7 @@ public class LowLevelIoTest {
             dm = InitialNaming.lookup(DeviceManager.NAME);
 
             IDEDevice current = (IDEDevice) dm.getDevice(args[0]);
-            BlockDeviceAPI api =
-                current.getAPI(BlockDeviceAPI.class);
+            BlockDeviceAPI api = current.getAPI(BlockDeviceAPI.class);
 
             int size = (int) (Math.random() * 5 /*256*/) * 512;
             int offset = (int) (Math.random() * 10000) * 512;

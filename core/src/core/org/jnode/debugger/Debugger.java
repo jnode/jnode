@@ -150,8 +150,7 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
                     final Collection<Device> devs = DeviceUtils
                         .getDevicesByAPI(KeyboardAPI.class);
                     for (Device dev : devs) {
-                        final KeyboardAPI api = (KeyboardAPI) dev
-                            .getAPI(KeyboardAPI.class);
+                        final KeyboardAPI api = dev.getAPI(KeyboardAPI.class);
                         api.setPreferredListener(l);
                     }
                 } catch (ApiNotFoundException ex) {

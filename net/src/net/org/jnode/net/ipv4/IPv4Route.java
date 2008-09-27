@@ -84,7 +84,7 @@ public class IPv4Route implements IPv4Constants {
             this.flags |= RTF_GATEWAY;
         }
         try {
-            this.deviceAPI = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+            this.deviceAPI = device.getAPI(NetDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
             throw new IllegalArgumentException("Device " + device.getId() +
                     " is not a network device");

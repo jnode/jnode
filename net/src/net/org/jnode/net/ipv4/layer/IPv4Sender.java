@@ -127,7 +127,7 @@ public class IPv4Sender implements IPv4Constants, EthernetConstants {
             // The device has been given, use it
             dev = skbuf.getDevice();
             try {
-                api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+                api = dev.getAPI(NetDeviceAPI.class);
             } catch (ApiNotFoundException ex) {
                 throw new NetworkException("Device is not a network device", ex);
             }
