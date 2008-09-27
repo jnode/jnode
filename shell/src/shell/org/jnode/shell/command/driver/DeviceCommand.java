@@ -174,7 +174,7 @@ public class DeviceCommand extends AbstractCommand {
         out.println();
         final PrintWriter pw = new PrintWriter(out);
         try {
-            final DeviceInfoAPI infoApi = (DeviceInfoAPI) dev.getAPI(DeviceInfoAPI.class);
+            final DeviceInfoAPI infoApi = dev.getAPI(DeviceInfoAPI.class);
             if (infoApi != dev) {
                 infoApi.showInfo(pw);
             }

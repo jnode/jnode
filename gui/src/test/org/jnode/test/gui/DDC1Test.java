@@ -44,7 +44,7 @@ public class DDC1Test {
             final Device dev = DeviceUtils.getDevice(devId);
 
             System.out.println("Reading DDC1 data, please wait");
-            final DisplayDataChannelAPI api = (DisplayDataChannelAPI) dev.getAPI(DisplayDataChannelAPI.class);
+            final DisplayDataChannelAPI api = dev.getAPI(DisplayDataChannelAPI.class);
             final DDC1Reader reader = new DDC1Reader(api);
             final EDID data = reader.read();
 

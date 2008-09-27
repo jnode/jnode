@@ -143,7 +143,7 @@ public class DefaultNetworkLayerManager implements NetworkLayerManager,
             }
             final NetDeviceAPI deviceAPI;
             try {
-                deviceAPI = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+                deviceAPI = dev.getAPI(NetDeviceAPI.class);
             } catch (ApiNotFoundException ex) {
                 throw new NetworkException("Device in SocketBuffer is not a network device");
             }

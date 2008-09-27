@@ -126,7 +126,7 @@ final class Route {
         throws NetworkException {
         for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
             try {
-                final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+                final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
                 final IPv4ProtocolAddressInfo addrInfo;
                 addrInfo = (IPv4ProtocolAddressInfo) api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
                 if (addrInfo != null) {

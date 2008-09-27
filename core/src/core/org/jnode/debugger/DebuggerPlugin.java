@@ -100,8 +100,7 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
     private void addListeners(Device device) {
         if (device.implementsAPI(SystemTriggerAPI.class)) {
             try {
-                final SystemTriggerAPI api = (SystemTriggerAPI) device
-                    .getAPI(SystemTriggerAPI.class);
+                final SystemTriggerAPI api = device.getAPI(SystemTriggerAPI.class);
                 api.addSystemTriggerListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
@@ -109,8 +108,7 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
         }
         if (device.implementsAPI(KeyboardAPI.class)) {
             try {
-                final KeyboardAPI api = (KeyboardAPI) device
-                    .getAPI(KeyboardAPI.class);
+                final KeyboardAPI api = device.getAPI(KeyboardAPI.class);
                 api.addKeyboardListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
@@ -121,8 +119,7 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
     private void removeListeners(Device device) {
         if (device.implementsAPI(SystemTriggerAPI.class)) {
             try {
-                final SystemTriggerAPI api = (SystemTriggerAPI) device
-                    .getAPI(SystemTriggerAPI.class);
+                final SystemTriggerAPI api = device.getAPI(SystemTriggerAPI.class);
                 api.removeSystemTriggerListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore
@@ -130,8 +127,7 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
         }
         if (device.implementsAPI(KeyboardAPI.class)) {
             try {
-                final KeyboardAPI api = (KeyboardAPI) device
-                    .getAPI(KeyboardAPI.class);
+                final KeyboardAPI api = device.getAPI(KeyboardAPI.class);
                 api.removeKeyboardListener(debugger);
             } catch (ApiNotFoundException ex) {
                 // Ignore

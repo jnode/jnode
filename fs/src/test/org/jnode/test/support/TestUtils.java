@@ -193,8 +193,7 @@ public class TestUtils {
     public static File copyDeviceToFile(Device imageDevice, String destFile)
         throws SecurityException, IOException, ApiNotFoundException {
         File dest = new File(destFile);
-        BlockDeviceAPI imgApi = imageDevice
-            .getAPI(BlockDeviceAPI.class);
+        BlockDeviceAPI imgApi = imageDevice.getAPI(BlockDeviceAPI.class);
 
         if (dest.exists())
             dest.delete();
@@ -245,8 +244,7 @@ public class TestUtils {
     public static void copyInputStreamToDevice(InputStream imageStream,
                                                Device workDevice) throws ApiNotFoundException,
         NameNotFoundException, IOException, FileSystemException {
-        BlockDeviceAPI wrkApi = workDevice
-            .getAPI(BlockDeviceAPI.class);
+        BlockDeviceAPI wrkApi = workDevice.getAPI(BlockDeviceAPI.class);
 
         int sectorSize = 512;
         byte[] sector = new byte[sectorSize];
@@ -265,10 +263,8 @@ public class TestUtils {
 
     public static void copyDevice(Device imageDevice, Device workDevice)
         throws ApiNotFoundException, IOException {
-        BlockDeviceAPI imgApi = imageDevice
-            .getAPI(BlockDeviceAPI.class);
-        BlockDeviceAPI wrkApi = workDevice
-            .getAPI(BlockDeviceAPI.class);
+        BlockDeviceAPI imgApi = imageDevice.getAPI(BlockDeviceAPI.class);
+        BlockDeviceAPI wrkApi = workDevice.getAPI(BlockDeviceAPI.class);
 
         if (imgApi.getLength() != wrkApi.getLength())
             throw new IllegalArgumentException("devices of different length");
