@@ -1013,8 +1013,7 @@ public final class VmSystem {
         exitCode = (reset ? 1 : 0);
         inShutdown = true;
         try {
-            final PluginManager pm = (PluginManager) InitialNaming
-                .lookup(PluginManager.NAME);
+            final PluginManager pm = InitialNaming.lookup(PluginManager.NAME);
             pm.stopPlugins();
         } catch (NameNotFoundException ex) {
             System.err.println("Cannot find ServiceManager");

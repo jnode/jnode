@@ -238,7 +238,7 @@ public abstract class BitmapGraphics {
                                                 int width, int height, int bytesPerLine, int transparency) {
         final ResourceManager rm;
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NamingException ex) {
             throw new RuntimeException("Cannot find ResourceManager", ex);
         }

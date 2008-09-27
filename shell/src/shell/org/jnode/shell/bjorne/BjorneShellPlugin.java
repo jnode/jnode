@@ -61,8 +61,7 @@ public class BjorneShellPlugin extends Plugin {
      */
     protected void startPlugin() throws PluginException {
         try {
-            ShellManager mgr = (ShellManager) InitialNaming
-                    .lookup(ShellManager.NAME);
+            ShellManager mgr = InitialNaming.lookup(ShellManager.NAME);
             mgr.registerInterpreterFactory(FACTORY);
         } catch (NamingException ex) {
             throw new PluginException("Cannot find the shell manager", ex);
@@ -74,8 +73,7 @@ public class BjorneShellPlugin extends Plugin {
      */
     protected void stopPlugin() throws PluginException {
         try {
-            ShellManager mgr = (ShellManager) InitialNaming
-                    .lookup(ShellManager.NAME);
+            ShellManager mgr = InitialNaming.lookup(ShellManager.NAME);
             mgr.unregisterInterpreterFactory(FACTORY);
         } catch (NamingException ex) {
             throw new PluginException("Cannot find the shell manager", ex);

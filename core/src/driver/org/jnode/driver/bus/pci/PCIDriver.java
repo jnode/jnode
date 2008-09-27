@@ -89,8 +89,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
     public void startDevice() throws DriverException {
         try {
             final Device pciBusDevice = getDevice();
-            final ResourceManager rm = (ResourceManager) InitialNaming
-                .lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             // Claim the resources
             pciConfigIO = claimPorts(rm, pciBusDevice);
             // Register the API's
@@ -122,7 +121,7 @@ final class PCIDriver extends Driver implements DeviceInfoAPI, PCIBusAPI, PCICon
         // Stop & unregister all PCI devices
         DeviceManager devMan;
         try {
-            devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            devMan = InitialNaming.lookup(DeviceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find device manager", ex);
         }

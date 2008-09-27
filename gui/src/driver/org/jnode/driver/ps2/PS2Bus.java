@@ -72,7 +72,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
         try {
             final ResourceManager rm;
             try {
-                rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+                rm = InitialNaming.lookup(ResourceManager.NAME);
             } catch (NameNotFoundException ex) {
                 throw new DriverException("Cannot find ResourceManager: ", ex);
             }

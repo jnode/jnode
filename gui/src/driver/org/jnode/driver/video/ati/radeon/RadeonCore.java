@@ -100,7 +100,7 @@ final class RadeonCore implements RadeonConstants {
         final PCIRomAddress romAddr = pciCfg.getRomAddress();
         log.info("Found ATI " + model + ", chipset 0x" + NumberUtils.hex(pciCfg.getRevision()));
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             final int ioBase = (int) ioAddr.getMemoryBase();
             final int ioSize = ioAddr.getSize();
             final int fbBase = (int) fbAddr.getMemoryBase() /* & 0xFF800000 */;

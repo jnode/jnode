@@ -134,7 +134,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         log.debug("Found EEPRO100 IOBase: 0x" + NumberUtils.hex(iobase) + ", length: " + iolength);
 
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find ResourceManager");
         }

@@ -93,7 +93,7 @@ public class VESACore extends AbstractSurface implements HardwareCursorAPI {
         Address address = Address.fromIntZeroExtend(modeInfoBlock.getRamBase());
 
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             this.capabilities = vbeInfoBlock.getCapabilities();
             this.maxWidth = modeInfoBlock.getXResolution();
             this.maxHeight = modeInfoBlock.getYResolution();

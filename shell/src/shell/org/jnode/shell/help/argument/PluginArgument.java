@@ -55,7 +55,7 @@ public class PluginArgument extends Argument {
     public void complete(CompletionInfo completion, String partial) {
         try {
             // get the plugin manager
-            final PluginManager piMgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+            final PluginManager piMgr = InitialNaming.lookup(PluginManager.NAME);
 
             // collect matching plugin id's
             for (PluginDescriptor descr : piMgr.getRegistry()) {

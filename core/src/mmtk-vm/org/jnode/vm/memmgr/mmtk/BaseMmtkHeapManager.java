@@ -264,11 +264,9 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
         // Claim the available heap region as resource.
         try {
-            final ResourceManager rm = InitialNaming
-                    .lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             final Address start = Memory.AVAILABLE_START();
-            final Extent size = Memory.AVAILABLE_END().toWord().sub(
-                    start.toWord()).toExtent();
+            final Extent size = Memory.AVAILABLE_END().toWord().sub(start.toWord()).toExtent();
             heapResource = rm.claimMemoryResource(ResourceOwner.SYSTEM, start,
                     size, ResourceManager.MEMMODE_NORMAL);
         } catch (NameNotFoundException ex) {

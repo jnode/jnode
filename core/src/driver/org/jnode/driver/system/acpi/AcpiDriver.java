@@ -92,9 +92,9 @@ final class AcpiDriver extends Driver implements AcpiAPI {
         final AcpiDevice dev = (AcpiDevice) getDevice();
         try {
             final ResourceManager rm;
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
             mmapAcpiRegion();
-            AcpiRSDPInfo acpiInfo = ((AcpiDevice) dev).getRsdpInfo();
+            AcpiRSDPInfo acpiInfo = dev.getRsdpInfo();
             loadRootTable(rm, acpiInfo);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Could not find ResourceManager", ex);

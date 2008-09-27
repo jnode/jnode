@@ -69,7 +69,7 @@ final class BiosDriver extends Driver implements FirmwareAPI {
         // Find the ACPI info
         try {
             final ResourceManager rm;
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
             info = findAcpiRSDTPTR(rm);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find the resource manager");

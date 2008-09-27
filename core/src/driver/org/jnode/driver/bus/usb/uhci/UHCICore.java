@@ -93,7 +93,7 @@ public class UHCICore implements USBHostControllerAPI, UHCIConstants, IRQHandler
         final PCIDeviceConfig cfg = device.getConfig();
         final PCIBaseAddress baseAddr = getBaseAddress(cfg);
         try {
-            this.rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            this.rm = InitialNaming.lookup(ResourceManager.NAME);
             final int ioBase = baseAddr.getIOBase();
             final int ioSize = baseAddr.getSize();
             log.info("Found UHCI at 0x" + NumberUtils.hex(ioBase));

@@ -79,8 +79,7 @@ public class RouteCommand extends AbstractCommand {
         final IPv4Address target = ARG_TARGET.getValue();
         final IPv4Address gateway = ARG_GATEWAY.getValue();
         final Device device = ARG_DEVICE.getValue();
-        final IPv4ConfigurationService cfg =
-                (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+        final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
 
         if (FLAG_ADD.isSet()) {
             cfg.addRoute(target, gateway, device, true);

@@ -62,7 +62,7 @@ public class DeviceArgument extends Argument {
     public Device getDevice(ParsedArguments args) throws SyntaxErrorException {
         String value = getValue(args);
         try {
-            return ((DeviceManager) InitialNaming.lookup(DeviceManager.NAME)).getDevice(value);
+            return (InitialNaming.lookup(DeviceManager.NAME)).getDevice(value);
         } catch (NameNotFoundException ex) {
             throw new SyntaxErrorException("DeviceManager not found. Check your system setup");
         } catch (DeviceNotFoundException ex) {

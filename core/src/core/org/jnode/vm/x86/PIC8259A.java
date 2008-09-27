@@ -40,7 +40,7 @@ final class PIC8259A {
         final SimpleResourceOwner owner = new SimpleResourceOwner("PIC8259A");
 
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             io8259_A = rm.claimIOResource(owner, 0x20, 1); // 0xA0
             io8259_B = rm.claimIOResource(owner, 0xA0, 1);
         } catch (NameNotFoundException ex) {

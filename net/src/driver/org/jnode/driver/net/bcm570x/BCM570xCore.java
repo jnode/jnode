@@ -116,7 +116,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
         final ResourceManager rm;
 
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find ResourceManager");
         }

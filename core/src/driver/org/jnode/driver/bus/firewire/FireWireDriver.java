@@ -50,7 +50,7 @@ public class FireWireDriver extends Driver {
         final Device device = getDevice();
         final DeviceManager dm;
         try {
-            dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            dm = InitialNaming.lookup(DeviceManager.NAME);
             dm.rename(device, getDevicePrefix(), true);
         } catch (DeviceAlreadyRegisteredException ex) {
             log.error("Cannot rename device", ex);
