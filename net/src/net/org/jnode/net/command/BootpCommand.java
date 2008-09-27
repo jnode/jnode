@@ -57,8 +57,7 @@ public class BootpCommand extends AbstractCommand {
             PrintStream out, PrintStream err) throws NameNotFoundException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
         out.println("Trying to configure " + dev.getId() + "...");
-        final IPv4ConfigurationService cfg = 
-            (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+        final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
         cfg.configureDeviceBootp(dev, true);
     }
 
