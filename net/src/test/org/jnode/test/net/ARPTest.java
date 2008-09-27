@@ -44,7 +44,7 @@ public class ARPTest {
     public static void main(String[] args) throws Exception {
         final ARPNetworkLayer arp =
                 (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
-        final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+        final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
         final IPv4Address addr = new IPv4Address(args[0]);
         final IPv4Address myAddr = new IPv4Address(args[1]);
         final Device dev = dm.getDevice(args[2]);

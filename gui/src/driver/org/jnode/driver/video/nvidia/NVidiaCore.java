@@ -91,7 +91,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
         final PCIBaseAddress fbAddr = pciCfg.getBaseAddresses()[1];
         log.info("Found NVidia " + model + ", chipset 0x" + NumberUtils.hex(pciCfg.getRevision()));
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             final int ioBase = (int) ioAddr.getMemoryBase() & 0xFF800000;
             final int ioSize = ioAddr.getSize();
             final int fbBase = (int) fbAddr.getMemoryBase() & 0xFF800000;

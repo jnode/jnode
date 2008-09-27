@@ -127,7 +127,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore implements IRQHandle
         final int iolength = getIOLength(device, flags);
         final ResourceManager rm;
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find ResourceManager");
         }

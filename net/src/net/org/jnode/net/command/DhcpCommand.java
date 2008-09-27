@@ -71,8 +71,8 @@ public class DhcpCommand extends AbstractCommand {
         // network layer is left in a state that will require a reboot to unjam it (AFAIK).  
         //
         // So, check that loopback is correctly bound ...
-        Device loopback = ((DeviceManager) InitialNaming.lookup(DeviceManager.NAME)).getDevice("loopback");
-        NetDeviceAPI api = (NetDeviceAPI) loopback.getAPI(NetDeviceAPI.class);
+        Device loopback = (InitialNaming.lookup(DeviceManager.NAME)).getDevice("loopback");
+        NetDeviceAPI api = loopback.getAPI(NetDeviceAPI.class);
         ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
         if (info == null || !info.contains(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}))) {
             err.println("The loopback network device is not bound to IP address 127.0.0.1");
@@ -82,8 +82,7 @@ public class DhcpCommand extends AbstractCommand {
 
         // Now it should be safe to do the DHCP configuration.
         out.println("Configuring network device " + dev.getId() + "...");
-        final IPv4ConfigurationService cfg = 
-            (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+        final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
         cfg.configureDeviceDhcp(dev, true);
     }
 }

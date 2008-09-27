@@ -121,7 +121,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
         final ResourceManager rm;
 
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find ResourceManager");
         }

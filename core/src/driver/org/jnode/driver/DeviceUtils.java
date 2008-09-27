@@ -47,7 +47,7 @@ public class DeviceUtils {
     public static DeviceManager getDeviceManager()
         throws NameNotFoundException {
         if (dm == null) {
-            dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            dm = InitialNaming.lookup(DeviceManager.NAME);
         }
         return dm;
     }

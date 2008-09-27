@@ -52,7 +52,7 @@ public abstract class AbstractFrameBufferDriver extends Driver implements FrameB
     protected void startDevice() throws DriverException {
         final Device device = getDevice();
         try {
-            final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             dm.rename(device, getDevicePrefix() + "-" + device.getId(), false);
         } catch (DeviceAlreadyRegisteredException ex) {
             log.error("Cannot rename device", ex);

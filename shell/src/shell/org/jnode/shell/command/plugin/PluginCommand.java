@@ -108,7 +108,7 @@ public class PluginCommand extends AbstractCommand {
 
     private void doRun() 
         throws NameNotFoundException, SyntaxMultiplicityException, PluginException, MalformedURLException {
-        mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+        mgr = InitialNaming.lookup(PluginManager.NAME);
         final String version = ARG_VERSION.isSet() ? ARG_VERSION.getValue() : Vm.getVm().getVersion();
         final String pluginId = ARG_PLUGIN_ID.getValue();
         if (ARG_LOADER_URL.isSet()) {

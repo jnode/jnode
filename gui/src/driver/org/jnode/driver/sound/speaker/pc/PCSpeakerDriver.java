@@ -72,7 +72,7 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI {
     public void startDevice() throws DriverException {
         try {
             final Device dev = getDevice();
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             speakIO = claimPorts(rm, dev, SPEAKER_PORT, 1);
             pitIO = claimPorts(rm, dev, CHANNEL2_PORT, 2);
             getDevice().registerAPI(SpeakerAPI.class, this);

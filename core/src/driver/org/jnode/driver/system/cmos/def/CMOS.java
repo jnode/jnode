@@ -48,7 +48,7 @@ final class CMOS implements CMOSConstants {
     public CMOS(ResourceOwner owner)
         throws ResourceNotFreeException {
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             this.cmosIO = rm.claimIOResource(owner, CMOS_FIRST_PORT, CMOS_LAST_PORT - CMOS_FIRST_PORT + 1);
         } catch (NameNotFoundException ex) {
             throw new ResourceNotFreeException("Cannot find ResourceManager", ex);

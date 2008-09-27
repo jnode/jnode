@@ -116,7 +116,7 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
         device.readConfigByte(0xd2);
 
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             try {
                 ioRes = claimPorts(rm, device, hostStatusIORegister, 14);
             } catch (ResourceNotFreeException ex1) {

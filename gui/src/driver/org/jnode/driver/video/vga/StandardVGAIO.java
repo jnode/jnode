@@ -54,7 +54,7 @@ public class StandardVGAIO implements VgaConstants, VgaIO {
     public StandardVGAIO(ResourceOwner owner, MemoryResource mem) throws ResourceNotFreeException,
             DriverException {
         try {
-            ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             vgaIO = claimPorts(rm, owner, VGA_FIRST_PORT, VGA_LAST_PORT - VGA_FIRST_PORT + 1);
             this.mem = mem;
             current_mode = getColorMode();

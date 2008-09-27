@@ -59,8 +59,7 @@ public class SerialPortDriver extends Driver implements SerialPortAPI,
 
     protected void startDevice() throws DriverException {
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming
-                .lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             port = claimPorts(rm, getDevice(), basePort, 8);
             configure(BAUD9600);
             getDevice().registerAPI(SerialPortAPI.class, this);

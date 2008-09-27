@@ -61,9 +61,9 @@ public class SpeakerUtils {
     public static void beep() {
         if (stdBeep == null) {
             try {
-                DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+                DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
                 Device dev = dm.getDevice("speaker0");
-                SpeakerAPI s = (SpeakerAPI) dev.getAPI(SpeakerAPI.class);
+                SpeakerAPI s = dev.getAPI(SpeakerAPI.class);
                 s.beep();
             } catch (ApiNotFoundException anfex) {
                 log.error("Unable to beep: ", anfex);
@@ -79,9 +79,9 @@ public class SpeakerUtils {
     /** Plays a series of notes through the default speaker * */
     public static void play(Note[] n) {
         try {
-            DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             Device dev = dm.getDevice("speaker0");
-            SpeakerAPI s = (SpeakerAPI) dev.getAPI(SpeakerAPI.class);
+            SpeakerAPI s = dev.getAPI(SpeakerAPI.class);
             s.playNote(n);
         } catch (ApiNotFoundException anfex) {
             log.error("Unable to beep: ", anfex);

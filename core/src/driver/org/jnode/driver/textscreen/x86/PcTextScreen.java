@@ -57,8 +57,7 @@ public class PcTextScreen extends AbstractPcTextScreen {
         super(80, 25);
         Address ptr = Address.fromIntZeroExtend(0xb8000);
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming
-                    .lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             final ResourceOwner owner = new SimpleResourceOwner("Screen");
             memory = rm.claimMemoryResource(owner, ptr, getWidth()
                     * getHeight() * 2, ResourceManager.MEMMODE_NORMAL);

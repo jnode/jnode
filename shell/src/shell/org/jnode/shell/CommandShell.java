@@ -197,8 +197,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @see java.lang.Object
      */
     public CommandShell() throws NameNotFoundException, ShellException {
-        this((TextConsole) ((ConsoleManager) InitialNaming
-                .lookup(ConsoleManager.NAME)).getFocus());
+        this((TextConsole) (InitialNaming.lookup(ConsoleManager.NAME)).getFocus());
     }
 
     public CommandShell(TextConsole cons) throws ShellException {

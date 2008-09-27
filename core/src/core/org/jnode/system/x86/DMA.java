@@ -110,7 +110,7 @@ final class DMA implements DMAConstants {
     public DMA() throws DMAException {
         final ResourceManager rm;
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DMAException("Cannot find ResourceManager", ex);
         }

@@ -135,7 +135,7 @@ public class LanceCore extends AbstractDeviceCore implements IRQHandler, LanceCo
         log.debug("Found Lance IOBase: 0x" + NumberUtils.hex(iobase) + ", length: " + iolength);
         ResourceManager rm;
         try {
-            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            rm = InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find ResourceManager");
         }

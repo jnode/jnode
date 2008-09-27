@@ -38,9 +38,9 @@ public class NetTest {
         String devId = (args.length > 0) ? args[0] : "eth0";
 
         try {
-            final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             final Device dev = dm.getDevice(devId);
-            final NetDeviceAPI api = (NetDeviceAPI) dev.getAPI(NetDeviceAPI.class);
+            final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
             final EthernetAddress mac = (EthernetAddress) api.getAddress();
 
             SocketBuffer skbuf = new SocketBuffer();

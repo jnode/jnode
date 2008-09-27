@@ -118,7 +118,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
                 " and 0x" + NumberUtils.hex(valuePort));
 
         try {
-            final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
             ports = claimPorts(rm, device, basePort, SVGA_NUM_PORTS * 4);
             final int id = getVMWareID();
             if (id == SVGA_ID_0 || id == SVGA_ID_INVALID) {

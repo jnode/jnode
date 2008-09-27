@@ -58,7 +58,7 @@ final class Route {
             // Find the device ourselves
             final DeviceManager dm;
             try {
-                dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+                dm = InitialNaming.lookup(DeviceManager.NAME);
             } catch (NameNotFoundException ex) {
                 throw new NetworkException("Cannot find DeviceManager", ex);
             }

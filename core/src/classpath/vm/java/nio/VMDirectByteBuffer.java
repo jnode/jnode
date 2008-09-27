@@ -103,8 +103,7 @@ public final class VMDirectByteBuffer {
 
 		public MemoryRawData(int size) {
 			try {
-				final ResourceManager rm = (ResourceManager) InitialNaming
-						.lookup(ResourceManager.NAME);
+				final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
 				final ResourceOwner owner = new SimpleResourceOwner("java.nio");
 				this.resource = rm.claimMemoryResource(owner, null, size,
 						ResourceManager.MEMMODE_NORMAL);
