@@ -58,7 +58,7 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
         return "thread";
     }
 
-    CommandThreadImpl createThread(CommandLine cmdLine, CommandRunner cr) {
-        return new CommandThreadImpl(cr, cmdLine.getCommandName());
+    protected CommandThreadImpl createThread(CommandRunner cr) {
+        return new CommandThreadImpl(cr, cr.getCommandName());
     }
 }

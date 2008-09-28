@@ -35,11 +35,11 @@ import junit.framework.TestCase;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.DefaultCommandInvoker;
 import org.jnode.shell.DefaultInterpreter;
-import org.jnode.shell.ProcletCommandInvoker;
 import org.jnode.shell.RedirectingInterpreter;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.ThreadCommandInvoker;
 import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.proclet.ProcletCommandInvoker;
 import org.jnode.test.shell.syntax.TestAliasManager;
 import org.jnode.test.shell.syntax.TestSyntaxManager;
 

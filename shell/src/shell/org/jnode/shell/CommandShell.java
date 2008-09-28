@@ -62,6 +62,8 @@ import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.io.FanoutWriter;
 import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
+import org.jnode.shell.isolate.IsolateCommandInvoker;
+import org.jnode.shell.proclet.ProcletCommandInvoker;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.SyntaxManager;
@@ -269,6 +271,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             ShellUtils.registerCommandInvoker(DefaultCommandInvoker.FACTORY);
             ShellUtils.registerCommandInvoker(ThreadCommandInvoker.FACTORY);
             ShellUtils.registerCommandInvoker(ProcletCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInvoker(IsolateCommandInvoker.FACTORY);
             ShellUtils.registerCommandInterpreter(DefaultInterpreter.FACTORY);
             ShellUtils
                     .registerCommandInterpreter(RedirectingInterpreter.FACTORY);
@@ -282,7 +285,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // Now become interactive
         ownThread = Thread.currentThread();
 
-        // Run commands from the JNode commandline first
+        // Run commands from the JNode command line first
         final String cmdLine = System.getProperty(CMDLINE_PROPERTY_NAME, "");
         final StringTokenizer tok = new StringTokenizer(cmdLine);
 
