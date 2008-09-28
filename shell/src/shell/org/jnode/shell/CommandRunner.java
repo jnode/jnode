@@ -42,11 +42,11 @@ import org.jnode.vm.VmExit;
  * @author crawley@jnode.org
  *
  */
-class CommandRunner implements Runnable {
+public class CommandRunner implements Runnable {
     private final CommandShell shell;
     private final CommandInvoker invoker;
-    final CommandIO[] ios;
-    final Class<?> cx;
+    private final CommandIO[] ios;
+    final Class<?> targetClass;
     final Method method;
     final Object[] args;
     final CommandInfo cmdInfo;
@@ -55,11 +55,11 @@ class CommandRunner implements Runnable {
     private int rc;
 
     public CommandRunner(CommandShell shell, CommandInvoker invoker,
-            CommandInfo cmdInfo, Class<?> cx, Method method, Object[] args,
+            CommandInfo cmdInfo, Class<?> targetClass, Method method, Object[] args,
             CommandIO[] ios) {
         this.shell = shell;
         this.invoker = invoker;
-        this.cx = cx;
+        this.targetClass = targetClass;
         this.method = method;
         this.cmdInfo = cmdInfo;
         this.commandLine = null;
@@ -71,7 +71,7 @@ class CommandRunner implements Runnable {
             CommandInfo cmdInfo, CommandLine commandLine, CommandIO[] ios) {
         this.shell = shell;
         this.invoker = invoker;
-        this.cx = null;
+        this.targetClass = null;
         this.method = null;
         this.args = null;
         this.cmdInfo = cmdInfo;
@@ -85,16 +85,16 @@ class CommandRunner implements Runnable {
             try {
                 if (method != null) {
                     try {
-                        // This saves the Command instance that has the commandline state
+                        // This saves the Command instance that has the command line state
                         // associated in a thread-local so that the Abstract.execute(String[])
                         // method can get hold of it.  This is the magic that allows a command
                         // that implements 'main' as "new MyCommand().execute(args)" to get the
-                        // parsed commandline arguments, etc.
+                        // parsed command line arguments, etc.
                         AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
                         
                         // Call the command's entry point method reflectively
                         Object obj = Modifier.isStatic(method.getModifiers()) ? null
-                                : cx.newInstance();
+                                : targetClass.newInstance();
                         AccessController.doPrivileged(new InvokeAction(method, obj,
                                 args));
                     } finally {
@@ -109,7 +109,7 @@ class CommandRunner implements Runnable {
                     // bounce us to the older execute(CommandLine, InputStream, PrintStream,
                     // PrintStream) method.
                     Command cmd = cmdInfo.createCommandInstance();
-                    cmd.initialize(commandLine, ios);
+                    cmd.initialize(commandLine, getIos());
                     cmd.execute();
                 }
                 ok = true;
@@ -124,7 +124,7 @@ class CommandRunner implements Runnable {
                 IOException savedEx = null;
                 // Make sure that we try to flush all IOs, even if some of the flushes
                 // result in IOExceptions.
-                for (CommandIO io : ios) {
+                for (CommandIO io : getIos()) {
                     try {
                         io.flush();
                     } catch (IOException ex) {
@@ -180,6 +180,30 @@ class CommandRunner implements Runnable {
         if (ex != null && isDebugEnabled()) {
             ex.printStackTrace(shell.getErr());
         }
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public Class<?> getTargetClass() {
+        return targetClass;
+    }
+
+    public Object[] getArgs() {
+        return args;
+    }
+
+    public CommandIO[] getIos() {
+        return ios;
+    }
+
+    public CommandLine getCommandLine() {
+        return commandLine;
+    }
+
+    public String getCommandName() {
+        return commandLine != null ? commandLine.getCommandName() : null;
     }
 
 }

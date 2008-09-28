@@ -33,7 +33,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
 
     /**
      * @param group the parent group for the thread
-     * @param runner the runnable that implements the command
+     * @param runner the runnable that will run the command
      * @param name a thread name
      * @param size the threads stack size
      */
@@ -45,16 +45,17 @@ public class CommandThreadImpl extends Thread implements CommandThread {
 
     /**
      * @param group the parent group for the thread
-     * @param runner the runnable that implements the command
+     * @param runner the Runnable that will run the command
+     * @param name the thread name
      */
-    public CommandThreadImpl(ThreadGroup group, Runnable runner) {
-        super(group, runner);
+    public CommandThreadImpl(ThreadGroup group, Runnable runner, String name) {
+        super(group, runner, name);
         this.runner = runner;
     }
 
     /**
-     * @param runner the runnable that implements the command
-     * @param name a thread name
+     * @param runner the Runnable that will run the command
+     * @param name the thread name
      */
     public CommandThreadImpl(Runnable runner, String name) {
         super(runner, name);

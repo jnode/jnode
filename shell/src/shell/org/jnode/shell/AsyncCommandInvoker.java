@@ -148,7 +148,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                 cr.run();
             } else {
                 try {
-                    threadProcess = createThread(cmdLine, cr);
+                    threadProcess = createThread(cr);
                 } catch (Exception ex) {
                     throw new ShellInvocationException(
                             "Exception while creating command thread", ex);
@@ -178,14 +178,15 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
             throw new ShellFailureException("unexpected internal command");
         }
         try {
-            return createThread(cmdLine, cr);
+            return createThread(cr);
         } catch (Exception ex) {
             throw new ShellInvocationException(
                     "Exception while creating command thread", ex);
         }
     }
 
-    abstract CommandThread createThread(CommandLine cmdLine, CommandRunner cr);
+    protected abstract CommandThread createThread(CommandRunner cr) 
+    throws ShellInvocationException;
 
     public void keyPressed(KeyboardEvent ke) {
         // disabling Ctrl-C since currently we have no safe method for killing a

@@ -19,56 +19,50 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.shell;
+package org.jnode.shell.isolate;
 
-import org.jnode.shell.io.CommandIO;
-import org.jnode.shell.proclet.ProcletContext;
-import org.jnode.shell.proclet.ProcletIOContext;
-import org.jnode.vm.VmSystem;
+import java.io.IOException;
+
+import org.jnode.shell.AsyncCommandInvoker;
+import org.jnode.shell.CommandInvoker;
+import org.jnode.shell.CommandRunner;
+import org.jnode.shell.CommandShell;
+import org.jnode.shell.CommandThread;
+import org.jnode.shell.ShellInvocationException;
 
 /**
- * This command invoker runs commands in their own proclet, giving each one its
- * own stdin,out,err etcetera.
+ * This command invoker runs commands in their own isolates.
  * 
  * @author crawley@jnode.org
  */
-public class ProcletCommandInvoker extends AsyncCommandInvoker {
+public class IsolateCommandInvoker extends AsyncCommandInvoker {
 
     public static final Factory FACTORY = new Factory() {
         public CommandInvoker create(CommandShell shell) {
-            return new ProcletCommandInvoker(shell);
+            return new IsolateCommandInvoker(shell);
         }
 
         public String getName() {
-            return "proclet";
+            return "isolate";
         }
     };
-    
-    private static boolean initialized;
 
-    public ProcletCommandInvoker(CommandShell commandShell) {
+    public IsolateCommandInvoker(CommandShell commandShell) {
         super(commandShell);
-        init();
     }
 
+    @Override
     public String getName() {
-        return "proclet";
+        return "isolate";
     }
 
-    CommandThreadImpl createThread(CommandLine cmdLine, CommandRunner cr) {
-        CommandIO[] ios = cmdLine.getStreams();
-        return ProcletContext.createProclet(cr, null, null, 
-                new Object[] {
-                    ios[0].getInputStream(), 
-                    ios[1].getPrintStream(),
-                    ios[2].getPrintStream()}, 
-                cmdLine.getCommandName());
-    }
-    
-    private static synchronized void init() {
-        if (!initialized) {
-            VmSystem.switchToExternalIOContext(new ProcletIOContext());
-            initialized = true;
+    @Override
+    protected CommandThread createThread(CommandRunner cr) 
+    throws ShellInvocationException {
+        try {
+        return new IsolateCommandThreadImpl(cr);
+        } catch (IOException ex) {
+            throw new ShellInvocationException(ex);
         }
     }
 }
