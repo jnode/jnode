@@ -32,7 +32,6 @@ import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.isolate.IsolateThread;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
@@ -48,6 +47,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
+import javax.isolate.Isolate;
 
 /**
  * VM thread implementation
@@ -389,10 +389,8 @@ public abstract class VmThread extends VmSystemObject {
         this.stopping = true;
         if (javaThread != null) {
             javaThread.onExit();
-            if(javaThread instanceof IsolateThread) {
-                //todo implement correct isolate exit for threads created in the new isolate
-                ((IsolateThread) javaThread).afterExit();
-            }
+            //exit the current isolate if needed
+            Isolate.currentIsolate().exit(0);
             // Notify joining threads
             synchronized (javaThread) {
                 javaThread.notifyAll();

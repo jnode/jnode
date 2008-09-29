@@ -82,11 +82,4 @@ public final class IsolateThread extends Thread {
     final PrintStream getStdout() {
         return stdout;
     }
-
-    /**
-     * Invoked by VmThread after this thread exits.
-     */
-    public final void afterExit() {
-        isolate.exit(isolate.getIsolate(), 0);
-    }
 }
