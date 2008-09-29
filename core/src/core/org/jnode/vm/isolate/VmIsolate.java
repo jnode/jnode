@@ -30,6 +30,8 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.List;
+import java.util.LinkedList;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
@@ -192,7 +194,7 @@ public final class VmIsolate {
         /**
          * Non-root isolates.
          */
-        private static final ArrayList<VmIsolate> isolates = new ArrayList<VmIsolate>();
+        private static final List<VmIsolate> isolates = new LinkedList<VmIsolate>();
 
         private static int nextId = 0;
 
@@ -341,6 +343,7 @@ public final class VmIsolate {
      */
     public final void exit(Isolate isolate, int status) {
         testIsolate(isolate);
+        //todo handle demon threads
         if(threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
         
