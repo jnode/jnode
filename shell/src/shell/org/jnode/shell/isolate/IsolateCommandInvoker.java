@@ -58,9 +58,9 @@ public class IsolateCommandInvoker extends AsyncCommandInvoker {
 
     @Override
     protected CommandThread createThread(CommandRunner cr) 
-    throws ShellInvocationException {
+        throws ShellInvocationException {
         try {
-        return new IsolateCommandThreadImpl(cr);
+            return new IsolateCommandThreadImpl(cr);
         } catch (IOException ex) {
             throw new ShellInvocationException(ex);
         }

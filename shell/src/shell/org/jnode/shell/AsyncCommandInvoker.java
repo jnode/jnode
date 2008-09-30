@@ -186,7 +186,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     }
 
     protected abstract CommandThread createThread(CommandRunner cr) 
-    throws ShellInvocationException;
+        throws ShellInvocationException;
 
     public void keyPressed(KeyboardEvent ke) {
         // disabling Ctrl-C since currently we have no safe method for killing a

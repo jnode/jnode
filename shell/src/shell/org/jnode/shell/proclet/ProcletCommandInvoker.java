@@ -23,7 +23,6 @@ package org.jnode.shell.proclet;
 
 import org.jnode.shell.AsyncCommandInvoker;
 import org.jnode.shell.CommandInvoker;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThreadImpl;
