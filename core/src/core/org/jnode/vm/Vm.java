@@ -345,7 +345,7 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * Gets of create a counter with a given name.
+     * Gets or creates a counter with a given name.
      *
      * @param name
      * @return The counter
@@ -365,7 +365,7 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * Gets of create a counter group with a given name.
+     * Gets or creates a counter group with a given name.
      *
      * @param name
      * @return The counter group
@@ -404,7 +404,7 @@ public final class Vm extends VmSystemObject implements Statistics {
      */
     public synchronized Statistic[] getStatistics() {
         if (statistics != null) {
-            return (Statistic[]) statistics.values().toArray(
+            return statistics.values().toArray(
                 new Statistic[statistics.size()]);
         } else {
             return new Statistic[0];
