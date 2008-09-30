@@ -10,20 +10,15 @@ import java.text.CharacterIterator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
-import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.font.bdf.BDFFontContainer;
 import org.jnode.font.bdf.BDFGlyph;
 import org.jnode.font.bdf.BDFMetrics;
-import org.jnode.font.bdf.BDFParser;
-import org.jnode.naming.InitialNaming;
-import org.jnode.vm.Unsafe;
 
 import sun.font.CoreMetrics;
 import sun.font.FontLineMetrics;
+import sun.font.StandardGlyphVector;
 
 /**
  * Specific implementation of {@link JNodeFontPeer} for BDF fonts
@@ -31,11 +26,16 @@ import sun.font.FontLineMetrics;
  * @author fabien
  *
  */
-public class BDFFontPeer extends JNodeFontPeer {
+public class BDFFontPeer extends JNodeFontPeer<BDFFontProvider, BDFFont> {
     private static final Logger log = Logger.getLogger(BDFFontPeer.class);    
 
-    public BDFFontPeer(String name, Map attrs) {
-        super(name, attrs);
+    /**
+     * this the char used to replace missing glyphs in BDFFont
+     */
+    private static final char MISSING_GLYPH_CODE = '\u0020';
+    
+    public BDFFontPeer(BDFFontProvider provider, String name, Map attrs) {
+        super(provider, name, attrs);
     }
 
     /**
@@ -43,13 +43,13 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public boolean canDisplay(Font font, char c) {        
-        BDFFont bdfFont = toBDFFont(font);
+        BDFFont bdfFont = getCompatibleFont(font);
         
         //TODO this is a temporary workaround : we should add a method to BDFFont
-        BDFGlyph spaceGlyph = bdfFont.getContainer().getGlyph('\u0020');
+        BDFGlyph spaceGlyph = bdfFont.getContainer().getGlyph(MISSING_GLYPH_CODE);
         BDFGlyph characterGlyph = bdfFont.getContainer().getGlyph(c);
         
-        return (c == '\u0020') || ((c != '\u0020') && (characterGlyph != spaceGlyph));
+        return (c == MISSING_GLYPH_CODE) || ((c != MISSING_GLYPH_CODE) && (characterGlyph != spaceGlyph));
     }
 
     /**
@@ -78,10 +78,7 @@ public class BDFFontPeer extends JNodeFontPeer {
     @Override
     public GlyphVector createGlyphVector(Font font, FontRenderContext frc,
                                          CharacterIterator ci) {
-        // TODO implement me
-        System.out.println("JNodeFontPeer.createGlyphVector(" +
-            "Font,FontRenderContext,CharacterIterator) not implemented");        
-        return null;
+        return new StandardGlyphVector(font, ci, frc);
     }
 
     /**
@@ -91,10 +88,7 @@ public class BDFFontPeer extends JNodeFontPeer {
     @Override
     public GlyphVector createGlyphVector(Font font, FontRenderContext ctx,
                                          int[] glyphCodes) {
-        // TODO implement me
-        System.out.println("JNodeFontPeer.createGlyphVector(" +
-                "Font,FontRenderContext,int[]) not implemented");        
-        return null;
+        return new StandardGlyphVector(font, glyphCodes, ctx);
     }
 
     /**
@@ -103,8 +97,12 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public byte getBaselineFor(Font font, char c) {
-        System.out.println("JNodeFontPeer.getBaselineFor not implemented"); // TODO implement me        
-        return 0;
+        System.out.println("JNodeFontPeer.getBaselineFor not implemented");
+        
+        // TODO find proper value from the BDFFontContainer 
+        // it should be one of Font.CENTER_BASELINE, Font.HANGING_BASELINE, 
+        // Font.ROMAN_BASELINE   
+        return Font.ROMAN_BASELINE;
     }
 
     /**
@@ -112,7 +110,7 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public FontMetrics getFontMetrics(Font font) {
-        return toBDFFont(font).getFontMetrics();
+        return getCompatibleFont(font).getFontMetrics();
     }
 
     /**
@@ -120,7 +118,7 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public String getGlyphName(Font font, int glyphIndex) {
-        return toBDFFont(font).getContainer().getGlyphs()[glyphIndex].getName();
+        return getCompatibleFont(font).getContainer().getGlyphs()[glyphIndex].getName();
     }
 
     /**
@@ -131,7 +129,7 @@ public class BDFFontPeer extends JNodeFontPeer {
     @Override
     public LineMetrics getLineMetrics(Font font, CharacterIterator ci,
                                       int begin, int limit, FontRenderContext rc) {
-        BDFFont bdfFont = toBDFFont(font);
+        BDFFont bdfFont = getCompatibleFont(font);
         BDFMetrics fm = bdfFont.getContainer().getFontMetrics();
         
         float ascent = fm.getAscent();
@@ -163,8 +161,12 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public Rectangle2D getMaxCharBounds(Font font, FontRenderContext rc) {
-        System.out.println("JNodeFontPeer.getMaxCharBounds not implemented"); // TODO implement me        
-        return null;
+        BDFFont bdfFont = getCompatibleFont(font);
+                        
+        final Rectangle2D bounds = provider.getMaxCharBounds(bdfFont.getContainer());
+        transform(bounds, rc);
+        
+        return bounds;
     }
 
     /**
@@ -173,7 +175,7 @@ public class BDFFontPeer extends JNodeFontPeer {
     @Override
     public int getMissingGlyphCode(Font font) {
         //TODO this is a temporary workaround : we should add a method to BDFFont
-        return '\u0020'; // this the char used to replace missing glyphs in BDFFont
+        return MISSING_GLYPH_CODE; // this the char used to replace missing glyphs in BDFFont
     }
 
     /**
@@ -181,7 +183,7 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public int getNumGlyphs(Font font) {
-        return toBDFFont(font).getContainer().getGlyphs().length;
+        return getCompatibleFont(font).getContainer().getGlyphs().length;
     }
 
     /**
@@ -189,7 +191,7 @@ public class BDFFontPeer extends JNodeFontPeer {
      */
     @Override
     public String getPostScriptName(Font font) {
-        return toBDFFont(font).getContainer().getName();
+        return getCompatibleFont(font).getContainer().getName();
     }
 
     /**
@@ -200,7 +202,7 @@ public class BDFFontPeer extends JNodeFontPeer {
     @Override
     public Rectangle2D getStringBounds(Font font, CharacterIterator ci,
                                        int begin, int limit, FontRenderContext frc) {
-        BDFFont bdfFont = toBDFFont(font);
+        BDFFont bdfFont = getCompatibleFont(font);
         BDFFontContainer container = bdfFont.getContainer();
 
         double width = 0;
@@ -213,7 +215,46 @@ public class BDFFontPeer extends JNodeFontPeer {
             }                
         }
         final Rectangle2D bounds = new Rectangle2D.Double(0, 0, width, height);
-        
+                
+        transform(bounds, frc);
+        return bounds;
+    }
+
+    /**
+     * 
+     * @see gnu.java.awt.peer.ClasspathFontPeer#getSubFamilyName(java.awt.Font,
+     *      java.util.Locale)
+     */
+    @Override
+    public String getSubFamilyName(Font font, Locale locale) {
+        System.out.println("JNodeFontPeer.getSubFamilyName not implemented");
+        // TODO not implemented ... remove that while moving to openjdk
+        return "";
+    }
+
+    /**
+     * @see gnu.java.awt.peer.ClasspathFontPeer#hasUniformLineMetrics(java.awt.Font)
+     */
+    @Override
+    public boolean hasUniformLineMetrics(Font font) {
+        // We don't have "subfonts" (terms used in GNU Classpath javadoc)
+        // => returns true
+        return true;
+    }
+
+    /**
+     * @see gnu.java.awt.peer.ClasspathFontPeer#layoutGlyphVector(java.awt.Font,
+     *      java.awt.font.FontRenderContext, char[], int, int, int)
+     */
+    @Override
+    public GlyphVector layoutGlyphVector(Font font, FontRenderContext frc,
+                                         char[] chars, int start, int limit, int flags) {
+        //TODO work only for latin fonts but not for hindi, arabic ... fonts
+        // see GNU Classpath javadoc
+        return new StandardGlyphVector(font, chars, start, limit, frc);
+    }
+    
+    private void transform(Rectangle2D bounds, FontRenderContext frc) {
         if (frc.getTransform() != null) {
             double[] srcPoints =
                     new double[] {bounds.getMinX(), bounds.getMinY(), 
@@ -238,67 +279,6 @@ public class BDFFontPeer extends JNodeFontPeer {
                 maxY = Math.max(maxY, y);
             }
             bounds.setRect(minX, minY, maxX - minX + 1, maxY - minY + 1);
-        }
-        
-        return bounds;
-    }
-
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getSubFamilyName(java.awt.Font,
-     *      java.util.Locale)
-     */
-    @Override
-    public String getSubFamilyName(Font font, Locale locale) {
-        System.out.println("JNodeFontPeer.getSubFamilyName not implemented"); // TODO implement me        
-        return null;
-    }
-
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#hasUniformLineMetrics(java.awt.Font)
-     */
-    @Override
-    public boolean hasUniformLineMetrics(Font font) {
-        System.out.println("JNodeFontPeer.hasUniformLineMetrics not implemented"); // TODO implement me        
-        return false;
-    }
-
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#layoutGlyphVector(java.awt.Font,
-     *      java.awt.font.FontRenderContext, char[], int, int, int)
-     */
-    @Override
-    public GlyphVector layoutGlyphVector(Font font, FontRenderContext frc,
-                                         char[] chars, int start, int limit, int flags) {
-        System.out.println("JNodeFontPeer.layoutGlyphVector not implemented"); // TODO implement me        
-        return null;
-    }
-    
-    /**
-     * Convert the given font to a BDFFont.
-     * The font given as input might not be an instance of BDFFont 
-     * since {@link Font} class is public, not abstract and has a public constructor.
-     * If that's the case, then we are trying to find the closest font that we provide.
-     *   
-     * @param font any instance of {@link Font} (might not be an instance of BDFFont)
-     * @return
-     */
-    private BDFFont toBDFFont(Font font) {
-        if (!(font instanceof BDFFont)) {
-            // ask the FontManager for a compatible Font that we provide
-            try {
-                FontManager mgr = InitialNaming.lookup(FontManager.NAME);
-                font = mgr.getClosestProvidedFont(font, BDFFontProvider.NAME);
-            } catch (NamingException ex) {
-                // it should never happen since font peers are created 
-                // by the FontManager
-                log.error(ex);
-            }
-        }
-        
-        if (!(font instanceof BDFFont)) {
-            throw new RuntimeException("unable to convert font " + font + " to a BDFFont"); 
-        }
-        
-        return (BDFFont) font;
+        }        
     }
 }

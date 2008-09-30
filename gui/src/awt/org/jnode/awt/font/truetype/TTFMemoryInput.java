@@ -21,6 +21,11 @@
 
 package org.jnode.awt.font.truetype;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 /**
  * FIXME: These methods are not really tested yet.
  *
@@ -33,10 +38,30 @@ public class TTFMemoryInput extends TTFInput {
     private final int offset;
     private int pointer;
 
+    public TTFMemoryInput(URL url) throws IOException {
+        this(url.openStream());
+    }
+    
+    public TTFMemoryInput(InputStream is) throws IOException {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        final byte[] buf = new byte[4096];
+        int len;
+        while ((len = is.read(buf)) > 0) {
+            os.write(buf, 0, len);
+        }
+        is.close();
+
+        this.data = os.toByteArray();
+        this.offset = 0;
+        this.pointer = 0;
+    }
+
     public TTFMemoryInput(byte[] data, int offset, int length) {
         this.data = data;
         this.offset = offset;
         this.pointer = offset;
+        
+        //FIXME more likely to be a bug since we ignore length parameter        
     }
 
     public TTFMemoryInput(byte[] data) {
@@ -46,6 +71,8 @@ public class TTFMemoryInput extends TTFInput {
     private TTFMemoryInput(TTFMemoryInput src, int offset, int length) {
         this.data = src.data;
         this.offset = src.offset + offset;
+        
+        //FIXME more likely to be a bug or why is that code disabled ?        
         //this.length = length;
     }
 

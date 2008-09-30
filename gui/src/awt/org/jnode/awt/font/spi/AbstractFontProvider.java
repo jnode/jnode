@@ -24,23 +24,25 @@ package org.jnode.awt.font.spi;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Vector;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.renderer.RenderContext;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public abstract class AbstractFontProvider<T extends Font> implements FontProvider {
+public abstract class AbstractFontProvider<F extends Font, FD> implements FontProvider<F> {
 
     /**
      * My logger
@@ -62,7 +64,7 @@ public abstract class AbstractFontProvider<T extends Font> implements FontProvid
     /**
      * All loaded fonts (name, Font)
      */
-    private final HashMap<String, T> fontsByName = new HashMap<String, T>();
+    private final HashMap<String, F> fontsByName = new HashMap<String, F>();
     /**
      * Have the system fonts been loaded yet
      */
@@ -74,9 +76,14 @@ public abstract class AbstractFontProvider<T extends Font> implements FontProvid
     private final RenderCache renderCache = new RenderCache(context);
 
     private final String name;
+    
+    private final Class<F> fontClass;
+    
+    private final List<FD> userFontDatas = new Vector<FD>();
 
-    protected AbstractFontProvider(String name) {
+    protected AbstractFontProvider(Class<F> fontClass, String name) {
         this.name = name;
+        this.fontClass = fontClass;
     }
 
 
@@ -98,11 +105,7 @@ public abstract class AbstractFontProvider<T extends Font> implements FontProvid
     public final boolean provides(Font font) {
         if (font == null) return false; // don't provide default (null) fonts
 
-        if (!fontsLoaded) {
-            log.debug("provides, !fontsLoaded");
-            loadFonts();
-        }
-        
+        loadFonts();
         return (getCompatibleFont(font) != null);
     }
 
@@ -118,11 +121,9 @@ public abstract class AbstractFontProvider<T extends Font> implements FontProvid
      *
      * @return The set containing all fonts provides by this provider.
      */
-    public final Set<Font> getAllFonts() {
-        if (!fontsLoaded) {
-            loadFonts();
-        }
-        return new HashSet<Font>(fontsByName.values());
+    public final Set<F> getAllFonts() {
+        loadFonts();
+        return new HashSet<F>(fontsByName.values());
     }
 
     /**
@@ -150,7 +151,7 @@ public abstract class AbstractFontProvider<T extends Font> implements FontProvid
      * @return The metrics
      */
     public final FontMetrics getFontMetrics(Font font) {
-        FontMetrics fm = (FontMetrics) metrics.get(font);
+        FontMetrics fm = metrics.get(font);
         
         if (fm == null) {
             try {
@@ -163,60 +164,97 @@ public abstract class AbstractFontProvider<T extends Font> implements FontProvid
         
         return fm;
     }
-
-    protected abstract FontMetrics createFontMetrics(Font font) throws IOException;
-
-    protected abstract String[] getSystemFonts();
-
-    protected abstract T loadFont(URL url) throws IOException;
     
-    protected final T getCompatibleFont(Font font) {
-        T f = null;
-        try {
-            f = fontsByName.get(font.getFamily());
-            if (f == null) {
-                f = fontsByName.get(font.getName());
-            }
-
-            if (f == null) {
-                f = fontsByName.get(font.getFontName());
-            }
-
-            if ((f == null) && (fontsByName.size() > 0)) {
-                f = fontsByName.values().iterator().next();
-            }
-        } catch (Throwable t) {
-            log.error("error in getCompatibleFont", t);
+   /*
+    * Load all default fonts.
+    */
+    private final void loadFonts() {
+        if (!fontsLoaded) {
+            loadFontsImpl();
+            fontsLoaded = true;
         }
-        return f;
     }
 
+    protected abstract FontMetrics createFontMetrics(Font font) throws IOException;
+    
     /**
      * Load all default fonts.
      */
-    private final void loadFonts() {
-        for (String font : getSystemFonts()) {
-            loadFont(font);
-        }
-        fontsLoaded = true;
-    }
+    protected abstract void loadFontsImpl();
 
-    private final void loadFont(String resName) {
-        try {
-            final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            final URL url = cl.getResource(resName);
-            if (url != null) {
-                final T font = loadFont(url);
-                //fontsByName.put(font.getName(), font);
-                fontsByName.put(font.getFamily(), font);
-                //fontsByName.put(font.getFontName(), font);
-            } else {
-                log.error("Cannot find font resource " + resName);
-            }
-        } catch (IOException ex) {
-            log.error("Cannot find font " + resName + ": " + ex.getMessage());
-        } catch (Throwable ex) {
-            log.error("Cannot find font " + resName, ex);
+    /**
+     * Translates the font into a font that is provided by this provider.
+     *
+     * @param font
+     * @return
+     */
+    @Override
+    public final F getCompatibleFont(Font font) {
+        F f = null;
+        
+        if (fontClass.isInstance(font)) {
+            f = fontClass.cast(font);
         }
+        
+        if (f == null) {
+            f = fontsByName.get(font.getFamily());
+        }
+        
+        if (f == null) {
+            f = fontsByName.get(font.getName());
+        }
+
+        if (f == null) {
+            f = fontsByName.get(font.getFontName());
+        }
+
+        if ((f == null) && (fontsByName.size() > 0)) {
+            f = fontsByName.values().iterator().next();
+        }
+        
+        return f;
     }
+    
+    protected void addUserFontData(FD data) {
+        userFontDatas.add(data);
+    }
+    
+    protected List<FD> getUserFontDatas() {
+        return userFontDatas;
+    }
+    
+    protected void addFont(F font) {
+        //fontsByName.put(font.getName(), font);
+        fontsByName.put(font.getFamily(), font);
+        //fontsByName.put(font.getFontName(), font);        
+    }
+    
+//    /**
+//     * Load all default fonts.
+//     */
+//    private final void loadFonts() {
+//        for (String font : getSystemFonts()) {
+//            loadFont(font);
+//        }
+//        fontsLoaded = true;
+//    }
+//
+//    private final void loadFont(String resName) {
+//        try {
+//            final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+//            final URL url = cl.getResource(resName);
+//            if (url != null) {
+//                final F font = loadFont(url);
+//                //fontsByName.put(font.getName(), font);
+//                fontsByName.put(font.getFamily(), font);
+//                //fontsByName.put(font.getFontName(), font);
+//            } else {
+//                log.error("Cannot find font resource " + resName);
+//            }
+//        } catch (IOException ex) {
+//            log.error("Cannot find font " + resName + ": " + ex.getMessage());
+//        } catch (Throwable ex) {
+//            log.error("Cannot find font " + resName, ex);
+//        }
+//    }
 }

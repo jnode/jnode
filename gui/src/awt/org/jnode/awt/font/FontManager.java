@@ -25,9 +25,11 @@ import gnu.java.awt.peer.ClasspathFontPeer;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -82,18 +84,11 @@ public interface FontManager {
                          Color color);
 
     /**
+     * @throws IOException 
+     * @throws FontFormatException 
      *
      */
-    public Font createFont(int format, InputStream stream);
+    public Font createFont(int format, InputStream stream) throws FontFormatException, IOException;
 
     public ClasspathFontPeer createFontPeer(String name, Map attrs);
-    
-    /**
-     * Translates the font into a font that is provided by a provider.
-     *
-     * @param font
-     * @param providerName
-     * @return
-     */
-    public Font getClosestProvidedFont(Font font, String providerName);    
 }
