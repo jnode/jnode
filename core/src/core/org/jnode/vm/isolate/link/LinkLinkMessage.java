@@ -8,14 +8,14 @@ import javax.isolate.Link;
 
 final class LinkLinkMessage extends LinkMessageImpl {
 
-    private final VmDataLink value;
+    private final VmLink value;
 
     /**
      * Message constructor
      *
      * @param value
      */
-    LinkLinkMessage(VmDataLink link) {
+    LinkLinkMessage(VmLink link) {
         this.value = link;
     }
 

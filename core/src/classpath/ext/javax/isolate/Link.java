@@ -24,7 +24,7 @@ package javax.isolate;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 
-import org.jnode.vm.isolate.link.VmDataLink;
+import org.jnode.vm.isolate.link.VmLink;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -228,6 +228,6 @@ public abstract class Link {
      */
     public static Link newLink(Isolate sender, Isolate receiver)
             throws ClosedLinkException {
-        return VmDataLink.newLink(sender.getImpl(), receiver.getImpl());
+        return VmLink.newLink(sender.getImpl(), receiver.getImpl());
     }
 }

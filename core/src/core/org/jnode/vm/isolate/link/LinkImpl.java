@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: DataLinkImpl.java 4552 2008-09-11 11:38:42Z crawley $
  */
 package org.jnode.vm.isolate.link;
 
@@ -11,20 +11,20 @@ import javax.isolate.Isolate;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
 
-final class DataLinkImpl extends Link {
+final class LinkImpl extends Link {
 
-    private final VmDataLink vmLink;
+    private final VmLink vmLink;
 
     /**
      * Constructor
      *
      * @param vmLink
      */
-    DataLinkImpl(VmDataLink vmLink) {
+    LinkImpl(VmLink vmLink) {
         this.vmLink = vmLink;
     }
 
-    final VmDataLink getImpl() {
+    final VmLink getImpl() {
         return vmLink;
     }
 
@@ -41,8 +41,8 @@ final class DataLinkImpl extends Link {
      */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof DataLinkImpl) {
-            return (((DataLinkImpl) other).vmLink == this.vmLink);
+        if (other instanceof LinkImpl) {
+            return (((LinkImpl) other).vmLink == this.vmLink);
         }
         return false;
     }
