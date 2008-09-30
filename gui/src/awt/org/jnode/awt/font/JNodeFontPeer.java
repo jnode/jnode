@@ -39,14 +39,17 @@ import java.util.Map;
  *         To change the template for this generated type comment go to Window -
  *         Preferences - Java - Code Generation - Code and Comments
  */
-public abstract class JNodeFontPeer extends ClasspathFontPeer implements FontPeer {
-
+public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font> 
+        extends ClasspathFontPeer implements FontPeer {
+    protected final FP provider;
+    
     /**
      * @param name
      * @param attrs
      */
-    public JNodeFontPeer(String name, Map attrs) {
+    public JNodeFontPeer(FP provider, String name, Map attrs) {
         super(name, attrs);
+        this.provider = provider;
     }
 
     /**
@@ -145,4 +148,18 @@ public abstract class JNodeFontPeer extends ClasspathFontPeer implements FontPee
      */
     public abstract GlyphVector layoutGlyphVector(Font font, FontRenderContext frc,
                                          char[] chars, int start, int limit, int flags);
+    
+    /**
+     * Convert the given font to a Font whose type is F.
+     * The font given as input might not be an instance of F 
+     * since {@link Font} class is public, not abstract and has a public constructor.
+     * If that's the case, then we are trying to find the closest font that 
+     * this peer's provider provides.
+     *   
+     * @param font any instance of {@link Font} (might not be an instance of F)
+     * @return
+     */
+    protected final F getCompatibleFont(Font font) {
+        return provider.getCompatibleFont(font);
+    }
 }

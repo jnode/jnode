@@ -37,6 +37,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -80,7 +81,6 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
-import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.image.BufferedImageSurface;
 import org.jnode.awt.image.JNodeImage;
 import org.jnode.driver.DeviceException;
@@ -265,7 +265,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     /**
      * @see gnu.java.awt.ClasspathToolkit#createFont(int, java.io.InputStream)
      */
-    public Font createFont(int format, InputStream stream) {
+    public Font createFont(int format, InputStream stream) throws FontFormatException, IOException {
         return getFontManager().createFont(format, stream);
     }
 

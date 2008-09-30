@@ -22,7 +22,10 @@
 package org.jnode.awt.font;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +35,7 @@ import org.jnode.awt.JNodeToolkit;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public interface FontProvider {
+public interface FontProvider<F extends Font> {
     /**
      * Give the name of the font (used for setting the first provider to use
      * among all available ones)
@@ -65,7 +68,7 @@ public interface FontProvider {
      *
      * @return All fonts this provider can provide
      */
-    public Set<Font> getAllFonts();
+    public Set<F> getAllFonts();
 
     /**
      * Gets a text renderer for the given font.
@@ -84,6 +87,14 @@ public interface FontProvider {
     public FontMetrics getFontMetrics(Font font);
     
     /**
+     * Translates the font into a font that is provided by this provider.
+     *
+     * @param font
+     * @return
+     */
+    public F getCompatibleFont(Font font);
+    
+    /**
      * Creates a font peer from the given name or return null if not supported/provided.
      * As said in {@link JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc : 
      * "We don't know what kind of "name" the user requested (logical, face, family)".
@@ -92,5 +103,12 @@ public interface FontProvider {
      * @param attrs
      * @return
      */
-    public JNodeFontPeer createFontPeer(String name, Map attrs);    
+    public JNodeFontPeer<? extends FontProvider<F>, F> createFontPeer(String name, Map attrs);
+
+    /**
+     * Read and create a Font from the given InputStream
+     * @param stream
+     * @return
+     */
+    public F createFont(InputStream stream) throws FontFormatException, IOException;    
 }

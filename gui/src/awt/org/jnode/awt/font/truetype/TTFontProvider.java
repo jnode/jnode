@@ -22,23 +22,29 @@
 package org.jnode.awt.font.truetype;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.font.TextRenderer;
+import org.jnode.awt.font.bdf.BDFFont;
+import org.jnode.awt.font.bdf.BDFFontPeer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
+import org.jnode.font.bdf.BDFFontContainer;
 
 /**
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class TTFontProvider extends AbstractFontProvider<TTFFont> {
+public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFile> {
     /**
      * My logger
      */
@@ -52,7 +58,7 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont> {
     };
 
     public TTFontProvider() {
-        super("ttf");
+        super(TTFFont.class, "ttf");
         log.debug("new TTFontProvider");
     }
 
@@ -82,10 +88,51 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont> {
      * @return
      */
     @Override
-    public JNodeFontPeer createFontPeer(String name, Map attrs) {
-        return null; //TODO
+    public TTFFontPeer createFontPeer(String name, Map attrs) {
+        //TODO implement me
+//        TTFFontPeer peer = null;
+//
+//        List<BDFFontContainer> datas = getUserFontDatas();
+//        for (BDFFontContainer container : datas) {
+//            if (match(container, name, attrs)) {
+//                peer = new TTFFontPeer(this, name, attrs);
+//                datas.remove(container);
+//                break;
+//            }
+//        }
+//        
+//        for (BDFFontContainer container : getContainers()) {
+//            if (match(container, name, attrs)) {
+//                peer = new TTFFontPeer(this, name, attrs);
+//                break;
+//            }
+//        }
+//        
+//        return peer;
+        
+        return new TTFFontPeer(this, name, attrs);
     }
 
+    /**
+     * Read an create a Font from the given InputStream
+     * @param stream
+     * @return
+     */
+    @Override
+    public TTFFont createFont(InputStream stream) throws FontFormatException, IOException {
+        try {
+            TTFFontDataFile data = new TTFFontDataFile(new TTFMemoryInput(stream));
+            addUserFontData(data);
+            return new TTFFont(data, 10);
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            FontFormatException ffe = new FontFormatException("bad ttf format");
+            ffe.initCause(e);
+            throw ffe;
+        }        
+    }
+    
     /**
      * Gets the font data for the given font
      *
@@ -106,13 +153,23 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont> {
         }
     }
 
-    protected TTFFont loadFont(URL url) throws IOException {
-        log.debug("<<< loadFont(" + url + ") >>>");
-        final TTFFontData fontData = new TTFFontDataFile(url);
-        return new TTFFont(fontData, 10);
-    }
-
-    protected String[] getSystemFonts() {
-        return SYSTEM_FONTS;
+    @Override
+    protected void loadFontsImpl() {
+        for (String fontResource : SYSTEM_FONTS) {
+            try {
+                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                final URL url = cl.getResource(fontResource);
+                if (url != null) {
+                    final TTFFontData fontData = new TTFFontDataFile(url);
+                    addFont(new TTFFont(fontData, 10));
+                } else {
+                    log.error("Cannot find font resource " + fontResource);
+                }
+            } catch (IOException ex) {
+                log.error("Cannot find font " + fontResource + ": " + ex.getMessage());
+            } catch (Throwable ex) {
+                log.error("Cannot find font " + fontResource, ex);
+            }
+        }            
     }
 }

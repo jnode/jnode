@@ -22,12 +22,16 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +42,7 @@ import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
 import org.jnode.font.bdf.BDFFontContainer;
+import org.jnode.font.bdf.BDFGlyph;
 import org.jnode.vm.Unsafe;
 
 /**
@@ -45,9 +50,7 @@ import org.jnode.vm.Unsafe;
  * 
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class BDFFontProvider extends AbstractFontProvider<BDFFont> {
-    static final String NAME = "bdf";
-    
+public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContainer> {
     /**
      * My logger
      */
@@ -60,21 +63,23 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont> {
         "Vera-10.bdf", "Vera-12.bdf", "Vera-14.bdf", "VeraMono-12-8.bdf", "6x12_FixedMedium-12.bdf"
     };
 
-    private List<BDFFontContainer> containers; 
+    private List<BDFFontContainer> containers;
+    
+    private Map<BDFFontContainer, Size> maxCharBounds = new HashMap<BDFFontContainer, Size>(); 
     
     public BDFFontProvider() {
-        super(NAME);        
+        super(BDFFont.class, "bdf");        
     }
 
     protected TextRenderer createTextRenderer(RenderCache renderCache, Font font) {
-        final BDFFont bdfFont = getBDFFont(font);
+        final BDFFont bdfFont = getCompatibleFont(font);
         final TextRenderer renderer = new BDFTextRenderer(bdfFont.getContainer());
         return renderer;
     }
 
 
     protected FontMetrics createFontMetrics(Font font) throws IOException {
-        final BDFFont bdfFont = getBDFFont(font);
+        final BDFFont bdfFont = getCompatibleFont(font);
         return bdfFont.getFontMetrics();
     }
     
@@ -91,29 +96,54 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont> {
     public BDFFontPeer createFontPeer(String name, Map attrs) {
         BDFFontPeer peer = null;
 
+        List<BDFFontContainer> datas = getUserFontDatas();
+        for (BDFFontContainer container : datas) {
+            if (match(container, name, attrs)) {
+                peer = new BDFFontPeer(this, name, attrs);
+                datas.remove(container);
+                break;
+            }
+        }
+        
         for (BDFFontContainer container : getContainers()) {
-            // it's a temporary workaround taking first font found
-            //FIXME : find the proper way for matching the font name
-            //if (container.getFamily().equals(name) || container.getName().equals(name)) {
-            peer = new BDFFontPeer(name, attrs);
-            break;
-            //}
+            if (match(container, name, attrs)) {
+                peer = new BDFFontPeer(this, name, attrs);
+                break;
+            }
         }
         
         //Unsafe.debug("BDFFontProvider: name=" + name + "fontPeer=" + peer);
         return peer;
     }
-    
+
+    /**
+     * Read an create a Font from the given InputStream
+     * @param stream
+     * @return
+     */
     @Override
-    protected BDFFont loadFont(URL url) throws IOException {
-        Reader reader = new InputStreamReader(url.openStream());
+    public BDFFont createFont(InputStream stream) throws FontFormatException, IOException {
         try {
+            Reader reader = new InputStreamReader(stream);
             BDFFontContainer container = BDFFontContainer.createFont(reader);
+            addUserFontData(container);
             return new BDFFont(container);
+        } catch (IOException e) {
+            throw e;
         } catch (Exception e) {
-            IOException ioe = new IOException("can't load BDFFont from " + url);
-            ioe.initCause(e);
-            throw ioe;
+            FontFormatException ffe = new FontFormatException("bad bdf format");
+            ffe.initCause(e);
+            throw ffe;
+        }
+    }
+    
+    /**
+     * Load all default fonts.
+     */
+    @Override
+    protected final void loadFontsImpl() {
+        for (BDFFontContainer container : getContainers()) {
+            addFont(new BDFFont(container));
         }
     }
         
@@ -121,7 +151,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont> {
         if (containers == null) {
             containers = new ArrayList<BDFFontContainer>();
 
-            for (String fontResource : getSystemFonts()) {
+            for (String fontResource : SYSTEM_FONTS) {
                 try {
                     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
                     final URL url = cl.getResource(fontResource);
@@ -142,23 +172,33 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont> {
         return containers;
     }
 
-    protected String[] getSystemFonts() {
-        return SYSTEM_FONTS;
+    Rectangle2D getMaxCharBounds(BDFFontContainer container) {
+        Size size = maxCharBounds.get(container);
+                
+        if (size == null) {
+            size = new Size();
+            for (BDFGlyph g : container.getGlyphs()) {
+                if (g != null) {
+                    size.maxCharWidth += g.getDWidth().width;
+                    size.maxCharHeight = Math.max(g.getDWidth().height, size.maxCharHeight);
+                }
+            }
+            maxCharBounds.put(container, size);
+        }
+        
+        return new Rectangle2D.Double(0, 0, size.maxCharWidth, size.maxCharHeight);                
     }
 
-    private BDFFont getBDFFont(Font font) {
-        final BDFFont bdfFont;
-        
-        if (font instanceof BDFFont) {
-            bdfFont = (BDFFont) font;
-        } else {
-            bdfFont = getCompatibleFont(font);
-        }
-        
-        if (bdfFont == null) {
-            log.warn("Font not instanceof BDFFont: " + font.getClass().getName());
-        }
-        
-        return bdfFont;
+    private boolean match(BDFFontContainer container, String name, Map attrs) {
+        // it's a temporary workaround taking first font found
+        //FIXME : find the proper way for matching the font name
+        //if (container.getFamily().equals(name) || container.getName().equals(name)) {
+        return true;
+    }
+    
+    private static class Size
+    {
+        int maxCharWidth = 0;
+        int maxCharHeight = 0;
     }
 }

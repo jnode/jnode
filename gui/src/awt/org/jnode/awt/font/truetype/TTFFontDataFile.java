@@ -56,7 +56,7 @@ public class TTFFontDataFile extends TTFFontData {
     }
 
     public TTFFontDataFile(URL url) throws IOException {
-        this(new TTFURLInput(url));
+        this(new TTFMemoryInput(url));
     }
 
     public TTFFontDataFile(TTFInput input) throws IOException {
@@ -125,5 +125,4 @@ public class TTFFontDataFile extends TTFFontData {
         System.out.println("  entrySelector: " + entrySelector);
         System.out.println("  rangeShift: " + rangeShift);
     }
-
 }

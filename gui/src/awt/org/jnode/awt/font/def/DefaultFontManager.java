@@ -25,9 +25,11 @@ import gnu.java.security.action.GetPropertyAction;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -35,7 +37,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -64,7 +65,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * Note : For now, we have only 2 providers (bdf, ttf) and we will probably 
      * never have more than 5 ones. So, a {@link List} is enough for our usage. 
      */
-    private final List<FontProvider> providers = new ArrayList<FontProvider>(2);
+    private final List<FontProvider<?>> providers = new ArrayList<FontProvider<?>>(2);
 
     public final Map<Integer, String> fontTypeToProviderName = (Map<Integer, String>)
         Collections.singletonMap(Font.TRUETYPE_FONT, "ttf");
@@ -121,7 +122,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      */
     public synchronized Font[] getAllFonts() {
         final HashSet<Font> all = new HashSet<Font>();
-        for (FontProvider prv : providers) {
+        for (FontProvider<?> prv : providers) {
             all.addAll(prv.getAllFonts());
         }
         return (Font[]) all.toArray(new Font[all.size()]);
@@ -189,23 +190,23 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
     }
 
-    public Font createFont(int format, InputStream stream) {
+    public Font createFont(int format, InputStream stream) throws FontFormatException, IOException {
         String name = fontTypeToProviderName.get(format);
         if (name == null) throw new IllegalArgumentException("unknown format " + name);
 
-        for (FontProvider prv : getProviders()) {
+        for (FontProvider<?> prv : getProviders()) {
             if (prv.getName().equals(name)) {
-                return null; //TODO
+                return prv.createFont(stream);
             }
         }
 
-        throw new IllegalArgumentException("can't create font with format " + name);
+        throw new FontFormatException("can't create font with format " + name);
     }
 
     @Override
-    public JNodeFontPeer createFontPeer(String name, Map attrs) {
-        for (FontProvider prv : getProviders()) {
-            JNodeFontPeer peer = prv.createFontPeer(name, attrs);
+    public JNodeFontPeer<?, ?> createFontPeer(String name, Map attrs) {
+        for (FontProvider<?> prv : getProviders()) {
+            JNodeFontPeer<?, ?> peer = prv.createFontPeer(name, attrs);
             if (peer != null) {
                 return peer;
             }
@@ -220,8 +221,8 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param font
      * @return The provider
      */
-    private FontProvider getProvider(Font font) {
-        for (FontProvider prv : getProviders()) {
+    private FontProvider<?> getProvider(Font font) {
+        for (FontProvider<?> prv : getProviders()) {
             if (prv.provides(font)) {
                 return prv;
             }
@@ -241,7 +242,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * 
      * @return
      */
-    private synchronized List<FontProvider> getProviders() {
+    private synchronized List<FontProvider<?>> getProviders() {
 // TODO fix true type font
 //        final String firstProviderName = (String)AccessController.
 // doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
@@ -252,7 +253,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
                 if (firstProviderName.equals(providers.get(i).getName())) {
                     
                     // exchange the providers so that firstProvider is always at index 0
-                    FontProvider firstProvider = providers.get(i);
+                    FontProvider<?> firstProvider = providers.get(i);
                     providers.set(i, providers.get(0));
                     providers.set(0, firstProvider);
                     
@@ -273,7 +274,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         Font txFont = font;
         
         if (getProvider(font) == null) {
-            txFont = getClosestProvidedFont(font, null);
+            txFont = getCompatibleFont(font);
         }
         
         return txFont;
@@ -285,18 +286,8 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param font
      * @return
      */
-    @Override
-    public Font getClosestProvidedFont(Font font, String providerName) {
-        for (FontProvider prv : getProviders()) {
-            if ((providerName == null) || (prv.getName().equals(providerName))) {
-                //TODO find the closest possible Font (size, style, ...) among provided ones.
-                //font = new Font("Luxi Sans", Font.PLAIN, font.getSize());
-                font = prv.getAllFonts().iterator().next();
-                break;
-            }
-        }            
-        
-        return font;
+    private Font getCompatibleFont(Font font) {
+        return getProviders().get(0).getCompatibleFont(font);
     }
     
     private synchronized void updateFontProviders() {
@@ -314,7 +305,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
     }
 
-    private void configureProvider(List<FontProvider> providers, ConfigurationElement element) {
+    private void configureProvider(List<FontProvider<?>> providers, ConfigurationElement element) {
         final String className = element.getAttribute("class");
         
         if (log.isDebugEnabled()) {
@@ -325,7 +316,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
             
             try {
                 final Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(className);
-                final FontProvider provider = (FontProvider) cls.newInstance();
+                final FontProvider<?> provider = (FontProvider<?>) cls.newInstance();
                 providers.add(provider);
             } catch (ClassNotFoundException ex) {
                 log.error("Cannot find provider class " + className);
@@ -350,14 +341,5 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
         
         return idx;
-    }
-
-    private static class EmptyFontMetrics extends FontMetrics {
-        /**
-         * @param font
-         */
-        public EmptyFontMetrics(Font font) {
-            super(font);
-        }
     }
 }
