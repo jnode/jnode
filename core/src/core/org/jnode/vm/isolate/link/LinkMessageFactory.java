@@ -51,7 +51,7 @@ public final class LinkMessageFactory {
      * @return
      */
     public static LinkMessage newLinkMessage(Link link) {
-        return new LinkLinkMessage(((DataLinkImpl) link).getImpl());
+        return new LinkLinkMessage(((LinkImpl) link).getImpl());
     }
 
     /**

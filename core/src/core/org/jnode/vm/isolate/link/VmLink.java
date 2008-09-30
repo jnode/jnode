@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: VmDataLink.java 4552 2008-09-11 11:38:42Z crawley $
  */
 package org.jnode.vm.isolate.link;
 
@@ -20,9 +20,9 @@ import org.jnode.vm.isolate.VmIsolateLocal;
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmDataLink {
+public final class VmLink {
 
-    private final VmIsolateLocal<DataLinkImpl> linkHolder = new VmIsolateLocal<DataLinkImpl>();
+    private final VmIsolateLocal<LinkImpl> linkHolder = new VmIsolateLocal<LinkImpl>();
 
     private final Queue<LinkMessageImpl> messages = new LinkedList<LinkMessageImpl>();
 
@@ -43,19 +43,19 @@ public final class VmDataLink {
         if (sender == receiver) {
             throw new IllegalArgumentException("sender == receiver");
         }
-        VmDataLink vmLink = new VmDataLink(sender, receiver);
+        VmLink vmLink = new VmLink(sender, receiver);
         return vmLink.asLink();
     }
 
-    public static VmDataLink fromLink(Link link) {
-        return ((DataLinkImpl) link).getImpl();
+    public static VmLink fromLink(Link link) {
+        return ((LinkImpl) link).getImpl();
     }
 
     /**
      * @param sender
      * @param receiver
      */
-    VmDataLink(VmIsolate sender, VmIsolate receiver) {
+    VmLink(VmIsolate sender, VmIsolate receiver) {
         this.sender = sender;
         this.receiver = receiver;
     }
@@ -66,9 +66,9 @@ public final class VmDataLink {
      * @return
      */
     public final Link asLink() {
-        final DataLinkImpl link = linkHolder.get();
+        final LinkImpl link = linkHolder.get();
         if (link == null) {
-            linkHolder.set(new DataLinkImpl(this));
+            linkHolder.set(new LinkImpl(this));
             return linkHolder.get();
         } else {
             return link;
@@ -246,7 +246,7 @@ public final class VmDataLink {
     final void send(LinkMessage message) throws ClosedLinkException,
         InterruptedIOException, IOException {
         if (VmIsolate.currentIsolate() != sender) {
-            // Current isolate is not a sender
+            // Current isolate is not the sender for this message
             throw new UnsupportedOperationException();
         }
         if (this.closed) {
@@ -267,6 +267,29 @@ public final class VmDataLink {
             messageImpl.waitUntilReceived();
         } catch (InterruptedException ex) {
             throw new InterruptedIOException();
+        }
+    }
+
+    /**
+     * This method is used to send status messages. These are sent
+     * without blocking and are queued in the link for the receiver
+     * to read at its leisure.  If the link is closed when this
+     * method is called, the message is quietly dropped.
+     * 
+     * @param message the status message to be sent.
+     */
+    public final void sendStatus(LinkMessage message) {
+        if (VmIsolate.currentIsolate() != sender) {
+            // Current isolate is not the sender for this message
+            throw new UnsupportedOperationException();
+        }
+        final LinkMessageImpl messageImpl = (LinkMessageImpl) message;
+        synchronized (this) {
+            if (!this.closed) {
+                // Send message
+                messages.add(messageImpl);
+                notifyAll();
+            }
         }
     }
 }

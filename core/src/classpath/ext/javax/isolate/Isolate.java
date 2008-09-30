@@ -147,14 +147,13 @@ public final class Isolate {
 
     /**
      * Gets a new Link associated with this Isolate from which the current
-     * isolate can receive events.
+     * isolate can receive status link messages.
      * 
      * @return
      * @throws ClosedLinkException
      */
-    public Link newEventLink() throws ClosedLinkException {
-        // TODO implement me
-        return null;
+    public Link newStatusLink() throws ClosedLinkException {
+        return impl.newStatusLink(currentIsolate().impl);
     }
 
     /**

@@ -54,7 +54,7 @@ import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.isolate.link.VmDataLink;
+import org.jnode.vm.isolate.link.VmLink;
 
 /**
  * VM specific implementation of the Isolate class.
@@ -122,7 +122,12 @@ public final class VmIsolate {
     /**
      * Links passed to the start of this isolate
      */
-    private VmDataLink[] dataLinks;
+    private VmLink[] dataLinks;
+
+    /**
+     * Status links created by newStatusLink()
+     */
+    private LinkedList<VmLink> statusLinks = new LinkedList<VmLink>();
 
     /**
      * The isolate-specific default IO context
@@ -344,7 +349,7 @@ public final class VmIsolate {
     public final void exit(Isolate isolate, int status) {
         testIsolate(isolate);
         //todo handle demon threads
-        if(threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
+        if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
         
         try {
@@ -352,7 +357,7 @@ public final class VmIsolate {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        state = State.EXITED;
+        changeState(State.EXITED);
         StaticData.isolates.remove(this);
     }
 
@@ -375,7 +380,7 @@ public final class VmIsolate {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        this.state = State.TERMINATED;
+        changeState(State.TERMINATED);
         StaticData.isolates.remove(this);
     }
 
@@ -428,14 +433,14 @@ public final class VmIsolate {
      * Gets the links passed to the start of the current isolate.
      */
     public static Link[] getLinks() {
-        final VmDataLink[] vmLinks = currentIsolate().dataLinks;
+        final VmLink[] vmLinks = currentIsolate().dataLinks;
 
         if ((vmLinks == null) || (vmLinks.length == 0)) {
             return new Link[0];
         } else {
             Link[] links = new Link[vmLinks.length];
             int i = 0;
-            for (VmDataLink vmLink : vmLinks) {
+            for (VmLink vmLink : vmLinks) {
                 links[i++] = vmLink.asLink();
             }
             return links;
@@ -449,7 +454,7 @@ public final class VmIsolate {
      * @throws IsolateStartupException
      */
     @PrivilegedActionPragma
-    public final void start(Isolate isolate, Link[] links)
+    public synchronized final void start(Isolate isolate, Link[] links)
         throws IsolateStartupException {
         testIsolate(isolate);
         // The creator of this isolate must be the same as the current isolate
@@ -461,10 +466,9 @@ public final class VmIsolate {
         synchronized (this) {
             // The state must be CREATED
             if (state != State.CREATED) {
-                throw new IllegalStateException(
-                    "Isolate has already been started");
+                throw new IllegalStateException("Isolate has already been started");
             }
-            this.state = State.STARTING;
+            changeState(State.STARTING);
         }
 
         // Save starter
@@ -473,13 +477,13 @@ public final class VmIsolate {
         // Save links
         this.dataLinks = null;
         if (links != null) {
-            VmDataLink[] vmLinks = new VmDataLink[links.length];
+            VmLink[] vmLinks = new VmLink[links.length];
             int i = 0;
             for (Link link : links) {
                 if (!link.isOpen()) {
                     throw new IsolateStartupException("Link is closed");
                 }
-                vmLinks[i] = VmDataLink.fromLink(link);
+                vmLinks[i] = VmLink.fromLink(link);
             }
             this.dataLinks = vmLinks;
         }
@@ -514,7 +518,7 @@ public final class VmIsolate {
             piManager, stdout, stderr, stdin);
 
         // Update the state of this isolate.
-        this.state = State.STARTED;
+        changeState(State.STARTED);
 
         // Start the main thread.
         mainThread.start();
@@ -749,5 +753,36 @@ public final class VmIsolate {
      */
     BootableHashMap getIsolateLocalMap() {
         return isolateLocalMap;
+    }
+
+    /**
+     * Create and return a new status link for this isolate and the supplied
+     * receiver isolate.
+     * @param receiver the receiver for the link.
+     * @return the link.
+     */
+    public synchronized Link newStatusLink(VmIsolate receiver) {
+        Link link = VmLink.newLink(this, receiver);
+        VmLink vmLink = VmLink.fromLink(link);
+        statusLinks.add(vmLink);
+        if (state == State.TERMINATED) {
+            // The spec says that we should immediately send a link message
+            // if the isolate is already 'EXITED'.
+            sendStatus(vmLink, state);
+        }
+        return link;
+    }
+    
+    private synchronized void changeState(State newState) {
+        if (state != newState) {
+            this.state = newState;
+            for (VmLink link : statusLinks) {
+                sendStatus(link, this.state);
+            }
+        }
+    }
+
+    private void sendStatus(VmLink link, State state) {
+        // TODO implement.
     }
 }
