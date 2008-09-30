@@ -31,6 +31,7 @@
     <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
     <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
     <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
+    <alias name="isolate" class="org.jnode.shell.command.IsolateCommand"/>
     <alias name="java" class="org.jnode.shell.command.JavaCommand"/>
     <alias name="kill" class="org.jnode.shell.command.KillCommand"/>
     <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
@@ -123,6 +124,9 @@
           <argument argLabel="prefix"/>
         </alternatives>
       </sequence>
+    </syntax>
+    <syntax alias="isolate">
+      <empty description="Show basic information about all isolates in the system"/>
     </syntax>
     <syntax alias="java" description="Run a Java class via its 'main' method">
       <sequence>
