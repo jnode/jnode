@@ -22,7 +22,7 @@ final class DataLinkMessage extends LinkMessageImpl {
      * @see org.jnode.vm.isolate.LinkMessageImpl#CloneMessage()
      */
     @Override
-    LinkMessageImpl CloneMessage() {
+    LinkMessageImpl cloneMessage() {
         final byte[] data = new byte[length];
         System.arraycopy(bytes, offset, data, 0, length);
         return new DataLinkMessage(data, 0, length);

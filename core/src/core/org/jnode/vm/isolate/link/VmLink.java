@@ -189,7 +189,7 @@ public final class VmLink {
             message = messages.poll();
         }
         message.notifyReceived();
-        return message.CloneMessage();
+        return message.cloneMessage();
     }
 
     /**
@@ -278,18 +278,11 @@ public final class VmLink {
      * 
      * @param message the status message to be sent.
      */
-    public final void sendStatus(LinkMessage message) {
-        if (VmIsolate.currentIsolate() != sender) {
-            // Current isolate is not the sender for this message
-            throw new UnsupportedOperationException();
-        }
-        final LinkMessageImpl messageImpl = (LinkMessageImpl) message;
-        synchronized (this) {
-            if (!this.closed) {
-                // Send message
-                messages.add(messageImpl);
-                notifyAll();
-            }
+    public final synchronized void sendStatus(LinkMessage message) {
+        if (!this.closed) {
+            // Send message
+            messages.add((LinkMessageImpl) message);
+            notifyAll();
         }
     }
 }

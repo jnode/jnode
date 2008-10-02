@@ -35,7 +35,9 @@ import java.util.LinkedList;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
+import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
+import javax.isolate.LinkMessage;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.naming.InitialNaming;
@@ -54,6 +56,7 @@ import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.isolate.link.StatusLinkMessage;
 import org.jnode.vm.isolate.link.VmLink;
 
 /**
@@ -783,6 +786,26 @@ public final class VmIsolate {
     }
 
     private void sendStatus(VmLink link, State state) {
-        // TODO implement.
+        IsolateStatus.State istate = null;
+        switch (state) {
+        case CREATED:
+            istate = IsolateStatus.State.UNKNOWN;
+            break;
+        case STARTING:
+            istate = IsolateStatus.State.STARTING;
+            break;
+        case STARTED:
+            istate = IsolateStatus.State.STARTED;
+            break;
+        case EXITED:
+            istate = IsolateStatus.State.EXITING;
+            break;
+        case TERMINATED:
+            istate = IsolateStatus.State.EXITED;
+            break;
+        }
+        LinkMessage message = 
+            new StatusLinkMessage(istate, IsolateStatus.ExitReason.IMPLICIT_EXIT, 0);
+        link.sendStatus(message);
     }
 }

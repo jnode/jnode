@@ -25,7 +25,7 @@ final class IsolateLinkMessage extends LinkMessageImpl {
      * @see org.jnode.vm.isolate.LinkMessageImpl#CloneMessage()
      */
     @Override
-    LinkMessageImpl CloneMessage() {
+    LinkMessageImpl cloneMessage() {
         return new IsolateLinkMessage(value);
     }
 

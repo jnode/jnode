@@ -19,7 +19,7 @@ abstract class LinkMessageImpl extends LinkMessage {
      *
      * @return
      */
-    abstract LinkMessageImpl CloneMessage();
+    abstract LinkMessageImpl cloneMessage();
 
     /**
      * Block the current thread, until this message has its received flag set.
