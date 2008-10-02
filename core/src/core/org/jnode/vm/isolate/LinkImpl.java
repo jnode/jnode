@@ -1,7 +1,7 @@
 /*
  * $Id: DataLinkImpl.java 4552 2008-09-11 11:38:42Z crawley $
  */
-package org.jnode.vm.isolate.link;
+package org.jnode.vm.isolate;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

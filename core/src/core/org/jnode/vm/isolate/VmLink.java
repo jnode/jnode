@@ -1,7 +1,7 @@
 /*
  * $Id: VmDataLink.java 4552 2008-09-11 11:38:42Z crawley $
  */
-package org.jnode.vm.isolate.link;
+package org.jnode.vm.isolate;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -12,8 +12,6 @@ import javax.isolate.ClosedLinkException;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
 
-import org.jnode.vm.isolate.VmIsolate;
-import org.jnode.vm.isolate.VmIsolateLocal;
 
 /**
  * Shared implementation of javax.isolate.Link

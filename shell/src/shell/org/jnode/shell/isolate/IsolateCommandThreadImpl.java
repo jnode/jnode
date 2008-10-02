@@ -24,7 +24,7 @@ import org.jnode.shell.ThreadExitListener;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.util.ReaderInputStream;
 import org.jnode.util.WriterOutputStream;
-import org.jnode.vm.isolate.link.ObjectLinkMessage;
+import org.jnode.vm.isolate.ObjectLinkMessage;
 
 /**
  * This class implements the CommandThread API for commands run in their 

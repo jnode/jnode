@@ -24,7 +24,7 @@ package javax.isolate;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.jnode.vm.isolate.link.LinkMessageFactory;
+import org.jnode.vm.isolate.LinkMessageFactory;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

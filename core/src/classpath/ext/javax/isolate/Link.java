@@ -24,7 +24,7 @@ package javax.isolate;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 
-import org.jnode.vm.isolate.link.VmLink;
+import org.jnode.vm.isolate.VmLink;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

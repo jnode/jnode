@@ -1,7 +1,7 @@
 /*
- * $Id$
+ * $Id: DataLinkMessage.java 4595 2008-10-02 13:24:26Z crawley $
  */
-package org.jnode.vm.isolate.link;
+package org.jnode.vm.isolate;
 
 
 final class DataLinkMessage extends LinkMessageImpl {
