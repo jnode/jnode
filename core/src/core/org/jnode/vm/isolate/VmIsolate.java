@@ -56,8 +56,6 @@ import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.isolate.link.StatusLinkMessage;
-import org.jnode.vm.isolate.link.VmLink;
 
 /**
  * VM specific implementation of the Isolate class.

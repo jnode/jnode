@@ -4,7 +4,7 @@ import javax.isolate.Isolate;
 import javax.isolate.Link;
 
 import org.jnode.shell.CommandRunner;
-import org.jnode.vm.isolate.link.ObjectLinkMessage;
+import org.jnode.vm.isolate.ObjectLinkMessage;
 
 public class IsolateCommandLauncher {
 
