@@ -12,7 +12,9 @@ import java.net.Socket;
 import java.util.Properties;
 
 import javax.isolate.Isolate;
+import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
+import javax.isolate.LinkMessage;
 import javax.isolate.StreamBindings;
 
 import org.jnode.shell.CommandRunner;
@@ -107,9 +109,18 @@ public class IsolateCommandThreadImpl implements CommandThread {
     public void start(ThreadExitListener listener) throws ShellInvocationException {
         try {
             Link cl = Link.newLink(Isolate.currentIsolate(), isolate);
+            Link sl = isolate.newStatusLink();
             isolate.start(cl);
             ObjectLinkMessage msg = ObjectLinkMessage.newMessage(this.cr);
             cl.send(msg);
+            while (true) {
+                LinkMessage statusMsg = sl.receive();
+                IsolateStatus status = statusMsg.extractStatus();
+                if (status.getState().equals(IsolateStatus.State.EXITED)) {
+                    System.err.println("Got the EXITED message");
+                    break;
+                }
+            }
         } catch (Exception ex) {
             throw new ShellInvocationException("Cannot start isolate", ex);
         } 

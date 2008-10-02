@@ -88,7 +88,7 @@ public class IsolateStatus {
      * @param type
      * @param exitReason
      */
-    IsolateStatus(State state, ExitReason exitReason, int exitCode) {
+    public IsolateStatus(State state, ExitReason exitReason, int exitCode) {
         this.state = state;
         this.exitReason = exitReason;
         this.exitCode = exitCode;

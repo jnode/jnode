@@ -21,7 +21,7 @@ final class StringLinkMessage extends LinkMessageImpl {
      * @see org.jnode.vm.isolate.LinkMessageImpl#CloneMessage()
      */
     @Override
-    LinkMessageImpl CloneMessage() {
+    LinkMessageImpl cloneMessage() {
         return new StringLinkMessage(new String(value));
     }
 
