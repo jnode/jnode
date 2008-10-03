@@ -21,7 +21,7 @@
 
 package org.jnode.driver.input.l10n;
 
-import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.AbstractKeyboardInterpreter;
 import org.jnode.driver.input.Keys;
 import org.jnode.driver.input.Key;
 
@@ -32,7 +32,7 @@ import java.awt.event.KeyEvent;
  * @since 0.2.8
  */
 
-public class KeyboardInterpreter_RU extends KeyboardInterpreter {
+public class KeyboardInterpreter_RU extends AbstractKeyboardInterpreter {
 
     protected void initKeys(Keys keys) {
         keys.setKey(1, new Key(KeyEvent.VK_ESCAPE));

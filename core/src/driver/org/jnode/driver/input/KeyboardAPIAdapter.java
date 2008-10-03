@@ -83,7 +83,7 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
     }
 
     /**
-     * @see org.jnode.driver.input.KeyboardAPI#setKbInterpreter(org.jnode.driver.input.KeyboardInterpreter)
+     * @see org.jnode.driver.input.KeyboardAPI#setKbInterpreter(org.jnode.driver.input.AbstractKeyboardInterpreter)
      */
     public void setKbInterpreter(KeyboardInterpreter kbInterpreter) {
         if (kbInterpreter == null) {

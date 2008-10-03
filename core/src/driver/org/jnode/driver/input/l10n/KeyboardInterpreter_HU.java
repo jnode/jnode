@@ -24,7 +24,7 @@ package org.jnode.driver.input.l10n;
 import java.awt.event.KeyEvent;
 import org.jnode.driver.input.DeadKeyException;
 import org.jnode.driver.input.Key;
-import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.AbstractKeyboardInterpreter;
 import org.jnode.driver.input.Keys;
 import org.jnode.driver.input.UnsupportedKeyException;
 
@@ -33,7 +33,7 @@ import org.jnode.driver.input.UnsupportedKeyException;
  * @author Levente S\u00e1ntha
  * @since 0.1.9
  */
-public class KeyboardInterpreter_HU extends KeyboardInterpreter {
+public class KeyboardInterpreter_HU extends AbstractKeyboardInterpreter {
 
     protected void initKeys(Keys keys) {
         Key key;

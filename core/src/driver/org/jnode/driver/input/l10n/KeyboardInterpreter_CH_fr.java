@@ -23,7 +23,7 @@ package org.jnode.driver.input.l10n;
 
 import java.awt.event.KeyEvent;
 import org.jnode.driver.input.Key;
-import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.AbstractKeyboardInterpreter;
 import org.jnode.driver.input.Keys;
 
 /**
@@ -31,7 +31,7 @@ import org.jnode.driver.input.Keys;
  *
  * @author Yves Galante
  */
-public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
+public class KeyboardInterpreter_CH_fr extends AbstractKeyboardInterpreter {
 
 
     public KeyboardInterpreter_CH_fr() {
