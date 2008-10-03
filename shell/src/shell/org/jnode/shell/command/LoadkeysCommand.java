@@ -90,7 +90,7 @@ public class LoadkeysCommand extends AbstractCommand {
             for (Device kb : kbDevs) {
                 final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
                 final KeyboardInterpreter kbInt = 
-                    KeyboardInterpreterFactory.getKeyboardInterpreter(
+                    KeyboardInterpreterFactory.createKeyboardInterpreter(
                             country, language, variant);
                 if (kbInt != null) {
                     out.println("Setting layout for keyboard " + kb.getId() + " to " +
