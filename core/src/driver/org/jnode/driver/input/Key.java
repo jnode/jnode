@@ -92,10 +92,6 @@ public class Key {
         this.lowerVirtuelKey = virtuelKey;
         this.upperVirtuelKey = virtuelKey;
         this.altGrVirtuelKey = virtuelKey;
-
-        lowerChar = 0;
-        upperChar = 0;
-        altGrChar = 0;
     }
 
     public char getLowerChar() {

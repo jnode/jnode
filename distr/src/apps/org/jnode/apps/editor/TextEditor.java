@@ -296,7 +296,7 @@ public class TextEditor implements KeyboardListener {
                     if (ro) break;
 
                     char c = e.getKeyChar();
-                    if (c == 0 && k != KeyEvent.VK_DELETE) return;
+                    if (c == KeyEvent.CHAR_UNDEFINED && k != KeyEvent.VK_DELETE) return;
                     if (cy == ls.size()) ls.add(new StringBuilder());
                     StringBuilder l = ls.get(oy());
                     switch (k) {

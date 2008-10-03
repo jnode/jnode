@@ -41,7 +41,11 @@ public abstract class KeyboardInterpreter {
     protected int lastDeadVK = -1;
 
     protected final Keys keys;
+    
+    // FIXME this is an evil hack to mitigate the performance issues that
+    // result from the interpretExtendedScanCode's inappropriate use of exceptions.
     private final UnsupportedKeyException unsupportedKeyException = new UnsupportedKeyException();
+    private final DeadKeyException deadKeyException = new DeadKeyException();
 
     private boolean extendedMode;
     private int capsLock = 0;
@@ -143,6 +147,7 @@ public abstract class KeyboardInterpreter {
                 mask = InputEvent.SHIFT_DOWN_MASK;
                 break;
             case KeyEvent.VK_CAPS_LOCK:
+                // FIXME ... can someone explain why 'capslock' isn't a boolean??
                 if (capsLock == 0 || capsLock == 3)
                     mask = InputEvent.SHIFT_DOWN_MASK;
                 else
@@ -274,12 +279,17 @@ public abstract class KeyboardInterpreter {
             case KeyEvent.VK_DOWN:
             case KeyEvent.VK_RIGHT:
             case KeyEvent.VK_PRINTSCREEN:
-            case KeyEvent.VK_ALT_GRAPH:
             case KeyEvent.VK_PROPS:
-            case KeyEvent.VK_CONTROL:  // both normal and extend should return 0
                 if (extended)
-                    return 0;
+                    return KeyEvent.CHAR_UNDEFINED;
                 break;
+
+            case KeyEvent.VK_SHIFT:
+            case KeyEvent.VK_CONTROL:
+            case KeyEvent.VK_ALT:
+            case KeyEvent.VK_ALT_GRAPH:
+            case KeyEvent.VK_CAPS_LOCK:
+                return KeyEvent.CHAR_UNDEFINED;
 
             case KeyEvent.VK_ENTER:
                 if (extended)
@@ -292,7 +302,7 @@ public abstract class KeyboardInterpreter {
         }
 
         if (deadKey) {
-            throw new DeadKeyException();
+            throw deadKeyException;
         } else if (lastDeadVK != -1) {
             try {
                 Key key = keys.getKey(scancode);
@@ -303,11 +313,11 @@ public abstract class KeyboardInterpreter {
                     if (deadChars.length > 1) {
                         return deadChars[1];
                     } else
-                        throw new UnsupportedKeyException();
+                        throw unsupportedKeyException;
                 } else if (deadChars.length > 0)
                     return deadChars[0];
                 else
-                    return 0;
+                    return KeyEvent.CHAR_UNDEFINED;
             } finally {
                 if (!released) {
                     lastDeadVK = -1;

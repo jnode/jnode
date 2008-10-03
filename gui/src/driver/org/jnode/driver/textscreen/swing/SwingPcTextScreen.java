@@ -157,20 +157,16 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             keyListener = new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent e) {
-                    char c = e.getKeyChar();
-                    if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
                     KeyboardEvent k = new KeyboardEvent(KeyEvent.KEY_PRESSED,
-                        e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
+                        e.getWhen(), e.getModifiersEx(), e.getKeyCode(), e.getKeyChar());
                     keyboardDriver.dispatchEvent(k);
 
                 }
 
                 @Override
                 public void keyReleased(KeyEvent e) {
-                    char c = e.getKeyChar();
-                    if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
                     KeyboardEvent k = new KeyboardEvent(KeyEvent.KEY_RELEASED,
-                        e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
+                        e.getWhen(), e.getModifiersEx(), e.getKeyCode(), e.getKeyChar());
                     keyboardDriver.dispatchEvent(k);
                 }
             };
