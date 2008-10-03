@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.input.KeyboardEvent;
@@ -52,7 +53,7 @@ public class KeyboardReader extends Reader
     private int pos;
     private int lim;
 
-    private static final char NO_CHAR = 0;
+    private static final char NO_CHAR = KeyEvent.CHAR_UNDEFINED;
 
     private final Line currentLine;
     private final TextConsole console;
@@ -128,11 +129,11 @@ public class KeyboardReader extends Reader
         KeyboardEvent event = keyboardHandler.getEvent();
         if (!event.isConsumed()) {
             char ch = event.getKeyChar();
+            int kc = event.getKeyCode();
             if (ch != NO_CHAR) {
                 event.consume();
                 return !processChar(ch);
             } else {
-                int kc = event.getKeyCode();
                 int mods = event.getModifiers();
                 if (processVirtualKeystroke(kc, mods)) {
                     event.consume();
