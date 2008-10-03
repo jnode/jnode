@@ -47,8 +47,8 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.KeyboardListener;
 
 /**
  * @author Levente S\u00e1ntha

@@ -23,13 +23,13 @@ package org.jnode.driver.input.l10n;
 
 import java.awt.event.KeyEvent;
 import org.jnode.driver.input.Key;
-import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.AbstractKeyboardInterpreter;
 import org.jnode.driver.input.Keys;
 
 /**
  * @author Matteo Di Giovinazzo <matteo.digiovinazzo@jugpadova.it>
  */
-public class KeyboardInterpreter_IT extends KeyboardInterpreter {
+public class KeyboardInterpreter_IT extends AbstractKeyboardInterpreter {
 
     protected void initKeys(Keys keys) {
         keys.setKey(1, new Key(KeyEvent.VK_ESCAPE));
