@@ -29,7 +29,9 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardInterpreter;
-import org.jnode.driver.input.KeyboardInterpreterFactory;
+import org.jnode.driver.input.KeyboardInterpreterException;
+import org.jnode.driver.input.KeyboardLayoutManager;
+import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
@@ -66,6 +68,7 @@ public class LoadkeysCommand extends AbstractCommand {
      */
     public void execute(CommandLine cmdLine, InputStream in, PrintStream out,
             PrintStream err) throws Exception {
+        final KeyboardLayoutManager mgr = InitialNaming.lookup(KeyboardLayoutManager.NAME);
         final Collection<Device> kbDevs = 
             DeviceUtils.getDevicesByAPI(KeyboardAPI.class);
 
@@ -89,16 +92,17 @@ public class LoadkeysCommand extends AbstractCommand {
 
             for (Device kb : kbDevs) {
                 final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
-                final KeyboardInterpreter kbInt = 
-                    KeyboardInterpreterFactory.createKeyboardInterpreter(
+                try {
+                    final KeyboardInterpreter kbInt = mgr.createKeyboardInterpreter(
                             country, language, variant);
-                if (kbInt != null) {
                     out.println("Setting layout for keyboard " + kb.getId() + " to " +
                         kbInt.getClass().getName());
                     api.setKbInterpreter(kbInt);
-                } else {
-                    out.println("No suitable keyboard layout found");
-                    break;
+                } catch (KeyboardInterpreterException ex) {
+                    out.println("No suitable keyboard layout found: " + ex.getMessage());
+                    // Re-throw the exception so that the shell can decide whether or not
+                    // to print a stacktrace.
+                    throw ex;
                 }
             }
         }

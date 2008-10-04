@@ -21,12 +21,20 @@
 package org.jnode.driver.input;
 
 /**
- * A KeyboardInterpreter translate scancodes into KeyboardEvent's.
+ * A KeyboardInterpreter translates a sequence of scancodes to the corresponding
+ * KeyboardEvent's.  An instance is stateful, remembering the state of the SHIFT, 
+ * CTRL and other 'modifier' keys for example.
  *
  * @author epr
  * @author Martin Husted Hartvig
+ * @author crawley@jnode.org
  */
 public interface KeyboardInterpreter {
+    
+    public interface Factory {
+        // Create a new interpreter instance.
+        public KeyboardInterpreter create() throws KeyboardInterpreterException;
+    }
 
     public static final int XT_RELEASE = 0x80;
     public static final int XT_EXTENDED = 0xE0;
@@ -36,13 +44,13 @@ public interface KeyboardInterpreter {
      *
      * @param scancode
      */
-    public abstract KeyboardEvent interpretScancode(int scancode);
+    public KeyboardEvent interpretScancode(int scancode);
 
     /**
      * @param keycode
      * @return
      * @throws UnsupportedKeyException
      */
-    public abstract KeyboardEvent interpretKeycode(int keycode);
+    public KeyboardEvent interpretKeycode(int keycode);
 
 }

@@ -5,7 +5,8 @@
         name="JNode input driver"
         version="@VERSION@"
         license-name="lgpl"
-        provider-name="JNode.org">
+        provider-name="JNode.org"
+        class="org.jnode.driver.input.KeyboardInputPlugin">
         
   <requires>
     <import plugin="org.jnode.driver.character"/>
