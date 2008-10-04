@@ -21,6 +21,8 @@
 
 package org.jnode.driver.input.usb;
 
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -37,7 +39,9 @@ import org.jnode.driver.bus.usb.USBRequest;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardAPIAdapter;
 import org.jnode.driver.input.KeyboardInterpreter;
-import org.jnode.driver.input.KeyboardInterpreterFactory;
+import org.jnode.driver.input.KeyboardInterpreterException;
+import org.jnode.driver.input.KeyboardLayoutManager;
+import org.jnode.naming.InitialNaming;
 import org.jnode.util.ByteQueue;
 import org.jnode.util.ByteQueueProcessor;
 import org.jnode.util.ByteQueueProcessorThread;
@@ -79,6 +83,7 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
         161, 115, 114, 113, 150, 158, 159, 128, 136, 177, 178, 176, 142, 152, 173, 140};
 
     /**
+     * @throws NameNotFoundException 
      * @see org.jnode.driver.Driver#startDevice()
      */
     protected void startDevice() throws DriverException {
@@ -110,8 +115,9 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
             final USBRequest req = intPipe.createRequest(intData);
             intPipe.asyncSubmit(req);
 
-            // Register the PointerAPI
-            apiAdapter.setKbInterpreter(KeyboardInterpreterFactory.getDefaultKeyboardInterpreter());
+            // Configure the default keyboard layout and register the KeyboardAPI
+            KeyboardLayoutManager mgr = InitialNaming.lookup(KeyboardLayoutManager.NAME);
+            apiAdapter.setKbInterpreter(mgr.createDefaultKeyboardInterpreter());
             dev.registerAPI(KeyboardAPI.class, apiAdapter);
 
             // Start the key event thread
@@ -119,6 +125,10 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
                     new ByteQueueProcessorThread(dev.getId() + "-daemon", keyCodeQueue, this);
             keyEventThread.start();
         } catch (USBException ex) {
+            throw new DriverException(ex);
+        } catch (NameNotFoundException ex) {
+            throw new DriverException("Cannot find keyboard layout manager", ex);
+        } catch (KeyboardInterpreterException ex) {
             throw new DriverException(ex);
         }
     }

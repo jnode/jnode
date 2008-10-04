@@ -28,8 +28,12 @@ import java.nio.channels.ByteChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+
+import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
+import org.jnode.naming.InitialNaming;
 import org.jnode.util.SystemInputStream;
 
 /**
@@ -93,7 +97,14 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
      */
     protected synchronized void startDevice() throws DriverException {
         this.channel = getChannel();
-        this.kbInterpreter = createKeyboardInterpreter();
+        try {
+            KeyboardLayoutManager mgr = InitialNaming.lookup(KeyboardLayoutManager.NAME);
+            this.kbInterpreter = mgr.createDefaultKeyboardInterpreter();
+        } catch (NameNotFoundException ex) {
+            throw new DriverException("Cannot find the keyboard layout manager", ex);
+        } catch (KeyboardInterpreterException ex) {
+            throw new DriverException();
+        }
 
         final Device dev = getDevice();
         final String id = dev.getId();
@@ -121,15 +132,6 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
      * @return The byte channel
      */
     protected abstract ByteChannel getChannel();
-
-    /**
-     * Create an interpreter for this keyboard device
-     *
-     * @return The created interpreter
-     */
-    protected KeyboardInterpreter createKeyboardInterpreter() {
-        return KeyboardInterpreterFactory.getDefaultKeyboardInterpreter();
-    }
 
     /**
      * Stop the keyboard device.
