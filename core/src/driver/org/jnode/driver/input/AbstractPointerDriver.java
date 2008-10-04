@@ -23,6 +23,7 @@ package org.jnode.driver.input;
 
 import java.io.IOException;
 import java.nio.channels.ByteChannel;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;

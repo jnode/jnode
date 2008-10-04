@@ -23,6 +23,7 @@ package org.jnode.driver.input;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
 import org.jnode.system.event.SystemEvent;
 
 /**

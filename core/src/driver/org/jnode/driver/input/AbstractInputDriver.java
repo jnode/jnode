@@ -24,6 +24,7 @@ package org.jnode.driver.input;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.ArrayList;
+
 import org.jnode.driver.Driver;
 import org.jnode.system.event.SystemEvent;
 import org.jnode.util.Queue;
