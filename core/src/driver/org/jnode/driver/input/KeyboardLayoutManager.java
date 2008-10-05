@@ -28,7 +28,6 @@ import java.util.ResourceBundle;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -207,7 +206,8 @@ public class KeyboardLayoutManager implements ExtensionPointListener {
     }
     
     /**
-     * Register a keyboard interpreter factory object.
+     * Register a keyboard interpreter factory object.  This factory could be an 
+     * instance of {@link KIClassWrapper} or some other factory.
      * 
      * @param name the keyboard layout identifier.
      * @param factory the factory to be registered.
@@ -305,7 +305,7 @@ public class KeyboardLayoutManager implements ExtensionPointListener {
      * This wrapper class allows us to treat a class name as a keyboard interpreter
      * factory.
      */
-    private static class KIClassWrapper implements KeyboardInterpreter.Factory {
+    public static class KIClassWrapper implements KeyboardInterpreter.Factory {
         private final String className;
         
         /**
