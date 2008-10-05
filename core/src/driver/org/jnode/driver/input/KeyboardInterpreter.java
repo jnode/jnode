@@ -31,9 +31,19 @@ package org.jnode.driver.input;
  */
 public interface KeyboardInterpreter {
     
+    /**
+     * A factory API for keyboard interpreters
+     */
     public interface Factory {
-        // Create a new interpreter instance.
+        /**
+         * Create a new interpreter instance.
+         */
         public KeyboardInterpreter create() throws KeyboardInterpreterException;
+        
+        /**
+         * Provide a short description for the layout.
+         */
+        public String describe();
     }
 
     public static final int XT_RELEASE = 0x80;

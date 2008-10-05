@@ -17,6 +17,8 @@
       <export name="org.jnode.driver.input.*"/>
     </library>
   </runtime>
+  
+  <extension-point id="keyboard-layouts" name="Standard keyboard layout identifier mappings"/>
         
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.driver.DriverPermission" name="setPreferredListener"/>

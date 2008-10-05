@@ -1,10 +1,38 @@
+/*
+ * $Id: TextScreenConsolePlugin.java 4556 2008-09-13 08:02:20Z crawley $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.driver.input;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import org.jnode.plugin.ConfigurationElement;
+import org.jnode.plugin.Extension;
+import org.jnode.plugin.ExtensionPoint;
+import org.jnode.plugin.ExtensionPointListener;
 
 /**
  * The KeyboardManager provides methods for creating KeyboardInterpreter objects, and managing
@@ -13,7 +41,7 @@ import org.apache.log4j.Logger;
  * @author Marc DENTY
  * @author crawley@jnode.org
  */
-public class KeyboardLayoutManager {
+public class KeyboardLayoutManager implements ExtensionPointListener {
     
     private final Logger log = Logger.getLogger(KeyboardLayoutManager.class);
 
@@ -21,14 +49,27 @@ public class KeyboardLayoutManager {
      * The name used to bind this manager in the InitialNaming namespace.
      */
     public static Class<KeyboardLayoutManager> NAME = KeyboardLayoutManager.class;
+
+    public static final String EP_NAME = "org.jnode.driver.input.keyboard-layouts";
     
-    private HashMap<String, KeyboardInterpreter.Factory> map = 
+    private final HashMap<String, KeyboardInterpreter.Factory> map = 
         new HashMap<String, KeyboardInterpreter.Factory>();
+
+    private final ExtensionPoint keyboardLayoutEP;
+    
+    
+    public KeyboardLayoutManager(ExtensionPoint keyboardLayoutEP) {
+        this.keyboardLayoutEP = keyboardLayoutEP;
+        keyboardLayoutEP.addListener(this);
+        for (Extension extension : keyboardLayoutEP.getExtensions()) {
+            addLayoutsToMap(extension);
+        }
+    }
     
     /**
      * Load the default keyboard layout as specified in the 'org.jnode.driver.input.KeyboardLayout'
      * resource bundle.  If none is specified or the specified layout cannot be used, we use the
-     * 'US_en' layout as a fallback.
+     * 'US_en' layout as a fall-back.
      *
      * @return a valid KeyboardInterpreter
      * @throws KeyboardInterpreterException 
@@ -59,7 +100,7 @@ public class KeyboardLayoutManager {
                         "' keyboard interpreter", ex);
             }
         }
-        // Use the US_en keyboard layout as a fallback if there was no resource bundle, no
+        // Use the US_en keyboard layout as a fall-back if there was no resource bundle, no
         // usable default keyboard layout or the specified default layout had no interpreter.
         log.error("Trying the 'US_en' keyboard interpreter as a fallback");
         try {
@@ -171,19 +212,93 @@ public class KeyboardLayoutManager {
      * @param name the keyboard layout identifier.
      * @param factory the factory to be registered.
      */
-    public synchronized void registerKeyboardLayout(
-            String name, KeyboardInterpreter.Factory factory) {
+    public synchronized void add(String name, KeyboardInterpreter.Factory factory) {
         map.put(name, factory);
     }
     
     /**
-     * Register a keyboard interpreter class.  The class is
+     * Register a keyboard interpreter class.  The classname will be wrapped in
+     * a new KeyboardInterpreter.Factory.
      * 
      * @param name the keyboard layout identifier.
-     * @param factory the name of the class to be registered.
+     * @param className the name of the class to be registered.
      */
-    public void registerKeyboardLayout(String name, String className) {
-        registerKeyboardLayout(name, new KIClassWrapper(className));
+    public void add(String name, String className) {
+        add(name, new KIClassWrapper(className));
+    }
+    
+    /**
+     * Remove the keyboard interpreter factory for a given layout identifier.
+     * @param name keyboard layout identifier.
+     * @return the factory removed or <code>null</node>
+     */
+    public synchronized KeyboardInterpreter.Factory remove(String name) {
+        return map.remove(name);
+    }
+    
+    /**
+     * Gets a collection of all layout identifiers known to this manager.
+     */
+    public synchronized Collection<String> layouts() {
+        return new TreeSet<String>(map.keySet());
+    }
+
+    /**
+     * Gets an iterator for the layout identifiers known to this manager.
+     * 
+     * @return An iterator the returns instances of String.
+     */
+    public Iterator<String> layoutIterator() {
+        return layouts().iterator();
+    }
+
+    /**
+     * Add all keyboard layouts in the extension data to the map.
+     */
+    @Override
+    public void extensionAdded(ExtensionPoint point, Extension extension) {
+        if (point.equals(keyboardLayoutEP)) {
+            addLayoutsToMap(extension);
+        }
+    }
+
+    /**
+     * Remove from the map any keyboard layouts that are identical to the extension data.
+     */
+    @Override
+    public void extensionRemoved(ExtensionPoint point, Extension extension) {
+        if (point.equals(keyboardLayoutEP)) {
+            removeLayoutsFromMap(extension);
+        }
+    }
+    
+    private synchronized void addLayoutsToMap(Extension extension) {
+        for (ConfigurationElement element : extension.getConfigurationElements()) {
+            if (element.getName().equals("layout")) {
+                String name = element.getAttribute("name");
+                String className = element.getAttribute("class");
+                if (name != null && className != null) {
+                    add(name, className);
+                }
+            }
+        }
+    }
+    
+    private synchronized void removeLayoutsFromMap(Extension extension) {
+        for (ConfigurationElement element : extension.getConfigurationElements()) {
+            if (element.getName().equals("layout")) {
+                String name = element.getAttribute("name");
+                String className = element.getAttribute("class");
+                if (name == null || className == null) {
+                    continue;
+                }
+                KeyboardInterpreter.Factory factory = map.get(name);
+                if (factory != null && (factory instanceof KIClassWrapper) &&
+                        ((KIClassWrapper) factory).className.equals(className)) {
+                    map.remove(name);
+                }
+            }
+        }
     }
     
     /**
@@ -227,6 +342,11 @@ public class KeyboardLayoutManager {
                         "Error instantiating keyboard interpreter class:" +
                         className, ex);
             }
+        }
+
+        @Override
+        public String describe() {
+            return className;
         }
     }
 }
