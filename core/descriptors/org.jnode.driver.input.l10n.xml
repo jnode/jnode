@@ -16,5 +16,36 @@
       <export name="org.jnode.driver.input.l10n.*"/>
     </library>
   </runtime>
+  
+  <extension point="org.jnode.driver.input.keyboard-layouts">
+    <layout name="BE_fr" class="org.jnode.driver.input.l10n.KeyboardInterpreter_BE_fr"/>
+    <layout name="CH_fr" class="org.jnode.driver.input.l10n.KeyboardInterpreter_CH_fr"/>
+    <layout name="DE" class="org.jnode.driver.input.l10n.KeyboardInterpreter_DE"/>
+    <layout name="DE_de" class="org.jnode.driver.input.l10n.KeyboardInterpreter_DE"/>
+    <layout name="DK" class="org.jnode.driver.input.l10n.KeyboardInterpreter_DK"/> 
+    <layout name="DK_dk" class="org.jnode.driver.input.l10n.KeyboardInterpreter_DK"/> 
+    <layout name="ES" class="org.jnode.driver.input.l10n.KeyboardInterpreter_ES"/>
+    <layout name="ES_es" class="org.jnode.driver.input.l10n.KeyboardInterpreter_ES"/>
+    <layout name="FR" class="org.jnode.driver.input.l10n.KeyboardInterpreter_FR"/>
+    <layout name="FR_fr" class="org.jnode.driver.input.l10n.KeyboardInterpreter_FR"/>
+    <layout name="GB" class="org.jnode.driver.input.l10n.KeyboardInterpreter_GB_en"/>
+    <layout name="GB_en" class="org.jnode.driver.input.l10n.KeyboardInterpreter_GB_en"/>
+    <layout name="HU" class="org.jnode.driver.input.l10n.KeyboardInterpreter_HU"/>
+    <layout name="HU_hu" class="org.jnode.driver.input.l10n.KeyboardInterpreter_HU"/>
+    <layout name="HU_hu_101" class="org.jnode.driver.input.l10n.KeyboardInterpreter_HU"/>
+    <layout name="HU_101" class="org.jnode.driver.input.l10n.KeyboardInterpreter_HU"/>
+    <layout name="IT" class="org.jnode.driver.input.l10n.KeyboardInterpreter_IT"/>
+    <layout name="IT_it" class="org.jnode.driver.input.l10n.KeyboardInterpreter_IT"/>
+    <layout name="NO" class="org.jnode.driver.input.l10n.KeyboardInterpreter_NO"/>
+    <layout name="NO_no" class="org.jnode.driver.input.l10n.KeyboardInterpreter_NO"/>
+    <layout name="RU" class="org.jnode.driver.input.l10n.KeyboardInterpreter_RU"/>
+    <layout name="RU_ru" class="org.jnode.driver.input.l10n.KeyboardInterpreter_RU"/>
+    <layout name="SE" class="org.jnode.driver.input.l10n.KeyboardInterpreter_SE"/>
+    <layout name="SE_se" class="org.jnode.driver.input.l10n.KeyboardInterpreter_SE"/>
+    <layout name="US" class="org.jnode.driver.input.l10n.KeyboardInterpreter_US_en"/>
+    <layout name="US_en" class="org.jnode.driver.input.l10n.KeyboardInterpreter_US_en"/>
+    <layout name="DV" class="org.jnode.driver.input.l10n.KeyboardInterpreter_DV"/> <!-- deprecated -->
+    <layout name="US_en_dvorak" class="org.jnode.driver.input.l10n.KeyboardInterpreter_DV"/>
+  </extension>
         
 </plugin>
