@@ -34,8 +34,12 @@ import org.jnode.driver.input.KeyboardLayoutManager;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.CountryArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.KeyboardLayoutArgument;
 import org.jnode.shell.syntax.LanguageArgument;
 import org.jnode.shell.syntax.StringArgument;
 
@@ -44,6 +48,9 @@ import org.jnode.shell.syntax.StringArgument;
  * @author crawley@jnode.org
  */
 public class LoadkeysCommand extends AbstractCommand {
+
+    private final KeyboardLayoutArgument ARG_LAYOUT = 
+        new KeyboardLayoutArgument("layout", Argument.OPTIONAL, "keyboard layout");
 
     private final CountryArgument ARG_COUNTRY = 
         new CountryArgument("country", Argument.OPTIONAL, "country code");
@@ -54,9 +61,26 @@ public class LoadkeysCommand extends AbstractCommand {
     private final StringArgument ARG_VARIANT = 
         new StringArgument("variant", Argument.OPTIONAL, "variant parameter");
     
+    private final FlagArgument ARG_TRIPLE =
+        new FlagArgument("triple", Argument.OPTIONAL, "use layout triples");
+    
+    private final FlagArgument ARG_ADD =
+        new FlagArgument("add", Argument.OPTIONAL, "add a layout binding");
+    
+    private final FlagArgument ARG_REMOVE =
+        new FlagArgument("remove", Argument.OPTIONAL, "remove a layout binding");
+    
+    private final FlagArgument ARG_SET =
+        new FlagArgument("set", Argument.OPTIONAL, "set the current layout");
+    
+    private final ClassNameArgument ARG_CLASS =
+        new ClassNameArgument("class", Argument.OPTIONAL, "the keyboard interpreter class name");
+        
+    
     public LoadkeysCommand() {
         super("display or change the current keyboard layout");
-        registerArguments(ARG_COUNTRY, ARG_LANGUAGE, ARG_VARIANT);
+        registerArguments(ARG_TRIPLE, ARG_LAYOUT, ARG_COUNTRY, ARG_LANGUAGE, ARG_VARIANT,
+                ARG_ADD, ARG_REMOVE, ARG_SET, ARG_CLASS);
     }
 
     public static void main(String[] args) throws Exception {
@@ -72,15 +96,56 @@ public class LoadkeysCommand extends AbstractCommand {
         final Collection<Device> kbDevs = 
             DeviceUtils.getDevicesByAPI(KeyboardAPI.class);
 
-        final String country = ARG_COUNTRY.isSet() ? ARG_COUNTRY.getValue() : null;
-        
-        if (country == null) {
+        if (ARG_ADD.isSet()) {
+            String layoutID = getLayoutID(mgr);
+            if (!ARG_CLASS.isSet()) {
+                throw new SyntaxErrorException("'class' is required with 'add'");
+            }
+            String className = ARG_CLASS.getValue();
+            mgr.add(layoutID, className);
+            out.println("Keyboard layout " + layoutID + " added");
+        } else if (ARG_REMOVE.isSet()) {
+            String layoutID = getLayoutID(mgr);
+            mgr.remove(layoutID);
+            out.println("Keyboard layout " + layoutID + " removed");
+        } else if (ARG_SET.isSet()) {
+            String layoutID = getLayoutID(mgr);
             for (Device kb : kbDevs) {
                 final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
-                out.println("Current layout for keyboard " + kb.getId() + ": " +
-                        api.getKbInterpreter().getClass().getName());
+                try {
+                    final KeyboardInterpreter kbInt = mgr.createKeyboardInterpreter(layoutID);
+                    out.println("Keyboard interpreter for " + kb.getId() + " set to " +
+                            kbInt.getClass().getName());
+                    api.setKbInterpreter(kbInt);
+                } catch (KeyboardInterpreterException ex) {
+                    err.println("Keyboard interpreter for " + kb.getId() + " not set: " + ex.getMessage());
+                    // Re-throw the exception so that the shell can decide whether or not
+                    // to print a stacktrace.
+                    throw ex;
+                }
             }
         } else {
+            for (Device kb : kbDevs) {
+                final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
+                out.println("Current keyboard interpreter for " + kb.getId() + " is " +
+                        api.getKbInterpreter().getClass().getName());
+            }
+        }
+    }
+
+
+    private String getLayoutID(KeyboardLayoutManager mgr) throws SyntaxErrorException {
+        if (!ARG_TRIPLE.isSet()) {
+            if (ARG_LAYOUT.isSet()) {
+                return ARG_LAYOUT.getValue();
+            } else {
+                throw new SyntaxErrorException("'layout' is required if 'triple' is not set");
+            }
+        } else {
+            if (!ARG_COUNTRY.isSet()) {
+                throw new SyntaxErrorException("'country' is required if 'triple' is set");
+            }
+            String country = ARG_COUNTRY.getValue();
             String language = ARG_LANGUAGE.isSet() ? ARG_LANGUAGE.getValue() : "";
             String variant = ARG_VARIANT.isSet() ? ARG_VARIANT.getValue() : "";
             if (language.trim().length() == 0) {
@@ -89,22 +154,7 @@ public class LoadkeysCommand extends AbstractCommand {
             if (variant.trim().length() == 0) {
                 variant = null;
             }
-
-            for (Device kb : kbDevs) {
-                final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
-                try {
-                    final KeyboardInterpreter kbInt = mgr.createKeyboardInterpreter(
-                            country, language, variant);
-                    out.println("Setting layout for keyboard " + kb.getId() + " to " +
-                        kbInt.getClass().getName());
-                    api.setKbInterpreter(kbInt);
-                } catch (KeyboardInterpreterException ex) {
-                    out.println("No suitable keyboard layout found: " + ex.getMessage());
-                    // Re-throw the exception so that the shell can decide whether or not
-                    // to print a stacktrace.
-                    throw ex;
-                }
-            }
+            return mgr.makeKeyboardInterpreterID(country, language, variant);
         }
     }
 }

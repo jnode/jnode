@@ -142,14 +142,54 @@
     </syntax>
     <syntax alias="loadkeys">
       <empty description="Print the current keyboard layout"/>
-      <sequence description="Change the keyboard layout">
-        <argument argLabel="country"/>
-        <optional>
-          <argument argLabel="language"/>
-          <optional>
-            <argument argLabel="variant"/>
-          </optional>
-        </optional>
+      <sequence description="Change the current keyboard layout">
+        <option argLabel="set" shortName="s" longName="set"/>
+        <alternatives>
+          <argument argLabel="layout" description="a keyboard layout id"/>
+          <sequence>
+            <option shortName="t" longName="triple" argLabel="triple"/>
+            <argument argLabel="country" description="a country code"/>
+            <optional>
+              <argument argLabel="language" description="a language code"/>
+              <optional>
+                <argument argLabel="variant" description="a variant name"/>
+              </optional>
+            </optional>
+          </sequence>
+        </alternatives>
+      </sequence>
+      <sequence description="Register a keyboard layout">
+        <option argLabel="add" shortName="a" longName="add"/>
+        <alternatives>
+          <argument argLabel="layout" description="a keyboard layout id"/>
+          <sequence>
+            <option shortName="t" longName="triple" argLabel="triple"/>
+            <argument argLabel="country" description="a country code"/>
+            <optional>
+              <argument argLabel="language" description="a language code"/>
+              <optional>
+                <argument argLabel="variant" description="a variant name"/>
+              </optional>
+            </optional>
+          </sequence>
+        </alternatives>
+        <argument argLabel="class" description="a keyboard interpreter class name"/>
+      </sequence>
+      <sequence description="Unregister a keyboard layout">
+        <option argLabel="remove" shortName="r" longName="remove"/>
+        <alternatives>
+          <argument argLabel="layout" description="a keyboard layout id"/>
+          <sequence>
+            <option shortName="t" longName="triple" argLabel="triple"/>
+            <argument argLabel="country" description="a country code"/>
+            <optional>
+              <argument argLabel="language" description="a language code"/>
+              <optional>
+                <argument argLabel="variant" description="a variant name"/>
+              </optional>
+            </optional>
+          </sequence>
+        </alternatives>
       </sequence>
     </syntax>
     <syntax alias="locale">
