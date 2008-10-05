@@ -159,6 +159,9 @@ public final class PluginRegistryModel extends VmSystemObject implements
     }
 
     private final boolean canResolve(PluginDescriptorModel descr) {
+        // We cannot (yet) resolve a plugin if it imports an unresolved plugin
+        // or if it contains an extension for an extension point defined by an 
+        // unresolved plugin.
         final PluginPrerequisite reqs[] = descr.getPrerequisites();
         final int length = reqs.length;
         for (int i = 0; i < length; i++) {
@@ -167,10 +170,24 @@ public final class PluginRegistryModel extends VmSystemObject implements
             }
         }
         final Extension[] exts = descr.getExtensions();
+        final ExtensionPoint[] extPoints = descr.getExtensionPoints();
         final int extsLength = exts.length;
+        final int extPointsLength = extPoints.length;
         for (int i = 0; i < extsLength; i++) {
             if (getPluginDescriptor(exts[i].getExtensionPointPluginId()) == null) {
-                return false;
+                // Normally, a extension for an extension point defined by an unresolved
+                // plugin will stop us resolving this plugin.
+                // But if this plugin defines the extension point, we are good to go.
+                boolean oneOfMine = false;
+                for (int j = 0; j < extPointsLength; j++) {
+                    if (extPoints[j].getDeclaringPluginDescriptor() == descr) {
+                        oneOfMine = true;
+                        break;
+                    }
+                }
+                if (!oneOfMine) {
+                    return false;
+                }
             }
         }
         return true;
