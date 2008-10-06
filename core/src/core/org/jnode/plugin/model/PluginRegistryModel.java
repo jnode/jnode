@@ -138,10 +138,15 @@ public final class PluginRegistryModel extends VmSystemObject implements
     }
 
     /**
-     * Resolve all given plugin descriptors in such an order that the
-     * depencencies are dealt with
+     * Resolve the plugins corresponding to a collection of supplied descriptors.  
+     * 
+     * @param descriptors the collection of descriptors to be resolved.
      */
-    public void resolveDescriptors(Collection<PluginDescriptorModel> descriptors) throws PluginException {
+    public void resolveDescriptors(Collection<PluginDescriptorModel> descriptors) 
+        throws PluginException {
+        // This method uses the brute-force approach of repeatedly checking the descriptors 
+        // in order until if finds one that will resolve.  This gives O(N**2) calls to
+        // canResolve unless the descriptor collection is suitably ordered.
         while (!descriptors.isEmpty()) {
             boolean change = false;
             for (Iterator<PluginDescriptorModel> i = descriptors.iterator(); i.hasNext();) {
@@ -158,13 +163,17 @@ public final class PluginRegistryModel extends VmSystemObject implements
         }
     }
 
+    /**
+     * Check to see if a plugin is resolvable given the current (simulated) registry state.
+     * 
+     * @param descr the descriptor for the plugin at issue.
+     * @return <code>true</code> if the plugin is resolvable.
+     */
     private final boolean canResolve(PluginDescriptorModel descr) {
-        // We cannot (yet) resolve a plugin if it imports an unresolved plugin
-        // or if it contains an extension for an extension point defined by an 
-        // unresolved plugin.
         final PluginPrerequisite reqs[] = descr.getPrerequisites();
         final int length = reqs.length;
         for (int i = 0; i < length; i++) {
+            // We cannot (yet) resolve a plugin if it imports an as-yet unresolved plugin.
             if (getPluginDescriptor(reqs[i].getPluginId()) == null) {
                 return false;
             }
@@ -174,13 +183,14 @@ public final class PluginRegistryModel extends VmSystemObject implements
         final int extsLength = exts.length;
         final int extPointsLength = extPoints.length;
         for (int i = 0; i < extsLength; i++) {
+            // We cannot resolve a plugin has an extension whose extension point defined by an 
+            // as-yet unresolved plugin.  However, if an extension and its matching extension point
+            // are defined in the same plugin, this will not prevent plugin resolution.
             if (getPluginDescriptor(exts[i].getExtensionPointPluginId()) == null) {
-                // Normally, a extension for an extension point defined by an unresolved
-                // plugin will stop us resolving this plugin.
-                // But if this plugin defines the extension point, we are good to go.
                 boolean oneOfMine = false;
+                String epId = exts[i].getExtensionPointUniqueIdentifier();
                 for (int j = 0; j < extPointsLength; j++) {
-                    if (extPoints[j].getDeclaringPluginDescriptor() == descr) {
+                    if (epId.equals(extPoints[j].getUniqueIdentifier())) {
                         oneOfMine = true;
                         break;
                     }
@@ -202,8 +212,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
         throws PluginException {
         final String id = descr.getId();
         if (descriptorMap.containsKey(id)) {
-            throw new PluginException(
-                "Duplicate plugin " + id);
+            throw new PluginException("Duplicate plugin " + id);
         }
         descriptorMap.put(id, descr);
     }
