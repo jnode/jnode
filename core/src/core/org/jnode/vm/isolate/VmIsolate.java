@@ -29,16 +29,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Properties;
-import java.util.List;
 import java.util.LinkedList;
-
+import java.util.List;
+import java.util.Properties;
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.util.BootableHashMap;
@@ -177,7 +175,7 @@ public final class VmIsolate {
         TERMINATED(IsolateStatus.State.EXITED),
 
         NEVERSTARTED(IsolateStatus.State.UNKNOWN),
-        
+
         UNKNOWN(IsolateStatus.State.UNKNOWN);
 
         private final IsolateStatus.State isolateState;
@@ -241,7 +239,7 @@ public final class VmIsolate {
         }
 
         static synchronized int nextId() {
-            return nextId ++;
+            return nextId++;
         }
     }
 
@@ -390,7 +388,7 @@ public final class VmIsolate {
         }
 
         this.exitCode = status;
-        if(currentIsolate() == this) {
+        if (currentIsolate() == this) {
             //todo implement: IMPLICIT_EXIT, UNCAUGHT_EXCEPTION
             this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
         } else {
@@ -422,7 +420,7 @@ public final class VmIsolate {
             t.printStackTrace();
         }
         this.exitCode = status;
-        if(currentIsolate() == this) {
+        if (currentIsolate() == this) {
             this.exitReason = IsolateStatus.ExitReason.SELF_HALT;
         } else {
             this.exitReason = IsolateStatus.ExitReason.OTHER_HALT;
@@ -498,11 +496,11 @@ public final class VmIsolate {
      * Start this isolate.
      *
      * @param isolate the isolate to start
-     * @param links an array of links passed to the isolate on startup
+     * @param links   an array of links passed to the isolate on startup
      * @throws IsolateStartupException on startup failure
      */
     @PrivilegedActionPragma
-    public synchronized final void start(Isolate isolate, Link[] links)
+    public final void start(Isolate isolate, Link[] links)
         throws IsolateStartupException {
         testIsolate(isolate);
         // The creator of this isolate must be the same as the current isolate
@@ -773,6 +771,7 @@ public final class VmIsolate {
 
     /**
      * Returns the identifier of this isolate.
+     *
      * @return the unique identifier
      */
     public int getId() {
@@ -781,6 +780,7 @@ public final class VmIsolate {
 
     /**
      * Returns the state of this isolate.
+     *
      * @return the current state
      */
     public State getState() {
@@ -789,6 +789,7 @@ public final class VmIsolate {
 
     /**
      * Returns the VmIsolate instance which created this VmIsolate instance.
+     *
      * @return
      */
     public VmIsolate getCreator() {
@@ -797,6 +798,7 @@ public final class VmIsolate {
 
     /**
      * Returns the map of isolate locals belonging to this isolate.
+     *
      * @return the isolate local map
      */
     BootableHashMap getIsolateLocalMap() {
@@ -810,6 +812,7 @@ public final class VmIsolate {
     /**
      * Create and return a new status link for this isolate and the supplied
      * receiver isolate.
+     *
      * @param receiver the receiver for the link.
      * @return the link.
      */
@@ -817,7 +820,7 @@ public final class VmIsolate {
         Link link = VmLink.newLink(this, receiver);
         VmLink vmLink = VmLink.fromLink(link);
         statusLinks.add(vmLink);
-        if (isolateState != null && isolateState.equals(IsolateStatus.State.EXITED)) {            
+        if (isolateState != null && isolateState.equals(IsolateStatus.State.EXITED)) {
             // The spec says that we should immediately send a link message
             // if the isolate is already 'EXITED'.
             sendStatus(vmLink, isolateState);
@@ -838,7 +841,7 @@ public final class VmIsolate {
     }
 
     private void sendStatus(VmLink link, IsolateStatus.State state) {
-        if(state.equals(IsolateStatus.State.EXITED)) {
+        if (state.equals(IsolateStatus.State.EXITED)) {
             org.jnode.vm.Unsafe.debugStackTrace();
             link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(state, exitReason, exitCode)));
         } else {

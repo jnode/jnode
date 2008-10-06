@@ -27,18 +27,11 @@ import java.awt.FontMetrics;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.font.TextRenderer;
-import org.jnode.awt.font.bdf.BDFFont;
-import org.jnode.awt.font.bdf.BDFFontPeer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
-import org.jnode.font.bdf.BDFFontContainer;
 
 /**
  * @author epr
@@ -77,12 +70,12 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
         return new TTFFontMetrics(font, getFontData(font));
     }
 
-    
+
     /**
      * Creates a font peer from the given name or return null if not supported/provided.
-     * As said in {@link JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc : 
+     * As said in {@link org.jnode.awt.JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc :
      * "We don't know what kind of "name" the user requested (logical, face, family)".
-     * 
+     *
      * @param name
      * @param attrs
      * @return
@@ -109,12 +102,13 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
 //        }
 //        
 //        return peer;
-        
+
         return new TTFFontPeer(this, name, attrs);
     }
 
     /**
      * Read an create a Font from the given InputStream
+     *
      * @param stream
      * @return
      */
@@ -130,9 +124,9 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
             FontFormatException ffe = new FontFormatException("bad ttf format");
             ffe.initCause(e);
             throw ffe;
-        }        
+        }
     }
-    
+
     /**
      * Gets the font data for the given font
      *
@@ -170,6 +164,6 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
             } catch (Throwable ex) {
                 log.error("Cannot find font " + fontResource, ex);
             }
-        }            
+        }
     }
 }

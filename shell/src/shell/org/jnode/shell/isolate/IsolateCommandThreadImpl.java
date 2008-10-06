@@ -8,16 +8,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.util.Properties;
-
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
 import javax.isolate.StreamBindings;
-
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellInvocationException;

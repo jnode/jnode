@@ -23,7 +23,7 @@ package org.jnode.vm.isolate;
 /**
  * This message type passes an object by reference.  This is probably a bad idea
  * because it 'breaks' the isolation of isolates.  Use sparingly if at all.
- * 
+ *
  * @author crawley@jnode.org
  */
 public class ObjectLinkMessage extends LinkMessageImpl {
@@ -34,7 +34,7 @@ public class ObjectLinkMessage extends LinkMessageImpl {
         this.obj = cr;
     }
 
-    public static ObjectLinkMessage newMessage (Object obj) {
+    public static ObjectLinkMessage newMessage(Object obj) {
         return new ObjectLinkMessage(obj);
     }
 

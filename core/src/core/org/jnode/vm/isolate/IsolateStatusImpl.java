@@ -29,7 +29,7 @@ public class IsolateStatusImpl extends IsolateStatus implements Cloneable {
     @Override
     public String toString() {
         State s = getState();
-        if(s.equals(State.EXITED)) {
+        if (s.equals(State.EXITED)) {
             return getState() + "(" + getExitReason() + "," + getExitCode();
         } else {
             return getState().toString();

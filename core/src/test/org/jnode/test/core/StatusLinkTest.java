@@ -5,12 +5,11 @@ package org.jnode.test.core;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import javax.isolate.ClosedLinkException;
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
+import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
-import javax.isolate.IsolateStatus;
 
 public class StatusLinkTest {
 
@@ -19,7 +18,7 @@ public class StatusLinkTest {
         Isolate child = new Isolate(clsName);
         Link link = child.newStatusLink();
         new Thread(new StatusMonitor(link)).start();
-        child.start();        
+        child.start();
     }
 
     public static class StatusMonitor implements Runnable {
@@ -33,9 +32,9 @@ public class StatusLinkTest {
             try {
                 while (true) {
                     LinkMessage msg = link.receive();
-                    if(msg.containsStatus()) {
+                    if (msg.containsStatus()) {
                         IsolateStatus is = msg.extractStatus();
-                        if(is.getState().equals(IsolateStatus.State.EXITED)) {
+                        if (is.getState().equals(IsolateStatus.State.EXITED)) {
                             System.out.println("Message: state=" + is.getState() + " code=" + is.getExitCode() +
                                 " reason=" + is.getExitReason());
                             break;
@@ -43,7 +42,7 @@ public class StatusLinkTest {
                             System.out.println("Message: state=" + is.getState());
                         }
                     } else {
-                        System.out.println("Unknown message: " + msg);                        
+                        System.out.println("Unknown message: " + msg);
                     }
                 }
             } catch (Exception x) {

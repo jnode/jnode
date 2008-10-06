@@ -26,7 +26,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
-import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.RoundRectangle2D;
@@ -41,7 +40,6 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.font.FontManager;
 import org.jnode.driver.video.Surface;
