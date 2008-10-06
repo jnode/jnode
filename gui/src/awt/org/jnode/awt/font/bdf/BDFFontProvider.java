@@ -34,20 +34,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
 import org.jnode.font.bdf.BDFFontContainer;
 import org.jnode.font.bdf.BDFGlyph;
-import org.jnode.vm.Unsafe;
 
 /**
- * {@link FontProvider} for {@link BDFFont}s.
- * 
+ * {@link org.jnode.awt.font.FontProvider} for {@link BDFFont}s.
+ *
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContainer> {
@@ -64,11 +60,11 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
     };
 
     private List<BDFFontContainer> containers;
-    
-    private Map<BDFFontContainer, Size> maxCharBounds = new HashMap<BDFFontContainer, Size>(); 
-    
+
+    private Map<BDFFontContainer, Size> maxCharBounds = new HashMap<BDFFontContainer, Size>();
+
     public BDFFontProvider() {
-        super(BDFFont.class, "bdf");        
+        super(BDFFont.class, "bdf");
     }
 
     protected TextRenderer createTextRenderer(RenderCache renderCache, Font font) {
@@ -82,12 +78,12 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
         final BDFFont bdfFont = getCompatibleFont(font);
         return bdfFont.getFontMetrics();
     }
-    
+
     /**
      * Creates a font peer from the given name or return null if not supported/provided.
-     * As said in {@link JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc : 
+     * As said in {@link org.jnode.awt.JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc :
      * "We don't know what kind of "name" the user requested (logical, face, family)".
-     * 
+     *
      * @param name
      * @param attrs
      * @return
@@ -104,20 +100,21 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
                 break;
             }
         }
-        
+
         for (BDFFontContainer container : getContainers()) {
             if (match(container, name, attrs)) {
                 peer = new BDFFontPeer(this, name, attrs);
                 break;
             }
         }
-        
+
         //Unsafe.debug("BDFFontProvider: name=" + name + "fontPeer=" + peer);
         return peer;
     }
 
     /**
      * Read an create a Font from the given InputStream
+     *
      * @param stream
      * @return
      */
@@ -136,7 +133,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
             throw ffe;
         }
     }
-    
+
     /**
      * Load all default fonts.
      */
@@ -146,7 +143,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
             addFont(new BDFFont(container));
         }
     }
-        
+
     private List<BDFFontContainer> getContainers() {
         if (containers == null) {
             containers = new ArrayList<BDFFontContainer>();
@@ -156,7 +153,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
                     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
                     final URL url = cl.getResource(fontResource);
                     if (url != null) {
-                        Reader reader = new InputStreamReader(url.openStream()); 
+                        Reader reader = new InputStreamReader(url.openStream());
                         containers.add(BDFFontContainer.createFont(reader));
                     } else {
                         log.error("Cannot find font resource " + fontResource);
@@ -166,15 +163,15 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
                 } catch (Throwable ex) {
                     log.error("Cannot find font " + fontResource, ex);
                 }
-            }            
+            }
         }
-        
+
         return containers;
     }
 
     Rectangle2D getMaxCharBounds(BDFFontContainer container) {
         Size size = maxCharBounds.get(container);
-                
+
         if (size == null) {
             size = new Size();
             for (BDFGlyph g : container.getGlyphs()) {
@@ -185,8 +182,8 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
             }
             maxCharBounds.put(container, size);
         }
-        
-        return new Rectangle2D.Double(0, 0, size.maxCharWidth, size.maxCharHeight);                
+
+        return new Rectangle2D.Double(0, 0, size.maxCharWidth, size.maxCharHeight);
     }
 
     private boolean match(BDFFontContainer container, String name, Map attrs) {
@@ -195,9 +192,8 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
         //if (container.getFamily().equals(name) || container.getName().equals(name)) {
         return true;
     }
-    
-    private static class Size
-    {
+
+    private static class Size {
         int maxCharWidth = 0;
         int maxCharHeight = 0;
     }

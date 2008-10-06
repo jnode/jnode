@@ -3,7 +3,6 @@
  */
 package org.jnode.vm.isolate;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
 
 /**

@@ -5,10 +5,6 @@ package org.jnode.test.core;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
-import javax.isolate.Link;
-import javax.isolate.ClosedLinkException;
-import javax.isolate.LinkMessage;
-import javax.isolate.IsolateStatus;
 
 public class IsolateTest {
 

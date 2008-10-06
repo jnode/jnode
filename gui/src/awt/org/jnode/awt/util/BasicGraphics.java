@@ -62,7 +62,8 @@ public abstract class BasicGraphics extends Graphics {
             clip = clip.intersection(r);
 
         if (this.clip.width == 0 && this.clip.height == 0) {
-            //TODO it's probably a regular (but rare) use case since a GUI (swing/awt) component can have width=0 and height=0
+            //TODO it's probably a regular (but rare) use case since a GUI (swing/awt)
+            // component can have width=0 and height=0
             org.jnode.vm.Unsafe.debug(getClass().getSimpleName() + ": zero clip\n");
         }
     }
