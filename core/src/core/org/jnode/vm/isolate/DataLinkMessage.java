@@ -12,7 +12,7 @@ final class DataLinkMessage extends LinkMessageImpl {
 
     private final int length;
 
-    public DataLinkMessage(byte[] bytes, int offset, int length) {
+    DataLinkMessage(byte[] bytes, int offset, int length) {
         this.bytes = bytes;
         this.offset = offset;
         this.length = length;

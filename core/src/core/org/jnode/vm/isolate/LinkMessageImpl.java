@@ -15,7 +15,7 @@ abstract class LinkMessageImpl extends LinkMessage {
     private boolean received = false;
 
     /**
-     * Close this message in the current isolate.
+     * Clone this message in the current isolate.
      *
      * @return
      */

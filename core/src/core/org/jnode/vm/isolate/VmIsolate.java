@@ -37,7 +37,6 @@ import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
-import javax.isolate.LinkMessage;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.naming.InitialNaming;
@@ -94,6 +93,10 @@ public final class VmIsolate {
      * The state of this isolate.
      */
     private State state = State.CREATED;
+
+    private IsolateStatus.State isolateState;
+    private IsolateStatus.ExitReason exitReason;
+    private int exitCode;
 
     /**
      * The root of the threadgroups for this isolate.
@@ -159,7 +162,33 @@ public final class VmIsolate {
      */
     @SharedStatics
     private enum State {
-        CREATED, STARTING, STARTED, EXITED, TERMINATED
+        CREATED(IsolateStatus.State.UNKNOWN),
+
+        STARTING(IsolateStatus.State.STARTING),
+
+        STARTED(IsolateStatus.State.STARTED),
+
+        EXITING(IsolateStatus.State.EXITING),
+
+        EXITED(IsolateStatus.State.EXITED),
+
+        TERMINATING(IsolateStatus.State.EXITING),
+
+        TERMINATED(IsolateStatus.State.EXITED),
+
+        NEVERSTARTED(IsolateStatus.State.UNKNOWN),
+        
+        UNKNOWN(IsolateStatus.State.UNKNOWN);
+
+        private final IsolateStatus.State isolateState;
+
+        private State(IsolateStatus.State isolateState) {
+            this.isolateState = isolateState;
+        }
+
+        IsolateStatus.State getIsolateState() {
+            return isolateState;
+        }
     }
 
     public static boolean walkIsolates(ObjectVisitor visitor) {
@@ -352,12 +381,22 @@ public final class VmIsolate {
         //todo handle demon threads
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
-        
+
+        changeState(State.EXITING);
         try {
             threadGroup.destroy();
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
+        this.exitCode = status;
+        if(currentIsolate() == this) {
+            //todo implement: IMPLICIT_EXIT, UNCAUGHT_EXCEPTION
+            this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
+        } else {
+            this.exitReason = IsolateStatus.ExitReason.OTHER_EXIT;
+        }
+
         changeState(State.EXITED);
         StaticData.isolates.remove(this);
     }
@@ -370,8 +409,9 @@ public final class VmIsolate {
     @SuppressWarnings("deprecation")
     public final void halt(Isolate isolate, int status) {
         testIsolate(isolate);
+        changeState(State.EXITING);
         switch (state) {
-            case STARTED:
+            case EXITING:
                 threadGroup.stop();
                 break;
         }
@@ -381,7 +421,13 @@ public final class VmIsolate {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        changeState(State.TERMINATED);
+        this.exitCode = status;
+        if(currentIsolate() == this) {
+            this.exitReason = IsolateStatus.ExitReason.SELF_HALT;
+        } else {
+            this.exitReason = IsolateStatus.ExitReason.OTHER_HALT;
+        }
+        changeState(State.EXITED);
         StaticData.isolates.remove(this);
     }
 
@@ -451,8 +497,9 @@ public final class VmIsolate {
     /**
      * Start this isolate.
      *
-     * @param messages
-     * @throws IsolateStartupException
+     * @param isolate the isolate to start
+     * @param links an array of links passed to the isolate on startup
+     * @throws IsolateStartupException on startup failure
      */
     @PrivilegedActionPragma
     public synchronized final void start(Isolate isolate, Link[] links)
@@ -518,9 +565,6 @@ public final class VmIsolate {
         final IsolateThread mainThread = new IsolateThread(threadGroup, this,
             piManager, stdout, stderr, stdin);
 
-        // Update the state of this isolate.
-        changeState(State.STARTED);
-
         // Start the main thread.
         mainThread.start();
     }
@@ -538,7 +582,7 @@ public final class VmIsolate {
             task.run();
             return;
         }
-        
+
         synchronized(taskSync){
             taskList.add(task);
             taskSync.notifyAll();
@@ -632,6 +676,9 @@ public final class VmIsolate {
                     return null;
                 }
             });
+
+            // Update the state of this isolate.
+            changeState(State.STARTED);
 
             // Run main method.
             mainMethod.invoke(null, new Object[]{args});
@@ -756,6 +803,10 @@ public final class VmIsolate {
         return isolateLocalMap;
     }
 
+    public IsolateStatus.State getIsolateState() {
+        return isolateState;
+    }
+
     /**
      * Create and return a new status link for this isolate and the supplied
      * receiver isolate.
@@ -766,44 +817,32 @@ public final class VmIsolate {
         Link link = VmLink.newLink(this, receiver);
         VmLink vmLink = VmLink.fromLink(link);
         statusLinks.add(vmLink);
-        if (state == State.TERMINATED) {
+        if (isolateState != null && isolateState.equals(IsolateStatus.State.EXITED)) {            
             // The spec says that we should immediately send a link message
             // if the isolate is already 'EXITED'.
-            sendStatus(vmLink, state);
+            sendStatus(vmLink, isolateState);
         }
         return link;
     }
-    
-    private synchronized void changeState(State newState) {
-        if (state != newState) {
-            this.state = newState;
+
+    private synchronized boolean changeState(State newState) {
+        this.state = newState;
+        IsolateStatus.State newIsolateState = newState.getIsolateState();
+        if (isolateState != newIsolateState) {
+            this.isolateState = newIsolateState;
             for (VmLink link : statusLinks) {
-                sendStatus(link, this.state);
+                sendStatus(link, this.isolateState);
             }
         }
+        return true;
     }
 
-    private void sendStatus(VmLink link, State state) {
-        IsolateStatus.State istate = null;
-        switch (state) {
-        case CREATED:
-            istate = IsolateStatus.State.UNKNOWN;
-            break;
-        case STARTING:
-            istate = IsolateStatus.State.STARTING;
-            break;
-        case STARTED:
-            istate = IsolateStatus.State.STARTED;
-            break;
-        case EXITED:
-            istate = IsolateStatus.State.EXITING;
-            break;
-        case TERMINATED:
-            istate = IsolateStatus.State.EXITED;
-            break;
+    private void sendStatus(VmLink link, IsolateStatus.State state) {
+        if(state.equals(IsolateStatus.State.EXITED)) {
+            org.jnode.vm.Unsafe.debugStackTrace();
+            link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(state, exitReason, exitCode)));
+        } else {
+            link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(state, null, -1)));
         }
-        LinkMessage message = 
-            new StatusLinkMessage(istate, IsolateStatus.ExitReason.IMPLICIT_EXIT, 0);
-        link.sendStatus(message);
     }
 }

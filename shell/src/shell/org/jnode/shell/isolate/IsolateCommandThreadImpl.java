@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.util.Properties;
 
@@ -102,7 +103,8 @@ public class IsolateCommandThreadImpl implements CommandThread {
 
     @Override
     public boolean isAlive() {
-        return isolate.hasStarted() && !isolate.hasExited();
+        final IsolateStatus.State state = isolate.getState();
+        return IsolateStatus.State.STARTED.equals(state);
     }
 
     @Override
