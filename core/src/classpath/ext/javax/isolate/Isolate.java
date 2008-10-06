@@ -35,11 +35,11 @@ public final class Isolate {
     /** The actual isolate implementation */
     private final VmIsolate impl;
 
+    //todo hide this constructor
     /**
      * Constructor for the root isolate.
      * 
-     * @param mainClass
-     * @param args
+     * @param impl the JNode speciffic isolate implementation
      */
     public Isolate(VmIsolate impl) {
         this.impl = impl;
@@ -51,10 +51,8 @@ public final class Isolate {
      * @param mainClass
      * @param args
      */
-    public Isolate(String mainClass, String[] args) {
-        this(new StreamBindings(),
-                (Properties) AccessController.doPrivileged(new GetPropertiesAction()),
-                mainClass, args);
+    public Isolate(String mainClass, String... args) {
+        this(new StreamBindings(), AccessController.doPrivileged(new GetPropertiesAction()), mainClass, args);
     }
 
     /**
@@ -64,22 +62,20 @@ public final class Isolate {
      * @param args
      * @param properties
      */
-    public Isolate(Properties properties, String mainClass, String[] args) {
+    public Isolate(Properties properties, String mainClass, String... args) {
         this(new StreamBindings(), properties, mainClass, args);
     }
 
     /**
      * Initialize this instance.
-     * 
-     * @param mainClass
-     * @param mainArgs
+     *
      * @param bindings
      * @param properties
+     * @param mainClass
+     * @param args
      */
-    public Isolate(StreamBindings bindings, Properties properties,
-            String mainClass, String[] args) {
-        this.impl = new VmIsolate(this, bindings.getBindings(), properties,
-                mainClass, args);
+    public Isolate(StreamBindings bindings, Properties properties, String mainClass, String... args) {
+        this.impl = new VmIsolate(this, bindings.getBindings(), properties, mainClass, args);
     }
 
     /**
@@ -119,33 +115,6 @@ public final class Isolate {
     }
 
     /**
-     * Has this isolate reached the exited state.
-     * 
-     * @return
-     */
-    public boolean hasExited() {
-        return impl.hasExited();
-    }
-
-    /**
-     * Has this isolate reached the terminated state.
-     * 
-     * @return
-     */
-    public boolean hasTerminated() {
-        return impl.hasTerminated();
-    }
-
-    /**
-     * Has this isolate reached the started state.
-     * 
-     * @return
-     */
-    public boolean hasStarted() {
-        return impl.hasStarted();
-    }
-
-    /**
      * Gets a new Link associated with this Isolate from which the current
      * isolate can receive status link messages.
      * 
@@ -159,13 +128,48 @@ public final class Isolate {
     /**
      * Start this isolate.
      * 
-     * @param messages
+     * @param links
      * @throws IsolateStartupException
      */
     public void start(Link... links) throws IsolateStartupException {
         impl.start(this, links);
     }
 
+    /**
+     * Returns an array of active Isolate objects.
+     * The array contains one entry for each isolate in the invoker's aggregate that has been started but has not yet
+     * terminated. New isolates may have been constructed or existing ones terminated by the time method returns.
+     *
+     * @return the active Isolate objects present at the time of the call
+     * 
+     * @throws SecurityException if a security manager is present and permission to query isolates is denied
+     */
+    public static Isolate[] getIsolates() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Returns the name of the main class of this isolate.
+     * 
+     * @return the name of the main class of this isolate
+     */
+    public String getMainClassName() {
+        return impl.getMainClassName(); 
+    }
+
+    /**
+     * Returns the current state of the isolate.
+     *
+     * @return the current state of an isolate
+     * 
+     * @throws IllegalStateException if called before the isolate is started
+     * @throws SecurityException if a security manager is present and permission to query isolates is denied
+     */
+    public IsolateStatus.State	getState() {
+        return impl.getIsolateState();
+    }
+    
     /**
      * Retrieves a copy of the Link array passed to start() by the current
      * isolate's creator. Modification of this array will have no effect on
@@ -180,6 +184,7 @@ public final class Isolate {
         return VmIsolate.getLinks();
     }
 
+    //todo hide this method
     /**
      * Gets the implementation instance.
      * 
@@ -187,5 +192,11 @@ public final class Isolate {
      */
     final VmIsolate getImpl() {
         return impl;
+    }
+
+    @Override
+    public String toString() {
+        //todo implement it
+        return super.toString();    //To change body of overridden methods use File | Settings | File Templates.
     }
 }

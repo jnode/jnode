@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.jnode.vm.isolate;
@@ -23,68 +23,35 @@ package org.jnode.vm.isolate;
 import javax.isolate.IsolateStatus;
 
 /**
- * This class is use to transport status isolate information
- * @author crawley@jnode.org
+ * @author Levente S\u00e1ntha
  */
-public final class StatusLinkMessage extends LinkMessageImpl {
+final class StatusLinkMessage extends LinkMessageImpl {
+    private final IsolateStatusImpl status;
 
-    private final String state;
-    private final String exitReason;
-    private final int exitCode;
-    
-    /**
-     * Internal message constructor used by cloneMessage
-     *
-     * @param value
-     */
-    private StatusLinkMessage(String state, String exitReason, int exitCode) {
-        this.state = state;
-        this.exitReason = exitReason;
-        this.exitCode = exitCode;
+    StatusLinkMessage(IsolateStatus status) {
+        this.status = (IsolateStatusImpl) status;
     }
 
     /**
-     * Message constructor used VmIsolate
+     * Clone this message in the current isolate.
      *
-     * @param value
+     * @return
      */
-    public StatusLinkMessage(IsolateStatus.State state, IsolateStatus.ExitReason exitReason,
-            int exitCode) {
-        this(state.toString(), exitReason.toString(), exitCode);
-    }
-
-    /**
-     * @see org.jnode.vm.isolate.LinkMessageImpl#CloneMessage()
-     */
-    @Override
     LinkMessageImpl cloneMessage() {
-        return new StatusLinkMessage(state, exitReason, exitCode);
+        return new StatusLinkMessage(status.copy());
     }
 
-    /**
-     * @see javax.isolate.LinkMessage#extract()
-     */
-    @Override
-    public Object extract() {
-        return extractStatus();
-    }
-
-    /**
-     * @see javax.isolate.LinkMessage#containsString()
-     */
     @Override
     public boolean containsStatus() {
         return true;
     }
 
-    /**
-     * @see javax.isolate.LinkMessage#extractString()
-     */
+    public Object extract() {
+        return status;
+    }
+
     @Override
     public IsolateStatus extractStatus() {
-        return new IsolateStatus(
-                IsolateStatus.State.valueOf(state),
-                IsolateStatus.ExitReason.valueOf(exitReason),
-                exitCode);
+        return status;
     }
 }

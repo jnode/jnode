@@ -28,9 +28,7 @@ public final class LinkMessageFactory {
      * @param bytes
      * @return
      */
-    public static LinkMessage newDataMessage(byte[] bytes,
-                                             int offset,
-                                             int length) {
+    public static LinkMessage newDataMessage(byte[] bytes, int offset, int length) {
         return new DataLinkMessage(bytes, offset, length);
     }
 

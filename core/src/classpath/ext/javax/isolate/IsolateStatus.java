@@ -84,11 +84,11 @@ public class IsolateStatus {
     
     /**
      * Initialize this instance.
-     * @param source
-     * @param type
+     * @param state
      * @param exitReason
+     * @param exitCode
      */
-    public IsolateStatus(State state, ExitReason exitReason, int exitCode) {
+    protected IsolateStatus(State state, ExitReason exitReason, int exitCode) {
         this.state = state;
         this.exitReason = exitReason;
         this.exitCode = exitCode;
