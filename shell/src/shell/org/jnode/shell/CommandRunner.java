@@ -23,6 +23,7 @@ package org.jnode.shell;
 import gnu.java.security.action.InvokeAction;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -43,7 +44,7 @@ import org.jnode.vm.VmExit;
  *
  */
 public class CommandRunner implements Runnable {
-    private final CommandShell shell;
+    
     private final CommandInvoker invoker;
     private final CommandIO[] ios;
     final Class<?> targetClass;
@@ -51,13 +52,13 @@ public class CommandRunner implements Runnable {
     final Object[] args;
     final CommandInfo cmdInfo;
     final CommandLine commandLine;
-
+    final PrintWriter shellErr;
     private int rc;
+    
 
-    public CommandRunner(CommandShell shell, CommandInvoker invoker,
+    public CommandRunner(CommandInvoker invoker,
             CommandInfo cmdInfo, Class<?> targetClass, Method method, Object[] args,
             CommandIO[] ios) {
-        this.shell = shell;
         this.invoker = invoker;
         this.targetClass = targetClass;
         this.method = method;
@@ -65,11 +66,11 @@ public class CommandRunner implements Runnable {
         this.commandLine = null;
         this.args = args;
         this.ios = ios;
+        this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
     }
 
-    public CommandRunner(CommandShell shell, CommandInvoker invoker, 
+    public CommandRunner(CommandInvoker invoker, 
             CommandInfo cmdInfo, CommandLine commandLine, CommandIO[] ios) {
-        this.shell = shell;
         this.invoker = invoker;
         this.targetClass = null;
         this.method = null;
@@ -77,6 +78,7 @@ public class CommandRunner implements Runnable {
         this.cmdInfo = cmdInfo;
         this.commandLine = commandLine;
         this.ios = ios;
+        this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
     }
 
     public void run() {
@@ -128,14 +130,14 @@ public class CommandRunner implements Runnable {
                     try {
                         io.flush();
                     } catch (IOException ex) {
-                        shell.getErr().println("Failed to flush output: " + ex.getMessage());
+                        shellErr.println("Failed to flush output: " + ex.getMessage());
                         if (ok) {
                             savedEx = ex;
                         }
                     }
                 }
                 if (savedEx != null) {
-                    // If we were'nt already propagating an exception, and the flush failed,
+                    // If we weren't already propagating an exception, and the flush failed,
                     // propagate one of the IOExceptions.
                     throw savedEx;
                 }
@@ -143,10 +145,10 @@ public class CommandRunner implements Runnable {
             invoker.unblock();
         } catch (SyntaxErrorException ex) {
             try {
-                Help.getInfo(cmdInfo.getCommandClass()).usage(shell.getErr());
-                shell.getErr().println(ex.getMessage());
+                Help.getInfo(cmdInfo.getCommandClass()).usage(shellErr);
+                shellErr.println(ex.getMessage());
             } catch (HelpException e) {
-                shell.getErr().println("Exception while trying to get the command usage");
+                shellErr.println("Exception while trying to get the command usage");
                 stackTrace(ex);
             }
             invoker.unblock();
@@ -154,11 +156,11 @@ public class CommandRunner implements Runnable {
             setRC(ex.getStatus());
             invoker.unblock();
         } catch (Exception ex) {
-            shell.getErr().println("Exception in command");
+            shellErr.println("Exception in command");
             stackTrace(ex);
             invoker.unblock();
         } catch (Throwable ex) {
-            shell.getErr().println("Fatal error in command");
+            shellErr.println("Fatal error in command");
             stackTrace(ex);
             invoker.unblock();
         }
@@ -172,13 +174,9 @@ public class CommandRunner implements Runnable {
         this.rc = rc;
     }
 
-    boolean isDebugEnabled() {
-        return shell.isDebugEnabled();
-    }
-
     void stackTrace(Throwable ex) {
-        if (ex != null && isDebugEnabled()) {
-            ex.printStackTrace(shell.getErr());
+        if (ex != null && invoker.isDebugEnabled()) {
+            ex.printStackTrace(shellErr);
         }
     }
 

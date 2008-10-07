@@ -212,7 +212,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 throw new ShellInvocationException("cannot open '" +
                         desc.toFileName.token + "': " + ex.getMessage());
             }
-            desc.commandLine.setStreams(new CommandIO[] {in, out, err});
+            desc.commandLine.setStreams(new CommandIO[] {in, out, err, CommandLine.DEFAULT_STDERR});
             try {
                 CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
                 return shell.invoke(desc.commandLine, cmdInfo);
@@ -297,7 +297,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                             } catch (IOException ex) {
                                 // squash
                             }
-                            prevIOs[1] = CommandLine.DEVNULL;
+                            prevIOs[Command.STD_OUT] = CommandLine.DEVNULL;
                             prev.commandLine.setStreams(prevIOs);
                         }
                     } else {
@@ -318,7 +318,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         desc.openedStreams.add(out);
                     }
                 }
-                desc.commandLine.setStreams(new CommandIO[] {in, out, err});
+                desc.commandLine.setStreams(new CommandIO[] {in, out, err, CommandLine.DEFAULT_STDERR});
                 try {
                     CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
                     desc.thread =

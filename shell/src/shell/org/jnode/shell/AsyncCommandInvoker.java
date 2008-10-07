@@ -50,8 +50,6 @@ import org.jnode.shell.io.CommandIO;
 public abstract class AsyncCommandInvoker implements CommandInvoker,
         KeyboardListener {
 
-    PrintStream err;
-
     CommandShell commandShell;
 
     static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
@@ -66,6 +64,8 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     static final String EXECUTE_METHOD = "execute";
 
     boolean blocking;
+    
+    boolean debugEnabled;
 
     Thread blockingThread;
     CommandThread threadProcess = null;
@@ -73,7 +73,6 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
 
     public AsyncCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
-        this.err = commandShell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
         
         // listen for ctrl-c
         commandShell.getConsole().addKeyboardListener(this);
@@ -109,21 +108,21 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
         if (command != null) {
-            cr = new CommandRunner(commandShell, this, cmdInfo, cmdLine, resolvedIOs);
+            cr = new CommandRunner(this, cmdInfo, cmdLine, resolvedIOs);
         } else {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
                 if ((method.getModifiers() & Modifier.STATIC) != 0) {
-                    if (ios[0] != CommandLine.DEFAULT_STDIN
-                            || ios[1] != CommandLine.DEFAULT_STDOUT
-                            || ios[2] != CommandLine.DEFAULT_STDERR) {
+                    if (ios[Command.STD_IN] != CommandLine.DEFAULT_STDIN
+                            || ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT
+                            || ios[Command.STD_ERR] != CommandLine.DEFAULT_STDERR) {
                         throw new ShellInvocationException(
                                 "Entry point method for "
                                         + cmdInfo.getCommandClass()
                                         + " does not allow redirection or pipelining");
                     }
                     cr = new CommandRunner(
-                            commandShell, this, cmdInfo, cmdInfo.getCommandClass(), method,
+                            this, cmdInfo, cmdInfo.getCommandClass(), method,
                             new Object[] {cmdLine.getArguments()}, resolvedIOs);
                 }
             } catch (NoSuchMethodException e) {
@@ -238,5 +237,15 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     }
 
     public void keyReleased(KeyboardEvent event) {
+    }
+
+    @Override
+    public boolean isDebugEnabled() {
+        return this.debugEnabled;
+    }
+
+    @Override
+    public void setDebugEnabled(boolean debugEnabled) {
+        this.debugEnabled = debugEnabled;
     }
 }

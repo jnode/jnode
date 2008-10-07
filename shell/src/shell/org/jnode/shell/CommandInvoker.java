@@ -80,4 +80,8 @@ public interface CommandInvoker {
      * FIXME - this is a temporary hack.
      */
     void unblock();
+
+    boolean isDebugEnabled();
+
+    void setDebugEnabled(boolean enabled);
 }
