@@ -1,3 +1,23 @@
+/*
+ * $Id: Shell.java 4556 2008-09-13 08:02:20Z crawley $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.shell.isolate;
 
 import java.io.Closeable;
@@ -15,6 +35,8 @@ import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
 import javax.isolate.StreamBindings;
+
+import org.jnode.shell.Command;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellInvocationException;
@@ -45,25 +67,26 @@ public class IsolateCommandThreadImpl implements CommandThread {
     }
 
     private StreamBindings createStreamBindings(CommandIO[] ios) throws IOException {
-        // FIXME if there are more than 3 CommandIOs, they should be passed
-        // to the isolate via a link message.
-        if (ios.length > 3) {
-            throw new RuntimeException("> 3 CommandIOs not implemented yet");
-        }
+        // FIXME if there are more than 4 CommandIOs, they should be passed
+        // to the isolate via a link message.  Note that the 4th one is the command
+        // shell's error stream!!
+//        if (ios.length > 3) {
+//            throw new RuntimeException("> 3 CommandIOs not implemented yet");
+//        }
         StreamBindings streamBindings = new StreamBindings();
-        Closeable in = ios[0].findBaseStream();
+        Closeable in = ios[Command.STD_IN].findBaseStream();
         if (in instanceof FileInputStream) {
             streamBindings.setIn((FileInputStream) in);
         } else {
             streamBindings.setIn(createSocketForInput(in));
         }
-        Closeable out = ios[1].findBaseStream();
+        Closeable out = ios[Command.STD_OUT].findBaseStream();
         if (out instanceof FileOutputStream) {
             streamBindings.setOut((FileOutputStream) out);
         } else {
             streamBindings.setOut(createSocketForOutput(out));
         }
-        Closeable err = ios[2].findBaseStream();
+        Closeable err = ios[Command.STD_ERR].findBaseStream();
         if (err instanceof FileOutputStream) {
             streamBindings.setErr((FileOutputStream) err);
         } else {

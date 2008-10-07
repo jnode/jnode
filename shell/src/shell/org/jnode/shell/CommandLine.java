@@ -137,15 +137,14 @@ public class CommandLine implements Completable, Iterable<String> {
      * Create a new instance encapsulating a command name, argument list and io
      * stream array. If 'arguments' is <code>null</code>, a zero length
      * String array is substituted. If 'streams' is <code>null</code> , an
-     * array of length 3 is substituted. A non-null 'streams' argument must have
-     * a length of at least 3.
+     * array of length 4 is substituted. A non-null 'streams' argument must have
+     * a length of at least 4.
      * 
      * @param commandName the command name or <code>null</code>.
      * @param arguments the argument list or <code>null</code>.
      * @param ios the io stream array or <code>null</code>.
      */
-    public CommandLine(String commandName, String[] arguments,
-            CommandIO[] ios) {
+    public CommandLine(String commandName, String[] arguments, CommandIO[] ios) {
         this.commandToken = commandName == null ? null : new Token(commandName);
         if (arguments == null || arguments.length == 0) {
             this.argumentTokens = NO_TOKENS;
@@ -182,9 +181,14 @@ public class CommandLine implements Completable, Iterable<String> {
 
     private CommandIO[] setupStreams(CommandIO[] ios) {
         if (ios == null) {
-            return new CommandIO[] {DEFAULT_STDIN, DEFAULT_STDOUT, DEFAULT_STDERR};
-        } else if (ios.length < 3) {
-            throw new IllegalArgumentException("streams.length < 3");
+            ios = new CommandIO[4];
+            ios[Command.STD_IN] = DEFAULT_STDIN;
+            ios[Command.STD_OUT] = DEFAULT_STDOUT;
+            ios[Command.STD_ERR] = DEFAULT_STDERR;
+            ios[Command.SHELL_ERR] = DEFAULT_STDERR;
+            return ios;
+        } else if (ios.length < 4) {
+            throw new IllegalArgumentException("streams.length < 4");
         } else {
             return ios.clone();
         }
@@ -547,7 +551,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Get the IO stream context for executing the command. The result is
-     * guaranteed to be non-null and to have at least 3 entries.
+     * guaranteed to be non-null and to have at least 4 entries.
      * 
      * @return the stream context as described above.
      */
@@ -561,6 +565,9 @@ public class CommandLine implements Completable, Iterable<String> {
      * @param ios the command's new stream context.
      */
     public void setStreams(CommandIO[] ios) {
+        if (ios.length < 4) {
+            throw new IllegalArgumentException("need >= 4 CommandIO objects");
+        }
         this.ios = ios.clone();
     }
 

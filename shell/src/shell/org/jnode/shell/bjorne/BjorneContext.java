@@ -228,6 +228,7 @@ public class BjorneContext {
         this(interpreter, new StreamHolder[] {
             new StreamHolder(CommandLine.DEFAULT_STDIN, false),
             new StreamHolder(CommandLine.DEFAULT_STDOUT, false),
+            new StreamHolder(CommandLine.DEFAULT_STDERR, false),
             new StreamHolder(CommandLine.DEFAULT_STDERR, false)});
     }
 

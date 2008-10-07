@@ -22,6 +22,7 @@
 package org.jnode.shell.proclet;
 
 import org.jnode.shell.AsyncCommandInvoker;
+import org.jnode.shell.Command;
 import org.jnode.shell.CommandInvoker;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
@@ -62,9 +63,9 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         CommandIO[] ios = cr.getIos();
         return ProcletContext.createProclet(cr, null, null, 
                 new Object[] {
-                    ios[0].getInputStream(), 
-                    ios[1].getPrintStream(),
-                    ios[2].getPrintStream()}, 
+                    ios[Command.STD_IN].getInputStream(), 
+                    ios[Command.STD_OUT].getPrintStream(),
+                    ios[Command.STD_ERR].getPrintStream()}, 
                 cr.getCommandName());
     }
     

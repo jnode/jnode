@@ -168,8 +168,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private CompletionInfo completion;
 
     private boolean historyEnabled;
-
-    private boolean debugEnabled;
+    
+    private final boolean debugEnabled;
 
     private boolean exited = false;
 
@@ -203,6 +203,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public CommandShell(TextConsole cons) throws ShellException {
+        debugEnabled = true;
         try {
             console = cons;
             Reader in = console.getIn();
@@ -243,12 +244,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
         this.aliasMgr = aliasMgr;
         this.syntaxMgr = syntaxMgr;
+        this.debugEnabled = true;
         setupStreams(
                 new InputStreamReader(System.in), 
                 new OutputStreamWriter(System.out), 
                 new OutputStreamWriter(System.err));
         this.readingCommand = true;
-        this.debugEnabled = true;
     }
 
     /**
@@ -362,8 +363,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     private void setupFromProperties() {
-        debugEnabled = Boolean.parseBoolean(System.getProperty(
-                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
+//        debugEnabled = Boolean.parseBoolean(System.getProperty(
+//                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
         historyEnabled = Boolean.parseBoolean(System.getProperty(
                 HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
         try {
@@ -384,16 +385,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // Use the fallback interpreter
             setCommandInterpreter(FALLBACK_INTERPRETER);
         }
+        invoker.setDebugEnabled(debugEnabled);
     }
 
     private void refreshFromProperties() {
-        debugEnabled = Boolean.parseBoolean(System.getProperty(
-                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
+//        debugEnabled = Boolean.parseBoolean(System.getProperty(
+//                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
         historyEnabled = Boolean.parseBoolean(System.getProperty(
                 HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
         try {
-            setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
-                    ""));
+            setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME, ""));
         } catch (Exception ex) {
             errPW.println(ex.getMessage());
             stackTrace(ex);
@@ -404,6 +405,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             errPW.println(ex.getMessage());
             stackTrace(ex);
         }
+        invoker.setDebugEnabled(debugEnabled);
     }
 
     public synchronized void setCommandInvoker(String name) throws IllegalArgumentException {

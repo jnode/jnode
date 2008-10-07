@@ -42,6 +42,12 @@ import org.jnode.shell.syntax.ArgumentBundle;
  * @author crawley@jnode.org
  */
 public interface Command {
+    public int STD_IN = 0;
+    public int STD_OUT = 1;
+    public int STD_ERR = 2;
+    public int SHELL_ERR = 3;
+    
+    
     /**
      * This is the old native command entry point method.  The method is
      * (was) called to execute the command, passing the command line arguments
