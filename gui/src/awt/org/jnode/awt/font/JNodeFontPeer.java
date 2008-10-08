@@ -33,6 +33,8 @@ import java.text.CharacterIterator;
 import java.util.Locale;
 import java.util.Map;
 
+import sun.font.StandardGlyphVector;
+
 /**
  * @author vali
  *         <p/>
@@ -61,22 +63,39 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
      * @see gnu.java.awt.peer.ClasspathFontPeer#canDisplayUpTo(java.awt.Font,
      *      java.text.CharacterIterator, int, int)
      */
-    public abstract int canDisplayUpTo(Font font, CharacterIterator i, int start,
-                              int limit);
+    @Override
+    public final int canDisplayUpTo(Font font, CharacterIterator i, int start, int limit) {
+        int upTo = -1;
+        
+        for (char c = i.setIndex(start); i.getIndex() <= limit; c = i.next()) {
+            if (!canDisplay(font, c)) {
+                upTo = i.getIndex();
+                break;
+            }
+        }
+    
+        return upTo;
+    }
 
     /**
      * @see gnu.java.awt.peer.ClasspathFontPeer#createGlyphVector(java.awt.Font,
      *      java.awt.font.FontRenderContext, java.text.CharacterIterator)
      */
-    public abstract GlyphVector createGlyphVector(Font font, FontRenderContext frc,
-                                         CharacterIterator ci);
+    @Override
+    public final GlyphVector createGlyphVector(Font font, FontRenderContext frc,
+                                         CharacterIterator ci) {
+        return new StandardGlyphVector(font, ci, frc);
+    }
 
     /**
      * @see gnu.java.awt.peer.ClasspathFontPeer#createGlyphVector(java.awt.Font,
      *      java.awt.font.FontRenderContext, int[])
      */
-    public abstract GlyphVector createGlyphVector(Font font, FontRenderContext ctx,
-                                         int[] glyphCodes);
+    @Override
+    public final GlyphVector createGlyphVector(Font font, FontRenderContext ctx,
+                                         int[] glyphCodes) {
+        return new StandardGlyphVector(font, glyphCodes, ctx);
+    }
 
     /**
      * @see gnu.java.awt.peer.ClasspathFontPeer#getBaselineFor(java.awt.Font,
@@ -162,4 +181,32 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
     protected final F getCompatibleFont(Font font) {
         return provider.getCompatibleFont(font);
     }
+    
+    protected final void transform(Rectangle2D bounds, FontRenderContext frc) {
+        if (frc.getTransform() != null) {
+            double[] srcPoints =
+                    new double[] {bounds.getMinX(), bounds.getMinY(), 
+                        bounds.getMinX(), bounds.getMaxY(), 
+                        bounds.getMaxX(), bounds.getMaxY(), 
+                        bounds.getMaxX(), bounds.getMinY()};
+            double[] dstPoints = new double[srcPoints.length]; 
+            frc.getTransform().transform(srcPoints, 0, dstPoints, 0, srcPoints.length / 2);
+            
+            // compute the bounding box of the result
+            double minX = dstPoints[0];
+            double minY = dstPoints[1];
+            double maxX = minX;
+            double maxY = minY;
+            for (int i = 2; i < dstPoints.length; i += 2) {
+                double x = dstPoints[i];
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                
+                double y = dstPoints[i + 1];
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            }
+            bounds.setRect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+        }        
+    }    
 }

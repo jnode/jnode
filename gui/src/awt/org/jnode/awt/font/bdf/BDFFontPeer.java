@@ -53,52 +53,11 @@ public class BDFFontPeer extends JNodeFontPeer<BDFFontProvider, BDFFont> {
     }
 
     /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#canDisplayUpTo(java.awt.Font,
-     *      java.text.CharacterIterator, int, int)
-     */
-    @Override
-    public int canDisplayUpTo(Font font, CharacterIterator i, int start,
-                              int limit) {
-        int upTo = -1;
-        
-        for (char c = i.setIndex(start); i.getIndex() <= limit; c = i.next()) {
-            if (!canDisplay(font, c)) {
-                upTo = i.getIndex();
-                break;
-            }
-        }
-
-        return upTo;
-    }
-
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#createGlyphVector(java.awt.Font,
-     *      java.awt.font.FontRenderContext, java.text.CharacterIterator)
-     */
-    @Override
-    public GlyphVector createGlyphVector(Font font, FontRenderContext frc,
-                                         CharacterIterator ci) {
-        return new StandardGlyphVector(font, ci, frc);
-    }
-
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#createGlyphVector(java.awt.Font,
-     *      java.awt.font.FontRenderContext, int[])
-     */
-    @Override
-    public GlyphVector createGlyphVector(Font font, FontRenderContext ctx,
-                                         int[] glyphCodes) {
-        return new StandardGlyphVector(font, glyphCodes, ctx);
-    }
-
-    /**
      * @see gnu.java.awt.peer.ClasspathFontPeer#getBaselineFor(java.awt.Font,
      *      char)
      */
     @Override
     public byte getBaselineFor(Font font, char c) {
-        System.out.println("JNodeFontPeer.getBaselineFor not implemented");
-        
         // TODO find proper value from the BDFFontContainer 
         // it should be one of Font.CENTER_BASELINE, Font.HANGING_BASELINE, 
         // Font.ROMAN_BASELINE   
@@ -252,33 +211,5 @@ public class BDFFontPeer extends JNodeFontPeer<BDFFontProvider, BDFFont> {
         //TODO work only for latin fonts but not for hindi, arabic ... fonts
         // see GNU Classpath javadoc
         return new StandardGlyphVector(font, chars, start, limit, frc);
-    }
-    
-    private void transform(Rectangle2D bounds, FontRenderContext frc) {
-        if (frc.getTransform() != null) {
-            double[] srcPoints =
-                    new double[] {bounds.getMinX(), bounds.getMinY(), 
-                        bounds.getMinX(), bounds.getMaxY(), 
-                        bounds.getMaxX(), bounds.getMaxY(), 
-                        bounds.getMaxX(), bounds.getMinY()};
-            double[] dstPoints = new double[srcPoints.length]; 
-            frc.getTransform().transform(srcPoints, 0, dstPoints, 0, srcPoints.length / 2);
-            
-            // compute the bounding box of the result
-            double minX = dstPoints[0];
-            double minY = dstPoints[1];
-            double maxX = minX;
-            double maxY = minY;
-            for (int i = 2; i < dstPoints.length; i += 2) {
-                double x = dstPoints[i];
-                minX = Math.min(minX, x);
-                maxX = Math.max(maxX, x);
-                
-                double y = dstPoints[i + 1];
-                minY = Math.min(minY, y);
-                maxY = Math.max(maxY, y);
-            }
-            bounds.setRect(minX, minY, maxX - minX + 1, maxY - minY + 1);
-        }        
     }
 }

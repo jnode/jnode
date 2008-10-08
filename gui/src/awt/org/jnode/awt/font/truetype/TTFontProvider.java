@@ -28,16 +28,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
+import org.jnode.awt.font.spi.AbstractFontProvider.Size;
+import org.jnode.awt.font.truetype.glyph.TTFGlyph;
 
 /**
  * @author epr
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFile> {
+public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontData> {
     /**
      * My logger
      */
@@ -70,12 +73,12 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
         return new TTFFontMetrics(font, getFontData(font));
     }
 
-
+    
     /**
      * Creates a font peer from the given name or return null if not supported/provided.
      * As said in {@link org.jnode.awt.JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc :
      * "We don't know what kind of "name" the user requested (logical, face, family)".
-     *
+     * 
      * @param name
      * @param attrs
      * @return
@@ -102,7 +105,7 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
 //        }
 //        
 //        return peer;
-
+        
         return new TTFFontPeer(this, name, attrs);
     }
 
@@ -124,9 +127,9 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
             FontFormatException ffe = new FontFormatException("bad ttf format");
             ffe.initCause(e);
             throw ffe;
-        }
+        }        
     }
-
+    
     /**
      * Gets the font data for the given font
      *
@@ -164,6 +167,25 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontDataFil
             } catch (Throwable ex) {
                 log.error("Cannot find font " + fontResource, ex);
             }
-        }
+        }            
+    }
+
+    @Override
+    protected Size getMaxCharSize(TTFFontData fontData) {
+        Size size = new Size();
+        
+        //TODO implement it
+//        for (TTFGlyph g : fontData.getGlyph(c)) {
+//            if (g != null) {
+//                size.maxCharWidth += g.getDWidth().width;
+//                size.maxCharHeight = Math.max(g.getDWidth().height, size.maxCharHeight);
+//            }
+//        }
+        // temporary workaround
+        size.maxCharWidth = 15;
+        size.maxCharHeight = 15;
+        
+        
+        return size;
     }
 }
