@@ -23,10 +23,12 @@ package org.jnode.awt.font.spi;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -80,6 +82,8 @@ public abstract class AbstractFontProvider<F extends Font, FD> implements FontPr
     
     private final List<FD> userFontDatas = new Vector<FD>();
 
+    private Map<FD, Size> maxCharBounds = new HashMap<FD, Size>(); 
+        
     protected AbstractFontProvider(Class<F> fontClass, String name) {
         this.name = name;
         this.fontClass = fontClass;
@@ -256,4 +260,22 @@ public abstract class AbstractFontProvider<F extends Font, FD> implements FontPr
 //            log.error("Cannot find font " + resName, ex);
 //        }
 //    }
+    
+    public Rectangle2D getMaxCharBounds(FD container) {
+        Size size = maxCharBounds.get(container);
+                
+        if (size == null) {
+            size = getMaxCharSize(container);
+            maxCharBounds.put(container, size);
+        }
+        
+        return new Rectangle2D.Double(0, 0, size.maxCharWidth, size.maxCharHeight);                
+    }
+    
+    protected abstract Size getMaxCharSize(FD fontData);
+    
+    public static class Size {
+        public int maxCharWidth = 0;
+        public int maxCharHeight = 0;
+    }
 }
