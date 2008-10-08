@@ -1,11 +1,27 @@
 package org.jnode.driver.console.textscreen;
 
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_COMPLETE;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CONSUME;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_LEFT;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_RIGHT;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_TO_END;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_TO_START;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_DELETE_AFTER;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_DELETE_BEFORE;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_ENTER;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_HISTORY_UP;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_IGNORE;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_INSERT;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_KILL_LINE;
+import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_SOFT_EOF;
+
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
 import org.jnode.driver.console.InputCompleter;
+import org.jnode.driver.console.KeyEventBindings;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.system.event.FocusEvent;
@@ -19,6 +35,7 @@ import org.jnode.util.ConsoleStream;
  * <li>line buffering and line editing, using a text console,
  * <li>integrated input history and completion,
  * <li>CTRL-D is interpreted as a 'soft' EOF mark,
+ * <li>binding of keyboard events to various actions is soft,
  * <li>listens to keyboard focus events.
  * </ul>
  * <p/>
@@ -26,7 +43,6 @@ import org.jnode.util.ConsoleStream;
  * <ul>
  * <li>a "raw" mode in which characters and other keyboard events are delivered without line editing,
  * <li>a "no echo" mode in which line editing occurs without echoing of input characters,
- * <li>making the active characters and keycodes "soft",
  * <li>making completion and history context sensitive; e.g. when switching between a shell and 
  * an application, and
  * <li>code refactoring to support classical terminal devices and remote consoles.
@@ -42,6 +58,11 @@ import org.jnode.util.ConsoleStream;
  */
 public class KeyboardReader extends Reader 
     implements FocusListener, ConsoleStream {
+    
+    /**
+     * This KR code causes the next history line to be selected.
+     */
+    public static final byte KR_HISTORY_DOWN = 16;
 
     public static final byte CTRL_L = 12;
     public static final byte CTRL_D = 4;
@@ -58,6 +79,8 @@ public class KeyboardReader extends Reader
     private final TextConsole console;
     private InputCompleter completer;
     private final Writer out;
+    
+    private KeyEventBindings bindings = ConsoleKeyEventBindings.createDefault();
 
     private String currentPrompt;
 
@@ -106,6 +129,24 @@ public class KeyboardReader extends Reader
     public void clearSoftEOF() {
         eof = false;
     }
+    
+    /**
+     * Get a snapshot of the reader's key event bindings.
+     * 
+     * @return a copy of the current bindings.
+     */
+    public KeyEventBindings getKeyEventBindings() {
+        return new KeyEventBindings(bindings);
+    }
+    
+    /**
+     * Set the reader's key event bindings.
+     * 
+     * @param bindings the new bindings.
+     */
+    public void setKeyEventBindings(KeyEventBindings bindings) {
+        this.bindings = new KeyEventBindings(bindings);
+    }
 
     @Override
     public boolean ready() throws IOException {
@@ -122,167 +163,129 @@ public class KeyboardReader extends Reader
     /**
      * Pull a keyboard event from the queue and process it.
      * 
-     * @return true if the event was processed
+     * @return true if the event should commit the characters in the
+     *    input (line editing) buffer to the Reader's character stream.
      */
     private boolean processEvent() throws IOException {
         KeyboardEvent event = keyboardHandler.getEvent();
         if (!event.isConsumed()) {
-            char ch = event.getKeyChar();
-            int kc = event.getKeyCode();
-            if (ch != NO_CHAR) {
-                event.consume();
-                return !processChar(ch);
-            } else {
-                int mods = event.getModifiers();
-                if (processVirtualKeystroke(kc, mods)) {
-                    event.consume();
-                }
-                return true;
-            }
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Process a keystroke interpreted as a character.
-     * 
-     * @param ch the character to process
-     * @return <code>true</code> if the character should cause the current
-     *         line buffer contents to be returned to the user.
-     */
-    private boolean processChar(char ch) throws IOException {
-        boolean breakChar = false;
-        switch (ch) {
-            // if its a backspace we want to remove one from the end of our
-            // current
-            // line
-            case KeyEvent.VK_BACK_SPACE:
-                if (currentLine.backspace()) {
-                    refreshCurrentLine();
-                }
-                break;
-            // if its an enter key we want to process the command, and then
-            // resume
-            // the thread
-            case '\n':
-                currentLine.moveEnd();
-                refreshCurrentLine();
-                out.write('\n');
-                currentLine.appendChar(ch);
-                breakChar = true;
-                historyIndex = -1;
-                break;
-            // if it's the tab key, we want to trigger command line completion
-            case '\t':
-                if (completer != null) {
-                    if (currentLine.complete()) {
-                        currentLine.start(true);
+            int action = bindings.getKeyboardEventAction(event);
+            boolean breakChar = false;
+            boolean consume = true;
+            switch (action) {
+                case KR_DELETE_BEFORE:
+                    // Delete character before cursor
+                    if (currentLine.backspace()) {
+                        refreshCurrentLine();
                     }
-                    out.write(currentPrompt);
+                    break;
+                case KR_ENTER:
+                    // Append event character to the line and commit.
+                    currentLine.moveEnd();
                     refreshCurrentLine();
-                }
-                break;
-            // interpret ^D as a soft EOF
-            // FIXME - behavior correct? cf bash's treatment of ^D
-            case CTRL_D:
-                currentLine.moveEnd();
-                refreshCurrentLine();
-                out.write('\n');
-                eof = true;
-                breakChar = true;
-                break;
-            // ^L means kill current line and redraw screen.
-            // FIXME - is this behavior useful?
-            case CTRL_L:
-                this.console.clear();
-                this.console.setCursor(0, 0);
-                out.write(currentPrompt);
-                currentLine.start();
-                refreshCurrentLine();
-                break;
-            default:
-                // otherwise add it to our current line
-                currentLine.appendChar(ch);
-                refreshCurrentLine();
-                historyIndex = -1;
-        }
-        return breakChar;
-    }
-
-    /**
-     * Process a keystroke that doesn't have an associated char value.
-     * 
-     * @param code key code
-     * @param modifiers key modifiers
-     * @return <code>true</code> if the keystroke has been recognized and
-     *         acted on, <code>false</code> otherwise.
-     * @throws IOException 
-     */
-    private boolean processVirtualKeystroke(int code, int modifiers) throws IOException {
-        if (modifiers != 0) {
+                    out.write('\n');
+                    currentLine.appendChar(event.getKeyChar());
+                    breakChar = true;
+                    historyIndex = -1;
+                    break;
+                case KR_COMPLETE:
+                    // Perform completion
+                    if (completer != null) {
+                        if (currentLine.complete()) {
+                            currentLine.start(true);
+                        }
+                        out.write(currentPrompt);
+                        refreshCurrentLine();
+                    }
+                    break;
+                case KR_SOFT_EOF:
+                    // Set soft EOF status and commit
+                    currentLine.moveEnd();
+                    refreshCurrentLine();
+                    out.write('\n');
+                    eof = true;
+                    breakChar = true;
+                    break;
+                case KR_KILL_LINE:
+                    // Kill the current input line (and clear the screen)
+                    this.console.clear();
+                    this.console.setCursor(0, 0);
+                    out.write(currentPrompt);
+                    currentLine.start();
+                    refreshCurrentLine();
+                    break;
+                case KR_INSERT:
+                    // Insert event's character
+                    currentLine.appendChar(event.getKeyChar());
+                    refreshCurrentLine();
+                    historyIndex = -1;
+                    break;
+                case KR_HISTORY_UP:
+                    // Previous history item
+                    if (completer != null) {
+                        if (historyIndex == -1) {
+                            historyIndex = completer.getInputHistory().size();
+                            savedCurrentLine = currentLine.getContent();
+                        }
+                        historyIndex--;
+                        updateCurrentLine();
+                    }
+                    break;
+                case KR_HISTORY_DOWN:
+                    // Next history item
+                    if (completer != null) {
+                        if (historyIndex == -1) {
+                            savedCurrentLine = currentLine.getContent();
+                        }
+                        if (historyIndex == completer.getInputHistory().size() - 1) {
+                            historyIndex = -2;
+                        }
+                        historyIndex++;
+                        updateCurrentLine();
+                    }
+                    break;
+                case KR_CURSOR_LEFT:
+                    // Move the cursor left
+                    if (currentLine.moveLeft()) {
+                        refreshCurrentLine();
+                    }
+                    break;
+                case KR_CURSOR_RIGHT:
+                    // Move the cursor right
+                    if (currentLine.moveRight()) {
+                        refreshCurrentLine();
+                    }
+                    break;
+                case KR_CURSOR_TO_START:
+                    // Move the cursor to the start of the line
+                    currentLine.moveBegin();
+                    refreshCurrentLine();
+                    break;
+                case KR_CURSOR_TO_END:
+                    // Move the cursor to the end of the line
+                    currentLine.moveEnd();
+                    refreshCurrentLine();
+                    break;
+                case KR_DELETE_AFTER:
+                    // Delete the character after the cursor
+                    currentLine.delete();
+                    refreshCurrentLine();
+                    break;
+                case KR_CONSUME:
+                    // Comsume (and ignore) the event
+                    break;
+                case KR_IGNORE:
+                    // Leave the event unconsumed.
+                    consume = false;
+                    break;
+            }
+            if (consume) {
+                event.consume();
+            }
+            return breakChar;
+        } else {
             return false;
         }
-        switch (code) {
-            case KeyEvent.VK_UP:
-                // Previous history item
-                if (completer != null) {
-                    if (historyIndex == -1) {
-                        historyIndex = completer.getInputHistory().size();
-                        savedCurrentLine = currentLine.getContent();
-                    }
-                    historyIndex--;
-
-                    updateCurrentLine();
-                }
-                break;
-            case KeyEvent.VK_DOWN:
-                // Next history item
-                if (completer != null) {
-                    if (historyIndex == -1)
-                        savedCurrentLine = currentLine.getContent();
-
-                    if (historyIndex == completer.getInputHistory().size() - 1)
-                        historyIndex = -2;
-
-                    historyIndex++;
-
-                    updateCurrentLine();
-
-                }
-                break;
-            case KeyEvent.VK_LEFT:
-                // Left the cursor goes left
-                if (currentLine.moveLeft()) {
-                    refreshCurrentLine();
-                }
-                break;
-            case KeyEvent.VK_RIGHT:
-                // Right the cursor goes right
-                if (currentLine.moveRight()) {
-                    refreshCurrentLine();
-                }
-                break;
-            case KeyEvent.VK_HOME:
-                // The cursor goes at the start
-                currentLine.moveBegin();
-                refreshCurrentLine();
-                break;
-            case KeyEvent.VK_END:
-                // the cursor goes at the end of line
-                currentLine.moveEnd();
-                refreshCurrentLine();
-                break;
-            // if its a delete we want to remove one under the cursor
-            case KeyEvent.VK_DELETE:
-                currentLine.delete();
-                refreshCurrentLine();
-                break;
-            default:
-                // ignore other virtual keys.
-                return false;
-        }
-        return true;
     }
 
     private void updateCurrentLine() throws IOException {
@@ -309,7 +312,7 @@ public class KeyboardReader extends Reader
         currentPrompt = sb.toString();
 
         currentLine.start();
-        while (processEvent()) { /* */
+        while (!processEvent()) { /* */
         }
         buffer = currentLine.consumeChars();
         lim = buffer.length;

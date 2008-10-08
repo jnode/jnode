@@ -29,6 +29,7 @@ import java.security.PrivilegedAction;
 
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputCompleter;
+import org.jnode.driver.console.KeyEventBindings;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.AbstractConsole;
 import org.jnode.driver.console.spi.ConsoleWriter;
@@ -39,6 +40,8 @@ import org.jnode.system.event.FocusListener;
 import org.jnode.util.WriterOutputStream;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.isolate.VmIsolate;
+
+import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -334,6 +337,24 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     public void setCompleter(InputCompleter completer) {
         if (in instanceof KeyboardReader) {
             ((KeyboardReader) in).setCompleter(completer);
+        }
+    }
+    
+    @Override
+    public KeyEventBindings getKeyEventBindings() {
+        if (in instanceof KeyboardReader) {
+            return ((KeyboardReader) in).getKeyEventBindings();
+        } else {
+            throw new UnsupportedOperationException("key event bindings not available");
+        }
+    }
+
+    @Override
+    public void setKeyEventBindings(KeyEventBindings bindings) {
+        if (in instanceof KeyboardReader) {
+            ((KeyboardReader) in).setKeyEventBindings(bindings);
+        } else {
+            throw new UnsupportedOperationException("key event bindings cannt be set");
         }
     }
 
