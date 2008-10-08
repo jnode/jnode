@@ -26,6 +26,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.spi.ShapedGlyph;
@@ -90,13 +91,13 @@ public class TTFSimpleTextRenderer implements TextRenderer {
             }
             final double ascent = hheadTable.getAscent();
 
-            final AffineTransform tx = new AffineTransform();
-            final double scale = fontSize / ascent;
-
+            final AffineTransform tx = new AffineTransform();            
+            final double scale = fontSize / (-hheadTable.getDescent() + ascent);
+            
             tx.translate(x, y + fontSize);
             tx.scale(scale, -scale);
             tx.translate(0, ascent);
-
+            
             for (int i = 0; i < text.length(); i++) {
                 // get the index for the needed glyph
                 final char character = text.charAt(i);
