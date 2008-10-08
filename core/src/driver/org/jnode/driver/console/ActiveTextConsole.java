@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+
 /**
  * This virtual console class operates on the console that has the current focus.
  * The {@link #getOut()} and {@link #getErr()} return Writers that track changes 
@@ -89,6 +90,16 @@ public class ActiveTextConsole extends VirtualTextConsole {
         return getActiveTextConsole().getWidth();
     }
     
+    @Override
+    public KeyEventBindings getKeyEventBindings() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setKeyEventBindings(KeyEventBindings bindings) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Get the current active console; i.e. the one that currently has focus.
      * Note that this may change at any instant.

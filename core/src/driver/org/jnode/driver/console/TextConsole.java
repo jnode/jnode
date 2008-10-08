@@ -24,6 +24,7 @@ package org.jnode.driver.console;
 import java.io.Reader;
 import java.io.Writer;
 
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
@@ -203,4 +204,19 @@ public interface TextConsole extends Console {
      * @param The new completer or <code>null</code>.
      */
     public void setCompleter(InputCompleter completer);
+    
+    /**
+     * Get a snapshot of the console's key event bindings.
+     * 
+     * @return a copy of the current bindings.
+     */
+    public KeyEventBindings getKeyEventBindings();
+    
+    /**
+     * Set the console's key event bindings.
+     * 
+     * @param bindings the new bindings.
+     */
+    public void setKeyEventBindings(KeyEventBindings bindings);
+    
 }
