@@ -169,7 +169,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private boolean historyEnabled;
     
-    private final boolean debugEnabled;
+    private boolean debugEnabled;
 
     private boolean exited = false;
 
@@ -363,8 +363,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     private void setupFromProperties() {
-//        debugEnabled = Boolean.parseBoolean(System.getProperty(
-//                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
+        debugEnabled = Boolean.parseBoolean(System.getProperty(
+                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
         historyEnabled = Boolean.parseBoolean(System.getProperty(
                 HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
         try {
@@ -389,8 +389,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     private void refreshFromProperties() {
-//        debugEnabled = Boolean.parseBoolean(System.getProperty(
-//                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
+        debugEnabled = Boolean.parseBoolean(System.getProperty(
+                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
         historyEnabled = Boolean.parseBoolean(System.getProperty(
                 HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
         try {
