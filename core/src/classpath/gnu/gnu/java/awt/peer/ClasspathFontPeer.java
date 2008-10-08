@@ -568,7 +568,9 @@ public abstract class ClasspathFontPeer
 
   public boolean isTransformed (Font font)
   {
-    return ! transform.isIdentity ();
+    //jnode : avoid case where transform is null (seen with Java2Demo)
+    //return ! transform.isIdentity ();
+    return !getTransform(font).isIdentity ();
   }
 
   /** 
