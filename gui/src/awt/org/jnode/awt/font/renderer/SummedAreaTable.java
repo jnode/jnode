@@ -111,7 +111,7 @@ public abstract class SummedAreaTable {
 
     /**
      * Gets the intensity of the area described by the parameters.
-     * The intensity if the sum of the given area, divided by the number of
+     * The intensity is the sum of the given area, divided by the number of
      * elements in the area.
      *
      * @param x
