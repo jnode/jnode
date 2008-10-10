@@ -22,7 +22,9 @@
 package org.jnode.driver.console.textscreen;
 
 import java.io.PrintStream;
+
 import javax.naming.NamingException;
+
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;

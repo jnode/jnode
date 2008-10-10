@@ -22,6 +22,7 @@ package org.jnode.driver.console;
 
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.jnode.driver.input.KeyboardEvent;
 
@@ -31,30 +32,30 @@ import org.jnode.driver.input.KeyboardEvent;
  * 
  * @author crawley@jnode.org
  */
-public class KeyEventBindings {
+public abstract class KeyEventBindings<T extends Enum<?>> {
     
-    private final int defaultCharAction;
-    private final int defaultVKAction;
-    private CodeMap charMap;
-    private CodeMap vkMap;
+    private final T defaultCharAction;
+    private final T defaultVKAction;
+    private CodeMap<T> charMap;
+    private CodeMap<T> vkMap;
     
     /**
      * Create empty bindings.
      * @param defaultCharAction the default action for a character-valued event
      * @param defaultVKAction the default action for a VK-valued event.
      */
-    public KeyEventBindings(int defaultCharAction, int defaultVKAction) {
+    public KeyEventBindings(T defaultCharAction, T defaultVKAction) {
         this.defaultCharAction = defaultCharAction;
         this.defaultVKAction = defaultVKAction;
-        this.charMap = new CodeMap(defaultCharAction);
-        this.vkMap = new CodeMap(defaultVKAction);
+        this.charMap = new CodeMap<T>(defaultCharAction);
+        this.vkMap = new CodeMap<T>(defaultVKAction);
     }
     
     /**
      * Create a copy of an existing KeyEventBindings object.
      * @param bindings the bindings to be copied.
      */
-    public KeyEventBindings(KeyEventBindings bindings) {
+    public KeyEventBindings(KeyEventBindings<T> bindings) {
         this.defaultCharAction = bindings.defaultCharAction;
         this.defaultVKAction = bindings.defaultVKAction;
         this.charMap = new CodeMap(bindings.charMap);
@@ -75,7 +76,7 @@ public class KeyEventBindings {
      * @param ch the character
      * @return the corresponding action.
      */
-    public int getKeyboardEventAction(KeyboardEvent event) {
+    public T getKeyboardEventAction(KeyboardEvent event) {
         char ch = event.getKeyChar();
         if (ch == KeyEvent.CHAR_UNDEFINED) {
             return getVKAction(event.getKeyCode(), event.getModifiers());
@@ -90,7 +91,7 @@ public class KeyEventBindings {
      * @param ch the character
      * @return the corresponding action.
      */
-    public int getCharAction(char ch) {
+    public T getCharAction(char ch) {
         return charMap.get(ch);
     }
 
@@ -101,7 +102,7 @@ public class KeyEventBindings {
      * @param modifiers the modifier set
      * @return the corresponding action.
      */
-    public int getVKAction(int vk, int modifiers) {
+    public T getVKAction(int vk, int modifiers) {
         checkVK(vk, modifiers);
         return vkMap.get(vk | (modifiers << 16));
     }
@@ -114,6 +115,10 @@ public class KeyEventBindings {
             throw new IllegalArgumentException("modifiers range error");
         }
     }
+    
+    public T getVKAction(VirtualKey vk) {
+        return vkMap.get(vk.value);
+    }
 
     /**
      * Set the action for a given character
@@ -121,7 +126,7 @@ public class KeyEventBindings {
      * @param ch the character
      * @param action the action
      */
-    public void setCharAction(char ch, int action) {
+    public void setCharAction(char ch, T action) {
         charMap.put(ch, action);
     }
 
@@ -131,7 +136,7 @@ public class KeyEventBindings {
      * @param vk the virtual key code
      * @param action the action
      */
-    public void setVKAction(int vk, int action) {
+    public void setVKAction(int vk, T action) {
         checkVK(vk, 0);
         vkMap.put(vk, action);
     }
@@ -143,7 +148,7 @@ public class KeyEventBindings {
      * @param modifiers the modifier set
      * @param action the action
      */
-    public void setVKAction(int vk, int modifiers, int action) {
+    public void setVKAction(int vk, int modifiers, T action) {
         checkVK(vk, modifiers);
         vkMap.put(vk | (modifiers << 16), action);
     }
@@ -155,7 +160,7 @@ public class KeyEventBindings {
      * @param chHi the last character in the range
      * @param action the action
      */
-    public void setCharAction(char chLo, char chHi, int action) {
+    public void setCharAction(char chLo, char chHi, T action) {
         charMap.put(chLo, chHi, action);
     }
 
@@ -167,7 +172,7 @@ public class KeyEventBindings {
      * @param modifiers the modifier set
      * @param action the action
      */
-    public void setVKAction(int vkLo, int vkHi, int modifiers, int action) {
+    public void setVKAction(int vkLo, int vkHi, int modifiers, T action) {
         checkVK(vkLo, modifiers);
         checkVK(vkHi, modifiers);
         if (modifiers == 0) {
@@ -181,27 +186,47 @@ public class KeyEventBindings {
             }
         }
     }
+    
+    public char[] getBoundChars() {
+        Set<Integer> charSet = charMap.getKeys();
+        char[] res = new char[charSet.size()];
+        int i = 0;
+        for (int ch : charSet) {
+            res[i++] = (char) ch;
+        }
+        return res;
+    }
+
+    public VirtualKey[] getBoundVKs() {
+        Set<Integer> vkSet = vkMap.getKeys();
+        VirtualKey[] res = new VirtualKey[vkSet.size()];
+        int i = 0;
+        for (int vk : vkSet) {
+            res[i++] = new VirtualKey(vk);
+        }
+        return res;
+    }
 
     /**
      * This class implements a sparse representation of an int to int
      * mapping using a HashMap and a default value.
      */
-    private static class CodeMap {
-        private final HashMap<Integer, Integer> map;
-        private final int defaultValue;
+    private static class CodeMap<T extends Enum<?>> {
+        private final HashMap<Integer, T> map;
+        private final T defaultValue;
 
-        public CodeMap(int defaultValue) {
+        public CodeMap(T defaultValue) {
             this.defaultValue = defaultValue;
-            this.map = new HashMap<Integer, Integer>();
+            this.map = new HashMap<Integer, T>();
         }
 
-        public CodeMap(CodeMap codeMap) {
+        public CodeMap(CodeMap<T> codeMap) {
             this.defaultValue = codeMap.defaultValue;
-            this.map = new HashMap<Integer, Integer>(codeMap.map);
+            this.map = new HashMap<Integer, T>(codeMap.map);
         }
 
-        public int get(int key) {
-            Integer value = this.map.get(key);
+        public T get(int key) {
+            T value = this.map.get(key);
             if (value != null) {
                 return value;
             } else {
@@ -209,7 +234,7 @@ public class KeyEventBindings {
             }
         }
 
-        public void put(int key, int value) {
+        public void put(int key, T value) {
             if (value == this.defaultValue) {
                 this.map.remove(key);
             } else {
@@ -217,7 +242,7 @@ public class KeyEventBindings {
             }
         }
 
-        public void put(int keyLo, int keyHi, int value) {
+        public void put(int keyLo, int keyHi, T value) {
             if (keyLo > keyHi) {
                 throw new IllegalArgumentException("keyLo > keyHi");
             }
@@ -230,6 +255,10 @@ public class KeyEventBindings {
                     this.map.put(key, value);
                 }
             }
+        }
+        
+        public Set<Integer> getKeys() {
+            return map.keySet();
         }
     }
 }

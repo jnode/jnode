@@ -24,6 +24,9 @@ package org.jnode.driver.console;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.jnode.driver.console.textscreen.ConsoleKeyEventBindings;
+
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -210,13 +213,13 @@ public interface TextConsole extends Console {
      * 
      * @return a copy of the current bindings.
      */
-    public KeyEventBindings getKeyEventBindings();
+    public ConsoleKeyEventBindings getKeyEventBindings();
     
     /**
      * Set the console's key event bindings.
      * 
      * @param bindings the new bindings.
      */
-    public void setKeyEventBindings(KeyEventBindings bindings);
+    public void setKeyEventBindings(ConsoleKeyEventBindings bindings);
     
 }

@@ -19,6 +19,7 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
+    <alias name="bindkeys" class="org.jnode.shell.command.BindKeysCommand"/>
     <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
     <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
     <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
@@ -53,6 +54,8 @@
         <argument argLabel="alias"/>
         <argument argLabel="className"/>
       </sequence>
+    </syntax>
+    <syntax alias="bindkeys" description="Show the key bindings">
     </syntax>
     <syntax alias="class" description="Show details of a Java class">
       <argument argLabel="className"/>
