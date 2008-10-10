@@ -1,27 +1,11 @@
 package org.jnode.driver.console.textscreen;
 
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_COMPLETE;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CONSUME;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_LEFT;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_RIGHT;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_TO_END;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_CURSOR_TO_START;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_DELETE_AFTER;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_DELETE_BEFORE;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_ENTER;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_HISTORY_UP;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_IGNORE;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_INSERT;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_KILL_LINE;
-import static org.jnode.driver.console.textscreen.ConsoleKeyEventBindings.KR_SOFT_EOF;
-
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
 import org.jnode.driver.console.InputCompleter;
-import org.jnode.driver.console.KeyEventBindings;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.system.event.FocusEvent;
@@ -80,7 +64,7 @@ public class KeyboardReader extends Reader
     private InputCompleter completer;
     private final Writer out;
     
-    private KeyEventBindings bindings = ConsoleKeyEventBindings.createDefault();
+    private ConsoleKeyEventBindings bindings = ConsoleKeyEventBindings.createDefault();
 
     private String currentPrompt;
 
@@ -135,8 +119,8 @@ public class KeyboardReader extends Reader
      * 
      * @return a copy of the current bindings.
      */
-    public KeyEventBindings getKeyEventBindings() {
-        return new KeyEventBindings(bindings);
+    public ConsoleKeyEventBindings getKeyEventBindings() {
+        return new ConsoleKeyEventBindings(bindings);
     }
     
     /**
@@ -144,8 +128,8 @@ public class KeyboardReader extends Reader
      * 
      * @param bindings the new bindings.
      */
-    public void setKeyEventBindings(KeyEventBindings bindings) {
-        this.bindings = new KeyEventBindings(bindings);
+    public void setKeyEventBindings(ConsoleKeyEventBindings bindings) {
+        this.bindings = new ConsoleKeyEventBindings(bindings);
     }
 
     @Override
@@ -169,7 +153,7 @@ public class KeyboardReader extends Reader
     private boolean processEvent() throws IOException {
         KeyboardEvent event = keyboardHandler.getEvent();
         if (!event.isConsumed()) {
-            int action = bindings.getKeyboardEventAction(event);
+            KeyboardReaderAction action = bindings.getKeyboardEventAction(event);
             boolean breakChar = false;
             boolean consume = true;
             switch (action) {

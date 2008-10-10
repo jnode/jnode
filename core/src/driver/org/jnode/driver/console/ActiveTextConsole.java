@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.jnode.driver.console.textscreen.ConsoleKeyEventBindings;
+
+
 
 /**
  * This virtual console class operates on the console that has the current focus.
@@ -91,12 +94,12 @@ public class ActiveTextConsole extends VirtualTextConsole {
     }
     
     @Override
-    public KeyEventBindings getKeyEventBindings() {
+    public ConsoleKeyEventBindings getKeyEventBindings() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setKeyEventBindings(KeyEventBindings bindings) {
+    public void setKeyEventBindings(ConsoleKeyEventBindings bindings) {
         throw new UnsupportedOperationException();
     }
 

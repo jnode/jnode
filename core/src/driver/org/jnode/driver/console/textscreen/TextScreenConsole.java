@@ -341,7 +341,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     }
     
     @Override
-    public KeyEventBindings getKeyEventBindings() {
+    public ConsoleKeyEventBindings getKeyEventBindings() {
         if (in instanceof KeyboardReader) {
             return ((KeyboardReader) in).getKeyEventBindings();
         } else {
@@ -350,7 +350,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     }
 
     @Override
-    public void setKeyEventBindings(KeyEventBindings bindings) {
+    public void setKeyEventBindings(ConsoleKeyEventBindings bindings) {
         if (in instanceof KeyboardReader) {
             ((KeyboardReader) in).setKeyEventBindings(bindings);
         } else {

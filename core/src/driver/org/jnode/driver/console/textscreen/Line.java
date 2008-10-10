@@ -24,6 +24,7 @@ package org.jnode.driver.console.textscreen;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.SortedSet;
+
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.ScrollableTextConsole;
