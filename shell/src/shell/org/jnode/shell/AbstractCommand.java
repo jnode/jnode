@@ -24,6 +24,10 @@ package org.jnode.shell;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import javax.naming.NameNotFoundException;
+
+import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandOutput;
@@ -74,22 +78,63 @@ public abstract class AbstractCommand implements Command {
         // presumably called us will have created another instance; i.e. this one.
         Command command = retrieveCurrentCommand();
         if (command != null) {
-            // We're ignoring the instance created in the static void main method and
-            // using the one that the invoker saved for us earlier.
-            command.execute(new CommandLine(args), System.in, System.out, System.err);
+            // We'll ignore the instance created in the static void main method and
+            // use the one that the invoker saved for us earlier.
+        } else if (bundle != null) {
+            // It appears that this class is designed to use the new-style syntax mechanism
+            // but we've somehow been called without having a Command instance recorded.
+            // We'll do our best to build a Command and parse the arguments based on the 
+            // information we have to hand.  (We have no way of knowing what alias was
+            // supplied by the user.)
+            command = prepareCommand(args);
         } else {
-            if (bundle != null) {
-                // It appears that this class is designed to use the new-style syntax mechanism
-                // but we've somehow been called without having a Command instance recorded.
-                throw new ShellInvocationException(
-                    "Commands with new-style syntax cannot be invoked this way");
-                // FIXME ... if a JNode Command class is going to be usable outside of JNode, we
-                // will need to figure out how to call ArgumentBundle.parse here using the appropriate
-                // Syntax object.
-            }
-
-            execute(new CommandLine(args), System.in, System.out, System.err);
+            // The command does not use the new syntax mechanism, so we can just run
+            // it and let it deal with the arguments itself.
+            command = this;
         }
+        command.execute(new CommandLine(args), System.in, System.out, System.err);
+    }
+
+    /**
+     * Attempt to create a command instance and parse the command line arguments.
+     * 
+     * @param args the command arguments
+     * @return the command with arguments bound by the parser.
+     * @throws Exception
+     */
+    private Command prepareCommand(String[] args) throws Exception {
+        String className = this.getClass().getCanonicalName();
+        String commandName = getProbableAlias(className);
+        if (commandName == null) {
+            commandName = className;
+        }
+        CommandLine cmdLine = new CommandLine(commandName, args);
+        // This will be problematic in a classic JVM ...
+        CommandInfo ci = cmdLine.parseCommandLine((CommandShell) ShellUtils.getCurrentShell());
+        return ci.getCommandInstance();
+    }
+    
+    /**
+     * Get our best guess as to what the alias was.
+     * 
+     * @param canonicalName the class name
+     * @return the intuited alias name
+     * @throws NameNotFoundException
+     */
+    private String getProbableAlias(String canonicalName) throws NameNotFoundException {
+        // This will be problematic in a classic JVM ...
+        AliasManager mgr = ShellUtils.getAliasManager();
+        for (String alias : mgr.aliases()) {
+            try {
+                if (mgr.getAliasClassName(alias).equals(canonicalName)) {
+                    return alias;
+                }
+            } catch (NoSuchAliasException e) {
+                // This can only occur if an alias is removed while we are working.
+                // There's not much we can do about it ... so ignore this.
+            }
+        }
+        return null;
     }
 
     /**
