@@ -193,16 +193,19 @@ public class MauveTestCommand extends TestHarness {
             System.out.println("failed to write HTML due to following error:");
             e.printStackTrace(System.out);
         }
-        System.out.println("Creating XML report...");
-
-        /*
-          try {
-              new XMLGenerator(result).generate(new File(out, "results.xml"));
-          } catch (IOException e) {
-              System.out.println("failed to write XML due to following error:");
-              e.printStackTrace(System.out);
-          }
-          */
+        
+        System.out.println("Creating XML report...");        
+        try {
+            // new XMLGenerator(result).generate(new File(out, "results.xml"));
+            
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            File fx = new File(out, "results-" + timestamp + ".xml");
+            new XMLReportWriter().write(result, fx);
+            System.out.println("XML file written to " + fx.getAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("failed to write XML due to following error:");
+            e.printStackTrace(System.out);
+        }
 
         System.out.println("DONE!");
     }

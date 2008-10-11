@@ -144,4 +144,8 @@ public class TestResult implements Comparable {
     public String getFailedMessage() {
         return error;
     }
+
+    public void setFailedMessage(String error) {
+        this.error = error;        
+    }
 }
