@@ -55,7 +55,13 @@
         <argument argLabel="className"/>
       </sequence>
     </syntax>
-    <syntax alias="bindkeys" description="Show the key bindings">
+    <syntax alias="bindkeys">
+      <empty description="Show the key bindings"/>
+      <option argLabel="reset" longName="reset" description="Reset the key bindings to the default settings"/>
+      <sequence description="Remove key bindings">
+        <option argLabel="remove" shortName="r" longName="remove"/>
+        <argument argLabel="action"/>
+      </sequence>
     </syntax>
     <syntax alias="class" description="Show details of a Java class">
       <argument argLabel="className"/>
