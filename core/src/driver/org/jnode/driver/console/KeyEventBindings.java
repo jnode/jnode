@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.jnode.driver.console.textscreen.KeyboardReaderAction;
 import org.jnode.driver.input.KeyboardEvent;
 
 /**
@@ -131,14 +132,13 @@ public abstract class KeyEventBindings<T extends Enum<?>> {
     }
 
     /**
-     * Set the action for a given virtual key code and no modifiers
+     * Unset the action for a given character.
+     * This is equivalent to setting the action to the default action.
      * 
-     * @param vk the virtual key code
-     * @param action the action
+     * @param ch the character
      */
-    public void setVKAction(int vk, T action) {
-        checkVK(vk, 0);
-        vkMap.put(vk, action);
+    public void unsetCharAction(char ch) {
+        charMap.put(ch, defaultCharAction);
     }
 
     /**
@@ -151,6 +151,37 @@ public abstract class KeyEventBindings<T extends Enum<?>> {
     public void setVKAction(int vk, int modifiers, T action) {
         checkVK(vk, modifiers);
         vkMap.put(vk | (modifiers << 16), action);
+    }
+
+    /**
+     * Unset the action for a given virtual key code and modifier set.
+     * This is equivalent to setting the action to the default action.
+     * 
+     * @param vk the virtual key code
+     * @param modifiers the modifier set
+     */
+    public void unsetVKAction(int vk, int modifiers) {
+        setVKAction(vk, modifiers, defaultVKAction);
+    }
+
+    /**
+     * Set the action for a given VirtualKey
+     * 
+     * @param vk the VirtualKey
+     * @param action the action
+     */
+    public void setVKAction(VirtualKey vk, T action) {
+        setVKAction(vk.getVKCode(), vk.getModifiers(), action);
+    }
+
+    /**
+     * Unset the action for a given VirtualKey.
+     * This is equivalent to setting the action to the default action.
+     * 
+     * @param vk the VirtualKey
+     */
+    public void unsetVKAction(VirtualKey vk) {
+        setVKAction(vk, defaultVKAction);
     }
 
     /**
@@ -187,6 +218,10 @@ public abstract class KeyEventBindings<T extends Enum<?>> {
         }
     }
     
+    /**
+     * Get all characters that are currently bound to an action.
+     * @return the bound characters.
+     */
     public char[] getBoundChars() {
         Set<Integer> charSet = charMap.getKeys();
         char[] res = new char[charSet.size()];
@@ -197,6 +232,10 @@ public abstract class KeyEventBindings<T extends Enum<?>> {
         return res;
     }
 
+    /**
+     * Get all virtual keys that are currently bound to an action.
+     * @return the bound virtual keys.
+     */
     public VirtualKey[] getBoundVKs() {
         Set<Integer> vkSet = vkMap.getKeys();
         VirtualKey[] res = new VirtualKey[vkSet.size()];

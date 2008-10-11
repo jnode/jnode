@@ -54,22 +54,22 @@ public class ConsoleKeyEventBindings extends KeyEventBindings<KeyboardReaderActi
      */
     public static ConsoleKeyEventBindings createDefault() {
         ConsoleKeyEventBindings res = new ConsoleKeyEventBindings();
-        res.setVKAction(KeyEvent.VK_BACK_SPACE, KeyboardReaderAction.KR_DELETE_BEFORE);
+        res.setVKAction(KeyEvent.VK_BACK_SPACE, 0, KeyboardReaderAction.KR_DELETE_BEFORE);
         res.setCharAction('\b', KeyboardReaderAction.KR_DELETE_BEFORE);
-        res.setVKAction(KeyEvent.VK_ENTER, KeyboardReaderAction.KR_ENTER);
+        res.setVKAction(KeyEvent.VK_ENTER, 0, KeyboardReaderAction.KR_ENTER);
         res.setCharAction('\n', KeyboardReaderAction.KR_ENTER);
-        res.setVKAction(KeyEvent.VK_TAB, KeyboardReaderAction.KR_COMPLETE);
+        res.setVKAction(KeyEvent.VK_TAB, 0, KeyboardReaderAction.KR_COMPLETE);
         res.setCharAction('\t', KeyboardReaderAction.KR_COMPLETE);
         res.setCharAction('\004', KeyboardReaderAction.KR_SOFT_EOF);
         res.setCharAction('\014', KeyboardReaderAction.KR_KILL_LINE);
-        res.setVKAction(KeyEvent.VK_UP, KeyboardReaderAction.KR_HISTORY_UP);
-        res.setVKAction(KeyEvent.VK_DOWN, KeyboardReaderAction.KR_HISTORY_DOWN);
-        res.setVKAction(KeyEvent.VK_LEFT, KeyboardReaderAction.KR_CURSOR_LEFT);
-        res.setVKAction(KeyEvent.VK_RIGHT, KeyboardReaderAction.KR_CURSOR_RIGHT);
-        res.setVKAction(KeyEvent.VK_HOME, KeyboardReaderAction.KR_CURSOR_TO_START);
-        res.setVKAction(KeyEvent.VK_END, KeyboardReaderAction.KR_CURSOR_TO_END);
+        res.setVKAction(KeyEvent.VK_UP, 0, KeyboardReaderAction.KR_HISTORY_UP);
+        res.setVKAction(KeyEvent.VK_DOWN, 0, KeyboardReaderAction.KR_HISTORY_DOWN);
+        res.setVKAction(KeyEvent.VK_LEFT, 0, KeyboardReaderAction.KR_CURSOR_LEFT);
+        res.setVKAction(KeyEvent.VK_RIGHT, 0, KeyboardReaderAction.KR_CURSOR_RIGHT);
+        res.setVKAction(KeyEvent.VK_HOME, 0, KeyboardReaderAction.KR_CURSOR_TO_START);
+        res.setVKAction(KeyEvent.VK_END, 0, KeyboardReaderAction.KR_CURSOR_TO_END);
         res.setCharAction('\177', KeyboardReaderAction.KR_DELETE_AFTER);
-        res.setVKAction(KeyEvent.VK_DELETE, KeyboardReaderAction.KR_DELETE_AFTER);
+        res.setVKAction(KeyEvent.VK_DELETE, 0, KeyboardReaderAction.KR_DELETE_AFTER);
         return res;
     }
 }
