@@ -9,8 +9,13 @@ import javax.isolate.IsolateStatus;
  * @author Levente S\u00e1ntha
  */
 public class IsolateStatusImpl extends IsolateStatus implements Cloneable {
-    public IsolateStatusImpl(State state, ExitReason exitReason, int exitCode) {
-        super(state, exitReason, exitCode);
+
+    public IsolateStatusImpl(State state) {
+        super(state, null, 0);
+    }
+
+    public IsolateStatusImpl(ExitReason exitReason, int exitCode) {
+        super(State.EXITED, exitReason, exitCode);
     }
 
     @Override
@@ -30,7 +35,7 @@ public class IsolateStatusImpl extends IsolateStatus implements Cloneable {
     public String toString() {
         State s = getState();
         if (s.equals(State.EXITED)) {
-            return getState() + "(" + getExitReason() + "," + getExitCode();
+            return getState() + "(" + getExitReason() + "," + getExitCode() + ")";
         } else {
             return getState().toString();
         }

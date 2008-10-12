@@ -28,6 +28,8 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcess;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmExit;
+import org.jnode.vm.isolate.VmIsolate;
+import javax.isolate.Isolate;
 
 /**
  * VMRuntime represents the interface to the Virtual Machine.
@@ -153,7 +155,11 @@ final class VMRuntime
      * @param status the status to end the process with
      */
     static void exit(int status) {
-        throw new VmExit(status);
+        if(VmIsolate.getRoot() == VmIsolate.currentIsolate()){
+            throw new VmExit(status);
+        } else {
+            VmIsolate.currentIsolate().systemExit(Isolate.currentIsolate(), status);
+        }
     }
 
     /**

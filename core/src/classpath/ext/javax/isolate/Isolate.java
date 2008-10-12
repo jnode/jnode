@@ -21,24 +21,25 @@
 
 package javax.isolate;
 
-import java.util.Properties;
-import java.security.AccessController;
-
-import org.jnode.vm.isolate.VmIsolate;
 import gnu.java.security.action.GetPropertiesAction;
+import java.security.AccessController;
+import java.util.Properties;
+import org.jnode.vm.isolate.VmIsolate;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class Isolate {
 
-    /** The actual isolate implementation */
+    /**
+     * The actual isolate implementation
+     */
     private final VmIsolate impl;
 
     //todo hide this constructor
     /**
      * Constructor for the root isolate.
-     * 
+     *
      * @param impl the JNode speciffic isolate implementation
      */
     public Isolate(VmIsolate impl) {
@@ -47,7 +48,7 @@ public final class Isolate {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param mainClass
      * @param args
      */
@@ -57,7 +58,7 @@ public final class Isolate {
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param mainClass
      * @param args
      * @param properties
@@ -80,7 +81,7 @@ public final class Isolate {
 
     /**
      * Gets the isolate that is running the current thread.
-     * 
+     *
      * @return
      */
     public static Isolate currentIsolate() {
@@ -89,7 +90,7 @@ public final class Isolate {
 
     /**
      * If this object equal to the given object.
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -98,7 +99,7 @@ public final class Isolate {
 
     /**
      * Request normal termination of this isolate.
-     * 
+     *
      * @param status
      */
     public void exit(int status) {
@@ -107,17 +108,17 @@ public final class Isolate {
 
     /**
      * Force termination of this isolate.
-     * 
+     *
      * @param status
      */
     public void halt(int status) {
-        impl.halt(this, status);
+        impl.halt(status);
     }
 
     /**
      * Gets a new Link associated with this Isolate from which the current
      * isolate can receive status link messages.
-     * 
+     *
      * @return
      * @throws ClosedLinkException
      */
@@ -127,7 +128,7 @@ public final class Isolate {
 
     /**
      * Start this isolate.
-     * 
+     *
      * @param links
      * @throws IsolateStartupException
      */
@@ -141,43 +142,46 @@ public final class Isolate {
      * terminated. New isolates may have been constructed or existing ones terminated by the time method returns.
      *
      * @return the active Isolate objects present at the time of the call
-     * 
      * @throws SecurityException if a security manager is present and permission to query isolates is denied
      */
     public static Isolate[] getIsolates() {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        VmIsolate[] children = currentIsolate().impl.getChildren();
+        int c_nr = children.length;
+        Isolate[] ret = new Isolate[c_nr];
+        for (int i = 0; i < c_nr; i++)
+            ret[i] = children[i].getIsolate();
+
+        return ret;
     }
 
     /**
      * Returns the name of the main class of this isolate.
-     * 
+     *
      * @return the name of the main class of this isolate
      */
     public String getMainClassName() {
-        return impl.getMainClassName(); 
+        return impl.getMainClassName();
     }
 
     /**
      * Returns the current state of the isolate.
      *
      * @return the current state of an isolate
-     * 
      * @throws IllegalStateException if called before the isolate is started
-     * @throws SecurityException if a security manager is present and permission to query isolates is denied
+     * @throws SecurityException     if a security manager is present and permission to query isolates is denied
      */
-    public IsolateStatus.State	getState() {
+    public IsolateStatus.State getState() {
         return impl.getIsolateState();
     }
-    
+
     /**
      * Retrieves a copy of the Link array passed to start() by the current
      * isolate's creator. Modification of this array will have no effect on
      * subsequent invocation of this method.
-     * 
+     * <p/>
      * This method never returns null: it will return a zero-length array if
      * this isolate's creator passed null to start().
-     * 
+     *
      * @return
      */
     public static Link[] getLinks() {
@@ -187,7 +191,7 @@ public final class Isolate {
     //todo hide this method
     /**
      * Gets the implementation instance.
-     * 
+     *
      * @return
      */
     final VmIsolate getImpl() {

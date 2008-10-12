@@ -32,6 +32,7 @@ import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
@@ -47,7 +48,6 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
-import javax.isolate.Isolate;
 
 /**
  * VM thread implementation
@@ -390,7 +390,30 @@ public abstract class VmThread extends VmSystemObject {
         if (javaThread != null) {
             javaThread.onExit();
             //exit the current isolate if needed
-            Isolate.currentIsolate().exit(0);
+            if (ex instanceof ThreadDeath)
+                VmIsolate.currentIsolate().implicitExit(0);
+            else
+                VmIsolate.currentIsolate().uncaughtExceptionExit();
+            // Notify joining threads
+            synchronized (javaThread) {
+                javaThread.notifyAll();
+            }
+        }
+
+        // Do the low level stop uninterrupted
+        doStop();
+    }
+
+    /**
+     * Stop the thread permanently.
+     *
+     * @param ex
+     * @throws UninterruptiblePragma
+     */
+    public final void stopForced(Throwable ex) throws UninterruptiblePragma {
+        this.stopping = true;
+        if (javaThread != null) {
+            javaThread.onExit();
             // Notify joining threads
             synchronized (javaThread) {
                 javaThread.notifyAll();
@@ -722,17 +745,22 @@ public abstract class VmThread extends VmSystemObject {
      */
     @LoadStatics
     protected static final void runThread(VmThread thread) {
+        Throwable t = null;
         try {
             thread.asThread().run();
         } catch (Throwable ex) {
             try {
+                t = ex;
                 ex.printStackTrace();
             } catch (Throwable ex2) {
                 /* Ignore */
             }
         } finally {
             try {
-                thread.stop(new ThreadDeath());
+                if (t == null)
+                    thread.stop(new ThreadDeath());
+                else
+                    thread.stop(t);
             } catch (Throwable ex) {
                 /* Ignore */
                 while (true) {

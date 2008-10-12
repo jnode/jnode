@@ -153,6 +153,8 @@ public final class VmIsolate {
      */
     private BootableHashMap<VmIsolateLocal<?>, ?> isolateLocalMap = new BootableHashMap<VmIsolateLocal<?>, Object>();
 
+    private List<VmIsolate> children = new LinkedList<VmIsolate>();
+
     /**
      * Isolate states.
      *
@@ -369,23 +371,49 @@ public final class VmIsolate {
         return isolate;
     }
 
+    public final void exit(Isolate isolate, int status) {
+        exit0(isolate, status);
+    }
+
+    public final void systemExit(Isolate isolate, int status) {
+        //only this isolate may call this method
+        testIsolate(isolate);
+
+        this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
+        this.exitCode = status;
+
+        int ac = threadGroup.activeCount();
+        if (ac > 0) {
+            Thread[] ta = new Thread[ac];
+            int rc = threadGroup.enumerate(ta);
+            Thread current = Thread.currentThread();
+            boolean found = false;
+            for (int i = 0; i < rc; i++) {
+                Thread thread = ta[i];
+                if (current != thread) {
+                    thread.getVmThread().stopForced(null);
+                } else {
+                    found = true;
+                }
+            }
+            if (found) {
+                current.getVmThread().stop(null);
+            }
+        }
+    }
+
     /**
      * Request normal termination of this isolate.
      *
      * @param status
      */
-    public final void exit(Isolate isolate, int status) {
-        testIsolate(isolate);
+    public final void exit0(Isolate isolate, int status) {
+        //testIsolate(isolate);
         //todo handle demon threads
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
 
         changeState(State.EXITING);
-        try {
-            threadGroup.destroy();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
 
         this.exitCode = status;
         if (currentIsolate() == this) {
@@ -395,8 +423,51 @@ public final class VmIsolate {
             this.exitReason = IsolateStatus.ExitReason.OTHER_EXIT;
         }
 
-        changeState(State.EXITED);
-        StaticData.isolates.remove(this);
+        doExit();
+    }
+
+    /**
+     * Request normal termination of this isolate.
+     *
+     * @param status
+     */
+    public final void implicitExit(int status) {
+        //on this isolate may call this method
+        testIsolate(currentIsolate().isolate);
+
+        //todo handle demon threads
+        if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
+            return;
+
+        changeState(State.EXITING);
+
+        if (exitReason == null) {
+            exitReason = IsolateStatus.ExitReason.IMPLICIT_EXIT;
+            this.exitCode = status;
+        }
+
+        doExit();
+    }
+
+    /**
+     * Request normal termination of this isolate.
+     *
+     * @param status
+     */
+    public final void uncaughtExceptionExit() {
+        //on this isolate may call this method
+        testIsolate(currentIsolate().isolate);
+
+        //todo handle demon threads
+        if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
+            return;
+
+        changeState(State.EXITING);
+
+        exitReason = IsolateStatus.ExitReason.UNCAUGHT_EXCEPTION;
+        this.exitCode = -1;
+
+        doExit();
     }
 
     /**
@@ -405,8 +476,7 @@ public final class VmIsolate {
      * @param status
      */
     @SuppressWarnings("deprecation")
-    public final void halt(Isolate isolate, int status) {
-        testIsolate(isolate);
+    public final void halt(int status) {
         changeState(State.EXITING);
         switch (state) {
             case EXITING:
@@ -414,19 +484,28 @@ public final class VmIsolate {
                 break;
         }
 
-        try {
-            threadGroup.destroy();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        this.exitCode = status;
         if (currentIsolate() == this) {
             this.exitReason = IsolateStatus.ExitReason.SELF_HALT;
         } else {
             this.exitReason = IsolateStatus.ExitReason.OTHER_HALT;
         }
-        changeState(State.EXITED);
+
+        this.exitCode = status;
+
+        doExit();
+    }
+
+    private void doExit() {
+        try {
+            threadGroup.destroy();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
+        this.creator.removeChild(this);
         StaticData.isolates.remove(this);
+
+        changeState(State.EXITED);
     }
 
     /**
@@ -677,6 +756,8 @@ public final class VmIsolate {
 
             // Update the state of this isolate.
             changeState(State.STARTED);
+            //add to parent
+            this.creator.addChild(this);
 
             // Run main method.
             mainMethod.invoke(null, new Object[]{args});
@@ -842,10 +923,21 @@ public final class VmIsolate {
 
     private void sendStatus(VmLink link, IsolateStatus.State state) {
         if (state.equals(IsolateStatus.State.EXITED)) {
-            org.jnode.vm.Unsafe.debugStackTrace();
-            link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(state, exitReason, exitCode)));
+            link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(exitReason, exitCode)));
         } else {
-            link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(state, null, -1)));
+            link.sendStatus(new StatusLinkMessage(new IsolateStatusImpl(state)));
         }
+    }
+
+    private synchronized void addChild(VmIsolate child) {
+        this.children.add(child);
+    }
+
+    private synchronized void removeChild(VmIsolate child) {
+        this.children.remove(child);
+    }
+
+    public synchronized VmIsolate[] getChildren() {
+        return this.children.toArray(new VmIsolate[children.size()]);
     }
 }
