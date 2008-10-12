@@ -2,6 +2,7 @@ package org.jnode.test.mauve;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Constants for tags used by {@link XMLReportParser} and {@link XMLReportWriter}.
@@ -51,7 +52,7 @@ public class XMLReportConstants {
         File f = File.createTempFile("XMLReport", "xml");
         f.deleteOnExit();
         new XMLReportWriter().write(runResult, f);
-        new XMLReportWriter().write(runResult, System.out);
+        new XMLReportWriter().write(runResult, new PrintWriter(System.out));
         
         RunResult rr = new XMLReportParser().parse(f);
         System.out.println("rr = " + rr);
