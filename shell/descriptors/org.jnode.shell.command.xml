@@ -61,6 +61,22 @@
       <sequence description="Remove key bindings">
         <option argLabel="remove" shortName="r" longName="remove"/>
         <argument argLabel="action"/>
+        <repeat minCount="0">
+          <alternatives>
+            <argument argLabel="vkSpec"/>
+            <argument argLabel="character"/>
+          </alternatives>
+        </repeat>
+      </sequence>
+      <sequence description="Add key bindings">
+        <option argLabel="add" shortName="a" longName="add"/>
+        <argument argLabel="action"/>
+        <repeat minCount="1">
+          <alternatives>
+            <argument argLabel="vkSpec"/>
+            <argument argLabel="character"/>
+          </alternatives>
+        </repeat>
       </sequence>
     </syntax>
     <syntax alias="class" description="Show details of a Java class">

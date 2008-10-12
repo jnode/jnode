@@ -34,6 +34,10 @@ public class VirtualKey {
         this.value = value;
     }
     
+    public VirtualKey(int vk, int modifiers) {
+        this.value = vk | (modifiers << 16);
+    }
+    
     public int getVKCode() {
         return value & 0xffff;
     }
