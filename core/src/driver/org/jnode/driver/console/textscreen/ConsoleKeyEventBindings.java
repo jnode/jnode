@@ -55,12 +55,17 @@ public class ConsoleKeyEventBindings extends KeyEventBindings<KeyboardReaderActi
     public static ConsoleKeyEventBindings createDefault() {
         ConsoleKeyEventBindings res = new ConsoleKeyEventBindings();
         res.setVKAction(KeyEvent.VK_BACK_SPACE, 0, KeyboardReaderAction.KR_DELETE_BEFORE);
+        res.setVKAction(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_DELETE_BEFORE);
         res.setCharAction('\b', KeyboardReaderAction.KR_DELETE_BEFORE);
         res.setVKAction(KeyEvent.VK_ENTER, 0, KeyboardReaderAction.KR_ENTER);
+        res.setVKAction(KeyEvent.VK_J, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_ENTER);
         res.setCharAction('\n', KeyboardReaderAction.KR_ENTER);
         res.setVKAction(KeyEvent.VK_TAB, 0, KeyboardReaderAction.KR_COMPLETE);
+        res.setVKAction(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_COMPLETE);
         res.setCharAction('\t', KeyboardReaderAction.KR_COMPLETE);
+        res.setVKAction(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_SOFT_EOF);
         res.setCharAction('\004', KeyboardReaderAction.KR_SOFT_EOF);
+        res.setVKAction(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_KILL_LINE);
         res.setCharAction('\014', KeyboardReaderAction.KR_KILL_LINE);
         res.setVKAction(KeyEvent.VK_UP, 0, KeyboardReaderAction.KR_HISTORY_UP);
         res.setVKAction(KeyEvent.VK_DOWN, 0, KeyboardReaderAction.KR_HISTORY_DOWN);
