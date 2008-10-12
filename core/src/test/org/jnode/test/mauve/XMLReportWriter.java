@@ -95,6 +95,8 @@ public class XMLReportWriter {
         }
         level--;
         endTag(ps, level, RUN_RESULT);
+        
+        ps.flush();
     }
     
     private void check(PrintWriter ps, int level, CheckResult check) {
