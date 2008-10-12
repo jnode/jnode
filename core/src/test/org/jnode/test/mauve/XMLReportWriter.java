@@ -19,7 +19,8 @@ import static org.jnode.test.mauve.XMLReportConstants.TEST_RESULT;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 
 /**
@@ -39,10 +40,10 @@ public class XMLReportWriter {
      * @throws FileNotFoundException
      */
     public void write(RunResult result, File output) throws FileNotFoundException {
-        PrintStream ps = null;
+        PrintWriter ps = null;
 
         try {
-            ps = new PrintStream(output);
+            ps = new PrintWriter(new FileOutputStream(output));
             write(result, ps);
         } finally {
             if (ps != null) {
@@ -57,7 +58,7 @@ public class XMLReportWriter {
      * @param result
      * @param ps
      */
-    public void write(RunResult result, PrintStream ps) {
+    public void write(RunResult result, PrintWriter ps) {
         int level = 0;        
         runResult(ps, level, result);
         level++;
@@ -96,7 +97,7 @@ public class XMLReportWriter {
         endTag(ps, level, RUN_RESULT);
     }
     
-    private void check(PrintStream ps, int level, CheckResult check) {
+    private void check(PrintWriter ps, int level, CheckResult check) {
         beginTag(ps, level, CHECK_RESULT, CHECK_NUMBER, check.getNumber(), 
                 CHECK_POINT, check.getCheckPoint(), 
                 CHECK_PASSED, check.getPassed(), 
@@ -108,24 +109,24 @@ public class XMLReportWriter {
         endTag(ps, level, CHECK_RESULT);
     }
 
-    private void test(PrintStream ps, int level, TestResult test) {
+    private void test(PrintWriter ps, int level, TestResult test) {
         beginTag(ps, level, TEST_RESULT, TEST_NAME, test.getName());
         text(ps, level + 1, TEST_ERROR, test.getFailedMessage());
     }
 
-    private void classResult(PrintStream ps, int level, ClassResult cr) {
+    private void classResult(PrintWriter ps, int level, ClassResult cr) {
         beginTag(ps, level, CLASS_RESULT, CLASS_NAME, cr.getName());
     }
 
-    private void packageResult(PrintStream ps, int level, PackageResult pr) {
+    private void packageResult(PrintWriter ps, int level, PackageResult pr) {
         beginTag(ps, level, PACKAGE_RESULT, PACKAGE_NAME, pr.getName());
     }
 
-    private void runResult(PrintStream ps, int level, RunResult rr) {
+    private void runResult(PrintWriter ps, int level, RunResult rr) {
         beginTag(ps, level, RUN_RESULT, RUN_NAME, rr.getName());
     }
     
-    private PrintStream text(PrintStream ps, int level, String tag, String text) {
+    private PrintWriter text(PrintWriter ps, int level, String tag, String text) {
         beginTag(ps, level, tag);
         
         if (text != null) {
@@ -138,7 +139,7 @@ public class XMLReportWriter {
         return endTag(ps, level, tag);
     }
 
-    private PrintStream beginTag(PrintStream ps, int level, String tag, Object... attributes) {
+    private PrintWriter beginTag(PrintWriter ps, int level, String tag, Object... attributes) {
         tag(ps, level, tag, true);
         for (int i = 0; i < attributes.length; i += 2) {
             ps.append(' ').append(String.valueOf(attributes[i]));
@@ -151,11 +152,11 @@ public class XMLReportWriter {
         return ps;
     }
     
-    private PrintStream endTag(PrintStream ps, int level, String tag) {
+    private PrintWriter endTag(PrintWriter ps, int level, String tag) {
         return tag(ps, level, tag, false);
     }
     
-    private PrintStream tag(PrintStream ps, int level, String tag, boolean begin) {
+    private PrintWriter tag(PrintWriter ps, int level, String tag, boolean begin) {
         indent(ps, level).append(begin ? "<" : "</").append(tag);
         if (!begin) {
             ps.append(">\n");
@@ -164,7 +165,7 @@ public class XMLReportWriter {
         return ps;
     }
 
-    private PrintStream indent(PrintStream ps, int level) {
+    private PrintWriter indent(PrintWriter ps, int level) {
         for (int i = 0; i < level; i++) {
             ps.print(INDENT);
         }

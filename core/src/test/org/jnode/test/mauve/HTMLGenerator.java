@@ -142,7 +142,6 @@ public class HTMLGenerator {
                 File tempFile = new File(tempDir, "package_index.html");
                 tempFile.createNewFile();
             }
-            System.gc();
         }
         writer.println("</table>");
         writer.println("</td>");
