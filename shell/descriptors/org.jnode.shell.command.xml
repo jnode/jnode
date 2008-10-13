@@ -28,22 +28,23 @@
     <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
     <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
     <alias name="exit" class="org.jnode.shell.command.ExitCommand"/>
-    <alias name="set" class="org.jnode.shell.command.SetCommand"/>
     <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
+    <alias name="grep" class="org.jnode.shell.command.GrepCommand"/>
     <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
     <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
     <alias name="isolate" class="org.jnode.shell.command.IsolateCommand"/>
     <alias name="java" class="org.jnode.shell.command.JavaCommand"/>
     <alias name="kill" class="org.jnode.shell.command.KillCommand"/>
+    <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
+    <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
     <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
-    <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
-    <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
-    <alias name="run" class="org.jnode.shell.command.RunCommand"/>
-    <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
-    <alias name="grep" class="org.jnode.shell.command.GrepCommand"/>
+    <alias name="page" class="org.jnode.shell.command.PageCommand"/>
+    <alias name="run" class="org.jnode.shell.command.RunCommand"/>
+    <alias name="set" class="org.jnode.shell.command.SetCommand"/>
     <alias name="syntax" class="org.jnode.shell.command.SyntaxCommand"/>
+    <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
@@ -238,6 +239,10 @@
         <option argLabel="minTotalSize" longName="minTotalSize"/>
       </optionSet>
     </syntax> 
+    <syntax alias="page">
+      <empty description="Filter standard input a page (screen) at a time"/>
+      <argument argLabel="file" description="Output the file a page (screen) at a time"/>
+    </syntax>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
