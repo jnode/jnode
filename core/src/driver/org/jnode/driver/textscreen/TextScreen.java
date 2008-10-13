@@ -95,14 +95,14 @@ public interface TextScreen {
     public abstract void copyTo(TextScreen dst, int offset, int length);
 
     /**
-     * Gets the height of the screen in letters.
+     * Gets the height of the screen in characters.
      *
      * @return Returns the height.
      */
     public int getHeight();
 
     /**
-     * Gets the width of the screen in letters.
+     * Gets the width of the screen in characters.
      *
      * @return Returns the width.
      */
