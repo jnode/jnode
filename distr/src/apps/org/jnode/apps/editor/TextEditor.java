@@ -170,7 +170,7 @@ public class TextEditor implements KeyboardListener {
             }
         }
 
-        if(message != null) {
+        if (message != null) {
             e.append(message);
             message = null;
         } else {
