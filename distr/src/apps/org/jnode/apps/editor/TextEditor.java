@@ -47,13 +47,8 @@ public class TextEditor implements KeyboardListener {
 
             TextEditor te = new TextEditor(console);
             File f = new File(argv[0]);
-            if (f == null) {
-                System.out.println("No file to edit.");
-                manager.unregisterConsole(console);
-            } else {
-                te.ro = argv.length == 2 && "ro".equals(argv[1]);
-                te.loadFile(f);
-            }
+            te.ro = argv.length == 2 && "ro".equals(argv[1]);
+            te.loadFile(f);
         } catch (Exception e) {
             manager.unregisterConsole(console);
             throw e;
@@ -98,6 +93,8 @@ public class TextEditor implements KeyboardListener {
         updateScreen();
     }
 
+    private String message;
+
     private void saveFile() {
         if (file == null) {
             System.out.println("No file.");
@@ -108,12 +105,14 @@ public class TextEditor implements KeyboardListener {
                 try {
                     StringBuilder buf = new StringBuilder();
                     FileWriter fw = new FileWriter(file);
+
                     for (StringBuilder sb : ls)
                         buf.append(sb);
+
                     fw.write(buf.toString());
                     fw.flush();
                     fw.close();
-                    System.out.println("Saved " + file);
+                    message = "Saved " + file;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -171,8 +170,13 @@ public class TextEditor implements KeyboardListener {
             }
         }
 
-        e.append(ro ? "VIEW: " : "EDIT: ").append(file.getName()).append(" [").append(fx2 + cx2 + 1).append(",")
-            .append(oy() + 1).append("]");
+        if(message != null) {
+            e.append(message);
+            message = null;
+        } else {
+            e.append(ro ? "VIEW: " : "EDIT: ").append(file.getName()).
+                append(" [").append(fx2 + cx2 + 1).append(",").append(oy() + 1).append("]");
+        }
         for (int j = 0; j < sw; j++) {
             data[k++] = (j < e.length()) ? e.charAt(j) : ' ';
         }
