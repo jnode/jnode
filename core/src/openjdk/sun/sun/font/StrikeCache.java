@@ -127,8 +127,6 @@ public final class StrikeCache {
     static native void getGlyphCacheDescription(long[] infoArray);
 
     static {
-        //jnode
-        if(false) {
 
     long[] nativeInfo = new long[11];
 	getGlyphCacheDescription(nativeInfo);
@@ -181,7 +179,6 @@ public final class StrikeCache {
 		return null;
 	    }
         });
-        }
     }
 
 
