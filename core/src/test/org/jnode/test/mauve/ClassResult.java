@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Represents the result of running all the tests for a particular class.
  */
-public class ClassResult implements Comparable {
+public class ClassResult implements Comparable, Result {
 
     /**
      * The name of the test (usually the class name).

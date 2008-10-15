@@ -23,7 +23,7 @@ package org.jnode.test.mauve;
 /**
  * Records the details of a check that is performed by Mauve.
  */
-public class CheckResult {
+public class CheckResult implements Result {
 
     /**
      * The check number.
@@ -180,5 +180,10 @@ public class CheckResult {
         if (log == null)
             log = new StringBuffer();
         log.append(message);
+    }
+
+    @Override
+    public String getName() {
+        return Integer.toString(number);
     }
 }
