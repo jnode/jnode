@@ -371,17 +371,32 @@ public final class VmIsolate {
         return isolate;
     }
 
-    public final void exit(Isolate isolate, int status) {
-        exit0(isolate, status);
+    public final void isolateExit(int status) {
+        changeState(State.EXITING);
+
+        this.exitCode = status;
+        if (currentIsolate() == this) {
+            this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
+        } else {
+            this.exitReason = IsolateStatus.ExitReason.OTHER_EXIT;
+        }
+
+        stopAllThreads();
     }
 
     public final void systemExit(Isolate isolate, int status) {
         //only this isolate may call this method
         testIsolate(isolate);
 
+        changeState(State.EXITING);
+
         this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
         this.exitCode = status;
 
+        stopAllThreads();
+    }
+
+    private void stopAllThreads() {
         int ac = threadGroup.activeCount();
         if (ac > 0) {
             Thread[] ta = new Thread[ac];
@@ -397,33 +412,13 @@ public final class VmIsolate {
                 }
             }
             if (found) {
-                current.getVmThread().stop(null);
+                current.getVmThread().stop(new ThreadDeath());
+            } else {
+                doExit();
             }
-        }
-    }
-
-    /**
-     * Request normal termination of this isolate.
-     *
-     * @param status
-     */
-    public final void exit0(Isolate isolate, int status) {
-        //testIsolate(isolate);
-        //todo handle demon threads
-        if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
-            return;
-
-        changeState(State.EXITING);
-
-        this.exitCode = status;
-        if (currentIsolate() == this) {
-            //todo implement: IMPLICIT_EXIT, UNCAUGHT_EXCEPTION
-            this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
         } else {
-            this.exitReason = IsolateStatus.ExitReason.OTHER_EXIT;
+            //todo analyze this case
         }
-
-        doExit();
     }
 
     /**
@@ -439,9 +434,8 @@ public final class VmIsolate {
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
 
-        changeState(State.EXITING);
-
         if (exitReason == null) {
+            changeState(State.EXITING);
             exitReason = IsolateStatus.ExitReason.IMPLICIT_EXIT;
             this.exitCode = status;
         }
@@ -451,8 +445,6 @@ public final class VmIsolate {
 
     /**
      * Request normal termination of this isolate.
-     *
-     * @param status
      */
     public final void uncaughtExceptionExit() {
         //on this isolate may call this method

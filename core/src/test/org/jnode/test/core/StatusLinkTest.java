@@ -3,21 +3,49 @@
  */
 package org.jnode.test.core;
 
-import java.io.IOException;
 import javax.isolate.Isolate;
-import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
+import javax.isolate.ClosedLinkException;
+import javax.isolate.IsolateStartupException;
 
 public class StatusLinkTest {
 
-    public static void main(String[] args) throws IsolateStartupException, IOException {
-        String clsName = ChildClass.class.getName();
-        Isolate child = new Isolate(clsName);
-        Link link = child.newStatusLink();
-        new Thread(new StatusMonitor(link)).start();
+    public static void main(String[] args) throws Exception {
+
+        runChild(ChildClass1.class);
+
+        runChild(ChildClass2.class);
+
+        runChild(ChildClass3.class);
+
+        runChild(ChildClass4.class);
+
+        runChild(ChildClass5.class);
+
+        runChild(ChildClass6.class);
+
+        Isolate child = new Isolate(ChildClass7.class.getName());
+        new Thread(new StatusMonitor(child.newStatusLink()), "status-monitor").start();
         child.start();
+
+        try {
+            Thread.sleep(100);
+        } finally {
+            child.exit(0);
+        }
+    }
+
+    private static void runChild(Class<?> clazz)
+        throws ClosedLinkException, IsolateStartupException, InterruptedException {
+        Isolate child;
+        Thread moni;
+        child = new Isolate(clazz.getName());
+        moni = new Thread(new StatusMonitor(child.newStatusLink()), "status-monitor");
+        moni.start();
+        child.start();
+        moni.join();
     }
 
     public static class StatusMonitor implements Runnable {
@@ -33,13 +61,10 @@ public class StatusLinkTest {
                     LinkMessage msg = link.receive();
                     if (msg.containsStatus()) {
                         IsolateStatus is = msg.extractStatus();
-                        System.out.println("Isolate status: " + is);
+                        System.out.println("Got status message: " + is);
+                        //org.jnode.vm.Unsafe.debug("Got status message: " + is + "\n");
                         if (is.getState().equals(IsolateStatus.State.EXITED)) {
-                            System.out.println("Message: state=" + is.getState() + " code=" + is.getExitCode() +
-                                " reason=" + is.getExitReason());
                             break;
-                        } else {
-                            System.out.println("Message: state=" + is.getState());
                         }
                     } else {
                         System.out.println("Unknown message: " + msg);
@@ -51,29 +76,139 @@ public class StatusLinkTest {
         }
     }
 
-    public static class ChildClass {
-
+    public static class ChildClass1 {
         public static void main(String[] args) throws InterruptedException {
             System.out.println("Child: started");
-            System.out.println("Child: sleeping 3 seconds");
-            Thread.sleep(3000);
-            //if(true)
-            //  throw new RuntimeException();
+            System.out.println("Child: sleeping 2 seconds");
+            Thread.sleep(2000);
+            System.out.println("Child: exiting");
+        }
+    }
+
+    public static class ChildClass2 {
+        public static void main(String[] args) throws InterruptedException {
+            System.out.println("Child: started");
             new Thread(new Runnable() {
                 public void run() {
                     try {
                         System.out.println("Child thread: started");
-                        System.out.println("Child thread: sleeping 3 seconds");
-                        Thread.sleep(3000);
-                        if (true)
-                            throw new RuntimeException();
+                        System.out.println("Child thread: sleeping 2 seconds");
+                        Thread.sleep(2000);
                         System.out.println("Child thread: exiting");
                     } catch (InterruptedException ie) {
                         ie.printStackTrace();
                     }
                 }
-            }).start();
+            }, "child-thread2").start();
+            System.out.println("Child: exiting");
+        }
+    }
 
+    public static class ChildClass3 {
+        public static void main(String[] args) throws InterruptedException {
+            System.out.println("Child: started");
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        System.out.println("Child thread: started");
+                        System.out.println("Child thread: sleeping 2 seconds");
+                        Thread.sleep(2000);
+                        System.out.println("Child thread: throwing an exception");
+                        throw new RuntimeException();
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                }
+            }, "child-thread3").start();
+
+            System.out.println("Child: exiting");
+        }
+    }
+
+    public static class ChildClass4 {
+        public static void main(String[] args) throws InterruptedException {
+            System.out.println("Child: started");
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        System.out.println("Child thread: started");
+                        System.out.println("Child thread: sleeping 2 seconds");
+                        Thread.sleep(2000);
+                        System.out.println("Child thread: calling System.exit()");
+                        System.exit(0);
+                        System.out.println("Child thread: exiting");
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                }
+            }, "child-thread4").start();
+
+            System.out.println("Child: exiting");
+        }
+    }
+
+    public static class ChildClass5 {
+        public static void main(String[] args) throws InterruptedException {
+            System.out.println("Child: started");
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        System.out.println("Child thread: started");
+                        System.out.println("Child thread: sleeping 2 seconds");
+                        Thread.sleep(2000);
+                        System.out.println("Child thread: callng Runtime.halt()");
+                        Runtime.getRuntime().halt(0);
+                        System.out.println("Child thread: exiting");
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                }
+            }, "child-thread5").start();
+
+            System.out.println("Child: exiting");
+        }
+    }
+
+    public static class ChildClass6 {
+        public static void main(String[] args) throws InterruptedException {
+            System.out.println("Child: started");
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        System.out.println("Child thread: started");
+                        System.out.println("Child thread: sleeping 2 seconds");
+                        Thread.sleep(2000);
+                        System.out.println("Child thread: calling Isolate.exit()");
+                        Isolate.currentIsolate().exit(0);
+                        System.out.println("Child thread: exiting");
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                }
+            }, "child-thread6").start();
+
+            System.out.println("Child: exiting");
+        }
+    }
+
+    public static class ChildClass7 {
+        public static void main(String[] args) throws InterruptedException {
+            System.out.println("Child: started");
+            new Thread(new Runnable() {
+                public void run() {
+                    System.out.println("Child thread: started");
+                    System.out.println("Child thread: working ...");
+                    for(int i = 0; i < 100000; i ++) {
+                       // System.out.println("Child thread: " + i);
+                        Math.sin(i);
+                        if(i % 100 == 0) {
+                            //org.jnode.vm.Unsafe.debug("i=" + i + "\n");
+                            System.out.println("i=" + i);
+                        }
+                    }
+                    System.out.println("Child thread: exiting");
+                }
+            }, "child-thread7").start();
             System.out.println("Child: exiting");
         }
     }

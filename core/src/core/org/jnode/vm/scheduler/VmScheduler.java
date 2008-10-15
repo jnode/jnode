@@ -124,6 +124,10 @@ public final class VmScheduler {
         allThreadsLock.lock();
         try {
             allThreadsQueue.remove(thread);
+            //todo recent change, more testing needed
+            //remove the thread from readyQueue and sleepQueue too
+            readyQueue.remove(thread);
+            sleepQueue.remove(thread);
         } finally {
             allThreadsLock.unlock();
         }
