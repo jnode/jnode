@@ -390,10 +390,11 @@ public abstract class VmThread extends VmSystemObject {
         if (javaThread != null) {
             javaThread.onExit();
             //exit the current isolate if needed
-            if (ex instanceof ThreadDeath)
+            if (ex instanceof ThreadDeath) {
                 VmIsolate.currentIsolate().implicitExit(0);
-            else
+            } else {
                 VmIsolate.currentIsolate().uncaughtExceptionExit();
+            }
             // Notify joining threads
             synchronized (javaThread) {
                 javaThread.notifyAll();

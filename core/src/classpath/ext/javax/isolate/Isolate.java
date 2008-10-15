@@ -103,7 +103,7 @@ public final class Isolate {
      * @param status
      */
     public void exit(int status) {
-        impl.exit(this, status);
+        impl.isolateExit(status);
     }
 
     /**
