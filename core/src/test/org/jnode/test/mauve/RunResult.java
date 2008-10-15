@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Represents the result of running a collection of Mauve tests.
  */
-public class RunResult {
+public class RunResult implements Result {
 
     /**
      * The name of the run.
@@ -51,7 +51,7 @@ public class RunResult {
      *
      * @param name the class name.
      */
-    RunResult(String name) {
+    public RunResult(String name) {
         this.name = name;
         packageResults = new ArrayList();
     }

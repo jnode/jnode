@@ -31,7 +31,7 @@ import java.util.List;
  * checks and corresponds to a single method in the API being tested.  There
  * are exceptions of course.
  */
-public class TestResult implements Comparable {
+public class TestResult implements Comparable, Result  {
 
     /**
      * The name of the test (usually the method name).
