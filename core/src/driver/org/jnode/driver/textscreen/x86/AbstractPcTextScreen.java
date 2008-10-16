@@ -44,7 +44,7 @@ public abstract class AbstractPcTextScreen implements TextScreen {
     }
     
     /**
-     * Gets the height of the screen in letters.
+     * Gets the height of the virtual screen in characters.
      * 
      * @return Returns the height.
      */
@@ -54,7 +54,7 @@ public abstract class AbstractPcTextScreen implements TextScreen {
     }
 
     /**
-     * Gets the width of the screen in letters.
+     * Gets the width of the virtual screen in characters.
      * 
      * @return Returns the width.
      */
@@ -62,6 +62,30 @@ public abstract class AbstractPcTextScreen implements TextScreen {
     public final int getWidth() {
         return width;
     }
+    
+    /**
+     * Gets the height of the 'physical' screen in characters.  Unless overriden, 
+     * this delegates to getHeight().
+     * 
+     * @return Returns the height.
+     */
+    @Override
+    public int getDeviceHeight() {
+        return getHeight();        
+    }
+
+    /**
+     * Gets the width of the 'physical' screen in characters.  Unless overriden, 
+     * this delegates to getWidth().
+     * 
+     * @return Returns the width.
+     */
+    @Override
+    public int getDeviceWidth() {
+        return getWidth();
+    }
+    
+    
     
     /**
      * Calculate the offset for a given x,y coordinate.

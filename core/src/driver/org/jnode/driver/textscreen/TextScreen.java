@@ -95,18 +95,36 @@ public interface TextScreen {
     public abstract void copyTo(TextScreen dst, int offset, int length);
 
     /**
-     * Gets the height of the screen in characters.
+     * Gets the height of the virtual screen in characters.  For a buffered
+     * screen this is the height of the buffer.  The height of the physical
+     * screen is given by {@line #getDeviceHeight()}.
      *
-     * @return Returns the height.
+     * @return Returns the virtual screen height.
      */
-    public int getHeight();
+    public abstract int getHeight();
 
     /**
-     * Gets the width of the screen in characters.
+     * Gets the width of the virtual screen in characters.  For a buffered
+     * screen this is the width of the buffer.  The width of the physical
+     * screen is given by {@line #getDeviceWidth()}.
      *
-     * @return Returns the width.
+     * @return Returns the virtual screen width.
      */
-    public int getWidth();
+    public abstract int getWidth();
+    
+    /**
+     * Gets the height of the physical screen in characters.
+     *
+     * @return Returns the physical screen height.
+     */
+    public abstract int getDeviceHeight();
+
+    /**
+     * Gets the width of the physical screen in characters.
+     *
+     * @return Returns the physical screen width.
+     */
+    public abstract int getDeviceWidth();
 
     /**
      * Calculate the offset for a given x,y coordinate.

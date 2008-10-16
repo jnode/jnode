@@ -105,18 +105,32 @@ public interface TextConsole extends Console {
     public int getColor(int x, int y);
 
     /**
-     * Gets the width of the console.
+     * Gets the virtual width of the console's screen.
      *
      * @return int
      */
     public int getWidth();
 
     /**
-     * Gets the height of the console.
+     * Gets the virtual height of the console's screen.
      *
      * @return int
      */
     public int getHeight();
+
+    /**
+     * Gets the physical width of the console's screen.
+     *
+     * @return int
+     */
+    public int getDeviceWidth();
+
+    /**
+     * Gets the physical height of the console's screen.
+     *
+     * @return int
+     */
+    public int getDeviceHeight();
 
     /**
      * Clear the console.

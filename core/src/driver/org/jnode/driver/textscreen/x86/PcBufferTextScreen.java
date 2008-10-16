@@ -44,6 +44,22 @@ public class PcBufferTextScreen extends AbstractPcBufferTextScreen {
     }
 
     /**
+     * Get the height of the actual device
+     */
+    @Override
+    public int getDeviceHeight() {
+        return parent.getDeviceHeight();
+    }
+
+    /**
+     * Get the width of the actual device
+     */
+    @Override
+    public int getDeviceWidth() {
+        return parent.getDeviceWidth();
+    }
+
+    /**
      * Synchronize the state with the actual device.
      */
     @Override
