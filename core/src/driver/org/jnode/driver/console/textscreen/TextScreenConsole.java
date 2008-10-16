@@ -41,7 +41,6 @@ import org.jnode.util.WriterOutputStream;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.isolate.VmIsolate;
 
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -281,6 +280,22 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
     @Override
     public int getWidth() {
         return screen.getWidth();
+    }
+
+    /**
+     * @see org.jnode.driver.console.TextConsole#getHeight()
+     */
+    @Override
+    public int getDeviceHeight() {
+        return screen.getDeviceHeight();
+    }
+
+    /**
+     * @see org.jnode.driver.console.TextConsole#getWidth()
+     */
+    @Override
+    public int getDeviceWidth() {
+        return screen.getDeviceWidth();
     }
 
     /**

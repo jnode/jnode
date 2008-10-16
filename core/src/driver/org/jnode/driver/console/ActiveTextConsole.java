@@ -55,6 +55,12 @@ public class ActiveTextConsole extends VirtualTextConsole {
         return getActiveTextConsole().getHeight();
     }
 
+
+    @Override
+    public int getDeviceHeight() {
+        return getActiveTextConsole().getDeviceHeight();
+    }
+
     /**
      * This operation is not supported because the resulting Reader would
      * behave in a way that breaks JNode's conceptual model of virtual consoles.
@@ -91,6 +97,11 @@ public class ActiveTextConsole extends VirtualTextConsole {
     @Override
     public int getWidth() {
         return getActiveTextConsole().getWidth();
+    }
+
+    @Override
+    public int getDeviceWidth() {
+        return getActiveTextConsole().getDeviceWidth();
     }
     
     @Override
