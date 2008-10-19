@@ -12,6 +12,7 @@ import org.jnode.test.mauve.RunResult;
 import org.jnode.test.mauve.TestResult;
 
 /**
+ * Comparator of 2 {@link RunResult}s
  * 
  * @author fabien
  *

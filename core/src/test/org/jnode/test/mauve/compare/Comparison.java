@@ -1,18 +1,18 @@
 package org.jnode.test.mauve.compare;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.jnode.test.mauve.Result;
 
 /**
+ * Abstract class for the result of the comparison of 2 {@link Result}s
  * 
  * @author fabien
  *
  * @param <T>
  */
-public class Comparison<T extends Result> implements Comparable<Comparison<T>>, Iterable<Comparison<?>> {
+public abstract class Comparison<T extends Result> implements Comparable<Comparison<T>> {
     private final String name;
     private final Set<Comparison<?>> children = new TreeSet<Comparison<?>>();
     
@@ -27,7 +27,7 @@ public class Comparison<T extends Result> implements Comparable<Comparison<T>>, 
     public final Comparison<?> get(String name) {
         Comparison<?> result = null;
         
-        for (Comparison<?> r : this) {
+        for (Comparison<?> r : children) {
             if (r.getName().equals(name)) {
                 result = r;
                 break;
@@ -37,10 +37,12 @@ public class Comparison<T extends Result> implements Comparable<Comparison<T>>, 
         return result;
     }
     
+    public abstract void accept(ComparisonVisitor visitor);
+    
     public int getProgression() {
         int progression = 0;
         
-        for (Comparison<?> r : this) {
+        for (Comparison<?> r : children) {
             progression += r.getProgression();
         }
         
@@ -52,13 +54,21 @@ public class Comparison<T extends Result> implements Comparable<Comparison<T>>, 
     }
     
     @Override
-    public int compareTo(Comparison<T> o) {
-        return name.compareTo(o.getName());
+    public final int compareTo(Comparison<T> o) {
+        // regressions have negative progression
+        // we sort from bigger regression to bigger progression
+        int result = getProgression() - o.getProgression();
+        
+        if (result == 0) {
+            result = getName().compareTo(o.getName());
+        }
+        
+        return result;
     }
 
-    @Override
-    public final Iterator<Comparison<?>> iterator() {
-        return children.iterator();
-    }
-    
+    protected final void acceptChildren(ComparisonVisitor visitor) {
+        for (Comparison<?> cmp : children) {
+            cmp.accept(visitor);
+        }
+    }    
 }

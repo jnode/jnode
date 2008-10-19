@@ -7,14 +7,14 @@ import org.jnode.test.mauve.RunResult;
 import org.jnode.test.mauve.TestResult;
 
 /**
- * 
+ * Result of the comparison of 2 {@link RunResult}s
  * @author fabien
  *
  */
 public class RunComparison extends Comparison<RunResult> {
     
     RunComparison(RunResult result1, RunResult result2) {
-        super(new RunResult("comparison of " + result1.getName() + " and " + result2.getName()));
+        super(new RunResult("Comparison of '" + result1.getName() + "' and '" + result2.getName() + "'"));
     }
 
     /**
@@ -30,18 +30,25 @@ public class RunComparison extends Comparison<RunResult> {
         // package
         Comparison<?> pc = get(pkg.getName());
         if (pc == null) {
-            pc = new Comparison<PackageResult>(pkg);
+            pc = new PackageComparison(pkg);
             add(pc);
         }
 
         // class
         Comparison<?> classComp = pc.get(cls.getName());
         if (classComp == null) {
-            classComp = new Comparison<ClassResult>(cls);
+            classComp = new ClassComparison(cls);
             pc.add(classComp);
         }
 
         // test
         classComp.add(new TestComparison(test, check, nbProgressedChecks));
+    }
+    
+
+    @Override
+    public void accept(ComparisonVisitor visitor) {
+        visitor.visit(this);
+        acceptChildren(visitor);
     }
 }

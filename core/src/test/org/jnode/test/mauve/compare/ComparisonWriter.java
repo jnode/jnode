@@ -7,7 +7,14 @@ import java.io.PrintWriter;
 
 import org.jnode.test.mauve.CheckResult;
 
-public class ComparisonWriter {
+/**
+ * Abstract class for writing a {@link Comparison}
+ * 
+ * @author fabien
+ *
+ */
+public abstract class ComparisonWriter {
+    
     /**
      * Write the given comparison
      * 
@@ -15,7 +22,7 @@ public class ComparisonWriter {
      * @param output
      * @throws FileNotFoundException
      */
-    public void write(RunComparison comp, File output) throws FileNotFoundException {
+    public final void write(RunComparison comp, File output) throws FileNotFoundException {
         PrintWriter ps = null;
 
         try {
@@ -34,51 +41,104 @@ public class ComparisonWriter {
      * @param run
      * @param pw
      */
-    public void write(RunComparison run, PrintWriter pw) {
-
-        pw.append(run.getName()).append('\n');
+    public final void write(RunComparison run, PrintWriter pw) {
+        final Visitor v = createVisitor(pw);
         
-        // package
-        for (Comparison<?> pkg : run) {
-            write(pw, 4, pkg, true);
-            
-            // class
-            for (Comparison<?> cls : pkg) {
-                write(pw, 8, cls, true);
-                
-                // test
-                for (Comparison<?> test : cls) {
-                    write(pw, 12, test, false);
-                    
-                    TestComparison tc = (TestComparison) test;
-                    CheckResult cr = tc.getCheckResult();
-                    pw.append('\t');
-                    
-                    if (cr == null) {
-                        pw.append("<no checkpoint>");
-                    } else {
-                        pw.append(Integer.toString(cr.getNumber())).append(':');
-                        pw.append(cr.getCheckPoint());
-                    }
-                    
-                    pw.append('\n');
-                }
-            }
-        }
-
+        v.writeBegin();
+        run.accept(v);
+        v.writeEnd();
+        
         pw.flush();
     }
     
-    private void write(PrintWriter pw, int indent, Comparison<?> comp, boolean endLine) {
-        for (int i = 0; i < indent; i++) {
-            pw.append(' ');
-        }
+    protected abstract Visitor createVisitor(PrintWriter pw);
+    
+    protected static enum Level {
+        RUN,
+        PACKAGE,
+        CLASS,
+        TEST;
+
+        public static final Level MAX = values()[values().length - 1];
         
-        pw.append(comp.getName()).append('\t');
-        pw.append(Integer.toString(comp.getProgression()));
-        
-        if (endLine) {
-            pw.append('\n');
+        public int getValue() {
+            return ordinal();
         }
     }
+    
+    protected abstract static class Visitor implements ComparisonVisitor { 
+        protected final PrintWriter pw;
+
+        protected Visitor(PrintWriter pw) {
+            this.pw = pw;
+        }
+        
+        public void writeBegin() {
+        }
+
+        public void writeEnd() {
+        }
+
+        @Override
+        public final void visit(RunComparison run) {
+            write(Level.RUN, run, true);
+        }
+    
+        @Override
+        public final void visit(PackageComparison pkg) {
+            write(Level.PACKAGE, pkg, true);
+        }
+    
+        @Override
+        public final void visit(ClassComparison cls) {
+            write(Level.CLASS, cls, true);
+        }
+    
+        @Override
+        public final void visit(TestComparison test) {
+            write(Level.TEST, test, false);
+            
+            CheckResult cr = test.getCheckResult();
+            String result;
+            if (cr == null) {
+                result = "<no checkpoint>";
+            } else {
+                result = Integer.toString(cr.getNumber()) + ':';
+                
+                if (cr.getCheckPoint() == null) {
+                    result += "<no name>";
+                } else {
+                    result += cr.getCheckPoint();
+                }
+            }
+            writeCheckResult(result);
+            
+            writeEndLine();
+        }
+
+        protected abstract void writeBeginLine(Level level);
+        protected abstract void writeName(Level level, String name);
+        protected abstract void writeProgression(int progression);
+        protected abstract void writeEndLine();
+        
+        protected abstract void writeCheckResult(String result);
+
+        protected final void writeIndent(Level level) {
+            final int indent = level.getValue() * 4;
+            for (int i = 0; i < indent; i++) {
+                pw.append(' ');
+            }
+        }
+
+        private void write(Level level, Comparison<?> comp, boolean endLine) {
+            writeBeginLine(level);
+            
+            writeName(level, comp.getName());
+            writeProgression(comp.getProgression());
+            
+            if (endLine) {
+                writeEndLine();
+            }
+        }
+    };
 }
