@@ -4,7 +4,7 @@ import org.jnode.test.mauve.CheckResult;
 import org.jnode.test.mauve.TestResult;
 
 /**
- * 
+ * Result of the comparison of 2 {@link TestResult}s
  * @author fabien
  *
  */
@@ -31,17 +31,9 @@ public class TestComparison extends Comparison<TestResult> {
     public int getProgression() {
         return progression;
     }
-
+    
     @Override
-    public int compareTo(Comparison<TestResult> o) {
-        // regressions have negative progression
-        // we sort from bigger regression to bigger progression
-        int result = progression - ((TestComparison) o).progression;
-        
-        if (result == 0) {
-            result = getName().compareTo(o.getName());
-        }
-        
-        return result;
-    }
+    public void accept(ComparisonVisitor visitor) {
+        visitor.visit(this);
+    }    
 }
