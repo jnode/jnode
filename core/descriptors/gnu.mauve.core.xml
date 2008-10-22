@@ -16,6 +16,7 @@
     </library>
     <library name="jnode-core.jar">
       <export name="org/jnode/test/mauve/*"/>
+      <export name="org/jnode/test/mauve/compare/*"/>
     </library>
   </runtime>
 
