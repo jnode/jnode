@@ -1,15 +1,19 @@
 package org.jnode.test.mauve.compare;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jnode.nanoxml.XMLParseException;
 import org.jnode.test.mauve.CheckResult;
 import org.jnode.test.mauve.ClassResult;
 import org.jnode.test.mauve.PackageResult;
 import org.jnode.test.mauve.Result;
 import org.jnode.test.mauve.RunResult;
 import org.jnode.test.mauve.TestResult;
+import org.jnode.test.mauve.XMLReportParser;
 
 /**
  * Comparator of 2 {@link RunResult}s
@@ -21,6 +25,51 @@ public class ReportComparator {
 
     private final RunResult result1;
     private final RunResult result2;
+    
+    public static void main(String[] args) throws XMLParseException, IOException {
+        if (args.length < 3) {
+            System.out.println("usage : java " + ReportComparator.class.getName() + 
+                    " <report1.xml> <report2.xml> [html|text]");
+        } else {
+            File report1 = new File(args[0]);
+            File report2 = new File(args[1]);
+            String format = args[2];
+            compare(report1, report2, format);
+        }
+    }
+    
+    public static File compare(File report1, File report2, String format) throws XMLParseException, IOException {
+        XMLReportParser parser = new XMLReportParser();
+        RunResult result1 = parser.parse(report1);
+        RunResult result2 = parser.parse(report2);
+        
+        ReportComparator comparator = new ReportComparator(result1, result2);
+        RunComparison comparison = comparator.compare();
+        
+        final ComparisonWriter writer;
+        final String extension;
+        if ("text".equals(format)) {
+            writer = new TextComparisonWriter();
+            extension = "txt";
+        } else if ("html".equals(format)) {
+            writer = new HTMLComparisonWriter();
+            extension = "html";
+        } else {
+            extension = "txt";
+            writer = new TextComparisonWriter();
+        }
+        
+        int i = 0;
+        File output = new File(report2.getParent(), "comp_" + i + "." + extension);
+        while (output.exists()) {
+            i++;
+            output = new File(report2.getParent(), "comp_" + i + "." + extension);
+        }
+        writer.write(comparison, output);
+        System.out.println("Comparison wrote to " + output.getAbsolutePath());
+        
+        return output;
+    }
     
     public ReportComparator(RunResult result1, RunResult result2) {
         this.result1 = result1;
