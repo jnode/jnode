@@ -23,7 +23,7 @@ public class MauveTests {
         System.out.println("=========================");
         
         System.out.println("\n--- writing XML file ---");
-        File f = File.createTempFile("XMLReport", "xml");
+        File f = File.createTempFile("XMLReport", ".xml");
         f.deleteOnExit();
         new XMLReportWriter().write(runResult, f);
         new XMLReportWriter().write(runResult, new PrintWriter(System.out));
