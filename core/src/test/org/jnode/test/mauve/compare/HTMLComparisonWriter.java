@@ -2,6 +2,8 @@ package org.jnode.test.mauve.compare;
 
 import java.io.PrintWriter;
 
+import org.jnode.test.mauve.XMLReportWriter;
+
 /**
  * Writer in HTML format for a {@link Comparison}
  * @author fabien
@@ -86,9 +88,6 @@ public class HTMLComparisonWriter extends ComparisonWriter {
                 pw.append("<").append(tag).append(" width=\"30px\"></").append(tag).append(">");
             }
             
-            value = value.replaceAll("<", "&lt;");
-            value = value.replaceAll(">", "&gt;");
-            
             pw.append("<").append(tag);
             if (style != null) {
                 pw.append(" style=\"").append(style).append('\"');
@@ -102,7 +101,8 @@ public class HTMLComparisonWriter extends ComparisonWriter {
             
             pw.append('>');
             
-            pw.append(value).append("</").append(tag).append(">");
+            pw.append(XMLReportWriter.protect(value));
+            pw.append("</").append(tag).append(">");
         }
     };
 }

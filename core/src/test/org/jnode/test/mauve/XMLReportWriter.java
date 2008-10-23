@@ -154,13 +154,13 @@ public class XMLReportWriter {
         return ps;
     }
     
-    private String protect(String text) {
+    public static String protect(String text) {
         return text == null ? null : text.
-            replace("<", "&lt;").
-            replace(">", "&gt;").
-            replace("\"", "&quot;").
-            replace("\'", "&apos;").
-            replace("&", "&amp;");
+                replace("&", "&amp;").
+                replace("<", "&lt;").
+                replace(">", "&gt;").
+                replace("\"", "&quot;").
+                replace("\'", "&apos;");
     }
     
     private PrintWriter endTag(PrintWriter ps, int level, String tag) {
