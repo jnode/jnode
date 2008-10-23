@@ -133,8 +133,8 @@ public class XMLReportWriter {
         
         if (text != null) {
             text = text.trim();
-            if (!text.isEmpty()) { 
-                ps.append(text).append('\n');
+            if (!text.isEmpty()) {
+                ps.append(protect(text)).append('\n');
             }
         }
         
@@ -147,11 +147,20 @@ public class XMLReportWriter {
             ps.append(' ').append(String.valueOf(attributes[i]));
             
             Object value = attributes[i + 1];
-            ps.append("=\"").append((value == null) ? "" : value.toString()).append('\"');
+            ps.append("=\"").append((value == null) ? "" : protect(value.toString())).append('\"');
         }
         
         ps.append(">\n");
         return ps;
+    }
+    
+    private String protect(String text) {
+        return text == null ? null : text.
+            replace("<", "&lt;").
+            replace(">", "&gt;").
+            replace("\"", "&quot;").
+            replace("\'", "&apos;").
+            replace("&", "&amp;");
     }
     
     private PrintWriter endTag(PrintWriter ps, int level, String tag) {
