@@ -155,12 +155,46 @@ public class XMLReportWriter {
     }
     
     public static String protect(String text) {
-        return text == null ? null : text.
-                replace("&", "&amp;").
-                replace("<", "&lt;").
-                replace(">", "&gt;").
-                replace("\"", "&quot;").
-                replace("\'", "&apos;");
+        if (text == null)
+            return text;
+
+        final int size = text.length();
+        final StringBuilder sb = new StringBuilder(size);
+        boolean changed = false;
+        for (int i = 0; i < size; i++) {
+            final char c = text.charAt(i);
+            switch (c) {
+                case '&' :
+                    sb.append("&amp;");
+                    changed = true;
+                    break;
+
+                case '<' :
+                    sb.append("&lt;");
+                    changed = true;
+                    break;
+
+                case '>' :
+                    sb.append("&gt;");
+                    changed = true;
+                    break;
+
+                case '\'' :
+                    sb.append("&apos;");
+                    changed = true;
+                    break;
+
+                case '"' :
+                    sb.append("&quot;");
+                    changed = true;
+                    break;
+
+                default:
+                    sb.append(c);
+            }
+        }
+
+        return changed ? sb.toString() : text;
     }
     
     private PrintWriter endTag(PrintWriter ps, int level, String tag) {
