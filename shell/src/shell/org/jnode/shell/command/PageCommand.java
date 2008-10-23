@@ -40,16 +40,14 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.naming.NameNotFoundException;
 
 /**
  * This command is a simple analog of the UNIX/Linux 'more' and 'less' commands.
- * Its current reportoire is:
- * <dl>
- *   <dt>SP</dt><dd>Output the next page.</dd>
- *   <dt>NL</dt><dd>Output the next line.</dd>
- * </dl>
  * 
  * @author crawley@jnode.org
  */
@@ -63,6 +61,8 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     
     private int pageHeight;
     private int pageWidth;
+    private int pageSize;
+    private int tabSize;
     
     // This is the line number of the top (data source) line displayed on the
     // screen page.
@@ -76,7 +76,8 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     private int bottomSublineNo;
     
     // This is where we build the screen image prior to sending it to the console
-    private char[] buffer;
+    private char[] charBuffer;
+    private int[] colorBuffer;
     
     // This pipe passes characters from the system thread that calls 
     // our 'keyPressed' event method to the thread that runs the Page command.
@@ -85,11 +86,13 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
 
     private TextScreenConsoleManager manager;
 
-    private int tabSize = 8;
-
-    private int pageSize;
-
     private LineStore lineStore;
+
+    private Pattern regex;
+    private Matcher matcher;
+
+    private String prompt;
+    
     
     public PageCommand() {
         super("output a file to the console one 'page' at a time");
@@ -159,7 +162,9 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         pageHeight = console.getDeviceHeight() - 1;
         pageWidth = console.getDeviceWidth();
         pageSize = pageHeight * pageWidth;
-        buffer = new char[pageSize];
+        tabSize = console.getTabSize();
+        charBuffer = new char[pageSize];
+        colorBuffer = new int[pageSize];
         
         pw = new PipedWriter();
         pr = new PipedReader();
@@ -220,6 +225,12 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                 case '>':
                     gotoLastPage();
                     break;
+                case '/':
+                    searchForwards();
+                    break;
+                case '?':
+                    searchBackwards();
+                    break;
                 case 'q':
                     exit = true;
                     break;
@@ -231,14 +242,101 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         }
     }
 
+    private void searchBackwards() throws IOException {
+        String input = readLine('?');
+        int lineNo = bottomLineNo;
+        if (input.length() <= 1) {
+            if (regex == null) {
+                setPrompt("No previous search");
+                return;
+            }
+            lineNo--;
+        } else {
+            try {
+                regex = Pattern.compile(input.substring(1));
+            } catch (PatternSyntaxException ex) {
+                setPrompt("Invalid regex");
+                return;
+            }
+            matcher = regex.matcher("");
+        }
+        while (true) {
+            String line = lineStore.getLine(lineNo);
+            if (line == null) {
+                gotoPage(0);
+                setPrompt("Not found");
+                return;
+            }
+            matcher.reset(line);
+            if (matcher.find()) {
+                prepareReverse(lineNo);
+                output();
+                return;
+            }
+            lineNo--;
+        }
+    }
+
+    private void searchForwards() throws IOException {
+        String input = readLine('/');
+        int lineNo = topLineNo;
+        if (input.length() <= 1) {
+            if (regex == null) {
+                setPrompt("No previous search");
+                return;
+            }
+            lineNo++;
+        } else {
+            try {
+                regex = Pattern.compile(input.substring(1));
+            } catch (PatternSyntaxException ex) {
+                setPrompt("Invalid regex");
+                return;
+            }
+            matcher = regex.matcher("");
+        }
+        
+        while (true) {
+            String line = lineStore.getLine(lineNo);
+            if (line == null) {
+                gotoLastPage();
+                setPrompt("Not found");
+                return;
+            }
+            matcher.reset(line);
+            if (matcher.find()) {
+                prepare(lineNo);
+                output();
+                return;
+            }
+            lineNo++;
+        }
+    }
+
+    private String readLine(int ch) throws IOException {
+        StringBuffer sb = new StringBuffer();
+        String line;
+        do {
+            sb.append((char) ch);
+            line = sb.toString();
+            prompt(line);
+            ch = pr.read();
+        } while (ch != -1 && ch != '\n');
+        return line;
+    }
+
     private void help() throws IOException {
         String[] help = new String[] {
-            "Move forwards 1 page: ' ', 'f'",
-            "Move backwards 1 page: 'b'",
-            "Move forwards 1 line: ENTER",
-            "Move backwards 1 line: 'k', 'y'",
-            "Go to start of data: '<'",
-            "Go to end of data: '>'",
+            "Move forwards 1 page:      ' ', 'f'",
+            "Move backwards 1 page:     'b'",
+            "Move forwards 1 line:      ENTER",
+            "Move backwards 1 line:     'k', 'y'",
+            "Go to start of data:       '<'",
+            "Go to end of data:         '>'",
+            "Search forwards:           '/regex'",
+            "Repeat search forwards:    '/'",
+            "Search backwards:          '?regex'",
+            "Repeat search backwards:   '?'",
         };
         StringBuffer sb = new StringBuffer(pageSize);
         for (int i = 0; i < pageHeight; i++) {
@@ -259,14 +357,23 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     }
 
     private void prompt() {
-        prompt(lineStore.isLastLineNo(bottomLineNo) ? "(END)" :
+        if (prompt == null) {
+            prompt(lineStore.isLastLineNo(bottomLineNo) ? "(END)" :
                 (topLineNo + ", " + bottomLineNo + ": "));
+        } else {
+            prompt(prompt);
+            prompt = null;
+        }
     }
 
     private void prompt(String text) {
         console.clearRow(this.pageHeight);
         console.setChar(0, this.pageHeight, text.toCharArray(), 0x07);
         console.setCursor(0, this.pageHeight);
+    }
+    
+    private void setPrompt(String prompt) {
+        this.prompt = prompt;
     }
 
     private void erasePrompt() {
@@ -329,7 +436,12 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     }
 
     private void output() {
-        console.setChar(0, 0, buffer, 0, pageSize, 0x7);
+        console.setChar(0, 0, charBuffer, 0, pageSize, 0x7);
+        for (int i = 0; i < pageSize; i++) {
+            if (colorBuffer[i] != 0x07) {
+                console.setChar(i % pageWidth, i / pageWidth, charBuffer, i, 1, colorBuffer[i]);
+            }
+        }
     }
 
     /**
@@ -340,18 +452,16 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
      */
     private void prepare(int startLineNo) {
         int lineNo = startLineNo;
-        RenderCursor cursor = new RenderCursor(buffer);
+        RenderCursor cursor = new RenderCursor(charBuffer, colorBuffer);
         String line = null;
-        while (cursor.getEndOffset() < pageSize) {
+        while (cursor.getPos() < pageSize) {
             line = lineStore.getLine(lineNo);
             if (line == null) {
                 if (startLineNo > 0) {
                     prepare(startLineNo - 1);
                     return;
                 }
-                while (cursor.getEndOffset() < pageSize) {
-                    cursor.putChar(' ');
-                }
+                cursor.putSpaces(pageSize - cursor.getPos());
                 break;
             }
             lineNo++;
@@ -372,16 +482,16 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
      */
     private void prepareReverse(int endLineNo) {
         int lineNo = endLineNo;
-        RenderCursor cursor = new RenderCursor(buffer);
-        RenderCursor measureCursor = new RenderCursor(null);
+        RenderCursor cursor = new RenderCursor(charBuffer, colorBuffer);
+        RenderCursor measureCursor = new RenderCursor(null, null);
         String line = null;
         int lineOffset = pageSize;
         while (lineOffset > 0 && lineNo >= 0) {
             line = lineStore.getLine(lineNo--);
-            measureCursor.setStartOffset(0);
+            measureCursor.setPos(0);
             render(line, 0, measureCursor);
-            lineOffset -= measureCursor.getEndOffset();
-            cursor.setStartOffset(lineOffset);
+            lineOffset -= measureCursor.getPos();
+            cursor.setPos(lineOffset);
             render(line, 0, cursor);
         }
         if (lineOffset <= 0) {
@@ -403,7 +513,25 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     private void render(String line, int firstSubline, RenderCursor cursor) {
         int pos = 0;
         int len = line.length();
+        int startMatchPos = len;
+        int endMatchPos = len;
+        if (matcher != null) {
+            matcher.reset(line);
+            if (matcher.find(0)) {
+                startMatchPos = matcher.start();
+                endMatchPos = matcher.end();
+            }
+        } 
         for (int i = 0; i < len; i++) {
+            if (i == startMatchPos) {
+                cursor.setColor(0x04);
+            } else if (i == endMatchPos) {
+                cursor.setColor(0x07);
+                if (i + 1 < len && matcher.find(i + 1)) {
+                    startMatchPos = matcher.start();
+                    endMatchPos = matcher.end();
+                } 
+            }
             // FIXME - support different renderings, including ones where
             // control characters are rendered as visible characters?
             char ch = line.charAt(i);
@@ -419,12 +547,9 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                     }
                     break;
                 case '\t':
-                    cursor.putChar(' ');
-                    pos++;
-                    while (pos % pageWidth % tabSize != 0) {
-                        cursor.putChar(' ');
-                        pos++;
-                    }
+                    int fill = tabSize - pos % pageWidth % tabSize;
+                    cursor.putSpaces(fill);
+                    pos += fill;
                     break;
                 default:
                     if (ch > ' ' && ch <= '\377' && ch != '\177') {
@@ -435,9 +560,11 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                     pos++;
             }
         }
-        while (pos % pageWidth != 0) {
-            cursor.putChar(' ');
-            pos++;
+        cursor.setColor(0x07);
+        int fill = pageWidth - pos % pageWidth;
+        if (fill != pageWidth) {
+            cursor.putSpaces(fill);
+            pos += fill;
         }
     }
 
@@ -468,7 +595,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     }
     
     /**
-     * This class provides an in-memory buffer of lines from the data source 
+     * This class provides an in-memory buffer for lines read from the data source 
      * being paged.  In the future, this could be enhanced to cut down on memory
      * usage.  When paging a seekable Reader, it could use seek/tell to record file
      * offsets rather than actual file lines.  When paging a non-seekable Reader
@@ -485,8 +612,16 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             this.reader = new BufferedReader(reader);
         }
         
+        /**
+         * Get a line identified by line number.
+         * @param lineNo the line number
+         * @return the requested line, or <code>null</code> if the EOF
+         * was reached before the requested line could be reached.
+         */
         private String getLine(int lineNo) {
-            if (lineNo < lines.size()) {
+            if (lineNo < 0) {
+                return null;
+            } else if (lineNo < lines.size()) {
                 return lines.get(lineNo);
             } else if (lineNo > lines.size()) {
                 throw new AssertionError(
@@ -510,6 +645,12 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             }
         }
         
+        /**
+         * Get the last line number for the data source.  This requires that
+         * all lines of the data source are read up to the EOF position.
+         * @return the last line number
+         * @throws IOException
+         */
         private int getLastLineNo() throws IOException {
             while (!reachedEOF) {
                 String line = reader.readLine();
@@ -522,35 +663,100 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             return lines.size() - 1;
         }
         
+        /**
+         * Check if a given line number is known to be the last line
+         * of the data source.  This method does not do any reading
+         * ahead of the data source to find the last line.
+         * @param lineNo the line number to test
+         * @return Returns <code>true</code> if the given line number 
+         * is known to be the last line, and <code>false</code> if it is
+         * not, or if we don't know.
+         */
         private boolean isLastLineNo(int lineNo) {
             return reachedEOF && lineNo == lines.size() - 1;
         }
     }
     
+    /**
+     * The RenderCursor class is used for storing characters in a region of a buffer,
+     * or counting characters.
+     * 
+     * @author crawley@jnode.org
+     */
     private final class RenderCursor {
         int pos;
-        int startOffset;
-        char[] buffer;
+        char[] charBuffer;
+        int[] colorBuffer;
+        int color;
         
-        private RenderCursor(char[] buffer) {
-            this.buffer = buffer;
-            this.startOffset = 0;
+        /**
+         * Create a render cursor for filling a buffer.  If the supplied buffer
+         * is <code>null</code> the cursor will just count the characters.
+         * 
+         * @param charBuffer The buffer to hold the characters, or <code>null</code>
+         * @param colorBuffer The buffer to hold the corresponding colors, or <code>null</code>
+         */
+        private RenderCursor(char[] charBuffer, int[] colorBuffer) {
+            this.charBuffer = charBuffer;
+            this.colorBuffer = colorBuffer;
+            this.pos = 0;
+            this.color = 0x07;
         }
         
-        public void setStartOffset(int startOffset) {
-            this.startOffset = startOffset;
+        /**
+         * Set or reset the cursor's offset for putting characters.
+         * @param pos the number of characters from the start of the
+         * buffer.  This may be negative.
+         */
+        public void setPos(int pos) {
+            this.pos = pos;
         }
 
+        /**
+         * Set the current color for characters.
+         */
+        public void setColor(int color) {
+            this.color = color;
+        }
+
+        /**
+         * Put a character into the buffer and advance the cursor.  If the 
+         * current cursor position is outside of the buffer bounds, the
+         * character is quietly dropped, but the cursor is moved anyway.
+         * @param ch the character to be put into the buffer.
+         */
         private void putChar(char ch) {
-            if (buffer == null || pos + startOffset < 0 || pos + startOffset > buffer.length) {
+            if (charBuffer == null || pos < 0 || pos >= charBuffer.length) {
                 pos++;
             } else {
-                buffer[pos++ + startOffset] = ch;
+                colorBuffer[pos] = color;
+                charBuffer[pos++] = ch;
             }
         }
         
-        private int getEndOffset() {
-            return pos + startOffset;
+        /**
+         * Put multiple spaces into the buffer.  This is logically equivalent
+         * to calling {@line #putChar(char)} <code>count</code> times.
+         * @param count the number of spaces to put into the buffer.
+         */
+        private void putSpaces(int count) {
+            if (charBuffer != null) {
+                int pos1 = Math.max(pos, 0);
+                int pos2 = Math.min(pos + count, charBuffer.length);
+                for (int i = pos1; i < pos2; i++) {
+                    colorBuffer[i] = color;
+                    charBuffer[i] = ' ';
+                }
+            }
+            pos += count;
+        }
+        
+        /**
+         * Get the current cursor position.
+         * @return the position.
+         */
+        private int getPos() {
+            return pos;
         }
     }
 }
