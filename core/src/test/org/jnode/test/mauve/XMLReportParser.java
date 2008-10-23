@@ -20,6 +20,7 @@ import static org.jnode.test.mauve.XMLReportConstants.TEST_RESULT;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.BufferedReader;
 import java.util.List;
 
 import org.jnode.nanoxml.XMLElement;
@@ -42,10 +43,10 @@ public class XMLReportParser {
      */
     public RunResult parse(File input) throws XMLParseException, IOException {
         XMLElement xmlRun = new XMLElement();
-        FileReader reader = null;
+        BufferedReader reader = null;
         
         try {
-            reader = new FileReader(input);
+            reader = new BufferedReader(new FileReader(input));
             xmlRun.parseFromReader(reader);
     
             checkTag(xmlRun, RUN_RESULT);
