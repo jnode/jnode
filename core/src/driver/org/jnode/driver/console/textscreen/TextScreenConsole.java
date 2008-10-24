@@ -29,7 +29,6 @@ import java.security.PrivilegedAction;
 
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputCompleter;
-import org.jnode.driver.console.KeyEventBindings;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.AbstractConsole;
 import org.jnode.driver.console.spi.ConsoleWriter;

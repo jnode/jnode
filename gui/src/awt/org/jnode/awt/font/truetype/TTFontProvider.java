@@ -33,8 +33,6 @@ import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
-import org.jnode.awt.font.spi.AbstractFontProvider.Size;
-import org.jnode.awt.font.truetype.glyph.TTFGlyph;
 
 /**
  * @author epr
