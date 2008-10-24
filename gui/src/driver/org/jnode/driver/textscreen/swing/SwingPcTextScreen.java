@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -81,7 +82,13 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         int h;
 
         {
-            Font font = new Font("-Misc-Fixed-Medium-R-SemiCondensed--12-110-75-75-C-60-437-", Font.PLAIN, 12);
+            Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
+
+            Font font = screen_size.width > 800 ?
+                new Font("-dosemu-VGA-Medium-R-Normal--19-190-75-75-C-100-IBM-", Font.PLAIN, 18) :
+                new Font("-Misc-Fixed-Medium-R-SemiCondensed--12-110-75-75-C-60-437-", Font.PLAIN, 12);
+
+//            Font font = new Font("-Misc-Fixed-Medium-R-SemiCondensed--12-110-75-75-C-60-437-", Font.PLAIN, 12);
             //Font font = new Font(
             //"-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
             //Font font = new Font("-FontForge-Bitstream Vera Sans
