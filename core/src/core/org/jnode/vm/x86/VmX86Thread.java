@@ -274,4 +274,15 @@ public abstract class VmX86Thread extends VmThread {
     final Address getStackEnd() {
         return stackEnd;
     }
+
+    //todo protect or hide this method in the future
+    /**
+     * Gets the stack pointer of this thread.
+     * Valid only when the thread is not running.
+     *
+     * @return
+     */
+    public final Address getStackPointer() {
+        return esp;
+    }
 }
