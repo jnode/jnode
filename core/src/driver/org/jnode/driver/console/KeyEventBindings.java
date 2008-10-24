@@ -24,7 +24,6 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.jnode.driver.console.textscreen.KeyboardReaderAction;
 import org.jnode.driver.input.KeyboardEvent;
 
 /**
