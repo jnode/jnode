@@ -35,17 +35,27 @@ public class StatusLinkTest {
         } finally {
             child.exit(0);
         }
+
+        child = new Isolate(ChildClass7.class.getName());
+        new Thread(new StatusMonitor(child.newStatusLink()), "status-monitor").start();
+        child.start();
+
+        try {
+            Thread.sleep(100);
+        } finally {
+            child.halt(0);
+        }
+
     }
 
-    private static void runChild(Class<?> clazz)
+    private static Isolate runChild(Class<?> clazz)
         throws ClosedLinkException, IsolateStartupException, InterruptedException {
-        Isolate child;
-        Thread moni;
-        child = new Isolate(clazz.getName());
-        moni = new Thread(new StatusMonitor(child.newStatusLink()), "status-monitor");
+        Isolate child = new Isolate(clazz.getName());
+        Thread moni = new Thread(new StatusMonitor(child.newStatusLink()), "status-monitor");
         moni.start();
         child.start();
         moni.join();
+        return child;
     }
 
     public static class StatusMonitor implements Runnable {
@@ -198,12 +208,12 @@ public class StatusLinkTest {
                 public void run() {
                     System.out.println("Child thread: started");
                     System.out.println("Child thread: working ...");
-                    for(int i = 0; i < 100000; i ++) {
+                    for (int i = 0; i < 100000; i++) {
                        // System.out.println("Child thread: " + i);
                         Math.sin(i);
-                        if(i % 100 == 0) {
-                            //org.jnode.vm.Unsafe.debug("i=" + i + "\n");
-                            System.out.println("i=" + i);
+                        if (i % 100 == 0) {
+                            org.jnode.vm.Unsafe.debug("i=" + i + "\n");
+                            //System.out.println("i=" + i);
                         }
                     }
                     System.out.println("Child thread: exiting");

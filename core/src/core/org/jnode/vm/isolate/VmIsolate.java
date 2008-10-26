@@ -384,6 +384,19 @@ public final class VmIsolate {
         stopAllThreads();
     }
 
+    public final void isolateHalt(int status) {
+        changeState(State.EXITING);
+
+        this.exitCode = status;
+        if (currentIsolate() == this) {
+            this.exitReason = IsolateStatus.ExitReason.SELF_HALT;
+        } else {
+            this.exitReason = IsolateStatus.ExitReason.OTHER_HALT;
+        }
+
+        stopAllThreads();
+    }
+
     public final void systemExit(Isolate isolate, int status) {
         //only this isolate may call this method
         testIsolate(isolate);
@@ -391,6 +404,18 @@ public final class VmIsolate {
         changeState(State.EXITING);
 
         this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
+        this.exitCode = status;
+
+        stopAllThreads();
+    }
+
+    public final void systemHalt(Isolate isolate, int status) {
+        //only this isolate may call this method
+        testIsolate(isolate);
+
+        changeState(State.EXITING);
+
+        this.exitReason = IsolateStatus.ExitReason.SELF_HALT;
         this.exitCode = status;
 
         stopAllThreads();
@@ -407,7 +432,7 @@ public final class VmIsolate {
                 Thread thread = ta[i];
                 if (current != thread) {
                     thread.getVmThread().stopForced(null);
-                } else {
+                } else {                                           
                     found = true;
                 }
             }
@@ -417,7 +442,8 @@ public final class VmIsolate {
                 doExit();
             }
         } else {
-            //todo analyze this case
+            //todo analyze this case      
+            doExit();
         }
     }
 
@@ -745,6 +771,10 @@ public final class VmIsolate {
                     return null;
                 }
             });
+
+            //create the appcontext for this isolate
+            //todo improve this
+            Class.forName("sun.awt.SunToolkit").getMethod("createNewAppContext").invoke(null);
 
             // Update the state of this isolate.
             changeState(State.STARTED);
