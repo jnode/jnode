@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package java.lang;
 
 import java.io.File;
@@ -162,6 +162,19 @@ final class VMRuntime
         }
     }
 
+     /**
+     * Native method that actually shuts down the virtual machine.
+     *
+     * @param status the status to end the process with
+     */
+    static void halt(int status) {
+        if(VmIsolate.getRoot() == VmIsolate.currentIsolate()){
+            throw new VmExit(status);
+        } else {
+            VmIsolate.currentIsolate().systemHalt(Isolate.currentIsolate(), status);
+        }
+    }
+
     /**
      * Load a file. If it has already been loaded, do nothing. The name has
      * already been mapped to a true filename.
@@ -181,7 +194,7 @@ final class VMRuntime
      * it to the path.
      * XXX This method is being replaced by System.mapLibraryName.
      *
-     * @param pathname the path
+     * @param libname the path
      * @param libname the short version of the library name
      * @return the full filename
      */
