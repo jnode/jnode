@@ -112,7 +112,7 @@ public final class Isolate {
      * @param status
      */
     public void halt(int status) {
-        impl.halt(status);
+        impl.isolateHalt(status);
     }
 
     /**
