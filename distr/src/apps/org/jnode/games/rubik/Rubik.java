@@ -669,6 +669,7 @@ public final class Rubik extends JComponent {
 
     public static void main(String[] argv) {
         JFrame f = new JFrame("Rubik's Cube");
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Rubik rubik = new Rubik();
         rubik.init();
         rubik.setPreferredSize(new Dimension(120, 120));
@@ -676,6 +677,5 @@ public final class Rubik extends JComponent {
         rubik.requestFocus();
         f.pack();
         f.setVisible(true);
-
     }
 }
