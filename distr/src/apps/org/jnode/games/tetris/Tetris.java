@@ -554,7 +554,6 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
                 Tetris tetris = new Tetris();
                 tetris.delay = delay;
                 frame.add(tetris, BorderLayout.CENTER);
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frame.setSize(DIM.width + 7, DIM.height + CELL + CELL / 2);
                 frame.setVisible(true);
                 tetris.requestFocus();
