@@ -171,7 +171,7 @@ public class Runtime
       sm.checkExit(status);
 
     if (runShutdownHooks())
-      halt(status);
+      VMRuntime.exit(status);
 
     // Someone else already called runShutdownHooks().
     // Make sure we are not/no longer in the shutdownHooks set.
@@ -194,7 +194,7 @@ public class Runtime
     // while finalization for exit is going on and the status is non-zero
     // we halt immediately.
     if (status != 0)
-      halt(status);
+      VMRuntime.exit(status);
 
 // @classpath-bugfix 27213 19/4/2006 Martin Husted Hartvig (hagar@jnode.org) :
       while (shutdownHooks != null)
@@ -211,7 +211,7 @@ public class Runtime
           }
       }
 
-      halt(status);
+      VMRuntime.exit(status);
 // @classpath-bugfix-end
     }
 
@@ -413,7 +413,7 @@ public class Runtime
     SecurityManager sm = SecurityManager.current; // Be thread-safe!
     if (sm != null)
       sm.checkExit(status);
-    VMRuntime.exit(status);
+    VMRuntime.halt(status);
 	}
 
 	/**
