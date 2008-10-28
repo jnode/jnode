@@ -31,6 +31,18 @@ import java.util.Iterator;
  */
 public class XMLReportWriter {
     private static final String INDENT = "  ";
+    private static final String NOT_APPLIABLE = "n/a";
+    
+    private final boolean compactMode;
+
+    public XMLReportWriter() {
+        // by default, not in compact mode
+        this(false);
+    }
+    
+    public XMLReportWriter(boolean compactMode) {
+        this.compactMode = compactMode;
+    }
     
     /**
      * Write the given result in xml format.
@@ -100,63 +112,73 @@ public class XMLReportWriter {
     }
     
     private void check(PrintWriter ps, int level, CheckResult check) {
-        beginTag(ps, level, CHECK_RESULT, CHECK_NUMBER, check.getNumber(), 
+        String log = getNullIfBlank(check.getLog());
+        boolean closeTag = (log == null);
+        
+        beginTag(ps, level, CHECK_RESULT, closeTag, CHECK_NUMBER, check.getNumber(), 
                 CHECK_POINT, check.getCheckPoint(), 
                 CHECK_PASSED, check.getPassed(), 
                 CHECK_EXPECTED, check.getExpected(), 
                 CHECK_ACTUAL, check.getActual());
-
-        text(ps, level + 1, CHECK_LOG, check.getLog());
         
-        endTag(ps, level, CHECK_RESULT);
+        if (!closeTag) {
+            text(ps, level + 1, CHECK_LOG, log);
+            
+            endTag(ps, level, CHECK_RESULT);
+        }
     }
 
     private void test(PrintWriter ps, int level, TestResult test) {
-        beginTag(ps, level, TEST_RESULT, TEST_NAME, test.getName());
+        beginTag(ps, level, TEST_RESULT, false, TEST_NAME, test.getName());
         text(ps, level + 1, TEST_ERROR, test.getFailedMessage());
     }
 
     private void classResult(PrintWriter ps, int level, ClassResult cr) {
-        beginTag(ps, level, CLASS_RESULT, CLASS_NAME, cr.getName());
+        beginTag(ps, level, CLASS_RESULT, false, CLASS_NAME, cr.getName());
     }
 
     private void packageResult(PrintWriter ps, int level, PackageResult pr) {
-        beginTag(ps, level, PACKAGE_RESULT, PACKAGE_NAME, pr.getName());
+        beginTag(ps, level, PACKAGE_RESULT, false, PACKAGE_NAME, pr.getName());
     }
 
     private void runResult(PrintWriter ps, int level, RunResult rr) {
-        beginTag(ps, level, RUN_RESULT, RUN_NAME, rr.getName());
+        beginTag(ps, level, RUN_RESULT, false, RUN_NAME, rr.getName());
     }
     
     private PrintWriter text(PrintWriter ps, int level, String tag, String text) {
-        beginTag(ps, level, tag);
-        
+        text = getNullIfBlank(text);
         if (text != null) {
-            text = text.trim();
-            if (!text.isEmpty()) {
-                ps.append(protect(text)).append('\n');
+            beginTag(ps, level, tag, false);                
+            ps.append(protect(text));
+            appendCarriageReturn(ps);
+            endTag(ps, level, tag);
+        }
+        
+        return ps;
+    }
+
+    private PrintWriter beginTag(PrintWriter ps, int level, String tag, boolean closeTag, Object... attributes) {
+        tag(ps, level, tag, true);
+        for (int i = 0; i < attributes.length; i += 2) {
+            String value = getNullIfBlank(attributes[i + 1]);
+            
+            if (value != null) {
+                ps.append(' ').append(String.valueOf(attributes[i]));
+                
+                ps.append("=\"").append(protect(value)).append('\"');
             }
         }
         
-        return endTag(ps, level, tag);
-    }
-
-    private PrintWriter beginTag(PrintWriter ps, int level, String tag, Object... attributes) {
-        tag(ps, level, tag, true);
-        for (int i = 0; i < attributes.length; i += 2) {
-            ps.append(' ').append(String.valueOf(attributes[i]));
-            
-            Object value = attributes[i + 1];
-            ps.append("=\"").append((value == null) ? "" : protect(value.toString())).append('\"');
-        }
+        ps.append(closeTag ? "/>" : ">");
         
-        ps.append(">\n");
+        appendCarriageReturn(ps);
         return ps;
     }
     
     public static String protect(String text) {
-        if (text == null)
+        if (text == null) {
             return text;
+        }
 
         final int size = text.length();
         final StringBuilder sb = new StringBuilder(size);
@@ -204,17 +226,48 @@ public class XMLReportWriter {
     private PrintWriter tag(PrintWriter ps, int level, String tag, boolean begin) {
         indent(ps, level).append(begin ? "<" : "</").append(tag);
         if (!begin) {
-            ps.append(">\n");
+            ps.append('>');
+            appendCarriageReturn(ps);
         }
         
         return ps;
+    }
+    
+    private PrintWriter appendCarriageReturn(PrintWriter pw) {
+        if (!compactMode) {
+            pw.append('\n');
+        }
+        
+        return pw;
     }
 
     private PrintWriter indent(PrintWriter ps, int level) {
-        for (int i = 0; i < level; i++) {
-            ps.print(INDENT);
+        if (!compactMode) {
+            for (int i = 0; i < level; i++) {
+                ps.print(INDENT);
+            }
         }
         
         return ps;
     }
+    
+    private String getNullIfBlank(Object text) {
+        String result = null;
+        
+        if (text != null) {
+            result = text.toString().trim();
+            
+            // We assume here that the corresponding attribute
+            // is defaulted to NOT_APPLIABLE when it's null.
+            //
+            // It's the case for CheckResult.getExpected() and 
+            // CheckResult.getActual())   
+            if (result.isEmpty() || NOT_APPLIABLE.equals(result)) {
+                result = null;
+            }
+        }
+        
+        return result;
+    }
+    
 }

@@ -26,7 +26,10 @@ public class MauveTests {
         File f = File.createTempFile("XMLReport", ".xml");
         f.deleteOnExit();
         new XMLReportWriter().write(runResult, f);
-        new XMLReportWriter().write(runResult, new PrintWriter(System.out));
+        System.out.println("\n--- COMPACT MODE:");
+        new XMLReportWriter(true).write(runResult, new PrintWriter(System.out));
+        System.out.println("\n--- NORMAL MODE:");
+        new XMLReportWriter(false).write(runResult, new PrintWriter(System.out));
         HTMLGenerator.createReport(runResult, f.getParentFile());
         System.out.println("========================");
         
