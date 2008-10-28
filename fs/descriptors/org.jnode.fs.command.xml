@@ -33,6 +33,7 @@
     <alias name="pwd" class="org.jnode.fs.command.PwdCommand"/>
     <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
     <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
+    <alias name="md5sum" class="org.jnode.fs.command.Md5SumCommand"/>
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
@@ -109,6 +110,18 @@
     </syntax>
     <syntax alias="touch">
       <argument argLabel="file" description="touch the given file"/>
+    </syntax>
+    <syntax alias="md5sum">
+        <sequence description="Cecks md5 sums agains a file">
+          <option argLabel="check" shortName="c" longName="check"/>
+          <argument argLabel="checkfile" description="md5sum file to check against"/>
+        </sequence>
+        <sequence description="Calculates the md5sum for files or folders of files">
+          <optionSet>
+              <option argLabel="recursive" shortName="r" longName="recursive"/>
+          </optionSet>
+          <repeat minCount="1"><argument argLabel="paths"/></repeat>
+        </sequence>
     </syntax>
   </extension>
 
