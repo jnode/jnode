@@ -200,7 +200,7 @@ public class MauveTestCommand extends TestHarness {
             
             String timestamp = String.valueOf(System.currentTimeMillis());
             File fx = new File(out, "results-" + timestamp + ".xml");
-            new XMLReportWriter().write(result, fx);
+            new XMLReportWriter(true).write(result, fx);
             System.out.println("XML file written to " + fx.getAbsolutePath());
         } catch (IOException e) {
             System.out.println("failed to write XML due to following error:");
