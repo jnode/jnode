@@ -97,7 +97,7 @@ public abstract class ComparisonWriter {
             this.evolutionLabel = label;
         }
 
-        abstract protected void writeSummary(int nbRegressions, int nbProgressions, int nbStagnations);
+        protected abstract void writeSummary(int nbRegressions, int nbProgressions, int nbStagnations);
         
         private void writeSummary(RunComparison run) {
             EvolutionTypeVisitor evolTypeVisitor = new EvolutionTypeVisitor();
