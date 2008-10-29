@@ -10,35 +10,55 @@ import org.jnode.test.mauve.XMLReportWriter;
  *
  */
 public class HTMLComparisonWriter extends ComparisonWriter {
-    private static final String STAGNATION_COLOR = "green";
-    private static final String PROGRESSION_COLOR = "cyan";
-    private static final String REGRESSION_COLOR = "red";
-    
     @Override
     protected Visitor createVisitor(PrintWriter pw) {
-        return new TextVisitor(pw);
+        return new HTMLVisitor(pw);
     }
     
-    protected static class TextVisitor extends Visitor { 
-        private TextVisitor(PrintWriter pw) {
+    protected static class HTMLVisitor extends Visitor { 
+        private HTMLVisitor(PrintWriter pw) {
             super(pw);
+        }
+        
+        @Override
+        protected void writeSummary(int nbRegressions, int nbProgressions, int nbStagnations) {
+            pw.append("<h2>Summary</h2>");
+            appendLink(nbRegressions, EvolutionType.REGRESSION, " regressions. ");            
+            appendLink(nbProgressions, EvolutionType.PROGRESSION, " progressions. ");
+            appendLink(nbStagnations, EvolutionType.STAGNATION, " stagnations. ");
+        }
+        
+        private void appendLink(int value, EvolutionType type, String label) {
+            pw.append("<a href=\"#").append(type.toString()).append("\">");
+            pw.append(Integer.toString(value)).append(label);
+            pw.append("</a>").append("&nbsp;&nbsp;&nbsp;");;
         }
         
         public void writeBegin() {
             pw.append("<html><head></head><body>");
+        }
+
+        public void writeEnd() {
+            pw.append("</body></html>\n");
+        }
+
+        public void writeBeginTable() {
+            pw.append("<br/><h2 id=\"").append(type.toString()).append("\">");
+            pw.append(evolutionLabel);
+            pw.append("</h2><br/>");
+            
             pw.append("<table border=\"1\" cellspacing=\"1\" cellpadding=\"1\"><tr>");
             
             writeCell("th", 0, Level.values().length, "Name");            
-            writeCell("th", 0, 1, "Progress");            
             writeCell("th", 0, 1, "Last reached checkpoint");
             
             pw.append("</tr>\n");
         }
 
-        public void writeEnd() {
-            pw.append("\n</table></body></html>\n");
+        public void writeEndTable() {
+            pw.append("\n</table>");
         }
-         
+
         @Override
         protected void writeBeginLine(Level level) {
             writeIndent(level);
@@ -48,20 +68,6 @@ public class HTMLComparisonWriter extends ComparisonWriter {
         @Override
         protected void writeName(Level level, String name) {
             writeCell("td", level.getValue(), 1 + Level.MAX.getValue() - level.getValue(), name);
-        }
-        
-        @Override
-        protected void writeProgression(int progression) {
-            final String bgColor;
-            if (progression == 0) {
-                bgColor = STAGNATION_COLOR;
-            } else if (progression < 0) {
-                bgColor = REGRESSION_COLOR;
-            } else {
-                bgColor = PROGRESSION_COLOR;
-            }
-            
-            writeCell("td", 0, 1, Integer.toString(progression), "text-align:right;", bgColor);
         }
         
         @Override

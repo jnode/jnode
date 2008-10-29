@@ -32,6 +32,16 @@ public class TestComparison extends Comparison<TestResult> {
         return progression;
     }
     
+    public EvolutionType getEvolutionType() {
+        EvolutionType type = EvolutionType.STAGNATION;
+        if (getProgression() > 0) {
+            type = EvolutionType.PROGRESSION;
+        } else if (getProgression() < 0) {
+            type = EvolutionType.REGRESSION;
+        }
+        return type;
+    }
+
     @Override
     public void accept(ComparisonVisitor visitor) {
         visitor.visit(this);
