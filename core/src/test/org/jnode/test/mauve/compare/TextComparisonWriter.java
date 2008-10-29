@@ -19,6 +19,17 @@ public class TextComparisonWriter extends ComparisonWriter {
         }
         
         @Override
+        protected void writeSummary(int nbRegressions, int nbProgressions, int nbStagnations) {
+            pw.append(Integer.toString(nbRegressions)).append(" regressions. ");
+            pw.append(Integer.toString(nbProgressions)).append(" progressions. ");
+            pw.append(Integer.toString(nbStagnations)).append(" stagnations.\n");
+        }
+        
+        public void writeBeginTable() {
+            pw.append("\n").append(evolutionLabel).append("\n");
+        }
+        
+        @Override
         protected void writeBeginLine(Level level) {
             writeIndent(level);
         }
@@ -26,11 +37,6 @@ public class TextComparisonWriter extends ComparisonWriter {
         @Override
         protected void writeName(Level level, String name) {
             pw.append(name).append('\t');
-        }
-        
-        @Override
-        protected void writeProgression(int progression) {
-            pw.append(Integer.toString(progression));            
         }
         
         @Override
