@@ -39,6 +39,7 @@ import java.io.PipedWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +53,8 @@ import javax.naming.NameNotFoundException;
  * @author crawley@jnode.org
  */
 public class PageCommand extends AbstractCommand implements KeyboardListener {
+    private static boolean DEBUG = false;
+    private static int LAST_SUBLINE = Integer.MAX_VALUE;
     
     private final FileArgument ARG_FILE = 
         new FileArgument("file", Argument.OPTIONAL, "the file to be paged");
@@ -75,10 +78,6 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     private int bottomLineNo;
     private int bottomSublineNo;
     
-    // This is where we build the screen image prior to sending it to the console
-    private char[] charBuffer;
-    private int[] colorBuffer;
-    
     // This pipe passes characters from the system thread that calls 
     // our 'keyPressed' event method to the thread that runs the Page command.
     private PipedReader pr;
@@ -92,6 +91,8 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     private Matcher matcher;
 
     private String prompt;
+
+    private ScreenBuffer currentBuffer;
     
     
     public PageCommand() {
@@ -118,7 +119,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             } else if (getInput().isTTY()) {
                 // We cannot do this.  We need to use the console as the
                 // source of command characters for the Page command.
-                err.println("Paging piped from the console is not supported");
+                debugln("Paging piped from the console is not supported");
                 exit(1);
             } else {
                 r = getInput().getReader();
@@ -128,7 +129,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             pager();
             
         } catch (IOException ex) {
-            err.println(ex.getMessage());
+            debugln(ex.getMessage());
             exit(1);
         } finally {
             if (r != null && opened) {
@@ -163,8 +164,6 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         pageWidth = console.getDeviceWidth();
         pageSize = pageHeight * pageWidth;
         tabSize = console.getTabSize();
-        charBuffer = new char[pageSize];
-        colorBuffer = new int[pageSize];
         
         pw = new PipedWriter();
         pr = new PipedReader();
@@ -219,6 +218,12 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                         nextLine();
                     }
                     break;
+                case 'u':
+                    prevScreenLine();
+                    break;
+                case 'd':
+                    nextScreenLine();
+                    break;
                 case '<':
                     gotoPage(0);
                     break;
@@ -269,8 +274,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             }
             matcher.reset(line);
             if (matcher.find()) {
-                prepareReverse(lineNo);
-                output();
+                prepareReverse(lineNo, LAST_SUBLINE).output();
                 return;
             }
             lineNo--;
@@ -305,14 +309,21 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             }
             matcher.reset(line);
             if (matcher.find()) {
-                prepare(lineNo);
-                output();
+                prepare(lineNo, 0).output();
                 return;
             }
             lineNo++;
         }
     }
 
+    /**
+     * Read a line up to the next newline and return it as a String.  The
+     * line is echoed at the prompt location.
+     * 
+     * @param ch a preread character.
+     * @return
+     * @throws IOException
+     */
     private String readLine(int ch) throws IOException {
         StringBuffer sb = new StringBuffer();
         String line;
@@ -327,33 +338,30 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
 
     private void help() throws IOException {
         String[] help = new String[] {
-            "Move forwards 1 page:      ' ', 'f'",
-            "Move backwards 1 page:     'b'",
-            "Move forwards 1 line:      ENTER",
-            "Move backwards 1 line:     'k', 'y'",
-            "Go to start of data:       '<'",
-            "Go to end of data:         '>'",
-            "Search forwards:           '/regex'",
-            "Repeat search forwards:    '/'",
-            "Search backwards:          '?regex'",
-            "Repeat search backwards:   '?'",
+            "Move forwards 1 page:         ' ', 'f'",
+            "Move backwards 1 page:        'b'",
+            "Move forwards 1 data line:    ENTER",
+            "Move backwards 1 data line:   'k', 'y'",
+            "Move forwards 1 screen line:  'd'",
+            "Move backwards 1 screen line: 'u'",
+            "Go to start of data:          '<'",
+            "Go to end of data:            '>'",
+            "Search forwards:              '/regex'",
+            "Repeat search forwards:       '/'",
+            "Search backwards:             '?regex'",
+            "Repeat search backwards:      '?'",
         };
-        StringBuffer sb = new StringBuffer(pageSize);
-        for (int i = 0; i < pageHeight; i++) {
-            if (i < help.length) {
-                sb.append(help[i]);
-            } else {
-                sb.append(' ');
-            }
-            while (sb.length() % pageWidth != 0) {
-                sb.append(' ');
-            }
+        ScreenBuffer prevBuffer = this.currentBuffer;
+        ScreenBuffer buffer = new ScreenBuffer(true);
+        for (int i = 0; i < help.length; i++) {
+            prepareLine(help[i], i, buffer);
         }
-        console.setChar(0, 0, sb.toString().toCharArray(), 0, pageSize, 0x7);
+        buffer.adjust(0, 0);
+        buffer.output();
         prompt("Hit any key to continue");
-        int ch = pr.read();
+        pr.read();
         prompt();
-        output();
+        prevBuffer.output();
     }
 
     private void prompt() {
@@ -392,25 +400,28 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
      * @throws IOException
      */
     private void nextPage() throws IOException {
-        prepare(bottomLineNo + 1);
-        output();
+        prepare(bottomLineNo + 1, 0).output();
     }
     
+    /**
+     * Page backwards by one page.  The implementation strategy is similar to
+     * page forward except that we use prepareReverse which paints lines starting
+     * with the nominated line and working backwards.
+     * 
+     * @throws IOException
+     */
     private void prevPage() throws IOException {
         if (topLineNo > 0) {
-            prepareReverse(topLineNo - 1);
-            output();
+            prepareReverse(topLineNo - 1, LAST_SUBLINE).output();
         }
     }
     
     private void gotoPage(int firstLineNo) throws IOException {
-        prepare(firstLineNo);
-        output();
+        prepare(firstLineNo, 0).output();
     }
     
     private void gotoLastPage() throws IOException {
-        prepareReverse(lineStore.getLastLineNo());
-        output();
+        prepareReverse(lineStore.getLastLineNo(), LAST_SUBLINE).output();
     }
     
     /**
@@ -420,8 +431,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
      * @throws IOException
      */
     private void nextLine() throws IOException {
-        prepare(topLineNo + 1);
-        output();
+        prepare(topLineNo + 1, 0).output();
     }
 
     /**
@@ -431,74 +441,65 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
      * @throws IOException
      */
     private void prevLine() throws IOException {
-        prepare((topLineNo > 0) ? topLineNo - 1 : topLineNo);
-        output();
+        prepareReverse(bottomLineNo - 1, LAST_SUBLINE).output();
     }
-
-    private void output() {
-        console.setChar(0, 0, charBuffer, 0, pageSize, 0x7);
-        for (int i = 0; i < pageSize; i++) {
-            if (colorBuffer[i] != 0x07) {
-                console.setChar(i % pageWidth, i / pageWidth, charBuffer, i, 1, colorBuffer[i]);
-            }
+    
+    private void nextScreenLine() throws IOException {
+        prepare(topLineNo, topSublineNo + 1).output();
+    }
+    
+    private void prevScreenLine() throws IOException {
+        if (bottomSublineNo == 0) {
+            prepareReverse(bottomLineNo - 1, LAST_SUBLINE).output();
+        } else {
+            prepareReverse(bottomLineNo, bottomSublineNo + 1).output();
         }
     }
 
     /**
-     * Prepare lines for output by painting them to our private buffer
-     * starting at the supplied bufferLineOffset
+     * Prepare lines for output by painting them to our private buffer in the forward
+     * direction starting at a given line number and (rendered) subline number.
      * 
      * @param startLineNo
      */
-    private void prepare(int startLineNo) {
+    private ScreenBuffer prepare(int startLineNo, int startSublineNo) {
+        ScreenBuffer buffer = new ScreenBuffer(true);
         int lineNo = startLineNo;
-        RenderCursor cursor = new RenderCursor(charBuffer, colorBuffer);
-        String line = null;
-        while (cursor.getPos() < pageSize) {
-            line = lineStore.getLine(lineNo);
+        boolean more;
+        do {
+            String line = lineStore.getLine(lineNo);
             if (line == null) {
-                if (startLineNo > 0) {
-                    prepare(startLineNo - 1);
-                    return;
-                }
-                cursor.putSpaces(pageSize - cursor.getPos());
                 break;
             }
+            more = prepareLine(line, lineNo, buffer);
             lineNo++;
-            render(line, 0, cursor);
-        }
-        if (lineNo > startLineNo) {
-            topLineNo = startLineNo;
-            bottomLineNo = lineNo - 1;
+        } while (more);
+        if (buffer.adjust(startLineNo, startSublineNo) || startLineNo == 0) {
+            return buffer;
+        } else {
+            return prepare(startLineNo - 1, Integer.MAX_VALUE);
         }
     }
 
     /**
-     * Prepare lines for output by painting them to our private buffer
-     * starting at the supplied bufferLineOffset
      * 
-     * @param bufferLineOffset the buffer offset in screen lines to start
-     *        painting
+     * Prepare lines for output by painting them to our private buffer in the reverse
+     * direction starting at a given end line number and (rendered) subline number.
      */
-    private void prepareReverse(int endLineNo) {
+    private ScreenBuffer prepareReverse(int endLineNo, int endSublineNo) {
+        ScreenBuffer buffer = new ScreenBuffer(false);
         int lineNo = endLineNo;
-        RenderCursor cursor = new RenderCursor(charBuffer, colorBuffer);
-        RenderCursor measureCursor = new RenderCursor(null, null);
         String line = null;
-        int lineOffset = pageSize;
-        while (lineOffset > 0 && lineNo >= 0) {
-            line = lineStore.getLine(lineNo--);
-            measureCursor.setPos(0);
-            render(line, 0, measureCursor);
-            lineOffset -= measureCursor.getPos();
-            cursor.setPos(lineOffset);
-            render(line, 0, cursor);
-        }
-        if (lineOffset <= 0) {
-            topLineNo = Math.max(0, lineNo);
-            bottomLineNo = endLineNo;
+        boolean more;
+        do {
+            line = lineStore.getLine(lineNo);
+            more = prepareLine(line, lineNo, buffer);
+            lineNo--;
+        } while (more && lineNo >= 0);
+        if (buffer.adjust(endLineNo, endSublineNo)) {
+            return buffer;
         } else {
-            prepare(0);
+            return prepare(0, 0);
         }
     }
     
@@ -507,10 +508,11 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
      * starting at the supplied bufferLineOffset
      * 
      * @param line the line to be prepared
-     * @param bufferLineOffset the buffer offset in screen lines to start
-     *        painting
+     * @param lineNo the line's line number
+     * @param buffer the ScreenBuffer we are preparing 
      */
-    private void render(String line, int firstSubline, RenderCursor cursor) {
+    private boolean prepareLine(String line, int lineNo, ScreenBuffer buffer) {
+        buffer.startLine(lineNo);
         int pos = 0;
         int len = line.length();
         int startMatchPos = len;
@@ -524,9 +526,9 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         } 
         for (int i = 0; i < len; i++) {
             if (i == startMatchPos) {
-                cursor.setColor(0x04);
+                buffer.setColor(0x04);
             } else if (i == endMatchPos) {
-                cursor.setColor(0x07);
+                buffer.setColor(0x07);
                 if (i + 1 < len && matcher.find(i + 1)) {
                     startMatchPos = matcher.start();
                     endMatchPos = matcher.end();
@@ -541,31 +543,25 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                 case '\r':
                     // ignore bare CRs.
                     break;
-                case '\b':
-                    if (pos > 0) {
-                        pos--;
-                    }
-                    break;
                 case '\t':
                     int fill = tabSize - pos % pageWidth % tabSize;
-                    cursor.putSpaces(fill);
+                    for (int j = 0; j < fill; j++) {
+                        buffer.putChar(' ');
+                    }
                     pos += fill;
                     break;
                 default:
-                    if (ch > ' ' && ch <= '\377' && ch != '\177') {
-                        cursor.putChar(ch);
+                    if (ch >= ' ' && ch <= '\377' && ch != '\177') {
+                        buffer.putChar(ch);
                     } else {
-                        cursor.putChar('?');
+                        buffer.putChar('?');
                     }
                     pos++;
             }
         }
-        cursor.setColor(0x07);
-        int fill = pageWidth - pos % pageWidth;
-        if (fill != pageWidth) {
-            cursor.putSpaces(fill);
-            pos += fill;
-        }
+        buffer.setColor(0x07);
+        buffer.endLine();
+        return !buffer.isComplete();
     }
 
     /**
@@ -592,6 +588,12 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     @Override
     public void keyReleased(KeyboardEvent event) {
         // ignore
+    }
+    
+    private void debugln(String msg) {
+        if (DEBUG) {
+            err.println(msg);
+        }
     }
     
     /**
@@ -678,85 +680,243 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
     }
     
     /**
-     * The RenderCursor class is used for storing characters in a region of a buffer,
-     * or counting characters.
+     * The ScreenBuffer class holds the screen image that we are building.
+     * It takes care of wrapping long lines over multiple screen lines.
+     * <p>
+     * In the javadoc and embedded comments, a 'line' refers to an arbitrarily
+     * long data source line, and a 'subline' refers to a screen line.  Sublines
+     * are 'pageWidth' characters wide and are filled with SP characters when
+     * completed.
      * 
      * @author crawley@jnode.org
      */
-    private final class RenderCursor {
-        int pos;
-        char[] charBuffer;
-        int[] colorBuffer;
-        int color;
+    private final class ScreenBuffer {
+        private final class ScreenLine {
+            private final char[] chars = new char[pageWidth];
+            private final int[] colors = new int[pageWidth];
+            private final int lineNo;
+            private final int sublineNo;
+            
+            private ScreenLine(int lineNo, int sublineNo) {
+                this.lineNo = lineNo;
+                this.sublineNo = sublineNo;
+            }
+        }
         
-        /**
-         * Create a render cursor for filling a buffer.  If the supplied buffer
-         * is <code>null</code> the cursor will just count the characters.
-         * 
-         * @param charBuffer The buffer to hold the characters, or <code>null</code>
-         * @param colorBuffer The buffer to hold the corresponding colors, or <code>null</code>
-         */
-        private RenderCursor(char[] charBuffer, int[] colorBuffer) {
-            this.charBuffer = charBuffer;
-            this.colorBuffer = colorBuffer;
-            this.pos = 0;
+        ArrayList<ScreenLine> lines = new ArrayList<ScreenLine>();
+        
+        // The direction of filling ...
+        private final boolean forwards;
+        
+        // The current color.
+        private int color;
+        
+        // The character pos in the current subline
+        private int charPos;
+        
+        // The current subline no
+        private int linePos;
+        
+        // The current data source line number
+        private int lineNo;
+        private int sublineNo;
+        private int firstLinePos;
+        private int lastLinePos;
+        
+        ScreenBuffer(boolean forwards) {
+            this.forwards = forwards;
+            this.linePos = 0;
             this.color = 0x07;
         }
-        
-        /**
-         * Set or reset the cursor's offset for putting characters.
-         * @param pos the number of characters from the start of the
-         * buffer.  This may be negative.
-         */
-        public void setPos(int pos) {
-            this.pos = pos;
-        }
 
-        /**
-         * Set the current color for characters.
-         */
-        public void setColor(int color) {
+        void setColor(int color) {
             this.color = color;
         }
 
         /**
-         * Put a character into the buffer and advance the cursor.  If the 
-         * current cursor position is outside of the buffer bounds, the
-         * character is quietly dropped, but the cursor is moved anyway.
-         * @param ch the character to be put into the buffer.
+         * Start a new line.  If we are filling forwards, this will be
+         * after the last subline of the current line.  If we are filling
+         * backwards it will be before first subline of the current line.
+         * It is an error to start a new line when the buffer is full, so 
+         * this method won't grow the buffer.
+         * 
+         * @param lineNo the line number of the datastream line we are starting.
          */
-        private void putChar(char ch) {
-            if (charBuffer == null || pos < 0 || pos >= charBuffer.length) {
-                pos++;
-            } else {
-                colorBuffer[pos] = color;
-                charBuffer[pos++] = ch;
+        void startLine(int lineNo) throws IllegalArgumentException, IllegalStateException {
+            if (lineNo < 0) {
+                throw new IllegalArgumentException("lineNo < 0");
             }
+            
+            // Record current line number and allocate the first screen line.
+            this.lineNo = lineNo;
+            this.sublineNo = 0;
+            lines.add(linePos, new ScreenLine(lineNo, 0));
+            charPos = 0;
         }
         
         /**
-         * Put multiple spaces into the buffer.  This is logically equivalent
-         * to calling {@line #putChar(char)} <code>count</code> times.
-         * @param count the number of spaces to put into the buffer.
+         * End the current line.  This fills the remainder of the subline, then
+         * moves 'linePos' to the position for the next line.
          */
-        private void putSpaces(int count) {
-            if (charBuffer != null) {
-                int pos1 = Math.max(pos, 0);
-                int pos2 = Math.min(pos + count, charBuffer.length);
-                for (int i = pos1; i < pos2; i++) {
-                    colorBuffer[i] = color;
-                    charBuffer[i] = ' ';
+        void endLine() {
+            // Fill to the end of the current subline with a spaces
+            ScreenLine line = lines.get(linePos);
+            while (charPos < pageWidth) {
+                line.chars[charPos] = ' ';
+                line.colors[charPos] = color;
+                charPos++;
+            }
+            // Move 'linepos' to the position for the next line.
+            if (forwards) {
+                linePos++;
+            } else {
+                while (linePos > 0 && lines.get(linePos - 1).lineNo == lineNo) {
+                    linePos--;
                 }
             }
-            pos += count;
         }
         
         /**
-         * Get the current cursor position.
-         * @return the position.
+         * Put a character to the current line, allocating a new subline
+         * if we wrap past 'pageWidth'.
+         * 
+         * @param ch
          */
-        private int getPos() {
-            return pos;
+        void putChar(char ch) {
+            if (charPos >= pageWidth) {
+                newSubline();
+                charPos = 0;
+            }
+            ScreenLine line = lines.get(linePos);
+            line.chars[charPos] = ch;
+            line.colors[charPos] = color;
+            charPos++;
+        }
+        
+        /**
+         * Add a new subline for the current line.  The subline
+         * goes into the buffer after the current subline.  If
+         * we are filling forward, the current subline stays where it is.
+         * If we are filling backwards, other sublines in the current line
+         * are moves 'upwards' to make space.
+         */
+        private void newSubline() {
+            sublineNo++;
+            linePos++;
+            lines.add(linePos, new ScreenLine(lineNo, sublineNo));
+        }
+        
+        /**
+         * This method calculates the adjusted start/end linePos values corresponding
+         * to the supplied lineNo/sublineNo and the opposite end of the screen buffer.
+         * Then it resets the top/bottom lineNo and sublineNo fields.
+         * 
+         * @param lineNo
+         * @param sublineNo
+         */
+        boolean adjust(final int lineNo, final int sublineNo) {
+            debugln(lineNo + ", " + sublineNo);
+            debugln(topLineNo + ", " + topSublineNo + ", " +
+                    bottomLineNo + ", " + bottomSublineNo);
+            int linePos;
+            int len = lines.size();
+            for (linePos = 0; linePos < len - 1; linePos++) {
+                ScreenLine line = lines.get(linePos);
+                if (line.lineNo == lineNo && line.sublineNo == sublineNo) {
+                    break;
+                }
+                if (line.lineNo > lineNo) {
+                    linePos--;
+                    break;
+                }
+            }
+            debugln(linePos + " : " + len);
+            firstLinePos = forwards ? linePos : Math.max(0, linePos - pageHeight + 1);
+            lastLinePos = forwards ? Math.min(len, linePos + pageHeight) - 1 : linePos;
+            
+            if (lastLinePos >= len) {
+                firstLinePos = Math.max(0, firstLinePos - (len - lastLinePos));
+                lastLinePos = len - 1;
+            }
+            
+            debugln(firstLinePos + ", " + lastLinePos);
+            ScreenLine topLine = lines.get(firstLinePos);
+            topLineNo = topLine.lineNo;
+            topSublineNo = topLine.sublineNo;
+            ScreenLine bottomLine = lines.get(lastLinePos);
+            bottomLineNo = bottomLine.lineNo;
+            bottomSublineNo = bottomLine.sublineNo;
+            debugln(topLineNo + ", " + topSublineNo + ", " +
+                    bottomLineNo + ", " + bottomSublineNo);
+            return lastLinePos - firstLinePos == (pageHeight - 1);
+        }
+
+        /**
+         * Test if the buffer is 'full'; i.e. if 'pageHeight' lines
+         * have been populated.  This should only be called after
+         * we have called {@line #endLine()}.
+         * 
+         * @return
+         */
+        boolean isComplete() {
+            if (charPos != pageWidth) {
+                throw new IllegalStateException(
+                        "line is still active (" + charPos + ", " + pageWidth + ")");
+            }
+            // Since we've called endLine(), linePos should be at the point where
+            // the next line will be added to the buffer.
+            if (forwards) {
+                return linePos >= pageHeight;
+            } else {
+                return lines.size() - linePos - 1 >= pageHeight;
+            }
+        }
+
+        /**
+         * Output the buffer to the screen.
+         */
+        void output() {
+            // This is probably the best I can do given the current console APIs.  The 
+            // problem are:
+            // 1) there is no 'console.setChar(x, y, chars, colors, x, 1)' method, and
+            // 2) a call to setChar(...) will sync the screen, which currently repaints
+            //    every character to the screen device.
+            
+            // First we build a single char array for all characters on the screen, populate
+            // from the lines, and pad out with spaces to the screen height.
+            char[] tmp = new char[pageSize];
+            debugln("output: " + firstLinePos + ", " + lastLinePos);
+            for (int y = firstLinePos; y <= lastLinePos; y++) {
+                try {
+                    ScreenLine line = lines.get(y);
+                    System.arraycopy(line.chars, 0, tmp, (y - firstLinePos) * pageWidth, pageWidth);
+                } catch (NullPointerException ex) {
+                    debugln("NPE: y = " + y);
+                    throw ex;
+                }
+            }
+            Arrays.fill(tmp, (lastLinePos - firstLinePos + 1) * pageWidth, pageSize, ' ');
+            
+            // Next, output the characters in the default color
+            console.setChar(0, 0, tmp, 0, pageSize, 0x7);
+            
+            // Finally, go back and repaint any characters that have a different color
+            // to the default.
+            for (int y = firstLinePos; y <= lastLinePos; y++) {
+                ScreenLine line = lines.get(y);
+                char[] chars = line.chars;
+                int[] colors = line.colors;
+                for (int x = 0; x < pageWidth; x++) {
+                    if (colors[x] != 0x07) {
+                        // TODO we can do this more efficiently if we repaint the characters with
+                        // the same (non default) color in a run.  Make use of the 'tmp' array to
+                        // simplify end-of-line stuff?
+                        debugln("writing '" + chars[x] + "' to " + x + ", " + (y - firstLinePos));
+                        console.setChar(x, y - firstLinePos, chars, x, 1, colors[x]);
+                    }
+                }
+            }
+            currentBuffer = this;
         }
     }
 }
