@@ -109,6 +109,9 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         new PageCommand().execute(args);
     }
 
+    /**
+     * JNode command entry point.
+     */
     @Override
     public void execute() throws Exception {
         err = getError().getPrintWriter();
@@ -144,13 +147,10 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             tearDown();
         }
     }
-
-    private void tearDown() throws IOException {
-        manager.unregisterConsole(console);
-        pw.close();
-        pr.close();
-    }
-
+    
+    /**
+     * Set up the pager's console and command pipe.
+     */
     private void setup() throws NameNotFoundException, IOException {
         ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
         manager = (TextScreenConsoleManager) sm.getCurrentShell().getConsole().getManager();
@@ -172,6 +172,22 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         pr.connect(pw);
         
         console.addKeyboardListener(this);
+    }
+    
+    /**
+     * Tear down the console and pipe.
+     * @throws IOException
+     */
+    private void tearDown() throws IOException {
+        if (manager != null && console != null) {
+            manager.unregisterConsole(console);
+        }
+        if (pw != null) {
+            pw.close();
+        }
+        if (pr != null) {
+            pr.close();
+        }
     }
 
     /**
@@ -353,7 +369,11 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             "Search backwards:             '?regex'",
             "Repeat search backwards:      '?'",
         };
+        // Remember the 'current' buffer so that we can repaint it
+        // when we are done.
         ScreenBuffer prevBuffer = this.currentBuffer;
+        
+        // Prepare and paint the help screen
         ScreenBuffer buffer = new ScreenBuffer(true);
         for (int i = 0; i < help.length; i++) {
             prepareLine(help[i], i, buffer);
@@ -361,6 +381,8 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         buffer.adjust(0, 0);
         buffer.output();
         prompt("Hit any key to continue");
+        
+        // Wait till the user is done, then repaint the previous screen.
         pr.read();
         prompt();
         prevBuffer.output();
@@ -888,7 +910,8 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         }
 
         /**
-         * Output the buffer to the screen.
+         * Output the buffer to the screen.  When we're done, we make this buffer
+         * the 'current' buffer. 
          */
         void output() {
             // This is probably the best I can do given the current console APIs.  The 
