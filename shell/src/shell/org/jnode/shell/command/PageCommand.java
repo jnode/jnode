@@ -55,6 +55,8 @@ import javax.naming.NameNotFoundException;
 public class PageCommand extends AbstractCommand implements KeyboardListener {
     private static boolean DEBUG = false;
     private static int LAST_SUBLINE = Integer.MAX_VALUE;
+    private static int DEFAULT_COLOR = 0x07;
+    private static int MATCH_COLOR = 0x04;
     
     private final FileArgument ARG_FILE = 
         new FileArgument("file", Argument.OPTIONAL, "the file to be paged");
@@ -376,7 +378,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
 
     private void prompt(String text) {
         console.clearRow(this.pageHeight);
-        console.setChar(0, this.pageHeight, text.toCharArray(), 0x07);
+        console.setChar(0, this.pageHeight, text.toCharArray(), DEFAULT_COLOR);
         console.setCursor(0, this.pageHeight);
     }
     
@@ -477,7 +479,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         if (buffer.adjust(startLineNo, startSublineNo) || startLineNo == 0) {
             return buffer;
         } else {
-            return prepare(startLineNo - 1, Integer.MAX_VALUE);
+            return prepare(startLineNo - 1, LAST_SUBLINE);
         }
     }
 
@@ -490,12 +492,12 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         ScreenBuffer buffer = new ScreenBuffer(false);
         int lineNo = endLineNo;
         String line = null;
-        boolean more;
-        do {
+        boolean more = true;
+        while (more && lineNo >= 0) {
             line = lineStore.getLine(lineNo);
             more = prepareLine(line, lineNo, buffer);
             lineNo--;
-        } while (more && lineNo >= 0);
+        }
         if (buffer.adjust(endLineNo, endSublineNo)) {
             return buffer;
         } else {
@@ -526,13 +528,17 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         } 
         for (int i = 0; i < len; i++) {
             if (i == startMatchPos) {
-                buffer.setColor(0x04);
+                buffer.setColor(MATCH_COLOR);
             } else if (i == endMatchPos) {
-                buffer.setColor(0x07);
-                if (i + 1 < len && matcher.find(i + 1)) {
+                if (matcher.find(i)) {
                     startMatchPos = matcher.start();
                     endMatchPos = matcher.end();
-                } 
+                    if (startMatchPos > i) {
+                        buffer.setColor(DEFAULT_COLOR);
+                    }
+                } else {
+                    buffer.setColor(DEFAULT_COLOR);
+                }
             }
             // FIXME - support different renderings, including ones where
             // control characters are rendered as visible characters?
@@ -559,7 +565,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                     pos++;
             }
         }
-        buffer.setColor(0x07);
+        buffer.setColor(DEFAULT_COLOR);
         buffer.endLine();
         return !buffer.isComplete();
     }
@@ -726,7 +732,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
         ScreenBuffer(boolean forwards) {
             this.forwards = forwards;
             this.linePos = 0;
-            this.color = 0x07;
+            this.color = DEFAULT_COLOR;
         }
 
         void setColor(int color) {
@@ -820,32 +826,41 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                     bottomLineNo + ", " + bottomSublineNo);
             int linePos;
             int len = lines.size();
-            for (linePos = 0; linePos < len - 1; linePos++) {
-                ScreenLine line = lines.get(linePos);
-                if (line.lineNo == lineNo && line.sublineNo == sublineNo) {
-                    break;
+            if (len == 0) {
+                firstLinePos = 0;
+                lastLinePos = -1;
+                topLineNo = 0;
+                topSublineNo = 0;
+                bottomLineNo = -1;
+                bottomSublineNo = 0;
+            } else {
+                for (linePos = 0; linePos < len - 1; linePos++) {
+                    ScreenLine line = lines.get(linePos);
+                    if (line.lineNo == lineNo && line.sublineNo == sublineNo) {
+                        break;
+                    }
+                    if (line.lineNo > lineNo) {
+                        linePos--;
+                        break;
+                    }
                 }
-                if (line.lineNo > lineNo) {
-                    linePos--;
-                    break;
+                debugln(linePos + " : " + len);
+                firstLinePos = forwards ? linePos : Math.max(0, linePos - pageHeight + 1);
+                lastLinePos = forwards ? Math.min(len, linePos + pageHeight) - 1 : linePos;
+
+                if (lastLinePos >= len) {
+                    firstLinePos = Math.max(0, firstLinePos - (len - lastLinePos));
+                    lastLinePos = len - 1;
                 }
+
+                debugln(firstLinePos + ", " + lastLinePos);
+                ScreenLine topLine = lines.get(firstLinePos);
+                topLineNo = topLine.lineNo;
+                topSublineNo = topLine.sublineNo;
+                ScreenLine bottomLine = lines.get(lastLinePos);
+                bottomLineNo = bottomLine.lineNo;
+                bottomSublineNo = bottomLine.sublineNo;
             }
-            debugln(linePos + " : " + len);
-            firstLinePos = forwards ? linePos : Math.max(0, linePos - pageHeight + 1);
-            lastLinePos = forwards ? Math.min(len, linePos + pageHeight) - 1 : linePos;
-            
-            if (lastLinePos >= len) {
-                firstLinePos = Math.max(0, firstLinePos - (len - lastLinePos));
-                lastLinePos = len - 1;
-            }
-            
-            debugln(firstLinePos + ", " + lastLinePos);
-            ScreenLine topLine = lines.get(firstLinePos);
-            topLineNo = topLine.lineNo;
-            topSublineNo = topLine.sublineNo;
-            ScreenLine bottomLine = lines.get(lastLinePos);
-            bottomLineNo = bottomLine.lineNo;
-            bottomSublineNo = bottomLine.sublineNo;
             debugln(topLineNo + ", " + topSublineNo + ", " +
                     bottomLineNo + ", " + bottomSublineNo);
             return lastLinePos - firstLinePos == (pageHeight - 1);
@@ -887,13 +902,8 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             char[] tmp = new char[pageSize];
             debugln("output: " + firstLinePos + ", " + lastLinePos);
             for (int y = firstLinePos; y <= lastLinePos; y++) {
-                try {
-                    ScreenLine line = lines.get(y);
-                    System.arraycopy(line.chars, 0, tmp, (y - firstLinePos) * pageWidth, pageWidth);
-                } catch (NullPointerException ex) {
-                    debugln("NPE: y = " + y);
-                    throw ex;
-                }
+                ScreenLine line = lines.get(y);
+                System.arraycopy(line.chars, 0, tmp, (y - firstLinePos) * pageWidth, pageWidth);
             }
             Arrays.fill(tmp, (lastLinePos - firstLinePos + 1) * pageWidth, pageSize, ' ');
             
@@ -901,19 +911,31 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
             console.setChar(0, 0, tmp, 0, pageSize, 0x7);
             
             // Finally, go back and repaint any characters that have a different color
-            // to the default.
+            // to the default.  We do this in runs, to avoid doing too many screen syncs. 
+            int color = DEFAULT_COLOR;
+            int colorStartX = -1;
+            int colorStartY = -1;
+            int colorStartPos = -1;
             for (int y = firstLinePos; y <= lastLinePos; y++) {
                 ScreenLine line = lines.get(y);
-                char[] chars = line.chars;
                 int[] colors = line.colors;
                 for (int x = 0; x < pageWidth; x++) {
-                    if (colors[x] != 0x07) {
-                        // TODO we can do this more efficiently if we repaint the characters with
-                        // the same (non default) color in a run.  Make use of the 'tmp' array to
-                        // simplify end-of-line stuff?
-                        debugln("writing '" + chars[x] + "' to " + x + ", " + (y - firstLinePos));
-                        console.setChar(x, y - firstLinePos, chars, x, 1, colors[x]);
+                    if (colors[x] != color) {
+                        if (color != DEFAULT_COLOR) {
+                            int pos = x + y * pageWidth;
+                            console.setChar(colorStartX, colorStartY,
+                                    tmp, colorStartPos, pos - colorStartPos, color);
+                        } else {
+                            colorStartX = x;
+                            colorStartY = y;
+                            colorStartPos = colorStartX + colorStartY * pageWidth;
+                        }
+                        color = colors[x];
                     }
+                }
+                if (color != DEFAULT_COLOR) {
+                    console.setChar(colorStartX, colorStartY,
+                            tmp, colorStartPos, pageSize - colorStartPos, color);
                 }
             }
             currentBuffer = this;
