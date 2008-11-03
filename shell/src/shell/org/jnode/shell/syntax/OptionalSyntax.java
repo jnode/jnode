@@ -32,8 +32,15 @@ import org.jnode.nanoxml.XMLElement;
  */
 public class OptionalSyntax extends GroupSyntax {
     
-    public OptionalSyntax(String label, String description, Syntax...syntaxes) {
+    private final boolean eager;
+    
+    public OptionalSyntax(String label, String description, boolean eager, Syntax...syntaxes) {
         super(label, description, syntaxes);
+        this.eager = eager;
+    }
+
+    public OptionalSyntax(String label, String description, Syntax...syntaxes) {
+        this(label, description, false, syntaxes);
     }
 
     public OptionalSyntax(String label, Syntax...syntaxes) {
@@ -46,7 +53,7 @@ public class OptionalSyntax extends GroupSyntax {
 
     @Override
     public String toString() {
-        return "OptionalSyntax{" + super.toString()  + "}";
+        return "OptionalSyntax{" + super.toString() + ",eager=" + eager + "}";
     }
 
     @Override
@@ -64,7 +71,7 @@ public class OptionalSyntax extends GroupSyntax {
             }
             tmp = new MuSequence((String) null, childMuSyntaxes);
         }
-        return new MuAlternation(label, null, tmp);
+        return eager ? new MuAlternation(label, tmp, null) : new MuAlternation(label, null, tmp);
     }
 
     @Override
@@ -91,6 +98,10 @@ public class OptionalSyntax extends GroupSyntax {
 
     @Override
     public XMLElement toXML() {
-        return basicElement("optional");
+        XMLElement element = basicElement("optional");
+        if (eager) {
+            element.setAttribute("eager", eager);
+        }
+        return element;
     }
 }

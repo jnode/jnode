@@ -126,12 +126,13 @@ public class SyntaxSpecLoader {
             }
             return new SequenceSyntax(label, description, seq);
         } else if (kind.equals("optional")) {
+            boolean eager = getFlag(syntaxElement, "eager", false);
             int nos = syntaxElement.getNosChildren();
             Syntax[] seq = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
                 seq[i] = doLoad(syntaxElement.getChild(i));
             }
-            return new OptionalSyntax(label, description, seq);
+            return new OptionalSyntax(label, description, eager, seq);
         } else if (kind.equals("argument")) {
             String argLabel = syntaxElement.getAttribute("argLabel");
             if (argLabel == null) {
@@ -171,6 +172,19 @@ public class SyntaxSpecLoader {
             } catch (NumberFormatException ex) {
                 throw new SyntaxFailureException("'" + name + "' attribute is not an integer");
             }
+        }
+    }
+
+    private boolean getFlag(SyntaxSpecAdapter element, String  name, boolean defaultValue) {
+        String tmp = element.getAttribute(name);
+        if (tmp == null) {
+            return defaultValue;
+        } else if (tmp.equalsIgnoreCase("true")) {
+            return true;
+        } else if (tmp.equalsIgnoreCase("false")) {
+            return true;
+        } else {
+            throw new SyntaxFailureException("'" + name + "' attribute is not 'true' or 'false'");
         }
     }
 }
