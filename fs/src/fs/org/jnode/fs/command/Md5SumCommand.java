@@ -1,6 +1,25 @@
+/*
+ * $Id: FormatCommand.java 3585 2007-11-13 13:31:18Z galatnm $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.fs.command;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,221 +27,233 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.PrintWriter;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 
+/**
+ * This command class calculates MD5 digests for files.  If the 'check' flag is
+ * given, it reads a file containing digests and filenames and checks that the
+ * named files digests batch the supplied digests.  Otherwise, it simply calculates
+ * and outputs the digests as filenames in a format compatible with 'check' processing.
+ * <p>
+ * The command is based on the GNU 'md5sum' command, with some differences in the
+ * 'check' file format.
+ * 
+ * @author Tim Sparg
+ * @author crawley@jnode.org
+ */
 public class Md5SumCommand extends AbstractCommand {
 
     private final FileArgument ARG_PATHS = new FileArgument(
         "paths", Argument.OPTIONAL | Argument.MULTIPLE,
-        "the files or directories to be md5summed");
+        "the files (or directories) to be calculate MD5 digests for");
     private final FlagArgument FLAG_RECURSIVE = new FlagArgument(
         "recursive", Argument.OPTIONAL,
-        "if set, will recursively go through all folders, md5summing all files");
-    private final FlagArgument ARG_CHECK = new FlagArgument(
-        "check", Argument.OPTIONAL,
-        "if set, will check all md5sums against a file ");
+        "if set, recursively calculate MD5 digests for the contents of any directory");
     private final FileArgument ARG_CHECKFILE = new FileArgument(
         "checkfile", Argument.OPTIONAL | Argument.SINGLE,
-        "the md5sum file to check against ");
+        "check MD5 digests for files listed in this file");
 
 
-    private static final int MEGABYTE = 1048576;
-    static final byte[] HEX_CHAR_TABLE = {
-        (byte) '0', (byte) '1', (byte) '2', (byte) '3',
-        (byte) '4', (byte) '5', (byte) '6', (byte) '7',
-        (byte) '8', (byte) '9', (byte) 'a', (byte) 'b',
-        (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f'
-    };
+    private static final int BUFFER_SIZE = 1048576;  // 1Mb
 
-    private boolean recursive;
-    private File[] paths;
-    private PrintStream err;
-    private MessageDigest msgDigest;
-    private PrintStream out;
-    private File checkFile;
-    private String hexOutputString;
-
+    private PrintWriter out;
+    private PrintWriter err;
+    private MessageDigest digestEngine;
+    
+    
     public Md5SumCommand() {
-        super("Calculate a md5sum against a file or Folder of Files");
-        registerArguments(ARG_PATHS, FLAG_RECURSIVE, ARG_CHECK, ARG_CHECKFILE);
+        super("Calculate or check MD5 digests");
+        registerArguments(ARG_PATHS, FLAG_RECURSIVE, ARG_CHECKFILE);
     }
 
+    public void execute() throws Exception {
+        this.err = getError().getPrintWriter();
+        this.out = getOutput().getPrintWriter();
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) throws Exception {
+        // If this throws an exception, we want it to propagate ,,,
+        digestEngine = MessageDigest.getInstance("md5");
 
-        recursive = FLAG_RECURSIVE.isSet();
-        paths = ARG_PATHS.getValues();
-        checkFile = ARG_CHECKFILE.getValue();
-
-        this.err = err;
-        this.out = out;
-
-        if (ARG_CHECK.isSet()) {
-            calculatemd5sumAgainstFile();
-        } else {
-            boolean ok = true;
+        boolean ok = true;
+        if (ARG_CHECKFILE.isSet()) {
+            ok = checkFile(ARG_CHECKFILE.getValue());
+        } else if (ARG_PATHS.isSet()) {
+            boolean recursive = FLAG_RECURSIVE.isSet();
+            File[] paths = ARG_PATHS.getValues();
             for (File file : paths) {
-                ok &= calculatemd5sum(file);
+                ok &= processFile(file, recursive);
             }
+        } else {
+            ok = processInput();
         }
-
-
+        if (!ok) {
+            exit(1);
+        }
     }
 
-    private void calculatemd5sumAgainstFile() {
-        boolean md5Ok = true;
-        if (!checkFile.exists()) {
-            err.println(checkFile);
-            md5Ok = false;
-        }
-
-        BufferedReader reader = null;
-        if (md5Ok) {
+    /**
+     * Read a check file containing a list of filenames and the expected MD5 digests
+     * of the corresponding files.  We calculate the actual digests, compare with
+     * the expected digests and report any differences and other problems to stdout
+     * and/or stderr.
+     * 
+     * @param checkFile the file listing the files to be checked and their
+     *        expected digests.
+     * @return <code>true</code> if the check file was opened successfully, all 
+     *         named files were found and their digests were as expected.
+     */
+    private boolean checkFile(File checkFile) {
+        BufferedReader br = null;
+        try {
             try {
-                reader = new BufferedReader(new FileReader(checkFile));
-            } catch (FileNotFoundException e) {
-                //have just checked against this, so this shouldnt occour
+                br = new BufferedReader(new FileReader(checkFile));
+            } catch (FileNotFoundException ex) {
+                err.println("Cannot open " + checkFile + ": " + ex.getMessage());
+                return false;
             }
-        }
-
-        if (md5Ok) {
             String readLine;
-            try {
-                int failCount = 0;
-                while ((readLine = reader.readLine()) != null) {
-                    boolean passed = true;
-                    String[] line = readLine.split("[ ]+");
-                    if (calculatemd5sum(new File(line[1].trim()))) {
-                        if (!hexOutputString.equals(line[0].trim())) {
-                            passed = false;
+            int failCount = 0;
+            while ((readLine = br.readLine()) != null) {
+                String[] line = readLine.split("\\s+");
+                if (line.length == 2) {
+                    try {
+                        byte[] digest = computeDigest(new File(line[1]));
+                        boolean passed = toHexString(digest).equalsIgnoreCase(line[0]);
+                        if (passed) {
+                            out.println(line[1] + " : OK");
+                        } else {
+                            out.println(line[1] + " : FAILED");
+                            failCount++;
                         }
-                    } else {
-                        passed = false;
-                    }
-
-                    if (passed) {
-                        out.println(line[1] + " : OK");
-                    } else {
-                        out.println(line[1] + " : FAILED");
+                    } catch (IOException ex) {
+                        out.println(line[1] + " : IO EXCEPTION - " + ex.getMessage());
                         failCount++;
                     }
                 }
-                if (failCount > 0) {
-                    out.println(failCount + " file(s) failed");
+            }
+            if (failCount > 0) {
+                err.println(failCount + " file(s) failed");
+                return false;
+            }
+        } catch (IOException ex) {
+            err.println("problem reading file " + checkFile + ": " + ex.getMessage());
+            return false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    // squash ...
                 }
-            } catch (IOException e) {
-                out.println("md5sum could not be checked against " + checkFile);
             }
         }
+        return true;
     }
 
-
-    private boolean calculatemd5sum(File file) {
-        if (!file.exists()) {
-            err.println(file + " does not exist");
-            return false;
-        }
-        boolean md5sumOk = true;
-
+    /**
+     * Calculate the digest for a file and output it in a format compatible 
+     * with the 'check' option.  If the supplied file is a directory and 
+     * 'recursive' is <code>true</code>, recursively process the directory
+     * contents.
+     * 
+     * @param file the file (or directory) to be processed.
+     * @param recursive if <code>true</code> process directory contents recursively.
+     * @return <code>true</code> if all file digests were computed and output.
+     */
+    private boolean processFile(File file, boolean recursive) {
+        boolean res = true;
         if (file.isDirectory()) {
             if (recursive) {
                 for (File f : file.listFiles()) {
                     final String name = f.getName();
                     if (!name.equals(".") && !name.equals("..")) {
-                        md5sumOk &= calculatemd5sum(f);
+                        res &= processFile(f, recursive);
                     }
                 }
             } else {
                 err.println("Cannot calculate md5sum on folder: " + file);
-                md5sumOk = false;
+                res = false;
             }
         } else {
-            if (md5sumOk) {
-                if (msgDigest == null) {
-                    try {
-                        msgDigest = MessageDigest.getInstance("md5");
-                    } catch (NoSuchAlgorithmException e) {
-                        err.println("md5sum algorithm Could not be found");
-                        md5sumOk = false;
-                    }
-                } else {
-                    msgDigest.reset();
-                }
+            try {
+                out.println(toHexString(computeDigest(file)) + "    " + file);
             }
-
-            BufferedInputStream bis = null;
-            byte[] buffer = null;
-            int maxBytesToRead = 0;
-            long fileSize = file.length();
-            if (md5sumOk) {
-                if (fileSize >= MEGABYTE) {
-                    maxBytesToRead = MEGABYTE;
-                    buffer = new byte[maxBytesToRead];
-                } else {
-                    maxBytesToRead = (int) fileSize;
-                    buffer = new byte[maxBytesToRead];
-                }
-                try {
-                    bis = new BufferedInputStream(new FileInputStream(file));
-                } catch (FileNotFoundException e) {
-                    md5sumOk = false;
-                }
-
+            catch (IOException ex) {
+                err.println(file + " was not md5summed: " + ex.getMessage());
             }
-
-
-            if (md5sumOk) {
-                int bytesRead = 0;
-                try {
-                    bytesRead = bis.read(buffer, 0, maxBytesToRead);
-                    do {
-                        msgDigest.update(buffer);
-                        bytesRead = bis.read(buffer, 0, maxBytesToRead);
-                    } while (bytesRead > 0);
-                    bis.close();
-                    hexOutputString = convertOutputToHexString(msgDigest.digest());
-                } catch (IOException e) {
-                    md5sumOk = false;
-                }
-
-            }
-
-            if (md5sumOk) {
-                out.println(hexOutputString + "    " + file);
-            } else {
-                err.println(file + " was not md5summed");
-            }
-
         }
-
-        return md5sumOk;
+        return res;
     }
-
-
-    private String convertOutputToHexString(byte[] bs) throws UnsupportedEncodingException {
-        byte[] hex = new byte[2 * bs.length];
-        int index = 0;
-
-        for (byte b : bs) {
-            int v = b & 0xFF;
-            hex[index++] = HEX_CHAR_TABLE[v >>> 4];
-            hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+    
+    /**
+     * Compute digest for the command's input stream.
+     * @return <code>true</code> if all is well;
+     */
+    private boolean processInput() {
+        try {
+            out.println(toHexString(computeDigest(null)));
+            return true;
         }
-
-        return new String(hex, "ASCII");
+        catch (IOException ex) {
+            err.println("Input was not md5summed: " + ex.getMessage());
+            return false;
+        }
     }
-
 
     /**
+     * Compute the digest of a file.
+     * @param file the file.  If this is <code>null</code>, we calculate the digest
+     *       for the command's input stream.
+     * @return the digest.
+     * @throws IOException
+     */
+    private byte[] computeDigest(File file) throws IOException {
+        InputStream is = null;
+        byte[] buffer = new byte[BUFFER_SIZE];
+        try {
+            digestEngine.reset();
+            is = (file != null) ? new FileInputStream(file) : getInput().getInputStream();
+            int bytesRead;
+            while ((bytesRead = is.read(buffer, 0, BUFFER_SIZE)) > 0 ) {
+                digestEngine.update(buffer, 0, bytesRead);
+            }
+            return digestEngine.digest();
+        } finally {
+            if (file != null && is != null) {
+                is.close();
+            }
+        }
+    }
+
+    /**
+     * Turn a digest represented as a byte array into a hexadecimal string.
+     * 
+     * @param digest the digest as bytes
+     * @return the corresponding hex string.
+     */
+    private String toHexString(byte[] digest) {
+        char[] hex = new char[digest.length * 2];
+        int index = 0;
+
+        for (byte b : digest) {
+            hex[index++] = hexChar(b >> 4);
+            hex[index++] = hexChar(b);
+        }
+        return new String(hex);
+    }
+    
+    private char hexChar(int i) {
+        i = i & 0xf;
+        return (char) ((i > 9 ? ('a' - 10) : '0') + i);
+    }
+
+    /**
+     * The classic Java entry point.
      * @param args
      * @throws Exception
      */
