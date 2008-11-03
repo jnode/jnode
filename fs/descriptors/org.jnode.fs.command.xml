@@ -94,6 +94,17 @@
       <empty description="list the current directory"/>
       <repeat><argument argLabel="path" description="list files or directories"/></repeat>
     </syntax>
+    <syntax alias="md5sum">
+      <option description="Checks MD5 digests recorded in a file"
+              argLabel="checkfile" shortName="c" longName="check"/>
+      <sequence description="Calculates the MD5 digests for files">
+        <optional eager="true">
+          <option argLabel="recursive" shortName="r" longName="recursive"/>
+        </optional>
+        <repeat minCount="1"><argument argLabel="paths"/></repeat>
+      </sequence>
+      <empty description="Calculates the MD5 digest for standard input"/>
+    </syntax>
     <syntax alias="mkdir">
       <argument argLabel="directory" description="create a new directory"/>
     </syntax>
@@ -111,20 +122,7 @@
     <syntax alias="touch">
       <argument argLabel="file" description="touch the given file"/>
     </syntax>
-    <syntax alias="md5sum">
-        <sequence description="Cecks md5 sums agains a file">
-          <option argLabel="check" shortName="c" longName="check"/>
-          <argument argLabel="checkfile" description="md5sum file to check against"/>
-        </sequence>
-        <sequence description="Calculates the md5sum for files or folders of files">
-          <optionSet>
-              <option argLabel="recursive" shortName="r" longName="recursive"/>
-          </optionSet>
-          <repeat minCount="1"><argument argLabel="paths"/></repeat>
-        </sequence>
-    </syntax>
   </extension>
-
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
