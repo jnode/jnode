@@ -182,8 +182,7 @@ public class Md5SumCommand extends AbstractCommand {
         } else {
             try {
                 out.println(toHexString(computeDigest(file)) + "    " + file);
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 err.println(file + " was not md5summed: " + ex.getMessage());
             }
         }
@@ -198,8 +197,7 @@ public class Md5SumCommand extends AbstractCommand {
         try {
             out.println(toHexString(computeDigest(null)));
             return true;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             err.println("Input was not md5summed: " + ex.getMessage());
             return false;
         }
@@ -219,7 +217,7 @@ public class Md5SumCommand extends AbstractCommand {
             digestEngine.reset();
             is = (file != null) ? new FileInputStream(file) : getInput().getInputStream();
             int bytesRead;
-            while ((bytesRead = is.read(buffer, 0, BUFFER_SIZE)) > 0 ) {
+            while ((bytesRead = is.read(buffer, 0, BUFFER_SIZE)) > 0) {
                 digestEngine.update(buffer, 0, bytesRead);
             }
             return digestEngine.digest();

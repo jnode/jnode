@@ -53,7 +53,7 @@ public class DefaultTokenizerTest extends TestCase {
         assertEquals(true, t.whitespaceAfterLast());
     }
 
-    public void testTokenizerSimple() throws ShellException{
+    public void testTokenizerSimple() throws ShellException {
         SymbolSource<CommandLine.Token> t = new MyDefaultInterpreter().makeTokenizer("a b c");
         assertEquals(true, t.hasNext());
         assertEquals(false, t.whitespaceAfterLast());
