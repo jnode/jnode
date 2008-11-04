@@ -21,11 +21,14 @@ import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.Vm;
+import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * @author Levente S\u00e1ntha
  */
-@org.jnode.vm.annotation.MagicPermission
+@MagicPermission
+@SharedStatics
 class NativeUnsafe {
     static void registerNatives() {
     }
@@ -576,6 +579,7 @@ class NativeUnsafe {
     }
 
     static final Map<Object, ThreadParker> parking = new HashMap<Object, ThreadParker>();
+    @SharedStatics
     private static class ThreadParker {
         private synchronized void park(long time){
             try {
