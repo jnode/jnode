@@ -32,6 +32,7 @@ import java.awt.VMAwtAPI;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
+import java.util.prefs.Preferences;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -43,11 +44,10 @@ import org.jnode.awt.JNodeAwtContext;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class DesktopFrame extends JFrame implements JNodeAwtContext {
+    private static final String DESKTOP_BACKGROUND = "desktop.background";
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(110, 190, 235);
     private final JDesktopPane desktop;
     private static final Logger log = Logger.getLogger(DesktopFrame.class);
-
-
     private BufferedImage backgroundImage;
 
     /**
@@ -90,8 +90,22 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
                 }
             }
         };
-        desktop.setBackground(DESKTOP_BACKGROUND_COLOR);
+        setBgColor();
         getContentPane().add(desktop);
+    }
+
+    private void setBgColor() {
+        Preferences prefs = Preferences.userNodeForPackage(DesktopFrame.class);
+        int color = prefs.getInt(DESKTOP_BACKGROUND, DESKTOP_BACKGROUND_COLOR.getRGB());
+        desktop.setBackground(new Color(color));
+    }
+
+    private void saveBgColor() {
+        Color color = desktop.getBackground();
+        if (color != null) {
+            Preferences prefs = Preferences.userNodeForPackage(DesktopFrame.class);
+            prefs.putInt(DESKTOP_BACKGROUND, color.getRGB());
+        }
     }
 
     /**
@@ -132,6 +146,7 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
                 log.warn("Failed closing frame: " + f.getTitle(), e);
             }
         }
+        saveBgColor();
         super.dispose();
     }
 
