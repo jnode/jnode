@@ -649,7 +649,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public Completable parseCommandLine(String cmdLineStr)
-        throws ShellSyntaxException {
+        throws ShellException {
         return interpreter.parsePartial(this, cmdLineStr);
     }
     
@@ -678,7 +678,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             if (cl != null) {
                 cl.complete(completion, this);
             }
-        } catch (ShellSyntaxException ex) {
+        } catch (ShellException ex) {
             outPW.println(); // next line
             errPW.println("Cannot parse: " + ex.getMessage());
             stackTrace(ex);

@@ -53,10 +53,9 @@ public interface CommandInterpreter {
      * @param partial a input to the interpreter.
      * @return the CommandLine represent the fragment of the supplied command
      *         input to be completed.
-     * @throws ShellException
+     * @throws ShellException 
      */
-    Completable parsePartial(CommandShell shell, String partial)
-        throws ShellSyntaxException;
+    Completable parsePartial(CommandShell shell, String partial) throws ShellException;
 
     /**
      * Get the interpreter's name

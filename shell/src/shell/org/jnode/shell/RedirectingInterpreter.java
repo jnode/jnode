@@ -78,7 +78,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     }
 
     public Completable parsePartial(CommandShell shell, String line)
-        throws ShellSyntaxException {
+        throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
         List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
         return parse(tokenizer, commands, true);

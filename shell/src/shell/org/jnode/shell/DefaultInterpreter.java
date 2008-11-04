@@ -110,8 +110,7 @@ public class DefaultInterpreter implements CommandInterpreter {
         }
     }
 
-    public Completable parsePartial(CommandShell shell, String line)
-        throws ShellSyntaxException {
+    public Completable parsePartial(CommandShell shell, String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line);
         if (!tokenizer.hasNext()) {
             return new CommandLine("", null);
@@ -211,12 +210,13 @@ public class DefaultInterpreter implements CommandInterpreter {
          * 
          * @param line the input String.
          * @param flags flags controlling the tokenization.
+         * @throws ShellException 
          */
-        public Tokenizer(String line, int flags) {
+        public Tokenizer(String line, int flags) throws ShellSyntaxException {
             tokenize(line, flags);
         }
 
-        public Tokenizer(String line) {
+        public Tokenizer(String line) throws ShellSyntaxException {
             this(line, 0);
         }
 
@@ -242,7 +242,7 @@ public class DefaultInterpreter implements CommandInterpreter {
             return tokens.get(pos++);
         }
 
-        private void tokenize(String s, int flags) throws IllegalArgumentException {
+        private void tokenize(String s, int flags) throws ShellSyntaxException {
             int pos = 0;
 
             while (true) {
@@ -271,7 +271,7 @@ public class DefaultInterpreter implements CommandInterpreter {
                     switch (currentChar) {
                         case ESCAPE_CHAR:
                             if (pos >= s.length()) {
-                                throw new IllegalArgumentException(
+                                throw new ShellSyntaxException(
                                     "escape char ('\\') not followed by a character");
                             }
                             char ch;
