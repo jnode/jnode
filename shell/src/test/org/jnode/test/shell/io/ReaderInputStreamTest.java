@@ -125,12 +125,32 @@ public class ReaderInputStreamTest extends TestCase {
         Reader r = new StringReader(LINE);
         ReaderInputStream ris = new ReaderInputStream(r, "latin1");
         byte[] buffer = new byte[257];
+        assertEquals(256, ris.read(buffer));
         try {
             ris.read(buffer);
             fail("No exception raised");
         } catch (UnmappableCharacterException ex) {
             // expected
         }
+    }
+    
+    public void testBadLatin1Recovery() throws Exception {
+        char[] chars = new char[11];
+        for (int i = 0; i < 11; i++) {
+            chars[i] = i == 5 ? '\u0101' : (char) ('A' + i);
+        }
+        final String LINE = new String(chars);
+        Reader r = new StringReader(LINE);
+        ReaderInputStream ris = new ReaderInputStream(r, "latin1");
+        byte[] buffer = new byte[5];
+        assertEquals(5, ris.read(buffer));
+        try {
+            ris.read();
+            fail("No exception raised");
+        } catch (UnmappableCharacterException ex) {
+            // expected
+        }
+        assertEquals(5, ris.read(buffer));
     }
     
     public void testUnicode() throws Exception {
