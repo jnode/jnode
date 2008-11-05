@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
@@ -42,6 +43,7 @@ public class ReaderInputStream extends InputStream {
     private ByteBuffer bytes = ByteBuffer.allocate(2048);
     
     private CharsetEncoder encoder;
+    private CoderResult cr;
     
     public ReaderInputStream(Reader reader) {
         this(reader, Charset.defaultCharset().name());
@@ -104,10 +106,12 @@ public class ReaderInputStream extends InputStream {
      * @throws IOException
      */
     private int fillBuffer(boolean wait) throws IOException {
+        // If there was a coder error left over from the last call, process
+        // it now.
+        resetAndThrowOnError();
         bytes.clear();
         // The loop is necessary because of the way that an encoder has to deal
         // with UTF-16 surrogate pairs.
-        CoderResult cr = null;
         int count;
         do {
             if (chars.remaining() == 0 || cr == CoderResult.UNDERFLOW) {
@@ -126,23 +130,41 @@ public class ReaderInputStream extends InputStream {
                 if (reader.read(chars) == -1) {
                     chars.flip();
                     cr = encoder.encode(chars, bytes, true);
-                    if (cr.isError()) {
-                        cr.throwException();
-                    }
                     count = bytes.position();
+                    if (count == 0) {
+                        // Only report errors now if we didn't manage to encode anything
+                        resetAndThrowOnError();
+                    }
                     bytes.flip();
                     return count > 0 ? count : -1;
                 }
                 chars.flip();
             }
             cr = encoder.encode(chars, bytes, false);
-            if (cr.isError()) {
-                cr.throwException();
-            }
             count = bytes.position();
+            if (count == 0) {
+                // Only report errors now if we didn't manage to encode anything
+                resetAndThrowOnError();
+            }
         } while (wait && count == 0);
         bytes.flip();
         return count;
+    }
+
+    private void resetAndThrowOnError() throws CharacterCodingException {
+        if (cr != null && cr.isError()) {
+            // Reset the encoder so that it will work next time we try to use it.
+            encoder.reset();
+            // Skip over the problem characters
+            for (int i = 0; i < cr.length(); i++) {
+                chars.get();
+            }
+            // Clear the coder result
+            CoderResult tmp = cr;
+            cr = null;
+            // ... and report the error using the appropriate exception.
+            tmp.throwException();
+        }
     }
 
     public Reader getReader() {
