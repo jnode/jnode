@@ -110,6 +110,7 @@ public final class Monitor {
      * locked by the current thread.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     @Inline
     public final void enter() {
@@ -160,6 +161,7 @@ public final class Monitor {
      * Giveup this monitor.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     public final void exit() {
         String exMsg = null;
@@ -203,6 +205,7 @@ public final class Monitor {
      *
      * @param timeout
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      * @throws InterruptedException
      */
     public final void Wait(long timeout) throws InterruptedException {
@@ -272,6 +275,7 @@ public final class Monitor {
      * Notify threads waiting on this monitor.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     public final void NotifyAll() {
         Notify(true);
@@ -282,6 +286,7 @@ public final class Monitor {
      *
      * @param all
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     final void Notify(boolean all) {
         final VmProcessor proc = VmProcessor.current();
@@ -311,6 +316,7 @@ public final class Monitor {
      * exception thrown if the monitor is not locked.
      *
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     final boolean unsynchronizedNotifyAll() {
         if (lockNoWait()) {
@@ -331,6 +337,7 @@ public final class Monitor {
      * @param thread
      * @return boolean
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     @Inline
     final boolean isOwner(VmThread thread) {
@@ -354,6 +361,7 @@ public final class Monitor {
      *
      * @return boolean
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     @Inline
     final boolean isLocked() {
@@ -368,6 +376,7 @@ public final class Monitor {
      * @param queueName
      * @return The queue
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     private final void prepareWait(VmThread thread,
                                    VmThreadQueue.ScheduleQueue queue, int waitState, String queueName) {
@@ -385,6 +394,7 @@ public final class Monitor {
      *
      * @param thread
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     @NoInline
     private final void notifyThread(VmThread thread) {
@@ -423,10 +433,10 @@ public final class Monitor {
      * @param queue
      * @param all
      * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
      */
     @Inline
-    private final void wakeupWaitingThreads(VmThreadQueue.ScheduleQueue queue,
-                                            boolean all) {
+    private final void wakeupWaitingThreads(VmThreadQueue.ScheduleQueue queue, boolean all) {
         if (queue != null) {
             while (!queue.isEmpty()) {
                 final VmThread thread = queue.first();
@@ -459,8 +469,7 @@ public final class Monitor {
     @Inline
     private final void lock() {
         //final VmProcessor proc = VmProcessor.current();
-        final Address mlAddr = ObjectReference.fromObject(this).toAddress()
-            .add(4);
+        final Address mlAddr = ObjectReference.fromObject(this).toAddress().add(4);
         while (!mlAddr.attempt(0, 1)) {
             //proc.yield(true); // Yield breaks the Uninterruptible idea, so don't use it!
         }
@@ -474,8 +483,7 @@ public final class Monitor {
      */
     @Inline
     private final boolean lockNoWait() {
-        final Address mlAddr = ObjectReference.fromObject(this).toAddress()
-            .add(4);
+        final Address mlAddr = ObjectReference.fromObject(this).toAddress().add(4);
         return mlAddr.attempt(0, 1);
     }
 
