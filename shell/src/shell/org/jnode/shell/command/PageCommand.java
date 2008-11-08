@@ -254,6 +254,7 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
                 case '?':
                     searchBackwards();
                     break;
+                case '\004': // ^D
                 case 'q':
                     exit = true;
                     break;
@@ -356,18 +357,20 @@ public class PageCommand extends AbstractCommand implements KeyboardListener {
 
     private void help() throws IOException {
         String[] help = new String[] {
-            "Move forwards 1 page:         ' ', 'f'",
-            "Move backwards 1 page:        'b'",
+            "Move forwards 1 page:         SPACE, f",
+            "Move backwards 1 page:        b",
             "Move forwards 1 data line:    ENTER",
-            "Move backwards 1 data line:   'k', 'y'",
-            "Move forwards 1 screen line:  'd'",
-            "Move backwards 1 screen line: 'u'",
-            "Go to start of data:          '<'",
-            "Go to end of data:            '>'",
-            "Search forwards:              '/regex'",
-            "Repeat search forwards:       '/'",
-            "Search backwards:             '?regex'",
-            "Repeat search backwards:      '?'",
+            "Move backwards 1 data line:   k, y",
+            "Move forwards 1 screen line:  d",
+            "Move backwards 1 screen line: u",
+            "Go to start of data:          <",
+            "Go to end of data:            >",
+            "Search forwards:              /regex",
+            "Repeat search forwards:       /",
+            "Search backwards:             ?regex",
+            "Repeat search backwards:      ?",
+            "Display this help screen:     h",
+            "Quit:                         q, CTRL-D",
         };
         // Remember the 'current' buffer so that we can repaint it
         // when we are done.
