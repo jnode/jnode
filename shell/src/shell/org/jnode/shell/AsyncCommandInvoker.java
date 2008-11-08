@@ -188,13 +188,14 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         throws ShellInvocationException;
 
     public void keyPressed(KeyboardEvent ke) {
-        // disabling Ctrl-C since currently we have no safe method for killing a
-        // thread
-        /*
-         * if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_C) {
-         * doCtrlC(); ke.consume(); }
-         */
-        if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_Z) {
+        // FIXME - use KeyEventBindings, etc to make the ^C, ^Z keys soft
+        if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_C) {
+            // This seems to 'work' now: at least is it not causing kernel
+            // panics all of the time.  But if it proves to be unreliable
+            // it should be disabled again.
+            doCtrlC(); 
+            ke.consume(); 
+        } else if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_Z) {
             doCtrlZ();
             ke.consume();
         }
