@@ -47,8 +47,7 @@ import org.jnode.util.WriterOutputStream;
 import org.jnode.vm.isolate.ObjectLinkMessage;
 
 /**
- * This class implements the CommandThread API for commands run in their 
- * own private isolates.
+ * This class implements the CommandThread API for running commands in a new isolates.
  * 
  * @author crawley@jnode.org
  */
@@ -56,6 +55,8 @@ public class IsolateCommandThreadImpl implements CommandThread {
     
     private final Isolate isolate;
     private final CommandRunner cr;
+    private Link sl;
+    private int rc;
     
     public IsolateCommandThreadImpl(CommandRunner cr) throws IOException {
         this.cr = cr;
@@ -117,8 +118,8 @@ public class IsolateCommandThreadImpl implements CommandThread {
 
     @Override
     public int getReturnCode() {
-        // TODO Auto-generated method stub
-        return -1;
+        // FIXME ... maybe we should check that the thread has terminated.
+        return rc;
     }
 
     @Override
@@ -131,20 +132,12 @@ public class IsolateCommandThreadImpl implements CommandThread {
     public void start(ThreadExitListener listener) throws ShellInvocationException {
         try {
             Link cl = Link.newLink(Isolate.currentIsolate(), isolate);
-            Link sl = isolate.newStatusLink();
+            sl = isolate.newStatusLink();
             isolate.start(cl);
             ObjectLinkMessage msg = ObjectLinkMessage.newMessage(this.cr);
             cl.send(msg);
-            while (true) {
-                LinkMessage statusMsg = sl.receive();
-                IsolateStatus status = statusMsg.extractStatus();
-                if (status.getState().equals(IsolateStatus.State.EXITED)) {
-                    System.err.println("Got the EXITED message");
-                    break;
-                }
-            }
         } catch (Exception ex) {
-            throw new ShellInvocationException("Cannot start isolate", ex);
+            throw new ShellInvocationException("Error starting isolate", ex);
         } 
     }
 
@@ -155,7 +148,18 @@ public class IsolateCommandThreadImpl implements CommandThread {
         isolate.halt(0 /* FIXME */);
     }
     
-    public void waitFor() {
-        // TODO implement me
+    public void waitFor() throws ShellInvocationException {
+        try {
+            while (true) {
+                LinkMessage statusMsg = sl.receive();
+                IsolateStatus status = statusMsg.extractStatus();
+                if (status.getState().equals(IsolateStatus.State.EXITED)) {
+                    rc = status.getExitCode();
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            throw new ShellInvocationException("Error waiting for isolate", ex);
+        } 
     }
 }
