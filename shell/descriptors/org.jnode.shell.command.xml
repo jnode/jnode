@@ -43,6 +43,7 @@
     <alias name="page" class="org.jnode.shell.command.PageCommand"/>
     <alias name="run" class="org.jnode.shell.command.RunCommand"/>
     <alias name="set" class="org.jnode.shell.command.SetCommand"/>
+    <alias name="sleep" class="org.jnode.shell.command.SleepCommand"/>
     <alias name="syntax" class="org.jnode.shell.command.SyntaxCommand"/>
     <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
   </extension>
@@ -252,6 +253,9 @@
         <argument argLabel="value"/>
       </sequence>
       <argument description="Remove a system property" argLabel="key"/>
+    </syntax>
+    <syntax alias="sleep" description="Sleep for a given number of seconds">
+      <argument argLabel="seconds"/>
     </syntax>
     <syntax alias="syntax">
       <empty description="List aliases which have syntaxes"/>
