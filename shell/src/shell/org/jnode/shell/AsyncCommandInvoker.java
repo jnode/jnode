@@ -201,6 +201,11 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     }
 
     private void doCtrlZ() {
+        // FIXME - this should suspend the current command, not put it into the
+        // background.  It is a BAD IDEA to put a command that is reading from 
+        // the keyboard into the background because it will compete with the shell
+        // for input.  If we figure out how to prevent this, then ^Z could mean
+        // "background, losing control of keyboard input".
         if (blockingThread != null && blockingThread.isAlive()) {
             System.err.println("ctrl-z: Returning focus to console. ("
                     + cmdName + " is still running)");
