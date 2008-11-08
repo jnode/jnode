@@ -143,9 +143,7 @@ public class IsolateCommandThreadImpl implements CommandThread {
 
     @Override
     public void stop(ThreadDeath threadDeath) {
-        // FIXME - not sure what status argument should be ... but this is moot
-        // at the moment because VmIsolate.halt does nothing with it anyway.
-        isolate.halt(0 /* FIXME */);
+        isolate.halt(-1);
     }
     
     public void waitFor() throws ShellInvocationException {

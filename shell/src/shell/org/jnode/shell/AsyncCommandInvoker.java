@@ -214,7 +214,6 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void doCtrlC() {
         if (threadProcess != null && threadProcess.isAlive()
                 && blockingThread != null && blockingThread.isAlive()) {

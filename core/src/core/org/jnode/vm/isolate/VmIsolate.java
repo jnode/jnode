@@ -422,10 +422,17 @@ public final class VmIsolate {
     }
 
     private void stopAllThreads() {
+        // FIXME - this is probably unsafe because any of the threads being killed could
+        // be in the middle of updating a critical system data structure.  I'm also 
+        // unsure of the order in which we are killing the threads here.  It might be
+        // better to kill the isolate's main thread first to give it the chance to
+        // do a graceful shutdown.  (Stephen Crawley - 2008-11-08)
         int ac = threadGroup.activeCount();
         if (ac > 0) {
             Thread[] ta = new Thread[ac];
             int rc = threadGroup.enumerate(ta);
+            // FIXME - notwithstanding the above comments, is the 'current' thread the
+            // same one as the isolate's main thread?  (Stephen Crawley - 2008-11-08)
             Thread current = Thread.currentThread();
             boolean found = false;
             for (int i = 0; i < rc; i++) {
@@ -442,7 +449,7 @@ public final class VmIsolate {
                 doExit();
             }
         } else {
-            //todo analyze this case      
+            // TODO - analyze this case      
             doExit();
         }
     }
@@ -456,7 +463,7 @@ public final class VmIsolate {
         //on this isolate may call this method
         testIsolate(currentIsolate().isolate);
 
-        //todo handle demon threads
+        // FIXME - handle demon threads
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
 
@@ -476,7 +483,7 @@ public final class VmIsolate {
         //on this isolate may call this method
         testIsolate(currentIsolate().isolate);
 
-        //todo handle demon threads
+        // FIXME - handle demon threads
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
 
@@ -773,7 +780,7 @@ public final class VmIsolate {
             });
 
             //create the appcontext for this isolate
-            //todo improve this
+            // TODO - improve this
             Class.forName("sun.awt.SunToolkit").getMethod("createNewAppContext").invoke(null);
 
             // Update the state of this isolate.
