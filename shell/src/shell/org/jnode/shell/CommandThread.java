@@ -41,7 +41,8 @@ public interface CommandThread {
     public void start(ThreadExitListener listener) throws ShellInvocationException;
 
     /**
-     * Get the thread's return code.
+     * Get the thread's return code.  This should only be called after the thread
+     * has terminated.
      * 
      * @return zero for success, non-zero for failure
      */
@@ -61,6 +62,8 @@ public interface CommandThread {
 
     /**
      * The invoker will wait for this thread to terminate.
+     * 
+     * @throws ShellInvocationException 
      */
-    public void waitFor();
+    public void waitFor() throws ShellInvocationException;
 }
