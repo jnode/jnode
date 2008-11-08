@@ -45,6 +45,7 @@
     <alias name="set" class="org.jnode.shell.command.SetCommand"/>
     <alias name="sleep" class="org.jnode.shell.command.SleepCommand"/>
     <alias name="syntax" class="org.jnode.shell.command.SyntaxCommand"/>
+    <alias name="terminate" class="org.jnode.shell.command.TerminateCommand"/>
     <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
   </extension>
   
@@ -272,6 +273,9 @@
         <option argLabel="remove" longName="remove" shortName="r"/>
         <argument argLabel="alias"/>
       </sequence>
+    </syntax>
+    <syntax alias="terminate" description="Terminate an isolate">
+        <argument argLabel="id" description="isolate identifier"/>
     </syntax>
     <syntax alias="thread">
       <optional description="Display all extant JNode Threads">
