@@ -225,9 +225,17 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
     }
 
-    public final void unblock() {
+    /**
+     * Unblock the thread that is waiting for the invoker to finish.  This should
+     * only be used in response to 'job control' actions ("^C", etc), due to the
+     * "nasty" way we currently implement it.
+     */
+    private final void unblock() {
         blocking = false;
         if (blockingThread != null) {
+            // FIXME - this is wrong. The thread may not actually be waiting yet,
+            // and the interrupt may interfere with whatever is is doing; e.g. in the
+            // 'start' method for IsolateCommandThreadImpl.
             blockingThread.interrupt();
         }
     }

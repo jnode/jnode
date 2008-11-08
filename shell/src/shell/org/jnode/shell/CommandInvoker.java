@@ -75,12 +75,6 @@ public interface CommandInvoker {
      */
     String getName();
 
-    /**
-     * This method is called to tell the invoker to unblock.
-     * FIXME - this is a temporary hack.
-     */
-    void unblock();
-
     boolean isDebugEnabled();
 
     void setDebugEnabled(boolean enabled);
