@@ -142,7 +142,6 @@ public class CommandRunner implements Runnable {
                     throw savedEx;
                 }
             }
-            invoker.unblock();
         } catch (SyntaxErrorException ex) {
             try {
                 Help.getInfo(cmdInfo.getCommandClass()).usage(shellErr);
@@ -151,18 +150,14 @@ public class CommandRunner implements Runnable {
                 shellErr.println("Exception while trying to get the command usage");
                 stackTrace(ex);
             }
-            invoker.unblock();
         } catch (VmExit ex) {
             setRC(ex.getStatus());
-            invoker.unblock();
         } catch (Exception ex) {
             shellErr.println("Exception in command");
             stackTrace(ex);
-            invoker.unblock();
         } catch (Throwable ex) {
             shellErr.println("Fatal error in command");
             stackTrace(ex);
-            invoker.unblock();
         }
     }
 
