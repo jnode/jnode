@@ -21,12 +21,10 @@
  
 package org.jnode.shell.command.system;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.List;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.vm.Vm;
@@ -51,10 +49,10 @@ public class VmInfoCommand extends AbstractCommand {
     }
     
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
         final Vm vm = Vm.getVm();
         if (vm != null && !vm.isBootstrap()) {
+            PrintWriter out = getOutput().getPrintWriter();
             out.println("JNode VM " + vm.getVersion());
             vm.dumpStatistics(out);
             vm.getSharedStatics().dumpStatistics(out);

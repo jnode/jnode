@@ -22,15 +22,13 @@
 package org.jnode.shell.command.driver.system.bus;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.bus.smbus.SMBusControler;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 
 /**
  * @author Francois-Frederic Ozog
@@ -46,10 +44,9 @@ public class SMBusCommand extends AbstractCommand {
     }
     
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
         SMBusControler smbusctrl = null;
-
+        PrintWriter out = getOutput().getPrintWriter();
         try {
             smbusctrl = InitialNaming.lookup(SMBusControler.NAME);
         } catch (NameNotFoundException ex) {

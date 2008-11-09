@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -35,7 +33,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -81,8 +78,7 @@ public class Log4jCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws IOException {
+    public void execute() throws IOException {
         if (ARG_FILE.isSet()) {
             // Set configuration from a file
             final File configFile = ARG_FILE.getValue();
@@ -93,7 +89,7 @@ public class Log4jCommand extends AbstractCommand {
                 props.load(fis);
                 PropertyConfigurator.configure(props);
             } catch (FileNotFoundException ex) {
-                err.println("Cannot open configuration file '" + 
+                getError().getPrintWriter().println("Cannot open configuration file '" + 
                         configFile + "': " + ex.getMessage());
                 exit(1);
             } finally {
@@ -114,7 +110,7 @@ public class Log4jCommand extends AbstractCommand {
                 String level = (logger.getLevel() == null) ? 
                         ("(" + logger.getEffectiveLevel().toString() + ")") :
                             logger.getLevel().toString();
-                out.println(logger.getName() + ": " + level);
+                getOutput().getPrintWriter().println(logger.getName() + ": " + level);
             }
         } else if (FLAG_SET_LEVEL.isSet()) {
             // Change the logging level for a specified logger or the root logger

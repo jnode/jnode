@@ -21,11 +21,7 @@
  
 package org.jnode.shell.command.plugin;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -42,8 +38,7 @@ public class RebootCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
         VmSystem.halt(true);
     }
 }

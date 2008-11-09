@@ -21,8 +21,6 @@
  
 package org.jnode.shell.command.driver.system.acpi;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 
@@ -31,7 +29,6 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.system.acpi.AcpiAPI;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 
@@ -60,9 +57,9 @@ public class AcpiCommand extends AbstractCommand {
     }
     
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws ApiNotFoundException {
+    public void execute() throws ApiNotFoundException {
         final Collection<Device> acpiDevs = DeviceUtils.getDevicesByAPI(AcpiAPI.class);
+        PrintWriter out = getOutput().getPrintWriter();
         if (acpiDevs.isEmpty()) {
             out.println("No ACPI devices are registered");
             exit(1);

@@ -21,7 +21,7 @@
 
 package org.jnode.vm;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -411,7 +411,7 @@ public final class Vm extends VmSystemObject implements Statistics {
         }
     }
 
-    public void dumpStatistics(PrintStream out) {
+    public void dumpStatistics(PrintWriter out) {
         if (statistics != null) {
             final Statistic[] stats = getStatistics();
             for (int i = 0; i < stats.length; i++) {
