@@ -143,6 +143,11 @@ public abstract class VmThread extends VmSystemObject {
     private Monitor waitForMonitor;
 
     /**
+     * The most recently owned monitor.
+     */
+    private Monitor lastOwnedMonitor;
+
+    /**
      * My priority
      */
     protected int priority = Thread.NORM_PRIORITY;
@@ -391,7 +396,7 @@ public abstract class VmThread extends VmSystemObject {
             javaThread.onExit();
             //exit the current isolate if needed
             if (ex instanceof ThreadDeath) {
-                VmIsolate.currentIsolate().implicitExit(0);
+                VmIsolate.currentIsolate().implicitExit(this, 0);
             } else {
                 VmIsolate.currentIsolate().uncaughtExceptionExit();
             }
@@ -433,6 +438,18 @@ public abstract class VmThread extends VmSystemObject {
      */
     @Uninterruptible
     private final void doStop() {
+        //release monitors
+        Monitor lom = lastOwnedMonitor;
+        while(lom != null) {
+            Monitor prev = lom.getPrevious();
+            lom.release(this);
+            if (prev == lom)
+                break;
+            lom = prev;
+        }
+        lastOwnedMonitor = null;
+
+
         final VmProcessor proc = VmMagic.currentProcessor();
         final VmThread current = proc.getCurrentThread();
         proc.getScheduler().unregisterThread(this);
@@ -914,6 +931,7 @@ public abstract class VmThread extends VmSystemObject {
      * @see ObjectFlags#THREAD_ID_SHIFT
      */
     @KernelSpace
+    @Uninterruptible
     public final int getId() {
         return id;
     }
@@ -1386,5 +1404,19 @@ public abstract class VmThread extends VmSystemObject {
                 return new UnknownError("Unknown system-exception at " + hexAddress
                     + state);
         }
+    }
+
+    public VmIsolatedStatics getIsolatedStatics() {
+        return isolatedStatics;
+    }
+
+    @Uninterruptible
+    final Monitor getLastOwnedMonitor() {
+        return lastOwnedMonitor;
+    }
+
+    @Uninterruptible
+    final void setLastOwnedMonitor(Monitor lastOwnedMonitor) {
+        this.lastOwnedMonitor = lastOwnedMonitor;
     }
 }

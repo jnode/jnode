@@ -213,7 +213,7 @@ public class StatusLinkTest {
                         Math.sin(i);
                         if (i % 100 == 0) {
                             org.jnode.vm.Unsafe.debug("i=" + i + "\n");
-                            //System.out.println("i=" + i);
+                            System.out.println("i=" + i);
                         }
                     }
                     System.out.println("Child thread: exiting");

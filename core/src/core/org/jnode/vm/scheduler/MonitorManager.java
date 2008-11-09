@@ -26,6 +26,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.vmmagic.unboxed.Address;
@@ -36,6 +37,7 @@ import org.vmmagic.unboxed.Word;
  * @author epr
  */
 @MagicPermission
+@Uninterruptible
 public final class MonitorManager {
 
     /**
@@ -78,7 +80,7 @@ public final class MonitorManager {
                 if (counter.EQ(Word.fromIntZeroExtend(ObjectFlags.LOCK_COUNT_MASK))) {
                     // thin lock entry counter == max, so we need to inflate
                     // ourselves.
-                    installInflatedLock(object).enter();
+                    installInflatedLock(object, null).enter();
                     return;
                 } else {
                     // not-quite-so-fast path: locked by current thread.
@@ -98,8 +100,17 @@ public final class MonitorManager {
             } else {
                 // Another thread owns the lock
                 // thin lock owned by another thread.
-                // install an inflated lock.
-                installInflatedLock(object).enter();
+                int ownerId = oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.THREAD_ID_MASK)).toInt();
+                VmThread thread = VmMagic.currentProcessor().getScheduler().getThreadById(ownerId);
+                if(thread == null) {
+                    //the owner of the lock was destroyed               
+                    //aquire the lock in fast fashion
+                    statusPtr.store(statusFlags.or(tid));
+                    return;
+                } else {
+                    // install an inflated lock.
+                    installInflatedLock(object, thread).enter();
+                }
                 return;
             }
 
@@ -217,7 +228,7 @@ public final class MonitorManager {
      */
     private static Monitor getOwnedInflatedMonitor(Object object)
         throws IllegalMonitorStateException {
-        final Monitor m = installInflatedLock(object);
+        final Monitor m = installInflatedLock(object, null);
         if (!m.isOwner(VmMagic.currentProcessor().getCurrentThread())) {
             // lock not owned by us!
             String exMsg = "Object not locked by current thread";
@@ -233,7 +244,7 @@ public final class MonitorManager {
      * @param k
      */
     static void setupInflatedLock(Object k) {
-        installInflatedLock(k);
+        installInflatedLock(k, null);
     }
 
     /**
@@ -241,9 +252,10 @@ public final class MonitorManager {
      * until the object is unlocked or inflated.
      *
      * @param k the object for which the inflated lock is installed
+     * @param thread
      * @return the Monitor object representing the lock
      */
-    private static Monitor installInflatedLock(Object k) {
+    private static Monitor installInflatedLock(Object k, VmThread thread) {
         Monitor m = null;
         Word monAddr = null;
 
@@ -271,7 +283,10 @@ public final class MonitorManager {
             int lockcount = 1 + oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.LOCK_COUNT_MASK)).
                 rshl(ObjectFlags.LOCK_COUNT_SHIFT).toInt();
             int ownerId = oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.THREAD_ID_MASK)).toInt();
-            m.initialize(VmMagic.currentProcessor().getScheduler().getThreadById(ownerId), lockcount);
+            if(thread == null) {
+                thread = VmMagic.currentProcessor().getScheduler().getThreadById(ownerId);
+            }
+            m.initialize(thread, lockcount);
 
             final Word statusFlags = oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.STATUS_FLAGS_MASK));
             final Word newlockword = monAddr.or(statusFlags).or(Word.fromIntZeroExtend(ObjectFlags.LOCK_EXPANDED));

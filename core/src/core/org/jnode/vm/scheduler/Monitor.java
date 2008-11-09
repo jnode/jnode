@@ -67,6 +67,11 @@ public final class Monitor {
     private final VmThreadQueue.ScheduleQueue notifyQueue;
 
     /**
+     * The previous monitor in a thread bound monitor chain
+     */
+    private Monitor previous;
+
+    /**
      * Create a new instance
      */
     public Monitor() {
@@ -86,6 +91,7 @@ public final class Monitor {
     Monitor(VmThread owner, int lockCount) {
         this.monitorLock = 0;
         this.owner = owner;
+        addToOwner();
         this.lockCount = lockCount;
         if (lockCount < 1) {
             throw new IllegalArgumentException("LockCount must be >= 1");
@@ -101,7 +107,9 @@ public final class Monitor {
      * @param lockcount
      */
     final void initialize(VmThread owner, int lockcount) {
+        dropFromOwner();
         this.owner = owner;
+        addToOwner();
         this.lockCount = lockcount;
     }
 
@@ -139,7 +147,9 @@ public final class Monitor {
             // Try to claim this monitor
             if (lcAddr.attempt(0, 1)) {
                 loop = false;
+                dropFromOwner();
                 this.owner = current;
+                addToOwner();
             } else {
                 // Claim the lock for this monitor
                 lock();
@@ -178,6 +188,7 @@ public final class Monitor {
             lock();
             try {
                 wakeupWaitingThreads(enterQueue, true);
+                dropFromOwner();
                 owner = null;
                 lockCount = 0;
             } finally {
@@ -187,6 +198,37 @@ public final class Monitor {
         if (exMsg != null) {
             Unsafe.debug(exMsg);
             throw new IllegalMonitorStateException(exMsg);
+        }
+    }
+
+    /**
+     * Giveup this monitor.
+     * Called from VmThread on thread stop.
+     *
+     * @throws org.vmmagic.pragma.UninterruptiblePragma
+     *
+     */
+    public final void release(VmThread thread) {
+        if (owner != thread) {
+            Unsafe.debug("Current thread is not the owner of this monitor\n");
+            return;
+        }
+
+        if (lockCount <= 0) {
+            Unsafe.debug("Monitor is not locked\n");
+            return;
+        }
+
+        // Monitor is locked by current thread, decrement lockcount
+        lockCount = 0;
+        lock();
+        try {
+            wakeupWaitingThreads(enterQueue, true);
+            dropFromOwner();
+            owner = null;
+            lockCount = 0;
+        } finally {
+            unlock();
         }
     }
 
@@ -232,6 +274,7 @@ public final class Monitor {
                 current.wakeupTime = VmSystem.currentKernelMillis() + timeout;
                 VmMagic.currentProcessor().getScheduler().addToSleepQueue(current);
             }
+            dropFromOwner();
             owner = null;
             lockCount = 0;
             wakeupWaitingThreads(enterQueue, true);
@@ -497,5 +540,57 @@ public final class Monitor {
     @Inline
     private final void unlock() {
         monitorLock = 0;
+    }
+
+    //monitor chaining to handle thread stop
+
+    /**
+     * Returns the monitor previously owned by the owner thread of this monitor.
+     *
+     * @return the previous monitor
+     */
+    Monitor getPrevious() {
+        return previous;
+    }
+
+    @Inline
+    private void addToOwner() {
+        Monitor lom = owner.getLastOwnedMonitor();
+        if(lom == null) {
+            //the first monitor
+            owner.setLastOwnedMonitor(this);
+        } else {
+            if(lom.owner != this.owner) {
+                //todo error
+                return;
+            } else {
+                if(lom == this) {
+                    //no need to add it
+                    return;
+                } else {
+                    //add it
+                    this.previous = lom;
+                    owner.setLastOwnedMonitor(this);
+                }
+            }
+        }
+    }
+
+    @Inline
+    private void dropFromOwner() {
+        if(owner == null) {
+            //error
+            return;
+        }
+
+        Monitor lom = owner.getLastOwnedMonitor();
+        if(lom == null)
+            return;
+
+        if(lom != this)
+            return;
+
+        owner.setLastOwnedMonitor(lom.previous);
+        lom.previous = null;
     }
 }

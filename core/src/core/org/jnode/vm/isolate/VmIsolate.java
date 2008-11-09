@@ -48,6 +48,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmIOContext;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.scheduler.VmThread;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
@@ -153,7 +154,7 @@ public final class VmIsolate {
      */
     private BootableHashMap<VmIsolateLocal<?>, ?> isolateLocalMap = new BootableHashMap<VmIsolateLocal<?>, Object>();
 
-    private List<VmIsolate> children = new LinkedList<VmIsolate>();
+    private final List<VmIsolate> children = new LinkedList<VmIsolate>();
 
     /**
      * Isolate states.
@@ -235,7 +236,9 @@ public final class VmIsolate {
 
         static final VmIsolate getRoot() {
             if (rootIsolate == null) {
-                rootIsolate = new VmIsolate();
+                rootIsolate = new VmIsolate(null/*Thread.currentThread().getVmThread().getIsolatedStatics()*/);
+//                org.jnode.vm.Unsafe.debug("getRoot() istatics: " + rootIsolate.isolatedStaticsTable + "\n");
+//                org.jnode.vm.Unsafe.debugStackTrace();
             }
             return rootIsolate;
         }
@@ -265,7 +268,7 @@ public final class VmIsolate {
     /**
      * Constructor for the root isolate.
      */
-    private VmIsolate() {
+    private VmIsolate(VmIsolatedStatics isolatedStatics) {
         this.id = StaticData.nextId();
         this.isolate = new Isolate(this);
         this.mainClass = null;
@@ -274,7 +277,7 @@ public final class VmIsolate {
         this.state = State.STARTED;
         this.threadGroup = getRootThreadGroup();
         this.creator = null;
-        this.isolatedStaticsTable = null;
+        this.isolatedStaticsTable = isolatedStatics;
 
         // Initialize currentHolder
         IsolatedStaticData.current = this;
@@ -301,6 +304,14 @@ public final class VmIsolate {
         this.isolatedStaticsTable = new VmIsolatedStatics(VmMagic.currentProcessor().getIsolatedStatics(),
             arch, new Unsafe.UnsafeObjectResolver());
         this.creator = currentIsolate();
+        if(getRoot().executor == null && isRoot()) {
+            //initialize the root executor on the creation of the first child
+            getRoot().invokeAndWait(new Runnable(){
+                public void run() {
+                    //org.jnode.vm.Unsafe.debug("Root executor ready\n");
+                }
+            });
+        }
         StaticData.isolates.add(this);
     }
 
@@ -381,7 +392,9 @@ public final class VmIsolate {
             this.exitReason = IsolateStatus.ExitReason.OTHER_EXIT;
         }
 
-        stopAllThreads();
+        disposeAppContext(this.exitReason == IsolateStatus.ExitReason.SELF_EXIT);
+
+        //stopAllThreads();
     }
 
     public final void isolateHalt(int status) {
@@ -394,7 +407,9 @@ public final class VmIsolate {
             this.exitReason = IsolateStatus.ExitReason.OTHER_HALT;
         }
 
-        stopAllThreads();
+        disposeAppContext(this.exitReason == IsolateStatus.ExitReason.SELF_HALT);
+
+        //stopAllThreads();
     }
 
     public final void systemExit(Isolate isolate, int status) {
@@ -406,7 +421,9 @@ public final class VmIsolate {
         this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;
         this.exitCode = status;
 
-        stopAllThreads();
+        disposeAppContext(true);
+
+        //stopAllThreads();
     }
 
     public final void systemHalt(Isolate isolate, int status) {
@@ -418,11 +435,14 @@ public final class VmIsolate {
         this.exitReason = IsolateStatus.ExitReason.SELF_HALT;
         this.exitCode = status;
 
-        stopAllThreads();
+        disposeAppContext(true);
+
+        //stopAllThreads();
     }
 
     private void stopAllThreads() {
-        // FIXME - this is probably unsafe because any of the threads being killed could
+        // TODO - investigate it
+        // TODO - this is probably unsafe because any of the threads being killed could
         // be in the middle of updating a critical system data structure.  I'm also 
         // unsure of the order in which we are killing the threads here.  It might be
         // better to kill the isolate's main thread first to give it the chance to
@@ -431,8 +451,6 @@ public final class VmIsolate {
         if (ac > 0) {
             Thread[] ta = new Thread[ac];
             int rc = threadGroup.enumerate(ta);
-            // FIXME - notwithstanding the above comments, is the 'current' thread the
-            // same one as the isolate's main thread?  (Stephen Crawley - 2008-11-08)
             Thread current = Thread.currentThread();
             boolean found = false;
             for (int i = 0; i < rc; i++) {
@@ -459,11 +477,11 @@ public final class VmIsolate {
      *
      * @param status
      */
-    public final void implicitExit(int status) {
+    public final void implicitExit(VmThread vmThread, int status) {
         //on this isolate may call this method
         testIsolate(currentIsolate().isolate);
 
-        // FIXME - handle demon threads
+        // TODO - handle demon threads
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
 
@@ -473,7 +491,14 @@ public final class VmIsolate {
             this.exitCode = status;
         }
 
-        doExit();
+        if(vmThread.getName().indexOf("-AWT-stopper") > - 1) {
+            doExit();
+        } else {
+            disposeAppContext(true);
+        }
+
+        //doExit();
+        ///stopAllThreads();
     }
 
     /**
@@ -483,7 +508,7 @@ public final class VmIsolate {
         //on this isolate may call this method
         testIsolate(currentIsolate().isolate);
 
-        // FIXME - handle demon threads
+        // TODO - handle demon threads
         if (threadGroup.activeCount() > 0 || threadGroup.activeGroupCount() > 0)
             return;
 
@@ -492,13 +517,18 @@ public final class VmIsolate {
         exitReason = IsolateStatus.ExitReason.UNCAUGHT_EXCEPTION;
         this.exitCode = -1;
 
-        doExit();
+        disposeAppContext(true);
+
+        //doExit();
+
+        //stopAllThreads();
     }
 
     /**
      * Force termination of this isolate.
      *
      * @param status
+     * @deprecated
      */
     @SuppressWarnings("deprecation")
     public final void halt(int status) {
@@ -522,7 +552,8 @@ public final class VmIsolate {
 
     private void doExit() {
         try {
-            threadGroup.destroy();
+            if(!threadGroup.isDestroyed())
+                threadGroup.destroy();
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -639,8 +670,7 @@ public final class VmIsolate {
         }
 
         // Create a new ThreadGroup
-        this.threadGroup = new ThreadGroup(StaticData.getRoot().threadGroup,
-            mainClass);
+        this.threadGroup = new ThreadGroup(StaticData.getRoot().threadGroup, mainClass);
 
         // Find plugin manager
         PluginManager piManager;
@@ -677,7 +707,7 @@ public final class VmIsolate {
     private Thread executorThread;
     */
 
-    public void invokeAndWait(final Runnable task) {
+//    public void invokeAndWait(final Runnable task) {
         //TODO implement VmIsolate.invokeAndWait(Runnable)
         /*
         if(this == StaticData.rootIsolate){
@@ -700,7 +730,7 @@ public final class VmIsolate {
             }
         }
         */
-    }
+//    }
     /*
     private class TaskExecutor implements Runnable{
         public void run() {
@@ -734,6 +764,160 @@ public final class VmIsolate {
         }
     }
     */
+
+
+    private java.util.concurrent.ExecutorService executor;
+
+    /**
+     * Execute a task within this isolate and wait for completion.
+     *
+     * @param task the task as a Runnable object
+     */
+    public synchronized void invokeAndWait(final Runnable task) {
+        if(executor == null) {
+            executor = java.util.concurrent.Executors.newSingleThreadExecutor(new IsolateThreadFactory2(this));
+        }
+        if(task == null)
+            return;
+        
+        try {
+            if(executor.submit(task).get() != null) {
+                throw new RuntimeException("Execution failed!");
+            }
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    /**
+     * Execute a task asynchronously within this isolate.
+     *
+     * @param task the task as a Runnable object
+     */
+    public synchronized void invokeLater(final Runnable task) {
+        org.jnode.vm.Unsafe.debug("invokeLater Called - 0\n");
+        if(executor == null) {
+            executor = java.util.concurrent.Executors.newSingleThreadExecutor(new IsolateThreadFactory(this));
+            org.jnode.vm.Unsafe.debug("invokeAndWait executor created - 0\n");
+        }
+        if(task == null)
+            return;
+
+        try {
+            org.jnode.vm.Unsafe.debug("invokeAndWait submitting task - 0\n");
+            executor.submit(task);
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    boolean isEDT(){
+        if(appContext == null)
+            return false;
+
+
+        try {
+            Object eq = appContext.getClass().getMethod("get", Object.class).
+                invoke(appContext, appContext.getClass().getField("EVENT_QUEUE_KEY").get(null));
+            if(eq == null)
+                return false;
+
+            org.jnode.vm.Unsafe.debug("isEDT - 1\n");
+
+            Object t = eq.getClass().getField("dispatchThread").get(eq);
+            if(t == null)
+                return false;
+
+            org.jnode.vm.Unsafe.debug("isEDT edt=" + t + "\n");
+            org.jnode.vm.Unsafe.debug("isEDT currenThread=" + Thread.currentThread() + "\n");
+
+            return t == Thread.currentThread();
+        }catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+        /*
+                    try {
+                        return (Boolean) Class.forName("java.awt.EventQueue").
+                            getMethod("isDispatchThread").invoke(null);
+                    } catch (Exception x) {
+                        throw new RuntimeException(x);
+
+                    }
+                    */
+       // return false;
+                }
+
+    private Object appContext;
+
+    private void disposeAppContext(boolean intraIsolate) {
+        if(appSupport != null) {
+            appSupport.stop(intraIsolate);
+        } else {
+            stopAllThreads();
+        }
+    }
+
+    /**
+     *
+     * @param intraIsolate
+     * @deprecated
+     */
+    private void disposeAppContext_old(boolean intraIsolate) {
+        final Object appContext;
+        final boolean is_edt;
+        synchronized (this) {
+            is_edt = isEDT();
+            appContext = this.appContext;
+            this.appContext = null;
+        }
+        org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 000\n");
+        org.jnode.vm.Unsafe.debugStackTrace();
+        org.jnode.vm.Unsafe.debug("disposeAppContextCalled  - 000 " + intraIsolate + "\n");
+        if(appContext != null) {
+            org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0001\n");
+            org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0002\n");
+            if(intraIsolate && is_edt) {
+                org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0003\n");
+                Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 00\n");
+                        getRoot().invokeAndWait(new Runnable() {
+                            public void run() {
+                                try {
+                                    org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 01\n");
+                                    appContext.getClass().getMethod("dispose").invoke(appContext);
+                                    org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 02\n");
+                                } catch (Exception x) {
+                                    x.printStackTrace();
+                                }
+                            }
+                        });
+                        stopAllThreads();
+                        doExit();
+                    }
+                }, "isolate-" + getId() + "-AWT-stopper");
+                t.start();
+            } else {
+                org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0004\n");
+                org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 0\n");
+                getRoot().invokeAndWait(new Runnable(){
+                    public void run() {
+                        try {
+                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 1\n");
+                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled appcontext: " + appContext + "\n");
+                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled appcontext.getClass(): " + appContext.getClass() + "\n");
+                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled appcontext.getClass().dispose: " + appContext.getClass().getMethod("dispose") + "\n");
+                            appContext.getClass().getMethod("dispose").invoke(appContext);
+                            org.jnode.vm.Unsafe.debug("disposeAppContextCalled - 2\n");
+                        }catch (Exception x) {
+                            x.printStackTrace();
+                        }
+                    }
+                });
+                stopAllThreads();
+            }
+        }
+    }
 
     /**
      * Run this isolate. This method is called from IsolateThread.
@@ -781,7 +965,9 @@ public final class VmIsolate {
 
             //create the appcontext for this isolate
             // TODO - improve this
-            Class.forName("sun.awt.SunToolkit").getMethod("createNewAppContext").invoke(null);
+            //appContext = Class.forName("sun.awt.SunToolkit").getMethod("createNewAppContext").invoke(null);
+            this.appSupport = new AppSupport(this);
+            this.appSupport.start();
 
             // Update the state of this isolate.
             changeState(State.STARTED);
@@ -812,6 +998,8 @@ public final class VmIsolate {
             } catch (Throwable ex2) {
                 Unsafe.debug("Exception in catch block.. giving up: ");
                 Unsafe.debug(ex2.getMessage());
+            } finally {
+                systemHalt(isolate, -1);
             }
         }
     }
@@ -958,15 +1146,158 @@ public final class VmIsolate {
         }
     }
 
-    private synchronized void addChild(VmIsolate child) {
-        this.children.add(child);
+    private void addChild(VmIsolate child) {
+        synchronized (children) {
+            children.add(child);
+        }
     }
 
-    private synchronized void removeChild(VmIsolate child) {
-        this.children.remove(child);
+    private void removeChild(VmIsolate child) {
+        synchronized (children) {
+            children.remove(child);
+        }
     }
 
-    public synchronized VmIsolate[] getChildren() {
-        return this.children.toArray(new VmIsolate[children.size()]);
+    public VmIsolate[] getChildren() {
+        synchronized (children) {
+            return children.toArray(new VmIsolate[children.size()]);
+        }
+    }
+
+    public ThreadGroup getThreadGroup() {
+        if(threadGroup == null) {
+            throw new IllegalStateException("Isolate not available");
+        }
+        return threadGroup;
+    }
+
+    private AppSupport appSupport;
+
+    @SharedStatics
+    private static class AppSupport {
+        private static boolean awtSupport;
+        static {
+            try {
+                Class.forName("java.awt.Toolkit");
+                awtSupport = true;
+            } catch (ClassNotFoundException x) {
+                awtSupport = false;
+            }
+        }
+
+        private final VmIsolate vmIsolate;
+        private Object appContext;
+
+        AppSupport(VmIsolate vmIsolate) {
+            this.vmIsolate = vmIsolate;
+        }
+
+        boolean isAWTReady() {
+            if(!awtSupport)
+                return false;
+
+            try {
+                return Class.forName("java.awt.Toolkit").getField("toolkit").get(null) != null;
+            } catch (Exception x) {
+                return false;
+            }
+        }
+
+        void start() throws Exception {
+            if(isAWTReady()) {
+                synchronized (this) {
+                    appContext = Class.forName("sun.awt.SunToolkit").getMethod("createNewAppContext").invoke(null);
+                }
+            }
+        }
+
+        void stop(boolean intraIsolate) {
+            boolean done = false;
+            if(awtSupport) {
+                synchronized (this) {
+                    if(appContext != null) {
+                        disposeAppContext(intraIsolate);
+                        done = true;
+                    }
+                }
+            }
+
+            if(!done) {
+                vmIsolate.stopAllThreads();
+                vmIsolate.doExit();
+            }
+        }
+
+        boolean isEDT(){
+        if(appContext == null)
+            return false;
+
+
+        try {
+            Object eq = appContext.getClass().getMethod("get", Object.class).
+                invoke(appContext, appContext.getClass().getField("EVENT_QUEUE_KEY").get(null));
+            if(eq == null)
+                return false;
+
+            Object t = eq.getClass().getField("dispatchThread").get(eq);
+            if(t == null)
+                return false;
+
+            return t == Thread.currentThread();
+        }catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+        /*
+                    try {
+                        return (Boolean) Class.forName("java.awt.EventQueue").
+                            getMethod("isDispatchThread").invoke(null);
+                    } catch (Exception x) {
+                        throw new RuntimeException(x);
+
+                    }
+                    */
+       // return false;
+                }
+
+    private void disposeAppContext(boolean intraIsolate) {
+        final Object appContext;
+        final boolean is_edt;
+        synchronized (this) {
+            is_edt = isEDT();
+            appContext = this.appContext;
+            this.appContext = null;
+        }
+        if(appContext != null) {
+            if(intraIsolate && is_edt) {
+                Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        getRoot().invokeAndWait(new Runnable() {
+                            public void run() {
+                                try {
+                                    appContext.getClass().getMethod("dispose").invoke(appContext);
+                                } catch (Exception x) {
+                                    x.printStackTrace();
+                                }
+                            }
+                        });
+                        vmIsolate.stopAllThreads();
+                        vmIsolate.doExit();
+                    }
+                }, "isolate-" + vmIsolate.getId() + "-AWT-stopper");
+                t.start();
+            } else {
+                getRoot().invokeAndWait(new Runnable(){
+                    public void run() {
+                        try {
+                            appContext.getClass().getMethod("dispose").invoke(appContext);
+                        }catch (Exception x) {
+                            x.printStackTrace();
+                        }
+                    }
+                });
+                vmIsolate.stopAllThreads();
+            }
+        }
+    }
     }
 }

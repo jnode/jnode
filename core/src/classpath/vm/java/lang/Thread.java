@@ -408,7 +408,12 @@ public class Thread implements Runnable
      * @param name
      */
     protected Thread(ThreadGroup group, Runnable target, String name, VmIsolatedStatics isolatedStatics) {
+        /*
         if (!(this instanceof IsolateThread)) {
+            throw new SecurityException("Constructor can only be called from IsolateThread");
+        }
+        */
+        if (!(this.getClass().getName().startsWith("org.jnode.vm.isolate"))) {
             throw new SecurityException("Constructor can only be called from IsolateThread");
         }
         if (group == null) {
