@@ -73,6 +73,7 @@ public final class VmScheduler {
      *
      * @param visitor
      */
+    @Uninterruptible
     final VmThread getThreadById(int id) {
         // final SpinLock lock = vm.allThreadsLock;
         VmThreadQueueEntry e = this.allThreadsQueue.first;
