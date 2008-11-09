@@ -27,12 +27,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;

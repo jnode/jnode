@@ -23,13 +23,11 @@ package org.jnode.fs.command;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FileArgument; 
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * The CdCommand class changes the current directory as given by the "user.dir" property.
@@ -52,10 +50,10 @@ public class CdCommand extends AbstractCommand {
         new CdCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    public void execute() 
         throws IOException {
         File dir = ARG_DIR.getValue();
-
+        PrintWriter err = getError().getPrintWriter();
         if (dir == null) {
             // If no directory argument was given, change to the "user.home" directory.
             String home = System.getProperty("user.home");
