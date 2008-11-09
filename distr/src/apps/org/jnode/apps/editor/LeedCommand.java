@@ -24,11 +24,11 @@ public class LeedCommand extends AbstractCommand {
         new LeedCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+    public void execute()
         throws Exception {
         final File file = ARG_EDIT.getValue();
         if (file.isDirectory()) {
-            err.println(file + " is a directory");
+            getError().getPrintWriter().println(file + " is a directory");
         } else {
             TextEditor.main(new String[]{file.toString()});
         }

@@ -36,7 +36,7 @@ public class JettyCommand extends AbstractCommand {
         new JettyCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+    public void execute()
         throws Exception {
         File webapp_dir = ARG_WEBAPP.getValue();
         int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : 8080;

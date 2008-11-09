@@ -70,7 +70,7 @@ public class PlayCommand extends AbstractCommand {
         new PlayCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+    public void execute() {
         Note[] tune = ARG_TUNE.isSet() ? ARG_TUNE.getValue() : SpeakerUtils.SCALE;
         SpeakerUtils.play(tune);
     }

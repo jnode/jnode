@@ -54,8 +54,7 @@ public class RamDiskCommand extends AbstractCommand {
         new RamDiskCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err)
+    public void execute()
         throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException {
         final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
         if (FLAG_CREATE.isSet()) {

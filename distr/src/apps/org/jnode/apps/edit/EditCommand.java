@@ -44,13 +44,13 @@ public class EditCommand extends AbstractCommand {
         new EditCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+    public void execute()
         throws Exception {
         final File file = ARG_EDIT.isSet() ? ARG_EDIT.getValue() : null;
         if (file == null)
             Editor.editFile(null);
         else if (file.isDirectory()) {
-            err.println(file + " is a directory");
+            getError().getPrintWriter().println(file + " is a directory");
         } else {
             Editor.editFile(file);
         }

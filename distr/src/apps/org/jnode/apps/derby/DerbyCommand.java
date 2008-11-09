@@ -43,7 +43,7 @@ public class DerbyCommand extends AbstractCommand {
         new DerbyCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+    public void execute()
         throws Exception {
         File home_dir = ARG_HOME.getValue();
         String command = FLAG_START.isSet() ? "start" : FLAG_STOP.isSet() ? "stop" : "?";
@@ -53,20 +53,14 @@ public class DerbyCommand extends AbstractCommand {
 
         NetworkServerControlImpl server = new NetworkServerControlImpl();
 
-        try {
-            int server_command = server.parseArgs(new String[]{command});
+        int server_command = server.parseArgs(new String[]{command});
 
-            if (server_command == NetworkServerControlImpl.COMMAND_START) {
-                PrintWriter printWriter = new PrintWriter(out);
-                server.setLogWriter(printWriter);
-                server.start(printWriter);
-            } else if (server_command == NetworkServerControlImpl.COMMAND_SHUTDOWN) {
-                server.shutdown();
-            }
-
-        } catch (Exception e) {
-            // FIXME ... don't do this!
-            e.printStackTrace();
+        if (server_command == NetworkServerControlImpl.COMMAND_START) {
+            PrintWriter printWriter = getOutput().getPrintWriter();
+            server.setLogWriter(printWriter);
+            server.start(printWriter);
+        } else if (server_command == NetworkServerControlImpl.COMMAND_SHUTDOWN) {
+            server.shutdown();
         }
 
 //    server.executeWork(server_command);
