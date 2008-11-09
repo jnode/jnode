@@ -440,7 +440,7 @@ public final class AppContext {
                 notificationLock.wait(DISPOSAL_TIMEOUT);
             } catch (InterruptedException e) { }
         }
-
+/* jnode
         // Next, we interrupt all Threads in the ThreadGroup
         this.threadGroup.interrupt();
             // Note, the EventDispatchThread we've interrupted may dump an
@@ -473,7 +473,7 @@ public final class AppContext {
                 Thread.sleep(10);
             } catch (InterruptedException e) { }
         }
-
+jnode*/
         // Next, we remove this and all subThreadGroups from threadGroup2appContext
         int numSubGroups = this.threadGroup.activeGroupCount();
         if (numSubGroups > 0) {
@@ -492,7 +492,7 @@ public final class AppContext {
 
         // Finally, we destroy the ThreadGroup entirely.
         try {
-            this.threadGroup.destroy();
+//jnode            this.threadGroup.destroy();
         } catch (IllegalThreadStateException e) {
             // Fired if not all the Threads died, ignore it and proceed
         }
