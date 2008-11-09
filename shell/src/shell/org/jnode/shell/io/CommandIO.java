@@ -54,11 +54,22 @@ public interface CommandIO {
     public OutputStream getOutputStream() throws CommandIOException;
 
     /**
-     * Reify the CommandIO as a PrintStream.
+     * Reify the CommandIO as a PrintStream.   Equivalent to </code>getPrintStream(true)</code>.
      * 
      * @return the object's print stream.
      */
     public PrintStream getPrintStream() throws CommandIOException;
+
+    /**
+     * Reify the CommandIO as a PrintStream.
+     * 
+     * @param autoflush if <code>true</code>, set the autoflush on the stream that we
+     *        open.  Note that this is only respected on the first call to this method
+     *        that a comman makes.  On subsequent calls, the caller will get the previously
+     *        reified PrintStream.
+     * @return the object's print stream.
+     */
+    public PrintStream getPrintStream(boolean autoflush) throws CommandIOException;
 
     /**
      * Reify the CommandIO as a Writer.
@@ -68,11 +79,21 @@ public interface CommandIO {
     public Writer getWriter() throws CommandIOException;
 
     /**
-     * Reify the CommandIO as a PrintWriter.
-     * 
+     * Reify the CommandIO as a PrintWriter.  Equivalent to </code>getPrintWriter(true)</code>.
      * @return the object's print writer.
      */
     public PrintWriter getPrintWriter() throws CommandIOException;
+
+    /**
+     * Reify the CommandIO as a PrintWriter
+     * 
+     * @param autoflush if <code>true</code>, set the autoflush on the stream that we
+     *        open.  Note that this is only respected on the first call to this method
+     *        that a comman makes.  On subsequent calls, the caller will get the previously
+     *        reified PrintStream.
+     * @return the object's print writer.
+     */
+    public PrintWriter getPrintWriter(boolean autoflush) throws CommandIOException;
 
     /**
      * Reify the CommandIO as an InputStream.

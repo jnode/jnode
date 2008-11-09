@@ -22,6 +22,8 @@ package org.jnode.shell.io;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
 import org.jnode.util.IOUtils;
@@ -69,6 +71,16 @@ abstract class BaseCommandIO implements CommandIO {
     public abstract void close() throws IOException;
     
     public void flush() throws IOException {
+    }
+
+    @Override
+    public final PrintStream getPrintStream() throws CommandIOException {
+        return this.getPrintStream(true);
+    }
+
+    @Override
+    public final PrintWriter getPrintWriter() throws CommandIOException {
+        return this.getPrintWriter(true);
     }
     
 }

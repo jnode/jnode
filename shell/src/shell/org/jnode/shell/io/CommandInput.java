@@ -90,12 +90,12 @@ public class CommandInput extends BaseCommandIO {
     }
 
     @Override
-    public PrintStream getPrintStream() {
+    public PrintStream getPrintStream(boolean autoflush) {
         throw new CommandIOException("Output not supported");
     }
 
     @Override
-    public PrintWriter getPrintWriter() {
+    public PrintWriter getPrintWriter(boolean autoflush) {
         throw new CommandIOException("Output not supported");
     }
 
