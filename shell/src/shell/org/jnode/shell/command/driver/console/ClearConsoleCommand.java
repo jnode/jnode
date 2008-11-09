@@ -21,12 +21,8 @@
 
 package org.jnode.shell.command.driver.console;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.driver.console.TextConsole;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 
@@ -51,8 +47,7 @@ public class ClearConsoleCommand extends AbstractCommand {
     }
     
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         final Shell shell = ShellUtils.getCurrentShell();
         TextConsole tc = (TextConsole) shell.getConsole();
         tc.clear();

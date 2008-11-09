@@ -21,7 +21,7 @@
 
 package org.jnode.shell.command.driver.console;
 
-import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
@@ -33,7 +33,6 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellManager;
@@ -73,9 +72,8 @@ public class ConsoleCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws NameNotFoundException, IsolateStartupException, ShellException {
-
+    public void execute() throws NameNotFoundException, IsolateStartupException, ShellException {
+        final PrintWriter out = getOutput().getPrintWriter();
         final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
         final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
 
@@ -120,7 +118,8 @@ public class ConsoleCommand extends AbstractCommand {
             try {
                 final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
                 final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
-                TextConsole console = createConsoleWithShell(conMgr, System.out);
+                final PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
+                TextConsole console = createConsoleWithShell(conMgr, out);
                 System.setIn(new ReaderInputStream(console.getIn()));
                 System.setOut(new PrintStream(new WriterOutputStream(console.getOut()), true));
                 System.setErr(new PrintStream(new WriterOutputStream(console.getErr()), true));
@@ -132,7 +131,7 @@ public class ConsoleCommand extends AbstractCommand {
         }
     }
 
-    private static TextConsole createConsoleWithShell(final ConsoleManager conMgr, PrintStream out) 
+    private static TextConsole createConsoleWithShell(final ConsoleManager conMgr, PrintWriter out) 
         throws ShellException {
         final TextConsole console = (TextConsole) conMgr.createConsole(null,
                 ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE);

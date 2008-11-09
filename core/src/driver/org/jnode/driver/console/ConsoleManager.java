@@ -21,7 +21,7 @@
 
 package org.jnode.driver.console;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Set;
 
 import org.jnode.driver.input.KeyboardListener;
@@ -151,5 +151,5 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
      */
     public Console createConsole(String name, int options);
 
-    public void printConsoles(PrintStream ps);
+    public void printConsoles(PrintWriter pw);
 }

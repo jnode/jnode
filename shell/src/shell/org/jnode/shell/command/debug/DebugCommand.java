@@ -6,11 +6,10 @@ package org.jnode.shell.command.debug;
 import gnu.classpath.jdwp.JNodeSocketTransport;
 import gnu.classpath.jdwp.Jdwp;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.IntegerArgument;
 
@@ -35,8 +34,7 @@ public class DebugCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : DEFAULT_PORT;
 
         // FIXME - in the even of internal exceptions, JDWP writes to System.out.
@@ -56,6 +54,8 @@ public class DebugCommand extends AbstractCommand {
         });
         t.start();
 
+        Reader in = getInput().getReader();
+        PrintWriter out = getOutput().getPrintWriter();
         while (in.read() != 'q') {
             out.println("Type 'q' to exit");
         }

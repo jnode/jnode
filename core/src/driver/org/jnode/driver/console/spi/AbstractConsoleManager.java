@@ -23,7 +23,7 @@ package org.jnode.driver.console.spi;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -215,19 +217,19 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
-    public void printConsoles(PrintStream ps) {
+    public void printConsoles(PrintWriter pw) {
         ArrayList<Integer> list = new ArrayList<Integer>();
         list.addAll(stackMap.keySet());
         Collections.sort(list);
         for (Integer key : list) {
-            ps.println("Screen of " + KeyEvent.getKeyText(key) + ":");
+            pw.println("Screen of " + KeyEvent.getKeyText(key) + ":");
             Stack<Console> stack = stackMap.get(key);
             int t_ind = stack.size();
             for (int i = t_ind; i-- > 0;) {
                 Console console = stack.get(i);
                 String prefix = console == current ? " > " :
                     i == t_ind - 1 ? " * " : "   ";
-                ps.println(prefix + console.getConsoleName());
+                pw.println(prefix + console.getConsoleName());
             }
         }
     }
