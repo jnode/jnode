@@ -22,13 +22,9 @@
 
 package org.jnode.fs.jfat.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 
@@ -53,11 +49,11 @@ public class JGrubInstallCommand extends AbstractCommand {
         new JGrubInstallCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+    public void execute()
         throws GrubException {
         Device device = ARG_DEVICE.getValue();
 
-        JGrub jgrub = new JGrub(out, err, device);
+        JGrub jgrub = new JGrub(getOutput().getPrintWriter(), device);
         jgrub.install();
     }
 }

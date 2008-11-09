@@ -23,15 +23,13 @@ package org.jnode.fs.command;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 
@@ -58,12 +56,14 @@ public class DirCommand extends AbstractCommand {
         new DirCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    public void execute() 
         throws IOException {
         File[] paths = ARG_PATH.getValues();
         if (paths.length == 0) {
             paths = new File[] {new File(System.getProperty("user.dir"))};
         }
+        PrintWriter out = getOutput().getPrintWriter(false);
+        PrintWriter err = getError().getPrintWriter();
         for (File path : paths) {
             if (!path.exists()) {
                 err.println("No such path: " + path);
@@ -81,7 +81,7 @@ public class DirCommand extends AbstractCommand {
         }
     }
 
-    private void printList(File[] list, PrintStream out) {
+    private void printList(File[] list, PrintWriter out) {
         if (list != null) {
             Arrays.sort(list, new Comparator<File>() {
                 public int compare(File f1, File f2) {

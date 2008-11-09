@@ -23,8 +23,7 @@ package org.jnode.net.command;
 
 import static org.jnode.net.ethernet.EthernetConstants.ETH_P_IP;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import javax.naming.NameNotFoundException;
 
@@ -39,7 +38,6 @@ import org.jnode.net.syntax.IPv4AddressArgument;
 import org.jnode.net.syntax.IPv4HostArgument;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -72,8 +70,7 @@ public class RouteCommand extends AbstractCommand {
         new RouteCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws NoSuchProtocolException, NetworkException, NameNotFoundException {
+    public void execute() throws NoSuchProtocolException, NetworkException, NameNotFoundException {
         final IPv4NetworkLayer ipNL =
                 (IPv4NetworkLayer) NetUtils.getNLM().getNetworkLayer(ETH_P_IP);
         final IPv4Address target = ARG_TARGET.getValue();
@@ -86,6 +83,7 @@ public class RouteCommand extends AbstractCommand {
         } else if (FLAG_DEL.isSet()) {
             cfg.deleteRoute(target, gateway, device);
         } else {
+            PrintWriter out = getOutput().getPrintWriter();
             out.println("Routing table");
             out.println(ipNL.getRoutingTable());
         }

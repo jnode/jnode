@@ -21,9 +21,6 @@
  
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
@@ -32,7 +29,6 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 
@@ -53,10 +49,9 @@ public class BootpCommand extends AbstractCommand {
         new BootpCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, 
-            PrintStream out, PrintStream err) throws NameNotFoundException, NetworkException {
+    public void execute() throws NameNotFoundException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
-        out.println("Trying to configure " + dev.getId() + "...");
+        getOutput().getPrintWriter().println("Trying to configure " + dev.getId() + "...");
         final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
         cfg.configureDeviceBootp(dev, true);
     }

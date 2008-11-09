@@ -21,8 +21,7 @@
 
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 
 import org.jnode.driver.net.NetworkException;
@@ -30,7 +29,6 @@ import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.util.ResolverImpl;
 import org.jnode.net.syntax.IPv4AddressArgument;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 
@@ -59,9 +57,9 @@ public class ResolverCommand extends AbstractCommand {
         new ResolverCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws NetworkException {
+    public void execute() throws NetworkException {
         IPv4Address server = ARG_DNS_SERVER.getValue();
+        PrintWriter out = getOutput().getPrintWriter();
         if (FLAG_ADD.isSet()) {
             // Add a DNS server
             ResolverImpl.addDnsServer(server);

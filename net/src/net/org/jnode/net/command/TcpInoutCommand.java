@@ -3,7 +3,7 @@ package org.jnode.net.command;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +12,6 @@ import javax.net.ServerSocketFactory;
 import javax.net.SocketFactory;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.HostNameArgument;
 import org.jnode.shell.syntax.PortNumberArgument;
@@ -56,8 +55,7 @@ public class TcpInoutCommand extends AbstractCommand {
         new TcpInoutCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws IOException {
+    public void execute() throws IOException {
         Socket socket;
         if (ARG_LOCAL_PORT.isSet()) {
             int port = ARG_LOCAL_PORT.getValue();
@@ -68,7 +66,9 @@ public class TcpInoutCommand extends AbstractCommand {
             int port = ARG_PORT.getValue();
             socket = SocketFactory.getDefault().createSocket(host, port);
         }
-
+        InputStream in = getInput().getInputStream();
+        OutputStream out = getOutput().getOutputStream();
+        PrintWriter err = getError().getPrintWriter();
         toThread = new CopyThread(in, socket.getOutputStream(), err);
         fromThread = new CopyThread(socket.getInputStream(), out, err);
 
@@ -104,10 +104,10 @@ public class TcpInoutCommand extends AbstractCommand {
     private class CopyThread extends Thread {
         private final InputStream in;
         private final OutputStream out;
-        private final PrintStream err;
+        private final PrintWriter err;
         private boolean terminated;
 
-        CopyThread(InputStream in, OutputStream out, PrintStream err) {
+        CopyThread(InputStream in, OutputStream out, PrintWriter err) {
             this.in = in;
             this.out = out;
             this.err = err;

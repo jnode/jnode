@@ -21,9 +21,6 @@
  
 package org.jnode.fs.jifs.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import javax.naming.NameNotFoundException;
 
 import org.jnode.naming.InitialNaming;
@@ -31,7 +28,6 @@ import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginManager;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.EnumArgument;
 
@@ -66,8 +62,7 @@ public class CreateJIFSCommand extends AbstractCommand {
         registerArguments(ARG_ACTION);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws NameNotFoundException, PluginException {
+    public void execute() throws NameNotFoundException, PluginException {
         final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
         final Plugin p =
             mgr.getRegistry().getPluginDescriptor("org.jnode.fs.jifs.def").getPlugin();

@@ -22,18 +22,10 @@
 package org.jnode.fs.ftpfs.command;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-
-import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
-import org.jnode.driver.DriverException;
-import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ftpfs.FTPFSDevice;
 import org.jnode.fs.ftpfs.FTPFSDriver;
 import org.jnode.fs.ftpfs.FTPFileSystem;
@@ -41,7 +33,6 @@ import org.jnode.fs.ftpfs.FTPFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.HostNameArgument;
@@ -72,10 +63,7 @@ public class FTPMountCommand extends AbstractCommand {
         new FTPMountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) 
-        throws DriverException, NameNotFoundException, DeviceAlreadyRegisteredException, 
-            FileSystemException, IOException {
+    public void execute() throws Exception {
         final File mountPoint = MOUNTPOINT_ARG.getValue();
         final String host = HOST_ARG.getValue();
         final String user = USERNAME_ARG.getValue();
@@ -94,6 +82,9 @@ public class FTPMountCommand extends AbstractCommand {
             fss.registerFileSystem(fs);
             fss.mount(mountPoint.getAbsolutePath(), fs, null);
             ok = true;
+        } catch (Exception ex) {
+            getError().getPrintStream().println("FTP mount failed: " + ex.getLocalizedMessage());
+            throw ex;
         } finally {
             if (!ok) {
                 try {

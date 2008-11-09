@@ -22,11 +22,8 @@
 package org.jnode.fs.command;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
@@ -40,8 +37,8 @@ public class PwdCommand extends AbstractCommand {
         new PwdCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+    public void execute() {
         File file = new File("");
-        out.println(file.getAbsolutePath());
+        getOutput().getPrintWriter().println(file.getAbsolutePath());
     }
 }

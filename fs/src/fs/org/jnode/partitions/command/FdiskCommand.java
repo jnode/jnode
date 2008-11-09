@@ -22,8 +22,7 @@
 package org.jnode.partitions.command;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +41,6 @@ import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -100,10 +98,10 @@ public class FdiskCommand extends AbstractCommand {
         new FdiskCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
-
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         if (!ARG_DEVICE.isSet()) {
             // Show all devices.
             listAvailableDevices(dm, out);
@@ -143,7 +141,7 @@ public class FdiskCommand extends AbstractCommand {
         return partNumber;
     }
 
-    private void modifyPartition(PartitionHelper helper, int id, PrintStream out) throws IOException  {
+    private void modifyPartition(PartitionHelper helper, int id, PrintWriter out) throws IOException  {
         long start = ARG_START.getValue();
         long size = ARG_SECTORS.isSet() ? ARG_SECTORS.getValue() : ARG_BYTES.getValue();
         IBMPartitionTypes type = ARG_TYPE.getValue();
@@ -156,7 +154,7 @@ public class FdiskCommand extends AbstractCommand {
         helper.modifyPartition(id, false, start, size, sizeUnit, type);
     }
 
-    private void printPartitionTable(Device dev, PrintStream out)
+    private void printPartitionTable(Device dev, PrintWriter out)
         throws DeviceNotFoundException, ApiNotFoundException, IOException {
         IDEDevice ideDev = null;
         // FIXME ... this needs to be generalized to other disc device types.
@@ -208,7 +206,7 @@ public class FdiskCommand extends AbstractCommand {
         }
     }
 
-    private void listAvailableDevices(DeviceManager dm, PrintStream out) {
+    private void listAvailableDevices(DeviceManager dm, PrintWriter out) {
         final Collection<Device> allDevices = dm.getDevicesByAPI(BlockDeviceAPI.class);
         for (Device dev : allDevices) {
             out.println("Found device : " + dev.getId() + "[" + dev.getClass() + "]");

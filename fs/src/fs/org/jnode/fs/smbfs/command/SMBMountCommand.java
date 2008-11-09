@@ -22,8 +22,7 @@
 package org.jnode.fs.smbfs.command;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
+
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
@@ -34,7 +33,6 @@ import org.jnode.fs.smbfs.SMBFileSystem;
 import org.jnode.fs.smbfs.SMBFileSystemType;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.HostNameArgument;
@@ -65,8 +63,7 @@ public class SMBMountCommand extends AbstractCommand {
         new SMBMountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
         final File mountPoint = MOUNTPOINT_ARG.getValue();
         final String host = HOST_ARG.getValue();
         final String path = PATH_ARG.getValue();

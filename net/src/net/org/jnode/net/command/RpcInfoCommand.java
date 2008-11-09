@@ -22,8 +22,7 @@
 package org.jnode.net.command;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -32,7 +31,6 @@ import org.acplt.oncrpc.OncRpcPortmapClient;
 import org.acplt.oncrpc.OncRpcProtocols;
 import org.acplt.oncrpc.OncRpcServerIdent;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.HostNameArgument;
 
@@ -57,9 +55,11 @@ public class RpcInfoCommand extends AbstractCommand {
         new RpcInfoCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+    public void execute() {
         OncRpcPortmapClient client = null;
         String hostname = ARG_HOST.getValue();
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         try {
             InetAddress host = InetAddress.getByName(hostname);
             client = new OncRpcPortmapClient(host, OncRpcProtocols.ONCRPC_UDP);

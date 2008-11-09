@@ -22,8 +22,7 @@
 package org.jnode.fs.command;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import org.jnode.driver.Device;
@@ -32,7 +31,6 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 import org.jnode.shell.syntax.FileArgument;
@@ -60,11 +58,11 @@ public class MountCommand extends AbstractCommand {
         new MountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         // Find the filesystem service
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         if (!ARG_DEV.isSet()) {
             // List all mounted file systems
             Map<String, FileSystem<?>> filesystems = fss.getMountPoints();

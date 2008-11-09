@@ -21,8 +21,7 @@
  
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -39,7 +38,6 @@ import org.jnode.net.ProtocolAddressInfo;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 
@@ -61,8 +59,7 @@ public class DhcpCommand extends AbstractCommand {
         new DhcpCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws DeviceNotFoundException, NameNotFoundException, ApiNotFoundException, 
+    public void execute() throws DeviceNotFoundException, NameNotFoundException, ApiNotFoundException, 
         UnknownHostException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
 
@@ -75,13 +72,14 @@ public class DhcpCommand extends AbstractCommand {
         NetDeviceAPI api = loopback.getAPI(NetDeviceAPI.class);
         ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
         if (info == null || !info.contains(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}))) {
+            PrintWriter err = getError().getPrintWriter();
             err.println("The loopback network device is not bound to IP address 127.0.0.1");
             err.println("Run 'ifconfig loopback 127.0.0.1 255.255.255.255' to fix this.");
             exit(1);
         }
 
         // Now it should be safe to do the DHCP configuration.
-        out.println("Configuring network device " + dev.getId() + "...");
+        getOutput().getPrintWriter().println("Configuring network device " + dev.getId() + "...");
         final IPv4ConfigurationService cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
         cfg.configureDeviceDhcp(dev, true);
     }

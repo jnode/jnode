@@ -25,9 +25,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -51,21 +50,21 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
     public static final String QUIT_CMD = "quit";
 
     private BufferedReader br;
-    private PrintStream out;
+    private PrintWriter out;
     private InetAddress serverAddress;
     private int mode = BINARY_MODE;
     private boolean quit;
     
 
-    public TFTPClient(PrintStream out) {
+    public TFTPClient(PrintWriter out) {
         this.out = out;
     }
 
     @SuppressWarnings("deprecation")
-    public void run(InputStream in) throws IOException {
+    public void run(Reader in) throws IOException {
         // FIXME ... figure out to how to use JNode command argument parsing
         // (and completion) for our little TFTP interactive command syntax. 
-        this.br = new BufferedReader(new InputStreamReader(in));
+        this.br = new BufferedReader(in);
         out.println("JNode TFTP Client");
         do {
             out.print("tftp> ");
