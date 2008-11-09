@@ -43,7 +43,7 @@ public class BeepCommand extends AbstractCommand {
         new BeepCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+    public void execute() {
         SpeakerUtils.beep();
     }
 }

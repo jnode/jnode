@@ -56,7 +56,7 @@ public abstract class AbstractFormatCommand<T extends FileSystem<?>> extends Abs
 
     protected abstract Formatter<T> getFormatter();
 
-    public final void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    public final void execute() 
         throws FileSystemException, NameNotFoundException, DeviceNotFoundException, DriverException {
         Device dev = ARG_DEVICE.getValue();
         Formatter<T> formatter = getFormatter();

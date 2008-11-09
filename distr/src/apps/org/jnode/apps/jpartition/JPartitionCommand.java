@@ -29,10 +29,12 @@ public class JPartitionCommand extends AbstractCommand {
         new JPartitionCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
+    public void execute() throws Exception {
         boolean install = ARG_INSTALL.isSet();
 
+        InputStream in = getInput().getInputStream();
+        PrintStream out = getOutput().getPrintStream();
+        PrintStream err = getError().getPrintStream();
         ViewFactory viewFactory =
                 FLAG_CONSOLE.isSet() ? new ConsoleViewFactory(in, out, err)
                         : FLAG_SWING.isSet() ? new SwingViewFactory() : null;
