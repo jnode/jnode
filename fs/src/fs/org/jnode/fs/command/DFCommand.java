@@ -22,7 +22,6 @@ package org.jnode.fs.command;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map;
 
 import javax.naming.NameNotFoundException;

@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import org.jnode.apps.jpartition.consoleview.ConsoleViewFactory;
 import org.jnode.apps.jpartition.swingview.SwingViewFactory;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 

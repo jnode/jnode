@@ -4,10 +4,8 @@
 package org.jnode.apps.editor;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
+
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 

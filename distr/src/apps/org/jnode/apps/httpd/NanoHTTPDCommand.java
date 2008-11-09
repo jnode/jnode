@@ -21,15 +21,14 @@
 
 package org.jnode.apps.httpd;
 
-import fi.iki.elonen.NanoHTTPD;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Properties;
+
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
+
+import fi.iki.elonen.NanoHTTPD;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)

@@ -21,12 +21,8 @@
 
 package org.jnode.driver.sound.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.driver.sound.speaker.SpeakerUtils;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 
 /**
  * This command plays a system beep.
