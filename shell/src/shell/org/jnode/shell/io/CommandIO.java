@@ -65,7 +65,7 @@ public interface CommandIO {
      * 
      * @param autoflush if <code>true</code>, set the autoflush on the stream that we
      *        open.  Note that this is only respected on the first call to this method
-     *        that a comman makes.  On subsequent calls, the caller will get the previously
+     *        that a command makes.  On subsequent calls, the caller will get the previously
      *        reified PrintStream.
      * @return the object's print stream.
      */
@@ -89,7 +89,7 @@ public interface CommandIO {
      * 
      * @param autoflush if <code>true</code>, set the autoflush on the stream that we
      *        open.  Note that this is only respected on the first call to this method
-     *        that a comman makes.  On subsequent calls, the caller will get the previously
+     *        that a command makes.  On subsequent calls, the caller will get the previously
      *        reified PrintStream.
      * @return the object's print writer.
      */
@@ -144,7 +144,7 @@ public interface CommandIO {
     
     /**
      * Flush this CommandIO's associated byte and / or character output streams.
-     * This is a no-op for an input-only or closed CommandIO.
+     * This method has no effect on an input-only or closed CommandIO object.
      * 
      * @throws IOException
      */
