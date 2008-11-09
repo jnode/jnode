@@ -3,11 +3,10 @@
  */
 package org.jnode.shell.command;
 
+import java.io.PrintWriter;
+
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.vm.isolate.VmIsolate;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 /**
  * The IsolateCommand provides information about the current isolates in the system.
@@ -15,8 +14,8 @@ import java.io.PrintStream;
  */
 public class IsolateCommand extends AbstractCommand {
     @Override
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
+        final PrintWriter out = getOutput().getPrintWriter();
         out.println("      Id " + " Creator " + "State    " + "Main class");
         VmIsolate root = VmIsolate.getRoot();
         if (root != null) {

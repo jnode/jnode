@@ -21,14 +21,11 @@
 package org.jnode.shell.command;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.StringArgument;
@@ -63,8 +60,7 @@ public class GrepCommand extends AbstractCommand {
     /**
      * Primary entry point
      */
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
 
         boolean inverse = FLAG_INVERSE.isSet();
         boolean useRegex = FLAG_REGEX.isSet();
@@ -81,15 +77,16 @@ public class GrepCommand extends AbstractCommand {
                 pattern = Pattern.compile(Pattern.quote(expr));
             }
         } catch (PatternSyntaxException ex) {
-            err.println("Invalid regex: " + ex.getMessage());
+            getError().getPrintWriter().println("Invalid regex: " + ex.getMessage());
             exit(2);
         }
 
-        final BufferedReader r = new BufferedReader(new InputStreamReader(in));
+        final BufferedReader r = new BufferedReader(getInput().getReader());
 
         // Read the input a line at a time, searching each line for the expression.
         boolean found = false;
         String line;
+        PrintWriter out = getOutput().getPrintWriter();
         while ((line = r.readLine()) != null) {
             if (pattern.matcher(line).find()) {
                 if (!inverse) {

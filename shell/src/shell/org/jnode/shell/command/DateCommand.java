@@ -21,12 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.Date;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 
 /** 
  * A shell command to access the display the system date.
@@ -40,9 +37,8 @@ public class DateCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
-        out.println(new Date());
+    public void execute() throws Exception {
+        getOutput().getPrintWriter().println(new Date());
     }
 
     /** 

@@ -21,13 +21,11 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -63,8 +61,7 @@ public class AliasCommand extends AbstractCommand {
         new AliasCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         final AliasManager aliasMgr = ShellUtils.getCurrentAliasManager();
 
         if (ARG_REMOVE.isSet()) {
@@ -86,11 +83,11 @@ public class AliasCommand extends AbstractCommand {
             aliasMgr.add(ARG_ALIAS.getValue(), className);
         } else {
             // list the aliases
-            showAliases(aliasMgr, out);
+            showAliases(aliasMgr, getOutput().getPrintWriter());
         } 
     }
     
-    private void showAliases(AliasManager aliasMgr, PrintStream out) throws NoSuchAliasException {
+    private void showAliases(AliasManager aliasMgr, PrintWriter out) throws NoSuchAliasException {
         final TreeMap<String, String> map = new TreeMap<String, String>();
 
         for (String alias : aliasMgr.aliases()) {

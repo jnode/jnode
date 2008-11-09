@@ -20,12 +20,10 @@
  */
  
 package org.jnode.shell.command;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.driver.console.InputHistory;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.syntax.Argument;
@@ -49,8 +47,8 @@ public class HistoryCommand extends AbstractCommand {
         new FlagArgument("test", Argument.OPTIONAL, "If set, don't try to execute the history command");
 
     private Shell shell;
-    private PrintStream out;
-    private PrintStream err;
+    private PrintWriter out;
+    private PrintWriter err;
     private InputHistory history;
 
 
@@ -60,12 +58,11 @@ public class HistoryCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         shell = ShellUtils.getShellManager().getCurrentShell();
         history = shell.getCommandHistory();
-        this.out = out;
-        this.err = err;
+        this.out = getOutput().getPrintWriter();
+        this.err = getError().getPrintWriter();
 
         int index = ARG_INDEX.isSet() ? ARG_INDEX.getValue() : -1;
         String prefix = ARG_PREFIX.isSet() ? ARG_PREFIX.getValue() : null;

@@ -23,6 +23,7 @@ package org.jnode.shell.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
@@ -86,8 +87,8 @@ public class GcCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
+    public void execute() throws Exception {
+        final PrintWriter out = getOutput().getPrintWriter();
         if (ARG_SET.isSet()) {
             Vm.getHeapManager().setHeapFlags(getFlags());
         } else if (ARG_CLEAR.isSet()) {
@@ -114,7 +115,7 @@ public class GcCommand extends AbstractCommand {
         }
     }
 
-    private void showFlags(int flags, PrintStream out) {
+    private void showFlags(int flags, PrintWriter out) {
         StringBuilder sb = new StringBuilder();
         for (int flagBitMask = 1; flagBitMask != 0; flagBitMask = flagBitMask << 1) {
             if ((flags & flagBitMask) != 0) {

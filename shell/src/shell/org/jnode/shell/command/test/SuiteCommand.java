@@ -21,8 +21,7 @@
  
 package org.jnode.shell.command.test;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -31,7 +30,6 @@ import junit.framework.TestSuite;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FlagArgument;
@@ -68,10 +66,10 @@ public class SuiteCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
         TestManager mgr = TestManager.getInstance();
         if (FLAG_LIST.isSet()) {
+            PrintWriter out = getOutput().getPrintWriter();
             for (Class<? extends Test> test : mgr.getTests()) {
                 out.print(test.getName() + " :");
                 for (String category : mgr.getCategories(test)) {

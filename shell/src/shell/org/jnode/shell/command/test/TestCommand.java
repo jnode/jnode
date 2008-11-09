@@ -21,15 +21,11 @@
  
 package org.jnode.shell.command.test;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 
@@ -56,8 +52,7 @@ public class TestCommand extends AbstractCommand {
      * 
      * @throws ClassNotFoundException 
      */
-    public void execute(CommandLine cmdLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
         try {
             Class<?> clazz = ARG_CLASS.getValueAsClass();
             TestResult res = new TestRunner().doRun(new TestSuite(clazz));
@@ -65,7 +60,7 @@ public class TestCommand extends AbstractCommand {
                 exit(1);
             }
         } catch (ClassNotFoundException ex) {
-            err.println("Class not found: " + ex.getMessage());
+            getError().getPrintWriter().println("Class not found: " + ex.getMessage());
             exit(2);
         }
     }

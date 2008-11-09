@@ -1,11 +1,7 @@
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellManager;
 
@@ -25,8 +21,7 @@ public class ExitCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine,
-                        InputStream in, PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
         ((CommandShell) sm.getCurrentShell()).exit();
     }
