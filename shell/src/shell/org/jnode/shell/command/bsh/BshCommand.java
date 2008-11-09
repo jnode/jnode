@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -58,12 +57,13 @@ public class BshCommand extends AbstractCommand {
         new BshCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
         Interpreter bsh = null;
         Object ret;
         boolean interactive = false;
-
+        InputStream in = getInput().getInputStream();
+        OutputStream out = getOutput().getOutputStream();
+        OutputStream err = getError().getOutputStream();
         if (FLAG_INTERACTIVE.isSet()) {
             bsh = createInterpreter(in, out, err, true);
             interactive = true;
@@ -77,7 +77,7 @@ public class BshCommand extends AbstractCommand {
             ret = bsh.eval(code);
 
             if (ret != null) {
-                out.println(ret);
+                out.write((ret + "\n").getBytes());
             }
         }
 
@@ -90,9 +90,10 @@ public class BshCommand extends AbstractCommand {
             ret = bsh.source(file);
 
             if (ret != null) {
-                out.println(ret);
+                out.write((ret + "\n").getBytes());
             }
         }
+        out.flush();
 
         if (bsh == null) {
             // If no arguments were given, default to interactive mode.

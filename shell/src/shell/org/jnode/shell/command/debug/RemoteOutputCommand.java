@@ -22,10 +22,9 @@
 package org.jnode.shell.command.debug;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -39,7 +38,6 @@ import org.jnode.debug.RemoteAppender;
 import org.jnode.debug.RemoteReceiver;
 import org.jnode.debug.UDPOutputStream;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -68,9 +66,8 @@ public class RemoteOutputCommand extends AbstractCommand {
         registerArguments(ARG_ADDRESS, ARG_PORT, FLAG_UDP);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
+        PrintWriter err = getError().getPrintWriter();
         try {
             final int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : DEFAULT_PORT;
             final InetAddress addr = ARG_ADDRESS.getAsInetAddress();
