@@ -21,11 +21,9 @@
  
 package org.jnode.shell.command.system;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.vm.scheduler.VmProcessor;
 
 /**
@@ -44,10 +42,10 @@ public class CpuIDCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) {
+    public void execute() {
         final VmProcessor cpu = VmProcessor.current();
+        PrintWriter out = getOutput().getPrintWriter();
         out.println(cpu.getCPUID());
         out.println(cpu.getPerformanceCounters());
     }
-
 }

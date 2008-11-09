@@ -21,7 +21,7 @@
 
 package org.jnode.vm.memmgr;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
@@ -333,7 +333,7 @@ public abstract class VmHeapManager extends VmSystemObject {
     /**
      * Print the statics on this object on out.
      */
-    public abstract void dumpStatistics(PrintStream out);
+    public abstract void dumpStatistics(PrintWriter out);
 
     public abstract GCStatistics getStatistics();
 

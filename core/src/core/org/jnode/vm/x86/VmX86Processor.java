@@ -21,7 +21,7 @@
 
 package org.jnode.vm.x86;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
@@ -387,7 +387,7 @@ public abstract class VmX86Processor extends VmProcessor {
         return perfCounters;
     }
 
-    public void dumpStatistics(PrintStream out) {
+    public void dumpStatistics(PrintWriter out) {
         out.println("Type       : " + (bootProcessor ? "BSP" : (logical ? "AP-logical" : "AP")));
         out.println("CPUID      : " + getCPUID());
         out.println("fxSave/Res : " + fxSaveCounter + "/" + fxRestoreCounter

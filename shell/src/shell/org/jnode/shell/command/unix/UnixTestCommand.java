@@ -22,8 +22,8 @@
 package org.jnode.shell.command.unix;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -50,8 +50,7 @@ public class UnixTestCommand extends AbstractCommand {
             this.kind = kind;
         }
     }
-
-    private PrintStream err;
+    
     private boolean bracketted;
     private int pos;
     private String[] args;
@@ -117,9 +116,10 @@ public class UnixTestCommand extends AbstractCommand {
         OPERATOR_MAP.put(")", new Operator(OP_RPAREN, 6, OP_SPECIAL));
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    public void execute() 
         throws Exception {
         boolean res = false;
+        CommandLine commandLine = getCommandLine();
         String commandName = commandLine.getCommandName();
         bracketted = (commandName != null && commandName.equals("["));
         args = commandLine.getArguments();
@@ -156,7 +156,7 @@ public class UnixTestCommand extends AbstractCommand {
                 exit(1);
             }
         } catch (SyntaxErrorException ex) {
-            err.println(ex.getMessage());
+            getError().getPrintWriter().println(ex.getMessage());
             exit(2);
         }
     }
@@ -324,6 +324,7 @@ public class UnixTestCommand extends AbstractCommand {
     }
 
     private void processAsOptions(String[] args) throws SyntaxErrorException {
+        PrintWriter err = getError().getPrintWriter();
         for (String option : args) {
             if (option.equals("--help")) {
                 err.println("Don't panic!");

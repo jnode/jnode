@@ -21,7 +21,7 @@
 
 package org.jnode.vm.scheduler;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.CpuID;
@@ -655,7 +655,7 @@ public abstract class VmProcessor extends VmSystemObject {
      *
      * @param out
      */
-    public abstract void dumpStatistics(PrintStream out);
+    public abstract void dumpStatistics(PrintWriter out);
 
     /**
      * Gets the isolates statics table of the current thread.

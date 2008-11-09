@@ -21,7 +21,7 @@
 
 package org.jnode.vm.classmgr;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.ByteOrder;
 
 import org.jnode.assembler.Label;
@@ -365,7 +365,7 @@ public abstract class VmStatics extends VmStaticsBase {
         return true;
     }
 
-    public final void dumpStatistics(PrintStream out) {
+    public final void dumpStatistics(PrintWriter out) {
         allocator.dumpStatistics(out);
     }
 

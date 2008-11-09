@@ -21,7 +21,7 @@
 
 package org.jnode.vm.classmgr;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -95,7 +95,7 @@ public class VmStaticsAllocator extends VmStaticsBase {
         return types.length;
     }
 
-    public final void dumpStatistics(PrintStream out) {
+    public final void dumpStatistics(PrintWriter out) {
         out.println("  #static int fields  " + typeCounter[TYPE_INT]);
         out.println("  #static long fields " + typeCounter[TYPE_LONG]);
         out.println("  #methods            " + typeCounter[TYPE_METHOD_CODE]);

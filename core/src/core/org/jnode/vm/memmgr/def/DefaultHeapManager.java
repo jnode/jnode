@@ -21,7 +21,7 @@
 
 package org.jnode.vm.memmgr.def;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.VmArchitecture;
@@ -408,7 +408,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * Print the statics on this object on out.
      */
-    public void dumpStatistics(PrintStream out) {
+    public void dumpStatistics(PrintWriter out) {
         out.println("WriteBarrier: " + getWriteBarrier());
     }
 

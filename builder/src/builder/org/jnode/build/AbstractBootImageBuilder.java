@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -40,11 +41,12 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
-import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -626,10 +628,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size "
                 + (bootHeapBitmapSize >>> 10) + "K");
             log("Shared statics");
-            clsMgr.getSharedStatics().dumpStatistics(System.out);
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
+            clsMgr.getSharedStatics().dumpStatistics(out);
             log("Isolated statics");
-            clsMgr.getIsolatedStatics().dumpStatistics(System.out);
-            vm.dumpStatistics(System.out);
+            clsMgr.getIsolatedStatics().dumpStatistics(out);
+            vm.dumpStatistics(out);
 
             logStatistics(os);
 

@@ -21,8 +21,6 @@
  
 package org.jnode.shell.command.driver;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.TreeMap;
 
@@ -37,7 +35,6 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 import org.jnode.shell.syntax.EnumArgument;
@@ -77,8 +74,9 @@ public class DeviceCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         if (ARG_ACTION.isSet()) {
             if (!ARG_DEVICE.isSet()) {
                 err.println("No target device specified");
@@ -153,7 +151,7 @@ public class DeviceCommand extends AbstractCommand {
      * @param out
      * @param dev
      */
-    protected void showDevice(PrintStream out, Device dev) {
+    protected void showDevice(PrintWriter out, Device dev) {
         final String prefix = "    ";
         out.println("Device: " + dev.getId());
         final String drvClassName = dev.getDriverClassName();
@@ -192,7 +190,7 @@ public class DeviceCommand extends AbstractCommand {
      * @param out
      * @throws NameNotFoundException
      */
-    protected void showDevices(PrintStream out) throws NameNotFoundException {
+    protected void showDevices(PrintWriter out) throws NameNotFoundException {
         // Create a sorted list
         final TreeMap<String, Device> tm = new TreeMap<String, Device>();
         final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);

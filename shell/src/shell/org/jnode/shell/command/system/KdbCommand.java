@@ -18,14 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
 package org.jnode.shell.command.system;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.vm.Unsafe;
@@ -55,8 +52,8 @@ public class KdbCommand extends AbstractCommand {
     }
     
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
+        PrintWriter out = getOutput().getPrintWriter();
         if (FLAG_OFF.isSet()) {
             Unsafe.setKdbEnabled(false);
             out.println("KDB disabled");

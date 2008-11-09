@@ -21,7 +21,7 @@
  
 package org.jnode.vm.memmgr.mmtk;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -178,17 +178,15 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     /**
      * @see org.jnode.vm.memmgr.VmHeapManager#dumpStatistics(java.io.PrintStream)
      */
-    public void dumpStatistics(PrintStream out) {
-        // TODO Auto-generated method stub
-
+    public void dumpStatistics(PrintWriter out) {
+        // Default behavior is to do nothing
     }
 
     /**
      * @see org.jnode.vm.memmgr.VmHeapManager#gc()
      */
     public void gc() {
-        // TODO Auto-generated method stub
-
+        // Default behavior is to do nothing
     }
 
     /**

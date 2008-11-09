@@ -21,8 +21,7 @@
  
 package org.jnode.shell.command.plugin;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
@@ -42,7 +41,6 @@ import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.URLPluginLoader;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.PluginArgument;
@@ -74,7 +72,7 @@ public class PluginCommand extends AbstractCommand {
     private final StringArgument ARG_VERSION =
         new StringArgument("version", Argument.OPTIONAL, "plugin version");
 
-    private PrintStream out;
+    private PrintWriter out;
     private PluginManager mgr;
     
 
@@ -91,9 +89,8 @@ public class PluginCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out,
-            PrintStream err) throws Exception {
-        this.out = out;
+    public void execute() throws Exception {
+        this.out = getOutput().getPrintWriter();
         try {
             AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws Exception {

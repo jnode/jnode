@@ -21,11 +21,7 @@
  
 package org.jnode.shell.command.system;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.vm.scheduler.IRQManager;
 import org.jnode.vm.scheduler.VmProcessor;
 
@@ -43,13 +39,12 @@ public class LsIRQCommand extends AbstractCommand {
     }
     
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) {
+    public void execute() {
         final VmProcessor proc = VmProcessor.current();
         final IRQManager irqMgr = proc.getIRQManager();
         final int max = irqMgr.getNumIRQs();
         for (int i = 0; i < max; i++) {
-            out.println("IRQ" + i + "\t" + irqMgr.getIrqCount(i) + "\t"
+            getOutput().getPrintWriter().println("IRQ" + i + "\t" + irqMgr.getIrqCount(i) + "\t"
                     + irqMgr.getHandlerInfo(i));
         }
     }

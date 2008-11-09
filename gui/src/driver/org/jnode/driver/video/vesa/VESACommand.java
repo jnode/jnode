@@ -1,5 +1,7 @@
 package org.jnode.driver.video.vesa;
 
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 
 import javax.naming.NameNotFoundException;
@@ -115,7 +117,8 @@ public class VESACommand {
             biosMemory.position(pos);
         }
 
-        VmProcessor.current().dumpStatistics(System.out);
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
+        VmProcessor.current().dumpStatistics(out);
         System.out.println("after dumpStatistics");
         if (pmInfoBlock != null) {
             System.out.println("step4");
