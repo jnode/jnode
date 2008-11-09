@@ -21,9 +21,8 @@
 
 package org.jnode.driver.block.ramdisk.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DriverException;
@@ -31,7 +30,6 @@ import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
