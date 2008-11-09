@@ -57,6 +57,7 @@ import java.security.AccessController;
 import java.util.Map;
 
 import javax.imageio.spi.IIORegistry;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * An abstract superclass for Classpath toolkits.
@@ -79,6 +80,7 @@ import javax.imageio.spi.IIORegistry;
  *
  * @author Sascha Brawer (brawer@dandelis.ch)
  */
+@SharedStatics
 public abstract class ClasspathToolkit
   extends Toolkit
 {
