@@ -3,6 +3,9 @@
  */
 package org.jnode.install.action;
 
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.fs.jfat.command.JGrub;
@@ -27,7 +30,7 @@ public class GrubInstallerAction implements InstallerAction {
                         inContext.getStringInput("Enter the installation disk device name (example: hda0) : ");
 
                     Device disk = DeviceUtils.getDevice(deviceID);
-                    JGrub jgrub = new JGrub(System.out, System.err, disk);
+                    JGrub jgrub = new JGrub(new PrintWriter(new OutputStreamWriter(System.out)), disk);
 
                     inContext.setStringValue(ActionConstants.INSTALL_ROOT_DIR, jgrub.getMountPoint());
                     return AbstractInstaller.Step.forth;
