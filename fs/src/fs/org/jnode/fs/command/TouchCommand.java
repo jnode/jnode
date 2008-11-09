@@ -22,11 +22,9 @@
 package org.jnode.fs.command;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 
@@ -51,9 +49,10 @@ public class TouchCommand extends AbstractCommand {
         new TouchCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
         File file = ARG_FILE.getValue();
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         if (!file.exists()) {
             File parentFile = file.getParentFile();
             if (parentFile != null && !parentFile.exists()) {

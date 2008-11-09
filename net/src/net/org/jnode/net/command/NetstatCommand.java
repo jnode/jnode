@@ -21,8 +21,7 @@
 
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.NetworkLayer;
@@ -30,7 +29,6 @@ import org.jnode.net.NetworkLayerManager;
 import org.jnode.net.TransportLayer;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 
@@ -50,16 +48,15 @@ public class NetstatCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
+    public void execute() throws Exception {
         final NetworkLayerManager nlm = NetUtils.getNLM();
 
         for (NetworkLayer nl : nlm.getNetworkLayers()) {
-            showStats(out, nl, 80);
+            showStats(getOutput().getPrintWriter(), nl, 80);
         }
     }
 
-    private void showStats(PrintStream out, NetworkLayer nl, int maxWidth) throws NetworkException {
+    private void showStats(PrintWriter out, NetworkLayer nl, int maxWidth) throws NetworkException {
         out.println(nl.getName() + ": ID " + nl.getProtocolID());
         final String prefix = "    ";
         out.print(prefix);
@@ -73,7 +70,7 @@ public class NetstatCommand extends AbstractCommand {
         out.println();
     }
 
-    private void showStats(PrintStream out, Statistics stat, int maxWidth, String prefix)
+    private void showStats(PrintWriter out, Statistics stat, int maxWidth, String prefix)
         throws NetworkException {
         final Statistic[] list = stat.getStatistics();
         if (list.length == 0) {

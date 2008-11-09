@@ -23,8 +23,6 @@ package org.jnode.fs.nfs.command;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.InetAddress;
 
 import javax.naming.NameNotFoundException;
@@ -42,7 +40,6 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.nfs.Protocol;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -90,8 +87,7 @@ public class NFSMountCommand extends AbstractCommand {
         new NFSMountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException,
+    public void execute() throws NameNotFoundException, DriverException, DeviceAlreadyRegisteredException,
         FileSystemException, IOException {
         final File mountPoint = MOUNTPOINT_ARG.getValue();
         final InetAddress host = HOST_ARG.getAddress();

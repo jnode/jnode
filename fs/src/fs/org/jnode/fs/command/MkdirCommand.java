@@ -22,11 +22,9 @@
 package org.jnode.fs.command;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 
@@ -48,8 +46,9 @@ public class MkdirCommand extends AbstractCommand {
         new MkdirCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) {
+    public void execute() {
         File dir = ARG_DIR.getValue();
+        PrintWriter err = getError().getPrintWriter();
         if (dir.exists()) {
             err.println(dir.getPath() + " already exists.");
             exit(1);

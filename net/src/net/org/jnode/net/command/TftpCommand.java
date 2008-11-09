@@ -22,12 +22,9 @@
 package org.jnode.net.command;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 import org.jnode.net.ipv4.tftp.TFTPClient;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -62,9 +59,8 @@ public class TftpCommand extends AbstractCommand {
         new TftpCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
-        TFTPClient client = new TFTPClient(out);
+    public void execute() throws Exception {
+        TFTPClient client = new TFTPClient(getOutput().getPrintWriter());
         String host = ARG_SERVER.getValue();
         File file = ARG_FILENAME.getValue();
         if (FLAG_PUT.isSet()) {
@@ -89,7 +85,7 @@ public class TftpCommand extends AbstractCommand {
                     exit(2);
                 }
             }
-            client.run(in);
+            client.run(getInput().getReader());
         }
     }
 }

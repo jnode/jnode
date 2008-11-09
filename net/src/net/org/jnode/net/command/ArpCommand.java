@@ -21,8 +21,7 @@
  
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.NoSuchProtocolException;
@@ -31,7 +30,6 @@ import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 
@@ -55,9 +53,10 @@ public class ArpCommand extends AbstractCommand {
         new ArpCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, 
-            PrintStream out, PrintStream err) throws NoSuchProtocolException, NetworkException {
-        ARPNetworkLayer arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
+    public void execute() throws NoSuchProtocolException, NetworkException {
+        ARPNetworkLayer arp = (ARPNetworkLayer) 
+                NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
+        PrintWriter out = getOutput().getPrintWriter();
         if (FLAG_CLEAR.isSet()) {
             arp.getCache().clear();
             out.println("Cleared the ARP cache");

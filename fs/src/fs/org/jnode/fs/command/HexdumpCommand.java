@@ -9,11 +9,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.URLArgument;
@@ -39,9 +38,11 @@ public class HexdumpCommand extends AbstractCommand {
         new HexdumpCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws IOException {
+    public void execute() throws IOException {
+        boolean myInput = false;
         InputStream is = null;
+        PrintWriter out = getOutput().getPrintWriter(false);
+        PrintWriter err = getError().getPrintWriter();
         try {
             // Set up the stream to be dumped.
             File file = ARG_FILE.getValue();
@@ -61,7 +62,8 @@ public class HexdumpCommand extends AbstractCommand {
                     exit(1);
                 }
             } else {
-                is = in;
+                is = getInput().getInputStream();
+                myInput = true;
             }
 
             // Now do the work
@@ -122,7 +124,7 @@ public class HexdumpCommand extends AbstractCommand {
             }
             out.flush();
         } finally {
-            if (is != null && is != in) {
+            if (is != null && myInput) {
                 try {
                     is.close();
                 } catch (IOException ex) {

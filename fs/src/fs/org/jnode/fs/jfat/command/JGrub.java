@@ -23,7 +23,7 @@
 package org.jnode.fs.jfat.command;
 
 import java.io.File;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.naming.NameNotFoundException;
@@ -48,18 +48,18 @@ import org.jnode.naming.InitialNaming;
  * @author Tango Devian
  */
 public class JGrub {
-    private final PrintStream out;
+    private final PrintWriter out;
     private final MBRFormatter stage1;
     private final Stage1_5 stage1_5;
     private final Stage2 stage2;
     private final Device device;
     private final String mountPoint;
 
-    public JGrub(PrintStream out, PrintStream err, Device device) throws GrubException {
-        this(out, err, device, new MBRFormatter(), new Stage1_5(), new Stage2());
+    public JGrub(PrintWriter out, Device device) throws GrubException {
+        this(out, device, new MBRFormatter(), new Stage1_5(), new Stage2());
     }
 
-    protected JGrub(PrintStream out, PrintStream err, Device device, MBRFormatter stage1,
+    protected JGrub(PrintWriter out, Device device, MBRFormatter stage1,
             Stage1_5 stage1_5, Stage2 stage2) throws GrubException {
         this.out = out;
         this.stage1 = stage1;

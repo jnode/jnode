@@ -21,15 +21,11 @@
 
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.WirelessNetDeviceAPI;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -60,8 +56,7 @@ public class WLanCtlCommand extends AbstractCommand {
         new WLanCtlCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws ApiNotFoundException, NetworkException {
+    public void execute() throws ApiNotFoundException, NetworkException {
         final Device dev = ARG_DEVICE.getValue();
         final WirelessNetDeviceAPI api;
         api = dev.getAPI(WirelessNetDeviceAPI.class);
@@ -69,7 +64,7 @@ public class WLanCtlCommand extends AbstractCommand {
         // Perform the selected operation
         if (FLAG_SET_ESSID.isSet()) {
             final String essid = ARG_VALUE.getValue();
-            out.println("Setting ESSID on " + dev.getId() + " to " + essid);
+            getOutput().getPrintWriter().println("Setting ESSID on " + dev.getId() + " to " + essid);
             api.setESSID(essid);
         }
     }

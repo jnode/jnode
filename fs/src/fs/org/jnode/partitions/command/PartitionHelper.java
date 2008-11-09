@@ -1,7 +1,7 @@
 package org.jnode.partitions.command;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import javax.naming.NameNotFoundException;
 
@@ -32,14 +32,14 @@ public class PartitionHelper {
     private final MasterBootRecord MBR;
     private BootSector bs;
     
-    private final PrintStream out;
+    private final PrintWriter out;
 
-    public PartitionHelper(String deviceId, PrintStream out) throws DeviceNotFoundException, ApiNotFoundException,
+    public PartitionHelper(String deviceId, PrintWriter out) throws DeviceNotFoundException, ApiNotFoundException,
             IOException, NameNotFoundException {
         this((IDEDevice) DeviceUtils.getDeviceManager().getDevice(deviceId), out);
     }
 
-    public PartitionHelper(IDEDevice device, PrintStream out) throws DeviceNotFoundException, ApiNotFoundException,
+    public PartitionHelper(IDEDevice device, PrintWriter out) throws DeviceNotFoundException, ApiNotFoundException,
             IOException {
         this.current = device;
         this.api = current.getAPI(BlockDeviceAPI.class);

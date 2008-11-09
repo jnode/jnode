@@ -21,8 +21,7 @@
  
 package org.jnode.net.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import javax.naming.NameNotFoundException;
 
@@ -37,7 +36,6 @@ import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.net.syntax.IPv4AddressArgument;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 
@@ -69,8 +67,8 @@ public class IfconfigCommand extends AbstractCommand {
         new IfconfigCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws NameNotFoundException, ApiNotFoundException, NetworkException {
+    public void execute() throws NameNotFoundException, ApiNotFoundException, NetworkException {
+        PrintWriter out = getOutput().getPrintWriter();
         if (!ARG_DEVICE.isSet()) {
             // Print MAC address, MTU and IP address(es) for all network devices.
             final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);

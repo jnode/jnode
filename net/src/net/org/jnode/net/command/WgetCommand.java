@@ -20,27 +20,27 @@
  */
 package org.jnode.net.command;
 
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.URLArgument;
 
 public class WgetCommand extends AbstractCommand {
+    private static final int BUFFER_SIZE = 8192;
+    
     private final FlagArgument ARG_DEBUG =
         new FlagArgument("debug", Argument.OPTIONAL, "if set, output debug information");
     private final URLArgument ARG_SOURCE = 
         new URLArgument("url", Argument.MANDATORY + Argument.MULTIPLE, "the source URL(s)");
 
-    private PrintStream out;
-    private PrintStream err;
+    private PrintWriter out;
+    private PrintWriter err;
     
     public WgetCommand() {
         super("Fetch the contents of one or more URLs.");
@@ -52,10 +52,9 @@ public class WgetCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
-        this.out = out;
-        this.err = err;
+    public void execute() throws Exception {
+        this.out = getOutput().getPrintWriter();
+        this.err = getError().getPrintWriter();
         boolean debug = ARG_DEBUG.isSet();
         int errorCount = 0;
         for (URL url : ARG_SOURCE.getValues()) {
@@ -108,15 +107,15 @@ public class WgetCommand extends AbstractCommand {
      */
     protected void get(URL url, String localFileName) throws IOException {
         InputStream is = null;
-        BufferedOutputStream bos = null;
+        FileOutputStream os = null;
         try {
             is = url.openStream();
-            bos = new BufferedOutputStream(new FileOutputStream(localFileName));
-            byte[] buffer = new byte[8192];
+            os = new FileOutputStream(localFileName);
+            byte[] buffer = new byte[BUFFER_SIZE];
             int numRead;
             long numWritten = 0;
             while ((numRead = is.read(buffer)) != -1) {
-                bos.write(buffer, 0, numRead);
+                os.write(buffer, 0, numRead);
                 numWritten += numRead;
             }
             is.close();
@@ -124,8 +123,8 @@ public class WgetCommand extends AbstractCommand {
             if (is != null) {
                 is.close();
             }
-            if (bos != null) {
-                bos.close();
+            if (os != null) {
+                os.close();
             }
         }
     }

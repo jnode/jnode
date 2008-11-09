@@ -22,14 +22,11 @@
 package org.jnode.fs.command;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.RemovableDeviceAPI;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 
@@ -52,14 +49,14 @@ public class EjectCommand extends AbstractCommand {
         new EjectCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    public void execute() 
         throws ApiNotFoundException, IOException {
         final Device dev = ARG_DEVICE.getValue();
         final RemovableDeviceAPI api = dev.getAPI(RemovableDeviceAPI.class);
         try {
             api.eject();
         } catch (IOException ex) {
-            err.println("eject failed for " + dev.getId() + ": " + ex.getMessage());
+            getError().getPrintWriter().println("eject failed for " + dev.getId() + ": " + ex.getMessage());
             exit(1);
         }
     }
