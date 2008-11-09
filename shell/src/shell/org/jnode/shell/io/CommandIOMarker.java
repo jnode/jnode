@@ -66,12 +66,12 @@ public final class CommandIOMarker extends BaseCommandIO {
     }
 
     @Override
-    public PrintStream getPrintStream() {
+    public PrintStream getPrintStream(boolean autoflush) {
         throw new CommandIOException("I/O not supported on CommandIOMarker");
     }
 
     @Override
-    public PrintWriter getPrintWriter() {
+    public PrintWriter getPrintWriter(boolean autoflush) {
         throw new CommandIOException("I/O not supported on CommandIOMarker");
     }
 

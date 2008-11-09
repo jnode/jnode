@@ -60,12 +60,12 @@ public class CommandOutput extends BaseCommandIO {
         return outputStream;
     }
     
-    public PrintStream getPrintStream() {
+    public PrintStream getPrintStream(boolean autoflush) {
         if (printStream == null) {
             if (outputStream instanceof PrintStream) {
                 printStream = (PrintStream) outputStream;
             } else {
-                printStream = new PrintStream(getOutputStream(), true);
+                printStream = new PrintStream(getOutputStream(), autoflush);
             }
         }
         return printStream;
@@ -82,12 +82,12 @@ public class CommandOutput extends BaseCommandIO {
         return writer;
     }
     
-    public PrintWriter getPrintWriter() {
+    public PrintWriter getPrintWriter(boolean autoflush) {
         if (printWriter == null) {
             if (writer instanceof PrintWriter) {
                 printWriter = (PrintWriter) writer;
             } else {
-                printWriter = new PrintWriter(getWriter(), true);
+                printWriter = new PrintWriter(getWriter(), autoflush);
             }
         }
         return printWriter;
