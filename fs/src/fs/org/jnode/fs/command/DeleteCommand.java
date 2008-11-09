@@ -21,18 +21,17 @@
 
 package org.jnode.fs.command;
 
+import java.io.File;
+import java.io.PrintWriter;
+
+import javax.naming.NameNotFoundException;
+
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
-
-import javax.naming.NameNotFoundException;
-import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 /**
  * Delete a file or a empty directory
@@ -54,7 +53,7 @@ public class DeleteCommand extends AbstractCommand {
     
     private FileSystemService fss;
     private boolean recursive;
-    private PrintStream err;
+    private PrintWriter err;
     
 
     public DeleteCommand() {
@@ -66,13 +65,12 @@ public class DeleteCommand extends AbstractCommand {
         new DeleteCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws NameNotFoundException {
+    public void execute() throws NameNotFoundException {
         // Lookup the Filesystem service
         fss = InitialNaming.lookup(FileSystemService.NAME);
         recursive = FLAG_RECURSIVE.isSet();
         File[] paths = ARG_PATHS.getValues();
-        this.err = err;
+        this.err = getError().getPrintWriter();
         boolean ok = true;
         for (File file : paths) {
             ok &= deleteFile(file);

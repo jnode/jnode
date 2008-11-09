@@ -21,19 +21,18 @@
 package org.jnode.fs.command;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.DeviceArgument;
 
@@ -55,38 +54,34 @@ public class DFCommand extends AbstractCommand {
         registerArguments(ARG_DEVICE);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) throws NameNotFoundException {
+    public void execute() throws NameNotFoundException {
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
         final Map<String, String> mountPoints = fss.getDeviceMountPoints();
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        format(pw, "ID", true);
-        format(pw, "Size", false);
-        format(pw, "Used", false);
-        format(pw, "Free", false);
-        pw.println("Mount");
-        pw.println();
+        PrintWriter out = getOutput().getPrintWriter(false);
+        format(out, "ID", true);
+        format(out, "Size", false);
+        format(out, "Used", false);
+        format(out, "Free", false);
+        out.println("Mount");
+        out.println();
         if (ARG_DEVICE.isSet()) {
             final Device dev = ARG_DEVICE.getValue();
             FileSystem<?> fs = fss.getFileSystem(dev);
             if (fs == null) {
-                pw.println("No filesystem on device");
+                out.println("No filesystem on device");
             } else {
-                displayInfo(pw, dev, fs, mountPoints.get(fs.getDevice().getId()));
+                displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
             }
         } else {
             final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             for (Device dev : dm.getDevices()) {
                 FileSystem<?> fs = fss.getFileSystem(dev);
                 if (fs != null) {
-                    displayInfo(pw, dev, fs, mountPoints.get(fs.getDevice().getId()));
+                    displayInfo(out, dev, fs, mountPoints.get(fs.getDevice().getId()));
                 }
             }
         }
-        pw.flush();
-        out.print(sw.toString());
-
+        out.flush();
     }
 
     /**
@@ -122,15 +117,17 @@ public class DFCommand extends AbstractCommand {
     private void format(PrintWriter out, String str, boolean left) {
         int ln;
         ln = 15 - str.length();
-        if (ln < 0) str = str.substring(0, 15);
-        else {
+        if (ln < 0) {
+            str = str.substring(0, 15); 
+        } else {
             if (left) {
                 out.print(str);
             }
             for (int i = 0; i < ln; i++) out.print(' ');
         }
-        if (!left)
+        if (!left) {
             out.print(str);
+        }
         out.print(' ');
     }
 }

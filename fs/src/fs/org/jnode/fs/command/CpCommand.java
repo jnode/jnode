@@ -27,19 +27,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 
 /**
  * File copy utility.  This utility copies one file to another file, or multiple files or directories
- * into a directory.  Recursive directory copy is supported.
+ * into an existing directory.  Files are copied byte-wise (not character-wise).  Recursive directory 
+ * copy is supported.
  * 
  * @author crawley@jnode.org
  */
@@ -77,8 +76,8 @@ public class CpCommand extends AbstractCommand {
     private int filesCopied = 0;
     private int directoriesCreated = 0;
     private BufferedReader in;
-    private PrintStream out;
-    private PrintStream err;
+    private PrintWriter out;
+    private PrintWriter err;
     private byte[] buffer = new byte[1024 * 8];
 
     public CpCommand() {
@@ -91,13 +90,12 @@ public class CpCommand extends AbstractCommand {
         new CpCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
-        this.out = out;
-        this.err = err;
+    public void execute() throws Exception {
+        this.out = getOutput().getPrintWriter();
+        this.err = getError().getPrintWriter();
         processFlags();
         if (mode == MODE_INTERACTIVE) {
-            this.in = new BufferedReader(new InputStreamReader(in));
+            this.in = new BufferedReader(getInput().getReader());
         }
         File[] sources = ARG_SOURCE.getValues();
         File target = ARG_TARGET.getValue();
