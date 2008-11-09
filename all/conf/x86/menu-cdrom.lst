@@ -4,7 +4,8 @@ timeout 5
 
 # ---------------------------
 title JNode (default)
-kernel /jnode32.gz mp=no
+serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1
+kernel /jnode32.gz mp=no kdb
 module /default.jgz
 
 # ---------------------------

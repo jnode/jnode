@@ -21,13 +21,11 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.URLArgument;
@@ -58,8 +56,7 @@ public class ClasspathCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         if (ARG_ADD.isSet()) {
             addToClassPath(ARG_ADD.getValue());
         } else if (ARG_CLEAR.isSet()) {
@@ -67,7 +64,7 @@ public class ClasspathCommand extends AbstractCommand {
         } else if (ARG_REFRESH.isSet()) {
             refreshClassPath();
         } else {
-            printClassPath(out);
+            printClassPath(getOutput().getPrintWriter());
         }
     }
 
@@ -101,7 +98,7 @@ public class ClasspathCommand extends AbstractCommand {
         }
     }
 
-    private void printClassPath(PrintStream out) {
+    private void printClassPath(PrintWriter out) {
         getClassLoader().print(out);
     }
 
@@ -128,7 +125,7 @@ public class ClasspathCommand extends AbstractCommand {
             addURL(url);
         }
 
-        public void print(PrintStream out) {
+        public void print(PrintWriter out) {
             URL[] urls = getURLs();
             for (int i = 0; i < urls.length; i++) {
                 out.println(urls[i]);

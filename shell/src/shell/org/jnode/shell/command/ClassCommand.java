@@ -21,13 +21,11 @@
 
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -49,15 +47,14 @@ public class ClassCommand extends AbstractCommand {
         registerArguments(ARG_CLASS);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         String className = ARG_CLASS.getValue();
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             final Class<?> type = cl.loadClass(className);
-            showClass(type, out);
+            showClass(type, getOutput().getPrintWriter());
         } catch (ClassNotFoundException ex) {
-            err.println("Cannot find the requested class: " + className);
+            getError().getPrintWriter().println("Cannot find the requested class: " + className);
             exit(1);
         }
     }
@@ -66,7 +63,7 @@ public class ClassCommand extends AbstractCommand {
         new ClassCommand().execute(args);
     }
 
-    private void showClass(final Class<?> type, final PrintStream out) {
+    private void showClass(final Class<?> type, final PrintWriter out) {
         final VmType<?> vmType = AccessController.doPrivileged(
                 new PrivilegedAction<VmType<?>>() {
                     public VmType<?> run() {

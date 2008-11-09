@@ -21,11 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.StringArgument;
 
@@ -37,7 +35,8 @@ import org.jnode.shell.syntax.StringArgument;
  */
 public class EchoCommand extends AbstractCommand {
 
-    private final StringArgument ARG_WORDS = new StringArgument("text", Argument.MULTIPLE, "the text to be printed");
+    private final StringArgument ARG_WORDS = 
+        new StringArgument("text", Argument.MULTIPLE, "the text to be printed");
 
     public EchoCommand() {
         super("Print the argument text to standard output");
@@ -51,8 +50,8 @@ public class EchoCommand extends AbstractCommand {
     /**
      * Execute the command
      */
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
+        final PrintWriter out = getOutput().getPrintWriter();
         String[] words = ARG_WORDS.getValues();
         for (int i = 0; i < words.length; i++) {
             if (i > 0) {

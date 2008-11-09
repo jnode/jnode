@@ -21,12 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -65,8 +62,9 @@ public class DisassembleCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
+        final PrintWriter out = getOutput().getPrintWriter();
+        final PrintWriter err = getError().getPrintWriter();
         final String className = ARG_CLASS.getValue();
         final String methodName = ARG_METHOD.isSet() ? ARG_METHOD.getValue() : null;
         final int level = ARG_LEVEL.isSet() ? ARG_LEVEL.getValue() : 0;
@@ -96,7 +94,7 @@ public class DisassembleCommand extends AbstractCommand {
             exit(1);
         }
         final long start = System.currentTimeMillis();
-        final int count = type.disassemble(methodName, level, test, new OutputStreamWriter(out));
+        final int count = type.disassemble(methodName, level, test, out);
         final long end = System.currentTimeMillis();
         out.println("Disassembling " + count + " methods took " + (end - start) + "ms");
     }

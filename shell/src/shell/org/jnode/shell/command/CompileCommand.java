@@ -21,11 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -61,12 +59,12 @@ public class CompileCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
         final String className = ARG_CLASS.getValue();
         final int level = ARG_LEVEL.isSet() ? ARG_LEVEL.getValue() : 0;
         final boolean test = ARG_TEST.isSet();
-
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         if (test) {
             if (maxTestLevel == -1) {
                 err.println("No test compilers are currently registered");

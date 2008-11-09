@@ -22,7 +22,6 @@
 package org.jnode.shell.command.unix;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Stack;

@@ -23,15 +23,13 @@ package org.jnode.shell.command;
 
 import gnu.java.security.action.GetPropertiesAction;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.security.AccessController;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 
 /**
  * @author epr
@@ -49,14 +47,13 @@ public class EnvCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
+    public void execute() throws Exception {
         final Properties ps = (Properties) AccessController.doPrivileged(new GetPropertiesAction());
         final TreeMap<Object, Object> sortedPs = new TreeMap<Object, Object>(ps);
+        final PrintWriter out = getOutput().getPrintWriter();
         for (Map.Entry<Object, Object> entry : sortedPs.entrySet()) {
             final String key = entry.getKey().toString();
             final String value = entry.getValue().toString();
-
             out.println(key + '=' + value);
         }
     }
