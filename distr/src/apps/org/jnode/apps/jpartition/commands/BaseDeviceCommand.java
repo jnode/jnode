@@ -1,6 +1,8 @@
 package org.jnode.apps.jpartition.commands;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 import org.jnode.apps.jpartition.commands.framework.BaseCommand;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
@@ -24,7 +26,7 @@ public abstract class BaseDeviceCommand extends BaseCommand {
     protected final PartitionHelper createPartitionHelper() throws CommandException {
         try {
             //FIXME replace System.out by output stream from (Console)ViewFactory 
-            return new PartitionHelper(device, System.out);
+            return new PartitionHelper(device, new PrintWriter(new OutputStreamWriter(System.out)));
         } catch (DeviceNotFoundException e) {
             throw new CommandException(e);
         } catch (ApiNotFoundException e) {

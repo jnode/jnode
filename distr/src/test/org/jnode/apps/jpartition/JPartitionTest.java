@@ -1,5 +1,8 @@
 package org.jnode.apps.jpartition;
 
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
 import junit.framework.TestSuite;
 
 import org.jnode.apps.jpartition.consoleview.ConsoleViewFactory;
@@ -41,7 +44,7 @@ public class JPartitionTest extends TestSuite {
 
         // DeviceUtils.createFakeDevice(new ErrorReporter());
         AbstractIDEDevice dev = DeviceUtils.createFileDevice();
-        JGrub jgrub = new JGrub(System.out, System.err, dev);
+        JGrub jgrub = new JGrub(new PrintWriter(new OutputStreamWriter(System.out)), dev);
         jgrub.install();
 
         JPartitionCommand.main(args);
