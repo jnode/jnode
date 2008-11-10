@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jtestserver.server"
+        name="JTestServer"
+        version="0.1"
+        provider-name="JNode.org"
+        provider-url="http://www.jnode.org/"
+        license-name="gpl">
+
+  <requires>
+    <import plugin="gnu.mauve"/>
+    <import plugin="org.jnode.test"/>
+  </requires>
+                
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jtestserver.server.*"/>
+      <export name="org.jtestserver.server.commands.*"/>
+      <export name="org.jtestserver.common.*"/>
+      <export name="org.jtestserver.common.message.*"/>
+      <export name="org.jtestserver.common.protocol.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.security.AllPermission" />  
+  </extension>
+
+   <extension point="org.jnode.shell.aliases">
+    <alias name="TestServer" class="org.jtestserver.server.TestServer"/>
+  </extension>
+        
+</plugin>
