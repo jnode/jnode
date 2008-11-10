@@ -1,5 +1,7 @@
 // Copyright (C) 2004 by Object Refinery Limited
 // Written by David Gilbert (david.gilbert@object-refinery.com)
+// Modified by Levente S\u00e1ntha (lsantha@jnode.org)
+// Modified by Peter Barth (peda@jnode.org)
 
 // This file is part of Mauve Reporter.
 
