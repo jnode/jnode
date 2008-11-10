@@ -25,15 +25,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.Hashtable;
 
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.Argument;
@@ -74,8 +70,9 @@ public class SyntaxCommand extends AbstractCommand {
         new SyntaxCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute()  throws Exception {
+        PrintWriter out = getOutput().getPrintWriter();
+        PrintWriter err = getError().getPrintWriter();
         SyntaxManager synMgr = ShellUtils.getCurrentSyntaxManager();
         if (ARG_DUMP_ALL.isSet()) {
             for (String alias : synMgr.getKeys()) {
@@ -130,7 +127,7 @@ public class SyntaxCommand extends AbstractCommand {
         return ARG_ALIAS.getValue();
     }
 
-    private void dumpSyntax(String alias, SyntaxBundle bundle, PrintStream out) 
+    private void dumpSyntax(String alias, SyntaxBundle bundle, PrintWriter out) 
         throws IOException {
         XMLElement element = new XMLElement(new Hashtable<String, Object>(), false, false);
         element.setName("syntax");
@@ -143,9 +140,7 @@ public class SyntaxCommand extends AbstractCommand {
         for (Syntax syntax : syntaxes) {
             element.addChild(syntax.toXML());
         }
-        Writer writer = new OutputStreamWriter(out);
-        element.write(writer);
-        writer.flush();
+        element.write(out);
         out.println();
     }
     

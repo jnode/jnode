@@ -22,7 +22,9 @@
 package org.jnode.test.shell.syntax;
 
 import java.io.File;
+
 import junit.framework.TestCase;
+
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FileArgument;

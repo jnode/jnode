@@ -21,11 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -43,8 +41,8 @@ public class MemoryCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
+        PrintWriter out = getOutput().getPrintWriter();
         final Runtime rt = Runtime.getRuntime();
         out.println("Total memory " + NumberUtils.toBinaryByte(rt.totalMemory()));
         out.println("Used memory  " + NumberUtils.toBinaryByte(rt.totalMemory() - rt.freeMemory()));

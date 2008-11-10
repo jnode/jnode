@@ -22,7 +22,9 @@
 package org.jnode.test.shell.syntax;
 
 import java.io.File;
+
 import junit.framework.TestCase;
+
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.NoTokensAvailableException;
 import org.jnode.shell.syntax.Argument;

@@ -22,6 +22,7 @@
 package org.jnode.test.shell.syntax;
 
 import junit.framework.TestCase;
+
 import org.jnode.shell.syntax.MuAlternation;
 import org.jnode.shell.syntax.MuArgument;
 import org.jnode.shell.syntax.MuBackReference;

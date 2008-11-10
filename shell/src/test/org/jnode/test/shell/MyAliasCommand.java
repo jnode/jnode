@@ -21,11 +21,7 @@
 
 package org.jnode.test.shell;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
@@ -47,7 +43,6 @@ public class MyAliasCommand extends AbstractCommand {
         registerArguments(ARG_ALIAS, ARG_CLASS, ARG_REMOVE);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
     }
 }

@@ -21,11 +21,9 @@
 
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.ThreadNameArgument;
@@ -61,8 +59,7 @@ public class ThreadCommand extends AbstractCommand {
     /**
      * Execute this command
      */
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
         // If threadName is null, we'll print all threads
         String threadName = (ARG_NAME.isSet()) ? ARG_NAME.getValue() : null;
         boolean dump = FLAG_GROUP_DUMP.isSet();
@@ -74,11 +71,13 @@ public class ThreadCommand extends AbstractCommand {
         }
 
         if (dump) {
-            // Produce an ugly (but useful) ThreadGroup dump
+            // Produce an ugly (but useful) ThreadGroup dump.  Unfortunately,
+            // it goes to System.out, and we cannot fix it w/o changing a Java
+            // standard API.
             grp.list();
         } else {
             // Show the threads in the ThreadGroup tree.
-            showThreads(grp, out, threadName);
+            showThreads(grp, getOutput().getPrintWriter(), threadName);
         }
     }
 
@@ -91,7 +90,7 @@ public class ThreadCommand extends AbstractCommand {
      * @param out the destination for output
      * @param threadName if non-null, only display this thread.
      */
-    private void showThreads(ThreadGroup grp, PrintStream out, String threadName) {
+    private void showThreads(ThreadGroup grp, PrintWriter out, String threadName) {
         if (threadName == null) {
             out.println(GROUP + grp.getName());
         }

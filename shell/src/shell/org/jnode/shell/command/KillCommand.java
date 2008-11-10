@@ -21,11 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
@@ -51,8 +49,8 @@ public class KillCommand extends AbstractCommand {
     }
 
     @SuppressWarnings("deprecation")
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
+        PrintWriter out = getError().getPrintWriter();
         boolean debug = FLAG_DEBUG.isSet();
         int threadId = ARG_THREADID.getValue();
         if (debug) {
