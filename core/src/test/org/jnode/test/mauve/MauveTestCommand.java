@@ -2,6 +2,9 @@
 // Copyright (C) 2005 by <zander@kde.org>
 // Written by David Gilbert (david.gilbert@object-refinery.com)
 // Written by Thomas Zander <zander@kde.org>
+// Modified by Levente S\u00e1ntha (lsantha@jnode.org)
+// Modified by Peter Barth (peda@jnode.org)
+// Modified by Fabien DUMINY (fduminy@jnode.org)
 
 // This file is part of Mauve.
 

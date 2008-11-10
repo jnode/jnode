@@ -2,6 +2,9 @@
  Copyright (C) 2005 Mark J. Wielaard
  This file is part of Mauve.
 
+ Modified by Levente S\u00e1ntha (lsantha@jnode.org)
+ Modified by Ewout Prangsma (epr@jnode.org)
+ 
  Mauve is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2, or (at your option)
