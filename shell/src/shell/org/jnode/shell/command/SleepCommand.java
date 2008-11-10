@@ -21,11 +21,7 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.IntegerArgument;
 
@@ -49,8 +45,7 @@ public class SleepCommand extends AbstractCommand {
         new SleepCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
         Integer seconds = SECONDS_ARG.getValue();
         if (seconds > 0) {
             Thread.sleep(seconds * 1000);

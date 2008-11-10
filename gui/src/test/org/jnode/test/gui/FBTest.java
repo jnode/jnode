@@ -109,8 +109,7 @@ public class FBTest extends AbstractCommand {
         new FBTest().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in,
-                        PrintStream out, PrintStream err) {
+    public void execute() {
 
         Device dev = ARG_DEVICE.getValue();
         count = ARG_LOOPS.isSet() ? ARG_LOOPS.getValue() : 100;
@@ -120,7 +119,7 @@ public class FBTest extends AbstractCommand {
             if (dev == null) {
                 final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
                 if (devs.size() == 0) {
-                    err.println("No framebuffer devices to test");
+                    getError().getPrintWriter().println("No framebuffer devices to test");
                     exit(1);
                 }
                 dev = new ArrayList<Device>(devs).get(0);

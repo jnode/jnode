@@ -21,11 +21,7 @@
 
 package org.jnode.test.shell;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.argument.FileArgument;
@@ -42,7 +38,7 @@ public class MyDirCommand extends AbstractCommand {
             "List the entries of the given path",
             new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
+    public void execute() throws Exception {
+        // suddenly ... nothing happened
     }
 }

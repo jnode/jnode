@@ -21,9 +21,8 @@
 
 package org.jnode.test.shell.syntax;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import junit.framework.TestCase;
+
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -46,9 +45,8 @@ public class RepeatedSyntaxTest extends TestCase {
             registerArguments(arg);
         }
 
-        public void execute(CommandLine commandLine, InputStream in,
-                            PrintStream out, PrintStream err) throws Exception {
-            out.print(arg.getValue());
+        public void execute() throws Exception {
+            getOutput().getPrintWriter().print(arg.getValue());
         }
     }
 

@@ -24,8 +24,7 @@ package org.jnode.shell.command;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,7 +32,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.StringArgument;
@@ -66,13 +64,13 @@ public class JavaCommand extends AbstractCommand {
     /**
      * Execute the command
      */
-    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
-        throws Exception {
-
+    public void execute() throws Exception {
+        PrintWriter err = getError().getPrintWriter();
+        
         // Build our classloader
         final ClassLoader parent_cl = Thread.currentThread().getContextClassLoader();
         JCClassLoader cl = new JCClassLoader(parent_cl, new String[]{"./"});
-
+        
         Method mainMethod = null;
         String className = ARG_CLASS.getValue();
         try {

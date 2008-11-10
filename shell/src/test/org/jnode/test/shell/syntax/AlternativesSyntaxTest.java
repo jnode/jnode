@@ -21,9 +21,8 @@
 
 package org.jnode.test.shell.syntax;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import junit.framework.TestCase;
+
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
@@ -52,8 +51,7 @@ public class AlternativesSyntaxTest extends TestCase {
             registerArguments(fileArg, intArg, flagArg);
         }
 
-        public void execute(CommandLine commandLine, InputStream in,
-                            PrintStream out, PrintStream err) throws Exception {
+        public void execute() throws Exception {
         }
     }
 

@@ -21,15 +21,13 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.TreeSet;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.CountryArgument;
 import org.jnode.shell.syntax.FlagArgument;
@@ -63,8 +61,8 @@ public class LocaleCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(CommandLine commandLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
+    public void execute() throws Exception {
+        PrintWriter out = getOutput().getPrintWriter();
         if (ARG_LANGUAGE.isSet()) {
             final String language = ARG_LANGUAGE.getValue();
 
@@ -73,7 +71,8 @@ public class LocaleCommand extends AbstractCommand {
 
             Locale locale = findLocale(language, country, variant);
             if (locale == null) {
-                err.println("No Locale is available for " + language + " " + country + " " + variant);
+                getError().getPrintWriter().println(
+                        "No Locale is available for " + language + " " + country + " " + variant);
                 exit(1);
             }
             out.println("Setting default Locale to " + formatLocale(locale));
@@ -90,7 +89,7 @@ public class LocaleCommand extends AbstractCommand {
      * 
      * @param out destination for the listing
      */
-    private void listLocales(PrintStream out) {
+    private void listLocales(PrintWriter out) {
         // (The getAvailableLocales() method returns a cloned array ...)
         Locale[] locales = Locale.getAvailableLocales();
         TreeSet<Locale> treeSet = new TreeSet<Locale>(new Comparator<Locale>() {

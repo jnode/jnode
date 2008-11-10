@@ -21,6 +21,7 @@
 package org.jnode.test.shell.syntax;
 
 import junit.framework.TestCase;
+
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.NoTokensAvailableException;
 import org.jnode.shell.syntax.CommandSyntaxException;

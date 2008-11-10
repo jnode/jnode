@@ -21,11 +21,9 @@
  
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.PropertyNameArgument;
 import org.jnode.shell.syntax.StringArgument;
@@ -54,8 +52,8 @@ public class SetCommand extends AbstractCommand {
         new SetCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-        throws Exception {
+    public void execute() throws Exception {
+        PrintWriter out = getOutput().getPrintWriter();
         String key = keyArg.getValue();
         if (!valueArg.isSet()) {
             out.println("Removing " + key);

@@ -23,6 +23,7 @@ package org.jnode.test.shell.syntax;
 
 import java.util.Collection;
 import java.util.HashMap;
+
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 

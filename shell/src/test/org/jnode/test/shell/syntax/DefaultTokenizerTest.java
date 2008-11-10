@@ -22,7 +22,9 @@
 package org.jnode.test.shell.syntax;
 
 import java.util.NoSuchElementException;
+
 import junit.framework.TestCase;
+
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.DefaultInterpreter;
 import org.jnode.shell.ShellException;

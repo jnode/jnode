@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
 import junit.framework.TestCase;
+
 import org.jnode.shell.help.def.DefaultHelp;
 
 /**
