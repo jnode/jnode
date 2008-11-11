@@ -80,6 +80,7 @@
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 	<property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
 	<property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
+    <property name="junit4.jar" value="${root.dir}/distr/lib/junit-4.1.jar"/>
 	
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
