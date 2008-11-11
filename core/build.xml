@@ -13,6 +13,7 @@
   <!-- Subproject specific classpath -->
   <path id="my-cp">
     <path refid="cp"/>
+    <pathelement location="${junit4.jar}"/>
   	<pathelement location="${mmtk.jar}"/>
   	<pathelement location="${mauve.jar}"/>
   </path>
