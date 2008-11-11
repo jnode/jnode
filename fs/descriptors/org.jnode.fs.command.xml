@@ -21,7 +21,7 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="cat" class="org.jnode.fs.command.CatCommand"/>
-    <alias name="cd"  class="org.jnode.fs.command.CdCommand"/>
+    <alias name="cd"  class="org.jnode.fs.command.CdCommand" internal="yes"/>
     <alias name="cp" class="org.jnode.fs.command.CpCommand"/>
     <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
     <alias name="df" class="org.jnode.fs.command.DFCommand"/>
