@@ -51,6 +51,7 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.KeyboardReader;
+import org.jnode.driver.console.textscreen.KeyboardReaderAction;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -647,15 +648,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
         return result.toString();
     }
-
-    public Completable parseCommandLine(String cmdLineStr)
-        throws ShellException {
-        return interpreter.parsePartial(this, cmdLineStr);
-    }
     
     /**
      * This method is called by the console input driver to perform command line
-     * completion in response to a TAB character.
+     * completion in response to a {@link KeyboardReaderAction#KR_COMPLETE} action; 
+     * typically a TAB character.
      */
     public CompletionInfo complete(String partial) {
         if (!readingCommand) {
@@ -674,7 +671,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // do command completion
         completion = new CommandCompletions(interpreter);
         try {
-            Completable cl = parseCommandLine(partial);
+            Completable cl = interpreter.parsePartial(this, partial);
             if (cl != null) {
                 cl.complete(completion, this);
             }
@@ -682,12 +679,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             outPW.println(); // next line
             errPW.println("Cannot parse: " + ex.getMessage());
             stackTrace(ex);
-
-        } catch (CompletionException ex) {
+        } catch (Throwable ex) {
             outPW.println(); // next line
             errPW.println("Problem in completer: " + ex.getMessage());
             stackTrace(ex);
-        }
+        }   
 
         // Make sure that the shell's completion context gets nulled.
         CompletionInfo myCompletion = completion;
@@ -695,6 +691,29 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return myCompletion;
     }
     
+    /**
+     * This method is responsible for generating incremental help in response
+     * to a @link KeyboardReaderAction#KR_HELP} action.
+     */
+    public boolean help(String partial, PrintWriter pw) {
+        if (!readingCommand) {
+            return false;
+        }
+        try {
+            return interpreter.help(this, partial, pw);
+        } catch (ShellException ex) {
+            outPW.println(); // next line
+            errPW.println("Cannot parse: " + ex.getMessage());
+            stackTrace(ex);
+            return false;
+        } catch (Throwable ex) {
+            outPW.println(); // next line
+            errPW.println("Problem in incremental help: " + ex.getMessage());
+            stackTrace(ex);
+            return false;
+        } 
+    }
+
     public void addCommandToHistory(String cmdLineStr) {
         // Add this command to the command history.
         if (isHistoryEnabled() && !cmdLineStr.equals(lastCommandLine)) {

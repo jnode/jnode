@@ -21,6 +21,8 @@
 
 package org.jnode.shell;
 
+import java.io.PrintWriter;
+
 /**
  * This is the API that a shell-based interpreter must implement.
  * 
@@ -50,7 +52,7 @@ public interface CommandInterpreter {
      * completed.
      * 
      * @param shell the current CommandShell.
-     * @param partial a input to the interpreter.
+     * @param partial a partial command line
      * @return the CommandLine represent the fragment of the supplied command
      *         input to be completed.
      * @throws ShellException 
@@ -73,4 +75,15 @@ public interface CommandInterpreter {
      * @return the word with any necessary escaping or quoting added.
      */
     String escapeWord(String word);
+
+    /**
+     * Get incremental help for the partial command line.
+     * 
+     * @param shell the current CommandShell.
+     * @param partial a partial command line
+     * @param pw the destination for any help information
+     * @return <code>true</code> if useful help information was written to 'pw'
+     * @throws ShellException 
+     */
+    boolean help(CommandShell shell, String partial, PrintWriter pw) throws ShellException;
 }

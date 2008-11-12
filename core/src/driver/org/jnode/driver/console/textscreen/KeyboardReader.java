@@ -21,6 +21,7 @@
 package org.jnode.driver.console.textscreen;
 
 import java.awt.event.KeyEvent;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -187,7 +188,17 @@ public class KeyboardReader extends Reader
                 case KR_COMPLETE:
                     // Perform completion
                     if (completer != null) {
-                        if (currentLine.complete()) {
+                        if (currentLine.complete(completer)) {
+                            currentLine.start(true);
+                        }
+                        out.write(currentPrompt);
+                        refreshCurrentLine();
+                    }
+                    break;
+                case KR_HELP:
+                    // Request incremental help
+                    if (completer != null) {
+                        if (currentLine.help(completer)) {
                             currentLine.start(true);
                         }
                         out.write(currentPrompt);

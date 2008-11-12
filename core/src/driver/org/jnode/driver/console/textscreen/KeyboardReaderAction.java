@@ -33,9 +33,16 @@ public enum KeyboardReaderAction {
     KR_KILL_LINE,
 
     /**
-     * This action causes the input completion to be performed.
+     * This action causes the input completion to be performed on the current
+     * partial input line.
      */
     KR_COMPLETE,
+
+    /**
+     * This action causes incremental help to be output for the current 
+     * partial input line.
+     */
+    KR_HELP,
 
     /**
      * This action causes the input line to be refreshed to the

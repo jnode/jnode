@@ -21,6 +21,7 @@
 
 package org.jnode.shell;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -76,30 +77,16 @@ public class DefaultInterpreter implements CommandInterpreter {
     private static final char ESCAPE_T = '\t';
     private static final char T = 't';
 
+    @Override
     public String getName() {
         return "default";
     }
 
+    @Override
     public int interpret(CommandShell shell, String line) throws ShellException {
-        LinkedList<CommandLine.Token> tokens =
-                new LinkedList<CommandLine.Token>();
-        Tokenizer tokenizer = new Tokenizer(line);
-        while (tokenizer.hasNext()) {
-            tokens.add(tokenizer.next());
-        }
-        int nosTokens = tokens.size();
-        if (nosTokens == 0) {
+        CommandLine cmd = doParseCommandLine(line);
+        if (cmd == null) {
             return 0;
-        }
-        CommandLine cmd;
-        if (nosTokens == 1) {
-            cmd = new CommandLine(tokens.get(0), null, null);
-        } else {
-            CommandLine.Token commandToken = tokens.removeFirst();
-            CommandLine.Token[] argTokens =
-                    new CommandLine.Token[nosTokens - 1];
-            cmd = new CommandLine(
-                    commandToken, tokens.toArray(argTokens), null);
         }
         shell.addCommandToHistory(line);
         try {
@@ -110,10 +97,29 @@ public class DefaultInterpreter implements CommandInterpreter {
         }
     }
 
+    @Override
     public Completable parsePartial(CommandShell shell, String line) throws ShellException {
+        CommandLine res = doParseCommandLine(line);
+        return res == null ? new CommandLine("", null) : res;
+    }
+    
+    @Override
+    public boolean help(CommandShell shell, String line, PrintWriter pw) throws ShellException {
+        CommandLine cmd = doParseCommandLine(line);
+        CommandInfo cmdInfo = cmd.getCommandInfo(shell);
+        if (cmdInfo == null) {
+            return false;
+        } else {
+            // This will do for a start.
+            pw.println("Command class is " + cmdInfo.getCommandClass().getName());
+            return true;
+        }
+    }
+    
+    private CommandLine doParseCommandLine(String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line);
         if (!tokenizer.hasNext()) {
-            return new CommandLine("", null);
+            return null;
         }
         CommandLine.Token commandToken = tokenizer.next();
         LinkedList<CommandLine.Token> tokenList =
@@ -127,7 +133,7 @@ public class DefaultInterpreter implements CommandInterpreter {
         res.setArgumentAnticipated(tokenizer.whitespaceAfterLast());
         return res;
     }
-    
+
     @Override
     public String escapeWord(String word) {
         return escapeWord(word, false);
