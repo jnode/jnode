@@ -661,4 +661,16 @@ public class CommandLine implements Completable, Iterable<String> {
             completion.setCompletionStart(commandToken == null ? 0 : commandToken.start);
         }
     }
+
+    public CommandInfo getCommandInfo(CommandShell shell) {
+        String cmd = (commandToken == null) ? "" : commandToken.token.trim();
+        if (cmd.equals("")) {
+            return null;
+        }
+        try {
+            return shell.getCommandInfo(cmd);
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
 }

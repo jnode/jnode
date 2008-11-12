@@ -21,7 +21,9 @@
 
 package org.jnode.driver.console.textscreen;
 
+import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.SortedSet;
 
@@ -165,9 +167,16 @@ class Line {
         }
     }
 
-    public boolean complete() throws IOException {
+    /**
+     * Perform completion on the current input, output any completion alternatives
+     * then rebuild line the input with the common completion appended.
+     * 
+     * @param completer the object (e.g. shell) responsible for completion.
+     * @return <code>true</code> if we output a list of completion alternatives.
+     * @throws IOException
+     */
+    public boolean complete(InputCompleter completer) throws IOException {
         CompletionInfo info = null;
-        InputCompleter completer = console.getCompleter();
         String ending =
             posOnCurrentLine != currentLine.length() ? currentLine.substring(posOnCurrentLine) : "";
         info = completer.complete(currentLine.substring(0, posOnCurrentLine));
@@ -184,6 +193,38 @@ class Line {
             posOnCurrentLine = currentLine.length() - ending.length();
         }
         return res;
+    }
+
+    /**
+     * Get and output incremental help for the current input line.
+     * 
+     * @param completer the object (e.g. shell) responsible for providing help.
+     * @return <code>true</code> if we output any help.
+     * @throws IOException 
+     * @throws IOException
+     */
+    public boolean help(InputCompleter completer) throws IOException {
+        CharArrayWriter caw = new CharArrayWriter();
+        PrintWriter pw = new PrintWriter(caw);
+        boolean res = completer.help(currentLine.substring(0, posOnCurrentLine), pw);
+        if (!res) {
+            return false;
+        }
+        char[] chars = caw.toCharArray();
+        if (chars.length == 0 || chars.length == 1 && chars[0] == '\n') {
+            return false;
+        }
+
+        int oldPosOnCurrentLine = posOnCurrentLine;
+        moveEnd();
+        refreshCurrentLine();
+        out.write('\n');
+        out.write(chars);
+        if (chars[chars.length - 1] != '\n') {
+            out.write('\n');
+        }
+        posOnCurrentLine = oldPosOnCurrentLine;
+        return true;
     }
 
     protected boolean printList(CompletionInfo info) throws IOException {

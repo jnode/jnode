@@ -13,6 +13,7 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 import org.jnode.shell.CommandInfo;
@@ -120,19 +121,28 @@ public class BjorneInterpreter implements CommandInterpreter {
     public BjorneInterpreter() {
     }
 
+    @Override
     public String getName() {
         return "bjorne";
     }
 
+    @Override
     public int interpret(CommandShell shell, String command) throws ShellException {
         return interpret(shell, command, null, false);
     }
 
+    @Override
     public Completable parsePartial(CommandShell shell, String partial) throws ShellSyntaxException {
         // TODO Auto-generated method stub
         return null;
     }
     
+    @Override
+    public boolean help(CommandShell shell, String partial, PrintWriter pw) throws ShellException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     @Override
     public String escapeWord(String word) {
         // TODO Auto-generated method stub

@@ -63,6 +63,8 @@ public class ConsoleKeyEventBindings extends KeyEventBindings<KeyboardReaderActi
         res.setVKAction(KeyEvent.VK_TAB, 0, KeyboardReaderAction.KR_COMPLETE);
         res.setVKAction(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_COMPLETE);
         res.setCharAction('\t', KeyboardReaderAction.KR_COMPLETE);
+        res.setVKAction(KeyEvent.VK_ESCAPE, 0, KeyboardReaderAction.KR_HELP);
+        res.setVKAction(KeyEvent.VK_SLASH, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_HELP);
         res.setVKAction(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_SOFT_EOF);
         res.setCharAction('\004', KeyboardReaderAction.KR_SOFT_EOF);
         res.setVKAction(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK, KeyboardReaderAction.KR_KILL_LINE);

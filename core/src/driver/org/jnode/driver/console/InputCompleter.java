@@ -20,6 +20,8 @@
  */
 package org.jnode.driver.console;
 
+import java.io.PrintWriter;
+
 /**
  * This interface is implemented by objects registered with a Console as
  * input completers.
@@ -34,7 +36,16 @@ public interface InputCompleter {
      * @param partial the partial input line.
      * @return a CompletionInfo that contains the possible completions.
      */
-    CompletionInfo complete(String partial);
+    public CompletionInfo complete(String partial);
+    
+    /**
+     * Show incremental syntax help for the supplied partial input line.
+     * 
+     * @param partial the partial input line.
+     * @param out the PrintWriter that help information should be written to.
+     * @return <code>true</code> if any help information was written.
+     */
+    public boolean help(String partial, PrintWriter out); 
 
     /**
      * Gets the completer's current InputHistory object.  If the completer is modal,

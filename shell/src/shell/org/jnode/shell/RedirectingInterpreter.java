@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,11 +57,13 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             return "redirecting";
         }
     };
-    
+
+    @Override
     public String getName() {
         return "redirecting";
     }
 
+    @Override
     public int interpret(CommandShell shell, String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
         List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
@@ -77,6 +80,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         }
     }
 
+    @Override
     public Completable parsePartial(CommandShell shell, String line)
         throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
@@ -84,6 +88,12 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         return parse(tokenizer, commands, true);
     }
     
+    @Override
+    public boolean help(CommandShell shell, String line, PrintWriter pw) throws ShellException {
+        pw.println("Don't panic!");
+        return true;
+    }
+
     @Override
     public String escapeWord(String word) {
         return escapeWord(word, true);
