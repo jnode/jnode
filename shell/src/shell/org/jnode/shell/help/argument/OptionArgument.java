@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.Parameter;
 
 /**
@@ -54,7 +54,7 @@ public class OptionArgument extends Argument {
     }
 
     @Override
-    public void describe(Help help, PrintWriter out) {
+    public void describe(HelpFactory help, PrintWriter out) {
         for (Option option : options)
             option.describe(help, out);
     }

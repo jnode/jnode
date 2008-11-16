@@ -68,7 +68,7 @@ public class AlternativesSyntaxTest extends TestCase {
             new OptionSyntax("intArg", 'i'),
             new OptionSyntax("fileArg", 'f'),
             new OptionSyntax("flagArg", "xxx"));
-        assertEquals("( -i <intArg:integer> ) | ( -f <fileArg:file> ) | --xxx",
+        assertEquals("( -i <intArg> ) | ( -f <fileArg> ) | --xxx",
             syntax1.format(test.getArgumentBundle()));
     }
 

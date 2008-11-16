@@ -18,118 +18,41 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
 package org.jnode.shell.help;
 
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
 
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
- * @author qades
- * @author Fabien DUMINY (fduminy@jnode.org)
+ * This is the interface for an object that outputs command help.  Different
+ * implementations support different command syntax mechanisms, and (in the
+ * future) will provide help in different output formats; e.g. plain text, 
+ * HTML and so on.
+ * 
+ * @author crawley@jnode.org
  */
-public abstract class Help {
-    public static final String BUNDLE_NAME = "messages"; // must be in our package
-
-    public static final Class<Help> NAME = Help.class;
-
-    public static final String INFO_FIELD_NAME = "HELP_INFO";
-
-    public static Help getHelp() throws HelpException {
-        try {
-            return InitialNaming.lookup(NAME);
-        } catch (NamingException ex) {
-            throw new HelpException("Help application not found");
-        }
-    }
-
-    public static String getLocalizedHelp(String messageKey) {
-        return PluginUtils.getLocalizedMessage(Help.class, 
-                BUNDLE_NAME, messageKey);
-    }
-
-    public static Info getInfo(Class<?> clazz) throws HelpException {
-        try {
-            Field helpInfo = clazz.getField(INFO_FIELD_NAME);
-            return (Help.Info) helpInfo.get(null); // static access
-        } catch (NoSuchFieldException ex) {
-            throw new HelpException("Command information not found");
-        } catch (IllegalAccessException ex) {
-            throw new HelpException("Command information not accessible");
-        }
-    }
-
+public interface Help {
+    
     /**
-     * Shows the help page for a command
+     * Output complete help for the command.
      * 
-     * @param info the command info
-     * @param command a command name or alias which appears in the help
-     * @param out the destination for help output.
+     * @param pw the help information is written here
      */
-    public abstract void help(Info info, String command, PrintWriter out);
-
+    public void help(PrintWriter pw);
+    
     /**
-     * Shows the help page for a command
+     * Output the usage message(s) for the command.
      * 
-     * @param syntaxes the command's syntax bundle
-     * @param bundle the command's argument bundle
-     * @param out the destination for help output.
+     * @param pw the help information is written here
      */
-    public abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out);
-
+    public void usage(PrintWriter pw);
+    
     /**
-     * Shows the usage line for a command
-     * 
-     * @param info the command information
-     * @param out the destination for help output.
+     * This class is here for historical reasons.  It is a key API class in the
+     * 'old' JNode syntax mechanism.
      */
-    public abstract void usage(Info info, PrintWriter out);
-
-    /**
-     * Shows the usage line for a command
-     * 
-     * @param syntaxes the command's syntax bundle
-     * @param bundle the command's argument bundle
-     * @param out the destination for help output.
-     */
-    public abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out);
-
-    /**
-     * Shows the description of a single argument. Used as a callback in
-     * {@link Argument#describe(Help)}.
-     */
-    public abstract void describeArgument(Argument arg, PrintWriter out);
-
-    /**
-     * Shows the description of a single argument. Used as a callback in
-     * {@link Argument#describe(Help)}.
-     */
-    public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintWriter out);
-
-    /**
-     * Shows the description of a single FlagArgument. Used as a callback in
-     * {@link Argument#describe(Help)}.
-     */
-    public abstract void describeOption(FlagArgument arg, 
-            TreeSet<String> flagTokens, PrintWriter out);
-
-    /**
-     * Shows the description of a single parameter. Used as a callback in
-     * {@link Parameter#describe(Help)}.
-     */
-    public abstract void describeParameter(Parameter param, PrintWriter out);
-
     public static class Info {
 
         private final String name;
@@ -161,7 +84,7 @@ public abstract class Help {
 
         public void usage(PrintWriter out) {
             try {
-                Help.getHelp().usage(this, out);
+                HelpFactory.getHelpFactory().usage(this, out);
             } catch (HelpException ex) {
                 ex.printStackTrace();
             }
@@ -173,7 +96,7 @@ public abstract class Help {
          * @throws HelpException
          */
         public void help(String command, PrintWriter out) throws HelpException {
-            Help.getHelp().help(this, command, out);
+            HelpFactory.getHelpFactory().help(this, command, out);
         }
 
         public String complete(CompletionInfo completion, CommandLine partial, 

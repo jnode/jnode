@@ -64,11 +64,11 @@ public class OptionSyntaxTest extends TestCase {
     public void testFormat() {
         Test test = new Test();
         Syntax syntax1 = new OptionSyntax("fileArg", "file", 'f');
-        assertEquals("--file | -f <fileArg:file>", syntax1.format(test.getArgumentBundle()));
+        assertEquals("--file | -f <fileArg>", syntax1.format(test.getArgumentBundle()));
         Syntax syntax2 = new OptionSyntax("intArg", "int");
-        assertEquals("--int <intArg:integer>", syntax2.format(test.getArgumentBundle()));
+        assertEquals("--int <intArg>", syntax2.format(test.getArgumentBundle()));
         Syntax syntax3 = new OptionSyntax("intArg", 'i');
-        assertEquals("-i <intArg:integer>", syntax3.format(test.getArgumentBundle()));
+        assertEquals("-i <intArg>", syntax3.format(test.getArgumentBundle()));
         Syntax syntax4 = new OptionSyntax("flagArg", "xxx", 'x');
         assertEquals("--xxx | -x", syntax4.format(test.getArgumentBundle()));
     }

@@ -30,7 +30,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
-import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.vm.VmExit;
@@ -117,7 +117,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
                     }
                 }
             } catch (SyntaxErrorException ex) {
-                Help.getInfo(cmdInfo.getCommandClass()).usage(err);
+                HelpFactory.getInfo(cmdInfo.getCommandClass()).usage(err);
                 err.println(ex.getMessage());
             } catch (VmExit ex) {
                 return ex.getStatus();

@@ -19,8 +19,8 @@ import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.def.DefaultAliasManager;
 import org.jnode.shell.def.DefaultShellManager;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.def.DefaultHelp;
+import org.jnode.shell.help.HelpFactory;
+import org.jnode.shell.help.def.DefaultHelpFactory;
 import org.jnode.shell.syntax.DefaultSyntaxManager;
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
@@ -93,7 +93,7 @@ public abstract class Emu {
                 InitialNaming.bind(AliasManager.NAME, aliasMgr);
                 InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
                 InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);
-                InitialNaming.bind(Help.NAME, new DefaultHelp());
+                InitialNaming.bind(HelpFactory.NAME, new DefaultHelpFactory());
             } catch (NamingException ex) {
                 throw new EmuException("Problem setting up InitialNaming bindings", ex);
             }

@@ -64,7 +64,7 @@ public class PowersetSyntaxTest extends TestCase {
         Syntax syntax1 = new PowersetSyntax(
             new OptionSyntax("intArg", 'i'),
             new OptionSyntax("fileArg", 'f'));
-        assertEquals("[ ( -i <intArg:integer> ) | ( -f <fileArg:file> ) ] ...",
+        assertEquals("[ ( -i <intArg> ) | ( -f <fileArg> ) ] ...",
             syntax1.format(bundle));
     }
 

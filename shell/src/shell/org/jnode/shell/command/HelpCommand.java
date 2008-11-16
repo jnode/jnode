@@ -26,18 +26,17 @@ import java.io.PrintWriter;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Shell;
+import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.shell.syntax.SyntaxBundle;
-import org.jnode.shell.syntax.SyntaxManager;
 
 /**
  * @author qades
@@ -59,7 +58,9 @@ public class HelpCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws NameNotFoundException, ClassNotFoundException, NoSuchAliasException {
+        // The above exceptions are either bugs or configuration errors and should be allowed
+        // to propagate so that the shell can diagnose them appropriately.
         String alias;
         CommandLine commandLine = getCommandLine();
         PrintWriter out = getOutput().getPrintWriter();
@@ -71,108 +72,53 @@ public class HelpCommand extends AbstractCommand {
         } else {
             alias = "help";
         }
-
-        Help.Info info = null; 
-        SyntaxBundle syntaxes = null;
-        ArgumentBundle bundle = null;
-        String otherAliases = null;
+        CommandShell shell = null;
         try {
-            final Shell shell = ShellUtils.getShellManager().getCurrentShell();
-            final AliasManager aliasManager = shell.getAliasManager(); 
-            final SyntaxManager syntaxManager = shell.getSyntaxManager();
-            Class<?> clazz = getCommandClass(aliasManager, alias);
-            bundle = getBundle(clazz, err);
-            if (bundle != null) {
-                syntaxes = syntaxManager.getSyntaxBundle(alias);
-                if (syntaxes == null) {
-                    syntaxes = new SyntaxBundle(alias, bundle.createDefaultSyntax());
-                }
-            } else {
-                info = Help.getInfo(clazz);
-            }
-            if (info != null || syntaxes != null) {
-                otherAliases = getOtherAliases(aliasManager, alias, clazz);
-            }
-        } catch (ClassNotFoundException ex) {
-            err.println("Alias not found: " + alias);
-            exit(1);
-        } catch (SecurityException ex) {
-            err.println("Access to class prevented by security manager");
-            exit(2);
-        } catch (NameNotFoundException ex) {
-            err.println("Can't find the shell manager");
-            exit(2);
+            shell = (CommandShell) ShellUtils.getShellManager().getCurrentShell();
+            CommandInfo cmdInfo =  shell.getCommandInfo(alias);
+            Help cmdHelp = HelpFactory.getHelpFactory().getHelp(alias, shell.getCommandInfo(alias));
+            cmdHelp.help(out);
+            otherAliases(shell.getAliasManager(), alias, cmdInfo.getCommandClass().getName(), out);
         } catch (HelpException ex) {
-            err.println("No help information available for alias " + alias);
+            err.println("No help information is available for alias / class '" + alias + "'");
             exit(1);
-        }
-
-        if (syntaxes != null) {
-            Help.getHelp().help(syntaxes, bundle, out);
-        } else if (info != null) {
-            Help.getHelp().help(info, alias, out);
-        } else {
-            out.println("No help information available: " + alias);
-        }
-        if (otherAliases != null) {
-            out.println(otherAliases);
-        }
-    }
-
-    private ArgumentBundle getBundle(Class<?> clazz, PrintWriter err) {
-        try {
-            AbstractCommand command = (AbstractCommand) clazz.newInstance();
-            return command.getArgumentBundle();
-        } catch (ClassCastException e) {
-            // The target class cannot 
-        } catch (InstantiationException e) {
-            err.println("Problem during instantiation of " + clazz.getName());
-            exit(2);
-        } catch (IllegalAccessException e) {
-            err.println("Constructor for " + clazz.getName() + " is not accessible");
-            exit(2);
-        }
-        return null;
-    }
-
-    private Class<?> getCommandClass(AliasManager aliasManager, String commandName)
-        throws ClassNotFoundException {
-        try {
-            return aliasManager.getAliasClass(commandName);
-        } catch (NoSuchAliasException ex) {
-            // Not an alias -> assuming it's a class name
-            return Class.forName(commandName);
+        } catch (ClassNotFoundException ex) {
+            try {
+                String className = shell.getAliasManager().getAliasClassName(alias);
+                err.println("Cannot load class '" + className + "' for alias '" + alias + "'");
+            } catch (NoSuchAliasException ex2) {
+                err.println("'" + alias + "' is neither an alias or a loadable class name");
+            }
+            throw ex;
+        } catch (SecurityException ex) {
+            err.println("Security exception while loading the class associated with alias '" + alias + "'");
+            err.println("Reported reason: " + ex.getLocalizedMessage());
+            throw ex;
         }
     }
 
-    private String getOtherAliases(AliasManager aliasManager, String alias, Class<?> aliasClass) {
-        boolean hasOtherAlias = false; 
-        StringBuilder sb = new StringBuilder("Other aliases: ");
-        boolean first = true;
+    private void otherAliases(AliasManager aliasManager, String thisAlias, 
+            String aliasClass, PrintWriter out) throws NoSuchAliasException {
+        // NoSuchAliasException indicates a bug, and should be allowed to propagate.
+        StringBuilder sb = new StringBuilder();
 
         for (String otherAlias : aliasManager.aliases()) {
-            // exclude alias from the returned list
-            if (!otherAlias.equals(alias)) {
-                try {
-                    Class<?> otherAliasClass = aliasManager.getAliasClass(otherAlias);
-
-                    if (aliasClass.equals(otherAliasClass)) {
-                        // we have found another alias for the same command
-                        hasOtherAlias = true;
-                        if (!first) {
-                            sb.append(",");
-                        }
-                        sb.append(otherAlias);
-                        first = false;
+            // exclude thisAlias from the output
+            if (!otherAlias.equals(thisAlias)) {
+                String otherAliasClass = aliasManager.getAliasClassName(otherAlias);
+                // System.err.println("comparing '" + aliasClass + "' with '" + otherAliasClass + "'");
+                if (aliasClass.equals(otherAliasClass)) {
+                    // we have found another alias for the same command
+                    if (sb.length() > 0) {
+                        sb.append(", ");
                     }
-                } catch (NoSuchAliasException nsae) {
-                    // should never happen since we iterate on known aliases
-                } catch (ClassNotFoundException e) {
-                    // should never happen since we iterate on known aliases
+                    sb.append(otherAlias);
                 }
             }
         }
 
-        return hasOtherAlias ? sb.toString() : null;
+        if (sb.length() > 0) {
+            out.println("Other aliases: " + sb);
+        }
     }
 }

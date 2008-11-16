@@ -26,7 +26,7 @@ import java.lang.reflect.Array;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 
@@ -55,7 +55,7 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
         return result.substring(1);
     }
 
-    public void describe(Help help, PrintWriter out) {
+    public void describe(HelpFactory help, PrintWriter out) {
         for (EnumOption<T> option : options)
             option.describe(help, out);
     }

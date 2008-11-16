@@ -30,7 +30,7 @@ import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 
-import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.io.CommandIO;
@@ -144,7 +144,7 @@ public class CommandRunner implements Runnable {
             }
         } catch (SyntaxErrorException ex) {
             try {
-                Help.getInfo(cmdInfo.getCommandClass()).usage(shellErr);
+                HelpFactory.getInfo(cmdInfo.getCommandClass()).usage(shellErr);
                 shellErr.println(ex.getMessage());
             } catch (HelpException e) {
                 shellErr.println("Exception while trying to get the command usage");

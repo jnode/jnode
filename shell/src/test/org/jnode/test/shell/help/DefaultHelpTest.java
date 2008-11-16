@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 
 import junit.framework.TestCase;
 
-import org.jnode.shell.help.def.DefaultHelp;
+import org.jnode.shell.help.def.DefaultHelpFactory;
 
 /**
  * Unit tests for the DefaultHelp implementation of the Help
@@ -34,7 +34,7 @@ import org.jnode.shell.help.def.DefaultHelp;
  */
 public class DefaultHelpTest extends TestCase {
 
-    static class MyDefaultHelp extends DefaultHelp {
+    static class MyDefaultHelp extends DefaultHelpFactory {
         static class MyCell extends Cell {
 
             MyCell(int margin, int width) {
@@ -56,7 +56,7 @@ public class DefaultHelpTest extends TestCase {
     }
 
     public void testConstructor() {
-        new DefaultHelp();
+        new DefaultHelpFactory();
     }
 
     public void testCellFit() {
@@ -78,8 +78,8 @@ public class DefaultHelpTest extends TestCase {
 
     public void testFormat() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintWriter ps = new PrintWriter(bos);
-        new MyDefaultHelp().format(ps,
+        PrintWriter pw = new PrintWriter(bos);
+        new MyDefaultHelp().format(pw,
             new MyDefaultHelp.MyCell[]{
                 new MyDefaultHelp.MyCell(3, 5), new MyDefaultHelp.MyCell(3, 20)},
             new String[]{
