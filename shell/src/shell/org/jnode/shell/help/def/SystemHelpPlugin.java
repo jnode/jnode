@@ -18,7 +18,6 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
 package org.jnode.shell.help.def;
 
 import javax.naming.NamingException;
@@ -27,7 +26,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpFactory;
 
 /**
  * Service used to create and bind the system help.
@@ -48,8 +47,8 @@ public class SystemHelpPlugin extends Plugin {
      */
     protected void startPlugin() throws PluginException {
         try {
-            final Help help = new DefaultHelp();
-            InitialNaming.bind(Help.NAME, help);
+            final HelpFactory help = new DefaultHelpFactory();
+            InitialNaming.bind(HelpFactory.NAME, help);
         } catch (NamingException ex) {
             throw new PluginException("Cannot bind system help", ex);
         }
@@ -59,6 +58,6 @@ public class SystemHelpPlugin extends Plugin {
      * Stop this plugin
      */
     protected void stopPlugin() throws PluginException {
-        InitialNaming.unbind(Help.NAME);
+        InitialNaming.unbind(HelpFactory.NAME);
     }
 }

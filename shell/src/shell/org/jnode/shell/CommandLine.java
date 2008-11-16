@@ -27,6 +27,7 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandIOMarker;
@@ -643,7 +644,7 @@ public class CommandLine implements Completable, Iterable<String> {
                 } else {
                     // Otherwise, try old-style completion using the command's INFO
                     try {
-                        Help.Info info = Help.getInfo(cmdClass.getCommandClass());
+                        Help.Info info = HelpFactory.getInfo(cmdClass.getCommandClass());
                         info.complete(completion, this, shell.getOut());
                     } catch (HelpException ex) {
                         // And fall back to old-style completion with an 'info' that

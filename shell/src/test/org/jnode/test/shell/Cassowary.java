@@ -35,8 +35,8 @@ import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.def.DefaultAliasManager;
 import org.jnode.shell.def.DefaultShellManager;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.def.DefaultHelp;
+import org.jnode.shell.help.HelpFactory;
+import org.jnode.shell.help.def.DefaultHelpFactory;
 
 /**
  * A Cassowary is another large Australian bird ...
@@ -83,7 +83,7 @@ public class Cassowary {
             new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
         InitialNaming.bind(AliasManager.NAME, alias_mgr);
         InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
-        InitialNaming.bind(Help.NAME, new DefaultHelp());
+        InitialNaming.bind(HelpFactory.NAME, new DefaultHelpFactory());
 
         BasicConfigurator.configure();
         initialized = true;

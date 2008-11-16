@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: DefaultHelp.java 4556 2008-09-13 08:02:20Z crawley $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -18,7 +18,6 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package org.jnode.shell.help.def;
 
 import java.io.PrintWriter;
@@ -26,21 +25,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandInfo;
+import org.jnode.shell.Shell;
+import org.jnode.shell.ShellUtils;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.OptionSyntax;
 import org.jnode.shell.syntax.SyntaxBundle;
+import org.jnode.shell.syntax.SyntaxManager;
 
 /**
  * @author qades
  * @author Fabien DUMINY (fduminy@jnode.org)
  * @author crawley@jnode.org
  */
-public class DefaultHelp extends Help {
+public class DefaultHelpFactory extends HelpFactory {
     public static final String RESOURCE_NAME = "messages.properties";
     private static final int NOMINAL_WIDTH = 75;
     /* start with 80 spaces ... */
@@ -50,15 +56,49 @@ public class DefaultHelp extends Help {
     /**
      * Create a new instance
      */
-    public DefaultHelp() {
+    public DefaultHelpFactory() {
+    }
+    
+    @Override
+    public Help getHelp(String alias, CommandInfo cmdInfo) throws HelpException {
+        Help.Info info = null; 
+        SyntaxBundle syntaxes = null;
+        ArgumentBundle bundle = null;
+        try {
+            final Shell shell = ShellUtils.getShellManager().getCurrentShell();
+            final SyntaxManager syntaxManager = shell.getSyntaxManager();
+            Class<?> clazz = cmdInfo.getCommandClass();
+            Command cmd = cmdInfo.createCommandInstance();
+            if (cmd != null) {
+                bundle = cmd.getArgumentBundle();
+                syntaxes = syntaxManager.getSyntaxBundle(alias);
+                if (syntaxes == null) {
+                    syntaxes = new SyntaxBundle(alias, bundle.createDefaultSyntax());
+                }
+            } else {
+                info = HelpFactory.getInfo(clazz);
+            }
+        } catch (HelpException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new HelpException(ex.getMessage(), ex);
+        }
+
+        if (info != null && alias != null) {
+            return new OldSyntaxHelp(info, alias);
+        } else if (syntaxes != null && bundle != null) {
+            return new NewSyntaxHelp(syntaxes, bundle);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Shows the complete help for a command.
      *
-     * @see Help#help(org.jnode.shell.help.Help.Info, String)
+     * @see HelpFactory#help(org.jnode.shell.help.HelpFactory.Info, String)
      */
-    public void help(Info info, String command, PrintWriter out) {
+    public void help(Help.Info info, String command, PrintWriter out) {
         final Syntax[] syntaxes = info.getSyntaxes();
         final String name = command == null ? info.getName() : command;
         for (int i = 0; i < syntaxes.length; i++) {
@@ -73,7 +113,7 @@ public class DefaultHelp extends Help {
     public void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out) {
         usage(syntaxes, bundle, out);
         if (bundle.getDescription() != null) {
-            out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
+            out.println("\n" + HelpFactory.getLocalizedHelp("help.description") + ":");
             format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)},
                 new String[]{bundle.getDescription()});
         }
@@ -82,7 +122,7 @@ public class DefaultHelp extends Help {
         for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
             if (arg instanceof FlagArgument) {
                 if (first) {
-                    out.println("\n" + Help.getLocalizedHelp("help.options") + ":");
+                    out.println("\n" + HelpFactory.getLocalizedHelp("help.options") + ":");
                     first = false;
                 }
                 describeOption((FlagArgument) arg, flagMap.get(arg.getLabel()), out);
@@ -92,7 +132,7 @@ public class DefaultHelp extends Help {
         for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
             if (!(arg instanceof FlagArgument)) {
                 if (first) {
-                    out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
+                    out.println("\n" + HelpFactory.getLocalizedHelp("help.parameters") + ":");
                     first = false;
                 }
                 describeArgument(arg, out);
@@ -139,13 +179,13 @@ public class DefaultHelp extends Help {
     public void help(String name, Syntax syntax, PrintWriter out) {
         usage(name, syntax, out);
         if (syntax.getDescription() != null) {
-            out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
+            out.println("\n" + HelpFactory.getLocalizedHelp("help.description") + ":");
             format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)},
                 new String[]{syntax.getDescription()});
         }
         final Parameter[] params = syntax.getParams();
         if (params.length != 0) {
-            out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
+            out.println("\n" + HelpFactory.getLocalizedHelp("help.parameters") + ":");
             for (int i = 0; i < params.length; i++) {
                 params[i].describe(this, out);
             }
@@ -155,7 +195,7 @@ public class DefaultHelp extends Help {
     /**
      * Shows the usage information of a command.
      */
-    public void usage(Info info, PrintWriter out) {
+    public void usage(Help.Info info, PrintWriter out) {
         final Syntax[] syntaxes = info.getSyntaxes();
         for (int i = 0; i < syntaxes.length; i++) {
             usage(info.getName(), syntaxes[i], out);
@@ -171,13 +211,13 @@ public class DefaultHelp extends Help {
         for (int i = 0; i < params.length; i++) {
             line.append(' ').append(params[i].format());
         }
-        out.println(Help.getLocalizedHelp("help.usage") + ": " + line);
+        out.println(HelpFactory.getLocalizedHelp("help.usage") + ": " + line);
     }
 
     @Override
     public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, PrintWriter out) {
         String command = syntaxBundle.getAlias();
-        String usageText = Help.getLocalizedHelp("help.usage") + ":";
+        String usageText = HelpFactory.getLocalizedHelp("help.usage") + ":";
         int usageLength = usageText.length();
         int commandLength = command.length();
         Cell[] cells =

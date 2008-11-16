@@ -105,7 +105,7 @@ public class Parameter extends CommandLineElement {
         return (optional ? "[" + result + "]" : result);
     }
 
-    public void describe(Help help, PrintWriter out) {
+    public void describe(HelpFactory help, PrintWriter out) {
         if (!isAnonymous()) {
             help.describeParameter(this, out);
         }

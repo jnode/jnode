@@ -55,7 +55,7 @@ public class Argument extends CommandLineElement {
         return "<" + getName() + ">" + (isMulti() ? " ..." : "");
     }
 
-    public void describe(Help help, PrintWriter out) {
+    public void describe(HelpFactory help, PrintWriter out) {
         help.describeArgument(this, out);
     }
 

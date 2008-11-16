@@ -53,13 +53,13 @@ public class RepeatedSyntaxTest extends TestCase {
     public void testFormat() {
         Test test = new Test();
         Syntax syntax1 = new RepeatSyntax(new ArgumentSyntax("arg1"));
-        assertEquals("[ <arg1:file> ... ]", syntax1.format(test.getArgumentBundle()));
+        assertEquals("[ <arg1> ... ]", syntax1.format(test.getArgumentBundle()));
         Syntax syntax2 = new RepeatSyntax(new ArgumentSyntax("arg1"), 1, Integer.MAX_VALUE);
-        assertEquals("<arg1:file> ...", syntax2.format(test.getArgumentBundle()));
+        assertEquals("<arg1> ...", syntax2.format(test.getArgumentBundle()));
         Syntax syntax3 = new RepeatSyntax(new ArgumentSyntax("arg1"), 1, 2);
-        assertEquals("<arg1:file> ...2", syntax3.format(test.getArgumentBundle()));
+        assertEquals("<arg1> ...2", syntax3.format(test.getArgumentBundle()));
         Syntax syntax4 = new RepeatSyntax(new ArgumentSyntax("arg1"), 3, 6);
-        assertEquals("<arg1:file> 3...6", syntax4.format(test.getArgumentBundle()));
+        assertEquals("<arg1> 3...6", syntax4.format(test.getArgumentBundle()));
     }
 
     public void testZeroToMany() throws Exception {

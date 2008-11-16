@@ -62,11 +62,11 @@ public class SequenceSyntaxTest extends TestCase {
     public void testFormat() {
         Test test = new Test();
         Syntax syntax1 = new SequenceSyntax(new ArgumentSyntax("fileArg"));
-        assertEquals("<fileArg:file>", syntax1.format(test.getArgumentBundle()));
+        assertEquals("<fileArg>", syntax1.format(test.getArgumentBundle()));
         Syntax syntax2 = new SequenceSyntax(
             new RepeatSyntax(new ArgumentSyntax("fileArg")),
             new ArgumentSyntax("intArg"));
-        assertEquals("[ <fileArg:file> ... ] <intArg:integer>", syntax2.format(test.getArgumentBundle()));
+        assertEquals("[ <fileArg> ... ] <intArg>", syntax2.format(test.getArgumentBundle()));
         Syntax syntax3 = new SequenceSyntax();
         assertEquals("", syntax3.format(test.getArgumentBundle()));
     }
