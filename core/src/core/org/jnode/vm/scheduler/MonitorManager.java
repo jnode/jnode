@@ -102,7 +102,7 @@ public final class MonitorManager {
                 // thin lock owned by another thread.
                 int ownerId = oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.THREAD_ID_MASK)).toInt();
                 VmThread thread = VmMagic.currentProcessor().getScheduler().getThreadById(ownerId);
-                if(thread == null) {
+                if (thread == null) {
                     //the owner of the lock was destroyed               
                     //aquire the lock in fast fashion
                     statusPtr.store(statusFlags.or(tid));
@@ -283,7 +283,7 @@ public final class MonitorManager {
             int lockcount = 1 + oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.LOCK_COUNT_MASK)).
                 rshl(ObjectFlags.LOCK_COUNT_SHIFT).toInt();
             int ownerId = oldlockword.and(Word.fromIntZeroExtend(ObjectFlags.THREAD_ID_MASK)).toInt();
-            if(thread == null) {
+            if (thread == null) {
                 thread = VmMagic.currentProcessor().getScheduler().getThreadById(ownerId);
             }
             m.initialize(thread, lockcount);
