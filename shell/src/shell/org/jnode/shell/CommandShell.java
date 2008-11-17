@@ -51,7 +51,6 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.KeyboardReader;
-import org.jnode.driver.console.textscreen.KeyboardReaderAction;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -152,12 +151,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * Contains the last application input line entered
      */
     private String lastInputLine = "";
-
-    /**
-     * Flag to know when to wait (while input is happening). This is (hopefully)
-     * a thread safe implementation. *
-     */
-    private volatile boolean threadSuspended = false;
 
     private CommandInvoker invoker;
     private String invokerName;
@@ -753,7 +746,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * application in the application input history.
      */
     private class HistoryInputStream extends FilterInputStream {
-        // TODO - revisit for support of multi-byte character encodings.
+        // TODO - replace with a Reader
         private StringBuilder line = new StringBuilder();
 
         public HistoryInputStream(InputStream in) {
@@ -851,7 +844,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private void exit0() {
         exited = true;
-        threadSuspended = false;
     }
 
     private synchronized boolean isExited() {
