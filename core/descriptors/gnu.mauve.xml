@@ -18,6 +18,8 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="mauve" class="gnu.testlet.runner.Mauve"/>
     <alias name="mauve-filter" class="gnu.testlet.runner.Filter"/>
+    <alias name="mauve-compare" class="gnu.testlet.runner.compare.ReportComparator"/>
+    <alias name="mauve-single" class="gnu.testlet.SingleTestHarness"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">

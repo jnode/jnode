@@ -1,32 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="gnu.mauve.core"
-  name="Mauve java.lang testlets"
+<fragment id="gnu.mauve.plugin"
+  name="Mauve extensions for JNode"
   version="@VERSION@"
-  system="false"
-  provider-name="Mauve"
-  provider-url="http://sources.redhat.com/mauve/"
+  plugin-id="gnu.mauve"
+  plugin-version="@VERSION@"
+  provider-name="JNode.org"
+  provider-url="http://www.jnode.org/"
   license-name="gpl">
 
   <runtime>
-    <library name="mauve.jar">
-      <!-- export name="gnu/testlet/*"/ -->
-      <export name="*"/>
-    </library>
     <library name="jnode-core.jar">
       <export name="org/jnode/test/mauve/*"/>
-      <export name="org/jnode/test/mauve/compare/*"/>
     </library>
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
     <alias name="mauve-plugin" class="org.jnode.test.mauve.PluginTestHarness"/>
-    <alias name="mauve-simple" class="org.jnode.test.mauve.SingleTestHarness"/>
-    <alias name="testCommand" class="org.jnode.test.mauve.MauveTestCommand"/>    
   </extension>
 
   <extension point="org.jnode.security.permissions">
 	<permission class="java.security.AllPermission" />  
   </extension>
-</plugin>
+</fragment>

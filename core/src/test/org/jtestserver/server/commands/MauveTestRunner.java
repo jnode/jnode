@@ -1,4 +1,5 @@
 /*
+
 JTestServer is a client/server framework for testing any JVM implementation.
  
 Copyright (C) 2008  Fabien DUMINY (fduminy@jnode.org)
@@ -19,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.server.commands;
 
+import gnu.testlet.SingleTestHarness;
 import gnu.testlet.TestHarness;
 import gnu.testlet.Testlet;
 
@@ -26,7 +28,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jnode.test.mauve.SingleTestHarness;
 import org.jtestserver.common.Status;
 import org.jtestserver.server.TestFailureException;
 
@@ -105,7 +106,7 @@ public class MauveTestRunner implements TestRunner {
                     status = Status.RUNNING;
                     try {
                         Testlet t = (Testlet) testClass.newInstance();
-                        TestHarness h = new SingleTestHarness(t);
+                        TestHarness h = new SingleTestHarness(t, false);
                         t.test(h);
                         status = Status.READY;
                     } catch (Throwable t) {
