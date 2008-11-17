@@ -29,7 +29,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -55,6 +54,7 @@ import org.apache.log4j.Logger;
 import org.jnode.awt.GraphicsFactory;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics2D;
+import org.jnode.awt.JNodeToolkit;
 import sun.awt.CausedFocusEvent;
 
 /**
@@ -277,7 +277,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      */
     protected final void postPaintEvent() {
         if (targetComponent != null) {
-            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent.getBounds()));
+            final PaintEvent event = new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent.getBounds());
+            JNodeToolkit.postToTarget(event, targetComponent);
         }
     }
 
@@ -403,18 +404,14 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
                     if (fl != null) {
                         postPaintEvent();
-                        toolkit.postEvent(fl);
-                        //XWindow.sendEvent(fl);
+                        JNodeToolkit.postToTarget(fl, currentOwner);
                     }
-                    toolkit.postEvent(fg);
-                    //XWindow.sendEvent(fg);
+                    JNodeToolkit.postToTarget(fg, (Component) fg.getSource());
                     return true;
 
 
                 } catch (Exception x) {
                     x.printStackTrace();
-                    org.jnode.vm.Unsafe.debug("SwingComponentPeer.requestFocus() exception\n");
-                    org.jnode.vm.Unsafe.debugStackTrace();
                     return false;
                 }
             }
@@ -508,8 +505,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * @param what
      */
     protected final void fireComponentEvent(int what) {
-        final EventQueue queue = toolkit.getSystemEventQueue();
-        queue.postEvent(new ComponentEvent(targetComponent, what));
+        JNodeToolkit.postToTarget(new ComponentEvent(targetComponent, what), targetComponent);
     }
 
     public void layout() {

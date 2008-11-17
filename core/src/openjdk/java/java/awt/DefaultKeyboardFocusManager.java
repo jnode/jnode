@@ -669,6 +669,7 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager {
                     // Then we need to deactive the active Window as well.
                     // No need to synthesize in other cases, because
                     // WINDOW_ACTIVATED will handle it if necessary.
+                    if(activeWindow != null) //jnode sometimes this is null, todo check it why
                     sendMessage(activeWindow,
                                 new WindowEvent(activeWindow,
                                                 WindowEvent.WINDOW_DEACTIVATED,

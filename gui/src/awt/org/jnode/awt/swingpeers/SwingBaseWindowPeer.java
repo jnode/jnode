@@ -21,23 +21,28 @@
 
 package org.jnode.awt.swingpeers;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.Color;
+import java.awt.event.InvocationEvent;
 import java.awt.event.WindowEvent;
 import java.awt.peer.WindowPeer;
 import java.beans.PropertyVetoException;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
+import org.jnode.awt.JNodeToolkit;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -70,7 +75,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * Add this window to the desktop.
      */
     protected final void addToDesktop() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Runnable run = new Runnable() {
             public void run() {
                 final JDesktopPane desktop = toolkit.getAwtContext().getDesktop();
                 desktop.add(peerComponent);
@@ -83,7 +88,19 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
                     log.warn("", x);
                 }
             }
-        });
+        };
+
+        final JDesktopPane desktop = toolkit.getAwtContext().getDesktop();
+        AppContext ac = SunToolkit.targetToAppContext(desktop);
+        if (ac != null) {
+            EventQueue eq = (EventQueue) ac.get(AppContext.EVENT_QUEUE_KEY);
+            if (eq != null) {
+                eq.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), run));
+                return;
+            }
+        }
+        //shouldn't get here
+        throw new RuntimeException("Desktop event queue not found!");
     }
 
     /**
@@ -174,7 +191,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * Fire a WindowEvent with a given id to the awtComponent.
      */
     private final void fireWindowEvent(int id) {
-        getToolkitImpl().postEvent(new WindowEvent(targetComponent, id));
+        JNodeToolkit.postToTarget(new WindowEvent(targetComponent, id), targetComponent);
     }
 
     public void updateAlwaysOnTop() {

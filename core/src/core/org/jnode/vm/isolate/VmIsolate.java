@@ -416,6 +416,12 @@ public final class VmIsolate {
         //only this isolate may call this method
         testIsolate(isolate);
 
+        //todo add similar checks to other exit modes too
+        synchronized (this) {
+            if(!this.state.equals(State.STARTED))
+                return;
+        }
+
         changeState(State.EXITING);
 
         this.exitReason = IsolateStatus.ExitReason.SELF_EXIT;

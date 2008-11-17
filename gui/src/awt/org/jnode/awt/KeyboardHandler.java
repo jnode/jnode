@@ -256,7 +256,8 @@ public class KeyboardHandler implements KeyboardListener {
         }
 
         KeyEvent ke = new KeyEvent(source, id, time, modifiers, keyCode, keyChar);
-        eventQueue.postEvent(ke);
+
+        JNodeToolkit.postToTarget(ke, source);
     }
 
     private boolean processSystemKey(KeyboardEvent event) {
