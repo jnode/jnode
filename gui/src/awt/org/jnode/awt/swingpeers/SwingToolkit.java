@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.EventQueue;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
@@ -51,9 +52,11 @@ import java.awt.Scrollbar;
 import java.awt.Shape;
 import java.awt.TextArea;
 import java.awt.TextField;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
+import java.awt.event.InvocationEvent;
 import java.awt.image.BufferedImage;
 import java.awt.peer.ButtonPeer;
 import java.awt.peer.CanvasPeer;
@@ -85,12 +88,16 @@ import javax.swing.JMenuBar;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
+import org.jnode.vm.annotation.SharedStatics;
+import sun.awt.AWTAutoShutdown;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
@@ -99,6 +106,7 @@ import org.jnode.awt.JNodeToolkit;
  * @author Levente S\u00e1ntha
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SharedStatics
 public final class SwingToolkit extends JNodeToolkit {
 
     /**
@@ -152,13 +160,6 @@ public final class SwingToolkit extends JNodeToolkit {
                 return getContainerPeer(parent);
             }
         }
-    }
-
-    /**
-     * Post the given event on the system eventqueue.
-     */
-    public final void postEvent(AWTEvent event) {
-        getSystemEventQueueImpl().postEvent(event);
     }
 
     /**
@@ -247,24 +248,41 @@ public final class SwingToolkit extends JNodeToolkit {
         return null;
     }
 
-    protected FramePeer createFrame(Frame target) {
-        if (!isGuiActive()) {
-            //throw new AWTError("AWT is currently not available");
-            initGui();
-        }
-        if (target instanceof DesktopFrame) {
-            setTop(target);
-            log.debug("createFrame:desktopFramePeer(" + target + ")");
-            // Only desktop is real frame
-            return new DesktopFramePeer(this, (DesktopFrame) target);
-        } else /*if (target instanceof JFrame) */ {
-            if (!isGuiActive()) {
-                throw new AWTError("Gui is not active");
-            }
-            log.debug("createFrame:normal(" + target + ")");
-            // Other frames are emulated
-            return new SwingFramePeer(this, target);
-        } /*else {
+    protected FramePeer createFrame(final Frame target) {
+        final FramePeer[] ret = new FramePeer[1];
+
+        Runnable run = new Runnable() {
+            public void run() {
+
+                if (!isGuiActive()) {
+                    //throw new AWTError("AWT is currently not available");
+                    initGui();
+                }
+                if (target instanceof DesktopFrame) {
+                    setTop(target);
+                    log.debug("createFrame:desktopFramePeer(" + target + ")");
+                    // Only desktop is real frame
+                    //return new DesktopFramePeer(SwingToolkit.this, (DesktopFrame) target);
+                    synchronized (ret) {
+                        ret[0] = new DesktopFramePeer(SwingToolkit.this, (DesktopFrame) target);
+                        try {
+                            AWTAutoShutdown.class.getMethod("registerPeer", Object.class, Object.class).
+                                invoke(AWTAutoShutdown.getInstance(), target, ret[0]);
+                        } catch (Exception x) {
+                            x.printStackTrace();
+                        }
+                    }
+                } else /*if (target instanceof JFrame) */ {
+                    if (!isGuiActive()) {
+                        throw new AWTError("Gui is not active");
+                    }
+                    log.debug("createFrame:normal(" + target + ")");
+                    // Other frames are emulated
+                    //return new SwingFramePeer(SwingToolkit.this, target);
+                    synchronized (ret) {
+                        ret[0] = new SwingFramePeer(SwingToolkit.this, target);
+                    }
+                } /*else {
             if (!isGuiActive()) {
                 throw new AWTError("Gui is not active");
             }
@@ -272,6 +290,70 @@ public final class SwingToolkit extends JNodeToolkit {
             // Other frames are emulated
             return new SwingJFramePeer(this, target);
         }   */
+            }
+        };
+
+        //peer frames should be created in the same app context where the desktop is
+        //todo refactor this into a generic inter-appcontext invoke and wait
+        AppContext ac = SunToolkit.targetToAppContext(target);
+        if (ac != null) {
+            EventQueue eq = (EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
+            if (eq != null) {
+                try {
+                    EventQueue.class.getMethod("initDispatchThread").invoke(eq);
+                } catch (Exception x) {
+                    x.printStackTrace();
+                }
+            }
+        }
+
+        // invoke and wait --
+        EventQueue eq = getMainEventQueue();
+
+        if (eq == getSystemEventQueueImpl()) {
+            run.run();
+            synchronized (ret) {
+                return ret[0];
+            }
+        }
+
+        try {
+            Thread edt = (Thread) EventQueue.class.getField("dispatchThread").get(eq);
+            if (Thread.currentThread() == edt) {
+                run.run();
+                synchronized (ret) {
+                    return ret[0];
+                }
+            }
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+
+        class AWTInvocationLock {
+        }
+        Object lock = new AWTInvocationLock();
+
+        InvocationEvent event = new InvocationEvent(Toolkit.getDefaultToolkit(), run, lock, true);
+
+        try {
+            synchronized (lock) {
+                eq.postEvent(event);
+                lock.wait();
+            }
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+
+        Throwable eventThrowable = event.getThrowable();
+        if (eventThrowable != null) {
+            throw new RuntimeException(eventThrowable);
+        }
+
+        // --invoke and wait
+
+        synchronized (ret) {
+            return ret[0];
+        }
     }
 
     protected LabelPeer createLabel(Label target) {
@@ -469,7 +551,7 @@ public final class SwingToolkit extends JNodeToolkit {
 
         try {
             MetalLookAndFeel.setCurrentTheme(new OceanTheme());
-            UIManager.setLookAndFeel(new MetalLookAndFeel());            
+            UIManager.setLookAndFeel(new MetalLookAndFeel());
         } catch (Exception x) {
             log.warn("Look And Feel not found: ", x);
         }

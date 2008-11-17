@@ -442,7 +442,8 @@ public class MouseHandler implements PointerListener {
                   " p.x=" + p.x + " p.y=" + p.y +"\n");
         }
         */
-        eventQueue.postEvent(event);
+
+        JNodeToolkit.postToTarget(event, source);
     }
 
     private Component findSource() {

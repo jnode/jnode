@@ -173,6 +173,18 @@ public abstract class KeyboardFocusManager
 	return getCurrentKeyboardFocusManager(AppContext.getAppContext());
     }
 
+    //jnode--
+    private static KeyboardFocusManager kbfm;
+    synchronized static KeyboardFocusManager
+	getCurrentKeyboardFocusManager(AppContext appcontext)
+    {
+        if (kbfm == null) {
+            kbfm = new DefaultKeyboardFocusManager();
+        }
+        return kbfm;
+    }
+    //--jnode
+    /* original
     synchronized static KeyboardFocusManager
 	getCurrentKeyboardFocusManager(AppContext appcontext)
     {
@@ -184,6 +196,7 @@ public abstract class KeyboardFocusManager
         }
         return manager;
     }
+    */
 
     /**
      * Sets the current KeyboardFocusManager instance for the calling thread's
@@ -468,9 +481,13 @@ public abstract class KeyboardFocusManager
 	        return null;
 	    }
 
-	    return (focusOwner.appContext == AppContext.getAppContext())
+	   /*jnode
+	    TODO remove it if we use per appcontext focus manager
+	   return (focusOwner.appContext == AppContext.getAppContext())
 	        ? focusOwner
 	        : null;
+	        */
+            return focusOwner;
 	}
     }
 

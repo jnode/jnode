@@ -612,10 +612,16 @@ public abstract class SunToolkit extends Toolkit
         if (eventContext != null && !eventContext.equals(appContext)) {
             log.fine("Event posted on wrong app context : " + event);
         }
-	PostEventQueue postEventQueue =
+        /*jnode: post queues are not used at this time
+    PostEventQueue postEventQueue =
 	    (PostEventQueue)appContext.get(POST_EVENT_QUEUE_KEY);
         if(postEventQueue != null) {
             postEventQueue.postEvent(event);
+        }
+        */
+        EventQueue eventQueue = (EventQueue) appContext.get(AppContext.EVENT_QUEUE_KEY);
+        if (eventQueue != null) {
+            eventQueue.postEvent(event);
         }
     }
 

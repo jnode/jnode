@@ -26,8 +26,8 @@ import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
-
 import java.awt.AWTError;
+import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
@@ -50,6 +50,7 @@ import java.awt.PrintJob;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.BufferedImage;
@@ -75,10 +76,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.imageio.ImageIO;
 import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.image.BufferedImageSurface;
@@ -91,16 +90,19 @@ import org.jnode.driver.video.FrameBufferAPIOwner;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.naming.InitialNaming;
-
+import org.jnode.vm.annotation.SharedStatics;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 import sun.awt.image.ToolkitImage;
 
 /**
  * @author epr
  * @author Levente S\u00e1ntha
  */
+@SharedStatics
 public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBufferAPIOwner {
     protected static final Logger log = Logger.getLogger(JNodeToolkit.class);
-    
+
     private final Object initCloseLock = new Object();
     private EventQueue waitingNativeQueue;
     private Clipboard systemClipboard;
@@ -121,6 +123,23 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     public JNodeToolkit() {
         refCount = 0;
         systemClipboard = new Clipboard("JNodeSystemClipboard");
+
+        //initialize the main AppContext
+        AppContext appContext = AppContext.getAppContext();
+
+        synchronized (this) {
+            if (appContext.get(AppContext.EVENT_QUEUE_KEY) == null || _eventQueue == null) {
+                String eqName = System.getProperty("AWT.EventQueueClass", "org.jnode.awt.JNodeEventQueue");
+                try {
+                    _eventQueue = (JNodeEventQueue) Class.forName(eqName).newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println("Failed loading " + eqName + ": " + e);
+                    _eventQueue = new JNodeEventQueue();
+                }
+                appContext.put(AppContext.EVENT_QUEUE_KEY, _eventQueue);
+            }
+        }
     }
 
     /**
@@ -148,7 +167,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     }
 
     public static boolean isGuiActive() {
-        final Toolkit tk = getDefaultToolkit();
+        final Toolkit tk = Toolkit.getDefaultToolkit();
         if (!(tk instanceof JNodeToolkit)) {
             throw new AWTError("Toolkit is not a JNodeToolkit");
         }
@@ -156,8 +175,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     }
 
     public static void startGui() {
-        clearDefaultToolkit();
-        final Toolkit tk = getDefaultToolkit();
+        final Toolkit tk = Toolkit.getDefaultToolkit();
         if (!(tk instanceof JNodeToolkit)) {
             throw new AWTError("Toolkit is not a JNodeToolkit");
         }
@@ -165,7 +183,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     }
 
     public static void initGui() {
-        final Toolkit tk = getDefaultToolkit();
+        final Toolkit tk = Toolkit.getDefaultToolkit();
         if (!(tk instanceof JNodeToolkit)) {
             throw new AWTError("Toolkit is not a JNodeToolkit");
         }
@@ -173,15 +191,16 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     }
 
     public static void stopGui() {
-        final Toolkit tk = getDefaultToolkit();
+        final Toolkit tk = Toolkit.getDefaultToolkit();
         if (!(tk instanceof JNodeToolkit)) {
             throw new AWTError("Toolkit is not a JNodeToolkit");
         }
         ((JNodeToolkit) tk).decRefCount(true);
+        Toolkit.clearDefaultToolkit();
     }
 
     public static void refreshGui() {
-        final Toolkit tk = getDefaultToolkit();
+        final Toolkit tk = Toolkit.getDefaultToolkit();
         if (!(tk instanceof JNodeToolkit)) {
             throw new AWTError("Toolkit is not a JNodeToolkit");
         }
@@ -193,7 +212,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     }
 
     public static void waitUntilStopped() {
-        final Toolkit tk = getDefaultToolkit();
+        final Toolkit tk = Toolkit.getDefaultToolkit();
         if (!(tk instanceof JNodeToolkit)) {
             throw new AWTError("Toolkit is not a JNodeToolkit");
         }
@@ -602,13 +621,30 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
      * @return The event queue
      */
     protected final EventQueue getSystemEventQueueImpl() {
+        AppContext ac = AppContext.getAppContext();
+        if (ac != null) {
+            EventQueue eq = (EventQueue) ac.get(AppContext.EVENT_QUEUE_KEY);
+            if (eq != null) {
+                return eq;
+            }
+        }
+
         if ((_eventQueue == null) || (!_eventQueue.isLive() && isGuiActive())) {
             synchronized (this) {
                 if ((_eventQueue == null) || (!_eventQueue.isLive() && isGuiActive())) {
                     _eventQueue = new JNodeEventQueue();
                 }
+
+                if (ac != null && ac.get(AppContext.EVENT_QUEUE_KEY) == null) {
+                    ac.put(AppContext.EVENT_QUEUE_KEY, _eventQueue);
+                }
             }
         }
+
+        return _eventQueue;
+    }
+
+    public final synchronized EventQueue getMainEventQueue() {
         return _eventQueue;
     }
 
@@ -786,22 +822,23 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
                 config.getBounds().height - 2 * (100 + i)), null, tx, (i % 2 == 0) ? Color.RED : Color.BLUE,
                 Surface.PAINT_MODE);
     }
-    
+
     private JNodeFrameBufferDevice getDevice() {
         final JNodeFrameBufferDevice device =
             (JNodeFrameBufferDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (device == null) {
             throw new AWTError("No framebuffer fbDevice found");
         }
-        
+
         return device;
     }
 
     private GraphicsConfiguration[] configs;
+
     public GraphicsConfiguration[] getConfigurations() {
         if (configs == null) {
             final GraphicsConfiguration[] configurations = getDevice().getConfigurations();
-            
+
             configs = new GraphicsConfiguration[configurations.length];
             System.arraycopy(configurations, 0, configs, 0, configurations.length);
             Arrays.sort(configs, new Comparator<GraphicsConfiguration>() {
@@ -809,7 +846,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
                 public int compare(GraphicsConfiguration o1, GraphicsConfiguration o2) {
                     final Rectangle b1 = o1.getBounds();
                     final Rectangle b2 = o2.getBounds();
-                    
+
                     int comp;
                     if (b1.getWidth() > b2.getWidth()) {
                         comp = +1;
@@ -824,15 +861,15 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
                             comp = 0;
                         }
                     }
-                    
+
                     return comp;
                 }
-                
+
             });
         }
         return configs;
     }
-    
+
     public Dimension changeScreenSize(JNodeGraphicsConfiguration config) {
         final JNodeFrameBufferDevice device = getDevice();
 
@@ -900,7 +937,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
             graphicsMode = false;
             initCloseLock.notifyAll();
         }
-        
+
         api.releaseOwnership(this);
     }
 
@@ -910,7 +947,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     public final void joinGUI() {
         try {
             api.requestOwnership(this);
-            
+
             this.graphics = api.open(config.getConfig());
             this.keyboardHandler = new KeyboardHandler(_eventQueue);
             this.mouseHandler = new MouseHandler(fbDevice.getDevice(),
@@ -1102,14 +1139,14 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
         //todo implementit
         return null;
     }
-    
+
     @Override
     public void ownershipLost() {
         if (isGuiActive()) {
             leaveGUI();
         }
     }
-    
+
     @Override
     public void ownershipGained() {
         startAwt();
@@ -1117,7 +1154,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
 
     static void startAwt() {
         if (JNodeToolkit.isGuiActive()) {
-            ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).joinGUI();
+            ((JNodeToolkit) Toolkit.getDefaultToolkit()).joinGUI();
             JNodeToolkit.waitUntilStopped();
         } else {
             JNodeToolkit.startGui();
@@ -1142,13 +1179,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
                 JNodeToolkit.waitUntilStopped();
             }
         }
-        ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).runExitAction();
+        ((JNodeToolkit) Toolkit.getDefaultToolkit()).runExitAction();
     }
-    
+
     /**
      * Set the action to be performed after the GUI has been shutdown, and
      * before control is returned to (for instance) the CommandShell.
-     * 
+     *
      * @param exitAction an action, or <code>null</code>.
      */
     public static void setExitAction(Runnable exitAction) {
@@ -1156,12 +1193,45 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
         // is currently used potentially offers a small window for some other
         // thread to insert an action that would then be executed in the security
         // context of the GUI's owner.)
-        ((JNodeToolkit) JNodeToolkit.getDefaultToolkit()).exitAction = exitAction;
+        ((JNodeToolkit) Toolkit.getDefaultToolkit()).exitAction = exitAction;
     }
 
     private synchronized void runExitAction() {
         if (exitAction != null) {
             exitAction.run();
         }
+    }
+
+    /**
+     * Post the given event on the system eventqueue.
+     */
+    public final void postEvent(AWTEvent event) {
+        Object source = event.getSource();
+        if (source instanceof Component) {
+            AppContext ac = SunToolkit.targetToAppContext(source);
+            if (ac != null) {
+                java.awt.EventQueue eq = (java.awt.EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
+                if (eq != null) {
+                    eq.postEvent(event);
+                    return;
+                }
+            }
+        }
+        getSystemEventQueueImpl().postEvent(event);
+    }
+
+    public static void postToTarget(ComponentEvent event, Component target) {
+        EventQueue queue;
+        AppContext ac = SunToolkit.targetToAppContext(target);
+        if (ac == null) {
+            queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+        } else {
+            queue = (EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
+            if (queue == null) {
+                queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+            }
+        }
+
+        queue.postEvent(event);
     }
 }

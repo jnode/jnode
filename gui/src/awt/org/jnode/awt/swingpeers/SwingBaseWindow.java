@@ -25,6 +25,7 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -39,6 +40,8 @@ import javax.swing.JRootPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 
 /**
  * Base class for peer implementation that subclass {@link java.awt.Window}.
@@ -84,7 +87,9 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     public void paint(Graphics g) {
         super.paint(g);
         if (target instanceof RootPaneContainer && isVisible()) {
-            target.paint(g.create());
+            //target.paint(g.create());
+            swingPeer.postPaintEvent();
+            //JNodeToolkit.postToTarget(new PaintEvent(target, PaintEvent.UPDATE, target.getBounds()), target);
         }
     }
 
@@ -116,7 +121,17 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
-        target.dispatchEvent(SwingToolkit.convertEvent(event, target));
+        AppContext ac = SunToolkit.targetToAppContext(target);
+        if (ac == null) {
+            target.dispatchEvent(SwingToolkit.convertEvent(event, target));
+        } else {
+            EventQueue eq = (EventQueue) ac.get(AppContext.EVENT_QUEUE_KEY);
+            if (eq == null) {
+                target.dispatchEvent(SwingToolkit.convertEvent(event, target));
+            } else {
+                eq.postEvent(SwingToolkit.convertEvent(event, target));
+            }
+        }
     }
 
     /**

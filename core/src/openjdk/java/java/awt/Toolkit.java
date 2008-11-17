@@ -67,6 +67,7 @@ import sun.awt.NullComponentPeer;
 import sun.security.util.SecurityConstants;
 
 import sun.util.CoreResourceBundleControl;
+import org.jnode.vm.VmSystem;
 
 /**
  * This class is the abstract superclass of all actual
@@ -866,6 +867,10 @@ public abstract class  Toolkit {
                             try {
                                 //jnode
                                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                                if(cl == null)
+                                    cl = Toolkit.class.getClassLoader();
+                                if(cl == null)
+                                    cl = VmSystem.getSystemClassLoader().asClassLoader();
                                 cls = cl.loadClass(nm);
                             } catch (ClassNotFoundException e) {
                                 ClassLoader cl = ClassLoader.getSystemClassLoader();
