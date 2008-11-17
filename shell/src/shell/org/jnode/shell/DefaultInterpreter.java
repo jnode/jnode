@@ -26,7 +26,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import org.apache.log4j.Logger;
 import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
@@ -48,6 +52,8 @@ public class DefaultInterpreter implements CommandInterpreter {
     };
 
     static final String[] NO_ARGS = new String[0];
+    
+    private static final Logger LOG = Logger.getLogger(DefaultInterpreter.class);
 
     public static final int REDIRECTS_FLAG = 0x01;
 
@@ -107,13 +113,17 @@ public class DefaultInterpreter implements CommandInterpreter {
     public boolean help(CommandShell shell, String line, PrintWriter pw) throws ShellException {
         CommandLine cmd = doParseCommandLine(line);
         CommandInfo cmdInfo = cmd.getCommandInfo(shell);
-        if (cmdInfo == null) {
-            return false;
-        } else {
-            // This will do for a start.
-            pw.println("Command class is " + cmdInfo.getCommandClass().getName());
-            return true;
+        if (cmdInfo != null) {
+            try {
+                Help help = HelpFactory.getHelpFactory().getHelp(cmd.getCommandName(), cmdInfo);
+                help.usage(pw);
+                return true;
+            } catch (HelpException ex) {
+                LOG.info("Unexpected error while getting help for alias / class '" + 
+                        cmd.getCommandName() + "': " + ex.getMessage(), ex);
+            }
         }
+        return false;
     }
     
     private CommandLine doParseCommandLine(String line) throws ShellException {
