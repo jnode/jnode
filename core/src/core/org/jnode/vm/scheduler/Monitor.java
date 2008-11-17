@@ -556,15 +556,15 @@ public final class Monitor {
     @Inline
     private void addToOwner() {
         Monitor lom = owner.getLastOwnedMonitor();
-        if(lom == null) {
+        if (lom == null) {
             //the first monitor
             owner.setLastOwnedMonitor(this);
         } else {
-            if(lom.owner != this.owner) {
+            if (lom.owner != this.owner) {
                 //todo error
                 return;
             } else {
-                if(lom == this) {
+                if (lom == this) {
                     //no need to add it
                     return;
                 } else {
@@ -578,16 +578,16 @@ public final class Monitor {
 
     @Inline
     private void dropFromOwner() {
-        if(owner == null) {
+        if (owner == null) {
             //error
             return;
         }
 
         Monitor lom = owner.getLastOwnedMonitor();
-        if(lom == null)
+        if (lom == null)
             return;
 
-        if(lom != this)
+        if (lom != this)
             return;
 
         owner.setLastOwnedMonitor(lom.previous);

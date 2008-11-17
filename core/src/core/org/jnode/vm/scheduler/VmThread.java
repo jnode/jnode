@@ -440,7 +440,7 @@ public abstract class VmThread extends VmSystemObject {
     private final void doStop() {
         //release monitors
         Monitor lom = lastOwnedMonitor;
-        while(lom != null) {
+        while (lom != null) {
             Monitor prev = lom.getPrevious();
             lom.release(this);
             if (prev == lom)
