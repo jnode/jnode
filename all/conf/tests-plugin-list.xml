@@ -10,9 +10,7 @@
 
   <plugin id="org.junit"/>
   <plugin id="gnu.mauve"/>   
-  <plugin id="gnu.mauve.core"/>
-  <plugin id="gnu.mauve.java.util"/>
-  <plugin id="gnu.mauve.java.lang"/>  
+  <plugin id="gnu.mauve.plugin"/>
   
   <plugin id="org.objectweb.asm"/>    
   <plugin id="net.sf.cglib"/>  

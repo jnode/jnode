@@ -26,6 +26,9 @@ package org.jnode.test.mauve;
 import gnu.testlet.ResourceNotFoundException;
 import gnu.testlet.TestHarness;
 import gnu.testlet.Testlet;
+import gnu.testlet.runner.Filter;
+import gnu.testlet.runner.Filter.LineProcessor;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,12 +36,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.PluginClassLoader;
-import org.jnode.plugin.PluginDescriptor;
-import org.jnode.plugin.PluginManager;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PluginTestHarness extends TestHarness {
+    
     private int count;
 
     private final String className;
@@ -163,14 +165,16 @@ public class PluginTestHarness extends TestHarness {
     }
 
     private static void usage() {
-        System.out.println("Usage: mauve-plugin <test-plugin> [filter]");
+        System.out.println("Usage: mauve-plugin [-v|-verbose] [-c|-continue] [-q|-quiet] <filter>");
+        System.out.println("-v|-verbose  : enable verbose mode");
+        System.out.println("-c|-continue : don't stop on failure");
+        System.out.println("-q|-quiet    : enable quiet mode");
+        System.out.println("filter       : filter for teslets to run. Example : java.lang");
     }
 
     public static void main(String[] args) throws Exception {
 
         // Parse arguments
-        String name = null;
-        String filter = null;
         boolean stopOnFail = true;
         boolean verbose = false;
         boolean quiet = false;
@@ -193,53 +197,71 @@ public class PluginTestHarness extends TestHarness {
                 break;
             }
         }
-        name = (argIndex < args.length) ? args[argIndex++] : null;
-        filter = (argIndex < args.length) ? args[argIndex++] : "";
+        final String filter;
+        if (argIndex < args.length) {
+            String f = args[argIndex++];
+            if (!f.startsWith("gnu.testlet.")) {
+                filter = "gnu.testlet." + f;
+            } else {
+                filter = f;
+            }
+        } else {
+            filter = null;
+        }
 
-        if (name == null) {
+        if (filter == null) {
             usage();
         } else {
-            PluginManager pm = InitialNaming.lookup(PluginManager.NAME);
-            PluginDescriptor descr = pm.getRegistry().getPluginDescriptor(name);
-            if (descr == null) {
-                System.out.println("Plugin " + name + " not found");
-            } else {
-                int passed = 0;
-                int failed = 0;
-                ClassLoader cl = descr.getPluginClassLoader();
-                if (cl instanceof PluginClassLoader) {
-                    PluginClassLoader pcl = (PluginClassLoader) cl;
-                    for (String className : pcl.getClassNames()) {
+            int passed = 0;
+            int failed = 0;
+            
+            final List<String> tests = new ArrayList<String>();
+            Filter.readTestList(new LineProcessor() {
+
+                @Override
+                public void processLine(StringBuffer buf) {
+                    String className = buf.toString();
+                    className = className.trim();
+               
+                    if (!className.isEmpty() && (className.indexOf('[') < 0)) {                        
                         if (className.startsWith(filter)) {
-                            try {
-                                Class k = pcl.loadClass(className);
-                                if (Testlet.class.isAssignableFrom(k)) {
-                                    if (!quiet) {
-                                        System.out.println("Running "
-                                            + className);
-                                    }
-                                    Testlet t = (Testlet) k.newInstance();
-                                    PluginTestHarness h = new PluginTestHarness(
-                                        t, verbose);
-                                    t.test(h);
-                                    passed += h.passed;
-                                    failed += h.failed;
-                                    if ((h.failed > 0) && stopOnFail) {
-                                        break;
-                                    }
-                                }
-                            } catch (Throwable ex) {
-                                System.out.println("Exception in " + className);
-                                ex.printStackTrace();
-                            }
+                            tests.add(className);
                         }
                     }
-                    System.out.println("Tests passed: " + passed + ", failed: "
-                        + failed);
-                } else {
-                    System.out.println("Plugin has no PluginClassLoader");
+                }
+                
+            });
+            
+            for (String className : tests) {
+                
+                if (!className.isEmpty() && (className.indexOf('[') < 0)) {                        
+                    if (className.startsWith(filter)) {
+                        try {
+                            Class k = Thread.currentThread().getContextClassLoader().loadClass(className);
+                            if (Testlet.class.isAssignableFrom(k)) {
+                                if (!quiet) {
+                                    System.out.println("Running "
+                                        + className);
+                                }
+                                Testlet t = (Testlet) k.newInstance();
+                                PluginTestHarness h = new PluginTestHarness(
+                                    t, verbose);
+                                t.test(h);
+                                passed += h.passed;
+                                failed += h.failed;
+                                if ((h.failed > 0) && stopOnFail) {
+                                    break;
+                                }
+                            }
+                        } catch (Throwable ex) {
+                            System.out.println("Exception in " + className);
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             }
+            System.out.println("Tests passed: " + passed + ", failed: "
+                + failed);
         }
     }
 }
