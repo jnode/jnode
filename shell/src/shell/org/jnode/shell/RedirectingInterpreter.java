@@ -32,6 +32,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandOutput;
@@ -57,6 +61,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             return "redirecting";
         }
     };
+
+    private static final Logger LOG = Logger.getLogger(RedirectingInterpreter.class);
 
     @Override
     public String getName() {
@@ -90,8 +96,27 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     
     @Override
     public boolean help(CommandShell shell, String line, PrintWriter pw) throws ShellException {
-        pw.println("Don't panic!");
-        return true;
+        Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
+        List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
+        parse(tokenizer, commands, true);
+        int len = commands.size();
+        if (len == 0) {
+            return false;
+        }
+        // We'll show the help for the last command in the pipeline.
+        CommandLine cmd = commands.get(len - 1).commandLine;
+        CommandInfo cmdInfo = cmd.getCommandInfo(shell);
+        if (cmdInfo != null) {
+            try {
+                Help help = HelpFactory.getHelpFactory().getHelp(cmd.getCommandName(), cmdInfo);
+                help.usage(pw);
+                return true;
+            } catch (HelpException ex) {
+                LOG.info("Unexpected error while getting help for alias / class '" + 
+                        cmd.getCommandName() + "': " + ex.getMessage(), ex);
+            }
+        }
+        return false;
     }
 
     @Override
