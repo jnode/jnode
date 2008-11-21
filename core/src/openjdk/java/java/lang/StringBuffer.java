@@ -76,7 +76,6 @@ package java.lang;
  * it performs no synchronization.
  *
  * @author	Arthur van Hoff
- * @version 	1.107, 05/05/07
  * @see     java.lang.StringBuilder
  * @see     java.lang.String
  * @since   JDK1.0
@@ -642,6 +641,6 @@ package java.lang;
         throws java.io.IOException, ClassNotFoundException {
         java.io.ObjectInputStream.GetField fields = s.readFields();
         value = (char[])fields.get("value", null);
-        count = (int)fields.get("count", 0);
+        count = fields.get("count", 0);
     }
 }

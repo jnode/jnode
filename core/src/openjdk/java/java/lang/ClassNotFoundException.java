@@ -45,7 +45,6 @@ package java.lang;
  * Throwable#getCause()} method, as well as the aforementioned "legacy method."
  *
  * @author  unascribed
- * @version 1.27, 05/05/07
  * @see     java.lang.Class#forName(java.lang.String)
  * @see     java.lang.ClassLoader#findSystemClass(java.lang.String)
  * @see     java.lang.ClassLoader#loadClass(java.lang.String, boolean)

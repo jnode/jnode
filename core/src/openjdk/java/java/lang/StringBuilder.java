@@ -65,7 +65,6 @@ package java.lang;
  * recommended that {@link java.lang.StringBuffer} be used. 
  *
  * @author	Michael McCloskey
- * @version 	1.17, 05/05/07
  * @see         java.lang.StringBuffer
  * @see         java.lang.String
  * @since	1.5

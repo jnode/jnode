@@ -40,7 +40,6 @@ package java.lang;
  * <a href="http://java.sun.com/docs/books/jls/second_edition/html/expressions.doc.html#40220">
  * Section  15.18.1.1</a>), regardless of the type of <i>expression</i>.
  *
- * @version 1.15, 05/05/07
  * @since   1.4
  */
 public class AssertionError extends Error {

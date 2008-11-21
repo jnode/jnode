@@ -48,7 +48,6 @@ package java.lang;
  * behavior of the class.
  *
  * @author  Arthur van Hoff
- * @version 1.32, 05/05/07
  * @see     java.lang.Thread
  * @see     java.util.concurrent.Callable
  * @since   JDK1.0

@@ -39,7 +39,6 @@ package java.lang;
  *</ul>
  *
  * @author  unascribed
- * @version 1.25, 05/05/07
  * @see     java.lang.Class#newInstance()
  * @since   JDK1.0
  */

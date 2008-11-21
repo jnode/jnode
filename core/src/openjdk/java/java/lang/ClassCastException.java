@@ -35,7 +35,6 @@ package java.lang;
  * </pre></blockquote>
  *
  * @author  unascribed
- * @version 1.27, 05/05/07
  * @since   JDK1.0
  */
 public

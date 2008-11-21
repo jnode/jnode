@@ -33,7 +33,6 @@ package java.lang;
  * Java Collections Framework</a>.
  *
  * @author  Josh Bloch
- * @version 1.27, 05/05/07
  * @since   1.2
  */
 public class UnsupportedOperationException extends RuntimeException {

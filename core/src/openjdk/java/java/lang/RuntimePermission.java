@@ -316,7 +316,6 @@ import java.util.StringTokenizer;
  *   The actual backing store may reside within a traditional filesystem
  *   directory or within a registry depending on the platform OS</td>
  * </tr>
-
  * </table>
  *
  * @see java.security.BasicPermission
@@ -325,7 +324,6 @@ import java.util.StringTokenizer;
  * @see java.security.PermissionCollection
  * @see java.lang.SecurityManager
  *
- * @version 1.63 07/05/05
  *
  * @author Marianne Mueller
  * @author Roland Schemers

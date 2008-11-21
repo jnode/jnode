@@ -46,7 +46,6 @@ package java.lang;
  * reflectively, there is no guarantee that it will succeed.
  *
  * @author  unascribed
- * @version 1.23, 05/05/07
  * @see     java.lang.CloneNotSupportedException
  * @see     java.lang.Object#clone()
  * @since   JDK1.0

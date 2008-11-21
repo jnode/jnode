@@ -32,7 +32,6 @@ package java.lang;
  * Applications can subclass this class to indicate similar exceptions. 
  *
  * @author  Frank Yellin
- * @version 1.18, 05/05/07
  * @since   JDK1.0
  */
 public

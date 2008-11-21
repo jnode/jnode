@@ -30,7 +30,6 @@ package java.lang;
  * inappropriate argument.
  *
  * @author  unascribed
- * @version 1.30, 05/05/07
  * @see	    java.lang.Thread#setPriority(int)
  * @since   JDK1.0
  */

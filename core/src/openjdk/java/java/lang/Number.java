@@ -38,7 +38,6 @@ package java.lang;
  *
  * @author	Lee Boynton
  * @author	Arthur van Hoff
- * @version 1.36, 05/05/07
  * @see     java.lang.Byte
  * @see     java.lang.Double
  * @see     java.lang.Float

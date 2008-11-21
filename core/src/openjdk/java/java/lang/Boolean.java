@@ -38,7 +38,6 @@ package java.lang;
  * {@code boolean}. 
  *
  * @author  Arthur van Hoff
- * @version 1.60, 05/05/07
  * @since   JDK1.0
  */
 public final class Boolean implements java.io.Serializable,

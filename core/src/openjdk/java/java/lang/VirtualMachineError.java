@@ -31,7 +31,6 @@ package java.lang;
  *
  *
  * @author  Frank Yellin
- * @version 1.21, 05/05/07
  * @since   JDK1.0
  */
 abstract public

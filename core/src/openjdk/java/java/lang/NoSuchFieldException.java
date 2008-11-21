@@ -29,7 +29,6 @@ package java.lang;
  * Signals that the class doesn't have a field of a specified name.
  *
  * @author  unascribed
- * @version 1.21, 05/05/07
  * @since   JDK1.1
  */
 public class NoSuchFieldException extends Exception {

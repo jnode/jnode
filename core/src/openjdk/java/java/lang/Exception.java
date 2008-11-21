@@ -31,7 +31,6 @@ package java.lang;
  * application might want to catch.
  *
  * @author  Frank Yellin
- * @version 1.38, 05/05/07
  * @see     java.lang.Error
  * @since   JDK1.0
  */

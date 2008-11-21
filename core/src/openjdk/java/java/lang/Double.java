@@ -44,7 +44,6 @@ import sun.misc.DoubleConsts;
  * @author  Lee Boynton
  * @author  Arthur van Hoff
  * @author  Joseph D. Darcy
- * @version 1.107, 05/05/07
  * @since JDK1.0
  */
 public final class Double extends Number implements Comparable<Double> {
@@ -393,7 +392,7 @@ public final class Double extends Number implements Comparable<Double> {
      * where <i>Sign</i>, <i>FloatingPointLiteral</i>,
      * <i>HexNumeral</i>, <i>HexDigits</i>, <i>SignedInteger</i> and
      * <i>FloatTypeSuffix</i> are as defined in the lexical structure
-     * sections of the of the <a
+     * sections of the <a
      * href="http://java.sun.com/docs/books/jls/html/">Java Language
      * Specification</a>. If {@code s} does not have the form of
      * a <i>FloatValue</i>, then a {@code NumberFormatException}

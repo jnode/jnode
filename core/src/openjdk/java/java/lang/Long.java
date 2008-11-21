@@ -45,7 +45,6 @@ package java.lang;
  * @author  Arthur van Hoff
  * @author  Josh Bloch
  * @author  Joseph D. Darcy
- * @version 1.89, 05/05/07
  * @since   JDK1.0
  */
 public final class Long extends Number implements Comparable<Long> {
@@ -344,9 +343,8 @@ public final class Long extends Number implements Comparable<Long> {
      * by whether {@link java.lang.Character#digit(char, int)} returns
      * a nonnegative value), except that the first character may be an
      * ASCII minus sign {@code '-'} (<code>'&#92;u002D'</code>) to
-     * indicate a negative value or an ASCII plus sign {@code '+'}
-     * (<code>'&#92;u002B'</code>) to indicate a positive value. The
-     * resulting {@code long} value is returned.
+     * indicate a negative value. The resulting {@code long} value is
+     * returned.
      * 
      * <p>Note that neither the character {@code L}
      * (<code>'&#92;u004C'</code>) nor {@code l}
@@ -369,9 +367,8 @@ public final class Long extends Number implements Comparable<Long> {
      *
      * <li>Any character of the string is not a digit of the specified
      * radix, except that the first character may be a minus sign
-     * {@code '-'} (<code>'&#92;u002d'</code>) or plus sign {@code
-     * '+'} (<code>'&#92;u002B'</code>) provided that the string is
-     * longer than length 1.
+     * {@code '-'} (<code>'&#92;u002d'</code>) provided that the
+     * string is longer than length 1.
      *
      * <li>The value represented by the string is not a value of type
      *      {@code long}. 
@@ -381,7 +378,6 @@ public final class Long extends Number implements Comparable<Long> {
      * <blockquote><pre>
      * parseLong("0", 10) returns 0L
      * parseLong("473", 10) returns 473L
-     * parseLong("+42", 10) returns 42L
      * parseLong("-0", 10) returns 0L
      * parseLong("-FF", 16) returns -255L
      * parseLong("1100110", 2) returns 102L
@@ -416,32 +412,26 @@ public final class Long extends Number implements Comparable<Long> {
 
 	long result = 0;
 	boolean negative = false;
-	int i = 0, max = s.length();
-	long limit;
+        int i = 0, len = s.length();
+        long limit = -Long.MAX_VALUE;
 	long multmin;
 	int digit;
 
-	if (max > 0) {
+        if (len > 0) {
 	    char firstChar = s.charAt(0);
+            if (firstChar < '0') { // Possible leading "-"
 	    if (firstChar == '-') {
 		negative = true;
 		limit = Long.MIN_VALUE;
+                } else
+                    throw NumberFormatException.forInputString(s);
+
+                if (len == 1) // Cannot have lone "-"
+                    throw NumberFormatException.forInputString(s);
 		i++;
-	    } else {
-		if (firstChar == '+')
-		    i++;
-		limit = -Long.MAX_VALUE;
 	    }
 	    multmin = limit / radix;
-            if (i < max) {
-                digit = Character.digit(s.charAt(i++),radix);
-		if (digit < 0) {
-		    throw NumberFormatException.forInputString(s);
-		} else {
-		    result = -digit;
-		}
-	    }
-	    while (i < max) {
+            while (i < len) {
 		// Accumulating negatively avoids surprises near MAX_VALUE
 		digit = Character.digit(s.charAt(i++),radix);
 		if (digit < 0) {
@@ -459,27 +449,17 @@ public final class Long extends Number implements Comparable<Long> {
 	} else {
 	    throw NumberFormatException.forInputString(s);
 	}
-	if (negative) {
-	    if (i > 1) {
-		return result;
-	    } else {	/* Only got "-" */
-		throw NumberFormatException.forInputString(s);
-	    }
-	} else {
-	    return -result;
-	}
+        return negative ? result : -result;
     }
 
     /**
      * Parses the string argument as a signed decimal {@code long}.
      * The characters in the string must all be decimal digits, except
      * that the first character may be an ASCII minus sign {@code '-'}
-     * (<code>&#92;u002D'</code>) to indicate a negative value or an
-     * ASCII plus sign {@code '+'} (<code>'&#92;u002B'</code>) to
-     * indicate a positive value. The resulting {@code long} value is
-     * returned, exactly as if the argument and the radix {@code 10}
-     * were given as arguments to the {@link
-     * #parseLong(java.lang.String, int)} method.
+     * (<code>&#92;u002D'</code>) to indicate a negative value.  The
+     * resulting {@code long} value is returned, exactly as if the
+     * argument and the radix {@code 10} were given as arguments to
+     * the {@link #parseLong(java.lang.String, int)} method.
      * 
      * <p>Note that neither the character {@code L}
      * (<code>'&#92;u004C'</code>) nor {@code l}
@@ -603,7 +583,6 @@ public final class Long extends Number implements Comparable<Long> {
      * <p>
      * <dt><i>Sign:</i>
      * <dd>{@code -}
-     * <dd>{@code +}
      * </dl>
      * </blockquote>
      *
@@ -612,7 +591,7 @@ public final class Long extends Number implements Comparable<Long> {
      * of the <a href="http://java.sun.com/docs/books/jls/html/">Java 
      * Language Specification</a>.
      * 
-     * <p>The sequence of characters following an optional
+     * <p>The sequence of characters following an (optional) negative
      * sign and/or radix specifier ("{@code 0x}", "{@code 0X}",
      * "{@code #}", or leading zero) is parsed as by the {@code
      * Long.parseLong} method with the indicated radix (10, 16, or 8).
@@ -643,8 +622,7 @@ public final class Long extends Number implements Comparable<Long> {
         if (firstChar == '-') {
             negative = true;
             index++;
-	} else if (firstChar == '+')
-            index++;
+        }
 
         // Handle radix specifier, if present
 	if (nm.startsWith("0x", index) || nm.startsWith("0X", index)) {
@@ -660,7 +638,7 @@ public final class Long extends Number implements Comparable<Long> {
             radix = 8;
 	}
 
-        if (nm.startsWith("-", index) || nm.startsWith("+", index))
+        if (nm.startsWith("-", index))
             throw new NumberFormatException("Sign character in wrong position");
 
         try {
@@ -670,7 +648,7 @@ public final class Long extends Number implements Comparable<Long> {
             // If number is Long.MIN_VALUE, we'll end up here. The next line
             // handles this case, and causes any genuine format error to be
             // rethrown.
-            String constant = negative ? new String("-" + nm.substring(index))
+            String constant = negative ? ("-" + nm.substring(index))
                                        : nm.substring(index);
             result = Long.valueOf(constant, radix);
         }

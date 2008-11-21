@@ -36,7 +36,6 @@ package java.lang;
  *
  *
  * @author  Frank Yellin
- * @version 1.20, 05/05/07
  * @since   JDK1.0
  */
 public class RuntimeException extends Exception {

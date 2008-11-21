@@ -31,7 +31,6 @@ package java.lang;
  * including arrays, implement the methods of this class. 
  *
  * @author  unascribed
- * @version 1.79, 05/05/07
  * @see     java.lang.Class
  * @since   JDK1.0
  */

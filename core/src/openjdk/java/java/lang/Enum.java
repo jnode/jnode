@@ -36,7 +36,6 @@ import java.io.ObjectStreamException;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.24, 05/05/07
  * @see     Class#getEnumConstants()
  * @since   1.5
  */

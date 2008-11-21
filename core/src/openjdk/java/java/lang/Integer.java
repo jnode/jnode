@@ -45,7 +45,6 @@ package java.lang;
  * @author  Arthur van Hoff
  * @author  Josh Bloch
  * @author  Joseph D. Darcy
- * @version 1.100, 05/05/07
  * @since JDK1.0
  */
 public final class Integer extends Number implements Comparable<Integer> {
@@ -392,9 +391,8 @@ public final class Integer extends Number implements Comparable<Integer> {
      * whether {@link java.lang.Character#digit(char, int)} returns a
      * nonnegative value), except that the first character may be an
      * ASCII minus sign {@code '-'} (<code>'&#92;u002D'</code>) to
-     * indicate a negative value or an ASCII plus sign {@code '+'}
-     * (<code>'&#92;u002B'</code>) to indicate a positive value. The
-     * resulting integer value is returned.
+     * indicate a negative value. The resulting integer value is
+     * returned.
      * 
      * <p>An exception of type {@code NumberFormatException} is
      * thrown if any of the following situations occurs:
@@ -408,8 +406,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      *
      * <li>Any character of the string is not a digit of the specified
      * radix, except that the first character may be a minus sign
-     * {@code '-'} (<code>'&#92;u002D'</code>) or plus sign
-     * {@code '+'} (<code>'&#92;u002B'</code>) provided that the
+     * {@code '-'} (<code>'&#92;u002D'</code>) provided that the
      * string is longer than length 1.
      *
      * <li>The value represented by the string is not a value of type
@@ -420,7 +417,6 @@ public final class Integer extends Number implements Comparable<Integer> {
      * <blockquote><pre>
      * parseInt("0", 10) returns 0
      * parseInt("473", 10) returns 473
-     * parseInt("+42", 10) returns 42
      * parseInt("-0", 10) returns 0
      * parseInt("-FF", 16) returns -255
      * parseInt("1100110", 2) returns 102
@@ -459,32 +455,26 @@ public final class Integer extends Number implements Comparable<Integer> {
 
 	int result = 0;
 	boolean negative = false;
-	int i = 0, max = s.length();
-	int limit;
+        int i = 0, len = s.length();
+        int limit = -Integer.MAX_VALUE;
 	int multmin;
 	int digit;
 
-	if (max > 0) {
+        if (len > 0) {
 	    char firstChar = s.charAt(0);
+            if (firstChar < '0') { // Possible leading "-"
 	    if (firstChar == '-') {
 		negative = true;
 		limit = Integer.MIN_VALUE;
+                } else
+                    throw NumberFormatException.forInputString(s);
+
+                if (len == 1) // Cannot have lone "-"
+                    throw NumberFormatException.forInputString(s);
 		i++;
-	    } else {
-		if (firstChar == '+')
-		    i++;
-		limit = -Integer.MAX_VALUE;
 	    }
 	    multmin = limit / radix;
-	    if (i < max) {
-		digit = Character.digit(s.charAt(i++),radix);
-		if (digit < 0) {
-		    throw NumberFormatException.forInputString(s);
-		} else {
-		    result = -digit;
-		}
-	    }
-	    while (i < max) {
+            while (i < len) {
 		// Accumulating negatively avoids surprises near MAX_VALUE
 		digit = Character.digit(s.charAt(i++),radix);
 		if (digit < 0) {
@@ -502,27 +492,17 @@ public final class Integer extends Number implements Comparable<Integer> {
 	} else {
 	    throw NumberFormatException.forInputString(s);
 	}
-	if (negative) {
-	    if (i > 1) {
-		return result;
-	    } else {	/* Only got "-" */
-		throw NumberFormatException.forInputString(s);
-	    }
-	} else {
-	    return -result;
-	}
+        return negative ? result : -result;
     }
 
     /**
      * Parses the string argument as a signed decimal integer. The
      * characters in the string must all be decimal digits, except
      * that the first character may be an ASCII minus sign {@code '-'}
-     * (<code>'&#92;u002D'</code>) to indicate a negative value or an
-     * ASCII plus sign {@code '+'} (<code>'&#92;u002B'</code>) to
-     * indicate a positive value. The resulting integer value is
-     * returned, exactly as if the argument and the radix 10 were
-     * given as arguments to the {@link #parseInt(java.lang.String,
-     * int)} method.
+     * (<code>'&#92;u002D'</code>) to indicate a negative value.  The
+     * resulting integer value is returned, exactly as if the argument
+     * and the radix 10 were given as arguments to the {@link
+     * #parseInt(java.lang.String, int)} method.
      *
      * @param s	   a {@code String} containing the {@code int}
      *             representation to be parsed
@@ -892,7 +872,6 @@ public final class Integer extends Number implements Comparable<Integer> {
      * <p>
      * <dt><i>Sign:</i>
      * <dd>{@code -}
-     * <dd>{@code +}
      * </dl>
      * </blockquote>
      *
@@ -901,7 +880,7 @@ public final class Integer extends Number implements Comparable<Integer> {
      * of the <a href="http://java.sun.com/docs/books/jls/html/">Java 
      * Language Specification</a>.
      * 
-     * <p>The sequence of characters following an optional
+     * <p>The sequence of characters following an (optional) negative
      * sign and/or radix specifier ("{@code 0x}", "{@code 0X}",
      * "{@code #}", or leading zero) is parsed as by the {@code
      * Integer.parseInt} method with the indicated radix (10, 16, or
@@ -931,8 +910,7 @@ public final class Integer extends Number implements Comparable<Integer> {
         if (firstChar == '-') {
             negative = true;
             index++;
-	} else if (firstChar == '+')
-            index++;
+        }
 
         // Handle radix specifier, if present
 	if (nm.startsWith("0x", index) || nm.startsWith("0X", index)) {
@@ -948,7 +926,7 @@ public final class Integer extends Number implements Comparable<Integer> {
             radix = 8;
 	}
 
-        if (nm.startsWith("-", index) || nm.startsWith("+", index))
+        if (nm.startsWith("-", index))
             throw new NumberFormatException("Sign character in wrong position");
 
         try {
@@ -958,7 +936,7 @@ public final class Integer extends Number implements Comparable<Integer> {
             // If number is Integer.MIN_VALUE, we'll end up here. The next line
             // handles this case, and causes any genuine format error to be
             // rethrown.
-            String constant = negative ? new String("-" + nm.substring(index))
+            String constant = negative ? ("-" + nm.substring(index))
                                        : nm.substring(index);
             result = Integer.valueOf(constant, radix);
         }

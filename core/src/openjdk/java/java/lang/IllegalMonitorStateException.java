@@ -31,7 +31,6 @@ package java.lang;
  * monitor without owning the specified monitor. 
  *
  * @author  unascribed
- * @version 1.19, 05/05/07
  * @see     java.lang.Object#notify()
  * @see     java.lang.Object#notifyAll()
  * @see     java.lang.Object#wait() 
