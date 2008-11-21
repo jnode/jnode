@@ -1165,7 +1165,3 @@ public class ImageUtil {
         return ImageUtil.isBinary(sm);
     }
 }
-
-  
-
-

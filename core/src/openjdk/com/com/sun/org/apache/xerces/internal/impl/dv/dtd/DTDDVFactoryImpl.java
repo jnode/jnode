@@ -80,4 +80,3 @@ public class DTDDVFactoryImpl extends DTDDVFactory {
     }//createBuiltInTypes()
 
 }// DTDDVFactoryImpl
-

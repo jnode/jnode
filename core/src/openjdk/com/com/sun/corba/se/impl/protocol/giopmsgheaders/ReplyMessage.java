@@ -33,7 +33,6 @@ import com.sun.corba.se.spi.ior.IOR;
  * This interface captures the ReplyMessage contract.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public interface ReplyMessage extends Message, LocateReplyOrReplyMessage {

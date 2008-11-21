@@ -37,7 +37,6 @@ package org.omg.SendingContext;
 * when a value type is marshalled on a GIOP Request message, the receiver
 * of the value type may need to ask the sender about the CodeBase for the
 * implementation of the value type.
-* @version 1.23 05/05/07
 */
 public interface RunTime extends RunTimeOperations, org.omg.CORBA.Object, org.omg.CORBA.portable.IDLEntity 
 {

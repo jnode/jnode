@@ -55,4 +55,3 @@ public interface HTMLMenuElement extends HTMLElement {
     public void setCompact(boolean compact);
 
 }
-

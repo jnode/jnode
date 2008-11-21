@@ -76,7 +76,6 @@ import java.io.InputStream;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.XMLReader#parse(org.xml.sax.InputSource)
  * @see org.xml.sax.EntityResolver#resolveEntity
  * @see java.io.InputStream

@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)IIOPOutputStream_1_3_1.java	1.12 07/05/05
  */
 package com.sun.corba.se.impl.orbutil;
 
@@ -65,4 +64,3 @@ public class IIOPOutputStream_1_3_1 extends com.sun.corba.se.impl.io.IIOPOutputS
 	putFields_1_3_1.write(this);
     }
 }
-

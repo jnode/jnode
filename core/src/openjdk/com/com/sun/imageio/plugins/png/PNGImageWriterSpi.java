@@ -36,7 +36,6 @@ import javax.imageio.metadata.IIOMetadataFormatImpl;
 import javax.imageio.spi.ImageWriterSpi;
 
 /**
- * @version 0.5
  */
 public class PNGImageWriterSpi extends ImageWriterSpi {
 

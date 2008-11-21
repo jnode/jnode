@@ -84,4 +84,3 @@ public abstract class StackInstruction extends Instruction {
     return Type.UNKNOWN;
   }  
 }
-

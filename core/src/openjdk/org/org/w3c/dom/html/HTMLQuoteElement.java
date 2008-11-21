@@ -55,4 +55,3 @@ public interface HTMLQuoteElement extends HTMLElement {
     public void setCite(String cite);
 
 }
-

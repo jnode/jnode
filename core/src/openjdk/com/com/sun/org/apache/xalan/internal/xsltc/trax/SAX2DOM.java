@@ -60,10 +60,18 @@ public class SAX2DOM implements ContentHandler, LexicalHandler, Constants {
     private Locator locator = null;
     private boolean needToSetDocumentInfo = true;
             
-    public SAX2DOM() throws ParserConfigurationException {
-	final DocumentBuilderFactory factory =
+    /**
+     * JAXP document builder factory. Create a single instance and use
+     * synchronization because the Javadoc is not explicit about 
+     * thread safety.
+     */
+    static final DocumentBuilderFactory _factory =
 		DocumentBuilderFactory.newInstance();
-	_document = factory.newDocumentBuilder().newDocument();
+
+   public SAX2DOM() throws ParserConfigurationException {
+        synchronized (SAX2DOM.class) {
+          _document = _factory.newDocumentBuilder().newDocument();
+        }
 	_root = _document;
     }
 
@@ -76,9 +84,9 @@ public class SAX2DOM implements ContentHandler, LexicalHandler, Constants {
 	  _document = root.getOwnerDocument();
 	}
 	else {
-	  final DocumentBuilderFactory factory = 
-		DocumentBuilderFactory.newInstance();
-	  _document = factory.newDocumentBuilder().newDocument();
+          synchronized (SAX2DOM.class) {
+              _document = _factory.newDocumentBuilder().newDocument();
+          }
 	  _root = _document;
 	}
 	

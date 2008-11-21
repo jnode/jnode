@@ -99,4 +99,3 @@ abstract public class POAHelper
        return null;
     }
 }
-

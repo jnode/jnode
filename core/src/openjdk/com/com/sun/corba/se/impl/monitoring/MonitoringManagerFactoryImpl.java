@@ -45,4 +45,3 @@ public class MonitoringManagerFactoryImpl implements MonitoringManagerFactory {
         return m;
     }
 }
-

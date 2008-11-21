@@ -53,7 +53,6 @@ import java.util.Enumeration;
  * @since 1.4
  * @author Nathan Abramson
  * @author David Brownell
- * @version 1.21
  */
 public interface SSLSessionContext {
 
@@ -140,4 +139,3 @@ public interface SSLSessionContext {
     public int getSessionCacheSize();
 
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -161,7 +161,6 @@ import java.security.PrivilegedAction;
  * <P>
  * An application or applet can be initialized in one or more ORBs.
  * ORB initialization is a bootstrap call into the CORBA world.
- * @version 1.70, 09/09/97
  * @since   JDK1.2
  */
 abstract public class ORB {
@@ -290,7 +289,7 @@ abstract public class ORB {
      *
      * @return the singleton ORB
      */
-    public static ORB init() {
+    public static synchronized ORB init() {
         if (singleton == null) {
             String className = getSystemProperty(ORBSingletonClassKey);
             if (className == null)

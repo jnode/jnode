@@ -100,4 +100,3 @@ public class DevanagariInputMethodDescriptor implements InputMethodDescriptor {
         return getClass().getName();
     }
 }
-

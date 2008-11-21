@@ -105,4 +105,3 @@ class AndQueryExp extends QueryEval implements QueryExp {
    }
    
  }
-

@@ -204,4 +204,3 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	throw new ServantNotActive();
     }
 }
-

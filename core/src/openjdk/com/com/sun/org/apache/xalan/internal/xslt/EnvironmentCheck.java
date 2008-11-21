@@ -259,7 +259,7 @@ public class EnvironmentCheck
     boolean errors = false;
 
     logMsg(
-      "#---- BEGIN writeEnvironmentReport($Revision: 1.4 $): Useful stuff found: ----");
+      "#---- BEGIN writeEnvironmentReport($Revision: 1.7 $): Useful stuff found: ----");
 
     // Fake the Properties-like output
     for (Enumeration keys = h.keys(); 
@@ -418,7 +418,7 @@ public class EnvironmentCheck
     try
     {
       Element envCheckNode = factory.createElement("EnvironmentCheck");
-      envCheckNode.setAttribute("version", "$Revision: 1.4 $");
+      envCheckNode.setAttribute("version", "$Revision: 1.7 $");
       container.appendChild(envCheckNode);
 
       if (null == h)

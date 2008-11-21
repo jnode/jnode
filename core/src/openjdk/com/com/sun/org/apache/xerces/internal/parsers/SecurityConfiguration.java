@@ -112,4 +112,3 @@ public class SecurityConfiguration extends XIncludeAwareParserConfiguration
     } // <init>(SymbolTable,XMLGrammarPool)
 
 } // class SecurityConfiguration
-

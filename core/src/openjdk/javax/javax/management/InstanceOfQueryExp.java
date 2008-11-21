@@ -118,4 +118,3 @@ class InstanceOfQueryExp extends QueryEval implements QueryExp {
        return "InstanceOf " + classNameValue.toString();
    }
 }
-

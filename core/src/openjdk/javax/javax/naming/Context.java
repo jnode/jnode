@@ -274,7 +274,6 @@ import java.util.Hashtable;
  * @author Rosanna Lee
  * @author Scott Seligman
  * @author R. Vasudevan
- * @version 1.20 07/05/05
  *
  * @since 1.3
  */

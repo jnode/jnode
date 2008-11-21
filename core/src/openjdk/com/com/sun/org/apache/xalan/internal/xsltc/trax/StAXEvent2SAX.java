@@ -142,6 +142,7 @@ public class StAXEvent2SAX implements XMLReader, Locator {
         try {
             // remembers the nest level of elements to know when we are done.
             int depth=0;
+            boolean startedAtDocument = false;
 
             XMLEvent event = staxEventReader.peek();
 
@@ -149,19 +150,42 @@ public class StAXEvent2SAX implements XMLReader, Locator {
                 throw new IllegalStateException();
             }
 
-            // if the parser is on START_DOCUMENT, skip ahead to the first element
-            while( !event.isStartElement() ) {
                 if (event.getEventType() == XMLStreamConstants.START_DOCUMENT){
+                startedAtDocument = true;
                     version = ((StartDocument)event).getVersion();
                     if (((StartDocument)event).encodingSet())
                         encoding = ((StartDocument)event).getCharacterEncodingScheme();
-                }
-                
-                event = staxEventReader.nextEvent();
+                event=staxEventReader.nextEvent(); // that gets the one we peeked at
+                event=staxEventReader.nextEvent(); // that really gets the next one
             }
            
             handleStartDocument(event);
 
+            // Handle the prolog: http://www.w3.org/TR/REC-xml/#NT-prolog
+            while (event.getEventType() != XMLStreamConstants.START_ELEMENT) {
+                switch (event.getEventType()) {
+                    case XMLStreamConstants.CHARACTERS :
+                        handleCharacters(event.asCharacters());
+                        break;
+                    case XMLStreamConstants.PROCESSING_INSTRUCTION :
+                        handlePI((ProcessingInstruction)event);
+                        break;
+                    case XMLStreamConstants.COMMENT :
+                        handleComment();
+                        break;
+                    case XMLStreamConstants.DTD :
+                        handleDTD();
+                        break;
+                    case XMLStreamConstants.SPACE :
+                        handleSpace();
+                        break;
+                    default :
+                        throw new InternalError("processing prolog event: " + event);
+                }
+                event=staxEventReader.nextEvent();
+            }
+
+            // Process the (document) element
             do {
                 // These are all of the events listed in the javadoc for
                 // XMLEvent.
@@ -214,6 +238,29 @@ public class StAXEvent2SAX implements XMLReader, Locator {
 
                 event=staxEventReader.nextEvent();
             } while (depth!=0);
+
+            if (startedAtDocument) {
+                // Handle the Misc (http://www.w3.org/TR/REC-xml/#NT-Misc) that can follow the document element
+                while (event.getEventType() != XMLStreamConstants.END_DOCUMENT) {
+                    switch (event.getEventType()) {
+                        case XMLStreamConstants.CHARACTERS :
+                            handleCharacters(event.asCharacters());
+                            break;
+                        case XMLStreamConstants.PROCESSING_INSTRUCTION :
+                            handlePI((ProcessingInstruction)event);
+                            break;
+                        case XMLStreamConstants.COMMENT :
+                            handleComment();
+                            break;
+                        case XMLStreamConstants.SPACE :
+                            handleSpace();
+                            break;
+                        default :
+                            throw new InternalError("processing misc event after document element: " + event);
+                    }
+                    event=staxEventReader.nextEvent();
+                }
+            }
 
             handleEndDocument();
         } catch (SAXException e) {

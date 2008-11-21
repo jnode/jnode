@@ -210,4 +210,3 @@ public class XMLDTDDescription extends XMLResourceIdentifierImpl
         return 0;
     }
 } // class XMLDTDDescription
-

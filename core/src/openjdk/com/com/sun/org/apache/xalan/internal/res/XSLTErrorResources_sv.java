@@ -2697,5 +2697,3 @@ public class XSLTErrorResources_sv extends ListResourceBundle
   public static final String QUERY_HEADER = "M\u00d6NSTER ";
 
 }
-
-

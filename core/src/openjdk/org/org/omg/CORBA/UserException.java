@@ -33,7 +33,6 @@ package org.omg.CORBA;
  *
  * @see <A href="../../../../technotes/guides/idl/jidlExceptions.html">documentation on
  * Java&nbsp;IDL exceptions</A>
- * @version	1.28 09/09/97
  */
 public abstract class UserException extends java.lang.Exception implements org.omg.CORBA.portable.IDLEntity {
 
@@ -56,4 +55,3 @@ public abstract class UserException extends java.lang.Exception implements org.o
 	super(reason);
     }
 }
-

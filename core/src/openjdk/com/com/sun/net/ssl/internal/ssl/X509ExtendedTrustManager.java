@@ -53,7 +53,6 @@ import java.security.cert.CertificateException;
  * @see HostnameVerifier
  *
  * @since 1.6
- * @version 1.10
  * @author Xuelei Fan
  */
 public abstract class X509ExtendedTrustManager implements X509TrustManager {

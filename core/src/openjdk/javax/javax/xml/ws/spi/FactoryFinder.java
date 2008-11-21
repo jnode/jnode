@@ -67,7 +67,7 @@ class FactoryFinder {
     /**
      * Finds the implementation <code>Class</code> object for the given
      * factory name, or if that fails, finds the <code>Class</code> object
-     * for the given fallback class name. The arguments supplied must be
+     * for the given fallback class name. The arguments supplied MUST be
      * used in order. If using the first argument is successful, the second
      * one will not be used.
      * <P>

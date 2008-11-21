@@ -184,4 +184,3 @@ class XSDAbstractIDConstraintTraverser extends XSDAbstractTraverser {
         
     } // traverseIdentityConstraint(IdentityConstraint,Element, XSDocumentInfo)
 } // XSDAbstractIDConstraintTraverser
-

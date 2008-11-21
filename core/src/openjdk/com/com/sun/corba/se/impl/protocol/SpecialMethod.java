@@ -166,4 +166,3 @@ class GetInterface extends SpecialMethod  {	// _get_interface
 }
 
 // End of file.
-

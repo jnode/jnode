@@ -166,7 +166,6 @@ import org.omg.CORBA.portable.IDLEntity;
  * on a <code>struct</code> <code>TypeCode</code> to be permitted
  * on an <code>exception</code> <code>TypeCode</code> as well. <p>
  *
- * @version 1.25 09/09/97
  */
 public abstract class TypeCode implements IDLEntity {
 

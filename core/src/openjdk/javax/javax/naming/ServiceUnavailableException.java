@@ -38,7 +38,6 @@ package javax.naming;
   * @author Rosanna Lee
   * @author Scott Seligman
   *
-  * @version 1.15 07/05/05
   * @since 1.3
   */
 

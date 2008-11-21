@@ -130,7 +130,6 @@ import javax.naming.NamingException;
  * 
  * @author Rosanna Lee
  * @author Scott Seligman
- * @version 1.11 03/12/19
  * @since 1.3
  */
 

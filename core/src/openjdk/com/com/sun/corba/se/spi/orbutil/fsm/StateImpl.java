@@ -96,4 +96,3 @@ public class StateImpl extends NameBase implements State {
 	return (Set)inputToGuardedActions.get( in ) ;
     }
 }
-

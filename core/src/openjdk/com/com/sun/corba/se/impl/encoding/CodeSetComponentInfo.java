@@ -338,4 +338,3 @@ public final class CodeSetComponentInfo {
         = new CodeSetContext(OSFCodeSetRegistry.ISO_8859_1.getNumber(),
                              OSFCodeSetRegistry.UTF_16.getNumber());
 }
-

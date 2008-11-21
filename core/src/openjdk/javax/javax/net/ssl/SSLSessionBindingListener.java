@@ -41,7 +41,6 @@ import java.util.EventListener;
  * @since 1.4
  * @author Nathan Abramson
  * @author David Brownell
- * @version 1.17
  */
 public
 interface SSLSessionBindingListener
@@ -65,4 +64,3 @@ extends EventListener
      */
     public void valueUnbound(SSLSessionBindingEvent event);
 }
-

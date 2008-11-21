@@ -138,4 +138,3 @@ public interface HTMLAnchorElement extends HTMLElement {
     public void focus();
 
 }
-

@@ -57,7 +57,6 @@ import javax.naming.NamingEnumeration;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.19 07/05/05
   *
   * @see DirContext#getAttributes
   * @see DirContext#modifyAttributes
@@ -173,7 +172,7 @@ public class BasicAttributes implements Attributes {
     }
 
     public Attribute put(String attrID, Object val) {
-	return (Attribute)this.put(new BasicAttribute(attrID, val));
+        return this.put(new BasicAttribute(attrID, val));
     }
 
     public Attribute put(Attribute attr) {
@@ -353,7 +352,7 @@ class IDEnumImpl implements NamingEnumeration<String> {
     }
 
     public String nextElement() {
-	Attribute attr = (Attribute)elements.nextElement();
+        Attribute attr = elements.nextElement();
 	return attr.getID();
     }
 

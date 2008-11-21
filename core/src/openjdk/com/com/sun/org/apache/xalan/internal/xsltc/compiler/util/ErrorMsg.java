@@ -303,4 +303,3 @@ public final class ErrorMsg {
         return _isWarningError;
     }
 }
-

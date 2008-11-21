@@ -293,4 +293,3 @@ public class ExceptionHandlerImpl implements ExceptionHandler
 	return new ExceptionRWRMIImpl( cls ) ;
     }
 }
-

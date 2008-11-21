@@ -36,7 +36,6 @@ import org.w3c.dom.Node;
 // TODO - document elimination of globalColorTableFlag
 
 /**
- * @version 0.5
  */
 public class GIFStreamMetadata extends GIFMetadata {
 

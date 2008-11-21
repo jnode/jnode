@@ -37,7 +37,6 @@ import java.util.NoSuchElementException;
   * @author Rosanna Lee
   * @author Scott Seligman
   * @author Aravindan Ranganathan
-  * @version 1.16 07/05/05
   * @since 1.3
   */
 
@@ -729,4 +728,3 @@ class NameImplEnumerator implements Enumeration {
 	throw new NoSuchElementException("NameImplEnumerator");
     }
 }
-

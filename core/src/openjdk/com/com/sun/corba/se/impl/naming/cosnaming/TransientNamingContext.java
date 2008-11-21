@@ -355,4 +355,3 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      */
     public org.omg.CORBA.Object localRoot;
 }
-

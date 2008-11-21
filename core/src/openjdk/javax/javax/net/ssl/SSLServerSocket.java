@@ -54,7 +54,6 @@ import java.net.*;
  * @see SSLSocket
  *
  * @since 1.4
- * @version 1.32
  * @author David Brownell
  */
 public abstract class SSLServerSocket extends ServerSocket
@@ -79,22 +78,9 @@ public abstract class SSLServerSocket extends ServerSocket
      * authentication context.  The connection backlog defaults to
      * fifty connections queued up before the system starts to
      * reject new connection requests.
-     * <P>
-     * A port number of <code>0</code> creates a socket on any free port.
-     * <P>
-     * If there is a security manager, its <code>checkListen</code>
-     * method is called with the <code>port</code> argument as its
-     * argument to ensure the operation is allowed. This could result
-     * in a SecurityException.
      *
      * @param port the port on which to listen
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkListen</code> method doesn't allow the operation.
-     * @throws IllegalArgumentException if the port parameter is outside the
-     *         specified range of valid port values, which is between 0 and
-     *         65535, inclusive.
-     * @see    SecurityManager#checkListen
      */
     protected SSLServerSocket(int port)
     throws IOException
@@ -106,28 +92,11 @@ public abstract class SSLServerSocket extends ServerSocket
      * <P>
      * Create a TCP server socket on a port, using the default
      * authentication context and a specified backlog of connections.
-     * <P>
-     * A port number of <code>0</code> creates a socket on any free port.
-     * <P>
-     * The <code>backlog</code> argument must be a positive
-     * value greater than 0. If the value passed if equal or less
-     * than 0, then the default value will be assumed.
-     * <P>
-     * If there is a security manager, its <code>checkListen</code>
-     * method is called with the <code>port</code> argument as its
-     * argument to ensure the operation is allowed. This could result
-     * in a SecurityException.
      *
      * @param port the port on which to listen
      * @param backlog how many connections may be pending before
      *		the system should start rejecting new requests
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkListen</code> method doesn't allow the operation.
-     * @throws IllegalArgumentException if the port parameter is outside the
-     *         specified range of valid port values, which is between 0 and
-     *         65535, inclusive.
-     * @see    SecurityManager#checkListen
      */
     protected SSLServerSocket(int port, int backlog)
     throws IOException
@@ -143,20 +112,6 @@ public abstract class SSLServerSocket extends ServerSocket
      * constructor is used on multihomed hosts, such as those used
      * for firewalls or as routers, to control through which interface
      * a network service is provided.
-     * <P>
-     * If there is a security manager, its <code>checkListen</code>
-     * method is called with the <code>port</code> argument as its
-     * argument to ensure the operation is allowed. This could result
-     * in a SecurityException.
-     * <P>
-     * A port number of <code>0</code> creates a socket on any free port.
-     * <P>
-     * <P>The <code>backlog</code> argument must be a positive
-     * value greater than 0. If the value passed if equal or less
-     * than 0, then the default value will be assumed.
-     * <P>
-     * If <i>address</i> is null, it will default accepting connections
-     * on any/all local addresses.
      *
      * @param port the port on which to listen
      * @param backlog how many connections may be pending before
@@ -164,12 +119,6 @@ public abstract class SSLServerSocket extends ServerSocket
      * @param address the address of the network interface through
      *		which connections will be accepted
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkListen</code> method doesn't allow the operation.
-     * @throws IllegalArgumentException if the port parameter is outside the
-     *         specified range of valid port values, which is between 0 and
-     *         65535, inclusive.
-     * @see    SecurityManager#checkListen
      */
     protected SSLServerSocket(int port, int backlog, InetAddress address)
     throws IOException

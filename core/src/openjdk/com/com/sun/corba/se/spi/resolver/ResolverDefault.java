@@ -102,4 +102,3 @@ public class ResolverDefault {
 	return new FileResolverImpl( orb, file ) ;
     }
 }
-

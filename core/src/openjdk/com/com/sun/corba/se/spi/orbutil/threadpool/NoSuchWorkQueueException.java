@@ -30,4 +30,3 @@ public class NoSuchWorkQueueException extends Exception
 }
 
 // End of file.
-

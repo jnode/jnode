@@ -37,7 +37,6 @@ import javax.lang.model.type.TypeVariable;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.11 07/05/05
  * @see TypeVariable
  * @since 1.6
  */

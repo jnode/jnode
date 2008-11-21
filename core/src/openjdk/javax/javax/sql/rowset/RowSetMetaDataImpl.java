@@ -1090,6 +1090,3 @@ public class RowSetMetaDataImpl implements RowSetMetaData,  Serializable {
         public boolean writable = true;
     }
 }
-
-
-

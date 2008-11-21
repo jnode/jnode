@@ -48,7 +48,6 @@ package javax.naming;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.8 03/12/19
   *
   * @see Context#lookupLink
   * @see LinkRef

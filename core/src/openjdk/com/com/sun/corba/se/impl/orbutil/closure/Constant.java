@@ -40,4 +40,3 @@ public class Constant implements Closure {
 	return value ;
     }
 }
-

@@ -26,7 +26,6 @@ package com.sun.corba.se.impl.activation;
 
 /**
  *
- * @version     1.28
  * @author      Anita Jindal
  * @since       JDK1.2
  */

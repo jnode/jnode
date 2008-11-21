@@ -35,7 +35,6 @@ import com.sun.corba.se.spi.ior.ObjectKey;
  * This implements the GIOP 1.1 LocateRequest header.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public final class LocateRequestMessage_1_1 extends Message_1_1

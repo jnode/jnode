@@ -102,4 +102,3 @@ public abstract class StoreInstruction extends LocalVariableInstruction
     v.visitStoreInstruction(this);
   }
 }
-

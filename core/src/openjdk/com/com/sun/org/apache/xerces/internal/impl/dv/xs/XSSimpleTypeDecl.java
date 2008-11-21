@@ -3259,4 +3259,3 @@ public class XSSimpleTypeDecl implements XSSimpleType, TypeInfo {
     }
 	
 } // class XSSimpleTypeDecl
-

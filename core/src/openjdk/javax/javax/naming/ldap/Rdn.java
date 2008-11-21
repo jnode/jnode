@@ -99,7 +99,6 @@ import java.io.IOException;
  * to a constructor or method in this class will cause NullPointerException
  * to be thrown.
  *
- * @version 1.15 07/05/05
  * @since 1.5
  */
 

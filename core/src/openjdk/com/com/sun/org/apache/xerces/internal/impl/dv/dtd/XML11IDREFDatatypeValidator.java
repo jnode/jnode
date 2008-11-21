@@ -79,4 +79,3 @@ public class XML11IDREFDatatypeValidator extends IDREFDatatypeValidator {
     }
 
 }
-

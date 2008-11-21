@@ -66,7 +66,6 @@ import java.util.Locale;
  *             interface, which includes Namespace support.
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.EntityResolver
  * @see org.xml.sax.DTDHandler
  * @see org.xml.sax.DocumentHandler

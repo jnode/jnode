@@ -75,7 +75,6 @@ import org.xml.sax.SAXParseException;
  *
  * @since SAX 2.0
  * @author David Megginson,
- * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.EntityResolver
  * @see org.xml.sax.DTDHandler
  * @see org.xml.sax.ContentHandler

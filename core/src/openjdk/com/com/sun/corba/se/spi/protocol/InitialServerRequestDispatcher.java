@@ -40,4 +40,3 @@ public interface InitialServerRequestDispatcher
      */
     void init( Resolver resolver ) ;
 }
-

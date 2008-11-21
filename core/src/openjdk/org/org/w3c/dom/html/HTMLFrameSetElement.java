@@ -61,4 +61,3 @@ public interface HTMLFrameSetElement extends HTMLElement {
     public void setRows(String rows);
 
 }
-

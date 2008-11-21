@@ -57,7 +57,6 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @since SAX 2.0 (extensions 1.1 alpha)
  * @author David Brownell
- * @version TBS
  */
 public class DefaultHandler2 extends DefaultHandler
     implements LexicalHandler, DeclHandler, EntityResolver2

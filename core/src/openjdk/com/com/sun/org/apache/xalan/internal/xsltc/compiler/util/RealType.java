@@ -341,4 +341,3 @@ public final class RealType extends NumberType {
 	return DUP2;
     }
 }
-

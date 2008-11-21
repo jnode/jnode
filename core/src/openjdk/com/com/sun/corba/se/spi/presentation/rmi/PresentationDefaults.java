@@ -60,4 +60,3 @@ public abstract class PresentationDefaults
 	return new StubFactoryStaticImpl( stubClass ) ;
     }
 }
-

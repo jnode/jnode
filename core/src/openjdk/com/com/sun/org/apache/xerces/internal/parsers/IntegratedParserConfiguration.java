@@ -250,4 +250,3 @@ extends StandardParserConfiguration {
     } // createDTDValidator():XMLDTDValidator
 
 } // class IntegratedParserConfiguration
-

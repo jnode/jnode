@@ -377,4 +377,3 @@ public final class ReferenceType extends Type {
 	return new ASTORE(slot);
     }
 }
-

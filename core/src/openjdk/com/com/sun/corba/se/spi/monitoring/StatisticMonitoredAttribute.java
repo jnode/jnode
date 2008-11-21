@@ -128,6 +128,3 @@ public class StatisticMonitoredAttribute extends MonitoredAttributeBase {
         return statisticsAccumulator;
     }
 } // end StatisticMonitoredAttribute
-
-
-

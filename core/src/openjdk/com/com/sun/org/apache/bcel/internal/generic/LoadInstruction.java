@@ -102,4 +102,3 @@ public abstract class LoadInstruction extends LocalVariableInstruction
     v.visitLoadInstruction(this);
   }
 }
-

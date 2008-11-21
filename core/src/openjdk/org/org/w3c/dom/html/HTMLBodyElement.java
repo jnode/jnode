@@ -95,4 +95,3 @@ public interface HTMLBodyElement extends HTMLElement {
     public void setVLink(String vLink);
 
 }
-

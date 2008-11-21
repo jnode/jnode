@@ -71,8 +71,3 @@ public interface ConnectionPoolDataSource  extends CommonDataSource {
   PooledConnection getPooledConnection(String user, String password) 
     throws SQLException;        
  } 
-
-
-
-
-

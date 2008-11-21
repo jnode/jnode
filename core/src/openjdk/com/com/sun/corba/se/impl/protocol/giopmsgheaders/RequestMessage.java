@@ -33,7 +33,6 @@ import com.sun.corba.se.spi.servicecontext.ServiceContexts;
  * This interface captures the RequestMessage contract.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public interface RequestMessage extends Message {

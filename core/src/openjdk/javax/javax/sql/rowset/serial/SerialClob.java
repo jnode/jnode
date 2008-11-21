@@ -329,15 +329,7 @@ public class SerialClob implements Clob, Serializable, Cloneable {
     public long position(Clob searchStr, long start) 
         throws SerialException, SQLException {
             
-        char cPattern[] = null;
-        try {
-            java.io.Reader r = searchStr.getCharacterStream();         
-            cPattern = new char[(int)searchStr.length()];
-            r.read(cPattern);
-        } catch (IOException e) {
-            throw new SerialException("Error streaming Clob search data");
-        }
-        return position(new String(cPattern), start);   
+        return position(searchStr.getSubString(1,(int)searchStr.length()), start);
     }
     
     /**

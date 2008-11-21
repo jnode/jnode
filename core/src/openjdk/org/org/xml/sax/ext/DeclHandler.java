@@ -68,7 +68,6 @@ import org.xml.sax.SAXException;
  *
  * @since SAX 2.0 (extensions 1.0)
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  */
 public interface DeclHandler
 {

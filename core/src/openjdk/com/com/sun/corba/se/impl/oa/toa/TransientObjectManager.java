@@ -203,4 +203,3 @@ final class Element {
 	return "Element[" + index + ", " + counter + "]" ;
     }
 }
-

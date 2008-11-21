@@ -90,4 +90,3 @@ public class IIOPEndpointInfo
 	System.out.println( "port -> " + port );
     }
 }
-

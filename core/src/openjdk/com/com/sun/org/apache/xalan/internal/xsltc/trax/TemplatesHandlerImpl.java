@@ -332,5 +332,3 @@ public class TemplatesHandlerImpl
         _parser.setDocumentLocator(locator);
     }
 }
-
-

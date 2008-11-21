@@ -148,4 +148,3 @@ public abstract class BufferManagerWrite
 
     protected boolean sentFullMessage = false;
 }
-

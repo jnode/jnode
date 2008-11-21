@@ -36,7 +36,6 @@ package javax.naming;
   * apply directly here.
   *
   * @author Rosanna Lee
-  * @version 1.14 07/05/05
   * @author Scott Seligman
   * @since 1.3
   */

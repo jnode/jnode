@@ -33,6 +33,7 @@ import com.sun.xml.internal.stream.events.NotationDeclarationImpl;
 import javax.xml.namespace.NamespaceContext;
 import com.sun.org.apache.xerces.internal.xni.XNIException;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.events.XMLEvent;
@@ -316,23 +317,16 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
         return fEntityScanner.getLineNumber() ;
     }//getLineNumber
     
-    /** For START_ELEMENT or END_ELEMENT returns the (local) name of the current element. For ENTITY_REF it returns entity name. For
-     * PROCESSING_INSTRUCTION it returns the target. The current event must be START_ELEMENT or END_ELEMENT, PROCESSING_INSTRUCTION, or
-     * ENTITY_REF, otherwise null is returned.
-     * @return
-     */
     public String getLocalName() {
         if(fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.END_ELEMENT){
             //xxx check whats the value of fCurrentElement
             return fScanner.getElementQName().localpart ;
         }
-        else if(fEventType == XMLEvent.PROCESSING_INSTRUCTION){
-            return fScanner.getPITarget();
-        }
         else if(fEventType == XMLEvent.ENTITY_REFERENCE){
             return fScanner.getEntityName();
         }
-        return null;
+        throw new IllegalStateException("Method getLocalName() cannot be called for " +
+            getEventTypeString(fEventType) + " event.");
     }//getLocalName()
     
     /**
@@ -373,12 +367,14 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
     
     
     /**
-     * @return
+    * @return the prefix of the current event, or null if the event does
+    * not have a prefix. For START_ELEMENT and END_ELEMENT, return
+    * XMLConstants.DEFAULT_NS_PREFIX when no prefix is available.
      */
     public String getPrefix() {
-        //doesn't take care of Attribute as separte event
         if(fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.END_ELEMENT){
-            return fScanner.getElementQName().prefix ;
+            String prefix = fScanner.getElementQName().prefix;
+            return prefix == null ? XMLConstants.DEFAULT_NS_PREFIX : prefix;
         }
         return null ;
     }//getPrefix()
@@ -461,7 +457,7 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
     /** this Funtion returns true if the current event has name */
     public boolean hasName() {
         if(fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.END_ELEMENT
-        || fEventType == XMLEvent.ENTITY_REFERENCE || fEventType == XMLEvent.PROCESSING_INSTRUCTION) {
+        || fEventType == XMLEvent.ENTITY_REFERENCE) {
             return true;
         }  else {
             return false;
@@ -541,7 +537,9 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
      * @return
      */
     public int next() throws XMLStreamException {
-
+        if( !hasNext() ) {
+            throw new java.util.NoSuchElementException( "END_DOCUMENT reached: no more elements on the stream." );
+        }
         try {
             fEventType = fScanner.next();
 
@@ -1250,6 +1248,7 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
      * @return
      */
     public javax.xml.namespace.QName convertXNIQNametoJavaxQName(com.sun.org.apache.xerces.internal.xni.QName qname){
+        if (qname == null) return null;
         //xxx: prefix definition ?
         if(qname.prefix == null){
             return new javax.xml.namespace.QName(qname.uri, qname.localpart) ;
@@ -1269,8 +1268,11 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
      * <a href="http://www.w3.org/2000/xmlns/">http://www.w3.org/2000/xmlns/</a>
      * @return the uri bound to the given prefix or null if it is not bound
      * @param prefix The prefix to lookup, may not be null
+     * @throws IllegalStateException - if the prefix is null
      */
     public String getNamespaceURI(String prefix) {
+        if(prefix == null) throw new java.lang.IllegalArgumentException("prefix cannot be null.") ;
+
         //first add the string to symbol table.. since internally identity comparisons are done.
         return fScanner.getNamespaceContext().getURI(fSymbolTable.addSymbol(prefix)) ;
     }

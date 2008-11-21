@@ -44,7 +44,6 @@ import java.util.Properties;
  * Implementation of {@link XPathFactory#newInstance(String)}.
  * 
  * @author <a href="Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
- * @version $Revision: 1.4 $, $Date: 2005/10/06 05:39:24 $
  * @since 1.5
  */
 class XPathFactoryFinder  {

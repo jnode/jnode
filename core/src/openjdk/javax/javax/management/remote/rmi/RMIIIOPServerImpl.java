@@ -139,6 +139,9 @@ public class RMIIIOPServerImpl extends RMIServerImpl {
 
     @Override
     RMIConnection doNewClient(final Object credentials) throws IOException {
+        if (callerACC == null) {
+            throw new SecurityException("AccessControlContext cannot be null");
+        }
         try {
             return AccessController.doPrivileged(
                 new PrivilegedExceptionAction<RMIConnection>() {

@@ -38,7 +38,6 @@ import java.security.*;
  * @since 1.4
  * @see TrustManagerFactory
  * @see TrustManager
- * @version 1.18
  */
 public abstract class TrustManagerFactorySpi {
     /**

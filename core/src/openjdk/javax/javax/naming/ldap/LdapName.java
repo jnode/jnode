@@ -99,7 +99,6 @@ import java.io.IOException;
  * NullPointerException to be thrown.
  *
  * @author Scott Seligman
- * @version 1.14 07/05/05
  * @since 1.5
  */
 

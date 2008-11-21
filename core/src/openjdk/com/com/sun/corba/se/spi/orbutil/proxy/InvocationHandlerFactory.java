@@ -38,5 +38,3 @@ public interface InvocationHandlerFactory
      */
     Class[] getProxyInterfaces() ;
 }
-
-

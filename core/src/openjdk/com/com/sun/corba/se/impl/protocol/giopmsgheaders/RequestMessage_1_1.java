@@ -38,7 +38,6 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
  * This implements the GIOP 1.1 Request header.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public final class RequestMessage_1_1 extends Message_1_1

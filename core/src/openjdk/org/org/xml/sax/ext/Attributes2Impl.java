@@ -58,7 +58,6 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  * @since SAX 2.0 (extensions 1.1 alpha)
  * @author David Brownell
- * @version TBS
  */
 public class Attributes2Impl extends AttributesImpl implements Attributes2
 {

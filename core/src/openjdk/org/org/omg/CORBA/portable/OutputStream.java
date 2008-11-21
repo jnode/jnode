@@ -35,7 +35,6 @@ import org.omg.CORBA.Any;
  * The <code>_array</code> versions of the methods can be directly
  * used to write sequences and arrays of IDL types.
  *
- * @version 1.13, 04/22/98
  * @since   JDK1.2
  */
 

@@ -129,7 +129,7 @@ public class CMBuilder {
         fLeafCount = 0;
         fParticleCount = 0;
         // convert particle tree to CM tree
-        CMNode node = buildSyntaxTree(particle);
+        CMNode node = buildSyntaxTree(particle, true);
         if (node == null)
             return null;
         // build DFA content model from the CM tree
@@ -142,7 +142,7 @@ public class CMBuilder {
     // 3. convert model groups (a, b, c, ...) or (a | b | c | ...) to
     //    binary tree: (((a,b),c),...) or (((a|b)|c)|...)
     // 4. make sure each leaf node (XSCMLeaf) has a distinct position
-    private CMNode buildSyntaxTree(XSParticleDecl particle) {
+    private CMNode buildSyntaxTree(XSParticleDecl particle, boolean optimize) {
 
         int maxOccurs = particle.fMaxOccurs;
         int minOccurs = particle.fMinOccurs;
@@ -159,7 +159,7 @@ public class CMBuilder {
             // This is useful for checking UPA.
             nodeRet = fNodeFactory.getCMLeafNode(particle.fType, particle.fValue, fParticleCount++, fLeafCount++);
             // (task 2) expand occurrence values
-            nodeRet = expandContentModel(nodeRet, minOccurs, maxOccurs);
+            nodeRet = expandContentModel(nodeRet, minOccurs, maxOccurs, optimize);
         }
         else if (type == XSParticleDecl.PARTICLE_MODELGROUP) {
             // (task 1,3) convert model groups to binary trees
@@ -178,7 +178,8 @@ public class CMBuilder {
             boolean twoChildren = false;
             for (int i = 0; i < group.fParticleCount; i++) {
                 // first convert each child to a CM tree
-                temp = buildSyntaxTree(group.fParticles[i]);
+                temp = buildSyntaxTree(group.fParticles[i],
+                        optimize && (group.fParticleCount == 1));
                 // then combine them using binary operation
                 if (temp != null) {
                     if (nodeRet == null) {
@@ -201,7 +202,7 @@ public class CMBuilder {
                     !twoChildren && group.fParticleCount > 1) {
                     nodeRet = fNodeFactory.getCMUniOpNode(XSParticleDecl.PARTICLE_ZERO_OR_ONE, nodeRet);
                 }
-                nodeRet = expandContentModel(nodeRet, minOccurs, maxOccurs);
+                nodeRet = expandContentModel(nodeRet, minOccurs, maxOccurs, false);
             }
         }
 
@@ -212,7 +213,7 @@ public class CMBuilder {
     //                                  a{n, m} -> a, a, ..., a?, a?, ...
     // 4. make sure each leaf node (XSCMLeaf) has a distinct position
     private CMNode expandContentModel(CMNode node,
-                                      int minOccurs, int maxOccurs) {
+                                      int minOccurs, int maxOccurs, boolean optimize) {
 
         CMNode nodeRet = null;
 
@@ -231,7 +232,7 @@ public class CMBuilder {
             //one or more
             nodeRet = fNodeFactory.getCMUniOpNode(XSParticleDecl.PARTICLE_ONE_OR_MORE, node);
         }
-        else if (node.type() == XSParticleDecl.PARTICLE_ELEMENT ||        
+        else if (optimize && node.type() == XSParticleDecl.PARTICLE_ELEMENT ||        
                  node.type() == XSParticleDecl.PARTICLE_WILDCARD) {
             // Only for elements and wildcards, subsume e{n,m} and e{n,unbounded} to e*
             // or e+ and, once the DFA reaches a final state, check if the actual number 

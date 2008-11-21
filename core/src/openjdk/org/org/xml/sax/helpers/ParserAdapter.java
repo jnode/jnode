@@ -74,7 +74,6 @@ import org.xml.sax.SAXNotSupportedException;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.helpers.XMLReaderAdapter
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.Parser

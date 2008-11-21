@@ -181,4 +181,3 @@ public interface HTMLDocument extends Document {
     public NodeList getElementsByName(String elementName);
 
 }
-

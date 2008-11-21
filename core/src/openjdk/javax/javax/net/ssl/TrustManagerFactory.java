@@ -38,7 +38,6 @@ import sun.security.jca.GetInstance;
  *
  * @since 1.4
  * @see TrustManager
- * @version 1.24, 05/05/07
  */
 public class TrustManagerFactory {
     // The provider

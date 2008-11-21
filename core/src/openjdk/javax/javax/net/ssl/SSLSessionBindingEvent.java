@@ -44,7 +44,6 @@ import java.util.EventObject;
  * @since 1.4
  * @author Nathan Abramson
  * @author David Brownell
- * @version 1.21
  */
 public
 class SSLSessionBindingEvent

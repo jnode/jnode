@@ -38,7 +38,6 @@ package org.omg.CORBA;
  *
  * @see <A href="../../../../technotes/guides/idl/jidlExceptions.html#minorcodemeanings">meaning of
  * minor codes</A>
- * @version     1.17, 09/09/97
  * @since       JDK1.2
  */
 

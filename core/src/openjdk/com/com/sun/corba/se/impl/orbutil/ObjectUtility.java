@@ -371,7 +371,7 @@ public final class ObjectUtility {
             if (security != null && !Modifier.isPublic(cls.getModifiers())) { 
 		fields = new Field[0]; 
 	    } else { 
-		fields = sun.reflect.misc.FieldUtil.getDeclaredFields(cls); 
+                fields = cls.getDeclaredFields();
             } 
 
 	    for (int ctr=0; ctr<fields.length; ctr++ ) {

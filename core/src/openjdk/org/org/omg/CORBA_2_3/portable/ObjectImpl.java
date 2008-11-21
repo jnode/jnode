@@ -40,7 +40,6 @@ import org.omg.CORBA_2_3.portable.Delegate;
  *
  * @see org.omg.CORBA.portable.ObjectImpl
  * @author  OMG
- * @version 1.21 05/05/07
  * @since   JDK1.2
  */
 

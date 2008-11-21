@@ -39,7 +39,6 @@ import javax.xml.namespace.QName;
  *
  * @author  <a href="mailto:Norman.Walsh@Sun.com">Norman Walsh</a>
  * @author  <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.3 $, $Date: 2005/07/25 14:46:33 $
  * @since 1.5
  */
 public interface XPathVariableResolver {

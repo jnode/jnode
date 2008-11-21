@@ -126,9 +126,11 @@ final class Param extends VariableBase {
 		// Ignore this if previous definition has higher precedence
 		else if (them > us) {
 		    _ignore = true;
+                    copyReferences(param);
 		    return;
 		}
 		else {
+                    param.copyReferences(this);
 		    param.disable();
 		}
 	    }

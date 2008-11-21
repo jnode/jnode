@@ -38,7 +38,6 @@ import java.security.*;
  *
  * @since 1.4
  * @see SSLContext
- * @version 1.23
  */
 public abstract class SSLContextSpi {
     /**

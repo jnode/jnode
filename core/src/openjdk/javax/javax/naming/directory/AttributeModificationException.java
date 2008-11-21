@@ -44,7 +44,6 @@ import javax.naming.NamingException;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.16 07/05/05
   *
   * @see DirContext#modifyAttributes
   * @since 1.3

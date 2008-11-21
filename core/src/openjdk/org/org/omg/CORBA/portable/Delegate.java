@@ -44,7 +44,6 @@ import org.omg.CORBA.SystemException;
  *
  * @see org.omg.CORBA.Object
  * @author OMG
- * @version 1.44 05/05/07
  */
 
 public abstract class Delegate {

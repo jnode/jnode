@@ -31,7 +31,6 @@ import com.sun.corba.se.spi.ior.ObjectKey;
  * This interface captures the LocateRequestMessage contract.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public interface LocateRequestMessage extends Message {

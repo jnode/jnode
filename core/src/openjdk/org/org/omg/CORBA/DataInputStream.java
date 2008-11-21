@@ -30,7 +30,6 @@ package org.omg.CORBA;
 * written custom unmarshaling code for custom value types.
 * @see org.omg.CORBA.DataOutputStream
 * @see org.omg.CORBA.CustomMarshal
-* @version 1.17 05/05/07
 */
 public interface DataInputStream extends org.omg.CORBA.portable.ValueBase
 {
@@ -343,4 +342,3 @@ public interface DataInputStream extends org.omg.CORBA.portable.ValueBase
     */
     void read_double_array (org.omg.CORBA.DoubleSeqHolder seq, int offset, int length);
 } // interface DataInputStream
-

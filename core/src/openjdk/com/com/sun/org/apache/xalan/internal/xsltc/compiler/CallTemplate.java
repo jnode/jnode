@@ -240,4 +240,3 @@ final class CallTemplate extends Instruction {
     	}
      }
 }
-    

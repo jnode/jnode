@@ -91,7 +91,6 @@ import org.omg.CORBA.portable.IDLEntity;
  * and for reading an <code>Any</code> object from a stream or
  * writing it to a stream.
  * <BR>
- * @version 1.12, 09/09/97
  * @since   JDK1.2
  */
 abstract public class Any implements IDLEntity {

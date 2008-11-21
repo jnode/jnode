@@ -32,7 +32,6 @@ package com.sun.corba.se.spi.orbutil.fsm;
  * The toString() method should also be overridden to give a concise
  * description or name of the input.
  *
- * @version @(#)Input.java	1.13 07/05/05
  * @author Ken Cavanaugh 
  */
 public interface Input

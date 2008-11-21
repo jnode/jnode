@@ -37,6 +37,13 @@ public abstract class AnyNodeCounter extends NodeCounter {
 	super(translet, document, iterator);
     }
 	
+    public AnyNodeCounter(Translet translet,
+                          DOM document,
+                          DTMAxisIterator iterator,
+                          boolean hasFrom) {
+        super(translet, document, iterator, hasFrom);
+    }
+
     public NodeCounter setStartNode(int node) {
 	_node = node;
 	_nodeType = _document.getExpandedTypeID(node);

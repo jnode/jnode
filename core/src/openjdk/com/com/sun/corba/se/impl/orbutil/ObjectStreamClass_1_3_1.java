@@ -81,7 +81,6 @@ import com.sun.corba.se.impl.io.ObjectStreamClass;
  * be found using the lookup method.
  *
  * @author  Roger Riggs
- * @(#)ObjectStreamClass_1_3_1.java	1.17 99/06/07
  * @since   JDK1.1
  */
 public class ObjectStreamClass_1_3_1 implements java.io.Serializable {

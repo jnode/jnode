@@ -94,5 +94,3 @@ class WriterOutputBuffer implements OutputBuffer {
 	return this;
     }
 }
-
-

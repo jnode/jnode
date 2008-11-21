@@ -69,4 +69,3 @@ public interface HTMLFontElement extends HTMLElement {
     public void setSize(String size);
 
 }
-

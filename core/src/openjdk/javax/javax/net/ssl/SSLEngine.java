@@ -365,7 +365,6 @@ import java.nio.ReadOnlyBufferException;
  * @see java.net.Socket
  *
  * @since 1.5
- * @version 1.23
  * @author Brad R. Wetmore
  */
 

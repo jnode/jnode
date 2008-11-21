@@ -46,7 +46,6 @@ import sun.security.util.ObjectIdentifier;
  * representing the standard name types defined in GSS-API.
  *
  * @author Mayank Upadhyay
- * @version 1.16, 05/05/07
  * @since 1.4
  */
 public class Oid {
@@ -185,7 +184,7 @@ public class Oid {
 	    derEncoding = dout.toByteArray();
 	}
 
-        return (byte[])derEncoding.clone();
+        return derEncoding.clone();
     }
     
     /** 

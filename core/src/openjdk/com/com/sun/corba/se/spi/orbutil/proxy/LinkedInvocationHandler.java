@@ -38,4 +38,3 @@ public interface LinkedInvocationHandler extends InvocationHandler
 
     Proxy getProxy() ;
 }
-

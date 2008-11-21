@@ -91,7 +91,6 @@ import javax.xml.namespace.QName;
  *
  * @author  <a href="mailto:Norman.Walsh@Sun.com">Norman Walsh</a>
  * @author  <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.4 $, $Date: 2005/10/13 17:00:49 $
  * @see <a href="http://www.w3.org/TR/xpath#section-Expressions">XML Path Language (XPath) Version 1.0, Expressions</a>
  * @since 1.5
  */

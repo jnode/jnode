@@ -111,4 +111,3 @@ public class TOAFactory implements ObjectAdapterFactory
 	return orb ;
     }
 } ;
-

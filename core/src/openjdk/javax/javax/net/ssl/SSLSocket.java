@@ -136,7 +136,6 @@ import java.util.Vector;
  * @see SSLSocketFactory
  *
  * @since 1.4
- * @version 1.37
  * @author David Brownell
  */
 public abstract class SSLSocket extends Socket
@@ -153,22 +152,11 @@ public abstract class SSLSocket extends Socket
      * Used only by subclasses.
      * Constructs a TCP connection to a named host at a specified port.
      * This acts as the SSL client.
-     * <p>
-     * If there is a security manager, its <code>checkConnect</code>
-     * method is called with the host address and <code>port</code>
-     * as its arguments. This could result in a SecurityException.
      *
-     * @param host name of the host with which to connect, or
-     *        <code>null</code> for the loopback address.
+     * @param host name of the host with which to connect
      * @param port number of the server's port
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkConnect</code> method doesn't allow the operation.
      * @throws UnknownHostException if the host is not known
-     * @throws IllegalArgumentException if the port parameter is outside the
-     *         specified range of valid port values, which is between 0 and
-     *         65535, inclusive.
-     * @see SecurityManager#checkConnect
      */
     protected SSLSocket(String host, int port)
     throws IOException, UnknownHostException
@@ -179,21 +167,10 @@ public abstract class SSLSocket extends Socket
      * Used only by subclasses.
      * Constructs a TCP connection to a server at a specified address
      * and port.  This acts as the SSL client.
-     * <p>
-     * If there is a security manager, its <code>checkConnect</code>
-     * method is called with the host address and <code>port</code>
-     * as its arguments. This could result in a SecurityException.
      *
      * @param address the server's host
      * @param port its port
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkConnect</code> method doesn't allow the operation.
-     * @throws IllegalArgumentException if the port parameter is outside the
-     *         specified range of valid port values, which is between 0 and
-     *         65535, inclusive.
-     * @throws NullPointerException if <code>address</code> is null.
-     * @see SecurityManager#checkConnect
      */
     protected SSLSocket(InetAddress address, int port)
     throws IOException
@@ -205,24 +182,13 @@ public abstract class SSLSocket extends Socket
      * Constructs an SSL connection to a named host at a specified port,
      * binding the client side of the connection a given address and port.
      * This acts as the SSL client.
-     * <p>
-     * If there is a security manager, its <code>checkConnect</code>
-     * method is called with the host address and <code>port</code>
-     * as its arguments. This could result in a SecurityException.
      *
-     * @param host name of the host with which to connect, or
-     *        <code>null</code> for the loopback address.
+     * @param host name of the host with which to connect
      * @param port number of the server's port
      * @param clientAddress the client's host
      * @param clientPort number of the client's port
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkConnect</code> method doesn't allow the operation.
      * @throws UnknownHostException if the host is not known
-     * @throws IllegalArgumentException if the port parameter or clientPort
-     *         parameter is outside the specified range of valid port values,
-     *         which is between 0 and 65535, inclusive.
-     * @see SecurityManager#checkConnect
      */
     protected SSLSocket(String host, int port,
 	InetAddress clientAddress, int clientPort)
@@ -235,23 +201,12 @@ public abstract class SSLSocket extends Socket
      * Constructs an SSL connection to a server at a specified address
      * and TCP port, binding the client side of the connection a given
      * address and port.  This acts as the SSL client.
-     * <p>
-     * If there is a security manager, its <code>checkConnect</code>
-     * method is called with the host address and <code>port</code>
-     * as its arguments. This could result in a SecurityException.
      *
      * @param address the server's host
      * @param port its port
      * @param clientAddress the client's host
      * @param clientPort number of the client's port
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws SecurityException if a security manager exists and its
-     *         <code>checkConnect</code> method doesn't allow the operation.
-     * @throws IllegalArgumentException if the port parameter or clientPort
-     *         parameter is outside the specified range of valid port values,
-     *         which is between 0 and 65535, inclusive.
-     * @throws NullPointerException if <code>address</code> is null.
-     * @see SecurityManager#checkConnect
      */
     protected SSLSocket(InetAddress address, int port,
 	InetAddress clientAddress, int clientPort)

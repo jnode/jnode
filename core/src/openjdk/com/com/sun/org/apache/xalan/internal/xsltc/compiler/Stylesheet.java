@@ -1000,17 +1000,24 @@ public final class Stylesheet extends SyntaxTreeNode {
 
 	toplevel.addException("com.sun.org.apache.xalan.internal.xsltc.TransletException");
 
+        final int setFilter = cpg.addInterfaceMethodref(DOM_INTF,
+                               "setFilter",
+                               "(Lcom/sun/org/apache/xalan/internal/xsltc/StripFilter;)V");
+
 	// Define and initialize 'current' variable with the root node
 	final LocalVariableGen current = 
 	    toplevel.addLocalVariable("current",
 				    com.sun.org.apache.bcel.internal.generic.Type.INT,
 				    il.getEnd(), null);
 
-	final int setFilter = cpg.addInterfaceMethodref(DOM_INTF,
-			       "setFilter",
-			       "(Lcom/sun/org/apache/xalan/internal/xsltc/StripFilter;)V");
-
-	il.append(new PUSH(cpg, DTM.ROOT_NODE));
+        // Get root node from main DOM by calling dom.getIterator().next()
+        final int gitr = cpg.addInterfaceMethodref(DOM_INTF,
+                                                   "getIterator", "()"+NODE_ITERATOR_SIG);
+        final int next = cpg.addInterfaceMethodref(NODE_ITERATOR,
+                                                   "next", "()I");
+        il.append(toplevel.loadDOM());
+        il.append(new INVOKEINTERFACE(gitr, 1));
+        il.append(new INVOKEINTERFACE(next, 1));
 	il.append(new ISTORE(current.getIndex()));
 
         // Create a new list containing variables/params + keys
@@ -1262,10 +1269,6 @@ public final class Stylesheet extends SyntaxTreeNode {
 	
 	//store to _dom variable
 	il.append(new PUTFIELD(domField));
-
-	// continue with globals initialization
-	il.append(new PUSH(cpg, DTM.ROOT_NODE));
-	il.append(new ISTORE(current.getIndex()));
 
 	// Transfer the output settings to the output post-processor
 	il.append(classGen.loadTranslet());

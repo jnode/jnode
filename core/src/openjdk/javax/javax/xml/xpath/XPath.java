@@ -95,7 +95,6 @@ import javax.xml.namespace.NamespaceContext;
  * 
  * @author  <a href="Norman.Walsh@Sun.com">Norman Walsh</a>
  * @author  <a href="Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.5 $, $Date: 2005/10/13 17:00:49 $
  * @see <a href="http://www.w3.org/TR/xpath">XML Path Language (XPath) Version 1.0</a>
  * @since 1.5
  */

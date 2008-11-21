@@ -63,7 +63,6 @@ package org.omg.CORBA;
  * @see org.omg.CORBA.NVList
  * @see org.omg.CORBA.NamedValue
  *
- * @version 1.15 09/09/97
  */
 
 public abstract class ServerRequest {

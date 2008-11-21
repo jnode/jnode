@@ -40,7 +40,6 @@ import java.security.cert.CertPathParameters;
  * @see java.security.cert.CertPathParameters
  *
  * @since   1.5
- * @version 1.8, 05/05/07
  * @author  Andreas Sterbenz
  */
 public class CertPathTrustManagerParameters implements ManagerFactoryParameters {

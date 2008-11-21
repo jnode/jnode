@@ -52,7 +52,6 @@ import javax.security.auth.x500.X500Principal;
  * <code>connect</code>ing.
  *
  * @since 1.4
- * @version 1.33
  */
 abstract public
 class HttpsURLConnection extends HttpURLConnection

@@ -38,7 +38,6 @@ import sun.security.jca.GetInstance;
  *
  * @since 1.4
  * @see KeyManager
- * @version 1.28, 05/05/07
  */
 public class KeyManagerFactory {
     // The provider
@@ -131,7 +130,6 @@ public class KeyManagerFactory {
      * @exception NoSuchAlgorithmException if no Provider supports a
      *		KeyManagerFactorySpi implementation for the
      *		specified algorithm.
-     * @exception NullPointerException if <code>algorithm</code> is null.
      *
      * @see java.security.Provider
      */
@@ -174,7 +172,6 @@ public class KeyManagerFactory {
      *		registered in the security provider list.
      *
      * @throws IllegalArgumentException if the provider name is null or empty.
-     * @throws NullPointerException if <code>algorithm</code> is null.
      *
      * @see java.security.Provider
      */
@@ -212,7 +209,6 @@ public class KeyManagerFactory {
      *		from the specified Provider object.
      *
      * @throws IllegalArgumentException if provider is null.
-     * @throws NullPointerException if <code>algorithm</code> is null.
      *
      * @see java.security.Provider
      */

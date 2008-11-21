@@ -105,4 +105,3 @@ public abstract class ReturnInstruction extends Instruction
     return getType();
   }
 }
-

@@ -32,7 +32,6 @@ import java.sql.SQLException;
  * RowSet implementation cannot be used  without a <code>SyncProvider</code>
  * being successfully instantiated
  *
- * @version 0.2
  * @author Jonathan Bruce
  * @see javax.sql.rowset.spi.SyncFactory
  * @see javax.sql.rowset.spi.SyncFactoryException
@@ -57,5 +56,3 @@ public class SyncFactoryException extends java.sql.SQLException {
         
     static final long serialVersionUID = -4354595476433200352L;
 }
-
-

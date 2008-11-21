@@ -53,4 +53,3 @@ class StringOutputBuffer implements OutputBuffer {
 	return this;
     }
 }
-

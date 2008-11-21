@@ -23,7 +23,6 @@
  * have any questions.
  */
 /*
- * @(#)AnyImplHelper.java	1.20 07/05/05
  */
 /*
  * Licensed Materials - Property of IBM

@@ -69,7 +69,6 @@ import com.sun.corba.se.impl.protocol.AddressingDispositionException;
  * support GIOP 1.0, 1.1 and 1.2 message types.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public abstract class MessageBase implements Message{

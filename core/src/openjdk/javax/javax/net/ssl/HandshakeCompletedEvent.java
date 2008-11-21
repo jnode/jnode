@@ -46,7 +46,6 @@ import javax.security.auth.x500.X500Principal;
  * @see SSLSession
  *
  * @since 1.4
- * @version 1.29
  * @author David Brownell
  */
 public class HandshakeCompletedEvent extends EventObject

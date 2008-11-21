@@ -48,7 +48,6 @@ package org.omg.CORBA;
  * items have been added, it is possible to call methods for accessing
  * or deleting an item at a designated index.
  *
- * @version 1.13, 09/09/97
  * @since   JDK1.2
  */
 

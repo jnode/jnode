@@ -121,7 +121,6 @@ import com.sun.naming.internal.ResourceManager;
  *
  * @author Rosanna Lee
  * @author Scott Seligman
- * @version 1.21 07/05/05
  *
  * @see Context
  * @see NamingManager#setInitialContextFactoryBuilder

@@ -93,7 +93,6 @@ import javax.xml.namespace.QName;
  * @author <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
  * @author <a href="mailto:Sunitha.Reddy@Sun.com">Sunitha Reddy</a>
- * @version $Revision: 1.7 $, $Date: 2006/01/12 18:49:19 $
  * @see XMLGregorianCalendar#add(Duration)
  * @since 1.5
  */
@@ -987,4 +986,3 @@ public abstract class Duration {
         return cal.getTime().getTime();
     }
 }
-

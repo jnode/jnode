@@ -37,7 +37,6 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
  * This implements the GIOP 1.0 Message header.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public class Message_1_0

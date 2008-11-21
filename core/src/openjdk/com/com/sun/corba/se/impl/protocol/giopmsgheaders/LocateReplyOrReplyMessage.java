@@ -38,4 +38,3 @@ public interface LocateReplyOrReplyMessage extends Message {
 }
 
 // End of file.
-

@@ -169,7 +169,6 @@ import java.io.OutputStream;
  * </pre>
  *
  * @author Mayank Upadhyay
- * @version 1.17, 05/05/07
  * @since 1.4
  */
 public interface GSSContext {

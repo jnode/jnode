@@ -55,4 +55,3 @@ public interface HTMLDirectoryElement extends HTMLElement {
     public void setCompact(boolean compact);
 
 }
-

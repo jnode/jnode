@@ -54,4 +54,3 @@ public interface HTMLPreElement extends HTMLElement {
     public void setWidth(int width);
 
 }
-

@@ -66,7 +66,6 @@ import org.xml.sax.Attributes;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  */
 public class AttributesImpl implements Attributes
 {
@@ -640,4 +639,3 @@ public class AttributesImpl implements Attributes
 }
 
 // end of AttributesImpl.java
-

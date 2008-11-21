@@ -28,7 +28,6 @@ package com.sun.corba.se.spi.orbutil.fsm;
 /**
  * Description goes here
  *
- * @version @(#)Action.java	1.18 07/05/05
  * @author Ken Cavanaugh
  */
 public interface Action
@@ -54,4 +53,3 @@ public interface Action
 }
 
 // end of Action.java
-

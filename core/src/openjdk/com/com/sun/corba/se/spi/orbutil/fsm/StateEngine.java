@@ -40,7 +40,6 @@ package com.sun.corba.se.spi.orbutil.fsm;
  * states from the current state.  In this case, the action that
  * is executed for the transition must set the correct new state.
  *
- * @version @(#)StateEngine.java	1.16 07/05/05
  * @author Ken Cavanaugh
  */
 public interface StateEngine
@@ -108,5 +107,3 @@ public interface StateEngine
 }
 
 // end of StateEngine.java
-
-

@@ -81,4 +81,3 @@ public class XML11DTDDVFactoryImpl extends DTDDVFactoryImpl {
 
 
 }//XML11DTDDVFactoryImpl
-

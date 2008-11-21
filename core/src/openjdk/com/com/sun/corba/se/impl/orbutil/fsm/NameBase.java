@@ -75,4 +75,3 @@ public class NameBase {
 	return toStringName ;
     }
 } 
-

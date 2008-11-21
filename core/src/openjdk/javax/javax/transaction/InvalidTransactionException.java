@@ -48,4 +48,3 @@ public class InvalidTransactionException extends java.rmi.RemoteException
 	super(msg);
     }
 }
-

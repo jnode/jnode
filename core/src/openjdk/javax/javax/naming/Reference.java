@@ -65,7 +65,6 @@ import java.util.Enumeration;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.16 07/05/05
   *
   * @see RefAddr
   * @see StringRefAddr

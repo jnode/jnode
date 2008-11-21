@@ -88,4 +88,3 @@ public abstract class ParserActionBase implements ParserAction {
 	return operation ;
     }
 }
-

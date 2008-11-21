@@ -83,4 +83,3 @@ public abstract class IfInstruction extends BranchInstruction implements StackCo
    */
   public abstract IfInstruction negate();
 }
-

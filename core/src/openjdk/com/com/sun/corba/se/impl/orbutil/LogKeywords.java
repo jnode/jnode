@@ -95,9 +95,3 @@ public class LogKeywords {
     public final static String NAMING_REBIND_FAILURE =
         NAMING_REBIND + "<<FAILURE>>";
 }
-
-    
-    
-
-     
-

@@ -113,6 +113,3 @@ public abstract class MonitoredAttributeBase implements MonitoredAttribute {
         return name;
     } 
 } // end MonitoredAttributeBase
-
-
-

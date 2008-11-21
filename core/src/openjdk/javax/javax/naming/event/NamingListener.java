@@ -47,7 +47,6 @@ package javax.naming.event;
   * 
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.14 07/05/05
   *
   * @see NamingEvent
   * @see NamingExceptionEvent

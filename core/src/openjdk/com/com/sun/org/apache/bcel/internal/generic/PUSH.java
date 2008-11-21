@@ -197,4 +197,3 @@ public final class PUSH
     return instruction.toString() + " (PUSH)";
   }
 }
-

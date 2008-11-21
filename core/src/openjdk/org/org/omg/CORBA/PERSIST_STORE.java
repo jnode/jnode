@@ -35,7 +35,6 @@ package org.omg.CORBA;
  *
  * @see <A href="../../../../technotes/guides/idl/jidlExceptions.html">documentation on
  * Java&nbsp;IDL exceptions</A>
- * @version     1.16 09/09/97
  */
 
 public final class PERSIST_STORE extends SystemException {

@@ -61,4 +61,3 @@ public interface HTMLIsIndexElement extends HTMLElement {
     public void setPrompt(String prompt);
 
 }
-

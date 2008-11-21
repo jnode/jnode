@@ -22,7 +22,6 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-/* @(#)WStringValueHelper.java	1.23 07/05/05 */
 
 /**
 * The Helper for <tt>WStringValue</tt>.  For more information on 

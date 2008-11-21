@@ -32,7 +32,6 @@ package org.omg.CORBA;
  *
  * @see <A href="../../../../technotes/guides/idl/jidlExceptions.html">documentation on
  *      Java&nbsp;IDL exceptions</A>
- * @version 1.0, 03/05/2004
  * @since   J2SE 1.5
  */
 

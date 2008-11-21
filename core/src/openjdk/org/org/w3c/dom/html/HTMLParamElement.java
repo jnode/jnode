@@ -77,4 +77,3 @@ public interface HTMLParamElement extends HTMLElement {
     public void setValueType(String valueType);
 
 }
-

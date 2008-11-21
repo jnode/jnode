@@ -70,4 +70,3 @@ public class ClassFormatException extends RuntimeException {
   public ClassFormatException() { super(); }
   public ClassFormatException(String s) { super(s); }
 }
-

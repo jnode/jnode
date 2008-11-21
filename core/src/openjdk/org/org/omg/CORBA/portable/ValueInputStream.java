@@ -49,4 +49,3 @@ public interface ValueInputStream {
      */
     void end_value();
 }
-

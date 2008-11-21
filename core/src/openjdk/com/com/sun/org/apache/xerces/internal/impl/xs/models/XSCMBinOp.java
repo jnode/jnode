@@ -31,7 +31,6 @@ import com.sun.org.apache.xerces.internal.impl.xs.XSModelGroupImpl;
  * @xerces.internal  
  *
  * @author Neil Graham, IBM
- * @version $$
  */
 public class XSCMBinOp extends CMNode {
     // -------------------------------------------------------------------
@@ -140,4 +139,3 @@ public class XSCMBinOp extends CMNode {
     private CMNode  fLeftChild;
     private CMNode  fRightChild;
 } // XSCMBinOp
-

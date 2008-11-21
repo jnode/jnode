@@ -285,4 +285,3 @@ public interface JdbcRowSet extends RowSet, Joinable {
     public void rollback(Savepoint s) throws SQLException;
      
 }
-

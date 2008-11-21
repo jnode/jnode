@@ -62,7 +62,6 @@ package org.omg.CORBA;
  *
  * @see org.omg.CORBA.NamedValue
  *
- * @version 1.13 09/09/97
  */
 
 public abstract class Request {

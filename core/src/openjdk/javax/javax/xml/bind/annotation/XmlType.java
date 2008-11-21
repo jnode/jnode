@@ -122,7 +122,7 @@ import java.lang.annotation.Target;
  *   <table border="1" cellpadding="4" cellspacing="3">
  *     <tbody>
  *       <tr>
- *         <td><b>Target</b></td>
+ *         <td><b>Target</td>
  *         <td><b>propOrder</b></td>
  *         <td><b>ClassBody</b></td>
  *         <td><b>ComplexType</b></td>

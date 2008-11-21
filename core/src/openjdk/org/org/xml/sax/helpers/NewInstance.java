@@ -54,7 +54,6 @@ import java.lang.reflect.InvocationTargetException;
  * including versions of Java 2.</p>
  *
  * @author Edwin Goei, David Brownell
- * @version 2.0.1 (sax2r2)
  */
 class NewInstance {
 

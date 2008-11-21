@@ -411,4 +411,3 @@ public class XML11Char {
     } // isXML11ValidName(String):boolean
 
 } // class XML11Char
-

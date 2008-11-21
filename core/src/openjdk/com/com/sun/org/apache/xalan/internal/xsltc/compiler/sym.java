@@ -64,4 +64,3 @@ public class sym {
   public static final int GT = 19;
   public static final int NODE = 31;
 }
-

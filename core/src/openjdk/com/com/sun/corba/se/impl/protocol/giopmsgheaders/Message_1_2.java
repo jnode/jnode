@@ -79,4 +79,3 @@ public class Message_1_2 extends Message_1_1
 	this.GIOP_version = gv; // restore
     }
 }
-

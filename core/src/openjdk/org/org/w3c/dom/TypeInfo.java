@@ -197,7 +197,7 @@ public interface TypeInfo {
      *   in this interface. 
      * @return  If the document's schema is a DTD or no schema is associated 
      *   with the document, this method will always return <code>false</code>
-     *   .  If the document's schema is an XML Schema, the method will 
+     *   .  If the document's schema is an XML Schema, the method will return
      *   <code>true</code> if the reference type definition is derived from 
      *   the other type definition according to the derivation parameter. If 
      *   the value of the parameter is <code>0</code> (no bit is set to 

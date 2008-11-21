@@ -40,7 +40,6 @@ package javax.naming;
   * @author Rosanna Lee
   * @author Scott Seligman
   * @author R. Vasudevan
-  * @version 1.14 07/05/05
   *
   * @see Context#bind
   * @see javax.naming.spi.NamingManager#getObjectInstance

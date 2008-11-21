@@ -58,7 +58,6 @@ import javax.naming.directory.SearchControls;
  * 
  * @author Rosanna Lee
  * @author Scott Seligman
- * @version 1.8 03/12/19
  * @since 1.3
  */
 

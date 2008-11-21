@@ -2368,5 +2368,3 @@ public class CorbaMessageMediatorImpl
 }
 
 // End of file.
-
-

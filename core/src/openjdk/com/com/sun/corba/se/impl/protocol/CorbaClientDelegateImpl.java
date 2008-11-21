@@ -441,4 +441,3 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 }
 
 // End of file.
-

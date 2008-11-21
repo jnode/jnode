@@ -59,4 +59,3 @@ public final class ServiceInformation implements org.omg.CORBA.portable.IDLEntit
         service_details = __service_details;
     }
 }
-

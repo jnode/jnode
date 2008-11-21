@@ -249,4 +249,3 @@ public abstract class Repository {
     return implementationOf(lookupClass(clazz), inter);
   }
 }
-

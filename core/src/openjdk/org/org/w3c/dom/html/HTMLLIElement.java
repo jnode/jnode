@@ -62,4 +62,3 @@ public interface HTMLLIElement extends HTMLElement {
     public void setValue(int value);
 
 }
-

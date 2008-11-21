@@ -24,10 +24,6 @@
  * have any questions.
  *
  */
-/* 
- * @(#)ORBD.java	1.27 00/03/02
- *
- */
 
 package com.sun.corba.se.impl.activation;
 
@@ -62,7 +58,6 @@ import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
 /**
  * 
- * @version 	1.10, 97/12/06
  * @author	Rohit Garg
  * @since	JDK1.2
  */

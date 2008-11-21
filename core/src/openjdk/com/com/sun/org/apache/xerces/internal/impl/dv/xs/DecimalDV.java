@@ -362,4 +362,3 @@ public class DecimalDV extends TypeValidator {
         }
     }
 } // class DecimalDV
-

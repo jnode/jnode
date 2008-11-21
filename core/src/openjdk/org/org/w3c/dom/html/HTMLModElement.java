@@ -62,4 +62,3 @@ public interface HTMLModElement extends HTMLElement {
     public void setDateTime(String dateTime);
 
 }
-

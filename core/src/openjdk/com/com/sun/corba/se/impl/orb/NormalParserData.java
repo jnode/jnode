@@ -50,4 +50,3 @@ public class NormalParserData extends ParserDataBase {
 	props.setProperty( getPropertyName(), testData ) ;
     }
 }
-

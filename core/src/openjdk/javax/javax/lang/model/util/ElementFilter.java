@@ -65,7 +65,6 @@ import javax.lang.model.type.*;
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
  * @author Martin Buchholz
- * @version 1.12 07/05/05
  * @since 1.6
  */
 public class ElementFilter {

@@ -76,8 +76,6 @@ public abstract class RMIServerImpl implements Closeable, RMIServer {
      */
     public RMIServerImpl(Map<String,?> env) {
         this.env = (env == null) ? Collections.EMPTY_MAP : env;
-	if (logger.debugOn())
-	    logger.trace("RMIServerImpl","class="+this.getClass().getName());
     }
 
     void setRMIConnectorServer(RMIConnectorServer connServer)

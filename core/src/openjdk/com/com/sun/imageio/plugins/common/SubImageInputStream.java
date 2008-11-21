@@ -30,7 +30,6 @@ import javax.imageio.stream.ImageInputStreamImpl;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * @version 0.5 
  */
 public final class SubImageInputStream extends ImageInputStreamImpl {
 

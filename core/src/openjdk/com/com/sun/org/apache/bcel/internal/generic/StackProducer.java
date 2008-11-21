@@ -70,4 +70,3 @@ public interface StackProducer {
    */
   public int produceStack(ConstantPoolGen cpg);
 }
-

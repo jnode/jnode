@@ -54,4 +54,3 @@ public interface HTMLBRElement extends HTMLElement {
     public void setClear(String clear);
 
 }
-

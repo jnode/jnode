@@ -46,7 +46,6 @@ import sun.security.jca.*;
  * @author Jan Luehe
  * @author Jeff Nisewanger
  * @author Brad Wetmore
- * @version  1.20 05/05/07
  */
 
 final class SSLSecurity {
@@ -691,4 +690,3 @@ final class X509TrustManagerComSunWrapper implements X509TrustManager {
 	return theX509TrustManager.getAcceptedIssuers();
     }
 }
-

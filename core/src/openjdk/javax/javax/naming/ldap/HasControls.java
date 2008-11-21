@@ -53,7 +53,6 @@ import javax.naming.NamingException;
   * @author Rosanna Lee
   * @author Scott Seligman
   * @author Vincent Ryan
-  * @version 1.15 07/05/05
   * @since 1.3
   *
   */

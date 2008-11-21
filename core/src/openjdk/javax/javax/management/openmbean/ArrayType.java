@@ -1024,4 +1024,3 @@ public class ArrayType<T> extends OpenType<T> {
                              dimension, elementType, primitiveArray);
     }
 }
-

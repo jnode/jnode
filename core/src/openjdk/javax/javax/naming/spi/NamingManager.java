@@ -58,7 +58,6 @@ import com.sun.naming.internal.FactoryEnumeration;
  *
  * @author Rosanna Lee
  * @author Scott Seligman
- * @version 1.28 07/05/05
  * @since 1.3
  */
 

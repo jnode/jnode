@@ -35,7 +35,6 @@ package javax.lang.model.type;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.9 07/05/05
  * @see TypeVisitor#visitUnknown
  * @since 1.6
  */

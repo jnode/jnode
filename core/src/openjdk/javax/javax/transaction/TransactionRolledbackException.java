@@ -50,4 +50,3 @@ public class TransactionRolledbackException extends java.rmi.RemoteException
 	super(msg);
     }
 }
-

@@ -72,4 +72,3 @@ public interface NamedAndTyped {
   public void   setType(Type type);
 
 }
-

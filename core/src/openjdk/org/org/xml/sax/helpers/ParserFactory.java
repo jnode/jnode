@@ -69,7 +69,6 @@ import org.xml.sax.Parser;
  *             interface.
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  */
 public class ParserFactory {
     
@@ -151,4 +150,3 @@ public class ParserFactory {
     }
     
 }
-

@@ -23,7 +23,7 @@
  * have any questions.
  */
 /*
- * @(#)author    IBM Corp.
+ * @author    IBM Corp.
  * 
  * Copyright IBM Corp. 1999-2000.  All rights reserved.
  */
@@ -197,4 +197,3 @@ public class InvalidTargetObjectTypeException  extends Exception
       }
     }
 }
-

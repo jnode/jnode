@@ -40,7 +40,6 @@ import java.security.*;
  * @since 1.4
  * @see SSLSocket
  * @see SSLServerSocket
- * @version 1.33
  * @author David Brownell
  */
 public abstract class SSLServerSocketFactory extends ServerSocketFactory

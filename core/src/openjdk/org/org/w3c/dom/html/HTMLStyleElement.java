@@ -68,4 +68,3 @@ public interface HTMLStyleElement extends HTMLElement {
     public void setType(String type);
 
 }
-

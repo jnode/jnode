@@ -40,7 +40,6 @@ package org.omg.CORBA;
  * </PRE>
  *
  * @see org.omg.CORBA.Context#get_values(String, int, String)
- * @version 1.3, 09/09/97
  * @since   JDK1.2
  */
 public interface CTX_RESTRICT_SCOPE {
@@ -51,4 +50,3 @@ public interface CTX_RESTRICT_SCOPE {
  */
   int value = 15;
 }
-

@@ -57,4 +57,3 @@ public class SplitLocalResolverImpl implements LocalResolver
 	return resolver.list() ;
     }
 }
-

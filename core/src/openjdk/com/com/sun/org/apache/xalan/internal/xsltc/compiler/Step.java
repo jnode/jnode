@@ -413,7 +413,7 @@ final class Step extends RelativeLocationPath {
 	    else if (predicate.isNthDescendant()) {
 		il.append(methodGen.loadDOM());
 		// il.append(new ICONST(NodeTest.ELEMENT));
-		il.append(new ICONST(predicate.getPosType()));
+                il.append(new PUSH(cpg, predicate.getPosType()));
 		predicate.translate(classGen, methodGen);
 		il.append(new ICONST(0));
 		idx = cpg.addInterfaceMethodref(DOM_INTF,

@@ -131,7 +131,6 @@ import java.security.Provider;
  * </pre> 
  *
  * @author Mayank Upadhyay
- * @version 1.16, 05/05/07
  * @see GSSName
  * @see GSSCredential
  * @see GSSContext

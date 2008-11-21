@@ -38,7 +38,6 @@ import sun.security.jca.GetInstance;
  * secure random bytes.
  *
  * @since 1.4
- * @version 1.37, 05/05/07
  */
 public class SSLContext {
     private final Provider provider;

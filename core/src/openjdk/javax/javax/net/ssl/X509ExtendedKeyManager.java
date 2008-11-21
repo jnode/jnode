@@ -35,7 +35,6 @@ import java.security.Principal;
  * implementations.
  *
  * @since 1.5
- * @version 1.7
  * @author Brad R. Wetmore
  */
 public abstract class X509ExtendedKeyManager implements X509KeyManager {

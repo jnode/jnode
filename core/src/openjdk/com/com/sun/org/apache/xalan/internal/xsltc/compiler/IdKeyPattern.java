@@ -127,4 +127,3 @@ abstract class IdKeyPattern extends LocationPathPattern {
     }
 
 }
-

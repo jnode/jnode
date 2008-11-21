@@ -69,4 +69,3 @@ public interface StackConsumer {
    */
   public int consumeStack(ConstantPoolGen cpg);
 }
-

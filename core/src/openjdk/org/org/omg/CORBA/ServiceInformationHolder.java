@@ -108,4 +108,3 @@ public final class ServiceInformationHolder
         return org.omg.CORBA.ServiceInformationHelper.type();
     }
 }
-

@@ -112,4 +112,3 @@ public interface HTMLFrameElement extends HTMLElement {
     public Document getContentDocument();
 
 }
-

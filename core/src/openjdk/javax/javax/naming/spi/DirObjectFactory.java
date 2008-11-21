@@ -54,7 +54,6 @@ import javax.naming.directory.Attributes;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.18 07/05/05
   *
   * @see NamingManager#getObjectInstance
   * @see DirectoryManager#getObjectInstance

@@ -136,4 +136,3 @@ public interface HTMLImageElement extends HTMLElement {
     public void setWidth(String width);
 
 }
-

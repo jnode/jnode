@@ -231,4 +231,3 @@ public class XSAllCM implements XSCMValidator {
     }
 
 } // class XSAllCM
-

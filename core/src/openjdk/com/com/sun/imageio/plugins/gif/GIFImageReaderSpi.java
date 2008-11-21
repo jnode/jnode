@@ -35,7 +35,6 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * @version 0.5
  */
 public class GIFImageReaderSpi extends ImageReaderSpi {
 

@@ -37,4 +37,3 @@ public abstract class NumberType extends Type {
 	return true;
     }
 }
-

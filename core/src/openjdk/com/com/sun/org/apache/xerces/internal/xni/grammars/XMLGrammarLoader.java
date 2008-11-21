@@ -146,4 +146,3 @@ public interface XMLGrammarLoader {
     public Grammar loadGrammar(XMLInputSource source)
         throws IOException, XNIException;
 } // XMLGrammarLoader
-

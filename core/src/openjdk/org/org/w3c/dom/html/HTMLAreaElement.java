@@ -105,4 +105,3 @@ public interface HTMLAreaElement extends HTMLElement {
     public void setTarget(String target);
 
 }
-

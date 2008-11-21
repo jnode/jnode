@@ -29,7 +29,6 @@ import com.sun.org.apache.xerces.internal.impl.dtd.models.CMStateSet;
  * @xerces.internal 
  *
  * @author Neil Graham, IBM
- * @version $$
  */
 public class XSCMLeaf
     extends CMNode {
@@ -134,5 +133,3 @@ public class XSCMLeaf
     }
 
 } // class XSCMLeaf
-
-

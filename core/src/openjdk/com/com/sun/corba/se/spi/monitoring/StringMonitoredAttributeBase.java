@@ -71,6 +71,3 @@ public abstract class StringMonitoredAttributeBase
 
 
 } // end StringMonitoredAttributeBase
-
-
-

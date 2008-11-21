@@ -190,14 +190,8 @@ public class PaletteBuilder {
         this.transparency =
 	    srcColorModel.getTransparency();
 
-        if (transparency != Transparency.OPAQUE) {
-            this.requiredSize = size - 1;
-            transColor = new ColorNode();
-            transColor.isLeaf = true;
-        } else {
             this.requiredSize = size;
         }
-    }
 
     private Color getSrcColor(int x, int y) {
 	int argb = srcColorModel.getRGB(srcRaster.getDataElements(x, y, null));
@@ -250,6 +244,12 @@ public class PaletteBuilder {
                 if (transparency != Transparency.OPAQUE &&
 		    aColor.getAlpha() != 0xff)
 		{
+                    if (transColor == null) {
+                        this.requiredSize --; // one slot for transparent color
+
+                        transColor = new ColorNode();
+                        transColor.isLeaf = true;
+                    }
                     transColor = insertNode(transColor, aColor, 0);
                 } else {
                     root = insertNode(root, aColor, 0);
@@ -297,7 +297,7 @@ public class PaletteBuilder {
 
     protected IndexColorModel getIndexColorModel() {
         int size = currSize;
-        if (transparency == Transparency.BITMASK) {
+        if (transColor != null) {
             size ++; // we need place for transparent color;
         }
 
@@ -307,14 +307,16 @@ public class PaletteBuilder {
 
         int index = 0;
         palette = new ColorNode[size];
-        if (transparency == Transparency.BITMASK) {
+        if (transColor != null) {
             index ++;
         }
 
-        int lastIndex = findPaletteEntry(root, index, red, green, blue);
+        if (root != null) {
+            findPaletteEntry(root, index, red, green, blue);
+        }
 
         IndexColorModel icm = null;
-        if (transparency == Transparency.BITMASK) {
+        if (transColor  != null) {
             icm = new IndexColorModel(8, size, red, green, blue, 0);
         } else {
             icm = new IndexColorModel(8, currSize, red, green, blue);

@@ -49,7 +49,6 @@ package javax.naming;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.14 07/05/05
   *
   * @see RefAddr
   * @see StringRefAddr

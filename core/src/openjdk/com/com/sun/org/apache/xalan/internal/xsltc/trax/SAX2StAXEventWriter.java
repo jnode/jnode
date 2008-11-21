@@ -129,7 +129,23 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
         // is called for first time. So, defer START_DOCUMENT event of StAX till
         // that point of time.
         needToCallStartDocument = true;
+    }
         
+    private void writeStartDocument() throws SAXException {
+        try {
+            if (docLocator == null)
+                writer.add(eventFactory.createStartDocument());
+            else {
+                try{
+                    writer.add(eventFactory.createStartDocument(((Locator2)docLocator).getEncoding(),((Locator2)docLocator).getXMLVersion()));
+                } catch(ClassCastException e){
+                    writer.add(eventFactory.createStartDocument());
+                }
+            }
+        } catch (XMLStreamException e) {
+            throw new SAXException(e);
+        }
+        needToCallStartDocument = false;
     }
 
     public void endDocument() throws SAXException {
@@ -153,28 +169,10 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
 
     }
 
-    public void startElement(String uri, String localName, String qName,
-            Attributes attributes) throws SAXException {
-        
-        if (needToCallStartDocument){
-            try {
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                 
-                if (docLocator == null)
-                    writer.add(eventFactory.createStartDocument());
-                else {
-                    try{
-                        writer.add(eventFactory.createStartDocument(((Locator2)docLocator).getEncoding(),((Locator2)docLocator).getXMLVersion()));
-                    }catch(ClassCastException e){
-                        writer.add(eventFactory.createStartDocument());
-                    }
-                }
-                
-            } catch (XMLStreamException e) {
-
-                throw new SAXException(e);
-
-            }
-            needToCallStartDocument = false;
+        if (needToCallStartDocument) {
+            writeStartDocument();
         }
         
         // set document location
@@ -183,7 +181,6 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
         // create attribute and namespace events
         Collection[] events = {null, null};
         createStartEvents(attributes, events);
-
 
         namespaceStack.add(events[0]);
 
@@ -236,6 +233,12 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
     }
 
     public void comment(char[] ch, int start, int length) throws SAXException {
+        if (needToCallStartDocument) {
+            // Drat. We were trying to postpone this until the first element so that we could get
+            // the locator, but we can't output a comment before the start document, so we're just
+            // going to have to do without the locator if it hasn't been set yet.
+            writeStartDocument();
+        }
 
         super.comment(ch, start, length);
 
@@ -287,6 +290,13 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
     public void processingInstruction(String target, String data)
             throws SAXException {
 
+        if (needToCallStartDocument) {
+            // Drat. We were trying to postpone this until the first element so that we could get
+            // the locator, but we can't output a PI before the start document, so we're just
+            // going to have to do without the locator if it hasn't been set yet.
+            writeStartDocument();
+        }
+
         super.processingInstruction(target, data);
         try {
 
@@ -325,22 +335,16 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
 
         // create namespaces
         if (namespaces != null) {
-
             final int nDecls = namespaces.size();
                 for (int i = 0; i < nDecls; i++) {
-                    final String prefix = (String) namespaces.elementAt(i);
-                    String uri = (String) namespaces.elementAt(i++);
+                final String prefix = (String) namespaces.elementAt(i++);
+                String uri = (String) namespaces.elementAt(i);
                 Namespace ns = createNamespace(prefix, uri);
                 if (nsMap == null) {
-
                     nsMap = new HashMap();
-
                 }
                 nsMap.put(prefix, ns);
-
-                
             }
-
         }
 
         // create attributes
@@ -357,21 +361,16 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
             String attrURI = attributes.getURI(i);
 
             if ("xmlns".equals(attrQName) || "xmlns".equals(attrPrefix)) {
-
                 // namespace declaration disguised as an attribute. If the
                 // namespace has already been declared, skip it, otherwise
                 // write it as an namespace
-
-                if (!nsMap.containsKey(attrPrefix)) {
-
-                    Namespace ns = createNamespace(attrPrefix, attrValue);
                     if (nsMap == null) {
-
                         nsMap = new HashMap();
-
                     }
-                    nsMap.put(attrPrefix, ns);
 
+                if (!nsMap.containsKey(attrLocal)) {
+                    Namespace ns = createNamespace(attrLocal, attrValue);
+                    nsMap.put(attrLocal, ns);
                 }
 
             } else {
@@ -397,7 +396,6 @@ public class SAX2StAXEventWriter extends SAX2StAXBaseWriter {
                 attrs.add(attribute);
 
             }
-
         }
 
         events[0] = (nsMap == null ? Collections.EMPTY_LIST : nsMap.values());

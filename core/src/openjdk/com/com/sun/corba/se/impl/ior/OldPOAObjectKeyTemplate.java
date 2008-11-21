@@ -91,4 +91,3 @@ public final class OldPOAObjectKeyTemplate extends OldObjectKeyTemplateBase
 	    throw new INTERNAL() ;
     }
 }
-

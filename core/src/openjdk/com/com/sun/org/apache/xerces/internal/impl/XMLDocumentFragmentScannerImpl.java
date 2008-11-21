@@ -290,6 +290,8 @@ public class XMLDocumentFragmentScannerImpl
     protected boolean fReportCdataEvent = false ;
     protected boolean fIsCoalesce = false ;
     protected String fDeclaredEncoding =  null;
+    /** Disallow doctype declaration. */
+    protected boolean fDisallowDoctype = false;
     
     // drivers
     
@@ -1853,6 +1855,11 @@ public class XMLDocumentFragmentScannerImpl
         }
         // start general entity
         if (!fEntityStore.isDeclaredEntity(name)) {
+            //SUPPORT_DTD=false && ReplaceEntityReferences should throw exception
+            if (fDisallowDoctype && fReplaceEntityReferences) {
+                reportFatalError("EntityNotDeclared", new Object[]{name});
+                return;
+            }
             //REVISIT: one more case needs to be included: external PE and standalone is no
             if ( fHasExternalDTD && !fStandalone) {
                 if (fValidation)
@@ -3007,6 +3014,10 @@ public class XMLDocumentFragmentScannerImpl
                             
                             if(fScannerState == SCANNER_STATE_REFERENCE){
                                 setScannerState(SCANNER_STATE_CONTENT);
+                                if (fReplaceEntityReferences && fEntityStore.isDeclaredEntity(fCurrentEntityName)) {
+                                    // Skip the entity reference, we don't care
+                                    return fDriver.next();
+                                }
                                 return XMLEvent.ENTITY_REFERENCE;
                             }
                         }

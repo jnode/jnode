@@ -140,4 +140,3 @@ public interface HTMLTextAreaElement extends HTMLElement {
     public void select();
 
 }
-

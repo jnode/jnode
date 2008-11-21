@@ -59,7 +59,6 @@ import org.xml.sax.Attributes;
  *
  * @since SAX 2.0 (extensions 1.1 alpha)
  * @author David Brownell
- * @version TBS
  */
 public interface Attributes2 extends Attributes
 {

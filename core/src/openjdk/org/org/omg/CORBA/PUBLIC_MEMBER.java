@@ -41,7 +41,6 @@ package org.omg.CORBA;
  * The other constant is <code>PRIVATE_MEMBER</code>.
  *
  * @author unattributed
- * @version 1.24 05/05/07
  */
 public interface PUBLIC_MEMBER {
     final short value = (short) (1L);

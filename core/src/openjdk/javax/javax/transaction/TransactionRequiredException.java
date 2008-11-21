@@ -47,4 +47,3 @@ public class TransactionRequiredException extends java.rmi.RemoteException
 	super(msg);
     }
 }
-

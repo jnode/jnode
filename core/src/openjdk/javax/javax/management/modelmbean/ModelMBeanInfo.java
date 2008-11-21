@@ -23,7 +23,7 @@
  * have any questions.
  */
 /*
- * @(#)author    IBM Corp.
+ * @author    IBM Corp.
  * 
  * Copyright IBM Corp. 1999-2000.  All rights reserved.
  */
@@ -177,8 +177,8 @@ public interface ModelMBeanInfo
      * presentationString : xml formatted string to allow presentation of data to be associated with the MBean.
      * </PRE>
      * <P>
-     * The default descriptor is: name=mbeanName,descriptorType=mbean, displayName=this.getClassName(),
-     *	persistPolicy=never,log=F,export=F,visibility=1
+     * The default descriptor is: name=className,descriptorType="mbean", displayName=className,
+     *  persistPolicy="never",log="F",export="F",visibility="1"
      * If the descriptor does not contain all these fields, they will be added with these default values.
      *
      * <p><b>Note:</b> because of inconsistencies in previous versions of
@@ -206,8 +206,8 @@ public interface ModelMBeanInfo
      * metadata about the MBean and default policies for persistence and caching. This operation
      * does a complete replacement of the descriptor, no merging is done. If the descriptor to
      * set to is null then the default descriptor will be created.
-     * The default descriptor is: name=mbeanName,descriptorType=mbean, displayName=this.getClassName(),
-     *	persistPolicy=never,log=F,export=F,visibility=1
+     * The default descriptor is: name=className,descriptorType="mbean", displayName=className,
+     *  persistPolicy="never",log="F",export="F",visibility="1"
      * If the descriptor does not contain all these fields, they will be added with these default values.
      *
      * See {@link #getMBeanDescriptor getMBeanDescriptor} method javadoc for description of valid field names.

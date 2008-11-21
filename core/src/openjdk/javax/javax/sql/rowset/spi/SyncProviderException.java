@@ -162,5 +162,3 @@ public class SyncProviderException extends java.sql.SQLException {
     static final long serialVersionUID = -939908523620640692L;
         
 }
-
-

@@ -83,4 +83,3 @@ public interface HTMLCollection {
     public Node namedItem(String name);
 
 }
-

@@ -22,6 +22,7 @@ package com.sun.org.apache.xerces.internal.dom;
 
 import org.w3c.dom.Entity;
 import org.w3c.dom.Node;
+import org.w3c.dom.DOMException;
 
 /**
  * Entity nodes hold the reference data for an XML Entity -- either
@@ -132,7 +133,31 @@ public class EntityImpl
         }
         return name;
     }
-
+    /**
+     * Sets the node value.
+     * @throws DOMException(NO_MODIFICATION_ALLOWED_ERR)
+     */
+    public void setNodeValue(String x)
+        throws DOMException {
+        if (ownerDocument.errorChecking && isReadOnly()) {
+            String msg = DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NO_MODIFICATION_ALLOWED_ERR", null);
+            throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, msg);
+        }
+    }
+    /**
+     * The namespace prefix of this node
+     * @exception DOMException
+     *   <br>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.
+     */
+    public void setPrefix(String prefix)
+        throws DOMException
+    {
+        if (ownerDocument.errorChecking && isReadOnly()) {
+            throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, 
+                  DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, 
+                    "NO_MODIFICATION_ALLOWED_ERR", null));
+        }
+    }    
     /** Clone node. */
     public Node cloneNode(boolean deep) {
         EntityImpl newentity = (EntityImpl)super.cloneNode(deep);

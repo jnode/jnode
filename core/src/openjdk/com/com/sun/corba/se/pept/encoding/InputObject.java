@@ -61,4 +61,3 @@ public interface InputObject
 }
 
 // End of file.
-

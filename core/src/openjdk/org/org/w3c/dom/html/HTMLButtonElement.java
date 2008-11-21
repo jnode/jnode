@@ -93,4 +93,3 @@ public interface HTMLButtonElement extends HTMLElement {
     public void setValue(String value);
 
 }
-

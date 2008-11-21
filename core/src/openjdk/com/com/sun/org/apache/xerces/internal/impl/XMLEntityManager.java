@@ -1133,7 +1133,6 @@ protected static final String PARSER_SETTINGS =
             boolean unparsed = entity.isUnparsed();
             boolean parameter = entityName.startsWith("%");
             boolean general = !parameter;
-            fExternalGeneralEntities = external;//ToDo :Venu
             if (unparsed || (general && !fExternalGeneralEntities) ||
                     (parameter && !fExternalParameterEntities)) {
                 
@@ -1431,8 +1430,8 @@ protected static final String PARSER_SETTINGS =
         fEntityStack.removeAllElements();
         fCurrentEntity = null;
         fValidation = false;
-        fExternalGeneralEntities = false;
-        fExternalParameterEntities = false;
+        fExternalGeneralEntities = true;
+        fExternalParameterEntities = true;
         fAllowJavaEncodings = true ;
         
         //test();

@@ -59,4 +59,3 @@ public interface HTMLMapElement extends HTMLElement {
     public void setName(String name);
 
 }
-

@@ -34,7 +34,6 @@ package org.omg.CORBA;
  *
  * @see <A href="../../../../technotes/guides/idl/jidlExceptions.html">documentation on
  * Java&nbsp;IDL exceptions</A>
- * @version     1.18, 09/09/97
  * @since       JDK1.2
  */
 
@@ -78,4 +77,3 @@ public final class NO_MEMORY extends SystemException {
         super(s, minor, completed);
     }
 }
-

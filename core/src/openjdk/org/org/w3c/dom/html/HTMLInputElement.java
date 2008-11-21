@@ -223,4 +223,3 @@ public interface HTMLInputElement extends HTMLElement {
     public void click();
 
 }
-

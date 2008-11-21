@@ -189,5 +189,3 @@ public abstract class CMNode
     private int         fMaxStates  = -1;
     private Object      fUserData   = null;
 };
-
-
