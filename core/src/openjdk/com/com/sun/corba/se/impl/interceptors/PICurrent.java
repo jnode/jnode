@@ -168,6 +168,3 @@ public class PICurrent extends org.omg.CORBA.LocalObject
 	this.orbInitializing = init;
     }
 }
-
-
-    

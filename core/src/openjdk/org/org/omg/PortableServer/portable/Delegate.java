@@ -113,4 +113,3 @@ public interface Delegate {
 
     org.omg.CORBA.Object get_interface_def(Servant self);
 }
-

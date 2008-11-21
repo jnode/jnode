@@ -67,7 +67,6 @@ import org.xml.sax.SAXNotRecognizedException;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.XMLFilter
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.EntityResolver

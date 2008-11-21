@@ -186,4 +186,3 @@ public interface HTMLObjectElement extends HTMLElement {
     public Document getContentDocument();
 
 }
-

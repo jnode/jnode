@@ -53,6 +53,3 @@ public class MalformedObjectNameException extends OperationsException   {
 	super(message);
     }
 }
-
-
-

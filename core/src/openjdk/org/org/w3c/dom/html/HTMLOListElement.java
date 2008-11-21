@@ -68,4 +68,3 @@ public interface HTMLOListElement extends HTMLElement {
     public void setType(String type);
 
 }
-

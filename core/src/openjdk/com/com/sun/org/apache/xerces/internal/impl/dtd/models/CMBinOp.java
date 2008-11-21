@@ -190,4 +190,3 @@ public class CMBinOp extends CMNode
     private CMNode  fLeftChild;
     private CMNode  fRightChild;
 };
-

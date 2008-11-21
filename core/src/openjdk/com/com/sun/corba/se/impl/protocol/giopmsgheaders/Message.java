@@ -33,7 +33,6 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
  * This is the base interface for different message type interfaces.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public interface Message {

@@ -75,4 +75,3 @@ public interface HTMLMetaElement extends HTMLElement {
     public void setScheme(String scheme);
 
 }
-

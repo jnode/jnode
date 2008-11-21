@@ -68,4 +68,3 @@ public interface HTMLLabelElement extends HTMLElement {
     public void setHtmlFor(String htmlFor);
 
 }
-

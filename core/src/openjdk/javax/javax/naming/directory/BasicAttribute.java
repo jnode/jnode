@@ -67,7 +67,6 @@ import javax.naming.OperationNotSupportedException;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.20 07/05/05
   * @since 1.3
   */
 public class BasicAttribute implements Attribute {

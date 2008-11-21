@@ -46,4 +46,3 @@ public interface ResponseWaitingRoom
 }
 
 // End of file.
-

@@ -67,6 +67,9 @@ public abstract class Type implements Constants {
             return Type.ObjectString;
         } 
         else {
+            //
+            java.security.AccessControlContext acc = java.security.AccessController.getContext();
+            acc.checkPermission(new RuntimePermission("getContextClassLoader"));
             return new ObjectType(javaClassName);
         }
     }

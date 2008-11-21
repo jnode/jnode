@@ -54,4 +54,3 @@ public interface HTMLParagraphElement extends HTMLElement {
     public void setAlign(String align);
 
 }
-

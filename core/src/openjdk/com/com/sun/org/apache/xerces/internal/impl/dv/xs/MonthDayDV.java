@@ -127,4 +127,3 @@ public class MonthDayDV extends AbstractDateTimeDV {
                 , DatatypeConstants.FIELD_UNDEFINED, DatatypeConstants.FIELD_UNDEFINED, DatatypeConstants.FIELD_UNDEFINED, DatatypeConstants.FIELD_UNDEFINED, date.timezoneHr * 60 + date.timezoneMin);
     }
 }
-

@@ -23,11 +23,6 @@
  * have any questions.
  */
 
-/* 
- * @(#)RepositoryImpl.java 1.1 97/10/17 
- *
- */
-
 package com.sun.corba.se.impl.activation;
 
 import java.io.File;
@@ -63,7 +58,6 @@ import com.sun.corba.se.impl.logging.ActivationSystemException;
 
 /**
  * 
- * @version 	1.1, 97/10/17
  * @author	Rohit Garg
  * @since	JDK1.2
  */

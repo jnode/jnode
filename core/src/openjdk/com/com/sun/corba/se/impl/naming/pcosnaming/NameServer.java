@@ -40,7 +40,6 @@ import org.omg.CosNaming.NamingContext;
  * It uses the PersistentNameService and TransientNameService
  * classes for the name service implementation.
  *
- * @version     1.1, 99/10/07
  * @author      Hemanth Puttaswamy
  * @since       JDK1.2
  */

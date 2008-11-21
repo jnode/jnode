@@ -62,7 +62,6 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
  * @author <a href="mailto:Neeraj.Bajaj@sun.com">Neeraj Bajaj</a>
  *
- * @version $Revision: 1.10 $, $Date: 2006/05/19 01:08:42 $
  * @since 1.5
  */
 public abstract class DatatypeFactory {

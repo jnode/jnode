@@ -879,4 +879,3 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         return TCKind.tk_wchar;
     }
 }
-

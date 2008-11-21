@@ -99,7 +99,6 @@ import java.lang.SecurityManager;
  * @see java.lang.SecurityManager
  *
  * @since 1.4
- * @version 1.17
  * @author Marianne Mueller
  * @author Roland Schemers
  */
@@ -143,5 +142,3 @@ public final class SSLPermission extends BasicPermission {
 	super(name, actions);
     }
 }
-
-

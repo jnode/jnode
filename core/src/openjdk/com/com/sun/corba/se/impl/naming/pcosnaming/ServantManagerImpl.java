@@ -49,7 +49,6 @@ import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
 import com.sun.corba.se.spi.orb.ORB;
 
 /**
- * @version     1.6, 99/10/07
  * @author      Rohit Garg
  * @since       JDK1.2
  */

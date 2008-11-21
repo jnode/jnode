@@ -69,4 +69,3 @@ public interface HTMLLegendElement extends HTMLElement {
     public void setAlign(String align);
 
 }
-

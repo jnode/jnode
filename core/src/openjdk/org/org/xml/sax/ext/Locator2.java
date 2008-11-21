@@ -53,7 +53,6 @@ import org.xml.sax.Locator;
  *
  * @since SAX 2.0 (extensions 1.1 alpha)
  * @author David Brownell
- * @version TBS
  */
 public interface Locator2 extends Locator
 {

@@ -92,7 +92,6 @@ import java.util.Enumeration;
  * @see GSSManager#createName(byte[], Oid)
  *
  * @author Mayank Upadhyay
- * @version 1.14, 05/05/07
  * @since 1.4
  */
 public interface GSSName {

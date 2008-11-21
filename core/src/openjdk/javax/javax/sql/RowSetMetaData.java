@@ -233,8 +233,3 @@ public interface RowSetMetaData extends ResultSetMetaData {
   void setColumnTypeName(int columnIndex, String typeName) throws SQLException;
 
 }
-
-
-
-
-

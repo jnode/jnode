@@ -668,8 +668,21 @@ public class ElementImpl
 		}
 		else {
             if (newAttr instanceof AttrNSImpl){
-                // change prefix and value
-                ((AttrNSImpl)newAttr).name= (prefix!=null)?(prefix+":"+localName):localName;
+                String origNodeName = ((AttrNSImpl) newAttr).name;
+                String newName = (prefix!=null) ? (prefix+":"+localName) : localName;
+
+                ((AttrNSImpl) newAttr).name = newName;
+
+                if (!newName.equals(origNodeName)) {
+                    // Note: we can't just change the name of the attribute. Names have to be in sorted
+                    // order in the attributes vector because a binary search is used to locate them.
+                    // If the new name has a different prefix, the list may become unsorted.
+                    // Maybe it would be better to resort the list, but the simplest
+                    // fix seems to be to remove the old attribute and re-insert it.
+                    // -- Norman.Walsh@Sun.COM, 2 Feb 2007
+                    newAttr = (Attr) attributes.removeItem(newAttr, false);
+                    attributes.addItem(newAttr);
+                }
             }
             else {
                 // This case may happen if user calls:

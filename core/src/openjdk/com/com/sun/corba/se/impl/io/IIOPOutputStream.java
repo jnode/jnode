@@ -68,7 +68,6 @@ import com.sun.corba.se.impl.logging.UtilSystemException ;
  * IIOPOutputStream is ...
  *
  * @author  Stephen Lewallen
- * @version 0.01, 4/6/98
  * @since   JDK1.1.6
  */
 
@@ -815,4 +814,3 @@ public class IIOPOutputStream
     	}
     }
 }
-

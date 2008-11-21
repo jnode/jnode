@@ -74,5 +74,3 @@ public final class PackagePrefixChecker {
     }
 
 }
-
-

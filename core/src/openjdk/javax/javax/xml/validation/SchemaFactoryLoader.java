@@ -41,7 +41,6 @@ package javax.xml.validation;
  * </p>
  * 
  * @author <a href="Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
- * @version $Revision: 1.1 $, $Date: 2005/10/12 16:48:28 $
  * @since 1.5
  */
 public abstract class SchemaFactoryLoader {

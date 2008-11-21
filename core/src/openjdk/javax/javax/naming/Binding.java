@@ -42,7 +42,6 @@ package javax.naming;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.15 07/05/05
   * @since 1.3
   */
 
@@ -198,4 +197,3 @@ public class Binding extends NameClassPair {
      */
     private static final long serialVersionUID = 8839217842691845890L;
 };
-

@@ -381,5 +381,3 @@ public class ClassPath implements Serializable {
     }
   }
 }
-
-

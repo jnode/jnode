@@ -45,10 +45,10 @@ import com.sun.xml.internal.stream.StaxEntityResolverWrapper;
 public class PropertyManager {
     
     
-    protected static final String STAX_NOTATIONS = "javax.xml.stream.notations";
-    protected static final String STAX_ENTITIES = "javax.xml.stream.entities";
+    public static final String STAX_NOTATIONS = "javax.xml.stream.notations";
+    public static final String STAX_ENTITIES = "javax.xml.stream.entities";
     
-    private static final String STRING_INTERNING = "http://xml.org/sax/features/string-interning".intern() ;
+    private static final String STRING_INTERNING = "http://xml.org/sax/features/string-interning";
     
             
     HashMap supportedProps = new HashMap();
@@ -135,10 +135,7 @@ public class PropertyManager {
     }
     
     public Object getProperty(String property){
-        if(property == null) return null;
-        if(supportedProps.containsKey(property))
             return supportedProps.get(property);
-        return null;
     }
     
     public void setProperty(String property, Object value){

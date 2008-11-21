@@ -60,6 +60,7 @@ public interface SOAPBinding extends Binding {
    */
   public static final String SOAP12HTTP_MTOM_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/?mtom=true";
 
+  
   /** Gets the roles played by the SOAP binding instance.
    *
    *  @return Set<String> The set of roles played by the binding instance.
@@ -89,6 +90,7 @@ public interface SOAPBinding extends Binding {
    *               be enabled or disabled.
    *  @throws WebServiceException If the specified setting is not supported
    *                  by this binding instance.
+   * 
   **/
   public void setMTOMEnabled(boolean flag);
   

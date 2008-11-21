@@ -532,4 +532,3 @@ abstract public class ObjectImpl implements org.omg.CORBA.Object
            return (this==obj);
     }
 }
-

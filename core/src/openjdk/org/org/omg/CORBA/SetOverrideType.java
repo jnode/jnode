@@ -44,7 +44,6 @@ package org.omg.CORBA;
  * are replaced with the given ones.
  *
  * @author OMG
- * @version 1.22 05/05/07
  * @since   JDK1.2
  */
 

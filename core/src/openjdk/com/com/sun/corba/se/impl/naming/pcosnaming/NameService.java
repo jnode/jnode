@@ -43,7 +43,6 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.impl.orbutil.ORBConstants ;
 
 /**
- * @version     1.3, 00/04/06
  * @author      Hemanth Puttaswamy
  * @since       JDK1.2
  */

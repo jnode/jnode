@@ -38,7 +38,6 @@ package com.sun.corba.se.spi.orbutil.fsm ;
  * successfully, then after X completes execution, A.postAction is executed,
  * followed by B.preAction.
  *
- * @version @(#)State.java	1.14 07/05/05
  * @author Ken Cavanaugh
  */
 public interface State

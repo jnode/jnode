@@ -64,4 +64,3 @@ public final class UnknownUserException extends UserException {
         except = a;
     }
 }
-

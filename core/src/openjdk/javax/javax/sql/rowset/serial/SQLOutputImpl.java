@@ -616,8 +616,3 @@ public class SQLOutputImpl implements SQLOutput {
     }
 
 }
-
-
-
-
-

@@ -37,7 +37,6 @@ import java.security.KeyStore.*;
  * @see X509KeyManager
  *
  * @author  Andreas Sterbenz
- * @version 1.10, 05/05/07
  * @since   1.5
  */
 public class KeyStoreBuilderParameters implements ManagerFactoryParameters {

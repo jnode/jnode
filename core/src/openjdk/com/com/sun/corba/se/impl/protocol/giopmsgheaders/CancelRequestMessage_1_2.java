@@ -31,7 +31,6 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
  * This implements the GIOP 1.2 CancelRequest header.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public final class CancelRequestMessage_1_2 extends Message_1_1

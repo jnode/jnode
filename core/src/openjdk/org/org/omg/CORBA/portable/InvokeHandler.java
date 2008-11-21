@@ -70,4 +70,3 @@ public interface InvokeHandler {
 			 ResponseHandler handler)
 	throws org.omg.CORBA.SystemException;
 }
-

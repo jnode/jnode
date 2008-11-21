@@ -33,7 +33,6 @@ package org.omg.CORBA.TypeCodePackage;
  * exception <code>BadKind</code> to be thrown.
  *
  * @see org.omg.CORBA.TypeCode
- * @version 1.7, 03/18/98
  * @since   JDK1.2
  */
 

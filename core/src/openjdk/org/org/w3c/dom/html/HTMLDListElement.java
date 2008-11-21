@@ -54,4 +54,3 @@ public interface HTMLDListElement extends HTMLElement {
     public void setCompact(boolean compact);
 
 }
-

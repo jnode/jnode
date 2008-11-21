@@ -273,4 +273,3 @@ public class XMLVersionDetector {
     }
 
 } // class XMLVersionDetector
-

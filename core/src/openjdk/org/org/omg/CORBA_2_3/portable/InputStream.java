@@ -38,7 +38,6 @@ package org.omg.CORBA_2_3.portable;
  *
  * @see org.omg.CORBA.portable.InputStream
  * @author  OMG
- * @version 1.22 05/05/07
  * @since   JDK1.2
  */
 

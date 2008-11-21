@@ -71,8 +71,3 @@ public interface XADataSource extends CommonDataSource {
   XAConnection getXAConnection(String user, String password) 
     throws SQLException;        
  } 
-
-
-
-
-

@@ -44,8 +44,8 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ErrorMsg;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.MethodType;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.TypeCheckError;
-import com.sun.org.apache.xalan.internal.xsltc.runtime.AttributeList;
 import org.xml.sax.Attributes;
+import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -360,7 +360,7 @@ public class Parser implements Constants, ContentHandler {
 		stylesheet = new Stylesheet();
 		stylesheet.setSimplified();
 		stylesheet.addElement(element);
-		stylesheet.setAttributes((AttributeList) element.getAttributes());
+                stylesheet.setAttributes((AttributesImpl) element.getAttributes());
 
 		// Map the default NS if not already defined
 		if (element.lookupNamespace(EMPTYSTRING) == null) {
@@ -1265,7 +1265,7 @@ public class Parser implements Constants, ContentHandler {
 	    parent.addElement(element);
 	    element.setParent(parent);
 	}
-	element.setAttributes(new AttributeList(attributes));
+        element.setAttributes(new AttributesImpl(attributes));
 	element.setPrefixMapping(_prefixMapping);
 	
 	if (element instanceof Stylesheet) {

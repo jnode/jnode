@@ -49,7 +49,6 @@ import javax.naming.event.NamingListener;
  * @author Rosanna Lee
  * @author Scott Seligman
  * @author Vincent Ryan
- * @version 1.14 07/05/05
  *
  * @see UnsolicitedNotificationEvent
  * @see UnsolicitedNotification

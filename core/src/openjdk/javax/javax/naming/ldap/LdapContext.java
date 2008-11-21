@@ -170,7 +170,6 @@ import java.util.Hashtable;
  * @author Rosanna Lee
  * @author Scott Seligman
  * @author Vincent Ryan
- * @version 1.17 07/05/05
  *
  * @see InitialLdapContext
  * @see LdapReferralException#getReferralContext(java.util.Hashtable,javax.naming.ldap.Control[])

@@ -17,7 +17,6 @@ import com.sun.org.apache.xalan.internal.xsltc.runtime.Operators;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ErrorMsg;
 
 /** CUP v0.10j generated parser.
-  * @version Thu Oct 06 10:09:26 PDT 2005
   */
 public class XPathParser extends com.sun.java_cup.internal.runtime.lr_parser {
 
@@ -3145,4 +3144,3 @@ class CUP$XPathParser$actions {
         }
     }
 }
-

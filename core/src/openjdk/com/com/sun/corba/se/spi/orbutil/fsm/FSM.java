@@ -39,7 +39,6 @@ package com.sun.corba.se.spi.orbutil.fsm ;
  * implements the FSM interface by delegating to an FSM instance
  * created by StateEngine.makeFSM.
  *
- * @version @(#)FSM.java	1.15 07/05/05
  * @author Ken Cavanaugh
  */
 public interface FSM
@@ -55,4 +54,3 @@ public interface FSM
 }
 
 // end of FSM.java
-

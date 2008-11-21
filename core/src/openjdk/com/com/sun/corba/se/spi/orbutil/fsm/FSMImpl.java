@@ -39,7 +39,6 @@ import com.sun.corba.se.spi.orbutil.fsm.FSM ;
  * using a state engine.  It may be used as a base class, in which case
  * the guards and actions have access to the derived class.
  *
- * @version @(#)FSMImpl.java	1.20 07/05/05
  * @author Ken Cavanaugh
  */
 public class FSMImpl implements FSM
@@ -113,4 +112,3 @@ public class FSMImpl implements FSM
 }
 
 // end of FSMImpl.java
-

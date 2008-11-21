@@ -196,7 +196,6 @@ import java.util.Properties;
  *
  * @author Rosanna Lee
  * @author Scott Seligman
- * @version 1.21 07/05/05
  * @since 1.3
  */
 

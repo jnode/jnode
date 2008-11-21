@@ -45,7 +45,6 @@ import com.sun.naming.internal.ResourceManager;
   * @author Rosanna Lee
   * @author Scott Seligman
   * @author Vincent Ryan
-  * @version 1.19 07/05/05
   *
   * @see Control
   * @since 1.3

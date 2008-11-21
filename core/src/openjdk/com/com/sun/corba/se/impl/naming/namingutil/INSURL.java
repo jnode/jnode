@@ -49,5 +49,3 @@ public interface INSURL {
     // A debug method, which is not required for normal operation
     public void dPrint( );
 }
-
-    

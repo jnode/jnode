@@ -253,4 +253,3 @@ class DevanagariTables {
         SIGN_AVAGRAHA
     };
 }
-

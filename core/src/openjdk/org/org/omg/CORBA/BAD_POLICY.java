@@ -29,7 +29,6 @@ package org.omg.CORBA;
  * the <tt>PolicyError</tt> exception.
  *
  * @author rip-dev
- * @version 1.20 05/05/07
  */
 
 public interface BAD_POLICY {

@@ -1427,9 +1427,12 @@ public final class BasisLibrary {
     /**
      * This function is used in the execution of xsl:element
      */
-    private static int prefixIndex = 0;		// not thread safe!!
+    private static int prefixIndex = 0;
+
     public static String generatePrefix() {
+        synchronized (BasisLibrary.class) {
 	return ("ns" + prefixIndex++);
+    }
     }
 
     public static final String RUN_TIME_INTERNAL_ERR =

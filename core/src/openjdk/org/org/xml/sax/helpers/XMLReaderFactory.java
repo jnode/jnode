@@ -69,7 +69,6 @@ import org.xml.sax.SAXException;
  *
  * @since SAX 2.0
  * @author David Megginson, David Brownell
- * @version 2.0.1 (sax2r2)
  */
 final public class XMLReaderFactory
 {

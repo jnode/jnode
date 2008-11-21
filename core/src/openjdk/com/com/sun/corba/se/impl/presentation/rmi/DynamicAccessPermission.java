@@ -33,7 +33,6 @@ import java.security.*;
  * no actions list; you either have the named permission
  * or you don't.
  *
- * @version 1.1 05/08/26
  */
 
 public final class DynamicAccessPermission extends BasicPermission {

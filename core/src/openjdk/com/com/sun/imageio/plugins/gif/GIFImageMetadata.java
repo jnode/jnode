@@ -38,7 +38,6 @@ import javax.imageio.metadata.IIOMetadataFormatImpl;
 import org.w3c.dom.Node;
 
 /**
- * @version 0.5
  */
 public class GIFImageMetadata extends GIFMetadata {
 

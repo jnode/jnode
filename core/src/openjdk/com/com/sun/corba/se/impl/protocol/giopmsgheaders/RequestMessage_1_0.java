@@ -35,7 +35,6 @@ import com.sun.corba.se.spi.ior.ObjectKey;
  * This implements the GIOP 1.0 Request header.
  *
  * @author Ram Jeyaraman 05/14/2000
- * @version 1.0
  */
 
 public final class RequestMessage_1_0 extends Message_1_0

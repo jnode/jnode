@@ -184,5 +184,3 @@ public class LegacyServerSocketManagerImpl
 }
 
 // End of file.
-
-

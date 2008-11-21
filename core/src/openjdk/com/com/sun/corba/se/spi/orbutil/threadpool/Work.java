@@ -53,4 +53,3 @@ public interface Work
 }
 
 // End of file.
-

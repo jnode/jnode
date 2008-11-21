@@ -498,10 +498,3 @@ public class LocalObject implements org.omg.CORBA.Object
         throw new org.omg.CORBA.NO_IMPLEMENT(reason);
     }
 }
-
-
-
-
-
-
-

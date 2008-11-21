@@ -31,7 +31,6 @@ import org.omg.CORBA.TypeCode;
  * IDL types. The ORB treats all generated Holders as Streamable to invoke
  * the methods for marshalling and unmarshalling.
  *
- * @version 1.11, 03/18/98
  * @since   JDK1.2
  */
 

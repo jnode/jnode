@@ -30,7 +30,6 @@ package org.omg.CORBA;
 * This is one of the possible results of the <code>type_modified</code>
 * method on the <code>TypeCode</code> interface.
 * @see org.omg.CORBA.TypeCode
-* @version 1.15 05/05/07
 */
 public interface VM_ABSTRACT {
     /** The value representing an abstract interface value type in

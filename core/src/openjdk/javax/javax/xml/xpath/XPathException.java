@@ -32,7 +32,6 @@ import java.io.PrintWriter;
  *
  * @author  <a href="Norman.Walsh@Sun.com">Norman Walsh</a>
  * @author <a href="mailto:Jeff.Suttor@Sun.COM">Jeff Suttor</a>
- * @version $Revision: 1.2 $, $Date: 2005/06/10 03:50:44 $
  * @since 1.5
  */
 public class XPathException extends Exception {

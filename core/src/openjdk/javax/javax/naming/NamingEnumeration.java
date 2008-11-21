@@ -69,7 +69,6 @@ import java.util.Enumeration;
   * 
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.15 07/05/05
   *
   * @see Context#list
   * @see Context#listBindings

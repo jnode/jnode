@@ -158,4 +158,3 @@ public interface FilteredRowSet extends WebRowSet {
     */
     public Predicate getFilter() ;
 }
-

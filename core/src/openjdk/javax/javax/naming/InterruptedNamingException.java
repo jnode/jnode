@@ -41,7 +41,6 @@ package javax.naming;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.15 07/05/05
   *
   * @see Context
   * @see javax.naming.directory.DirContext

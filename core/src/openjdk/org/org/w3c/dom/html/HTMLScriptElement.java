@@ -93,4 +93,3 @@ public interface HTMLScriptElement extends HTMLElement {
     public void setType(String type);
 
 }
-

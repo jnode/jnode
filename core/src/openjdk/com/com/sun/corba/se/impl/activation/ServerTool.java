@@ -45,7 +45,6 @@ import com.sun.corba.se.spi.activation.LocatorPackage.ServerLocationPerORB;
 
 /**
  * 
- * @version 	1.7, 97/10/19
  * @author	Anita Jindal
  * @since	JDK1.3
  */

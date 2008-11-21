@@ -806,6 +806,9 @@ final class ValidatorHandlerImpl extends ValidatorHandler implements
         /** In start element. **/
         private boolean fInStartElement = false;
         
+        /** In end element. **/
+        private boolean fInEndElement = false;
+        
         /** Initializes the TypeInfoProvider with type information for the current element. **/
         void beginStartElement(Augmentations elementAugs, XMLAttributes attributes) {
             fInStartElement = true;
@@ -822,11 +825,13 @@ final class ValidatorHandlerImpl extends ValidatorHandler implements
         
         /** Initializes the TypeInfoProvider with type information for the current element. **/
         void beginEndElement(Augmentations elementAugs) {
+            fInEndElement = true;
             fElementAugs = elementAugs;
         }
         
         /** Cleanup at the end of end element. **/
         void finishEndElement() {
+            fInEndElement = false;
             fElementAugs = null;
         }
         
@@ -835,20 +840,20 @@ final class ValidatorHandlerImpl extends ValidatorHandler implements
          * the startElement callback. the JAXP API requires this
          * for most of the public methods.
          */
-        private void checkState() {
-            if( !fInStartElement ) {
+        private void checkState(boolean forElementInfo) {
+            if (! (fInStartElement || (fInEndElement && forElementInfo))) {
                 throw new IllegalStateException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
                         "TypeInfoProviderIllegalState", null));
             }
         }
         
         public TypeInfo getAttributeTypeInfo(int index) {
-            checkState();
+            checkState(false);
             return getAttributeType(index);
         }
         
         private TypeInfo getAttributeType( int index ) {
-            checkState();
+            checkState(false);
             if( index<0 || fAttributes.getLength()<=index )
                 throw new IndexOutOfBoundsException(Integer.toString(index));
             Augmentations augs = fAttributes.getAugmentations(index);
@@ -858,17 +863,17 @@ final class ValidatorHandlerImpl extends ValidatorHandler implements
         }
         
         public TypeInfo getAttributeTypeInfo(String attributeUri, String attributeLocalName) {
-            checkState();
+            checkState(false);
             return getAttributeTypeInfo(fAttributes.getIndex(attributeUri,attributeLocalName));
         }
         
         public TypeInfo getAttributeTypeInfo(String attributeQName) {
-            checkState();
+            checkState(false);
             return getAttributeTypeInfo(fAttributes.getIndex(attributeQName));
         }
         
         public TypeInfo getElementTypeInfo() {
-            checkState();
+            checkState(true);
             if (fElementAugs == null) return null;
             ElementPSVI psvi = (ElementPSVI)fElementAugs.getItem(Constants.ELEMENT_PSVI);
             return getTypeInfoFromPSVI(psvi);
@@ -897,14 +902,14 @@ final class ValidatorHandlerImpl extends ValidatorHandler implements
         }
         
         public boolean isIdAttribute(int index) {
-            checkState();
+            checkState(false);
             XSSimpleType type = (XSSimpleType)getAttributeType(index);
             if(type==null)  return false;
             return type.isIDType();
         }
         
         public boolean isSpecified(int index) {
-            checkState();
+            checkState(false);
             return fAttributes.isSpecified(index);
         }
         

@@ -68,6 +68,3 @@ public abstract class LongMonitoredAttributeBase extends MonitoredAttributeBase 
 
 
 } // end LongMonitoredAttributeBase
-
-
-

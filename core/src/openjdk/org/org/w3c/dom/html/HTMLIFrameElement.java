@@ -125,4 +125,3 @@ public interface HTMLIFrameElement extends HTMLElement {
     public Document getContentDocument();
 
 }
-

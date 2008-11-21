@@ -263,4 +263,3 @@ final class SymbolTable {
     }
 
 }
-

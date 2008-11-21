@@ -59,7 +59,6 @@ import com.sun.naming.internal.FactoryEnumeration;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.20 07/05/05
   *
   * @see DirObjectFactory
   * @see DirStateFactory

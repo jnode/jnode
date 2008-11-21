@@ -61,4 +61,3 @@ public interface HTMLDOMImplementation extends DOMImplementation {
     public HTMLDocument createHTMLDocument(String title);
 
 }
-

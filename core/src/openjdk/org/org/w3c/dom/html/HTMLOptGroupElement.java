@@ -62,4 +62,3 @@ public interface HTMLOptGroupElement extends HTMLElement {
     public void setLabel(String label);
 
 }
-

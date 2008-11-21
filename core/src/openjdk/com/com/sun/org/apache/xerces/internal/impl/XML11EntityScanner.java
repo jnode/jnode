@@ -1525,4 +1525,3 @@ public class XML11EntityScanner
     } // skipString(String):boolean
 
 } // class XML11EntityScanner
-

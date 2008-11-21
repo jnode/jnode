@@ -92,6 +92,19 @@ class VariableBase extends TopLevelElement {
     }
 
     /**
+     * When a variable is overriden by another, e.g. via xsl:import,
+     * its references need to be copied or otherwise it may be
+     * compiled away as dead code. This method can be used for that
+     * purpose.
+     */
+    public void copyReferences(VariableBase var) {
+        final int size = _refs.size();
+        for (int i = 0; i < size; i++) {
+            var.addReference((VariableRefBase) _refs.get(i));
+        }
+    }
+
+    /**
      * Map this variable to a register
      */
     public void mapRegister(MethodGenerator methodGen) {

@@ -40,7 +40,6 @@ import javax.imageio.metadata.IIOMetadataNode;
 import org.w3c.dom.Node;
 
 /**
- * @version 0.5
  */
 public class PNGMetadata extends IIOMetadata implements Cloneable {
 
@@ -332,9 +331,18 @@ public class PNGMetadata extends IIOMetadata implements Cloneable {
                 icm.getAlphas(alpha);
             }
 
-            if (isGray && hasAlpha) {
+            /*
+             * NB: PNG_COLOR_GRAY_ALPHA color type may be not optimal for images
+             * contained more than 1024 pixels (or even than 768 pixels in case of
+             * single transparent pixel in palette).
+             * For such images alpha samples in raster will occupy more space than
+             * it is required to store palette so it could be reasonable to
+             * use PNG_COLOR_PALETTE color type for large images.
+             */
+
+            if (isGray && hasAlpha && (bitDepth == 8 || bitDepth == 16)) {
                 IHDR_colorType = PNGImageReader.PNG_COLOR_GRAY_ALPHA;
-            } else if (isGray) {
+            } else if (isGray && !hasAlpha) {
                 IHDR_colorType = PNGImageReader.PNG_COLOR_GRAY;
             } else {
                 IHDR_colorType = PNGImageReader.PNG_COLOR_PALETTE;

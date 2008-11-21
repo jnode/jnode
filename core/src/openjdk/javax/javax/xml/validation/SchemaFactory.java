@@ -106,7 +106,6 @@ import org.xml.sax.SAXNotSupportedException;
  * @author  <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
  * @author  <a href="mailto:Neeraj.Bajaj@sun.com">Neeraj Bajaj</a>
  *
- * @version $Revision: 1.7 $, $Date: 2006/05/19 01:08:43 $
  * @since 1.5
  */
 public abstract class SchemaFactory {

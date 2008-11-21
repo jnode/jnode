@@ -35,7 +35,6 @@ import javax.imageio.metadata.IIOMetadataFormatImpl;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * @version 0.5
  */
 public class PNGImageReaderSpi extends ImageReaderSpi {
 

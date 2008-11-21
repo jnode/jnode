@@ -56,7 +56,6 @@ import javax.lang.model.util.*;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.14 07/05/05
  * @see DeclaredType
  * @since 1.6
  */

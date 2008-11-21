@@ -129,4 +129,3 @@ public interface HTMLTableRowElement extends HTMLElement {
                            throws DOMException;
 
 }
-

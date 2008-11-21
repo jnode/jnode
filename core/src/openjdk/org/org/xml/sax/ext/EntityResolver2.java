@@ -82,7 +82,6 @@ import org.xml.sax.SAXException;
  *
  * @since SAX 2.0 (extensions 1.1 alpha)
  * @author David Brownell
- * @version TBD
  */
 public interface EntityResolver2 extends EntityResolver
 {

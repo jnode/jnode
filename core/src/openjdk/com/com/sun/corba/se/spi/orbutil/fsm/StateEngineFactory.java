@@ -30,7 +30,6 @@ import com.sun.corba.se.impl.orbutil.fsm.StateEngineImpl ;
 /**
  * Factory for creating the standard state machine implementation.
  *
- * @version @(#)StateEngineFactory.java	1.15 07/05/05
  * @author Ken Cavanaugh
  */
 public class StateEngineFactory {

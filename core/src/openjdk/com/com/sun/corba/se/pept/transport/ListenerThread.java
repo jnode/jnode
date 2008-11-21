@@ -35,11 +35,3 @@ public interface ListenerThread
 }
 
 // End of file.
-
-
-
-
-
-
-
-

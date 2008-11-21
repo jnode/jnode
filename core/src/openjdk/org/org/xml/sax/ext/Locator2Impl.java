@@ -47,7 +47,6 @@ import org.xml.sax.helpers.LocatorImpl;
  *
  * @since SAX 2.0.2
  * @author David Brownell
- * @version TBS
  */
 public class Locator2Impl extends LocatorImpl implements Locator2
 {

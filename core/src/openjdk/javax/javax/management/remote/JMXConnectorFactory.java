@@ -25,19 +25,21 @@
 
 package javax.management.remote;
 
+import com.sun.jmx.mbeanserver.Util;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import com.sun.jmx.remote.util.ClassLogger;
 import com.sun.jmx.remote.util.EnvHelp;
-import com.sun.jmx.remote.util.Service;
+
 
 /**
  * <p>Factory to create JMX API connector clients.  There
@@ -298,23 +300,22 @@ public class JMXConnectorFactory {
     public static JMXConnector newJMXConnector(JMXServiceURL serviceURL,
                                                Map<String,?> environment)
             throws IOException {
+        Map<String, Object> envcopy;
         if (environment == null)
-            environment = new HashMap();
+            envcopy = new HashMap<String, Object>();
         else {
             EnvHelp.checkAttributes(environment);
-            environment = new HashMap(environment);
+            envcopy = new HashMap<String, Object>(environment);
         }
         
-        final ClassLoader loader = resolveClassLoader(environment);
-        final Class targetInterface = JMXConnectorProvider.class;
+        final ClassLoader loader = resolveClassLoader(envcopy);
+        final Class<JMXConnectorProvider> targetInterface = JMXConnectorProvider.class;
         final String protocol = serviceURL.getProtocol();
         final String providerClassName = "ClientProvider";
         
         JMXConnectorProvider provider =
-            (JMXConnectorProvider) getProvider(serviceURL, environment,
-                                               providerClassName,
-                                               targetInterface,
-                                               loader);
+            getProvider(serviceURL, envcopy, providerClassName,
+                        targetInterface, loader);
 
         IOException exception = null;
         if (provider == null) {
@@ -325,7 +326,7 @@ public class JMXConnectorFactory {
             if (loader != null) {
                 try {
                     JMXConnector connection =
-                        getConnectorAsService(loader, serviceURL, environment);
+                        getConnectorAsService(loader, serviceURL, envcopy);
                     if (connection != null)
                         return connection;
                 } catch (JMXProviderException e) {
@@ -334,7 +335,7 @@ public class JMXConnectorFactory {
                     exception = e;
                 }
             }
-            provider = (JMXConnectorProvider)
+            provider =
                 getProvider(protocol, PROTOCOL_PROVIDER_DEFAULT_PACKAGE,
                             JMXConnectorFactory.class.getClassLoader(),
                             providerClassName, targetInterface);
@@ -350,9 +351,9 @@ public class JMXConnectorFactory {
             }
         }
 
-        environment = Collections.unmodifiableMap(environment);
+        envcopy = Collections.unmodifiableMap(envcopy);
 
-        return provider.newJMXConnector(serviceURL, environment);
+        return provider.newJMXConnector(serviceURL, envcopy);
     }
 
     private static String resolvePkgs(Map env) throws JMXProviderException {
@@ -364,7 +365,7 @@ public class JMXConnectorFactory {
 
         if (pkgsObject == null)
             pkgsObject =
-                AccessController.doPrivileged(new PrivilegedAction() {
+                AccessController.doPrivileged(new PrivilegedAction<Object>() {
                     public Object run() {
                         return System.getProperty(PROTOCOL_PROVIDER_PACKAGES);
                     }
@@ -395,9 +396,10 @@ public class JMXConnectorFactory {
         return pkgs;
     }
 
-    static Object getProvider(JMXServiceURL serviceURL,
-                              Map environment, String providerClassName,
-                              Class targetInterface,
+    static <T> T getProvider(JMXServiceURL serviceURL,
+                             Map<String, Object> environment,
+                             String providerClassName,
+                             Class<T> targetInterface,
                               ClassLoader loader)
             throws IOException {
 
@@ -405,7 +407,7 @@ public class JMXConnectorFactory {
         
         final String pkgs = resolvePkgs(environment);
 
-        Object instance = null;
+        T instance = null;
         
         if (pkgs != null) {
             environment.put(PROTOCOL_PROVIDER_CLASS_LOADER, loader);
@@ -418,30 +420,26 @@ public class JMXConnectorFactory {
         return instance;
     }
     
-    static Iterator getProviderIterator(final Class providerClass,
+    static <T> Iterator<T> getProviderIterator(final Class<T> providerClass,
                                         final ClassLoader loader) {
-        PrivilegedAction action = new PrivilegedAction() {
-                public Object run() {
-                    return Service.providers(providerClass, loader);
-                }
-            };
-        return (Iterator) AccessController.doPrivileged(action);
+       ServiceLoader<T> serviceLoader =
+                ServiceLoader.load(providerClass,
+                loader);
+       return serviceLoader.iterator();
     }
 
     private static JMXConnector getConnectorAsService(ClassLoader loader,
                                                       JMXServiceURL url,
-                                                      Map map)
+                                                      Map<String, ?> map)
         throws IOException {
 
-        Iterator providers = getProviderIterator(JMXConnectorProvider.class,
-                                                 loader);
-        JMXConnectorProvider provider = null;
+        Iterator<JMXConnectorProvider> providers =
+                getProviderIterator(JMXConnectorProvider.class, loader);
         JMXConnector connection = null;
         IOException exception = null;
-        while (providers.hasNext()) {
-            provider = (JMXConnectorProvider) providers.next();
+        while(providers.hasNext()) {
             try {
-                connection = provider.newJMXConnector(url, map);
+                connection = providers.next().newJMXConnector(url, map);
                 return connection;
             } catch (JMXProviderException e) {
                 throw e;
@@ -469,11 +467,11 @@ public class JMXConnectorFactory {
             throw exception;
     }
 
-    static Object getProvider(String protocol,
+    static <T> T getProvider(String protocol,
                               String pkgs, 
                               ClassLoader loader,
                               String providerClassName,
-                              Class targetInterface)
+                              Class<T> targetInterface)
             throws IOException {
 
         StringTokenizer tokenizer = new StringTokenizer(pkgs, "|");
@@ -482,7 +480,7 @@ public class JMXConnectorFactory {
             String pkg = tokenizer.nextToken();
             String className = (pkg + "." + protocol2package(protocol) +
                                 "." + providerClassName);
-            Class providerClass;
+            Class<?> providerClass;
             try {
                 providerClass = Class.forName(className, true, loader);
             } catch (ClassNotFoundException e) {
@@ -498,8 +496,10 @@ public class JMXConnectorFactory {
                 throw new JMXProviderException(msg);
             }
 
+            // We have just proved that this cast is correct
+            Class<? extends T> providerClassT = Util.cast(providerClass);
             try {
-                return providerClass.newInstance();
+                return providerClassT.newInstance();
             } catch (Exception e) {
                 final String msg =
                     "Exception when instantiating provider [" + className +
@@ -528,9 +528,9 @@ public class JMXConnectorFactory {
         }
 
         if (loader == null)
-            loader = (ClassLoader)
-                AccessController.doPrivileged(new PrivilegedAction() {
-                        public Object run() {
+            loader =
+                AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                        public ClassLoader run() {
                             return
                                 Thread.currentThread().getContextClassLoader();
                         }

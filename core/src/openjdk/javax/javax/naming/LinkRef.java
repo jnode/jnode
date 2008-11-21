@@ -59,7 +59,6 @@ package javax.naming;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.7 03/12/19
   *
   * @see LinkException
   * @see LinkLoopException

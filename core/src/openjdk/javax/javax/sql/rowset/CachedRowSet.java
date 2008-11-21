@@ -1620,4 +1620,3 @@ public interface CachedRowSet extends RowSet, Joinable {
     public boolean previousPage() throws SQLException;    
     
 }
-

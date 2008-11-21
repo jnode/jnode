@@ -50,7 +50,6 @@ import java.net.Socket;
  * class.
  *
  * @since 1.4
- * @version 1.22
  */
 public interface X509KeyManager extends KeyManager {
     /**

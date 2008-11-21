@@ -29,7 +29,6 @@ import org.omg.CORBA.ORB;
 import java.io.PrintStream;
 
 /**
- * @version     1.21, 07/05/06
  * @author      Rohit Garg
  * @since       JDK1.2
  */

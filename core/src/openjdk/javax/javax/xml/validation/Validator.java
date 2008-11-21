@@ -50,7 +50,6 @@ import org.xml.sax.SAXNotSupportedException;
  * 
  *
  * @author  <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
- * @version $Revision: 1.4 $, $Date: 2005/10/13 17:00:48 $
  * @since 1.5
  */
 public abstract class Validator {

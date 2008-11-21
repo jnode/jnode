@@ -112,6 +112,10 @@ public final class XMLSchemaFactory extends SchemaFactory {
         fXMLSchemaLoader.setProperty(XMLGRAMMAR_POOL, fXMLGrammarPoolWrapper);
         fXMLSchemaLoader.setEntityResolver(fDOMEntityResolverWrapper);
         fXMLSchemaLoader.setErrorHandler(fErrorHandlerWrapper);
+
+        // Enable secure processing feature by default
+        fSecurityManager = new SecurityManager();
+        fXMLSchemaLoader.setProperty(SECURITY_MANAGER, fSecurityManager);
     }
     
     /**

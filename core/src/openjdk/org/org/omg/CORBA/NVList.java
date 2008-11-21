@@ -87,7 +87,6 @@ package org.omg.CORBA;
  * @see org.omg.CORBA.NamedValue
  * @see org.omg.CORBA.Context
  *
- * @version 1.14 ,09/09/97
  * @since       JDK1.2
  */
 

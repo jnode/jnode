@@ -35,7 +35,6 @@ package javax.naming.directory;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.15 07/05/05
   * @since 1.3
   */
 
@@ -132,4 +131,3 @@ public class ModificationItem implements java.io.Serializable {
      */
     private static final long serialVersionUID = 7573258562534746850L;
 }
-

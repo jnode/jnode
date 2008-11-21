@@ -34,7 +34,6 @@ import java.io.IOException;
  * by failed SSL-related operations.
  *
  * @since 1.4
- * @version 1.19
  * @author David Brownell
  */
 public

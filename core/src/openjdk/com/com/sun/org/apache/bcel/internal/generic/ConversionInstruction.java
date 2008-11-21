@@ -103,4 +103,3 @@ public abstract class ConversionInstruction extends Instruction
     }
   }
 }
-

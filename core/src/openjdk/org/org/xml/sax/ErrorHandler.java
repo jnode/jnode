@@ -67,7 +67,6 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0.1+ (sax2r3pre1)
  * @see org.xml.sax.XMLReader#setErrorHandler
  * @see org.xml.sax.SAXParseException 
  */

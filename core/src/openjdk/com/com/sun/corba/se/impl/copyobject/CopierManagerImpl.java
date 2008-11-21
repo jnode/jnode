@@ -71,4 +71,3 @@ public class CopierManagerImpl implements CopierManager
 	map.set( id, factory ) ;
     }
 }
-

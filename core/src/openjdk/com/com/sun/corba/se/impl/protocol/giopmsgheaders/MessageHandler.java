@@ -70,4 +70,3 @@ public interface MessageHandler
     // CancelRequest
     void handleInput(CancelRequestMessage header) throws IOException;
 }
-

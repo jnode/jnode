@@ -31,7 +31,8 @@ import java.security.PrivilegedAction;
 import javax.naming.ConfigurationException;
 import javax.naming.NamingException;
 import com.sun.naming.internal.VersionHelper;
-import sun.misc.Service;
+import java.util.ServiceLoader;
+import java.util.ServiceConfigurationError;
 
 /**
  * This class implements the LDAPv3 Extended Request for StartTLS as
@@ -179,17 +180,16 @@ public class StartTlsRequest implements ExtendedRequest {
 
 	StartTlsResponse resp = null;
 
-	Iterator ps = Service.providers(StartTlsResponse.class,
-	    getContextClassLoader());
+        ServiceLoader<StartTlsResponse> sl = ServiceLoader.load(
+                StartTlsResponse.class, getContextClassLoader());
+        Iterator<StartTlsResponse> iter = sl.iterator();
 
-	while (resp == null && privilegedHasNext(ps)) {
-	    resp = (StartTlsResponse)ps.next();
+        while (resp == null && privilegedHasNext(iter)) {
+            resp = iter.next();
 	}
-
 	if (resp != null) {
 	    return resp;
 	}
-
         try {
 	    VersionHelper helper = VersionHelper.getVersionHelper();
 	    Class clas = helper.loadClass(

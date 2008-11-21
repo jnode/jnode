@@ -71,11 +71,24 @@ public abstract class NodeCounter {
   
   private StringBuffer _tempBuffer = new StringBuffer();
     
+    /**
+     * Indicates if this instance of xsl:number has a from pattern.
+     */
+    protected boolean _hasFrom;
+
     protected NodeCounter(Translet translet,
               DOM document, DTMAxisIterator iterator) {
     _translet = translet;
     _document = document;
     _iterator = iterator;
+    }
+
+    protected NodeCounter(Translet translet,
+              DOM document, DTMAxisIterator iterator, boolean hasFrom) {
+        _translet = translet;
+        _document = document;
+        _iterator = iterator;
+        _hasFrom = hasFrom;
     }
 
     /** 
@@ -349,4 +362,3 @@ public abstract class NodeCounter {
     }
 
 }
-

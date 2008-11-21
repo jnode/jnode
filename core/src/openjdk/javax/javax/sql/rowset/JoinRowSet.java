@@ -535,4 +535,3 @@ public interface JoinRowSet extends WebRowSet {
 
         
 }
-

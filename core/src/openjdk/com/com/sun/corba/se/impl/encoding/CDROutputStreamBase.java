@@ -174,4 +174,3 @@ abstract class CDROutputStreamBase extends java.io.OutputStream
 
     public abstract void end_value();
 }
-

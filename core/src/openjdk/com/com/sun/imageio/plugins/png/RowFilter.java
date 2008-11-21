@@ -26,7 +26,6 @@
 package com.sun.imageio.plugins.png;
 
 /**
- * @version 0.5
  */
 public class RowFilter {
 

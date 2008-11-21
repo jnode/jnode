@@ -37,7 +37,6 @@ package javax.net.ssl;
  * exception is thrown.
  *
  * @since 1.4
- * @version 1.21
  * @author David Brownell
  */
 public

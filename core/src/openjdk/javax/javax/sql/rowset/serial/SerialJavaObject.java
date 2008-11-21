@@ -44,7 +44,6 @@ import javax.sql.rowset.RowSetWarning;
  * Static or transient fields cannot be serialized; an attempt to serialize
  * them will result in a <code>SerialException</code> object being thrown.
  *
- * @version 0.1
  * @author Jonathan Bruce
  */
 public class SerialJavaObject implements Serializable, Cloneable {

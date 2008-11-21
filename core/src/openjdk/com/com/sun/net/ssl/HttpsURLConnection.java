@@ -190,4 +190,3 @@ class HttpsURLConnection extends HttpURLConnection
 	return sslSocketFactory;
     }
 }
-

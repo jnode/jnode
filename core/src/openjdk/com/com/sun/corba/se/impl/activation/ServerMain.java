@@ -37,7 +37,6 @@ import com.sun.corba.se.spi.activation.ActivatorHelper ;
 import com.sun.corba.se.impl.orbutil.ORBConstants ;
 
 /**
- * @version     1.8, 99/11/02
  * @author	Ken Cavanaugh 
  * @since       JDK1.2
  */

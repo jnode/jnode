@@ -60,4 +60,3 @@ public abstract class ObjectReferenceProducerBase {
 	return ORBUtility.makeObjectReference( ior ) ;
     }
 }
-

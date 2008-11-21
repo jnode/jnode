@@ -46,7 +46,6 @@ package org.omg.CORBA;
  * <bold>from_int</bold>(int i)</code> --
  * for creating an instance from one of the <code>int</code> members
  * </UL>
- * @version %I, %G
  * @see     org.omg.CORBA.SystemException
  * @since   JDK1.2
  */

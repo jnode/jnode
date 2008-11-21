@@ -41,7 +41,6 @@ import javax.naming.InvalidNameException;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.10 03/12/19
   * @since 1.3
   */
 public class ResolveResult implements java.io.Serializable {

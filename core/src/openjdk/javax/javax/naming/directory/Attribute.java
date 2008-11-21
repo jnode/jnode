@@ -68,7 +68,6 @@ import javax.naming.OperationNotSupportedException;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.19 07/05/05
   *
   * @see BasicAttribute
   * @since 1.3

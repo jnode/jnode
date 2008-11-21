@@ -152,4 +152,3 @@ public interface HTMLTableCellElement extends HTMLElement {
     public void setWidth(String width);
 
 }
-

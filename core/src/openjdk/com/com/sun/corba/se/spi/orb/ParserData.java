@@ -41,4 +41,3 @@ public interface ParserData {
 
     public void addToProperties( Properties props ) ;
 }
-

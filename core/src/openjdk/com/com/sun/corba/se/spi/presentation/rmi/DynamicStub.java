@@ -67,4 +67,3 @@ public interface DynamicStub extends org.omg.CORBA.Object
 
     OutputStream request( String operation, boolean responseExpected ) ;
 }
-

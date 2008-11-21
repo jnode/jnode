@@ -104,6 +104,3 @@ public interface Repository extends java.io.Serializable {
    */
   public void clear();
 }
-
-
-

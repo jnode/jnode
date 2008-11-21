@@ -31,7 +31,6 @@ package org.omg.CORBA;
  * ORB, but is not currently supported.
  *
  * @author rip-dev
- * @version 1.19 05/05/07
  */
 public interface UNSUPPORTED_POLICY {
     /**

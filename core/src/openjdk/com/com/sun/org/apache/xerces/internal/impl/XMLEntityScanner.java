@@ -2140,4 +2140,3 @@ public class XMLEntityScanner implements XMLLocator  {
     
     
 } // class XMLEntityScanner
-

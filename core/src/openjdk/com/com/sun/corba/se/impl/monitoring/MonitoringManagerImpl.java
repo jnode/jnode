@@ -48,8 +48,3 @@ public class MonitoringManagerImpl implements MonitoringManager {
         return rootMonitoredObject;
     }
 }
-        
-    
-
-   
-

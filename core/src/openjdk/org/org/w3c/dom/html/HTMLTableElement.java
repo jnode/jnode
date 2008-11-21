@@ -215,4 +215,3 @@ public interface HTMLTableElement extends HTMLElement {
                           throws DOMException;
 
 }
-

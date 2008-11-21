@@ -89,7 +89,6 @@ package org.ietf.jgss;
  * @see #dispose()
  *
  * @author Mayank Upadhyay
- * @version 1.16, 05/05/07
  * @since 1.4
  */
 public interface GSSCredential extends Cloneable{
@@ -369,4 +368,3 @@ public interface GSSCredential extends Cloneable{
     public int hashCode();
 
 }
-

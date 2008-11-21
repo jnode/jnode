@@ -58,4 +58,3 @@ public class XML11NMTOKENDatatypeValidator extends NMTOKENDatatypeValidator {
    }
 
 } // class XML11NMTOKENDatatypeValidator
-

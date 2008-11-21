@@ -44,7 +44,6 @@ import javax.lang.model.util.Types;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.10 07/05/05
  * @see TypeParameterElement
  * @since 1.6
  */

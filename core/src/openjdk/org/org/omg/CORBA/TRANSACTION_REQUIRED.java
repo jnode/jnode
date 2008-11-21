@@ -35,7 +35,6 @@ package org.omg.CORBA;
  *
  * @see <A href="../../../../technotes/guides/idl/jidlExceptions.html">documentation on
  * Java&nbsp;IDL exceptions</A>
- * @version     1.5 09/09/97
  */
 
 public final class TRANSACTION_REQUIRED extends SystemException {

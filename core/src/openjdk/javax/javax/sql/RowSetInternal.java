@@ -101,8 +101,3 @@ public interface RowSetInternal {
   public ResultSet getOriginalRow() throws SQLException;
 
 }
-
-
-
-
-

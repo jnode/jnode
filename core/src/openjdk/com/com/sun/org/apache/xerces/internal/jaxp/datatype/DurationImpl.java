@@ -98,7 +98,6 @@ import com.sun.org.apache.xerces.internal.util.DatatypeMessageFormatter;
  *  
  * @author <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
  * @author <a href="mailto:Joseph.Fialli@Sun.com">Joseph Fialli</a>
- * @version $Revision: 1.3 $, $Date: 2005/09/07 19:41:13 $    
 
  * @see XMLGregorianCalendar#add(Duration)
  */
@@ -2013,4 +2012,3 @@ class DurationImpl
         return cal.getTime().getTime();
     }
 }
-

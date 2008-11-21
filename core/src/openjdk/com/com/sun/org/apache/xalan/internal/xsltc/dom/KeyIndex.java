@@ -413,13 +413,13 @@ public class KeyIndex extends DTMAxisIteratorBase {
     }
     
     public void setDom(DOM dom, int node) {
-        // If a multi DOM, then select the appropriate dom
+        _dom = dom;
+
+        // If a MultiDOM, ensure _enhancedDOM is correctly set
+        // so that getElementById() works in lookupNodes below
         if (dom instanceof MultiDOM) {
             dom = ((MultiDOM) dom).getDTM(node);
         }
-        
-    	_dom = dom;
-        _enhancedDOM = null;    // reset
         
     	if (dom instanceof DOMEnhancedForDTM) {
     	    _enhancedDOM = (DOMEnhancedForDTM)dom;

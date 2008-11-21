@@ -31,7 +31,6 @@ import com.sun.org.apache.xerces.internal.impl.xs.XSParticleDecl;
  * @xerces.internal 
  *
  * @author Neil Graham, IBM
- * @version $$
  */
 public class XSCMUniOp extends CMNode {
     // -------------------------------------------------------------------
@@ -98,4 +97,3 @@ public class XSCMUniOp extends CMNode {
     // -------------------------------------------------------------------
     private CMNode  fChild;
 } // XSCMUniOp
-

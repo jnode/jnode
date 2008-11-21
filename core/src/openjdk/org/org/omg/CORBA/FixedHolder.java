@@ -44,7 +44,6 @@ import org.omg.CORBA.portable.OutputStream;
  * Before the method invocation returns, the ORB will fill in the contained
  * value corresponding to the "out" value returned from the server.
  *
- * @version     1.14 09/09/97
  */
 public final class FixedHolder implements Streamable {
     /**

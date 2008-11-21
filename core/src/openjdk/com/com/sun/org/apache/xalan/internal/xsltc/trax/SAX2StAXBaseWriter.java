@@ -211,7 +211,6 @@ public abstract class SAX2StAXBaseWriter extends DefaultHandler
 	 * {@link Locator}.
 	 * 
 	 * @author christian
-	 * @version $Revision: 1.2 $
 	 */
 	private static final class SAXLocation implements Location {
 

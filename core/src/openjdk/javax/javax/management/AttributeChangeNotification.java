@@ -144,5 +144,3 @@ public class AttributeChangeNotification extends javax.management.Notification {
     }
       
 }
-
-

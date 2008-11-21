@@ -38,7 +38,6 @@ import java.security.*;
  * @since 1.4
  * @see KeyManagerFactory
  * @see KeyManager
- * @version 1.20
  */
 public abstract class KeyManagerFactorySpi {
     /**

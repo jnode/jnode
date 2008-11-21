@@ -34,5 +34,3 @@ interface OutputBuffer {
     public OutputBuffer append(char[] s, int from, int to);
 
 }
-
-

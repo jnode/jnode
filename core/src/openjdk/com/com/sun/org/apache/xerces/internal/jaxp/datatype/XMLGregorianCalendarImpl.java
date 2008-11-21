@@ -182,7 +182,6 @@ import com.sun.org.apache.xerces.internal.util.DatatypeMessageFormatter;
  * @author <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
  * @author <a href="mailto:Joseph.Fialli@Sun.com">Joseph Fialli</a>
  * @author <a href="mailto:Sunitha.Reddy@Sun.com">Sunitha Reddy</a>
- * @version $Revision: 1.7 $, $Date: 2005/11/03 17:54:07 $
  * @see javax.xml.datatype.Duration
  * @since 1.5
  */
@@ -2942,7 +2941,29 @@ public class XMLGregorianCalendarImpl
             case 's':
                 bufPtr = print2Number(buf,bufPtr,getSecond());
                 if (getFractionalSecond() != null) {
+                    // Note: toPlainString() isn't available before Java 1.5
                     String frac = getFractionalSecond().toString();
+
+                    int pos = frac.indexOf("E-");
+                    if (pos >= 0) {
+                        String zeros = frac.substring(pos+2);
+                        frac = frac.substring(0,pos);
+                        pos = frac.indexOf(".");
+                        if (pos >= 0) {
+                            frac = frac.substring(0,pos) + frac.substring(pos+1);
+                        }
+                        int count = Integer.parseInt(zeros);
+                        if (count < 40) {
+                            frac = "00000000000000000000000000000000000000000".substring(0,count-1) + frac;
+                        } else {
+                            // do it the hard way
+                            while (count > 1) {
+                                frac = "0" + frac;
+                                count--;
+                            }
+                        }
+                        frac = "0." + frac;
+                    }
 
                     // reallocate the buffer now so that it has enough space
                     char[] n = new char[buf.length+frac.length()];
@@ -3027,4 +3048,3 @@ public class XMLGregorianCalendarImpl
         //PENDING : Implementation of reset method
     }
 }
-

@@ -50,7 +50,6 @@ package org.ietf.jgss;
  * @see GSSContext#verifyMIC
  *
  * @author Mayank Upadhyay
- * @version 1.17, 05/05/07
  * @since 1.4
  */
 public class MessageProp {

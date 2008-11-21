@@ -335,4 +335,3 @@ public class XMLContentSpec {
     } // interface Provider
 
 } // class XMLContentSpec
-

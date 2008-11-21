@@ -110,4 +110,3 @@ public interface HTMLLinkElement extends HTMLElement {
     public void setType(String type);
 
 }
-

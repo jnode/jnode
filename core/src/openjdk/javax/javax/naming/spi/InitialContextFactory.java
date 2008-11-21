@@ -42,7 +42,6 @@ import javax.naming.*;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.17 07/05/05
   *
   * @see InitialContextFactoryBuilder
   * @see NamingManager#getInitialContext

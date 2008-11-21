@@ -147,4 +147,3 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         write_short((short)0);
     }
 }
-

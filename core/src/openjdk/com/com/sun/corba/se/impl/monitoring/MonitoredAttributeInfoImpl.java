@@ -57,5 +57,3 @@ public class MonitoredAttributeInfoImpl implements MonitoredAttributeInfo {
          return this.statisticFlag;
     }
 }
-
-    

@@ -31,7 +31,6 @@ package org.omg.CORBA.ORBPackage;
  * for which there is no initial reference.
  *
  * @see org.omg.CORBA.ORB#resolve_initial_references(String)
- * @version 1.6, 03/18/98
  * @since   JDK1.2
  */
 

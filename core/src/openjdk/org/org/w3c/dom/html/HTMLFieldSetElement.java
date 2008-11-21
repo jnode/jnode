@@ -54,4 +54,3 @@ public interface HTMLFieldSetElement extends HTMLElement {
     public HTMLFormElement getForm();
 
 }
-

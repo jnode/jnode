@@ -27,7 +27,6 @@ import com.sun.org.apache.xalan.internal.xsltc.TransletException;
 import com.sun.org.apache.xalan.internal.xsltc.StripFilter;
 import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 import com.sun.org.apache.xalan.internal.xsltc.runtime.BasisLibrary;
-import com.sun.org.apache.xalan.internal.xsltc.runtime.AttributeList;
 
 import com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
 import com.sun.org.apache.xml.internal.dtm.DTMAxisTraverser;
@@ -41,6 +40,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * AdaptiveResultTreeImpl is a adaptive DOM model for result tree fragments (RTF). It is
@@ -94,7 +94,7 @@ public class AdaptiveResultTreeImpl extends SimpleResultTreeImpl
     private boolean _buildIdIndex;
     
     // The AttributeList
-    private final AttributeList  _attributes = new AttributeList();
+    private final AttributesImpl _attributes = new AttributesImpl();
     
     // The element name
     private String _openElementName;
@@ -688,13 +688,14 @@ public class AdaptiveResultTreeImpl extends SimpleResultTreeImpl
         addAttribute(qName, value); 
     }
 
-    public void addAttribute(String name, String value)
+    public void addAttribute(String uri, String localName, String qname,
+            String type, String value)
     {    
 	if (_openElementName != null) {
-	    _attributes.add(name, value);
+            _attributes.addAttribute(uri, localName, qname, type, value);
 	}
 	else {
-	    BasisLibrary.runTimeError(BasisLibrary.STRAY_ATTRIBUTE_ERR, name);
+            BasisLibrary.runTimeError(BasisLibrary.STRAY_ATTRIBUTE_ERR, qname);
 	}
     }
 

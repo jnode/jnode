@@ -1416,7 +1416,8 @@ public abstract class XMLScanner
             return (XMLStringBuffer)stringBufferCache.get(fStringBufferIndex++);
         }else{
             XMLStringBuffer tmpObj = new XMLStringBuffer();
-            stringBufferCache.add(fStringBufferIndex, tmpObj);
+            fStringBufferIndex++;
+            stringBufferCache.add(tmpObj);
             return tmpObj;
         }
     }

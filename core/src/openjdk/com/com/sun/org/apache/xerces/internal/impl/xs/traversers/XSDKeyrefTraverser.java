@@ -103,4 +103,3 @@ class XSDKeyrefTraverser extends XSDAbstractIDConstraintTraverser {
         fAttrChecker.returnAttrArray(attrValues, schemaDoc);
     } // traverse(Element,int,XSDocumentInfo, SchemaGrammar)
 } // XSDKeyrefTraverser
-

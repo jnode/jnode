@@ -88,4 +88,3 @@ public class ByteListImpl implements ByteList {
     }
     
 }
-

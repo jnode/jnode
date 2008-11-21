@@ -263,4 +263,3 @@ class MultipleObjectMap extends ActiveObjectMap
 	entryToKeys.clear() ;
     }
 }
-

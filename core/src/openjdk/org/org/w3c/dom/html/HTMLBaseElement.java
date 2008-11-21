@@ -60,4 +60,3 @@ public interface HTMLBaseElement extends HTMLElement {
     public void setTarget(String target);
 
 }
-

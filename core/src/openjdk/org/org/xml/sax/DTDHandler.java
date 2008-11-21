@@ -69,7 +69,6 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.XMLReader#setDTDHandler
  */
 public interface DTDHandler {

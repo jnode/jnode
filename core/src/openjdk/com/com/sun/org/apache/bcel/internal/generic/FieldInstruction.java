@@ -117,4 +117,3 @@ public abstract class FieldInstruction extends FieldOrMethod
     return getName(cpg);
   }
 }
-

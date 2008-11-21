@@ -92,4 +92,3 @@ public interface HTMLElement extends Element {
     public void setClassName(String className);
 
 }
-

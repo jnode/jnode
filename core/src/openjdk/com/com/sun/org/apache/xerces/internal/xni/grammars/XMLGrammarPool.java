@@ -104,4 +104,3 @@ public interface XMLGrammarPool {
      */
     public void clear();
 } // XMLGrammarPool
-

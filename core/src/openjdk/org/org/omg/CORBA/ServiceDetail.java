@@ -32,7 +32,6 @@ package org.omg.CORBA;
 
  *
  * @author RIP Team
- * @version 1.11 11/15/00
  */
 public final class ServiceDetail implements org.omg.CORBA.portable.IDLEntity
 {

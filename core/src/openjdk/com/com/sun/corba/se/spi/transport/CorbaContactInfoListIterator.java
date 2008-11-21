@@ -42,4 +42,3 @@ public interface CorbaContactInfoListIterator extends ContactInfoListIterator
 }
 
 // End of file.
-

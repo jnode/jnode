@@ -68,4 +68,3 @@ public class GuardedAction {
     public Guard getGuard() { return guard ; }
     public State getNextState() { return nextState ; }
 }
-

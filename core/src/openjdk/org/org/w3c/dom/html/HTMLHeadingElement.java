@@ -55,4 +55,3 @@ public interface HTMLHeadingElement extends HTMLElement {
     public void setAlign(String align);
 
 }
-

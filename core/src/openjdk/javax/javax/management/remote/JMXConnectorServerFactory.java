@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -210,15 +211,15 @@ public class JMXConnectorServerFactory {
                                     Map<String, ?> map,
                                     MBeanServer mbs)
         throws IOException {
-        Iterator providers = JMXConnectorFactory.getProviderIterator(
-            JMXConnectorServerProvider.class, loader);
-        JMXConnectorServerProvider provider = null;
+        Iterator<JMXConnectorServerProvider> providers =
+                JMXConnectorFactory.
+                getProviderIterator(JMXConnectorServerProvider.class, loader);
+
         JMXConnectorServer connection = null;
         IOException exception = null;
         while (providers.hasNext()) {
-            provider = (JMXConnectorServerProvider) providers.next();
             try {
-                connection = provider.newJMXConnectorServer(url, map, mbs);
+                connection = providers.next().newJMXConnectorServer(url, map, mbs);
                 return connection;
             } catch (JMXProviderException e) {
                 throw e;
@@ -296,17 +297,19 @@ public class JMXConnectorServerFactory {
             envcopy = new HashMap<String, Object>(environment);
         }
 
-        final Class targetInterface = JMXConnectorServerProvider.class;
+        final Class<JMXConnectorServerProvider> targetInterface =
+                JMXConnectorServerProvider.class;
         final ClassLoader loader = 
             JMXConnectorFactory.resolveClassLoader(envcopy);
         final String protocol = serviceURL.getProtocol();
         final String providerClassName = "ServerProvider";
         
         JMXConnectorServerProvider provider =
-            (JMXConnectorServerProvider)
-            JMXConnectorFactory.getProvider(serviceURL, envcopy,
+            JMXConnectorFactory.getProvider(serviceURL,
+                                            envcopy,
                                             providerClassName,
-                                            targetInterface, loader);
+                                            targetInterface,
+                                            loader);
 
         IOException exception = null;
         if (provider == null) {
@@ -329,7 +332,7 @@ public class JMXConnectorServerFactory {
                     exception = e;
                 }
             }
-            provider = (JMXConnectorServerProvider)
+            provider =
                 JMXConnectorFactory.getProvider(
                     protocol,
                     PROTOCOL_PROVIDER_DEFAULT_PACKAGE,

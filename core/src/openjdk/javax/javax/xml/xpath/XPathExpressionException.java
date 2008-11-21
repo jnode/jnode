@@ -30,7 +30,6 @@ package javax.xml.xpath;
  *
  * @author  <a href="mailto:Norman.Walsh@Sun.com">Norman Walsh</a>
  * @author  <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.2 $, $Date: 2005/06/10 03:50:44 $
  * @since 1.5
  */
 public class XPathExpressionException extends XPathException {

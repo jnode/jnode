@@ -54,4 +54,3 @@ public interface IDLNameTranslator
      */
     String getIDLName( Method method )  ;
 }
-

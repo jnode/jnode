@@ -75,7 +75,6 @@ import java.util.Arrays;
  *  information.
  *
  * @author Mayank Upadhyay
- * @version 1.16, 05/05/07
  * @since 1.4
  */
 public class ChannelBinding {

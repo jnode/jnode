@@ -55,4 +55,3 @@ public interface HTMLHtmlElement extends HTMLElement {
     public void setVersion(String version);
 
 }
-

@@ -35,7 +35,6 @@ import java.security.cert.*;
  * status checking or other means.
  *
  * @since 1.4
- * @version 1.18
  */
 public interface X509TrustManager extends TrustManager {
     /**

@@ -53,4 +53,3 @@ public interface HTMLTitleElement extends HTMLElement {
     public void setText(String text);
 
 }
-

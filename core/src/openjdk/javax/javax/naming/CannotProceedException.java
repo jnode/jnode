@@ -49,7 +49,6 @@ import java.util.Hashtable;
   *
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.18 07/05/05
   * @since 1.3
   */
 

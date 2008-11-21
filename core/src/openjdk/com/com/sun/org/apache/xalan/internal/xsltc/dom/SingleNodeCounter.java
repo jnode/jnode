@@ -43,6 +43,13 @@ public abstract class SingleNodeCounter extends NodeCounter {
 	super(translet, document, iterator);
     }
 
+    public SingleNodeCounter(Translet translet,
+                             DOM document,
+                             DTMAxisIterator iterator,
+                             boolean hasFrom) {
+        super(translet, document, iterator, hasFrom);
+    }
+
     public NodeCounter setStartNode(int node) {
 	_node = node;
 	_nodeType = _document.getExpandedTypeID(node);
@@ -63,7 +70,9 @@ public abstract class SingleNodeCounter extends NodeCounter {
 	else {
 	    int next = _node;
 	    result = 0;
-	    if (!matchesCount(next)) {
+            boolean matchesCount = matchesCount(next);
+
+            if (!matchesCount) {
 		while ((next = _document.getParent(next)) > END) {
 		    if (matchesCount(next)) {
 			break;		// found target
@@ -76,16 +85,31 @@ public abstract class SingleNodeCounter extends NodeCounter {
 	    }
 
 	    if (next != END) {
+                int from = next;
+
+                if (!matchesCount && _hasFrom) {
+                    // Target found, but need to check if ancestor matches from
+                    while ((from = _document.getParent(from)) > END) {
+                        if (matchesFrom(from)) {
+                            break;          // found from
+                        }
+                    }
+                }
+
+                // Have we found ancestor matching from?
+                if (from != END) {
 		_countSiblings.setStartNode(next);
 		do {
 		    if (matchesCount(next)) result++;
 		} while ((next = _countSiblings.next()) != END);
+
+                    return formatNumbers(result);
 	    }
-	    else {
+            }
+
 		// If no target found then pass the empty list
 		return formatNumbers(EmptyArray);
 	    }
-	}
 	return formatNumbers(result);
     }
 
@@ -132,4 +156,3 @@ public abstract class SingleNodeCounter extends NodeCounter {
 	}
     }
 }
-

@@ -32,7 +32,6 @@ package javax.net.ssl;
  * desired level of security.  The connection is no longer usable.
  *
  * @since 1.4
- * @version 1.17
  * @author David Brownell
  */
 public
@@ -51,4 +50,3 @@ class SSLHandshakeException extends SSLException
         super(reason);
     }
 }
-

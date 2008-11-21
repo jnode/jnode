@@ -54,4 +54,3 @@ public interface HTMLTableCaptionElement extends HTMLElement {
     public void setAlign(String align);
 
 }
-

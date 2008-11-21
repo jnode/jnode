@@ -24,7 +24,6 @@
  */
 
 /**
- * @(#)MaxStreamFormatVersionServiceContext.java	1.15 07/05/05
  */
 package com.sun.corba.se.spi.servicecontext;
 
@@ -81,7 +80,3 @@ public class MaxStreamFormatVersionServiceContext extends ServiceContext {
             + maxStreamFormatVersion + "]";
     }
 }
-    
-
-
-

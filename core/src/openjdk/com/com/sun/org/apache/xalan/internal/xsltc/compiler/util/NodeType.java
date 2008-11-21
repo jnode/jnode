@@ -322,4 +322,3 @@ public final class NodeType extends Type {
 	return new ISTORE(slot);
     }
 }
-

@@ -77,7 +77,6 @@ import java.io.IOException;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0.1+ (sax2r3pre1)
  * @see org.xml.sax.XMLFilter
  * @see org.xml.sax.helpers.ParserAdapter
  * @see org.xml.sax.helpers.XMLReaderAdapter 

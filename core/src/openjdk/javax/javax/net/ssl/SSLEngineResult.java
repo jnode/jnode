@@ -43,7 +43,6 @@ package javax.net.ssl;
  * @see SSLEngine#unwrap(ByteBuffer, ByteBuffer)
  *
  * @author Brad R. Wetmore
- * @version 1.11, 07/05/05
  * @since 1.5
  */
 
@@ -59,7 +58,6 @@ public class SSLEngineResult {
      * should be consulted for that information.
      *
      * @author Brad R. Wetmore
-     * @version 1.11, 07/05/05
      * @since 1.5
      */
     public static enum Status {
@@ -105,7 +103,6 @@ public class SSLEngineResult {
      * handshaking state of this <code>SSLEngine</code>.
      *
      * @author Brad R. Wetmore
-     * @version 1.11, 07/05/05
      * @since 1.5
      */
     public static enum HandshakeStatus {

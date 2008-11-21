@@ -50,7 +50,6 @@ import javax.imageio.stream.ImageInputStream;
 import com.sun.imageio.plugins.common.ReaderUtil;
 
 /**
- * @version 0.5
  */
 public class GIFImageReader extends ImageReader {
 

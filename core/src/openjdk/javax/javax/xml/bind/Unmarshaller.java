@@ -271,7 +271,7 @@ import java.io.Reader;
  *     </tr>
  *     <tr>
  *       <td>scope</td>
- *       <td><code>null</code> <i>(actual scope is unknown)</i></td>
+ *       <td><code>null</code> <i>(actual scope is unknown)</td>
  *     </tr>
  *   </tbody>
  *  </table>
@@ -709,7 +709,7 @@ public interface Unmarshaller {
      * and return the resulting content tree.
      * 
      * <p>
-     * This method implements <a href="#unmarshalByDeclaredType">unmarshal by declaredType</a>.
+     * This method implements <a href="unmarshalByDeclaredType">unmarshal by declaredType</a>.
      * <p>
      * This method assumes that the parser is on a START_DOCUMENT or
      * START_ELEMENT event. Unmarshalling will be done from this 
@@ -779,7 +779,7 @@ public interface Unmarshaller {
      * and return the resulting content tree.
      * 
      * <p>
-     * This method implements <a href="#unmarshalByDeclaredType">unmarshal by declaredType</a>.
+     * This method implements <a href="unmarshalByDeclaredType">unmarshal by declaredType</a>.
      *
      * <p>
      * This method assumes that the parser is on a START_DOCUMENT or

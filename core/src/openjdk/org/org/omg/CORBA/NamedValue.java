@@ -90,7 +90,6 @@ package org.omg.CORBA;
  * @see ARG_INOUT
  * @see ARG_OUT
  *
- * @version 1.12 ,09/09/97
  * @since       JDK1.2
  */
 

@@ -38,7 +38,6 @@ import sun.security.action.GetPropertyAction;
  *
  * @since 1.4
  * @see SSLSocket
- * @version 1.32
  * @author David Brownell
  */
 public abstract class SSLSocketFactory extends SocketFactory
@@ -176,7 +175,7 @@ public abstract class SSLSocketFactory extends SocketFactory
      * @param autoClose close the underlying socket when this socket is closed
      * @return a socket connected to the specified host and port
      * @throws IOException if an I/O error occurs when creating the socket
-     * @throws NullPointerException if the parameter s is null
+     * @throws UnknownHostException if the host is not known
      */
     public abstract Socket createSocket(Socket s, String host,
 					int port, boolean autoClose)

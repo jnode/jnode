@@ -52,7 +52,6 @@ package org.omg.CORBA;
  * method <code>remove</code>.
  *
  * @see Context
- * @version 1.2, 09/09/97
  * @since   JDK1.2
  */
 

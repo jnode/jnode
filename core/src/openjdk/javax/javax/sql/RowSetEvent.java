@@ -60,7 +60,3 @@ public class RowSetEvent extends java.util.EventObject {
    */
   static final long serialVersionUID = -1875450876546332005L;  
 }
-
-
-
-

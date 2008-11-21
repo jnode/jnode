@@ -43,7 +43,6 @@ import java.util.HashSet;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.14 07/05/05
  * @since 1.6
  */
 public enum SourceVersion {
@@ -117,15 +116,7 @@ public enum SourceVersion {
      *
      * No major changes from {@code RELEASE_5}.
      */
-    RELEASE_6,
-
-    /**
-     * The version recognized by the Java Platform, Standard Edition
-     * 7.
-     *
-     * @since 1.7
-     */
-    RELEASE_7;
+    RELEASE_6;
 
     // Note that when adding constants for newer releases, the
     // behavior of latest() and latestSupported() must be updated too.
@@ -136,7 +127,7 @@ public enum SourceVersion {
      * @return the latest source version that can be modeled
      */
     public static SourceVersion latest() {
-	return RELEASE_7;
+        return RELEASE_6;
     }
 
     private static final SourceVersion latestSupported = getLatestSupported();
@@ -144,9 +135,7 @@ public enum SourceVersion {
     private static SourceVersion getLatestSupported() {
 	try {
 	    String specVersion = System.getProperty("java.specification.version");
-	    if ("1.7".equals(specVersion))
-		return RELEASE_7;
-	    else if ("1.6".equals(specVersion))
+            if ("1.6".equals(specVersion))
 		return RELEASE_6;
 	} catch (SecurityException se) {}
 	

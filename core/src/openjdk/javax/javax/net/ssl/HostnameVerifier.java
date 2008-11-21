@@ -40,7 +40,6 @@ package javax.net.ssl;
  * verification fail.
  *
  * @author Brad R. Wetmore
- * @version 1.10, 05/05/07
  * @since 1.4
  */
 

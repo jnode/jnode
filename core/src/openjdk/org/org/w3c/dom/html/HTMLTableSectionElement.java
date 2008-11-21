@@ -111,4 +111,3 @@ public interface HTMLTableSectionElement extends HTMLElement {
                           throws DOMException;
 
 }
-

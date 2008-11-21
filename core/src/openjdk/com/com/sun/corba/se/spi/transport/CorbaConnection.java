@@ -166,4 +166,3 @@ public interface CorbaConnection
 }
 
 // End of file.
-

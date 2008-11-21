@@ -172,7 +172,6 @@ import java.util.GregorianCalendar;
  * @author <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
  * @author <a href="mailto:Sunitha.Reddy@Sun.com">Sunitha Reddy</a>
- * @version $Revision: 1.7 $, $Date: 2006/01/12 18:53:55 $    
  * @see Duration
  * @see DatatypeFactory
  * @since 1.5

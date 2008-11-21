@@ -421,4 +421,3 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
     }
     
 } // XMLSchemaValidatorComponentManager
- 

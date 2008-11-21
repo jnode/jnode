@@ -30,7 +30,6 @@ package org.omg.CORBA;
 * written custom marshalling code for custom value types.
 * @see org.omg.CORBA.DataInputStream
 * @see org.omg.CORBA.CustomMarshal
-* @version 1.19 05/05/07
 */
 public interface DataOutputStream extends org.omg.CORBA.portable.ValueBase
 {

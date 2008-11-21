@@ -159,7 +159,6 @@ import javax.naming.*;
  * @author Rosanna Lee
  * @author Scott Seligman
  * @author R. Vasudevan
- * @version 1.19 07/05/05
  *
  * @see javax.naming.Context
  * @since 1.3

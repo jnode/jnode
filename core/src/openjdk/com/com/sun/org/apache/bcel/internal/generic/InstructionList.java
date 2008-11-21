@@ -1288,4 +1288,3 @@ public class InstructionList implements Serializable {
 	((InstructionListObserver)e.next()).notify(this);
   }
 }
-

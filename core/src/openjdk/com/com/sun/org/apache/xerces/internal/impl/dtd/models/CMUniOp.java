@@ -142,4 +142,3 @@ public class CMUniOp extends CMNode
     // -------------------------------------------------------------------
     private CMNode  fChild;
 };
-

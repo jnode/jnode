@@ -63,4 +63,3 @@ public class StringPair {
 	return second ;
     }
 }
-

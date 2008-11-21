@@ -96,7 +96,6 @@ package org.omg.CORBA;
  * A <code>Context</code> object may be named for purposes of specifying
  * a starting search scope.
  *
- * @version 1.11, 09/09/97
  * @since   JDK1.2
  */
 
@@ -243,4 +242,3 @@ public abstract class Context {
     abstract public NVList get_values(String start_scope, int op_flags,
 				      String pattern);
 };
-

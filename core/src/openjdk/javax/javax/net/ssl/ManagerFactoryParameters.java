@@ -39,7 +39,6 @@ package javax.net.ssl;
  * needed information.
  *
  * @author Brad R. Wetmore
- * @version 1.9, 05/05/07
  * @since 1.4
  */
 

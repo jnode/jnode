@@ -42,7 +42,6 @@ package com.sun.corba.se.impl.io;
  * The count field contains the number of bytes available to read.
  *
  * @author  unascribed
- * @version 1.7, 11/02/98
  * @since   JDK1.1
  */
 public class OptionalDataException extends java.io.IOException {

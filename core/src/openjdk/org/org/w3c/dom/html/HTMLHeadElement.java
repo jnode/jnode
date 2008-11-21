@@ -54,4 +54,3 @@ public interface HTMLHeadElement extends HTMLElement {
     public void setProfile(String profile);
 
 }
-

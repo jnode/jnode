@@ -49,4 +49,3 @@ public class NormalParserAction extends ParserActionBase {
 	    return null ;
     }
 }
-

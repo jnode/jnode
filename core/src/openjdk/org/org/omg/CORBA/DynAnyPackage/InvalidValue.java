@@ -27,7 +27,6 @@ package org.omg.CORBA.DynAnyPackage;
 
 /**
  * @author unattributed
- * @version 1.20 05/05/07
  *
  * Dynamic Any insert operations raise the <code>InvalidValue</code>
  * exception if the value inserted is not consistent with the type

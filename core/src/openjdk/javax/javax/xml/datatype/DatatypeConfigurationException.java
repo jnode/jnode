@@ -29,7 +29,6 @@ package javax.xml.datatype;
  * <p>Indicates a serious configuration error.</p>
  *
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.3 $, $Date: 2005/09/14 21:57:16 $
  * @since 1.5
  */
 

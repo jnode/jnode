@@ -146,4 +146,3 @@ final class TransletOutput extends Instruction {
 	il.append(methodGen.storeHandler());
     }
 }
-

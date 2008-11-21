@@ -32,7 +32,6 @@ package org.omg.CORBA.TypeCodePackage;
  * raise <code>Bounds</code> when the index parameter is greater than or equal
  * to the number of members constituting the type.
  *
- * @version 1.7, 03/18/98
  * @since   JDK1.2
  */
 

@@ -97,8 +97,3 @@ public interface DataSource  extends CommonDataSource,Wrapper {
     throws SQLException;
 
 }
-
-
-
-
-

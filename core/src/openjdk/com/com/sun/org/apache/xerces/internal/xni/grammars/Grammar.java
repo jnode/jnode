@@ -54,4 +54,3 @@ public interface Grammar {
      */
     public XMLGrammarDescription getGrammarDescription ();
 } // interface Grammar
-

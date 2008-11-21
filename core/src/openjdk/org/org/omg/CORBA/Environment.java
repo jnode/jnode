@@ -31,7 +31,6 @@ package org.omg.CORBA;
  * <code>Environment</code> object is created with the <code>ORB</code>
  * method <code>create_environment</code>.
  *
- * @version 1.11, 09/09/97
  * @since   JDK1.2
  */
 

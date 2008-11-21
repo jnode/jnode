@@ -47,7 +47,6 @@ import org.omg.CORBA.portable.OutputStream;
  * the value stored in its <code>value</code> field can be accessed with
  * <code>myIntHolder.value</code>.
  *
- * @version	1.14, 09/09/97
  * @since       JDK1.2
  */
 public final class IntHolder implements Streamable {

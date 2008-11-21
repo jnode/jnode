@@ -106,7 +106,7 @@ class SecuritySupport  {
                     if (cl == null) {
                         url = ClassLoader.getSystemResource(name);
                     } else {
-                        url = cl.getSystemResource(name);
+                        url = cl.getResource(name);
                     }
                     return url;
                 }
@@ -124,7 +124,7 @@ class SecuritySupport  {
                     if (cl == null) {
                         enumeration = ClassLoader.getSystemResources(name);
                     } else {
-                        enumeration = cl.getSystemResources(name);
+                        enumeration = cl.getResources(name);
                     }
                     return enumeration;
                 }

@@ -43,4 +43,3 @@ public interface TOA extends ObjectAdapter {
     */
     void disconnect( org.omg.CORBA.Object obj ) ;
 }
-

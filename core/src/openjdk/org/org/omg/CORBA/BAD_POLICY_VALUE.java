@@ -30,7 +30,6 @@ package org.omg.CORBA;
 * incorrect for a valid policy type in a call to the
 * <code>create_policy</code> method defined in the ORB class.
 *
-* @version 1.19 05/05/07
 */
 public interface BAD_POLICY_VALUE {
     /** 

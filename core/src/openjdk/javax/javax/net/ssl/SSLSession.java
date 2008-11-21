@@ -61,7 +61,6 @@ import java.security.Principal;
  * be done implicitly, when faced with certain kinds of errors.
  *
  * @since 1.4
- * @version 1.41
  * @author David Brownell
  */
 public interface SSLSession {

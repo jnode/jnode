@@ -68,4 +68,3 @@ package com.sun.org.apache.bcel.internal.generic;
  * @see JSR
  */
 public interface UnconditionalBranch {}
-

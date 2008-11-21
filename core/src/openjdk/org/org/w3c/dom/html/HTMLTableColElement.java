@@ -89,4 +89,3 @@ public interface HTMLTableColElement extends HTMLElement {
     public void setWidth(String width);
 
 }
-

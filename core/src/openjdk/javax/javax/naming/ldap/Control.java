@@ -45,7 +45,6 @@ package javax.naming.ldap;
   * @author Rosanna Lee
   * @author Scott Seligman
   * @author Vincent Ryan
-  * @version 1.15 07/05/05
   *
   * @see ControlFactory
   * @since 1.3

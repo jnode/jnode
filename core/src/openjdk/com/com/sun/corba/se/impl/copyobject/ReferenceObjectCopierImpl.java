@@ -34,4 +34,3 @@ public class ReferenceObjectCopierImpl implements ObjectCopier
 	return obj ;
     }
 }
-

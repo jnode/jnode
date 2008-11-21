@@ -152,4 +152,3 @@ public final class BranchHandle extends InstructionHandle {
     bi = (BranchInstruction)i;
   }
 }
-

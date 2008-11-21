@@ -36,4 +36,3 @@ public class MonitoredObjectFactoryImpl implements MonitoredObjectFactory {
         return new MonitoredObjectImpl( name, description );
     }
 }
-

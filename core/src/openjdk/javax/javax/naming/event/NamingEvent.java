@@ -65,7 +65,6 @@ import javax.naming.Binding;
   * 
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.17 07/05/05
   *
   * @see NamingListener
   * @see EventContext

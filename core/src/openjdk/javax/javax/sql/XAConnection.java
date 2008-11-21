@@ -59,8 +59,3 @@ public interface XAConnection extends PooledConnection {
   javax.transaction.xa.XAResource getXAResource() throws SQLException;
 
  } 
-
-
-
-
-

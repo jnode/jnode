@@ -35,9 +35,7 @@ package org.omg.CORBA.portable;
  * StreamableValue or CustomValue interface.
  *
  * @author OMG
- * @version 1.19 05/05/07
  */
 public interface StreamableValue extends Streamable, ValueBase {
 
 }
-

@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
  *
  * @author <a href="mailto:Norman.Walsh@Sun.COM">Norman Walsh</a>
  * @author <a href="mailto:Jeff.Suttor@Sun.COM">Jeff Suttor</a>
- * @version $Revision: 1.2 $, $Date: 2005/06/10 03:50:44 $
  * @see <a href="http://www.w3.org/TR/xpath">XML Path Language (XPath) Version 1.0</a>
  * @since 1.5
  */

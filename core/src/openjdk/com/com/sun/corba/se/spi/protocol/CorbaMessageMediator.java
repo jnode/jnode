@@ -144,4 +144,3 @@ public interface CorbaMessageMediator
 }
 
 // End of file.
-

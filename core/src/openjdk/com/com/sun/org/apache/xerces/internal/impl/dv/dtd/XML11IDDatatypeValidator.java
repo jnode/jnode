@@ -85,4 +85,3 @@ public class XML11IDDatatypeValidator extends IDDatatypeValidator {
     }
     
 }
-
