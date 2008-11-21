@@ -29,7 +29,6 @@ package java.lang;
  * Thrown if an application tries to create an array with negative size.
  *
  * @author  unascribed
- * @version 1.26, 05/05/07
  * @since   JDK1.0
  */
 public

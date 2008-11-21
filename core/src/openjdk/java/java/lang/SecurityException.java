@@ -28,7 +28,6 @@ package java.lang;
  * Thrown by the security manager to indicate a security violation. 
  *
  * @author  unascribed
- * @version 1.23, 05/05/07
  * @see     java.lang.SecurityManager
  * @since   JDK1.0
  */

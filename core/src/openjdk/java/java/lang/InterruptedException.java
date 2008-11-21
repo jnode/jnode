@@ -38,7 +38,6 @@ package java.lang;
  * </pre>
  *
  * @author  Frank Yellin
- * @version 1.23, 05/05/07
  * @see     java.lang.Object#wait()
  * @see     java.lang.Object#wait(long)
  * @see     java.lang.Object#wait(long, int)

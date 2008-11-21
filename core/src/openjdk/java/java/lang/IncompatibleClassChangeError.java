@@ -31,7 +31,6 @@ package java.lang;
  * executing method depends, has since changed. 
  *
  * @author  unascribed
- * @version 1.25, 05/05/07
  * @since   JDK1.0
  */
 public

@@ -32,7 +32,6 @@ package java.lang;
  * <code>Thread</code>. 
  *
  * @author  unascribed
- * @version 1.28, 05/05/07
  * @see     java.lang.Thread#resume()
  * @see     java.lang.Thread#suspend()
  * @since   JDK1.0

@@ -31,7 +31,6 @@ package java.lang;
  * be interpreted as a class file. 
  *
  * @author  unascribed
- * @version 1.27, 05/05/07
  * @since   JDK1.0
  */
 public

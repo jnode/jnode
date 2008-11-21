@@ -36,7 +36,6 @@ import java.util.Arrays;
  * sequence can be changed through certain method calls.
  *
  * @author	Michael McCloskey
- * @version 	1.22, 05/05/07
  * @since	1.5
  */
 abstract class AbstractStringBuilder implements Appendable, CharSequence {

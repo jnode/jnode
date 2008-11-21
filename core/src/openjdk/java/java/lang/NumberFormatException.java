@@ -31,7 +31,6 @@ package java.lang;
  * have the appropriate format. 
  *
  * @author  unascribed
- * @version 1.27, 05/05/07
  * @see     java.lang.Integer#toString()
  * @since   JDK1.0
  */

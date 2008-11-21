@@ -39,7 +39,6 @@ package java.lang;
  * as the aforementioned "legacy method."
  *
  * @author  Frank Yellin
- * @version 1.24, 05/05/07
  * @since   JDK1.1
  */
 public class ExceptionInInitializerError extends LinkageError {

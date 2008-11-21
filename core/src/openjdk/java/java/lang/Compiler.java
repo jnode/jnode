@@ -42,7 +42,6 @@ package java.lang;
  * <p> If no compiler is available, these methods do nothing.
  *
  * @author  Frank Yellin
- * @version 1.29, 05/05/07
  * @since   JDK1.0
  */
 public final class Compiler  {

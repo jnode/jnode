@@ -39,7 +39,6 @@ package java.lang;
  * errors are abnormal conditions that should never occur. 
  *
  * @author  Frank Yellin
- * @version 1.23, 05/05/07
  * @see     java.lang.ThreadDeath
  * @since   JDK1.0
  */

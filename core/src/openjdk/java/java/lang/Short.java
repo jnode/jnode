@@ -37,7 +37,6 @@ package java.lang;
  *
  * @author  Nakul Saraiya
  * @author  Joseph D. Darcy
- * @version 1.53, 05/05/07
  * @see     java.lang.Number
  * @since   JDK1.1
  */
@@ -80,10 +79,8 @@ public final class Short extends Number implements Comparable<Short> {
      * determined by whether {@link java.lang.Character#digit(char,
      * int)} returns a nonnegative value) except that the first
      * character may be an ASCII minus sign {@code '-'}
-     * (<code>'&#92;u002D'</code>) to indicate a negative value or an
-     * ASCII plus sign {@code '+'} (<code>'&#92;u002B'</code>) to
-     * indicate a positive value.  The resulting {@code short} value
-     * is returned.
+     * (<code>'&#92;u002D'</code>) to indicate a negative value.  The
+     * resulting {@code short} value is returned.
      * 
      * <p>An exception of type {@code NumberFormatException} is
      * thrown if any of the following situations occurs:
@@ -97,8 +94,7 @@ public final class Short extends Number implements Comparable<Short> {
      *
      * <li> Any character of the string is not a digit of the
      * specified radix, except that the first character may be a minus
-     * sign {@code '-'} (<code>'&#92;u002D'</code>) or plus sign
-     * {@code '+'} (<code>'&#92;u002B'</code>) provided that the
+     * sign {@code '-'} (<code>'&#92;u002D'</code>) provided that the
      * string is longer than length 1.
      *
      * <li> The value represented by the string is not a value of type
@@ -127,11 +123,10 @@ public final class Short extends Number implements Comparable<Short> {
      * short}. The characters in the string must all be decimal
      * digits, except that the first character may be an ASCII minus
      * sign {@code '-'} (<code>'&#92;u002D'</code>) to indicate a
-     * negative value or an ASCII plus sign {@code '+'}
-     * (<code>'&#92;u002B'</code>) to indicate a positive value.  The
-     * resulting {@code short} value is returned, exactly as if the
-     * argument and the radix 10 were given as arguments to the {@link
-     * #parseShort(java.lang.String, int)} method.
+     * negative value.  The resulting {@code short} value is returned,
+     * exactly as if the argument and the radix 10 were given as
+     * arguments to the {@link #parseShort(java.lang.String, int)}
+     * method.
      *
      * @param s	a {@code String} containing the {@code short}
      *          representation to be parsed
@@ -249,7 +244,6 @@ public final class Short extends Number implements Comparable<Short> {
      * <p>
      * <dt><i>Sign:</i>
      * <dd>{@code -}
-     * <dd>{@code +}
      * </dl>
      * </blockquote>
      *
@@ -258,7 +252,7 @@ public final class Short extends Number implements Comparable<Short> {
      * of the <a href="http://java.sun.com/docs/books/jls/html/">Java 
      * Language Specification</a>.
      * 
-     * <p>The sequence of characters following an optional
+     * <p>The sequence of characters following an (optional) negative
      * sign and/or radix specifier ("{@code 0x}", "{@code 0X}",
      * "{@code #}", or leading zero) is parsed as by the {@code
      * Short.parseShort} method with the indicated radix (10, 16, or

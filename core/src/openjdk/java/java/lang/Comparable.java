@@ -90,7 +90,6 @@ import java.util.*;
  * @param <T> the type of objects that this object may be compared to
  *
  * @author  Josh Bloch
- * @version 1.32, 05/05/07
  * @see java.util.Comparator
  * @since 1.2
  */

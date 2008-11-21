@@ -33,7 +33,6 @@ package java.lang;
  * the specified class, field, method or constructor.
  *
  * @author  unascribed
- * @version 1.21, 05/05/07
  * @see     Class#newInstance()
  * @see     java.lang.reflect.Field#set(Object, Object)
  * @see     java.lang.reflect.Field#setBoolean(Object, boolean)

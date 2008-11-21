@@ -34,7 +34,6 @@ package java.lang;
  * incompatibly changed. 
  *
  * @author  unascribed
- * @version 1.23, 05/05/07
  * @since   JDK1.0
  */
 public class IllegalAccessError extends IncompatibleClassChangeError {

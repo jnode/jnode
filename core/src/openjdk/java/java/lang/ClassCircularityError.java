@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-1997 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,22 +29,22 @@ package java.lang;
  * Thrown when a circularity has been detected while initializing a class.
  *
  * @author     unascribed
- * @version    1.22, 05/05/07
  * @since      JDK1.0
  */
 public class ClassCircularityError extends LinkageError {
     /**
-     * Constructs a <code>ClassCircularityError</code> with no detail  message.
+     * Constructs a {@code ClassCircularityError} with no detail message.
      */
     public ClassCircularityError() {
 	super();
     }
 
     /**
-     * Constructs a <code>ClassCircularityError</code> with the 
-     * specified detail message. 
+     * Constructs a {@code ClassCircularityError} with the specified detail
+     * message.
      *
-     * @param      s   the detail message.
+     * @param  s
+     *         The detail message
      */
     public ClassCircularityError(String s) {
 	super(s);

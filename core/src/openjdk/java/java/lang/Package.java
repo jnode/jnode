@@ -52,10 +52,10 @@ import sun.net.www.ParseUtil;
 import java.lang.annotation.Annotation;
 
 /**
- * <code>Package</code> objects contain version information
+ * {@code Package} objects contain version information
  * about the implementation and specification of a Java package.
  * This versioning information is retrieved and made available
- * by the {@link ClassLoader <code>ClassLoader</code>} instance that
+ * by the {@link ClassLoader} instance that
  * loaded the class(es).  Typically, it is stored in the manifest that is
  * distributed with the classes.
  *
@@ -63,8 +63,9 @@ import java.lang.annotation.Annotation;
  * particular specification and if so the specification title, version number,
  * and vendor strings identify that specification.
  * An application can ask if the package is
- * compatible with a particular version, see the {@link #isCompatibleWith
- * <code>isCompatibleWith</code>} method for details.
+ * compatible with a particular version, see the {@link
+ * #isCompatibleWith isCompatibleWith}
+ * method for details.
  *
  * <p>Specification version numbers use a syntax that consists of nonnegative
  * decimal integers separated by periods ".", for example "2.0" or
@@ -77,15 +78,15 @@ import java.lang.annotation.Annotation;
  * <dd>Digits RefinedVersion<sub>opt</sub></i>
 
  * <p><dt><i>RefinedVersion:</i>
- * <dd><code>.</code> <i>Digits</i>
- * <dd><code>.</code> <i>Digits RefinedVersion</i>
+ * <dd>{@code .} <i>Digits</i>
+ * <dd>{@code .} <i>Digits RefinedVersion</i>
  *
  * <p><dt><i>Digits:
  * <dd>Digit
  * <dd>Digits</i>
  *
  * <p><dt><i>Digit:</i>
- * <dd>any character for which {@link Character#isDigit} returns <code>true</code>,
+ * <dd>any character for which {@link Character#isDigit} returns {@code true},
  * e.g. 0, 1, 2, ...
  * </dl>
  * </blockquote>
@@ -97,7 +98,7 @@ import java.lang.annotation.Annotation;
  * implementation version strings have no specified syntax and should
  * only be compared for equality with desired version identifiers.
  *
- * <p>Within each <code>ClassLoader</code> instance all classes from the same
+ * <p>Within each {@code ClassLoader} instance all classes from the same
  * java package have the same Package object.  The static methods allow a package
  * to be found by name or the set of all packages known to the current class
  * loader to be found.
@@ -111,7 +112,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
      * @return  The fully-qualified name of this package as defined in the
      *          <em>Java Language Specification, Third Edition</em>
      *          <a href="http://java.sun.com/docs/books/jls/third_edition/html/names.html#6.5.3">
-     *          &sect;6.5.3</a>, for example, <tt>java.lang</tt>
+     *          &sect;6.5.3</a>, for example, {@code java.lang}
      */
     public String getName() {
 	return pkgName;
@@ -257,11 +258,11 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * Find a package by name in the callers <code>ClassLoader</code> instance.
-     * The callers <code>ClassLoader</code> instance is used to find the package
+     * Find a package by name in the callers {@code ClassLoader} instance.
+     * The callers {@code ClassLoader} instance is used to find the package
      * instance corresponding to the named class. If the callers
-     * <code>ClassLoader</code> instance is null then the set of packages loaded
-     * by the system <code>ClassLoader</code> instance is searched to find the
+     * {@code ClassLoader} instance is null then the set of packages loaded
+     * by the system {@code ClassLoader} instance is searched to find the
      * named package. <p>
      *
      * Packages have attributes for versions and specifications only if the class
@@ -282,15 +283,15 @@ public class Package implements java.lang.reflect.AnnotatedElement {
     }
 
     /**
-     * Get all the packages currently known for the caller's <code>ClassLoader</code>
+     * Get all the packages currently known for the caller's {@code ClassLoader}
      * instance.  Those packages correspond to classes loaded via or accessible by
-     * name to that <code>ClassLoader</code> instance.  If the caller's
-     * <code>ClassLoader</code> instance is the bootstrap <code>ClassLoader</code>
-     * instance, which may be represented by <code>null</code> in some implementations,
+     * name to that {@code ClassLoader} instance.  If the caller's
+     * {@code ClassLoader} instance is the bootstrap {@code ClassLoader}
+     * instance, which may be represented by {@code null} in some implementations,
      * only packages corresponding to classes loaded by the bootstrap
-     * <code>ClassLoader</code> instance will be returned.
+     * {@code ClassLoader} instance will be returned.
      *
-     * @return a new array of packages known to the callers <code>ClassLoader</code>
+     * @return a new array of packages known to the callers {@code ClassLoader}
      * instance.  An zero length array is returned if none are known.
      */
     public static Package[] getPackages() {
@@ -307,7 +308,7 @@ public class Package implements java.lang.reflect.AnnotatedElement {
      * The class's class loader is used to find the package instance
      * corresponding to the specified class. If the class loader
      * is the bootstrap class loader, which may be represented by
-     * <code>null</code> in some implementations, then the set of packages
+     * {@code null} in some implementations, then the set of packages
      * loaded by the bootstrap class loader is searched to find the package.
      * <p>
      * Packages have attributes for versions and specifications only

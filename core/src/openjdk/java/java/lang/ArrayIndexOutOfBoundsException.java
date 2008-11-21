@@ -31,7 +31,6 @@ package java.lang;
  * equal to the size of the array. 
  *
  * @author  unascribed
- * @version 1.28, 05/05/07
  * @since   JDK1.0
  */
 public

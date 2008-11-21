@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-1997 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,27 +26,23 @@
 package java.lang;
 
 /**
- * An instance of <code>ThreadDeath</code> is thrown in the victim 
- * thread when the <code>stop</code> method with zero arguments in 
- * class <code>Thread</code> is called. 
- * <p>
- * An application should catch instances of this class only if it 
- * must clean up after being terminated asynchronously. If 
- * <code>ThreadDeath</code> is caught by a method, it is important 
- * that it be rethrown so that the thread actually dies. 
- * <p>
- * The top-level error handler does not print out a message if 
- * <code>ThreadDeath</code> is never caught. 
- * <p>
- * The class <code>ThreadDeath</code> is specifically a subclass of 
- * <code>Error</code> rather than <code>Exception</code>, even though 
- * it is a "normal occurrence", because many applications 
- * catch all occurrences of <code>Exception</code> and then discard 
- * the exception. 
+ * An instance of {@code ThreadDeath} is thrown in the victim thread
+ * when the (deprecated) {@link Thread#stop()} method is invoked.
  *
- * @author unascribed
- * @version 1.22, 05/05/07
- * @see     java.lang.Thread#stop()
+ * <p>An application should catch instances of this class only if it
+ * must clean up after being terminated asynchronously. If 
+ * {@code ThreadDeath} is caught by a method, it is important that it
+ * be rethrown so that the thread actually dies.
+ *
+ * <p>The {@linkplain ThreadGroup#uncaughtException top-level error
+ * handler} does not print out a message if {@code ThreadDeath} is
+ * never caught.
+ *
+ * <p>The class {@code ThreadDeath} is specifically a subclass of
+ * {@code Error} rather than {@code Exception}, even though it is a
+ * "normal occurrence", because many applications catch all
+ * occurrences of {@code Exception} and then discard the exception.
+ *
  * @since   JDK1.0
  */
 

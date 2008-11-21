@@ -30,7 +30,6 @@ package java.lang;
  * the Java Virtual Machine. 
  *
  * @author  unascribed
- * @version 1.28, 05/05/07
  * @since   JDK1.0
  */
 public

@@ -34,7 +34,6 @@ import java.lang.annotation.*;
  * deprecated program element is used or overridden in non-deprecated code.
  *
  * @author  Neal Gafter
- * @version 1.11, 05/05/07
  * @since 1.5
  */
 @Documented

@@ -31,7 +31,6 @@ package java.lang;
  * or security problem. 
  *
  * @author  unascribed
- * @version 1.20, 05/05/07
  * @since   JDK1.0
  */
 public

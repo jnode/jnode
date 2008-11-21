@@ -35,7 +35,6 @@ package java.lang;
  * </pre></blockquote>
  *
  * @author  unascribed
- * @version 1.18, 05/05/07
  * @since   JDK1.0
  */
 public
@@ -57,4 +56,3 @@ class ArrayStoreException extends RuntimeException {
 	super(s);
     }
 }
-

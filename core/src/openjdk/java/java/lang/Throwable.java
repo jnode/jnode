@@ -142,7 +142,6 @@ import  java.io.*;
  * @author  unascribed
  * @author  Josh Bloch (Added exception chaining and programmatic access to
  *          stack trace in 1.4.)
- * @version 1.62, 05/05/07
  * @since JDK1.0
  */
 public class Throwable implements Serializable {
@@ -196,7 +195,6 @@ public class Throwable implements Serializable {
      * the stack trace data in the newly created throwable.
      */
     public Throwable() {
-        
         fillInStackTrace();
     }
 
@@ -598,7 +596,7 @@ public class Throwable implements Serializable {
      * @since  1.4
      */
     public StackTraceElement[] getStackTrace() {
-        return (StackTraceElement[]) getOurStackTrace().clone();
+        return getOurStackTrace().clone();
     }
 
     private synchronized StackTraceElement[] getOurStackTrace() {
@@ -636,8 +634,7 @@ public class Throwable implements Serializable {
      * @since  1.4
      */
     public void setStackTrace(StackTraceElement[] stackTrace) {
-        StackTraceElement[] defensiveCopy =
-            (StackTraceElement[]) stackTrace.clone();
+        StackTraceElement[] defensiveCopy = stackTrace.clone();
         for (int i = 0; i < defensiveCopy.length; i++)
             if (defensiveCopy[i] == null)
                 throw new NullPointerException("stackTrace[" + i + "]");

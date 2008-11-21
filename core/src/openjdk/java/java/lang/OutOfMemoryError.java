@@ -31,7 +31,6 @@ package java.lang;
  * available by the garbage collector. 
  *
  * @author  unascribed
- * @version 1.28, 05/05/07
  * @since   JDK1.0
  */
 public

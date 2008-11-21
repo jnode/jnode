@@ -29,7 +29,6 @@ package java.lang;
  * Thrown when a particular method cannot be found.
  *
  * @author     unascribed
- * @version    1.20, 05/05/07
  * @since      JDK1.0
  */
 public

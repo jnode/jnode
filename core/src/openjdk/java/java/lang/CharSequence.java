@@ -45,7 +45,6 @@ package java.lang;
  * a map. </p>
  *
  * @author Mike McCloskey
- * @version 1.15 07/05/05
  * @since 1.4
  * @spec JSR-51
  */

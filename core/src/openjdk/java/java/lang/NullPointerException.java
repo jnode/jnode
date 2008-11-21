@@ -42,7 +42,6 @@ package java.lang;
  * other illegal uses of the <code>null</code> object. 
  *
  * @author  unascribed
- * @version 1.26, 05/05/07
  * @since   JDK1.0
  */
 public

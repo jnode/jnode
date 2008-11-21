@@ -81,7 +81,6 @@ import java.util.Random;
  * 
  * @author  unascribed
  * @author  Joseph D. Darcy
- * @version 1.79, 05/05/07
  * @since   JDK1.0
  */
 
@@ -719,13 +718,12 @@ public final class Math {
      * If the argument is negative, the negation of the argument is returned. 
      * 
      * <p>Note that if the argument is equal to the value of
-     * {@code Integer.MIN_VALUE}, the most negative representable
+     * {@link Integer#MIN_VALUE}, the most negative representable
      * {@code int} value, the result is that same value, which is
      * negative.
      *
      * @param   a   the argument whose absolute value is to be determined
      * @return  the absolute value of the argument.
-     * @see     java.lang.Integer#MIN_VALUE
      */
     public static int abs(int a) {
 	return (a < 0) ? -a : a;
@@ -737,13 +735,12 @@ public final class Math {
      * If the argument is negative, the negation of the argument is returned. 
      * 
      * <p>Note that if the argument is equal to the value of
-     * {@code Long.MIN_VALUE}, the most negative representable
+     * {@link Long#MIN_VALUE}, the most negative representable
      * {@code long} value, the result is that same value, which
      * is negative.
      *
      * @param   a   the argument whose absolute value is to be determined
      * @return  the absolute value of the argument.
-     * @see     java.lang.Long#MIN_VALUE
      */
     public static long abs(long a) {
 	return (a < 0) ? -a : a;
@@ -790,13 +787,12 @@ public final class Math {
     /**
      * Returns the greater of two {@code int} values. That is, the 
      * result is the argument closer to the value of 
-     * {@code Integer.MAX_VALUE}. If the arguments have the same value, 
+     * {@link Integer#MAX_VALUE}. If the arguments have the same value,
      * the result is that same value.
      *
      * @param   a   an argument.
      * @param   b   another argument.
      * @return  the larger of {@code a} and {@code b}.
-     * @see     java.lang.Long#MAX_VALUE
      */
     public static int max(int a, int b) {
 	return (a >= b) ? a : b;
@@ -805,13 +801,12 @@ public final class Math {
     /**
      * Returns the greater of two {@code long} values. That is, the 
      * result is the argument closer to the value of 
-     * {@code Long.MAX_VALUE}. If the arguments have the same value, 
+     * {@link Long#MAX_VALUE}. If the arguments have the same value,
      * the result is that same value. 
      *
      * @param   a   an argument.
      * @param   b   another argument.
      * @return  the larger of {@code a} and {@code b}.
-     * @see     java.lang.Long#MAX_VALUE
      */
     public static long max(long a, long b) {
 	return (a >= b) ? a : b;
@@ -869,13 +864,12 @@ public final class Math {
     /**
      * Returns the smaller of two {@code int} values. That is,
      * the result the argument closer to the value of
-     * {@code Integer.MIN_VALUE}.  If the arguments have the same
+     * {@link Integer#MIN_VALUE}.  If the arguments have the same
      * value, the result is that same value.
      *
      * @param   a   an argument.
      * @param   b   another argument.
      * @return  the smaller of {@code a} and {@code b}.
-     * @see     java.lang.Long#MIN_VALUE
      */
     public static int min(int a, int b) {
 	return (a <= b) ? a : b;
@@ -884,13 +878,12 @@ public final class Math {
     /**
      * Returns the smaller of two {@code long} values. That is,
      * the result is the argument closer to the value of
-     * {@code Long.MIN_VALUE}. If the arguments have the same
+     * {@link Long#MIN_VALUE}. If the arguments have the same
      * value, the result is that same value.
      *
      * @param   a   an argument.
      * @param   b   another argument.
      * @return  the smaller of {@code a} and {@code b}.
-     * @see     java.lang.Long#MIN_VALUE
      */
     public static long min(long a, long b) {
 	return (a <= b) ? a : b;
