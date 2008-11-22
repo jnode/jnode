@@ -25,9 +25,7 @@
 
 package com.sun.tools.javac.code;
 
-import com.sun.tools.javac.util.Version;
 
-@Version("@(#)BoundKind.java	1.13 07/05/05")
 public enum BoundKind {
     EXTENDS("? extends "),
     SUPER("? super "),

@@ -39,5 +39,3 @@ interface ValueContainer {
     String typeName();
     String signature();
 }
-
-

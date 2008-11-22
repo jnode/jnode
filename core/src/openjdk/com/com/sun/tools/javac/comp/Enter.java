@@ -89,7 +89,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Enter.java	1.140 07/05/05")
 public class Enter extends JCTree.Visitor {
     protected static final Context.Key<Enter> enterKey =
 	new Context.Key<Enter>();
@@ -221,7 +220,7 @@ public class Enter extends JCTree.Visitor {
      *	only, and members go into the class member scope.
      */
     Scope enterScope(Env<AttrContext> env) {
-	return (env.tree.tag == JCTree.CLASSDEF)
+        return (env.tree.getTag() == JCTree.CLASSDEF)
 	    ? ((JCClassDecl) env.tree).sym.members_field
 	    : env.info.scope;
     }
@@ -423,7 +422,7 @@ public class Enter extends JCTree.Visitor {
     public void visitTypeParameter(JCTypeParameter tree) {
 	TypeVar a = (tree.type != null)
 	    ? (TypeVar)tree.type
-	    : new TypeVar(tree.name, env.info.scope.owner);
+            : new TypeVar(tree.name, env.info.scope.owner, syms.botType);
 	tree.type = a;
 	if (chk.checkUnique(tree.pos(), a.tsym, env.info.scope)) {
 	    env.info.scope.enter(a.tsym);

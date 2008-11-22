@@ -42,7 +42,6 @@ import com.sun.tools.javac.util.*;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-@Version("@(#)JavacTypes.java	1.12 07/05/05")
 public class JavacTypes implements javax.lang.model.util.Types {
 
     private Symtab syms;

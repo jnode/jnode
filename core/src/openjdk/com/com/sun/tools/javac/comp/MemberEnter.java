@@ -53,7 +53,6 @@ import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)MemberEnter.java	1.71 07/05/05")
 public class MemberEnter extends JCTree.Visitor implements Completer {
     protected static final Context.Key<MemberEnter> memberEnterKey =
         new Context.Key<MemberEnter>();
@@ -625,7 +624,7 @@ public class MemberEnter extends JCTree.Visitor implements Completer {
         tree.sym = v;
         if (tree.init != null) {
             v.flags_field |= HASINIT;
-            if ((v.flags_field & FINAL) != 0 && tree.init.tag != JCTree.NEWCLASS)
+            if ((v.flags_field & FINAL) != 0 && tree.init.getTag() != JCTree.NEWCLASS)
                 v.setLazyConstValue(initEnv(tree, env), log, attr, tree.init);
         }
         if (chk.checkUnique(tree.pos(), v, enclScope)) {

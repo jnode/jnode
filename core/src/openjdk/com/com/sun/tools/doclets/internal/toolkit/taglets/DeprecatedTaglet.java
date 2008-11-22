@@ -58,4 +58,3 @@ public class DeprecatedTaglet extends BaseTaglet{
         return writer.deprecatedTagOutput(holder);
     }
 }
-

@@ -40,7 +40,6 @@ import com.sun.tools.javac.tree.JCTree.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Annotate.java	1.43 07/05/05")
 public class Annotate {
     protected static final Context.Key<Annotate> annotateKey =
 	new Context.Key<Annotate>();
@@ -149,7 +148,7 @@ public class Annotate {
 	    return new Attribute.Compound(a.type, List.<Pair<MethodSymbol,Attribute>>nil());
 	}
 	List<JCExpression> args = a.args;
-	if (args.length() == 1 && args.head.tag != JCTree.ASSIGN) {
+        if (args.length() == 1 && args.head.getTag() != JCTree.ASSIGN) {
 	    // special case: elided "value=" assumed
 	    args.head = make.at(args.head.pos).
 		Assign(make.Ident(names.value), args.head);
@@ -158,12 +157,12 @@ public class Annotate {
 	    new ListBuffer<Pair<MethodSymbol,Attribute>>();
 	for (List<JCExpression> tl = args; tl.nonEmpty(); tl = tl.tail) {
 	    JCExpression t = tl.head;
-	    if (t.tag != JCTree.ASSIGN) {
+            if (t.getTag() != JCTree.ASSIGN) {
 		log.error(t.pos(), "annotation.value.must.be.name.value");
                 continue;
 	    }
 	    JCAssign assign = (JCAssign)t;
-	    if (assign.lhs.tag != JCTree.IDENT) {
+            if (assign.lhs.getTag() != JCTree.IDENT) {
 		log.error(t.pos(), "annotation.value.must.be.name.value");
                 continue;
 	    }
@@ -213,14 +212,14 @@ public class Annotate {
 				       (((JCFieldAccess) tree).selected).type);
 	}
 	if ((expected.tsym.flags() & Flags.ANNOTATION) != 0) {
-	    if (tree.tag != JCTree.ANNOTATION) {
+            if (tree.getTag() != JCTree.ANNOTATION) {
 		log.error(tree.pos(), "annotation.value.must.be.annotation");
                 expected = syms.errorType;
 	    }
 	    return enterAnnotation((JCAnnotation)tree, expected, env);
 	}
 	if (expected.tag == TypeTags.ARRAY) { // should really be isArray()
-	    if (tree.tag != JCTree.NEWARRAY) {
+            if (tree.getTag() != JCTree.NEWARRAY) {
 		tree = make.at(tree.pos).
 		    NewArray(null, List.<JCExpression>nil(), List.of(tree));
 	    }

@@ -40,4 +40,3 @@ public class CommentedMethodFinder extends MethodFinder {
         return method.inlineTags().length > 0;
     }
 }
- 

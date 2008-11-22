@@ -47,7 +47,6 @@ import static com.sun.tools.javac.util.JCDiagnostic.DiagnosticType.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)JCDiagnostic.java	1.27 07/05/05")
 public class JCDiagnostic implements Diagnostic<JavaFileObject> {
     /** A factory for creating diagnostic objects. */
     public static class Factory {

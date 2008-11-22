@@ -273,7 +273,3 @@ public class PackageWriterImpl extends HtmlDocletWriter
         navCellEnd();
     }
 }
-
-
-
-

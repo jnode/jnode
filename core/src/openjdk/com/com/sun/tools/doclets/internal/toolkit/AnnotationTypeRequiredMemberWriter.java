@@ -103,4 +103,3 @@ public interface AnnotationTypeRequiredMemberWriter {
      */
     public void close() throws IOException;
 }
-

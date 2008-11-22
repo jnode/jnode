@@ -36,5 +36,3 @@ interface ThreadListener extends EventListener {
      *   void threadSuspended(ThreadAction action);
      */
 }
-
-

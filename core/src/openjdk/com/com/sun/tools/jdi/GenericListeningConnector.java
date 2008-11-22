@@ -45,7 +45,7 @@ public class GenericListeningConnector
     static final String ARG_ADDRESS = "address";
     static final String ARG_TIMEOUT = "timeout";
 
-    Map listenMap;
+    Map<Map<String,? extends Connector.Argument>, TransportService.ListenKey>  listenMap;
     TransportService transportService;
     Transport transport;
 
@@ -81,7 +81,7 @@ public class GenericListeningConnector
                 false,
                 0, Integer.MAX_VALUE);
 
-	listenMap = new HashMap(10);
+        listenMap = new HashMap<Map<String,? extends Connector.Argument>,TransportService.ListenKey>(10);
     }
 
     /**
@@ -101,14 +101,13 @@ public class GenericListeningConnector
 	return new GenericListeningConnector(ts, true);
     }
 
-    public String startListening(String address, Map args) 
+    public String startListening(String address, Map<String,? extends Connector.Argument> args)
 	throws IOException, IllegalConnectorArgumentsException
     {
-	TransportService.ListenKey listener =
-            (TransportService.ListenKey)listenMap.get(args);
+        TransportService.ListenKey listener = listenMap.get(args);
 	if (listener != null) {
 	   throw new IllegalConnectorArgumentsException("Already listening",
-               new ArrayList(args.keySet())); 
+               new ArrayList<String>(args.keySet()));
 	}
 
 	listener = transportService.startListening(address);
@@ -127,11 +126,10 @@ public class GenericListeningConnector
     public void stopListening(Map<String,? extends Connector.Argument> args)
 	throws IOException, IllegalConnectorArgumentsException
     {
-	TransportService.ListenKey listener = 
-	    (TransportService.ListenKey)listenMap.get(args);
+        TransportService.ListenKey listener = listenMap.get(args);
 	if (listener == null) {
            throw new IllegalConnectorArgumentsException("Not listening", 
-               new ArrayList(args.keySet()));
+               new ArrayList<String>(args.keySet()));
         }
 	transportService.stopListening(listener);
 	listenMap.remove(args);
@@ -147,8 +145,7 @@ public class GenericListeningConnector
 	    timeout = Integer.decode(ts).intValue();
         }
 
-	TransportService.ListenKey listener =
-            (TransportService.ListenKey)listenMap.get(args);
+        TransportService.ListenKey listener = listenMap.get(args);
 	Connection connection;
 	if (listener != null) {
 	    connection = transportService.accept(listener, timeout, 0);
@@ -159,7 +156,7 @@ public class GenericListeningConnector
 	     * once-off accept
 	     */
 	     startListening(args);
-	     listener = (TransportService.ListenKey)listenMap.get(args);
+             listener = listenMap.get(args);
 	     assert listener != null;
 	     connection = transportService.accept(listener, timeout, 0);
 	     stopListening(args);
@@ -184,4 +181,3 @@ public class GenericListeningConnector
     }
 
 }
-

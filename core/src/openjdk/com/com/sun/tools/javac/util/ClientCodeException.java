@@ -34,7 +34,6 @@ package com.sun.tools.javac.util;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ClientCodeException.java	1.8 07/05/05")
 public class ClientCodeException extends RuntimeException {
 
     static final long serialVersionUID = -5674494409392415163L;

@@ -48,7 +48,6 @@ import java.util.NoSuchElementException;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)List.java	1.43 07/05/05")
 public class List<A> extends AbstractCollection<A> implements java.util.List<A> {
 
     /** The first element of the list, supposed to be immutable.

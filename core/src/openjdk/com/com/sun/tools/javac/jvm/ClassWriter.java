@@ -55,7 +55,6 @@ import static javax.tools.StandardLocation.CLASS_OUTPUT;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ClassWriter.java	1.130 07/05/05")
 public class ClassWriter extends ClassFile {
     protected static final Context.Key<ClassWriter> classWriterKey =
         new Context.Key<ClassWriter>();
@@ -908,6 +907,8 @@ public class ClassWriter extends ClassFile {
              l = l.tail) {
             ClassSymbol inner = l.head;
             char flags = (char) adjustFlags(inner.flags_field);
+            if ((flags & INTERFACE) != 0) flags |= ABSTRACT; // Interfaces are always ABSTRACT
+            if (inner.name.isEmpty()) flags &= ~FINAL; // Anonymous class: unset FINAL flag
             if (dumpInnerClassModifiers) {
                 log.errWriter.println("INNERCLASS  " + inner.name);
                 log.errWriter.println("---" + flagNames(flags));
@@ -1490,6 +1491,7 @@ public class ClassWriter extends ClassFile {
         if ((flags & PROTECTED) != 0) flags |= PUBLIC;
         flags = flags & ClassFlags & ~STRICTFP;
         if ((flags & INTERFACE) == 0) flags |= ACC_SUPER;
+        if (c.isInner() && c.name.isEmpty()) flags &= ~FINAL;
         if (dumpClassModifiers) {
             log.errWriter.println();
             log.errWriter.println("CLASSFILE  " + c.getQualifiedName());

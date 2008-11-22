@@ -103,4 +103,3 @@ public interface EnumConstantWriter {
      */
     public void close() throws IOException;
 }
-

@@ -64,7 +64,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Attr.java	1.228 07/05/05")
 public class Attr extends JCTree.Visitor {
     protected static final Context.Key<Attr> attrKey =
         new Context.Key<Attr>();
@@ -215,7 +214,7 @@ public class Attr extends JCTree.Visitor {
             ((v.flags() & HASINIT) != 0
              ||
              !((base == null ||
-               (base.tag == JCTree.IDENT && TreeInfo.name(base) == names._this)) &&
+               (base.getTag() == JCTree.IDENT && TreeInfo.name(base) == names._this)) &&
                isAssignableAsBlankFinal(v, env)))) {
             log.error(pos, "cant.assign.val.to.final.var", v);
         }
@@ -227,7 +226,7 @@ public class Attr extends JCTree.Visitor {
      *  @param tree    The candidate tree.
      */
     boolean isStaticReference(JCTree tree) {
-        if (tree.tag == JCTree.SELECT) {
+        if (tree.getTag() == JCTree.SELECT) {
             Symbol lsym = TreeInfo.symbol(((JCFieldAccess) tree).selected);
             if (lsym == null || lsym.kind != TYP) {
                 return false;
@@ -564,7 +563,7 @@ public class Attr extends JCTree.Visitor {
             // disable implicit outer instance from being passed.
             // (This would be an illegal access to "this before super").
             if (env.info.isSelfCall &&
-                env.tree.tag == JCTree.NEWCLASS &&
+                env.tree.getTag() == JCTree.NEWCLASS &&
                 ((JCNewClass) env.tree).encl == null)
             {
                 c.flags_field |= NOOUTERTHIS;
@@ -713,7 +712,7 @@ public class Attr extends JCTree.Visitor {
             chk.checkDeprecatedAnnotation(tree.pos(), v);
 
             if (tree.init != null) {
-                if ((v.flags_field & FINAL) != 0 && tree.init.tag != JCTree.NEWCLASS) {
+                if ((v.flags_field & FINAL) != 0 && tree.init.getTag() != JCTree.NEWCLASS) {
                     // In this case, `v' is final.  Ensure that it's initializer is
                     // evaluated.
                     v.getConstValue(); // ensure initializer is evaluated
@@ -819,8 +818,8 @@ public class Attr extends JCTree.Visitor {
     public void visitLabelled(JCLabeledStatement tree) {
         // Check that label is not used in an enclosing statement
         Env<AttrContext> env1 = env;
-        while (env1 != null && env1.tree.tag != JCTree.CLASSDEF) {
-            if (env1.tree.tag == JCTree.LABELLED &&
+        while (env1 != null && env1.tree.getTag() != JCTree.CLASSDEF) {
+            if (env1.tree.getTag() == JCTree.LABELLED &&
                 ((JCLabeledStatement) env1.tree).label == tree.label) {
                 log.error(tree.pos(), "label.already.in.use",
                           tree.label);
@@ -891,14 +890,14 @@ public class Attr extends JCTree.Visitor {
         private static void addVars(List<JCStatement> stats, Scope switchScope) {
             for (;stats.nonEmpty(); stats = stats.tail) {
                 JCTree stat = stats.head;
-                if (stat.tag == JCTree.VARDEF)
+                if (stat.getTag() == JCTree.VARDEF)
                     switchScope.enter(((JCVariableDecl) stat).sym);
             }
         }
     // where
     /** Return the selected enumeration constant symbol, or null. */
     private Symbol enumConstant(JCTree tree, Type enumType) {
-        if (tree.tag != JCTree.IDENT) {
+        if (tree.getTag() != JCTree.IDENT) {
             log.error(tree.pos(), "enum.label.must.be.unqualified.enum");
             return syms.errSymbol;
         }
@@ -1066,12 +1065,12 @@ public class Attr extends JCTree.Visitor {
     }
 
     public void visitBreak(JCBreak tree) {
-        tree.target = findJumpTarget(tree.pos(), tree.tag, tree.label, env);
+        tree.target = findJumpTarget(tree.pos(), tree.getTag(), tree.label, env);
         result = null;
     }
 
     public void visitContinue(JCContinue tree) {
-        tree.target = findJumpTarget(tree.pos(), tree.tag, tree.label, env);
+        tree.target = findJumpTarget(tree.pos(), tree.getTag(), tree.label, env);
         result = null;
     }
     //where
@@ -1096,16 +1095,16 @@ public class Attr extends JCTree.Visitor {
             Env<AttrContext> env1 = env;
             LOOP:
             while (env1 != null) {
-                switch (env1.tree.tag) {
+                switch (env1.tree.getTag()) {
                 case JCTree.LABELLED:
                     JCLabeledStatement labelled = (JCLabeledStatement)env1.tree;
                     if (label == labelled.label) {
                         // If jump is a continue, check that target is a loop.
                         if (tag == JCTree.CONTINUE) {
-                            if (labelled.body.tag != JCTree.DOLOOP &&
-                                labelled.body.tag != JCTree.WHILELOOP &&
-                                labelled.body.tag != JCTree.FORLOOP &&
-                                labelled.body.tag != JCTree.FOREACHLOOP)
+                            if (labelled.body.getTag() != JCTree.DOLOOP &&
+                                labelled.body.getTag() != JCTree.WHILELOOP &&
+                                labelled.body.getTag() != JCTree.FORLOOP &&
+                                labelled.body.getTag() != JCTree.FOREACHLOOP)
                                 log.error(pos, "not.loop.label", label);
                             // Found labelled statement target, now go inwards
                             // to next non-labelled tree.
@@ -1226,7 +1225,7 @@ public class Attr extends JCTree.Visitor {
                     if (site.getEnclosingType().tag == CLASS) {
                         // we are calling a nested class
 
-                        if (tree.meth.tag == JCTree.SELECT) {
+                        if (tree.meth.getTag() == JCTree.SELECT) {
                             JCTree qualifier = ((JCFieldAccess) tree.meth).selected;
 
                             // We are seeing a prefixed call, of the form
@@ -1242,7 +1241,7 @@ public class Attr extends JCTree.Visitor {
                             rs.resolveImplicitThis(tree.meth.pos(),
                                                    localEnv, site);
                         }
-                    } else if (tree.meth.tag == JCTree.SELECT) {
+                    } else if (tree.meth.getTag() == JCTree.SELECT) {
                         log.error(tree.meth.pos(), "illegal.qual.not.icls",
                                   site.tsym);
                     }
@@ -1291,11 +1290,14 @@ public class Attr extends JCTree.Visitor {
 
             // Compute the result type.
             Type restype = mtype.getReturnType();
-            assert restype.tag != WILDCARD : mtype;
+
+            if (restype.tag == WILDCARD) {
+                restype = types.upperBound(restype);
+            }
 
             // as a special case, array.clone() has a result that is
             // the same as static type of the array being cloned
-            if (tree.meth.tag == JCTree.SELECT &&
+            if (tree.meth.getTag() == JCTree.SELECT &&
                 allowCovariantReturns &&
                 methName == names.clone &&
                 types.isArray(((JCFieldAccess) tree.meth).selected.type))
@@ -1304,7 +1306,7 @@ public class Attr extends JCTree.Visitor {
             // as a special case, x.getClass() has type Class<? extends |X|>
             if (allowGenerics &&
                 methName == names.getClass && tree.args.isEmpty()) {
-                Type qualifier = (tree.meth.tag == JCTree.SELECT)
+                Type qualifier = (tree.meth.getTag() == JCTree.SELECT)
                     ? ((JCFieldAccess) tree.meth).selected.type
                     : env.enclClass.sym.type;
                 restype = new
@@ -1331,7 +1333,7 @@ public class Attr extends JCTree.Visitor {
             JCMethodDecl enclMethod = env.enclMethod;
             if (enclMethod != null && enclMethod.name == names.init) {
                 JCBlock body = enclMethod.body;
-                if (body.stats.head.tag == JCTree.EXEC &&
+                if (body.stats.head.getTag() == JCTree.EXEC &&
                     ((JCExpressionStatement) body.stats.head).expr == tree)
                     return true;
             }
@@ -1362,7 +1364,7 @@ public class Attr extends JCTree.Visitor {
         // complete class name to be fully qualified
         JCExpression clazz = tree.clazz; // Class field following new
         JCExpression clazzid =          // Identifier in class field
-            (clazz.tag == JCTree.TYPEAPPLY)
+            (clazz.getTag() == JCTree.TYPEAPPLY)
             ? ((JCTypeApply) clazz).clazz
             : clazz;
 
@@ -1381,7 +1383,7 @@ public class Attr extends JCTree.Visitor {
                                              attribExpr(tree.encl, env));
             clazzid1 = make.at(clazz.pos).Select(make.Type(encltype),
                                                  ((JCIdent) clazzid).name);
-            if (clazz.tag == JCTree.TYPEAPPLY)
+            if (clazz.getTag() == JCTree.TYPEAPPLY)
                 clazz = make.at(tree.pos).
                     TypeApply(clazzid1,
                               ((JCTypeApply) clazz).arguments);
@@ -1423,7 +1425,7 @@ public class Attr extends JCTree.Visitor {
             // Enums may not be instantiated except implicitly
             if (allowEnums &&
                 (clazztype.tsym.flags_field&Flags.ENUM) != 0 &&
-                (env.tree.tag != JCTree.VARDEF ||
+                (env.tree.getTag() != JCTree.VARDEF ||
                  (((JCVariableDecl) env.tree).mods.flags&Flags.ENUM) == 0 ||
                  ((JCVariableDecl) env.tree).init != tree))
                 log.error(tree.pos(), "enum.cant.be.instantiated");
@@ -1601,13 +1603,13 @@ public class Attr extends JCTree.Visitor {
         Type operand = attribExpr(tree.rhs, env);
         // Find operator.
         Symbol operator = tree.operator = rs.resolveBinaryOperator(
-            tree.pos(), tree.tag - JCTree.ASGOffset, env,
+            tree.pos(), tree.getTag() - JCTree.ASGOffset, env,
             owntype, operand);
 
         if (operator.kind == MTH) {
             chk.checkOperator(tree.pos(),
                               (OperatorSymbol)operator,
-                              tree.tag - JCTree.ASGOffset,
+                              tree.getTag() - JCTree.ASGOffset,
                               owntype,
                               operand);
             if (types.isSameType(operator.type.getReturnType(), syms.stringType)) {
@@ -1627,17 +1629,17 @@ public class Attr extends JCTree.Visitor {
 
     public void visitUnary(JCUnary tree) {
         // Attribute arguments.
-        Type argtype = (JCTree.PREINC <= tree.tag && tree.tag <= JCTree.POSTDEC)
+        Type argtype = (JCTree.PREINC <= tree.getTag() && tree.getTag() <= JCTree.POSTDEC)
             ? attribTree(tree.arg, env, VAR, Type.noType)
             : chk.checkNonVoid(tree.arg.pos(), attribExpr(tree.arg, env));
 
         // Find operator.
         Symbol operator = tree.operator =
-            rs.resolveUnaryOperator(tree.pos(), tree.tag, env, argtype);
+            rs.resolveUnaryOperator(tree.pos(), tree.getTag(), env, argtype);
 
         Type owntype = syms.errType;
         if (operator.kind == MTH) {
-            owntype = (JCTree.PREINC <= tree.tag && tree.tag <= JCTree.POSTDEC)
+            owntype = (JCTree.PREINC <= tree.getTag() && tree.getTag() <= JCTree.POSTDEC)
                 ? tree.arg.type
                 : operator.type.getReturnType();
             int opc = ((OperatorSymbol)operator).opcode;
@@ -1669,14 +1671,14 @@ public class Attr extends JCTree.Visitor {
 
         // Find operator.
         Symbol operator = tree.operator =
-            rs.resolveBinaryOperator(tree.pos(), tree.tag, env, left, right);
+            rs.resolveBinaryOperator(tree.pos(), tree.getTag(), env, left, right);
 
         Type owntype = syms.errType;
         if (operator.kind == MTH) {
             owntype = operator.type.getReturnType();
             int opc = chk.checkOperator(tree.lhs.pos(),
                                         (OperatorSymbol)operator,
-                                        tree.tag,
+                                        tree.getTag(),
                                         left,
                                         right);
 
@@ -1818,7 +1820,7 @@ public class Attr extends JCTree.Visitor {
             chk.earlyRefError(tree.pos(), sym.kind == VAR ? sym : thisSym(tree.pos(), env));
         }
 	Env<AttrContext> env1 = env;
-	if (sym.kind != ERR && sym.owner != null && sym.owner != env1.enclClass.sym) {
+        if (sym.kind != ERR && sym.kind != TYP && sym.owner != null && sym.owner != env1.enclClass.sym) {
 	    // If the found symbol is inaccessible, then it is
 	    // accessed through an enclosing instance.  Locate this
 	    // enclosing instance:
@@ -2204,10 +2206,10 @@ public class Attr extends JCTree.Visitor {
                 canOwnInitializer(env.info.scope.owner) &&
                 v.owner == env.info.scope.owner.enclClass() &&
                 ((v.flags() & STATIC) != 0) == Resolve.isStatic(env) &&
-                (env.tree.tag != JCTree.ASSIGN ||
+                (env.tree.getTag() != JCTree.ASSIGN ||
                  TreeInfo.skipParens(((JCAssign) env.tree).lhs) != tree)) {
 
-                if (!onlyWarning || isNonStaticEnumField(v)) {
+                if (!onlyWarning || isStaticEnumField(v)) {
                     log.error(tree.pos(), "illegal.forward.ref");
                 } else if (useBeforeDeclarationWarning) {
                     log.warning(tree.pos(), "forward.ref", v);
@@ -2241,7 +2243,7 @@ public class Attr extends JCTree.Visitor {
             // initializer expressions of an enum constant e to refer
             // to itself or to an enum constant of the same type that
             // is declared to the right of e."
-            if (isNonStaticEnumField(v)) {
+            if (isStaticEnumField(v)) {
                 ClassSymbol enclClass = env.info.scope.owner.enclClass();
 
                 if (enclClass == null || enclClass.owner == null)
@@ -2262,8 +2264,14 @@ public class Attr extends JCTree.Visitor {
             }
         }
 
-        private boolean isNonStaticEnumField(VarSymbol v) {
-            return Flags.isEnum(v.owner) && Flags.isStatic(v) && !Flags.isConstant(v);
+        /** Is the given symbol a static, non-constant field of an Enum?
+         *  Note: enum literals should not be regarded as such
+         */
+        private boolean isStaticEnumField(VarSymbol v) {
+            return Flags.isEnum(v.owner) &&
+                   Flags.isStatic(v) &&
+                   !Flags.isConstant(v) &&
+                   v.name != names._class;
         }
 
         /** Can the given symbol be the owner of code which forms part
@@ -2390,7 +2398,7 @@ public class Attr extends JCTree.Visitor {
                                       "unchecked.generic.array.creation",
                                       argtype);
                 Type elemtype = types.elemtype(argtype);
-                switch (tree.tag) {
+                switch (tree.getTag()) {
                 case JCTree.APPLY:
                     ((JCMethodInvocation) tree).varargsElement = elemtype;
                     break;
@@ -2472,9 +2480,9 @@ public class Attr extends JCTree.Visitor {
                 Type clazzOuter = clazztype.getEnclosingType();
                 if (clazzOuter.tag == CLASS) {
                     Type site;
-                    if (tree.clazz.tag == JCTree.IDENT) {
+                    if (tree.clazz.getTag() == JCTree.IDENT) {
                         site = env.enclClass.sym.type;
-                    } else if (tree.clazz.tag == JCTree.SELECT) {
+                    } else if (tree.clazz.getTag() == JCTree.SELECT) {
                         site = ((JCFieldAccess) tree.clazz).selected.type;
                     } else throw new AssertionError(""+tree);
                     if (clazzOuter.tag == CLASS && site != clazzOuter) {
@@ -2745,7 +2753,7 @@ public class Attr extends JCTree.Visitor {
                 ((c.flags() & STATIC) == 0 || c.name == names.empty) &&
                 (TreeInfo.flags(l.head) & (STATIC | INTERFACE)) != 0) {
                 Symbol sym = null;
-                if (l.head.tag == JCTree.VARDEF) sym = ((JCVariableDecl) l.head).sym;
+                if (l.head.getTag() == JCTree.VARDEF) sym = ((JCVariableDecl) l.head).sym;
                 if (sym == null ||
                     sym.kind != VAR ||
                     ((VarSymbol) sym).getConstValue() == null)

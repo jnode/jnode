@@ -1,5 +1,5 @@
 /*
- * Copyright 1998-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1998-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -32,7 +32,6 @@ import static com.sun.javadoc.LanguageVersion.*;
 import com.sun.tools.javac.util.List;
 
 import java.net.*;
-import java.lang.OutOfMemoryError;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
@@ -70,7 +69,8 @@ public class DocletInvoker {
     }
 
     public DocletInvoker(Messager messager, 
-			 String docletClassName, String docletPath) {
+                         String docletClassName, String docletPath,
+                         ClassLoader docletParentClassLoader) {
         this.messager = messager;
         this.docletClassName = docletClassName;
 
@@ -82,7 +82,13 @@ public class DocletInvoker {
         cpString = appendPath(System.getProperty("java.class.path"), cpString);
         cpString = appendPath(docletPath, cpString);
         URL[] urls = pathToURLs(cpString);
-        appClassLoader = new URLClassLoader(urls);
+        if (docletParentClassLoader == null) {
+            appClassLoader =
+                new URLClassLoader(urls,
+                                   getDelegationClassLoader(docletClassName));
+        } else {
+            appClassLoader = new URLClassLoader(urls, docletParentClassLoader);
+        }
 
         // attempt to find doclet
         Class dc = null;
@@ -95,9 +101,59 @@ public class DocletInvoker {
         docletClass = dc;
     }
 
-    /**
-     * Generate documentation here.  Return true on success.
+    /*
+     * Returns the delegation class loader to use when creating
+     * appClassLoader (used to load the doclet).  The context class
+     * loader is the best choice, but legacy behavior was to use the
+     * default delegation class loader (aka system class loader).
+     *
+     * Here we favor using the context class loader.  To ensure
+     * compatibility with existing apps, we revert to legacy
+     * behavior if either or both of the following conditions hold:
+     *
+     * 1) the doclet is loadable from the system class loader but not
+     *    from the context class loader,
+     *
+     * 2) this.getClass() is loadable from the system class loader but not
+     *    from the context class loader.
      */
+    private ClassLoader getDelegationClassLoader(String docletClassName) {
+        ClassLoader ctxCL = Thread.currentThread().getContextClassLoader();
+        ClassLoader sysCL = ClassLoader.getSystemClassLoader();
+        if (sysCL == null)
+            return ctxCL;
+        if (ctxCL == null)
+            return sysCL;
+
+        // Condition 1.
+        try {
+            sysCL.loadClass(docletClassName);
+            try {
+                ctxCL.loadClass(docletClassName);
+            } catch (ClassNotFoundException e) {
+                return sysCL;
+            }
+        } catch (ClassNotFoundException e) {
+        }
+
+        // Condition 2.
+        try {
+            if (getClass() == sysCL.loadClass(getClass().getName())) {
+                try {
+                    if (getClass() != ctxCL.loadClass(getClass().getName()))
+                        return sysCL;
+                } catch (ClassNotFoundException e) {
+                    return sysCL;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+        }
+
+        return ctxCL;
+    }
+
+    /**
+     * Generate documentation here.  Return true on success.  */
     public boolean start(RootDoc root) {
         Object retVal;
         String methodName = "start";
@@ -228,6 +284,8 @@ public class DocletInvoker {
 			       docletClassName, methodName);
                 throw new DocletInvokeException();
             }
+            ClassLoader savedCCL =
+                Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(appClassLoader);
                 return meth.invoke(null , params);
@@ -253,6 +311,8 @@ public class DocletInvoker {
                     exc.getTargetException().printStackTrace();
                 }
                 throw new DocletInvokeException();
+            } finally {
+                Thread.currentThread().setContextClassLoader(savedCCL);
             } 
     }
 
@@ -310,6 +370,3 @@ public class DocletInvoker {
         }
     }
 }
-
-
-

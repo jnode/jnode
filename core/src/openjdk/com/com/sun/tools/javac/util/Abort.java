@@ -33,7 +33,6 @@ package com.sun.tools.javac.util;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Abort.java	1.25 07/05/05")
 public class Abort extends Error {
     private static final long serialVersionUID = 0;
 

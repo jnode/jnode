@@ -44,7 +44,6 @@ import static com.sun.tools.javac.code.Flags.*;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)FilteredMemberList.java	1.7 07/05/05")
 public class FilteredMemberList extends AbstractList<Symbol> {
 
     private final Scope scope;

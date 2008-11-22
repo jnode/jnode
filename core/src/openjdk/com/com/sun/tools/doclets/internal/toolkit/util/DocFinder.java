@@ -222,5 +222,3 @@ public class DocFinder {
         return output;
     }
 }
-
-

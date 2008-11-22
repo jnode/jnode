@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.code;
 
-import com.sun.tools.javac.util.Version;
 
 /** An interface for type tag values, which distinguish between different
  *  sorts of types.
@@ -35,7 +34,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)TypeTags.java	1.28 07/05/05")
 public class TypeTags {
 
     private TypeTags() {} // uninstantiable

@@ -153,4 +153,3 @@ public interface Taglet {
     public abstract TagletOutput getTagletOutput(Doc holder, TagletWriter writer) throws IllegalArgumentException;
 
 }
-

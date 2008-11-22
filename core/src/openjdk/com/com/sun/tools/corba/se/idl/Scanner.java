@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Scanner.java	1.25 07/05/05
  */
 
 package com.sun.tools.corba.se.idl;
@@ -1614,4 +1613,3 @@ class ScannerData
   boolean      macrodata       = false;
   boolean      includeIsImport = false;
 } // class ScannerData
-

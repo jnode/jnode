@@ -34,9 +34,8 @@ public class ClassTypeImpl extends ReferenceTypeImpl
 {
     private boolean cachedSuperclass = false;
     private ClassType superclass = null;
-    private Map lineMapper = null;
     private int lastLine = -1;
-    private List interfaces = null;
+    private List<InterfaceType> interfaces = null;
 
     protected ClassTypeImpl(VirtualMachine aVm,long aRef) {
         super(aVm, aRef);
@@ -66,15 +65,15 @@ public class ClassTypeImpl extends ReferenceTypeImpl
         return superclass;
     }
 
-    public List interfaces()  {
+    public List<InterfaceType> interfaces()  {
         if (interfaces == null) {
             interfaces = getInterfaces();
         }
         return interfaces;
     }
 
-    void addInterfaces(List list) {
-        List immediate = interfaces();
+    void addInterfaces(List<InterfaceType> list) {
+        List<InterfaceType> immediate = interfaces();
         list.addAll(interfaces());
 
         Iterator iter = immediate.iterator();
@@ -89,15 +88,15 @@ public class ClassTypeImpl extends ReferenceTypeImpl
         }
     }
 
-    public List allInterfaces()  {
-        List all = new ArrayList();
+    public List<InterfaceType> allInterfaces()  {
+        List<InterfaceType> all = new ArrayList<InterfaceType>();
         addInterfaces(all);
         return all;
     }
 
-    public List subclasses() {
-        List all = vm.allClasses();
-        List subs = new ArrayList();
+    public List<ClassType> subclasses() {
+        List<ReferenceType> all = vm.allClasses();
+        List<ClassType> subs = new ArrayList<ClassType>();
         Iterator iter = all.iterator();
         while (iter.hasNext()) {
             ReferenceType refType = (ReferenceType)iter.next();
@@ -105,7 +104,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
                 ClassType clazz = (ClassType)refType;
                 ClassType superclass = clazz.superclass();
                 if ((superclass != null) && superclass.equals(this)) {
-                    subs.add(refType);
+                    subs.add((ClassType)refType);
                 }
             }
         }
@@ -222,7 +221,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
 
         validateMethodInvocation(method);
 
-        List arguments = method.validateAndPrepareArgumentsForInvoke(origArguments);
+        List<? extends Value> arguments = method.validateAndPrepareArgumentsForInvoke(origArguments);
 
 	ValueImpl[] args = (ValueImpl[])arguments.toArray(new ValueImpl[0]);
 	JDWP.ClassType.InvokeMethod ret;
@@ -270,7 +269,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
 
         validateConstructorInvocation(method);
 
-        List arguments = method.validateAndPrepareArgumentsForInvoke(
+        List<Value> arguments = method.validateAndPrepareArgumentsForInvoke(
                                                        origArguments);
 	ValueImpl[] args = (ValueImpl[])arguments.toArray(new ValueImpl[0]);
 	JDWP.ClassType.NewInstance ret = null;
@@ -318,8 +317,8 @@ public class ClassTypeImpl extends ReferenceTypeImpl
        return method;
    }
    
-   public List allMethods() {
-        ArrayList list = new ArrayList(methods());
+   public List<Method> allMethods() {
+        ArrayList<Method> list = new ArrayList<Method>(methods());
 
         ClassType clazz = superclass();
         while (clazz != null) {
@@ -340,10 +339,13 @@ public class ClassTypeImpl extends ReferenceTypeImpl
         return list;
     }
 
-    List inheritedTypes() {
-        List inherited = new ArrayList(interfaces());
+    List<ReferenceType> inheritedTypes() {
+        List<ReferenceType> inherited = new ArrayList<ReferenceType>();
         if (superclass() != null) {
-            inherited.add(0, superclass()); /* insert at front */
+            inherited.add(0, (ReferenceType)superclass()); /* insert at front */
+        }
+        for (ReferenceType rt : interfaces()) {
+            inherited.add(rt);
         }
         return inherited;
     }
@@ -388,7 +390,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
         } 
     }
 
-    void addVisibleMethods(Map methodMap) {
+    void addVisibleMethods(Map<String, Method> methodMap) {
         /*
          * Add methods from 
          * parent types first, so that the methods in this class will
@@ -416,7 +418,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
         } else if ((superclazz != null) && superclazz.isAssignableTo(type)) {
             return true;
         } else {
-            List interfaces = interfaces();
+            List<InterfaceType> interfaces = interfaces();
             Iterator iter = interfaces.iterator();
             while (iter.hasNext()) {
                 InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();

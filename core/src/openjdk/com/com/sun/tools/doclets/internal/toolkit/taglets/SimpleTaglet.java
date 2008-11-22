@@ -215,4 +215,3 @@ public class SimpleTaglet extends BaseTaglet {
         return writer.simpleTagOutput(holder.tags(getName()), header);
     }
 }
-

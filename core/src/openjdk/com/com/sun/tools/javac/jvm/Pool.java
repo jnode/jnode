@@ -38,7 +38,6 @@ import com.sun.tools.javac.code.Type;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Pool.java	1.29 07/05/05")
 public class Pool {
 
     public static final int MAX_ENTRIES = 0xFFFF;

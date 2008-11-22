@@ -52,7 +52,6 @@ import static com.sun.tools.javac.jvm.CRTFlags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Gen.java	1.153 07/05/05")
 public class Gen extends JCTree.Visitor {
     protected static final Context.Key<Gen> genKey =
 	new Context.Key<Gen>();
@@ -429,7 +428,7 @@ public class Gen extends JCTree.Visitor {
      */
     boolean hasFinally(JCTree target, Env<GenContext> env) {
 	while (env.tree != target) {
-	    if (env.tree.tag == JCTree.TRY && env.info.finalize.hasFinalizer())
+            if (env.tree.getTag() == JCTree.TRY && env.info.finalize.hasFinalizer())
 		return true;
 	    env = env.next;
 	}
@@ -455,7 +454,7 @@ public class Gen extends JCTree.Visitor {
 	//  - methodDefs for method definitions
 	for (List<JCTree> l = defs; l.nonEmpty(); l = l.tail) {
 	    JCTree def = l.head;
-	    switch (def.tag) {
+            switch (def.getTag()) {
 	    case JCTree.BLOCK:
 		JCBlock block = (JCBlock)def;
 		if ((block.flags & STATIC) != 0)
@@ -703,7 +702,7 @@ public class Gen extends JCTree.Visitor {
 	}
 	int startpc = code.curPc();
 	genStat(tree, env);
-	if (tree.tag == JCTree.BLOCK) crtFlags |= CRT_BLOCK;
+        if (tree.getTag() == JCTree.BLOCK) crtFlags |= CRT_BLOCK;
 	code.crt.put(tree, crtFlags, startpc, code.curPc());
     }
 
@@ -713,7 +712,7 @@ public class Gen extends JCTree.Visitor {
 	if (code.isAlive()) {
 	    code.statBegin(tree.pos);
 	    genDef(tree, env);
-	} else if (env.info.isSwitch && tree.tag == JCTree.VARDEF) {
+        } else if (env.info.isSwitch && tree.getTag() == JCTree.VARDEF) {
 	    // variables whose declarations are in a switch
 	    // can be used even if the decl is unreachable.
 	    code.newLocal(((JCVariableDecl) tree).sym);
@@ -780,7 +779,7 @@ public class Gen extends JCTree.Visitor {
      */
     public CondItem genCond(JCTree _tree, boolean markBranches) {
 	JCTree inner_tree = TreeInfo.skipParens(_tree);
-	if (inner_tree.tag == JCTree.CONDEXPR) {
+        if (inner_tree.getTag() == JCTree.CONDEXPR) {
 	    JCConditional tree = (JCConditional)inner_tree;
 	    CondItem cond = genCond(tree.cond, CRT_FLOW_CONTROLLER);
 	    if (cond.isTrue()) {
@@ -1027,7 +1026,7 @@ public class Gen extends JCTree.Visitor {
 	Env<GenContext> localEnv = env.dup(tree, new GenContext());
 	genStats(tree.stats, localEnv);
 	// End the scope of all block-local variables in variable info.
-	if (env.tree.tag != JCTree.METHODDEF) {
+        if (env.tree.getTag() != JCTree.METHODDEF) {
             code.statBegin(tree.endpos);
             code.endScopes(limit);
             code.pendingStatPos = Position.NOPOS;
@@ -1615,8 +1614,15 @@ public class Gen extends JCTree.Visitor {
 
     public void visitExec(JCExpressionStatement tree) {
 	// Optimize x++ to ++x and x-- to --x.
-	if (tree.expr.tag == JCTree.POSTINC) tree.expr.tag = JCTree.PREINC;
-	else if (tree.expr.tag == JCTree.POSTDEC) tree.expr.tag = JCTree.PREDEC;
+        JCExpression e = tree.expr;
+        switch (e.getTag()) {
+            case JCTree.POSTINC:
+                ((JCUnary) e).setTag(JCTree.PREINC);
+                break;
+            case JCTree.POSTDEC:
+                ((JCUnary) e).setTag(JCTree.PREDEC);
+                break;
+        }
 	genExpr(tree.expr, tree.expr.type).drop();
     }
 
@@ -1798,13 +1804,13 @@ public class Gen extends JCTree.Visitor {
 	    // If we have an increment of -32768 to +32767 of a local
 	    // int variable we can use an incr instruction instead of
 	    // proceeding further.
-	    if ((tree.tag == JCTree.PLUS_ASG || tree.tag == JCTree.MINUS_ASG) &&
+            if ((tree.getTag() == JCTree.PLUS_ASG || tree.getTag() == JCTree.MINUS_ASG) &&
 		l instanceof LocalItem &&
 		tree.lhs.type.tag <= INT &&
 		tree.rhs.type.tag <= INT &&
 		tree.rhs.type.constValue() != null) {
 		int ival = ((Number) tree.rhs.type.constValue()).intValue();
-		if (tree.tag == JCTree.MINUS_ASG) ival = -ival;
+                if (tree.getTag() == JCTree.MINUS_ASG) ival = -ival;
 		((LocalItem)l).incr(ival);
 		result = l;
 		return;
@@ -1820,12 +1826,12 @@ public class Gen extends JCTree.Visitor {
 
     public void visitUnary(JCUnary tree) {
         OperatorSymbol operator = (OperatorSymbol)tree.operator;
-	if (tree.tag == JCTree.NOT) {
+        if (tree.getTag() == JCTree.NOT) {
 	    CondItem od = genCond(tree.arg, false);
 	    result = od.negate();
 	} else {
 	    Item od = genExpr(tree.arg, operator.type.getParameterTypes().head);
-	    switch (tree.tag) {
+            switch (tree.getTag()) {
 	    case JCTree.POS:
 		result = od.load();
 		break;
@@ -1842,7 +1848,7 @@ public class Gen extends JCTree.Visitor {
 		od.duplicate();
 		if (od instanceof LocalItem &&
 		    (operator.opcode == iadd || operator.opcode == isub)) {
-		    ((LocalItem)od).incr(tree.tag == JCTree.PREINC ? 1 : -1);
+                    ((LocalItem)od).incr(tree.getTag() == JCTree.PREINC ? 1 : -1);
 		    result = od;
 		} else {
 		    od.load();
@@ -1861,7 +1867,7 @@ public class Gen extends JCTree.Visitor {
 		if (od instanceof LocalItem && 
                     (operator.opcode == iadd || operator.opcode == isub)) {
 		    Item res = od.load();
-		    ((LocalItem)od).incr(tree.tag == JCTree.POSTINC ? 1 : -1);
+                    ((LocalItem)od).incr(tree.getTag() == JCTree.POSTINC ? 1 : -1);
 		    result = res;
 		} else {
 		    Item res = od.load();
@@ -1905,7 +1911,7 @@ public class Gen extends JCTree.Visitor {
 	    // Convert buffer to string.
 	    bufferToString(tree.pos());
 	    result = items.makeStackItem(syms.stringType);
-	} else if (tree.tag == JCTree.AND) {
+        } else if (tree.getTag() == JCTree.AND) {
 	    CondItem lcond = genCond(tree.lhs, CRT_FLOW_CONTROLLER);
 	    if (!lcond.isFalse()) {
 		Chain falseJumps = lcond.jumpFalse();
@@ -1919,7 +1925,7 @@ public class Gen extends JCTree.Visitor {
 	    } else {
 		result = lcond;
 	    }
-	} else if (tree.tag == JCTree.OR) {
+        } else if (tree.getTag() == JCTree.OR) {
 	    CondItem lcond = genCond(tree.lhs, CRT_FLOW_CONTROLLER);
 	    if (!lcond.isTrue()) {
 		Chain trueJumps = lcond.jumpTrue();
@@ -1976,7 +1982,7 @@ public class Gen extends JCTree.Visitor {
 	 */
         void appendStrings(JCTree tree) {
 	    tree = TreeInfo.skipParens(tree);
-	    if (tree.tag == JCTree.PLUS && tree.type.constValue() == null) {
+            if (tree.getTag() == JCTree.PLUS && tree.type.constValue() == null) {
 		JCBinary op = (JCBinary) tree;
 		if (op.operator.kind == MTH &&
 		    ((OperatorSymbol) op.operator).opcode == string_add) {
@@ -2219,7 +2225,7 @@ public class Gen extends JCTree.Visitor {
 	    if (nerrs != 0) {
 		// if errors, discard code
 		for (List<JCTree> l = cdef.defs; l.nonEmpty(); l = l.tail) {
-		    if (l.head.tag == JCTree.METHODDEF)
+                    if (l.head.getTag() == JCTree.METHODDEF)
 			((JCMethodDecl) l.head).sym.code = null;
 		}
 	    }

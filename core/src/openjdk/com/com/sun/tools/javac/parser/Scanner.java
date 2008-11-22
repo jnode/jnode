@@ -47,7 +47,6 @@ import static com.sun.tools.javac.util.LayoutCharacters.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Scanner.java	1.79 07/05/05")
 public class Scanner implements Lexer {
 
     private static boolean scannerDebug = false;
@@ -1121,4 +1120,3 @@ public class Scanner implements Lexer {
     }
 
 }
-

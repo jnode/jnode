@@ -43,7 +43,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  * represents an invocation of a generic class or interface.
  *
  * @author Scott Seligman
- * @version 1.18 07/05/05
  * @since 1.5
  */
 public class ParameterizedTypeImpl

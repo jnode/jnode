@@ -137,4 +137,3 @@ public class LayoutParser extends DefaultHandler {
         isParsing = ! qName.equals(currentRoot);
     }
 }
-

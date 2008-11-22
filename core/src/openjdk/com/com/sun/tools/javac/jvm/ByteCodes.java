@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.jvm;
 
-import com.sun.tools.javac.util.Version;
 
 /** Bytecode instruction codes, as well as typecodes used as
  *  instruction modifiers.
@@ -35,7 +34,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ByteCodes.java	1.26 07/05/05")
 public interface ByteCodes {
 
     /** Byte code instruction codes.
@@ -310,4 +308,3 @@ public interface ByteCodes {
 	"oops"
     };
 }
-

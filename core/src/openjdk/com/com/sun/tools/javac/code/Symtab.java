@@ -47,7 +47,6 @@ import static com.sun.tools.javac.code.Flags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Symtab.java	1.72 07/05/05")
 public class Symtab {
     /** The context key for the symbol table. */
     protected static final Context.Key<Symtab> symtabKey =
@@ -63,19 +62,20 @@ public class Symtab {
 
     /** Builtin types.
      */
-    public static final Type byteType = new Type(TypeTags.BYTE, null);       
-    public static final Type charType = new Type(TypeTags.CHAR, null);       
-    public static final Type shortType = new Type(TypeTags.SHORT, null);     
-    public static final Type intType = new Type(TypeTags.INT, null);         
-    public static final Type longType = new Type(TypeTags.LONG, null);       
-    public static final Type floatType = new Type(TypeTags.FLOAT, null);     
-    public static final Type doubleType = new Type(TypeTags.DOUBLE, null);   
-    public static final Type booleanType = new Type(TypeTags.BOOLEAN, null); 
-    public static final Type botType = new BottomType();
-    public static final JCNoType voidType = new JCNoType(TypeTags.VOID);
+    public final Type byteType = new Type(TypeTags.BYTE, null);
+    public final Type charType = new Type(TypeTags.CHAR, null);
+    public final Type shortType = new Type(TypeTags.SHORT, null);
+    public final Type intType = new Type(TypeTags.INT, null);
+    public final Type longType = new Type(TypeTags.LONG, null);
+    public final Type floatType = new Type(TypeTags.FLOAT, null);
+    public final Type doubleType = new Type(TypeTags.DOUBLE, null);
+    public final Type booleanType = new Type(TypeTags.BOOLEAN, null);
+    public final Type botType = new BottomType();
+    public final JCNoType voidType = new JCNoType(TypeTags.VOID);
 
     private final Name.Table names;
     private final ClassReader reader;
+    private final Target target;
 
     /** A symbol for the root package.
      */
@@ -145,6 +145,7 @@ public class Symtab {
     public final Type suppressWarningsType;
     public final Type inheritedType;
     public final Type proprietaryType;
+    public final Type systemType;
 
     /** The symbol representing the length field of an array.
      */
@@ -273,6 +274,55 @@ public class Symtab {
 	return reader.enterClass(names.fromString(s)).type;
     }
 
+    public void synthesizeEmptyInterfaceIfMissing(final Type type) {
+        final Completer completer = type.tsym.completer;
+        if (completer != null) {
+            type.tsym.completer = new Completer() {
+                public void complete(Symbol sym) throws CompletionFailure {
+                    try {
+                        completer.complete(sym);
+                    } catch (CompletionFailure e) {
+                        sym.flags_field |= (PUBLIC | INTERFACE);
+                        ((ClassType) sym.type).supertype_field = objectType;
+                    }
+                }
+            };
+        }
+    }
+
+    public void synthesizeBoxTypeIfMissing(final Type type) {
+        ClassSymbol sym = reader.enterClass(boxedName[type.tag]);
+        final Completer completer = sym.completer;
+        if (completer != null) {
+            sym.completer = new Completer() {
+                public void complete(Symbol sym) throws CompletionFailure {
+                    try {
+                        completer.complete(sym);
+                    } catch (CompletionFailure e) {
+                        sym.flags_field |= PUBLIC;
+                        ((ClassType) sym.type).supertype_field = objectType;
+                        Name n = target.boxWithConstructors() ? names.init : names.valueOf;
+                        MethodSymbol boxMethod =
+                            new MethodSymbol(PUBLIC | STATIC,
+                                n,
+                                new MethodType(List.of(type), sym.type,
+                                    List.<Type>nil(), methodClass),
+                                sym);
+                        sym.members().enter(boxMethod);
+                        MethodSymbol unboxMethod =
+                            new MethodSymbol(PUBLIC,
+                                type.tsym.name.append(names.Value), // x.intValue()
+                                new MethodType(List.<Type>nil(), type,
+                                    List.<Type>nil(), methodClass),
+                                sym);
+                        sym.members().enter(unboxMethod);
+                    }
+                }
+            };
+        }
+
+    }
+
     /** Constructor; enters all predefined identifiers and operators
      *  into symbol table.
      */
@@ -280,6 +330,7 @@ public class Symtab {
 	context.put(symtabKey, this);
 
 	names = Name.Table.instance(context);
+        target = Target.instance(context);
 
 	// Create the unknown type
 	unknownType = new Type(TypeTags.UNKNOWN, null);
@@ -374,7 +425,7 @@ public class Symtab {
 	collectionsType = enterClass("java.util.Collections");
 	comparableType = enterClass("java.lang.Comparable");
 	arraysType = enterClass("java.util.Arrays");
-	iterableType = Target.instance(context).hasIterable()
+        iterableType = target.hasIterable()
             ? enterClass("java.lang.Iterable")
             : enterClass("java.util.Collection");
 	iteratorType = enterClass("java.util.Iterator");
@@ -384,6 +435,12 @@ public class Symtab {
 	deprecatedType = enterClass("java.lang.Deprecated");
 	suppressWarningsType = enterClass("java.lang.SuppressWarnings");
 	inheritedType = enterClass("java.lang.annotation.Inherited");
+        systemType = enterClass("java.lang.System");
+
+        synthesizeEmptyInterfaceIfMissing(cloneableType);
+        synthesizeEmptyInterfaceIfMissing(serializableType);
+        synthesizeBoxTypeIfMissing(doubleType);
+        synthesizeBoxTypeIfMissing(floatType);
 
         // Enter a synthetic class that is used to mark Sun
         // proprietary classes in ct.sym.  This class does not have a

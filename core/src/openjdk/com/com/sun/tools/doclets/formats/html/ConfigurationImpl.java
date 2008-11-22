@@ -51,7 +51,7 @@ import java.io.*;
  */
 public class ConfigurationImpl extends Configuration {
     
-    private static final ConfigurationImpl instance = new ConfigurationImpl();
+    private static ConfigurationImpl instance = new ConfigurationImpl();
     
     /**
      * The build date.  Note: For now, we will use
@@ -189,6 +189,15 @@ public class ConfigurationImpl extends Configuration {
             "com.sun.tools.doclets.formats.html.resources.standard");
     }
     
+    /**
+     * Reset to a fresh new ConfigurationImpl, to allow multiple invocations
+     * of javadoc within a single VM. It would be better not to be using
+     * static fields at all, but .... (sigh).
+     */
+    public static void reset() {
+        instance = new ConfigurationImpl();
+    }
+
     public static ConfigurationImpl getInstance() {
         return instance;
     }
@@ -475,7 +484,7 @@ public class ConfigurationImpl extends Configuration {
      * {@inheritDoc}
      */
     public WriterFactory getWriterFactory() {
-        return WriterFactoryImpl.getInstance();
+        return new WriterFactoryImpl(this);
     }
         
     /**
@@ -485,5 +494,3 @@ public class ConfigurationImpl extends Configuration {
         return null;
     }
 }
-
-

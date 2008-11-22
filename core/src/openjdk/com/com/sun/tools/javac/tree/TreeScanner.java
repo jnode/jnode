@@ -41,7 +41,6 @@ import com.sun.tools.javac.tree.JCTree.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)TreeScanner.java	1.32 07/05/05")
 public class TreeScanner extends Visitor {
 
     /** Visitor method: Scan a single node.

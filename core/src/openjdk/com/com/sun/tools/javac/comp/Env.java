@@ -42,7 +42,6 @@ import java.util.NoSuchElementException;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Env.java	1.29 07/05/05")
 public class Env<A> implements Iterable<Env<A>> {
 
     /** The next enclosing environment.
@@ -120,7 +119,7 @@ public class Env<A> implements Iterable<Env<A>> {
      */
     public Env<A> enclosing(int tag) {
 	Env<A> env1 = this;
-	while (env1 != null && env1.tree.tag != tag) env1 = env1.next;
+        while (env1 != null && env1.tree.getTag() != tag) env1 = env1.next;
 	return env1;
     }
     

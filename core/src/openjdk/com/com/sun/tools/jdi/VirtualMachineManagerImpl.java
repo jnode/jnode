@@ -37,15 +37,13 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.io.IOException;
 
-import sun.misc.Service; 			// slated to move to java.util in tiger.
-import sun.misc.ServiceConfigurationError;
+import java.util.ServiceLoader;
 
 /* Public for use by com.sun.jdi.Bootstrap */
 public class VirtualMachineManagerImpl implements VirtualMachineManagerService {
-    private List connectors = new ArrayList();
+    private List<Connector> connectors = new ArrayList<Connector>();
     private LaunchingConnector defaultConnector = null;
-    private List targets = new ArrayList();
-    private List connectionListeners = new ArrayList();
+    private List<VirtualMachine> targets = new ArrayList<VirtualMachine>();
     private final ThreadGroup mainGroupForJDI;
     private ResourceBundle messages = null;
     private int vmSequenceNumber = 0;
@@ -85,8 +83,11 @@ public class VirtualMachineManagerImpl implements VirtualMachineManagerService {
    	/*
 	 * Load the connectors
 	 */
-	Iterator connectors = Service.providers(Connector.class,
-						Connector.class.getClassLoader());
+        ServiceLoader<Connector> connectorLoader =
+            ServiceLoader.load(Connector.class, Connector.class.getClassLoader());
+
+        Iterator<Connector> connectors = connectorLoader.iterator();
+
 	while (connectors.hasNext()) {
 	    Connector connector;
 
@@ -109,8 +110,13 @@ public class VirtualMachineManagerImpl implements VirtualMachineManagerService {
 	 * Load any transport services and encapsulate them with 
   	 * an attaching and listening connector.
 	 */
-	Iterator transportServices = Service.providers(TransportService.class,
+        ServiceLoader<TransportService> transportLoader =
+            ServiceLoader.load(TransportService.class,
 						       TransportService.class.getClassLoader());
+
+        Iterator<TransportService> transportServices =
+            transportLoader.iterator();
+
 	while (transportServices.hasNext()) {
 	    TransportService transportService;
 
@@ -141,10 +147,8 @@ public class VirtualMachineManagerImpl implements VirtualMachineManagerService {
 	// isn't found then we arbitarly pick the first connector.
 	//
 	boolean found = false;
-	List launchers = launchingConnectors();
-	Iterator i = launchers.iterator();
-	while (i.hasNext()) {
-	    LaunchingConnector lc = (LaunchingConnector)i.next();
+        List<LaunchingConnector> launchers = launchingConnectors();
+        for (LaunchingConnector lc: launchers) {
 	    if (lc.name().equals("com.sun.jdi.CommandLineLaunch")) {
 		setDefaultConnector(lc);
 		found = true;
@@ -152,7 +156,7 @@ public class VirtualMachineManagerImpl implements VirtualMachineManagerService {
 	    }
 	}
 	if (!found && launchers.size() > 0) {
-	    setDefaultConnector((LaunchingConnector)launchers.get(0));
+            setDefaultConnector(launchers.get(0));
 	}
 
     }
@@ -168,47 +172,41 @@ public class VirtualMachineManagerImpl implements VirtualMachineManagerService {
         defaultConnector = connector;
     }
 
-    public List launchingConnectors() {
-        List launchingConnectors = new ArrayList(connectors.size());
-        Iterator iter = connectors.iterator();
-        while (iter.hasNext()) {
-            Object connector = iter.next();
+    public List<LaunchingConnector> launchingConnectors() {
+        List<LaunchingConnector> launchingConnectors = new ArrayList<LaunchingConnector>(connectors.size());
+        for (Connector connector: connectors) {
             if (connector instanceof LaunchingConnector) {
-                launchingConnectors.add(connector);
+                launchingConnectors.add((LaunchingConnector)connector);
             }
         }
         return Collections.unmodifiableList(launchingConnectors);
     }
 
-    public List attachingConnectors() {
-        List attachingConnectors = new ArrayList(connectors.size());
-        Iterator iter = connectors.iterator();
-        while (iter.hasNext()) {
-            Object connector = iter.next();
+    public List<AttachingConnector> attachingConnectors() {
+        List<AttachingConnector> attachingConnectors = new ArrayList<AttachingConnector>(connectors.size());
+        for (Connector connector: connectors) {
             if (connector instanceof AttachingConnector) {
-                attachingConnectors.add(connector);
+                attachingConnectors.add((AttachingConnector)connector);
             }
         }
         return Collections.unmodifiableList(attachingConnectors);
     }
 
-    public List listeningConnectors() {
-        List listeningConnectors = new ArrayList(connectors.size());
-        Iterator iter = connectors.iterator();
-        while (iter.hasNext()) {
-            Object connector = iter.next();
+    public List<ListeningConnector> listeningConnectors() {
+        List<ListeningConnector> listeningConnectors = new ArrayList<ListeningConnector>(connectors.size());
+        for (Connector connector: connectors) {
             if (connector instanceof ListeningConnector) {
-                listeningConnectors.add(connector);
+                listeningConnectors.add((ListeningConnector)connector);
             }
         }
         return Collections.unmodifiableList(listeningConnectors);
     }
 
-    public List allConnectors() {
+    public List<Connector> allConnectors() {
         return Collections.unmodifiableList(connectors);
     }
 
-    public List connectedVirtualMachines() {
+    public List<VirtualMachine> connectedVirtualMachines() {
         return Collections.unmodifiableList(targets);
     }
 

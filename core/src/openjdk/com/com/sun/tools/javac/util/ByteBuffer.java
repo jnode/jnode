@@ -36,7 +36,6 @@ import java.io.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ByteBuffer.java	1.26 07/05/05")
 public class ByteBuffer {
 
     /** An array holding the bytes in this buffer; can be grown.
@@ -166,11 +165,3 @@ public class ByteBuffer {
 	return names.fromUtf(elems, 0, length);
     }
 }
-	
-	
-	
-
-
-
-
-

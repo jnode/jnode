@@ -33,7 +33,6 @@ import static com.sun.tools.javac.code.Flags.*;
  *   Classes, methods and fields can be filtered, or filtering
  *   can be done directly on modifier bits. 
  *   @see com.sun.tools.javac.code.Flags;
- *   @version 07/05/05
  *   @author Robert Field
  */
 

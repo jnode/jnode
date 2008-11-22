@@ -37,7 +37,6 @@ import java.text.MessageFormat;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Messages.java	1.9 07/05/05")
 public class Messages {
     /** The context key for the Messages object. */
     protected static final Context.Key<Messages> messagesKey =

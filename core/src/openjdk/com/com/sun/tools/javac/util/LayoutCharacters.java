@@ -33,7 +33,6 @@ package com.sun.tools.javac.util;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)LayoutCharacters.java	1.24 07/05/05")
 public interface LayoutCharacters {
 
     /** Tabulator column increment.
@@ -62,5 +61,3 @@ public interface LayoutCharacters {
      */
     final static byte EOI   = 0x1A;
 }
-
-

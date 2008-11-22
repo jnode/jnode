@@ -26,6 +26,7 @@
 package com.sun.tools.jdi;
 
 import com.sun.jdi.*;
+import com.sun.jdi.event.*;
 import com.sun.jdi.connect.spi.Connection;
 import com.sun.jdi.event.EventSet;
 
@@ -33,9 +34,9 @@ import java.util.*;
 import java.io.IOException;
 
 public class TargetVM implements Runnable {
-    private Map waitingQueue = new HashMap(32,0.75f);
+    private Map<String, Packet> waitingQueue = new HashMap<String, Packet>(32,0.75f);
     private boolean shouldListen = true;
-    private List eventQueues = Collections.synchronizedList(new ArrayList(2));
+    private List<EventQueue> eventQueues = Collections.synchronizedList(new ArrayList<EventQueue>(2));
     private VirtualMachineImpl vm;
     private Connection connection;
     private Thread readerThread; 
@@ -372,4 +373,3 @@ public class TargetVM implements Runnable {
     }
 
 }
-

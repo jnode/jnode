@@ -35,7 +35,6 @@ import javax.tools.JavaFileObject;
 
 import static javax.tools.JavaFileObject.Kind.*;
 
-@Version("@(#)BaseFileObject.java	1.13 07/05/05")
 public abstract class BaseFileObject implements JavaFileObject {
 
     public JavaFileObject.Kind getKind() {

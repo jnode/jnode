@@ -37,7 +37,6 @@ import com.sun.tools.javac.code.Type;
  * <code>ProgramElementDoc</code>).
  *
  * @author Scott Seligman
- * @version 1.11 07/05/05
  * @since 1.5
  */
 abstract class AbstractTypeImpl implements com.sun.javadoc.Type {

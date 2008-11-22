@@ -280,5 +280,3 @@ class SerializedForm {
 	return definesSerializableFields;
     }
 }
-
-

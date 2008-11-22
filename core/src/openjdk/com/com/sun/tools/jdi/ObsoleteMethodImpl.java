@@ -54,20 +54,20 @@ public class ObsoleteMethodImpl extends NonConcreteMethodImpl {
         throw new ClassNotLoadedException("type unknown");
     }
 
-    public List argumentTypeNames() {
-        return new ArrayList();
+    public List<String> argumentTypeNames() {
+        return new ArrayList<String>();
     }
 
-    public List argumentSignatures() {
-        return new ArrayList();
+    public List<String> argumentSignatures() {
+        return new ArrayList<String>();
     }
 
     Type argumentType(int index) throws ClassNotLoadedException {
         throw new ClassNotLoadedException("type unknown");
     }
 
-    public List argumentTypes() throws ClassNotLoadedException {
-        return new ArrayList();
+    public List<Type> argumentTypes() throws ClassNotLoadedException {
+        return new ArrayList<Type>();
     }
 
 }

@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.main;
 
-import com.sun.tools.javac.util.Version;
 
 /**
  * TODO: describe com.sun.tools.javac.main.OptionName
@@ -35,7 +34,6 @@ import com.sun.tools.javac.util.Version;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-@Version("@(#)OptionName.java	1.8 07/05/05")
 public enum OptionName {
     G("-g"),
     G_NONE("-g:none"),

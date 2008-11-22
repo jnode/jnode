@@ -50,5 +50,3 @@ class VMAction extends EventObject {
         return id;
     }
 }
-
-

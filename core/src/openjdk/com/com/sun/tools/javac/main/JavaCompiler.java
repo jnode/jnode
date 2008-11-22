@@ -74,7 +74,6 @@ import javax.lang.model.SourceVersion;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)JavaCompiler.java	1.116 07/05/05")
 public class JavaCompiler implements ClassReader.SourceCompleter {
     /** The context key for the compiler. */
     protected static final Context.Key<JavaCompiler> compilerKey =
@@ -1362,7 +1361,7 @@ public class JavaCompiler implements ClassReader.SourceCompleter {
                     ListBuffer<JCTree> newdefs = lb();
                     for (List<JCTree> it = tree.defs; it.tail != null; it = it.tail) {
                         JCTree t = it.head;
-                        switch (t.tag) {
+                        switch (t.getTag()) {
                         case JCTree.CLASSDEF:
                             if (isInterface ||
                                 (((JCClassDecl) t).mods.flags & (Flags.PROTECTED|Flags.PUBLIC)) != 0 ||

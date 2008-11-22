@@ -176,4 +176,3 @@ public class LocalVariableImpl extends MirrorImpl
               "@" + scopeStart.toString();
     }
 }
-

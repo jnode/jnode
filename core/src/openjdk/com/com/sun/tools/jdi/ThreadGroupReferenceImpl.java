@@ -138,12 +138,12 @@ public class ThreadGroupReferenceImpl extends ObjectReferenceImpl
         return kids;
     }
 
-    public List threads() {
-        return Arrays.asList(kids().childThreads);
+    public List<ThreadReference> threads() {
+        return Arrays.asList((ThreadReference[])kids().childThreads);
     }
 
-    public List threadGroups() {
-        return Arrays.asList(kids().childGroups);
+    public List<ThreadGroupReference> threadGroups() {
+        return Arrays.asList((ThreadGroupReference[])kids().childGroups);
     }
 
     public String toString() {

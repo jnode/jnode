@@ -39,7 +39,6 @@ import java.util.Iterator;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Scope.java	1.47 07/05/05")
 public class Scope {
 
     /** The number of scopes that share this scope's hash table.

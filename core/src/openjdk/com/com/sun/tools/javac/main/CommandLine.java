@@ -31,7 +31,6 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.StreamTokenizer;
 import com.sun.tools.javac.util.ListBuffer;
-import com.sun.tools.javac.util.Version;
 
 /**
  * Various utility methods for processing Java tool command line arguments.
@@ -41,7 +40,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)CommandLine.java	1.22 07/05/05")
 public class CommandLine {
     /**
      * Process Win32-style command files for the specified command line

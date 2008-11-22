@@ -65,8 +65,8 @@ public class ArrayTypeImpl extends ReferenceTypeImpl
         // arrays don't have methods
     }
 
-    public List allMethods() {
-        return new ArrayList(0);   // arrays don't have methods
+    public List<Method> allMethods() {
+        return new ArrayList<Method>(0);   // arrays don't have methods
     }
 
     /*
@@ -147,8 +147,8 @@ public class ArrayTypeImpl extends ReferenceTypeImpl
         }
     }
 
-    List inheritedTypes() {
-        return new ArrayList(0);
+    List<ReferenceType> inheritedTypes() {
+        return new ArrayList<ReferenceType>(0);
     }
 
     void getModifiers() {

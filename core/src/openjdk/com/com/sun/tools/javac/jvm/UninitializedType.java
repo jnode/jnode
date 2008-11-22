@@ -27,7 +27,6 @@ package com.sun.tools.javac.jvm;
 
 import com.sun.tools.javac.code.*;
 
-import com.sun.tools.javac.util.Version;
 
 /** These pseudo-types appear in the generated verifier tables to
  *  indicate objects that have been allocated but not yet constructed.
@@ -37,7 +36,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)UninitializedType.java	1.12 07/05/05")
 class UninitializedType extends Type.DelegatedType {
     public static final int UNINITIALIZED_THIS = TypeTags.TypeTagCount;
     public static final int UNINITIALIZED_OBJECT = UNINITIALIZED_THIS + 1;

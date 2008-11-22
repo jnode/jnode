@@ -44,7 +44,6 @@ import static com.sun.tools.javac.code.Flags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Pretty.java	1.75 07/05/05")
 public class Pretty extends JCTree.Visitor {
 
     public Pretty(Writer out, boolean sourceOutput) {
@@ -311,7 +310,7 @@ public class Pretty extends JCTree.Visitor {
 
     /** Is the given tree an enumerator definition? */
     boolean isEnumerator(JCTree t) {
-        return t.tag == JCTree.VARDEF && (((JCVariableDecl) t).mods.flags & ENUM) != 0;
+        return t.getTag() == JCTree.VARDEF && (((JCVariableDecl) t).mods.flags & ENUM) != 0;
     }
 
     /** Print unit consisting of package clause and import statements in toplevel,
@@ -332,9 +331,9 @@ public class Pretty extends JCTree.Visitor {
         }
         boolean firstImport = true;
         for (List<JCTree> l = tree.defs;
-        l.nonEmpty() && (cdef == null || l.head.tag == JCTree.IMPORT);
+        l.nonEmpty() && (cdef == null || l.head.getTag() == JCTree.IMPORT);
         l = l.tail) {
-            if (l.head.tag == JCTree.IMPORT) {
+            if (l.head.getTag() == JCTree.IMPORT) {
                 JCImport imp = (JCImport)l.head;
                 Name name = TreeInfo.name(imp.qualid);
                 if (name == name.table.asterisk ||
@@ -528,7 +527,7 @@ public class Pretty extends JCTree.Visitor {
             printStat(tree.body);
             align();
             print(" while ");
-            if (tree.cond.tag == JCTree.PARENS) {
+            if (tree.cond.getTag() == JCTree.PARENS) {
                 printExpr(tree.cond);
             } else {
                 print("(");
@@ -544,7 +543,7 @@ public class Pretty extends JCTree.Visitor {
     public void visitWhileLoop(JCWhileLoop tree) {
         try {
             print("while ");
-            if (tree.cond.tag == JCTree.PARENS) {
+            if (tree.cond.getTag() == JCTree.PARENS) {
                 printExpr(tree.cond);
             } else {
                 print("(");
@@ -562,7 +561,7 @@ public class Pretty extends JCTree.Visitor {
         try {
             print("for (");
             if (tree.init.nonEmpty()) {
-                if (tree.init.head.tag == JCTree.VARDEF) {
+                if (tree.init.head.getTag() == JCTree.VARDEF) {
                     printExpr(tree.init.head);
                     for (List<JCStatement> l = tree.init.tail; l.nonEmpty(); l = l.tail) {
                         JCVariableDecl vdef = (JCVariableDecl)l.head;
@@ -609,7 +608,7 @@ public class Pretty extends JCTree.Visitor {
     public void visitSwitch(JCSwitch tree) {
         try {
             print("switch ");
-            if (tree.selector.tag == JCTree.PARENS) {
+            if (tree.selector.getTag() == JCTree.PARENS) {
                 printExpr(tree.selector);
             } else {
                 print("(");
@@ -648,7 +647,7 @@ public class Pretty extends JCTree.Visitor {
     public void visitSynchronized(JCSynchronized tree) {
         try {
             print("synchronized ");
-            if (tree.lock.tag == JCTree.PARENS) {
+            if (tree.lock.getTag() == JCTree.PARENS) {
                 printExpr(tree.lock);
             } else {
                 print("(");
@@ -706,7 +705,7 @@ public class Pretty extends JCTree.Visitor {
     public void visitIf(JCIf tree) {
         try {
             print("if ");
-            if (tree.cond.tag == JCTree.PARENS) {
+            if (tree.cond.getTag() == JCTree.PARENS) {
                 printExpr(tree.cond);
             } else {
                 print("(");
@@ -793,7 +792,7 @@ public class Pretty extends JCTree.Visitor {
     public void visitApply(JCMethodInvocation tree) {
         try {
             if (!tree.typeargs.isEmpty()) {
-                if (tree.meth.tag == JCTree.SELECT) {
+                if (tree.meth.getTag() == JCTree.SELECT) {
                     JCFieldAccess left = (JCFieldAccess)tree.meth;
                     printExpr(left.selected);
                     print(".<");
@@ -935,7 +934,7 @@ public class Pretty extends JCTree.Visitor {
         try {
             open(prec, TreeInfo.assignopPrec);
             printExpr(tree.lhs, TreeInfo.assignopPrec + 1);
-            print(" " + operatorName(tree.tag - JCTree.ASGOffset) + "= ");
+            print(" " + operatorName(tree.getTag() - JCTree.ASGOffset) + "= ");
             printExpr(tree.rhs, TreeInfo.assignopPrec);
             close(prec, TreeInfo.assignopPrec);
         } catch (IOException e) {
@@ -945,10 +944,10 @@ public class Pretty extends JCTree.Visitor {
 
     public void visitUnary(JCUnary tree) {
         try {
-            int ownprec = TreeInfo.opPrec(tree.tag);
-            String opname = operatorName(tree.tag);
+            int ownprec = TreeInfo.opPrec(tree.getTag());
+            String opname = operatorName(tree.getTag());
             open(prec, ownprec);
-            if (tree.tag <= JCTree.PREDEC) {
+            if (tree.getTag() <= JCTree.PREDEC) {
                 print(opname);
                 printExpr(tree.arg, ownprec);
             } else {
@@ -963,8 +962,8 @@ public class Pretty extends JCTree.Visitor {
 
     public void visitBinary(JCBinary tree) {
         try {
-            int ownprec = TreeInfo.opPrec(tree.tag);
-            String opname = operatorName(tree.tag);
+            int ownprec = TreeInfo.opPrec(tree.getTag());
+            String opname = operatorName(tree.getTag());
             open(prec, ownprec);
             printExpr(tree.lhs, ownprec);
             print(" " + opname + " ");

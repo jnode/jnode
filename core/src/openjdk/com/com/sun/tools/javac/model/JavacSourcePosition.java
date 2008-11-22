@@ -27,7 +27,6 @@ package com.sun.tools.javac.model;
 
 import javax.tools.JavaFileObject;
 import com.sun.tools.javac.util.Position;
-import com.sun.tools.javac.util.Version;
 
 /**
  * Implementation of model API SourcePosition based on javac internal state.
@@ -37,7 +36,6 @@ import com.sun.tools.javac.util.Version;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-@Version("@(#)JavacSourcePosition.java	1.8 07/05/05")
 class JavacSourcePosition {
 
     final JavaFileObject sourcefile;

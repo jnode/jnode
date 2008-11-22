@@ -45,7 +45,6 @@ import java.util.*;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)JavacMessager.java	1.15 07/05/05")
 public class JavacMessager implements Messager {
     Log log;
     JavacProcessingEnvironment processingEnv;
@@ -177,6 +176,6 @@ public class JavacMessager implements Messager {
     }
 
     public String toString() {
-	return "javac Messager version @(#)JavacMessager.java	1.15 07/05/05";
+        return "javac Messager";
     }
 }

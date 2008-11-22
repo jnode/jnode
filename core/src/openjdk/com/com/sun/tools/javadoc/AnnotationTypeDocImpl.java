@@ -44,7 +44,6 @@ import com.sun.tools.javac.util.Position;
  * Represents an annotation type.
  * 
  * @author Scott Seligman
- * @version 1.16 07/05/05
  * @since 1.5
  */
 

@@ -598,8 +598,3 @@ public class ClassWriterImpl extends SubWriterHolderWriter
         p();
     }
 }
-
-
-
-
-

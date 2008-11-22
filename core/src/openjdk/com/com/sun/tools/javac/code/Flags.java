@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.code;
 
-import com.sun.tools.javac.util.Version;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +37,6 @@ import javax.lang.model.element.Modifier;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Flags.java	1.51 07/05/05")
 public class Flags {
 
     private Flags() {} // uninstantiable

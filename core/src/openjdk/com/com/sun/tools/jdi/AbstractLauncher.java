@@ -70,7 +70,7 @@ abstract class AbstractLauncher extends ConnectorImpl implements LaunchingConnec
                                                         true);
         String quoted = null;
         String pending = null;
-        List tokenList = new ArrayList();
+        List<String> tokenList = new ArrayList<String>();
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             if (quoted != null) {
@@ -271,4 +271,3 @@ abstract class AbstractLauncher extends ConnectorImpl implements LaunchingConnec
         }
     }
 }
-

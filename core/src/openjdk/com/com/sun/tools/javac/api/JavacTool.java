@@ -52,7 +52,6 @@ import com.sun.tools.javac.util.JavacFileManager;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
 import com.sun.tools.javac.util.Pair;
-import com.sun.tools.javac.util.Version;
 import java.nio.charset.Charset;
 
 /**
@@ -65,7 +64,6 @@ import java.nio.charset.Charset;
  *
  * @author Peter von der Ah\u00e9
  */
-@Version("@(#)JavacTool.java	1.19 07/05/05")
 public final class JavacTool implements JavaCompiler {
     private final List<Pair<String,String>> options
         = new ArrayList<Pair<String,String>>();

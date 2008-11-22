@@ -104,4 +104,3 @@ public interface MethodWriter {
      */
     public void close() throws IOException;
 }
-

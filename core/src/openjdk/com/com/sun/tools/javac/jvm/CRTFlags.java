@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.jvm;
 
-import com.sun.tools.javac.util.Version;
 
 /** The CharacterRangeTable flags indicating type of an entry.
  *
@@ -34,7 +33,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)CRTFlags.java	1.17 07/05/05")
 public interface CRTFlags {
 
     /** CRTEntry flags.

@@ -173,7 +173,3 @@ public abstract class SubWriterHolderWriter extends HtmlDocletWriter {
     }
 
 }
-
-
-
-

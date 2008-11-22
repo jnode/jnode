@@ -40,7 +40,6 @@ import java.lang.ref.SoftReference;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Name.java	1.58 07/05/05")
 public class Name implements javax.lang.model.element.Name {
 
     /** The table structure where the name is stored

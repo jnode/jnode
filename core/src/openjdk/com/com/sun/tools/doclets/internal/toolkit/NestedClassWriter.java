@@ -93,4 +93,3 @@ public interface NestedClassWriter {
      */
     public void close() throws IOException;
 }
-

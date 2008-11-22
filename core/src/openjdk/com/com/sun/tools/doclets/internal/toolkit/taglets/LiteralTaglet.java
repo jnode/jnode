@@ -39,7 +39,6 @@ import com.sun.tools.doclets.Taglet;
  * <blockquote>  {@literal a<B>c}  </blockquote>
  *
  * @author Scott Seligman
- * @version 1.9 07/05/05
  * @since 1.5
  */
 

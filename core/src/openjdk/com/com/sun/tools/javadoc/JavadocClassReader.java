@@ -90,6 +90,18 @@ class JavadocClassReader extends ClassReader {
 		String classPathName = entryName.substring(0, lastSep + 1);
 		docenv.getPackageDoc(pack).setDocPath(zipName, classPathName);
 	    }
+            else if (fo instanceof JavacFileManager.ZipFileIndexFileObject) {
+                JavacFileManager.ZipFileIndexFileObject zfo = (JavacFileManager.ZipFileIndexFileObject) fo;
+                String zipName = zfo.getZipName();
+                String entryName = zfo.getZipEntryName();
+                if (File.separatorChar != '/') {
+                    entryName = entryName.replace(File.separatorChar, '/');
+                }
+
+                int lastSep = entryName.lastIndexOf("/");
+                String classPathName = entryName.substring(0, lastSep + 1);
+                docenv.getPackageDoc(pack).setDocPath(zipName, classPathName);
+            }
 	    else {
 		File fileDir = new File(Old199.getPath(fo)).getParentFile();
 		docenv.getPackageDoc(pack).setDocPath(fileDir.getAbsolutePath());

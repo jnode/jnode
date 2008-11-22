@@ -36,7 +36,6 @@ import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.
  */
-@Version("@(#)Warner.java	1.25 07/05/05")
 public class Warner {
     public static final Warner noWarnings = new Warner();
 

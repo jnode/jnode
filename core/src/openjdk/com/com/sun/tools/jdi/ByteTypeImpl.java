@@ -41,5 +41,3 @@ public class ByteTypeImpl extends PrimitiveTypeImpl implements ByteType {
         return vm.mirrorOf(((PrimitiveValueImpl)value).checkedByteValue());
     }    
 }
-
-

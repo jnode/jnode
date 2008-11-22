@@ -37,7 +37,6 @@ import java.util.NoSuchElementException;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ListBuffer.java	1.34 07/05/05")
 public class ListBuffer<A> implements Collection<A> {
 
     public static <T> ListBuffer<T> lb() {

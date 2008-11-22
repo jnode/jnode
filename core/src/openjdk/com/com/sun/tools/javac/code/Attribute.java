@@ -44,7 +44,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Attribute.java	1.20 07/05/05")
 public abstract class Attribute implements AnnotationValue {
 
     /** The type of the annotation element. */

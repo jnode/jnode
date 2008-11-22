@@ -46,4 +46,3 @@ public interface AnnotationTypeOptionalMemberWriter extends
      */
     public void writeDefaultValueInfo(MemberDoc member);
 }
-

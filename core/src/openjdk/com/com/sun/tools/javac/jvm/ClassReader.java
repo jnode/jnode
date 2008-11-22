@@ -63,7 +63,6 @@ import static javax.tools.StandardLocation.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ClassReader.java	1.142 07/05/05")
 public class ClassReader extends ClassFile implements Completer {
     /** The context key for the class reader. */
     protected static final Context.Key<ClassReader> classReaderKey =
@@ -776,7 +775,7 @@ public class ClassReader extends ClassFile implements Completer {
         Name name = names.fromUtf(signature, start, sigp - start);
         TypeVar tvar;
         if (sigEnterPhase) {
-            tvar = new TypeVar(name, currentOwner);
+            tvar = new TypeVar(name, currentOwner, syms.botType);
             typevars.enter(tvar.tsym);
         } else {
             tvar = (TypeVar)findTypeVar(name);
@@ -815,7 +814,7 @@ public class ClassReader extends ClassFile implements Completer {
                 // we don't know for sure if this owner is correct.  It could
                 // be a method and there is no way to tell before reading the
                 // enclosing method attribute.
-                TypeVar t = new TypeVar(name, currentOwner);
+                TypeVar t = new TypeVar(name, currentOwner, syms.botType);
                 missingTypeVariables = missingTypeVariables.prepend(t);
                 // System.err.println("Missing type var " + name);
                 return t;

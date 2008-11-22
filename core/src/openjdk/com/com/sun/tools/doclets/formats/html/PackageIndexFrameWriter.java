@@ -180,7 +180,3 @@ public class PackageIndexFrameWriter extends AbstractPackageIndexWriter {
         
     }
 }
-
-
-
-

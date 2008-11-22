@@ -63,4 +63,3 @@ public class NativeGen implements com.sun.tools.corba.se.idl.NativeGen
   } // generate
 
 } // class NativeGen
-

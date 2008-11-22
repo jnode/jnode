@@ -110,12 +110,12 @@ class SDE {
          * is always a terminator stratum.
          * Default sourceName (the first one) must be first.
          */
-        List sourceNames(ReferenceTypeImpl refType) {
+        List<String> sourceNames(ReferenceTypeImpl refType) {
             int i;
             int fileIndexStart = stratumTable[sti].fileIndex;
             /* one past end */
             int fileIndexEnd = stratumTable[sti+1].fileIndex; 
-            List result = new ArrayList(fileIndexEnd - fileIndexStart);
+            List<String> result = new ArrayList<String>(fileIndexEnd - fileIndexStart);
             for (i = fileIndexStart; i < fileIndexEnd; ++i) {
                 result.add(fileTable[i].sourceName);
             }
@@ -129,12 +129,12 @@ class SDE {
          * is always a terminator stratum.
          * Default sourcePath (the first one) must be first.
          */
-        List sourcePaths(ReferenceTypeImpl refType) {
+        List<String> sourcePaths(ReferenceTypeImpl refType) {
             int i;
             int fileIndexStart = stratumTable[sti].fileIndex;
             /* one past end */
             int fileIndexEnd = stratumTable[sti+1].fileIndex; 
-            List result = new ArrayList(fileIndexEnd - fileIndexStart);
+            List<String> result = new ArrayList<String>(fileIndexEnd - fileIndexStart);
             for (i = fileIndexStart; i < fileIndexEnd; ++i) {
                 result.add(fileTable[i].getSourcePath(refType));
             }
@@ -364,8 +364,8 @@ class SDE {
         return new Stratum(sti);
     }
 
-    List availableStrata() {
-        List strata = new ArrayList();
+    List<String> availableStrata() {
+        List<String> strata = new ArrayList<String>();
 
         for (int i = 0; i < (stratumIndex-1); ++i) {
             StratumTableRecord rec = stratumTable[i];

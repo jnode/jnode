@@ -173,7 +173,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Flow.java	1.95 07/05/05")
 public class Flow extends TreeScanner {
     protected static final Context.Key<Flow> flowKey =
 	new Context.Key<Flow>();
@@ -385,7 +384,7 @@ public class Flow extends TreeScanner {
      */
     void letInit(JCTree tree) {
 	tree = TreeInfo.skipParens(tree);
-	if (tree.tag == JCTree.IDENT || tree.tag == JCTree.SELECT) {
+        if (tree.getTag() == JCTree.IDENT || tree.getTag() == JCTree.SELECT) {
 	    Symbol sym = TreeInfo.symbol(tree);
 	    letInit(tree.pos(), (VarSymbol)sym);
 	}
@@ -419,7 +418,7 @@ public class Flow extends TreeScanner {
 	pendingExits = oldPendingExits;
 	for (; exits.nonEmpty(); exits = exits.tail) {
 	    PendingExit exit = exits.head;
-	    if (exit.tree.tag == JCTree.BREAK &&
+            if (exit.tree.getTag() == JCTree.BREAK &&
 		((JCBreak) exit.tree).target == tree) {
 		inits.andSet(exit.inits);
 		uninits.andSet(exit.uninits);
@@ -438,7 +437,7 @@ public class Flow extends TreeScanner {
 	pendingExits = new ListBuffer<PendingExit>();
 	for (; exits.nonEmpty(); exits = exits.tail) {
 	    PendingExit exit = exits.head;
-	    if (exit.tree.tag == JCTree.CONTINUE &&
+            if (exit.tree.getTag() == JCTree.CONTINUE &&
 		((JCContinue) exit.tree).target == tree) {
 		inits.andSet(exit.inits);
 		uninits.andSet(exit.uninits);
@@ -483,7 +482,7 @@ public class Flow extends TreeScanner {
      */
     void scanDef(JCTree tree) {
 	scanStat(tree);
-	if (tree != null && tree.tag == JCTree.BLOCK && !alive) {
+        if (tree != null && tree.getTag() == JCTree.BLOCK && !alive) {
 	    log.error(tree.pos(),
 		      "initializer.must.be.able.to.complete.normally");
 	}
@@ -494,7 +493,7 @@ public class Flow extends TreeScanner {
     void scanStat(JCTree tree) {
 	if (!alive && tree != null) {
 	    log.error(tree.pos(), "unreachable.stmt");
-	    if (tree.tag != JCTree.SKIP) alive = true;
+            if (tree.getTag() != JCTree.SKIP) alive = true;
 	}
 	scan(tree);
     }
@@ -578,7 +577,7 @@ public class Flow extends TreeScanner {
 	try {
 	    // define all the static fields
 	    for (List<JCTree> l = tree.defs; l.nonEmpty(); l = l.tail) {
-		if (l.head.tag == JCTree.VARDEF) {
+                if (l.head.getTag() == JCTree.VARDEF) {
 		    JCVariableDecl def = (JCVariableDecl)l.head;
 		    if ((def.mods.flags & STATIC) != 0) {
 			VarSymbol sym = def.sym;
@@ -590,7 +589,7 @@ public class Flow extends TreeScanner {
 
 	    // process all the static initializers
 	    for (List<JCTree> l = tree.defs; l.nonEmpty(); l = l.tail) {
-		if (l.head.tag != JCTree.METHODDEF &&
+                if (l.head.getTag() != JCTree.METHODDEF &&
 		    (TreeInfo.flags(l.head) & STATIC) != 0) {
 		    scanDef(l.head);
 		    errorUncaught();
@@ -617,7 +616,7 @@ public class Flow extends TreeScanner {
 
 	    // define all the instance fields
 	    for (List<JCTree> l = tree.defs; l.nonEmpty(); l = l.tail) {
-		if (l.head.tag == JCTree.VARDEF) {
+                if (l.head.getTag() == JCTree.VARDEF) {
 		    JCVariableDecl def = (JCVariableDecl)l.head;
 		    if ((def.mods.flags & STATIC) == 0) {
 			VarSymbol sym = def.sym;
@@ -629,7 +628,7 @@ public class Flow extends TreeScanner {
 
 	    // process all the instance initializers
 	    for (List<JCTree> l = tree.defs; l.nonEmpty(); l = l.tail) {
-		if (l.head.tag != JCTree.METHODDEF &&
+                if (l.head.getTag() != JCTree.METHODDEF &&
 		    (TreeInfo.flags(l.head) & STATIC) == 0) {
 		    scanDef(l.head);
 		    errorUncaught();
@@ -652,7 +651,7 @@ public class Flow extends TreeScanner {
             
 	    // process all the methods
 	    for (List<JCTree> l = tree.defs; l.nonEmpty(); l = l.tail) {
-		if (l.head.tag == JCTree.METHODDEF) {
+                if (l.head.getTag() == JCTree.METHODDEF) {
 		    scan(l.head);
 		    errorUncaught();
 		}
@@ -721,7 +720,7 @@ public class Flow extends TreeScanner {
 		PendingExit exit = exits.head;
 		exits = exits.tail;
 		if (exit.thrown == null) {
-		    assert exit.tree.tag == JCTree.RETURN;
+                    assert exit.tree.getTag() == JCTree.RETURN;
 		    if (isInitialConstructor) {
 			inits = exit.inits;
 			for (int i = firstadr; i < nextadr; i++)
@@ -941,7 +940,7 @@ public class Flow extends TreeScanner {
 				    Bits uninits) {
 	    for (;stats.nonEmpty(); stats = stats.tail) {
 		JCTree stat = stats.head;
-		if (stat.tag == JCTree.VARDEF) {
+                if (stat.getTag() == JCTree.VARDEF) {
 		    int adr = ((JCVariableDecl) stat).sym.adr;
 		    inits.excl(adr);
 		    uninits.incl(adr);
@@ -1177,7 +1176,7 @@ public class Flow extends TreeScanner {
     }
 
     public void visitUnary(JCUnary tree) {
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.NOT:
 	    scanCond(tree.arg);
 	    Bits t = initsWhenFalse;
@@ -1198,7 +1197,7 @@ public class Flow extends TreeScanner {
     }
 
     public void visitBinary(JCBinary tree) {
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.AND:
 	    scanCond(tree.lhs);
 	    Bits initsWhenFalseLeft = initsWhenFalse;

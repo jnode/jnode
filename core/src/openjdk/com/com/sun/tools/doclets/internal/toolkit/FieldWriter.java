@@ -103,4 +103,3 @@ public interface FieldWriter {
      */
     public void close() throws IOException;
 }
-

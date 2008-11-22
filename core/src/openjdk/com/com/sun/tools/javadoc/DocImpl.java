@@ -418,4 +418,3 @@ abstract class DocImpl implements Doc, Comparable<Object> {
      */
     public SourcePosition position() { return null; }
 }
-

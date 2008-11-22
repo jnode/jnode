@@ -211,6 +211,3 @@ public class PackageIndexWriter extends AbstractPackageIndexWriter {
         printBottom();
     }
 }
-
-
-

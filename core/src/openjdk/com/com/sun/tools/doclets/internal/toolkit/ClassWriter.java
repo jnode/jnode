@@ -135,4 +135,3 @@ public interface ClassWriter {
      */
     public void completeMemberSummaryBuild();
 }
-

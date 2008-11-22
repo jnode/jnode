@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Helper.java	1.23 07/05/05
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;

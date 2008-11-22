@@ -34,7 +34,6 @@ package com.sun.tools.javac.util;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)FatalError.java	1.22 07/05/05")
 public class FatalError extends Error {
     private static final long serialVersionUID = 0;
 
@@ -59,5 +58,3 @@ public class FatalError extends Error {
 	super(s);
     }
 }
-
-

@@ -62,7 +62,6 @@ import com.sun.tools.javac.util.*;
  *  you write code that depends on this, you do so at your own risk.
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b> */
-@Version("@(#)ClassFile.java	1.35 07/05/05")
 public class ClassFile {
 
     public final static int JAVA_MAGIC = 0xCAFEBABE;
@@ -159,4 +158,3 @@ public class ClassFile {
 	}
     }
 }
-

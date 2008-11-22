@@ -28,7 +28,6 @@ package com.sun.tools.javac.parser;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
-import com.sun.tools.javac.util.Version;
 
 import static com.sun.tools.javac.parser.Token.*;
 
@@ -40,7 +39,6 @@ import static com.sun.tools.javac.parser.Token.*;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)Keywords.java	1.23 07/05/05")
 public class Keywords {
     public static final Context.Key<Keywords> keywordsKey =
 	new Context.Key<Keywords>();

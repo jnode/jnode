@@ -65,4 +65,3 @@ class StratumLineInfo implements LineInfo {
         return sourcePath;
     }
 }
-

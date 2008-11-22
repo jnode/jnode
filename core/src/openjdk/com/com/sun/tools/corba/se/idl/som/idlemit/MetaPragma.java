@@ -31,8 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997,1998,1999
  * RMI-IIOP v1.0
  *
- *  @(#)MetaPragma.java	1.22 07/05/05
- *
  */
 
 package com.sun.tools.corba.se.idl.som.idlemit;

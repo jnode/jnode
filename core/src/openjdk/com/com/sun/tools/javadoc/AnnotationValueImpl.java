@@ -38,7 +38,6 @@ import com.sun.tools.javac.code.TypeTags;
  * Represents a value of an annotation type element.
  * 
  * @author Scott Seligman
- * @version 1.14 07/05/05
  * @since 1.5
  */
 

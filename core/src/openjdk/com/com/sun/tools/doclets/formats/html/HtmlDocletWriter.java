@@ -1846,5 +1846,3 @@ public class HtmlDocletWriter extends HtmlDocWriter {
         return configuration;
     }
 }
-
-

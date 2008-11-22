@@ -46,7 +46,7 @@ public class StackFrameImpl extends MirrorImpl
     private final ThreadReferenceImpl thread;
     private final long id;
     private final Location location;
-    private Map visibleVariables =  null;
+    private Map<String, LocalVariable> visibleVariables =  null;
     private ObjectReference thisObject = null;
 
     StackFrameImpl(VirtualMachine vm, ThreadReferenceImpl thread, 
@@ -156,17 +156,15 @@ public class StackFrameImpl extends MirrorImpl
      */
     private void createVisibleVariables() throws AbsentInformationException {
         if (visibleVariables == null) {
-            List allVariables = location.method().variables();
-            Map map = new HashMap(allVariables.size());
+            List<LocalVariable> allVariables = location.method().variables();
+            Map<String, LocalVariable> map = new HashMap<String, LocalVariable>(allVariables.size());
         
-            Iterator iter = allVariables.iterator();
-            while (iter.hasNext()) {
-                LocalVariableImpl variable = (LocalVariableImpl)iter.next();
+            for (LocalVariable variable : allVariables) {
                 String name = variable.name();
                 if (variable.isVisible(this)) {
                     LocalVariable existing = (LocalVariable)map.get(name);
                     if ((existing == null) || 
-                        variable.hides(existing)) {
+                        ((LocalVariableImpl)variable).hides(existing)) {
                         map.put(name, variable);
                     }
                 }
@@ -179,10 +177,10 @@ public class StackFrameImpl extends MirrorImpl
      * Return the list of visible variable in the frame.
      * Need not be synchronized since it cannot be provably stale.
      */
-    public List visibleVariables() throws AbsentInformationException {
+    public List<LocalVariable> visibleVariables() throws AbsentInformationException {
         validateStackFrame();
         createVisibleVariables();
-        List mapAsList = new ArrayList(visibleVariables.values());
+        List<LocalVariable> mapAsList = new ArrayList<LocalVariable>(visibleVariables.values());
         Collections.sort(mapAsList);
         return mapAsList;
     }
@@ -194,17 +192,16 @@ public class StackFrameImpl extends MirrorImpl
     public LocalVariable visibleVariableByName(String name) throws AbsentInformationException  {
         validateStackFrame();
         createVisibleVariables();
-        return (LocalVariable)visibleVariables.get(name);
+        return visibleVariables.get(name);
     }
 
     public Value getValue(LocalVariable variable) {
-        List list = new ArrayList(1);
+        List<LocalVariable> list = new ArrayList<LocalVariable>(1);
         list.add(variable);
-        Map map = getValues(list);
-        return (Value)map.get(variable);
+        return getValues(list).get(variable);
     }
 
-    public Map getValues(List<? extends LocalVariable> variables) {      
+    public Map<LocalVariable, Value> getValues(List<? extends LocalVariable> variables) {
         validateStackFrame();
         validateMirrors(variables);
 
@@ -249,7 +246,7 @@ public class StackFrameImpl extends MirrorImpl
             throw new InternalException(
                       "Wrong number of values returned from target VM");
         }
-        Map map = new HashMap(count);
+        Map<LocalVariable, Value> map = new HashMap<LocalVariable, Value>(count);
         for (int i=0; i<count; ++i) {
             LocalVariableImpl variable = (LocalVariableImpl)variables.get(i);
             map.put(variable, values[i]);
@@ -318,7 +315,7 @@ public class StackFrameImpl extends MirrorImpl
         }
     }
 
-    public List getArgumentValues() {
+    public List<Value> getArgumentValues() {
         validateStackFrame();
         MethodImpl mmm = (MethodImpl)location.method();
         List<String> argSigs = mmm.argumentSignatures();
@@ -366,7 +363,7 @@ public class StackFrameImpl extends MirrorImpl
             throw new InternalException(
                       "Wrong number of values returned from target VM");
         }
-        return Arrays.asList(values);
+        return Arrays.asList((Value[])values);
     }
 
     void pop() throws IncompatibleThreadStateException {
@@ -405,4 +402,3 @@ public class StackFrameImpl extends MirrorImpl
        return location.toString() + " in thread " + thread.toString();
     }
 }
-
