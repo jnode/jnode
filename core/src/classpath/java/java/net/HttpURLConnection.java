@@ -586,4 +586,9 @@ public abstract class HttpURLConnection extends URLConnection
     // http://www.w3.org/Protocols/HTTP-NG/ng-notes.txt
     return super.getHeaderFieldDate(key, value);
   }
+    //jnode openjdk
+    public void setChunkedStreamingMode(Integer chunkSize) {
+        //todo implement it
+
+    }
 }
