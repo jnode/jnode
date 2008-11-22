@@ -39,7 +39,6 @@ import java.lang.annotation.Annotation;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.13 07/05/05
  * @since 1.6
  */
 public interface RoundEnvironment {
@@ -77,8 +76,8 @@ public interface RoundEnvironment {
      * The annotation may appear directly or be inherited.  Only
      * package elements and type elements <i>included</i> in this
      * round of annotation processing, or declarations of members,
-     * constructors, parameters, or type parameters declared within
-     * those, are returned.  Included type elements are {@linkplain
+     * parameters, or type parameters declared within those, are
+     * returned.  Included type elements are {@linkplain
      * #getRootElements root types} and any member types nested within
      * them.  Elements in a package are not considered included simply
      * because a {@code package-info} file for that package was
@@ -97,8 +96,8 @@ public interface RoundEnvironment {
      * The annotation may appear directly or be inherited.  Only
      * package elements and type elements <i>included</i> in this
      * round of annotation processing, or declarations of members,
-     * constructors, parameters, or type parameters declared within
-     * those, are returned.  Included type elements are {@linkplain
+     * parameters, or type parameters declared within those, are
+     * returned.  Included type elements are {@linkplain
      * #getRootElements root types} and any member types nested within
      * them.  Elements in a package are not considered included simply
      * because a {@code package-info} file for that package was

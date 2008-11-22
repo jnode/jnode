@@ -32,7 +32,6 @@ package javax.security.auth;
  * the <code>Refreshable</code> interface when the <code>refresh</code>
  * method fails.
  *
- * @version 1.15, 05/05/07
  */
 public class RefreshFailedException extends Exception {
 

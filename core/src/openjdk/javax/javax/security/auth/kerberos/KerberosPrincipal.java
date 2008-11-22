@@ -36,7 +36,6 @@ import sun.security.util.*;
  * This class encapsulates a Kerberos principal.
  *
  * @author Mayank Upadhyay
- * @version 1.29, 05/05/07
  * @since 1.4
  */
 

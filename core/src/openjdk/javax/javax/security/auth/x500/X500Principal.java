@@ -58,7 +58,6 @@ import sun.security.util.*;
  * <code>X509Certificate</code> return X500Principals representing the
  * issuer and subject fields of the certificate.
  *
- * @version 1.32, 05/05/07
  * @see java.security.cert.X509Certificate
  * @since 1.4
  */

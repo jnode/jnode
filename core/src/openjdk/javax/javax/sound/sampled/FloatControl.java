@@ -49,7 +49,6 @@ package javax.sound.sampled;
  *
  * @author David Rivas
  * @author Kara Kytle
- * @version 1.23, 07/05/05
  * @since 1.3
  */
 public abstract class FloatControl extends Control {
@@ -336,7 +335,6 @@ public abstract class FloatControl extends Control {
      * common types.
      *
      * @author Kara Kytle
-     * @version 1.23, 07/05/05
      * @since 1.3
      */
     public static class Type extends Control.Type {

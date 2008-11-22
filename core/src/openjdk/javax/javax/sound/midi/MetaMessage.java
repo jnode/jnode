@@ -54,7 +54,6 @@ import java.io.IOException;
  *
  * @see MetaEventListener
  *
- * @version 1.31, 07/05/05
  * @author David Rivas
  * @author Kara Kytle
  */

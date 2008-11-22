@@ -28,7 +28,6 @@ package javax.security.auth.login;
 /**
  * This is the basic login exception.
  *
- * @version 1.23, 05/05/07
  * @see javax.security.auth.login.LoginContext
  */
 

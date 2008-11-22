@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package javax.imageio.stream;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 import java.nio.ByteOrder;
@@ -35,7 +34,6 @@ import java.nio.ByteOrder;
  * This class is designed to reduce the number of methods that must
  * be implemented by subclasses.
  *
- * @version 0.5
  */
 public abstract class ImageOutputStreamImpl
     extends ImageInputStreamImpl

@@ -45,7 +45,6 @@ import java.util.Set;
  * usually represented in scripts by the corresponding keys or by decorated forms of them.
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 

@@ -47,7 +47,6 @@ import javax.swing.text.*;
  * @see AccessibleContext#getAccessibleText
  * @see AccessibleText.AccessibleTextChunk
  *
- * @version      1.11 05/05/07
  * @author       Peter Korn
  * @author       Lynn Monsanto
  * @since 1.5
@@ -142,4 +141,3 @@ public interface AccessibleExtendedText {
      */
     public Rectangle getTextBounds(int startIndex, int endIndex);
 }
- 

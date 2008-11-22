@@ -46,7 +46,6 @@ import javax.xml.transform.Source;
  *
  * @author <a href="mailto:Neeraj.Bajaj@Sun.com">Neeraj Bajaj</a>
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.4 $, $Date: 2006/04/24 13:42:27 $
  *
  * @see <a href="http://jcp.org/en/jsr/detail?id=173">
  *  JSR 173: Streaming API for XML</a>

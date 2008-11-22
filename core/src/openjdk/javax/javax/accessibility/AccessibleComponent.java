@@ -44,7 +44,6 @@ import java.awt.event.*;
  * @see AccessibleContext
  * @see AccessibleContext#getAccessibleComponent
  *
- * @version     1.7 10/05/99 14:00:28
  * @author	Peter Korn
  * @author	Hans Muller
  * @author      Willie Walker

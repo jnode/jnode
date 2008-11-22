@@ -36,7 +36,6 @@ package javax.sound.sampled;
  * each kind of control.
  *
  * @author Kara Kytle
- * @version 1.32, 07/05/05
  *
  * @see Line#getControls
  * @see Line#isControlSupported

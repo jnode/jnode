@@ -46,7 +46,6 @@ import javax.sound.sampled.AudioInputStream;
  * the stream returned by one of the <code>getAudioInputStream</code> methods.
  *
  * @author Kara Kytle
- * @version 1.36, 07/05/05
  * @since 1.3
  */
 public abstract class FormatConversionProvider {

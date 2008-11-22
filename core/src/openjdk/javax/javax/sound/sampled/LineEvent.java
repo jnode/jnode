@@ -38,7 +38,6 @@ package javax.sound.sampled;
  * serialize a <code>LineEvent</code> object will fail.
  *
  * @author Kara Kytle
- * @version 1.33, 07/05/05
  *
  * @see Line
  * @see LineListener#update

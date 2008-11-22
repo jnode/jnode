@@ -157,7 +157,6 @@ import com.sun.media.sound.AutoConnectSequencer;
  * If that fails, too, a <code>MidiUnavailableException</code>
  * is thrown.
  *
- * @version 1.74, 07/05/05
  * @author Kara Kytle
  * @author Florian Bomers
  * @author Matthias Pfisterer

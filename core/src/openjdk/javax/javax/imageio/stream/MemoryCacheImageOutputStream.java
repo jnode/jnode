@@ -38,7 +38,6 @@ import java.io.OutputStream;
  * the stream that have already been written to the cache and not
  * yet flushed.
  *
- * @version 0.5
  */
 public class MemoryCacheImageOutputStream extends ImageOutputStreamImpl {
 

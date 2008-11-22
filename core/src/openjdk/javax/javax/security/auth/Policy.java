@@ -152,7 +152,6 @@ package javax.security.auth;
  * Policy for Principal-based Permission entries.
  *
  *
- * @version 1.59, 05/05/07
  */
 @Deprecated
 public abstract class Policy {

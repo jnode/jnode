@@ -123,7 +123,6 @@ import java.util.Map;
  * no arguments.  This allows classes which load the <code>LoginModule</code>
  * to instantiate it.
  *
- * @version 1.60, 05/05/07
  * @see javax.security.auth.login.LoginContext
  * @see javax.security.auth.login.Configuration
  */

@@ -72,7 +72,6 @@ import java.awt.IllegalComponentStateException;
  * description: Minimal information that all accessible objects return
  *
 
- * @version     1.51 05/05/07
  * @author	Peter Korn
  * @author      Hans Muller
  * @author      Willie Walker

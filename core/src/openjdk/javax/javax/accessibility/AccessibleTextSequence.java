@@ -35,7 +35,6 @@ package javax.accessibility;
  * @see AccessibleContext#getAccessibleText
  * @see AccessibleAttributeSequence
  *
- * @version      1.11 05/05/07
  * @author       Lynn Monsanto
  */
  
@@ -75,4 +74,3 @@ public class AccessibleTextSequence {
         text = txt;
     }
 };
-

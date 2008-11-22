@@ -42,7 +42,6 @@ package javax.accessibility;
  * @see AccessibleContext
  * @see AccessibleContext#getAccessibleValue
  *
- * @version     1.9 10/12/99 15:41:54
  * @author	Peter Korn
  * @author      Hans Muller
  * @author      Willie Walker

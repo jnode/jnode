@@ -39,7 +39,6 @@ import org.w3c.dom.Node;
  * {@link javax.xml.parsers.DocumentBuilderFactory#setNamespaceAware(boolean awareness)}.</p>
  * 
  * @author <a href="Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.2 $, $Date: 2005/06/10 03:50:40 $
  * @see <a href="http://www.w3.org/TR/DOM-Level-2">Document Object Model (DOM) Level 2 Specification</a>
  */
 public class DOMSource implements Source {

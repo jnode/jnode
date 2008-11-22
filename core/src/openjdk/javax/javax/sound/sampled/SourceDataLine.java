@@ -57,7 +57,6 @@ package javax.sound.sampled;
  * when the audio output resumes. 
  *
  * @author Kara Kytle
- * @version 1.27 07/05/05
  * @see Mixer
  * @see DataLine
  * @see TargetDataLine

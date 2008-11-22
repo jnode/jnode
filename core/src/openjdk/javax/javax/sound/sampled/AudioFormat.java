@@ -115,7 +115,6 @@ import java.util.Map;
  *
  * @author Kara Kytle
  * @author Florian Bomers
- * @version 1.41 07/05/05
  * @see DataLine#getFormat
  * @see AudioInputStream#getFormat
  * @see AudioFileFormat
@@ -573,7 +572,6 @@ public class AudioFormat {
      * @see javax.sound.sampled.spi.FormatConversionProvider
      *
      * @author Kara Kytle
-     * @version 1.41 07/05/05
      * @since 1.3
      */
     public static class Encoding {
@@ -660,4 +658,3 @@ public class AudioFormat {
 
     } // class Encoding
 }
-

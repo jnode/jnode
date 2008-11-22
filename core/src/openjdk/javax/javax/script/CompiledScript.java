@@ -39,7 +39,6 @@ import java.util.Map;
  * of tne <code>CompiledScript</code>  may visible during subsequent executions of scripts by the engine.
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public abstract class CompiledScript {

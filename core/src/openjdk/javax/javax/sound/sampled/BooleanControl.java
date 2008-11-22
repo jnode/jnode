@@ -40,7 +40,6 @@ package javax.sound.sampled;
  * display in the user interface.
  *
  * @author Kara Kytle
- * @version 1.22, 07/05/05
  * @since 1.3
  */
 public abstract class BooleanControl extends Control {
@@ -156,7 +155,6 @@ public abstract class BooleanControl extends Control {
      * common types.
      *
      * @author Kara Kytle
-     * @version 1.22, 07/05/05
      * @since 1.3
      */
     public static class Type extends Control.Type {

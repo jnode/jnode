@@ -74,7 +74,6 @@ import java.security.BasicPermission;
  *<p>
  *
  * @author Kara Kytle
- * @version 1.25 07/05/05
  * @since 1.3
  */
 /*
@@ -122,7 +121,6 @@ import java.security.BasicPermission;
  *<p>
  *
  * @author Kara Kytle
- * @version 1.25 07/05/05
  * @since 1.3
  */
 
@@ -202,7 +200,6 @@ import java.security.BasicPermission;
  * </table>
  *<p>
  *
- * @version 1.25 07/05/05
  * @author Kara Kytle
  */
 
@@ -237,4 +234,3 @@ public class AudioPermission extends BasicPermission {
 	super(name, actions);
     }
 }
-

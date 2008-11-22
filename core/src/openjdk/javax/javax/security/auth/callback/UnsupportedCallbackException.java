@@ -29,7 +29,6 @@ package javax.security.auth.callback;
  * Signals that a <code>CallbackHandler</code> does not
  * recognize a particular <code>Callback</code>.
  *
- * @version 1.18, 05/05/07
  */
 public class UnsupportedCallbackException extends Exception {
 

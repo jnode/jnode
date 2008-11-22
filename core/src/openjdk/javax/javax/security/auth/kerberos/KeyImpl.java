@@ -44,7 +44,6 @@ import sun.security.util.DerValue;
  * with a principal and may represent an ephemeral session key.
  *
  * @author Mayank Upadhyay
- * @version 1.27, 05/05/07
  * @since 1.4
  * 
  * @serial include

@@ -41,7 +41,6 @@ import javax.swing.text.*;
  * @see AccessibleText
  * @see AccessibleContext#getAccessibleText
  *
- * @version 1.20, 05/05/07
  * @author	Peter Korn
  */
 public abstract class AccessibleHyperlink implements AccessibleAction {

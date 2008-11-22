@@ -143,8 +143,10 @@ class FactoryFinder {
         try {
             Class providerClass = getProviderClass(className, cl, doFallback);                        
             Object instance = providerClass.newInstance();
+            if (debug) {    // Extra check to avoid computing cl strings
             dPrint("created new instance of " + providerClass +
                    " using ClassLoader: " + cl);
+            }
             return instance;
         } 
         catch (ClassNotFoundException x) {
@@ -261,7 +263,9 @@ class FactoryFinder {
             return null;
         }
         
+        if (debug) {    // Extra check to avoid computing cl strings
         dPrint("found jar resource=" + serviceId + " using ClassLoader: " + cl);
+        }
         
         BufferedReader rd;
         try {

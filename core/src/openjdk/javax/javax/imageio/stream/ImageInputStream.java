@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1999-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,9 +26,7 @@
 package javax.imageio.stream;
 
 import java.io.DataInput;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.UTFDataFormatException;
 import java.nio.ByteOrder;
 
 /**
@@ -43,7 +41,6 @@ import java.nio.ByteOrder;
  * @see FileCacheImageInputStream
  * @see MemoryCacheImageInputStream
  *
- * @version 0.5
  */
 public interface ImageInputStream extends DataInput {
 

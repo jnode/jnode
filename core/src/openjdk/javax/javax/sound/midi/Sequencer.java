@@ -64,7 +64,6 @@ import java.io.IOException;
  * @see Transmitter
  * @see MidiDevice
  *
- * @version 1.43, 07/05/05
  * @author Kara Kytle
  * @author Florian Bomers
  */

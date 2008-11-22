@@ -47,7 +47,6 @@ package javax.sound.midi;
  * @see SysexMessage
  * @see MetaMessage
  *
- * @version 1.32, 07/05/05
  * @author David Rivas
  * @author Kara Kytle
  * @author Florian Bomers

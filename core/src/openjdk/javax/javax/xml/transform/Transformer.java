@@ -45,7 +45,6 @@ import java.util.Properties;
  * output properties are preserved across transformations.</p>
  * 
  * @author <a href="Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.3 $, $Date: 2005/10/12 17:14:20 $
  */
 public abstract class Transformer {
 

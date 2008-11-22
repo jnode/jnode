@@ -37,7 +37,6 @@ import java.util.ResourceBundle;
  *
  * @see AccessibleRelation
  *
- * @version     1.21 05/05/07
  * @author      Lynn Monsanto
  * @since 1.3
  */

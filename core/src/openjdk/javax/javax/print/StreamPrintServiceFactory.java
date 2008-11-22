@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,7 +33,8 @@ import java.util.Iterator;
 import javax.print.DocFlavor;
 
 import sun.awt.AppContext;
-import sun.misc.Service;
+import java.util.ServiceLoader;
+import java.util.ServiceConfigurationError;
 
 /**
  * A <code>StreamPrintServiceFactory</code> is the factory for 
@@ -84,10 +85,12 @@ public abstract class StreamPrintServiceFactory {
     /**
      * Locates factories for print services that can be used with
      * a print job to output a stream of data in the
-     * format specified by <code>flavor</code>.
-     * For example, the doc flavor is the document type that you want to
-     * create, not the flavor of the 
-     * document before printing.
+     * format specified by {@code outputMimeType}.
+     * <p>
+     * The {@code outputMimeType} parameter describes the document type that
+     * you want to create, whereas the {@code flavor} parameter describes the
+     * format in which the input data will be provided by the application
+     * to the {@code StreamPrintService}.
      * <p>
      * Although null is an acceptable value to use in the lookup of stream
      * printing services, it's typical to search for a particular
@@ -173,17 +176,20 @@ public abstract class StreamPrintServiceFactory {
 		java.security.AccessController.doPrivileged(
 		     new java.security.PrivilegedExceptionAction() {
                         public Object run() {
-			    Iterator iterator =
-				Service.providers(
-				    StreamPrintServiceFactory.class);
+                            Iterator<StreamPrintServiceFactory> iterator =
+                                ServiceLoader.load
+                                (StreamPrintServiceFactory.class).iterator();
 			    ArrayList lof = getListOfFactories();
 			    while (iterator.hasNext()) {
 				try {
-				    StreamPrintServiceFactory factory =
-				 	(StreamPrintServiceFactory)
-					           iterator.next();
-				    lof.add(factory);
-				}  catch (Exception e) {
+                                    lof.add(iterator.next());
+                                }  catch (ServiceConfigurationError err) {
+                                     /* In the applet case, we continue */
+                                    if (System.getSecurityManager() != null) {
+                                        err.printStackTrace();
+                                    } else {
+                                        throw err;
+                                    }
 				}
 			    }
 			    return null;

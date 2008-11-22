@@ -51,7 +51,6 @@ package javax.sound.sampled;
  * the oldest queued data is discarded and replaced by new data.
  * 
  * @author Kara Kytle
- * @version 1.27 07/05/05
  * @see Mixer
  * @see DataLine
  * @see SourceDataLine

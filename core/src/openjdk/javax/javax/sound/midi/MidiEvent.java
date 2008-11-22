@@ -37,7 +37,6 @@ package javax.sound.midi;
  * contained in a <code>Sequence</code>. 
  *
  *
- * @version 1.17 07/05/05
  * @author David Rivas
  * @author Kara Kytle
  */

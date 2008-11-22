@@ -30,7 +30,6 @@ import java.util.Map;
  * A mapping of key/value pairs, all of whose keys are
  * <code>Strings</code>.
  *
- * @version 1.0
  * @author Mike Grogan
  * @since 1.6
  */

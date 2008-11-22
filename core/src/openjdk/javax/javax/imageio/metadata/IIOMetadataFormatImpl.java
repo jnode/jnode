@@ -73,7 +73,6 @@ import com.sun.imageio.plugins.common.StandardMetadataFormat;
  *
  * @see ResourceBundle#getBundle(String,Locale)
  *
- * @version 0.5
  */
 public abstract class IIOMetadataFormatImpl implements IIOMetadataFormat {
 

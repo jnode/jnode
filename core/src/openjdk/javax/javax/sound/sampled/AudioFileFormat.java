@@ -98,7 +98,6 @@ import java.util.Map;
  * @author David Rivas
  * @author Kara Kytle
  * @author Florian Bomers
- * @version 1.29 07/05/05
  * @see AudioInputStream
  * @since 1.3
  */

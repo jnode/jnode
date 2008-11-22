@@ -36,7 +36,6 @@ import java.io.Reader;
  * that can be used by the ScriptEngines for input and output.
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public interface ScriptContext {

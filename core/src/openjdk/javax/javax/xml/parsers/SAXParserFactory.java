@@ -38,7 +38,6 @@ import org.xml.sax.SAXNotSupportedException;
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
  * @author <a href="mailto:Neeraj.Bajaj@sun.com">Neeraj Bajaj</a>
  *
- * @version $Revision: 1.5 $, $Date: 2006/04/24 13:41:47 $
  *
  */
 public abstract class SAXParserFactory {
@@ -472,4 +471,3 @@ public abstract class SAXParserFactory {
             );
     }
 }
-

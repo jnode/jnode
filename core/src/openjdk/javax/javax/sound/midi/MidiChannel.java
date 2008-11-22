@@ -60,7 +60,6 @@ package javax.sound.midi;
  *
  * @see Synthesizer#getChannels
  *
- * @version 1.50, 05/05/07
  * @author David Rivas
  * @author Kara Kytle
  */

@@ -36,7 +36,6 @@ package javax.security.cert;
  * <code>java.security.cert</code>.</em></p>
  *
  * @author Hemma Prafullchandra
- * @version 1.36
  * @since 1.4
  * @see Certificate
  */

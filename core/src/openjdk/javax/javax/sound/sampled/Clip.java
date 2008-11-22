@@ -51,7 +51,6 @@ import java.io.IOException;
  * of the clip.
  *
  * @author Kara Kytle
- * @version 1.45, 07/05/05
  * @since 1.3
  */
 public interface Clip extends DataLine {

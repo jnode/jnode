@@ -35,7 +35,6 @@ import java.util.Set;
  * a <code>HashMap</code> or some other specified <code>Map</code>.
  * 
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public class SimpleBindings implements Bindings {

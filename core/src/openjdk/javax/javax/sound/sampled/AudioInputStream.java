@@ -53,7 +53,6 @@ import java.io.IOException;
  * @author David Rivas
  * @author Kara Kytle
  * @author Florian Bomers
- * @version 1.40, 07/05/05
  *
  * @see AudioSystem
  * @see Clip#open(AudioInputStream) Clip.open(AudioInputStream)

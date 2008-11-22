@@ -38,7 +38,6 @@ package javax.security.auth.login;
  * an IllegalArgumentException if it does not understand the
  * <code>Configuration.Parameters</code> input.
  *
- * @version 1.8, 05/05/07
  *
  * @since 1.6
  */

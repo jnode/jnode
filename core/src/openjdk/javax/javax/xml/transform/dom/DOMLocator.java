@@ -47,4 +47,3 @@ public interface DOMLocator extends SourceLocator {
      */
     public Node getOriginatingNode();
 }
-

@@ -44,7 +44,6 @@ import java.util.ResourceBundle;
  * to describe the role of an object, a subclass should be generated
  * from this class and it should provide constants in a similar manner.
  *
- * @version     1.45 05/05/07
  * @author      Willie Walker
  * @author	Peter Korn
  */

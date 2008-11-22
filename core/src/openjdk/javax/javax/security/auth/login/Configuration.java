@@ -189,7 +189,6 @@ import sun.security.jca.GetInstance;
  * Java Cryptography Architecture API Specification &amp; Reference </a>
  * for a list of standard Configuration types.
  *
- * @version 1.70, 05/05/07
  * @see javax.security.auth.login.LoginContext
  */
 public abstract class Configuration {

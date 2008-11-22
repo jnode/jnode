@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,9 +25,7 @@
 
 package javax.imageio.stream;
 
-import java.io.DataInput;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -38,7 +36,6 @@ import com.sun.imageio.stream.StreamCloser;
  * output to a regular <code>OutputStream</code>.  A file is used to
  * cache data until it is flushed to the output stream.
  *
- * @version 0.5
  */
 public class FileCacheImageOutputStream extends ImageOutputStreamImpl {
 

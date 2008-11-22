@@ -32,7 +32,6 @@ import java.io.*;
  * Simple implementation of ScriptContext.
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public class SimpleScriptContext  implements ScriptContext {

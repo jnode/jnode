@@ -47,7 +47,6 @@ package javax.sound.sampled;
  * used for each setting.
  *
  * @author Kara Kytle
- * @version 1.21, 07/05/05
  * @since 1.3
  */
 public abstract class EnumControl extends Control {
@@ -183,7 +182,6 @@ public abstract class EnumControl extends Control {
      * @see EnumControl
      *
      * @author Kara Kytle
-     * @version 1.21, 07/05/05
      * @since 1.3
      */
     public static class Type extends Control.Type {

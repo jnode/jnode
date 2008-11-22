@@ -68,7 +68,6 @@ package javax.sound.midi;
  * @see Sequence
  * @see Receiver
  *
- * @version 1.36, 07/05/05
  * @author David Rivas
  * @author Kara Kytle
  */

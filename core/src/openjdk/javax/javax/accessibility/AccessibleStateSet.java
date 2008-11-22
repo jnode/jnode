@@ -38,7 +38,6 @@ import java.util.ResourceBundle;
  *
  * @see AccessibleState
  *
- * @version     1.10 10/12/99 15:05:34
  * @author      Willie Walker
  */
 public class AccessibleStateSet {

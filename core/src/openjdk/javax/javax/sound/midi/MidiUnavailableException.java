@@ -36,7 +36,6 @@ package javax.sound.midi;
  * {@link Transmitter#setReceiver(Receiver) setReceiver} method of 
  * <code>Transmitter</code>. 
  *
- * @version 1.20, 05/05/07
  * @author Kara Kytle
  */
 public class MidiUnavailableException extends Exception {

@@ -45,7 +45,6 @@ import java.net.URL;
  * @see Patch
  * @see Synthesizer#loadInstrument(Instrument)
  * @see MidiChannel#programChange(int, int)
- * @version 1.23, 07/05/05
  * @author Kara Kytle
  */
 
@@ -87,5 +86,3 @@ public abstract class Instrument extends SoundbankResource {
 	return patch;
     }	
 }
-
-

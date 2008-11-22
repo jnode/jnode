@@ -41,7 +41,6 @@ import java.util.EventListener;
  *
  * @see MidiChannel#controlChange(int, int)
  *
- * @version 1.22, 07/05/05
  * @author Kara Kytle
  */
 public interface ControllerEventListener extends EventListener {

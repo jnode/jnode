@@ -73,7 +73,6 @@ import javax.sound.sampled.Control;
  * @see Transmitter
  * @see MidiDevice
  *
- * @version 1.35, 07/05/05
  * @author Kara Kytle
  */
 public interface Synthesizer extends MidiDevice {
@@ -252,7 +251,8 @@ public interface Synthesizer extends MidiDevice {
      * <code>isSoundbankSupported()</code>, and if the instrument's 
      * <code>Soundbank</code> is supported, you can try loading the instrument.
      *  
-     * @return list of available instruments.
+     * @return list of available instruments. If the synthesizer
+     * has no instruments coming with it, an array of length 0 is returned.
      * @see #getLoadedInstruments	 
      * @see #isSoundbankSupported(Soundbank)
      * @see #loadInstrument	 

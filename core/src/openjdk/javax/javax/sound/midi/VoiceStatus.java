@@ -80,7 +80,6 @@ package javax.sound.midi;
  * @see Synthesizer#getMaxPolyphony
  * @see Synthesizer#getVoiceStatus
  *
- * @version 1.25, 05/05/07
  * @author David Rivas
  * @author Kara Kytle
  */

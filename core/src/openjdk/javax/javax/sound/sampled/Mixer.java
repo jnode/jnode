@@ -52,7 +52,6 @@ package javax.sound.sampled;
  * automatically start or stop simultaneously with the explicitly affected one.
  *
  * @author Kara Kytle
- * @version 1.38, 07/05/05
  * @since 1.3
  */
 public interface Mixer extends Line {
@@ -247,7 +246,6 @@ public interface Mixer extends Line {
      * method of the <code>Mixer</code> interface.
      *
      * @author Kara Kytle
-     * @version 1.38, 07/05/05
      * @since 1.3
      */
     public static class Info {

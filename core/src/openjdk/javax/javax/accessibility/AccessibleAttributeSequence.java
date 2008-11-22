@@ -37,7 +37,6 @@ import javax.swing.text.AttributeSet;
  * @see AccessibleContext#getAccessibleText
  * @see AccessibleTextSequence
  *
- * @version      1.11 05/05/07
  * @author       Lynn Monsanto
  */
  
@@ -77,4 +76,3 @@ public class AccessibleAttributeSequence {
     }
 
 };
-

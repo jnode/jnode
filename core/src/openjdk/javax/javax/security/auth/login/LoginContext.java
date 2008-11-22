@@ -193,7 +193,6 @@ import sun.security.util.ResourcesMgr;
  * &lt;JAVA_HOME&gt; refers to the value of the java.home system property,
  * and specifies the directory where the JRE is installed.
  * 
- * @version 1.107, 05/05/07
  * @see java.security.Security
  * @see javax.security.auth.AuthPermission
  * @see javax.security.auth.Subject

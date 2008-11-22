@@ -53,7 +53,6 @@ import javax.security.auth.DestroyFailedException;
  * {@link javax.security.auth.kerberos.ServicePermission ServicePermission}.
  *
  * @author Mayank Upadhyay
- * @version 1.27, 05/05/07
  * @since 1.4
  */
 public class KerberosKey implements SecretKey, Destroyable {

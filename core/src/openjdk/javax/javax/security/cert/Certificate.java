@@ -59,7 +59,6 @@ import java.security.SignatureException;
  * @see X509Certificate
  *
  * @author Hemma Prafullchandra
- * @version 1.23
  */
 public abstract class Certificate {
 
