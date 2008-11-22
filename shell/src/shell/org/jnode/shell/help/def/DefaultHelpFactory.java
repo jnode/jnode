@@ -29,12 +29,9 @@ import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
-import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.HelpFactory;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.Syntax;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.OptionSyntax;
@@ -61,13 +58,11 @@ public class DefaultHelpFactory extends HelpFactory {
     
     @Override
     public Help getHelp(String alias, CommandInfo cmdInfo) throws HelpException {
-        Help.Info info = null; 
         SyntaxBundle syntaxes = null;
         ArgumentBundle bundle = null;
         try {
             final Shell shell = ShellUtils.getShellManager().getCurrentShell();
             final SyntaxManager syntaxManager = shell.getSyntaxManager();
-            Class<?> clazz = cmdInfo.getCommandClass();
             Command cmd = cmdInfo.createCommandInstance();
             if (cmd != null) {
                 bundle = cmd.getArgumentBundle();
@@ -75,37 +70,15 @@ public class DefaultHelpFactory extends HelpFactory {
                 if (syntaxes == null) {
                     syntaxes = new SyntaxBundle(alias, bundle.createDefaultSyntax());
                 }
-            } else {
-                info = HelpFactory.getInfo(clazz);
-            }
-        } catch (HelpException ex) {
-            throw ex;
+            } 
         } catch (Exception ex) {
             throw new HelpException(ex.getMessage(), ex);
         }
 
-        if (info != null && alias != null) {
-            return new OldSyntaxHelp(info, alias);
-        } else if (syntaxes != null && bundle != null) {
+        if (syntaxes != null && bundle != null) {
             return new NewSyntaxHelp(syntaxes, bundle);
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Shows the complete help for a command.
-     *
-     * @see HelpFactory#help(org.jnode.shell.help.HelpFactory.Info, String)
-     */
-    public void help(Help.Info info, String command, PrintWriter out) {
-        final Syntax[] syntaxes = info.getSyntaxes();
-        final String name = command == null ? info.getName() : command;
-        for (int i = 0; i < syntaxes.length; i++) {
-            help(name, syntaxes[i], out);
-            if (i < syntaxes.length) {
-                out.println();
-            }
         }
     }
 
@@ -173,47 +146,6 @@ public class DefaultHelpFactory extends HelpFactory {
         }
     }
 
-    /**
-     * Shows the help for a command syntax.
-     */
-    public void help(String name, Syntax syntax, PrintWriter out) {
-        usage(name, syntax, out);
-        if (syntax.getDescription() != null) {
-            out.println("\n" + HelpFactory.getLocalizedHelp("help.description") + ":");
-            format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)},
-                new String[]{syntax.getDescription()});
-        }
-        final Parameter[] params = syntax.getParams();
-        if (params.length != 0) {
-            out.println("\n" + HelpFactory.getLocalizedHelp("help.parameters") + ":");
-            for (int i = 0; i < params.length; i++) {
-                params[i].describe(this, out);
-            }
-        }
-    }
-
-    /**
-     * Shows the usage information of a command.
-     */
-    public void usage(Help.Info info, PrintWriter out) {
-        final Syntax[] syntaxes = info.getSyntaxes();
-        for (int i = 0; i < syntaxes.length; i++) {
-            usage(info.getName(), syntaxes[i], out);
-        }
-    }
-
-    /**
-     * Shows the usage information of a command.
-     */
-    public void usage(String name, Syntax syntax, PrintWriter out) {
-        StringBuilder line = new StringBuilder(name);
-        final Parameter[] params = syntax.getParams();
-        for (int i = 0; i < params.length; i++) {
-            line.append(' ').append(params[i].format());
-        }
-        out.println(HelpFactory.getLocalizedHelp("help.usage") + ": " + line);
-    }
-
     @Override
     public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, PrintWriter out) {
         String command = syntaxBundle.getAlias();
@@ -241,17 +173,7 @@ public class DefaultHelpFactory extends HelpFactory {
             format(out, cells, texts);
         }
     }
-
-    public void describeParameter(Parameter param, PrintWriter out) {
-        format(out, new Cell[]{new Cell(2, 18), new Cell(2, NOMINAL_WIDTH - 22)},
-            new String[]{param.getName(), param.getDescription()});
-    }
-
-    public void describeArgument(Argument arg, PrintWriter out) {
-        format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
-            new String[]{arg.getName(), arg.getDescription()});
-    }
-
+    
     @Override
     public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintWriter out) {
         String description = "(" + arg.getTypeDescription() + ") " + arg.getDescription();

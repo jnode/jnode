@@ -25,14 +25,16 @@ import java.util.NoSuchElementException;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.CompletionException;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.HelpException;
-import org.jnode.shell.help.HelpFactory;
-import org.jnode.shell.help.Parameter;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandIOMarker;
+import org.jnode.shell.syntax.AliasArgument;
+import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.CommandSyntaxException;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.RepeatSyntax;
+import org.jnode.shell.syntax.Syntax;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
@@ -94,22 +96,6 @@ public class CommandLine implements Completable, Iterable<String> {
 
     private static final String[] NO_ARGS = new String[0];
     private static final Token[] NO_TOKENS = new Token[0];
-
-    @SuppressWarnings("deprecation")
-    private final Help.Info defaultInfo = new Help.Info("file",
-            "default parameter for command line completion", 
-            new Parameter(
-                    new org.jnode.shell.help.argument.FileArgument(
-                            "file", "a file", org.jnode.shell.help.Argument.MULTI),
-                            org.jnode.shell.help.Parameter.OPTIONAL));
-
-    private final org.jnode.shell.help.Argument defaultArg = 
-        new org.jnode.shell.help.argument.AliasArgument("command",
-            "the command to be called");
-
-//  private final Syntax defaultSyntax = new RepeatSyntax(new ArgumentSyntax("argument"));
-//  private final ArgumentBundle defaultArguments = new ArgumentBundle(
-//  new FileArgument("argument", org.jnode.shell.syntax.Argument.MULTIPLE));
 
     private final Token commandToken;
 
@@ -631,34 +617,33 @@ public class CommandLine implements Completable, Iterable<String> {
                 throw new CompletionException("Problem creating a command instance", ex);
             }
 
-            // Get the command's argument bundle, or the default one.
+            // Get the command's argument bundle and syntax
             ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
-
-            // Get a syntax for the alias, or a default one.
             SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
-
+            
+            if (bundle == null) {
+                // We're missing the argument bundle.  We assume this is a 'classic' Java application 
+                // that does its own argument parsing and completion like a UNIX shell; i.e. 
+                // completing each argument as a pathname.
+                Syntax syntax = new RepeatSyntax(new ArgumentSyntax("argument"));
+                syntaxes = new SyntaxBundle(cmd, syntax);
+                bundle = new ArgumentBundle(
+                        new FileArgument("argument", Argument.MULTIPLE));
+            } else if (syntaxes == null) {
+                // We're missing the syntax, but we do have an argument bundle.  Generate
+                // a default syntax from the bundle.
+                syntaxes = new SyntaxBundle(cmd, bundle.createDefaultSyntax());
+            }
             try {
-                // Try new-style completion if we have a Syntax
-                if (bundle != null) {
-                    bundle.complete(this, syntaxes, completion);
-                } else {
-                    // Otherwise, try old-style completion using the command's INFO
-                    try {
-                        Help.Info info = HelpFactory.getInfo(cmdClass.getCommandClass());
-                        info.complete(completion, this, shell.getOut());
-                    } catch (HelpException ex) {
-                        // And fall back to old-style completion with an 'info' that
-                        // specifies a sequence of 'file' names.
-                        // FIXME ...
-                        defaultInfo.complete(completion, this, shell.getOut());
-                    }
-                }
+               bundle.complete(this, syntaxes, completion);
             } catch (CommandSyntaxException ex) {
                 throw new CompletionException("Command syntax problem", ex);
             }
         } else {
-            // do completion on the command name
-            defaultArg.complete(completion, cmd);
+            // We haven't got a command name yet, so complete the partial command name string
+            // as an AliasArgument.
+            AliasArgument cmdNameArg = new AliasArgument("cmdName", Argument.SINGLE);
+            cmdNameArg.complete(completion, cmd);
             completion.setCompletionStart(commandToken == null ? 0 : commandToken.start);
         }
     }

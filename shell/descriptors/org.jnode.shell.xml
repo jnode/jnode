@@ -20,7 +20,6 @@
       <export name="org.jnode.shell.alias.def.*"/>
       <export name="org.jnode.shell.def.*"/>
       <export name="org.jnode.shell.help.*"/>
-      <export name="org.jnode.shell.help.argument.*"/>
       <export name="org.jnode.shell.help.def.*"/>
       <export name="org.jnode.shell.io.*"/>
       <export name="org.jnode.shell.isolate.*"/>

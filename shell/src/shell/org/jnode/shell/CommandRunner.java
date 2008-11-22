@@ -144,7 +144,7 @@ public class CommandRunner implements Runnable {
             }
         } catch (SyntaxErrorException ex) {
             try {
-                HelpFactory.getInfo(cmdInfo.getCommandClass()).usage(shellErr);
+                HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), cmdInfo).usage(shellErr);
                 shellErr.println(ex.getMessage());
             } catch (HelpException e) {
                 shellErr.println("Exception while trying to get the command usage");
