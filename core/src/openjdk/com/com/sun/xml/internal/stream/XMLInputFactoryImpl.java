@@ -58,16 +58,12 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
     //default value is true
     boolean fReuseInstance = true;
     
-    //set this flag to true if EventReader instance is being created
-    boolean fEventReaderInstance = false;
-    
     /** Creates a new instance of ZephryParserFactory */
     public XMLInputFactoryImpl() {
         
     }
     
     void initEventReader(){
-        fEventReaderInstance = true;
         fPropertyChanged = true;
     }
     
@@ -144,7 +140,8 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
     }
     
     public XMLStreamReader createXMLStreamReader(Source source) throws XMLStreamException {
-        return new XMLStreamReaderImpl(jaxpSourcetoXMLInputSource(source) , getNewPropertyManager());
+        return new XMLStreamReaderImpl(jaxpSourcetoXMLInputSource(source),
+                new PropertyManager(fPropertyManager));
     }
     
     public XMLStreamReader createXMLStreamReader(String systemId, InputStream inputstream) throws XMLStreamException {
@@ -262,7 +259,8 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
         //1. if the temp reader is null -- create the instance and return
         if(fTempReader == null){
             fPropertyChanged = false;
-            return fTempReader = new XMLStreamReaderImpl(inputSource, getNewPropertyManager());
+            return fTempReader = new XMLStreamReaderImpl(inputSource,
+                    new PropertyManager(fPropertyManager));
         }
         //if factory is configured to reuse the instance & this instance can be reused 
         //& the setProperty() hasn't been called
@@ -276,22 +274,9 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
         }else{
             fPropertyChanged = false;
             //just return the new instance.. note that we are not setting  fTempReader to the newly created instance
-            return fTempReader = new XMLStreamReaderImpl(inputSource, getNewPropertyManager());
+            return fTempReader = new XMLStreamReaderImpl(inputSource,
+                    new PropertyManager(fPropertyManager));
         }
-    }
-    
-    PropertyManager getNewPropertyManager(){
-        PropertyManager pm = new PropertyManager(fPropertyManager);
-        if(fEventReaderInstance){
-            //this  is really ugly.. event reader has to be in undefined state.
-            //set this property for this new PropertyManager instance
-            pm.setProperty(Constants.READER_IN_DEFINED_STATE, Boolean.FALSE);
-            fEventReaderInstance = false;
-            //xxx: if instance is reused, this instance will be in undefined state
-            //set this flag to true so that this instance is not reused
-            fPropertyChanged = true;
-        }
-        return pm;        
     }
     
     XMLInputSource jaxpSourcetoXMLInputSource(Source source){

@@ -82,4 +82,3 @@ public class LocationImpl implements Location{
     }
     
 }
-

@@ -228,13 +228,11 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
         fNamespaceContext.internalContext = fInternalNamespaceContext;
 
         // Set internal state based on property values
-        if (fPropertyManager != null) {
             Boolean ob = (Boolean) fPropertyManager.getProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES);
             fIsRepairingNamespace = ob.booleanValue();
             ob = (Boolean) fPropertyManager.getProperty(Constants.ESCAPE_CHARACTERS);
             setEscapeCharacters(ob.booleanValue());
         }
-    }
 
     /**
      * Reset this instance so that it can be re-used. Do not read properties
@@ -333,7 +331,6 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
             }
         } else {
             encoding = System.getProperty("file.encoding");
-           
             if (encoding != null && encoding.equalsIgnoreCase("utf-8")) {
                 fWriter = new UTF8OutputStreamWriter(os);
             } else {
@@ -362,14 +359,16 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
      * Close this XMLStreamWriter by closing underlying writer.
      */
     public void close() throws XMLStreamException {
-
+        if (fWriter != null) {
         try {
             //fWriter.close();
             fWriter.flush();
         } catch (IOException e) {
             throw new XMLStreamException(e);
         }
-
+        }
+        fWriter = null;
+        fOutputStream = null;
         fNamespaceDecls.clear();
         fAttributeCache.clear();
         fElementStack.clear();
@@ -744,7 +743,7 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
         // normalize namespaceURI
         String namespaceURINormalized = null;
         if (namespaceURI == null) {
-            namespaceURINormalized = XMLConstants.NULL_NS_URI;
+            namespaceURINormalized = ""; // XMLConstants.NULL_NS_URI
         } else {
             namespaceURINormalized = namespaceURI;
         }
@@ -851,7 +850,7 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
                 return;
             }
 
-            if (prefix != XMLConstants.DEFAULT_NS_PREFIX) {
+            if ((prefix != null) && (prefix != XMLConstants.DEFAULT_NS_PREFIX)) {
                 fWriter.write(prefix);
                 fWriter.write(":");
             }
@@ -967,7 +966,7 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
         // normalize namespaceURI
         String namespaceURINormalized = null;
         if (namespaceURI == null) {
-            namespaceURINormalized = XMLConstants.NULL_NS_URI;
+            namespaceURINormalized = ""; // XMLConstants.NULL_NS_URI
         } else {
             namespaceURINormalized = namespaceURI;
         }
@@ -1140,7 +1139,6 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
      */
     public void writeStartDocument(String encoding, String version)
         throws XMLStreamException {
-        
         //Revisit : What about standalone ?
         try {
             if ((encoding == null) && (version == null)) {
@@ -1156,13 +1154,13 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
             }
             
             String streamEncoding = null;
-            if (fWriter instanceof OutputStreamWriter){
+            if (fWriter instanceof OutputStreamWriter) {
                 streamEncoding = ((OutputStreamWriter) fWriter).getEncoding();
-            
-            } else if (fWriter instanceof UTF8OutputStreamWriter){
+            }
+            else if (fWriter instanceof UTF8OutputStreamWriter) {
                 streamEncoding = ((UTF8OutputStreamWriter) fWriter).getEncoding();
-            
-            } else if (fWriter instanceof XMLWriter ){
+            }
+            else if (fWriter instanceof XMLWriter) {
                 streamEncoding = ((OutputStreamWriter) ((XMLWriter)fWriter).getWriter()).getEncoding();
             }
 
@@ -1184,6 +1182,7 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
                 }
             }
             
+
             fWriter.write("<?xml version=\"");
 
             if ((version == null) || version.equals("")) {
@@ -1195,7 +1194,6 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
             if (!encoding.equals("")) {
                 fWriter.write("\" encoding=\"");
                 fWriter.write(encoding);
-              
             }
 
             fWriter.write("\"?>");
@@ -1537,6 +1535,7 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
 
             if (currentElement.isEmpty) {
                 fElementStack.pop();
+                fInternalNamespaceContext.popContext();
                 fWriter.write(CLOSE_EMPTY_ELEMENT);
             } else {
                 fWriter.write(CLOSE_START_TAG);
@@ -2104,19 +2103,12 @@ public final class XMLStreamWriterImpl extends AbstractMap implements XMLStreamW
 
     /**
      * Returns the value associated to an implementation-specific
-     * property. Ensures that underlying <code>OutputStream</code>
-     * is flushed before returning.
+     * property.
      */
     public Object get(Object key) {
-        try {
             if (key.equals(OUTPUTSTREAM_PROPERTY)) {
-                flush();
                 return fOutputStream;
             }
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
         return null;
     }
 

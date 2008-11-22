@@ -301,4 +301,3 @@ public abstract class XMLEntityReader implements XMLLocator {
     public abstract void registerListener(XMLBufferListener listener);
     
 } // class XMLEntityScanner
-

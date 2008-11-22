@@ -22,9 +22,11 @@ package com.sun.xml.internal.stream;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.IOException;
 
+import com.sun.xml.internal.stream.util.BufferAllocator;
+import com.sun.xml.internal.stream.util.ThreadLocalBufferAllocator;
 import com.sun.org.apache.xerces.internal.xni.XMLResourceIdentifier;
-
 
 /**
  * Entity information.
@@ -398,9 +400,24 @@ public abstract class Entity {
             this.literal = literal;
             this.mayReadChunks = mayReadChunks;
             this.isExternal = isExternal;
-            this.ch = new char[isExternal ? fBufferSize : DEFAULT_INTERNAL_BUFFER_SIZE];
+            final int size = isExternal ? fBufferSize : DEFAULT_INTERNAL_BUFFER_SIZE;
+            BufferAllocator ba = ThreadLocalBufferAllocator.getBufferAllocator();
+            ch = ba.getCharBuffer(size);
+            if (ch == null) {
+                this.ch = new char[size];
+            }
         } // <init>(StringXMLResourceIdentifier,InputStream,Reader,String,boolean, boolean)
         
+        /**
+         * Release any resources associated with this entity.
+         */
+        public void close() throws IOException {
+            BufferAllocator ba = ThreadLocalBufferAllocator.getBufferAllocator();
+            ba.returnCharBuffer(ch);
+            ch = null;
+            reader.close();
+        }
+
         //
         // Entity methods
         //
@@ -452,4 +469,3 @@ public abstract class Entity {
     } // class ScannedEntity
     
 } // class Entity
-

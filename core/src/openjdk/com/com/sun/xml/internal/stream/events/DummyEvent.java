@@ -43,13 +43,15 @@ import javax.xml.stream.Location;
  */
 
 public abstract class DummyEvent implements XMLEvent {
+    // Make sure that getLocation() never returns null. Instead, return this dummy location
+    // that indicates "nowhere" as effectively as possible.
+    private static DummyLocation nowhere = new DummyLocation();
     
     /* Event type this event corresponds to */
     private int fEventType;
-    protected Location fLocation = null;
+    protected Location fLocation = (Location) nowhere;
     
     public DummyEvent() {
-        
     }
     
     public DummyEvent(int i) {
@@ -98,7 +100,11 @@ public abstract class DummyEvent implements XMLEvent {
     }
     
     void setLocation(Location loc){
+        if (loc == null) {
+            fLocation = nowhere;
+        } else {
         fLocation = loc;
+    }
     }
     
     /** Returns this event as Characters, may result in
@@ -171,4 +177,28 @@ public abstract class DummyEvent implements XMLEvent {
     public void writeAsEncodedUnicode(Writer writer) throws javax.xml.stream.XMLStreamException {
     }
     
+    static class DummyLocation implements Location {
+        public DummyLocation() {
+        }
+
+        public int getCharacterOffset() {
+            return -1;
+        }
+
+        public int getColumnNumber() {
+            return -1;
+        }
+
+        public int getLineNumber() {
+            return -1;
+        }
+
+        public String getPublicId() {
+            return null;
+        }
+
+        public String getSystemId() {
+            return null;
+        }
+    }
 }

@@ -25,6 +25,8 @@
 
 package com.sun.xml.internal.stream.events;
 
+import com.sun.org.apache.xerces.internal.impl.PropertyManager;
+import java.util.List;
 import javax.xml.stream.util.XMLEventAllocator;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
@@ -144,7 +146,13 @@ public class XMLEventAllocatorImpl implements XMLEventAllocator {
                 break;
             }
             case XMLEvent.DTD:{
-                event = new DTDEvent(streamReader.getText());
+                DTDEvent dtdEvent = new DTDEvent(streamReader.getText());
+                dtdEvent.setLocation(streamReader.getLocation());
+                List entities = (List)streamReader.getProperty(PropertyManager.STAX_ENTITIES);
+                if (entities != null && entities.size() != 0) dtdEvent.setEntities(entities);
+                List notations = (List)streamReader.getProperty(PropertyManager.STAX_NOTATIONS);
+                if (notations != null && notations.size() != 0) dtdEvent.setNotations(notations);
+                event = dtdEvent;
                 break;
             }
             case XMLEvent.CDATA:{
@@ -241,17 +249,9 @@ public class XMLEventAllocatorImpl implements XMLEventAllocator {
         NamespaceSupport ns = new NamespaceSupport(contextWrapper.getNamespaceContext());
         event.setNamespaceContext(new NamespaceContextWrapper(ns));
     }
-    private QName getQName(XMLStreamReader xmlr){
-        String prefix = xmlr.getPrefix();
-        String uri = xmlr.getNamespaceURI();
-        String localpart = xmlr.getLocalName();
-        QName qn = null;
-        if(prefix != null && uri != null)
-            qn = new QName(uri, localpart, prefix);
-        else if(prefix == null && uri != null)
-            qn = new QName(uri, localpart);
-        else if(prefix == null && uri == null)
-            qn = new QName(localpart);
-        return qn;
+
+    private QName getQName(XMLStreamReader xmlr) {
+        return new QName(xmlr.getNamespaceURI(), xmlr.getLocalName(),
+                xmlr.getPrefix());
     }
 }

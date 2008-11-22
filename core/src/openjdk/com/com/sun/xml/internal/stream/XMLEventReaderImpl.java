@@ -52,6 +52,7 @@ public class XMLEventReaderImpl implements javax.xml.stream.XMLEventReader{
         if(fXMLEventAllocator == null){
             fXMLEventAllocator = new XMLEventAllocatorImpl();
         }
+        fPeekedEvent = fXMLEventAllocator.allocate(fXMLReader);
     }
     
     
