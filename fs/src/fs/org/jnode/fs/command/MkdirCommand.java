@@ -35,7 +35,7 @@ import org.jnode.shell.syntax.FileArgument;
 public class MkdirCommand extends AbstractCommand {
 
     private final FileArgument ARG_DIR = new FileArgument(
-            "directory", Argument.MANDATORY, "the directory to create");
+            "directory", Argument.MANDATORY | Argument.NONEXISTENT, "the directory to create");
 
     public MkdirCommand() {
         super("Create a new directory");

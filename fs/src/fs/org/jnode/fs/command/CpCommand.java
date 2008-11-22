@@ -50,7 +50,8 @@ public class CpCommand extends AbstractCommand {
     static final byte MODE_UPDATE = 3;
 
     private final FileArgument ARG_SOURCE = 
-        new FileArgument("source", Argument.MANDATORY + Argument.MULTIPLE, "source files or directories");
+        new FileArgument("source", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, 
+                "source files or directories");
 
     private final FileArgument ARG_TARGET = 
         new FileArgument("target", Argument.MANDATORY, "target file or directory");

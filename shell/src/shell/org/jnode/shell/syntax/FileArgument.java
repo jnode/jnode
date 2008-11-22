@@ -29,7 +29,9 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 /**
- * This argument class performs completion against the file system namespace.
+ * This argument class performs completion against the file system namespace.  This
+ * Argument class understands the {@link Argument#EXISTING} and {@link Argument#NONEXISTENT}
+ * flags when accepting argument values, but not (yet) when completing them.
  * 
  * @author crawley@jnode.org
  */
@@ -45,9 +47,15 @@ public class FileArgument extends Argument<File> {
 
     @Override
     protected File doAccept(Token token) throws CommandSyntaxException {
-        // FIXME ... do proper filename checks ...
         if (token.token.length() > 0) {
-            return new File(token.token);
+            File file = new File(token.token);
+            if (isExisting() && !file.exists()) {
+                throw new CommandSyntaxException("this file or directory does not exist");
+            }
+            if (isNonexistent() && file.exists()) {
+                throw new CommandSyntaxException("this file or directory already exist");
+            }
+            return file;
         } else {
             throw new CommandSyntaxException("invalid file name");
         }

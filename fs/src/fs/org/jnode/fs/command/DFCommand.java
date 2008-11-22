@@ -45,7 +45,7 @@ import org.jnode.shell.syntax.DeviceArgument;
 public class DFCommand extends AbstractCommand {
 
     private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-        "device", Argument.OPTIONAL,
+        "device", Argument.OPTIONAL | Argument.EXISTING,
         "The device for which disk usage inforrmation should be displayed");
 
     public DFCommand() {

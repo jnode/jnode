@@ -55,15 +55,45 @@ import org.jnode.shell.CommandLine.Token;
  */
 public abstract class Argument<V> {
     
-    public static final int OPTIONAL = 0x00;
-    public static final int MANDATORY = 0x01;
+    /**
+     * This Argument flag indicates that the Argument is optional.
+     */
+    public static final int OPTIONAL = 0x001;
+    
+    /**
+     * This Argument flag indicates that the Argument is mandatory.  At least
+     * one instance of this Argument must be supplied.
+     */
+    public static final int MANDATORY = 0x002;
 
-    public static final int SINGLE = 0x00;
-    public static final int MULTIPLE = 0x04;
+    /**
+     * This Argument flag indicates that the Argument may have at most one value.
+     */
+    public static final int SINGLE = 0x004;
+    
+    /**
+     * This Argument flag indicates that multiple instances of this Argument may 
+     * be provided.
+     */
+    public static final int MULTIPLE = 0x008;
+
+    /**
+     * This Argument flag indicates that an Argument's value must denote an entity
+     * that already exists in whatever domain that the Argument values corresponds to.
+     */
+    public static final int EXISTING = 0x010;
+    
+    /**
+     * This Argument flag indicates that an Argument's value must denote an entity
+     * that does not exists in whatever domain that the Argument values corresponds to.
+     */
+    public static final int NONEXISTENT = 0x020;
     
     private final String label;
     private final boolean mandatory;
     private final boolean multiple;
+    private final boolean existing;
+    private final boolean nonexistent;
     private final String description;
     
     protected final List<V> values = new ArrayList<V>();
@@ -80,22 +110,36 @@ public abstract class Argument<V> {
      * @param vArray A template array used by the getValues method.  It is 
      * typically zero length.
      * @param description Optional documentation for the argument.
+     * @throws IllegalArgumentException if the flags are inconsistent
      */
-    protected Argument(String label, int flags, V[] vArray, String description) {
+    protected Argument(String label, int flags, V[] vArray, String description) 
+        throws IllegalArgumentException {
         super();
+        if ((flags & EXISTING) != 0 && (flags & NONEXISTENT) != 0) {
+            throw new IllegalArgumentException("inconsistent flags: EXISTING and NONEXISTENT");
+        }
+        if ((flags & SINGLE) != 0 && (flags & MULTIPLE) != 0) {
+            throw new IllegalArgumentException("inconsistent flags: SINGLE and MULTIPLE");
+        }
+        if ((flags & MANDATORY) != 0 && (flags & OPTIONAL) != 0) {
+            throw new IllegalArgumentException("inconsistent flags: MANDATORY and OPTIONAL");
+        }
         this.label = label;
         this.description = description;
         this.mandatory = (flags & MANDATORY) != 0;
         this.multiple = (flags & MULTIPLE) != 0;
+        this.existing = (flags & EXISTING) != 0;
+        this.nonexistent = (flags & NONEXISTENT) != 0;
         this.vArray = vArray;
     }
     
     /**
-     * Reconstruct and return this Arguments flags as passed to the constructor.
+     * Reconstruct and return Argument flags equiivalent to those passed to the constructor.
      * @return the flags.
      */
     public int getFlags() {
-        return (mandatory ? MANDATORY : 0) | (multiple ? MULTIPLE : 0);
+        return ((mandatory ? MANDATORY : OPTIONAL) | (multiple ? MULTIPLE : SINGLE) |
+                (existing ? EXISTING : 0) | (nonexistent ? NONEXISTENT : 0));
     }
 
     /**
@@ -212,6 +256,22 @@ public abstract class Argument<V> {
         return multiple;
     }
     
+    /**
+     * If this method returns <code>true</code>, an Argument value must correspond 
+     * to an existing entity in the domain of entities denoted by the Argument type.
+     */
+    public boolean isExisting() {
+        return existing;
+    }
+
+    /**
+     * If this method returns <code>true</code>, an Argument value must <i>not</i> correspond 
+     * to an existing entity in the domain of entities denoted by the Argument type.
+     */
+    public boolean isNonexistent() {
+        return nonexistent;
+    }
+
     void setBundle(ArgumentBundle bundle) {
         this.bundle = bundle;
     }

@@ -37,7 +37,7 @@ import org.jnode.shell.syntax.DeviceArgument;
 public class EjectCommand extends AbstractCommand {
 
     private final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", Argument.MANDATORY, "device to eject the medium from",
+            "device", Argument.MANDATORY | Argument.EXISTING, "device to eject the medium from",
             RemovableDeviceAPI.class);
 
     public EjectCommand() {
