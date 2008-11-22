@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 public class UDPProtocol implements Protocol {
     private static final int DEFAULT_PORT = 10000;
 
+    //private static final int CHAR_SIZE = 2; // size of a char in bytes
     private static final int INT_SIZE = 4; // size of an int in bytes
     
     private final DatagramSocket socket;
@@ -124,13 +125,21 @@ public class UDPProtocol implements Protocol {
             ByteBuffer byteBuffer = ByteBuffer.allocate(INT_SIZE).putInt(command.length());
             byte[] data = byteBuffer.array();
             DatagramPacket packet = new DatagramPacket(data, data.length, remoteIp, remotePort);
-            
+                        
             socket.send(packet);
             
             // send data
             data = command.getBytes();
             packet = new DatagramPacket(data, data.length, remoteIp, remotePort);
             socket.send(packet);
+            
+//            if (!socket.isConnected()) {
+//                socket.connect(remoteIp, remotePort);
+//            }
+//            
+//            ByteBuffer bb = ByteBuffer.allocate(command.length() * CHAR_SIZE + INT_SIZE);
+//            bb.putInt(command.length()).asCharBuffer().append(command);
+//            socket.getChannel().send(bb, socket.getRemoteSocketAddress());
         } catch (SocketTimeoutException e) {
             throw new TimeoutException("timeout in receive", e);
         } catch (IOException e) {
@@ -151,11 +160,19 @@ public class UDPProtocol implements Protocol {
             data = new byte[size];
             packet = new DatagramPacket(data, data.length);
             socket.receive(packet);
-
+            
             remoteIp = packet.getAddress();
             remotePort = packet.getPort();
 
             return new String(packet.getData());
+            
+//            ByteBuffer bb = ByteBuffer.allocate(INT_SIZE);
+//            socket.getChannel().read(bb);
+//            int size = bb.getInt();
+//            bb = ByteBuffer.allocate(size);
+//            socket.getChannel().read(bb);
+//            
+//            return bb.asCharBuffer().rewind().toString();
         } catch (SocketTimeoutException e) {
             throw new TimeoutException("timeout in receive", e);
         } catch (IOException e) {
