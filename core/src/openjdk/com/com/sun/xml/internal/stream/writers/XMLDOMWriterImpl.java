@@ -78,6 +78,7 @@ public class XMLDOMWriterImpl implements XMLStreamWriter  {
         node = result.getNode();
         if( node.getNodeType() == Node.DOCUMENT_NODE){
             ownerDoc = (Document)node;
+            currentNode = ownerDoc;
         }else{
             ownerDoc = node.getOwnerDocument();
             currentNode = node;
@@ -496,12 +497,10 @@ public class XMLDOMWriterImpl implements XMLStreamWriter  {
     }
     
     /**
-     * Creates a namespace attribute and will associate it with the current element in
+     * creates a namespace attribute and will associate it with the current element in
      * the DOM tree.
-     *
      * @param prefix {@inheritDoc}
      * @param namespaceURI {@inheritDoc}
-     *
      * @throws javax.xml.stream.XMLStreamException {@inheritDoc}
      */
     public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {

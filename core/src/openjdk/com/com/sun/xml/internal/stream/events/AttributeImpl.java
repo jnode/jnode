@@ -186,4 +186,3 @@ public class AttributeImpl extends DummyEvent implements Attribute
     
     
 }//AttributeImpl
-

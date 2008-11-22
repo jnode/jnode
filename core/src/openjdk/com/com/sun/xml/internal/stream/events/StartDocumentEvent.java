@@ -69,7 +69,9 @@ implements StartDocument {
         this.fStandalone = standalone;
         this.fEncodingSchemeSet = false;
         this.fStandaloneSet = false;
+        if (loc != null) {
         this.fLocation = loc;
+    }
     }
     protected void init() {
         setEventType(XMLStreamConstants.START_DOCUMENT);

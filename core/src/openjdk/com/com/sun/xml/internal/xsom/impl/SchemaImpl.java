@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2005-2006 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,14 +22,15 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package com.sun.xml.internal.xsom.impl;
 
 import com.sun.xml.internal.xsom.ForeignAttributes;
+import com.sun.xml.internal.xsom.SCD;
 import com.sun.xml.internal.xsom.XSAnnotation;
 import com.sun.xml.internal.xsom.XSAttGroupDecl;
 import com.sun.xml.internal.xsom.XSAttributeDecl;
 import com.sun.xml.internal.xsom.XSComplexType;
+import com.sun.xml.internal.xsom.XSComponent;
 import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSIdentityConstraint;
 import com.sun.xml.internal.xsom.XSModelGroupDecl;
@@ -42,7 +43,10 @@ import com.sun.xml.internal.xsom.visitor.XSFunction;
 import com.sun.xml.internal.xsom.visitor.XSVisitor;
 import org.xml.sax.Locator;
 
+import javax.xml.namespace.NamespaceContext;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,10 +68,11 @@ public class SchemaImpl implements XSSchema
         return null;
     }
 
-    protected final SchemaSetImpl parent;
-    public SchemaSetImpl getParent() {
+    public SchemaSetImpl getRoot() {
         return parent;
     }
+
+    protected final SchemaSetImpl parent;
 
     private final String targetNamespace;
     public String getTargetNamespace() {
@@ -86,6 +91,12 @@ public class SchemaImpl implements XSSchema
         return annotation;
     }
     
+    public XSAnnotation getAnnotation(boolean createIfNotExist) {
+        if(createIfNotExist && annotation==null)
+            annotation = new AnnotationImpl();
+        return annotation;
+    }
+
     // it's difficult to determine the source location for the schema
     // component as one schema can be defined across multiple files.
     // so this locator might not correctly reflect all the locations
@@ -130,7 +141,8 @@ public class SchemaImpl implements XSSchema
 
     private final Map<String,XSAttGroupDecl> attGroups = new HashMap<String,XSAttGroupDecl>();
     private final Map<String,XSAttGroupDecl> attGroupsView = Collections.unmodifiableMap(attGroups);
-    public void addAttGroupDecl(XSAttGroupDecl newDecl) {
+    public void addAttGroupDecl(XSAttGroupDecl newDecl, boolean overwrite) {
+        if(overwrite || !attGroups.containsKey(newDecl.getName()))
         attGroups.put(newDecl.getName(), newDecl);
     }
     public Map<String,XSAttGroupDecl> getAttGroupDecls() {
@@ -161,7 +173,8 @@ public class SchemaImpl implements XSSchema
 
     private final Map<String,XSModelGroupDecl> modelGroups = new HashMap<String,XSModelGroupDecl>();
     private final Map<String,XSModelGroupDecl> modelGroupsView = Collections.unmodifiableMap(modelGroups);
-    public void addModelGroupDecl(XSModelGroupDecl newDecl) {
+    public void addModelGroupDecl(XSModelGroupDecl newDecl, boolean overwrite) {
+        if(overwrite || !modelGroups.containsKey(newDecl.getName()))
         modelGroups.put(newDecl.getName(), newDecl);
     }
     public Map<String,XSModelGroupDecl> getModelGroupDecls() {
@@ -195,9 +208,11 @@ public class SchemaImpl implements XSSchema
 
     private final Map<String,XSSimpleType> simpleTypes = new HashMap<String,XSSimpleType>();
     private final Map<String,XSSimpleType> simpleTypesView = Collections.unmodifiableMap(simpleTypes);
-    public void addSimpleType(XSSimpleType newDecl) {
+    public void addSimpleType(XSSimpleType newDecl, boolean overwrite) {
+        if(overwrite || !simpleTypes.containsKey(newDecl.getName())) {
         simpleTypes.put(newDecl.getName(), newDecl);
         allTypes.put(newDecl.getName(), newDecl);
+    }
     }
     public Map<String,XSSimpleType> getSimpleTypes() {
         return simpleTypesView;
@@ -211,9 +226,11 @@ public class SchemaImpl implements XSSchema
 
     private final Map<String,XSComplexType> complexTypes = new HashMap<String,XSComplexType>();
     private final Map<String,XSComplexType> complexTypesView = Collections.unmodifiableMap(complexTypes);
-    public void addComplexType(XSComplexType newDecl) {
+    public void addComplexType(XSComplexType newDecl, boolean overwrite) {
+        if(overwrite || !complexTypes.containsKey(newDecl.getName())) {
         complexTypes.put(newDecl.getName(), newDecl);
         allTypes.put(newDecl.getName(), newDecl);
+    }
     }
     public Map<String,XSComplexType> getComplexTypes() {
         return complexTypesView;
@@ -271,5 +288,21 @@ public class SchemaImpl implements XSSchema
             if(v!=null) return v;
         }
         return null;
+    }
+
+    public Collection<XSComponent> select(String scd, NamespaceContext nsContext) {
+        try {
+            return SCD.create(scd,nsContext).select(this);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public XSComponent selectSingle(String scd, NamespaceContext nsContext) {
+        try {
+            return SCD.create(scd,nsContext).selectSingle(this);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

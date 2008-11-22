@@ -58,8 +58,6 @@ public class XMLOutputFactoryImpl extends XMLOutputFactory {
     //cache the instance of XMLStreamWriterImpl
     private XMLStreamWriterImpl fStreamWriter = null;
     
-    private StreamResult fStreamResult = new StreamResult();
-    
     /**
      * TODO: at the current time, XMLStreamWriters are not Thread safe.
      */
@@ -107,7 +105,7 @@ public class XMLOutputFactoryImpl extends XMLOutputFactory {
     }
     
     public javax.xml.stream.XMLStreamWriter createXMLStreamWriter(java.io.Writer writer) throws javax.xml.stream.XMLStreamException {
-        return createXMLStreamWriter(getStreamResult(null, writer, null) , null);
+        return createXMLStreamWriter(toStreamResult(null, writer, null) , null);
     }
     
     public javax.xml.stream.XMLStreamWriter createXMLStreamWriter(java.io.OutputStream outputStream) throws javax.xml.stream.XMLStreamException {
@@ -115,7 +113,7 @@ public class XMLOutputFactoryImpl extends XMLOutputFactory {
     }
     
     public javax.xml.stream.XMLStreamWriter createXMLStreamWriter(java.io.OutputStream outputStream, String encoding) throws javax.xml.stream.XMLStreamException {
-        return createXMLStreamWriter(getStreamResult(outputStream, null, null) , encoding);
+        return createXMLStreamWriter(toStreamResult(outputStream, null, null) , encoding);
     }
     
     public Object getProperty(String name) throws java.lang.IllegalArgumentException {
@@ -159,24 +157,14 @@ public class XMLOutputFactoryImpl extends XMLOutputFactory {
         fPropertyManager.setProperty(name,value);
     }
 
-    /**
-     * If property has changed or value of the property has been set, 
-     * <code>PropertyManager</code> is returned else <code>'null'</code>
-     * is returned.
-     * 
-     * @return PropertyManager returns PropertyManager.
-     */
-    PropertyManager getPropertyManager(){
-        return fPropertyChanged ? fPropertyManager : null ;
-    }
-
     /** StreamResult object is re-used and the values are set appropriately.
      */
-    StreamResult getStreamResult(OutputStream os, Writer writer, String systemId){
-        fStreamResult.setOutputStream(os);
-        fStreamResult.setWriter(writer);
-        fStreamResult.setSystemId(systemId);
-        return fStreamResult;
+    StreamResult toStreamResult(OutputStream os, Writer writer, String systemId){
+        StreamResult sr = new StreamResult();
+        sr.setOutputStream(os);
+        sr.setWriter(writer);
+        sr.setSystemId(systemId);
+        return sr;
     }
 
     javax.xml.stream.XMLStreamWriter createXMLStreamWriter(javax.xml.transform.stream.StreamResult sr, String encoding) throws javax.xml.stream.XMLStreamException {
@@ -189,7 +177,7 @@ public class XMLOutputFactoryImpl extends XMLOutputFactory {
                 if(DEBUG)System.out.println("reusing instance, object id : " + fStreamWriter);
                 return fStreamWriter;
             }
-            return fStreamWriter = new XMLStreamWriterImpl(sr, encoding, getPropertyManager());
+            return fStreamWriter = new XMLStreamWriterImpl(sr, encoding, new PropertyManager(fPropertyManager));
         }catch(java.io.IOException io){
             throw new XMLStreamException(io);
         }
