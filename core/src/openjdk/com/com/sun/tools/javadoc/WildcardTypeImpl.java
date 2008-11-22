@@ -40,7 +40,6 @@ import com.sun.tools.javac.util.List;
  * represents a wildcard type.
  *
  * @author Scott Seligman
- * @version 1.17 07/05/05
  * @since 1.5
  */
 public class WildcardTypeImpl extends AbstractTypeImpl implements WildcardType {

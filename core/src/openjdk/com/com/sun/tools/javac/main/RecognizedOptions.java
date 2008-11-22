@@ -35,7 +35,6 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
-import com.sun.tools.javac.util.Version;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import java.io.File;
 import java.io.FileWriter;
@@ -55,7 +54,6 @@ import static com.sun.tools.javac.main.OptionName.*;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-@Version("@(#)RecognizedOptions.java	1.13 07/05/05")
 public class RecognizedOptions {
     
     private RecognizedOptions() {}

@@ -96,7 +96,6 @@ import static javax.tools.StandardLocation.CLASS_OUTPUT;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)JavacFiler.java	1.20 07/05/05")
 public class JavacFiler implements Filer, Closeable {
     // TODO: Implement different transaction model for updating the
     // Filer's record keeping on file close.
@@ -571,7 +570,7 @@ public class JavacFiler implements Filer, Closeable {
     }
 
     public String toString() {
-        return "javac Filer version @(#)JavacFiler.java	1.20 07/05/05";
+        return "javac Filer";
     }
 
     /**

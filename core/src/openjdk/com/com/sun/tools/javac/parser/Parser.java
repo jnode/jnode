@@ -48,7 +48,6 @@ import static com.sun.tools.javac.parser.Token.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Parser.java	1.107 07/05/05")
 public class Parser {
 
     /** A factory for creating parsers. */
@@ -746,7 +745,7 @@ public class Parser {
         assert top == 0;
         t = odStack[0];
 
-        if (t.tag == JCTree.PLUS) {
+        if (t.getTag() == JCTree.PLUS) {
             StringBuffer buf = foldStrings(t);
             if (buf != null) {
                 t = toP(F.at(startPos).Literal(TypeTags.CLASS, buf.toString()));
@@ -777,7 +776,7 @@ public class Parser {
         protected StringBuffer foldStrings(JCTree tree) {
             List<String> buf = List.nil();
             while (true) {
-                if (tree.tag == JCTree.LITERAL) {
+                if (tree.getTag() == JCTree.LITERAL) {
                     JCLiteral lit = (JCLiteral) tree;
                     if (lit.typetag == TypeTags.CLASS) {
                         StringBuffer sbuf =
@@ -788,9 +787,9 @@ public class Parser {
                         }
                         return sbuf;
                     }
-                } else if (tree.tag == JCTree.PLUS) {
+                } else if (tree.getTag() == JCTree.PLUS) {
                     JCBinary op = (JCBinary)tree;
-                    if (op.rhs.tag == JCTree.LITERAL) {
+                    if (op.rhs.getTag() == JCTree.LITERAL) {
                         JCLiteral lit = (JCLiteral) op.rhs;
                         if (lit.typetag == TypeTags.CLASS) {
                             buf = buf.prepend((String) lit.value);
@@ -1579,7 +1578,7 @@ public class Parser {
             default:
                 Name name = S.name();
                 JCExpression t = term(EXPR | TYPE);
-                if (S.token() == COLON && t.tag == JCTree.IDENT) {
+                if (S.token() == COLON && t.getTag() == JCTree.IDENT) {
                     S.nextToken();
                     JCStatement stat = statement();
                     stats.append(F.at(pos).Labelled(name, stat));
@@ -1656,7 +1655,7 @@ public class Parser {
             accept(LPAREN);
             List<JCStatement> inits = S.token() == SEMI ? List.<JCStatement>nil() : forInit();
             if (inits.length() == 1 &&
-                inits.head.tag == JCTree.VARDEF &&
+                inits.head.getTag() == JCTree.VARDEF &&
                 ((JCVariableDecl) inits.head).init == null &&
                 S.token() == COLON) {
                 checkForeach();
@@ -1778,7 +1777,7 @@ public class Parser {
         default:
             Name name = S.name();
             JCExpression expr = expression();
-            if (S.token() == COLON && expr.tag == JCTree.IDENT) {
+            if (S.token() == COLON && expr.getTag() == JCTree.IDENT) {
                 S.nextToken();
                 JCStatement stat = statement();
                 return F.at(pos).Labelled(name, stat);
@@ -2012,7 +2011,7 @@ public class Parser {
         if (S.token() == IDENTIFIER) {
             mode = EXPR;
             JCExpression t1 = term1();
-            if (t1.tag == JCTree.IDENT && S.token() == EQ) {
+            if (t1.getTag() == JCTree.IDENT && S.token() == EQ) {
                 int pos = S.pos();
                 accept(EQ);
                 return toP(F.at(pos).Assign(t1, annotationValue()));
@@ -2503,7 +2502,7 @@ public class Parser {
                 } else {
                     type = type();
                 }
-                if (S.token() == LPAREN && !isInterface && type.tag == JCTree.IDENT) {
+                if (S.token() == LPAREN && !isInterface && type.getTag() == JCTree.IDENT) {
                     if (isInterface || name != className)
                         log.error(pos, "invalid.meth.decl.ret.type.req");
                     return List.of(methodDeclaratorRest(
@@ -2686,7 +2685,7 @@ public class Parser {
     /** Check that given tree is a legal expression statement.
      */
     protected JCExpression checkExprStat(JCExpression t) {
-        switch(t.tag) {
+        switch(t.getTag()) {
         case JCTree.PREINC: case JCTree.PREDEC:
         case JCTree.POSTINC: case JCTree.POSTDEC:
         case JCTree.ASSIGN:

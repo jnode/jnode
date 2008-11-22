@@ -308,6 +308,3 @@ public class TypeMaker {
 	}
     }
 }
-
-
-

@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
@@ -74,7 +73,11 @@ import javax.tools.JavaFileObject;
 
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.util.JCDiagnostic.SimpleDiagnosticPosition;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.tools.StandardJavaFileManager;
+
+import com.sun.tools.javac.zip.*;
+import java.io.ByteArrayInputStream;
 
 import static com.sun.tools.javac.main.OptionName.*;
 import static javax.tools.StandardLocation.*;
@@ -83,8 +86,25 @@ import static javax.tools.StandardLocation.*;
  * This class provides access to the source, class and other files
  * used by the compiler and related tools.
  */
-@Version("@(#)JavacFileManager.java	1.48 07/05/05")
 public class JavacFileManager implements StandardJavaFileManager {
+
+    private static final String[] symbolFileLocation = { "lib", "ct.sym" };
+    private static final String symbolFilePrefix = "META-INF/sym/rt.jar/";
+
+    boolean useZipFileIndex;
+
+    private static int symbolFilePrefixLength = 0;
+    static {
+        try {
+            symbolFilePrefixLength = symbolFilePrefix.getBytes("UTF-8").length;
+        } catch (java.io.UnsupportedEncodingException uee) {
+            // Can't happen...UTF-8 is always supported.
+        }
+    }
+
+    private static boolean CHECK_ZIP_TIMESTAMP = false;
+    private static Map<File, Boolean> isDirectory = new ConcurrentHashMap<File, Boolean>();
+
 
     public static char[] toArray(CharBuffer buffer) {
         if (buffer.hasArray())
@@ -166,6 +186,9 @@ public class JavacFileManager implements StandardJavaFileManager {
         }
 
         options = Options.instance(context);
+
+        useZipFileIndex = System.getProperty("useJavaUtilZip") == null;// TODO: options.get("useJavaUtilZip") == null;
+        CHECK_ZIP_TIMESTAMP = System.getProperty("checkZipIndexTimestamp") != null;// TODO: options.get("checkZipIndexTimestamp") != null;
 
         mmappedIO = options.get("mmappedIO") != null;
         ignoreSymbolFile = options.get("ignore.symbol.file") != null;
@@ -293,7 +316,23 @@ public class JavacFileManager implements StandardJavaFileManager {
                                boolean recurse,
                                ListBuffer<JavaFileObject> l) {
         Archive archive = archives.get(directory);
-        if (archive != null || directory.isFile()) {
+
+        boolean isFile = false;
+        if (CHECK_ZIP_TIMESTAMP) {
+            Boolean isf = isDirectory.get(directory);
+            if (isf == null) {
+                isFile = directory.isFile();
+                isDirectory.put(directory, isFile);
+            }
+            else {
+                isFile = directory.isFile();
+            }
+        }
+        else {
+            isFile = directory.isFile();
+        }
+
+        if (archive != null || isFile) {
             if (archive == null) {
                 try {
                     archive = openArchive(directory);
@@ -304,9 +343,22 @@ public class JavacFileManager implements StandardJavaFileManager {
                 }
             }
             if (subdirectory.length() != 0) {
+                if (!useZipFileIndex) {
                 subdirectory = subdirectory.replace('\\', '/');
                 if (!subdirectory.endsWith("/")) subdirectory = subdirectory + "/";
             }
+                else {
+                    if (File.separatorChar == '/') {
+                        subdirectory = subdirectory.replace('\\', '/');
+                    }
+                    else {
+                        subdirectory = subdirectory.replace('/', '\\');
+                    }
+
+                    if (!subdirectory.endsWith(File.separator)) subdirectory = subdirectory + File.separator;
+                }
+            }
+
             List<String> files = archive.getFiles(subdirectory);
             if (files != null) {
                 for (String file; !files.isEmpty(); files = files.tail) {
@@ -536,9 +588,6 @@ public class JavacFileManager implements StandardJavaFileManager {
      */
     Map<File, Archive> archives = new HashMap<File,Archive>();
 
-    private static final String[] symbolFileLocation = { "lib", "ct.sym" };
-    private static final String symbolFilePrefix = "META-INF/sym/rt.jar/";
-
     /** Open a new zip file directory.
      */
     protected Archive openArchive(File zipFileName) throws IOException {
@@ -558,11 +607,58 @@ public class JavacFileManager implements StandardJavaFileManager {
             }
 
             try {
-                ZipFile zdir = new ZipFile(zipFileName);
-                if (origZipFileName == zipFileName)
+
+                ZipFile zdir = null;
+
+                boolean usePreindexedCache = false;
+                String preindexCacheLocation = null;
+
+                if (!useZipFileIndex) {
+                    zdir = new ZipFile(zipFileName);
+                }
+                else {
+                    usePreindexedCache = options.get("usezipindex") != null;
+                    preindexCacheLocation = options.get("java.io.tmpdir");
+                    String optCacheLoc = options.get("cachezipindexdir");
+
+                    if (optCacheLoc != null && optCacheLoc.length() != 0) {
+                        if (optCacheLoc.startsWith("\"")) {
+                            if (optCacheLoc.endsWith("\"")) {
+                                optCacheLoc = optCacheLoc.substring(1, optCacheLoc.length() - 1);
+                            }
+                           else {
+                                optCacheLoc = optCacheLoc.substring(1);
+                            }
+                        }
+
+                        File cacheDir = new File(optCacheLoc);
+                        if (cacheDir.exists() && cacheDir.canWrite()) {
+                            preindexCacheLocation = optCacheLoc;
+                            if (!preindexCacheLocation.endsWith("/") &&
+                                !preindexCacheLocation.endsWith(File.separator)) {
+                                preindexCacheLocation += File.separator;
+                            }
+                        }
+                    }
+                }
+
+                if (origZipFileName == zipFileName) {
+                    if (!useZipFileIndex) {
                     archive = new ZipArchive(zdir);
-                else
+                    } else {
+                        archive = new ZipFileIndexArchive(this, ZipFileIndex.getZipFileIndex(zipFileName, 0,
+                                usePreindexedCache, preindexCacheLocation, options.get("writezipindexfiles") != null));
+                    }
+                }
+                else {
+                    if (!useZipFileIndex) {
                     archive = new SymbolArchive(origZipFileName, zdir);
+                    }
+                    else {
+                        archive = new ZipFileIndexArchive(this, ZipFileIndex.getZipFileIndex(zipFileName, symbolFilePrefixLength,
+                                usePreindexedCache, preindexCacheLocation, options.get("writezipindexfiles") != null));
+                    }
+                }
             } catch (FileNotFoundException ex) {
                 archive = new MissingArchive(zipFileName);
             } catch (IOException ex) {
@@ -813,6 +909,8 @@ public class JavacFileManager implements StandardJavaFileManager {
             for (File dir: path) {
                 //System.err.println("dir: " + dir);
                 String dPath = dir.getPath();
+                if (dPath.length() == 0)
+                    dPath = System.getProperty("user.dir");
                 if (!dPath.endsWith(File.separator))
                     dPath += File.separator;
                 if (rPath.regionMatches(true, 0, dPath, 0, dPath.length())
@@ -827,6 +925,12 @@ public class JavacFileManager implements StandardJavaFileManager {
             if (entryName.startsWith(symbolFilePrefix))
                 entryName = entryName.substring(symbolFilePrefix.length());
             return removeExtension(entryName).replace('/', '.');
+        } else if (file instanceof ZipFileIndexFileObject) {
+            ZipFileIndexFileObject z = (ZipFileIndexFileObject) file;
+            String entryName = z.getZipEntryName();
+            if (entryName.startsWith(symbolFilePrefix))
+                entryName = entryName.substring(symbolFilePrefix.length());
+            return removeExtension(entryName).replace(File.separatorChar, '.');
         } else
             throw new IllegalArgumentException(file.getClass().getName());
         // System.err.println("inferBinaryName failed for " + file);
@@ -1432,4 +1536,182 @@ public class JavacFileManager implements StandardJavaFileManager {
 
     }
 
+    /**
+     * A subclass of JavaFileObject representing zip entries using the com.sun.tools.javac.zip.ZipFileIndex implementation.
+     */
+    public class ZipFileIndexFileObject extends BaseFileObject {
+
+            /** The entry's name.
+         */
+        private String name;
+
+        /** The zipfile containing the entry.
+         */
+        ZipFileIndex zfIndex;
+
+        /** The underlying zip entry object.
+         */
+        ZipFileIndexEntry entry;
+
+        /** The InputStream for this zip entry (file.)
+         */
+        InputStream inputStream = null;
+
+        /** The name of the zip file where this entry resides.
+         */
+        String zipName;
+
+        JavacFileManager defFileManager = null;
+
+        public ZipFileIndexFileObject(JavacFileManager fileManager, ZipFileIndex zfIndex, ZipFileIndexEntry entry, String zipFileName) {
+            super();
+            this.name = entry.getFileName();
+            this.zfIndex = zfIndex;
+            this.entry = entry;
+            this.zipName = zipFileName;
+            defFileManager = fileManager;
+        }
+
+        public InputStream openInputStream() throws IOException {
+
+            if (inputStream == null) {
+                inputStream = new ByteArrayInputStream(read());
+            }
+            return inputStream;
+        }
+
+        protected CharsetDecoder getDecoder(boolean ignoreEncodingErrors) {
+            return JavacFileManager.this.getDecoder(getEncodingName(), ignoreEncodingErrors);
+        }
+
+        public OutputStream openOutputStream() throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        public Writer openWriter() throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        /** @deprecated see bug 6410637 */
+        @Deprecated
+        public String getName() {
+            return name;
+        }
+
+        public boolean isNameCompatible(String cn, JavaFileObject.Kind k) {
+            cn.getClass(); // null check
+            if (k == Kind.OTHER && getKind() != k)
+                return false;
+            return name.equals(cn + k.extension);
+        }
+
+        /** @deprecated see bug 6410637 */
+        @Deprecated
+        public String getPath() {
+            return entry.getName() + "(" + entry + ")";
+        }
+
+        public long getLastModified() {
+            return entry.getLastModified();
+        }
+
+        public boolean delete() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof ZipFileIndexFileObject))
+                return false;
+            ZipFileIndexFileObject o = (ZipFileIndexFileObject) other;
+            return entry.equals(o.entry);
+        }
+
+        @Override
+        public int hashCode() {
+            return zipName.hashCode() + (name.hashCode() << 10);
+        }
+
+        public String getZipName() {
+            return zipName;
+        }
+
+        public String getZipEntryName() {
+            return entry.getName();
+        }
+
+        public URI toUri() {
+            String zipName = new File(getZipName()).toURI().normalize().getPath();
+            String entryName = getZipEntryName();
+            if (File.separatorChar != '/') {
+                entryName = entryName.replace(File.separatorChar, '/');
+            }
+            return URI.create("jar:" + zipName + "!" + entryName);
+        }
+
+        private byte[] read() throws IOException {
+            if (entry == null) {
+                entry = zfIndex.getZipIndexEntry(name);
+                if (entry == null)
+                  throw new FileNotFoundException();
+            }
+            return zfIndex.read(entry);
+        }
+
+        public CharBuffer getCharContent(boolean ignoreEncodingErrors) throws IOException {
+            SoftReference<CharBuffer> r = defFileManager.contentCache.get(this);
+            CharBuffer cb = (r == null ? null : r.get());
+            if (cb == null) {
+                InputStream in = new ByteArrayInputStream(zfIndex.read(entry));
+                try {
+                    ByteBuffer bb = makeByteBuffer(in);
+                    JavaFileObject prev = log.useSource(this);
+                    try {
+                        cb = decode(bb, ignoreEncodingErrors);
+                    } finally {
+                        log.useSource(prev);
+                    }
+                    byteBufferCache.put(bb); // save for next time
+                    if (!ignoreEncodingErrors)
+                        defFileManager.contentCache.put(this, new SoftReference<CharBuffer>(cb));
+                } finally {
+                    in.close();
+                }
+            }
+            return cb;
+        }
+    }
+
+    public class ZipFileIndexArchive implements Archive {
+        private final ZipFileIndex zfIndex;
+        private JavacFileManager fileManager;
+
+        public ZipFileIndexArchive(JavacFileManager fileManager, ZipFileIndex zdir) throws IOException {
+            this.fileManager = fileManager;
+            this.zfIndex = zdir;
+        }
+
+        public boolean contains(String name) {
+            return zfIndex.contains(name);
+        }
+
+        public com.sun.tools.javac.util.List<String> getFiles(String subdirectory) {
+              return zfIndex.getFiles(((subdirectory.endsWith("/") || subdirectory.endsWith("\\"))? subdirectory.substring(0, subdirectory.length() - 1) : subdirectory));
+        }
+
+        public JavaFileObject getFileObject(String subdirectory, String file) {
+            String fullZipFileName = subdirectory + file;
+            ZipFileIndexEntry entry = zfIndex.getZipIndexEntry(fullZipFileName);
+            JavaFileObject ret = new ZipFileIndexFileObject(fileManager, zfIndex, entry, zfIndex.getZipFile().getPath());
+            return ret;
+        }
+
+        public Set<String> getSubdirectories() {
+            return zfIndex.getAllDirectories();
+        }
+
+        public void close() throws IOException {
+            zfIndex.close();
+        }
+    }
 }

@@ -37,7 +37,6 @@ import com.sun.tools.javac.util.Position.LineMap;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)Lexer.java	1.8 07/05/05")
 public interface Lexer {
 
     /**

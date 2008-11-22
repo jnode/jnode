@@ -48,7 +48,6 @@ import javax.annotation.processing.Processor;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Main.java	1.119 07/05/05")
 public class Main {
 
     /** The name of the compiler, for use in diagnostics.

@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)UnionGen.java	1.10 01/01/09
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;

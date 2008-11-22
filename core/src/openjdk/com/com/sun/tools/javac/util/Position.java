@@ -41,7 +41,6 @@ import static com.sun.tools.javac.util.LayoutCharacters.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Position.java	1.25 07/05/05")
 public class Position {
     public static final int NOPOS        = -1;
 

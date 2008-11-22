@@ -454,4 +454,3 @@ public class ClassUseWriter extends SubWriterHolderWriter {
     }
     
 }
-

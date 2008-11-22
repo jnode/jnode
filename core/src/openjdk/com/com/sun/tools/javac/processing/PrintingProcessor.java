@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.processing;
 
-import com.sun.tools.javac.util.Version;
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
@@ -51,7 +50,6 @@ import java.util.*;
  */
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-@Version("@(#)PrintingProcessor.java	1.13 07/05/05")
 public class PrintingProcessor extends AbstractProcessor {
     PrintWriter writer; 
 

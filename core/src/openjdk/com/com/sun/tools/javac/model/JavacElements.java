@@ -59,7 +59,6 @@ import static javax.lang.model.util.ElementFilter.methodsIn;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-@Version("@(#)JavacElements.java	1.19 07/05/05")
 public class JavacElements implements Elements {
 
     private JavaCompiler javaCompiler;
@@ -298,7 +297,7 @@ public class JavacElements implements Elements {
 		}
 	    }
 	    public void visitArray(Attribute.Array array) {
-		if (tree.tag == JCTree.NEWARRAY &&
+                if (tree.getTag() == JCTree.NEWARRAY &&
 			types.elemtype(array.type).tsym == findme.type.tsym) {
 		    List<JCExpression> elems = ((JCNewArray) tree).elems;
 		    for (Attribute value : array.values) {
@@ -337,7 +336,7 @@ public class JavacElements implements Elements {
 		    scan(t.args);
 	    }
 	    public void visitAssign(JCAssign t) {
-		if (t.lhs.tag == JCTree.IDENT) {
+                if (t.lhs.getTag() == JCTree.IDENT) {
 		    JCIdent ident = (JCIdent) t.lhs;
 		    if (ident.sym == sym)
 			result = t.rhs;

@@ -40,9 +40,9 @@ implements ReferenceType {
     private String baseSourceDir = null;
     private String baseSourcePath = null;
     protected int modifiers = -1;
-    private SoftReference fieldsRef = null;
-    private SoftReference methodsRef = null;
-    private SoftReference sdeRef = null;
+    private SoftReference<List<Field>> fieldsRef = null;
+    private SoftReference<List<Method>> methodsRef = null;
+    private SoftReference<SDE> sdeRef = null;
 
     private boolean isClassLoaderCached = false;
     private ClassLoaderReference classLoader = null;
@@ -302,18 +302,17 @@ implements ReferenceType {
         return (status & JDWP.ClassStatus.ERROR) != 0;
     }
 
-    public List fields() {
-        List fields = (fieldsRef == null) ? null : (List)fieldsRef.get();
+    public List<Field> fields() {
+        List<Field> fields = (fieldsRef == null) ? null : fieldsRef.get();
         if (fields == null) {
             if (vm.canGet1_5LanguageFeatures()) {
                 JDWP.ReferenceType.FieldsWithGeneric.FieldInfo[] jdwpFields;
                 try {
-                    jdwpFields = JDWP.ReferenceType.FieldsWithGeneric.
-                        process(vm, this).declared;
+                    jdwpFields = JDWP.ReferenceType.FieldsWithGeneric.process(vm, this).declared;
                 } catch (JDWPException exc) {
                     throw exc.toJDIException();
                 }
-                fields = new ArrayList(jdwpFields.length);
+                fields = new ArrayList<Field>(jdwpFields.length);
                 for (int i=0; i<jdwpFields.length; i++) {
                     JDWP.ReferenceType.FieldsWithGeneric.FieldInfo fi
                         = jdwpFields[i];
@@ -332,7 +331,7 @@ implements ReferenceType {
                 } catch (JDWPException exc) {
                     throw exc.toJDIException();
                 }
-                fields = new ArrayList(jdwpFields.length);
+                fields = new ArrayList<Field>(jdwpFields.length);
                 for (int i=0; i<jdwpFields.length; i++) {
                     JDWP.ReferenceType.Fields.FieldInfo fi = jdwpFields[i];
 
@@ -345,15 +344,15 @@ implements ReferenceType {
             }
 
             fields = Collections.unmodifiableList(fields);
-            fieldsRef = new SoftReference(fields);
+            fieldsRef = new SoftReference<List<Field>>(fields);
         }
         return fields;
     }
 
-    abstract List inheritedTypes();
+    abstract List<? extends ReferenceType> inheritedTypes();
 
-    void addVisibleFields(List visibleList, Map visibleTable, List ambiguousNames) {
-        List list = visibleFields();
+    void addVisibleFields(List<Field> visibleList, Map<String, Field> visibleTable, List<String> ambiguousNames) {
+        List<Field> list = visibleFields();
         Iterator iter = list.iterator();
         while (iter.hasNext()) {
             Field field = (Field)iter.next();
@@ -374,21 +373,21 @@ implements ReferenceType {
         }
     }
 
-    public List visibleFields() {
+    public List<Field> visibleFields() {
         /*
          * Maintain two different collections of visible fields. The 
          * list maintains a reasonable order for return. The
          * hash map provides an efficient way to lookup visible fields
          * by name, important for finding hidden or ambiguous fields.
          */
-        List visibleList = new ArrayList();
-        Map  visibleTable = new HashMap();
+        List<Field> visibleList = new ArrayList<Field>();
+        Map<String, Field>  visibleTable = new HashMap<String, Field>();
 
         /* Track fields removed from above collection due to ambiguity */
-        List ambiguousNames = new ArrayList();
+        List<String> ambiguousNames = new ArrayList<String>();
 
         /* Add inherited, visible fields */
-        List types = inheritedTypes();
+        List<? extends ReferenceType> types = inheritedTypes();
         Iterator iter = types.iterator();
         while (iter.hasNext()) {
             /*
@@ -402,7 +401,7 @@ implements ReferenceType {
          * Insert fields from this type, removing any inherited fields they
          * hide. 
          */
-        List retList = new ArrayList(fields());
+        List<Field> retList = new ArrayList<Field>(fields());
         iter = retList.iterator();
         while (iter.hasNext()) {
             Field field = (Field)iter.next();
@@ -415,16 +414,16 @@ implements ReferenceType {
         return retList;
     }
 
-    void addAllFields(List fieldList, Set typeSet) {
+    void addAllFields(List<Field> fieldList, Set<ReferenceType> typeSet) {
         /* Continue the recursion only if this type is new */
         if (!typeSet.contains(this)) {
-            typeSet.add(this);
+            typeSet.add((ReferenceType)this);
 
             /* Add local fields */
             fieldList.addAll(fields());
 
             /* Add inherited fields */
-            List types = inheritedTypes();
+            List<? extends ReferenceType> types = inheritedTypes();
             Iterator iter = types.iterator();
             while (iter.hasNext()) {
                 ReferenceTypeImpl type = (ReferenceTypeImpl)iter.next();
@@ -432,9 +431,9 @@ implements ReferenceType {
             }
         }
     }
-    public List allFields() {
-        List fieldList = new ArrayList();
-        Set typeSet = new HashSet();
+    public List<Field> allFields() {
+        List<Field> fieldList = new ArrayList<Field>();
+        Set<ReferenceType> typeSet = new HashSet<ReferenceType>();
         addAllFields(fieldList, typeSet);
         return fieldList;
     }
@@ -456,8 +455,8 @@ implements ReferenceType {
         return null;
     }
 
-    public List methods() {
-        List methods = (methodsRef == null) ? null : (List)methodsRef.get();
+    public List<Method> methods() {
+        List<Method> methods = (methodsRef == null) ? null : methodsRef.get();
         if (methods == null) {
             if (!vm.canGet1_5LanguageFeatures()) {
                 methods = methods1_4();
@@ -469,7 +468,7 @@ implements ReferenceType {
                 } catch (JDWPException exc) {
                     throw exc.toJDIException();
                 }
-                methods = new ArrayList(declared.length);
+                methods = new ArrayList<Method>(declared.length);
                 for (int i=0; i<declared.length; i++) {
                     JDWP.ReferenceType.MethodsWithGeneric.MethodInfo 
                         mi = declared[i];
@@ -483,13 +482,13 @@ implements ReferenceType {
                 }
             }
             methods = Collections.unmodifiableList(methods);
-            methodsRef = new SoftReference(methods);
+            methodsRef = new SoftReference<List<Method>>(methods);
         }
         return methods;
     }
 
-    private List methods1_4() {
-        List methods;
+    private List<Method> methods1_4() {
+        List<Method> methods;
         JDWP.ReferenceType.Methods.MethodInfo[] declared;
         try {
             declared = JDWP.ReferenceType.Methods.
@@ -497,7 +496,7 @@ implements ReferenceType {
         } catch (JDWPException exc) {
             throw exc.toJDIException();
         }
-        methods = new ArrayList(declared.length);
+        methods = new ArrayList<Method>(declared.length);
         for (int i=0; i<declared.length; i++) {
             JDWP.ReferenceType.Methods.MethodInfo mi = declared[i];
 
@@ -515,7 +514,7 @@ implements ReferenceType {
      * Utility method used by subclasses to build lists of visible
      * methods.
      */
-    void addToMethodMap(Map methodMap, List methodList) {
+    void addToMethodMap(Map<String, Method> methodMap, List<Method> methodList) {
         Iterator iter = methodList.iterator();
         while (iter.hasNext()) {
             Method method = (Method)iter.next();
@@ -523,15 +522,15 @@ implements ReferenceType {
         }
     }
 
-    abstract void addVisibleMethods(Map methodMap);
+    abstract void addVisibleMethods(Map<String, Method> methodMap);
 
-    public List visibleMethods() {
+    public List<Method> visibleMethods() {
         /*
          * Build a collection of all visible methods. The hash
          * map allows us to do this efficiently by keying on the
          * concatenation of name and signature.
          */
-        Map map = new HashMap();
+        Map<String, Method> map = new HashMap<String, Method>();
         addVisibleMethods(map);
 
         /*
@@ -540,16 +539,16 @@ implements ReferenceType {
          * So, start over with allMethods() and use the hash map
          * to filter that ordered collection.
          */
-        List list = allMethods();
+        List<Method> list = allMethods();
         list.retainAll(map.values());
         return list;
     }
 
-    abstract public List allMethods();
+    abstract public List<Method> allMethods();
 
-    public List methodsByName(String name) {
-        List methods = visibleMethods();
-        ArrayList retList = new ArrayList(methods.size());
+    public List<Method> methodsByName(String name) {
+        List<Method> methods = visibleMethods();
+        ArrayList<Method> retList = new ArrayList<Method>(methods.size());
         Iterator iter = methods.iterator();
         while (iter.hasNext()) {
             Method candidate = (Method)iter.next();
@@ -561,9 +560,9 @@ implements ReferenceType {
         return retList;
     }
 
-    public List methodsByName(String name, String signature) {
-        List methods = visibleMethods();
-        ArrayList retList = new ArrayList(methods.size());
+    public List<Method> methodsByName(String name, String signature) {
+        List<Method> methods = visibleMethods();
+        ArrayList<Method> retList = new ArrayList<Method>(methods.size());
         Iterator iter = methods.iterator();
         while (iter.hasNext()) {
             Method candidate = (Method)iter.next();
@@ -576,7 +575,7 @@ implements ReferenceType {
         return retList;
     }
 
-    List getInterfaces() {
+    List<InterfaceType> getInterfaces() {
         InterfaceTypeImpl[] intfs;
 	try {
 	    intfs = JDWP.ReferenceType.Interfaces.
@@ -584,12 +583,12 @@ implements ReferenceType {
 	} catch (JDWPException exc) {
 	    throw exc.toJDIException();
 	}
-        return Arrays.asList(intfs);
+        return Arrays.asList((InterfaceType[])intfs);
     }
 
-    public List nestedTypes() {
+    public List<ReferenceType> nestedTypes() {
         List all = vm.allClasses();
-        List nested = new ArrayList();
+        List<ReferenceType> nested = new ArrayList<ReferenceType>();
         String outername = name();
         int outerlen = outername.length();
         Iterator iter = all.iterator();
@@ -609,7 +608,7 @@ implements ReferenceType {
     }
 
     public Value getValue(Field sig) {
-        List list = new ArrayList(1);
+        List<Field> list = new ArrayList<Field>(1);
         list.add(sig);
         Map map = getValues(list);
         return(Value)map.get(sig);
@@ -658,7 +657,7 @@ implements ReferenceType {
                                          field.ref());
         }
 
-        Map map = new HashMap(size);
+        Map<Field, Value> map = new HashMap<Field, Value>(size);
 
 	ValueImpl[] values;
 	try {
@@ -710,22 +709,22 @@ implements ReferenceType {
         return (String)(sourceNames(vm.getDefaultStratum()).get(0));
     }
 
-    public List sourceNames(String stratumID)
+    public List<String> sourceNames(String stratumID)
                                 throws AbsentInformationException {
         SDE.Stratum stratum = stratum(stratumID);
         if (stratum.isJava()) {
-            List result = new ArrayList(1);
+            List<String> result = new ArrayList<String>(1);
             result.add(baseSourceName());
             return result;
         }
         return stratum.sourceNames(this);
     }
 
-    public List sourcePaths(String stratumID)
+    public List<String> sourcePaths(String stratumID)
                                 throws AbsentInformationException {
         SDE.Stratum stratum = stratum(stratumID);
         if (stratum.isJava()) {
-            List result = new ArrayList(1);
+            List<String> result = new ArrayList<String>(1);
             result.add(baseSourceDir() + baseSourceName());
             return result;
         }
@@ -805,7 +804,7 @@ implements ReferenceType {
                     process(vm, this).extension;
             } catch (JDWPException exc) {
                 if (exc.errorCode() != JDWP.Error.ABSENT_INFORMATION) {
-                    sdeRef = new SoftReference(NO_SDE_INFO_MARK);
+                    sdeRef = new SoftReference<SDE>(NO_SDE_INFO_MARK);
                     throw exc.toJDIException();
                 }
             }
@@ -814,17 +813,17 @@ implements ReferenceType {
             } else {
                 sde = new SDE(extension);
             }
-            sdeRef = new SoftReference(sde);
+            sdeRef = new SoftReference<SDE>(sde);
         }
         return sde;
     }
 
-    public List availableStrata() {
+    public List<String> availableStrata() {
         SDE sde = sourceDebugExtensionInfo();
         if (sde.isValid()) {
             return sde.availableStrata();
         } else {
-            List strata = new ArrayList();
+            List<String> strata = new ArrayList<String>();
             strata.add(SDE.BASE_STRATUM_NAME);
             return strata;
         }
@@ -849,16 +848,16 @@ implements ReferenceType {
         return modifiers;
     }        
 
-    public List allLineLocations()
+    public List<Location> allLineLocations()
                             throws AbsentInformationException {
         return allLineLocations(vm.getDefaultStratum(), null);
     }
 
-    public List allLineLocations(String stratumID, String sourceName)
+    public List<Location> allLineLocations(String stratumID, String sourceName)
                             throws AbsentInformationException {
         boolean someAbsent = false; // A method that should have info, didn't
         SDE.Stratum stratum = stratum(stratumID);
-        List list = new ArrayList();  // location list
+        List<Location> list = new ArrayList<Location>();  // location list
 
         for (Iterator iter = methods().iterator(); iter.hasNext(); ) {
             MethodImpl method = (MethodImpl)iter.next();
@@ -880,14 +879,14 @@ implements ReferenceType {
         return list;
     }
 
-    public List locationsOfLine(int lineNumber)
+    public List<Location> locationsOfLine(int lineNumber)
                            throws AbsentInformationException {
         return locationsOfLine(vm.getDefaultStratum(),
                                null,
                                lineNumber);
     }
 
-    public List locationsOfLine(String stratumID,
+    public List<Location> locationsOfLine(String stratumID,
                                 String sourceName,
                                 int lineNumber)
                            throws AbsentInformationException {
@@ -895,10 +894,10 @@ implements ReferenceType {
         boolean someAbsent = false; 
         // A method that should have info, did
         boolean somePresent = false; 
-        List methods = methods();
+        List<Method> methods = methods();
         SDE.Stratum stratum = stratum(stratumID);
 
-        List list = new ArrayList();
+        List<Location> list = new ArrayList<Location>();
 
         Iterator iter = methods.iterator();
         while(iter.hasNext()) {
@@ -924,7 +923,7 @@ implements ReferenceType {
         return list;
     }
 
-    public List instances(long maxInstances) {
+    public List<ObjectReference> instances(long maxInstances) {
         if (!vm.canGetInstanceInfo()) {
             throw new UnsupportedOperationException(
                 "target does not support getting instances");
@@ -939,7 +938,8 @@ implements ReferenceType {
         // JDWP can't currently handle more than this (in mustang)
 
         try {
-            return Arrays.asList(JDWP.ReferenceType.Instances.
+            return Arrays.asList(
+                (ObjectReference[])JDWP.ReferenceType.Instances.
                 process(vm, this, intMax).instances);
         } catch (JDWPException exc) {
             throw exc.toJDIException();
@@ -1013,7 +1013,7 @@ implements ReferenceType {
             byte[] cpbytes;
             constanPoolCount = jdwpCPool.count;
             cpbytes = jdwpCPool.bytes;
-            constantPoolBytesRef = new SoftReference(cpbytes);
+            constantPoolBytesRef = new SoftReference<byte[]>(cpbytes);
             constantPoolInfoGotten = true;
         }
     }

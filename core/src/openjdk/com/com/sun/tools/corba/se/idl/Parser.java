@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1999-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Parser.java	1.32 07/05/05
  */
 
 package com.sun.tools.corba.se.idl;
@@ -2087,8 +2086,8 @@ class Parser
 
     if (token.type == Token.LeftBrace) {
       repIDStack.push(((IDLID)repIDStack.peek ()).clone ()) ;
-      ((IDLID)repIDStack.peek ()).appendToName (name);
       structEntry = makeStructEntry( name, entry, false ) ;
+      ((IDLID)repIDStack.peek ()).appendToName (name);
       prep.openScope (structEntry);
       match (Token.LeftBrace) ;
       member (structEntry) ;
@@ -2175,8 +2174,8 @@ class Parser
 
     if (token.type == Token.Switch) {
       repIDStack.push (((IDLID)repIDStack.peek ()).clone ());
-      ((IDLID)repIDStack.peek ()).appendToName (name);
       unionEntry = makeUnionEntry( name, entry, false ) ;
+      ((IDLID)repIDStack.peek ()).appendToName (name); 
       match (Token.Switch);
       match (Token.LeftParen);
       unionEntry.type (switchTypeSpec (unionEntry));
@@ -2642,8 +2641,8 @@ class Parser
   private void exceptDcl (SymtabEntry entry) throws IOException, ParseException
   {
     match (Token.Exception);
-    ExceptionEntry exceptEntry = stFactory.exceptionEntry (entry, (IDLID)repIDStack.peek ());
     repIDStack.push (((IDLID)repIDStack.peek ()).clone ());
+    ExceptionEntry exceptEntry = stFactory.exceptionEntry (entry, (IDLID)repIDStack.peek ());
     ((IDLID)repIDStack.peek ()).appendToName (token.name);
     exceptEntry.sourceFile (scanner.fileEntry ());
     // Comment must immediately precede "exception" keyword
@@ -3904,5 +3903,3 @@ class Parser
   private     Arguments   arguments;
 
 } // class Parser
-
-

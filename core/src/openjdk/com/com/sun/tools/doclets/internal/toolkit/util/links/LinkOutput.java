@@ -40,4 +40,3 @@ public interface LinkOutput {
      */
     public void append(Object o);
 }
-

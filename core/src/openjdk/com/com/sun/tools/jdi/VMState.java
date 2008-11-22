@@ -34,7 +34,7 @@ class VMState {
     private final VirtualMachineImpl vm;
 
     // Listeners
-    private final List listeners = new ArrayList(); // synchronized (this)
+    private final List<WeakReference> listeners = new ArrayList<WeakReference>(); // synchronized (this)
     private boolean notifyingListeners = false;  // synchronized (this)
 
     /*
@@ -48,8 +48,8 @@ class VMState {
 
     // This is cached only while the VM is suspended
     private static class Cache {
-        List groups = null;  // cached Top Level ThreadGroups
-        List threads = null; // cached Threads
+        List<ThreadGroupReference> groups = null;  // cached Top Level ThreadGroups
+        List<ThreadReference> threads = null; // cached Threads
     }
 
     private Cache cache = null;               // synchronized (this)
@@ -161,7 +161,7 @@ class VMState {
     }
 
     synchronized void addListener(VMListener listener) {
-        listeners.add(new WeakReference(listener));
+        listeners.add(new WeakReference<VMListener>(listener));
     }
 
     synchronized boolean hasListener(VMListener listener) {
@@ -179,8 +179,8 @@ class VMState {
         }
     }
 
-    List allThreads() {
-        List threads = null;
+    List<ThreadReference> allThreads() {
+        List<ThreadReference> threads = null;
         try {
             Cache local = getCache();
 
@@ -189,7 +189,7 @@ class VMState {
                 threads = local.threads;
             }
             if (threads == null) {
-                threads = Arrays.asList(JDWP.VirtualMachine.AllThreads.
+                threads = Arrays.asList((ThreadReference[])JDWP.VirtualMachine.AllThreads.
                                         process(vm).threads);
                 if (local != null) {
                     local.threads = threads;
@@ -206,8 +206,8 @@ class VMState {
     }
 
 
-    List topLevelThreadGroups() {
-        List groups = null;
+    List<ThreadGroupReference> topLevelThreadGroups() {
+        List<ThreadGroupReference> groups = null;
         try {
             Cache local = getCache();
 
@@ -216,7 +216,7 @@ class VMState {
             }
             if (groups == null) {
                 groups = Arrays.asList(
-                                JDWP.VirtualMachine.TopLevelThreadGroups.
+                                (ThreadGroupReference[])JDWP.VirtualMachine.TopLevelThreadGroups.
                                        process(vm).groups);
                 if (local != null) {
                     local.groups = groups;
@@ -234,4 +234,3 @@ class VMState {
     }
 
 }
-

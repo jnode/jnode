@@ -98,14 +98,14 @@ public class TreeCopier<P> implements TreeVisitor<JCTree,P> {
         JCAssignOp t = (JCAssignOp) node;
         JCTree lhs = copy(t.lhs, p);
         JCTree rhs = copy(t.rhs, p);
-        return M.at(t.pos).Assignop(t.tag, lhs, rhs);
+        return M.at(t.pos).Assignop(t.getTag(), lhs, rhs);
     }
 
     public JCTree visitBinary(BinaryTree node, P p) {
         JCBinary t = (JCBinary) node;
         JCExpression lhs = copy(t.lhs, p);
         JCExpression rhs = copy(t.rhs, p);
-        return M.at(t.pos).Binary(t.tag, lhs, rhs);
+        return M.at(t.pos).Binary(t.getTag(), lhs, rhs);
     }
 
     public JCTree visitBlock(BlockTree node, P p) {
@@ -373,7 +373,7 @@ public class TreeCopier<P> implements TreeVisitor<JCTree,P> {
     public JCTree visitUnary(UnaryTree node, P p) {
         JCUnary t = (JCUnary) node;
         JCExpression arg = copy(t.arg, p);
-        return M.at(t.pos).Unary(t.tag, arg);
+        return M.at(t.pos).Unary(t.getTag(), arg);
     }
 
     public JCTree visitVariable(VariableTree node, P p) {
@@ -400,7 +400,7 @@ public class TreeCopier<P> implements TreeVisitor<JCTree,P> {
 
     public JCTree visitOther(Tree node, P p) {
         JCTree tree = (JCTree) node;
-        switch (tree.tag) {
+        switch (tree.getTag()) {
             case JCTree.LETEXPR: {
                 LetExpr t = (LetExpr) node;
                 List<JCVariableDecl> defs = copy(t.defs, p);
@@ -408,7 +408,7 @@ public class TreeCopier<P> implements TreeVisitor<JCTree,P> {
                 return M.at(t.pos).LetExpr(defs, expr);
             }
             default:
-                throw new AssertionError("unknown tree tag: " + tree.tag);
+                throw new AssertionError("unknown tree tag: " + tree.getTag());
         }
     }
     

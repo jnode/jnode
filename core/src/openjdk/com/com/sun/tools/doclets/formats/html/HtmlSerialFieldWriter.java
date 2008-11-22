@@ -165,5 +165,3 @@ public class HtmlSerialFieldWriter extends FieldWriterImpl
         writer.dlEnd();
     }
 }
-
-

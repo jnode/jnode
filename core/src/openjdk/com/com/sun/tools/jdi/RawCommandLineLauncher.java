@@ -130,4 +130,3 @@ public class RawCommandLineLauncher extends AbstractLauncher implements Launchin
         return getString("raw.description");
     }
 }
-

@@ -34,7 +34,7 @@ import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import com.sun.tools.attach.AttachPermission;
 import com.sun.tools.attach.AttachNotSupportedException;
-import sun.misc.Service;
+import java.util.ServiceLoader;
 
 /**
  * Attach provider class for attaching to a Java virtual machine.
@@ -248,12 +248,15 @@ public abstract class AttachProvider {
 	    if (providers == null) {
 		providers = new ArrayList<AttachProvider>();
 
-		Iterator i = Service.providers(AttachProvider.class,
+                ServiceLoader<AttachProvider> providerLoader =
+                    ServiceLoader.load(AttachProvider.class,
 				AttachProvider.class.getClassLoader());
+
+                Iterator<AttachProvider> i = providerLoader.iterator();
 
 		while (i.hasNext()) {
 		    try {
-                        providers.add( (AttachProvider)i.next() );
+                        providers.add(i.next());
 		    } catch (Throwable t) {
 			if (t instanceof ThreadDeath) {
 			    ThreadDeath td = (ThreadDeath)t;

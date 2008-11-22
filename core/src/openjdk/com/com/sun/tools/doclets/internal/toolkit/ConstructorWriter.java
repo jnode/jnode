@@ -110,4 +110,3 @@ public interface ConstructorWriter {
      */
     public void close() throws IOException;
 }
-

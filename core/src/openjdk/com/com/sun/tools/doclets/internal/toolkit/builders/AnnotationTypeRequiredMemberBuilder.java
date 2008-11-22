@@ -243,4 +243,3 @@ public class AnnotationTypeRequiredMemberBuilder extends AbstractMemberBuilder {
         return writer;
     }
 }
-

@@ -206,4 +206,3 @@ public class Comment
   11aug1997<daz> Initial version completed.
   18aug1997<daz> Modified generate to write comment unformatted.
   ==================================================================================*/
-

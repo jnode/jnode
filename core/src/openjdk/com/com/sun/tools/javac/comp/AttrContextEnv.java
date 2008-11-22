@@ -26,7 +26,6 @@
 package com.sun.tools.javac.comp;
 
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Version;
 
 
 /** {@code Env<A>} specialized as {@code Env<AttrContext>}
@@ -36,7 +35,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)AttrContextEnv.java	1.19 07/05/05")
 public class AttrContextEnv extends Env<AttrContext> {
 
     /** Create an outermost environment for a given (toplevel)tree,

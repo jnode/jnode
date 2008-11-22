@@ -31,7 +31,6 @@ import javax.swing.JFileChooser;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import com.sun.tools.javac.util.Version;
 
 /**
  * <b>Unsupported</b> entry point for starting javac from an IDE.
@@ -50,7 +49,6 @@ import com.sun.tools.javac.util.Version;
  * @author Peter von der Ah&eacute;
  * @since 1.6
  */
-@Version("@(#)Launcher.java	1.10 07/05/05")
 class Launcher {
     public static void main(String... args) {
         JavaCompiler javac = ToolProvider.getSystemJavaCompiler();

@@ -50,5 +50,3 @@ class ThreadAction extends EventObject {
         return id;
     }
 }
-
-

@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.processing;
 
-import com.sun.tools.javac.util.Version;
 
 /** 
  * Error thrown for problems encountered during annotation processing.
@@ -35,7 +34,6 @@ import com.sun.tools.javac.util.Version;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)AnnotationProcessingError.java	1.8 07/05/05")
 public class AnnotationProcessingError extends Error {
     static final long serialVersionUID = 305337707019230790L;
     AnnotationProcessingError(Throwable cause) {

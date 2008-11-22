@@ -138,4 +138,3 @@ public class JavacScope implements com.sun.source.tree.Scope {
         return "JavacScope[env=" + env + ",starImport=" + isStarImportScope() + "]";
     }
 }
-

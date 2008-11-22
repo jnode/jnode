@@ -161,7 +161,7 @@ public class ObjectReferenceImpl extends ValueImpl
     }
 
     public Value getValue(Field sig) {
-        List list = new ArrayList(1);
+        List<Field> list = new ArrayList<Field>(1);
         list.add(sig);
         Map map = getValues(list);
         return(Value)map.get(sig);
@@ -170,9 +170,9 @@ public class ObjectReferenceImpl extends ValueImpl
     public Map<Field,Value> getValues(List<? extends Field> theFields) {
         validateMirrors(theFields);
 
-        List staticFields = new ArrayList(0);
+        List<Field> staticFields = new ArrayList<Field>(0);
         int size = theFields.size();
-        List instanceFields = new ArrayList(size);
+        List<Field> instanceFields = new ArrayList<Field>(size);
 
         for (int i=0; i<size; i++) {
             Field field = (Field)theFields.get(i);
@@ -190,11 +190,11 @@ public class ObjectReferenceImpl extends ValueImpl
             }
         }
 
-        Map map;
+        Map<Field, Value> map;
         if (staticFields.size() > 0) {
             map = referenceType().getValues(staticFields);
         } else {
-            map = new HashMap(size);
+            map = new HashMap<Field, Value>(size);
         }
 
         size = instanceFields.size();
@@ -380,7 +380,7 @@ public class ObjectReferenceImpl extends ValueImpl
 
         validateMethodInvocation(method, options);
 
-        List arguments = method.validateAndPrepareArgumentsForInvoke(
+        List<Value> arguments = method.validateAndPrepareArgumentsForInvoke(
                                                   origArguments);
 
 	ValueImpl[] args = (ValueImpl[])arguments.toArray(new ValueImpl[0]);
@@ -503,8 +503,8 @@ public class ObjectReferenceImpl extends ValueImpl
         return info;
     }
 
-    public List waitingThreads() throws IncompatibleThreadStateException {
-        return Arrays.asList(jdwpMonitorInfo().waiters);
+    public List<ThreadReference> waitingThreads() throws IncompatibleThreadStateException {
+        return Arrays.asList((ThreadReference[])jdwpMonitorInfo().waiters);
     }
 
     public ThreadReference owningThread() throws IncompatibleThreadStateException {
@@ -516,7 +516,7 @@ public class ObjectReferenceImpl extends ValueImpl
     }
 
 
-    public List referringObjects(long maxReferrers) {
+    public List<ObjectReference> referringObjects(long maxReferrers) {
         if (!vm.canGetInstanceInfo()) {
             throw new UnsupportedOperationException(
                 "target does not support getting referring objects");
@@ -532,7 +532,7 @@ public class ObjectReferenceImpl extends ValueImpl
         // JDWP can't currently handle more than this (in mustang)
 
         try {
-            return Arrays.asList(JDWP.ObjectReference.ReferringObjects.
+            return Arrays.asList((ObjectReference[])JDWP.ObjectReference.ReferringObjects.
                                 process(vm, this, intMax).referringObjects);
         } catch (JDWPException exc) {
             throw exc.toJDIException();

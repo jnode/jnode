@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)ConstGen.java	1.20 07/05/05
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -196,4 +195,3 @@ public class ConstGen implements com.sun.tools.corba.se.idl.ConstGen
                 -keep option, which causes null print stream to be sent to ConstGen.
   31jul1997daz  Write source comment immediately preceding constant declaration.
   =======================================================================================*/
-

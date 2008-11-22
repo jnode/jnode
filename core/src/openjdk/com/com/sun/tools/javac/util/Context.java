@@ -97,7 +97,6 @@ import java.util.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Context.java	1.27 07/05/05")
 public class Context {
     /** The client creates an instance of this class for each key.
      */

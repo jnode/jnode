@@ -33,7 +33,7 @@ public class ClassLoaderReferenceImpl extends ObjectReferenceImpl
 
     // This is cached only while the VM is suspended
     private static class Cache extends ObjectReferenceImpl.Cache {
-        List visibleClasses = null;
+        List<ReferenceType> visibleClasses = null;
     }
 
     protected ObjectReferenceImpl.Cache newCache() {
@@ -49,11 +49,9 @@ public class ClassLoaderReferenceImpl extends ObjectReferenceImpl
         return "ClassLoaderReference " + uniqueID();
     }
 
-    public List definedClasses() {
-        ArrayList definedClasses = new ArrayList();
-        Iterator iter = vm.allClasses().iterator();
-        while (iter.hasNext()) {
-            ReferenceType type = (ReferenceType)iter.next();
+    public List<ReferenceType> definedClasses() {
+        ArrayList<ReferenceType> definedClasses = new ArrayList<ReferenceType>();
+        for (ReferenceType type :  vm.allClasses()) {
             if (type.isPrepared() &&
 		equals(type.classLoader())) {
                 definedClasses.add(type);
@@ -62,8 +60,8 @@ public class ClassLoaderReferenceImpl extends ObjectReferenceImpl
         return definedClasses;
     }
 
-    public List visibleClasses() {
-        List classes = null;
+    public List<ReferenceType> visibleClasses() {
+        List<ReferenceType> classes = null;
         try {
             Cache local = (Cache)getCache();
 
@@ -74,7 +72,7 @@ public class ClassLoaderReferenceImpl extends ObjectReferenceImpl
                 JDWP.ClassLoaderReference.VisibleClasses.ClassInfo[] 
                   jdwpClasses = JDWP.ClassLoaderReference.VisibleClasses.
                                             process(vm, this).classes;
-                classes = new ArrayList(jdwpClasses.length);
+                classes = new ArrayList<ReferenceType>(jdwpClasses.length);
                 for (int i = 0; i < jdwpClasses.length; ++i) {
                     classes.add(vm.referenceType(jdwpClasses[i].typeID, 
                                                  jdwpClasses[i].refTypeTag));
@@ -96,7 +94,7 @@ public class ClassLoaderReferenceImpl extends ObjectReferenceImpl
     }
 
     Type findType(String signature) throws ClassNotLoadedException {
-        List types = visibleClasses();
+        List<ReferenceType> types = visibleClasses();
         Iterator iter = types.iterator();
         while (iter.hasNext()) {
             ReferenceType type = (ReferenceType)iter.next();

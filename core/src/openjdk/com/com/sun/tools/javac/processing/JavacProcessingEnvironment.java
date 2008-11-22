@@ -57,6 +57,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.DiagnosticListener;
 import static javax.tools.StandardLocation.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -68,9 +69,6 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import sun.misc.Service;
-import sun.misc.ServiceConfigurationError;
-
 /**
  * Objects of this class hold and manage the state needed to support
  * annotation processing.
@@ -80,7 +78,6 @@ import sun.misc.ServiceConfigurationError;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)JavacProcessingEnvironment.java	1.34 07/05/05")
 public class JavacProcessingEnvironment implements ProcessingEnvironment, Closeable {
     Options options;
 
@@ -203,10 +200,7 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
                 if (processorNames != null) {
                     processorIterator = new NameProcessIterator(processorNames, processorCL, log);
                 } else {
-                    @SuppressWarnings("unchecked")
-                        Iterator<Processor> it =
-                            Service.providers(Processor.class, processorCL);
-                    processorIterator = it;
+                    processorIterator = new ServiceIterator(processorCL, log);
                 }
             } catch (SecurityException e) {
                 /*
@@ -215,6 +209,25 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
                  * (i.e. no processor was specified either explicitly, or implicitly,
                  * in service configuration file.) Otherwise, we cannot continue.
                  */
+                processorIterator = handleServiceLoaderUnavailability("proc.cant.create.loader", e);
+            }
+        }
+        discoveredProcs = new DiscoveredProcessors(processorIterator);
+    }
+
+    /**
+     * Returns an empty processor iterator if no processors are on the
+     * relevant path, otherwise if processors are present, logs an
+     * error.  Called when a service loader is unavailable for some
+     * reason, either because a service loader class cannot be found
+     * or because a security policy prevents class loaders from being
+     * created.
+     *
+     * @param key The resource key to use to log an error message
+     * @param e   If non-null, pass this exception to Abort
+     */
+    private Iterator<Processor> handleServiceLoaderUnavailability(String key, Exception e) {
+        JavaFileManager fileManager = context.get(JavaFileManager.class);
 
 		if (fileManager instanceof JavacFileManager) {
 		    StandardJavaFileManager standardFileManager = (JavacFileManager) fileManager;
@@ -222,20 +235,121 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
 			? standardFileManager.getLocation(ANNOTATION_PROCESSOR_PATH)
 			: standardFileManager.getLocation(CLASS_PATH);
 
-		    if (needClassLoader(processorNames, workingPath) ) {
-			log.error("proc.cant.create.loader", e.getLocalizedMessage());
-			throw new Abort(e);
-		    }
+            if (needClassLoader(options.get("-processor"), workingPath) )
+                handleException(key, e);
+
 		} else {
-		    log.error("proc.cant.create.loader", e.getLocalizedMessage());
+            handleException(key, e);
+        }
+
+        java.util.List<Processor> pl = Collections.emptyList();
+        return pl.iterator();
+    }
+
+    /**
+     * Handle a security exception thrown during initializing the
+     * Processor iterator.
+     */
+    private void handleException(String key, Exception e) {
+        if (e != null) {
+            log.error(key, e.getLocalizedMessage());
 		    throw new Abort(e);
+        } else {
+            log.error(key);
+            throw new Abort();
+        }
 		}
 
-                processorIterator =  new LinkedList<Processor>().iterator();
+    /**
+     * Use a service loader appropriate for the platform to provide an
+     * iterator over annotations processors.  If
+     * java.util.ServiceLoader is present use it, otherwise, use
+     * sun.misc.Service, otherwise fail if a loader is needed.
+     */
+    private class ServiceIterator implements Iterator<Processor> {
+        // The to-be-wrapped iterator.
+        private Iterator<?> iterator;
+        private Log log;
+
+        ServiceIterator(ClassLoader classLoader, Log log) {
+            Class<?> loaderClass;
+            String loadMethodName;
+            boolean jusl;
+
+            this.log = log;
+            try {
+                try {
+                    loaderClass = Class.forName("java.util.ServiceLoader");
+                    loadMethodName = "load";
+                    jusl = true;
+                } catch (ClassNotFoundException cnfe) {
+                    try {
+                        loaderClass = Class.forName("sun.misc.Service");
+                        loadMethodName = "providers";
+                        jusl = false;
+                    } catch (ClassNotFoundException cnfe2) {
+                        // Fail softly if a loader is not actually needed.
+                        this.iterator = handleServiceLoaderUnavailability("proc.no.service",
+                                                                          null);
+                        return;
             }
         }
-	discoveredProcs = new DiscoveredProcessors(processorIterator);
+
+                // java.util.ServiceLoader.load or sun.misc.Service.providers
+                Method loadMethod = loaderClass.getMethod(loadMethodName,
+                                                          Class.class,
+                                                          ClassLoader.class);
+
+                Object result = loadMethod.invoke(null,
+                                                  Processor.class,
+                                                  classLoader);
+
+                // For java.util.ServiceLoader, we have to call another
+                // method to get the iterator.
+                if (jusl) {
+                    Method m = loaderClass.getMethod("iterator");
+                    result = m.invoke(result); // serviceLoader.iterator();
     }
+
+                // The result should now be an iterator.
+                this.iterator = (Iterator<?>) result;
+            } catch (Throwable t) {
+                log.error("proc.service.problem");
+                throw new Abort(t);
+            }
+        }
+
+        public boolean hasNext() {
+            try {
+                return iterator.hasNext();
+            } catch (Throwable t) {
+                if ("ServiceConfigurationError".
+                    equals(t.getClass().getSimpleName())) {
+                    log.error("proc.bad.config.file", t.getLocalizedMessage());
+                }
+                throw new Abort(t);
+            }
+        }
+
+        public Processor next() {
+            try {
+                return (Processor)(iterator.next());
+            } catch (Throwable t) {
+                if ("ServiceConfigurationError".
+                    equals(t.getClass().getSimpleName())) {
+                    log.error("proc.bad.config.file", t.getLocalizedMessage());
+                } else {
+                    log.error("proc.processor.constructor.error", t.getLocalizedMessage());
+                }
+                throw new Abort(t);
+            }
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
 
     private static class NameProcessIterator implements Iterator<Processor> {
 	Processor nextProc = null;
@@ -438,7 +552,6 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
             }
 
             public ProcessorState next() {
-                try {
                     if (!onProcInterator) {
                         if (innerIter.hasNext())
                             return innerIter.next();
@@ -453,32 +566,13 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
                         return ps;
                     } else
                         throw new NoSuchElementException();
-                } catch (ServiceConfigurationError e) {
-                    log.error("proc.bad.config.file", e.getLocalizedMessage());
-                    throw new Abort();
-                } catch (Throwable e) {
-                    // TODO: needed while we use sun.misc.Service;
-                    // not needed when we change to use java.util.Service
-                    log.error("proc.processor.constructor.error", e.getLocalizedMessage());
-                    throw new Abort();
-                }
             }
 
             public boolean hasNext() {
-                try {
                     if (onProcInterator)
                         return  psi.processorIterator.hasNext();
                     else
                         return innerIter.hasNext() || psi.processorIterator.hasNext();
-                } catch (ServiceConfigurationError e) {
-                    log.error("proc.bad.config.file", e.getLocalizedMessage());
-                    throw new Abort();
-                } catch (Throwable e) {
-                    // TODO: needed while we use sun.misc.Service;
-                    // not needed when we change to use java.util.Service
-                    log.error("proc.processor.constructor.error", e.getLocalizedMessage());
-                    throw new Abort();
-                }
             }
 
             public void remove () {
@@ -914,7 +1008,7 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
         List<ClassSymbol> classes = List.nil();
         for (JCCompilationUnit unit : units) {
 	    for (JCTree node : unit.defs) {
-		if (node.tag == JCTree.CLASSDEF) {
+                if (node.getTag() == JCTree.CLASSDEF) {
 		    classes = classes.prepend(((JCClassDecl) node).sym);
 		}
 	    }
@@ -1280,7 +1374,7 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
     }
 
     public String toString() {
-        return "javac ProcessingEnvironment version @(#)JavacProcessingEnvironment.java	1.34 07/05/05";
+        return "javac ProcessingEnvironment";
     }
 
     public static boolean isValidOptionName(String optionName) {
@@ -1291,4 +1385,3 @@ public class JavacProcessingEnvironment implements ProcessingEnvironment, Closea
         return true;
     }
 }
-

@@ -47,7 +47,6 @@ import com.sun.tools.javac.util.JCDiagnostic.DiagnosticType;
  * <li>%m: the text or the diagnostic, including any appropriate arguments
  * </ul>
  */
-@Version("@(#)DiagnosticFormatter.java	1.19 07/05/05")
 public class DiagnosticFormatter {
     /**
      * A format string to be used for diagnostics with a given position.

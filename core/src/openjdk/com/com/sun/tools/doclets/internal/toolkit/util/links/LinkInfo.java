@@ -149,4 +149,3 @@ public abstract class LinkInfo {
         }
     }
 }
-

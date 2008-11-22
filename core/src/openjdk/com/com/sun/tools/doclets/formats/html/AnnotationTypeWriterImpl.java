@@ -356,8 +356,3 @@ public class AnnotationTypeWriterImpl extends SubWriterHolderWriter
         p();
     }
 }
-
-
-
-
-

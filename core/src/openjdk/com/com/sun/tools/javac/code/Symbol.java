@@ -58,7 +58,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Symbol.java	1.103 07/05/05")
 public abstract class Symbol implements Element {
     // public Throwable debug = new Throwable();
 

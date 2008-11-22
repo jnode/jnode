@@ -37,7 +37,6 @@ import java.util.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Options.java	1.20 07/05/05")
 public class Options {
     private static final long serialVersionUID = 0;
 

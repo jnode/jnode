@@ -37,7 +37,7 @@ public class EventQueueImpl extends MirrorImpl implements EventQueue {
      * Note this is not a synchronized list. Iteration/update should be
      * protected through the 'this' monitor.
      */
-    LinkedList eventSets = new LinkedList();
+    LinkedList<EventSet> eventSets = new LinkedList<EventSet>();
 
     TargetVM target;
     boolean closed = false;
@@ -240,4 +240,3 @@ public class EventQueueImpl extends MirrorImpl implements EventQueue {
         }
     }
 }
-

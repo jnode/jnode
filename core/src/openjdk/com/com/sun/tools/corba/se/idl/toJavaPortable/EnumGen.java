@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)EnumGen.java	1.20 07/05/05
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -278,4 +277,3 @@ public class EnumGen implements com.sun.tools.corba.se.idl.EnumGen, JavaGenerato
                  enumeration declaration.
   12dec1998<klr> D55971 - omg 98-11-03 Java 2.4 RTF  - make subclassable
   ===========================================================================*/
-

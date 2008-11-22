@@ -32,7 +32,6 @@ package com.sun.tools.javac.util;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Pair.java	1.25 07/05/05")
 public class Pair<A, B> {
 
     public final A fst;

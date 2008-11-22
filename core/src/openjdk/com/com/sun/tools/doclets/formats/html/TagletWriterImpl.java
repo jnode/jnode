@@ -302,4 +302,3 @@ public class TagletWriterImpl extends TagletWriter {
         return new TagletOutputImpl("");
     }
 }
-

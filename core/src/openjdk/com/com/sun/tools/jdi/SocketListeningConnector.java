@@ -93,4 +93,3 @@ public class SocketListeningConnector extends GenericListeningConnector {
         return getString("socket_listening.description");
     }
 }
-

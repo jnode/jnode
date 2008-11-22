@@ -359,7 +359,7 @@ public class JavadocTool extends com.sun.tools.javac.main.JavaCompiler {
         ListBuffer<JCClassDecl> result = new ListBuffer<JCClassDecl>();
 	for (JCCompilationUnit t : trees) {
 	    for (JCTree def : t.defs) {
-		if (def.tag == JCTree.CLASSDEF)
+                if (def.getTag() == JCTree.CLASSDEF)
 		    result.append((JCClassDecl)def);
 	    }
         }
@@ -367,4 +367,3 @@ public class JavadocTool extends com.sun.tools.javac.main.JavaCompiler {
     }
     
 }
-

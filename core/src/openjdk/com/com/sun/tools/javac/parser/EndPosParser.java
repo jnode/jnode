@@ -31,7 +31,6 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeInfo;
 import com.sun.tools.javac.util.Position;
 import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.Version;
 
 import static com.sun.tools.javac.tree.JCTree.*;
 
@@ -44,7 +43,6 @@ import static com.sun.tools.javac.tree.JCTree.*;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b></p>
  */
-@Version("@(#)EndPosParser.java	1.13 07/05/05")
 public class EndPosParser extends Parser {
 
     public EndPosParser(Factory fac, Lexer S, boolean keepDocComments) {

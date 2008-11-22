@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.code;
 
-import com.sun.tools.javac.util.Version;
 
 /** Internal symbol kinds, which distinguish between elements of
  *  different subclasses of Symbol. Symbol kinds are organized so they can be
@@ -36,7 +35,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Kinds.java	1.25 07/05/05")
 public class Kinds {
 
     private Kinds() {} // uninstantiable

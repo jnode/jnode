@@ -47,7 +47,6 @@ import javax.lang.model.element.ElementVisitor;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Resolve.java	1.140 07/05/05")
 public class Resolve {
     protected static final Context.Key<Resolve> resolveKey =
         new Context.Key<Resolve>();
@@ -229,7 +228,7 @@ public class Resolve {
                 // another symbol which is a member of `site'
                 // (because, if it is overridden, `sym' is not strictly
                 // speaking a member of `site'.)
-                (sym.kind != MTH || sym.isConstructor() ||
+                (sym.kind != MTH || sym.isConstructor() || sym.isStatic() ||
                  ((MethodSymbol)sym).implementation(site.tsym, types, true) == sym);
         default: // this case includes erroneous combinations as well
             return isAccessible(env, site);
@@ -960,7 +959,7 @@ public class Resolve {
                 staticOnly = true;
         }
 
-        if (env.tree.tag != JCTree.IMPORT) {
+        if (env.tree.getTag() != JCTree.IMPORT) {
             sym = findGlobalType(env, env.toplevel.namedImportScope, name);
             if (sym.exists()) return sym;
             else if (sym.kind < bestSoFar.kind) bestSoFar = sym;

@@ -66,7 +66,6 @@ import static com.sun.tools.javac.code.TypeTags.*;
  *
  *  @see TypeTags
  */
-@Version("@(#)Type.java	1.108 07/05/05")
 public class Type implements PrimitiveType {
 
     /** Constant type: no type at all. */
@@ -272,6 +271,7 @@ public class Type implements PrimitiveType {
     public Type              getReturnType()     { return null; }
     public List<Type>        getThrownTypes()    { return List.nil(); }
     public Type              getUpperBound()     { return null; }
+    public Type              getLowerBound()     { return null; }
 
     public void setThrown(List<Type> ts) {
         throw new AssertionError();
@@ -933,15 +933,18 @@ public class Type implements PrimitiveType {
          *  points to the first class or interface bound.
          */
         public Type bound = null;
+        public Type lower;
 
-        public TypeVar(Name name, Symbol owner) {
+        public TypeVar(Name name, Symbol owner, Type lower) {
             super(TYPEVAR, null);
             tsym = new TypeSymbol(0, name, this, owner);
+            this.lower = lower;
         }
 
-        public TypeVar(TypeSymbol tsym, Type bound) {
+        public TypeVar(TypeSymbol tsym, Type bound, Type lower) {
             super(TYPEVAR, tsym);
             this.bound = bound;
+            this.lower = lower;
         }
 
         @Override
@@ -954,7 +957,7 @@ public class Type implements PrimitiveType {
         int rank_field = -1;
 
         public Type getLowerBound() {
-            return Symtab.botType;
+            return lower;
         }
 
         public TypeKind getKind() {
@@ -980,7 +983,7 @@ public class Type implements PrimitiveType {
 			    Type upper,
 			    Type lower,
 			    WildcardType wildcard) {
-            super(name, owner);
+            super(name, owner, lower);
             assert lower != null;
             this.bound = upper;
             this.lower = lower;

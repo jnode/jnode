@@ -112,5 +112,3 @@ public interface ConstantsSummaryWriter {
     public abstract void writeConstantMembersFooter(ClassDoc cd);
     
 }
-
-

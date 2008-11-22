@@ -63,7 +63,6 @@ import static com.sun.tools.javac.util.ListBuffer.lb;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)Types.java	1.95 07/05/05")
 public class Types {
     protected static final Context.Key<Types> typesKey =
         new Context.Key<Types>();
@@ -2095,7 +2094,7 @@ public class Types {
         ListBuffer<Type> newTvars = lb();
         // create new type variables without bounds
         for (Type t : tvars) {
-            newTvars.append(new TypeVar(t.tsym, null));
+            newTvars.append(new TypeVar(t.tsym, null, syms.botType));
         }
         // the new bounds should use the new type variables in place
         // of the old
@@ -2120,7 +2119,7 @@ public class Types {
         if (bound1 == t.bound)
             return t;
         else
-            return new TypeVar(t.tsym, bound1);
+            return new TypeVar(t.tsym, bound1, syms.botType);
     }
     // </editor-fold>
 
@@ -2156,7 +2155,7 @@ public class Types {
         return tvars1;
     }
     static private Mapping newInstanceFun = new Mapping("newInstanceFun") {
-            public Type apply(Type t) { return new TypeVar(t.tsym, t.getUpperBound()); }
+            public Type apply(Type t) { return new TypeVar(t.tsym, t.getUpperBound(), t.getLowerBound()); }
         };
     // </editor-fold>
 

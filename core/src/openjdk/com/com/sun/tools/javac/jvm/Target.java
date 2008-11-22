@@ -38,7 +38,6 @@ import com.sun.tools.javac.util.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Target.java	1.50 07/05/05")
 public enum Target {
     JDK1_1("1.1", 45, 3),
     JDK1_2("1.2", 46, 0),
@@ -62,10 +61,7 @@ public enum Target {
     JDK1_5("1.5", 49, 0),
 
     /** JDK 6. */
-    JDK1_6("1.6", 50, 0),
-
-    /** JDK 7. */
-    JDK1_7("1.7", 51, 0);
+    JDK1_6("1.6", 50, 0);
 
     private static final Context.Key<Target> targetKey =
 	new Context.Key<Target>();
@@ -97,7 +93,6 @@ public enum Target {
 	}
 	tab.put("5", JDK1_5);
 	tab.put("6", JDK1_6);
-        tab.put("7", JDK1_7);
     }
 
     public final String name;
@@ -202,6 +197,12 @@ public enum Target {
 	return compareTo(JDK1_6) >= 0;
     }
     
+    /** Beginning in -target 6, package-info classes are marked synthetic.
+     */
+    public boolean isPackageInfoSynthetic() {
+        return compareTo(JDK1_6) >= 0;
+    }
+
     /** Do we generate "empty" stackmap slots after double and long?
      */
     public boolean generateEmptyAfterBig() {

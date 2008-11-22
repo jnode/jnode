@@ -35,9 +35,6 @@ import java.util.Set;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.*;
 
-// FIXME sb removed before promoting to javax.tools
-import com.sun.tools.javac.util.Version;
-
 /**
  * Wraps all calls to a given file manager.  Subclasses of this class
  * might override some of these methods and might also provide
@@ -56,7 +53,6 @@ import com.sun.tools.javac.util.Version;
  * @author Peter von der Ah&eacute;
  * @since 1.6
  */
-@Version("@(#)WrappingJavaFileManager.java	1.10 07/05/05") // FIXME sb removed before promoting to javax.tools
 public class WrappingJavaFileManager<M extends JavaFileManager> extends ForwardingJavaFileManager<M> {
 
     /**

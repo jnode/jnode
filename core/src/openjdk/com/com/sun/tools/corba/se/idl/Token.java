@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Token.java	1.21 07/05/05
  */
 
 package com.sun.tools.corba.se.idl;
@@ -688,4 +687,3 @@ class Token
   boolean isWide = false ;  // Only for string and char literals: indicates that this is
 			    // a wide string or char.
 } // class Token
-

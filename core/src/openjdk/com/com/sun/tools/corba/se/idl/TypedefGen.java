@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)TypedefGen.java	1.20 07/05/05
  */
 
 package com.sun.tools.corba.se.idl;
@@ -47,4 +46,3 @@ public interface TypedefGen extends Generator
 {
   void generate (Hashtable symbolTable, TypedefEntry entry, PrintWriter stream);
 } // interface TypedefGen
-

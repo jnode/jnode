@@ -82,4 +82,3 @@ public abstract class AbstractMemberBuilder extends AbstractBuilder {
      */
     public abstract boolean hasMembersToDocument();
 }
-

@@ -403,5 +403,3 @@ public class MethodWriterImpl extends AbstractExecutableMemberWriter
         }
     }
 }
-
-

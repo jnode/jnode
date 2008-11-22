@@ -44,7 +44,6 @@ import static com.sun.tools.javac.jvm.ClassWriter.StackMapTableFrame;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Code.java	1.69 07/05/05")
 public class Code {
 
     public final boolean debugCode;

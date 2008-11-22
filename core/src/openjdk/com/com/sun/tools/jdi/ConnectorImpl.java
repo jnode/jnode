@@ -39,20 +39,20 @@ import java.util.ResourceBundle;
 import java.io.Serializable;
 
 abstract class ConnectorImpl implements Connector {
-    Map defaultArguments = new LinkedHashMap();
+    Map<String,Argument> defaultArguments = new java.util.LinkedHashMap<String,Argument>();
 
     // Used by BooleanArgument
     static String trueString = null;
     static String falseString;
 
-    public Map defaultArguments() {
-        Map defaults = new LinkedHashMap();
+    public Map<String,Argument> defaultArguments() {
+        Map<String,Argument> defaults = new java.util.LinkedHashMap<String,Argument>();
         Collection values = defaultArguments.values();
 
         Iterator iter = values.iterator();
         while (iter.hasNext()) {
             ArgumentImpl argument = (ArgumentImpl)iter.next();
-            defaults.put(argument.name(), argument.clone());
+            defaults.put(argument.name(), (Argument)argument.clone());
         }
         return defaults;
     }
@@ -88,7 +88,7 @@ abstract class ConnectorImpl implements Connector {
 
     void addSelectedArgument(String name, String label, String description, 
                              String defaultValue, boolean mustSpecify,
-                             List list) {
+                             List<String> list) {
         defaultArguments.put(name, 
                              new SelectedArgumentImpl(name, label, 
                                                       description, 
@@ -397,21 +397,20 @@ abstract class ConnectorImpl implements Connector {
     class SelectedArgumentImpl extends ConnectorImpl.ArgumentImpl 
                               implements Connector.SelectedArgument {
 
-        private final List choices;
+        private final List<String> choices;
 
         SelectedArgumentImpl(String name, String label, String description, 
                              String value,
-                             boolean mustSpecify, List choices) {
+                             boolean mustSpecify, List<String> choices) {
             super(name, label, description, value, mustSpecify);
-            this.choices = Collections.unmodifiableList(
-                                           new ArrayList(choices));
+            this.choices = Collections.unmodifiableList(new ArrayList<String>(choices));
         }
 
         /**
          * Return the possible values for the argument
          * @return {@link List} of {@link String}
          */
-        public List choices() {
+        public List<String> choices() {
             return choices;
         }
 

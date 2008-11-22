@@ -98,4 +98,3 @@ public class SocketAttachingConnector extends GenericAttachingConnector {
        return getString("socket_attaching.description");
     }
 }
-

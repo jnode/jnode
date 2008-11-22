@@ -32,5 +32,3 @@ interface VMListener extends EventListener {
     boolean vmSuspended(VMAction action);
     boolean vmNotSuspended(VMAction action);
 }
-
-

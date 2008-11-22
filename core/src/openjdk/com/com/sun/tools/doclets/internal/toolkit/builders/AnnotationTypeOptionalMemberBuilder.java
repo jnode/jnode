@@ -134,4 +134,3 @@ public class AnnotationTypeOptionalMemberBuilder extends
         return writer;
     }
 }
-

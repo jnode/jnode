@@ -27,7 +27,6 @@ package com.sun.tools.javac.main;
 
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
-import com.sun.tools.javac.util.Version;
 import java.io.PrintWriter;
 
 /**
@@ -38,7 +37,6 @@ import java.io.PrintWriter;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-@Version("@(#)JavacOption.java	1.7 07/05/05")
 public interface JavacOption {
 
     OptionKind getKind();

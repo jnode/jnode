@@ -37,11 +37,11 @@ public abstract class MethodImpl extends TypeComponentImpl
     private JNITypeParser signatureParser;
     abstract int argSlotCount() throws AbsentInformationException;
 
-    abstract List allLineLocations(SDE.Stratum stratum,
+    abstract List<Location> allLineLocations(SDE.Stratum stratum,
                                    String sourceName)
                            throws AbsentInformationException;
 
-    abstract List locationsOfLine(SDE.Stratum stratum,
+    abstract List<Location> locationsOfLine(SDE.Stratum stratum,
                                   String sourceName,
                                   int lineNumber)
                            throws AbsentInformationException;
@@ -91,25 +91,25 @@ public abstract class MethodImpl extends TypeComponentImpl
         return (int)ref();
     }
 
-    public final List allLineLocations()
+    public final List<Location> allLineLocations()
                            throws AbsentInformationException {
         return allLineLocations(vm.getDefaultStratum(), null);
     }
 
-    public List allLineLocations(String stratumID,
+    public List<Location> allLineLocations(String stratumID,
                                  String sourceName)
                            throws AbsentInformationException {
         return allLineLocations(declaringType.stratum(stratumID),
                                 sourceName);
     }
 
-    public final List locationsOfLine(int lineNumber)
+    public final List<Location> locationsOfLine(int lineNumber)
                            throws AbsentInformationException {
         return locationsOfLine(vm.getDefaultStratum(), 
                                null, lineNumber);
     }
 
-    public List locationsOfLine(String stratumID,
+    public List<Location> locationsOfLine(String stratumID,
                                 String sourceName,
                                 int lineNumber)
                            throws AbsentInformationException {
@@ -148,11 +148,11 @@ public abstract class MethodImpl extends TypeComponentImpl
         return enclosing.findType(signature);
     }
 
-    public List argumentTypeNames() {
+    public List<String> argumentTypeNames() {
         return signatureParser.argumentTypeNames();
     }
 
-    public List argumentSignatures() {
+    public List<String> argumentSignatures() {
         return signatureParser.argumentSignatures();
     }
 
@@ -162,9 +162,9 @@ public abstract class MethodImpl extends TypeComponentImpl
         return enclosing.findType(signature);
     }
 
-    public List argumentTypes() throws ClassNotLoadedException {
+    public List<Type> argumentTypes() throws ClassNotLoadedException {
         int size = argumentSignatures().size();
-        ArrayList types = new ArrayList(size);
+        ArrayList<Type> types = new ArrayList<Type>(size);
         for (int i = 0; i < size; i++) {
             Type type = argumentType(i);
             types.add(type);
@@ -289,9 +289,9 @@ public abstract class MethodImpl extends TypeComponentImpl
      *     - delete arguments(n+1), ...
      * NOTE that this might modify the input list.
      */
-    void handleVarArgs(List arguments) 
+    void handleVarArgs(List<Value> arguments)
         throws ClassNotLoadedException, InvalidTypeException {
-        List paramTypes = this.argumentTypes();
+        List<Type> paramTypes = this.argumentTypes();
         ArrayType lastParamType = (ArrayType)paramTypes.get(paramTypes.size() - 1);
         Type componentType = lastParamType.componentType();
         int argCount = arguments.size();
@@ -351,10 +351,10 @@ public abstract class MethodImpl extends TypeComponentImpl
     /*
      * The output list will be different than the input list.
      */
-    List validateAndPrepareArgumentsForInvoke(List origArguments) 
+    List<Value> validateAndPrepareArgumentsForInvoke(List<? extends Value> origArguments)
                          throws ClassNotLoadedException, InvalidTypeException {
         
-        List arguments = new ArrayList(origArguments);
+        List<Value> arguments = new ArrayList<Value>(origArguments);
         if (isVarArgs()) {
             handleVarArgs(arguments);
         }

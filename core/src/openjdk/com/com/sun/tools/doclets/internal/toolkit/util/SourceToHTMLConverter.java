@@ -287,4 +287,3 @@ public class SourceToHTMLConverter {
         return "line." + d.position().line();
     }
 }
-

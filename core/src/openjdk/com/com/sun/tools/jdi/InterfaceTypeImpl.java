@@ -37,29 +37,26 @@ import java.lang.ref.SoftReference;
 public class InterfaceTypeImpl extends ReferenceTypeImpl
                                implements InterfaceType {
 
-    private SoftReference superinterfacesRef = null;
+    private SoftReference<List<InterfaceType>> superinterfacesRef = null;
 
     protected InterfaceTypeImpl(VirtualMachine aVm,long aRef) {
         super(aVm, aRef);
     }
 
-    public List superinterfaces() {
-        List superinterfaces = (superinterfacesRef == null) ? null :
-                                     (List)superinterfacesRef.get();
+    public List<InterfaceType> superinterfaces() {
+        List<InterfaceType> superinterfaces = (superinterfacesRef == null) ? null :
+                                     superinterfacesRef.get();
         if (superinterfaces == null) {
             superinterfaces = getInterfaces();
             superinterfaces = Collections.unmodifiableList(superinterfaces);
-            superinterfacesRef = new SoftReference(superinterfaces);
+            superinterfacesRef = new SoftReference<List<InterfaceType>>(superinterfaces);
         }
         return superinterfaces;
     }
 
-    public List subinterfaces() {
-        List all = vm.allClasses();
-        List subs = new ArrayList();
-        Iterator iter = all.iterator();
-        while (iter.hasNext()) {
-            ReferenceType refType = (ReferenceType)iter.next();
+    public List<InterfaceType> subinterfaces() {
+        List<InterfaceType> subs = new ArrayList<InterfaceType>();
+        for (ReferenceType refType : vm.allClasses()) {
             if (refType instanceof InterfaceType) {
                 InterfaceType interfaze = (InterfaceType)refType;
                 if (interfaze.isPrepared() && interfaze.superinterfaces().contains(this)) {
@@ -67,16 +64,12 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
                 }
             }
         }
-
         return subs;
     }
 
-    public List implementors() {
-        List all = vm.allClasses();
-        List implementors = new ArrayList();
-        Iterator iter = all.iterator();
-        while (iter.hasNext()) {
-            ReferenceType refType = (ReferenceType)iter.next();
+    public List<ClassType> implementors() {
+        List<ClassType> implementors = new ArrayList<ClassType>();
+        for (ReferenceType refType : vm.allClasses()) {
             if (refType instanceof ClassType) {
                 ClassType clazz = (ClassType)refType;
                 if (clazz.isPrepared() && clazz.interfaces().contains(this)) {
@@ -84,50 +77,44 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
                 }
             }
         }
-
         return implementors;
     }
 
-    void addVisibleMethods(Map methodMap) {
+    void addVisibleMethods(Map<String, Method> methodMap) {
         /*
          * Add methods from 
          * parent types first, so that the methods in this class will
          * overwrite them in the hash table
          */
 
-        Iterator iter = superinterfaces().iterator();
-        while (iter.hasNext()) {
-            InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
-            interfaze.addVisibleMethods(methodMap);
+        for (InterfaceType interfaze : superinterfaces()) {
+            ((InterfaceTypeImpl)interfaze).addVisibleMethods(methodMap);
         }
 
         addToMethodMap(methodMap, methods());
     }
 
-    public List allMethods() {
-        ArrayList list = new ArrayList(methods());
+    public List<Method> allMethods() {
+        ArrayList<Method> list = new ArrayList<Method>(methods());
         
         /*
          * It's more efficient if don't do this 
          * recursively.
          */
-        List interfaces = allSuperinterfaces();
-        Iterator iter = interfaces.iterator();
-        while (iter.hasNext()) {
-            InterfaceType interfaze = (InterfaceType)iter.next();
+        for (InterfaceType interfaze : allSuperinterfaces()) {
             list.addAll(interfaze.methods());
         }
 
         return list;
     }
 
-    List allSuperinterfaces() {
-        ArrayList list = new ArrayList();
+    List<InterfaceType> allSuperinterfaces() {
+        ArrayList<InterfaceType> list = new ArrayList<InterfaceType>();
         addSuperinterfaces(list);
         return list;
     }
 
-    void addSuperinterfaces(List list) {
+    void addSuperinterfaces(List<InterfaceType> list) {
         /*
          * This code is a little strange because it 
          * builds the list with a more suitable order than the
@@ -140,7 +127,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
          * Get a list of direct superinterfaces that's not already in the 
          * list being built.
          */
-        List immediate = new ArrayList(superinterfaces());
+        List<InterfaceType> immediate = new ArrayList<InterfaceType>(superinterfaces());
         Iterator iter = immediate.iterator();
         while (iter.hasNext()) {
             InterfaceType interfaze = (InterfaceType)iter.next();
@@ -170,13 +157,9 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
         if (this.equals(type)) {
             return true;
         } else {
-
             // Try superinterfaces.
-            List supers = superinterfaces();
-            Iterator iter = supers.iterator();
-            while (iter.hasNext()) {
-                InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
-                if (interfaze.isAssignableTo(type)) {
+            for (InterfaceType interfaze : superinterfaces()) {
+                if (((InterfaceTypeImpl)interfaze).isAssignableTo(type)) {
                     return true;
                 }
             }
@@ -185,7 +168,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
         }
     }
 
-    List inheritedTypes() {
+    List<InterfaceType> inheritedTypes() {
         return superinterfaces();
     }
 

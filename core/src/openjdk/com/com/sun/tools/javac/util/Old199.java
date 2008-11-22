@@ -45,7 +45,6 @@ import static javax.tools.StandardLocation.SOURCE_PATH;
  * @author Peter von der Ah\u00e9
  */
 @Deprecated
-@Version("@(#)Old199.java	1.11 07/05/05")
 public class Old199 {
 
     private Old199() {}

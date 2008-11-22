@@ -228,6 +228,3 @@ public class HelpWriter extends HtmlDocletWriter {
         navCellEnd();
     }
 }
-
-
-

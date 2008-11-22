@@ -33,7 +33,6 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Options;
 import com.sun.tools.javac.util.Pair;
-import com.sun.tools.javac.util.Version;
 import static com.sun.tools.javac.code.Flags.*;
 
 
@@ -45,7 +44,6 @@ import static com.sun.tools.javac.code.Flags.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Lint.java	1.15 07/05/05")
 public class Lint
 {
     /** The context key for the root Lint object. */

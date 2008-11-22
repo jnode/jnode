@@ -28,7 +28,6 @@ package com.sun.tools.javac;
 import com.sun.tools.javac.main.JavacOption.Option;
 import com.sun.tools.javac.main.RecognizedOptions.GrumpyHelper;
 import com.sun.tools.javac.main.RecognizedOptions;
-import com.sun.tools.javac.util.Version;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -48,7 +47,6 @@ import javax.tools.*;
  * @author Peter von der Ah&eacute;
  * @since 1.6
  */
-@Version("@(#)Server.java	1.14 07/05/05")
 class Server implements Runnable {
     private final BufferedReader in;
     private final OutputStream out;

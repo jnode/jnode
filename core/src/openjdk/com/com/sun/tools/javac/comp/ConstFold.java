@@ -42,7 +42,6 @@ import static com.sun.tools.javac.jvm.ByteCodes.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)ConstFold.java	1.35 07/05/05")
 strictfp class ConstFold {
     protected static final Context.Key<ConstFold> constFoldKey =
 	new Context.Key<ConstFold>();
@@ -357,9 +356,3 @@ strictfp class ConstFold {
 	 return ttype;
      }
 }
-
-
-
-
-
-

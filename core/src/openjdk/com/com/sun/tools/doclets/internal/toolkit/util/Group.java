@@ -56,8 +56,6 @@ import java.util.*;
  */
 public class Group {
 
-    private static Group instance;
-    
     /**
      * Map of regular expressions with the corresponding group name.
      */
@@ -96,17 +94,10 @@ public class Group {
         }
     }
 
-    private Group(Configuration configuration) {
+    public Group(Configuration configuration) {
         this.configuration = configuration;
     }
     
-    public static Group getInstance(Configuration configuration) {
-        if (instance == null) {
-            instance = new Group(configuration);
-        }
-        return instance;
-    }
-     
     /**
      * Depending upon the format of the package name provided in the "-group"
      * option, generate two separate maps. There will be a map for mapping
@@ -252,5 +243,3 @@ public class Group {
         return groupList;
     }
 }
-        
-

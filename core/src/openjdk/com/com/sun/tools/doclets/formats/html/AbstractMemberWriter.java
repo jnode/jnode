@@ -425,5 +425,3 @@ public abstract class AbstractMemberWriter {
         writer.printSummaryLinkComment(this, member, firstSentenceTags);
     }
 }
-    
-    

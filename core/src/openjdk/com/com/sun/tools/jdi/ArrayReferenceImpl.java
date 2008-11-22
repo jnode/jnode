@@ -29,6 +29,7 @@ import com.sun.jdi.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class ArrayReferenceImpl extends ObjectReferenceImpl
@@ -73,7 +74,7 @@ public class ArrayReferenceImpl extends ObjectReferenceImpl
         return (Value)list.get(0);
     }
 
-    public List getValues() {
+    public List<Value> getValues() {
         return getValues(0, -1);
     }
     
@@ -100,19 +101,23 @@ public class ArrayReferenceImpl extends ObjectReferenceImpl
         }
     }
 
-    public List getValues(int index, int length) {
+    @SuppressWarnings("unchecked")
+    private static <T> T cast(Object x) {
+        return (T)x;
+    }
+
+    public List<Value> getValues(int index, int length) {
         if (length == -1) { // -1 means the rest of the array
            length = length() - index;
         }
         validateArrayAccess(index, length);
         if (length == 0) {
-            return new ArrayList();
+            return new ArrayList<Value>();
         }
 
-        List vals;
+        List<Value> vals;
         try {
-            vals = JDWP.ArrayReference.GetValues.
-                process(vm, this, index, length).values;
+            vals = cast(JDWP.ArrayReference.GetValues.process(vm, this, index, length).values);
         } catch (JDWPException exc) {
             throw exc.toJDIException();
         }
@@ -123,7 +128,7 @@ public class ArrayReferenceImpl extends ObjectReferenceImpl
     public void setValue(int index, Value value)
             throws InvalidTypeException,
                    ClassNotLoadedException {
-        List list = new ArrayList(1);
+        List<Value> list = new ArrayList<Value>(1);
         list.add(value);
         setValues(index, list, 0, 1);
     }

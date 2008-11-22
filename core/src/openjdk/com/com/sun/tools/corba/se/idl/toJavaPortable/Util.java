@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Util.java	1.25 07/05/05
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -1428,4 +1427,3 @@ public class Util extends com.sun.tools.corba.se.idl.Util
   static Hashtable symbolTable = new Hashtable ();
   static Hashtable packageTranslation = new Hashtable() ;
 } // class Util
-

@@ -534,4 +534,3 @@ class SocketTransportServiceCapabilities extends TransportService.Capabilities {
     }
 
 }
-

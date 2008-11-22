@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Skeleton.java	1.8 99/08/18
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -567,4 +566,3 @@ public class Skeleton implements AuxGen
   protected Vector         methodList  = null;
   protected String         intfName    = "";
 } // class Skeleton
-

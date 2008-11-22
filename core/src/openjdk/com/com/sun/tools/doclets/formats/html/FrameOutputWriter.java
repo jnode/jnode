@@ -165,6 +165,3 @@ public class FrameOutputWriter extends HtmlDocletWriter {
     }
 
 }
-
-
-

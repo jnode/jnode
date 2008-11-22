@@ -131,4 +131,3 @@ public class LegacyTaglet implements Taglet {
         return output;
     }
 }
-

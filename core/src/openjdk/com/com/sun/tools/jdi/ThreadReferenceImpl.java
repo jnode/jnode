@@ -42,12 +42,12 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
     private static class Cache extends ObjectReferenceImpl.Cache {
         String name = null;
         JDWP.ThreadReference.Status status = null;
-        List frames = null;
+        List<StackFrame> frames = null;
         int framesStart = -1;
         int framesLength = 0;
         int frameCount = -1;
-        List ownedMonitors = null;
-        List ownedMonitorsInfo = null;
+        List<ObjectReference> ownedMonitors = null;
+        List<MonitorInfo> ownedMonitorsInfo = null;
         ObjectReference contendedMonitor = null;
         boolean triedCurrentContended = false;
     }
@@ -57,7 +57,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
     }
 
     // Listeners - synchronized on vm.state() 
-    private List listeners = new ArrayList();
+    private List<WeakReference<ThreadListener>> listeners = new ArrayList<WeakReference<ThreadListener>>();
 
     ThreadReferenceImpl(VirtualMachine aVm, long aRef) {
         super(aVm,aRef);
@@ -287,7 +287,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
         return frameCount;
     }
 
-    public List frames() throws IncompatibleThreadStateException  {
+    public List<StackFrame> frames() throws IncompatibleThreadStateException  {
         return privateFrames(0, -1);
     }
 
@@ -317,7 +317,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
         return ((start + length) <= (local.framesStart + local.framesLength));
     }
 
-    public List frames(int start, int length) 
+    public List<StackFrame> frames(int start, int length)
                               throws IncompatibleThreadStateException  {
         if (length < 0) {
             throw new IndexOutOfBoundsException(
@@ -330,9 +330,9 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
      * Private version of frames() allows "-1" to specify all 
      * remaining frames.
      */
-    private List privateFrames(int start, int length) 
+    private List<StackFrame> privateFrames(int start, int length)
                               throws IncompatibleThreadStateException  {
-        List frames = null;
+        List<StackFrame> frames = null;
         try {
             Cache local = (Cache)getCache();
 
@@ -344,7 +344,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
                     = JDWP.ThreadReference.Frames.
                           process(vm, this, start, length).frames;
                 int count = jdwpFrames.length;
-                frames = new ArrayList(count);
+                frames = new ArrayList<StackFrame>(count);
 
                 // Lock must be held while creating stack frames.
                 // so that a resume will not resume a partially 
@@ -388,8 +388,8 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
         return Collections.unmodifiableList(frames);
     }
 
-    public List ownedMonitors()  throws IncompatibleThreadStateException  {
-        List monitors = null;
+    public List<ObjectReference> ownedMonitors()  throws IncompatibleThreadStateException  {
+        List<ObjectReference> monitors = null;
         try {
             Cache local = (Cache)getCache();
 
@@ -398,7 +398,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
             }
             if (monitors == null) {
                 monitors = Arrays.asList(
-                                 JDWP.ThreadReference.OwnedMonitors.
+                                 (ObjectReference[])JDWP.ThreadReference.OwnedMonitors.
                                          process(vm, this).owned);
                 if (local != null) {
                     local.ownedMonitors = monitors;
@@ -454,8 +454,8 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
         return monitor;
     }
 
-    public List ownedMonitorsAndFrames()  throws IncompatibleThreadStateException  {
-        List monitors = null;
+    public List<MonitorInfo> ownedMonitorsAndFrames()  throws IncompatibleThreadStateException  {
+        List<MonitorInfo> monitors = null;
         try {
             Cache local = (Cache)getCache();
 
@@ -466,7 +466,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
                 JDWP.ThreadReference.OwnedMonitorsStackDepthInfo.monitor[] minfo;
                 minfo = JDWP.ThreadReference.OwnedMonitorsStackDepthInfo.process(vm, this).owned;
 
-                monitors = new ArrayList(minfo.length);
+                monitors = new ArrayList<MonitorInfo>(minfo.length);
 
                 for (int i=0; i < minfo.length; i++) {
                     JDWP.ThreadReference.OwnedMonitorsStackDepthInfo.monitor mi =
@@ -521,7 +521,12 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
 
         validateMirrorOrNull(returnValue);
 
-        StackFrameImpl sf = (StackFrameImpl)frame(0);
+        StackFrameImpl sf;
+        try {
+           sf = (StackFrameImpl)frame(0);
+        } catch (IndexOutOfBoundsException exc) {
+           throw new InvalidStackFrameException("No more frames on the stack");
+        }
         sf.validateStackFrame();
         MethodImpl meth = (MethodImpl)sf.location().method();
         ValueImpl convertedValue  = ValueImpl.prepareForAssignment(returnValue, 
@@ -559,7 +564,7 @@ public class ThreadReferenceImpl extends ObjectReferenceImpl
 
     void addListener(ThreadListener listener) {
         synchronized (vm.state()) {
-            listeners.add(new WeakReference(listener));
+            listeners.add(new WeakReference<ThreadListener>(listener));
         }
     }
 

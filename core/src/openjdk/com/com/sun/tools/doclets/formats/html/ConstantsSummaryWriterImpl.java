@@ -242,6 +242,3 @@ public class ConstantsSummaryWriterImpl extends HtmlDocletWriter
         tdEnd();
     }
 }
-
-
-

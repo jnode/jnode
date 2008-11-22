@@ -302,5 +302,3 @@ public class FieldWriterImpl extends AbstractMemberWriter
         }
     }
 }
-
-

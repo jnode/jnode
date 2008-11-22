@@ -33,7 +33,6 @@ package com.sun.tools.javac.util;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Convert.java	1.29 07/05/05")
 public class Convert {
 
     /** Convert string to integer.

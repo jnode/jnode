@@ -214,6 +214,3 @@ public class PackageFrameWriter extends HtmlDocletWriter {
         tableEnd();
     }
 }
-
-
-

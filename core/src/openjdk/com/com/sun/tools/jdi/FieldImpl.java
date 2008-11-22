@@ -27,7 +27,6 @@ package com.sun.tools.jdi;
 
 import com.sun.jdi.*;
 
-import java.util.List;
 
 public class FieldImpl extends TypeComponentImpl 
                        implements Field, ValueContainer {

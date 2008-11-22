@@ -280,5 +280,3 @@ public class AnnotationTypeRequiredMemberWriterImpl extends AbstractMemberWriter
         }
     }
 }
-
-

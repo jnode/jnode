@@ -30,4 +30,3 @@ public interface NameModifier {
     */
     String makeName( String base ) ;
 } ;
-

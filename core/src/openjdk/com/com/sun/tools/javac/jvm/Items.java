@@ -50,7 +50,6 @@ import static com.sun.tools.javac.jvm.ByteCodes.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Items.java	1.41 07/05/05")
 public class Items {
 
     /** The current constant pool.

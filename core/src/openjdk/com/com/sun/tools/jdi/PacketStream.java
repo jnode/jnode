@@ -577,10 +577,10 @@ class PacketStream {
         return array;
     }
 
-    List readArrayRegion() {
+    List<Value> readArrayRegion() {
         byte typeKey = readByte();
         int length = readInt();
-        List list = new ArrayList(length);
+        List<Value> list = new ArrayList<Value>(length);
         boolean gettingObjects = isObjectTag(typeKey);
         for (int i = 0; i < length; i++) {
             /*
@@ -599,10 +599,10 @@ class PacketStream {
         return list;
     }
 
-    void writeArrayRegion(List srcValues) {
+    void writeArrayRegion(List<Value> srcValues) {
         writeInt(srcValues.size());
         for (int i = 0; i < srcValues.size(); i++) {
-            ValueImpl value = (ValueImpl)srcValues.get(i);
+            Value value = srcValues.get(i);
             writeUntaggedValue(value);
         }
     }
@@ -626,4 +626,3 @@ class PacketStream {
                (tag == JDWP.Tag.CLASS_OBJECT);
     }
 }               
-    

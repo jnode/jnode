@@ -27,8 +27,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997,1998
  * RMI-IIOP v1.0
  *
- *  @(#)FileLocator.java	1.21 07/05/05
- *
  */
 
 package com.sun.tools.corba.se.idl.som.cff;
@@ -54,7 +52,6 @@ import java.util.zip.*;
  * provides class methods for finding files in the directories or zip
  * archives that make up the CLASSPATH.
  *
- * @version 1.21, 05/05/07
  * @author      Larry K. Raper
  */
 public abstract class FileLocator extends Object {
@@ -383,7 +380,6 @@ public abstract class FileLocator extends Object {
  * This class is used to associate a filename with a DataInputStream
  * The host platform's file naming conventions are assumed for the filename.
  *
- * @version 1.21, 05/05/07
  * @author      Larry K. Raper
  *
  */

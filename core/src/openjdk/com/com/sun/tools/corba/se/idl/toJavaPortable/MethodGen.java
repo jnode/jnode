@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)MethodGen.java	1.9 99/08/18
  */
 
 package com.sun.tools.corba.se.idl.toJavaPortable;
@@ -1090,4 +1089,3 @@ public class MethodGen implements com.sun.tools.corba.se.idl.MethodGen
   protected boolean localOptimization = false;
   protected boolean isAbstract        = false;
 } // class MethodGen
-

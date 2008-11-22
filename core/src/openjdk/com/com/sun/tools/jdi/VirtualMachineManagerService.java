@@ -61,4 +61,3 @@ public interface VirtualMachineManagerService extends VirtualMachineManager {
     void removeConnector(Connector connector);
 
 }
-

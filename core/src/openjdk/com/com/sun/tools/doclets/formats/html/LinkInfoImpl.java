@@ -449,4 +449,3 @@ public class LinkInfoImpl extends LinkInfo {
         return Util.isLinkable(classDoc, ConfigurationImpl.getInstance());
     }
 }
-

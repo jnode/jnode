@@ -109,5 +109,3 @@ class ThrowsTagImpl extends TagImpl implements ThrowsTag {
         return Comment.getInlineTags(holder, exceptionComment());
     }
 }
-
-

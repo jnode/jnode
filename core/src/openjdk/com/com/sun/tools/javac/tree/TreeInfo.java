@@ -44,7 +44,6 @@ import com.sun.tools.javac.util.JCDiagnostic.SimpleDiagnosticPosition;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)TreeInfo.java	1.56 07/05/05")
 public class TreeInfo {
     protected static final Context.Key<TreeInfo> treeInfoKey =
 	new Context.Key<TreeInfo>();
@@ -104,7 +103,7 @@ public class TreeInfo {
     /** Is tree a constructor declaration?
      */
     public static boolean isConstructor(JCTree tree) {
-	if (tree.tag == JCTree.METHODDEF) {
+        if (tree.getTag() == JCTree.METHODDEF) {
 	    Name name = ((JCMethodDecl) tree).name;
 	    return name == name.table.init;
 	} else {
@@ -123,11 +122,11 @@ public class TreeInfo {
     /** Is statement an initializer for a synthetic field?
      */
     public static boolean isSyntheticInit(JCTree stat) {
-	if (stat.tag == JCTree.EXEC) {
+        if (stat.getTag() == JCTree.EXEC) {
 	    JCExpressionStatement exec = (JCExpressionStatement)stat;
-	    if (exec.expr.tag == JCTree.ASSIGN) {
+            if (exec.expr.getTag() == JCTree.ASSIGN) {
 		JCAssign assign = (JCAssign)exec.expr;
-		if (assign.lhs.tag == JCTree.SELECT) {
+                if (assign.lhs.getTag() == JCTree.SELECT) {
 		    JCFieldAccess select = (JCFieldAccess)assign.lhs;
 		    if (select.sym != null &&
 			(select.sym.flags() & SYNTHETIC) != 0) {
@@ -144,9 +143,9 @@ public class TreeInfo {
     /** If the expression is a method call, return the method name, null
      *  otherwise. */
     public static Name calledMethodName(JCTree tree) {
-	if (tree.tag == JCTree.EXEC) {
+        if (tree.getTag() == JCTree.EXEC) {
 	    JCExpressionStatement exec = (JCExpressionStatement)tree;
-	    if (exec.expr.tag == JCTree.APPLY) {
+            if (exec.expr.getTag() == JCTree.APPLY) {
 		Name mname = TreeInfo.name(((JCMethodInvocation) exec.expr).meth);
 		return mname;
 	    }
@@ -190,7 +189,7 @@ public class TreeInfo {
 
     /** Return the first call in a constructor definition. */
     public static JCMethodInvocation firstConstructorCall(JCTree tree) {
-	if (tree.tag != JCTree.METHODDEF) return null;
+        if (tree.getTag() != JCTree.METHODDEF) return null;
 	JCMethodDecl md = (JCMethodDecl) tree;
 	Name.Table names = md.name.table;
 	if (md.name != names.init) return null;
@@ -200,15 +199,15 @@ public class TreeInfo {
 	while (stats.nonEmpty() && isSyntheticInit(stats.head))
 	    stats = stats.tail;
 	if (stats.isEmpty()) return null;
-	if (stats.head.tag != JCTree.EXEC) return null;
+        if (stats.head.getTag() != JCTree.EXEC) return null;
 	JCExpressionStatement exec = (JCExpressionStatement) stats.head;
-	if (exec.expr.tag != JCTree.APPLY) return null;
+        if (exec.expr.getTag() != JCTree.APPLY) return null;
 	return (JCMethodInvocation)exec.expr;
     }
     
     /** Return true if a tree represents the null literal. */
     public static boolean isNull(JCTree tree) {
-        if (tree.tag != JCTree.LITERAL) 
+        if (tree.getTag() != JCTree.LITERAL)
             return false;
         JCLiteral lit = (JCLiteral) tree;
         return (lit.typetag == TypeTags.BOT);
@@ -218,7 +217,7 @@ public class TreeInfo {
      *  the block itself if it is empty.
      */
     public static int firstStatPos(JCTree tree) {
-	if (tree.tag == JCTree.BLOCK && ((JCBlock) tree).stats.nonEmpty())
+        if (tree.getTag() == JCTree.BLOCK && ((JCBlock) tree).stats.nonEmpty())
 	    return ((JCBlock) tree).stats.head.pos;
 	else
 	    return tree.pos;
@@ -228,11 +227,11 @@ public class TreeInfo {
      *  defined endpos.
      */
     public static int endPos(JCTree tree) {
-	if (tree.tag == JCTree.BLOCK && ((JCBlock) tree).endpos != Position.NOPOS)
+        if (tree.getTag() == JCTree.BLOCK && ((JCBlock) tree).endpos != Position.NOPOS)
 	    return ((JCBlock) tree).endpos;
-	else if (tree.tag == JCTree.SYNCHRONIZED)
+        else if (tree.getTag() == JCTree.SYNCHRONIZED)
 	    return endPos(((JCSynchronized) tree).body);
-	else if (tree.tag == JCTree.TRY) {
+        else if (tree.getTag() == JCTree.TRY) {
 	    JCTry t = (JCTry) tree;
 	    return endPos((t.finalizer != null)
 			  ? t.finalizer
@@ -251,7 +250,7 @@ public class TreeInfo {
 	if (tree == null)
 	    return Position.NOPOS;
         
-	switch(tree.tag) {
+        switch(tree.getTag()) {
 	case(JCTree.APPLY):
 	    return getStartPos(((JCMethodInvocation) tree).meth);
 	case(JCTree.ASSIGN):
@@ -332,7 +331,7 @@ public class TreeInfo {
 	if (mapPos != null)
 	    return mapPos;
 
-	switch(tree.tag) {
+        switch(tree.getTag()) {
 	case(JCTree.BITOR_ASG): case(JCTree.BITXOR_ASG): case(JCTree.BITAND_ASG):
 	case(JCTree.SL_ASG): case(JCTree.SR_ASG): case(JCTree.USR_ASG):
 	case(JCTree.PLUS_ASG): case(JCTree.MINUS_ASG): case(JCTree.MUL_ASG):
@@ -426,11 +425,11 @@ public class TreeInfo {
     /** The position of the finalizer of given try/synchronized statement.
      */
     public static int finalizerPos(JCTree tree) {
-	if (tree.tag == JCTree.TRY) {
+        if (tree.getTag() == JCTree.TRY) {
 	    JCTry t = (JCTry) tree;
 	    assert t.finalizer != null;
 	    return firstStatPos(t.finalizer);
-	} else if (tree.tag == JCTree.SYNCHRONIZED) {
+        } else if (tree.getTag() == JCTree.SYNCHRONIZED) {
 	    return endPos(((JCSynchronized) tree).body);
 	} else {
 	    throw new AssertionError();
@@ -526,8 +525,8 @@ public class TreeInfo {
     public static JCTree referencedStatement(JCLabeledStatement tree) {
 	JCTree t = tree;
 	do t = ((JCLabeledStatement) t).body;
-	while (t.tag == JCTree.LABELLED);
-	switch (t.tag) {
+        while (t.getTag() == JCTree.LABELLED);
+        switch (t.getTag()) {
 	case JCTree.DOLOOP: case JCTree.WHILELOOP: case JCTree.FORLOOP: case JCTree.FOREACHLOOP: case JCTree.SWITCH:
 	    return t;
 	default:
@@ -538,7 +537,7 @@ public class TreeInfo {
     /** Skip parens and return the enclosed expression
      */
     public static JCExpression skipParens(JCExpression tree) {
-	while (tree.tag == JCTree.PARENS) {
+        while (tree.getTag() == JCTree.PARENS) {
 	    tree = ((JCParens) tree).expr;
 	}
 	return tree;
@@ -547,7 +546,7 @@ public class TreeInfo {
     /** Skip parens and return the enclosed expression
      */
     public static JCTree skipParens(JCTree tree) {
-	if (tree.tag == JCTree.PARENS)
+        if (tree.getTag() == JCTree.PARENS)
 	    return skipParens((JCParens)tree);
 	else
 	    return tree;
@@ -566,7 +565,7 @@ public class TreeInfo {
      *  return its name, otherwise return null.
      */
     public static Name name(JCTree tree) {
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.IDENT:
 	    return ((JCIdent) tree).name;
 	case JCTree.SELECT:
@@ -583,7 +582,7 @@ public class TreeInfo {
      */
     public static Name fullName(JCTree tree) {
 	tree = skipParens(tree);
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.IDENT:
 	    return ((JCIdent) tree).name;
 	case JCTree.SELECT:
@@ -596,7 +595,7 @@ public class TreeInfo {
 
     public static Symbol symbolFor(JCTree node) {
 	node = skipParens(node);
-	switch (node.tag) {
+        switch (node.getTag()) {
 	case JCTree.CLASSDEF:
 	    return ((JCClassDecl) node).sym;
 	case JCTree.METHODDEF:
@@ -613,7 +612,7 @@ public class TreeInfo {
      */
     public static Symbol symbol(JCTree tree) {
 	tree = skipParens(tree);
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.IDENT:
 	    return ((JCIdent) tree).sym;
 	case JCTree.SELECT:
@@ -628,7 +627,7 @@ public class TreeInfo {
     /** Return true if this is a nonstatic selection. */
     public static boolean nonstaticSelect(JCTree tree) {
 	tree = skipParens(tree);
-	if (tree.tag != JCTree.SELECT) return false;
+        if (tree.getTag() != JCTree.SELECT) return false;
 	JCFieldAccess s = (JCFieldAccess) tree;
 	Symbol e = symbol(s.selected);
 	return e == null || (e.kind != Kinds.PCK && e.kind != Kinds.TYP);
@@ -638,7 +637,7 @@ public class TreeInfo {
      */
     public static void setSymbol(JCTree tree, Symbol sym) {
 	tree = skipParens(tree);
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.IDENT:
 	    ((JCIdent) tree).sym = sym; break;
 	case JCTree.SELECT:
@@ -651,7 +650,7 @@ public class TreeInfo {
      *  otherwise return 0.
      */
     public static long flags(JCTree tree) {
-	switch (tree.tag) {
+        switch (tree.getTag()) {
 	case JCTree.VARDEF:
 	    return ((JCVariableDecl) tree).mods.flags;
 	case JCTree.METHODDEF:
@@ -862,6 +861,3 @@ public class TreeInfo {
         }
     }
 }
-
-
-

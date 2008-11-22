@@ -97,4 +97,3 @@ public interface MemberSummaryWriter {
      */
     public void close() throws IOException;
 }
-

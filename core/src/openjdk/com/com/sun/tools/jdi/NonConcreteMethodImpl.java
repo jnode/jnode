@@ -64,41 +64,41 @@ public class NonConcreteMethodImpl extends MethodImpl {
         return location;
     }
 
-    public List allLineLocations(String stratumID,
+    public List<Location> allLineLocations(String stratumID,
                                  String sourceName) {
-        return new ArrayList(0);
+        return new ArrayList<Location>(0);
     }
 
-    public List allLineLocations(SDE.Stratum stratum,
+    public List<Location> allLineLocations(SDE.Stratum stratum,
                                  String sourceName) {
-        return new ArrayList(0);
+        return new ArrayList<Location>(0);
     }
 
-    public List locationsOfLine(String stratumID,
+    public List<Location> locationsOfLine(String stratumID,
                                 String sourceName,
                                 int lineNumber) {
-        return new ArrayList(0);
+        return new ArrayList<Location>(0);
     }
 
-    public List locationsOfLine(SDE.Stratum stratum,
+    public List<Location> locationsOfLine(SDE.Stratum stratum,
                                 String sourceName,
                                 int lineNumber) {
-        return new ArrayList(0);
+        return new ArrayList<Location>(0);
     }
 
     public Location locationOfCodeIndex(long codeIndex) {
         return null;
     }
 
-    public List variables() throws AbsentInformationException {
+    public List<LocalVariable> variables() throws AbsentInformationException {
         throw new AbsentInformationException();
     }
 
-    public List variablesByName(String name) throws AbsentInformationException {
+    public List<LocalVariable> variablesByName(String name) throws AbsentInformationException {
         throw new AbsentInformationException();
     }
 
-    public List arguments() throws AbsentInformationException {
+    public List<LocalVariable> arguments() throws AbsentInformationException {
         throw new AbsentInformationException();
     }
     

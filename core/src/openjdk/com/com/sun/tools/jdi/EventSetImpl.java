@@ -875,4 +875,3 @@ public class EventSetImpl extends ArrayList<Event> implements EventSet {
         throw new UnsupportedOperationException();
     }
 }
-

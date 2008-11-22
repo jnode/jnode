@@ -31,5 +31,3 @@ import java.util.EventListener;
 interface CommandSender {
     PacketStream send();
 }
-
-

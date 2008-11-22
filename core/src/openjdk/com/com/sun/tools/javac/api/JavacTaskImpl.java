@@ -330,7 +330,7 @@ public class JavacTaskImpl extends JavacTask {
             ListBuffer<TypeElement> elements = new ListBuffer<TypeElement>();
             for (JCCompilationUnit unit : units) {
                 for (JCTree node : unit.defs)
-                    if (node.tag == JCTree.CLASSDEF)
+                    if (node.getTag() == JCTree.CLASSDEF)
                         elements.append(((JCTree.JCClassDecl) node).sym);
             }
             return elements.toList();
@@ -383,7 +383,7 @@ public class JavacTaskImpl extends JavacTask {
     // where
         private void handleFlowResults(List<Env<AttrContext>> list, ListBuffer<Element> elems) {
             for (Env<AttrContext> env: list) {
-                switch (env.tree.tag) {
+                switch (env.tree.getTag()) {
                     case JCTree.CLASSDEF:
                         JCClassDecl cdef = (JCClassDecl) env.tree;
                         if (cdef.sym != null)

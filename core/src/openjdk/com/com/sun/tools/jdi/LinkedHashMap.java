@@ -83,7 +83,6 @@ import java.util.*;
  * @author  Josh Bloch
  * @author  Arthur van Hoff
  * @author  Zhenghua Li
- * @version 1.18 05/05/07
  * @see     Object#hashCode()
  * @see     java.util.Collection
  * @see     java.util.Map

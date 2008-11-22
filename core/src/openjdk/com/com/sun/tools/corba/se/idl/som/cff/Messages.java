@@ -27,8 +27,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997,1998
  * RMI-IIOP v1.0
  *
- *  @(#)Messages.java	1.22 07/05/05
- *
  *  Defect History
  *
  *  #26964 LKR 11/25/96 \u0020 at end-of-message not handled properly by Java.
@@ -59,7 +57,6 @@ import java.lang.System;
  *
  * @see com.sun.tools.corba.se.idl.som.cff.Messages#msgLoad
  *
- * @version 1.22, 05/05/07
  * @author      Larry K. Raper
  */
 

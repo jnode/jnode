@@ -44,7 +44,6 @@ import java.util.*;
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
  */
-@Version("@(#)JavacRoundEnvironment.java	1.13 07/05/05")
 public class JavacRoundEnvironment implements RoundEnvironment {
     // Default equals and hashCode methods are okay.
 

@@ -154,6 +154,3 @@ public abstract class AbstractPackageIndexWriter extends HtmlDocletWriter {
     protected void printAllClassesPackagesLink() {
     }
 }
-
-
-

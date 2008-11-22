@@ -173,4 +173,3 @@ public class LinkFactoryImpl extends LinkFactory {
         return buf.toString();
     }
 }
-

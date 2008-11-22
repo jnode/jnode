@@ -71,8 +71,8 @@ class VirtualMachineImpl extends MirrorImpl
     // Protected by "synchronized(this)". "retrievedAllTypes" may be
     // tested unsynchronized (since once true, it stays true), but must
     // be set synchronously
-    private Map typesByID;
-    private TreeSet typesBySignature;
+    private Map<Long, ReferenceType> typesByID;
+    private TreeSet<ReferenceType> typesBySignature;
     private boolean retrievedAllTypes = false;
 
     // For other languages support
@@ -80,11 +80,11 @@ class VirtualMachineImpl extends MirrorImpl
 
     // ObjectReference cache
     // "objectsByID" protected by "synchronized(this)".
-    private final Map objectsByID = new HashMap();
-    private final ReferenceQueue referenceQueue = new ReferenceQueue();
+    private final Map<Long, SoftObjectReference> objectsByID = new HashMap<Long, SoftObjectReference>();
+    private final ReferenceQueue<ObjectReferenceImpl> referenceQueue = new ReferenceQueue<ObjectReferenceImpl>();
     static private final int DISPOSE_THRESHOLD = 50;
-    private final List batchedDisposeRequests = 
-            Collections.synchronizedList(new ArrayList(DISPOSE_THRESHOLD + 10));
+    private final List<SoftObjectReference> batchedDisposeRequests =
+            Collections.synchronizedList(new ArrayList<SoftObjectReference>(DISPOSE_THRESHOLD + 10));
 
     // These are cached once for the life of the VM
     private JDWP.VirtualMachine.Version versionInfo;
@@ -264,10 +264,10 @@ class VirtualMachineImpl extends MirrorImpl
         return System.identityHashCode(this);
     }
 
-    public List classesByName(String className) {
+    public List<ReferenceType> classesByName(String className) {
         validateVM();
         String signature = JNITypeParser.typeNameToSignature(className);
-        List list;
+        List<ReferenceType> list;
         if (retrievedAllTypes) {
            list = findReferenceTypes(signature);
         } else {
@@ -276,15 +276,15 @@ class VirtualMachineImpl extends MirrorImpl
         return Collections.unmodifiableList(list);
     }
 
-    public List allClasses() {
+    public List<ReferenceType> allClasses() {
         validateVM();
             
         if (!retrievedAllTypes) {
             retrieveAllClasses();
         }
-        ArrayList a;
+        ArrayList<ReferenceType> a;
         synchronized (this) {
-            a = new ArrayList(typesBySignature);
+            a = new ArrayList<ReferenceType>(typesBySignature);
         }
         return Collections.unmodifiableList(a);
     }
@@ -354,7 +354,7 @@ class VirtualMachineImpl extends MirrorImpl
         }
 
         // Delete any record of the breakpoints
-        List toDelete = new ArrayList();
+        List<BreakpointRequest> toDelete = new ArrayList<BreakpointRequest>();
         EventRequestManager erm = eventRequestManager();
         it = erm.breakpointRequests().iterator();
         while (it.hasNext()) {
@@ -373,12 +373,12 @@ class VirtualMachineImpl extends MirrorImpl
         }
     }
 
-    public List allThreads() {
+    public List<ThreadReference> allThreads() {
         validateVM();
         return state.allThreads();
     }
 
-    public List topLevelThreadGroups() {
+    public List<ThreadGroupReference> topLevelThreadGroups() {
         validateVM();
         return state.topLevelThreadGroups();
     }
@@ -826,12 +826,12 @@ class VirtualMachineImpl extends MirrorImpl
         }
     }
 
-    private synchronized List findReferenceTypes(String signature) {
+    private synchronized List<ReferenceType> findReferenceTypes(String signature) {
         if (typesByID == null) {
-            return new ArrayList(0);
+            return new ArrayList<ReferenceType>(0);
         }
         Iterator iter = typesBySignature.iterator();
-        List list = new ArrayList();
+        List<ReferenceType> list = new ArrayList<ReferenceType>();
         while (iter.hasNext()) {
             ReferenceTypeImpl type = (ReferenceTypeImpl)iter.next();
             int comp = signature.compareTo(type.signature());
@@ -846,8 +846,8 @@ class VirtualMachineImpl extends MirrorImpl
     }
 
     private void initReferenceTypes() {
-        typesByID = new HashMap(300);
-        typesBySignature = new TreeSet();
+        typesByID = new HashMap<Long, ReferenceType>(300);
+        typesBySignature = new TreeSet<ReferenceType>();
     }
 
     ReferenceTypeImpl referenceType(long ref, byte tag) {
@@ -926,7 +926,7 @@ class VirtualMachineImpl extends MirrorImpl
         return capabilitiesNew;
     }
 
-    private List retrieveClassesBySignature(String signature) {
+    private List<ReferenceType> retrieveClassesBySignature(String signature) {
         if ((vm.traceFlags & VirtualMachine.TRACE_REFTYPES) != 0) {
             vm.printTrace("Retrieving matching ReferenceTypes, sig=" + signature);
         }
@@ -939,7 +939,7 @@ class VirtualMachineImpl extends MirrorImpl
         }
 
         int count = cinfos.length;
-        List list = new ArrayList(count);
+        List<ReferenceType> list = new ArrayList<ReferenceType>(count);
 
         // Hold lock during processing to improve performance
         synchronized (this) {
@@ -1250,7 +1250,7 @@ class VirtualMachineImpl extends MirrorImpl
         /*
          * Attempt to retrieve an existing object object reference 
          */
-        SoftObjectReference ref = (SoftObjectReference)objectsByID.get(key);
+        SoftObjectReference ref = objectsByID.get(key);
         if (ref != null) {
             object = ref.object();
         }
@@ -1311,8 +1311,7 @@ class VirtualMachineImpl extends MirrorImpl
         // Handle any queue elements that are not strongly reachable 
         processQueue();
 
-        SoftObjectReference ref = 
-            (SoftObjectReference)objectsByID.remove(new Long(object.ref()));
+        SoftObjectReference ref = objectsByID.remove(new Long(object.ref()));
         if (ref != null) {
             batchForDispose(ref);
         } else {
@@ -1378,11 +1377,11 @@ class VirtualMachineImpl extends MirrorImpl
         return pathInfo;
     }
 
-   public List classPath() {
+   public List<String> classPath() {
        return Arrays.asList(getClasspath().classpaths);
    }
 
-   public List bootClassPath() {
+   public List<String> bootClassPath() {
        return Arrays.asList(getClasspath().bootclasspaths);
    }
 
@@ -1411,12 +1410,12 @@ class VirtualMachineImpl extends MirrorImpl
 	return threadGroupForJDI;
     }
 
-   static private class SoftObjectReference extends SoftReference {
+   static private class SoftObjectReference extends SoftReference<ObjectReferenceImpl> {
        int count;
        Long key;
 
        SoftObjectReference(Long key, ObjectReferenceImpl mirror, 
-                           ReferenceQueue queue) {
+                           ReferenceQueue<ObjectReferenceImpl> queue) {
            super(mirror, queue);
            this.count = 1;
            this.key = key;

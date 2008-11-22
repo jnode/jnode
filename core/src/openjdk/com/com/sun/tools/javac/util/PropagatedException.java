@@ -35,7 +35,6 @@ package com.sun.tools.javac.util;
  *
  * @author Peter von der Ah\u00e9
  */
-@Version("@(#)PropagatedException.java	1.7 07/05/05")
 public class PropagatedException extends RuntimeException {
 
     static final long serialVersionUID = -6065309339888775367L;

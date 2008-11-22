@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.parser;
 
-import com.sun.tools.javac.util.Version;
 
 /** An interface that defines codes for Java source tokens
  *  returned from lexical analysis.
@@ -35,7 +34,6 @@ import com.sun.tools.javac.util.Version;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)Token.java	1.29 07/05/05")
 public enum Token {
     EOF,
     ERROR,
@@ -158,4 +156,3 @@ public enum Token {
 
     public final String name;
 }
-

@@ -31,7 +31,6 @@
  * 5639-D57 (C) COPYRIGHT International Business Machines Corp. 1997, 1999
  * RMI-IIOP v1.0
  *
- * @(#)Compile.java	1.21 07/05/05
  */
 
 package com.sun.tools.corba.se.idl;
@@ -519,5 +518,3 @@ public class Compile
   private Enumeration   emitList       = null;
   private String[]      keywords       = null;
 } // class Compile
-
-

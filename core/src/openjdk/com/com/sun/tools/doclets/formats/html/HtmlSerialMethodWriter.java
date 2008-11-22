@@ -110,6 +110,3 @@ public class HtmlSerialMethodWriter extends MethodWriterImpl implements
         }
     }
 }
-
-
-

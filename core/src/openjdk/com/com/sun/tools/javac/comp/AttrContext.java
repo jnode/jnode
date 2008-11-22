@@ -36,7 +36,6 @@ import com.sun.tools.javac.code.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)AttrContext.java	1.32 07/05/05")
 public class AttrContext {
 
     /** The scope of local symbols.
@@ -97,4 +96,3 @@ public class AttrContext {
         return "AttrContext[" + scope.toString() + "]";
     }
 }
-

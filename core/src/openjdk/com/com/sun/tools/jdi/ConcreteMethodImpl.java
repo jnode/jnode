@@ -48,8 +48,8 @@ public class ConcreteMethodImpl extends MethodImpl {
      */
     static private class SoftLocationXRefs {
         final String stratumID;   // The stratum of this information
-        final Map lineMapper;     // Maps line number to location(s)
-        final List lineLocations; // List of locations ordered by code index
+        final Map<Integer, List<Location>> lineMapper;     // Maps line number to location(s)
+        final List<Location> lineLocations; // List of locations ordered by code index
 
         /*
          * Note: these do not necessarily correspond to 
@@ -60,7 +60,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         final int lowestLine;
         final int highestLine;
     
-        SoftLocationXRefs(String stratumID, Map lineMapper, List lineLocations, 
+        SoftLocationXRefs(String stratumID, Map<Integer, List<Location>> lineMapper, List<Location> lineLocations,
                      int lowestLine, int highestLine) {
             this.stratumID = stratumID;
             this.lineMapper = Collections.unmodifiableMap(lineMapper);
@@ -72,13 +72,13 @@ public class ConcreteMethodImpl extends MethodImpl {
     }
 
     private Location location = null;
-    private SoftReference softBaseLocationXRefsRef;
-    private SoftReference softOtherLocationXRefsRef;
-    private SoftReference variablesRef = null;
+    private SoftReference<SoftLocationXRefs> softBaseLocationXRefsRef;
+    private SoftReference<SoftLocationXRefs> softOtherLocationXRefsRef;
+    private SoftReference<List<LocalVariable>> variablesRef = null;
     private boolean absentVariableInformation = false;
     private long firstIndex = -1;
     private long lastIndex = -1;
-    private SoftReference bytecodesRef = null;
+    private SoftReference<byte[]> bytecodesRef = null;
     private int argSlotCount = -1;
 
     ConcreteMethodImpl(VirtualMachine vm, ReferenceTypeImpl declaringType, 
@@ -98,7 +98,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         return location;
     }
     
-    List sourceNameFilter(List list, 
+    List<Location> sourceNameFilter(List<Location> list,
                           SDE.Stratum stratum, 
                           String sourceName)
                             throws AbsentInformationException {
@@ -106,11 +106,9 @@ public class ConcreteMethodImpl extends MethodImpl {
             return list;
         } else {
             /* needs sourceName filteration */
-            List locs = new ArrayList();
-            Iterator it = list.iterator();
-            while (it.hasNext()) {
-                LocationImpl loc = (LocationImpl)it.next();
-                if (loc.sourceName(stratum).equals(sourceName)) {
+            List<Location> locs = new ArrayList<Location>();
+            for (Location loc : list) {
+                if (((LocationImpl)loc).sourceName(stratum).equals(sourceName)) {
                     locs.add(loc);
                 }
             }
@@ -118,10 +116,10 @@ public class ConcreteMethodImpl extends MethodImpl {
         }
     }
 
-    List allLineLocations(SDE.Stratum stratum,
+    List<Location> allLineLocations(SDE.Stratum stratum,
                           String sourceName)
                             throws AbsentInformationException {
-        List lineLocations = getLocations(stratum).lineLocations;
+        List<Location> lineLocations = getLocations(stratum).lineLocations;
 
         if (lineLocations.size() == 0) {
             throw new AbsentInformationException();
@@ -131,7 +129,7 @@ public class ConcreteMethodImpl extends MethodImpl {
           sourceNameFilter(lineLocations, stratum, sourceName));
     }
 
-    List locationsOfLine(SDE.Stratum stratum,
+    List<Location> locationsOfLine(SDE.Stratum stratum,
                          String sourceName,
                          int lineNumber) 
                             throws AbsentInformationException {
@@ -145,11 +143,10 @@ public class ConcreteMethodImpl extends MethodImpl {
          * Find the locations which match the line number
          * passed in.
          */
-        List list = (List)info.lineMapper.get(
-                                  new Integer(lineNumber));
+        List<Location> list = info.lineMapper.get(new Integer(lineNumber));
 
         if (list == null) {
-            list = new ArrayList(0);
+            list = new ArrayList<Location>(0);
         }
         return Collections.unmodifiableList(
           sourceNameFilter(list, stratum, sourceName));
@@ -186,7 +183,7 @@ public class ConcreteMethodImpl extends MethodImpl {
                     "Location with invalid code index");
         }
 
-        List lineLocations = getLocations(stratum).lineLocations;
+        List<Location> lineLocations = getLocations(stratum).lineLocations;
 
         /*
          * Check for absent line numbers.
@@ -216,14 +213,14 @@ public class ConcreteMethodImpl extends MethodImpl {
     }
 
 
-    public List variables() throws AbsentInformationException {
+    public List<LocalVariable> variables() throws AbsentInformationException {
         return getVariables();
     }
 
-    public List variablesByName(String name) throws AbsentInformationException {
-        List variables = getVariables();
+    public List<LocalVariable> variablesByName(String name) throws AbsentInformationException {
+        List<LocalVariable> variables = getVariables();
         
-        List retList = new ArrayList(2);
+        List<LocalVariable> retList = new ArrayList<LocalVariable>(2);
         Iterator iter = variables.iterator();
         while(iter.hasNext()) {
             LocalVariable variable = (LocalVariable)iter.next();
@@ -234,10 +231,10 @@ public class ConcreteMethodImpl extends MethodImpl {
         return retList;
     }
 
-    public List arguments() throws AbsentInformationException {
-        List variables = getVariables();
+    public List<LocalVariable> arguments() throws AbsentInformationException {
+        List<LocalVariable> variables = getVariables();
         
-        List retList = new ArrayList(variables.size());
+        List<LocalVariable> retList = new ArrayList<LocalVariable>(variables.size());
         Iterator iter = variables.iterator();
         while(iter.hasNext()) {
             LocalVariable variable = (LocalVariable)iter.next();
@@ -258,7 +255,7 @@ public class ConcreteMethodImpl extends MethodImpl {
             } catch (JDWPException exc) {
                 throw exc.toJDIException();
             }
-            bytecodesRef = new SoftReference(bytecodes);
+            bytecodesRef = new SoftReference<byte[]>(bytecodes);
         }
         /*
          * Arrays are always modifiable, so it is a little unsafe
@@ -287,8 +284,8 @@ public class ConcreteMethodImpl extends MethodImpl {
             return info;
         }
 
-        List lineLocations = new ArrayList();
-        Map lineMapper = new HashMap();
+        List<Location> lineLocations = new ArrayList<Location>();
+        Map<Integer, List<Location>> lineMapper = new HashMap<Integer, List<Location>>();
         int lowestLine = -1;
         int highestLine = -1;
         SDE.LineStratum lastLineStratum = null;
@@ -333,9 +330,9 @@ public class ConcreteMethodImpl extends MethodImpl {
     
                 // Add to the line -> locations map
                 Integer key = new Integer(lineNumber);
-                List mappedLocs = (List)lineMapper.get(key);
+                List<Location> mappedLocs = lineMapper.get(key);
                 if (mappedLocs == null) {
-                    mappedLocs = new ArrayList(1);
+                    mappedLocs = new ArrayList<Location>(1);
                     lineMapper.put(key, mappedLocs);
                 }
                 mappedLocs.add(loc);
@@ -345,7 +342,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         info = new SoftLocationXRefs(stratumID,
                                 lineMapper, lineLocations, 
                                 lowestLine, highestLine);
-        softOtherLocationXRefsRef = new SoftReference(info);
+        softOtherLocationXRefsRef = new SoftReference<SoftLocationXRefs>(info);
         return info;
     }
 
@@ -369,8 +366,8 @@ public class ConcreteMethodImpl extends MethodImpl {
 
         int count  = lntab.lines.length;
 
-        List lineLocations = new ArrayList(count);
-        Map lineMapper = new HashMap();
+        List<Location> lineLocations = new ArrayList<Location>(count);
+        Map<Integer, List<Location>>lineMapper = new HashMap<Integer, List<Location>>();
         int lowestLine = -1;
         int highestLine = -1;
         for (int i = 0; i < count; i++) {
@@ -403,9 +400,9 @@ public class ConcreteMethodImpl extends MethodImpl {
     
                 // Add to the line -> locations map
                 Integer key = new Integer(lineNumber);
-                List mappedLocs = (List)lineMapper.get(key);
+                List<Location> mappedLocs = lineMapper.get(key);
                 if (mappedLocs == null) {
-                    mappedLocs = new ArrayList(1);
+                    mappedLocs = new ArrayList<Location>(1);
                     lineMapper.put(key, mappedLocs);
                 }
                 mappedLocs.add(loc);
@@ -426,7 +423,7 @@ public class ConcreteMethodImpl extends MethodImpl {
              * method start with no line info
              */
             if (count > 0) {
-                location = (Location)lineLocations.get(0);
+                location = lineLocations.get(0);
             } else {
                 location = new LocationImpl(virtualMachine(), this, 
                                             firstIndex); 
@@ -436,11 +433,11 @@ public class ConcreteMethodImpl extends MethodImpl {
         info = new SoftLocationXRefs(SDE.BASE_STRATUM_NAME,
                                 lineMapper, lineLocations, 
                                 lowestLine, highestLine);
-        softBaseLocationXRefsRef = new SoftReference(info);
+        softBaseLocationXRefsRef = new SoftReference<SoftLocationXRefs>(info);
         return info;
     }
 
-    private List getVariables1_4() throws AbsentInformationException {
+    private List<LocalVariable> getVariables1_4() throws AbsentInformationException {
         JDWP.Method.VariableTable vartab = null;
         try {
             vartab = JDWP.Method.VariableTable.
@@ -457,7 +454,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         // Get the number of slots used by argument variables
         argSlotCount = vartab.argCnt;
         int count = vartab.slots.length;
-        List variables = new ArrayList(count);
+        List<LocalVariable> variables = new ArrayList<LocalVariable>(count);
         for (int i=0; i<count; i++) {
             JDWP.Method.VariableTable.SlotInfo si = vartab.slots[i];
 
@@ -482,7 +479,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         return variables;
     }
 
-    private List getVariables1() throws AbsentInformationException {
+    private List<LocalVariable> getVariables1() throws AbsentInformationException {
 
         if (!vm.canGet1_5LanguageFeatures()) {
             return getVariables1_4();
@@ -504,7 +501,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         // Get the number of slots used by argument variables
         argSlotCount = vartab.argCnt;
         int count = vartab.slots.length;
-        List variables = new ArrayList(count);
+        List<LocalVariable> variables = new ArrayList<LocalVariable>(count);
         for (int i=0; i<count; i++) {
             JDWP.Method.VariableTableWithGeneric.SlotInfo si = vartab.slots[i];
 
@@ -530,19 +527,19 @@ public class ConcreteMethodImpl extends MethodImpl {
         return variables;
     }
 
-    private List getVariables() throws AbsentInformationException {
+    private List<LocalVariable> getVariables() throws AbsentInformationException {
         if (absentVariableInformation) {
             throw new AbsentInformationException();
         }
 
-        List variables = (variablesRef == null) ? null :
-                                     (List)variablesRef.get();
+        List<LocalVariable> variables = (variablesRef == null) ? null :
+                                        variablesRef.get();
         if (variables != null) {
             return variables;
         }
         variables = getVariables1();
         variables = Collections.unmodifiableList(variables);
-        variablesRef = new SoftReference(variables);
+        variablesRef = new SoftReference<List<LocalVariable>>(variables);
         return variables;
     }
 }

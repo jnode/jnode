@@ -41,7 +41,6 @@ import com.sun.tools.javac.tree.JCTree.*;
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
-@Version("@(#)CRTable.java	1.32 07/05/05")
 public class CRTable
 implements CRTFlags {
     
@@ -532,7 +531,7 @@ implements CRTFlags {
          */
         public int endPos(JCTree tree) {
 	    if (tree == null) return Position.NOPOS;
-	    if (tree.tag == JCTree.BLOCK)
+            if (tree.getTag() == JCTree.BLOCK)
 	        return ((JCBlock) tree).endpos;
 	    Integer endpos = endPositions.get(tree);
 	    if (endpos != null)
