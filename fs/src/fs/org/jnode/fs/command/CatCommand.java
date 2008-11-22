@@ -52,11 +52,11 @@ import org.jnode.shell.syntax.URLArgument;
 public class CatCommand extends AbstractCommand {
 
     private final FileArgument ARG_FILE = 
-        new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE, 
+        new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
                 "the files to be concatenated");
 
     private final URLArgument ARG_URL = 
-        new URLArgument("url", Argument.OPTIONAL | Argument.MULTIPLE, 
+        new URLArgument("url", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
                 "the urls to be concatenated");
     
     private final FlagArgument FLAG_URLS =

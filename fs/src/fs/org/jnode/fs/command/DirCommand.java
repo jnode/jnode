@@ -45,7 +45,8 @@ public class DirCommand extends AbstractCommand {
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
 
     private final FileArgument ARG_PATH = new FileArgument(
-            "path", Argument.OPTIONAL + Argument.MULTIPLE, "the file or directory to list");
+            "path", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING, 
+            "the file or directory to list");
     
     public DirCommand() {
         super("List files or directories");

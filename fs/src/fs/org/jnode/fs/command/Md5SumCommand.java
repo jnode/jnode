@@ -50,13 +50,13 @@ import org.jnode.shell.syntax.FlagArgument;
 public class Md5SumCommand extends AbstractCommand {
 
     private final FileArgument ARG_PATHS = new FileArgument(
-        "paths", Argument.OPTIONAL | Argument.MULTIPLE,
+        "paths", Argument.OPTIONAL | Argument.MULTIPLE | Argument.EXISTING,
         "the files (or directories) to be calculate MD5 digests for");
     private final FlagArgument FLAG_RECURSIVE = new FlagArgument(
         "recursive", Argument.OPTIONAL,
         "if set, recursively calculate MD5 digests for the contents of any directory");
     private final FileArgument ARG_CHECKFILE = new FileArgument(
-        "checkfile", Argument.OPTIONAL | Argument.SINGLE,
+        "checkfile", Argument.OPTIONAL | Argument.SINGLE | Argument.EXISTING,
         "check MD5 digests for files listed in this file");
 
 

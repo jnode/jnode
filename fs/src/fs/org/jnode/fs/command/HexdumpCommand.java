@@ -24,10 +24,10 @@ import org.jnode.util.NumberUtils;
  */
 public class HexdumpCommand extends AbstractCommand {
     private final FileArgument ARG_FILE = new FileArgument(
-            "file", Argument.OPTIONAL, "the file to print out");
+            "file", Argument.OPTIONAL | Argument.EXISTING, "the file to print out");
 
     private final URLArgument ARG_URL = new URLArgument(
-            "url", Argument.OPTIONAL, "the url to print out");
+            "url", Argument.OPTIONAL | Argument.EXISTING, "the url to print out");
 
     public HexdumpCommand() {
         super("Print a hexadecimal dump of a given file (or URL)");

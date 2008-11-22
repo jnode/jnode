@@ -39,7 +39,7 @@ import org.jnode.shell.syntax.FileArgument;
 public class CdCommand extends AbstractCommand {
 
     private final FileArgument ARG_DIR = new FileArgument(
-            "directory", Argument.OPTIONAL, "the directory to change to");
+            "directory", Argument.OPTIONAL | Argument.EXISTING, "the directory to change to");
 
     public CdCommand() {
         super("Change the current directory");

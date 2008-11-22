@@ -45,7 +45,7 @@ import org.jnode.shell.syntax.FlagArgument;
 public class DeleteCommand extends AbstractCommand {
 
     private final FileArgument ARG_PATHS = new FileArgument(
-            "paths", Argument.MANDATORY | Argument.MULTIPLE, 
+            "paths", Argument.MANDATORY | Argument.MULTIPLE | Argument.EXISTING, 
             "the files or directories to be deleted");
     private final FlagArgument FLAG_RECURSIVE = new FlagArgument(
             "recursive", Argument.OPTIONAL, 
