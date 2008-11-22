@@ -128,7 +128,6 @@ import java.io.Serializable;
  * @see          java.text.NumberFormat
  * @see          java.text.DateFormat
  * @see          java.text.MessageFormat
- * @version      1.43, 05/05/07
  * @author       Mark Davis
  */
 public abstract class Format implements Serializable, Cloneable {

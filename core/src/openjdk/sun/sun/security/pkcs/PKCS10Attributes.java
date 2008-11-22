@@ -44,7 +44,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.27
  * @see PKCS10
  * @see PKCS10Attribute
  */

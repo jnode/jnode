@@ -57,7 +57,6 @@ import sun.util.LocaleDataMetaInfo;
  *
  * @author Asmus Freytag
  * @author Mark Davis
- * @version 1.48 05/05/07
  */
 
 public class LocaleData {
@@ -93,8 +92,8 @@ public class LocaleData {
      * Gets a currency names resource bundle, using privileges
      * to allow accessing a sun.* package.
      */
-    public static ResourceBundle getCurrencyNames(Locale locale) {
-        return getBundle("sun.util.resources.CurrencyNames", locale);
+    public static OpenListResourceBundle getCurrencyNames(Locale locale) {
+        return (OpenListResourceBundle)getBundle("sun.util.resources.CurrencyNames", locale);
     }
     
     /**
@@ -215,7 +214,7 @@ public class LocaleData {
     private static boolean isNonEuroLangSupported() {
 	final String sep = File.separator;
 	String localeDataJar = 
-	    (String) java.security.AccessController.doPrivileged(
+            java.security.AccessController.doPrivileged(
              new sun.security.action.GetPropertyAction("java.home")) +
 	    sep + "lib" + sep + "ext" + sep + localeDataJarName;
 
@@ -224,11 +223,11 @@ public class LocaleData {
 	*/
 	final File f = new File(localeDataJar);
 	boolean isNonEuroResJarExist = 
-	    ((Boolean)AccessController.doPrivileged(new PrivilegedAction() {
-		    public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
 			return Boolean.valueOf(f.exists());
 		    }
-		})).booleanValue();
+                }).booleanValue();
 
 	return isNonEuroResJarExist;
     }

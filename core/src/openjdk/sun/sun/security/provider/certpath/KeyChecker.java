@@ -38,7 +38,6 @@ import sun.security.x509.PKIXExtensions;
  * certification path meets the specified target constraints specified as 
  * a CertSelector in the PKIXParameters passed to the CertPathValidator.
  *
- * @version 	1.18 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  */

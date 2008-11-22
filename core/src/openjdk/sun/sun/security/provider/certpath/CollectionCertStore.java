@@ -74,7 +74,6 @@ import java.security.cert.CertStoreSpi;
  *
  * @see java.security.cert.CertStore
  *
- * @version 	1.16 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  */

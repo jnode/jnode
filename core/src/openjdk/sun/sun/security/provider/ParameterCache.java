@@ -40,7 +40,6 @@ import javax.crypto.spec.DHParameterSpec;
  * explicitly specified by the application.
  *
  * @author  Andreas Sterbenz
- * @version 1.9, 05/05/07
  * @since   1.5
  */
 public final class ParameterCache {
@@ -102,7 +101,7 @@ public final class ParameterCache {
 		AlgorithmParameterGenerator.getInstance("DH");
 	gen.init(keyLength, random);
 	AlgorithmParameters params = gen.generateParameters();
-	spec = (DHParameterSpec)params.getParameterSpec(DHParameterSpec.class);
+        spec = params.getParameterSpec(DHParameterSpec.class);
 	dhCache.put(Integer.valueOf(keyLength), spec);
 	return spec;
     }
@@ -120,8 +119,7 @@ public final class ParameterCache {
 		AlgorithmParameterGenerator.getInstance("DSA");
 	gen.init(keyLength, random);
 	AlgorithmParameters params = gen.generateParameters();
-	DSAParameterSpec spec = (DSAParameterSpec)params.getParameterSpec
-					(DSAParameterSpec.class);
+        DSAParameterSpec spec = params.getParameterSpec(DSAParameterSpec.class);
 	return spec;
     }
     
@@ -226,4 +224,3 @@ public final class ParameterCache {
     }
    
 }
-

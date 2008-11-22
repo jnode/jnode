@@ -37,7 +37,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.24
  */
 public class CertificateAlgorithmId implements CertAttrSet<String> {
     private AlgorithmId	algId;

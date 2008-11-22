@@ -32,7 +32,6 @@ import java.rmi.*;
  * <code>RemoteStub</code> uses a remote reference to carry out a
  * remote method invocation to a remote object.
  *
- * @version 1.30, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  * @see     java.rmi.server.RemoteStub

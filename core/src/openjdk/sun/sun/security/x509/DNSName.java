@@ -46,7 +46,6 @@ import sun.security.util.*;
  * <p>
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.20
  */
 public class DNSName implements GeneralNameInterface {
     private String name;

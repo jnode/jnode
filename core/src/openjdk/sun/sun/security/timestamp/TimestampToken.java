@@ -78,6 +78,7 @@ public class TimestampToken {
     private AlgorithmId hashAlgorithm;
     private byte[] hashedMessage;
     private Date genTime;
+    private BigInteger nonce;
 
     /**
      * Constructs an object to store a timestamp token.
@@ -99,6 +100,19 @@ public class TimestampToken {
      */
     public Date getDate() {
 	return genTime;
+    }
+
+    public AlgorithmId getHashAlgorithm() {
+        return hashAlgorithm;
+    }
+
+    // should only be used internally, otherwise return a clone
+    public byte[] getHashedMessage() {
+        return hashedMessage;
+    }
+
+    public BigInteger getNonce() {
+        return nonce;
     }
 
     /*
@@ -133,11 +147,16 @@ public class TimestampToken {
 	genTime = tstInfo.data.getGeneralizedTime();
 
 	// Parse optional elements, if present
-	if (tstInfo.data.available() > 0) {
+        while (tstInfo.data.available() > 0) {
+            DerValue d = tstInfo.data.getDerValue();
+            if (d.tag == DerValue.tag_Integer) {    // must be the nonce
+                nonce = d.getBigInteger();
+                break;
+            }
 
+            // Additional fields:
 	    // Parse accuracy
 	    // Parse ordering
-	    // Parse nonce
 	    // Parse tsa
 	    // Parse extensions
 	}

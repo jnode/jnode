@@ -55,7 +55,6 @@ package sun.rmi.rmic.iiop;
  * The <code>buckets</code> array will contain a set of arrays, one for
  * each key in the <code>keys</code>, where <code>buckets[x][y]</code>
  * is an index into the <code>strings</code> array.
- * @version	1.0, 4/17/99
  * @author	Bryan Atsatt
  */
 public class StaticStringsHash {

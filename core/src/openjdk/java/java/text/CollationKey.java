@@ -94,7 +94,6 @@ package java.text;
  *
  * @see          Collator
  * @see          RuleBasedCollator
- * @version      1.27, 05/05/07
  * @author       Helena Shih
  */
 
@@ -144,4 +143,3 @@ public abstract class CollationKey implements Comparable<CollationKey> {
 
     final private String source;
 }
-

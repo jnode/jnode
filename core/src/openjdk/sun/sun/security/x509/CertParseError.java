@@ -30,7 +30,6 @@ package sun.security.x509;
  * @deprecated use one of the Exceptions defined in the
  * java.security.cert package.
  *
- * @version 1.24
  * @author David Brownell
  */
 @Deprecated
@@ -43,4 +42,3 @@ class CertParseError extends CertException
 	super (CertException.verf_PARSE_ERROR, where);
     }
 }
-

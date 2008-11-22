@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_de_LU.java	1.20 07/05/05
- */
+
 
 /*
  * (C) Copyright IBM Corp. 1998 - All Rights Reserved

@@ -371,7 +371,6 @@ import sun.util.resources.LocaleData;
  * @see          NumberFormat
  * @see          DecimalFormatSymbols
  * @see          ParsePosition
- * @version      1.94 05/05/07
  * @author       Mark Davis
  * @author       Alan Liu
  */

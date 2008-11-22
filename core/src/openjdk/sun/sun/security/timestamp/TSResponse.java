@@ -101,7 +101,6 @@ import sun.security.x509.X500Name;
  * </pre>
  *
  * @since 1.5
- * @version 1.10, 05/05/07
  * @author Vincent Ryan
  * @see Timestamper
  */

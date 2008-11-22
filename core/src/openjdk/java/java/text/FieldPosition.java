@@ -67,7 +67,6 @@ package java.text;
  * formatted string use the <code>Format</code> method
  * <code>formatToCharacterIterator</code>.
  *
- * @version     1.28 05/05/07
  * @author      Mark Davis
  * @see         java.text.Format
  */

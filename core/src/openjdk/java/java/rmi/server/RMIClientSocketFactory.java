@@ -52,7 +52,6 @@ import java.net.*;
  * implement {@link Object#hashCode} consistently with its
  * <code>Object.equals</code> implementation).
  *
- * @version 1.18, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  * @since   1.2

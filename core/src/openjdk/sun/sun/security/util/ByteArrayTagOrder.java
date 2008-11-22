@@ -28,7 +28,6 @@
  * ByteArrayTagOrder: a class for comparing two DER encodings by the 
  * order of their tags.
  *
- * @version 1.20 05/05/07
  * @author D. N. Hoover
  */
 

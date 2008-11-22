@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)KeyUsage.java	1.10 07/05/05
- */
+
 
 package sun.security.krb5.internal.crypto;
 

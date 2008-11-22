@@ -58,7 +58,6 @@ package sun.security.action;
  * </pre>
  *
  * @author Roland Schemers
- * @version 1.18, 05/05/07
  * @see java.security.PrivilegedAction
  * @see java.security.AccessController
  * @since 1.2

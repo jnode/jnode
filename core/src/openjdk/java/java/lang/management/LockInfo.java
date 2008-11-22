@@ -51,7 +51,6 @@ import java.beans.ConstructorProperties;
  * @see java.util.concurrent.locks.Condition
  *
  * @author  Mandy Chung
- * @version 1.12, 05/05/07
  * @since   1.6
  */
 

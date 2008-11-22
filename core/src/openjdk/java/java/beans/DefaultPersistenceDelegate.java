@@ -53,7 +53,6 @@ import sun.reflect.misc.*;
  *
  * @since 1.4
  *
- * @version 1.27 05/05/07
  * @author Philip Milne
  */
 
@@ -348,7 +347,7 @@ public class DefaultPersistenceDelegate extends PersistenceDelegate {
 
             String removeListenerMethodName = d.getRemoveListenerMethod().getName();
             for (int i = oldL.length; i < newL.length; i++) {
-                invokeStatement(oldInstance, removeListenerMethodName, new Object[]{oldL[i]}, out);
+                invokeStatement(oldInstance, removeListenerMethodName, new Object[]{newL[i]}, out);
             }
         }
     }

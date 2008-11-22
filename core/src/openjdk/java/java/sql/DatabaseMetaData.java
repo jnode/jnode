@@ -3569,6 +3569,3 @@ public interface DatabaseMetaData extends Wrapper {
     int functionReturnsTable	= 2;
 
 }
-
-
-

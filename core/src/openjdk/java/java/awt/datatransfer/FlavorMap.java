@@ -34,7 +34,6 @@ import java.util.Map;
  * platform-independent MIME types. FlavorMaps need not be symmetric, but
  * typically are.
  *
- * @version 1.26, 05/05/07
  *
  * @since 1.2
  */

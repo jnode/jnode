@@ -27,21 +27,20 @@ package sun.security.provider.certpath;
 
 import sun.security.util.Debug;
 
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.Iterator;
 import java.security.cert.CertPath;
-import java.security.cert.PKIXCertPathChecker;
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.PKIXCertPathChecker;
+import java.security.cert.X509Certificate;
 
 /** 
  * This class is initialized with a list of <code>PKIXCertPathChecker</code>s
  * and is used to verify the certificates in a <code>CertPath</code> by
  * feeding each certificate to each <code>PKIXCertPathChecker</code>.
  *
- * @version 	1.10 10/29/03
  * @since	1.4
  * @author      Yassir Elley
  */
@@ -73,12 +72,9 @@ class PKIXMasterCertPathValidator {
      * @exception CertPathValidatorException Exception thrown if cert
      * path does not validate.
      */
-    void validate(CertPath cpOriginal, List reversedCertList)
+    void validate(CertPath cpOriginal, List<X509Certificate> reversedCertList)
 	throws CertPathValidatorException
     {
-	X509Certificate currCert = null;
-	PKIXCertPathChecker currChecker = null;
-	
 	// we actually process reversedCertList, but we keep cpOriginal because
 	// we need to return the original certPath when we throw an exception.
 	// we will also need to modify the index appropriately when we
@@ -105,7 +101,7 @@ class PKIXMasterCertPathValidator {
             if (debug != null)
                 debug.println("Checking cert" + (i+1) + " ...");
 	    
-	    currCert = (X509Certificate) reversedCertList.get(i);
+            X509Certificate currCert = reversedCertList.get(i);
 	    Set<String> unresolvedCritExts =
 					currCert.getCriticalExtensionOIDs();
 	    if (unresolvedCritExts == null) {
@@ -114,16 +110,15 @@ class PKIXMasterCertPathValidator {
 
 	    if (debug != null &&  !unresolvedCritExts.isEmpty()) {
 	        debug.println("Set of critical extensions:");
-		for (Iterator<String> iter = unresolvedCritExts.iterator(); 
-	                iter.hasNext();) {
-	    	    debug.println(iter.next());
+                for (String oid : unresolvedCritExts) {
+                    debug.println(oid);
 		}
 	    }
 	    
 	    CertPathValidatorException ocspCause = null;
 	    for (int j = 0; j < certPathCheckers.size(); j++) {
 		
-		currChecker = certPathCheckers.get(j);
+                PKIXCertPathChecker currChecker = certPathCheckers.get(j);
 		if (debug != null) {
 		    debug.println("-Using checker" + (j + 1) + " ... [" +
 			currChecker.getClass().getName() + "]");
@@ -208,8 +203,8 @@ class PKIXMasterCertPathValidator {
      * both the current checker and the next checker are revocation checkers.
      * OCSPChecker and CrlRevocationChecker are both revocation checkers.
      */
-    private boolean isRevocationCheck(PKIXCertPathChecker checker, int index,
-	List<PKIXCertPathChecker> checkers) {
+    private static boolean isRevocationCheck(PKIXCertPathChecker checker,
+        int index, List<PKIXCertPathChecker> checkers) {
 
 	if (checker instanceof OCSPChecker && index + 1 < checkers.size()) {
 	    PKIXCertPathChecker nextChecker = checkers.get(index + 1);

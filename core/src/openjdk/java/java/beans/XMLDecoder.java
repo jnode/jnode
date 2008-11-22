@@ -63,7 +63,6 @@ import javax.xml.parsers.SAXParser;
  *
  * @since 1.4
  * 
- * @version 1.38 05/05/07
  * @author Philip Milne
  */
 public class XMLDecoder { 

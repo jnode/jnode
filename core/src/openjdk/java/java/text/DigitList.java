@@ -68,7 +68,6 @@ import java.math.RoundingMode;
  * @see  DecimalFormat
  * @see  ChoiceFormat
  * @see  MessageFormat
- * @version      1.40 05/05/07
  * @author       Mark Davis, Alan Liu
  */
 final class DigitList implements Cloneable {

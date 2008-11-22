@@ -35,7 +35,6 @@ import java.util.spi.LocaleServiceProvider;
  * {@link java.text.DateFormatSymbols DateFormatSymbols} class.
  *
  * @since        1.6 
- * @version      @(#)DateFormatSymbolsProvider.java	1.8 07/05/05
  */
 public abstract class DateFormatSymbolsProvider extends LocaleServiceProvider {
 

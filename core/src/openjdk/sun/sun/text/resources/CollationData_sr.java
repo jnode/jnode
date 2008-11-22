@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)CollationData_sr.java	1.10 07/05/05
- */
+
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved

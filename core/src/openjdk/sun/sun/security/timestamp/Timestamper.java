@@ -35,7 +35,6 @@ import java.io.IOException;
  * over different transport machanisms. TSP permits at least the following 
  * transports: HTTP, Internet mail, file-based and socket-based.
  * 
- * @version 1.9, 05/05/07
  * @author Vincent Ryan
  * @see HttpTimestamper
  */

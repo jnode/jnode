@@ -39,7 +39,6 @@ import java.beans.beancontext.BeanContext;
  *
  * @see java.beans.Beans#instantiate
  *
- * @version 1.19, 05/05/07
  * @since 1.2
  *
  */

@@ -109,7 +109,6 @@ import sun.security.util.*;
  *
  * </pre>
  *
- * @version 	1.11 05/05/07
  * @author	Ram Marti
  */
 
@@ -295,7 +294,7 @@ class OCSPResponse {
 
 			} else if (responseExtension[i].isCritical())  {
 			    throw new IOException(
-				"Unsupported OCSP criticial extension: " +
+                                "Unsupported OCSP critical extension: " +
 				responseExtension[i].getExtensionId()); 
 			}
 		    }
@@ -565,7 +564,7 @@ class OCSPResponse {
          * Return the certificate's revocation status code
          */
 	private int getStatus() {
-	    return (certStatus);
+            return certStatus;
 	}
 
 	private CertId getCertId() {
@@ -587,6 +586,5 @@ class OCSPResponse {
 	    }
 	    return sb.toString();
 	}
-	
     }
 }

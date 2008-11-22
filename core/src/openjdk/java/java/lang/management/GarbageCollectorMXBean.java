@@ -59,7 +59,6 @@ package java.lang.management;
  *      Ways to Access MXBeans</a>
  *
  * @author  Mandy Chung
- * @version 1.16, 05/05/07 
  * @since   1.5
  */
 public interface GarbageCollectorMXBean extends MemoryManagerMXBean {
@@ -89,4 +88,3 @@ public interface GarbageCollectorMXBean extends MemoryManagerMXBean {
     
     
 }
-

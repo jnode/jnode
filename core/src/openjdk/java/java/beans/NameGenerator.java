@@ -39,7 +39,6 @@ import static java.util.Locale.ENGLISH;
  * is passed into <code>instanceName</code> then the returned
  * string identifier will be &quot;JButton0&quot;.
  * 
- * @version 1.17 05/05/07
  * @author Philip Milne
  */
 class NameGenerator { 

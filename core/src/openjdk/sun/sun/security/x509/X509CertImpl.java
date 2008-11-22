@@ -74,7 +74,6 @@ import sun.security.provider.X509Factory;
  * @author Dave Brownell
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.141 05/05/07
  * @see X509CertInfo
  */
 public class X509CertImpl extends X509Certificate implements DerEncoder {
@@ -340,7 +339,7 @@ public class X509CertImpl extends X509Certificate implements DerEncoder {
             throw new CertificateEncodingException(
                           "Null certificate to encode");
         try {
-            out.write((byte[])signedCert.clone());
+            out.write(signedCert.clone());
         } catch (IOException e) {
             throw new CertificateEncodingException(e.toString());
         }
@@ -357,7 +356,7 @@ public class X509CertImpl extends X509Certificate implements DerEncoder {
     public void derEncode(OutputStream out) throws IOException {
         if (signedCert == null)
             throw new IOException("Null certificate to encode");
-	out.write((byte[])signedCert.clone());
+        out.write(signedCert.clone());
     }
 
     /**
@@ -369,7 +368,7 @@ public class X509CertImpl extends X509Certificate implements DerEncoder {
      * @exception CertificateEncodingException if an encoding error occurs.
      */  
     public byte[] getEncoded() throws CertificateEncodingException {
-	return (byte[])getEncodedInternal().clone();
+        return getEncodedInternal().clone();
     }
     
     /**

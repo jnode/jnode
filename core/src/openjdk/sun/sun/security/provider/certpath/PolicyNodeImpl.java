@@ -41,7 +41,6 @@ import java.security.cert.*;
  * before returning to a client and no mutable public or protected methods 
  * are exposed by this implementation, as per the contract of PolicyNode.
  *
- * @version     1.19 05/05/07
  * @since       1.4
  * @author      Seth Proctor
  * @author      Sean Mullan

@@ -1021,7 +1021,7 @@ public class ZoneInfoFile {
 	byte[] buffer = null;
 
 	try {
-	    String homeDir = (String) AccessController.doPrivileged(
+            String homeDir = AccessController.doPrivileged(
 				new sun.security.action.GetPropertyAction("java.home"));
 	    final String fname = homeDir + File.separator + "lib" + File.separator
 				 + "zi" + File.separator + fileName;

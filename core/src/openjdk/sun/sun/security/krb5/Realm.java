@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)Realm.java	1.23 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -146,27 +144,6 @@ public class Realm implements Cloneable {
 		throw new RealmException(Krb5.REALM_NULL);
 	    if (!isValidRealmString(result))
 		throw new RealmException(Krb5.REALM_ILLCHAR);
-	}
-	return result;
-    }
-
-    public static String parseRealmComponent(String name) {
-	if (name == null) {
-	    throw new IllegalArgumentException
-		("null input name is not allowed");
-	}
-	String temp = new String(name);
-	String result = null;
-	int i = 0;
-	while (i < temp.length()) {
-	    if (temp.charAt(i) == PrincipalName.REALM_COMPONENT_SEPARATOR) {
-		if (i == 0 || temp.charAt(i - 1) != '\\') {
-		    if (i + 1 < temp.length())
-			result = temp.substring(i + 1, temp.length());
-		    break;
-		}
-	    }
-	    i++;
 	}
 	return result;
     }

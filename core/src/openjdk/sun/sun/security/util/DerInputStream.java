@@ -50,7 +50,6 @@ import java.io.DataInputStream;
  * data encodings which are defined.  That subset is sufficient for parsing
  * most X.509 certificates.
  *
- * @version 1.67
  *
  * @author David Brownell
  * @author Amit Kapoor

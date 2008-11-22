@@ -48,7 +48,6 @@ import sun.security.util.Debug;
  * on a PKIX certificate, namely the signature, timestamp, and subject/issuer
  * name chaining.
  *
- * @version 	1.18 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  */

@@ -37,7 +37,6 @@ import sun.net.www.ParseUtil;
  * A utility class for getting a KeyStore instance from policy information.
  * In addition, a supporting getInputStream method.
  *
- * @version 1.9
  */
 public class PolicyUtil {
 

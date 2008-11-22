@@ -38,7 +38,6 @@ import java.util.Hashtable;
  * A NameContext enables detection of strings which differ only
  * in case.
  *
- * @version	1.0, 3/19/98
  * @author	Bryan Atsatt
  */
 class NameContext {

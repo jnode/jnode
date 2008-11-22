@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)Credentials.java	1.38 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -231,7 +229,7 @@ public class Credentials {
 	 */
 	options.set(KDCOptions.RENEWABLE, true);
 
-	KrbTgsReq tgsReq = new KrbTgsReq(options,
+        return new KrbTgsReq(options,
 					 this,
 					 server,
 					 null, // from
@@ -241,22 +239,7 @@ public class Credentials {
 					 cAddr,
 					 null,
 					 null,
-					 null);
-	String kdc = null;
-	KrbTgsRep tgsRep = null;
-	try {
-	    kdc = tgsReq.send();
-	    tgsRep = tgsReq.getReply();
-	} catch (KrbException ke) {
-		if (ke.returnCode() == Krb5.KRB_ERR_RESPONSE_TOO_BIG) {
-		    // useTCP is set
-		    tgsReq.send(server.getRealmString(), kdc, true);
-	            tgsRep = tgsReq.getReply();
-		} else {
-		    throw ke;
-		}
-	}
-	return tgsRep.getCreds();
+                             null).sendAndGetCreds();
     }
     
     /**
@@ -580,7 +563,7 @@ public class Credentials {
     private static Credentials serviceCreds(ServiceName service,
 					    Credentials ccreds)
 	throws KrbException, IOException {
-	KrbTgsReq tgs_req = new KrbTgsReq(
+        return new KrbTgsReq(
 					  new KDCOptions(),
 					  ccreds,
 					  service,
@@ -591,22 +574,8 @@ public class Credentials {
 					  null, // HostAddresses addresses
 					  null, // AuthorizationData
 					  null, // Ticket[] additionalTickets
-					  null);  // EncryptionKey subSessionKey
-	String kdc = null;
-	KrbTgsRep tgs_rep = null;
-	try {
-	    kdc = tgs_req.send();
-	    tgs_rep = tgs_req.getReply();
-	} catch (KrbException ke) {
-		if (ke.returnCode() == Krb5.KRB_ERR_RESPONSE_TOO_BIG) {
-			// try with TCP to connect to the same KDC
-		    tgs_req.send(service.getRealmString(), kdc, true); 
-	            tgs_rep = tgs_req.getReply();
-		} else {
-		    throw ke;
-		}
-	}
-	return tgs_rep.getCreds();
+                null  // EncryptionKey subSessionKey
+                ).sendAndGetCreds();
     }
 
     public CredentialsCache getCache() {

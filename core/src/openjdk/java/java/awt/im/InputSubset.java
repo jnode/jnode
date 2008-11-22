@@ -32,7 +32,6 @@ package java.awt.im;
  * java.lang.Character.UnicodeBlock}</code> class, these constants do not
  * directly correspond to Unicode code blocks.
  *
- * @version 1.18, 05/05/07
  * @since   1.2
  */
 

@@ -62,7 +62,6 @@ import sun.security.x509.PolicyMappingsExtension;
  * matching certificates from CertStores and verify a particular certificate
  * against a ReverseState.
  * 
- * @version 	1.24 05/05/07
  * @since	1.4
  * @author      Sean Mullan
  * @author      Yassir Elley

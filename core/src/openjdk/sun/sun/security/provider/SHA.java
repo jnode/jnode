@@ -37,7 +37,6 @@ import static sun.security.provider.ByteArrayAccess.*;
  * the Java Security framework, as a pluggable implementation, as a
  * filter for the digest stream classes.
  * 
- * @version     1.47 05/05/07
  * @author	Roger Riggs
  * @author      Benjamin Renaud 
  * @author      Andreas Sterbenz
@@ -186,4 +185,3 @@ public final class SHA extends DigestBase {
     }
 
 }
-

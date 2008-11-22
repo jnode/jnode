@@ -27,6 +27,7 @@ package java.beans;
 import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -47,7 +48,12 @@ import java.sql.Timestamp;
 
 import java.util.*;
 
+import javax.swing.Box;
+import javax.swing.JLayeredPane;
 import javax.swing.border.MatteBorder;
+import javax.swing.plaf.ColorUIResource;
+
+import sun.swing.PrintColorUIResource;
 
 /*
  * Like the <code>Intropector</code>, the <code>MetaData</code> class
@@ -57,7 +63,6 @@ import javax.swing.border.MatteBorder;
  *
  * @see java.beans.Intropector
  *
- * @version 1.58 05/05/07
  * @author Philip Milne
  * @author Steve Langley
  */
@@ -86,7 +91,7 @@ class EnumPersistenceDelegate extends PersistenceDelegate {
 
     protected Expression instantiate(Object oldInstance, Encoder out) {
         Enum e = (Enum) oldInstance;
-        return new Expression( e, e.getClass(), "valueOf", new Object[]{e.name()} );
+        return new Expression(e, Enum.class, "valueOf", new Object[]{e.getClass(), e.name()});
     }
 }
 
@@ -187,6 +192,10 @@ class java_lang_String_PersistenceDelegate extends PersistenceDelegate {
 
 // Classes
 class java_lang_Class_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return oldInstance.equals(newInstance);
+    }
+
     protected Expression instantiate(Object oldInstance, Encoder out) {
         Class c = (Class)oldInstance;
         // As of 1.3 it is not possible to call Class.forName("int"),
@@ -215,6 +224,10 @@ class java_lang_Class_PersistenceDelegate extends PersistenceDelegate {
 
 // Fields
 class java_lang_reflect_Field_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return oldInstance.equals(newInstance);
+    }
+
     protected Expression instantiate(Object oldInstance, Encoder out) {
         Field f = (Field)oldInstance;
         return new Expression(oldInstance,
@@ -226,6 +239,10 @@ class java_lang_reflect_Field_PersistenceDelegate extends PersistenceDelegate {
 
 // Methods
 class java_lang_reflect_Method_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return oldInstance.equals(newInstance);
+    }
+
     protected Expression instantiate(Object oldInstance, Encoder out) {
         Method m = (Method)oldInstance;
         return new Expression(oldInstance,
@@ -314,7 +331,7 @@ abstract class java_util_Collections extends PersistenceDelegate {
         return (oldC.size() == newC.size()) && oldC.containsAll(newC);
     }
 
-    private static Object getPrivateField(final Object instance, final String name) {
+    static Object getPrivateField(final Object instance, final String name) {
         return AccessController.doPrivileged(
                 new PrivilegedAction() {
                     public Object run() {
@@ -533,6 +550,44 @@ abstract class java_util_Collections extends PersistenceDelegate {
             SortedMap map = new TreeMap((SortedMap) oldInstance);
             return new Expression(oldInstance, Collections.class, "checkedSortedMap", new Object[]{map, keyType, valueType});
         }
+    }
+}
+
+/**
+ * The persistence delegate for <CODE>java.util.EnumMap</CODE> classes.
+ *
+ * @author Sergey A. Malenkov
+ */
+class java_util_EnumMap_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return super.mutatesTo(oldInstance, newInstance) && (getType(oldInstance) == getType(newInstance));
+    }
+
+    protected Expression instantiate(Object oldInstance, Encoder out) {
+        return new Expression(oldInstance, EnumMap.class, "new", new Object[] {getType(oldInstance)});
+    }
+
+    private static Object getType(Object instance) {
+        return java_util_Collections.getPrivateField(instance, "keyType");
+    }
+}
+
+/**
+ * The persistence delegate for <CODE>java.util.EnumSet</CODE> classes.
+ *
+ * @author Sergey A. Malenkov
+ */
+class java_util_EnumSet_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return super.mutatesTo(oldInstance, newInstance) && (getType(oldInstance) == getType(newInstance));
+    }
+
+    protected Expression instantiate(Object oldInstance, Encoder out) {
+        return new Expression(oldInstance, EnumSet.class, "noneOf", new Object[] {getType(oldInstance)});
+    }
+
+    private static Object getType(Object instance) {
+        return java_util_Collections.getPrivateField(instance, "elementType");
     }
 }
 
@@ -909,6 +964,10 @@ class java_awt_font_TextAttribute_PersistenceDelegate extends StaticFieldsPersis
 
 // MenuShortcut
 class java_awt_MenuShortcut_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return oldInstance.equals(newInstance);
+    }
+
     protected Expression instantiate(Object oldInstance, Encoder out) { 
         java.awt.MenuShortcut m = (java.awt.MenuShortcut)oldInstance; 
         return new Expression(oldInstance, m.getClass(), "new", 
@@ -940,7 +999,7 @@ class java_awt_Component_PersistenceDelegate extends DefaultPersistenceDelegate 
 
         // Bounds
         java.awt.Container p = c.getParent();
-        if (p == null || p.getLayout() == null && !(p instanceof javax.swing.JLayeredPane)) { 
+        if (p == null || p.getLayout() == null) {
             // Use the most concise construct.
             boolean locationCorrect = c.getLocation().equals(c2.getLocation()); 
             boolean sizeCorrect = c.getSize().equals(c2.getSize()); 
@@ -975,10 +1034,16 @@ class java_awt_Container_PersistenceDelegate extends DefaultPersistenceDelegate 
                 ? ( BorderLayout )oldC.getLayout()
                 : null;
 
+        JLayeredPane oldLayeredPane = (oldInstance instanceof JLayeredPane)
+                ? (JLayeredPane) oldInstance
+                : null;
+
         // Pending. Assume all the new children are unaltered.
         for(int i = newChildren.length; i < oldChildren.length; i++) {
             Object[] args = ( layout != null )
                     ? new Object[] {oldChildren[i], layout.getConstraints( oldChildren[i] )}
+                    : (oldLayeredPane != null)
+                            ? new Object[] {oldChildren[i], oldLayeredPane.getLayer(oldChildren[i]), Integer.valueOf(-1)}
                     : new Object[] {oldChildren[i]};
 
             invokeStatement(oldInstance, "add", args, out);
@@ -1193,14 +1258,17 @@ class javax_swing_JTabbedPane_PersistenceDelegate extends DefaultPersistenceDele
 
 // Box
 class javax_swing_Box_PersistenceDelegate extends DefaultPersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return super.mutatesTo(oldInstance, newInstance) && getAxis(oldInstance).equals(getAxis(newInstance));
+    }
+
     protected Expression instantiate(Object oldInstance, Encoder out) {
-	javax.swing.BoxLayout lm = (javax.swing.BoxLayout)((javax.swing.Box)oldInstance).getLayout();
+        return new Expression(oldInstance, oldInstance.getClass(), "new", new Object[] {getAxis(oldInstance)});
+    }
 	
-	Object value = ReflectionUtils.getPrivateField(lm, javax.swing.BoxLayout.class, "axis", 
-					   out.getExceptionListener());
-	String method = ((Integer)value).intValue() == javax.swing.BoxLayout.X_AXIS ?
-	    "createHorizontalBox" : "createVerticalBox";
-	return new Expression(oldInstance, oldInstance.getClass(), method, new Object[0]);
+    private Integer getAxis(Object object) {
+        Box box = (Box) object;
+        return (Integer) java_util_Collections.getPrivateField(box.getLayout(), "axis");
     }
 }
 
@@ -1260,6 +1328,28 @@ class javax_swing_JMenu_PersistenceDelegate extends DefaultPersistenceDelegate {
 }
 */
 
+/**
+ * The persistence delegate for {@link PrintColorUIResource}.
+ * It is impossible to use {@link DefaultPersistenceDelegate}
+ * because this class has special rule for serialization:
+ * it should be converted to {@link ColorUIResource}.
+ *
+ * @see PrintColorUIResource#writeReplace
+ *
+ * @author Sergey A. Malenkov
+ */
+final class sun_swing_PrintColorUIResource_PersistenceDelegate extends PersistenceDelegate {
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        return oldInstance.equals(newInstance);
+    }
+
+    protected Expression instantiate(Object oldInstance, Encoder out) {
+        Color color = (Color) oldInstance;
+        Object[] args = new Object[] {color.getRGB()};
+        return new Expression(color, ColorUIResource.class, "new", args);
+    }
+}
+
 class MetaData {
     private static Hashtable internalPersistenceDelegates = new Hashtable();
     private static Hashtable transientProperties = new Hashtable();
@@ -1272,6 +1362,70 @@ class MetaData {
     private static PersistenceDelegate proxyPersistenceDelegate;
 
     static {
+
+// Constructors.
+
+  // beans
+
+        registerConstructor("java.beans.Statement", new String[]{"target", "methodName", "arguments"});
+        registerConstructor("java.beans.Expression", new String[]{"target", "methodName", "arguments"});
+        registerConstructor("java.beans.EventHandler", new String[]{"target", "action", "eventPropertyName", "listenerMethodName"});
+
+  // awt
+
+        registerConstructor("java.awt.Color", new String[]{"red", "green", "blue", "alpha"});
+        registerConstructor("java.awt.Cursor", new String[]{"type"});
+        registerConstructor("java.awt.ScrollPane", new String[]{"scrollbarDisplayPolicy"});
+
+  // swing
+
+        registerConstructor("javax.swing.plaf.ColorUIResource", new String[]{"red", "green", "blue"});
+
+        registerConstructor("javax.swing.tree.DefaultTreeModel", new String[]{"root"});
+        registerConstructor("javax.swing.JTree", new String[]{"model"});
+        registerConstructor("javax.swing.tree.TreePath", new String[]{"path"});
+
+        registerConstructor("javax.swing.OverlayLayout", new String[]{"target"});
+        registerConstructor("javax.swing.BoxLayout", new String[]{"target", "axis"});
+        registerConstructor("javax.swing.Box$Filler", new String[]{"minimumSize", "preferredSize",
+                                                                   "maximumSize"});
+        registerConstructor("javax.swing.DefaultCellEditor", new String[]{"component"});
+
+        /*
+        This is required because the JSplitPane reveals a private layout class
+        called BasicSplitPaneUI$BasicVerticalLayoutManager which changes with
+        the orientation. To avoid the necessity for instantiating it we cause
+        the orientation attribute to get set before the layout manager - that
+        way the layout manager will be changed as a side effect. Unfortunately,
+        the layout property belongs to the superclass and therefore precedes
+        the orientation property. PENDING - we need to allow this kind of
+        modification. For now, put the property in the constructor.
+        */
+        registerConstructor("javax.swing.JSplitPane", new String[]{"orientation"});
+        // Try to synthesize the ImageIcon from its description.
+        registerConstructor("javax.swing.ImageIcon", new String[]{"description"});
+        // JButton's "text" and "actionCommand" properties are related,
+        // use the text as a constructor argument to ensure that it is set first.
+        // This remove the benign, but unnecessary, manipulation of actionCommand
+        // property in the common case.
+        registerConstructor("javax.swing.JButton", new String[]{"text"});
+
+        // borders
+
+        registerConstructor("javax.swing.border.BevelBorder", new String[]{"bevelType", "highlightOuterColor", "highlightInnerColor", "shadowOuterColor", "shadowInnerColor"});
+        registerConstructor("javax.swing.plaf.BorderUIResource$BevelBorderUIResource", new String[]{"bevelType", "highlightOuterColor", "highlightInnerColor", "shadowOuterColor", "shadowInnerColor"});
+        registerConstructor("javax.swing.border.CompoundBorder", new String[]{"outsideBorder", "insideBorder"});
+        registerConstructor("javax.swing.plaf.BorderUIResource$CompoundBorderUIResource", new String[]{"outsideBorder", "insideBorder"});
+        registerConstructor("javax.swing.border.EmptyBorder", new String[]{"borderInsets"});
+        registerConstructor("javax.swing.plaf.BorderUIResource$EmptyBorderUIResource", new String[]{"borderInsets"});
+        registerConstructor("javax.swing.border.EtchedBorder", new String[]{"etchType", "highlightColor", "shadowColor"});
+        registerConstructor("javax.swing.plaf.BorderUIResource$EtchedBorderUIResource", new String[]{"etchType", "highlightColor", "shadowColor"});
+        registerConstructor("javax.swing.border.LineBorder", new String[]{"lineColor", "thickness", "roundedCorners"});
+        registerConstructor("javax.swing.plaf.BorderUIResource$LineBorderUIResource", new String[]{"lineColor", "thickness"});
+        registerConstructor("javax.swing.border.SoftBevelBorder", new String[]{"bevelType", "highlightOuterColor", "highlightInnerColor", "shadowOuterColor", "shadowInnerColor"});
+        // registerConstructorWithBadEqual("javax.swing.plaf.BorderUIResource$SoftBevelBorderUIResource", new String[]{"bevelType", "highlightOuter", "highlightInner", "shadowOuter", "shadowInner"});
+        registerConstructor("javax.swing.border.TitledBorder", new String[]{"border", "title", "titleJustification", "titlePosition", "titleFont", "titleColor"});
+        registerConstructor("javax.swing.plaf.BorderUIResource$TitledBorderUIResource", new String[]{"border", "title", "titleJustification", "titlePosition", "titleFont", "titleColor"});
 
         internalPersistenceDelegates.put("java.net.URI",
                                          new PrimitivePersistenceDelegate());
@@ -1290,6 +1444,9 @@ class MetaData {
 
         internalPersistenceDelegates.put("java.sql.Date", new java_util_Date_PersistenceDelegate());
         internalPersistenceDelegates.put("java.sql.Time", new java_util_Date_PersistenceDelegate());
+
+        internalPersistenceDelegates.put("java.util.JumboEnumSet", new java_util_EnumSet_PersistenceDelegate());
+        internalPersistenceDelegates.put("java.util.RegularEnumSet", new java_util_EnumSet_PersistenceDelegate());
 
 // Transient properties
 
@@ -1460,7 +1617,7 @@ class MetaData {
     private static String[] getConstructorProperties(Class type) {
         String[] names = null;
         int length = 0;
-        for (Constructor constructor : type.getConstructors()) {
+        for (Constructor<?> constructor : type.getConstructors()) {
             String[] value = getAnnotationValue(constructor);
             if ((value != null) && (length < value.length) && isValid(constructor, value)) {
                 names = value;
@@ -1470,14 +1627,14 @@ class MetaData {
         return names;
     }
 
-    private static String[] getAnnotationValue(Constructor constructor) {
+    private static String[] getAnnotationValue(Constructor<?> constructor) {
         ConstructorProperties annotation = constructor.getAnnotation(ConstructorProperties.class);
         return (annotation != null)
                 ? annotation.value()
                 : null;
     }
 
-    private static boolean isValid(Constructor constructor, String[] names) {
+    private static boolean isValid(Constructor<?> constructor, String[] names) {
         Class[] parameters = constructor.getParameterTypes();
         if (names.length != parameters.length) {
             return false;
@@ -1533,6 +1690,14 @@ class MetaData {
 	return getBeanInfo(type).getBeanDescriptor().getValue(attribute);
     }
 
+    // MetaData registration
+
+    private synchronized static void registerConstructor(String typeName,
+                                                         String[] constructor) {
+        internalPersistenceDelegates.put(typeName,
+                                         new DefaultPersistenceDelegate(constructor));
+    }
+
     private static void removeProperty(String typeName, String property) {
         Vector tp = (Vector)transientProperties.get(typeName);
         if (tp == null) {
@@ -1542,4 +1707,3 @@ class MetaData {
         tp.add(property);
     }
 }
-

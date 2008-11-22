@@ -44,7 +44,6 @@ import sun.security.util.DerOutputStream;
  *
  * @author Jan Luehe
  *
- * @version 1.27, 05/05/07
  *
  * @since 1.2
  */

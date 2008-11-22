@@ -31,7 +31,6 @@ import java.util.*;
  * A utility class to iterate over the path segments of a cubic curve
  * segment through the PathIterator interface.
  *
- * @version 10 Feb 1997
  * @author	Jim Graham
  */
 class CubicIterator implements PathIterator {

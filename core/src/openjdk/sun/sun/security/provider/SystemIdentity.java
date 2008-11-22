@@ -32,7 +32,6 @@ import java.security.*;
 /**
  * An identity with a very simple trust mechanism.
  *
- * @version 1.35, 05/05/07
  * @author 	Benjamin Renaud
  */
 

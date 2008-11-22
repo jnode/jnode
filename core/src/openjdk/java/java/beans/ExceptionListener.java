@@ -29,7 +29,6 @@ package java.beans;
  * 
  * @since 1.4
  *
- * @version 1.13 05/05/07
  * @author Philip Milne
  */        
 public interface ExceptionListener { 
@@ -42,50 +41,3 @@ public interface ExceptionListener {
      */
     public void exceptionThrown(Exception e); 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

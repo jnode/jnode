@@ -30,7 +30,6 @@ import java.util.EventListener;
 /**
  * Defines an object which listens for {@link FlavorEvent}s.
  *
- * @version 1.10 05/05/07
  * @author Alexander Gerasimov
  * @since 1.5
  */

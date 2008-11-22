@@ -38,7 +38,6 @@ import sun.security.jgss.spi.GSSCredentialSpi;
  * This should be changed once multi-mechanism support is needed.
  *
  * @author Valerie Peng
- * @version 1.9, 05/05/07
  * @since 1.6
  */
 public class SpNegoCredElement implements GSSCredentialSpi {

@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_da_DK.java	1.22 07/05/05
- */
+
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved

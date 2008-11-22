@@ -48,7 +48,6 @@ import sun.security.krb5.KrbException;
  * data is replaced by (confounder || data || padding).
  *
  * @author Mayank Upadhyay
- * @version 1.24, 05/05/07
  */
 class WrapToken extends MessageToken {
     /**

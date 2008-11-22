@@ -41,7 +41,6 @@ import java.util.Vector;
  * All mechanism specific information is defined here.
  *
  * @author Mayank Upadhyay
- * @version 1.25, 05/05/07
  */
 
 public final class Krb5MechFactory implements MechanismFactory {

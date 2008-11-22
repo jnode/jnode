@@ -44,7 +44,6 @@ package java.text;
  * so they do not have to contain accented characters, such as A-grave.
  * @see                RuleBasedCollator
  * @see                LocaleElements
- * @version            1.33, 05/05/07
  * @author             Helena Shih, Mark Davis
  */
 final class CollationRules {

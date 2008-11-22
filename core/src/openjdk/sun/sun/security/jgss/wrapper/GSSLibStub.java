@@ -37,7 +37,6 @@ import sun.security.jgss.GSSUtil;
  * This class is essentially a JNI calling stub for all wrapper classes.
  *
  * @author Valerie Peng
- * @version 1.13, 05/05/07
  * @since 1.6
  */
 

@@ -37,7 +37,6 @@ import java.io.IOException;
  * deprecated because it is only used by deprecated methods of
  * <code>java.rmi.server.RemoteRef</code>.
  *
- * @version 1.27, 05/05/07
  * @since   JDK1.1
  * @author  Ann Wollrath
  * @author  Roger Riggs

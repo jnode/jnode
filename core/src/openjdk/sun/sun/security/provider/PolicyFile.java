@@ -53,6 +53,7 @@ import java.io.FilePermission;
 import java.net.SocketPermission;
 import java.net.NetPermission;
 import java.util.PropertyPermission;
+import java.util.concurrent.atomic.AtomicReference;
 import java.awt.AWTPermission;
 /*
 import javax.security.auth.AuthPermission;
@@ -273,7 +274,6 @@ import sun.net.www.ParseUtil;
  * instead of "<b>${{self}}</b>". However the use of "<b>self</b>" is 
  * deprecated in favour of "<b>${{self}}</b>".
  *
- * @version 	1.109, 05/05/07
  * @see java.security.CodeSource
  * @see java.security.Permissions
  * @see java.security.ProtectionDomain 
@@ -300,7 +300,8 @@ public class PolicyFile extends java.security.Policy {
     private static IdentityScope scope = null;
 
     // contains the policy grant entries, PD cache, and alias mapping
-    private volatile PolicyInfo policyInfo;
+    private AtomicReference<PolicyInfo> policyInfo =
+        new AtomicReference<PolicyInfo>();
     private boolean constructed = false;
 
     private boolean expandProperties = true;
@@ -463,7 +464,7 @@ public class PolicyFile extends java.security.Policy {
 	// System.out.println("number caches=" + numCaches);
 	PolicyInfo newInfo = new PolicyInfo(numCaches);
 	initPolicyFile(newInfo, url);
-	policyInfo = newInfo;
+        policyInfo.set(newInfo);
     }
 
     private void initPolicyFile(final PolicyInfo newInfo, final URL url) {
@@ -685,7 +686,7 @@ public class PolicyFile extends java.security.Policy {
 	AccessController.doPrivileged(new PrivilegedAction<Void>() {
 	    public Void run() {
 		PolicyEntry pe = new PolicyEntry(new CodeSource(null,
-		    (java.security.cert.Certificate[]) null));
+                    (Certificate[]) null));
 		pe.add(SecurityConstants.LOCAL_LISTEN_PERMISSION);
 		pe.add(new PropertyPermission("java.version",
 		    SecurityConstants.PROPERTY_READ_ACTION));
@@ -743,8 +744,7 @@ public class PolicyFile extends java.security.Policy {
 			try {
 			    pe = new PolicyEntry(canonicalizeCodebase(
 				new CodeSource(new URL(extCodebases[i]),
-				    (java.security.cert.Certificate[]) null), 
-				false ));
+                                    (Certificate[]) null), false ));
 			    pe.add(SecurityConstants.ALL_PERMISSION);
 
 			    // No need to sync because noone has access to 
@@ -1126,10 +1126,10 @@ public class PolicyFile extends java.security.Policy {
      * @see java.security.ProtectionDomain
      */
     public boolean implies(ProtectionDomain pd, Permission p) {
-	Map<ProtectionDomain, PermissionCollection> pdMap =
-						policyInfo.getPdMapping();
+        PolicyInfo pi = policyInfo.get();
+        Map<ProtectionDomain, PermissionCollection> pdMap = pi.getPdMapping();
 	
-	PermissionCollection pc = (PermissionCollection) pdMap.get(pd);
+        PermissionCollection pc = pdMap.get(pd);
 
 	if (pc != null) {
 	    return pc.implies(p);
@@ -1269,20 +1269,16 @@ public class PolicyFile extends java.security.Policy {
     private Permissions getPermissions(Permissions perms, 
 				       final CodeSource cs,
 				       Principal[] principals) {
-	// No need to sync because policyEntries do not changed after init
-	int numEntries = policyInfo.policyEntries.size();
-	PolicyEntry entry;
-	for (int i = 0; i < numEntries; i++) {
-	    entry = (PolicyEntry)policyInfo.policyEntries.get(i);
+        PolicyInfo pi = policyInfo.get();
+
+        for (PolicyEntry entry : pi.policyEntries) {
 	    addPermissions(perms, cs, principals, entry);
 	}
 
 	// Go through policyEntries gotten from identity db; sync required
 	// because checkForTrustedIdentity (below) might update list
-	synchronized (policyInfo.identityPolicyEntries) {
-	    numEntries = policyInfo.identityPolicyEntries.size();
-	    for (int i = 0; i < numEntries; i++) {
-		entry = (PolicyEntry)policyInfo.identityPolicyEntries.get(i);
+        synchronized (pi.identityPolicyEntries) {
+            for (PolicyEntry entry : pi.identityPolicyEntries) {
 		addPermissions(perms, cs, principals, entry);
 	    }
 	}
@@ -1292,12 +1288,9 @@ public class PolicyFile extends java.security.Policy {
 	    Certificate certs[] = cs.getCertificates();
 	    if (certs != null) {
 		for (int k=0; k < certs.length; k++) {
-		    Object idMap;
-		    synchronized (policyInfo.aliasMapping) {
-			idMap = policyInfo.aliasMapping.get(certs[k]);
-		    }
+                    Object idMap = pi.aliasMapping.get(certs[k]);
 		    if (idMap == null &&
-			checkForTrustedIdentity(certs[k], policyInfo)) {
+                        checkForTrustedIdentity(certs[k], pi)) {
 			// checkForTrustedIdentity added it
 			// to the policy for us. next time
 			// around we'll find it. This time
@@ -1481,7 +1474,7 @@ public class PolicyFile extends java.security.Policy {
 			Principal[] accPs,
 			PolicyEntry entry) {
 	for (int i = 0; i < entry.permissions.size(); i++) {
-	    Permission p = (Permission)entry.permissions.get(i);
+            Permission p = entry.permissions.get(i);
 	    if (debug != null) {
 		debug.println("  granting " + p);
 	    }
@@ -2086,15 +2079,11 @@ public class PolicyFile extends java.security.Policy {
 	    PolicyEntry pe = new PolicyEntry(new CodeSource(null, certs));
 	    pe.add(SecurityConstants.ALL_PERMISSION);
 
-	    synchronized (myInfo.identityPolicyEntries) {
 		myInfo.identityPolicyEntries.add(pe);
-	    }
 
-	    synchronized (myInfo.aliasMapping) {
 		// add it to the mapping as well so
 		// we don't have to go through this again
 		myInfo.aliasMapping.put(cert, id.getName());
-	    }
 
 	    return true;
 	}
@@ -2155,13 +2144,11 @@ public class PolicyFile extends java.security.Policy {
      * 
      * @author Marianne Mueller
      * @author Roland Schemers
-     * @version 	1.52, 10/26/00
      * @see java.security.CodeSource
      * @see java.security.Policy
      * @see java.security.Permissions
      * @see java.security.ProtectionDomain
      */
-
     private static class PolicyEntry {
 
 	private final CodeSource codesource;
@@ -2230,9 +2217,8 @@ public class PolicyFile extends java.security.Policy {
 	    return sb.toString();
 	}
     }
-}
 
-class SelfPermission extends Permission {
+    private static class SelfPermission extends Permission {
 
     private static final long serialVersionUID = -8315562579967246806L;
 
@@ -2263,7 +2249,7 @@ class SelfPermission extends Permission {
      *
      * @serial
      */
-    private java.security.cert.Certificate certs[];
+        private Certificate certs[];
 
     /**
      * Creates a new SelfPermission containing the permission
@@ -2273,20 +2259,19 @@ class SelfPermission extends Permission {
      * @param name the name of the permission.
      * @param actions the actions of the permission.
      * @param certs the certificates the permission's class was signed with.
-     * This is a list of certificate chains, where each chain is composed of a
-     * signer certificate and optionally its supporting certificate chain.
-     * Each chain is ordered bottom-to-top (i.e., with the signer certificate
-     * first and the (root) certificate authority last).
+         * This is a list of certificate chains, where each chain is composed of
+         * a signer certificate and optionally its supporting certificate chain.
+         * Each chain is ordered bottom-to-top (i.e., with the signer
+         * certificate first and the (root) certificate authority last).
      */
-  public SelfPermission(String type,
-			   String name,
-			   String actions,
-			   java.security.cert.Certificate certs[])
+        public SelfPermission(String type, String name, String actions,
+                              Certificate certs[])
   {
     super(type);
-    if (type == null) 
-      throw new NullPointerException(ResourcesMgr.getString(
-				         "type can't be null"));
+            if (type == null) {
+                throw new NullPointerException
+                    (ResourcesMgr.getString("type can't be null"));
+            }
     this.type = type;
     this.name = name;
     this.actions = actions;
@@ -2296,8 +2281,7 @@ class SelfPermission extends Permission {
 	if (!(certs[i] instanceof X509Certificate)) {
 	  // there is no concept of signer certs, so we store the
 	  // entire cert array
-	  this.certs =
-	    (java.security.cert.Certificate[])certs.clone();
+                        this.certs = certs.clone();
 	  break;
 	}
       }
@@ -2317,16 +2301,15 @@ class SelfPermission extends Permission {
 	  i++;
 	}
 	if (count == certs.length) {
-	  // All the certs are signer certs, so we store the entire
-	  // array
-	  this.certs =
-	    (java.security.cert.Certificate[])certs.clone();
+                        // All the certs are signer certs, so we store the
+                        // entire array
+                        this.certs = certs.clone();
 	}
 	
 	if (this.certs == null) {
 	  // extract the signer certs
-	  ArrayList<java.security.cert.Certificate> signerCerts =
-			new ArrayList<java.security.cert.Certificate>();
+                        ArrayList<Certificate> signerCerts =
+                            new ArrayList<Certificate>();
 	  i = 0;
 	  while (i < certs.length) {
 	    signerCerts.add(certs[i]);
@@ -2337,8 +2320,7 @@ class SelfPermission extends Permission {
 	    }
 	    i++;
 	  }
-	  this.certs =
-	    new java.security.cert.Certificate[signerCerts.size()];
+                        this.certs = new Certificate[signerCerts.size()];
 	  signerCerts.toArray(this.certs);
 	}
       }
@@ -2360,7 +2342,7 @@ class SelfPermission extends Permission {
   
   /**
    * Checks two SelfPermission objects for equality. 
-   
+         *
    * Checks that <i>obj</i> is an SelfPermission, and has 
    * the same type (class) name, permission name, actions, and
    * certificates as this object.
@@ -2419,7 +2401,6 @@ class SelfPermission extends Permission {
    *
    * @return a hash code value for this object.
    */
-  
   public int hashCode() {
     int hash = type.hashCode();
     if (name != null)
@@ -2431,64 +2412,58 @@ class SelfPermission extends Permission {
   
   /**
    * Returns the canonical string representation of the actions,
-   * which currently is the empty string "", since there are no actions for 
-   * an SelfPermission. That is, the actions for the
+         * which currently is the empty string "", since there are no actions
+         * for an SelfPermission. That is, the actions for the
    * permission that will be created when this SelfPermission
    * is resolved may be non-null, but an SelfPermission
    * itself is never considered to have any actions.
    *
    * @return the empty string "".
    */
-  public String getActions()
-  {
+        public String getActions() {
     return "";
   }
   
-  public String getSelfType()
-  {
+        public String getSelfType() {
     return type;
   }
   
-  public String getSelfName()
-  {
+        public String getSelfName() {
     return name;
   }
   
-  public String getSelfActions()
-  {
+        public String getSelfActions() {
     return actions;
   }
   
-  public java.security.cert.Certificate[] getCerts()
-  {
+        public Certificate[] getCerts() {
     return certs;
   }
   
   /**
    * Returns a string describing this SelfPermission.  The convention 
-   * is to specify the class name, the permission name, and the actions, in
-   * the following format: '(unresolved "ClassName" "name" "actions")'.
+         * is to specify the class name, the permission name, and the actions,
+         * in the following format: '(unresolved "ClassName" "name" "actions")'.
    * 
    * @return information about this SelfPermission.
    */
-  
   public String toString() {
     return "(SelfPermission " + type + " " + name + " " + actions + ")";
   }
-}
+    }
 
-/**
+    /**
  * holds policy information that we need to synch on
  */
-class PolicyInfo {
+    private static class PolicyInfo {
     private static final boolean verbose = false;
 
     // Stores grant entries in the policy
-    final List<Object> policyEntries;
+        final List<PolicyEntry> policyEntries;
 
     // Stores grant entries gotten from identity database
     // Use separate lists to avoid sync on policyEntries
-    final List<Object> identityPolicyEntries;
+        final List<PolicyEntry> identityPolicyEntries;
 
     // Maps aliases to certs
     final Map aliasMapping;
@@ -2498,13 +2473,15 @@ class PolicyInfo {
     private java.util.Random random;
 
     PolicyInfo(int numCaches) {
-	policyEntries = new ArrayList<Object>();
-	identityPolicyEntries = new ArrayList<Object>(2);
-	aliasMapping = new HashMap(11);
+            policyEntries = new ArrayList<PolicyEntry>();
+            identityPolicyEntries =
+                Collections.synchronizedList(new ArrayList<PolicyEntry>(2));
+            aliasMapping = Collections.synchronizedMap(new HashMap(11));
 
 	pdMapping = new Map[numCaches];
 	for (int i = 0; i < numCaches; i++) {
-	    pdMapping[i] = Collections.synchronizedMap(new WeakHashMap<ProtectionDomain, PermissionCollection>());
+                pdMapping[i] = Collections.synchronizedMap
+                    (new WeakHashMap<ProtectionDomain, PermissionCollection>());
 	}
 	if (numCaches > 1) {
 	    random = new java.util.Random();
@@ -2517,5 +2494,6 @@ class PolicyInfo {
 	    int i = java.lang.Math.abs(random.nextInt() % pdMapping.length);
 	    return pdMapping[i];
 	}
+    }
     }
 }

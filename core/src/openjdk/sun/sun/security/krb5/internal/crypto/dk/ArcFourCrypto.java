@@ -40,7 +40,6 @@ import sun.security.krb5.internal.crypto.KeyUsage;
  * http://www.ietf.org/rfc/rfc4757.txt
  * 
  * @author Seema Malkani
- * @version 1.11, 05/05/07
  */
 
 public class ArcFourCrypto extends DkCrypto {

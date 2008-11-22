@@ -45,7 +45,6 @@ import sun.security.x509.X509CertImpl;
  * constraints information on a PKIX certificate, namely basic constraints
  * and name constraints.
  *
- * @version 	1.20 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  */

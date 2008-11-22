@@ -125,5 +125,3 @@ public interface Ref {
     void setObject(Object value) throws SQLException;
 
 }
-
-

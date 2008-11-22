@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)KeyTab.java	1.26 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -49,7 +47,6 @@ import java.util.StringTokenizer;
  * and retrieving service keys for use in authentication exchanges.
  *
  * @author Yanni Zhang
- * @version 1.00  09 Mar 2000
  */
 public class KeyTab implements KeyTabConstants {
     int kt_vno;

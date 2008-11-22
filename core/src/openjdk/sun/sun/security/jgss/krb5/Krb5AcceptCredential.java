@@ -41,7 +41,6 @@ import javax.security.auth.DestroyFailedException;
  * Implements the krb5 acceptor credential element.
  *
  * @author Mayank Upadhyay
- * @version 1.27, 05/05/07
  * @since 1.4
  */
 public class Krb5AcceptCredential

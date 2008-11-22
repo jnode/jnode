@@ -38,7 +38,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.21
  */
 public class KeyIdentifier {
     private byte[] octetString;
@@ -49,7 +48,7 @@ public class KeyIdentifier {
      * @param octetString the octet string identifying the key identifier.
      */
     public KeyIdentifier(byte[] octetString) {
-        this.octetString = (byte[])octetString.clone();
+        this.octetString = octetString.clone();
     }
 
     /**
@@ -105,7 +104,7 @@ public class KeyIdentifier {
      * Return the value of the KeyIdentifier as byte array.
      */
     public byte[] getIdentifier() {
-        return ((byte[])octetString.clone());
+        return octetString.clone();
     }
 
     /**

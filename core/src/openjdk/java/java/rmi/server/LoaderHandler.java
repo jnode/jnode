@@ -33,7 +33,6 @@ import java.net.URL;
  * runtime in previous implementation versions.  It should never be accessed
  * by application code.
  *
- * @version 1.25, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  *

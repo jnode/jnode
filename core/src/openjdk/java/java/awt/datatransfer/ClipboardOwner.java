@@ -38,7 +38,6 @@ package java.awt.datatransfer;
  *
  * @see java.awt.datatransfer.Clipboard
  * 
- * @version 	1.18, 05/05/07
  * @author	Amy Fowler
  */
 

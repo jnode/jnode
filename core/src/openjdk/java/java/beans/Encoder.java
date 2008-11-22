@@ -41,7 +41,6 @@ import java.util.Map;
  * 
  * @since 1.4
  *
- * @version 1.3 11/15/00
  * @author Philip Milne
  */
         

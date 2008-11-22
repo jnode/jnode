@@ -48,7 +48,6 @@ import sun.awt.EventListenerAggregate;
  * @see java.awt.Toolkit#getSystemClipboard
  * @see java.awt.Toolkit#getSystemSelection
  *
- * @version 	1.30, 05/05/07
  * @author	Amy Fowler
  * @author      Alexander Gerasimov
  */
@@ -353,7 +352,3 @@ public class Clipboard {
         return set;
     }
 }
-
-    
-
-    

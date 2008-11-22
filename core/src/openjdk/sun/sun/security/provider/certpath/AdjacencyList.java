@@ -82,7 +82,6 @@ import java.util.List;
  * @see sun.security.provider.certpath.Vertex
  * <p>
  * @author  seth proctor
- * @version 1.14 05/05/07
  * @since   1.4
  */
 public class AdjacencyList {

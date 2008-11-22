@@ -64,7 +64,6 @@ import java.util.Arrays;
  * that control how to determine which regions are inside or outside
  * the path.
  * 
- * @version 1.10, 05/05/07
  * @author Jim Graham
  * @since 1.6
  */

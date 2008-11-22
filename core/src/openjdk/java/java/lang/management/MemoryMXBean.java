@@ -196,7 +196,6 @@ import javax.management.openmbean.CompositeData;
  *      Ways to Access MXBeans</a>
  *
  * @author  Mandy Chung
- * @version 1.22, 05/05/07 
  * @since   1.5
  */
 public interface MemoryMXBean {

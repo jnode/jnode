@@ -25,7 +25,6 @@
  */
 
 /*
- * @(#)StyledParagraph.java	1.9 05/08/26
  * (C) Copyright IBM Corp. 1999,  All rights reserved.
  */
 package java.awt.font;

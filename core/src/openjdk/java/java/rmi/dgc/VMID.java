@@ -35,7 +35,6 @@ import java.security.*;
  * machines.  VMIDs are used by the distributed garbage collector
  * to identify client VMs.
  *
- * @version	1.27, 05/05/07
  * @author	Ann Wollrath
  * @author	Peter Jones
  */

@@ -104,6 +104,13 @@ public class FormatData_tr extends ListResourceBundle {
                     "Cmt" // abb Saturday
                 }
             },
+            { "NumberPatterns",
+                new String[] {
+                    "#,##0.###;-#,##0.###", // decimal pattern
+                    "#,##0.00 \u00a4;-#,##0.00 \u00a4", // currency pattern
+                    "% #,##0" // percent pattern
+                }
+            },
             { "NumberElements",
                 new String[] {
                     ",", // decimal separator

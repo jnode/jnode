@@ -27,7 +27,6 @@
  * Provides library support for the Java programming language
  * annotation facility.
  *
- * @version 1.8, 05/05/07
  * @author Josh Bloch
  * @since 1.5
  */

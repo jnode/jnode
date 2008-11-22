@@ -42,7 +42,6 @@ package java.rmi;
  * <p>For complete details on RMI, see the <a
  href=../../../platform/rmi/spec/rmiTOC.html>RMI Specification</a> which describes the RMI API and system.
  *
- * @version 1.24, 05/05/07
  * @since   JDK1.1
  * @author  Ann Wollrath
  * @see	    java.rmi.server.UnicastRemoteObject

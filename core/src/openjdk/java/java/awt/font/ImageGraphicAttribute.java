@@ -225,5 +225,3 @@ public final class ImageGraphicAttribute extends GraphicAttribute {
         return true;
     }
 }
-
-

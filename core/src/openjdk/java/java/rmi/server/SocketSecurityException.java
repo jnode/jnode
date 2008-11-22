@@ -28,7 +28,6 @@ package java.rmi.server;
 /**
  * An obsolete subclass of {@link ExportException}.
  *
- * @version 1.20, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  **/

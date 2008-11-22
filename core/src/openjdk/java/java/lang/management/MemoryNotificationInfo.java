@@ -101,7 +101,6 @@ import sun.management.MemoryNotifInfoCompositeData;
  * </ul>
  *
  * @author  Mandy Chung
- * @version 1.14, 05/05/07
  * @since   1.5
  *
  */

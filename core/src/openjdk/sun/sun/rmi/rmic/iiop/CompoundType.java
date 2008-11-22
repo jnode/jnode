@@ -53,7 +53,6 @@ import java.io.File;
  * A CompoundType is an abstract base class for all IIOP class and
  * interface types.
  *
- * @version	1.0, 2/27/98
  * @author	Bryan Atsatt
  */
 public abstract class CompoundType extends Type {

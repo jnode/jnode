@@ -64,7 +64,6 @@ import sun.rmi.server.MarshalOutputStream;
  * @param <T> the type of the object contained in this
  * <code>MarshalledObject</code>
  *
- * @version 1.41, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  * @since   1.2

@@ -40,7 +40,6 @@ import sun.security.x509.GeneralNameInterface;
  * The methods are made available in this fashion for performance reasons.
  *
  * @author Andreas Sterbenz
- * @version 1.12, 05/05/07
  */
 public abstract class CertPathHelper {
     

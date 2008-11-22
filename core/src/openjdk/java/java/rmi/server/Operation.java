@@ -32,7 +32,6 @@ package java.rmi.server;
  * stubs (stubs generated with <code>rmic -v1.2</code>); hence, this class
  * is deprecated.
  *
- * @version 1.24, 05/05/07
  * @since JDK1.1
  * @deprecated no replacement
  */

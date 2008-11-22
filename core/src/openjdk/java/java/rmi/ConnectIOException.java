@@ -30,7 +30,6 @@ package java.rmi;
  * <code>IOException</code> occurs while making a connection
  * to the remote host for a remote method call.
  * 
- * @version 1.19, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

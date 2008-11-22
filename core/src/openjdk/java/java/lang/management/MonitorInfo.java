@@ -38,7 +38,6 @@ import sun.management.MonitorInfoCompositeData;
  * the {@link #from from} method.
  *
  * @author  Mandy Chung
- * @version 1.11, 05/05/07
  * @since   1.6
  */
 public class MonitorInfo extends LockInfo {

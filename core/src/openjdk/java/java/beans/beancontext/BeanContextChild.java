@@ -56,7 +56,6 @@ import java.beans.beancontext.BeanContext;
  * </p>
  *
  * @author	Laurence P. G. Cable
- * @version	1.28, 05/05/07
  * @since	1.2
  * 
  * @see	java.beans.beancontext.BeanContext

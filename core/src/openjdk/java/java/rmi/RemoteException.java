@@ -43,7 +43,6 @@ package java.rmi;
  * instance of <code>RemoteException</code> always throws {@link
  * IllegalStateException}.
  *
- * @version 1.31, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

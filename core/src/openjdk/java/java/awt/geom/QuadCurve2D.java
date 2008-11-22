@@ -39,7 +39,6 @@ import sun.awt.geom.Curve;
  * The actual storage representation of the coordinates is left to
  * the subclass.
  *
- * @version 	1.40, 05/05/07
  * @author	Jim Graham
  * @since 1.2
  */

@@ -31,7 +31,6 @@ import java.util.*;
  * A utility class to iterate over the path segments of a line segment
  * through the PathIterator interface.
  *
- * @version 	1.17, 05/05/07
  * @author	Jim Graham
  */
 class LineIterator implements PathIterator {

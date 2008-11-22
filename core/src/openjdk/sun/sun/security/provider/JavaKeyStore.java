@@ -41,7 +41,6 @@ import sun.security.pkcs.EncryptedPrivateKeyInfo;
  * @author Jan Luehe
  * @author David Brownell
  *
- * @version 1.62, 05/05/07
  *
  * @see KeyProtector
  * @see java.security.KeyStoreSpi
@@ -157,7 +156,7 @@ abstract class JavaKeyStore extends KeyStoreSpi {
 	    if (((KeyEntry)entry).chain == null) {
 		return null;
 	    } else {
-		return (Certificate[])((KeyEntry)entry).chain.clone();
+                return ((KeyEntry)entry).chain.clone();
 	    }
 	} else {
 	    return null;
@@ -262,7 +261,7 @@ abstract class JavaKeyStore extends KeyStoreSpi {
 		// clone the chain
 		if ((chain != null) &&
 		    (chain.length != 0)) {
-		    entry.chain = (Certificate[])chain.clone();
+                    entry.chain = chain.clone();
 		} else {
 		    entry.chain = null;
 		}
@@ -316,10 +315,10 @@ abstract class JavaKeyStore extends KeyStoreSpi {
 	    KeyEntry entry = new KeyEntry();
 	    entry.date = new Date();
 
-	    entry.protectedPrivKey = (byte[])key.clone();
+            entry.protectedPrivKey = key.clone();
 	    if ((chain != null) &&
 	        (chain.length != 0)) {
-		entry.chain = (Certificate[])chain.clone();
+                entry.chain = chain.clone();
 	    } else {
 		entry.chain = null;
 	    }

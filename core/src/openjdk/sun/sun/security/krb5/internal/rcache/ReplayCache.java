@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)ReplayCache.java	1.21 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -44,7 +42,6 @@ import sun.security.krb5.internal.KerberosTime;
  * The cache minimizes the memory usage by doing self-cleanup of expired items in the cache.
  *
  * @author Yanni Zhang
- * @version 1.00 10 Jul 00
  */
 public class ReplayCache extends LinkedList<AuthTime> {
 
@@ -151,4 +148,3 @@ public class ReplayCache extends LinkedList<AuthTime> {
     }
 
 }
-

@@ -71,7 +71,6 @@ import java.security.MessageDigest;
  *
  * @author Mayank Upadhyay
  * @author Ram Marti 
- * @version 1.25, 05/05/07
  * @see sun.security.jgss.GSSHeader
  */
 

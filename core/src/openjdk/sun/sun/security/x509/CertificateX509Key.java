@@ -38,7 +38,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.22
  * @see CertAttrSet
  */
 public class CertificateX509Key implements CertAttrSet<String> {

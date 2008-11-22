@@ -30,7 +30,6 @@ package sun.security.x509;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.18
  */
 public class X509AttributeName {
     // Public members

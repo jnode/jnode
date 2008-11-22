@@ -45,7 +45,6 @@ import sun.security.util.*;
  * }
  * </pre>
  * @author Hemma Prafullchandra
- * @version 1.20, 05/05/07
  */
 public class OtherName implements GeneralNameInterface {
 
@@ -112,7 +111,7 @@ public class OtherName implements GeneralNameInterface {
      * Get name value
      */
     public byte[] getNameValue() {
-	return (byte[])nameValue.clone();
+        return nameValue.clone();
     }
 
     /**

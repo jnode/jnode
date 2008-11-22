@@ -49,7 +49,6 @@ import java.io.File;
  * they are subject to change or removal without notice.
  *
  * @author 	Arthur van Hoff
- * @version 1.82, 05/05/07
  */
 
 public class Environment implements Constants {

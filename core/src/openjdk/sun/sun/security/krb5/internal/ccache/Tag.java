@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)Tag.java	1.13 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -38,7 +36,6 @@ import java.io.ByteArrayOutputStream;
  * tag field introduced in KRB5_FCC_FVNO_4 
  *
  * @author Yanni Zhang
- * @version 1.00
  */
 public class Tag{
     int length;

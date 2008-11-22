@@ -54,7 +54,6 @@ import sun.security.x509.X509CertImpl;
  * matching certificates from CertStores and verify a particular certificate
  * against a ForwardState.
  *
- * @version 1.29 05/05/07
  * @since	1.4
  * @author      Yassir Elley
  * @author      Sean Mullan

@@ -76,7 +76,6 @@ import sun.security.util.DerOutputStream;
  * hashmap of elements, but getElement() is synchronized.
  *
  * @author Mayank Upadhyay
- * @version 1.24, 05/05/07
  * @since 1.4
  */
 

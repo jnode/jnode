@@ -302,5 +302,3 @@ public interface Blob {
      */
     InputStream getBinaryStream(long pos, long length) throws SQLException;
 }
-
-

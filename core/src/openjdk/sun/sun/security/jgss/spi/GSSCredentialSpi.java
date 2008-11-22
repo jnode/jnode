@@ -34,7 +34,6 @@ import java.security.Provider;
  * credential elements from different mechanisms.
  *
  * @author Mayank Upadhyay
- * @version 1.12, 05/05/07
  */
 public interface GSSCredentialSpi {
     

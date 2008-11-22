@@ -39,7 +39,6 @@ package java.rmi;
  * <p>A <code>ServerRuntimeException</code> is not thrown from servers
  * executing on the Java 2 platform v1.2 or later versions.
  * 
- * @version 1.25, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  * @deprecated no replacement

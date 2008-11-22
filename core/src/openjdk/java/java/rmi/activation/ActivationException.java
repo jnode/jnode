@@ -40,7 +40,6 @@ package java.rmi.activation;
  * IllegalStateException}.
  *
  * @author 	Ann Wollrath
- * @version	1.31, 05/05/07
  * @since 	1.2
  */
 public class ActivationException extends Exception {

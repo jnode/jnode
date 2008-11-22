@@ -34,7 +34,6 @@ import java.security.Provider;
  * Provides type safety for Krb5 credential elements.
  *
  * @author Mayank Upadhyay
- * @version 1.14, 05/05/07
  * @since 1.4
  */
 interface Krb5CredElement 

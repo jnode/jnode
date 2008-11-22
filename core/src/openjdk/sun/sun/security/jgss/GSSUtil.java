@@ -274,7 +274,14 @@ public class GSSUtil {
      * The application indicates this by explicitly setting the system
      * property javax.security.auth.useSubjectCredsOnly to false.
      */
-    public static boolean useSubjectCredsOnly() {
+    public static boolean useSubjectCredsOnly(int caller) {
+
+        // HTTP/SPNEGO doesn't use the standard JAAS framework. Instead, it
+        // uses the java.net.Authenticator style, therefore always return
+        // false here.
+        if (caller == CALLER_HTTP_NEGOTIATE) {
+            return false;
+        }
         /*
          * Don't use GetBooleanAction because the default value in the JRE
          * (when this is unset) has to treated as true.

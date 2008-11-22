@@ -69,7 +69,6 @@ import sun.security.util.*;
  *
  * </pre>
  *
- * @version 	1.10 05/05/07
  * @author	Ram Marti
  */
 

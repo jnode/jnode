@@ -30,7 +30,6 @@ package java.rmi.activation;
  * fails during a remote call to an activatable object.
  *
  * @author 	Ann Wollrath
- * @version	1.17, 05/05/07
  * @since 	1.2
  */
 public class ActivateFailedException extends java.rmi.RemoteException {

@@ -227,4 +227,3 @@ public class Date extends java.util.Date {
     */ 
     static final long serialVersionUID = 1511598038487230103L;
 }
-

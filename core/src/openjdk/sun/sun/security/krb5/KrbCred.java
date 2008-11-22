@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)KrbCred.java	1.21 07/05/05
- * 
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -43,7 +41,6 @@ import sun.security.util.DerValue;
  *
  * Supports delegation of one ticket only.
  * @author Mayank Upadhyay
- * @version 1.21, 05/05/07
  */
 public class KrbCred {
 
@@ -85,21 +82,7 @@ public class KrbCred {
 
 	KrbTgsReq tgsReq = new KrbTgsReq(options, tgt, tgService,
 					 null, null, null, null, sAddrs, null, null, null);
-	KrbTgsRep tgsRep = null;
-	String kdc = null;
-	try {
-	    kdc = tgsReq.send();
-	    tgsRep = tgsReq.getReply();
-	} catch (KrbException ke) {
-		if (ke.returnCode() == Krb5.KRB_ERR_RESPONSE_TOO_BIG) {
-		    tgsReq.send(tgService.getRealmString(), kdc, true); // useTCP is set
-	            tgsRep = tgsReq.getReply();
-		} else {
-		    throw ke;
-		}
-	}
-
-	credMessg = createMessage(tgsRep.getCreds(), key);
+        credMessg = createMessage(tgsReq.sendAndGetCreds(), key);
 
 	obuf = credMessg.asn1Encode();
     }

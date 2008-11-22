@@ -52,7 +52,7 @@ public class FormatData_fr_CA extends ListResourceBundle {
                 new String[] {
                     "#,##0.###;-#,##0.###", // decimal pattern
                     "#,##0.00 \u00A4;(#,##0.00\u00A4)", // currency pattern
-                    "#,##0%" // percent pattern
+                    "#,##0 %" // percent pattern
                 }
             },
             { "DateTimePatterns",
@@ -68,7 +68,7 @@ public class FormatData_fr_CA extends ListResourceBundle {
                     "{1} {0}" // date-time pattern
                 }
             },
-            { "DateTimePatternChars", "GanjkHmsSEDFwWxhKzZ" },
+            { "DateTimePatternChars", "GaMjkHmsSEDFwWxhKzZ" },
         };
     }
 }

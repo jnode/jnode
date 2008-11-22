@@ -103,7 +103,6 @@ import java.awt.font.GlyphJustificationInfo;
  * @see Font
  * @see GlyphMetrics
  * @see TextLayout
- * @version 19 Mar 1998
  * @author Charlton Innovations, Inc.
  */
 

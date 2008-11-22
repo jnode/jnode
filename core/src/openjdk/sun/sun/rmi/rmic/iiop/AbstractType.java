@@ -43,7 +43,6 @@ import sun.tools.java.ClassDefinition;
  * <p>
  * The static forAbstract(...) method must be used to obtain an instance, and will
  * return null if the ClassDefinition is non-conforming.
- * @version	1.0, 2/25/98
  * @author	Bryan Atsatt
  */
 public class AbstractType extends RemoteType {

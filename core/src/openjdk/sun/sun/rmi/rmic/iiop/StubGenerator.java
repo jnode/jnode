@@ -52,10 +52,8 @@ import sun.rmi.rmic.Main;
 /**
  * An IIOP stub/tie generator for rmic.
  *
- * @version	1.0, 2/23/98
  * @author	Bryan Atsatt
  * @author	Anil Vijendran
- * @version     2.0 fall 99
  * @author      M. Mortazavi
  */
 

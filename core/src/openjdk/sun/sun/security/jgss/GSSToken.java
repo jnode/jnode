@@ -34,7 +34,6 @@ import sun.security.util.*;
 /**
  * Utilities for processing GSS Tokens.
  *
- * @version 1.8, 05/05/07
  */
 
 public abstract class GSSToken {

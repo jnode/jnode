@@ -57,7 +57,6 @@ import sun.security.util.Debug;
  * the specified input parameter set (which must be a
  * <code>PKIXParameters</code> object) and signature provider (if any).
  *
- * @version 	1.25 05/05/07
  * @since	1.4
  * @author      Yassir Elley
  */

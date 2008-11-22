@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)KrbTgsReq.java	1.25 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -195,6 +193,28 @@ public class KrbTgsReq extends KrbKdcReq {
 	return new KrbTgsRep(ibuf, this);
     }
     
+    /**
+     * Sends the request, waits for a reply, and returns the Credentials.
+     * Used in Credentials, KrbCred, and internal/CredentialsUtil.
+     */
+    public Credentials sendAndGetCreds() throws IOException, KrbException {
+        KrbTgsRep tgs_rep = null;
+        String kdc = null;
+        try {
+            kdc = send();
+            tgs_rep = getReply();
+        } catch (KrbException ke) {
+            if (ke.returnCode() == Krb5.KRB_ERR_RESPONSE_TOO_BIG) {
+                // set useTCP and retry
+                send(servName.getRealmString(), kdc, true);
+                tgs_rep = getReply();
+            } else {
+                throw ke;
+            }
+        }
+        return tgs_rep.getCreds();
+    }
+
     KerberosTime getCtime() {
 	return ctime;
     }

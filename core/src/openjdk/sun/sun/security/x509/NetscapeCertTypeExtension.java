@@ -44,7 +44,6 @@ import sun.security.util.*;
  * but is provided here for compatibility reasons.
  *
  * @author Hemma Prafullchandra
- * @version 1.19
  * @see Extension
  * @see CertAttrSet
  */

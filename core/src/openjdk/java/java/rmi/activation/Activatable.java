@@ -49,7 +49,6 @@ import sun.rmi.server.ActivatableServerRef;
  * fail.
  *
  * @author	Ann Wollrath
- * @version	1.44, 07/05/05
  * @since	1.2
  * @serial	exclude
  */

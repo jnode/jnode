@@ -57,7 +57,6 @@ import sun.security.jca.JCAUtil;
  * @author Benjamin Renaud
  *
  * @since   1.1
- * @version 1.107, 05/05/07
  *
  * @see DSAPublicKey
  * @see DSAPrivateKey

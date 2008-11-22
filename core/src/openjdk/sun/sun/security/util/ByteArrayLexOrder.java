@@ -31,7 +31,6 @@ import java.util.Comparator;
 /**
  * Compare two byte arrays in lexicographical order.
  *
- * @version 1.20 05/05/07
  * @author D. N. Hoover
  */
 public class ByteArrayLexOrder implements Comparator<byte[]> {

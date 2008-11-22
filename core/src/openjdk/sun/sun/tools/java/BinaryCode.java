@@ -109,7 +109,3 @@ public class BinaryCode implements Constants {
 	return (code != null) ? new BinaryCode(code, cpool, env) : null;
     }
 }
-    
-
-
-

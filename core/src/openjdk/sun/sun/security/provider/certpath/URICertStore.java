@@ -82,7 +82,6 @@ import sun.security.util.Debug;
  *
  * @author Andreas Sterbenz
  * @author Sean Mullan
- * @version 1.7, 05/05/07
  * @since 7.0
  */
 class URICertStore extends CertStoreSpi {

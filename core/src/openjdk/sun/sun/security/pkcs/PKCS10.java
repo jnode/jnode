@@ -76,7 +76,6 @@ import sun.security.x509.X500Signer;
  * @author David Brownell
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.45
  */
 public class PKCS10 {
     /**
@@ -262,7 +261,7 @@ public class PKCS10 {
      */
     public byte[] getEncoded() {
         if (encoded != null)
-	    return (byte[])encoded.clone();
+            return encoded.clone();
         else
             return null;
     }

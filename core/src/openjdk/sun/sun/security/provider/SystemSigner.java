@@ -33,7 +33,6 @@ import java.security.*;
  * can be set by SunSecurity classes, and a set of accessors for other
  * classes in sun.security.*.
  *
- * @version 1.40, 05/05/07
  * @author Benjamin Renaud
  */
 

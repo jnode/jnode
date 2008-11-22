@@ -50,7 +50,6 @@ import sun.rmi.rmic.Main;
 /**
  * An IDL generator for rmic.
  *
- * @version 1.0, 2/23/98
  * @author  Steve Newberry, Bryan Atsatt
  */
 public class IDLGenerator extends sun.rmi.rmic.iiop.Generator {

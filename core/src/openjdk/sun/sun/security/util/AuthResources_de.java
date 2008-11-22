@@ -34,7 +34,6 @@ package sun.security.util;
  * <li> com.sun.security.auth.login
  * </ol>
  * 
- * @version 1.6, 01/23/01
  */
 public class AuthResources_de extends java.util.ListResourceBundle {
 

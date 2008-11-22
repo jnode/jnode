@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)MemoryCredentialsCache.java	1.15 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -45,7 +43,6 @@ import java.io.File;
  * cache on Windows platforms.
  *
  * @author Yanni Zhang
- * @version 1.00
  */
 public abstract class MemoryCredentialsCache extends CredentialsCache {
 

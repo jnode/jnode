@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)BreakIteratorRules_th.java	1.24 07/05/05
- */
+
 
 /*
  * IBM Confidential

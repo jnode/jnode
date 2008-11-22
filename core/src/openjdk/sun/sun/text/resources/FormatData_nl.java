@@ -104,6 +104,12 @@ public class FormatData_nl extends ListResourceBundle {
                     "za" // abb Saturday
                 }
             },
+            { "Eras",
+                new String[] { // era strings for GregorianCalendar
+                    "v. Chr.",
+                    "n. Chr."
+                }
+            },
             { "NumberElements",
                 new String[] {
                     ",", // decimal separator

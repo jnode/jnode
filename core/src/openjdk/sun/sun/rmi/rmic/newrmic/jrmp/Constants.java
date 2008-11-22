@@ -32,7 +32,6 @@ package sun.rmi.rmic.newrmic.jrmp;
  * supported API.  Code that depends on them does so at its own risk:
  * they are subject to change or removal without notice.
  *
- * @version 1.9, 07/05/05
  * @author Peter Jones
  **/
 final class Constants {

@@ -65,7 +65,6 @@ import sun.security.action.GetPropertyAction;
  *
  * @author	Ann Wollrath
  * @author	Peter Jones
- * @version	1.37, 07/05/05
  * @since	JDK1.1
  */
 public final class ObjID implements Serializable {

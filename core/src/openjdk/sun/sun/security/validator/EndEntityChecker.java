@@ -62,7 +62,6 @@ import sun.security.x509.NetscapeCertTypeExtension;
  * </ul>
  *
  * @author Andreas Sterbenz
- * @version 1.14, 05/05/07
  */
 class EndEntityChecker {
 

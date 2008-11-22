@@ -35,7 +35,6 @@ import java.security.Security;
  * special code for the provider list during JAR verification.
  *
  * @author  Andreas Sterbenz
- * @version 1.13, 05/05/07
  * @since   1.5
  */
 public class Providers {
@@ -79,13 +78,34 @@ public class Providers {
     // The code here is used by sun.security.util.SignatureFileVerifier.
     // See there for details.
     
+    private static final String BACKUP_PROVIDER_CLASSNAME =
+        "sun.security.provider.VerificationProvider";
+
     // Hardcoded classnames of providers to use for JAR verification.
-    // MUST NOT be in signed JAR files.
-    private static final String[] jarClassNames = {
+    // MUST NOT be on the bootclasspath and not in signed JAR files.
+    private static final String[] jarVerificationProviders = {
 	"sun.security.provider.Sun",
 	"sun.security.rsa.SunRsaSign",
+        BACKUP_PROVIDER_CLASSNAME,
     };
     
+    // Return to Sun provider or its backup.
+    // This method should only be called by
+    // sun.security.util.ManifestEntryVerifier and java.security.SecureRandom.
+    public static Provider getSunProvider() {
+        try {
+            Class clazz = Class.forName(jarVerificationProviders[0]);
+            return (Provider)clazz.newInstance();
+        } catch (Exception e) {
+            try {
+                Class clazz = Class.forName(BACKUP_PROVIDER_CLASSNAME);
+                return (Provider)clazz.newInstance();
+            } catch (Exception ee) {
+                throw new RuntimeException("Sun provider not found", e);
+            }
+        }
+    }
+
     /**
      * Start JAR verification. This sets a special provider list for
      * the current thread. You MUST save the return value from this
@@ -94,7 +114,7 @@ public class Providers {
      */
     public static Object startJarVerification() {
 	ProviderList currentList = getProviderList();
-	ProviderList jarList = currentList.getJarList(jarClassNames);
+        ProviderList jarList = currentList.getJarList(jarVerificationProviders);
 	// return the old thread-local provider list, usually null
 	return beginThreadProviderList(jarList);
     }

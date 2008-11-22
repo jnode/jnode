@@ -65,7 +65,6 @@ import javax.security.auth.x500.X500Principal;
  *
  * Note that instances of this class are immutable.
  *
- * @version 1.15, 05/05/07
  */
 public class RDN {
 
@@ -267,7 +266,7 @@ public class RDN {
     }
     
     public RDN(AVA[] avas) {
-	assertion = (AVA[])avas.clone();
+        assertion = avas.clone();
 	for (int i = 0; i < assertion.length; i++) {
 	    if (assertion[i] == null) {
 		throw new NullPointerException();
@@ -470,8 +469,7 @@ public class RDN {
 		if (i > 0) {
 		    relname.append('+');
 		}
-		relname.append
-		    (((AVA)avaList.get(i)).toRFC2253CanonicalString());
+                relname.append(avaList.get(i).toRFC2253CanonicalString());
 	    }
 	}
 	return relname.toString();

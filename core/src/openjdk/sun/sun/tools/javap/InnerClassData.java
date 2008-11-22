@@ -73,4 +73,3 @@ class InnerClassData  implements RuntimeConstants {
     }
     
 } // end InnerClassData
-

@@ -31,7 +31,6 @@ import java.io.IOException;
 import sun.security.util.*;
 
 /**
- * @version 	1.12 05/05/07
  * @author	Ram Marti
  */
 

@@ -45,7 +45,6 @@ import com.sun.corba.se.impl.util.RepositoryId;
  * name mappings specified in Chapter 5 of the Java Language
  * to IDL specification.
  *
- * @version	1.0, 3/19/98
  * @author	Bryan Atsatt
  */
 public class IDLNames implements sun.rmi.rmic.iiop.Constants {
@@ -1198,4 +1197,3 @@ public class IDLNames implements sun.rmi.rmic.iiop.Constants {
         return convertIDLKeywords(result);
     }
 }
-

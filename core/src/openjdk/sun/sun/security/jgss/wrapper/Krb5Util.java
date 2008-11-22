@@ -30,7 +30,6 @@ import javax.security.auth.kerberos.ServicePermission;
 /**
  * This class is an utility class for Kerberos related stuff.
  * @author Valerie Peng
- * @version 1.9, 05/05/07
  * @since 1.6
  */
 class Krb5Util {

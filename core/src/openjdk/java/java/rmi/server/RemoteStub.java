@@ -31,7 +31,6 @@ package java.rmi.server;
  * exactly the same set of remote interfaces defined by the actual
  * implementation of the remote object.
  *
- * @version 1.28, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

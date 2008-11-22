@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_th_TH_TH.java	1.13 07/05/05
- */
+
 
 package sun.text.resources;
 

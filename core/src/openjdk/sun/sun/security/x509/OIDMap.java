@@ -42,7 +42,6 @@ import sun.security.util.*;
  * @author Hemma Prafullchandra
  * @author Andreas Sterbenz
  *
- * @version 1.42, 05/05/07
  */
 public class OIDMap {
     

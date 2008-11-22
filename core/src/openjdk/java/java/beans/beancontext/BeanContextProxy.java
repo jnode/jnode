@@ -67,7 +67,6 @@ package java.beans.beancontext;
  * instance
  * </p>
  * @author Laurence P. G. Cable
- * @version 1.18, 05/05/07
  * @since 1.2
  *
  * @see java.beans.beancontext.BeanContextChild

@@ -41,7 +41,6 @@ import sun.security.util.*;
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
  *
- * @version 1.25, 05/05/07
  */
 public class GeneralNames {
     

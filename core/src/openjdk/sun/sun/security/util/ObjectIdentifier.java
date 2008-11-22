@@ -44,7 +44,6 @@ import java.io.*;
  * hierarchy, and other organizations can easily acquire the ability
  * to assign such unique identifiers.
  *
- * @version 1.43
  *
  * @author David Brownell
  * @author Amit Kapoor
@@ -138,7 +137,7 @@ class ObjectIdentifier implements Serializable
     public ObjectIdentifier (int values []) throws IOException
     {
         checkValidOid(values, values.length);
-	components = (int []) values.clone ();
+        components = values.clone();
 	componentLen = values.length;
     }
     

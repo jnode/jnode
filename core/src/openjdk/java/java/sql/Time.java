@@ -246,6 +246,3 @@ public class Time extends java.util.Date {
     */
     static final long serialVersionUID = 8397324403548013681L;
 }
-
-
-

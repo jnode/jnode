@@ -344,7 +344,6 @@ import java.util.Locale;
  * @see          NumberFormat
  * @see          DecimalFormat
  * @see          ChoiceFormat
- * @version      1.69, 05/05/07
  * @author       Mark Davis
  */
 

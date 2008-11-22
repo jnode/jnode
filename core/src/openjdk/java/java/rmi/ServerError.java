@@ -34,7 +34,6 @@ package java.rmi;
  * A <code>ServerError</code> instance contains the original
  * <code>Error</code> that occurred as its cause.
  * 
- * @version 1.20, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

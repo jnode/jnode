@@ -46,7 +46,6 @@ import java.rmi.MarshalledObject;
  * object to use during reinitialization/activation.
  *
  * @author 	Ann Wollrath
- * @version	1.35, 05/05/07
  * @since 	1.2
  * @see         java.rmi.activation.Activatable
  */

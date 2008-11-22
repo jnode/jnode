@@ -25,9 +25,14 @@
 
 package java.beans;
 
+import com.sun.beans.TypeResolver;
+
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * The FeatureDescriptor class is the common baseclass for PropertyDescriptor,
@@ -42,7 +47,7 @@ import java.lang.ref.SoftReference;
 
 public class FeatureDescriptor {
 
-    private Reference classRef;
+    private Reference<Class> classRef;
 
     /**
      * Constructs a <code>FeatureDescriptor</code>.
@@ -278,11 +283,13 @@ public class FeatureDescriptor {
     // Package private methods for recreating the weak/soft referent
 
     void setClass0(Class cls) {
-	classRef = createReference(cls);
+        this.classRef = getWeakReference(cls);
     }
 
     Class getClass0() {
-	return (Class)getObject(classRef);
+        return (this.classRef != null)
+                ? this.classRef.get()
+                : null;
     }
 
     /**
@@ -318,8 +325,64 @@ public class FeatureDescriptor {
 	return (ref == null) ? null : (Object)ref.get();
     }
 
-    static String capitalize(String s) {
-	return NameGenerator.capitalize(s);
+    /**
+     * Creates a new soft reference that refers to the given object.
+     *
+     * @return a new soft reference or <code>null</code> if object is <code>null</code>
+     *
+     * @see SoftReference
+     */
+    static <T> Reference<T> getSoftReference(T object) {
+        return (object != null)
+                ? new SoftReference<T>(object)
+                : null;
+    }
+
+    /**
+     * Creates a new weak reference that refers to the given object.
+     *
+     * @return a new weak reference or <code>null</code> if object is <code>null</code>
+     *
+     * @see WeakReference
+     */
+    static <T> Reference<T> getWeakReference(T object) {
+        return (object != null)
+                ? new WeakReference<T>(object)
+                : null;
+    }
+
+    /**
+     * Resolves the return type of the method.
+     *
+     * @param base    the class that contains the method in the hierarchy
+     * @param method  the object that represents the method
+     * @return a class identifying the return type of the method
+     *
+     * @see Method#getGenericReturnType
+     * @see Method#getReturnType
+     */
+    static Class getReturnType(Class base, Method method) {
+        if (base == null) {
+            base = method.getDeclaringClass();
+        }
+        return TypeResolver.erase(TypeResolver.resolveInClass(base, method.getGenericReturnType()));
+    }
+
+    /**
+     * Resolves the parameter types of the method.
+     *
+     * @param base    the class that contains the method in the hierarchy
+     * @param method  the object that represents the method
+     * @return an array of classes identifying the parameter types of the method
+     *
+     * @see Method#getGenericParameterTypes
+     * @see Method#getParameterTypes
+     */
+    static Class[] getParameterTypes(Class base, Method method) {
+        if (base == null) {
+            base = method.getDeclaringClass();
+        }
+        return TypeResolver.erase(TypeResolver.resolveInClass(base, method.getGenericParameterTypes()));
     }
 
     private boolean expert;

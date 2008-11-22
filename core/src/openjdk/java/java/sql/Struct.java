@@ -104,5 +104,3 @@ public interface Struct {
   Object[] getAttributes(java.util.Map<String,Class<?>> map)
       throws SQLException;
 }
-
-

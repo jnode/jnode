@@ -59,7 +59,6 @@ import sun.security.util.DerInputStream;
  * departure from this convention and throw a
  * <code>CertPathValidatorException</code>.
  *
- * @version 	1.22, 05/05/07
  * @author	Yassir Elley
  * @since	1.4
  */

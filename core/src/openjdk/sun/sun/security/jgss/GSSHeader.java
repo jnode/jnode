@@ -41,7 +41,6 @@ import sun.security.util.*;
  * The format is specified in RFC 2743 section 3.1.
  *
  * @author Mayank Upadhyay
- * @version 1.13, 05/05/07
  */
 
 /*

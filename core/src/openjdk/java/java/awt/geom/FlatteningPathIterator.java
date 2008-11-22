@@ -33,7 +33,6 @@ import java.util.*;
  * classes can use this class to provide flattening behavior for their paths
  * without having to perform the interpolation calculations themselves.
  *
- * @version 1.6 06/29/98
  * @author Jim Graham
  */
 public class FlatteningPathIterator implements PathIterator {

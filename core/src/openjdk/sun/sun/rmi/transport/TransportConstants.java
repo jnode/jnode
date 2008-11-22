@@ -59,4 +59,3 @@ public class TransportConstants {
     /** Exceptional return */
     public static final byte ExceptionalReturn = 0x02;
 }
-

@@ -32,7 +32,6 @@ package java.rmi.server;
  * <code>java.rmi.server.UnicastRemoteObject</code> and
  * <code>java.rmi.activation.Activatable</code>.
  *
- * @version 1.19, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  * @see java.rmi.server.UnicastRemoteObject

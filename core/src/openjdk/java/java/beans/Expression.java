@@ -42,7 +42,6 @@ package java.beans;
  *
  * @since 1.4
  * 
- * @version 1.3 11/15/00
  * @author Philip Milne
  */
 public class Expression extends Statement { 
@@ -61,7 +60,6 @@ public class Expression extends Statement {
      *     
      * @see #getValue
      */
-    @ConstructorProperties({"target", "methodName", "arguments"})
     public Expression(Object target, String methodName, Object[] arguments) { 
         super(target, methodName, arguments); 
     } 

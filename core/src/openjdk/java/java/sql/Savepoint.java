@@ -58,5 +58,3 @@ public interface Savepoint {
      */
     String getSavepointName() throws SQLException;
 }
-
-

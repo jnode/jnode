@@ -161,6 +161,3 @@ public class FieldData implements RuntimeConstants  {
 	return attrs;
     }
 }
-
-   
-

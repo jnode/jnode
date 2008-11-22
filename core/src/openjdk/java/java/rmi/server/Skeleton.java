@@ -36,7 +36,6 @@ import java.rmi.Remote;
  * a server-side entity that dispatches calls to the actual remote object
  * implementation.
  *
- * @version 1.26, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  * @deprecated no replacement.  Skeletons are no longer required for remote

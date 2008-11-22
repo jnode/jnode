@@ -45,7 +45,6 @@ import javax.accessibility.*;
  *
  * @author      Arthur van Hoff
  * @author      Chris Warth
- * @version     1.89, 05/05/07
  * @since       JDK1.0
  */
 public class Applet extends Panel {

@@ -33,7 +33,6 @@ package sun.security.x509;
  *
  * @see java.security.Certificate
  *
- * @version 1.35
  *
  * @author David Brownell
  */

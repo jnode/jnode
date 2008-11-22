@@ -35,7 +35,6 @@ import java.util.List;
  * symmetric, but typically are.
  *
  * @author David Mendenhall
- * @version 1.12, 05/05/07
  *
  * @since 1.4
  */

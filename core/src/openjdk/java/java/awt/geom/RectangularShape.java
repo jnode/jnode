@@ -38,7 +38,6 @@ import java.awt.Rectangle;
  * query and modify the rectangular frame, which provides a reference
  * for the subclasses to define their geometry.
  *
- * @version 	1.26, 05/05/07
  * @author	Jim Graham
  * @since 1.2
  */

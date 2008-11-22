@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)CCacheInputStream.java	1.19 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -45,7 +43,6 @@ import sun.security.krb5.internal.util.KrbDataInputStream;
  * data	from file to memory.
  *
  * @author Yanni Zhang
- * @version 1.00
  *
  */
 public class CCacheInputStream extends KrbDataInputStream implements FileCCacheConstants {
@@ -377,4 +374,3 @@ public class CCacheInputStream extends KrbDataInputStream implements FileCCacheC
 	return cred;
     }
 }
-

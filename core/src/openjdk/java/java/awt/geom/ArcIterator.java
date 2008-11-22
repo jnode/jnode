@@ -31,7 +31,6 @@ import java.util.*;
  * A utility class to iterate over the path segments of an arc
  * through the PathIterator interface.
  *
- * @version 10 Feb 1997
  * @author	Jim Graham
  */
 class ArcIterator implements PathIterator {

@@ -44,7 +44,6 @@ import sun.tools.java.ClassDefinition;
  * The static forImplementation(...) method must be used to obtain an instance,
  * and will return null if the ClassDefinition is non-conforming.
  *
- * @version	1.0, 2/25/98
  * @author	Bryan Atsatt
  */
 public class NCClassType extends ClassType {

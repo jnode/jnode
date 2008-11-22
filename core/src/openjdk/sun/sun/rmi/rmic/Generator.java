@@ -51,7 +51,6 @@ import sun.tools.java.ClassDefinition;
  * supported API.  Code that depends on them does so at its own risk:
  * they are subject to change or removal without notice.
  *
- * @version	1.0, 2/23/98
  * @author	Bryan Atsatt
  */
 public interface Generator {

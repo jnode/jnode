@@ -118,7 +118,6 @@ import sun.rmi.rmic.Names;
  * method can be used to get the array dimension.
  * <p>
  * <i><strong>NOTE:</strong> None of these types is multi-thread-safe</i>
- * @version	1.0, 2/25/98
  * @author	Bryan Atsatt
  */
 public abstract class Type implements sun.rmi.rmic.iiop.Constants, ContextElement, Cloneable {

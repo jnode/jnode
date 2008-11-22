@@ -44,7 +44,6 @@ import java.security.ProviderException;
  * See the inline documentation for details.
  *
  * @since   1.5
- * @version 1.11, 05/05/07
  * @author  Andreas Sterbenz
  */
 abstract class DigestBase extends MessageDigestSpi implements Cloneable {
@@ -91,7 +90,7 @@ abstract class DigestBase extends MessageDigestSpi implements Cloneable {
 	this.algorithm = base.algorithm;
 	this.digestLength = base.digestLength;
 	this.blockSize = base.blockSize;
-	this.buffer = (byte[])base.buffer.clone();
+        this.buffer = base.buffer.clone();
 	this.bufOfs = base.bufOfs;
 	this.bytesProcessed = base.bytesProcessed;
     }

@@ -40,7 +40,6 @@ package java.rmi.server;
  * instance of <code>ServerCloneException</code> always throws {@link
  * IllegalStateException}.
  *
- * @version 1.27, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  * @see     java.rmi.server.UnicastRemoteObject#clone()

@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_de_CH.java	1.32 07/05/05
- */
+
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
@@ -56,7 +54,7 @@ public class FormatData_de_CH extends ListResourceBundle {
                 new String[] {
                     "#,##0.###;-#,##0.###", // decimal pattern
                     "\u00A4 #,##0.00;\u00A4-#,##0.00", // currency pattern
-                    "#,##0%" // percent pattern
+                    "#,##0 %" // percent pattern
                 }
             },
             { "NumberElements",

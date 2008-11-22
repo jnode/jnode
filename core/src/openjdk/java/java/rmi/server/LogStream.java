@@ -31,7 +31,6 @@ import java.util.*;
  * <code>LogStream</code> provides a mechanism for logging errors that are
  * of possible interest to those monitoring a system.  
  *
- * @version 1.27, 05/05/07
  * @author  Ann Wollrath (lots of code stolen from Ken Arnold)
  * @since   JDK1.1
  * @deprecated no replacement

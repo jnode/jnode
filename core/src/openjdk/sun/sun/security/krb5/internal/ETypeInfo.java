@@ -38,7 +38,6 @@ import java.io.IOException;
  *   }
  *
  * @author Seema Malkani
- * @version 1.9, 05/05/07
  */
 
 public class ETypeInfo {

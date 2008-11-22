@@ -53,7 +53,6 @@ import sun.security.pkcs.PKCS9Attribute;
  * @see X500Name
  * @see RDN
  *
- * @version 1.58, 05/05/07
  *
  * @author David Brownell
  * @author Amit Kapoor
@@ -1369,4 +1368,3 @@ class AVAKeyword {
 	new AVAKeyword("SERIALNUMBER", X500Name.SERIALNUMBER_OID, false, false);
     }
 }
-

@@ -35,7 +35,6 @@ package java.rmi.activation;
  * An <code>ActivationID</code> is also obtained during the
  * <code>Activatable.register</code> call.
  * 
- * @version 1.18, 05/05/07
  * @author  Ann Wollrath
  * @since   1.2
  * @see     java.rmi.activation.Activatable

@@ -661,12 +661,3 @@ public class ClassData implements RuntimeConstants {
 	return major_version;
     }
 }
-
-   
-
-
-
-
-
-
-

@@ -47,7 +47,6 @@ import sun.reflect.misc.MethodUtil;
  *
  * @since 1.4
  *
- * @version 1.37 05/05/07
  * @author Philip Milne
  */
 public class Statement {
@@ -75,7 +74,6 @@ public class Statement {
      * @param arguments The arguments of this statement. If <code>null</code> then an empty array will be used.
      *
      */
-    @ConstructorProperties({"target", "methodName", "arguments"})
     public Statement(Object target, String methodName, Object[] arguments) {
 	this.target = target;
         this.methodName = methodName;

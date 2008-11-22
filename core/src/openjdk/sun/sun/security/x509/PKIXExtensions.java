@@ -43,7 +43,6 @@ import sun.security.util.*;
  *
  * @see Extension
  *
- * @version 1.25
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
@@ -260,4 +259,3 @@ public class PKIXExtensions {
 	FreshestCRL_Id = ObjectIdentifier.newInternal(FreshestCRL_data);
     }
 }
-

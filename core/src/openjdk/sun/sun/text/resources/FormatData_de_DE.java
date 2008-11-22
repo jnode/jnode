@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_de_DE.java	1.21 07/05/05
- */
+
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved

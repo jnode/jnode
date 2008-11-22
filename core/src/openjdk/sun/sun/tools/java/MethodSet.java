@@ -185,7 +185,7 @@ class MethodSet {
         if (methodList == null) {
             // If there is no method of this name, return a bogus, empty
             // Iterator.
-            return Collections.EMPTY_LIST.iterator();
+            return Collections.emptyList().iterator();
         }
         return methodList.iterator();
     }
@@ -200,7 +200,7 @@ class MethodSet {
         // Iterator of all methods in the MethodSet.
         class MethodIterator implements Iterator {
             Iterator hashIter = lookupMap.values().iterator();
-            Iterator listIter = Collections.EMPTY_LIST.iterator();
+            Iterator listIter = Collections.emptyList().iterator();
             
             public boolean hasNext() {
                 if (listIter.hasNext()) {

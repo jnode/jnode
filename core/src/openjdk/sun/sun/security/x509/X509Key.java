@@ -55,7 +55,6 @@ import sun.security.util.*;
  * provided, it is used when parsing X.509 keys.  If one is not provided,
  * the key still parses correctly.
  *
- * @version 1.100, 05/05/07
  * @author David Brownell 
  */
 public class X509Key implements PublicKey {
@@ -306,7 +305,7 @@ public class X509Key implements PublicKey {
      */
     public byte[] getEncoded() {
 	try {
-	    return (byte[])getEncodedInternal().clone();
+            return getEncodedInternal().clone();
 	} catch (InvalidKeyException e) {
 	    // XXX
 	}
@@ -342,7 +341,7 @@ public class X509Key implements PublicKey {
      * @exception InvalidKeyException on encoding errors.
      */
     public byte[] encode() throws InvalidKeyException {
-	return (byte[])getEncodedInternal().clone();
+        return getEncodedInternal().clone();
     }
 
     /*

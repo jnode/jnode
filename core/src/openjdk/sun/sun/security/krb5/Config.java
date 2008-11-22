@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)Config.java	1.37 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -42,11 +40,8 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import sun.security.krb5.internal.crypto.EType;
 import sun.security.krb5.internal.ktab.*;
-import sun.security.krb5.internal.Krb5;
 
 /**
  * This class maintains key-value pairs of Kerberos configurable constants
@@ -554,13 +549,44 @@ public class Config {
 		})));
 		String Line;
 		Vector<String> v = new Vector<String> ();
+                String previous = null;
 		while ((Line = br.readLine()) != null) {
-		    // ignore comments in the configuration file. 
+                    // ignore comments and blank line in the configuration file.
 		    // Comments start with #.
-                    if (!(Line.startsWith("#"))) {   
-			v.addElement(Line.trim());
+                    if (!(Line.startsWith("#") || Line.trim().isEmpty())) {
+                        String current = Line.trim();
+                        // In practice, a subsection might look like:
+                        //      EXAMPLE.COM =
+                        //      {
+                        //              kdc = kerberos.example.com
+                        //              ...
+                        //      }
+                        // Before parsed into stanza table, it needs to be
+                        // converted into formal style:
+                        //      EXAMPLE.COM = {
+                        //              kdc = kerberos.example.com
+                        //              ...
+                        //      }
+                        //
+                        // So, if a line is "{", adhere to the previous line.
+                        if (current.equals("{")) {
+                            if (previous == null) {
+                                throw new IOException(
+                                    "Config file should not start with \"{\"");
+                            }
+                            previous += " " + current;
+                        } else {
+                            if (previous != null) {
+                                v.addElement(previous);
+                            }
+                            previous = current;
+                        }
                     }
+                    }
+                if (previous != null) {
+                    v.addElement(previous);
 		}
+
 		br.close(); 
 		return v;
 	    } 
@@ -570,6 +596,7 @@ public class Config {
         }
     } 
     
+
     /**
      * Parses stanza names and values from configuration file to
      * stanzaTable (Hashtable). Hashtable key would be stanza names,
@@ -1006,40 +1033,10 @@ public class Config {
     }
 
     /**
-     * Check if need to use DNS to locate Kerberos services
-     */
-    public boolean useDNS(String name) {
-	boolean value = getDefaultBooleanValue(name, "libdefaults");
-	if (value == false) {
-	    value = getDefaultBooleanValue("dns_fallback", "libdefaults");
-	}
-	return value;
-    }
-
-    /**
-     * Check if need to use DNS to locate the KDC
-     */
-    public boolean useDNS_KDC() {
-	return useDNS("dns_lookup_kdc");
-    }
-
-    /*
-     * Check if need to use DNS to locate the Realm
-     */
-    public boolean useDNS_Realm() {
-	return useDNS("dns_lookup_realm");
-    }
-
-    /**
      * Gets default realm.
      */
-    public String getDefaultRealm() throws KrbException {
-	String realm = getDefault("default_realm", "libdefaults");
-	if ((realm == null) && useDNS_Realm()) {
-	    // use DNS to locate Kerberos realm
-	    realm = getRealmFromDNS();
-	}
-	return realm;
+    public String getDefaultRealm() {
+        return getDefault("default_realm", "libdefaults");
     }
 
     /**
@@ -1048,93 +1045,13 @@ public class Config {
      * @param realm the realm for which the master KDC is desired
      * @return the list of KDCs
      */
-    public String getKDCList(String realm) throws KrbException {
+    public String getKDCList(String realm) {
 	if (realm == null) {
 	    realm = getDefaultRealm();
 	}
 	String kdcs = getDefault("kdc", realm);
-	if ((kdcs == null) && useDNS_KDC()) {
-	    // use DNS to locate KDC
-	    kdcs = getKDCFromDNS(realm);
-	}
-	return kdcs;
-    }
-
-    /**
-     * Locate Kerberos realm using DNS
-     *
-     * @return the Kerberos realm
-     */
-    private String getRealmFromDNS() throws KrbException {
-	// use DNS to locate Kerberos realm
-	String realm = null;
-	String hostName = null;
-	try {
-	    hostName = InetAddress.getLocalHost().getHostName();
-	} catch (UnknownHostException e) {
-	    KrbException ke = new KrbException(Krb5.KRB_ERR_GENERIC,
-		"Unable to locate Kerberos realm: " + e.getMessage());
-	    ke.initCause(e);
-	    throw (ke);
-	}
-	// get the domain realm mapping from the configuration
-	String mapRealm = PrincipalName.mapHostToRealm(hostName);
-	String[] records = null;
-	String newRealm = mapRealm;
-	while ((records == null) && (newRealm != null)) {
-	    // locate DNS TXT record
-	    records = KrbServiceLocator.getKerberosService(newRealm);
-	    newRealm = Realm.parseRealmComponent(newRealm);
-	    // if no DNS TXT records found, try again using sub-realm
-	}
-	if (records == null) {
-	    // no DNS TXT records
-	    throw new KrbException(Krb5.KRB_ERR_GENERIC,
-				"Unable to locate Kerberos realm");
-	}
-	boolean found = false;
-	for (int i = 0; i < records.length; i++) {
-	    if (records[i].equals(mapRealm)) {
-		found = true;
-		realm = records[i];
-	    }
-	}
-	if (found == false) {
-	    throw new KrbException(Krb5.KRB_ERR_GENERIC,
-				"Unable to locate Kerberos realm");
-	}
-	return realm;
-    }
-
-    /**
-     * Locate KDC using DNS
-     *
-     * @param realm the realm for which the master KDC is desired
-     * @return the KDC
-     */
-    private String getKDCFromDNS(String realm) throws KrbException {
-	// use DNS to locate KDC
-	String kdcs = null;
-	String[] srvs = null;
-	// locate DNS SRV record using UDP
-	srvs = KrbServiceLocator.getKerberosService(realm, "_udp.");
-	if (srvs == null) {
-	    // locate DNS SRV record using TCP
-	    srvs = KrbServiceLocator.getKerberosService(realm, "_tcp.");
-	}
-	if (srvs == null) {
-	    // no DNS SRV records
-	    throw new KrbException(Krb5.KRB_ERR_GENERIC,
-		"Unable to locate KDC for realm " + realm);
-	}
-	for (int i = 0; i < srvs.length; i++) {
-	    String value = srvs[i];
-	    for (int j = 0; j < srvs[i].length(); j++) {
-		// filter the KDC name
-		if (value.charAt(j) == ':') {
-		    kdcs = (value.substring(0, j)).trim();
-		}
-	    }
+        if (kdcs == null) {
+            return null;
 	}
 	return kdcs;
     }

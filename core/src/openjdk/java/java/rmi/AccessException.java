@@ -34,7 +34,6 @@ package java.rmi;
  * requested by the method call.  If the method was invoked from a non-local
  * host, then an <code>AccessException</code> is thrown.
  * 
- * @version 1.19, 05/05/07
  * @author  Ann Wollrath
  * @author  Roger Riggs
  * @since   JDK1.1

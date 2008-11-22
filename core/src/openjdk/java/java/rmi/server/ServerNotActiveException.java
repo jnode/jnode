@@ -31,7 +31,6 @@ package java.rmi.server;
  * the getClientHost method is called outside of servicing a remote
  * method call.
  *
- * @version 1.20, 05/05/07
  * @author  Roger Riggs
  * @since   JDK1.1
  * @see java.rmi.server.RemoteServer#getClientHost()

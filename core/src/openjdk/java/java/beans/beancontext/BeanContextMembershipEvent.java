@@ -49,7 +49,6 @@ import java.util.Iterator;
  * </code> method. 
  *
  * @author	Laurence P. G. Cable
- * @version	1.15
  * @since	1.2
  * @see		java.beans.beancontext.BeanContext
  * @see		java.beans.beancontext.BeanContextEvent
@@ -129,8 +128,3 @@ public class BeanContextMembershipEvent extends BeanContextEvent {
     */
     protected Collection children;
 }
-
-
-
-
-

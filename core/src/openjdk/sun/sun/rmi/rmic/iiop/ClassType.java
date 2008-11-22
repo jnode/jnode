@@ -43,7 +43,6 @@ import java.io.IOException;
  * ClassType is an abstract base representing any non-special class
  * type.
  *
- * @version	1.0, 2/27/98
  * @author	Bryan Atsatt
  */
 public abstract class ClassType extends CompoundType {

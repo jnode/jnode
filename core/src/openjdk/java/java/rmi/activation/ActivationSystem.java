@@ -40,7 +40,6 @@ import java.rmi.activation.UnknownObjectException;
  * and inactive groups.
  *
  * @author 	Ann Wollrath
- * @version	1.25, 05/05/07
  * @see		Activator
  * @see		ActivationMonitor
  * @since	1.2

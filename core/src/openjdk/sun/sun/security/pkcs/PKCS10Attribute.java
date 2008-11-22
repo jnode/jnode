@@ -52,7 +52,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.29
  */
 public class PKCS10Attribute implements DerEncoder {
 

@@ -43,7 +43,6 @@ import java.util.Enumeration;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.26
  * @see CertificateException
  */
 public interface CertAttrSet<T> {

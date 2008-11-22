@@ -39,7 +39,6 @@ import sun.tools.java.*;
  * they are subject to change or removal without notice.
  *
  *   @see java.lang.reflect.Modifier
- *   @version 1.20, 07/05/05
  *   @author Robert Field
  */
 

@@ -327,7 +327,6 @@ import sun.security.util.DerOutputStream;
  * </pre>
  *
  * @author Anne Anderson
- * @version 1.11, 05/05/07
  * @since	1.4
  * @see GeneralName
  * @see GeneralNames

@@ -55,7 +55,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.30
  * @see Extension
  * @see CertAttrSet
  */
@@ -147,7 +146,7 @@ implements CertAttrSet<String> {
 	for (int i = 0; i < seq.length; i++) {
             DerValue opt = seq[i];
 
-            if (opt.isContextSpecific((byte)TAG_BEFORE) &&
+            if (opt.isContextSpecific(TAG_BEFORE) &&
                 !opt.isConstructed()) {
 	        if (notBefore != null) {
                     throw new CertificateParsingException(
@@ -157,7 +156,7 @@ implements CertAttrSet<String> {
 	        str = new DerInputStream(opt.toByteArray());
 	        notBefore = str.getGeneralizedTime();
 
-            } else if (opt.isContextSpecific((byte)TAG_AFTER) &&
+            } else if (opt.isContextSpecific(TAG_AFTER) &&
                        !opt.isConstructed()) {
 	        if (notAfter != null) {
                     throw new CertificateParsingException(

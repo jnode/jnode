@@ -42,7 +42,6 @@ import java.util.Locale;
  * </p>
  *
  * @author Laurence P. G. Cable
- * @version 1.23, 12/19/03
  * @since 1.2
  *
  * @see java.beans.Beans

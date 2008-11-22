@@ -40,7 +40,6 @@ import java.io.ByteArrayOutputStream;
  * where HMAC is on { plaintext | 16-byte token-header }
  *
  * @author Seema Malkani
- * @version 1.10, 05/05/07
  */
 
 class MicToken_v2 extends MessageToken_v2 {

@@ -38,7 +38,6 @@ import sun.rmi.runtime.Log;
  * that WeakRef objects hash and compare to each other according to the
  * object identity of their referents.
  *
- * @version 1.26, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  */
@@ -138,4 +137,3 @@ class WeakRef extends WeakReference {
 	}
     }
 }
-

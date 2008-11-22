@@ -35,7 +35,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.20
  * @see GeneralName
  * @see GeneralNames
  * @see GeneralNameInterface

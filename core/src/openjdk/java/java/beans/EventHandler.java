@@ -275,7 +275,6 @@ import sun.reflect.misc.MethodUtil;
  * @author Philip Milne
  * @author Hans Muller
  *
- * @version 1.26, 05/05/07
  */
 public class EventHandler implements InvocationHandler {
     private Object target;
@@ -309,7 +308,6 @@ public class EventHandler implements InvocationHandler {
      * @see #getEventPropertyName
      * @see #getListenerMethodName
      */
-    @ConstructorProperties({"target", "action", "eventPropertyName", "listenerMethodName"})
     public EventHandler(Object target, String action, String eventPropertyName, String listenerMethodName) {
 	this.acc = AccessController.getContext();
         this.target = target;
@@ -688,8 +686,3 @@ public class EventHandler implements InvocationHandler {
 					 eventHandler);
     }
 }
-
-
-
-
-

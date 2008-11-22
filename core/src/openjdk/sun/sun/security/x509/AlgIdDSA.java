@@ -70,7 +70,6 @@ import sun.security.util.*;
  * @see java.security.KeyFactory
  * @see java.security.spec.DSAPublicKeySpec
  *
- * @version 1.48, 05/05/07
  * @author David Brownell
  */
 public final

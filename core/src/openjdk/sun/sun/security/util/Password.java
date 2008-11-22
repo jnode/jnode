@@ -33,7 +33,6 @@ import java.util.Arrays;
 /**
  * A utility class for reading passwords
  *
- * @version 1.3
  */
 public class Password {
     /** Reads user password from given input stream. */
@@ -150,4 +149,3 @@ public class Password {
     }
     private static volatile CharsetEncoder enc;
 } 
-

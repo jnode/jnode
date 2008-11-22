@@ -83,7 +83,3 @@ public class BeanContextServiceAvailableEvent extends BeanContextEvent {
      */
     protected Class			 serviceClass;
 }
-
-
-
-

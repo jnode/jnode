@@ -92,4 +92,3 @@ public class NullEType extends EType {
 	    return cipher.clone();
     }
 }
-

@@ -60,7 +60,6 @@ import sun.security.action.GetLongAction;
  *
  * @author	Ann Wollrath
  * @author	Peter Jones
- * @version	1.26, 07/05/05
  **/
 public class DGCAckHandler {
 

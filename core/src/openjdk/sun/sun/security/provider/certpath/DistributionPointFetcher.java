@@ -47,7 +47,6 @@ import sun.security.x509.*;
  *
  * @author Andreas Sterbenz
  * @author Sean Mullan
- * @version 1.19, 05/05/07
  * @since 1.4.2
  */
 class DistributionPointFetcher {
@@ -71,7 +70,7 @@ class DistributionPointFetcher {
     public static boolean getBooleanProperty(String propName,
 	    boolean defaultValue) {
 	// if set, require value of either true or false
-	String b = (String)AccessController.doPrivileged(
+        String b = AccessController.doPrivileged(
 		new GetPropertyAction(propName));
 	if (b == null) {
 	    return defaultValue;
@@ -108,18 +107,14 @@ class DistributionPointFetcher {
      * If CRLDP support is disabled, this method always returns an
      * empty set.
      */
-    Collection<X509CRL> getCRLs(CRLSelector selector, boolean signFlag, 
+    Collection<X509CRL> getCRLs(X509CRLSelector selector, boolean signFlag,
 	PublicKey prevKey, String provider, List<CertStore> certStores, 
 	boolean[] reasonsMask, TrustAnchor anchor) throws CertStoreException 
     {
 	if (USE_CRLDP == false) {
 	    return Collections.emptySet();
 	}
-	if (selector instanceof X509CRLSelector == false) {
-	    return Collections.emptySet();
-	}
-	X509CRLSelector x509Selector = (X509CRLSelector)selector;
-	X509Certificate cert = x509Selector.getCertificateChecking();
+        X509Certificate cert = selector.getCertificateChecking();
 	if (cert == null) {
 	    return Collections.emptySet();
 	}
@@ -143,7 +138,7 @@ class DistributionPointFetcher {
 	    for (Iterator<DistributionPoint> t = points.iterator(); 
 		 t.hasNext() && !Arrays.equals(reasonsMask, ALL_REASONS); ) {
 		DistributionPoint point = t.next();
-		Collection<X509CRL> crls = getCRLs(x509Selector, certImpl, 
+                Collection<X509CRL> crls = getCRLs(selector, certImpl,
 		    point, reasonsMask, signFlag, prevKey, provider, 
 		    certStores, anchor);
 		results.addAll(crls);
@@ -168,11 +163,32 @@ class DistributionPointFetcher {
 	boolean signFlag, PublicKey prevKey, String provider, 
 	List<CertStore> certStores, TrustAnchor anchor) 
     {
-        // must have full name 
+        // check for full name
         GeneralNames fullName = point.getFullName(); 
         if (fullName == null) { 
+            // check for relative name
+            RDN relativeName = point.getRelativeName();
+            if (relativeName == null) {
             return Collections.emptySet();
         } 
+            try {
+                GeneralNames crlIssuers = point.getCRLIssuer();
+                if (crlIssuers == null) {
+                    fullName = getFullNames
+                        ((X500Name) certImpl.getIssuerDN(), relativeName);
+                } else {
+                    // should only be one CRL Issuer
+                    if (crlIssuers.size() != 1) {
+                        return Collections.emptySet();
+                    } else {
+                        fullName = getFullNames
+                            ((X500Name) crlIssuers.get(0).getName(), relativeName);
+                    }
+                }
+            } catch (IOException ioe) {
+                return Collections.emptySet();
+            }
+        }
 	Collection<X509CRL> possibleCRLs = new ArrayList<X509CRL>();
 	Collection<X509CRL> crls = new ArrayList<X509CRL>(2);
 	for (Iterator<GeneralName> t = fullName.iterator(); t.hasNext(); ) {
@@ -483,12 +499,12 @@ class DistributionPointFetcher {
 	        // set interim reasons mask to the value of
 	        // onlySomeReasons in the IDP (and clone it since we may
 	        // modify it)
-	        interimReasonsMask = (boolean[]) reasons.getFlags().clone();
+                interimReasonsMask = reasons.getFlags().clone();
 	    }
 	} else if (idpExt == null || reasons == null) {
 	    if (pointReasonFlags != null) {
 		// set interim reasons mask to the value of DP reasons
-	        interimReasonsMask = (boolean[]) pointReasonFlags.clone();
+                interimReasonsMask = pointReasonFlags.clone();
 	    } else {
 		// set interim reasons mask to the special value all-reasons
 		interimReasonsMask = new boolean[9];
@@ -580,7 +596,7 @@ class DistributionPointFetcher {
 	throws IOException {
         List<RDN> rdns = new ArrayList<RDN>(issuer.rdns());
         rdns.add(rdn);
-        X500Name fullName = new X500Name(((RDN[])rdns.toArray(new RDN[0])));
+        X500Name fullName = new X500Name(rdns.toArray(new RDN[0]));
         GeneralNames fullNames = new GeneralNames();
         fullNames.add(new GeneralName(fullName));
 	return fullNames;

@@ -878,4 +878,3 @@ public final class UCharacter
         return PROPERTY_INITIAL_VALUE_;
     }
 }
-

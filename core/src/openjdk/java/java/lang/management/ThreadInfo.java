@@ -85,7 +85,6 @@ import static java.lang.Thread.State.*;
  * @see ThreadMXBean#dumpAllThreads
  *
  * @author  Mandy Chung
- * @version 1.31, 05/05/07 
  * @since   1.5
  */
 

@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * @version     1.0
  * @author        Ram Viswanadha
  */
 

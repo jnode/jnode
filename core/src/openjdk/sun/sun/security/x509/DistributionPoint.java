@@ -90,7 +90,6 @@ import sun.security.util.DerValue;
  *
  * @author Anne Anderson
  * @author Andreas Sterbenz
- * @version 1.11, 05/05/07
  * @since 1.4.2
  * @see CRLDistributionPointsExtension
  */

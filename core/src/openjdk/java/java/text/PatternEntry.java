@@ -45,7 +45,6 @@ import java.lang.Character;
  * This is to be used with MergeCollation for adding patterns to an
  * existing rule table.
  * @see        MergeCollation
- * @version    1.32 05/05/07
  * @author     Mark Davis, Helena Shih
  */
 

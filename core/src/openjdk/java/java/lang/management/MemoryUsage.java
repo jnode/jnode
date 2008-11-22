@@ -103,7 +103,6 @@ import sun.management.MemoryUsageCompositeData;
  * with attributes as specified in the {@link #from from} method. 
  *
  * @author   Mandy Chung
- * @version 1.23, 05/05/07
  * @since   1.5
  */
 public class MemoryUsage {

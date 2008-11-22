@@ -48,7 +48,6 @@ import java.security.AccessController;
  *   Oid is 1.3.6.1.4.1.42.2.26.1.2]
  *
  * @author Mayank Upadhyay
- * @version 1.17, 05/05/07
  */
 
 public final class SunProvider extends Provider {

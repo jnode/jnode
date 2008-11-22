@@ -29,7 +29,6 @@ package java.rmi;
  * A <code>ConnectException</code> is thrown if a connection is refused
  * to the remote host for a remote method call.
  * 
- * @version 1.20, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

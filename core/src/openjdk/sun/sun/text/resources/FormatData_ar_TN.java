@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_ar_TN.java	1.22 07/05/05
- */
+
 
 /*
  * (C) Copyright IBM Corp. 1998 - All Rights Reserved

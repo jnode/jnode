@@ -74,7 +74,6 @@ import sun.security.util.ObjectIdentifier;
  * <p>
  * @author Anne Anderson
  * @author Andreas Sterbenz
- * @version 1.13, 05/05/07
  * @since 1.4.2
  * @see DistributionPoint
  * @see Extension

@@ -51,7 +51,6 @@ import java.util.Properties;
  * <li> the group's initialization data (in a
  * <code>java.rmi.MarshalledObject</code>)</ul><p>
  *
- * @version	1.37, 05/05/07
  * @author	Ann Wollrath
  * @since	1.2
  * @see		ActivationGroup

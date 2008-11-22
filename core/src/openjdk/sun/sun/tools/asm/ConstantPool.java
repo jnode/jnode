@@ -174,4 +174,3 @@ class ConstantPool implements RuntimeConstants {
     }
 
 }
-

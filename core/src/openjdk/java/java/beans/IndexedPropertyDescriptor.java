@@ -41,9 +41,9 @@ import java.lang.reflect.Method;
 
 public class IndexedPropertyDescriptor extends PropertyDescriptor {
 
-    private Reference indexedPropertyTypeRef;
-    private Reference indexedReadMethodRef;
-    private Reference indexedWriteMethodRef;
+    private Reference<Class> indexedPropertyTypeRef;
+    private Reference<Method> indexedReadMethodRef;
+    private Reference<Method> indexedWriteMethodRef;
 
     private String indexedReadMethodName;
     private String indexedWriteMethodName;
@@ -66,10 +66,10 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
     public IndexedPropertyDescriptor(String propertyName, Class<?> beanClass)
 		throws IntrospectionException {
 	this(propertyName, beanClass,
-			 "get" + capitalize(propertyName),
-			 "set" + capitalize(propertyName),
-			 "get" + capitalize(propertyName),
-			 "set" + capitalize(propertyName));
+             Introspector.GET_PREFIX + NameGenerator.capitalize(propertyName),
+             Introspector.SET_PREFIX + NameGenerator.capitalize(propertyName),
+             Introspector.GET_PREFIX + NameGenerator.capitalize(propertyName),
+             Introspector.SET_PREFIX + NameGenerator.capitalize(propertyName));
     }
 
     /**
@@ -143,6 +143,30 @@ perty.
     }
     
     /**
+     * Creates <code>PropertyDescriptor</code> for the specified bean
+     * with the specified name and methods to read/write the property value.
+     *
+     * @param bean          the type of the target bean
+     * @param base          the base name of the property (the rest of the method name)
+     * @param read          the method used for reading the property value
+     * @param write         the method used for writing the property value
+     * @param readIndexed   the method used for reading an indexed property value
+     * @param writeIndexed  the method used for writing an indexed property value
+     * @exception IntrospectionException if an exception occurs during introspection
+     *
+     * @since 1.7
+     */
+    IndexedPropertyDescriptor(Class<?> bean, String base, Method read, Method write, Method readIndexed, Method writeIndexed) throws IntrospectionException {
+        super(bean, base, read, write);
+
+        setIndexedReadMethod0(readIndexed);
+        setIndexedWriteMethod0(writeIndexed);
+
+        // Type checking
+        setIndexedPropertyType(findIndexedPropertyType(readIndexed, writeIndexed));
+    }
+
+    /**
      * Gets the method that should be used to read an indexed
      * property value.
      *
@@ -162,9 +186,9 @@ perty.
 	    if (indexedReadMethodName == null) {
 		Class type = getIndexedPropertyType0();
 		if (type == boolean.class || type == null) {
-		    indexedReadMethodName = "is" + getBaseName();
+                    indexedReadMethodName = Introspector.IS_PREFIX + getBaseName();
 		} else {
-		    indexedReadMethodName = "get" + getBaseName();
+                    indexedReadMethodName = Introspector.GET_PREFIX + getBaseName();
 		}
 	    }
 	    
@@ -174,7 +198,7 @@ perty.
 							1, args);
 	    if (indexedReadMethod == null) {
 		// no "is" method, so look for a "get" method.
-		indexedReadMethodName = "get" + getBaseName();
+                indexedReadMethodName = Introspector.GET_PREFIX + getBaseName();
 		indexedReadMethod = Introspector.findMethod(cls, indexedReadMethodName, 
 							    1, args);
 	    }
@@ -206,7 +230,7 @@ perty.
 	setClass0(readMethod.getDeclaringClass());
 
 	indexedReadMethodName = readMethod.getName();
-	indexedReadMethodRef = createReference(readMethod);
+        this.indexedReadMethodRef = getSoftReference(readMethod);
     }
 
 
@@ -245,7 +269,7 @@ perty.
 	    }
 		
 	    if (indexedWriteMethodName == null) {
-		indexedWriteMethodName = "set" + getBaseName();
+                indexedWriteMethodName = Introspector.SET_PREFIX + getBaseName();
 	    }
 	    indexedWriteMethod = Introspector.findMethod(cls, indexedWriteMethodName, 
 			 2, (type == null) ? null : new Class[] { int.class, type });
@@ -278,7 +302,7 @@ perty.
 	setClass0(writeMethod.getDeclaringClass());
 
 	indexedWriteMethodName = writeMethod.getName();
-	indexedWriteMethodRef = createReference(writeMethod);
+        this.indexedWriteMethodRef = getSoftReference(writeMethod);
     }
 
     /**
@@ -305,19 +329,25 @@ perty.
     // Private methods which set get/set the Reference objects
 
     private void setIndexedPropertyType(Class type) {
-	indexedPropertyTypeRef = createReference(type);
+        this.indexedPropertyTypeRef = getWeakReference(type);
     }
 
     private Class getIndexedPropertyType0() {
-	return (Class)getObject(indexedPropertyTypeRef);
+        return (this.indexedPropertyTypeRef != null)
+                ? this.indexedPropertyTypeRef.get()
+                : null;
     }
 
     private Method getIndexedReadMethod0() {
-	return (Method)getObject(indexedReadMethodRef);
+        return (this.indexedReadMethodRef != null)
+                ? this.indexedReadMethodRef.get()
+                : null;
     }
 
     private Method getIndexedWriteMethod0() {
-	return (Method)getObject(indexedWriteMethodRef);
+        return (this.indexedWriteMethodRef != null)
+                ? this.indexedWriteMethodRef.get()
+                : null;
     }
 
     private Class findIndexedPropertyType(Method indexedReadMethod,
@@ -326,20 +356,20 @@ perty.
 	Class indexedPropertyType = null;
 
 	if (indexedReadMethod != null) {
-	    Class params[] = indexedReadMethod.getParameterTypes();
+            Class params[] = getParameterTypes(getClass0(), indexedReadMethod);
 	    if (params.length != 1) {
 		throw new IntrospectionException("bad indexed read method arg count");
 	    }
 	    if (params[0] != Integer.TYPE) {
 		throw new IntrospectionException("non int index to indexed read method");
 	    }
-	    indexedPropertyType = indexedReadMethod.getReturnType();
+            indexedPropertyType = getReturnType(getClass0(), indexedReadMethod);
 	    if (indexedPropertyType == Void.TYPE) {
 		throw new IntrospectionException("indexed read method returns void");
 	    }
 	}
 	if (indexedWriteMethod != null) {
-	    Class params[] = indexedWriteMethod.getParameterTypes();
+            Class params[] = getParameterTypes(getClass0(), indexedWriteMethod);
 	    if (params.length != 2) {
 		throw new IntrospectionException("bad indexed write method arg count");
 	    }

@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_ar_LB.java	1.23 07/05/05
- */
+
 
 /*
  * (C) Copyright IBM Corp. 1998 - All Rights Reserved

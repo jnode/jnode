@@ -169,4 +169,3 @@ public class SQLTimeoutException extends SQLTransientException {
 
     private static final long serialVersionUID = -4487171280562520262L;
 }
-

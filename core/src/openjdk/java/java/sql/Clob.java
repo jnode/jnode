@@ -346,4 +346,3 @@ public interface Clob {
     Reader getCharacterStream(long pos, long length) throws SQLException;
 
 }
-

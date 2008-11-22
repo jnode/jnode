@@ -79,7 +79,6 @@ import sun.security.util.ResourcesMgr;
  * principal is and what the code source is and returns an appropriate
  * Permissions object. 
  *
- * @version 1.28, 01/14/00
  * @author Roland Schemers
  * @author Ram Marti
  *
@@ -334,7 +333,7 @@ public class PolicyParser {
 
 	// write "grant" entries
 	while (enum_.hasMoreElements()) {
-	    GrantEntry ge = (GrantEntry) enum_.nextElement();
+            GrantEntry ge = enum_.nextElement();
 	    ge.write(out);
 	    out.println();
 	}

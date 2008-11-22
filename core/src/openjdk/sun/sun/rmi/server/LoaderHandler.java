@@ -65,7 +65,6 @@ import sun.security.action.GetPropertyAction;
  * @author	Ann Wollrath
  * @author	Peter Jones
  * @author	Laird Dornin
- * @version	1.50, 07/05/05
  */
 public final class LoaderHandler {
 

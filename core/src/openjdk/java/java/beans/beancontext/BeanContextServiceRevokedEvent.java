@@ -96,9 +96,3 @@ public class BeanContextServiceRevokedEvent extends BeanContextEvent {
     protected Class			 serviceClass;
     private   boolean			 invalidateRefs;
 }
-
-
-
-
-
-

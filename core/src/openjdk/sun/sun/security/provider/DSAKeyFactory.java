@@ -49,7 +49,6 @@ import sun.security.action.GetPropertyAction;
  *
  * @author Jan Luehe
  *
- * @version 1.27, 05/05/07
  *
  * @since 1.2
  */
@@ -265,8 +264,7 @@ public class DSAKeyFactory extends KeyFactorySpi {
 		}
 		// Convert key to spec
 		DSAPublicKeySpec dsaPubKeySpec
-		    = (DSAPublicKeySpec)engineGetKeySpec
-		    (key, DSAPublicKeySpec.class);
+                    = engineGetKeySpec(key, DSAPublicKeySpec.class);
 		// Create key from spec, and return it
 		return engineGeneratePublic(dsaPubKeySpec);
 
@@ -277,8 +275,7 @@ public class DSAKeyFactory extends KeyFactorySpi {
 		}
 		// Convert key to spec
 		DSAPrivateKeySpec dsaPrivKeySpec
-		    = (DSAPrivateKeySpec)engineGetKeySpec
-		    (key, DSAPrivateKeySpec.class);
+                    = engineGetKeySpec(key, DSAPrivateKeySpec.class);
 		// Create key from spec, and return it
 		return engineGeneratePrivate(dsaPrivKeySpec);
 

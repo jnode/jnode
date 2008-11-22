@@ -100,7 +100,6 @@ import sun.rmi.server.UnicastServerRef2;
  * </ul>
  * </ul>
  *
- * @version 1.39, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  * @since   JDK1.1

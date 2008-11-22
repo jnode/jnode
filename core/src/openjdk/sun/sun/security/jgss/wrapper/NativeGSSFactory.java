@@ -44,12 +44,12 @@ import sun.security.jgss.spi.*;
  * JGSS plugin for generic mechanisms provided through native GSS framework.
  *
  * @author Valerie Peng
- * @version 1.16, 05/05/07
  */
 
 public final class NativeGSSFactory implements MechanismFactory {
 
     GSSLibStub cStub = null;
+    private final int caller;
 
     private GSSCredElement getCredFromSubject(GSSNameElement name,
 					      boolean initiate)
@@ -60,7 +60,7 @@ public final class NativeGSSFactory implements MechanismFactory {
 
 	// If Subject is present but no native creds available 
 	if (creds != null && creds.isEmpty()) { 
-	    if (GSSUtil.useSubjectCredsOnly()) { 
+            if (GSSUtil.useSubjectCredsOnly(caller)) {
 		throw new GSSException(GSSException.NO_CRED); 
 	    }
 	}
@@ -75,7 +75,7 @@ public final class NativeGSSFactory implements MechanismFactory {
     }
 
     public NativeGSSFactory(int caller) {
-	// Ignore caller at the moment
+        this.caller = caller;
 	// Have to call setMech(Oid) explicitly before calling other
 	// methods. Otherwise, NPE may be thrown unexpectantly
     }

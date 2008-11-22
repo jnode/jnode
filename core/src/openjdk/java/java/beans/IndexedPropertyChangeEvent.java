@@ -37,7 +37,6 @@ package java.beans;
  * arbitrary set of if its properties have changed.  In this case the
  * old and new values should also be null.
  *
- * @version 1.11 05/05/07
  * @since 1.5
  * @author Mark Davidson
  */
@@ -73,4 +72,3 @@ public class IndexedPropertyChangeEvent extends PropertyChangeEvent {
 	return index;
     }
 }
-

@@ -41,7 +41,6 @@ import sun.security.jgss.*;
  *
  *
  * @author Seema Malkani
- * @version 1.8, 05/05/07
  * @since 1.6
  */
 

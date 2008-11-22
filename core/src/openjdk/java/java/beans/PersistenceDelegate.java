@@ -82,7 +82,6 @@ package java.beans;
  *
  * @since 1.4
  *
- * @version 1.19 05/05/07
  * @author Philip Milne
  */
 

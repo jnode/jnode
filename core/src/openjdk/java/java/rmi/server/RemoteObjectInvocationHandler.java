@@ -47,7 +47,6 @@ import sun.rmi.server.WeakClassHashMap;
  * or {@link Activatable} has an instance of this class as that proxy's
  * invocation handler.
  *
- * @version 1.11, 07/05/05
  * @author  Ann Wollrath
  * @since   1.5
  **/

@@ -38,7 +38,6 @@ import sun.security.action.*;
  * Collection of static utility methods related to KeyStores.
  *
  * @author Andreas Sterbenz
- * @version 1.12, 05/05/07
  */
 public class KeyStores {
 

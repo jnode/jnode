@@ -41,7 +41,6 @@ import sun.tools.java.ClassDefinition;
  * NCInterfaceType represents any non-special, non-conforming interface.
  * <p>
  * The static forNCInterface(...) method must be used to obtain an instance.
- * @version	1.0, 2/25/98
  * @author	Bryan Atsatt
  */
 public class NCInterfaceType extends InterfaceType {

@@ -50,10 +50,10 @@ public class FormatData_en_NZ extends ListResourceBundle {
         return new Object[][] {
             { "DateTimePatterns",
                 new String[] {
-                    "hh:mm:ss a z", // full time pattern
-                    "H:mm:ss", // long time pattern
-                    "HH:mm:ss", // medium time pattern
-                    "HH:mm", // short time pattern
+                    "h:mm:ss a z", // full time pattern
+                    "h:mm:ss a", // long time pattern
+                    "h:mm:ss a", // medium time pattern
+                    "h:mm a", // short time pattern
                     "EEEE, d MMMM yyyy", // full date pattern
                     "d MMMM yyyy", // long date pattern
                     "d/MM/yyyy", // medium date pattern

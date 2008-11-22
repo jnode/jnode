@@ -43,7 +43,6 @@ package java.rmi;
  * a remote object's stub when it is unmarshalled.
  * </ul>
  * 
- * @version 1.19, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

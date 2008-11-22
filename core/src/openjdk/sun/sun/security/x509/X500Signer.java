@@ -42,7 +42,6 @@ import java.security.NoSuchAlgorithmException;
  * <P><em>The X.509 certificate chain is temporarily not associated with
  * the signer, but this omission will be resolved.</em>
  *
- * @version 1.33
  *
  * @author David Brownell
  * @author Amit Kapoor

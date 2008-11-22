@@ -42,7 +42,6 @@ import sun.security.jgss.spi.GSSNameSpi;
  * This class is essentially a wrapper class for the gss_name_t
  * structure of the native GSS library.
  * @author Valerie Peng
- * @version 1.16, 05/05/07
  * @since 1.6
  */
 

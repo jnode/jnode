@@ -531,4 +531,3 @@ public final class LineBreakMeasurer {
         breakIter.setText(charIter);
     }
 }
-

@@ -25,14 +25,11 @@
 
 package java.sql;
 
-// Comment below before mustang integration 
-import sun.misc.Service;
-
-
-//Uncomment below before mustang integration
-//import java.util.Service;
-
 import java.util.Iterator;
+import java.sql.Driver;
+import java.util.ServiceLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 
 /**
@@ -503,25 +500,48 @@ public class DriverManager {
 
     private static void loadInitialDrivers() {
         String drivers;
-	
         try {
-	    drivers = (String) java.security.AccessController.doPrivileged(
-		new sun.security.action.GetPropertyAction("jdbc.drivers"));
+            drivers = (String)  AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    return System.getProperty("jdbc.drivers");
+                }
+            });
         } catch (Exception ex) {
             drivers = null;
         }
-        
-        // If the driver is packaged as a Service Provider,
-        // load it.
-        
+        // If the driver is packaged as a Service Provider, load it.
         // Get all the drivers through the classloader 
         // exposed as a java.sql.Driver.class service.
-	
-	 DriverService ds = new DriverService();
+        // ServiceLoader.load() replaces the sun.misc.Providers()
 
-	 // Have all the privileges to get all the 
-	 // implementation of java.sql.Driver
-	 java.security.AccessController.doPrivileged(ds);		
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+	
+                ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
+                Iterator driversIterator = loadedDrivers.iterator();
+
+                /* Load these drivers, so that they can be instantiated.
+                 * It may be the case that the driver class may not be there
+                 * i.e. there may be a packaged driver with the service class
+                 * as implementation of java.sql.Driver but the actual class
+                 * may be missing. In that case a java.util.ServiceConfigurationError
+                 * will be thrown at runtime by the VM trying to locate
+                 * and load the service.
+                 *
+                 * Adding a try catch block to catch those runtime errors
+                 * if driver not available in classpath but it's
+                 * packaged as service and that service is there in classpath.
+                 */
+                try{
+                    while(driversIterator.hasNext()) {
+                        println(" Loading done by the java.util.ServiceLoader :  "+driversIterator.next());
+                    }
+                } catch(Throwable t) {
+                // Do nothing
+                }
+                return null;
+            }
+        });
 	        
          println("DriverManager.initialize: jdbc.drivers = " + drivers);
         if (drivers == null) {
@@ -651,43 +671,6 @@ public class DriverManager {
     private static native ClassLoader getCallerClassLoader();
 
 }
-
-// DriverService is a package-private support class.    
-class DriverService implements java.security.PrivilegedAction {
-        Iterator ps = null;
-	public DriverService() {};
-        public Object run() {
-
-	// uncomment the followin line before mustang integration 	
-        // Service s = Service.lookup(java.sql.Driver.class);
-	// ps = s.iterator();
-
-	ps = Service.providers(java.sql.Driver.class);
-
-	/* Load these drivers, so that they can be instantiated. 
-	 * It may be the case that the driver class may not be there
-         * i.e. there may be a packaged driver with the service class
-         * as implementation of java.sql.Driver but the actual class
-         * may be missing. In that case a sun.misc.ServiceConfigurationError
-         * will be thrown at runtime by the VM trying to locate 
-	 * and load the service.
-         * 
-	 * Adding a try catch block to catch those runtime errors
-         * if driver not available in classpath but it's 
-	 * packaged as service and that service is there in classpath.
-	 */
-		
-	try {
-           while (ps.hasNext()) {
-               ps.next();
-           } // end while
-	} catch(Throwable t) {
-	    // Do nothing
-	}
-        return null;
-    } //end run
-
-} //end DriverService
 
 // DriverInfo is a package-private support class.
 class DriverInfo {

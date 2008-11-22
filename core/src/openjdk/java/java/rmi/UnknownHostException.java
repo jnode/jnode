@@ -30,7 +30,6 @@ package java.rmi;
  * <code>java.net.UnknownHostException</code> occurs while creating
  * a connection to the remote host for a remote method call.
  * 
- * @version 1.20, 05/05/07
  * @since   JDK1.1
  */
 public class UnknownHostException extends RemoteException {

@@ -64,7 +64,6 @@ import java.rmi.server.UID;
  * this method both registers and exports the object. </ul>
  *
  * @author	Ann Wollrath
- * @version	1.37, 07/05/05
  * @see		Activatable
  * @since	1.2
  */

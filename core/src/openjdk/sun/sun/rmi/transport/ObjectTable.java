@@ -44,7 +44,6 @@ import sun.security.action.GetLongAction;
  * This table maps object ids to remote object targets in this address
  * space.
  *
- * @version 1.39, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  */

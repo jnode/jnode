@@ -92,7 +92,6 @@ import sun.security.util.DerValue;
  *
  * @author Jan Luehe
  *
- * @version 1.31, 05/05/07
  *
  * @see java.security.KeyStore
  * @see JavaKeyStore
@@ -340,4 +339,3 @@ final class KeyProtector {
 	}
     }
 }
-

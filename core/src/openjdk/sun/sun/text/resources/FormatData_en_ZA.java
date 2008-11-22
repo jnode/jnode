@@ -57,14 +57,14 @@ public class FormatData_en_ZA extends ListResourceBundle {
             },
             { "DateTimePatterns",
                 new String[] {
-                    "hh:mm:ss a", // full time pattern
-                    "hh:mm:ss", // long time pattern
-                    "hh:mm:ss", // medium time pattern
-                    "hh:mm", // short time pattern
-                    "dd MMMM yyyy", // full date pattern
+                    "h:mm:ss a", // full time pattern
+                    "h:mm:ss a", // long time pattern
+                    "h:mm:ss a", // medium time pattern
+                    "h:mm a", // short time pattern
+                    "EEEE dd MMMM yyyy", // full date pattern
                     "dd MMMM yyyy", // long date pattern
-                    "yyyy/MM/dd", // medium date pattern
-                    "yy/MM/dd", // short date pattern
+                    "dd MMM yyyy", // medium date pattern
+                    "yyyy/MM/dd", // short date pattern
                     "{1} {0}" // date-time pattern
                 }
             }
