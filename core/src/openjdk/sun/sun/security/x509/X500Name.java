@@ -122,7 +122,6 @@ import javax.security.auth.x500.X500Principal;
  * @author David Brownell
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.82, 05/05/07
  * @see GeneralName
  * @see GeneralNames
  * @see GeneralNameInterface
@@ -277,7 +276,7 @@ public class X500Name implements GeneralNameInterface, Principal {
         if (rdnArray == null) {
             names = new RDN[0];
 	} else {
-	    names = (RDN[])rdnArray.clone();
+            names = rdnArray.clone();
 	    for (int i = 0; i < names.length; i++) {
 		if (names[i] == null) {
 		    throw new IOException("Cannot create an X500Name");
@@ -855,7 +854,7 @@ public class X500Name implements GeneralNameInterface, Principal {
      * @return the DER encoded byte array of this name.
      */
     public byte[] getEncoded() throws IOException {
-	return (byte[])getEncodedInternal().clone();
+        return getEncodedInternal().clone();
     }
 
     /*
@@ -1441,4 +1440,3 @@ public class X500Name implements GeneralNameInterface, Principal {
     }
     
 }
-

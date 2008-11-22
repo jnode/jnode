@@ -36,7 +36,6 @@ import java.security.GeneralSecurityException;
  * This class encapsulates the checksum type for HMAC RC4
  *
  * @author Seema Malkani
- * @version 1.7, 05/05/07
  */
 
 public class HmacMd5ArcFourCksumType extends CksumType {

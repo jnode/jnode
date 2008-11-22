@@ -42,7 +42,6 @@ import javax.security.auth.x500.X500Principal;
  * in case of failures.
  *
  * @author Andreas Sterbenz
- * @version 1.18, 05/05/07
  */
 public final class PKIXValidator extends Validator {
 

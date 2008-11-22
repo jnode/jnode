@@ -63,7 +63,6 @@ import sun.security.action.GetBooleanAction;
  * behavior for remote objects exported with the "UnicastRef" reference
  * type.
  *
- * @version 1.44, 07/05/05
  * @author  Ann Wollrath
  * @author  Roger Riggs
  * @author  Peter Jones

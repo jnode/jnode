@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)FileCredentialsCache.java	1.30 07/05/05
  * ===========================================================================
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  * 
@@ -53,7 +52,6 @@ import java.lang.reflect.*;
  *
  * @author Yanni Zhang
  * @author Ram Marti
- * @version 1.00
  */
 
 public class FileCredentialsCache extends CredentialsCache

@@ -39,7 +39,6 @@ import sun.security.util.*;
  * </pre>
  * </p>
  *
- * @version 1.24, 05/05/07
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra

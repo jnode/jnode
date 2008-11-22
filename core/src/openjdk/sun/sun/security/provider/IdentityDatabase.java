@@ -36,7 +36,6 @@ import java.security.*;
  * @see Identity
  * @see Key
  *
- * @version	1.52, 05/05/07
  * @author Benjamin Renaud
  */
 public

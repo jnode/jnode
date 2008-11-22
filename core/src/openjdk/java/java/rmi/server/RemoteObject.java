@@ -39,7 +39,6 @@ import sun.rmi.server.Util;
  * @author	Ann Wollrath
  * @author	Laird Dornin
  * @author	Peter Jones
- * @version	1.40, 07/05/05
  * @since	JDK1.1
  */
 public abstract class RemoteObject implements Remote, java.io.Serializable {

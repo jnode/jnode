@@ -60,7 +60,6 @@ import sun.security.pkcs.PKCS9Attribute;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.33
  * @see Extension
  * @see CertAttrSet
  */
@@ -502,7 +501,7 @@ implements CertAttrSet<String>, Cloneable {
 	if (excluded != null && excluded.size() > 0) {
 	
 	    for (int i = 0; i < excluded.size(); i++) {
-		GeneralSubtree gs = (GeneralSubtree)(excluded.get(i));
+                GeneralSubtree gs = excluded.get(i);
 		if (gs == null)
 		    continue;
 		GeneralName gn = gs.getName();
@@ -532,7 +531,7 @@ implements CertAttrSet<String>, Cloneable {
 	    boolean sameType = false;
 
 	    for (int i = 0; i < permitted.size(); i++) {
-		GeneralSubtree gs = (GeneralSubtree)(permitted.get(i));
+                GeneralSubtree gs = permitted.get(i);
 		if (gs == null)
 		    continue;
 		GeneralName gn = gs.getName();

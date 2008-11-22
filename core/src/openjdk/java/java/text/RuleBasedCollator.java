@@ -234,7 +234,6 @@ import java.util.Locale;
  *
  * @see        Collator
  * @see        CollationElementIterator
- * @version    1.25 07/24/98
  * @author     Helena Shih, Laura Werner, Richard Gillam
  */
 public class RuleBasedCollator extends Collator{
@@ -749,4 +748,3 @@ public class RuleBasedCollator extends Collator{
     private CollationElementIterator sourceCursor = null;
     private CollationElementIterator targetCursor = null;
 }
-

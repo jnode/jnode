@@ -23,7 +23,6 @@
  * have any questions.
  */
 /*
-* @(#)LineMetrics.java	1.4 98/09/21
 */
 
 package java.awt.font;

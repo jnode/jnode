@@ -42,7 +42,6 @@ import sun.security.pkcs.*;
  * <a href="http://www.ietf.org/rfc/rfc3161.txt">RFC 3161</a>.
  * 
  * @since 1.5
- * @version 1.10, 05/05/07
  * @author Vincent Ryan
  */
 

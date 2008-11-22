@@ -36,7 +36,6 @@ import java.util.Set;
  * An object that encapsualtes the parameter list of a MimeType
  * as defined in RFC 2045 and 2046.
  *
- * @version 1.23, 05/05/07
  * @author jeff.dunn@eng.sun.com
  */
 class MimeTypeParameterList implements Cloneable {

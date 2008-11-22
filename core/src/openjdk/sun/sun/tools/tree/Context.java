@@ -859,4 +859,3 @@ class ContextEnvironment extends Environment {
 	return ctx.resolveName(innerEnv, name);
     }
 }
-

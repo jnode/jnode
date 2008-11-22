@@ -47,7 +47,6 @@ import sun.security.util.DerOutputStream;
  *
  * @author Benjamin Renaud 
  *
- * @version 1.62, 12/19/03
  *
  * @see DSAPrivateKey
  * @see AlgIdDSA
@@ -119,8 +118,7 @@ implements java.security.interfaces.DSAPublicKey, Serializable {
 		if (algParams == null) {
 		    return null;
 		}
-		paramSpec = (DSAParameterSpec)algParams.getParameterSpec
-		    (DSAParameterSpec.class);
+                paramSpec = algParams.getParameterSpec(DSAParameterSpec.class);
 		return (DSAParams)paramSpec;
 	    }
 	} catch (InvalidParameterSpecException e) {

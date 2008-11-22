@@ -38,7 +38,6 @@ import java.security.InvalidKeyException;
  *
  * See the comments in DSAKeyFactory, 4532506, and 6232513.
  *
- * @version 1.8, 05/05/07
  */
 
 public final class DSAPublicKeyImpl extends DSAPublicKey {

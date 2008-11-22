@@ -55,7 +55,6 @@ import java.util.Locale;
  * </p>
  *
  * @author Laurence P. G. Cable
- * @version 1.31, 05/05/07
  * @since 1.2
  */
 

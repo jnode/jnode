@@ -70,7 +70,6 @@ import sun.misc.HexDumpEncoder;
  * </pre>
  *
  * @author Hemma Prafullchandra
- * @version 1.34 05/05/07
  */
 
 public class X509CRLEntryImpl extends X509CRLEntry {
@@ -196,9 +195,10 @@ public class X509CRLEntryImpl extends X509CRLEntry {
     public byte[] getEncoded() throws CRLException {
         if (revokedCert == null)
             this.encode(new DerOutputStream());
-        return (byte[])revokedCert.clone();
+        return revokedCert.clone();
     }
 
+    @Override
     public X500Principal getCertificateIssuer() {
 	return certIssuer;
     }
@@ -228,7 +228,7 @@ public class X509CRLEntryImpl extends X509CRLEntry {
      * @return the revocation date.
      */
     public Date getRevocationDate() {
-        return (new Date(revocationDate.getTime()));
+        return new Date(revocationDate.getTime());
     }
 
     /**
@@ -250,6 +250,7 @@ public class X509CRLEntryImpl extends X509CRLEntry {
      *
      * @return value of this revoked certificate in a printable form.
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 

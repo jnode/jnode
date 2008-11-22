@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_ca_ES.java	1.24 07/05/05
- */
+
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
@@ -62,4 +60,3 @@ public class FormatData_ca_ES extends ListResourceBundle {
         };
     }
 }
-

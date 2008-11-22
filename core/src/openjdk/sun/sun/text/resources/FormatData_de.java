@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)FormatData_de.java	1.31 07/05/05
- */
+
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
@@ -131,7 +129,7 @@ public class FormatData_de extends ListResourceBundle {
             },
             { "DateTimePatterns",
                 new String[] {
-                    "H.mm' Uhr 'z", // full time pattern
+                    "HH:mm' Uhr 'z", // full time pattern
                     "HH:mm:ss z", // long time pattern
                     "HH:mm:ss", // medium time pattern
                     "HH:mm", // short time pattern

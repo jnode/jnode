@@ -44,7 +44,6 @@ import java.security.PrivilegedActionException;
  *
  * @author Mayank Upadhyay
  * @author Ram Marti 
- * @version 1.32, 05/05/07
  * @since 1.4
  */
 
@@ -311,7 +310,7 @@ public class Krb5InitCredential
 	throws GSSException {
 
 	String realm = null;
-	final String clientPrincipal;
+        final String clientPrincipal, tgsPrincipal = null;
 
 	/*
 	 * Find the TGT for the realm that the client is in. If the client
@@ -334,9 +333,6 @@ public class Krb5InitCredential
 		throw ge;
 	    }
 	}
-
-	final String tgsPrincipal = new String("krbtgt/" + realm + "@" + realm);
-	// System.out.println("Will look for ticket for: " + tgsPrincipal);
 
 	final AccessControlContext acc = AccessController.getContext();
         

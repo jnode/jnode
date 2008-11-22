@@ -36,7 +36,6 @@ import sun.rmi.runtime.Log;
  * available) are provided abstractly by <code>RemoteServer</code> and
  * concretely by its subclass(es).
  *
- * @version 1.39, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

@@ -122,18 +122,7 @@ public class Main{
 	for (int i = 0 ; i < argv.length ; i++) {
 	    String arg = argv[i];
 	    if (arg.startsWith("-")) {
-		if (arg.equals("-Xold")) {
-		    String[] oldjpargs = new String[(argv.length)-1];
-		    int l = 0;
-		    for(int k = 0; k < argv.length; k++){
-			if(!(argv[k].equals("-Xold"))){
-			    oldjpargs[l] = argv[k];
-			    l++;
-			}
-		    }
-		    sun.tools.javap.oldjavap.JavaP.main(oldjpargs);
-		    
-		} else if (arg.equals("-l")) {
+                if (arg.equals("-l")) {
 		    env.showLineAndLocal = true;
 		} else if (arg.equals("-private") || arg.equals("-p")) {
 		    env.showAccess = env.PRIVATE;
@@ -225,12 +214,3 @@ public class Main{
 	}
     }
 }
-
-
-	
-
-
-    
-   
-
-   

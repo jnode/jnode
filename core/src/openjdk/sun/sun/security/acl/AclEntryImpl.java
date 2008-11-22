@@ -179,5 +179,3 @@ public class AclEntryImpl implements AclEntry {
 	return user;
     }
 }
-
-

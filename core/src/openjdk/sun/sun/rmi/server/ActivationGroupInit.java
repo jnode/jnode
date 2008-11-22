@@ -48,7 +48,6 @@ import java.rmi.activation.ActivationGroup;
  * descriptor from its stdin so that it can create the activation
  * group for the VM.
  *
- * @version	1.20, 05/05/07
  * @author Ann Wollrath
  */
 public abstract class ActivationGroupInit 

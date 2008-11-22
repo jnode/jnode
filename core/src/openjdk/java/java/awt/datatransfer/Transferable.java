@@ -36,7 +36,6 @@ import java.io.IOException;
  * How to Use Drag and Drop and Data Transfer</a>,
  * a section in <em>The Java Tutorial</em>, for more information.
  *
- * @version 	1.20, 05/05/07
  * @author	Amy Fowler  
  */
 

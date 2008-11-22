@@ -47,7 +47,6 @@ import sun.security.util.SecurityConstants;
  * inherited from the current thread).
  *
  * @author	Peter Jones
- * @version	1.14, 07/05/05
  **/
 public final class NewThreadAction implements PrivilegedAction<Thread> {
 

@@ -57,7 +57,6 @@ import java.text.AttributedCharacterIterator.Attribute;
  * @see java.awt.Component#getInputMethodRequests
  * @see java.awt.event.InputMethodListener
  *
- * @version 	1.25, 05/05/07
  * @author JavaSoft Asia/Pacific
  * @since 1.2
  */

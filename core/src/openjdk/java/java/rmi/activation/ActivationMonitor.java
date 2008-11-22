@@ -41,7 +41,6 @@ import java.rmi.activation.UnknownObjectException;
  * inactive, or the group as a whole becomes inactive.
  *
  * @author 	Ann Wollrath
- * @version	1.23, 05/05/07
  * @see		Activator
  * @see		ActivationSystem
  * @see 	ActivationGroup
@@ -107,5 +106,3 @@ public interface ActivationMonitor extends Remote {
 	throws UnknownGroupException, RemoteException;
 
 }
-
-

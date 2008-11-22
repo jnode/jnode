@@ -49,7 +49,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.26
  * @see Extension
  * @see CertAttrSet
  */

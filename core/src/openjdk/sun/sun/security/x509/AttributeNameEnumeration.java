@@ -35,7 +35,6 @@ import java.util.Enumeration;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.19
  */
 public class AttributeNameEnumeration extends Vector<String> {
 

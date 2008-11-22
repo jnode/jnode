@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)DictionaryBasedBreakIterator.java	1.3 99/05/03
  *
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
  * (C) Copyright IBM Corp. 1996 - 2002 - All Rights Reserved

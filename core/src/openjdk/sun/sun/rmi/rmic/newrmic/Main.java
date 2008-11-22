@@ -71,7 +71,6 @@ import sun.tools.util.CommandLine;
  * options are not yet supported.  The front end for the "old",
  * oldjavac-based rmic implementation is sun.rmi.rmic.Main.
  *
- * @version 1.13, 07/05/05
  * @author Peter Jones
  **/
 public class Main {

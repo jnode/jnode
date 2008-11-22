@@ -45,7 +45,6 @@ import java.security.Provider;
  * supporting this mechanism.
  *
  * @author Mayank Upadhyay
- * @version 1.13, 05/05/07
  */
 
 public interface MechanismFactory {

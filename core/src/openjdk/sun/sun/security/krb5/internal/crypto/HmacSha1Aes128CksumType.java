@@ -36,7 +36,6 @@ import java.security.GeneralSecurityException;
  * This class encapsulates the checksum type for AES128
  *
  * @author Seema Malkani
- * @version 1.10, 05/05/07
  */
 
 public class HmacSha1Aes128CksumType extends CksumType {

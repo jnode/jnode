@@ -47,7 +47,6 @@ import sun.security.krb5.KrbException;
  * (confounder || data || tokenHeader || checksum).
  *
  * @author Seema Malkani
- * @version 1.12, 05/05/07
  */
 class WrapToken_v2 extends MessageToken_v2 {
     /**

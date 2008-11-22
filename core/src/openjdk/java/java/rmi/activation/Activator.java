@@ -56,7 +56,6 @@ import java.rmi.activation.UnknownObjectException;
  * to groups and active object's within those groups.<p>
  *
  * @author 	Ann Wollrath
- * @version	1.26, 05/05/07
  * @see 	ActivationInstantiator
  * @see		ActivationGroupDesc
  * @see		ActivationGroupID

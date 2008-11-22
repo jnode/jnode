@@ -34,7 +34,6 @@ package java.rmi.activation;
  * <code>ActivationGroupID</code> in an <code>ActivationDesc</code> refers to
  * a group that is not registered with the <code>ActivationSystem</code>
  * 
- * @version 1.20, 05/05/07
  * @author  Ann Wollrath
  * @since   1.2
  * @see     java.rmi.activation.Activatable

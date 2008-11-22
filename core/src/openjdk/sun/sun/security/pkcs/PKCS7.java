@@ -51,7 +51,6 @@ import sun.security.x509.X500Name;
  * For signedData, <tt>crls</tt>, <tt>attributes</tt> and
  * PKCS#6 Extended Certificates are not supported.
  *
- * @version 1.62 05/05/07
  * @author Benjamin Renaud
  */
 public class PKCS7 {
@@ -583,7 +582,7 @@ public class PKCS7 {
      */
     public X509Certificate[] getCertificates() {
 	if (certificates != null)
-	    return (X509Certificate[])certificates.clone();
+            return certificates.clone();
 	else 
 	    return null;
     }
@@ -595,7 +594,7 @@ public class PKCS7 {
      */
     public X509CRL[] getCRLs() {
 	if (crls != null)
-	    return (X509CRL[]) crls.clone();
+            return crls.clone();
 	else
 	    return null;
     }

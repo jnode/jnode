@@ -32,7 +32,6 @@ import java.io.OutputStream;
  * Interface to an object that knows how to write its own DER 
  * encoding to an output stream.
  *
- * @version 1.17 05/05/07
  * @author D. N. Hoover
  */
 public interface DerEncoder {

@@ -364,5 +364,3 @@ public interface Array {
     void free() throws SQLException;
 
 }
-
-

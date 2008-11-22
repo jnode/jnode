@@ -26,7 +26,6 @@
 package sun.security.util;
 
 /**
- * @version 1.13, 05/05/07
  */
 public class ResourcesMgr {
 

@@ -34,7 +34,6 @@ import sun.security.jgss.*;
  * tokens. It contains commonly used definitions and utilities.
  *
  * @author Mayank Upadhyay
- * @version 1.19, 05/05/07
  */
 
 abstract class Krb5Token extends GSSToken {

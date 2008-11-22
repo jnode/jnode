@@ -56,7 +56,6 @@ import java.util.Hashtable;
  * they are subject to change or removal without notice.
  *
  * @author 	Arthur van Hoff
- * @version 	1.60, 12/15/96
  */
 
 public

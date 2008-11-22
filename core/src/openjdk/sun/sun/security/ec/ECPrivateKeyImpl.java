@@ -57,7 +57,6 @@ import sun.security.pkcs.PKCS8Key;
  * not in the private key structure.
  *
  * @since   1.6
- * @version 1.7, 05/05/07
  * @author  Andreas Sterbenz
  */
 public final class ECPrivateKeyImpl extends PKCS8Key implements ECPrivateKey {

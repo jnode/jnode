@@ -44,7 +44,6 @@ import sun.security.jca.JCAUtil;
  * @author Benjamin Renaud
  * @author Andreas Sterbenz
  *
- * @version 1.26, 05/05/07
  */
 public class DSAKeyPairGenerator extends KeyPairGenerator 
 implements java.security.interfaces.DSAKeyPairGenerator {

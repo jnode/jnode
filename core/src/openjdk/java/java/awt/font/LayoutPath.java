@@ -82,4 +82,3 @@ public abstract class LayoutPath {
     public abstract void pathToPoint(Point2D location, boolean preceding, 
                                      Point2D point);
 }
-

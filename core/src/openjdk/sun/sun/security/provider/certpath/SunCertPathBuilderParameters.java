@@ -43,7 +43,6 @@ import java.security.cert.*;
  * true, which means that the build algorithm should construct paths
  * from the target subject back to the trusted anchor.
  *
- * @version 	1.15 05/05/07
  * @since	1.4
  * @author	Sean Mullan
  * @author 	Yassir Elley

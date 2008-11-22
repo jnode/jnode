@@ -49,7 +49,6 @@ import java.security.*;
  * System.setSecurityManager(new SecurityManager());
  * </pre>
  *
- * @version 1.38, 05/05/07
  * @author  Roger Riggs
  * @author  Peter Jones
  * @since JDK1.1

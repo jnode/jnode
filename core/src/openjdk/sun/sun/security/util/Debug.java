@@ -32,7 +32,6 @@ import java.util.regex.Matcher;
 /**
  * A utility class for debuging.
  *
- * @version 1.32
  * @author Roland Schemers
  */
 public class Debug {
@@ -42,11 +41,11 @@ public class Debug {
     private static String args;
 
     static {
-	args = (String)java.security.AccessController.doPrivileged
+        args = java.security.AccessController.doPrivileged
 		(new sun.security.action.GetPropertyAction
 		("java.security.debug"));
 
-        String args2 = (String)java.security.AccessController.doPrivileged
+        String args2 = java.security.AccessController.doPrivileged
 		(new sun.security.action.GetPropertyAction
 		("java.security.auth.debug"));
 

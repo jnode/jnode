@@ -42,7 +42,6 @@ import sun.security.util.*;
  * another CRL.
  *
  * @author Hemma Prafullchandra
- * @version 1.23
  * @see Extension
  * @see CertAttrSet
  */

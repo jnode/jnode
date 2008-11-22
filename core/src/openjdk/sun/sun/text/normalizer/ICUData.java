@@ -81,4 +81,3 @@ public final class ICUData {
         return getStream(ICUData.class, resourceName, true);
     }
 }
-

@@ -42,7 +42,6 @@ import sun.tools.tree.*;
  * they are subject to change or removal without notice.
  *
  * @author 	John R. Rose
- * @version 	1.21, 05/05/07
  */
 public interface ParserActions {
     /**

@@ -29,7 +29,6 @@ package java.rmi;
  * is made to lookup or unbind in the registry a name that has
  * no associated binding.
  * 
- * @version 1.19, 05/05/07
  * @since   JDK1.1
  * @author  Ann Wollrath
  * @author  Roger Riggs

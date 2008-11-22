@@ -31,7 +31,6 @@ import java.rmi.*;
  * A ServerRef represents the server-side handle for a remote object
  * implementation.
  *
- * @version 1.23, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

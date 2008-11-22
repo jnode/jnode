@@ -35,7 +35,6 @@ import java.util.spi.LocaleServiceProvider;
  * {@link java.text.Collator Collator} class.
  *
  * @since        1.6 
- * @version      @(#)CollatorProvider.java	1.8 07/05/05
  */
 public abstract class CollatorProvider extends LocaleServiceProvider {
 

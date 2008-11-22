@@ -50,7 +50,6 @@ import sun.security.util.*;
  * Note that the mappings between algorithm IDs and algorithm names is
  * not one-to-one.
  *
- * @version 1.114, 05/05/07
  *
  * @author David Brownell
  * @author Amit Kapoor

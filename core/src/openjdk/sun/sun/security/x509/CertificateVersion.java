@@ -38,7 +38,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.25
  * @see CertAttrSet
  */
 public class CertificateVersion implements CertAttrSet<String> {

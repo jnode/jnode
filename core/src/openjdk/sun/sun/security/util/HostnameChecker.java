@@ -43,7 +43,6 @@ import sun.net.util.IPAddressUtil;
  * Class to check hostnames against the names specified in a certificate as
  * required for TLS and LDAP.
  *
- * @version 1.14, 05/05/07
  */
 public class HostnameChecker {
 

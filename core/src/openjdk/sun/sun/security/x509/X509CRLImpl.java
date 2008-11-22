@@ -87,7 +87,6 @@ import sun.misc.HexDumpEncoder;
  * </pre>
  *
  * @author Hemma Prafullchandra
- * @version 1.46, 05/05/07
  * @see X509CRL
  */
 public class X509CRLImpl extends X509CRL {
@@ -272,7 +271,7 @@ public class X509CRLImpl extends X509CRL {
      * @exception CRLException if an encoding error occurs.
      */
     public byte[] getEncoded() throws CRLException {
-	return (byte[])getEncodedInternal().clone();
+        return getEncodedInternal().clone();
     }
 
     /**
@@ -645,7 +644,7 @@ public class X509CRLImpl extends X509CRL {
 	// assume this is a direct CRL entry (cert and CRL issuer are the same)
 	X509IssuerSerial issuerSerial = new X509IssuerSerial
 	    (getIssuerX500Principal(), serialNumber);
-        return (X509CRLEntry)revokedCerts.get(issuerSerial);
+        return revokedCerts.get(issuerSerial);
     }
 
     /**
@@ -656,7 +655,7 @@ public class X509CRLImpl extends X509CRL {
 	    return null;
 	}
 	X509IssuerSerial issuerSerial = new X509IssuerSerial(cert);
-	return (X509CRLEntry)revokedCerts.get(issuerSerial);
+        return revokedCerts.get(issuerSerial);
     }
 
     /**

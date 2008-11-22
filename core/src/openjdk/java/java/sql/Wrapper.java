@@ -78,5 +78,3 @@ public interface Wrapper {
     boolean isWrapperFor(java.lang.Class<?> iface) throws java.sql.SQLException;
 
 }
-
-

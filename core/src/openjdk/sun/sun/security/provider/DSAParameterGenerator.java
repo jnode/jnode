@@ -44,7 +44,6 @@ import java.security.spec.DSAParameterSpec;
  *
  * @author Jan Luehe
  *
- * @version 1.21, 05/05/07
  *
  * @see java.security.AlgorithmParameters
  * @see java.security.spec.AlgorithmParameterSpec

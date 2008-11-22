@@ -40,7 +40,6 @@ import sun.security.util.*;	// DER
 
 /**
  * @author David Brownell
- * @version 1.28 05/05/07
  *
  * @see CertAndKeyGen
  * @deprecated  Use the new X509Certificate class.

@@ -32,7 +32,6 @@ package java.rmi;
  * thrown when an activatable object is registered via the
  * <code>java.rmi.activation.Activatable.register</code> method.
  * 
- * @version 1.23, 05/05/07
  * @author  Roger Riggs
  * @since   JDK1.1
  * @see	    java.rmi.server.UnicastRemoteObject

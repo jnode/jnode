@@ -611,7 +611,6 @@ public abstract class BreakIterator implements Cloneable
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
             throw new InternalError(e.toString()); 
         }
     }

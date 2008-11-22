@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)KrbDataInputStream.java	1.15 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -41,7 +39,6 @@ import java.io.IOException;
  * of data from underlying data stream.
  *
  * @author Yanni Zhang
- * @version 1.00
  *
  */
 public class KrbDataInputStream extends BufferedInputStream{
@@ -84,4 +81,3 @@ public class KrbDataInputStream extends BufferedInputStream{
         return result | (read() & 0xff);
     }
 }
-	

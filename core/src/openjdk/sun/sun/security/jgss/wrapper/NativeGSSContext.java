@@ -43,7 +43,6 @@ import java.io.*;
  * This class is essentially a wrapper class for the gss_ctx_id_t
  * structure of the native GSS library.
  * @author Valerie Peng
- * @version 1.15, 05/05/07
  * @since 1.6
  */
 class NativeGSSContext implements GSSContextSpi {

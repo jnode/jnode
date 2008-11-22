@@ -56,7 +56,6 @@ import sun.security.util.*;
  *    aACompromise           (10) }
  * </pre>
  * @author Hemma Prafullchandra
- * @version 1.23
  * @see Extension
  * @see CertAttrSet
  */
@@ -100,10 +99,7 @@ public class CRLReasonCodeExtension extends Extension
      * @param reason the enumerated value for the reason code.
      */
     public CRLReasonCodeExtension(int reason) throws IOException {
-        reasonCode = reason;
-        this.extensionId = PKIXExtensions.ReasonCode_Id;
-        this.critical = false;
-        encodeThis();
+        this(false, reason);
     }
 
     /**
@@ -125,7 +121,7 @@ public class CRLReasonCodeExtension extends Extension
      *
      * @param critical true if the extension is to be treated as critical.
      * @param value an array of DER encoded bytes of the actual value.
-     * @exception ClassCastException if value is not an arry of bytes
+     * @exception ClassCastException if value is not an array of bytes
      * @exception IOException on error.
      */
     public CRLReasonCodeExtension(Boolean critical, Object value)
@@ -226,13 +222,13 @@ public class CRLReasonCodeExtension extends Extension
         AttributeNameEnumeration elements = new AttributeNameEnumeration();
         elements.addElement(REASON);
 
-	return (elements.elements());
+        return elements.elements();
     }
 
     /**
      * Return the name of this attribute.
      */
     public String getName() {
-        return (NAME);
+        return NAME;
     }
 }

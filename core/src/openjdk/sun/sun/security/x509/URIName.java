@@ -74,7 +74,6 @@ import sun.security.util.*;
  * @author Hemma Prafullchandra
  * @author Sean Mullan
  * @author Steve Hanna
- * @version 1.24
  * @see GeneralName
  * @see GeneralNames
  * @see GeneralNameInterface

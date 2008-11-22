@@ -37,7 +37,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.28
  * @see CertAttrSet
  */
 public class CertificateValidity implements CertAttrSet<String> {

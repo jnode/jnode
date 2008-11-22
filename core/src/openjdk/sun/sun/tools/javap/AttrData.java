@@ -75,4 +75,3 @@ class AttrData {
 	return data;
     }
 }
-

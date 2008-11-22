@@ -118,5 +118,3 @@ public class ConstructorRepository
 	return exceptionTypes.clone(); // return cached result
     }
 }
-
-

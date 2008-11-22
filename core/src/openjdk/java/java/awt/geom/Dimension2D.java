@@ -34,7 +34,6 @@ package java.awt.geom;
  * The actual storage representation of the sizes is left to
  * the subclass.
  * 
- * @version 	1.21, 05/05/07
  * @author	Jim Graham
  * @since 1.2
  */

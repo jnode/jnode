@@ -37,7 +37,6 @@ import sun.security.util.ObjectIdentifier;
 /**
  * A set of attributes of class PKCS9Attribute. 
  *
- * @version 1.20 05/05/07
  * @author Douglas Hoover
  */
 public class PKCS9Attributes {
@@ -255,7 +254,7 @@ public class PKCS9Attributes {
      * DerValue.tag_SetOf.
      */
     public byte[] getDerEncoding() throws IOException {
-	return (byte[]) derEncoding.clone();
+        return derEncoding.clone();
 	    
     }
 

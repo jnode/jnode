@@ -76,7 +76,6 @@ import java.util.NoSuchElementException;
  * <tt>Hasher</tt> program in the <tt>make/tools/Hasher</tt> directory.
  *
  * @author Mark Reinhold
- * @version 1.8 07/05/05
  * @since 1.5
  *
  * @see java.util.AbstractMap

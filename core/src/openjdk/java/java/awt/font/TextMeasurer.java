@@ -90,7 +90,6 @@ import sun.font.FontResolver;
  * as will fit on each line). 
  *
  * @author John Raley
- * @version 1.31, 04/20/01
  * @see LineBreakMeasurer
  * @since 1.3
  */

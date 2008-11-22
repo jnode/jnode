@@ -40,7 +40,6 @@ import java.security.Provider;
  * Implements the GSSNameSpi for the krb5 mechanism.
  *
  * @author Mayank Upadhyay
- * @version 1.23, 05/05/07
  */
 public class Krb5NameElement 
     implements GSSNameSpi {

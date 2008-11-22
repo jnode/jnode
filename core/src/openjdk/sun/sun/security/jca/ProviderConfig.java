@@ -38,7 +38,6 @@ import sun.security.util.PropertyExpander;
  * the loaded Provider object itself.
  *
  * @author  Andreas Sterbenz
- * @version 1.11, 05/05/07
  * @since   1.5
  */
 final class ProviderConfig {
@@ -59,7 +58,6 @@ final class ProviderConfig {
     
     // parameters for the Provider(String) constructor,
     // use by doLoadProvider()
-//    private final static Class[] CL_STRING = new Class[] { String.class };
     private final static Class[] CL_STRING = { String.class };
 
     // lock to use while loading a provider. it ensures that each provider 
@@ -261,7 +259,6 @@ final class ProviderConfig {
 			obj = provClass.newInstance();
 		    } else {
 			Constructor<?> cons = provClass.getConstructor(CL_STRING);
-//			obj = cons.newInstance(new String[]{ argument });
 			obj = cons.newInstance(argument);
 		    }
 		    if (obj instanceof Provider) {
@@ -284,7 +281,7 @@ final class ProviderConfig {
 			t = e;
 		    }
 		    if (debug != null) {
-			debug.println("Error loading provider " + this);
+                        debug.println("Error loading provider " + ProviderConfig.this);
 			t.printStackTrace();
 		    }
 		    // provider indicates fatal error, pass through exception

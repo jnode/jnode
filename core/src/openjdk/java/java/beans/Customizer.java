@@ -63,4 +63,3 @@ public interface Customizer {
     void removePropertyChangeListener(PropertyChangeListener listener);
 
 }
-

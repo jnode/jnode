@@ -56,9 +56,9 @@ import sun.security.util.*;
  * <p>
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.29
  */
 public class Extension {
+
     protected ObjectIdentifier	extensionId = null;
     protected boolean		critical = false;
     protected byte[]		extensionValue = null;
@@ -149,14 +149,14 @@ public class Extension {
      * Returns true if extension is critical.
      */
     public boolean isCritical() {
-        return (critical);
+        return critical;
     }
 
     /**
      * Returns the ObjectIdentifier of the extension.
      */
     public ObjectIdentifier getExtensionId() {
-        return (extensionId);
+        return extensionId;
     }
 
     /**

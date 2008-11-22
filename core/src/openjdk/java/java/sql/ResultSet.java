@@ -4073,13 +4073,3 @@ public interface ResultSet extends Wrapper {
     void updateNClob(String columnLabel,  Reader reader) throws SQLException;
  
 }
-
-
-
-
-
-
-
-
-
-

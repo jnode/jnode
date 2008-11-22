@@ -35,7 +35,6 @@ import java.security.cert.CertPathValidatorException;
  * which is initialized by each build and updated each time a 
  * certificate is added to the current path.
  *
- * @version 	1.13 05/05/07
  * @since	1.4
  * @author      Sean Mullan
  * @author      Yassir Elley

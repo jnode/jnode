@@ -260,7 +260,7 @@ public final class LocaleServiceProviderPool {
     public <P, S> S getLocalizedObject(LocalizedObjectGetter<P, S> getter,
                                      Locale locale,
                                      Object... params) {
-        return getLocalizedObjectImpl(getter, locale, true, null, null, params);
+        return getLocalizedObjectImpl(getter, locale, true, null, null, null, params);
     }
 
     /**
@@ -281,16 +281,44 @@ public final class LocaleServiceProviderPool {
                                      OpenListResourceBundle bundle, 
                                      String key,
                                      Object... params) {
-        return getLocalizedObjectImpl(getter, locale, false, bundle, key, params);
+        return getLocalizedObjectImpl(getter, locale, false, null, bundle, key, params);
+    }
+
+    /**
+     * Returns the provider's localized name for the specified
+     * locale.
+     *
+     * @param getter an object on which getObject() method
+     *     is called to obtain the provider's instance.
+     * @param locale the given locale that is used as the starting one
+     * @param bundleKey JRE specific bundle key. e.g., "USD" is for currency
+           symbol and "usd" is for currency display name in the JRE bundle.
+     * @param bundle JRE resource bundle that contains
+     *     the localized names, or null for localized objects.
+     * @param key the key string if bundle is supplied, otherwise null.
+     * @param params provider specific parameters
+     * @return provider's instance, or null.
+     */
+    public <P, S> S getLocalizedObject(LocalizedObjectGetter<P, S> getter,
+                                     Locale locale,
+                                     String bundleKey,
+                                     OpenListResourceBundle bundle,
+                                     String key,
+                                     Object... params) {
+        return getLocalizedObjectImpl(getter, locale, false, bundleKey, bundle, key, params);
     }
 
     private <P, S> S getLocalizedObjectImpl(LocalizedObjectGetter<P, S> getter,
                                      Locale locale,
                                      boolean isObjectProvider,
+                                     String bundleKey,
                                      OpenListResourceBundle bundle, 
                                      String key,
                                      Object... params) {
         if (hasProviders()) {
+            if (bundleKey == null) {
+                bundleKey = key;
+            }
             Locale bundleLocale = (bundle != null ? bundle.getLocale() : null);
 	    Locale requested = locale;
    	    P lsp;
@@ -322,7 +350,7 @@ public final class LocaleServiceProviderPool {
             while (bundle != null) {
                 bundleLocale = bundle.getLocale();
                 
-                if (bundle.handleGetKeys().contains(key)) {
+                if (bundle.handleGetKeys().contains(bundleKey)) {
                     // JRE has it.
                     return null;
                 } else {

@@ -40,7 +40,6 @@ import java.io.FileInputStream;
  * DirectoryLoader is a simple ClassLoader which loads from a specified
  * file system directory.
  * @author Bryan Atsatt
- * @version 1.0
  */
 
 public class DirectoryLoader extends ClassLoader {

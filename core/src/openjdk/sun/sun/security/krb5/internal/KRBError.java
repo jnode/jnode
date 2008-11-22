@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)KRBError.java	1.23 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -46,6 +44,7 @@ import java.util.Arrays;
 /**
  * Implements the ASN.1 KRBError type.
  *
+ * <xmp>
  * KRB-ERROR	   ::= [APPLICATION 30] SEQUENCE {
  *	   pvno		   [0] INTEGER (5),
  *	   msg-type	   [1] INTEGER (30),
@@ -60,6 +59,13 @@ import java.util.Arrays;
  *	   sname	   [10] PrincipalName -- service name --,
  *	   e-text	   [11] KerberosString OPTIONAL,
  *	   e-data	   [12] OCTET STRING OPTIONAL
+ * }
+ *
+ * METHOD-DATA     ::= SEQUENCE OF PA-DATA
+ *
+ * TYPED-DATA      ::= SEQUENCE SIZE (1..MAX) OF SEQUENCE {
+ *         data-type       [0] Int32,
+ *         data-value      [1] OCTET STRING OPTIONAL
  * }
  * </xmp>
  *
@@ -99,7 +105,7 @@ public class KRBError implements java.io.Serializable {
             throws IOException, ClassNotFoundException {
 	try {
 	    init(new DerValue((byte[])is.readObject())); 
-            parsePAData(eData);
+            parseEData(eData);
         } catch (Exception e) {
 	    throw new IOException(e);
 	}
@@ -142,7 +148,7 @@ public class KRBError implements java.io.Serializable {
 	eText = new_eText;
 	eData = new_eData;
         
-        parsePAData(eData);        
+        parseEData(eData);
     }
 
     public KRBError(
@@ -175,28 +181,82 @@ public class KRBError implements java.io.Serializable {
 	eData = new_eData;
 	eCksum = new_eCksum;
         
-        parsePAData(eData);
+        parseEData(eData);
     }
 
     public KRBError(byte[] data) throws Asn1Exception,
             RealmException, KrbApErrException, IOException {
 	init(new DerValue(data));
-        parsePAData(eData);
+        parseEData(eData);
     }
 
     public KRBError(DerValue encoding) throws Asn1Exception,
             RealmException, KrbApErrException, IOException {
 	init(encoding);
         showDebug();
-        parsePAData(eData);
+        parseEData(eData);
     }
 
-    // parse the PA-DATA types
-    private void parsePAData(byte[] data) 
-            throws IOException, Asn1Exception {
+    /*
+     * Attention:
+     *
+     * According to RFC 4120, e-data field in a KRB-ERROR message is
+     * a METHOD-DATA when errorCode is KDC_ERR_PREAUTH_REQUIRED,
+     * and application-specific otherwise (The RFC suggests using
+     * TYPED-DATA).
+     *
+     * Hence, the ideal procedure to parse e-data should look like:
+     *
+     * if (errorCode is KDC_ERR_PREAUTH_REQUIRED) {
+     *    parse as METHOD-DATA
+     * } else {
+     *    try parsing as TYPED-DATA
+     * }
+     *
+     * Unfortunately, we know that some implementations also use the
+     * METHOD-DATA format for errorcode KDC_ERR_PREAUTH_FAILED, and
+     * do not use the TYPED-DATA for other errorcodes (say,
+     * KDC_ERR_CLIENT_REVOKED).
+     */
+
+    // parse the edata field
+    private void parseEData(byte[] data) throws IOException {
         if (data == null) {
             return;
         }
+
+        // We need to parse eData as METHOD-DATA for both errorcodes.
+        if (errorCode == Krb5.KDC_ERR_PREAUTH_REQUIRED
+                || errorCode == Krb5.KDC_ERR_PREAUTH_FAILED) {
+            try {
+                // RFC 4120 does not guarantee that eData is METHOD-DATA when
+                // errorCode is KDC_ERR_PREAUTH_FAILED. Therefore, the parse
+                // may fail.
+                parsePAData(data);
+            } catch (Exception e) {
+                if (DEBUG) {
+                    System.out.println("Unable to parse eData field of KRB-ERROR:\n" +
+                            new sun.misc.HexDumpEncoder().encodeBuffer(data));
+                }
+                IOException ioe = new IOException(
+                        "Unable to parse eData field of KRB-ERROR");
+                ioe.initCause(e);
+                throw ioe;
+            }
+        } else {
+            if (DEBUG) {
+                System.out.println("Unknown eData field of KRB-ERROR:\n" +
+                        new sun.misc.HexDumpEncoder().encodeBuffer(data));
+            }
+        }
+    }
+
+    /**
+     * Try parsing the data as a sequence of PA-DATA.
+     * @param data the data block
+     */
+    private void parsePAData(byte[] data)
+            throws IOException, Asn1Exception {
         DerValue derPA = new DerValue(data);
         while (derPA.data.available() > 0) {
             // read the PA-DATA

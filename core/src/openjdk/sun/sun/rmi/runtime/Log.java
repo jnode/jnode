@@ -59,7 +59,6 @@ import java.util.HashMap;
  * turned off, pre-1.4 logging behavior is used.
  *
  * @author Laird Dornin
- * 1.15, 07/05/05
  * @since 1.4
  */
 public abstract class Log {

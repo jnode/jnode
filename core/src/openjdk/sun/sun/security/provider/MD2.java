@@ -34,7 +34,6 @@ import java.util.Arrays;
  * be used for anything else.
  *
  * @since   1.5
- * @version 1.9, 05/05/07
  * @author  Andreas Sterbenz
  */
 public final class MD2 extends DigestBase {
@@ -61,8 +60,8 @@ public final class MD2 extends DigestBase {
     
     private MD2(MD2 base) {
 	super(base);
-	this.X = (int[])base.X.clone();
-	this.C = (int[])base.C.clone();
+        this.X = base.X.clone();
+        this.C = base.C.clone();
 	cBytes = new byte[16];
     }
 
@@ -149,4 +148,3 @@ public final class MD2 extends DigestBase {
     }
     
 }
-

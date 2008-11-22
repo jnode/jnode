@@ -32,7 +32,6 @@ package java.awt.geom;
  * operation being performed, such as appending a path segment 
  * to a {@link GeneralPath} without an initial moveto.
  *
- * @version 	1.19, 05/05/07
  */
 
 public class IllegalPathStateException extends RuntimeException {

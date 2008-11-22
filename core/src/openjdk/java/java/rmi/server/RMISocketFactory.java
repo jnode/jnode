@@ -43,7 +43,6 @@ import java.net.*;
  * communication, then HTTP to a cgi-bin script on the server is used
  * to POST the RMI call.<p>
  *
- * @version 1.28, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  * @since   JDK1.1

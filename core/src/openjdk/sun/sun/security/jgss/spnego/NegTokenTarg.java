@@ -49,7 +49,6 @@ import sun.security.util.*;
  *
  *
  * @author Seema Malkani
- * @version 1.11, 05/05/07
  * @since 1.6
  */
 

@@ -66,7 +66,6 @@ import sun.security.util.Debug;
  *
  * <p> This implementation is not thread-safe.
  *
- * @version 	1.29 05/05/07
  * @since	1.4
  * @author      Sean Mullan
  * @author      Yassir Elley

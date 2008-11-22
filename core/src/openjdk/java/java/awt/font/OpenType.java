@@ -34,7 +34,6 @@ package java.awt.font;
  * For more information on TrueType fonts, see the 
  * Apple TrueType Reference Manual 
  * ( <a href="http://fonts.apple.com/TTRefMan/index.html">http://fonts.apple.com/TTRefMan/index.html</a> ).
- * @version 10 Feb 1997
  */
 public interface OpenType {
   
@@ -431,4 +430,3 @@ public interface OpenType {
 
 
 }
-

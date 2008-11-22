@@ -322,4 +322,3 @@ public final class GlyphMetrics {
         return (glyphType & 0x4) == WHITESPACE;
     }
 }
-

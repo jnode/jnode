@@ -59,7 +59,6 @@ import sun.misc.HexDumpEncoder;
  * </pre>
  *
  * @author Hemma Prafullchandra
- * @version 1.26
  */
 public class CRLExtensions {
 
@@ -188,7 +187,7 @@ public class CRLExtensions {
             name = alias.substring(index + 1);
         } else
             name = alias;
-        return (Extension)map.get(name);
+        return map.get(name);
     }
 
     /**
@@ -266,7 +265,7 @@ public class CRLExtensions {
             otherExt = (Extension)objs[i];
             if (key == null)
                 key = otherExt.getExtensionId().toString();
-            thisExt = (Extension)map.get(key);
+            thisExt = map.get(key);
             if (thisExt == null)
                 return false;
             if (! thisExt.equals(otherExt))

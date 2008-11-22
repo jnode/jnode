@@ -41,7 +41,6 @@ import java.security.cert.TrustAnchor;
  *
  * @see PKIXCertPathBuilderResult
  *
- * @version 	1.13 05/05/07
  * @since	1.4
  * @author	Sean Mullan
  */

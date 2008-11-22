@@ -29,7 +29,6 @@ package java.rmi;
  * is made to bind an object in the registry to a name that already
  * has an associated binding.
  * 
- * @version 1.19, 05/05/07
  * @since   JDK1.1
  * @author  Ann Wollrath
  * @author  Roger Riggs

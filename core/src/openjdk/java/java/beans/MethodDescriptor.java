@@ -33,8 +33,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.sun.beans.ObjectHandler;
-
 /**
  * A MethodDescriptor describes a particular method that a Java Bean
  * supports for external access from other components.
@@ -42,7 +40,7 @@ import com.sun.beans.ObjectHandler;
 
 public class MethodDescriptor extends FeatureDescriptor {
 
-    private Reference methodRef;
+    private Reference<Method> methodRef;
 
     private String[] paramNames;
 
@@ -115,12 +113,14 @@ public class MethodDescriptor extends FeatureDescriptor {
 	if (getClass0() == null) {
 	    setClass0(method.getDeclaringClass());
 	}
-	setParams(method.getParameterTypes());
-	methodRef = createReference(method, true);
+        setParams(getParameterTypes(getClass0(), method));
+        this.methodRef = getSoftReference(method);
     }
 
     private Method getMethod0() {
-	return (Method)getObject(methodRef);
+        return (this.methodRef != null)
+                ? this.methodRef.get()
+                : null;
     }
 
     private synchronized void setParams(Class[] param) {

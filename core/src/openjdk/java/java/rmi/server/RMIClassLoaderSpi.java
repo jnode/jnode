@@ -54,7 +54,6 @@ import java.net.URL;
  * See the documentation for {@link RMIClassLoader} for a description
  * of how a provider instance is chosen.
  *
- * @version	1.22, 07/05/05
  * @author	Peter Jones
  * @author	Laird Dornin
  * @see		RMIClassLoader

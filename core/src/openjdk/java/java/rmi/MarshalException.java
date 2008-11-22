@@ -38,7 +38,6 @@ package java.rmi;
  * retransmitted after a <code>MarshalException</code> and reliably preserve
  * "at most once" call semantics.
  * 
- * @version 1.19, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

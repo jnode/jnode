@@ -122,7 +122,6 @@ import sun.util.LocaleServiceProviderPool;
  * @see         CollationKey
  * @see         CollationElementIterator
  * @see         Locale
- * @version     1.52, 05/05/07
  * @author      Helena Shih, Laura Werner, Richard Gillam
  */
 

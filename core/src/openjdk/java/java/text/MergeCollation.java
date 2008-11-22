@@ -57,7 +57,6 @@ import java.util.ArrayList;
  * "a < b < d & b < c"
  * XXX: make '' be a single quote.
  * @see PatternEntry
- * @version    1.24 05/05/07
  * @author             Mark Davis, Helena Shih
  */
 
@@ -341,4 +340,3 @@ final class MergeCollation {
         }
     }
 }
-

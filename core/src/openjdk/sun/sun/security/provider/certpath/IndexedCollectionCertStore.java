@@ -91,7 +91,6 @@ import javax.security.auth.x500.X500Principal;
  * @see java.security.cert.CertStore
  * @see CollectionCertStore
  *
- * @version 1.14, 05/05/07
  * @author Andreas Sterbenz
  */
 public class IndexedCollectionCertStore extends CertStoreSpi {

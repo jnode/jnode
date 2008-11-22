@@ -58,7 +58,6 @@ import sun.security.util.ObjectIdentifier;
  * </pre>
  *
  * @since 1.5
- * @version 1.9, 05/05/07
  * @author Vincent Ryan
  * @see Timestamper
  */

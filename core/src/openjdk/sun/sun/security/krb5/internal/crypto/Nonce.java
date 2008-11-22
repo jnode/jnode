@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)Nonce.java	1.17 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -39,4 +37,3 @@ public class Nonce {
     }
 
 }
-

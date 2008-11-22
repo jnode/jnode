@@ -46,7 +46,6 @@ import sun.misc.BASE64Decoder;
  * @author Hemma Prafullchandra
  * @author Sean Mullan
  *
- * @version 1.33, 05/05/07
  *
  * @see java.security.cert.CertificateFactorySpi
  * @see java.security.cert.Certificate

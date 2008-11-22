@@ -203,6 +203,3 @@ public final class UCompactIntArray implements Cloneable {
     private boolean[][] blockTouched;
     private boolean[] planeTouched;
 };
-
-
-

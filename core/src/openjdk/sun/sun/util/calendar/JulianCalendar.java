@@ -163,7 +163,7 @@ public class JulianCalendar extends BaseCalendar {
 	    days += (y - 1) / 4;
 	} else {
 	    // BCE years
-	    days += (long) CalendarUtils.floorDivide(y - 1, 4);
+            days += CalendarUtils.floorDivide(y - 1, 4);
 	}
 	if (month > 0) {
 	    days += ((367 * (long) month) - 362) / 12;

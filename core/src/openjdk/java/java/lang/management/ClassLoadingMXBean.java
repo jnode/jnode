@@ -50,7 +50,6 @@ package java.lang.management;
  *      Ways to Access MXBeans</a>
  *
  * @author  Mandy Chung
- * @version 1.18, 05/05/07
  * @since   1.5 
  */
 public interface ClassLoadingMXBean {
@@ -109,4 +108,3 @@ public interface ClassLoadingMXBean {
     public void setVerbose(boolean value);
 
 }
-

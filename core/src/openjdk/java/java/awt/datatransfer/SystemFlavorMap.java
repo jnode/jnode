@@ -63,7 +63,6 @@ import sun.awt.datatransfer.DataTransferer;
  * <code>AWT.DnD.flavorMapFileURL</code>. See <code>flavormap.properties</code>
  * for details.
  *
- * @version 1.44, 05/05/07
  * @since 1.2
  */
 public final class SystemFlavorMap implements FlavorMap, FlavorTable {

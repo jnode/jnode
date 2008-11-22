@@ -44,7 +44,6 @@ import java.lang.reflect.Array;
  * method can be used to get the array element type.  The getArrayDimension()
  * method can be used to get the array dimension.
  *
- * @version	1.0, 2/27/98
  * @author	Bryan Atsatt
  */
 public class ArrayType extends Type {

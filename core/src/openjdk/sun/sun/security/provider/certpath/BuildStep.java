@@ -34,7 +34,6 @@ import java.security.cert.X509Certificate;
  * and a result code.
  *
  * @author 	Anne Anderson
- * @version 	1.15 05/05/07
  * @since	1.4
  * @see sun.security.provider.certpath.Vertex
  */

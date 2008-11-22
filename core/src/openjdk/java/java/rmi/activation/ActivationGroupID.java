@@ -41,7 +41,6 @@ import java.rmi.server.UID;
  * when an activation group is created/recreated.
  *
  * @author 	Ann Wollrath
- * @version	1.22, 05/05/07
  * @see 	ActivationGroup
  * @see		ActivationGroupDesc
  * @since	1.2

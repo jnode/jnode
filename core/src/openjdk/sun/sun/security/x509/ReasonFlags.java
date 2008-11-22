@@ -52,7 +52,6 @@ import sun.security.util.*;
  * </pre>
  *
  * @author Hemma Prafullchandra
- * @version 1.23
  */
 public class ReasonFlags {
 

@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)BreakDictionary.java        1.3 99/04/07
  *
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
  * (C) Copyright IBM Corp. 1996 - 2002 - All Rights Reserved
@@ -340,4 +339,3 @@ class BreakDictionary {
         return table[row * numCols + col];
     }
 }
-

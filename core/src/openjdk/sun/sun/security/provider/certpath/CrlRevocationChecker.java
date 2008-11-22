@@ -38,38 +38,21 @@ import java.util.Iterator;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertPath;
-import java.security.cert.CertPathBuilder;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertPathValidatorException;
-import java.security.cert.CertStore;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.PKIXCertPathBuilderResult;
-import java.security.cert.PKIXCertPathChecker;
-import java.security.cert.PKIXParameters;
-import java.security.cert.TrustAnchor;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509CRL;
-import java.security.cert.X509CRLEntry;
-import java.security.cert.X509CRLSelector;
+import java.security.cert.*;
 import java.security.interfaces.DSAPublicKey;
 import javax.security.auth.x500.X500Principal;
 import sun.security.util.Debug;
 import sun.security.x509.AccessDescription;
 import sun.security.x509.AuthorityInfoAccessExtension;
 import sun.security.x509.CRLDistributionPointsExtension;
+import sun.security.x509.CRLReasonCodeExtension;
 import sun.security.x509.DistributionPoint;
 import sun.security.x509.GeneralName;
 import sun.security.x509.GeneralNames;
-import sun.security.x509.X509CRLEntryImpl;
-import sun.security.x509.CRLReasonCodeExtension;
 import sun.security.x509.PKIXExtensions;
 import sun.security.x509.X500Name;
 import sun.security.x509.X509CertImpl;
+import sun.security.x509.X509CRLEntryImpl;
 
 /**
  * CrlRevocationChecker is a <code>PKIXCertPathChecker</code> that checks
@@ -77,7 +60,6 @@ import sun.security.x509.X509CertImpl;
  * from one or more <code>CertStores</code>. This is based on section 6.3
  * of RFC 3280 (http://www.ietf.org/rfc/rfc3280.txt).
  *
- * @version 	1.31, 05/05/07
  * @since	1.4
  * @author	Seth Proctor
  * @author	Steve Hanna
@@ -318,21 +300,16 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
 	    throw new CertPathValidatorException(e);
         }
 	    
-        if (mPossibleCRLs.isEmpty() && mApprovedCRLs.isEmpty()) {
-	    // we are assuming the directory is not secure,
- 	    // so someone may have removed all the CRLs.
- 	    throw new CertPathValidatorException
-		("Could not determine revocation status");
-	}
-		
 	if (debug != null) {
 	    debug.println("CrlRevocationChecker.verifyRevocationStatus() " +
 	        "crls.size() = " + mPossibleCRLs.size());
 	}
+        if (!mPossibleCRLs.isEmpty()) {
 	// Now that we have a list of possible CRLs, see which ones can
 	// be approved
 	mApprovedCRLs.addAll(verifyPossibleCRLs(mPossibleCRLs, currCert, 
 		signFlag, prevKey, reasonsMask));
+        }
 	if (debug != null) {
 	    debug.println("CrlRevocationChecker.verifyRevocationStatus() " +
 	        "approved crls.size() = " + mApprovedCRLs.size());
@@ -352,9 +329,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
 	    }
 	}
 
-	// See if the cert is in the set of approved crls. If the
-	// cert is listed on hold in one crl, and revoked in another, ignore
-	// the hold. 
+        // See if the cert is in the set of approved crls.
         if (debug != null) {
 	    BigInteger sn = currCert.getSerialNumber();
 	    debug.println("starting the final sweep...");
@@ -362,11 +337,22 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
                           " cert SN: " + sn.toString());
 	}
 
-	boolean hold = false;
+        int reasonCode = 0;
+        X509CRLEntryImpl entry = null;
 	for (X509CRL crl : mApprovedCRLs) { 
-	    X509CRLEntry entry = 
-		(X509CRLEntry) crl.getRevokedCertificate(currCert);
-	    if (entry != null) {
+            X509CRLEntry e = crl.getRevokedCertificate(currCert);
+            if (e != null) {
+                try {
+                    entry = X509CRLEntryImpl.toImpl(e);
+                    Integer reason = entry.getReasonCode();
+                    // if reasonCode extension is absent, this is equivalent
+                    // to a reasonCode value of unspecified (0)
+                    reasonCode = (reason == null
+                        ? CRLReasonCodeExtension.UNSPECIFIED
+                        : reason.intValue());
+                } catch (Exception ex) {
+                    throw new CertPathValidatorException(ex);
+                }
                 if (debug != null) {
                     debug.println("CrlRevocationChecker.verifyRevocationStatus" 
 			+ " CRL entry: " + entry.toString());
@@ -395,45 +381,11 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
                     }
                 }
 
-		int reasonCode = 0;
-	        try { 
-	            X509CRLEntryImpl entryImpl = X509CRLEntryImpl.toImpl(entry);
-		    Integer reason = entryImpl.getReasonCode();
-		    // if reasonCode extension is absent, this is equivalent
-		    // to a reasonCode value of unspecified (0)
-		    reasonCode = (reason == null
-			? CRLReasonCodeExtension.UNSPECIFIED
-		        : reason.intValue());
- 	        } catch (Exception e) {
-		    throw new CertPathValidatorException(e);
-	        }
-
-		/*
-		 * If reason code is CERTIFICATE_HOLD, continue to look
-		 * for other revoked entries with different reasons before
-		 * exiting loop.
-		 */
-		hold = (reasonCode == CRLReasonCodeExtension.CERTIFICATE_HOLD);
-
-		/*
-		 * The certificate fails the revocation check if it is not
-		 * on hold and the reason code is not REMOVE_FROM_CRL, which
-		 * indicates a certificate that used to be but is no longer on 
-		 * hold status. It should not be considered fatal.
-		 */
-		if (!hold 
-		    && reasonCode != CRLReasonCodeExtension.REMOVE_FROM_CRL) 
-		{
 		    throw new CertificateRevokedException("Certificate has been"
 			+ " revoked, reason: " + reasonToString(reasonCode));
 		}
 	    }
 	}
-
-	if (hold) {
-	    throw new CertificateRevokedException("Certificate is on hold");
-	}
-    }
 
     /**
      * We have a cert whose revocation status couldn't be verified by

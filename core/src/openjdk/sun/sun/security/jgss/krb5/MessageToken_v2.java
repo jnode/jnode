@@ -86,7 +86,6 @@ import java.security.MessageDigest;
  * <p>
  *
  * @author Seema Malkani
- * @version 1.11, 05/05/07
  */
 
 abstract class MessageToken_v2 extends Krb5Token {

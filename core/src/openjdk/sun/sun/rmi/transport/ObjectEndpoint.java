@@ -30,7 +30,6 @@ import java.rmi.server.ObjID;
  * An object used as a key to the object table that maps an
  * instance of this class to a Target.
  *
- * @version 1.11, 05/05/07
  * @author  Ann Wollrath
  **/
 class ObjectEndpoint {
@@ -89,4 +88,3 @@ class ObjectEndpoint {
 	return id.toString();
     }
 }
-	

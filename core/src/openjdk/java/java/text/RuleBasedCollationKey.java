@@ -121,6 +121,3 @@ final class RuleBasedCollationKey extends CollationKey {
     private String key = null;
 
 }
-
-
-

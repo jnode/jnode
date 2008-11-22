@@ -72,7 +72,6 @@ import java.rmi.RemoteException;
  *
  * @author	Ann Wollrath
  * @author	Peter Jones
- * @version	1.25, 07/05/05
  * @since	JDK1.1
  * @see		LocateRegistry
  */

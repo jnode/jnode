@@ -39,7 +39,6 @@ import static sun.security.provider.ByteArrayAccess.*;
  * obtain an implementation, call the static getInstance() method in this
  * class.
  *
- * @version 	1.8, 05/05/07
  * @author	Andreas Sterbenz
  */
 public final class MD4 extends DigestBase {

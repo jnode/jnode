@@ -135,4 +135,3 @@ public interface SQLData {
   */
   void writeSQL (SQLOutput stream) throws SQLException;
 }
-

@@ -65,7 +65,6 @@ import java.util.HashSet;
  *                              HashSet alreadyChecked,
  *								IndentingWriter writer) throws IOException;
  * </pre>
- * @version	1.0, 2/24/98
  * @author	Bryan Atsatt
  */
 public abstract class Generator implements	sun.rmi.rmic.Generator,
@@ -435,4 +434,3 @@ public abstract class Generator implements	sun.rmi.rmic.Generator,
     	}
     }
 }
-

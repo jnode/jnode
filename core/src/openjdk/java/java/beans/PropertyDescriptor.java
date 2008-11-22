@@ -36,10 +36,10 @@ import java.lang.reflect.Constructor;
  */
 public class PropertyDescriptor extends FeatureDescriptor {
 
-    private Reference propertyTypeRef;
-    private Reference readMethodRef;
-    private Reference writeMethodRef;
-    private Reference propertyEditorClassRef;
+    private Reference<Class> propertyTypeRef;
+    private Reference<Method> readMethodRef;
+    private Reference<Method> writeMethodRef;
+    private Reference<Class> propertyEditorClassRef;
 
     private boolean bound;
     private boolean constrained;
@@ -69,8 +69,8 @@ public class PropertyDescriptor extends FeatureDescriptor {
     public PropertyDescriptor(String propertyName, Class<?> beanClass)
 		throws IntrospectionException {
 	this(propertyName, beanClass, 
-	     "is" + capitalize(propertyName), 
-	     "set" + capitalize(propertyName));
+             Introspector.IS_PREFIX + NameGenerator.capitalize(propertyName),
+             Introspector.SET_PREFIX + NameGenerator.capitalize(propertyName));
     }
 
     /**
@@ -110,7 +110,12 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	if (writeMethodName != null && getWriteMethod() == null) {
 	    throw new IntrospectionException("Method not found: " + writeMethodName);
 	}
-	
+        // If this class or one of its base classes allow PropertyChangeListener,
+        // then we assume that any properties we discover are "bound".
+        // See Introspector.getTargetPropertyInfo() method.
+        String name = "addPropertyChangeListener";
+        Class[] args = {PropertyChangeListener.class};
+        this.bound = (null != Introspector.findMethod(beanClass, name, args.length, args));
     }
 
     /**
@@ -133,6 +138,29 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	setName(propertyName);
 	setReadMethod(readMethod);
 	setWriteMethod(writeMethod);
+    }
+
+    /**
+     * Creates <code>PropertyDescriptor</code> for the specified bean
+     * with the specified name and methods to read/write the property value.
+     *
+     * @param bean   the type of the target bean
+     * @param base   the base name of the property (the rest of the method name)
+     * @param read   the method used for reading the property value
+     * @param write  the method used for writing the property value
+     * @exception IntrospectionException if an exception occurs during introspection
+     *
+     * @since 1.7
+     */
+    PropertyDescriptor(Class<?> bean, String base, Method read, Method write) throws IntrospectionException {
+        if (bean == null) {
+            throw new IntrospectionException("Target Bean class is null");
+        }
+        setClass0(bean);
+        setName(Introspector.decapitalize(base));
+        setReadMethod(read);
+        setWriteMethod(write);
+        this.baseName = base;
     }
 
     /**
@@ -159,11 +187,13 @@ public class PropertyDescriptor extends FeatureDescriptor {
     }
 
     private void setPropertyType(Class type) {
-	propertyTypeRef = createReference(type);
+        this.propertyTypeRef = getWeakReference(type);
     }
 
     private Class getPropertyType0() {
-	return (Class)getObject(propertyTypeRef);
+        return (this.propertyTypeRef != null)
+                ? this.propertyTypeRef.get()
+                : null;
     }
 
     /**
@@ -183,9 +213,9 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	    if (readMethodName == null) {
 		Class type = getPropertyType0();
 		if (type == boolean.class || type == null) {
-		    readMethodName = "is" + getBaseName();
+                    readMethodName = Introspector.IS_PREFIX + getBaseName();
 		} else {
-		    readMethodName = "get" + getBaseName();
+                    readMethodName = Introspector.GET_PREFIX + getBaseName();
 		}
 	    }
 	    
@@ -196,7 +226,7 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	    // reader method so look for this one first.
 	    readMethod = Introspector.findMethod(cls, readMethodName, 0);
 	    if (readMethod == null) {
-		readMethodName = "get" + getBaseName();
+                readMethodName = Introspector.GET_PREFIX + getBaseName();
 		readMethod = Introspector.findMethod(cls, readMethodName, 0);
 	    }
 	    try {
@@ -225,7 +255,7 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	setClass0(readMethod.getDeclaringClass());
 
 	readMethodName = readMethod.getName();
-	readMethodRef = createReference(readMethod, true);
+        this.readMethodRef = getSoftReference(readMethod);
     }
 
     /**
@@ -258,7 +288,7 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	    }
 		    
 	    if (writeMethodName == null) {
-		writeMethodName = "set" + getBaseName();
+                writeMethodName = Introspector.SET_PREFIX + getBaseName();
 	    }
 
 	    writeMethod = Introspector.findMethod(cls, writeMethodName, 1, 
@@ -289,16 +319,20 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	setClass0(writeMethod.getDeclaringClass());
 
 	writeMethodName = writeMethod.getName();
-	writeMethodRef = createReference(writeMethod, true);
+        this.writeMethodRef = getSoftReference(writeMethod);
 
     }
 
     private Method getReadMethod0() {
-	return (Method)getObject(readMethodRef);
+        return (this.readMethodRef != null)
+                ? this.readMethodRef.get()
+                : null;
     }
 
     private Method getWriteMethod0() {
-	return (Method)getObject(writeMethodRef);
+        return (this.writeMethodRef != null)
+                ? this.writeMethodRef.get()
+                : null;
     }
 
     /**
@@ -362,7 +396,7 @@ public class PropertyDescriptor extends FeatureDescriptor {
      * @param propertyEditorClass  The Class for the desired PropertyEditor.
      */
     public void setPropertyEditorClass(Class<?> propertyEditorClass) {
-	propertyEditorClassRef = createReference(propertyEditorClass);
+        this.propertyEditorClassRef = getWeakReference((Class)propertyEditorClass);
     }
 
     /**
@@ -376,7 +410,9 @@ public class PropertyDescriptor extends FeatureDescriptor {
      *		a suitable PropertyEditor.
      */
     public Class<?> getPropertyEditorClass() {
-	return (Class)getObject(propertyEditorClassRef);
+        return (this.propertyEditorClassRef != null)
+                ? this.propertyEditorClassRef.get()
+                : null;
     }
 
     /**
@@ -533,10 +569,10 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	// give priority to a boolean "is" method over a boolean "get" method.
 	if (xr != null && yr != null &&
 		   xr.getDeclaringClass() == yr.getDeclaringClass() &&
-		   xr.getReturnType() == boolean.class &&
-		   yr.getReturnType() == boolean.class &&
-		   xr.getName().indexOf("is") == 0 &&
-		   yr.getName().indexOf("get") == 0) {
+                   getReturnType(getClass0(), xr) == boolean.class &&
+                   getReturnType(getClass0(), yr) == boolean.class &&
+                   xr.getName().indexOf(Introspector.IS_PREFIX) == 0 &&
+                   yr.getName().indexOf(Introspector.GET_PREFIX) == 0) {
 	    try {
 		setReadMethod(xr);
 	    } catch (IntrospectionException ex) {
@@ -600,19 +636,19 @@ public class PropertyDescriptor extends FeatureDescriptor {
 	Class propertyType = null;
 	try {
 	    if (readMethod != null) {
-		Class[] params = readMethod.getParameterTypes();
+                Class[] params = getParameterTypes(getClass0(), readMethod);
 		if (params.length != 0) {
 		    throw new IntrospectionException("bad read method arg count: " 
 						     + readMethod);
 		}
-		propertyType = readMethod.getReturnType();
+                propertyType = getReturnType(getClass0(), readMethod);
 		if (propertyType == Void.TYPE) {
 		    throw new IntrospectionException("read method " +
 					readMethod.getName() + " returns void");
 		}
 	    }
 	    if (writeMethod != null) {
-		Class params[] = writeMethod.getParameterTypes();
+                Class params[] = getParameterTypes(getClass0(), writeMethod);
 		if (params.length != 1) {
 		    throw new IntrospectionException("bad write method arg count: "
 						     + writeMethod);
@@ -661,7 +697,7 @@ public class PropertyDescriptor extends FeatureDescriptor {
     // Calculate once since capitalize() is expensive.
     String getBaseName() {
 	if (baseName == null) {
-	    baseName = capitalize(getName());
+            baseName = NameGenerator.capitalize(getName());
 	}
 	return baseName;
     }

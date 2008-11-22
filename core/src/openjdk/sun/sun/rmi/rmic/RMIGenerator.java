@@ -57,7 +57,6 @@ import com.sun.corba.se.impl.util.Utility;
  * supported API.  Code that depends on them does so at its own risk:
  * they are subject to change or removal without notice.
  *
- * @version	1.33, 05/05/07
  * @author	Peter Jones,  Bryan Atsatt
  */
 public class RMIGenerator implements RMIConstants, Generator {

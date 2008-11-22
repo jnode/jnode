@@ -43,7 +43,6 @@ import javax.swing.JFrame;
  *
  * @since 1.3
  *
- * @version 	1.23, 05/05/07
  * @author JavaSoft International
  */
 

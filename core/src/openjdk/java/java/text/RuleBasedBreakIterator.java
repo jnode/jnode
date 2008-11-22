@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)RuleBasedBreakIterator.java	1.3 99/04/07
  *
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
  * (C) Copyright IBM Corp. 1996 - 2002 - All Rights Reserved
@@ -219,7 +218,6 @@ import sun.text.SupplementaryCharacterData;
  * &nbsp; For examples, see the resource data (which is annotated).</p>
  *
  * @author Richard Gillam
- * @version $RCSFile$ $Revision: 1.1 $ $Date: 1998/11/05 19:32:04 $
  */
 class RuleBasedBreakIterator extends BreakIterator {
 
@@ -1125,4 +1123,3 @@ class RuleBasedBreakIterator extends BreakIterator {
         }
     }
 }
-

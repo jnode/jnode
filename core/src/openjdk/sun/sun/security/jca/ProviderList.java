@@ -51,7 +51,6 @@ import java.security.Provider.Service;
  * methods are static in order to avoid confusion about the immutability.
  *
  * @author  Andreas Sterbenz
- * @version 1.19, 05/05/07
  * @since   1.5
  */
 public final class ProviderList {
@@ -188,7 +187,7 @@ public final class ProviderList {
 		configList.add(config);
 	    }
 	}
-	configs = (ProviderConfig[])configList.toArray(PC0);
+        configs = configList.toArray(PC0);
 	if (debug != null) {
 	    debug.println("provider configuration: " + configList);
 	}
@@ -217,7 +216,7 @@ public final class ProviderList {
 	    }
 	    newConfigs.add(newConfig);
 	}
-	ProviderConfig[] configArray = (ProviderConfig[])newConfigs.toArray(PC0);
+        ProviderConfig[] configArray = newConfigs.toArray(PC0);
 	return new ProviderList(configArray, false);
     }
     
@@ -503,4 +502,3 @@ public final class ProviderList {
     }
     
 }
-

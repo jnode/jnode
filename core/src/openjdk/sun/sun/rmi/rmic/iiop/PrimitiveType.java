@@ -42,7 +42,6 @@ import sun.tools.java.ClassDefinition;
  * The static forPrimitive(...) method must be used to obtain an instance, and
  * will return null if the type is non-conforming.
  *
- * @version	1.0, 2/27/98
  * @author	Bryan Atsatt
  */
 public class PrimitiveType extends Type {

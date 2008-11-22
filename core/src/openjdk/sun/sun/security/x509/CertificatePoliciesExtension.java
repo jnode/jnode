@@ -62,7 +62,6 @@ import sun.security.util.DerOutputStream;
  * CertPolicyId ::= OBJECT IDENTIFIER
  * </pre>
  * @author Anne Anderson
- * @version 1.16, 05/05/07
  * @since	1.4
  * @see Extension
  * @see CertAttrSet

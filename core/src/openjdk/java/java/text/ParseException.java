@@ -44,7 +44,6 @@ package java.text;
  * @see java.lang.Exception
  * @see java.text.Format
  * @see java.text.FieldPosition
- * @version     1.23, 05/05/07
  * @author      Mark Davis
  */
 public

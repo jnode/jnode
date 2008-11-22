@@ -50,7 +50,6 @@ import sun.tools.java.ClassNotFound;
  * supported API.  Code that depends on them does so at its own risk:
  * they are subject to change or removal without notice.
  *
- * @version	1.23, 05/05/07
  * @author	Peter Jones
  */
 public class RemoteClass implements sun.rmi.rmic.RMIConstants {

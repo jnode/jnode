@@ -51,7 +51,6 @@ import java.util.Hashtable;
  * @see		ClassType
  * @see		MethodType
  * @author 	Arthur van Hoff
- * @version 	1.41, 05/05/07
  */
 public
 class Type implements Constants {

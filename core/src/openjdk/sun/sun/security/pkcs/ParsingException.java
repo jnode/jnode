@@ -26,7 +26,6 @@
 /**
  * Generic PKCS Parsing exception. 
  * 
- * @version 1.22	05/05/07
  * @author Benjamin Renaud 
  */
 

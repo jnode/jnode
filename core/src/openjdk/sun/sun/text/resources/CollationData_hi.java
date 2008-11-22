@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)CollationData_hi.java	1.11 07/05/05
- */
+
 
 /*
  * Copyright (c) 1998 International Business Machines.

@@ -44,7 +44,6 @@ import java.io.UnsupportedEncodingException;
  * they are subject to change or removal without notice.
  *
  * @author 	Arthur van Hoff
- * @version 	1.12, 01/17/97
  */
 
 public

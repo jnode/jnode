@@ -44,7 +44,6 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 /**
- * @version     1.0
  * @author  Ram Viswanadha
  */
 public final class NormalizerImpl {

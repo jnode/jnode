@@ -34,7 +34,6 @@ package java.lang.annotation;
  * of the annotated elements.
  *
  * @author  Joshua Bloch
- * @version 1.12, 05/05/07
  * @since 1.5
  */
 @Documented

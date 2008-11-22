@@ -51,7 +51,6 @@ import javax.security.auth.kerberos.*;
  *
  * @author Mayank Upadhyay
  * @author Ram Marti
- * @version 1.32, 05/05/07
  * @since 1.4 
  */
 class Krb5Context implements GSSContextSpi {
@@ -561,7 +560,7 @@ class Krb5Context implements GSSContextSpi {
 		    final AccessControlContext acc =
 		        AccessController.getContext();
 
-		    if (GSSUtil.useSubjectCredsOnly()) {
+                    if (GSSUtil.useSubjectCredsOnly(caller)) {
 			KerberosTicket kerbTicket = null;
 			try {
 			   // get service ticket from caller's subject
@@ -611,7 +610,7 @@ class Krb5Context implements GSSContextSpi {
 			serviceCreds = Credentials.acquireServiceCreds(
 				     peerName.getKrb5PrincipalName().getName(),
 				     tgt);
-			if (GSSUtil.useSubjectCredsOnly()) {	
+                        if (GSSUtil.useSubjectCredsOnly(caller)) {
 		            final Subject subject = 
 				AccessController.doPrivileged(
 				new java.security.PrivilegedAction<Subject>() {
@@ -1279,5 +1278,10 @@ class Krb5Context implements GSSContextSpi {
 	  default:
 		return ("Unknown state " + state);
 	}
+    }
+
+    int getCaller() {
+        // Currently used by InitialToken only
+        return caller;
     }
 }

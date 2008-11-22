@@ -39,7 +39,6 @@ import java.math.BigInteger;
  * be supplanted by big-endian byte arrays which hold both signed
  * and unsigned arbitrary-precision integers.</em>
  *
- * @version 1.39
  * @author David Brownell
  */
 public final class BigInt {
@@ -54,7 +53,7 @@ public final class BigInt {
      * @param data a sequence of bytes, most significant bytes/digits
      *		first.  CONSUMED.
      */
-    public BigInt(byte[] data) { places = (byte[])data.clone(); }
+    public BigInt(byte[] data) { places = data.clone(); }
 
     /**
      * Constructs a "Big" integer from a "BigInteger", which must be
@@ -137,7 +136,7 @@ public final class BigInt {
      * Returns the data as a byte array.  The most significant bit
      * of the array is bit zero (as in <code>java.math.BigInteger</code>).
      */
-    public byte[] toByteArray() { return (byte[])places.clone(); }
+    public byte[] toByteArray() { return places.clone(); }
 
     private static final String digits = "0123456789abcdef";
     private String hexify() {

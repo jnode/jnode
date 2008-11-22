@@ -36,7 +36,6 @@ import java.security.PrivilegedAction;
  *
  * @see sun.security.rsa.SunRsaSign
  * @author  Andreas Sterbenz
- * @version 1.10, 05/05/07
  * @since   1.5
  */
 public class PutAllAction implements PrivilegedAction<Void> {

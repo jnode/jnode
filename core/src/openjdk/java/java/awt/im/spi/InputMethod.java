@@ -45,7 +45,6 @@ import java.lang.Character.Subset;
  *
  * @since 1.3
  *
- * @version 	1.37, 05/05/07
  * @author JavaSoft International
  */
 

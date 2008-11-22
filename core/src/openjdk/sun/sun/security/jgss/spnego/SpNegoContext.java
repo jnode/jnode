@@ -39,7 +39,6 @@ import sun.security.util.*;
  * GSS-API mechanism
  *
  * @author Seema Malkani
- * @version 1.16, 05/05/07
  * @since 1.6
  */
 public class SpNegoContext implements GSSContextSpi {
@@ -91,9 +90,9 @@ public class SpNegoContext implements GSSContextSpi {
 
     // debug property
     static final boolean DEBUG =
-	((Boolean)java.security.AccessController.doPrivileged(
+        java.security.AccessController.doPrivileged(
             new sun.security.action.GetBooleanAction
-		("sun.security.spnego.debug"))).booleanValue();
+            ("sun.security.spnego.debug")).booleanValue();
 
     /**
      * Constructor for SpNegoContext to be called on the context initiator's
@@ -181,7 +180,12 @@ public class SpNegoContext implements GSSContextSpi {
      * Is credential delegation enabled?
      */
     public final boolean getCredDelegState() {
+        if (mechContext != null &&
+                (state == STATE_IN_PROCESS || state == STATE_DONE)) {
+            return mechContext.getCredDelegState();
+        } else {
 	return credDelegState;
+    }
     }
 
     /**

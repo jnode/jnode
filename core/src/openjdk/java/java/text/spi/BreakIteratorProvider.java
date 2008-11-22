@@ -35,7 +35,6 @@ import java.util.spi.LocaleServiceProvider;
  * {@link java.text.BreakIterator BreakIterator} class.
  *
  * @since        1.6 
- * @version      @(#)BreakIteratorProvider.java	1.8 07/05/05
  */
 public abstract class BreakIteratorProvider extends LocaleServiceProvider {
 

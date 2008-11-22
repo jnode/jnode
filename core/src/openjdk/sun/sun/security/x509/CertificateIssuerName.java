@@ -39,7 +39,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.23
  * @see CertAttrSet
  */
 public class CertificateIssuerName implements CertAttrSet<String> {

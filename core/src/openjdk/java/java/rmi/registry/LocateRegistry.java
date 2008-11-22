@@ -49,7 +49,6 @@ import sun.rmi.transport.tcp.TCPEndpoint;
  * the remote host.  Therefore, a subsequent method invocation to a remote
  * registry returned as a result of this method may fail.
  *
- * @version 1.40, 05/05/07
  * @author  Ann Wollrath
  * @author  Peter Jones
  * @since   JDK1.1

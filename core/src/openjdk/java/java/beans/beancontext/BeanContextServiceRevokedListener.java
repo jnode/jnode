@@ -44,6 +44,3 @@ public interface BeanContextServiceRevokedListener extends EventListener {
      */
     void serviceRevoked(BeanContextServiceRevokedEvent bcsre);
 }
-
-
-

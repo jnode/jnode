@@ -45,7 +45,6 @@ import sun.security.action.GetIntegerAction;
  * capabilities.
  *
  * @author	Peter Jones
- * @version	1.8, 07/05/05
  **/
 public final class RuntimeUtil {
 

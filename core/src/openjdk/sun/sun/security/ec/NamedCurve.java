@@ -40,7 +40,6 @@ import sun.security.util.DerOutputStream;
  * the SunPKCS11 and SunJSSE code.
  *
  * @since   1.6
- * @version 1.7, 05/05/07
  * @author  Andreas Sterbenz
  */
 public final class NamedCurve extends ECParameterSpec {

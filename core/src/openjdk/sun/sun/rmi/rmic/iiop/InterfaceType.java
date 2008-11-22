@@ -41,7 +41,6 @@ import sun.rmi.rmic.IndentingWriter;
  * InterfaceType is an abstract base representing any non-special
  * interface type.
  *
- * @version	1.0, 2/27/98
  * @author	Bryan Atsatt
  */
 public abstract class InterfaceType extends CompoundType {

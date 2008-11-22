@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)KeyTabOutputStream.java	1.14 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -43,7 +41,6 @@ import java.io.UnsupportedEncodingException;
  * data to memory.
  *
  * @author Yanni Zhang
- * @version 1.00 13 Mar 2000
  *
  */
 public class KeyTabOutputStream extends KrbDataOutputStream implements KeyTabConstants {
@@ -104,4 +101,3 @@ public class KeyTabOutputStream extends KrbDataOutputStream implements KeyTabCon
 	//}
     }
 }
-	

@@ -34,7 +34,6 @@ import java.security.Provider;
  * different mechanisms.
  *
  * @author Mayank Upadhyay
- * @version 1.13, 05/05/07
  */
 
 public interface GSSNameSpi {

@@ -34,7 +34,6 @@ import java.util.EventObject;
  *
  * @see FlavorListener
  *
- * @version 1.11 05/05/07
  * @author Alexander Gerasimov
  * @since 1.5
  */
@@ -43,8 +42,6 @@ public class FlavorEvent extends EventObject {
      * Constructs a <code>FlavorEvent</code> object.
      *
      * @param source  the <code>Clipboard</code> that is the source of the event
-     *
-     * @throws IllegalArgumentException if the {@code source} is {@code null}
      */
     public FlavorEvent(Clipboard source) {
         super(source);

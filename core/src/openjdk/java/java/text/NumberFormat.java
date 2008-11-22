@@ -176,7 +176,6 @@ import sun.util.resources.LocaleData;
  *
  * @see          DecimalFormat
  * @see          ChoiceFormat
- * @version      1.80, 05/05/07
  * @author       Mark Davis
  * @author       Helena Shih
  */

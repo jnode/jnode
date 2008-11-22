@@ -42,7 +42,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.31
  * @see Extension
  * @see CertAttrSet
  */
@@ -352,7 +351,7 @@ implements CertAttrSet<String> {
 
 
     public boolean[] getBits() {
-	return (boolean[]) bitString.clone();
+        return bitString.clone();
     }
 
     /**

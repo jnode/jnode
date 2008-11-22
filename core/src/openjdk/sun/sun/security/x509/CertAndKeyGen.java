@@ -56,7 +56,6 @@ import sun.security.pkcs.PKCS10;
  *
  * @author David Brownell
  * @author Hemma Prafullchandra
- * @version 1.66
  * @see PKCS10
  * @see X509CertImpl
  */
@@ -236,6 +235,7 @@ public final class CertAndKeyGen {
      * system prototypes.
      *
      * @param myname X.500 name of the subject (who is also the issuer)
+     * @param firstDate the issue time of the certificate
      * @param validity how long the certificate should be valid, in seconds
      * @exception CertificateException on certificate handling errors.
      * @exception InvalidKeyException on key handling errors.
@@ -243,20 +243,20 @@ public final class CertAndKeyGen {
      * @exception NoSuchAlgorithmException on unrecognized algorithms.
      * @exception NoSuchProviderException on unrecognized providers.
      */
-    public X509Certificate getSelfCertificate (X500Name myname, long validity)
+    public X509Certificate getSelfCertificate (
+            X500Name myname, Date firstDate, long validity)
     throws CertificateException, InvalidKeyException, SignatureException,
         NoSuchAlgorithmException, NoSuchProviderException
     {
 	X500Signer	issuer;
 	X509CertImpl	cert;
-	Date		firstDate, lastDate;
+        Date            lastDate;
 
 	try {
 	    issuer = getSigner (myname);
 
-	    firstDate = new Date ();
 	    lastDate = new Date ();
-	    lastDate.setTime (lastDate.getTime () + validity * 1000);
+            lastDate.setTime (firstDate.getTime () + validity * 1000);
 
             CertificateValidity interval =
                                    new CertificateValidity(firstDate,lastDate);
@@ -276,11 +276,13 @@ public final class CertAndKeyGen {
             info.set(X509CertInfo.ISSUER,
                      new CertificateIssuerName(issuer.getSigner()));
             
+            if (System.getProperty("sun.security.internal.keytool.skid") != null) {
             CertificateExtensions ext = new CertificateExtensions();
                 ext.set(SubjectKeyIdentifierExtension.NAME, 
                         new SubjectKeyIdentifierExtension(
                             new KeyIdentifier(publicKey).getIdentifier()));            
             info.set(X509CertInfo.EXTENSIONS, ext);
+            }
 
 	    cert = new X509CertImpl(info);
 	    cert.sign(privateKey, this.sigAlg);
@@ -291,6 +293,14 @@ public final class CertAndKeyGen {
              throw new CertificateEncodingException("getSelfCert: " +
                                                     e.getMessage());
 	}
+    }
+
+    // Keep the old method
+    public X509Certificate getSelfCertificate (X500Name myname, long validity)
+    throws CertificateException, InvalidKeyException, SignatureException,
+        NoSuchAlgorithmException, NoSuchProviderException
+    {
+        return getSelfCertificate(myname, new Date(), validity);
     }
 
     /**

@@ -34,7 +34,6 @@ import java.security.GeneralSecurityException;
  * Class with static methods for doing RC4-HMAC operations.
  * 
  * @author Seema Malkani
- * @version 1.7, 05/05/07
  */
 
 public class ArcFourHmac {

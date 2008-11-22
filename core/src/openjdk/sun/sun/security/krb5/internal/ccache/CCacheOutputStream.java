@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)CCacheOutputStream.java	1.14 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -42,7 +40,6 @@ import sun.security.krb5.internal.*;
  * This class implements a buffered output stream. It provides functions to write FCC-format data to a disk file.
  *
  * @author Yanni Zhang
- * @version 1.00
  *
  */
 public class CCacheOutputStream extends KrbDataOutputStream implements FileCCacheConstants {   

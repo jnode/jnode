@@ -282,7 +282,6 @@ import javax.management.JMX;
  * @see javax.management.MXBean
  *
  * @author  Mandy Chung
- * @version 1.30, 05/05/07 
  * @since   1.5
  */
 public class ManagementFactory {
@@ -618,9 +617,9 @@ public class ManagementFactory {
         final Class interfaceClass = mxbeanInterface;
         // Only allow MXBean interfaces from rt.jar loaded by the
         // bootstrap class loader
-        final ClassLoader loader = (ClassLoader)
-            AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() { 
+        final ClassLoader loader =
+            AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
                     return interfaceClass.getClassLoader();
                 }
             });

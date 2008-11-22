@@ -97,7 +97,6 @@ import java.security.Provider;
  * that this will be rolled into the high level bindings sooner or later.
  *
  * @author Mayank Upadhyay
- * @version 1.15, 05/05/07
  */
 
 public interface GSSContextSpi {
@@ -405,5 +404,3 @@ public interface GSSContextSpi {
      */
     public void dispose() throws GSSException;
 }
-
-

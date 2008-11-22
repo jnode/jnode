@@ -38,7 +38,6 @@ package java.beans;
  * or other live Java executable abstraction.
  *
  * @author Laurence P. G. Cable
- * @version 1.21, 05/05/07
  * @since 1.2
  *
  * @see java.beans.beancontext.BeanContext

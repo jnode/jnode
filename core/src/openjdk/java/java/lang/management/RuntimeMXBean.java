@@ -53,7 +53,6 @@ package java.lang.management;
  *      Ways to Access MXBeans</a>
  *
  * @author  Mandy Chung
- * @version 1.20, 05/05/07 
  * @since   1.5
  */
 public interface RuntimeMXBean {
@@ -334,4 +333,3 @@ public interface RuntimeMXBean {
      */
     public java.util.Map<String, String> getSystemProperties();
 }
-

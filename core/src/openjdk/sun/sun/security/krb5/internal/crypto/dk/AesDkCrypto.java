@@ -23,10 +23,6 @@
  * have any questions.
  */
 
-/*
- * "@(#)AesDkCrypto.java      1.17     07/05/05 SMI"
- */
-
 package sun.security.krb5.internal.crypto.dk;
 
 import javax.crypto.Cipher;
@@ -79,7 +75,6 @@ import java.util.Arrays;
  * Supports AES128 and AES256
  * 
  * @author Seema Malkani
- * @version 1.17, 05/05/07
  */
 
 public class AesDkCrypto extends DkCrypto {

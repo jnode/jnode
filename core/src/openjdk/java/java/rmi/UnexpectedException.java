@@ -31,7 +31,6 @@ package java.rmi;
  * exception that is not among the checked exception types declared in the
  * <code>throws</code> clause of the method in the remote interface.
  * 
- * @version 1.19, 05/05/07
  * @author  Roger Riggs
  * @since   JDK1.1
  */

@@ -145,5 +145,3 @@ class SwitchDataEnumeration implements Enumeration {
 	return table[current_index++];
     }
 }
-
-

@@ -77,7 +77,6 @@ import sun.security.util.ObjectIdentifier;
  * consistent with both fields, then the certificate MUST NOT be used
  * for any purpose.<p>
  *
- * @version 1.17, 05/05/07
  * @since	1.4
  */
 public class ExtendedKeyUsageExtension extends Extension
@@ -139,7 +138,7 @@ implements CertAttrSet<String> {
 	DerOutputStream tmp = new DerOutputStream();
 
 	for (int i = 0; i < keyUsages.size(); i++) {
-	    tmp.putOID((ObjectIdentifier)keyUsages.elementAt(i));
+            tmp.putOID(keyUsages.elementAt(i));
 	}
 
 	os.write(DerValue.tag_Sequence, tmp);

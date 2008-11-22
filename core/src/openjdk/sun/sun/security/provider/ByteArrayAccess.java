@@ -53,7 +53,6 @@ import sun.misc.Unsafe;
  * the message digest implementation in the SUN provider.
  *
  * @since   1.6
- * @version 1.7, 05/05/07
  * @author  Andreas Sterbenz
  */
 final class ByteArrayAccess {

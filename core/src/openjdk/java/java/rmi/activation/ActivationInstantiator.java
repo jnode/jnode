@@ -36,7 +36,6 @@ import java.rmi.RemoteException;
  * method to handle creating objects within the group.
  *
  * @author 	Ann Wollrath
- * @version	1.23, 05/05/07
  * @see 	ActivationGroup
  * @since	1.2
  */

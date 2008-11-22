@@ -102,5 +102,3 @@ public interface BeanContextServiceProvider {
      */
     Iterator getCurrentServiceSelectors(BeanContextServices bcs, Class serviceClass);
 }
-
-

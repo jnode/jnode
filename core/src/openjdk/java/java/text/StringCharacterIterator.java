@@ -42,7 +42,7 @@ package java.text;
 
 /**
  * <code>StringCharacterIterator</code> implements the
- * <code>CharacterIterater</code> protocol for a <code>String</code>.
+ * <code>CharacterIterator</code> protocol for a <code>String</code>.
  * The <code>StringCharacterIterator</code> class iterates over the
  * entire <code>String</code>.
  *

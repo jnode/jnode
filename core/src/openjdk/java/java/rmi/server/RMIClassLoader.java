@@ -27,10 +27,10 @@ package java.rmi.server;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
-
-import sun.misc.Service;
+import java.util.ServiceLoader;
 
 /**
  * <code>RMIClassLoader</code> comprises static methods to support
@@ -101,7 +101,6 @@ import sun.misc.Service;
  *
  * </ul>
  *
- * @version	1.47, 07/05/05
  * @author	Ann Wollrath
  * @author	Peter Jones
  * @author	Laird Dornin
@@ -116,9 +115,9 @@ public class RMIClassLoader {
 
     /** provider instance */
     private static final RMIClassLoaderSpi provider =
-	(RMIClassLoaderSpi) java.security.AccessController.doPrivileged(
-	new java.security.PrivilegedAction() {
-	    public Object run() { return initializeProvider(); }
+        AccessController.doPrivileged(
+            new PrivilegedAction<RMIClassLoaderSpi>() {
+                public RMIClassLoaderSpi run() { return initializeProvider(); }
 	});
 
     /*
@@ -631,7 +630,7 @@ public class RMIClassLoader {
      */
     private static RMIClassLoaderSpi newDefaultProviderInstance() {
 	return new RMIClassLoaderSpi() {
-	    public Class loadClass(String codebase, String name,
+            public Class<?> loadClass(String codebase, String name,
 				   ClassLoader defaultLoader)
 		throws MalformedURLException, ClassNotFoundException
 	    {
@@ -639,7 +638,8 @@ public class RMIClassLoader {
 		    codebase, name, defaultLoader);
 	    }
     
-	    public Class loadProxyClass(String codebase, String[] interfaces,
+            public Class<?> loadProxyClass(String codebase,
+                                           String[] interfaces,
 					ClassLoader defaultLoader)
 		throws MalformedURLException, ClassNotFoundException
 	    {
@@ -677,10 +677,11 @@ public class RMIClassLoader {
 	    }
 
 	    try {
-		Class providerClass =
+                Class<? extends RMIClassLoaderSpi> providerClass =
 		    Class.forName(providerClassName, false,
-				  ClassLoader.getSystemClassLoader());
-		return (RMIClassLoaderSpi) providerClass.newInstance();
+                                  ClassLoader.getSystemClassLoader())
+                    .asSubclass(RMIClassLoaderSpi.class);
+                return providerClass.newInstance();
 
 	    } catch (ClassNotFoundException e) {
 		throw new NoClassDefFoundError(e.getMessage());
@@ -697,13 +698,14 @@ public class RMIClassLoader {
 	}
 
 	/*
-	 * Next look for a provider configuration file intalled:
+         * Next look for a provider configuration file installed:
 	 */
-	Iterator iter = Service.providers(RMIClassLoaderSpi.class,
-					  ClassLoader.getSystemClassLoader());
+        Iterator<RMIClassLoaderSpi> iter =
+            ServiceLoader.load(RMIClassLoaderSpi.class,
+                               ClassLoader.getSystemClassLoader()).iterator();
 	if (iter.hasNext()) {
 	    try {
-		return (RMIClassLoaderSpi) iter.next();
+                return iter.next();
 	    } catch (ClassCastException e) {
 		Error error = new LinkageError(
 		    "provider class not assignable to RMIClassLoaderSpi");

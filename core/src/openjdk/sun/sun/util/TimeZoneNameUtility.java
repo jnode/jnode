@@ -126,10 +126,9 @@ public final class TimeZoneNameUtility {
 
     private static final OpenListResourceBundle getBundle(Locale locale) {
         OpenListResourceBundle rb;
-        SoftReference<OpenListResourceBundle> data = 
-            (SoftReference<OpenListResourceBundle>)cachedBundles.get(locale);
+        SoftReference<OpenListResourceBundle> data = cachedBundles.get(locale);
 
-        if (data == null || ((rb = (OpenListResourceBundle)data.get()) == null)) {
+        if (data == null || ((rb = data.get()) == null)) {
             rb = LocaleData.getTimeZoneNames(locale);
             data = new SoftReference<OpenListResourceBundle>(rb);
             cachedBundles.put(locale, data);

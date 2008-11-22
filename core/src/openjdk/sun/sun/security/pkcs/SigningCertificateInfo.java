@@ -79,7 +79,6 @@ import sun.security.x509.SerialNumber;
  * </pre>
  *
  * @since 1.5
- * @version 1.10, 05/05/07
  * @author Vincent Ryan
  */
 public class SigningCertificateInfo {

@@ -70,7 +70,6 @@ import java.util.Map;
  * </p>
  *
  * @author Laurence P. G. Cable
- * @version 1.46, 01/13/03
  * @since 1.2
  */
 public class      BeanContextSupport extends BeanContextChildSupport

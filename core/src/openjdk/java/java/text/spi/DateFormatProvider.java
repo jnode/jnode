@@ -35,7 +35,6 @@ import java.util.spi.LocaleServiceProvider;
  * {@link java.text.DateFormat DateFormat} class.
  *
  * @since        1.6 
- * @version      @(#)DateFormatProvider.java	1.8 07/05/05
  */
 public abstract class DateFormatProvider extends LocaleServiceProvider {
 

@@ -30,7 +30,6 @@ package java.awt.geom;
  * an exception that is thrown if an operation is performed requiring
  * the inverse of an {@link AffineTransform} object but the 
  * <code>AffineTransform</code> is in a non-invertible state.
- * @version 	1.25, 05/05/07
  */
 
 public class NoninvertibleTransformException extends java.lang.Exception {

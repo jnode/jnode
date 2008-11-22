@@ -43,7 +43,6 @@ import sun.misc.HexDumpEncoder;
  * A SignerInfo, as defined in PKCS#7's signedData type.
  *
  * @author Benjamin Renaud
- * @version 1.55 05/05/07
  */
 public class SignerInfo implements DerEncoder {
 
@@ -470,7 +469,3 @@ public class SignerInfo implements DerEncoder {
     }
 
 }
-
-
-
-

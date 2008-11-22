@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)CredentialsUtil.java	1.17 07/05/05
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -296,21 +294,6 @@ rs.
     private static Credentials serviceCreds(
                     ServiceName service, Credentials ccreds)
     throws KrbException, IOException {
-            KrbTgsReq tgs_req = new KrbTgsReq(ccreds, service);
-	    KrbTgsRep tgs_rep = null;
-	    String kdc = null;
-	    try {
-		kdc = tgs_req.send();
-		tgs_rep = tgs_req.getReply();
-	    } catch (KrbException ke) {
-		if (ke.returnCode() == Krb5.KRB_ERR_RESPONSE_TOO_BIG) {
-			// set useTCP and retry  
-		    tgs_req.send(service.getRealmString(), kdc, true); 
-	            tgs_rep = tgs_req.getReply();
-		} else {
-		    throw ke;
-		}
-	    }
-            return tgs_rep.getCreds();
+        return new KrbTgsReq(ccreds, service).sendAndGetCreds();
     }
 }

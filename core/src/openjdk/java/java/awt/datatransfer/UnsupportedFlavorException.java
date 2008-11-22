@@ -29,7 +29,6 @@ package java.awt.datatransfer;
  * Signals that the requested data is not supported in this flavor.
  * @see Transferable#getTransferData
  *
- * @version 	1.22, 05/05/07
  * @author	Amy Fowler
  */
 public class UnsupportedFlavorException extends Exception {

@@ -67,7 +67,6 @@ import java.lang.ref.*;
  * buckets / 4 * 3. As mentioned above, with a SoftReference cache, it is
  * generally reasonable to set the size to a fairly large value.
  *
- * @version 1.11, 05/05/07
  * @author Andreas Sterbenz
  */
 public abstract class Cache {
@@ -461,4 +460,3 @@ class MemoryCache extends Cache {
     }
     
 }
-

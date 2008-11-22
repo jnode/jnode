@@ -34,6 +34,8 @@ import java.net.Inet6Address;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import sun.security.krb5.*;
+import sun.security.jgss.GSSUtil;
+import sun.security.krb5.internal.Krb5;
 
 abstract class InitialToken extends Krb5Token {
 
@@ -83,8 +85,13 @@ abstract class InitialToken extends Krb5Token {
 		CHECKSUM_FLAGS_SIZE;
 	    
 	    if (context.getCredDelegState()) {
-
-		if (!tgt.isForwardable()) {
+                if (context.getCaller() == GSSUtil.CALLER_HTTP_NEGOTIATE &&
+                        !serviceTicket.getFlags()[Krb5.TKT_OPTS_DELEGATE]) {
+                    // When the caller is HTTP/SPNEGO and OK-AS-DELEGATE
+                    // is not present in the service ticket, delegation
+                    // is disabled.
+                    context.setCredDelegState(false);
+                } else if (!tgt.isForwardable()) {
 		    // XXX log this resetting of delegation state
 		    context.setCredDelegState(false);
 		} else {

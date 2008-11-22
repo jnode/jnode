@@ -57,7 +57,6 @@ import java.util.LinkedList;
  * tokens arrive in sequence.
  *
  * @author Mayank Upadhyay
- * @version 1.15, 05/05/07
  * @since 1.4
  */
 public class TokenTracker {

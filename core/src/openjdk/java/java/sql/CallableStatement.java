@@ -2437,8 +2437,3 @@ public interface CallableStatement extends PreparedStatement {
      void setNClob(String parameterName, Reader reader)
        throws SQLException;
 }
-
-
-
-
-       

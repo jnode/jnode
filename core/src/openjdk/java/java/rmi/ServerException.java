@@ -34,7 +34,6 @@ package java.rmi;
  * A <code>ServerException</code> instance contains the original
  * <code>RemoteException</code> that occurred as its cause.
  *
- * @version 1.22, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  */

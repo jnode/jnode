@@ -35,7 +35,6 @@ package java.rmi.server;
  * <code>ServerSocket</code>.
  *
  * @author 	Ann Wollrath
- * @version	@(#)RMIFailureHandler.java	1.18, 07/05/05
  * @since 	JDK1.1
  */
 public interface RMIFailureHandler {
@@ -59,4 +58,3 @@ public interface RMIFailureHandler {
     public boolean failure(Exception ex);
     
 }
-

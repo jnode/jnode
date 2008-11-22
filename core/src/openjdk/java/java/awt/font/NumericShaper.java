@@ -972,4 +972,3 @@ public final class NumericShaper implements java.io.Serializable {
 	return index;
     }
 }
-

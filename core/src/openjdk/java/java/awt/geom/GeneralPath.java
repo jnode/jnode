@@ -45,7 +45,6 @@ import java.awt.Shape;
  * and used with floating point precision.  Use {@code Path2D.Double}
  * for data that requires the accuracy or range of double precision.
  *
- * @version 1.70, 05/05/07
  * @author Jim Graham
  * @since 1.2
  */

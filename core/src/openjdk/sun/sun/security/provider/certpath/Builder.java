@@ -45,7 +45,6 @@ import sun.security.x509.X509CertImpl;
  * Abstract class representing a builder, which is able to retrieve
  * matching certificates and is able to verify a particular certificate.
  * 
- * @version 	1.22 05/05/07
  * @since	1.4
  * @author      Sean Mullan
  * @author      Yassir Elley

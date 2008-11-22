@@ -37,7 +37,6 @@ import java.util.ArrayList;
  * end-of-contents bytes are expected.
  *
  * @author Hemma Prafullchandra
- * @version 1.20 05/05/07
  */
 class DerIndefLenConverter {
 

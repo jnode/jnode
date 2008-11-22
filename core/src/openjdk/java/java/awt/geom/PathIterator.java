@@ -55,7 +55,6 @@ package java.awt.geom;
  * @see java.awt.Shape
  * @see java.awt.BasicStroke
  *
- * @version 1.23, 05/05/07
  * @author Jim Graham
  */
 public interface PathIterator {

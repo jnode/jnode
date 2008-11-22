@@ -312,5 +312,3 @@ public class Types {
     // Prevent instantiation
     private Types() {}
 }
-
-

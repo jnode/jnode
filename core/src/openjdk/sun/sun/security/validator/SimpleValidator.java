@@ -48,7 +48,6 @@ import sun.security.util.ObjectIdentifier;
  * validator going forward.
  *
  * @author Andreas Sterbenz
- * @version 1.14, 05/05/07
  */
 public final class SimpleValidator extends Validator {
 

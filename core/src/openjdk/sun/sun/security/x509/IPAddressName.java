@@ -63,7 +63,6 @@ import sun.security.util.DerValue;
  * @see GeneralNameInterface
  * @see GeneralNames
  *
- * @version 1.21
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
@@ -303,7 +302,7 @@ public class IPAddressName implements GeneralNameInterface {
      * Returns this IPAddress name as a byte array.
      */
     public byte[] getBytes() {
-        return (byte[]) address.clone();
+        return address.clone();
     }
 
     /**

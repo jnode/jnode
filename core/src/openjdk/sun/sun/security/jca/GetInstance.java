@@ -34,7 +34,6 @@ import java.security.Provider.Service;
  * Collection of utility methods to facilitate implementing getInstance()
  * methods in the JCA/JCE/JSSE/... framework.
  *
- * @version 1.13, 05/05/07
  * @author  Andreas Sterbenz
  * @since   1.5
  */
@@ -263,4 +262,3 @@ public class GetInstance {
     }
     
 }
-

@@ -51,7 +51,6 @@ import sun.security.x509.InhibitAnyPolicyExtension;
  * information on a PKIX certificate, namely certificate policies, policy
  * mappings, policy constraints and policy qualifiers.
  *
- * @version 	1.18 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  */

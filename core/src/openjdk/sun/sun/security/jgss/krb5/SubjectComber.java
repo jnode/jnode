@@ -39,7 +39,6 @@ import java.util.Set;
  * for the desired client/server principals. 
  *
  * @author Ram Marti
- * @version 1.19, 05/05/07
  * @since 1.4.2 
  */
 
@@ -149,8 +148,8 @@ class SubjectComber {
 
                                 }
                             } else {
-                                if (ticket.getServer().getName().equals
-                                (serverPrincipal))  {
+                                if (serverPrincipal == null ||
+                                    ticket.getServer().getName().equals(serverPrincipal))  {
 
                                     if (clientPrincipal == null ||
                                         clientPrincipal.equals(

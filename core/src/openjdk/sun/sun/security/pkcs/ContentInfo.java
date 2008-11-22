@@ -32,7 +32,6 @@ import sun.security.util.*;
 /**
  * A ContentInfo type, as defined in PKCS#7.
  *
- * @version 1.33
  * @author Benjamin Renaud
  */
 

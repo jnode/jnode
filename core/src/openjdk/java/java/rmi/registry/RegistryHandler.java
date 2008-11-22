@@ -33,7 +33,6 @@ import java.rmi.UnknownHostException;
  * runtime in previous implementation versions.  It should never be accessed
  * by application code.
  *
- * @version 1.21, 05/05/07
  * @author  Ann Wollrath
  * @since   JDK1.1
  * @deprecated no replacement

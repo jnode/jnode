@@ -66,7 +66,6 @@ import sun.security.provider.X509Factory;
  * X.509(2000), X.509(1997).
  *
  * @author 	Sean Mullan
- * @version 	1.14 05/05/07
  * @since	1.4
  */
 

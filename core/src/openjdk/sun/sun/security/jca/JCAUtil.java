@@ -32,7 +32,6 @@ import java.security.*;
 /**
  * Collection of static utility methods used by the security framework.
  *
- * @version 1.9, 05/05/07
  * @author  Andreas Sterbenz
  * @since   1.5
  */
@@ -84,4 +83,3 @@ public final class JCAUtil {
     }
     
 }
-

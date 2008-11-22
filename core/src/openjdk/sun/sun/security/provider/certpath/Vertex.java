@@ -45,7 +45,6 @@ import sun.security.x509.X509CertImpl;
  * attempted certification paths.
  *
  * @author 	Sean Mullan
- * @version 	1.13 05/05/07
  * @since	1.4
  */
 public class Vertex {

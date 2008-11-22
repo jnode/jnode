@@ -29,7 +29,6 @@ package sun.security.util;
  * <p> This class represents the <code>ResourceBundle</code>
  * for javax.security.auth and sun.security.
  *
- * @version 1.20, 05/05/07
  */
 public class Resources_ko extends java.util.ListResourceBundle {
 
@@ -53,7 +52,7 @@ public class Resources_ko extends java.util.ListResourceBundle {
         {"Try keytool -help","keytool -help \uc0ac\uc6a9"},
         {"Command option <flag> needs an argument.", "\uba85\ub839 \uc635\uc158 {0}\uc5d0 \uc778\uc218\uac00 \ud544\uc694\ud569\ub2c8\ub2e4."},
         {"Warning:  Different store and key passwords not supported for PKCS12 KeyStores. Ignoring user-specified <command> value.",
-                "\uacbd\uace0:	  \ub2e4\ub978 \uc800\uc7a5\uc18c \ubc0f \ud0a4 \uc554\ud638\ub294 PKCS12 \ud0a4 \uc800\uc7a5\uc18c\uc5d0 \ub300\ud574 \uc9c0\uc6d0\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4. \uc0ac\uc6a9\uc790\uac00 \uc9c0\uc815\ud55c {0} \uac12\uc744 \ubb34\uc2dc\ud569\ub2c8\ub2e4."},
+                "\uacbd\uace0:\t  \ub2e4\ub978 \uc800\uc7a5\uc18c \ubc0f \ud0a4 \uc554\ud638\ub294 PKCS12 \ud0a4 \uc800\uc7a5\uc18c\uc5d0 \ub300\ud574 \uc9c0\uc6d0\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4. \uc0ac\uc6a9\uc790\uac00 \uc9c0\uc815\ud55c {0} \uac12\uc744 \ubb34\uc2dc\ud569\ub2c8\ub2e4."},
 	{"-keystore must be NONE if -storetype is {0}",
 		"-storetype\uc774 {0}\uc778 \uacbd\uc6b0 -keystore\uac00 NONE\uc774\uc5b4\uc57c \ud568"},
         {"Too may retries, program terminated",
@@ -108,7 +107,7 @@ public class Resources_ko extends java.util.ListResourceBundle {
         {"Import command completed:  <ok> entries successfully imported, <fail> entries failed or cancelled",
                  "\uac00\uc838\uc624\uae30 \uba85\ub839 \uc644\ub8cc:  {0}\uac1c \ud56d\ubaa9\uc744 \uc131\uacf5\uc801\uc73c\ub85c \uac00\uc838\uc654\uc2b5\ub2c8\ub2e4. {1}\uac1c \ud56d\ubaa9\uc740 \uc2e4\ud328\ud588\uac70\ub098 \ucde8\uc18c\ub418\uc5c8\uc2b5\ub2c8\ub2e4."},
         {"Warning: Overwriting existing alias <alias> in destination keystore",
-                 "\uacbd\uace0:	 \ub300\uc0c1 \ud0a4 \uc800\uc7a5\uc18c\uc5d0\uc11c \uae30\uc874 \ubcc4\uce6d {0}\uc744(\ub97c) \ub36e\uc5b4\uc4f0\ub294 \uc911"},
+                 "\uacbd\uace0:\t \ub300\uc0c1 \ud0a4 \uc800\uc7a5\uc18c\uc5d0\uc11c \uae30\uc874 \ubcc4\uce6d {0}\uc744(\ub97c) \ub36e\uc5b4\uc4f0\ub294 \uc911"},
         {"Existing entry alias <alias> exists, overwrite? [no]:  ",
                  "\uae30\uc874 \ud56d\ubaa9 \ubcc4\uce6d {0}\uc774(\uac00) \uc788\uc2b5\ub2c8\ub2e4. \ub36e\uc5b4\uc4f0\uc2dc\uaca0\uc2b5\ub2c8\uae4c? [\uc544\ub2c8\uc624]:  "},
 	{"Too many failures - try later", "\uc624\ub958\uac00 \ub108\ubb34 \ub9ce\uc2b5\ub2c8\ub2e4. \ub098\uc911\uc5d0 \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc2ed\uc2dc\uc624."},
@@ -402,10 +401,10 @@ public class Resources_ko extends java.util.ListResourceBundle {
                         
 	// policytool
 	{"Warning: A public key for alias 'signers[i]' does not exist.  Make sure a KeyStore is properly configured.",
-		"\uacbd\uace0:	 \ubcc4\uce6d {0}\uc5d0 \ub300\ud55c \uacf5\uac1c \ud0a4\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.  \ud0a4 \uc800\uc7a5\uc18c\uac00 \uc81c\ub300\ub85c \uad6c\uc131\ub418\uc5b4 \uc788\ub294\uc9c0 \ud655\uc778\ud558\uc2ed\uc2dc\uc624."},
+                "\uacbd\uace0:\t \ubcc4\uce6d {0}\uc5d0 \ub300\ud55c \uacf5\uac1c \ud0a4\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.  \ud0a4 \uc800\uc7a5\uc18c\uac00 \uc81c\ub300\ub85c \uad6c\uc131\ub418\uc5b4 \uc788\ub294\uc9c0 \ud655\uc778\ud558\uc2ed\uc2dc\uc624."},
 	{"Warning: Class not found: class", "\uacbd\uace0: \ud074\ub798\uc2a4\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc74c: {0}"},
 	{"Warning: Invalid argument(s) for constructor: {0}",
-		"\uacbd\uace0:	 \uc798\ubabb\ub41c \uad6c\uc131\uc790 \uc778\uc218: {0}"},
+                "\uacbd\uace0:\t \uc798\ubabb\ub41c \uad6c\uc131\uc790 \uc778\uc218: {0}"},
 	{"Illegal Principal Type: type", "\uc798\ubabb\ub41c \uae30\ubcf8 \uc720\ud615: {0}"},
 	{"Illegal option: option", "\uc798\ubabb\ub41c \uc635\uc158: {0}"},
 	{"Usage: policytool [options]", "\uc0ac\uc6a9\ubc95: policytool [\uc635\uc158]"},
@@ -649,4 +648,3 @@ public class Resources_ko extends java.util.ListResourceBundle {
 	return contents;
     }
 }
-

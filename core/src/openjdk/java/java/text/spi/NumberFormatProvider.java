@@ -35,7 +35,6 @@ import java.util.spi.LocaleServiceProvider;
  * {@link java.text.NumberFormat NumberFormat} class.
  *
  * @since        1.6
- * @version      @(#)NumberFormatProvider.java	1.8 07/05/05
  */
 public abstract class NumberFormatProvider extends LocaleServiceProvider {
 

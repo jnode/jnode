@@ -44,7 +44,6 @@ import static sun.security.provider.ByteArrayAccess.*;
  * MessageDigest implementation.
  * 
  * @since       1.4.2
- * @version     1.13 05/05/07
  * @author	Valerie Peng
  * @author      Andreas Sterbenz
  */
@@ -307,4 +306,3 @@ abstract class SHA5 extends DigestBase {
     }
 
 }
-

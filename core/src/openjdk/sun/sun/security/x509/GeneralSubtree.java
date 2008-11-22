@@ -39,7 +39,6 @@ import sun.security.util.*;
  * }
  * BaseDistance ::= INTEGER (0..MAX)
  * </pre>
- * @version 1.23
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
  */

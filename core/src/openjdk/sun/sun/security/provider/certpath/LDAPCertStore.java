@@ -98,7 +98,6 @@ import sun.security.action.GetPropertyAction;
  *
  * @see java.security.cert.CertStore
  *
- * @version 	1.28, 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  * @author	Andreas Sterbenz
@@ -136,7 +135,7 @@ public class LDAPCertStore extends CertStoreSpi {
 			    "sun.security.certpath.ldap.cache.lifetime";
     
     static {
-	String s = (String)AccessController.doPrivileged(
+        String s = AccessController.doPrivileged(
 				new GetPropertyAction(PROP_LIFETIME));
 	if (s != null) {
 	    LIFETIME = Integer.parseInt(s); // throws NumberFormatException

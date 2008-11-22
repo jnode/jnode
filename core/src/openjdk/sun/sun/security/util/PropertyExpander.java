@@ -36,7 +36,6 @@ import java.security.GeneralSecurityException;
  * is expanded to be the same as file.separator. If a property
  * is not set, a GeneralSecurityException will be thrown.
  *
- * @version 1.22
  * @author Roland Schemers
  */
 public class PropertyExpander {

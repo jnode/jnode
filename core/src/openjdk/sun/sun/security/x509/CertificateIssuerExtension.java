@@ -56,7 +56,6 @@ import sun.security.util.DerOutputStream;
  * 
  * @author Anne Anderson
  * @author Sean Mullan
- * @version 1.11, 05/05/07
  * @since 1.5
  * @see Extension
  * @see CertAttrSet

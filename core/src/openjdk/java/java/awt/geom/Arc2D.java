@@ -50,7 +50,6 @@ import java.io.Serializable;
  * The actual storage representation of the coordinates is left to
  * the subclass.
  *
- * @version 10 Feb 1997
  * @author	Jim Graham
  * @since 1.2
  */

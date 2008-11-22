@@ -41,14 +41,13 @@ import java.util.List;
 /**
  * Utilities for obtaining and converting Kerberos tickets.
  *
- * @version 1.16, 05/05/07
  */
 public class Krb5Util {
 
     static final boolean DEBUG =
-	((Boolean)java.security.AccessController.doPrivileged(
+        java.security.AccessController.doPrivileged(
 	    new sun.security.action.GetBooleanAction
-		("sun.security.krb5.debug"))).booleanValue();
+            ("sun.security.krb5.debug")).booleanValue();
 
     /**
      * Default constructor
@@ -83,7 +82,7 @@ public class Krb5Util {
 	}
 
 	Subject loginSubj = null;
-	if (!GSSUtil.useSubjectCredsOnly()) {
+        if (!GSSUtil.useSubjectCredsOnly(caller)) {
 	    // 2. Try to get ticket from login 
 	    try {
 		loginSubj = GSSUtil.login(caller, GSSUtil.GSS_KRB5_MECH_OID);
@@ -150,7 +149,7 @@ public class Krb5Util {
 		  KerberosTicket.class);
 
 	// Try to get ticket from Subject obtained from GSSUtil
-        if (ticket == null && !GSSUtil.useSubjectCredsOnly()) {
+        if (ticket == null && !GSSUtil.useSubjectCredsOnly(caller)) {
 	    Subject subject = GSSUtil.login(caller, GSSUtil.GSS_KRB5_MECH_OID);
 	    ticket = (KerberosTicket) SubjectComber.find(subject, 
 		serverPrincipal, clientPrincipal, KerberosTicket.class);
@@ -176,7 +175,7 @@ public class Krb5Util {
 	Subject subject = Subject.getSubject(acc);
 
 	// Try to get Subject obtained from GSSUtil
-        if (subject == null && !GSSUtil.useSubjectCredsOnly()) {
+        if (subject == null && !GSSUtil.useSubjectCredsOnly(caller)) {
 	    subject = GSSUtil.login(caller, GSSUtil.GSS_KRB5_MECH_OID);
         }
 	return subject;
@@ -199,7 +198,7 @@ public class Krb5Util {
  	List<KerberosKey> kkeys = (List<KerberosKey>)SubjectComber.findMany(
 		accSubj, serverPrincipal, null, KerberosKey.class);
 
-        if (kkeys == null && !GSSUtil.useSubjectCredsOnly()) {
+        if (kkeys == null && !GSSUtil.useSubjectCredsOnly(caller)) {
 	    Subject subject = GSSUtil.login(caller, GSSUtil.GSS_KRB5_MECH_OID);
 	    kkeys = (List<KerberosKey>) SubjectComber.findMany(subject, 
 		serverPrincipal, null, KerberosKey.class);

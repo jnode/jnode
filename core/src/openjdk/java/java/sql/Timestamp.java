@@ -535,4 +535,3 @@ public class Timestamp extends java.util.Date {
     static final long serialVersionUID = 2745179027874758501L;
 
 }
-

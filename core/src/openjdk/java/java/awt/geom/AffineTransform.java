@@ -108,7 +108,6 @@ import java.awt.Shape;
  * approximately 0.0000000211 radians (or 0.00000121 degrees) around
  * small multiples of <code>Math.PI/2.0</code>.
  *
- * @version 1.83, 05/05/07
  * @author Jim Graham
  * @since 1.2
  */

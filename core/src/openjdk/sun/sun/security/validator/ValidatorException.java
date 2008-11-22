@@ -32,7 +32,6 @@ import java.security.cert.*;
  * allow better error diagnostics.
  *
  * @author Andreas Sterbenz
- * @version 1.11, 05/05/07
  */
 public class ValidatorException extends CertificateException {
 

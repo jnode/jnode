@@ -34,7 +34,6 @@ import java.net.URL;
  * is running.
  *
  * @author 	Arthur van Hoff
- * @version     1.33, 05/05/07
  * @see         java.applet.Applet#setStub(java.applet.AppletStub)
  * @since       JDK1.0
  */

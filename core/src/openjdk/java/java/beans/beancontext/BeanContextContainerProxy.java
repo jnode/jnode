@@ -34,7 +34,6 @@ import java.awt.Container;
  * </p>
  *
  * @author Laurence P. G. Cable
- * @version 1.17, 05/05/07
  * @since 1.2
  *
  * @see java.beans.beancontext.BeanContext

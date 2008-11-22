@@ -47,7 +47,6 @@ import java.math.BigInteger;
  * DER data encodings which are defined.  That subset is sufficient for
  * generating most X.509 certificates.
  *
- * @version 1.57
  *
  * @author David Brownell
  * @author Amit Kapoor

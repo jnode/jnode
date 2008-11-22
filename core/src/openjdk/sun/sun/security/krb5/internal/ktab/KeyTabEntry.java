@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)KeyTabEntry.java	1.17 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -40,7 +38,6 @@ import java.io.UnsupportedEncodingException;
  * the key, time stamp, key version and secret key itself.
  *
  * @author Yanni Zhang
- * @version 1.00  09 Mar 2000
  */
 public class KeyTabEntry implements KeyTabConstants {
     PrincipalName service;

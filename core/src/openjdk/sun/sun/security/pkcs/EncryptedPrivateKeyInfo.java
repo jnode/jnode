@@ -42,7 +42,6 @@ import sun.security.util.DerOutputStream;
  *
  * @author Jan Luehe
  *
- * @version 1.18, 07/05/05
  */
 
 public class EncryptedPrivateKeyInfo {
@@ -87,7 +86,7 @@ public class EncryptedPrivateKeyInfo {
         if (seq[1].data.available() != 0)
             throw new IOException("encryptedData field overrun");
 
-	this.encoded = (byte[])encoded.clone();
+        this.encoded = encoded.clone();
     }
 
     /**
@@ -96,7 +95,7 @@ public class EncryptedPrivateKeyInfo {
      */
     public EncryptedPrivateKeyInfo(AlgorithmId algid, byte[] encryptedData) {
 	this.algid = algid;
-	this.encryptedData = (byte[])encryptedData.clone();
+        this.encryptedData = encryptedData.clone();
     }
 
     /**
@@ -110,7 +109,7 @@ public class EncryptedPrivateKeyInfo {
      * Returns the encrypted data.
      */
     public byte[] getEncryptedData() {
-	return (byte[])this.encryptedData.clone();
+        return this.encryptedData.clone();
     }
 
     /**
@@ -119,7 +118,7 @@ public class EncryptedPrivateKeyInfo {
     public byte[] getEncoded()
 	throws IOException
     {
-	if (this.encoded != null) return (byte[])this.encoded.clone();
+        if (this.encoded != null) return this.encoded.clone();
 
 	DerOutputStream out = new DerOutputStream();
 	DerOutputStream tmp = new DerOutputStream();
@@ -134,7 +133,7 @@ public class EncryptedPrivateKeyInfo {
 	out.write(DerValue.tag_Sequence, tmp);
 	this.encoded = out.toByteArray();
 
-	return (byte[])this.encoded.clone();
+        return this.encoded.clone();
     }
 
     public boolean equals(Object other) {

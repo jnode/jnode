@@ -51,7 +51,6 @@ import java.rmi.server.RMIClassLoader;
  * using the ObjectInputStream.readObject method.
  *
  * @author	Peter Jones
- * @version	1.44, 07/05/05
  */
 public class MarshalInputStream extends ObjectInputStream {
 

@@ -35,7 +35,6 @@ import java.util.spi.LocaleServiceProvider;
  * {@link java.text.DecimalFormatSymbols DecimalFormatSymbols} class.
  *
  * @since        1.6 
- * @version      @(#)DecimalFormatSymbolsProvider.java	1.8 07/05/05
  */
 public abstract class DecimalFormatSymbolsProvider extends LocaleServiceProvider {
 

@@ -29,7 +29,6 @@ package java.rmi;
  * has occurred during the execution of one of
  * <code>java.rmi.RMISecurityManager</code>'s methods.
  *
- * @version 1.23, 05/05/07
  * @author  Roger Riggs
  * @since   JDK1.1
  * @deprecated Use {@link java.lang.SecurityException} instead.

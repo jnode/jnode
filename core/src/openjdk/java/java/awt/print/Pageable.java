@@ -81,4 +81,3 @@ public interface Pageable {
     Printable getPrintable(int pageIndex)
 	throws IndexOutOfBoundsException;
 }
-

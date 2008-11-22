@@ -78,4 +78,3 @@ public class PermissionImpl implements Permission {
     }
 
 }
-

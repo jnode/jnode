@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)BreakIteratorRules.java	1.34 07/05/05
- */
+
 
 /*
  * Licensed Materials - Property of IBM

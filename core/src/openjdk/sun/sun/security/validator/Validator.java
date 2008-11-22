@@ -82,7 +82,6 @@ import java.security.cert.*;
  * @see EndEntityChecker
  *
  * @author Andreas Sterbenz
- * @version 1.15, 05/05/07
  */
 public abstract class Validator {
 

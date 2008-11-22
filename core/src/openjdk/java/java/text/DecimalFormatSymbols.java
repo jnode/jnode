@@ -60,7 +60,6 @@ import sun.util.resources.LocaleData;
  *
  * @see          java.util.Locale
  * @see          DecimalFormat
- * @version      1.52, 05/05/07
  * @author       Mark Davis
  * @author       Alan Liu
  */

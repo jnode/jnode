@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)AuthTime.java	1.15 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -37,7 +35,6 @@ import sun.security.krb5.internal.KerberosTime;
  * The class represents the timestamp in authenticator.
  *
  * @author Yanni Zhang
- * @version 1.00 10 Jul 00
  */
 public class AuthTime {
     long kerberosTime;

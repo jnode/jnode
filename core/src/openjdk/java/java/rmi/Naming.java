@@ -62,7 +62,6 @@ import java.net.URISyntaxException;
  * (see <code>java.rmi.registry.LocateRegistry.createRegistry</code> method
  * for details).
  *
- * @version 1.13, 09/05/99
  * @author  Ann Wollrath
  * @author  Roger Riggs
  * @since   JDK1.1

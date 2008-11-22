@@ -50,7 +50,6 @@ import java.lang.String;
  * they are subject to change or removal without notice.
  *
  * @author Arthur van Hoff
- * @version 	1.41, 08/19/97
  */
 public final
 class Assembler implements Constants {
@@ -954,4 +953,3 @@ public void GenJCov(Environment env) {
 	}
     }
 }
-

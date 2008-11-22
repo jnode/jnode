@@ -29,7 +29,6 @@ package java.lang.management;
  * Types of {@link MemoryPoolMXBean memory pools}.
  *
  * @author  Mandy Chung
- * @version 1.14, 05/05/07
  * @since   1.5
  */
 public enum MemoryType {

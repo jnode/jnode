@@ -58,7 +58,6 @@ import sun.security.util.ObjectIdentifier;
  * SkipCerts ::= INTEGER (0..MAX)
  * </pre></code>
  * @author Anne Anderson
- * @version 1.16, 05/05/07
  * @see CertAttrSet
  * @see Extension
  */

@@ -57,7 +57,6 @@ import sun.misc.HexDumpEncoder;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.37
  * @see CertAttrSet
  * @see X509CertImpl
  */
@@ -190,7 +189,7 @@ public class X509CertInfo implements CertAttrSet<String> {
             emit(tmp);
             rawCertInfo = tmp.toByteArray();
         }
-        out.write((byte[])rawCertInfo.clone());
+        out.write(rawCertInfo.clone());
     }
 
     /**
@@ -232,7 +231,7 @@ public class X509CertInfo implements CertAttrSet<String> {
                 emit(tmp);
                 rawCertInfo = tmp.toByteArray();
             }
-	    return (byte[])rawCertInfo.clone();
+            return rawCertInfo.clone();
         } catch (IOException e) {
             throw new CertificateEncodingException(e.toString());
         } catch (CertificateException e) {

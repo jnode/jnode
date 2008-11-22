@@ -55,7 +55,6 @@ import sun.rmi.registry.RegistryImpl;
 /**
  * The default activation group implementation.
  *
- * @version	1.51, 05/05/07
  * @author	Ann Wollrath
  * @since	1.2
  * @see		java.rmi.activation.ActivationGroup

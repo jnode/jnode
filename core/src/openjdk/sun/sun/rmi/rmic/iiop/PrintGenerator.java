@@ -42,7 +42,6 @@ import sun.rmi.rmic.Main;
 /**
  * An IDL generator for rmic.
  *
- * @version	1.0, 3/9/98
  * @author	Bryan Atsatt
  */
 public class PrintGenerator implements sun.rmi.rmic.Generator,

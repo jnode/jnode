@@ -51,7 +51,6 @@ import java.util.Enumeration;
  * they are subject to change or removal without notice.
  *
  * @author 	Arthur van Hoff
- * @version 	1.31, 05/05/07
  */
 
 public final

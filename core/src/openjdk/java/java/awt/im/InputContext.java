@@ -68,7 +68,6 @@ import sun.awt.im.InputMethodContext;
  *
  * @see java.awt.Component#getInputContext
  * @see java.awt.Component#enableInputMethods
- * @version 	1.43, 05/05/07
  * @author JavaSoft Asia/Pacific
  * @since 1.2
  */

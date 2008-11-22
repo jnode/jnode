@@ -30,7 +30,6 @@ import java.awt.Font;
  * The <code>MultipleMaster</code> interface represents Type 1
  * Multiple Master fonts.
  * A particular {@link Font} object can implement this interface.
- * @version 10 Feb 1997    
  */
 public interface MultipleMaster {
 

@@ -40,7 +40,6 @@ import sun.security.action.PutAllAction;
  * machine configuration.
  *
  * @author Yu-Ching Valerie Peng
- * @version 1.13, 05/05/07
  */
 
 public final class SunNativeProvider extends Provider {

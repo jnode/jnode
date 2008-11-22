@@ -46,7 +46,6 @@ import sun.security.util.*;
 /**
  * Holds a PKCS#8 key, for example a private key
  *
- * @version 1.54, 05/05/07
  * @author Dave Brownell
  * @author Benjamin Renaud
  */
@@ -302,7 +301,7 @@ public class PKCS8Key implements PrivateKey {
 					       e.getMessage());
 	    }
 	} 
-	return (byte[])encodedKey.clone();
+        return encodedKey.clone();
     }
 
     /*

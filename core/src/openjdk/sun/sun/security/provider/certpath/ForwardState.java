@@ -51,7 +51,6 @@ import sun.security.x509.X509CertImpl;
  * A specification of a forward PKIX validation state
  * which is initialized by each build and updated each time a 
  * certificate is added to the current path.
- * @version 	1.22 05/05/07
  * @since	1.4
  * @author      Yassir Elley
  */

@@ -58,7 +58,6 @@ import sun.security.util.DerOutputStream;
  *
  * @author Sean Mullan
  * @author Anne Anderson
- * @version 1.16, 05/05/07
  * @since	1.4
  */
 public class PolicyInformation {

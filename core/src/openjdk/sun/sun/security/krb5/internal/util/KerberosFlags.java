@@ -23,8 +23,6 @@
  */
 
 /*
- * @(#)KerberosFlags.java	1.16 07/04/27
- *
  *  (C) Copyright IBM Corp. 1999 All Rights Reserved.
  *  Copyright 1997 The Open Group Research Institute.  All rights reserved.
  */
@@ -54,7 +52,6 @@ import sun.security.util.DerOutputStream;
  *                      -- but no fewer than 32
  *
  * @author Yanni Zhang
- * @version 1.0 22 June 2000
  */
 public class KerberosFlags {
     BitArray bits;

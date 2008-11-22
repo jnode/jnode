@@ -47,7 +47,6 @@ import java.util.Date;
  * and RFC 3280, section 4.1.2.4., we assume that this kind of string will
  * contain ISO-8859-1 characters only.
  *
- * @version 1.76, 05/05/07
  *
  * @author David Brownell
  * @author Amit Kapoor

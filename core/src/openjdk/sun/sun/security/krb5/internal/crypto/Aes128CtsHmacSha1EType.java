@@ -35,7 +35,6 @@ import sun.security.krb5.Checksum;
  * This class encapsulates the encryption type for AES128
  *
  * @author Seema Malkani
- * @version 1.7, 05/05/07
  */
 
 public final class Aes128CtsHmacSha1EType extends EType {

@@ -45,7 +45,6 @@ import sun.security.x509.*;
  * <a href="http://www.ietf.org/rfc/rfc2560.txt">
  * http://www.ietf.org/rfc/rfc2560.txt</a>.
  *
- * @version 	1.13 05/05/07
  * @author	Ram Marti	
  */
 class OCSPChecker extends PKIXCertPathChecker {
@@ -93,8 +92,7 @@ class OCSPChecker extends PKIXCertPathChecker {
 	this.cp = certPath; 
 	this.pkixParams = pkixParams;
 	List<? extends Certificate> tmp = cp.getCertificates();
-	certs =
-	    (X509Certificate[]) tmp.toArray(new X509Certificate[tmp.size()]);
+        certs = tmp.toArray(new X509Certificate[tmp.size()]);
 	init(false);
     }
     
@@ -182,8 +180,7 @@ class OCSPChecker extends PKIXCertPathChecker {
 
 	    // Set the issuer certificate
 	    if (remainingCerts != 0) {
-		issuerCertImpl = X509CertImpl.toImpl(
-		    (X509Certificate)(certs[remainingCerts]));
+                issuerCertImpl = X509CertImpl.toImpl(certs[remainingCerts]);
 		seekIssuerCert = false; // done
 		
 		// By default, the OCSP responder's cert is the same as the 

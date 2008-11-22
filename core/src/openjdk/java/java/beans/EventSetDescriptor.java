@@ -44,8 +44,8 @@ public class EventSetDescriptor extends FeatureDescriptor {
     private MethodDescriptor removeMethodDescriptor;
     private MethodDescriptor getMethodDescriptor;
 
-    private Reference listenerMethodsRef;
-    private Reference listenerTypeRef;
+    private Reference<Method[]> listenerMethodsRef;
+    private Reference<Class> listenerTypeRef;
 
     private boolean unicast;
     private boolean inDefaultEventSet = true;
@@ -74,14 +74,14 @@ public class EventSetDescriptor extends FeatureDescriptor {
 		throws IntrospectionException {
 	this(sourceClass, eventSetName, listenerType, 
 	     new String[] { listenerMethodName },
-	     "add" + getListenerClassName(listenerType),
-	     "remove" + getListenerClassName(listenerType),
-	     "get" + getListenerClassName(listenerType) + "s");
+             Introspector.ADD_PREFIX + getListenerClassName(listenerType),
+             Introspector.REMOVE_PREFIX + getListenerClassName(listenerType),
+             Introspector.GET_PREFIX + getListenerClassName(listenerType) + "s");
 
-	String eventName = capitalize(eventSetName) + "Event";
+        String eventName = NameGenerator.capitalize(eventSetName) + "Event";
 	Method[] listenerMethods = getListenerMethods();
 	if (listenerMethods.length > 0) {
-	    Class[] args = listenerMethods[0].getParameterTypes();
+            Class[] args = getParameterTypes(getClass0(), listenerMethods[0]);
 	    // Check for EventSet compliance. Special case for vetoableChange. See 4529996
 	    if (!"vetoableChange".equals(eventSetName) && !args[0].getName().endsWith(eventName)) {
                 throw new IntrospectionException("Method \"" + listenerMethodName +
@@ -291,11 +291,13 @@ public class EventSetDescriptor extends FeatureDescriptor {
      * get invoked when the event is fired.
      */
     public Class<?> getListenerType() {
-	return (Class)getObject(listenerTypeRef);
+        return (this.listenerTypeRef != null)
+                ? this.listenerTypeRef.get()
+                : null;
     }
 
     private void setListenerType(Class cls) {
-	listenerTypeRef = createReference(cls);
+        this.listenerTypeRef = getWeakReference(cls);
     }
 
     /** 
@@ -329,11 +331,13 @@ public class EventSetDescriptor extends FeatureDescriptor {
                 listenerMethodDescriptors[i] = new MethodDescriptor(methods[i]);
 	    }
 	}
-	listenerMethodsRef = createReference(methods, true);
+        this.listenerMethodsRef = getSoftReference(methods);
     }
 
     private Method[] getListenerMethods0() {
-	return (Method[])getObject(listenerMethodsRef);
+        return (this.listenerMethodsRef != null)
+                ? this.listenerMethodsRef.get()
+                : null;
     }
 
     /** 

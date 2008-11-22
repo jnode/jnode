@@ -164,7 +164,7 @@ public class PropertyEditorSupport implements PropertyEditor {
     public String getAsText() {
         return (this.value != null)
                 ? this.value.toString()
-                : null;
+                : "null";
     }
 
     /**

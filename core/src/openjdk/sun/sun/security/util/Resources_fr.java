@@ -29,7 +29,6 @@ package sun.security.util;
  * <p> This class represents the <code>ResourceBundle</code>
  * for javax.security.auth and sun.security.
  *
- * @version 1.23, 05/05/07
  */
 public class Resources_fr extends java.util.ListResourceBundle {
 

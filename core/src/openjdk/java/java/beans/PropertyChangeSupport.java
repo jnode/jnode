@@ -22,19 +22,15 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-
 package java.beans;
 
 import java.io.Serializable;
+import java.io.ObjectStreamField;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import sun.awt.EventListenerAggregate;
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 /**
  * This is a utility class that can be used by beans that support bound
@@ -44,19 +40,15 @@ import sun.awt.EventListenerAggregate;
  * This class is serializable.  When it is serialized it will save
  * (and restore) any listeners that are themselves serializable.  Any
  * non-serializable listeners will be skipped during serialization.
- *
  */
-public class PropertyChangeSupport implements java.io.Serializable {
-
-    // Manages the listener list.
-    private transient EventListenerAggregate listeners;
+public class PropertyChangeSupport implements Serializable {
+    private PropertyChangeListenerMap map = new PropertyChangeListenerMap();
 
     /**
      * Constructs a <code>PropertyChangeSupport</code> object.
      *
      * @param sourceBean  The bean to be given as the source for any events.
      */
-
     public PropertyChangeSupport(Object sourceBean) {
 	if (sourceBean == null) {
 	    throw new NullPointerException();
@@ -74,12 +66,10 @@ public class PropertyChangeSupport implements java.io.Serializable {
      *
      * @param listener  The PropertyChangeListener to be added
      */
-    public synchronized void addPropertyChangeListener(
-				PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
 	if (listener == null) {
 	    return;
 	}
-
 	if (listener instanceof PropertyChangeListenerProxy) {
 	    PropertyChangeListenerProxy proxy =
                    (PropertyChangeListenerProxy)listener;
@@ -87,10 +77,7 @@ public class PropertyChangeSupport implements java.io.Serializable {
 	    addPropertyChangeListener(proxy.getPropertyName(),
                     (PropertyChangeListener)proxy.getListener());
 	} else {
-	    if (listeners == null) {
-		listeners = new EventListenerAggregate(PropertyChangeListener.class);
-	    }
-	    listeners.add(listener);
+            this.map.add(null, listener);
 	}
     }
 
@@ -105,12 +92,10 @@ public class PropertyChangeSupport implements java.io.Serializable {
      *
      * @param listener  The PropertyChangeListener to be removed
      */
-    public synchronized void removePropertyChangeListener(
-				PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
 	if (listener == null) {
 	    return;
 	}
-
 	if (listener instanceof PropertyChangeListenerProxy) {
 	    PropertyChangeListenerProxy proxy =
                     (PropertyChangeListenerProxy)listener;
@@ -118,10 +103,7 @@ public class PropertyChangeSupport implements java.io.Serializable {
 	    removePropertyChangeListener(proxy.getPropertyName(),
                    (PropertyChangeListener)proxy.getListener());
 	} else {
-	    if (listeners == null) {
-		return;
-	    }
-	    listeners.remove(listener);
+            this.map.remove(null, listener);
 	}
     }
 
@@ -156,32 +138,8 @@ public class PropertyChangeSupport implements java.io.Serializable {
      *         empty array if no listeners have been added
      * @since 1.4
      */
-    public synchronized PropertyChangeListener[] getPropertyChangeListeners() {
-	List returnList = new ArrayList();
-     
-	// Add all the PropertyChangeListeners 
-	if (listeners != null) {
-	    returnList.addAll(Arrays.asList(listeners.getListenersInternal()));
-	}
-	 
-	// Add all the PropertyChangeListenerProxys
-	if (children != null) {
-	    Iterator iterator = children.keySet().iterator();
-	    while (iterator.hasNext()) {
-		String key = (String)iterator.next();
-		PropertyChangeSupport child =
-                        (PropertyChangeSupport)children.get(key);
-		PropertyChangeListener[] childListeners =
-                        child.getPropertyChangeListeners();
-		for (int index = childListeners.length - 1; index >= 0;
-                        index--) {
-		    returnList.add(new PropertyChangeListenerProxy(
-                            key, childListeners[index]));
-		}
-	    }
-	}
-	return (PropertyChangeListener[])(returnList.toArray(
-                new PropertyChangeListener[0]));
+    public PropertyChangeListener[] getPropertyChangeListeners() {
+        return this.map.getListeners();
     }
 
     /**
@@ -197,22 +155,16 @@ public class PropertyChangeSupport implements java.io.Serializable {
      * @param propertyName  The name of the property to listen on.
      * @param listener  The PropertyChangeListener to be added
      */
-
-    public synchronized void addPropertyChangeListener(
+    public void addPropertyChangeListener(
                 String propertyName,
                 PropertyChangeListener listener) {
         if (listener == null || propertyName == null) {
             return;
         }
-        if (children == null) {
-            children = new java.util.Hashtable();
+        listener = this.map.extract(listener);
+        if (listener != null) {
+            this.map.add(propertyName, listener);
         }
-        PropertyChangeSupport child = (PropertyChangeSupport)children.get(propertyName);
-        if (child == null) {
-            child = new PropertyChangeSupport(source);
-            children.put(propertyName, child);
-        }
-        child.addPropertyChangeListener(listener);
     }
 
     /**
@@ -228,21 +180,16 @@ public class PropertyChangeSupport implements java.io.Serializable {
      * @param propertyName  The name of the property that was listened on.
      * @param listener  The PropertyChangeListener to be removed
      */
-
-    public synchronized void removePropertyChangeListener(
+    public void removePropertyChangeListener(
                 String propertyName,
                 PropertyChangeListener listener) {
         if (listener == null || propertyName == null) {
             return;
         }
-        if (children == null) {
-            return;
+        listener = this.map.extract(listener);
+        if (listener != null) {
+            this.map.remove(propertyName, listener);
         }
-        PropertyChangeSupport child = (PropertyChangeSupport)children.get(propertyName);
-        if (child == null) {
-            return;
-        }
-        child.removePropertyChangeListener(listener);
     }
 
     /**
@@ -256,20 +203,8 @@ public class PropertyChangeSupport implements java.io.Serializable {
      *         returned.
      * @since 1.4
      */
-    public synchronized PropertyChangeListener[] getPropertyChangeListeners(
-            String propertyName) {
-        ArrayList returnList = new ArrayList();
-
-        if (children != null && propertyName != null) {
-            PropertyChangeSupport support =
-                    (PropertyChangeSupport)children.get(propertyName);
-            if (support != null) {
-                returnList.addAll(
-                        Arrays.asList(support.getPropertyChangeListeners()));
-            }
-        }
-        return (PropertyChangeListener[])(returnList.toArray(
-                new PropertyChangeListener[0]));
+    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+        return this.map.getListeners(propertyName);
     }
 
     /**
@@ -312,9 +247,8 @@ public class PropertyChangeSupport implements java.io.Serializable {
 	if (oldValue == newValue) {
 	    return;
 	}
-	firePropertyChange(propertyName, new Integer(oldValue), new Integer(newValue));
+        firePropertyChange(propertyName, Integer.valueOf(oldValue), Integer.valueOf(newValue));
     }
-
 
     /**
      * Report a boolean bound property update to any registered listeners.
@@ -349,25 +283,23 @@ public class PropertyChangeSupport implements java.io.Serializable {
 	if (oldValue != null && newValue != null && oldValue.equals(newValue)) {
 	    return;
 	}
+        PropertyChangeListener[] common = this.map.get(null);
+        PropertyChangeListener[] named = (propertyName != null)
+                    ? this.map.get(propertyName)
+                    : null;
 
-	if (listeners != null) {
-	    Object[] list = listeners.getListenersInternal();
-	    for (int i = 0; i < list.length; i++) {
-		PropertyChangeListener target = (PropertyChangeListener)list[i];
-		target.propertyChange(evt);
-	    }
+        fire(common, evt);
+        fire(named, evt);
 	}
 
-	if (children != null && propertyName != null) {
-	    PropertyChangeSupport child = null;
-	    child = (PropertyChangeSupport)children.get(propertyName);
-	    if (child != null) {
-		child.firePropertyChange(evt);
+    private void fire(PropertyChangeListener[] listeners, PropertyChangeEvent event) {
+        if (listeners != null) {
+            for (PropertyChangeListener listener : listeners) {
+                listener.propertyChange(event);
 	    }
 	}
     }
 
-    
     /**
      * Report a bound indexed property update to any registered
      * listeners. 
@@ -414,8 +346,8 @@ public class PropertyChangeSupport implements java.io.Serializable {
 	    return;
 	}
 	fireIndexedPropertyChange(propertyName, index, 
-				  new Integer(oldValue), 
-				  new Integer(newValue));
+                                  Integer.valueOf(oldValue),
+                                  Integer.valueOf(newValue));
     }
 
     /**
@@ -451,18 +383,8 @@ public class PropertyChangeSupport implements java.io.Serializable {
      * @param propertyName  the property name.
      * @return true if there are one or more listeners for the given property
      */
-    public synchronized boolean hasListeners(String propertyName) {
-	if (listeners != null && !listeners.isEmpty()) {
-	    // there is a generic listener
-	    return true;
-	}
-	if (children != null && propertyName != null) {
-	    PropertyChangeSupport child = (PropertyChangeSupport)children.get(propertyName);
-	    if (child != null && child.listeners != null) {
-		return !child.listeners.isEmpty();
-	    }
-	}
-	return false;
+    public boolean hasListeners(String propertyName) {
+        return this.map.hasListeners(propertyName);
     }
 
     /**
@@ -470,16 +392,33 @@ public class PropertyChangeSupport implements java.io.Serializable {
      * <p>
      * At serialization time we skip non-serializable listeners and
      * only serialize the serializable listeners.
-     *
      */
     private void writeObject(ObjectOutputStream s) throws IOException {
-        s.defaultWriteObject();
+        Hashtable<String, PropertyChangeSupport> children = null;
+        PropertyChangeListener[] listeners = null;
+        synchronized (this.map) {
+            for (Entry<String, PropertyChangeListener[]> entry : this.map.getEntries()) {
+                String property = entry.getKey();
+                if (property == null) {
+                    listeners = entry.getValue();
+                } else {
+                    if (children == null) {
+                        children = new Hashtable<String, PropertyChangeSupport>();
+                    }
+                    PropertyChangeSupport pcs = new PropertyChangeSupport(this.source);
+                    pcs.map.set(null, entry.getValue());
+                    children.put(property, pcs);
+                }
+            }
+        }
+        ObjectOutputStream.PutField fields = s.putFields();
+        fields.put("children", children);
+        fields.put("source", this.source);
+        fields.put("propertyChangeSupportSerializedDataVersion", 2);
+        s.writeFields();
 
 	if (listeners != null) {
-	    Object[] list = listeners.getListenersCopy();
-
-	    for (int i = 0; i < list.length; i++) {
-	        PropertyChangeListener l = (PropertyChangeListener)list[i];
+            for (PropertyChangeListener l : listeners) {
 	        if (l instanceof Serializable) {
 	            s.writeObject(l);
 	        }
@@ -488,39 +427,82 @@ public class PropertyChangeSupport implements java.io.Serializable {
         s.writeObject(null);
     }
 
-
     private void readObject(ObjectInputStream s) throws ClassNotFoundException, IOException {
-        s.defaultReadObject();
+        this.map = new PropertyChangeListenerMap();
+
+        ObjectInputStream.GetField fields = s.readFields();
+
+        Hashtable<String, PropertyChangeSupport> children = (Hashtable<String, PropertyChangeSupport>) fields.get("children", null);
+        this.source = fields.get("source", null);
+        fields.get("propertyChangeSupportSerializedDataVersion", 2);
       
         Object listenerOrNull;
         while (null != (listenerOrNull = s.readObject())) {
-	    addPropertyChangeListener((PropertyChangeListener)listenerOrNull);
+            this.map.add(null, (PropertyChangeListener)listenerOrNull);
+        }
+        if (children != null) {
+            for (Entry<String, PropertyChangeSupport> entry : children.entrySet()) {
+                for (PropertyChangeListener listener : entry.getValue().getPropertyChangeListeners()) {
+                    this.map.add(entry.getKey(), listener);
+                }
+            }
         }
     }
 
     /** 
-     * Hashtable for managing listeners for specific properties.
-     * Maps property names to PropertyChangeSupport objects.
-     * @serial 
-     * @since 1.2
-     */
-    private java.util.Hashtable children;
-
-    /** 
      * The object to be provided as the "source" for any generated events.
-     * @serial
      */
     private Object source;
 
     /**
-     * Internal version number
-     * @serial
-     * @since
+     * @serialField children                                   Hashtable
+     * @serialField source                                     Object
+     * @serialField propertyChangeSupportSerializedDataVersion int
      */
-    private int propertyChangeSupportSerializedDataVersion = 2;
+    private static final ObjectStreamField[] serialPersistentFields = {
+            new ObjectStreamField("children", Hashtable.class),
+            new ObjectStreamField("source", Object.class),
+            new ObjectStreamField("propertyChangeSupportSerializedDataVersion", Integer.TYPE)
+    };
 
     /**
      * Serialization version ID, so we're compatible with JDK 1.1
      */
     static final long serialVersionUID = 6401253773779951803L;
+
+    /**
+     * This is a {@link ChangeListenerMap ChangeListenerMap} implementation
+     * that works with {@link PropertyChangeListener PropertyChangeListener} objects.
+     */
+    private static final class PropertyChangeListenerMap extends ChangeListenerMap<PropertyChangeListener> {
+        private static final PropertyChangeListener[] EMPTY = {};
+
+        /**
+         * Creates an array of {@link PropertyChangeListener PropertyChangeListener} objects.
+         * This method uses the same instance of the empty array
+         * when {@code length} equals {@code 0}.
+         *
+         * @param length  the array length
+         * @return        an array with specified length
+         */
+        @Override
+        protected PropertyChangeListener[] newArray(int length) {
+            return (0 < length)
+                    ? new PropertyChangeListener[length]
+                    : EMPTY;
+        }
+
+        /**
+         * Creates a {@link PropertyChangeListenerProxy PropertyChangeListenerProxy}
+         * object for the specified property.
+         *
+         * @param name      the name of the property to listen on
+         * @param listener  the listener to process events
+         * @return          a {@code PropertyChangeListenerProxy} object
+         */
+        @Override
+        protected PropertyChangeListener newProxy(String name, PropertyChangeListener listener) {
+            return new PropertyChangeListenerProxy(name, listener);
+        }
+    }
 }

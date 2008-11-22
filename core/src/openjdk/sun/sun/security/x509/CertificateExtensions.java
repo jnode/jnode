@@ -42,7 +42,6 @@ import sun.security.util.*;
  *
  * @author Amit Kapoor
  * @author Hemma Prafullchandra
- * @version 1.38
  * @see CertAttrSet
  */
 public class CertificateExtensions implements CertAttrSet<Extension> {
@@ -303,7 +302,7 @@ public class CertificateExtensions implements CertAttrSet<Extension> {
             otherExt = (Extension)objs[i];
             if (key == null)
                 key = otherExt.getExtensionId().toString();
-            thisExt = (Extension)map.get(key);
+            thisExt = map.get(key);
             if (thisExt == null)
                 return false;
             if (! thisExt.equals(otherExt))

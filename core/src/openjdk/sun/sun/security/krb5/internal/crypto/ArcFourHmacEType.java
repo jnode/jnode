@@ -35,7 +35,6 @@ import sun.security.krb5.Checksum;
  * This class encapsulates the encryption type for RC4-HMAC
  *
  * @author Seema Malkani
- * @version 1.7, 05/05/07
  */
 
 public final class ArcFourHmacEType extends EType {
