@@ -22,7 +22,6 @@
 package org.jnode.shell.help;
 
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.util.TreeSet;
 
 import javax.naming.NamingException;
@@ -30,7 +29,6 @@ import javax.naming.NamingException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandInfo;
-import org.jnode.shell.help.Help.Info;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
@@ -63,17 +61,6 @@ public abstract class HelpFactory {
         return PluginUtils.getLocalizedMessage(HelpFactory.class, 
                 BUNDLE_NAME, messageKey);
     }
-
-    public static Info getInfo(Class<?> clazz) throws HelpException {
-        try {
-            Field helpInfo = clazz.getField(INFO_FIELD_NAME);
-            return (Help.Info) helpInfo.get(null); // static access
-        } catch (NoSuchFieldException ex) {
-            throw new HelpException("Command information not found");
-        } catch (IllegalAccessException ex) {
-            throw new HelpException("Command information not accessible");
-        }
-    }
     
     /**
      * Obtain a CommanHelp object for a given command alias and its resolved CommandInfo.
@@ -92,28 +79,11 @@ public abstract class HelpFactory {
     /**
      * Shows the help page for a command
      * 
-     * @param info the command info
-     * @param command a command name or alias which appears in the help
-     * @param out the destination for help output.
-     */
-    protected abstract void help(Info info, String command, PrintWriter out);
-
-    /**
-     * Shows the help page for a command
-     * 
      * @param syntaxes the command's syntax bundle
      * @param bundle the command's argument bundle
      * @param out the destination for help output.
      */
     protected abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out);
-
-    /**
-     * Shows the usage line for a command
-     * 
-     * @param info the command information
-     * @param out the destination for help output.
-     */
-    protected abstract void usage(Info info, PrintWriter out);
 
     /**
      * Shows the usage line for a command
@@ -128,12 +98,6 @@ public abstract class HelpFactory {
      * Shows the description of a single argument. Used as a callback in
      * {@link Argument#describe(HelpFactory)}.
      */
-    protected abstract void describeArgument(Argument arg, PrintWriter out);
-
-    /**
-     * Shows the description of a single argument. Used as a callback in
-     * {@link Argument#describe(HelpFactory)}.
-     */
     protected abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintWriter out);
 
     /**
@@ -142,11 +106,5 @@ public abstract class HelpFactory {
      */
     protected abstract void describeOption(FlagArgument arg, 
             TreeSet<String> flagTokens, PrintWriter out);
-
-    /**
-     * Shows the description of a single parameter. Used as a callback in
-     * {@link Parameter#describe(HelpFactory)}.
-     */
-    protected abstract void describeParameter(Parameter param, PrintWriter out);
 
 }

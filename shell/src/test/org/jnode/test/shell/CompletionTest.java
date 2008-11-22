@@ -131,59 +131,6 @@ public class CompletionTest extends TestCase {
         }
     }
 
-    public void testDefaultInterpreterOldSyntax() throws Exception {
-        TestCommandShell cs = new TestCommandShell();
-        cs.setCommandInterpreter("default");
-
-        checkCompletions(cs, "", aliasCompletions, -1);
-        checkCompletions(cs, "di", new String[]{"dir "}, 0);
-        checkCompletions(cs, "dir", new String[]{"dir "}, 0);
-        checkCompletions(cs, "dir ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "dir T", new String[]{"Three ", "Two "}, 4);
-
-        // The default interpreter doesn't recognize '>' '<' or '|' as anything special.
-        // Therefore it should just try to complete them as filenames ... and fail.
-        checkCompletions(cs, "dir |", new String[]{}, -1);
-        checkCompletions(cs, "dir | ", new String[]{}, -1); // dir takes one argument only
-        checkCompletions(cs, "cat | ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "cat | ca", new String[]{}, -1);
-        checkCompletions(cs, "cat >", new String[]{}, -1);
-        checkCompletions(cs, "cat > ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "cat <", new String[]{}, -1);
-        checkCompletions(cs, "cat < ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-    }
-
-    public void testOldSyntaxOptions() throws Exception {
-        TestCommandShell cs = new TestCommandShell();
-        cs.setCommandInterpreter("default");
-
-        // For bug #4418
-        checkCompletions(cs, "cat -", new String[]{"-u "}, -2);
-        checkCompletions(cs, "cat -u", new String[]{"-u "}, -2);
-
-        // And some more ...
-    }
-
-    public void testRedirectingInterpreterOldSyntax() throws Exception {
-        TestCommandShell cs = new TestCommandShell();
-        cs.setCommandInterpreter("redirecting");
-
-        checkCompletions(cs, "", aliasCompletions, -1);
-        checkCompletions(cs, "di", new String[]{"dir "}, 0);
-        checkCompletions(cs, "dir", new String[]{"dir "}, 0);
-        checkCompletions(cs, "dir ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "dir T", new String[]{"Three ", "Two "}, 4);
-        checkCompletions(cs, "dir |", aliasCompletions, -1);
-        checkCompletions(cs, "dir | ", aliasCompletions, -1);
-        checkCompletions(cs, "cat |", aliasCompletions, -1);
-        checkCompletions(cs, "cat | ", aliasCompletions, -1);
-        checkCompletions(cs, "cat | ca", new String[]{"cat "}, 6);
-        checkCompletions(cs, "cat >", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "cat > ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "cat <", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-        checkCompletions(cs, "cat < ", new String[]{"Four/", "One ", "Three ", "Two "}, -1);
-    }
-
     public void testDefaultInterpreterNewSyntax() throws Exception {
         TestCommandShell cs = new TestCommandShell();
         cs.setCommandInterpreter("default");

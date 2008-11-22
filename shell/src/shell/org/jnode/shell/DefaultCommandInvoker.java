@@ -117,7 +117,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
                     }
                 }
             } catch (SyntaxErrorException ex) {
-                HelpFactory.getInfo(cmdInfo.getCommandClass()).usage(err);
+                HelpFactory.getHelpFactory().getHelp(cmdName, cmdInfo).usage(err);
                 err.println(ex.getMessage());
             } catch (VmExit ex) {
                 return ex.getStatus();
