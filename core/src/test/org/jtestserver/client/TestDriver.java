@@ -1,4 +1,5 @@
 /*
+
 JTestServer is a client/server framework for testing any JVM implementation.
  
 Copyright (C) 2008  Fabien DUMINY (fduminy@jnode.org)
@@ -19,10 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,33 +37,47 @@ import org.jtestserver.common.protocol.UDPProtocol;
 public class TestDriver {
     private static final Logger LOGGER = Logger.getLogger(TestDriver.class.getName());
     
-    public static void main(String[] args) throws ProtocolException, IOException {
-        TestDriver testDriver = createUDPTestDriver(InetAddress.getByName("localhost"));
-        
-        if ((args.length > 0) && "kill".equals(args[0])) {
-            testDriver.killRunningServers();
-        } else {
-            testDriver.start();
+    public static void main(String[] args) {
+        try {
+            TestDriver testDriver = createUDPTestDriver();
+            
+            if ((args.length > 0) && "kill".equals(args[0])) {
+                testDriver.killRunningServers();
+            } else {
+                testDriver.start();
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "protocol error", e);
+        } catch (ProtocolException e) {
+            LOGGER.log(Level.SEVERE, "I/O error", e);
         }
     }
     
-    private static TestDriver createUDPTestDriver(InetAddress serverAddress) throws ProtocolException {
-        UDPProtocol protocol = UDPProtocol.createClient(serverAddress);
-        protocol.setTimeout(10000);
+    private static TestDriver createUDPTestDriver() throws ProtocolException, IOException {
+        Config config = Config.read();
+        InetAddress serverAddress = InetAddress.getByName(config.getServerName());
+        int serverPort = config.getServerPort();
+        UDPProtocol protocol = UDPProtocol.createClient(serverAddress, serverPort);
+        protocol.setTimeout(config.getClientTimeout());
         
-        return new TestDriver(protocol, new NewProcessLauncher());
+        return new TestDriver(config, protocol, new NewProcessLauncher());
     }
     
     private final TestClient client;
     private final TestServerProcess serverProcess;
     private final List<String> tests = new ArrayList<String>();
+    private final Config config;
+    private final TestListRW testListRW;
     
-    private TestDriver(Protocol protocol, TestServerLauncher launcher) {
+    private TestDriver(Config config, Protocol protocol, TestServerLauncher launcher) {
+        this.config = config;
         this.client = new DefaultTestClient(protocol);
         this.serverProcess = new TestServerProcess(launcher);
+        this.testListRW = new TestListRW(config);
     }
     
     public void killRunningServers() throws ProtocolException {
+        LOGGER.info("killing running servers");
         try {
             // kill server that might still be running
             client.shutdown();
@@ -87,33 +100,61 @@ public class TestDriver {
         //killRunningServers();
         
         //serverProcess.start();
+
+        final File workingFile = new File(config.getWorkDir(), "working-tests.txt");
+        final File crashingFile = new File(config.getWorkDir(), "crashing-tests.txt");
         
-        readTests();
+        List<String> workingList = new ArrayList<String>();
+        List<String> crashingList = new ArrayList<String>();
         
-        for (String test : tests) {
-            try {
-                Status status = client.runMauveTest(test); 
-                LOGGER.info(((status == null) ? "null" : status.toString()) + ": " + test);
-            } catch (TimeoutException e) {
-                LOGGER.log(Level.SEVERE, "a timeout happened", e);
-            }
-        }
+        LOGGER.info("running list of working tests");
+        runTests(workingFile, true, workingList, crashingList);
         
-        //killRunningServers();
+        LOGGER.info("running list of crashing tests");
+        runTests(crashingFile, false, workingList, crashingList);
+        
+        LOGGER.info("writing crashing & working tests lists");        
+        testListRW.writeList(workingFile, workingList);
+        testListRW.writeList(crashingFile, crashingList);
+        
+        killRunningServers();
     }
     
-    private void readTests() throws IOException {
-        if (tests.isEmpty()) {
-            InputStream in = TestDriver.class.getResourceAsStream("/org/jnode/test/jtestserver/tests/mauve-tests.txt");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String test = null;
-            while ((test = reader.readLine()) != null) {
-                if (!test.startsWith("#")) {
-                    tests.add(test);
+    private void runTests(File listFile, boolean useCompleteListAsDefault,
+            List<String> workingList, List<String> crashingList)
+        throws ProtocolException, IOException {
+        final List<String> list;
+        if (listFile.exists() && !config.isForceUseMauveList()) {
+            list = testListRW.readList(listFile);
+        } else {
+            if (useCompleteListAsDefault || config.isForceUseMauveList()) {
+                // not yet a list of working/crashing tests => starts with the
+                // default one
+                list = testListRW.readCompleteList();
+            } else {
+                list = new ArrayList<String>();
+            }
+        }
+
+        for (String test : list) {
+            boolean working = false;
+            LOGGER.info("launching test " + test);
+
+            try {
+                Status status = client.runMauveTest(test);
+                LOGGER.info(((status == null) ? "null" : status.toString()) + ": " + test);
+
+                working = true;
+            } catch (TimeoutException e) {
+                LOGGER.log(Level.SEVERE, "a timeout happened", e);
+            } finally {
+                if (working) {
+                    workingList.add(test);
+                } else {
+                    crashingList.add(test);
                 }
             }
-            LOGGER.info("" + tests.size() + " tests");
-        }        
+        }
     }
     
 }

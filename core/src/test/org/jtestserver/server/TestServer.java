@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.server;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,25 +39,35 @@ import org.jtestserver.server.commands.ShutdownCommand;
 public class TestServer {
     private static final Logger LOGGER = Logger.getLogger(TestServer.class.getName());
         
-    public static void main(String[] args) throws ProtocolException {
-        UDPProtocol protocol = UDPProtocol.createServer();
-        //protocol.setTimeout(10000);
-        
-        TestServer server = new TestServer(protocol);
-        server.start();
+    public static void main(String[] args) {
+        try {
+            UDPProtocol protocol = UDPProtocol.createServer();
+            //protocol.setTimeout(10000);
+            
+            TestServer server = new TestServer(protocol);
+            server.start();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "unable to read config", e);
+        } catch (ProtocolException e) {
+            LOGGER.log(Level.SEVERE, "unable to create server", e);
+        }
     }
     
     private boolean shutdownRequested = false;
     private final Protocol protocol;
     private final Map<String, TestServerCommand> nameToCommand;
+    private final Config config;
     
-    public TestServer(Protocol protocol) {
+    public TestServer(Protocol protocol) throws IOException {
         this.protocol = protocol;
         nameToCommand = new HashMap<String, TestServerCommand>();
         
         addCommand(new RunMauveTestCommand());
         addCommand(new ShutdownCommand(this));
         addCommand(new GetStatusCommand());
+        
+        this.config = Config.read();
+        MauveTestRunner.getInstance().setConfig(config);
     }
     
     private void addCommand(TestServerCommand command) {
@@ -64,6 +75,8 @@ public class TestServer {
     }
     
     public void start() {
+        LOGGER.info("server started");
+        
         while (!shutdownRequested) {
             try {
                 InputMessage input = InputMessage.create(protocol);

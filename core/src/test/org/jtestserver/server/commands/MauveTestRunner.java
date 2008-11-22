@@ -24,11 +24,13 @@ import gnu.testlet.SingleTestHarness;
 import gnu.testlet.TestHarness;
 import gnu.testlet.Testlet;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jtestserver.common.Status;
+import org.jtestserver.server.Config;
 import org.jtestserver.server.TestFailureException;
 
 public class MauveTestRunner implements TestRunner {
@@ -40,8 +42,13 @@ public class MauveTestRunner implements TestRunner {
     
     private Status status = Status.READY;
     private RunnerThread thread = new RunnerThread();
+    private Config config;
     
     private MauveTestRunner() {        
+    }
+    
+    public void setConfig(Config config) {
+        this.config = config;        
     }
     
     @Override
@@ -52,7 +59,7 @@ public class MauveTestRunner implements TestRunner {
             
             thread.runTest(k);
         } catch (ClassNotFoundException e) {
-            throw new TestFailureException(e);            
+            throw new TestFailureException(e);
         }
     }
 
@@ -69,18 +76,19 @@ public class MauveTestRunner implements TestRunner {
                 
         private boolean shutdownRequested = false;
         
-        private AtomicReference<Class<?>> testClassRef = new AtomicReference<Class<?>>();
+        private ArrayBlockingQueue<Class<?>> tests;
         
         public void runTest(Class<?> testClass) {
             if (!isAlive()) {
+                tests = new ArrayBlockingQueue<Class<?>>(config.getMauveQueueSize());
                 start();
             }
             
-            while (!shutdownRequested && !testClassRef.compareAndSet(null, testClass)) {
+            if (!shutdownRequested) {
                 try {
-                    Thread.sleep(10);
+                    tests.put(testClass);
                 } catch (InterruptedException e) {
-                    // ignore
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "unexpected interruption", e);
                 }
             }
         }
@@ -94,14 +102,15 @@ public class MauveTestRunner implements TestRunner {
             while (!shutdownRequested) {
                 Class<?> testClass = null;
                 status = Status.READY;
-                while (!shutdownRequested && ((testClass = testClassRef.getAndSet(null)) == null)) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        // ignore
-                    }
-                }
                 
+                try {
+                    do {
+                        testClass = tests.poll(1, TimeUnit.SECONDS);
+                    } while ((testClass == null) && !shutdownRequested);
+                } catch (InterruptedException e) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "unexpected interruption", e);
+                }
+
                 if (!shutdownRequested) {
                     status = Status.RUNNING;
                     try {

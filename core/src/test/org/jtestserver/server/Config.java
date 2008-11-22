@@ -18,10 +18,24 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.common;
+package org.jtestserver.server;
 
-public enum Status {
-    READY,
-    ERROR,
-    RUNNING;
+import java.io.IOException;
+import java.util.Properties;
+
+public class Config {
+
+    public static Config read() throws IOException {
+        Properties properties = new Properties();
+        //properties.load(Config.class.getResourceAsStream("config.properties"));
+        return new Config(properties);
+    }
+    
+    private Config(Properties properties) {
+    }
+
+    public int getMauveQueueSize() {
+        // TODO Auto-generated method stub
+        return 100000;
+    }
 }
