@@ -41,6 +41,7 @@
       <export name="com.sun.tools.javac.sym.*"/>
       <export name="com.sun.tools.javac.tree.*"/>
       <export name="com.sun.tools.javac.util.*"/>
+      <export name="com.sun.tools.javac.zip.*"/>
     </library>
   </runtime>
 
