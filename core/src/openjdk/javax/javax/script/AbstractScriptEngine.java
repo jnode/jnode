@@ -45,7 +45,6 @@ import java.util.Iterator;
  * of the <code>AbstractScriptEngine</code>..
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public abstract class AbstractScriptEngine  implements ScriptEngine {

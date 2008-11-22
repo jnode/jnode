@@ -32,7 +32,6 @@ import java.util.ListResourceBundle;
  * package.  This is meant only for internal use by Java Accessibility and
  * is not meant to be used by assistive technologies or applications.
  *
- * @version     1.40 05/05/07 17:18:46
  * @author      Willie Walker
  * @deprecated This class is deprecated as of version 1.3 of the 
  *             Java Platform.

@@ -40,7 +40,6 @@ import javax.sound.midi.InvalidMidiDataException;
  * MIDI file, and can produce a <code>Sequence</code> object from files of these types.
  *
  * @author Kara Kytle
- * @version 1.20 07/05/05
  * @since 1.3
  */
 public abstract class MidiFileReader {

@@ -31,7 +31,6 @@ package javax.security.auth.callback;
  * method of a <code>CallbackHandler</code> to ask for YES/NO,
  * OK/CANCEL, YES/NO/CANCEL or other similar confirmations.
  *
- * @version 1.23, 05/05/07
  * @see javax.security.auth.callback.CallbackHandler
  */
 public class ConfirmationCallback implements Callback, java.io.Serializable {

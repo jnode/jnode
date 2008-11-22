@@ -85,7 +85,6 @@ import java.util.Map;
  * @see MidiSystem#getMidiFileFormat(java.io.File)
  * @see Sequencer#setSequence(java.io.InputStream stream)
  *
- * @version 1.23, 07/05/05
  * @author Kara Kytle
  * @author Florian Bomers
  */
@@ -302,4 +301,3 @@ public class MidiFileFormat {
 
 
 }
-

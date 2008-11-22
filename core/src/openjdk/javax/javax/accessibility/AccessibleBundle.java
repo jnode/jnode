@@ -43,7 +43,6 @@ import java.util.ResourceBundle;
  * @see AccessibleRole
  * @see AccessibleState
  *
- * @version     1.12 10/05/99
  * @author      Willie Walker
  * @author	Peter Korn
  * @author	Lynn Monsanto

@@ -62,7 +62,6 @@ import java.lang.reflect.Method;
  * @see javax.imageio.IIOImage
  * @see javax.imageio.ImageTranscoder
  *
- * @version 0.5
  */
 public abstract class IIOMetadata {
 

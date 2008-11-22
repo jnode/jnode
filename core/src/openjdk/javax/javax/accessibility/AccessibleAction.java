@@ -41,7 +41,6 @@ package javax.accessibility;
  * @see AccessibleContext
  * @see AccessibleContext#getAccessibleAction
  *
- * @version     1.25 05/05/07
  * @author	Peter Korn
  * @author      Hans Muller
  * @author      Willie Walker

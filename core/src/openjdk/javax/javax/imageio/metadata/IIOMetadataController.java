@@ -63,7 +63,6 @@ package javax.imageio.metadata;
  * @see IIOMetadata#hasController
  * @see IIOMetadata#activateController
  *
- * @version 0.5
  */
 public interface IIOMetadataController {
 

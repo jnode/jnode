@@ -32,7 +32,6 @@ package javax.security.auth.login;
  * determines that authentication is being attempted on a
  * locked account.
  *
- * @version 1.9, 05/05/07
  * @since 1.5
  */
 public class AccountLockedException extends AccountException {

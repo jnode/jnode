@@ -34,7 +34,6 @@ package javax.sound.sampled;
  * object.
  *
  * @author Kara Kytle
- * @version 1.33, 07/05/05
  * @since 1.3
  */
 public interface Port extends Line {
@@ -58,7 +57,6 @@ public interface Port extends Line {
      * lines matching the parameters specified in the <code>Port.Info</code> object.
      *
      * @author Kara Kytle
-     * @version 1.33, 07/05/05
      * @since 1.3
      */
     public static class Info extends Line.Info {

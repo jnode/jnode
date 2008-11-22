@@ -35,7 +35,6 @@ import javax.sound.midi.MidiUnavailableException;
  * how resources are managed in the creation and management of
  * a device.
  *
- * @version 1.26 07/05/05
  * @author Kara Kytle
  */
 public abstract class MidiDeviceProvider {

@@ -42,7 +42,6 @@ import org.w3c.dom.Node;
  * @see IIOMetadata#mergeTree
  * @see IIOMetadataNode
  *
- * @version 0.5
  */
 public class IIOInvalidTreeException extends IIOException {
     

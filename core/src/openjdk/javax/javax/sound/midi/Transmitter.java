@@ -33,7 +33,6 @@ package javax.sound.midi;
  *
  * @see Receiver
  *
- * @version 1.29, 07/05/05
  * @author Kara Kytle
  */
 public interface Transmitter {

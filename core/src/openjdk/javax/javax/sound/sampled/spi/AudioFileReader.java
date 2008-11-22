@@ -40,7 +40,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * audio file, and can produce audio input streams from files of these types.
  *
  * @author Kara Kytle
- * @version 1.22 07/05/05
  * @since 1.3
  */
 public abstract class AudioFileReader {

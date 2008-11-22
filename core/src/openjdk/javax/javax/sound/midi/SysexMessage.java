@@ -68,7 +68,6 @@ package javax.sound.midi;
  * bytes used to indicate that a <code>SysexMessage</code> contains continuing system
  * exclusive data should not be propagated via MIDI wire protocol.
  *
- * @version 1.33, 07/05/05
  * @author David Rivas
  * @author Kara Kytle
  * @author Florian Bomers

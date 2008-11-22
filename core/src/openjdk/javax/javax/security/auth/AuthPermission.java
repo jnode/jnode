@@ -125,7 +125,6 @@ package javax.security.auth;
  *				Subject-based access control policy.
  * </pre>
  *
- * @version 1.61, 05/05/07
  */
 public final class AuthPermission extends
 java.security.BasicPermission {

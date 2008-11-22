@@ -36,7 +36,6 @@ package javax.sound.midi;
  * For example, a file reader might not be able to parse a Type 2 MIDI file, even
  * though that format is defined in the MIDI specification.
  *
- * @version 1.18, 05/05/07
  * @author Kara Kytle
  */
 public class InvalidMidiDataException extends Exception {

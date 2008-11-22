@@ -95,7 +95,6 @@ import sun.security.util.SecurityConstants;
  * <code>Principal</code> implementations associated with Subjects
  * must implement <code>Serializable</code>.
  *
- * @version 1.134, 05/05/07
  * @see java.security.Principal
  * @see java.security.DomainCombiner
  */
@@ -132,6 +131,9 @@ public final class Subject implements java.io.Serializable {
     private static final int PRINCIPAL_SET = 1;
     private static final int PUB_CREDENTIAL_SET = 2;
     private static final int PRIV_CREDENTIAL_SET = 3;
+
+    private static final ProtectionDomain[] NULL_PD_ARRAY
+        = new ProtectionDomain[0];
 
     /**
      * Create an instance of a <code>Subject</code>
@@ -465,7 +467,7 @@ public final class Subject implements java.io.Serializable {
 	// for doPrivileged
 	final AccessControlContext callerAcc =
 		(acc == null ?
-		new AccessControlContext(new ProtectionDomain[0]) :
+                new AccessControlContext(NULL_PD_ARRAY) :
 		acc);
 
 	// call doPrivileged and push this new context on the stack
@@ -528,7 +530,7 @@ public final class Subject implements java.io.Serializable {
 	// set up the new Subject-based AccessControlContext for doPrivileged
 	final AccessControlContext callerAcc =
 		(acc == null ?
-		new AccessControlContext(new ProtectionDomain[0]) :
+                new AccessControlContext(NULL_PD_ARRAY) :
 		acc);
 
 	// call doPrivileged and push this new context on the stack

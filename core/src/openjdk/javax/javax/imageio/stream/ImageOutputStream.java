@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,7 +27,6 @@ package javax.imageio.stream;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.UTFDataFormatException;
 
 /**
  * A seekable output stream interface for use by
@@ -49,7 +48,6 @@ import java.io.UTFDataFormatException;
  *
  * @see ImageInputStream
  *
- * @version 0.5
  */
 public interface ImageOutputStream extends ImageInputStream, DataOutput {
     

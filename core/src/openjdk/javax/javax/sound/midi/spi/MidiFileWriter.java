@@ -38,7 +38,6 @@ import javax.sound.midi.MidiFileFormat;
  * a <code>{@link Sequence}</code> object.
  *
  * @author Kara Kytle
- * @version 1.24, 07/05/05
  * @since 1.3
  */
 public abstract class MidiFileWriter {

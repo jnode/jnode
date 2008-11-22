@@ -31,7 +31,6 @@ package javax.security.auth.login;
  * <p> This exception may be thrown by a LoginModule if it is unable
  * to locate a credential necessary to perform authentication.
  *
- * @version 1.9, 05/05/07
  * @since 1.5
  */
 public class CredentialNotFoundException extends CredentialException {

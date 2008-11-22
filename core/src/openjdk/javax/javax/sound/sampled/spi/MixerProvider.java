@@ -33,7 +33,6 @@ import javax.sound.sampled.Mixer;
  * how resources are managed in creation / management of
  * a mixer.
  *
- * @version 1.25 07/05/05
  * @author Kara Kytle
  * @since 1.3
  */

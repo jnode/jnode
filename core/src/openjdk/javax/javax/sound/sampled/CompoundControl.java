@@ -31,7 +31,6 @@ package javax.sound.sampled;
  * a <code>Control</code>.
  *
  * @author Kara Kytle
- * @version 1.17, 07/05/05
  * @since 1.3
  */
 public abstract class CompoundControl extends Control {
@@ -119,7 +118,6 @@ public abstract class CompoundControl extends Control {
      * common types.
      *
      * @author Kara Kytle
-     * @version 1.17, 07/05/05
      * @since 1.3
      */
     public static class Type extends Control.Type {

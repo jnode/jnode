@@ -37,7 +37,6 @@ import javax.imageio.ImageReader;
  * @see javax.imageio.ImageReader#addIIOReadUpdateListener
  * @see javax.imageio.ImageReader#removeIIOReadUpdateListener
  *
- * @version 0.5
  */
 public interface IIOReadUpdateListener extends EventListener {
 

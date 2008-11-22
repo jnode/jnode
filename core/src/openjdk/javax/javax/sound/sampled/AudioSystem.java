@@ -157,7 +157,6 @@ import com.sun.media.sound.JDK13Services;
  * @author Florian Bomers
  * @author Matthias Pfisterer
  * @author Kevin P. Smith
- * @version 1.89, 07/05/05
  *
  * @see AudioFormat
  * @see AudioInputStream

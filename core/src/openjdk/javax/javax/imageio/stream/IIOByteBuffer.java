@@ -37,7 +37,6 @@ package javax.imageio.stream;
  * <code>ImageReader</code> implementation; its contents should be
  * considered read-only and must not be modified.
  *
- * @version 0.5
  */
 public class IIOByteBuffer {
 

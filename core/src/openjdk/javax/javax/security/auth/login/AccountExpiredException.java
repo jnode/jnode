@@ -35,7 +35,6 @@ package javax.security.auth.login;
  * throws this exception to notify the application.  The application can
  * then take the appropriate steps to notify the user.
  *
- * @version 1.25, 05/05/07
  */
 public class AccountExpiredException extends AccountException {
 

@@ -66,7 +66,6 @@ package javax.sound.sampled;
  * resource.
  *
  * @author Kara Kytle
- * @version 1.36, 07/05/05
  *
  * @see LineEvent
  * @since 1.3
@@ -224,7 +223,6 @@ public interface Line {
      * are available and to obtain them.
      *
      * @author Kara Kytle
-     * @version 1.36, 07/05/05
      *
      * @see Line#getLineInfo
      * @see Mixer#getSourceLineInfo

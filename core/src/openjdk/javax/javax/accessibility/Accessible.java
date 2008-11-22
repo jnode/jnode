@@ -32,7 +32,6 @@ package javax.accessibility;
  * It contains a single method, {@link #getAccessibleContext}, which  
  * returns an instance of the class {@link AccessibleContext}.
  *
- * @version     1.1 11/24/97 20:34:48
  * @author	Peter Korn
  * @author      Hans Muller
  * @author      Willie Walker

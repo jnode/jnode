@@ -124,7 +124,6 @@ import java.util.Date;
  * <code>java.security.cert</code>.</em></p>
  *
  * @author Hemma Prafullchandra
- * @version 1.38
  * @since 1.4
  * @see Certificate
  * @see java.security.cert.X509Extension

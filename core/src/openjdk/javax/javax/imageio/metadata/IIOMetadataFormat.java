@@ -68,7 +68,6 @@ import javax.imageio.ImageTypeSpecifier;
  * representing such objects textually.
  * </ul>
  *
- * @version 0.5
  */
 public interface IIOMetadataFormat {
 

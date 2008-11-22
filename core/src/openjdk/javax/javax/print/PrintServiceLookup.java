@@ -32,7 +32,8 @@ import java.util.List;
 import javax.print.attribute.AttributeSet;
 
 import sun.awt.AppContext;
-import sun.misc.Service;
+import java.util.ServiceLoader;
+import java.util.ServiceConfigurationError;
 
 /** Implementations of this class provide lookup services for
   * print services (typically equivalent to printers) of a particular type.
@@ -338,15 +339,20 @@ public abstract class PrintServiceLookup {
 		java.security.AccessController.doPrivileged(
 		     new java.security.PrivilegedExceptionAction() {
                         public Object run() {
-			    Iterator iterator =
-				Service.providers(PrintServiceLookup.class);
+                            Iterator<PrintServiceLookup> iterator =
+                                ServiceLoader.load(PrintServiceLookup.class).
+                                iterator();
 			    ArrayList los = getListOfLookupServices();
 			    while (iterator.hasNext()) {
 				try {
-				    PrintServiceLookup lus =
-					(PrintServiceLookup)iterator.next();
-				    los.add(lus);
-				}  catch (Exception e) {
+                                    los.add(iterator.next());
+                                }  catch (ServiceConfigurationError err) {
+                                    /* In the applet case, we continue */
+                                    if (System.getSecurityManager() != null) {
+                                        err.printStackTrace();
+                                    } else {
+                                        throw err;
+                                    }
 				}
 			    }
 			    return null;
@@ -481,4 +487,3 @@ public abstract class PrintServiceLookup {
     }
 
 }
-

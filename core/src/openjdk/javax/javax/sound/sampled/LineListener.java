@@ -32,7 +32,6 @@ package javax.sound.sampled;
  * receive events when a line's status changes.
  *
  * @author Kara Kytle
- * @version 1.16 07/05/05
  *
  * @see Line
  * @see Line#addLineListener
@@ -50,7 +49,6 @@ package javax.sound.sampled;
  * @see Line#removeLineListener
  * @see LineEvent
  *
- * @version 1.16 07/05/05
  * @author Kara Kytle
  */
 public interface LineListener extends java.util.EventListener {

@@ -42,7 +42,6 @@ import javax.imageio.ImageWriter;
  * @see javax.imageio.ImageWriter#addIIOWriteWarningListener
  * @see javax.imageio.ImageWriter#removeIIOWriteWarningListener
  *
- * @version 0.5
  */
 public interface IIOWriteWarningListener extends EventListener {
     

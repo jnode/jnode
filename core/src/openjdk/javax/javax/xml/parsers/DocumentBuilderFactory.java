@@ -34,7 +34,6 @@ import javax.xml.validation.Schema;
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
  * @author <a href="mailto:Neeraj.Bajaj@sun.com">Neeraj Bajaj</a>
  *
- * @version $Revision: 1.5 $, $Date: 2005/11/03 19:34:14 $
 
  */
 

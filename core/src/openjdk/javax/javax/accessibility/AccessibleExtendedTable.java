@@ -35,7 +35,6 @@ package javax.accessibility;
   * If the return value is not null and the type of the return value is
   * AccessibleExtendedTable, the object supports this interface.
   *
-  * @version     1.13 05/05/07
   * @author      Lynn Monsanto
   * @since 1.4
   */
@@ -72,4 +71,3 @@ public interface AccessibleExtendedTable extends AccessibleTable {
       */
      public int getAccessibleIndex(int r, int c);
 }
-

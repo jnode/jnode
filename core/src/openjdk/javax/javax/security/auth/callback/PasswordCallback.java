@@ -30,7 +30,6 @@ package javax.security.auth.callback;
  * <code>PasswordCallback</code> to the <code>handle</code>
  * method of a <code>CallbackHandler</code> to retrieve password information.
  *
- * @version 1.25, 05/05/07
  * @see javax.security.auth.callback.CallbackHandler
  */
 public class PasswordCallback implements Callback, java.io.Serializable {
@@ -113,8 +112,7 @@ public class PasswordCallback implements Callback, java.io.Serializable {
      * @see #getPassword
      */
     public void setPassword(char[] password) {
-	this.inputPassword = (password == null ?
-			null : (char[])password.clone());
+        this.inputPassword = (password == null ? null : password.clone());
     }
 
     /**
@@ -129,8 +127,7 @@ public class PasswordCallback implements Callback, java.io.Serializable {
      * @see #setPassword
      */
     public char[] getPassword() {
-	return (inputPassword == null?
-			null : (char[])inputPassword.clone());
+        return (inputPassword == null ? null : inputPassword.clone());
     }
 
     /**

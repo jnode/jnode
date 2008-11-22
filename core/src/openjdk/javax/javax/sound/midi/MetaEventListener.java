@@ -37,7 +37,6 @@ import java.util.EventListener;
  * <code>{@link Sequencer#addMetaEventListener(MetaEventListener) addMetaEventListener}</code>
  * method of <code>Sequencer</code>.
  *
- * @version 1.23, 07/05/05
  * @author Kara Kytle
  */
 public interface MetaEventListener extends EventListener {

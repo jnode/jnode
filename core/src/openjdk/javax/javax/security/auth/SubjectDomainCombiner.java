@@ -47,7 +47,6 @@ import java.lang.ref.WeakReference;
  * with Principals from the <code>Subject</code> associated with this
  * <code>SubjectDomainCombiner</code>.
  *
- * @version 1.57, 05/05/07
  */
 public class SubjectDomainCombiner implements java.security.DomainCombiner {
 
@@ -82,7 +81,7 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
 
 	if (subject.isReadOnly()) {
 	    principalSet = subject.getPrincipals();
-	    principals = (Principal[])principalSet.toArray
+            principals = principalSet.toArray
 			(new Principal[principalSet.size()]);
 	}
     }
@@ -226,7 +225,7 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
 		synchronized(newSet) {
 		    principalSet = new java.util.HashSet<Principal>(newSet);
 		}
-		principals = (Principal[])principalSet.toArray
+                principals = principalSet.toArray
 			(new Principal[principalSet.size()]);
 		cachedPDs.clear();
 
@@ -328,7 +327,7 @@ public class SubjectDomainCombiner implements java.security.DomainCombiner {
 		synchronized(newSet) {
 		    principalSet = new java.util.HashSet<Principal>(newSet);
 		}
-		principals = (Principal[])principalSet.toArray
+                principals = principalSet.toArray
 			(new Principal[principalSet.size()]);
 		cachedPDs.clear();
 

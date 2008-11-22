@@ -47,7 +47,6 @@ import javax.swing.text.*;
  * @see AccessibleContext#getAccessibleText
  * @see AccessibleContext#getAccessibleEditableText
  *
- * @version	1.12 @(#)AccessibleEditableText.java	1.12
  * @author	Lynn Monsanto
  * @since 1.4
  */

@@ -38,7 +38,6 @@ import java.awt.datatransfer.DataFlavor;
  * types supported by the object and a streaming interface for each MIME type to
  * get the data.
  *
- * @version 1.11 05/05/07
  * @author Lynn Monsanto
  * @author Peter Korn
  *

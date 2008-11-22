@@ -103,7 +103,6 @@ import java.util.List;
  * @see Receiver
  * @see Transmitter
  *
- * @version 1.45, 07/05/05
  * @author Kara Kytle
  * @author Florian Bomers
  */

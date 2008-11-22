@@ -33,7 +33,6 @@ import java.io.Reader;
  * to a form that can be executed repeatedly without recompilation.
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public interface Compilable {

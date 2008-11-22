@@ -93,7 +93,7 @@ public class ScriptEngineManager  {
         nameAssociations = new HashMap<String, ScriptEngineFactory>();
         extensionAssociations = new HashMap<String, ScriptEngineFactory>();
         mimeTypeAssociations = new HashMap<String, ScriptEngineFactory>();
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 initEngines(loader);
                 return null;

@@ -70,4 +70,3 @@ public @interface Generated {
     */
    String comments() default "";
 }
-

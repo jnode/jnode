@@ -58,7 +58,6 @@ import com.sun.media.sound.MidiUtils;
  * @see Sequencer#setTrackMute
  * @see Sequencer#setTrackSolo
  *
- * @version 1.30, 07/05/05
  * @author Kara Kytle
  * @author Florian Bomers
  */

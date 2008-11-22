@@ -47,7 +47,6 @@ import javax.swing.text.*;
  * @see AccessibleContext
  * @see AccessibleContext#getAccessibleText
  *
- * @version	1.36 05/05/07
  * @author	Peter Korn
  */
 public interface AccessibleText {

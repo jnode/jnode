@@ -62,7 +62,6 @@ package javax.sound.sampled;
  * for a more complete description.
  *
  * @author Kara Kytle
- * @version 1.40, 07/05/05
  * @see LineEvent
  * @since 1.3
  */
@@ -279,7 +278,6 @@ public interface DataLine extends Line {
      *
      * @see Line.Info
      * @author Kara Kytle
-     * @version 1.40, 07/05/05
      * @since 1.3
      */
     public static class Info extends Line.Info {

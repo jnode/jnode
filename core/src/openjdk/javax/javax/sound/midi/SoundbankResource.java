@@ -62,7 +62,6 @@ package javax.sound.midi;
  * brightness).  Also, more than one <code>Instrument</code> can use the same 
  * sample.
  *
- * @version 1.22, 07/05/05
  * @author Kara Kytle
  */
 
@@ -176,4 +175,3 @@ public abstract class SoundbankResource {
      */
     //public abstract Instrument[] getInstruments();
 }
-

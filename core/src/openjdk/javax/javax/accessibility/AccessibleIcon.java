@@ -40,7 +40,6 @@ package javax.accessibility;
  * @see Accessible
  * @see AccessibleContext
  *
- * @version     1.3 10/12/99
  * @author	Lynn Monsanto
  * @since 1.3
  */

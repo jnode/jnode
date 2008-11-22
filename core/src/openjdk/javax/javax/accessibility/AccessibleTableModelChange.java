@@ -50,7 +50,6 @@ package javax.accessibility;
  * @see AccessibleContext
  * @see AccessibleContext#getAccessibleTable
  *
- * @version     1.2 10/12/99
  * @author	Lynn Monsanto
  * @since 1.3
  */

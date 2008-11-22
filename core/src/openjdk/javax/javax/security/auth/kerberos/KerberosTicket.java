@@ -74,7 +74,6 @@ import sun.security.util.*;
  * @see org.ietf.jgss.GSSManager
  * 
  * @author Mayank Upadhyay
- * @version 1.29, 05/05/07
  * @since 1.4
  */
 public class KerberosTicket implements Destroyable, Refreshable,

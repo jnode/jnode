@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,8 +27,6 @@ package javax.imageio.stream;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import com.sun.imageio.stream.StreamFinalizer;
 import sun.java2d.Disposer;
 import sun.java2d.DisposerRecord;
@@ -44,7 +42,6 @@ import sun.java2d.DisposerRecord;
  * <code>InputStream</code>.  This class is provided for cases where 
  * it is not possible to create a writable temporary file.
  *
- * @version 0.5
  */
 public class MemoryCacheImageInputStream extends ImageInputStreamImpl {
 

@@ -124,7 +124,6 @@ import java.io.IOException;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.16 07/05/05
  * @since 1.6
  */
 public interface Filer {

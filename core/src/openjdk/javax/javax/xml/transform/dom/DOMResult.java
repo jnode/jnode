@@ -35,7 +35,6 @@ import org.w3c.dom.Node;
  * which may be retrieved with {@link #getNode()}.</p>
  * 
  * @author <a href="Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.2 $, $Date: 2005/06/10 03:50:39 $
  */
 public class DOMResult implements Result {
 

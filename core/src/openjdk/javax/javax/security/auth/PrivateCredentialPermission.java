@@ -100,7 +100,6 @@ import sun.security.util.ResourcesMgr;
  * "a.b.Principal" with the name, "duke", and "c.d.Principal", with the name,
  * "dukette".
  *
- * @version 1.39, 05/05/07
  */
 public final class PrivateCredentialPermission extends Permission {
 
@@ -431,7 +430,7 @@ public final class PrivateCredentialPermission extends Permission {
 	}
 
 	this.credOwners = new CredOwner[pList.size()];
-	pList.toArray((CredOwner[])this.credOwners);
+        pList.toArray(this.credOwners);
     }
 
     private boolean impliesCredentialClass(String thisC, String thatC) {

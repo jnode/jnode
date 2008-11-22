@@ -40,7 +40,6 @@ import javax.sound.sampled.AudioInputStream;
  * stream.
  *
  * @author Kara Kytle
- * @version 1.31, 07/05/05
  * @since 1.3
  */
 public abstract class AudioFileWriter {

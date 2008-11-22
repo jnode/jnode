@@ -36,7 +36,6 @@ import javax.security.auth.Destroyable;
  * This enables looking up the private credentials for an X.500 principal
  * in a subject. 
  *
- * @version 1.15, 05/05/07
  */
 public final class X500PrivateCredential implements Destroyable {
     private X509Certificate cert;

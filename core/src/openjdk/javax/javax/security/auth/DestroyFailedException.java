@@ -32,7 +32,6 @@ package javax.security.auth;
  * the <code>Destroyable</code> interface when the <code>destroy</code>
  * method fails.
  *
- * @version 1.15, 05/05/07
  */
 public class DestroyFailedException extends Exception {
 

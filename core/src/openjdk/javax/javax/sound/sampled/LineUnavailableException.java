@@ -32,7 +32,6 @@ package javax.sound.sampled;
  * by another application.
  *
  * @author Kara Kytle
- * @version 1.16 07/05/05
  * @since 1.3
  */
 /*
@@ -41,7 +40,6 @@ package javax.sound.sampled;
  * arises most commonly when a line is requested when it is already in use 
  * by another application.
  *
- * @version 1.16 07/05/05
  * @author Kara Kytle
  */
 
@@ -68,4 +66,3 @@ public class LineUnavailableException extends Exception {
 	super(message);
     }
 }
-

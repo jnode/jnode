@@ -42,7 +42,6 @@ import javax.sound.midi.InvalidMidiDataException;
  * object that can be loaded into a {@link javax.sound.midi.Synthesizer}.
  *
  * @since 1.3
- * @version 1.25 07/05/05
  * @author Kara Kytle
  */
 public abstract class SoundbankReader {

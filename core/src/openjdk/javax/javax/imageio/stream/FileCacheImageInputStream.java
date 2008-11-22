@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package javax.imageio.stream;
 
-import java.io.DataInput;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -40,7 +39,6 @@ import sun.java2d.DisposerRecord;
  * input from a regular <code>InputStream</code>.  A file is used to
  * cache previously read data.
  *
- * @version 0.5
  */
 public class FileCacheImageInputStream extends ImageInputStreamImpl {
 

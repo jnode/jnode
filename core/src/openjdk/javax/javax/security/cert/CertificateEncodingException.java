@@ -38,7 +38,6 @@ package javax.security.cert;
  *
  * @since 1.4
  * @author Hemma Prafullchandra
- * @version 1.14
  */
 public class CertificateEncodingException extends CertificateException {
 

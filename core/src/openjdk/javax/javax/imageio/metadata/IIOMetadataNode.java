@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -264,7 +264,6 @@ class IIOAttr extends IIOMetadataNode implements Attr {
  * @see IIOMetadata#setFromTree
  * @see IIOMetadata#mergeTree
  *
- * @version 0.5
  */
 public class IIOMetadataNode implements Element, NodeList {
 
@@ -759,9 +758,16 @@ public class IIOMetadataNode implements Element, NodeList {
     }
 
     public void setAttribute(String name, String value) {
-        // Note minor dependency on Crimson package
-        // Steal the code if Crimson ever goes away
-        if (!com.sun.imageio.metadata.XmlNames.isName(name)) {
+        // Name must be valid unicode chars
+        boolean valid = true;
+        char[] chs = name.toCharArray();
+        for (int i=0;i<chs.length;i++) {
+            if (chs[i] >= 0xfffe) {
+                valid = false;
+                break;
+            }
+        }
+        if (!valid) {
             throw new IIODOMException(DOMException.INVALID_CHARACTER_ERR,
                                       "Attribute name is illegal!");
         }

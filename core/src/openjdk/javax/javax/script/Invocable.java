@@ -29,7 +29,6 @@ package javax.script;
  * The optional interface implemented by ScriptEngines whose methods allow the invocation of  
  * procedures in scripts that have previously been executed. 
  *
- * @version 1.0
  * @author  Mike Grogan
  * @author  A. Sundararajan
  * @since 1.6

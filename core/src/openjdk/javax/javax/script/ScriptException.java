@@ -32,7 +32,6 @@ package javax.script;
  * filenames if this information is available.
  *
  * @author Mike Grogan
- * @version 1.0
  * @since 1.6
  */
 public class ScriptException extends Exception {

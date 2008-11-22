@@ -31,7 +31,6 @@ package javax.sound.sampled;
  * type and format.
  *
  * @author Kara Kytle
- * @version 1.16 07/05/05
  * @since 1.3
  */
 /*
@@ -39,7 +38,6 @@ package javax.sound.sampled;
  * operation failed because a file did not contain valid data of a recognized file
  * type and format.
  *
- * @version 1.16 07/05/05
  * @author Kara Kytle
  */
 
@@ -66,4 +64,3 @@ public class UnsupportedAudioFileException extends Exception {
 	super(message);
     }
 }
-

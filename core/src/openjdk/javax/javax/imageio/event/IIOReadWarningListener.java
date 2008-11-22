@@ -42,7 +42,6 @@ import javax.imageio.ImageReader;
  * @see javax.imageio.ImageReader#addIIOReadWarningListener
  * @see javax.imageio.ImageReader#removeIIOReadWarningListener
  *
- * @version 0.5
  */
 public interface IIOReadWarningListener extends EventListener {
     

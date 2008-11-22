@@ -50,7 +50,6 @@ import com.sun.media.sound.MidiUtils;
  * @see Track#add(MidiEvent)
  * @see MidiFileFormat
  *
- * @version 1.34, 07/05/05
  * @author Kara Kytle
  */
 public class Sequence {

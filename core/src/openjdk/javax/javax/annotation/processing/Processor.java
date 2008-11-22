@@ -160,7 +160,6 @@ import javax.lang.model.SourceVersion;
  * @author Joseph D. Darcy
  * @author Scott Seligman
  * @author Peter von der Ah&eacute;
- * @version 1.19 07/05/05
  * @since 1.6
  */
 public interface Processor {
@@ -408,4 +407,3 @@ public interface Processor {
 						  ExecutableElement member,
 						  String userText);
 }
-

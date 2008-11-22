@@ -294,5 +294,3 @@ class GetORBPropertiesFileAction implements PrivilegedAction {
 	return results ;
     }
 }
-
-
