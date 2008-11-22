@@ -10,7 +10,6 @@
 
   <requires>
     <import plugin="gnu.mauve"/>
-    <import plugin="org.jnode.test"/>
   </requires>
                 
   <runtime>
