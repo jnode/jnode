@@ -45,7 +45,6 @@ import java.awt.*;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Shannon Hickey
- * @version 1.15 05/05/07
  */
 class SynthTextPaneUI extends SynthEditorPaneUI {
 

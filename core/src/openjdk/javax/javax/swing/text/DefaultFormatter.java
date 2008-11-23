@@ -54,7 +54,6 @@ import javax.swing.text.*;
  *
  * @see javax.swing.JFormattedTextField.AbstractFormatter
  *
- * @version 1.20 05/05/07
  * @since 1.4
  */
 public class DefaultFormatter extends JFormattedTextField.AbstractFormatter

@@ -96,7 +96,6 @@ import sun.swing.SwingUtilities2;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.163 05/05/07
  */
 public abstract class AbstractDocument implements Document, Serializable {
 
@@ -3120,10 +3119,3 @@ public abstract class AbstractDocument implements Document, Serializable {
         }
     }
 }
-
-
-
-
-
-
-	

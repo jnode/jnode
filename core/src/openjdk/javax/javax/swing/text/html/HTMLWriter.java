@@ -38,7 +38,6 @@ import java.net.URL;
  * This is a writer for HTMLDocuments.
  *
  * @author  Sunita Mani
- * @version 1.26, 02/02/00
  */
 
 

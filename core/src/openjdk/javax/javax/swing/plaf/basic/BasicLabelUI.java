@@ -52,7 +52,6 @@ import java.beans.PropertyChangeListener;
  * is completely static, i.e. there's only one UIView implementation 
  * that's shared by all JLabel objects.
  *
- * @version 1.97 05/05/07
  * @author Hans Muller
  */
 public class BasicLabelUI extends LabelUI implements  PropertyChangeListener

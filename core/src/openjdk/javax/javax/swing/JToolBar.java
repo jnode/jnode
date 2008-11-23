@@ -82,7 +82,6 @@ import java.util.Hashtable;
  *   attribute: isContainer true
  * description: A component which displays commonly used controls or Actions.
  *
- * @version 1.122 05/05/07
  * @author Georges Saab
  * @author Jeff Shapiro
  * @see Action

@@ -73,7 +73,6 @@ import javax.swing.plaf.basic.*;
  * <p>
  * The default is <code>Angled</code>.
  *
- * @version 1.31 05/05/07
  * @author Tom Santos
  * @author Steve Wilson (value add stuff)
  */

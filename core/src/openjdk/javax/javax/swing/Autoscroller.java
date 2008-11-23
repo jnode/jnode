@@ -34,7 +34,6 @@ import java.awt.event.*;
  * that receive the events to do the actual scrolling in response to the
  * mouse dragged events.
  *
- * @version 1.23 05/05/07
  * @author Dave Moore
  * @author Scott Violet
  */

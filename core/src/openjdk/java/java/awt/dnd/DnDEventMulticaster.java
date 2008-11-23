@@ -1,5 +1,5 @@
 /*
- * Copyright 2001 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2001-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,9 +25,6 @@
 package java.awt.dnd;
 
 import java.awt.AWTEventMulticaster;
-import java.lang.reflect.Array;
-import java.util.EventListener;
-import java.io.Serializable;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.EventListener;
@@ -38,7 +35,6 @@ import java.util.EventListener;
  * thread-safe multi-cast event dispatching for the drag-and-drop events defined
  * in the java.awt.dnd package.
  *
- * @version 	1.12, 05/05/07
  * @since 	1.4
  * @see AWTEventMulticaster
  */

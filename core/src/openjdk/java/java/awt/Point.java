@@ -31,7 +31,6 @@ import java.awt.geom.Point2D;
  * A point representing a location in {@code (x,y)} coordinate space,
  * specified in integer precision.
  *
- * @version 	1.46, 05/05/07
  * @author 	Sami Shaio
  * @since       1.0
  */

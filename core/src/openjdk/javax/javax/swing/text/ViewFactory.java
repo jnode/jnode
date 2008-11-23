@@ -32,7 +32,6 @@ import java.awt.Container;
  * mapped over a document model. 
  *
  * @author  Timothy Prinzing
- * @version 1.25 05/05/07
  */
 public interface ViewFactory {
 

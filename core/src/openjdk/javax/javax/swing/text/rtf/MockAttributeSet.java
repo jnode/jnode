@@ -122,5 +122,3 @@ class MockAttributeSet
          throw new InternalError("MockAttributeSet: charade revealed!");
     }
 }
-    
-    

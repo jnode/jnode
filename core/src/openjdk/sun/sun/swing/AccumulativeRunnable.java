@@ -85,7 +85,6 @@ import javax.swing.SwingUtilities;
  * </pre>
  *
  * @author Igor Kushnirskiy
- * @version 1.9 05/05/07
  *
  * @param <T> the type this {@code Runnable} accumulates
  *
@@ -157,4 +156,3 @@ public abstract class AccumulativeRunnable<T> implements Runnable {
         return list;
     }
 }
-

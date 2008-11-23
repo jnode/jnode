@@ -41,7 +41,6 @@ import javax.swing.event.*;
  *          conform to the HTML 4.0 standard and also be netscape
  *          compatible.
  *
- * @version 1.27 05/05/07
  */
 
 class FrameSetView extends javax.swing.text.BoxView {
@@ -321,4 +320,3 @@ class FrameSetView extends javax.swing.text.BoxView {
     }
 
 }
-

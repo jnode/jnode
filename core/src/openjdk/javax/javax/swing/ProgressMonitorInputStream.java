@@ -60,7 +60,6 @@ import java.awt.Component;
  * @see ProgressMonitor
  * @see JOptionPane
  * @author James Gosling
- * @version 1.26 05/05/07
  */
 public class ProgressMonitorInputStream extends FilterInputStream
 {

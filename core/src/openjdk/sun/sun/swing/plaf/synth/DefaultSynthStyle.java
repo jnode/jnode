@@ -41,7 +41,6 @@ import javax.swing.plaf.*;
  * and <code>clone</code> methods, these are used when the Styles are being
  * merged into a resulting style.
  *
- * @version 1.31, 05/05/07
  * @author Scott Violet
  */
 public class DefaultSynthStyle extends SynthStyle implements Cloneable {

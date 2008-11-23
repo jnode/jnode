@@ -50,7 +50,6 @@ import javax.accessibility.*;
  * new TextArea("Hello", 5, 40);
  * </pre></blockquote><hr>
  * <p>
- * @version	1.88, 05/05/07
  * @author 	Sami Shaio
  * @since       JDK1.0
  */

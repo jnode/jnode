@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,7 +26,6 @@
 package java.awt.event;
 
 import java.awt.AWTEvent;
-import java.awt.Event;
 
 /**
  * A semantic event which indicates that an object's text changed.
@@ -41,7 +40,6 @@ import java.awt.Event;
  * Instead, it can process a "meaningful" (semantic) event like "text changed". 
  *
  * @author Georges Saab
- * @version 1.24 05/05/07
  *
  * @see java.awt.TextComponent
  * @see TextListener
@@ -107,5 +105,3 @@ public class TextEvent extends AWTEvent {
         return typeStr;
     }
 }
-
-

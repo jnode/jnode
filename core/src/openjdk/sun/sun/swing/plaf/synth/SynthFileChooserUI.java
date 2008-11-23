@@ -29,8 +29,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
@@ -38,10 +36,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.*;
 import javax.swing.plaf.*;
-import javax.swing.plaf.basic.BasicDirectoryModel;
 import javax.swing.plaf.basic.BasicFileChooserUI;
-
-import sun.swing.*;
 
 /**
  * Synth FileChooserUI.
@@ -57,7 +52,6 @@ import sun.swing.*;
  * incompatible ways between releases. While this class is public, it
  * shoud be considered an implementation detail, and subject to change.
  *
- * @version 1.24, 05/05/07
  * @author Leif Samuelsson
  * @author Jeff Dinkins
  */
@@ -72,8 +66,6 @@ public abstract class SynthFileChooserUI extends BasicFileChooserUI implements
 
     private FileFilter actualFileFilter = null;
     private GlobFilter globFilter = null;
-
-    private boolean readOnly;
 
     public static ComponentUI createUI(JComponent c) {
         return new SynthFileChooserUIImpl((JFileChooser)c);
@@ -204,7 +196,6 @@ public abstract class SynthFileChooserUI extends BasicFileChooserUI implements
     protected void installDefaults(JFileChooser fc) {
         super.installDefaults(fc);
         updateStyle(fc);
-	readOnly = UIManager.getBoolean("FileChooser.readOnly");
     }
 
     protected void uninstallDefaults(JFileChooser fc) {
@@ -254,10 +245,6 @@ public abstract class SynthFileChooserUI extends BasicFileChooserUI implements
     }
     
     protected void doDirectoryChanged(PropertyChangeEvent e) {
-	File currentDirectory = getFileChooser().getCurrentDirectory();
-	if (!readOnly && currentDirectory != null) {
-	    getNewFolderAction().setEnabled(FilePane.canWrite(currentDirectory));
-	}
     }
 
     protected void doAccessoryChanged(PropertyChangeEvent e) {
@@ -367,7 +354,7 @@ public abstract class SynthFileChooserUI extends BasicFileChooserUI implements
     private void updateFileNameCompletion() {
 	if (fileNameCompletionString != null) {
 	    if (fileNameCompletionString.equals(getFileName())) {
-		File[] files = (File[])getModel().getFiles().toArray(new File[0]);
+                File[] files = getModel().getFiles().toArray(new File[0]);
 		String str = getCommonStartString(files);
 		if (str != null && str.startsWith(fileNameCompletionString)) {
 		    setFileName(str);
@@ -434,7 +421,6 @@ public abstract class SynthFileChooserUI extends BasicFileChooserUI implements
 	    char[] rPat = new char[gPat.length * 2];
 	    boolean isWin32 = (File.separatorChar == '\\');
 	    boolean inBrackets = false;
-	    StringBuffer buf = new StringBuffer();
 	    int j = 0;
 
 	    this.globPattern = globPattern;

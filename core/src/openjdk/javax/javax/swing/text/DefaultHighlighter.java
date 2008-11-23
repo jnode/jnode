@@ -34,7 +34,6 @@ import javax.swing.*;
  * painter that renders in a solid color.
  * 
  * @author  Timothy Prinzing
- * @version 1.46 05/05/07
  * @see     Highlighter
  */
 public class DefaultHighlighter extends LayeredHighlighter {
@@ -444,18 +443,18 @@ public class DefaultHighlighter extends LayeredHighlighter {
 	    else {
 		g.setColor(color);
 	    }
+
+            Rectangle r;
+
 	    if (offs0 == view.getStartOffset() &&
 		offs1 == view.getEndOffset()) {
 		// Contained in view, can just use bounds.
-		Rectangle alloc;
 		if (bounds instanceof Rectangle) {
-		    alloc = (Rectangle)bounds;
+                    r = (Rectangle) bounds;
 		}
 		else {
-		    alloc = bounds.getBounds();
+                    r = bounds.getBounds();
 		}
-		g.fillRect(alloc.x, alloc.y, alloc.width, alloc.height);
-		return alloc;
 	    }
 	    else {
 		// Should only render part of View.
@@ -464,16 +463,23 @@ public class DefaultHighlighter extends LayeredHighlighter {
                     Shape shape = view.modelToView(offs0, Position.Bias.Forward,
                                                    offs1,Position.Bias.Backward,
                                                    bounds);
-                    Rectangle r = (shape instanceof Rectangle) ?
+                    r = (shape instanceof Rectangle) ?
                                   (Rectangle)shape : shape.getBounds();
-                    g.fillRect(r.x, r.y, r.width, r.height);
-                    return r;
 		} catch (BadLocationException e) {
 		    // can't render
+                    r = null;
 		}
 	    }
-	    // Only if exception
-	    return null;
+
+            if (r != null) {
+                // If we are asked to highlight, we should draw something even
+                // if the model-to-view projection is of zero width (6340106).
+                r.width = Math.max(r.width, 1);
+
+                g.fillRect(r.x, r.y, r.width, r.height);
+            }
+
+            return r;
 	}
 
 	private Color color;

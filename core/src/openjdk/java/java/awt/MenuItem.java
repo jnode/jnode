@@ -66,7 +66,6 @@ import javax.accessibility.*;
  * does not send any event to the frame until one of its subitems is
  * selected.
  *
- * @version 1.101, 05/05/07
  * @author Sami Shaio
  */
 public class MenuItem extends MenuComponent implements Accessible {

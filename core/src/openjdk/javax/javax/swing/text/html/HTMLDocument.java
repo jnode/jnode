@@ -272,7 +272,6 @@ import sun.swing.SwingUtilities2;
  * @author  Timothy Prinzing
  * @author  Scott Violet
  * @author  Sunita Mani
- * @version 1.187 05/05/07
  */
 public class HTMLDocument extends DefaultStyledDocument {
     /**

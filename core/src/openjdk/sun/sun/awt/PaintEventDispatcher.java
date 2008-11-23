@@ -32,7 +32,6 @@ import java.awt.event.PaintEvent;
  * PaintEventDispatcher is responsible for dispatching PaintEvents.  There
  * can be only one PaintEventDispatcher active at a particular time.
  *
- * @version 1.9, 05/05/07
  */
 public class PaintEventDispatcher {
     /**

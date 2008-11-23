@@ -38,7 +38,6 @@ import javax.swing.event.*;
  * current visibility settings of the JTextField.
  *
  * @author  Timothy Prinzing
- * @version 1.33 05/05/07
  * @see     View
  */
 public class FieldView extends PlainView {

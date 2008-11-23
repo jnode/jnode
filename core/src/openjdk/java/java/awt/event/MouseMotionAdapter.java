@@ -46,7 +46,6 @@ package java.awt.event;
  * listener object is invoked and the <code>MouseEvent</code> is passed to it.
  *
  * @author Amy Fowler
- * @version 1.23 05/05/07
  *
  * @see MouseEvent
  * @see MouseMotionListener

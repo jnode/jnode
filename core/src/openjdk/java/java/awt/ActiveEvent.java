@@ -47,7 +47,6 @@ package java.awt;
  * potential deadlocks and denial-of-service attacks.
  *
  * @author  Timothy Prinzing
- * @version 1.20 05/05/07
  * @since   1.2
  */
 public interface ActiveEvent {

@@ -94,7 +94,6 @@ public class Main {
      * The main entry point into AppletViewer.
      */
     public static void main(String [] args) {
-        urlList.clear();
     Main m = new Main();
 	int ret = m.run(args);
 

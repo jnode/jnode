@@ -31,7 +31,6 @@ import java.util.EventListener;
 /**
  * Defines an object which listens for ChangeEvents.
  *
- * @version 1.18 05/05/07
  * @author Jeff Dinkins
  */
 public interface ChangeListener extends EventListener {
@@ -42,4 +41,3 @@ public interface ChangeListener extends EventListener {
      */
     void stateChanged(ChangeEvent e);
 }
-

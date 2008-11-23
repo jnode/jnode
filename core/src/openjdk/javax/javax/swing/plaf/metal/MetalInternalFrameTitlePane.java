@@ -39,7 +39,6 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 /**
  * Class that manages a JLF title bar
- * @version 1.65 05/05/07
  * @author Steve Wilson
  * @author Brian Beck
  * @since 1.3

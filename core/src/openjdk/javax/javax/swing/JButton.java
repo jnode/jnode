@@ -24,8 +24,6 @@
  */
 package javax.swing;
 
-import java.beans.ConstructorProperties;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -73,7 +71,6 @@ import java.io.IOException;
  *   attribute: isContainer false
  * description: An implementation of a \"push\" button.
  *
- * @version 1.105 05/05/07
  * @author Jeff Dinkins
  */
 public class JButton extends AbstractButton implements Accessible {
@@ -105,7 +102,6 @@ public class JButton extends AbstractButton implements Accessible {
      *
      * @param text  the text of the button
      */
-    @ConstructorProperties({"text"})
     public JButton(String text) {
         this(text, null);
     }

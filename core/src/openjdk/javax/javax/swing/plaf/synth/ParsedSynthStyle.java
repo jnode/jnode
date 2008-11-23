@@ -32,7 +32,6 @@ import sun.swing.plaf.synth.DefaultSynthStyle;
 /**
  * ParsedSynthStyle are the SynthStyle's that SynthParser creates.
  *
- * @version 1.13, 05/05/07
  * @author Scott Violet
  */
 class ParsedSynthStyle extends DefaultSynthStyle {

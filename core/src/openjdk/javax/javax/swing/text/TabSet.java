@@ -42,7 +42,6 @@ import java.io.Serializable;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Scott Violet
- * @version 1.22 05/05/07
  */
 public class TabSet implements Serializable
 {

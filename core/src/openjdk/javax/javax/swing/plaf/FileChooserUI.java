@@ -33,7 +33,6 @@ import java.io.File;
 /**
  * Pluggable look and feel interface for <code>JFileChooser</code>.
  *
- * @version 1.26 05/05/07
  * @author Jeff Dinkins
  */
 
@@ -48,4 +47,3 @@ public abstract class FileChooserUI extends ComponentUI
     public abstract void rescanCurrentDirectory(JFileChooser fc);
     public abstract void ensureFileIsVisible(JFileChooser fc, File f);
 }
-

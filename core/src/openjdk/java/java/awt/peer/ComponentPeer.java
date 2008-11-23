@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -32,10 +32,9 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;
 import java.awt.GraphicsConfiguration;
-import java.awt.event.FocusEvent;
-
-import java.awt.dnd.peer.DropTargetPeer;
 import sun.awt.CausedFocusEvent;
+import sun.java2d.pipe.Region;
+
 
 /**
  * The peer interfaces are intended only for use in porting
@@ -115,6 +114,12 @@ public interface ComponentPeer {
 
 
         Rectangle getBounds();
+
+    /**
+     * Applies the shape to the native component window.
+     * @since 1.7
+     */
+    void applyShape(Region shape);
 
     /**
      * DEPRECATED:  Replaced by getPreferredSize().

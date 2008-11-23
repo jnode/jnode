@@ -73,7 +73,6 @@ import javax.accessibility.*;
  *   attribute: isContainer false
  * description: A combination of a text field and a drop-down list.
  *
- * @version 1.147 05/05/07
  * @author Arnaud Weber
  * @author Mark Davidson
  */

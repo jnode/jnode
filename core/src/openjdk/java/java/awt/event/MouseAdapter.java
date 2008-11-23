@@ -57,7 +57,6 @@ package java.awt.event;
  *
  * @author Carl Quinn
  * @author Andrei Dmitriev
- * @version 1.8 08/02/97
  *
  * @see MouseEvent 
  * @see MouseWheelEvent 

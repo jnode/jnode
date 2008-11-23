@@ -36,7 +36,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.beans.ConstructorProperties;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -66,7 +65,6 @@ import javax.swing.UIManager;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.49 05/05/07 
  * @author David Kloba
  * @author Amy Fowler
  */
@@ -206,7 +204,6 @@ public class TitledBorder extends AbstractBorder
      * @param titleFont the font of the title
      * @param titleColor the color of the title
      */
-    @ConstructorProperties({"border", "title", "titleJustification", "titlePosition", "titleFont", "titleColor"})
     public TitledBorder(Border border,                     
                         String title,
                         int titleJustification,

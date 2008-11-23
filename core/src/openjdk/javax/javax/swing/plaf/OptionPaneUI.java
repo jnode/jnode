@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 /**
  * Pluggable look and feel interface for JOptionPane.
  *
- * @version 1.19 05/05/07
  * @author Scott Violet
  */
 

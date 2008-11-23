@@ -45,7 +45,6 @@ import javax.swing.event.DocumentEvent;
  * so that the model is stable while being accessed.
  *
  * @author  Timothy Prinzing
- * @version 1.24 05/05/07
  * @since   1.3
  */
 public class AsyncBoxView extends View {

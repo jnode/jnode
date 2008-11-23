@@ -100,7 +100,6 @@ import java.io.IOException;
  *    description: A component which provides a tab folder metaphor for 
  *                 displaying one component from a set of components.
  *
- * @version 1.161 05/05/07
  * @author Dave Moore
  * @author Philip Milne
  * @author Amy Fowler
@@ -723,6 +722,8 @@ public class JTabbedPane extends JComponent
         if (component != null) {
             addImpl(component, null, -1);
             component.setVisible(false);
+        } else {
+            firePropertyChange("indexForNullComponent", -1, index);
         }
 
         if (pages.size() == 1) {

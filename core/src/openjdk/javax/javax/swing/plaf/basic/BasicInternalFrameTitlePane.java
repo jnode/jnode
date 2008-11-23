@@ -54,7 +54,6 @@ import sun.swing.UIAction;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.41 01/18/01
  * @author David Kloba
  * @author Steve Wilson
  */
@@ -787,4 +786,3 @@ public class BasicInternalFrameTitlePane extends JComponent
     };  // end NoFocusButton
 
 }   // End Title Pane Class
-

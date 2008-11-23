@@ -89,7 +89,6 @@ import java.util.*;
  * <code>rowsUpdated</code>.
  *
  * @param <M> the type of the underlying model
- * @version 1.13 05/05/07
  * @see javax.swing.table.TableRowSorter
  * @since 1.6
  */

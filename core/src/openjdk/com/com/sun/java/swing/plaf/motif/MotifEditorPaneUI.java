@@ -40,7 +40,6 @@ import javax.swing.plaf.basic.BasicEditorPaneUI;
  * long term persistence.
  *
  * @author  Timothy Prinzing
- * @version 1.21 05/05/07
  */
 public class MotifEditorPaneUI extends BasicEditorPaneUI {
 
@@ -67,5 +66,3 @@ public class MotifEditorPaneUI extends BasicEditorPaneUI {
     }
 
 }
-
-

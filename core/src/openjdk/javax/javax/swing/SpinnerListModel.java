@@ -53,7 +53,6 @@ import java.io.Serializable;
  * @see SpinnerNumberModel
  * @see SpinnerDateModel
  * 
- * @version 1.18 05/05/07
  * @author Hans Muller
  * @since 1.4
  */
@@ -246,4 +245,3 @@ public class SpinnerListModel extends AbstractSpinnerModel implements Serializab
         return null;
     }
 }
-

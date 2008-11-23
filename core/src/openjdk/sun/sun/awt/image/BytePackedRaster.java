@@ -41,7 +41,6 @@ import java.awt.Point;
  * of raster can be used with an IndexColorModel. This raster uses a
  * MultiPixelPackedSampleModel.
  *
- * @version 10 Feb 1997
  */
 public class BytePackedRaster extends SunWritableRaster {
 

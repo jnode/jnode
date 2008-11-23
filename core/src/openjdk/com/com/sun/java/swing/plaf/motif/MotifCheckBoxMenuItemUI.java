@@ -39,7 +39,6 @@ import java.awt.event.*;
  * MotifCheckboxMenuItem implementation
  * <p>
  *
- * @version 1.53 05/05/07
  * @author Georges Saab
  * @author Rich Schiavi
  */
@@ -106,12 +105,3 @@ public class MotifCheckBoxMenuItemUI extends BasicCheckBoxMenuItemUI
     }
 
 }
-
-
-
-
-
-
-
-
-

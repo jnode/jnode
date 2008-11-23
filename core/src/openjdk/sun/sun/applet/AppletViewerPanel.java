@@ -41,7 +41,6 @@ import java.applet.*;
  * thread group to call the applet's init(), start(), stop(), and
  * destroy() methods.
  *
- * @version 	1.39, 05/05/07
  * @author 	Arthur van Hoff
  */
 class AppletViewerPanel extends AppletPanel {
@@ -216,6 +215,3 @@ class AppletViewerPanel extends AppletPanel {
 	}
     }
 }
-
-
-

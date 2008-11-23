@@ -24,7 +24,6 @@
  */
 
 /*
- *  @(#)SunLayoutEngine.java	1.6 07/02/07
  *
  * (C) Copyright IBM Corp. 2003 - All Rights Reserved
  */
@@ -105,10 +104,7 @@ import java.util.Locale;
 public final class SunLayoutEngine implements LayoutEngine, LayoutEngineFactory {
     private static native void initGVIDs();
     static {
-         java.security.AccessController.doPrivileged(
-            new sun.security.action.LoadLibraryAction("t2k"));
-         java.security.AccessController.doPrivileged(
-            new sun.security.action.LoadLibraryAction("fontmanager"));
+        FontManagerNativeLibrary.load();
 	initGVIDs();
     }
 
@@ -157,14 +153,19 @@ public final class SunLayoutEngine implements LayoutEngine, LayoutEngineFactory 
 		       Point2D.Float pt, GVData data) {
         Font2D font = key.font();
         FontStrike strike = font.getStrike(desc);
+        long layoutTables = 0;
+        if (font instanceof TrueTypeFont) {
+            layoutTables = ((TrueTypeFont) font).getLayoutTableCache();
+        }
         nativeLayout(font, strike, mat, gmask, baseIndex, 
 		     tr.text, tr.start, tr.limit, tr.min, tr.max, 
-		     key.script(), key.lang(), typo_flags, pt, data); 
+             key.script(), key.lang(), typo_flags, pt, data,
+             font.getUnitsPerEm(), layoutTables);
     }
 
     private static native void 
 	nativeLayout(Font2D font, FontStrike strike, float[] mat, int gmask, 
 		     int baseIndex, char[] chars, int offset, int limit, 
 		     int min, int max, int script, int lang, int typo_flags, 
-		     Point2D.Float pt, GVData data);
+             Point2D.Float pt, GVData data, long upem, long layoutTables);
 }

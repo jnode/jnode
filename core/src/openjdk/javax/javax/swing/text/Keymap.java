@@ -33,7 +33,6 @@ import javax.swing.KeyStroke;
  * resolve in a hierarchy.  
  *
  * @author  Timothy Prinzing
- * @version 1.25 05/05/07
  */
 public interface Keymap {
 

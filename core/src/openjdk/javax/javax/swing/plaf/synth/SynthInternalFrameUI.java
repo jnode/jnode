@@ -42,7 +42,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's InternalFrameUI.
  *
- * @version 1.28 05/05/07
  * @author David Kloba
  * @author Joshua Outwater
  * @author Rich Schiavi

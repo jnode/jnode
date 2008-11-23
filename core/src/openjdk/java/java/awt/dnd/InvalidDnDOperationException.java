@@ -31,7 +31,6 @@ package java.awt.dnd;
  * to undertake the requested operation that the present time, since the
  * undrelying DnD system is not in the appropriate state.
  *
- * @version 	1.19, 05/05/07
  * @since 1.2
  */
 
@@ -54,6 +53,3 @@ public class InvalidDnDOperationException extends IllegalStateException {
     public InvalidDnDOperationException(String msg) { super(msg); }
 
 }
-
-
-

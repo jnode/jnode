@@ -49,7 +49,6 @@ import java.awt.Point;
  * bands with a PackedColorModel (including a DirectColorModel) for
  * color interpretation.
  *
- * @version 10 Feb 1997
  */
 public class IntegerInterleavedRaster extends IntegerComponentRaster {
 
@@ -594,5 +593,3 @@ public class IntegerInterleavedRaster extends IntegerComponentRaster {
 //    }
 
 }
-
-

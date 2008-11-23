@@ -41,7 +41,6 @@ import java.util.*;
  * size is 0 when not visible.
  *
  * @author  Scott Violet
- * @version 1.19, 05/05/07
  */
 class EditableView extends ComponentView {
 

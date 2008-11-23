@@ -74,7 +74,6 @@ import javax.accessibility.*;
  *   attribute: isContainer true
  * description: A container for holding and displaying menus.
  *
- * @version 1.112 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber
@@ -763,4 +762,3 @@ public class JMenuBar extends JComponent implements Accessible,MenuElement
 
     }
 }
-

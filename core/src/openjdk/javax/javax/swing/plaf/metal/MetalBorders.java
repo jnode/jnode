@@ -48,7 +48,6 @@ import sun.swing.StringUIClientPropertyKey;
 /**
  * Factory object that can vend Borders appropriate for the metal L & F.
  * @author Steve Wilson
- * @version 1.49 05/05/07
  */
 
 public class MetalBorders {
@@ -1052,4 +1051,3 @@ public class MetalBorders {
 				  new MetalBorders.RolloverMarginBorder());
     }
 }
-

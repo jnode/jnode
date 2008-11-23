@@ -44,7 +44,6 @@ import javax.swing.JEditorPane;
  * it's relationship with a JTextComponent.
  *
  * @author  Timothy Prinzing
- * @version 1.26 05/05/07
  */
 public abstract class EditorKit implements Cloneable, Serializable {
 

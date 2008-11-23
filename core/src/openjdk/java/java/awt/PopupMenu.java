@@ -39,7 +39,6 @@ import javax.accessibility.*;
  * (e.g., you add it to a <code>MenuBar</code>), then you <b>cannot</b>
  * call <code>show</code> on that <code>PopupMenu</code>.
  *
- * @version	1.41 05/05/07
  * @author 	Amy Fowler
  */
 public class PopupMenu extends Menu {

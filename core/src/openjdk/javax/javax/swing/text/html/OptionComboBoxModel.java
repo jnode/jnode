@@ -39,7 +39,6 @@ import java.io.Serializable;
  * attribute set wins.
  *
   @author Sunita Mani
-  @version 1.15 05/05/07
  */
 
 class OptionComboBoxModel extends DefaultComboBoxModel implements Serializable {

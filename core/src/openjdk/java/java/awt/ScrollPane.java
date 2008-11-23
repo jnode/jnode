@@ -31,7 +31,6 @@ import javax.accessibility.*;
 import sun.awt.ScrollPaneWheelScroller;
 import sun.awt.SunToolkit;
 
-import java.beans.ConstructorProperties;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
@@ -84,7 +83,6 @@ import java.io.IOException;
  * will change dynamically depending on whether the scrollbars are
  * currently visible or not.
  *
- * @version     1.104 05/05/07
  * @author      Tom Ball
  * @author      Amy Fowler
  * @author      Tim Prinzing
@@ -197,7 +195,6 @@ public class ScrollPane extends Container implements Accessible {
      *     returns true
      * @see java.awt.GraphicsEnvironment#isHeadless
      */
-    @ConstructorProperties({"scrollbarDisplayPolicy"})
     public ScrollPane(int scrollbarDisplayPolicy) throws HeadlessException {
         GraphicsEnvironment.checkHeadless();
 	this.layoutMgr = null;

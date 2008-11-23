@@ -80,7 +80,6 @@ import javax.accessibility.*;
  *   attribute: isContainer false
  * description: An item which can be selected in a menu.
  *
- * @version 1.134 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @see JPopupMenu
@@ -948,4 +947,3 @@ public class JMenuItem extends AbstractButton implements Accessible,MenuElement 
     
     
 }
-

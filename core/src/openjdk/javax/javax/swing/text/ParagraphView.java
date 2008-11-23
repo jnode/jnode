@@ -45,7 +45,6 @@ import javax.swing.SizeRequirements;
  * @author  Timothy Prinzing
  * @author  Scott Violet
  * @author  Igor Kushnirskiy
- * @version 1.103 05/05/07
  * @see     View
  */
 public class ParagraphView extends FlowView implements TabExpander {

@@ -31,7 +31,6 @@ import java.awt.print.*;
  * Printable which counts the number of pages.
  *
  * @author Igor Kushnirskiy
- * @version 1.8 05/05/07
  * 
  * @since 1.6
  */

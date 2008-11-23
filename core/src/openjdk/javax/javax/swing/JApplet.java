@@ -87,7 +87,6 @@ import javax.accessibility.*;
  *      attribute: containerDelegate getContentPane
  *    description: Swing's Applet subclass.
  *
- * @version 1.77 05/05/07
  * @author Arnaud Weber
  */
 public class JApplet extends Applet implements Accessible,
@@ -569,4 +568,3 @@ public class JApplet extends Applet implements Accessible,
         // everything moved to new parent, AccessibleApplet
     }
 }
-

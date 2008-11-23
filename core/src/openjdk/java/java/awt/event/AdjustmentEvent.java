@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,7 +27,6 @@ package java.awt.event;
 
 import java.awt.Adjustable;
 import java.awt.AWTEvent;
-import java.awt.Event;
 
 /**
  * The adjustment event emitted by Adjustable objects.
@@ -35,7 +34,6 @@ import java.awt.Event;
  * @see AdjustmentListener
  *
  * @author Amy Fowler
- * @version 1.35 05/05/07
  * @since 1.1
  */
 public class AdjustmentEvent extends AWTEvent {

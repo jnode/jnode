@@ -43,7 +43,6 @@ import java.util.Enumeration;
  * </pre>
  * @see AudioPlayer
  * @author Arthur van Hoff
- * @version 1.14 07/05/05
  */
 public
     class AudioStreamSequence extends SequenceInputStream {

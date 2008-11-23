@@ -40,7 +40,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ScrollBarUI.
  *
- * @version 1.38, 05/05/07
  * @author Scott Violet
  */
 class SynthScrollBarUI extends BasicScrollBarUI implements

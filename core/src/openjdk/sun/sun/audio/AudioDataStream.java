@@ -36,7 +36,6 @@ import javax.sound.midi.*;
  * @see AudioData
  * @author Arthur van Hoff
  * @author Kara Kytle
- * @version 1.16 07/05/05
  */
 public class AudioDataStream extends ByteArrayInputStream {
     

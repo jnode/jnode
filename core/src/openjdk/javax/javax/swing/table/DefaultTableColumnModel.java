@@ -48,7 +48,6 @@ import sun.swing.SwingUtilities2;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.58 05/05/07
  * @author Alan Chung
  * @author Philip Milne
  * @see JTable
@@ -739,4 +738,3 @@ public class DefaultTableColumnModel implements TableColumnModel,
     }
 
 } // End of class DefaultTableColumnModel
-

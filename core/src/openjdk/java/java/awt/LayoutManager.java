@@ -37,7 +37,6 @@ package java.awt;
  * @see Container
  * @see javax.swing.JComponent#isOptimizedDrawingEnabled
  *
- * @version	1.33, 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  */

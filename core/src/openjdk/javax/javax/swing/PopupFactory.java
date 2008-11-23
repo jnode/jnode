@@ -53,7 +53,6 @@ import static javax.swing.ClientPropertyKey.PopupFactory_FORCE_HEAVYWEIGHT_POPUP
  *
  * @see Popup
  *
- * @version 1.26 02/22/05
  * @since 1.4
  */
 public class PopupFactory {
@@ -570,7 +569,10 @@ public class PopupFactory {
                         r.y += i.top;
                         r.width -= (i.left + i.right);
                         r.height -= (i.top + i.bottom);
-                        return r.contains(x, y, width, height);
+
+                        GraphicsConfiguration gc = parent.getGraphicsConfiguration();
+                        Rectangle popupArea = getContainerPopupArea(gc);
+                        return r.intersection(popupArea).contains(x, y, width, height);
                                                   
                     } else if (parent instanceof JApplet) {
                         Rectangle r = parent.getBounds();
@@ -587,6 +589,28 @@ public class PopupFactory {
                 }
             }
             return false;
+        }
+
+        Rectangle getContainerPopupArea(GraphicsConfiguration gc) {
+            Rectangle screenBounds;
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            Insets insets;
+            if(gc != null) {
+                // If we have GraphicsConfiguration use it
+                // to get screen bounds
+                screenBounds = gc.getBounds();
+                insets = toolkit.getScreenInsets(gc);
+            } else {
+                // If we don't have GraphicsConfiguration use primary screen
+                screenBounds = new Rectangle(toolkit.getScreenSize());
+                insets = new Insets(0, 0, 0, 0);
+            }
+            // Take insets into account
+            screenBounds.x += insets.left;
+            screenBounds.y += insets.top;
+            screenBounds.width -= (insets.left + insets.right);
+            screenBounds.height -= (insets.top + insets.bottom);
+            return screenBounds;
         }
     }
 

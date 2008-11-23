@@ -37,6 +37,7 @@ import java.awt.image.LookupTable;
 import java.awt.image.RasterOp;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
@@ -62,7 +63,16 @@ public class ImagingLib {
  
     private static Class[] nativeOpClass = new Class[NUM_NATIVE_OPS];
 
-    static  native void init();
+    /**
+     * Returned value indicates whether the library initailization was
+     * succeded.
+     *
+     * There could be number of reasons to failure:
+     * - failed to load library.
+     * - failed to get all required entry points.
+     */
+    private static native boolean init();
+
     static public native int transformBI(BufferedImage src, BufferedImage dst,
                                          double[] matrix, int interpType);
     static public native int transformRaster(Raster src, Raster dst,
@@ -78,8 +88,27 @@ public class ImagingLib {
                                               byte[][] table);
 
     static {
-        // Initialize medialib
-        init();
+
+        PrivilegedAction<Boolean> doMlibInitialization =
+            new PrivilegedAction<Boolean>() {
+                public Boolean run() {
+                    String arch = System.getProperty("os.arch");
+
+                    if (arch == null || !arch.startsWith("sparc")) {
+                        try {
+                            System.loadLibrary("mlib_image");
+                        } catch (UnsatisfiedLinkError e) {
+                            return Boolean.FALSE;
+                        }
+
+                    }
+                    boolean success =  init();
+                    return Boolean.valueOf(success);
+                }
+            };
+
+        useLib = AccessController.doPrivileged(doMlibInitialization);
+
         //
         // Cache the class references of the operations we know about
         // at the time this class is initially loaded.
@@ -246,6 +275,4 @@ public class ImagingLib {
 
         return retBI;
     }
-
 }
- 

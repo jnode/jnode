@@ -51,7 +51,6 @@ import sun.swing.plaf.synth.SynthUI;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Shannon Hickey
- * @version 1.19 05/05/07
  */
 class SynthTextFieldUI
     extends BasicTextFieldUI

@@ -34,7 +34,6 @@ import javax.swing.event.TreeExpansionEvent;
  * in <em>The Java Tutorial</em>
  * for further information and examples.
  *
- * @version 1.17 05/05/07
  * @author Scott Violet
  */
 public class ExpandVetoException extends Exception {

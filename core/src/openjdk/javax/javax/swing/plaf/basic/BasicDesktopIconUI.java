@@ -39,7 +39,6 @@ import java.io.Serializable;
 /**
  * Basic L&F for a minimized window on a desktop.
  *
- * @version 1.42 05/05/07
  * @author David Kloba
  * @author Steve Wilson
  * @author Rich Schiavi
@@ -299,5 +298,3 @@ public class BasicDesktopIconUI extends DesktopIconUI {
     }; /// End MotionListener
 
 }
-
-

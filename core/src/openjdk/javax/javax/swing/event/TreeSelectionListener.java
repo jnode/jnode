@@ -38,7 +38,6 @@ import java.util.EventListener;
  * @see javax.swing.tree.TreeSelectionModel
  * @see javax.swing.JTree
  *
- * @version 1.21 05/05/07
  * @author Scott Violet
  */
 public interface TreeSelectionListener extends EventListener

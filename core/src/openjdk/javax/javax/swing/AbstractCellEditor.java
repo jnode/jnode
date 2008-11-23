@@ -30,7 +30,6 @@ import java.util.EventObject;
 import java.io.Serializable;
 
 /**
- * @version 1.19 05/05/07 
  * 
  * A base class for <code>CellEditors</code>, providing default
  * implementations for the methods in the <code>CellEditor</code>

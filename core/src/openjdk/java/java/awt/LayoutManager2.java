@@ -40,7 +40,6 @@ package java.awt;
  * @see LayoutManager
  * @see Container
  *
- * @version	1.21, 05/05/07
  * @author 	Jonni Kanerva
  */
 public interface LayoutManager2 extends LayoutManager {

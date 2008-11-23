@@ -57,7 +57,6 @@ package javax.swing.plaf.synth;
  * }
  * </pre>
  *
- * @version 1.19, 05/05/07
  * @since 1.5
  * @author Scott Violet
  */

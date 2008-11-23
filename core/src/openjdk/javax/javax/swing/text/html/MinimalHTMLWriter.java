@@ -63,7 +63,6 @@ import javax.swing.text.*;
  * </pre>
  *
  * @author Sunita Mani
- * @version 1.21, 05/05/07
  */
 
 public class MinimalHTMLWriter extends AbstractWriter {

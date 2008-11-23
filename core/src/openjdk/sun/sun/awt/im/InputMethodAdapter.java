@@ -42,7 +42,6 @@ import java.awt.im.spi.InputMethod;
  * Licensees are free to modify this class as necessary to implement
  * their host input method adapters.
  *
- * @version 1.25 05/05/07
  * @author JavaSoft International
  */
 

@@ -27,6 +27,7 @@
 package java.awt.dnd;
 
 import java.awt.Component;
+import java.io.Serializable;
 import java.awt.Cursor;
 
 import java.awt.Image;
@@ -55,7 +56,6 @@ import java.io.ObjectOutputStream;
  * platform dependent drag initiating gesture has occurred 
  * on the <code>Component</code> that it is tracking.
  * 
- * @version 1.31
  * @see java.awt.dnd.DragGestureRecognizer
  * @see java.awt.dnd.DragGestureListener
  * @see java.awt.dnd.DragSource
@@ -66,7 +66,7 @@ public class DragGestureEvent extends EventObject {
     private static final long serialVersionUID = 9080172649166731306L;
 
     /**
-     * Constructs a <code>DragGestureEvent</code> given the
+     * Construct a <code>DragGestureEvent</code> given the
      * <code>DragGestureRecognizer</code> firing this event, 
      * an <code>int</code> representing
      * the user's preferred action, a <code>Point</code> 
@@ -78,7 +78,8 @@ public class DragGestureEvent extends EventObject {
      * @param ori The origin of the drag
      * @param evs The <code>List</code> of events that comprise the gesture
      * <P>
-     * @throws IllegalArgumentException if input parameters are {@code null}
+     * @throws <code>IllegalArgumentException</code> if
+     * input parameters are null
      */
 
     public DragGestureEvent(DragGestureRecognizer dgr, int act, Point ori,
@@ -201,20 +202,17 @@ public class DragGestureEvent extends EventObject {
      * <br>
      * If a <code>null</code> <code>Transferable</code> is specified 
      * <code>NullPointerException</code> will be thrown.
-     * @param dragCursor     The initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see 
-     *                       <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a>
-     *                       for more details on the cursor handling mechanism
-     *                       during drag and drop
+     *
+     * @param dragCursor   The <code>Cursor</code> for this drag operation
      * @param transferable The <code>Transferable</code> representing the source
      *                     data for this drag operation.
      *
-     * @throws InvalidDnDOperationException if the Drag and Drop
+     * @throws <code>InvalidDnDOperationException</code> if the Drag and Drop
      *         system is unable to initiate a drag operation, or if the user 
      *         attempts to start a drag while an existing drag operation is
      *         still executing. 
-     * @throws NullPointerException if the {@code Transferable} is {@code null}
+     * @throws <code>NullPointerException</code> if the
+     *         <code>Transferable</code> is <code>null</code>.
      * @since 1.4
      */
     public void startDrag(Cursor dragCursor, Transferable transferable) 
@@ -227,16 +225,11 @@ public class DragGestureEvent extends EventObject {
      * the <code>Transferable</code> object, 
      * and the <code>DragSourceListener</code> to use.
      * <P>
-     * @param dragCursor     The initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see
-     *                       <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a>
-     *                       for more details on the cursor handling mechanism
-     *                       during drag and drop
+     * @param dragCursor   The initial drag Cursor
      * @param transferable The source's Transferable
      * @param dsl	   The source's DragSourceListener
      * <P>
-     * @throws InvalidDnDOperationException if 
+     * @throws <code>InvalidDnDOperationException</code> if
      * the Drag and Drop system is unable to
      * initiate a drag operation, or if the user 
      * attempts to start a drag while an existing
@@ -254,18 +247,13 @@ public class DragGestureEvent extends EventObject {
      * the <code>Transferable</code> object, and 
      * the <code>DragSourceListener</code> to use.
      * <P>
-     * @param dragCursor     The initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see
-     *                       <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a>
-     *                       for more details on the cursor handling mechanism
-     *                       during drag and drop
+     * @param dragCursor   The initial drag Cursor
      * @param dragImage    The source's dragImage
      * @param imageOffset  The dragImage's offset
      * @param transferable The source's Transferable
      * @param dsl	   The source's DragSourceListener
      * <P>
-     * @throws InvalidDnDOperationException if 
+     * @throws <code>InvalidDnDOperationException</code> if
      * the Drag and Drop system is unable to
      * initiate a drag operation, or if the user 
      * attempts to start a drag while an existing

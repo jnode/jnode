@@ -29,7 +29,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Color;
 import java.awt.Component;
-import java.beans.ConstructorProperties;
 
 /**
  * A class which implements a simple etched border which can 
@@ -48,7 +47,6 @@ import java.beans.ConstructorProperties;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.25 05/05/07
  * @author David Kloba
  * @author Amy Fowler
  */
@@ -100,7 +98,6 @@ public class EtchedBorder extends AbstractBorder
      * @param highlight the color to use for the etched highlight
      * @param shadow the color to use for the etched shadow
      */
-    @ConstructorProperties({"etchType", "highlightColor", "shadowColor"})
     public EtchedBorder(int etchType, Color highlight, Color shadow)    {
         this.etchType = etchType;
         this.highlight = highlight;

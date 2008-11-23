@@ -67,17 +67,18 @@ public class FileFontStrike extends PhysicalStrike {
     private long[][] segLongGlyphImages;
 
     /* The "metrics" information requested by clients is usually nothing
-     * more than the horizontal advance of the character. So cache this
-     * information.
-     * This advance cache will take an extra (4 * numglyphs) bytes per
-     * strike and profiling will be needed to distinguish if its beneficial.
-     * The big advantage is the glyph Image pointers can then be more simply
-     * distinguished as valid images.
-     * Metrics other than horizontal advance is not cached in Java code but
-     * if a valid glyph Image exists it will contain all the metrics
-     * info (except for outline bounds which is even more rarely needed).
+     * more than the horizontal advance of the character.
+     * In most cases this advance and other metrics information is stored
+     * in the glyph image cache.
+     * But in some cases we do not automatically retrieve the glyph
+     * image when the advance is requested. In those cases we want to
+     * cache the advances since this has been shown to be important for
+     * performance.
+     * The segmented cache is used in cases when the single array
+     * would be too large.
      */
-    protected float[] horizontalAdvances;
+    private float[] horizontalAdvances;
+    private float[][] segHorizontalAdvances;
 
     /* Outline bounds are used when printing and when drawing outlines
      * to the screen. On balance the relative rarity of these cases
@@ -142,20 +143,20 @@ public class FileFontStrike extends PhysicalStrike {
          * requires it. However 
          */
         if (Double.isNaN(matrix[0]) || Double.isNaN(matrix[1]) ||
-            Double.isNaN(matrix[2]) || Double.isNaN(matrix[3])) {
-            pScalerContext = getNullScalerContext(fileFont.getNullScaler());
+            Double.isNaN(matrix[2]) || Double.isNaN(matrix[3]) ||
+            fileFont.getScaler() == null) {
+            pScalerContext = NullFontScaler.getNullScalerContext();
         } else {
-            pScalerContext =
-                createScalerContext(fileFont.getScaler(), matrix,
+            pScalerContext = fileFont.getScaler().createScalerContext(matrix,
                                     fileFont instanceof TrueTypeFont,
                                     desc.aaHint, desc.fmHint,
-                                    algoStyle, boldness, italic);
+                                    boldness, italic);
         }
 
 	mapper = fileFont.getMapper();
 	int numGlyphs = mapper.getNumGlyphs();
 
-        /* Always segment for fonts with > 4K glyphs, but also for smaller
+        /* Always segment for fonts with > 2K glyphs, but also for smaller
          * fonts with non-typical sizes and transforms.
          * Segmenting for all non-typical pt sizes helps to minimise memory
          * usage when very many distinct strikes are created.
@@ -167,18 +168,16 @@ public class FileFontStrike extends PhysicalStrike {
         int iSize = (int)ptSize;
         boolean isSimpleTx = (at.getType() & complexTX) == 0;
         segmentedCache =
-            (numGlyphs > SEGSIZE << 4) ||
+            (numGlyphs > SEGSIZE << 3) ||
             ((numGlyphs > SEGSIZE << 1) &&
              (!isSimpleTx || ptSize != iSize || iSize < 6 || iSize > 36));
 
-	/* Bad font. The scaler may already be the "null scaler"
-	 * or less likely this context couldn't be created.
-	 * In either case we create a minimal strike here that returns
-	 * empty glyphs, empty metrics and de-register this font for
-	 * future use. This isn't going to be completely seamless,
-	 * the user may see artifacts, but we won't crash and only
-	 * this font will be affected, and only for so long as this
-	 * strike is in use.
+        /* This can only happen if we failed to allocate memory for context.
+         * NB: in such case we may still have some memory in java heap
+         *     but subsequent attempt to allocate null scaler context
+         *     may fail too (cause it is allocate in the native heap).
+         *     It is not clear how to make this more robust but on the
+         *     other hand getting NULL here seems to be extremely unlikely.
 	 */
 	if (pScalerContext == 0L) {
             /* REMIND: when the code is updated to install cache objects
@@ -186,7 +185,7 @@ public class FileFontStrike extends PhysicalStrike {
              */
             this.disposer = new FontStrikeDisposer(fileFont, desc);
             initGlyphCache();
-	    pScalerContext = getNullScalerContext(fileFont.getNullScaler());
+            pScalerContext = NullFontScaler.getNullScalerContext();
 	    FontManager.deRegisterBadFont(fileFont);
 	    return;
 	}
@@ -214,41 +213,34 @@ public class FileFontStrike extends PhysicalStrike {
 
         /* Always get the image and the advance together for smaller sizes
          * that are likely to be important to rendering performance.
-         * Also if the cache is "segmented", then this indicates a
-         * large font and we would be better to do this rather than create
-         * an unsegmented advance cache. The point size of 48.0
-         * can be thought of as "maximumSizeForGetImageWithAdvance"
+         * The pixel size of 48.0 can be thought of as
+         * "maximumSizeForGetImageWithAdvance".
+         * This should be no greater than OutlineTextRender.THRESHOLD.
 	 */
-        getImageWithAdvance = at.getScaleY() <= 48.0 || segmentedCache;
+        getImageWithAdvance = at.getScaleY() <= 48.0;
 
         /* Some applications request advance frequently during layout.
          * If we are not getting and caching the image with the advance,
-         * we should at least cache the horizontal advance for smaller fonts.
-         * For sizes and fonts which don't fit these criteria there is
-         * a potentially significant performance penalty if the advance is
-         * repeatedly requested before requesting the image.
-         * REMIND: should address this, perhaps by using htmx for large sizes.
+         * there is a potentially significant performance penalty if the
+         * advance is repeatedly requested before requesting the image.
+         * We should at least cache the horizontal advance.
+         * REMIND: could use info in the font, eg hmtx, to retrieve some
+         * advances. But still want to cache it here.
          */
 
-        if (!getImageWithAdvance && numGlyphs < MAXADVANCECACHESIZE) {
+        if (!getImageWithAdvance) {
+            if (!segmentedCache) {
 	    horizontalAdvances = new float[numGlyphs];
 	    /* use max float as uninitialised advance */
 	    for (int i=0; i<numGlyphs; i++) {
 		horizontalAdvances[i] = Float.MAX_VALUE;
 	    }
+            } else {
+                int numSegments = (numGlyphs + SEGSIZE-1)/SEGSIZE;
+                segHorizontalAdvances = new float[numSegments][];
+            }
 	}
     }
-
-   /* Retrieves a singleton "null" scaler context instance which must
-     * not be freed.
-     */
-    static synchronized native long getNullScalerContext(long pScaler);
-
-    private native long createScalerContext(long pScaler, double[] matrix,
-					    boolean fontType,
-					    int aa, int fm, 
-					    boolean algStyle,
-					    float boldness, float italic);
 
     /* A number of methods are delegated by the strike to the scaler
      * context which is a shared resource on a physical font.
@@ -477,6 +469,15 @@ public class FileFontStrike extends PhysicalStrike {
 	    if (advance != Float.MAX_VALUE) {
 		return advance;
 	    }
+        } else if (segmentedCache && segHorizontalAdvances != null) {
+            int segIndex = glyphCode >> SEGSHIFT;
+            float[] subArray = segHorizontalAdvances[segIndex];
+            if (subArray != null) {
+                advance = subArray[glyphCode % SEGSIZE];
+                if (advance != Float.MAX_VALUE) {
+                    return advance;
+                }
+            }
 	}
 
 	if (invertDevTx != null) {
@@ -507,6 +508,16 @@ public class FileFontStrike extends PhysicalStrike {
 
 	if (horizontalAdvances != null) {
 	    horizontalAdvances[glyphCode] = advance;
+        } else if (segmentedCache && segHorizontalAdvances != null) {
+            int segIndex = glyphCode >> SEGSHIFT;
+            int subIndex = glyphCode % SEGSIZE;
+            if (segHorizontalAdvances[segIndex] == null) {
+                segHorizontalAdvances[segIndex] = new float[SEGSIZE];
+                for (int i=0; i<SEGSIZE; i++) {
+                     segHorizontalAdvances[segIndex][i] = Float.MAX_VALUE;
+                }
+            }
+            segHorizontalAdvances[segIndex][subIndex] = advance;
 	}
 	return advance;
     }
@@ -522,10 +533,20 @@ public class FileFontStrike extends PhysicalStrike {
 			     Rectangle result) {
 
         long ptr = getGlyphImagePtr(glyphCode);
-	float topLeftX =
-	  StrikeCache.unsafe.getFloat(ptr+StrikeCache.topLeftXOffset);
-	float topLeftY =
-	  StrikeCache.unsafe.getFloat(ptr+StrikeCache.topLeftYOffset);
+        float topLeftX, topLeftY;
+
+        /* With our current design NULL ptr is not possible
+           but if we eventually allow scalers to return NULL pointers
+           this check might be actually useful. */
+        if (ptr == 0L) {
+            result.x = (int) Math.floor(pt.x);
+            result.y = (int) Math.floor(pt.y);
+            result.width = result.height = 0;
+            return;
+        }
+
+        topLeftX = StrikeCache.unsafe.getFloat(ptr+StrikeCache.topLeftXOffset);
+        topLeftY = StrikeCache.unsafe.getFloat(ptr+StrikeCache.topLeftYOffset);
 
 	result.x = (int)Math.floor(pt.x + topLeftX);
 	result.y = (int)Math.floor(pt.y + topLeftY);

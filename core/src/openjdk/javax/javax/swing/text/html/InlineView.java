@@ -34,7 +34,6 @@ import javax.swing.text.*;
  * based upon css attributes.
  *
  * @author  Timothy Prinzing
- * @version 1.33 05/05/07
  */
 public class InlineView extends LabelView {
 

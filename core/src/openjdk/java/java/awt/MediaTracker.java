@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,7 +27,6 @@ package java.awt;
 
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.Graphics;
 import java.awt.image.ImageObserver;
 
 /**
@@ -163,7 +162,6 @@ import java.awt.image.ImageObserver;
  * }
  * </pre></blockquote><hr>
  *
- * @version 	1.50, 05/05/07
  * @author 	Jim Graham
  * @since       JDK1.0
  */
@@ -905,7 +903,7 @@ java.io.Serializable {
 	return image;
     }
 
-    int getStatus(boolean doLoad, boolean doVerify) {
+    synchronized int getStatus(boolean doLoad, boolean doVerify) {
 	if (doVerify) {
 	    int flags = tracker.target.checkImage(image, width, height, null);
 	    int s = parseflags(flags);

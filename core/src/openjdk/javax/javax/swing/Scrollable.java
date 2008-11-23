@@ -38,7 +38,6 @@ import java.awt.Rectangle;
  * @see JViewport
  * @see JScrollPane
  * @see JScrollBar
- * @version 1.19 05/05/07
  * @author Hans Muller
  */
 public interface Scrollable  

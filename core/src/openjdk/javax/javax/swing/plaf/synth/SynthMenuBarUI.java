@@ -46,7 +46,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's MenuBarUI.
  *
- * @version 1.17, 05/05/07
  * @author Scott Violet
  */
 class SynthMenuBarUI extends BasicMenuBarUI implements PropertyChangeListener,

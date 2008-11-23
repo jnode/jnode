@@ -57,7 +57,6 @@ import java.lang.ref.ReferenceQueue;
  * mark, and decreases the cost of keeping the mark updated.
  *
  * @author  Timothy Prinzing
- * @version 1.21 12/03/01
  */
 public class GapContent extends GapVector implements AbstractDocument.Content, Serializable {
 
@@ -953,5 +952,3 @@ public class GapContent extends GapVector implements AbstractDocument.Content, S
 	protected Vector posRefs;
     } // GapContent.RemoveUndo
 }
-
-

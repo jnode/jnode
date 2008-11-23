@@ -291,7 +291,6 @@ import sun.swing.text.TextComponentPrintable;
  * 
  * @author  Timothy Prinzing
  * @author Igor Kushnirskiy (printing support)
- * @version 1.235 05/05/07
  * @see Document
  * @see DocumentEvent
  * @see DocumentListener
@@ -5041,5 +5040,3 @@ public abstract class JTextComponent extends JComponent implements Scrollable, A
 	}
     }
 }
-
-

@@ -209,7 +209,6 @@ import java.beans.*;
  * <code>swing.actions.reconfigureOnNull</code> to the <code>String</code>
  * value <code>true</code>.
  *
- * @version 1.42 05/05/07
  * @author Georges Saab
  * @see AbstractAction
  */

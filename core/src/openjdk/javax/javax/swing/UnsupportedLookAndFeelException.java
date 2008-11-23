@@ -38,7 +38,6 @@ package javax.swing;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author unattributed
- * @version 1.24 05/05/07
  */
 public class UnsupportedLookAndFeelException extends Exception
 {

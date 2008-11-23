@@ -42,7 +42,6 @@ import java.awt.*;
  *
  * @see <a href="../../java/awt/doc-files/FocusSpec.html">Focus Specification</a>
  *
- * @version 1.35, 05/05/07
  * @author Arnaud Weber
  * @author David Mendenhall
  */
@@ -150,4 +149,3 @@ public abstract class FocusManager extends DefaultKeyboardFocusManager {
 	return enabled;
     }
 }
-

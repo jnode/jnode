@@ -49,7 +49,6 @@ import java.util.Set;
  * </pre>
  * some of the methods will cause a StackOverflowError to be thrown.
  *
- * @version 1.21 05/05/07
  * @author Scott Violet
  * @since 1.3
  */

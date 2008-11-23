@@ -47,7 +47,6 @@ import java.lang.ref.ReferenceQueue;
  *
  * @param T the type of JComponent the underlying Action is attached to
  *
- * @version 1.21 05/05/07
  * @author Georges Saab
  * @see AbstractButton
  */

@@ -30,7 +30,6 @@ import java.util.*;
  * A concrete subclass of AbstractUndoableEdit, used to assemble little
  * UndoableEdits into great big ones.
  *
- * @version 1.32 05/05/07
  * @author Ray Ryan
  */
 public class CompoundEdit extends AbstractUndoableEdit {

@@ -33,7 +33,6 @@ package javax.swing;
  * <code>ListModel</code>. This disjoint behavior allows for the temporary 
  * storage and retrieval of a selected item in the model.
  *
- * @version 1.22 05/05/07
  * @author Arnaud Weber
  */
 public interface ComboBoxModel extends ListModel {
@@ -54,4 +53,3 @@ public interface ComboBoxModel extends ListModel {
    */
   Object getSelectedItem();
 }
-

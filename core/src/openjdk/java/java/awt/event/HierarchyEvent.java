@@ -70,7 +70,6 @@ import java.awt.Container;
  * </code> when the event occurs.
  *
  * @author	David Mendenhall
- * @version	1.20, 05/05/07
  * @see		HierarchyListener
  * @see		HierarchyBoundsAdapter
  * @see		HierarchyBoundsListener

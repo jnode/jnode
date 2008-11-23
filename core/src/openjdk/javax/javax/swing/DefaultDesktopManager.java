@@ -45,7 +45,6 @@ import java.awt.event.ComponentEvent;
   * methods will call into the DesktopManager.</p>
   * @see JDesktopPane
   * @see JInternalFrame
-  * @version 1.65 05/05/07
   * @author David Kloba
   * @author Steve Wilson
   */
@@ -780,4 +779,3 @@ public class DefaultDesktopManager implements DesktopManager, java.io.Serializab
 
 
 }
-

@@ -34,6 +34,7 @@ package sun.font;
 public final class Type1GlyphMapper extends CharToGlyphMapper {
 
     Type1Font font;
+    FontScaler scaler;
 
     public Type1GlyphMapper(Type1Font font) {
 	this.font = font;
@@ -41,14 +42,26 @@ public final class Type1GlyphMapper extends CharToGlyphMapper {
     }
 
     private void initMapper() {
-	if (font.pScaler == 0L) {
-	    font.getScaler();
+        scaler = font.getScaler();
+        try {
+          missingGlyph = scaler.getMissingGlyphCode();
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            try {
+                missingGlyph = scaler.getMissingGlyphCode();
+            } catch (FontScalerException e) { //should not happen
+                missingGlyph = 0;
+            }
 	}
-	missingGlyph = font.getMissingGlyphCode(font.pScaler);
     }
     
     public int getNumGlyphs() {
-	return font.getNumGlyphs(font.pScaler);
+        try {
+            return scaler.getNumGlyphs();
+        } catch (FontScalerException e) {
+            scaler = FontManager.getNullScaler();
+            return getNumGlyphs();
+        }
     }
 
     public int getMissingGlyphCode() {
@@ -56,18 +69,33 @@ public final class Type1GlyphMapper extends CharToGlyphMapper {
     }
 
     public boolean canDisplay(char ch) {
-	return font.getGlyphCode(font.pScaler, ch) != missingGlyph;
+        try {
+            return scaler.getGlyphCode(ch) != missingGlyph;
+        } catch(FontScalerException e) {
+            scaler = FontManager.getNullScaler();
+            return canDisplay(ch);
+        }
     }
 
     public int charToGlyph(char ch) {
-	return font.getGlyphCode(font.pScaler, ch);
+        try {
+            return scaler.getGlyphCode(ch);
+        } catch (FontScalerException e) {
+            scaler = FontManager.getNullScaler();
+            return charToGlyph(ch);
+        }
     }
 
     public int charToGlyph(int ch) {
 	if (ch < 0 || ch > 0xffff) {
 	    return missingGlyph;
 	} else {
-	    return font.getGlyphCode(font.pScaler, (char)ch);
+            try {
+                return scaler.getGlyphCode((char)ch);
+            } catch (FontScalerException e) {
+                scaler = FontManager.getNullScaler();
+                return charToGlyph(ch);
+            }
 	}
     }
  
@@ -90,11 +118,7 @@ public final class Type1GlyphMapper extends CharToGlyphMapper {
 		    glyphs[i + 1] = 0xFFFF; // invisible glyph
 		}
 	    }
-	    if (code < 0 || code > 0xffff) {
-		glyphs[i] = missingGlyph;
-	    } else {
-		glyphs[i] = font.getGlyphCode(font.pScaler, (char)code);
-	    }
+            glyphs[i] = charToGlyph(code);
 	    if (code >= 0x10000) {
 		i += 1; // Empty glyph slot after surrogate
 	    }
@@ -107,12 +131,7 @@ public final class Type1GlyphMapper extends CharToGlyphMapper {
 	 * to be an issue for Type1 fonts. So no need to optimise it.
 	 */
 	for (int i=0; i<count; i++) {
-	    if (unicodes[i] < 0 || unicodes[i] > 0xffff) {
-		glyphs[i] = missingGlyph;
-	    } else {
-		glyphs[i] =
-		    font.getGlyphCode(font.pScaler, (char)unicodes[i]);
-	    }
+            glyphs[i] = charToGlyph(unicodes[i]);
 	}
     }
 
@@ -139,11 +158,7 @@ public final class Type1GlyphMapper extends CharToGlyphMapper {
 		}
 	    }
 
-	    if (code < 0 || code > 0xffff) {
-		glyphs[i] = missingGlyph;
-	    } else {
-		glyphs[i] = font.getGlyphCode(font.pScaler, (char)code);
-	    }
+            glyphs[i] = charToGlyph(code);
 
             if (code < FontManager.MIN_LAYOUT_CHARCODE) {
 		continue;

@@ -33,7 +33,6 @@ import java.net.URL;
  * parties that link was activated in a frame.
  *
  * @author Sunita Mani
- * @version 1.16, 05/05/07
  */
 
 public class HTMLFrameHyperlinkEvent extends HyperlinkEvent {

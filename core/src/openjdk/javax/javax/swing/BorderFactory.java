@@ -38,7 +38,6 @@ import javax.swing.border.*;
  to Use Borders</a>,
  * a section in <em>The Java Tutorial</em>.
  *
- * @version 1.41 05/05/07
  * @author David Kloba
  */
 public class BorderFactory 

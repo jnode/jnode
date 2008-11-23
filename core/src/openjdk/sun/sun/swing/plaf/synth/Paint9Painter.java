@@ -32,7 +32,6 @@ import sun.swing.CachedPainter;
  * Paint9Painter is used for painting images for both Synth and GTK's
  * pixmap/blueprint engines.
  *
- * @version @(#)Paint9Painter.java	1.8 07/05/05
  */
 public class Paint9Painter extends CachedPainter {
     /**

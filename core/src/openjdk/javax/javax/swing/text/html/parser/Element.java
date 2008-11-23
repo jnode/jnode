@@ -37,7 +37,6 @@ import java.io.*;
  *
  * @see DTD
  * @see AttributeList
- * @version 1.16, 05/05/07
  * @author Arthur van Hoff
  */
 public final

@@ -38,7 +38,6 @@ import sun.swing.plaf.synth.Paint9Painter;
  * by way of an insets, and the remaining regions are either tiled or
  * scaled to fit.
  *
- * @version 1.18, 05/05/07
  * @author Scott Violet
  */
 class ImagePainter extends SynthPainter {

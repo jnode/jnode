@@ -36,7 +36,6 @@ import javax.swing.plaf.UIResource;
  * components, otherwise 12.  This class also provides helper methods for
  * subclasses.
  *
- * @version 1.8, 05/05/07
  */
 public class DefaultLayoutStyle extends LayoutStyle {
     private static final DefaultLayoutStyle INSTANCE =

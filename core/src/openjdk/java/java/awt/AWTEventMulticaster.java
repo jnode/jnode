@@ -100,7 +100,6 @@ import java.util.EventListener;
  *
  * @author      John Rose
  * @author 	Amy Fowler
- * @version 	1.47, 05/05/07
  * @since 	1.1
  */
 

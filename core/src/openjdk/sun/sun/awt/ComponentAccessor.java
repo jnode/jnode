@@ -39,6 +39,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -49,7 +52,6 @@ import java.security.PrivilegedAction;
  * as we move away from native code to Pure-java peers we need this class. 
  *
  * @author Bino George
- * @version  1.26
  */
 
 
@@ -76,6 +78,11 @@ public class ComponentAccessor
     private static Method methodIsEnabledImpl;
     private static Method methodGetCursorNoClientCode;
     private static Method methodLocationNoClientCode;
+
+    private static final Logger log = Logger.getLogger("sun.awt.ComponentAccessor");
+
+    private ComponentAccessor() {
+    }
 
     static {
         AccessController.doPrivileged( new PrivilegedAction() {
@@ -133,16 +140,13 @@ public class ComponentAccessor
                         methodLocationNoClientCode.setAccessible(true);
                     }
                     catch (NoSuchFieldException e) {
-                        System.out.println("Unable to create ComponentAccessor : ");
-                        e.printStackTrace(); 
+                        log.log(Level.FINE, "Unable to initialize ComponentAccessor", e);
                     }
                     catch (ClassNotFoundException e) {
-                        System.out.println("Unable to create ComponentAccessor : ");
-                        e.printStackTrace(); 
+                        log.log(Level.FINE, "Unable to initialize ComponentAccessor", e);
                     }
                     catch (NoSuchMethodException e) {
-                        System.out.println("Unable to create ComponentAccessor : ");
-                        e.printStackTrace(); 
+                        log.log(Level.FINE, "Unable to initialize ComponentAccessor", e);
                     }
                     // to please javac
                     return null;
@@ -157,7 +161,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
     
@@ -168,7 +172,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
 
@@ -179,7 +183,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
     
@@ -190,7 +194,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
 
@@ -204,7 +208,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
 
@@ -214,7 +218,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return 0;
     }
@@ -225,7 +229,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return 0;
     }
@@ -236,7 +240,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return 0;
     }
@@ -247,7 +251,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return 0;
     }
@@ -258,7 +262,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return false;
     }
@@ -271,10 +275,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
 
         return parent;
@@ -288,10 +292,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
 
         return font;
@@ -307,10 +311,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
     }
 
@@ -322,10 +326,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
     }
 
@@ -336,7 +340,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
 
@@ -348,7 +352,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return color;
     }
@@ -361,7 +365,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return color;
     }
@@ -372,7 +376,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
     }
 
@@ -384,7 +388,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return f;
     }
@@ -396,7 +400,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return peer;
     }
@@ -406,7 +410,7 @@ public class ComponentAccessor
             fieldPeer.set(c, peer);
         } catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }            
     }
 
@@ -415,7 +419,7 @@ public class ComponentAccessor
             return fieldIgnoreRepaint.getBoolean(comp);
         }
         catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
 
         return false;
@@ -426,10 +430,10 @@ public class ComponentAccessor
             methodResetGC.invoke(c, (Object[]) null);
         }
         catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
     }
 
@@ -439,7 +443,7 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         return false;
     }
@@ -451,10 +455,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
         return enabled;
     }
@@ -467,10 +471,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
 
         return cursor;
@@ -484,10 +488,10 @@ public class ComponentAccessor
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to access the Component object", e);
         }
         catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Unable to invoke on the Component object", e);
         }
 
         return loc;

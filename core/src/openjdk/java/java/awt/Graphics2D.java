@@ -401,7 +401,6 @@ import java.util.Map;
  * </pre>
  * </ol>
  *
- * @version 	1.90, 05/05/07
  * @author Jim Graham
  * @see java.awt.RenderingHints
  */

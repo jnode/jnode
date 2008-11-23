@@ -309,7 +309,6 @@ import static javax.swing.ClientPropertyKey.PopupFactory_FORCE_HEAVYWEIGHT_POPUP
  *      attribute: isContainer true
  *    description: A component which implements standard dialog box controls.
  *
- * @version 1.108 05/05/07
  * @author James Gosling
  * @author Scott Violet
  */
@@ -2595,4 +2594,3 @@ public class JOptionPane extends JComponent implements Accessible
 
     } // inner class AccessibleJOptionPane
 }
-

@@ -45,7 +45,6 @@ import java.awt.Component;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.20 05/05/07
  * @author Georges Saab
  */
 public class MenuKeyEvent extends KeyEvent {
@@ -95,4 +94,3 @@ public class MenuKeyEvent extends KeyEvent {
 	return manager;
     }
 }
-

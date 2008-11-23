@@ -126,7 +126,6 @@ import javax.accessibility.*;
  * <li><code>WINDOW_STATE_CHANGED</code>
  * </ul>
  *
- * @version 	1.169, 05/05/07
  * @author 	Sami Shaio
  * @see WindowEvent
  * @see Window#addWindowListener

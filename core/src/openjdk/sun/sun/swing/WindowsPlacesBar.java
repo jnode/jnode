@@ -35,6 +35,7 @@ import javax.swing.border.*;
 import javax.swing.filechooser.*;
 
 import sun.awt.shell.*;
+import sun.awt.OSInfo;
 
 /**
  * <b>WARNING:</b> This class is an implementation detail and is only
@@ -42,7 +43,6 @@ import sun.awt.shell.*;
  * this public API.
  * <p>
  * 
- * @version 1.14, 05/05/07
  * @author Leif Samuelsson
  */
 public class WindowsPlacesBar extends JToolBar
@@ -59,8 +59,8 @@ public class WindowsPlacesBar extends JToolBar
 	setFloatable(false);
 	putClientProperty("JToolBar.isRollover", Boolean.TRUE);
 
-	boolean isXPPlatform = (System.getProperty("os.name").startsWith("Windows") &&
-				System.getProperty("os.version").compareTo("5.1") >= 0);
+        boolean isXPPlatform = (OSInfo.getOSType() == OSInfo.OSType.WINDOWS &&
+                OSInfo.getWindowsVersion().compareTo(OSInfo.WINDOWS_XP) >= 0);
 
 	if (isXPStyle) {
 	    buttonSize = new Dimension(83, 69);
@@ -181,4 +181,3 @@ public class WindowsPlacesBar extends JToolBar
 	return pref;
     }
 }
-

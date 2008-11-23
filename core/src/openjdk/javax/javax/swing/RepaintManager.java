@@ -52,7 +52,6 @@ import sun.security.action.GetPropertyAction;
  * Any calls to <code>repaint</code> on one of these will call into the
  * appropriate <code>addDirtyRegion</code> method.
  *
- * @version 1.75 05/05/07
  * @author Arnaud Weber
  */
 public class RepaintManager 
@@ -400,6 +399,7 @@ public class RepaintManager
     if ((c.getWidth() <= 0) || (c.getHeight() <= 0)) {
 	    return;
 	}
+
         if (extendDirtyRegion(c, x, y, w, h)) {
             // Component was already marked as dirty, region has been
             // extended, no need to continue.
@@ -433,7 +433,9 @@ public class RepaintManager
 		break;
 	    }
     }
+
 	if (root == null) return;
+
         synchronized(this) {
             if (extendDirtyRegion(c, x, y, w, h)) {
                 // In between last check and this check another thread
@@ -442,7 +444,6 @@ public class RepaintManager
             }
             dirtyComponents.put(c, new Rectangle(x, y, w, h));
         }
-
 
         // Queue a Runnable to invoke paintDirtyRegions and
         // validateInvalidComponents.
@@ -500,8 +501,6 @@ public class RepaintManager
         addDirtyRegion0(applet, x, y, w, h);
     }
 
-    // This is invoked from SystemEventQueueUtilities to flush any pending
-    // heavy weight regions into real paints.
     void scheduleHeavyWeightPaints() {
         Map<Container,Rectangle> hws;
 

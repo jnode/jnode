@@ -86,8 +86,9 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import java.util.logging.*;
+
 import sun.awt.AppContext;
-import sun.awt.DebugHelper;
 import sun.awt.SunToolkit;
 
 import java.awt.image.BufferedImage;
@@ -96,6 +97,8 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
 
+import java.io.FilePermission;
+import java.security.ProtectionDomain;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
@@ -129,14 +132,10 @@ import sun.awt.image.ToolkitImage;
  *
  * @author David Mendenhall
  * @author Danila Sinopalnikov
- * @version 1.46, 05/05/07
  *
  * @since 1.3.1
  */
 public abstract class DataTransferer {
-
-    private static final DebugHelper dbg =
-        DebugHelper.create(DataTransferer.class);
 
     /**
      * Cached value of Class.forName("[C");
@@ -220,6 +219,7 @@ public abstract class DataTransferer {
      */
     private static DataTransferer transferer;
 
+    private static final Logger dtLog = Logger.getLogger("sun.awt.datatransfer.DataTransfer");
 
     static {
         Class tCharArrayClass = null, tByteArrayClass = null;
@@ -383,8 +383,10 @@ public abstract class DataTransferer {
      * "text".
      */
     public static boolean doesSubtypeSupportCharset(DataFlavor flavor) {
-        if (dbg.on) {
-            dbg.assertion("text".equals(flavor.getPrimaryType()));
+        if (dtLog.isLoggable(Level.FINE)) {
+            if (!"text".equals(flavor.getPrimaryType())) {
+                dtLog.log(Level.FINE, "Assertion (\"text\".equals(flavor.getPrimaryType())) failed");
+            }
         }
 
         String subType = flavor.getSubType();
@@ -1182,7 +1184,7 @@ search:
              isFlavorCharsetTextType(flavor) && isTextFormat(format))) {
 
             return translateTransferableString(
-                (String)obj,
+                removeSuspectedData(flavor, contents, (String)obj),
                 format);
 
         // Source data is a Reader. Convert to a String and recur. In the
@@ -1290,6 +1292,11 @@ search:
                 throw new IOException("data translation failed");
             }
             final List list = (List)obj;
+            
+            final ArrayList <String> fileList = new ArrayList<String>();
+
+            final ProtectionDomain userProtectionDomain = getUserProtactionDomain(contents);
+            
             int nFiles = 0;
             for (int i = 0; i < list.size(); i++) {
                 Object o = list.get(i);
@@ -1304,11 +1311,14 @@ search:
                     public Object run() throws IOException {
                         for (int i = 0, j = 0; i < list.size(); i++) {
                             Object o = list.get(i);
-                            if (o instanceof File) {
-                                files[j++] = ((File)o).getCanonicalPath();
-                            } else if (o instanceof String) {
-                                files[j++] = (String)o;
+                            File file = castToFile(o);  
+                            if ( null != System.getSecurityManager() 
+                                && (isFileInWebstartedCache(file) || 
+                                isForbiddenToRead(file, userProtectionDomain) )) 
+                            {  
+                                continue;  
                             }
+                            fileList.add(file.getCanonicalPath());
                         }
                         return null;
                     }
@@ -1317,11 +1327,12 @@ search:
                 throw new IOException(pae.getMessage());
             }
 
-            for (int i = 0; i < files.length; i++) {
-                 byte[] bytes = files[i].getBytes();
-                 if (i != 0) bos.write(0);
+            for (String fileName: fileList) {
+                byte[] bytes = fileName.getBytes();
                  bos.write(bytes, 0, bytes.length);
+                bos.write(0);
             }
+            bos.write(0);
 
         // Source data is an InputStream. For arbitrary flavors, just grab the
         // bytes and dump them into a byte array. For text flavors, decode back
@@ -1595,6 +1606,122 @@ search:
         }
 
         return constructFlavoredObject(str, flavor, InputStream.class);
+    }
+
+    private String removeSuspectedData(DataFlavor flavor, final Transferable contents, final String str)
+            throws IOException
+    {
+        if (null == System.getSecurityManager()
+            || !flavor.isMimeTypeEqual("text/uri-list"))
+        {
+            return str;
+        }
+        
+
+        String ret_val = "";
+        final ProtectionDomain userProtectionDomain = getUserProtactionDomain(contents);
+
+        try {
+            ret_val = (String) AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                    public Object run() {
+                        StringBuffer allowedFiles = new StringBuffer(str.length());
+
+
+                        for (int i = 0; i < str.split("(\\s)+").length; i++) {
+                            String fileName = str.split("(\\s)+")[i];
+                            File file = new File(fileName);
+                            if (file.exists()
+                                && isFileInWebstartedCache(file) ||
+                                isForbiddenToRead(file, userProtectionDomain)) {
+                                continue;
+                            }
+
+                            if (0 != allowedFiles.length()) {
+                                allowedFiles.append("\\r\\n");
+                            }
+
+                            allowedFiles.append(fileName);
+                        }
+
+                        return allowedFiles.toString();
+                    }
+                });
+        } catch (PrivilegedActionException pae) {
+            throw new IOException(pae.getMessage(), pae);
+        }
+
+        return ret_val;
+    }
+
+    private static ProtectionDomain getUserProtactionDomain(Transferable contents) {
+        return contents.getClass().getProtectionDomain();
+    }
+
+    private boolean isForbiddenToRead (File file, ProtectionDomain protectionDomain)
+    {
+        if (null == protectionDomain) {
+            return false;
+        }
+        try {
+            FilePermission filePermission =
+                    new FilePermission(file.getCanonicalPath(), "read, delete");
+            if (protectionDomain.implies(filePermission)) {
+                return false;
+            }
+        } catch (IOException e) {}
+
+        return true;
+    }
+
+    // It is important do not use user's successors
+    // of File class.
+    private File castToFile(Object fileObject) throws IOException {
+        String filePath = null;
+        if (fileObject instanceof File) {
+            filePath = ((File)fileObject).getCanonicalPath();
+        } else if (fileObject instanceof String) {
+           filePath = (String) fileObject;
+        }
+        return new File(filePath);
+    }
+
+    private final static String[] DEPLOYMENT_CACHE_PROPERTIES = {
+        "deployment.system.cachedir",
+        "deployment.user.cachedir",
+        "deployment.javaws.cachedir",
+        "deployment.javapi.cachedir"
+    };
+
+    private final static ArrayList deploymentCacheDirectoryList =
+            new ArrayList();
+
+    private static boolean isFileInWebstartedCache(File f) {
+
+        if (deploymentCacheDirectoryList.isEmpty()) {
+            for (String cacheDirectoryProperty : DEPLOYMENT_CACHE_PROPERTIES) {
+                String cacheDirectoryPath = System.getProperty(cacheDirectoryProperty);
+                if (cacheDirectoryPath != null) {
+                    try {
+                        File cacheDirectory = (new File(cacheDirectoryPath)).getCanonicalFile();
+                        if (cacheDirectory != null) {
+                            deploymentCacheDirectoryList.add(cacheDirectory);
+                        }
+                    } catch (IOException ioe) {}
+                }
+            }
+        }
+
+        for (Iterator it = deploymentCacheDirectoryList.iterator(); it.hasNext();)
+        {
+            File deploymentCacheDirectory = (File) it.next();
+            for (File dir = f; dir != null; dir = dir.getParentFile()) {
+                if (dir.equals(deploymentCacheDirectory)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -36,7 +36,6 @@ import java.awt.image.WritableRaster;
  * contexts can exist simultaneously for a single {@link Composite} 
  * object.
  * @see Composite
- * @version 10 Feb 1997
  */
 
 public interface CompositeContext {
@@ -67,4 +66,3 @@ public interface CompositeContext {
 
 
 }
-

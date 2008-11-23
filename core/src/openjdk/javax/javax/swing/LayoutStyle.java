@@ -37,7 +37,6 @@ import sun.awt.AppContext;
  * <code>LayoutStyle</code>.  Instead use the static method
  * <code>getInstance</code> to obtain the current instance.
  *
- * @version 1.8, 05/05/07
  * @since 1.6
  */
 public abstract class LayoutStyle {

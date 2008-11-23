@@ -32,7 +32,6 @@ import java.text.MessageFormat;
 /**
  * An hanlder of localized messages.
  *
- * @version     1.24, 05/05/07
  * @author      Koji Uno
  */
 class AppletMessageHandler {

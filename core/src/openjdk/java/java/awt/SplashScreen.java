@@ -367,4 +367,3 @@ public final class SplashScreen {
     private native static boolean _setImageData(long SplashPtr, byte[] data);
 
 };
-

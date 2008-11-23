@@ -36,7 +36,6 @@ import java.lang.Integer;
  *
  * @author  Timothy Prinzing
  * @author  Sara Swanson
- * @version 1.39 05/05/07
  */
 class HRuleView extends View  {
 
@@ -315,4 +314,3 @@ class HRuleView extends View  {
     /** View Attributes. */
     private AttributeSet attr;
 }
-

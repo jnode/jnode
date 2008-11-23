@@ -34,7 +34,6 @@ import javax.swing.text.*;
  * state when a reset is requested.
  *
  * @author Sunita Mani
- * @version 1.15 05/05/07
  */
   
 class TextAreaDocument extends PlainDocument {
@@ -67,7 +66,3 @@ class TextAreaDocument extends PlainDocument {
 	}
     }
 }
-
-
-
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,6 +29,8 @@ import java.awt.Event;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * The root event class for all component-level input events.
@@ -42,7 +44,6 @@ import java.awt.Toolkit;
  * activated.
  *
  * @author Carl Quinn
- * @version 1.44 05/05/07
  *
  * @see KeyEvent
  * @see KeyAdapter
@@ -53,6 +54,7 @@ import java.awt.Toolkit;
  * @since 1.1
  */
 public abstract class InputEvent extends ComponentEvent {
+    private static final Logger log = Logger.getLogger("java.awt.event.InputEvent");
 
     /**
      * The Shift key modifier constant.
@@ -235,6 +237,9 @@ public abstract class InputEvent extends ComponentEvent {
                     sm.checkSystemClipboardAccess();
                     b = true;
                 } catch (SecurityException se) {
+                    if (log.isLoggable(Level.FINE)) {
+                        log.log(Level.FINE, "InputEvent.canAccessSystemClipboard() got SecurityException ", se);
+                    }
                 }
             } else {
                 b = true;
@@ -402,4 +407,3 @@ public abstract class InputEvent extends ComponentEvent {
         return buf.toString();
     }
 }
-

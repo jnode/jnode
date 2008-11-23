@@ -71,7 +71,6 @@ import sun.awt.AppContext;
  *
  * @see GraphicsEnvironment
  * @see GraphicsConfiguration
- * @version 1.47, 05/05/07
  */
 public abstract class GraphicsDevice {
 

@@ -35,7 +35,6 @@ import javax.swing.*;
  * <code>JComboBox</code>, <code>JTree</code>, or <code>JTable</code>
  * needs to implement.
  *
- * @version 1.23 05/05/07
  * @author Alan Chung
  */
 
@@ -71,4 +70,3 @@ public interface TableCellEditor extends CellEditor {
 					  boolean isSelected,
 					  int row, int column);
 }
-

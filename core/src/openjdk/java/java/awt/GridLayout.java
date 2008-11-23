@@ -87,7 +87,6 @@ package java.awt;
  * the number of columns affects the layout only when the 
  * number of rows is set to zero.
  *
- * @version 1.49, 05/05/07
  * @author  Arthur van Hoff
  * @since   JDK1.0
  */

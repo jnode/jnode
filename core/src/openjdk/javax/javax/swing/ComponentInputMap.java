@@ -32,7 +32,6 @@ package javax.swing;
  * <code>ComponentInputMap</code>s are used for
  * <code>WHEN_IN_FOCUSED_WINDOW</code> bindings.
  *
- * @version 1.17 05/05/07
  * @author Scott Violet
  * @since 1.3
  */

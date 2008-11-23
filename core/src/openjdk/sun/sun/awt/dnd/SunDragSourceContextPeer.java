@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -32,11 +32,9 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Point;
 
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
 import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceContext;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceDropEvent;
@@ -51,8 +49,6 @@ import java.awt.event.MouseEvent;
 
 import java.util.Map;
 import java.util.SortedMap;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 import sun.awt.SunToolkit;
 import sun.awt.datatransfer.DataTransferer;
@@ -62,7 +58,6 @@ import sun.awt.datatransfer.DataTransferer;
  * TBC
  * </p>
  *
- * @version 1.25.05/05/07
  * @since JDK1.3.1
  *
  */

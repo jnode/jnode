@@ -63,7 +63,6 @@ import javax.swing.event.*;
  * @see SpinnerNumberModel
  * @see SpinnerDateModel
  * 
- * @version 1.13 05/05/07
  * @author Hans Muller
  * @since 1.4
  */

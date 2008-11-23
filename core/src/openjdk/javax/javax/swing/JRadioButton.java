@@ -46,7 +46,7 @@ import java.io.IOException;
  * <blockquote>
  * <strong>Note:</strong>
  * The ButtonGroup object is a logical grouping -- not a physical grouping.
- * Tocreate a button panel, you should still create a {@link JPanel} or similar
+ * To create a button panel, you should still create a {@link JPanel} or similar
  * container-object and add a {@link javax.swing.border.Border} to it to set it off from surrounding
  * components.
  * </blockquote>
@@ -84,7 +84,6 @@ import java.io.IOException;
  *
  * @see ButtonGroup
  * @see JCheckBox
- * @version 1.84 05/05/07
  * @author Jeff Dinkins
  */
 public class JRadioButton extends JToggleButton implements Accessible {
@@ -299,4 +298,3 @@ public class JRadioButton extends JToggleButton implements Accessible {
 
     } // inner class AccessibleJRadioButton
 }
-  

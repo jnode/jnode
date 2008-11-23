@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-1998 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -37,6 +37,5 @@ import java.awt.*;
 public interface DialogPeer extends WindowPeer {
     void setTitle(String title);
     void setResizable(boolean resizeable);
+    void blockWindows(java.util.List<Window> windows);
 }
-
-

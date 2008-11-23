@@ -125,7 +125,6 @@ import javax.swing.text.*;
  * @author  Sunita Mani
  * @author  Sara Swanson
  * @author  Jill Nakata
- * @version 1.97 05/05/07
  */
 public class StyleSheet extends StyleContext {
     // As the javadoc states, this class maintains a mapping between

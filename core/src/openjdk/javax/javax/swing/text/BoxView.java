@@ -57,7 +57,6 @@ import javax.swing.SizeRequirements;
  * likely need to be reimplemented.
  *
  * @author  Timothy Prinzing
- * @version 1.76 05/05/07
  */
 public class BoxView extends CompositeView {
 

@@ -116,7 +116,6 @@ import java.util.Hashtable;
  * }
  * </pre></blockquote><hr>
  * <p>
- * @version 	1.66, 05/05/07
  * @author 	Arthur van Hoff
  * @see         java.awt.Container#add(String, Component)
  * @see         java.awt.ComponentOrientation

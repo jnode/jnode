@@ -52,7 +52,6 @@ import sun.security.action.GetPropertyAction;
  * It is a subclass of InputContext, which provides methods for use by
  * components.
  *
- * @version 1.53 05/05/07
  * @author JavaSoft International
  */
 

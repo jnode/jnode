@@ -36,7 +36,6 @@ import javax.swing.SwingUtilities;
  * {@code SwingPropertyChangeSupport(sourceBean, true)} it ensures
  * listeners are only ever notified on the <i>Event Dispatch Thread</i>.
  *
- * @version 1.29 05/05/07
  * @author Igor Kushnirskiy
  */
 

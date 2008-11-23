@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,7 +26,6 @@
 package java.awt.event;
 
 import java.awt.Component;
-import java.awt.Event;
 import java.awt.Rectangle;
 
 /**
@@ -39,7 +38,6 @@ import java.awt.Rectangle;
  * render themselves properly.
  *
  * @author Amy Fowler
- * @version 1.27, 05/05/07
  * @since 1.1
  */
 public class PaintEvent extends ComponentEvent {

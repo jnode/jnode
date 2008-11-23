@@ -36,11 +36,7 @@ import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.Transferable;
-import java.awt.dnd.*;
 import java.awt.geom.Point2D;
-
-import java.util.ArrayList;
-import java.util.TooManyListenersException;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
@@ -54,7 +50,6 @@ import javax.swing.plaf.basic.DragRecognitionSupport.BeforeDrag;
  * {@code BasicListUI} instances cannot be shared between multiple
  * lists.
  *
- * @version 1.129 05/05/07
  * @author Hans Muller
  * @author Philip Milne
  * @author Shannon Hickey (drag and drop)
@@ -2361,7 +2356,7 @@ public class BasicListUI extends ListUI
 	 * if it is not defined). Subsequent same key presses move the keyboard
 	 * focus to the next object that starts with the same letter until another
 	 * key is pressed, then it is treated as the prefix with appropriate number
-	 * of the same letters followed by first typed anothe letter.
+         * of the same letters followed by first typed another letter.
 	 */
 	public void keyTyped(KeyEvent e) {
 	    JList src = (JList)e.getSource();

@@ -39,7 +39,6 @@ import javax.swing.plaf.SeparatorUI;
  * A Basic L&F implementation of SeparatorUI.  This implementation 
  * is a "combined" view/controller.
  *
- * @version 1.31 05/05/07
  * @author Georges Saab
  * @author Jeff Shapiro
  */
@@ -117,7 +116,3 @@ public class BasicSeparatorUI extends SeparatorUI
     public Dimension getMinimumSize( JComponent c ) { return null; }
     public Dimension getMaximumSize( JComponent c ) { return null; }
 }
-
-
-
-

@@ -47,7 +47,6 @@ import java.awt.Color;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.21 05/05/07
  * @author Rich Schiavi
  * @author Hans Muller
  */

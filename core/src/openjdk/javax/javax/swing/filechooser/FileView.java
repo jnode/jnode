@@ -62,7 +62,6 @@ import javax.swing.*;
  *
  * @see javax.swing.JFileChooser
  *
- * @version 1.26 05/05/07
  * @author Jeff Dinkins
  *
  */

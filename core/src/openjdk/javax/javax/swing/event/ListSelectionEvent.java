@@ -46,7 +46,6 @@ import javax.swing.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.29 05/05/07
  * @author Hans Muller
  * @author Ray Ryan
  * @see ListSelectionModel
@@ -122,4 +121,3 @@ public class ListSelectionEvent extends EventObject
         return getClass().getName() + "[" + properties + "]";
     }
 }
-

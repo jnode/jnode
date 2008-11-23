@@ -35,7 +35,6 @@ import javax.swing.*;
  * Defines the requirements for a table column model object suitable for
  * use with <code>JTable</code>.
  *
- * @version 1.32 05/05/07
  * @author Alan Chung
  * @author Philip Milne
  * @see DefaultTableColumnModel

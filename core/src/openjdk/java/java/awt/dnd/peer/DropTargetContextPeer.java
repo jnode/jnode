@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-1999 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,18 +25,10 @@
 
 package java.awt.dnd.peer;
 
-import java.awt.Insets;
-
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetContext;
 import java.awt.dnd.InvalidDnDOperationException;
-
-import java.io.InputStream;
-import java.io.IOException;
 
 /**
  * <p>
@@ -44,7 +36,6 @@ import java.io.IOException;
  * enable control of platform DnD operations
  * </p>
  *
- * @version 	1.20, 05/05/07
  * @since 1.2
  *
  */

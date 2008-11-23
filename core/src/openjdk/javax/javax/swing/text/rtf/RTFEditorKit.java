@@ -39,7 +39,6 @@ import javax.swing.*;
  * provided.
  *
  * @author  Timothy Prinzing (of this class, not the package!)
- * @version 1.20 05/05/07
  */
 public class RTFEditorKit extends StyledEditorKit {
 

@@ -26,7 +26,7 @@ package javax.swing.text;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
+import java.util.Collections;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,19 +45,18 @@ import java.io.Serializable;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.48 05/05/07
  * @author Tim Prinzing
  */
 public class SimpleAttributeSet implements MutableAttributeSet, Serializable, Cloneable
 {
+    private static final long serialVersionUID = -6631553454711782652L;
+
     /**
      * An empty attribute set.
      */
     public static final AttributeSet EMPTY = new EmptyAttributeSet();
 
     private transient Hashtable table = new Hashtable(3);
-
-    private static Enumeration emptyEnumeration;
 
     /**
      * Creates a new attribute set.
@@ -347,9 +346,11 @@ public class SimpleAttributeSet implements MutableAttributeSet, Serializable, Cl
     }
 
     /**
-     * An AttributeSet this is always empty.
+     * An AttributeSet that is always empty.
      */
     static class EmptyAttributeSet implements AttributeSet, Serializable {
+        static final long serialVersionUID = -8714803568785904228L;
+
 	public int getAttributeCount() {
 	    return 0;
 	}
@@ -366,8 +367,12 @@ public class SimpleAttributeSet implements MutableAttributeSet, Serializable, Cl
 	    return null;
 	}
 	public Enumeration getAttributeNames() {
-	    return getEmptyEnumeration();
+            return new Enumeration() {
+                    public boolean hasMoreElements() { return false; }
+                    public Object nextElement() { throw new java.util.NoSuchElementException(); }
+                };
 	}
+
 	public boolean containsAttribute(Object name, Object value) {
 	    return false;
 	}
@@ -387,20 +392,5 @@ public class SimpleAttributeSet implements MutableAttributeSet, Serializable, Cl
 	public int hashCode() {
 	    return 0;
 	}
-    };
-
-    private static Enumeration getEmptyEnumeration() {
-        if (emptyEnumeration == null) {
-            emptyEnumeration = new Enumeration() {
-                public boolean hasMoreElements() {
-                    return false;
-                }
-                public Object nextElement() {
-                    throw new NoSuchElementException("No more elements");
-                }
-            };
-        }
-        return emptyEnumeration;
     }
 }
-

@@ -41,7 +41,6 @@ import java.awt.*;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.22 05/05/07
  * @author Jeff Dinkins
  */
 public class MotifSplitPaneUI extends BasicSplitPaneUI

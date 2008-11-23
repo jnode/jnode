@@ -74,7 +74,6 @@ import java.io.IOException;
  * 
  * @see JRadioButton
  * @see JCheckBox
- * @version 1.68 05/05/07
  * @author Jeff Dinkins
  */
 public class JToggleButton extends AbstractButton implements Accessible {
@@ -423,4 +422,3 @@ public class JToggleButton extends AbstractButton implements Accessible {
         }
     } // inner class AccessibleJToggleButton
 }
-  

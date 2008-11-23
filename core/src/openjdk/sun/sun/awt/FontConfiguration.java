@@ -2213,6 +2213,3 @@ public abstract class FontConfiguration {
 	}
     }
 }
-    
-
-

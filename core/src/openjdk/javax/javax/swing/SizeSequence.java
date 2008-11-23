@@ -109,7 +109,6 @@ package javax.swing;
  * a set of integer sizes, copying it into the new array, and then 
  * reforming the hybrid representation in place. 
  *
- * @version 1.23 05/05/07
  * @author Philip Milne
  * @since 1.3
  */   

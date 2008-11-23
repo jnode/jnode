@@ -28,8 +28,8 @@ package sun.applet;
 import java.awt.*;
 import java.io.*;
 import java.util.Properties;
-//import sun.net.www.http.HttpClient;
-//import sun.net.ftp.FtpClient;
+//jnode import sun.net.www.http.HttpClient;
+//jnode import sun.net.ftp.FtpClient;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -219,4 +219,3 @@ class AppletPropsErrorDialog extends Dialog {
 }
 
 /* end 4066432 */
-

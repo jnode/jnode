@@ -61,7 +61,6 @@ import javax.swing.*;
  * @see OceanTheme
  * @see MetalLookAndFeel#setCurrentTheme
  *
- * @version 1.35 05/05/07
  * @author Steve Wilson
  */
 public abstract class MetalTheme {

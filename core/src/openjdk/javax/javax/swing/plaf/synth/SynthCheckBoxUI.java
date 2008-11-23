@@ -35,7 +35,6 @@ import java.io.Serializable;
 /**
  * Synth's CheckBoxUI.
  *
- * @version 1.13, 05/05/07
  * @author Jeff Dinkins
  */
 class SynthCheckBoxUI extends SynthRadioButtonUI {

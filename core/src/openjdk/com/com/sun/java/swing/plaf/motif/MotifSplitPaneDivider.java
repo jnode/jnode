@@ -43,7 +43,6 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.24 05/05/07
  * @author Jeff Dinkins
  */
 public class MotifSplitPaneDivider extends BasicSplitPaneDivider

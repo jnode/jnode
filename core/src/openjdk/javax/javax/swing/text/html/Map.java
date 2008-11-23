@@ -36,7 +36,6 @@ import javax.swing.text.AttributeSet;
  * you can test if a point falls inside the map via the contains method.
  *
  * @author  Scott Violet
- * @version 1.16 05/05/07
  */
 class Map implements Serializable {
     /** Name of the Map. */

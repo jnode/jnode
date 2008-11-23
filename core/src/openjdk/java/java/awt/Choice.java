@@ -65,7 +65,6 @@ import javax.accessibility.*;
  * attributes as font size and length of items contained within 
  * the <code>Choice</code>.
  * <p>
- * @version	1.100 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @since       JDK1.0

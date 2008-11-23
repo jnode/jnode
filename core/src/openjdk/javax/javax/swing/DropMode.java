@@ -29,7 +29,6 @@ package javax.swing;
  * tracks and indicates a drop location during drag and drop.
  *
  * @author Shannon Hickey
- * @version 1.8 05/05/07
  * @see JTable#setDropMode
  * @see JList#setDropMode
  * @see JTree#setDropMode

@@ -40,7 +40,6 @@ import java.io.Serializable;
 /**
  * Motif rendition of the component.
  *
- * @version 1.35 05/05/07
  * @author Thomas Ball
  * @author Rich Schiavi
  */

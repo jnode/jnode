@@ -27,10 +27,7 @@
 package java.awt;
 
 import java.awt.image.BufferedImage;
-import java.util.Hashtable;
 import java.util.Locale;
-import java.util.Map;
-import java.io.InputStream;
 import sun.java2d.HeadlessGraphicsEnvironment;
 import sun.java2d.SunGraphicsEnvironment;
 
@@ -48,7 +45,6 @@ import sun.java2d.SunGraphicsEnvironment;
  * <code>GraphicsDevice</code> can be used.  
  * @see GraphicsDevice
  * @see GraphicsConfiguration
- * @version 	1.73, 05/05/07
  */
 
 public abstract class GraphicsEnvironment {
@@ -329,7 +325,6 @@ public abstract class GraphicsEnvironment {
      * </ul>
      * @return true if the <code>font</code> is successfully
      * registered in this <code>GraphicsEnvironment</code>.
-     * @throws NullPointerException if <code>font</code> is null
      * @since 1.6
      */
     public boolean registerFont(Font font) {
@@ -428,4 +423,3 @@ public abstract class GraphicsEnvironment {
         return SunGraphicsEnvironment.getUsableBounds(getDefaultScreenDevice());
     }
 }
-

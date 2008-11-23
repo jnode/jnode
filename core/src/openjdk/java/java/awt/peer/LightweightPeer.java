@@ -37,7 +37,6 @@ package java.awt.peer;
  * nor invoke any of the peer methods directly on the peer
  * instances.
  *
- * @version 1.18 05/05/07
  * @author Timothy Prinzing
  */
 public interface LightweightPeer extends ComponentPeer {

@@ -39,7 +39,6 @@ import java.lang.reflect.Method;
 /**
  * The default editor for editable combo boxes. The editor is implemented as a JTextField.
  *
- * @version 1.34 05/05/07
  * @author Arnaud Weber
  * @author Mark Davidson
  */
@@ -165,4 +164,3 @@ public class BasicComboBoxEditor implements ComboBoxEditor,FocusListener {
     implements javax.swing.plaf.UIResource {
     }
 }
-

@@ -71,7 +71,6 @@ import javax.swing.event.*;
  * the model to unarmed and unpressed, triggers the button, and causes an
  * <code>ActionEvent</code> to be fired.
  *
- * @version 1.35 05/05/07
  * @author Jeff Dinkins
  */
 public interface ButtonModel extends ItemSelectable {

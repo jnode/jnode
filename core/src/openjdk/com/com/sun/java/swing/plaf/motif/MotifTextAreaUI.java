@@ -42,7 +42,6 @@ import javax.swing.plaf.basic.BasicTextAreaUI;
  * long term persistence.
  *
  * @author  Timothy Prinzing
- * @version 1.29 05/05/07
  */
 public class MotifTextAreaUI extends BasicTextAreaUI {
 

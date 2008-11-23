@@ -41,7 +41,6 @@ import sun.security.action.GetPropertyAction;
  * A PaintManager implementation that uses a BufferStrategy for
  * rendering.
  *
- * @version 1.18, 05/05/07
  * @author Scott Violet
  */
 class BufferStrategyPaintManager extends RepaintManager.PaintManager {

@@ -33,7 +33,6 @@ package javax.swing.tree;
  * @see DefaultMutableTreeNode
  * @see javax.swing.JTree
  *
- * @version 1.18 05/05/07
  * @author Rob Davis
  * @author Scott Violet
  */

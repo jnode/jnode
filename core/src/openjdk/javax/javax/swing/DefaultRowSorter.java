@@ -104,7 +104,6 @@ import javax.swing.SortOrder;
  *
  * @param <M> the type of the model
  * @param <I> the type of the identifier passed to the <code>RowFilter</code>
- * @version 1.26 05/05/07
  * @see javax.swing.table.TableRowSorter
  * @see javax.swing.table.DefaultTableModel
  * @see java.text.Collator

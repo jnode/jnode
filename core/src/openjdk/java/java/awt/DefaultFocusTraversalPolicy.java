@@ -61,7 +61,6 @@ import java.awt.peer.ComponentPeer;
  * for more information.
  *
  * @author David Mendenhall
- * @version 1.13, 05/05/07
  *
  * @see Container#getComponents
  * @see Component#isFocusable

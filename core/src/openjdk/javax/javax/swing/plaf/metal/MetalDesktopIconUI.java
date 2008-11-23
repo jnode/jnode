@@ -38,7 +38,6 @@ import javax.swing.plaf.basic.BasicDesktopIconUI;
 /**
  * Metal desktop icon.
  *
- * @version 1.28 05/05/07
  * @author Steve Wilson
  */
 public class MetalDesktopIconUI extends BasicDesktopIconUI

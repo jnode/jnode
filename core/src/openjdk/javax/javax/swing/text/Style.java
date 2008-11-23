@@ -44,7 +44,6 @@ import java.util.Hashtable;
  * implementations that are more efficient.
  *
  * @author  Timothy Prinzing
- * @version 1.28 05/05/07
  */
 public interface Style extends MutableAttributeSet {
 

@@ -33,7 +33,6 @@ import javax.swing.JComponent;
  * A subclass of javax.swing.ComponentInputMap that implements UIResource. 
  * UI classes which provide a ComponentInputMap should use this class.
  * 
- * @version 1.14 05/05/07
  * @author Scott Violet
  * @since 1.3
  */

@@ -32,7 +32,6 @@ import javax.swing.tree.TreePath;
 /**
  * Pluggable look and feel interface for JTree.
  *
- * @version 1.31 05/05/07
  * @author Rob Davis
  * @author Scott Violet
  */

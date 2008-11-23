@@ -98,7 +98,6 @@ import java.net.*;
  * \n, \r or \r\n, which ever is encountered the most in parsing the
  * stream.
  *
- * @version 	1.35 05/05/07
  * @author      Sunita Mani
  */
 public class DocumentParser extends javax.swing.text.html.parser.Parser {

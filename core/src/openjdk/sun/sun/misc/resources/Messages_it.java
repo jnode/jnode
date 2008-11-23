@@ -30,7 +30,6 @@ package sun.misc.resources;
  * for sun.misc.
  * 
  * @author Michael Colburn
- * @version 1.12, 05/05/07
  */
 
 public class Messages_it extends java.util.ListResourceBundle {

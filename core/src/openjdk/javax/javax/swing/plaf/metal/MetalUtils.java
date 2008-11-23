@@ -37,7 +37,6 @@ import sun.swing.ImageIconUIResource;
 /**
  * This is a dumping ground for random stuff we want to use in several places.
  *
- * @version 1.45 05/05/07
  * @author Steve Wilson
  */
 

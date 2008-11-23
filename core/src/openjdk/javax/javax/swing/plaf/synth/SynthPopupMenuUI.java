@@ -52,7 +52,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's PopupMenuUI.
  *
- * @version 1.30, 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber

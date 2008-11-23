@@ -57,7 +57,6 @@ import java.io.Serializable;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.90 05/05/07
  * @author Tom Santos
  * @author Mark Davidson
  */
@@ -1294,5 +1293,3 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup {
     // end Utility methods
     //=================================================================
 }
-
-

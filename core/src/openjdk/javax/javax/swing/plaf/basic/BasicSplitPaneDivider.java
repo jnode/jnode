@@ -57,7 +57,6 @@ import sun.swing.DefaultLookup;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.61 05/05/07
  * @author Scott Violet
  */
 public class BasicSplitPaneDivider extends Container

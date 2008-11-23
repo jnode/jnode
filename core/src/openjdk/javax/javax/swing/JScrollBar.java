@@ -76,7 +76,6 @@ import java.io.IOException;
  *      attribute: isContainer false
  *    description: A component that helps determine the visible content range of an area.
  *
- * @version 1.87 05/05/07
  * @author David Kloba
  */
 public class JScrollBar extends JComponent implements Adjustable, Accessible

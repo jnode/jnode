@@ -91,7 +91,6 @@ import java.io.Serializable;
  * @see Component#getAlignmentX
  * @see Component#getAlignmentY
  *
- * @version 1.40 05/05/07
  * @author Timothy Prinzing
  */
 public class SizeRequirements implements Serializable {

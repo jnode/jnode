@@ -31,7 +31,6 @@ import java.util.EventListener;
 /**
  * Defines a menu mouse-drag listener.
  *
- * @version 1.18 05/05/07
  * @author Georges Saab
  */
 public interface MenuDragMouseListener extends EventListener {
@@ -64,4 +63,3 @@ public interface MenuDragMouseListener extends EventListener {
      */
     void menuDragMouseReleased(MenuDragMouseEvent e);
 }
-

@@ -155,7 +155,6 @@ import java.io.Serializable;
  * description: A component which allows for the editing of a single line of text.
  *
  * @author  Timothy Prinzing
- * @version 1.101 05/05/07
  * @see #setActionCommand
  * @see JPasswordField
  * @see #addActionListener

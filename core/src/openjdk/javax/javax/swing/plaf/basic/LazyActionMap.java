@@ -33,7 +33,6 @@ import javax.swing.plaf.*;
  * contents are populated by invoking the <code>loadActionMap</code>
  * method on the passed in Object.
  *
- * @version 1.12, 05/05/07
  * @author Scott Violet
  */
 class LazyActionMap extends ActionMapUIResource {

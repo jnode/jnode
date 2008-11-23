@@ -30,7 +30,6 @@ import java.awt.image.*;
 
 /** Color filter for DebugGraphics, used for images only.
   * 
-  * @version 1.18 05/05/07
   * @author Dave Karlton
   */
 class DebugGraphicsFilter extends RGBImageFilter {

@@ -105,7 +105,6 @@ import sun.swing.SwingUtilities2;
  * @see JRootPane
  * @see javax.swing.RootPaneContainer
  *
- * @version 1.164 05/05/07
  * @author David Kloba
  * @author Rich Schiavi
  * @beaninfo
@@ -1991,10 +1990,7 @@ public class JInternalFrame extends JComponent implements
 	//	   System.out.println("ouch");
          danger = true;
       }
-      //jnode
-        //org.jnode.vm.Unsafe.debug("JInternalFrame.panitComponent()\n");
-        //org.jnode.vm.Unsafe.debugStackTrace();
-      //jnode
+
       super.paintComponent(g);
    }
 

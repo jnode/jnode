@@ -23,8 +23,6 @@
  * have any questions.
  */
 /*
- * @(#)Underline.java	1.22 07/05/05
- *
  * (C) Copyright IBM Corp. 1998, All Rights Reserved
  */
 

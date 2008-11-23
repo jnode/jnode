@@ -38,7 +38,6 @@ import java.net.URL;
  * It defines the type and value of the the entity.
  *
  * @see DTD
- * @version 1.17, 05/05/07
  * @author Arthur van Hoff
  */
 public final
@@ -138,4 +137,3 @@ class Entity implements DTDConstants {
 	return (i == null) ? CDATA : i.intValue();
     }
 }
-

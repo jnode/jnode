@@ -71,7 +71,6 @@ import sun.swing.*;
  *
  * @author Timothy Prinzing
  * @author Shannon Hickey
- * @version 1.53 05/05/07
  * @since 1.4
  */
 @SuppressWarnings("serial")
@@ -1701,6 +1700,3 @@ public class TransferHandler implements Serializable {
     }
 
 }
-
-
-

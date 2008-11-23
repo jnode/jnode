@@ -35,7 +35,6 @@ import javax.swing.text.View;
 /**
  * Synth's RadioButtonUI.
  *
- * @version 1.15, 05/05/07
  * @author Jeff Dinkins
  */
 class SynthRadioButtonUI extends SynthToggleButtonUI {

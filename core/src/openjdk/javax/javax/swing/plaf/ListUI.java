@@ -33,7 +33,6 @@ import java.awt.Rectangle;
 /**
  * The {@code JList} pluggable look and feel delegate.
  *
- * @version 1.21 05/05/07
  * @author Hans Muller
  */
 

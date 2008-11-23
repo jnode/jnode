@@ -52,7 +52,6 @@ import java.awt.image.*;
  *  frame has started.  It is acceptable (expected?) for computeRow(0,r)
  *  to pause until the appropriate time to start the next frame.
  *
- *  @version 1.31 05/05/07
  *  @author James Gosling
  */
 abstract class SyntheticImage implements ImageProducer {

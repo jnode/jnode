@@ -45,7 +45,6 @@ import javax.swing.Icon;
  * <p>
  * 
  * @author  Timothy Prinzing
- * @version 1.43 05/05/07
  */
 public class StyleConstants {
 

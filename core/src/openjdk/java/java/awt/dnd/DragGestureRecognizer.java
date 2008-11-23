@@ -45,11 +45,10 @@ import java.io.Serializable;
  * identify platform-dependent drag initiating gestures.
  * <p>
  * The appropriate <code>DragGestureRecognizer</code>
- * subclass instance is obtained from the
- * {@link DragSource} asssociated with 
- * a particular <code>Component</code>, or from the <code>Toolkit</code> object via its
- * {@link java.awt.Toolkit#createDragGestureRecognizer createDragGestureRecognizer()}
- * method.
+ * subclass is obtained from the
+ * <code>DragSource</code> associated with
+ * a particular <code>Component</code>, or from the <code>Toolkit</code>
+ * object via its createDragGestureRecognizer() method.
  * <p>
  * Once the <code>DragGestureRecognizer</code> 
  * is associated with a particular <code>Component</code>
@@ -60,14 +59,12 @@ import java.io.Serializable;
  * Once the <code>DragGestureRecognizer</code> identifies a sequence of events
  * on the <code>Component</code> as a drag initiating gesture, it will notify
  * its unicast <code>DragGestureListener</code> by 
- * invoking its
- * {@link java.awt.dnd.DragGestureListener#dragGestureRecognized gestureRecognized()}
- * method.
+ * invoking its gestureRecognized() method.
  * <P>
  * When a concrete <code>DragGestureRecognizer</code> 
  * instance detects a drag initiating
  * gesture on the <code>Component</code> it is associated with,
- * it fires a {@link DragGestureEvent} to 
+ * it will fire a <code>DragGestureEvent</code> to
  * the <code>DragGestureListener</code> registered on
  * its unicast event source for <code>DragGestureListener</code>
  * events. This <code>DragGestureListener</code> is responsible 
@@ -76,7 +73,6 @@ import java.io.Serializable;
  * appropriate). 
  * <P>
  * @author Laurence P. G. Cable
- * @version 1.28
  * @see java.awt.dnd.DragGestureListener
  * @see java.awt.dnd.DragGestureEvent
  * @see java.awt.dnd.DragSource

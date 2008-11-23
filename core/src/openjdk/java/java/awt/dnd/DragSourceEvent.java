@@ -183,4 +183,3 @@ public class DragSourceEvent extends EventObject {
         return y;
     }
 }
-

@@ -33,7 +33,6 @@ import javax.swing.plaf.ColorUIResource;
  * for use during printing. Useful to replace color values that
  * may look poor in printed output.
  *
- * @version 1.9 05/05/07
  * @author Shannon Hickey
  * 
  */

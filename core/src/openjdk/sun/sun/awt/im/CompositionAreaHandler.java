@@ -43,7 +43,6 @@ import java.text.AttributedString;
  * composition area handler if it supports passive clients or below-the-spot
  * input, but all handlers share a single composition area.
  *
- * @version 1.21 05/05/07
  * @author JavaSoft International
  */
 

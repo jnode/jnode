@@ -39,7 +39,6 @@ import java.awt.*;
  * is completely static, i.e. there's only one UIView implementation 
  * that's shared by all JLabel objects.
  *
- * @version 1.21 05/05/07
  * @author Hans Muller
  */
 
@@ -78,4 +77,3 @@ public class MetalLabelUI extends BasicLabelUI
                                                    textX, textY);
     }
 }
-

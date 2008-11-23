@@ -37,7 +37,6 @@ import java.util.Enumeration;
  * But this value can be set by subclasses.
  *
  * @author Sunita Mani
- * @version 1.29, 05/05/07
  */
 
 public abstract class AbstractWriter {

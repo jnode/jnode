@@ -38,7 +38,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ViewportUI.
  *
- * @version 1.18, 05/05/07
  */
 class SynthViewportUI extends ViewportUI implements
            PropertyChangeListener, SynthUI {

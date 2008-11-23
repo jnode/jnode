@@ -72,7 +72,6 @@ import javax.swing.SwingConstants;
  * </ul>
  *
  * @author  Timothy Prinzing
- * @version 1.75 05/05/07
  */
 public abstract class CompositeView extends View {
 

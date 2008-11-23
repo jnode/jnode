@@ -112,7 +112,6 @@ import java.awt.geom.Rectangle2D;
  * the range of 32-bit integers, but zero dimension along one or both
  * axes, then the stored dimensions will be zero in those axes.
  *
- * @version 	1.79, 05/05/07
  * @author 	Sami Shaio
  * @since 1.0
  */

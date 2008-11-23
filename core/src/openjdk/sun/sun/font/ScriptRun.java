@@ -378,4 +378,3 @@ public final class ScriptRun
     private static final int pairedCharExtra = pairedChars.length - pairedCharPower;
 
 }
-

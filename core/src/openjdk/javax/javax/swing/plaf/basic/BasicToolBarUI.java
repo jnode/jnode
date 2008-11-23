@@ -46,7 +46,6 @@ import sun.swing.UIAction;
  * is a "combined" view/controller.
  * <p>
  *
- * @version 1.109 05/05/07
  * @author Georges Saab
  * @author Jeff Shapiro
  */

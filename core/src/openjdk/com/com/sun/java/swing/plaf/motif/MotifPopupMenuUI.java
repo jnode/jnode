@@ -56,7 +56,6 @@ import javax.swing.plaf.basic.BasicPopupMenuUI;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.33 05/05/07
  * @author Georges Saab
  * @author Rich Schiavi
  */
@@ -113,7 +112,3 @@ public class MotifPopupMenuUI extends BasicPopupMenuUI {
 		&& ((e.getModifiers() & MouseEvent.BUTTON3_MASK)!=0));
     }	    
 }
-
-
-
-

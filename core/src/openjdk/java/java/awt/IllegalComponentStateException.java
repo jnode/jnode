@@ -29,7 +29,6 @@ package java.awt;
  * Signals that an AWT component is not in an appropriate state for
  * the requested operation.
  *
- * @version 	1.19, 05/05/07
  * @author	Jonni Kanerva
  */
 public class IllegalComponentStateException extends IllegalStateException {

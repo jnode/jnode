@@ -57,7 +57,6 @@ import javax.swing.*;
  * they can throw a <code>NullPointerException</code> or
  * <code>IllegalArgumentException</code> in response to invalid arguments.
  *
- * @version 1.19, 05/05/07
  * @since 1.5
  * @author Scott Violet
  */

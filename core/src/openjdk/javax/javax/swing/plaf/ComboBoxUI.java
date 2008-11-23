@@ -30,7 +30,6 @@ import javax.swing.JComboBox;
 /**
  * Pluggable look and feel interface for JComboBox.
  *
- * @version 1.26 05/05/07
  * @author Arnaud Weber
  * @author Tom Santos
  */

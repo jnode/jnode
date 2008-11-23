@@ -31,7 +31,6 @@ import java.net.URL;
  * FormSubmitEvent is used to notify interested
  * parties that a form was submited.
  *
- * @version 1.11 05/05/07
  * @since 1.5
  * @author    Denis Sharypov
  */

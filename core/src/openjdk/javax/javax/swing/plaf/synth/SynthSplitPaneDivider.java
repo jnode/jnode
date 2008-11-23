@@ -34,7 +34,6 @@ import sun.swing.DefaultLookup;
 /**
  * Synth's SplitPaneDivider.
  *
- * @version 1.15, 05/05/07
  * @author Scott Violet
  */
 class SynthSplitPaneDivider extends BasicSplitPaneDivider {

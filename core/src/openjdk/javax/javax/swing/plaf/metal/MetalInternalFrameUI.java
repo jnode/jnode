@@ -41,7 +41,6 @@ import javax.swing.plaf.*;
  * Metal implementation of JInternalFrame.  
  * <p>
  *
- * @version 1.41 05/05/07
  * @author Steve Wilson
  */
 public class MetalInternalFrameUI extends BasicInternalFrameUI {
@@ -256,4 +255,3 @@ public class MetalInternalFrameUI extends BasicInternalFrameUI {
         return new BorderListener1();
     }
 }
-

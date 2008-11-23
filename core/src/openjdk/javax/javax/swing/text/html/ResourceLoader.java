@@ -39,7 +39,6 @@ import java.io.InputStream;
  * is called from HTMLEditorKit.getResourceAsStream.
  *
  * @author  Timothy Prinzing
- * @version 1.14 05/05/07
  */
 class ResourceLoader implements java.security.PrivilegedAction {
 

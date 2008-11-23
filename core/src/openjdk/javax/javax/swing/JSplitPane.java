@@ -29,7 +29,6 @@ package javax.swing;
 
 
 
-import java.beans.ConstructorProperties;
 import javax.swing.plaf.*;
 import javax.accessibility.*;
 
@@ -96,7 +95,6 @@ import java.io.IOException;
  * @see #setDividerLocation
  * @see #resetToPreferredSizes
  *
- * @version 1.84 05/05/07
  * @author Scott Violet
  */
 public class JSplitPane extends JComponent implements Accessible
@@ -262,7 +260,6 @@ public class JSplitPane extends JComponent implements Accessible
      * @exception IllegalArgumentException if <code>orientation</code>
      *		is not one of HORIZONTAL_SPLIT or VERTICAL_SPLIT.
      */
-    @ConstructorProperties({"orientation"})
     public JSplitPane(int newOrientation) {
         this(newOrientation, false);
     }

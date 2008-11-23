@@ -48,7 +48,6 @@ import java.util.Locale;
  * @see javax.swing.JFileChooser#addChoosableFileFilter
  * @see javax.swing.JFileChooser#getFileFilter
  *
- * @version 1.7 05/05/07
  * @since 1.6
  */
 public final class FileNameExtensionFilter extends FileFilter {

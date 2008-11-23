@@ -38,7 +38,6 @@ package java.awt;
  * {@link MouseInfo#getPointerInfo} again.
  *
  * @see MouseInfo#getPointerInfo
- * @version     1.9, 05/05/07
  * @author      Roman Poborchiy
  * @since       1.5
  */

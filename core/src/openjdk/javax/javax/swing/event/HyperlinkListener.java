@@ -30,7 +30,6 @@ import java.util.EventListener;
 /**
  * HyperlinkListener
  *
- * @version 1.17 05/05/07
  * @author  Timothy Prinzing
  */
 public interface HyperlinkListener extends EventListener {
@@ -42,4 +41,3 @@ public interface HyperlinkListener extends EventListener {
      */
     void hyperlinkUpdate(HyperlinkEvent e);
 }
-

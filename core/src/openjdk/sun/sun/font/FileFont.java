@@ -36,6 +36,19 @@ import java.nio.channels.FileChannel;
 import sun.java2d.Disposer;
 import sun.java2d.DisposerRecord;
 
+import java.lang.ref.WeakReference;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.BufferUnderflowException;
+import java.nio.channels.ClosedChannelException;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.awt.Font;
+
 public abstract class FileFont extends PhysicalFont {
 
     protected boolean useJavaRasterizer = true;
@@ -58,9 +71,7 @@ public abstract class FileFont extends PhysicalFont {
     //protected FileChannel channel;
     protected int fileSize;
 
-    protected FileFontDisposer disposer;
-
-    protected long pScaler;
+    protected FontScaler scaler;
 
     /* The following variables are used, (and in the case of the arrays, 
      * only initialised) for select fonts where a native scaler may be
@@ -103,6 +114,7 @@ public abstract class FileFont extends PhysicalFont {
      */
     protected abstract void close();
 
+
     /* 
      * This is the public interface. The subclasses need to implement
      * this. The returned block may be longer than the requested length.
@@ -119,11 +131,17 @@ public abstract class FileFont extends PhysicalFont {
     }
 
     /* This is called when a font scaler is determined to
-     * be unusable (ie bad). We want to free all references to it, so
-     * that its not used again.
-     * This means updating all strikes to point to the null scaler so that
-     * if they are currently referenced they will not attempt to use
-     * the freed native scaler.
+     * be unusable (ie bad).
+     * We want to replace current scaler with NullFontScaler, so
+     * we never try to use same font scaler again.
+     * Scaler native resources could have already been disposed
+     * or they will be eventually by Java2D disposer.
+     * However, it should be safe to call dispose() explicitly here.
+     *
+     * For safety we also invalidate all strike's scaler context.
+     * So, in case they cache pointer to native scaler
+     * it will not ever be used.
+     *
      * It also appears desirable to remove all the entries from the
      * cache so no other code will pick them up. But we can't just
      * 'delete' them as code may be using them. And simply dropping
@@ -142,8 +160,6 @@ public abstract class FileFont extends PhysicalFont {
     synchronized void deregisterFontAndClearStrikeCache() {
         FontManager.deRegisterBadFont(this);
 
-        pScaler = getNullScaler();
-
         for (Reference strikeRef : strikeCache.values()) {
             if (strikeRef != null) {
                 /* NB we know these are all FileFontStrike instances
@@ -151,81 +167,83 @@ public abstract class FileFont extends PhysicalFont {
                  */
                 FileFontStrike strike = (FileFontStrike)strikeRef.get();
                 if (strike != null && strike.pScalerContext != 0L) {
-                    setNullScaler(strike.pScalerContext);
+                    scaler.invalidateScalerContext(strike.pScalerContext);
                 }
             }
         }
+        scaler.dispose();
+        scaler = FontManager.getNullScaler();
     }
 
-    /* These methods defined in scalerMethods.c */
+    StrikeMetrics getFontMetrics(long pScalerContext) {
+        try {
+            return getScaler().getFontMetrics(pScalerContext);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            return getFontMetrics(pScalerContext);
+        }
+    }
 
-    /* set the null scaler in an already existing native scaler context.
-     * The effect of this is that existing references to a strike which
-     * holds a pointer to that native struct, on subsequent calls down
-     * into native will use that null scaler. This is used when the
-     * original scaler is 'bad' and can no longer be used.
-     */
-    native synchronized void setNullScaler(long pScalerContext);
+    float getGlyphAdvance(long pScalerContext, int glyphCode) {
+        try {
+            return getScaler().getGlyphAdvance(pScalerContext, glyphCode);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            return getGlyphAdvance(pScalerContext, glyphCode);
+        }
+    }
 
-    /* freeScaler is called by a disposer on a reference queue */
-    static native void freeScaler(long pScaler);
+    void getGlyphMetrics(long pScalerContext, int glyphCode, Point2D.Float metrics) {
+        try {
+            getScaler().getGlyphMetrics(pScalerContext, glyphCode, metrics);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            getGlyphMetrics(pScalerContext, glyphCode, metrics);
+        }
+    }
 
-    /* Retrieves a singleton "null" scaler instance which must
-     * not be freed.
-     */
-    static synchronized native long getNullScaler();
+    long getGlyphImage(long pScalerContext, int glyphCode) {
+        try {
+            return getScaler().getGlyphImage(pScalerContext, glyphCode);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            return getGlyphImage(pScalerContext, glyphCode);
+        }
+    }
 
-    native synchronized	StrikeMetrics getFontMetrics(long pScalerContext);
+    Rectangle2D.Float getGlyphOutlineBounds(long pScalerContext, int glyphCode) {
+        try {
+            return getScaler().getGlyphOutlineBounds(pScalerContext, glyphCode);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            return getGlyphOutlineBounds(pScalerContext, glyphCode);
+        }
+    }
 
-    native synchronized float getGlyphAdvance(long pScalerContext,
-					      int glyphCode);
-
-    native synchronized void getGlyphMetrics(long pScalerContext,
-					     int glyphCode,
-					     Point2D.Float metrics);
-
-    native synchronized long getGlyphImage(long pScalerContext,
-					   int glyphCode);
-
-    /* These methods defined in t2kscalerMethods.cpp */
-    native synchronized Rectangle2D.Float getGlyphOutlineBounds(long pContext,
-								int glyphCode);
-
-    native synchronized GeneralPath getGlyphOutline(long pScalerContext,
-						    int glyphCode,
-						    float x, float y);
-
-    native synchronized	GeneralPath getGlyphVectorOutline(long pScalerContext,
-							  int[] glyphs,
-							  int numGlyphs,
-							  float x, float y);
-
-    /* T1 & TT implementation differ so this method is abstract */
-    protected abstract long getScaler();
-
-//     protected synchronized void freeScaler() {
-// 	if (pScaler != 0L) {
-// 	    freeScaler(pScaler);
-// 	    pScaler = 0L;
-// 	}
-//     }
-
-    protected static class FileFontDisposer implements DisposerRecord {
-
-	long pScaler = 0L;
-	boolean disposed = false;
-
-	public FileFontDisposer(long pScaler) {
-	    this.pScaler = pScaler;
+    GeneralPath getGlyphOutline(long pScalerContext, int glyphCode, float x, float y) {
+        try {
+            return getScaler().getGlyphOutline(pScalerContext, glyphCode, x, y);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            return getGlyphOutline(pScalerContext, glyphCode, x, y);
+        }
 	}
 
-	public synchronized void dispose() {
-	    if (!disposed) {
-		FileFont.freeScaler(pScaler);
-		pScaler = 0L;
-		disposed = true;
+    GeneralPath getGlyphVectorOutline(long pScalerContext, int[] glyphs, int numGlyphs, float x, float y) {
+        try {
+            return getScaler().getGlyphVectorOutline(pScalerContext, glyphs, numGlyphs, x, y);
+        } catch (FontScalerException fe) {
+            scaler = FontManager.getNullScaler();
+            return getGlyphVectorOutline(pScalerContext, glyphs, numGlyphs, x, y);
 	    }
 	}
+
+    /* T1 & TT implementation differ so this method is abstract.
+       NB: null should not be returned here! */
+    protected abstract FontScaler getScaler();
+
+    protected long getUnitsPerEm() {
+        return getScaler().getUnitsPerEm();
     }
 
     private static class CreatedFontFileDisposerRecord implements DisposerRecord {
@@ -260,11 +278,3 @@ public abstract class FileFont extends PhysicalFont {
 	}
     }
 }
-
-
-   
-
-
-    
-
-    

@@ -32,7 +32,6 @@ import javax.swing.ActionMap;
  * A subclass of javax.swing.ActionMap that implements UIResource. 
  * UI classes which provide an ActionMap should use this class.
  * 
- * @version 1.14 05/05/07
  * @author Scott Violet
  * @since 1.3
  */

@@ -37,7 +37,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's OptionPaneUI.
  * 
- * @version 1.21, 05/05/07
  * @author James Gosling
  * @author Scott Violet
  * @author Amy Fowler

@@ -42,7 +42,6 @@ import java.util.*;
  * not editable, the textfield will not be visible.
  *
  * @author  Scott Violet
- * @version 1.23, 05/05/07
  */
 class HiddenTagView extends EditableView implements DocumentListener {
     HiddenTagView(Element e) {

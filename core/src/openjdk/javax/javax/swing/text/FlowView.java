@@ -46,7 +46,6 @@ import javax.swing.SizeRequirements;
  * </ul>
  *
  * @author  Timothy Prinzing
- * @version 1.60 05/05/07
  * @see     View
  * @since 1.3
  */

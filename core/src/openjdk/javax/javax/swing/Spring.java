@@ -124,7 +124,6 @@ import java.awt.Component;
  * @see SpringLayout
  * @see SpringLayout.Constraints
  *
- * @version 1.19 05/05/07
  * @author 	Philip Milne
  * @since       1.4
  */

@@ -60,7 +60,6 @@ import sun.security.util.SecurityConstants;
  * thread group to call the applet's init(), start(), stop(), and
  * destroy() methods.
  *
- * @version     1.98, 12/17/02
  * @author      Arthur van Hoff
  */
 public

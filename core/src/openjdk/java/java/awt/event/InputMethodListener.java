@@ -36,7 +36,6 @@ import java.util.EventListener;
  * The text editing component also has to provide an instance of InputMethodRequests.
  *
  * @author JavaSoft Asia/Pacific
- * @version 1.18 05/05/07
  * @see InputMethodEvent
  * @see java.awt.im.InputMethodRequests
  * @since 1.2

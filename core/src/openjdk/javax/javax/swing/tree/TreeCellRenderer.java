@@ -35,7 +35,6 @@ import javax.swing.JTree;
  * for an example of implementing a tree cell renderer
  * that displays custom icons.
  *
- * @version 1.30 05/05/07
  * @author Rob Davis
  * @author Ray Ryan
  * @author Scott Violet

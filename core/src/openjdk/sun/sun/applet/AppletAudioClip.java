@@ -38,7 +38,6 @@ import com.sun.media.sound.JavaSoundAudioClip;
 /**
  * Applet audio clip;
  *
- * @version 	1.40 07/05/05
  * @author Arthur van Hoff, Kara Kytle
  */
 

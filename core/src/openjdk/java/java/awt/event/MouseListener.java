@@ -47,7 +47,6 @@ import java.util.EventListener;
  * the <code>MouseEvent</code> is passed to it.
  *
  * @author Carl Quinn
- * @version 1.25, 05/05/07
  *
  * @see MouseAdapter
  * @see MouseEvent

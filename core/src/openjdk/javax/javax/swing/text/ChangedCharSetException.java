@@ -31,7 +31,6 @@ import java.io.IOException;
  * thrown when the charset is changed.
  *
  * @author Sunita Mani
- * 1.15, 05/05/07
  */
 public class ChangedCharSetException extends IOException {
 

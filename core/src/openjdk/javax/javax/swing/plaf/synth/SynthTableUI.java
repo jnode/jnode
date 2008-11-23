@@ -58,7 +58,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * SynthTableUI implementation
  *
- * @version 1.29, 05/05/07
  * @author Philip Milne
  */
 class SynthTableUI extends BasicTableUI implements SynthUI,

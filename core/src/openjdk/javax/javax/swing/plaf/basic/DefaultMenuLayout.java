@@ -38,7 +38,6 @@ import static sun.swing.SwingUtilities2.BASICMENUITEMUI_MAX_TEXT_OFFSET;
  * so that plauggable L&Fs can distinguish it from user-installed
  * layout managers on menus.
  *
- * @version 1.19 05/05/07
  * @author Georges Saab
  */
 
@@ -50,24 +49,26 @@ public class DefaultMenuLayout extends BoxLayout implements UIResource {
     public Dimension preferredLayoutSize(Container target) {
         if (target instanceof JPopupMenu) {
             JPopupMenu popupMenu = (JPopupMenu) target;
-            popupMenu.putClientProperty(
-                                   BasicMenuItemUI.MAX_ARROW_ICON_WIDTH, null);
-            popupMenu.putClientProperty(
-                                 BasicMenuItemUI.MAX_CHECK_ICON_WIDTH, null); 
-            popupMenu.putClientProperty(
-                                 BasicMenuItemUI.MAX_ICON_WIDTH, null);
-            popupMenu.putClientProperty(
-                                 BasicMenuItemUI.MAX_TEXT_WIDTH, null); 
-            popupMenu.putClientProperty(
-                                 BasicMenuItemUI.MAX_ACC_WIDTH, null);
-            popupMenu.putClientProperty(
-                                 BasicMenuItemUI.MAX_ICON_OFFSET, null);
-            popupMenu.putClientProperty(
-                                 BASICMENUITEMUI_MAX_TEXT_OFFSET, null);
+
+            // Before the calculation of menu preferred size
+            // clear the previously calculated maximal widths and offsets
+            // in menu's Client Properties
+            popupMenu.putClientProperty(BasicMenuItemUI.MAX_ACC_WIDTH, null);
+            popupMenu.putClientProperty(BasicMenuItemUI.MAX_ARROW_WIDTH, null);
+            popupMenu.putClientProperty(BasicMenuItemUI.MAX_CHECK_WIDTH, null);
+            popupMenu.putClientProperty(BasicMenuItemUI.MAX_ICON_WIDTH, null);
+            popupMenu.putClientProperty(BasicMenuItemUI.MAX_LABEL_WIDTH, null);
+            popupMenu.putClientProperty(BasicMenuItemUI.MAX_TEXT_WIDTH, null);
+            popupMenu.putClientProperty(BASICMENUITEMUI_MAX_TEXT_OFFSET, null);
+
             if (popupMenu.getComponentCount() == 0) {
                 return new Dimension(0, 0);
             }
         }
+
+        // Make BoxLayout recalculate cached preferred sizes
+        super.invalidateLayout(target);
+
         return super.preferredLayoutSize(target);
     }
 }

@@ -37,7 +37,6 @@ import javax.swing.RowSorter;
  *     been sorted or filtered.
  * </ul>
  *
- * @version 1.9 05/05/07
  * @see javax.swing.RowSorter
  * @since 1.6
  */

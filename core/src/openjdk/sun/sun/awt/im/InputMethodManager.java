@@ -35,8 +35,10 @@ import java.awt.PopupMenu;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.Toolkit;
+import sun.awt.AppContext;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InvocationEvent;
 import java.awt.im.spi.InputMethodDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
@@ -46,11 +48,13 @@ import java.security.PrivilegedExceptionAction;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.ServiceLoader;
 import java.util.Vector;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import sun.awt.InputMethodSupport;
-import sun.misc.Service;
+import sun.awt.SunToolkit;
 
 /**
  * <code>InputMethodManager</code> is an abstract class that manages the input
@@ -118,7 +122,6 @@ import sun.misc.Service;
  * as above.</LI>
  * </UL>
  * 
- * @version 1.43 05/05/07
  * @see java.awt.im.spi.InputMethod
  * @see sun.awt.im.InputContext
  * @see sun.awt.im.InputMethodAdapter
@@ -255,7 +258,7 @@ class ExecutableInputMethodManager extends InputMethodManager
      
     // locators for Java input methods
     private int javaInputMethodCount;         // number of Java input methods found
-    private Vector javaInputMethodLocatorList;
+    private Vector<InputMethodLocator> javaInputMethodLocatorList;
 
     // component that is requesting input method switch
     // must be Frame or Dialog
@@ -287,7 +290,7 @@ class ExecutableInputMethodManager extends InputMethodManager
 	    // if we can't get a descriptor, we'll just have to do without native input methods
 	}
 
-	javaInputMethodLocatorList = new Vector();
+        javaInputMethodLocatorList = new Vector<InputMethodLocator>();
 	initializeInputMethodLocatorList();
     }
 
@@ -313,17 +316,54 @@ class ExecutableInputMethodManager extends InputMethodManager
 	    waitForChangeRequest();
 	    initializeInputMethodLocatorList();
 	    try {
+                if (requestComponent != null) {
+                    showInputMethodMenuOnRequesterEDT(requestComponent);
+                } else {
 		// show the popup menu within the event thread
 		EventQueue.invokeAndWait(new Runnable() {
 		    public void run() {
 			showInputMethodMenu();
 		    }
 		});
+                }
 	    } catch (InterruptedException ie) {
 	    } catch (InvocationTargetException ite) {
 		// should we do anything under these exceptions?
 	    }
 	}
+    }
+
+    // Shows Input Method Menu on the EDT of requester component
+    // to avoid side effects. See 6544309.
+    private void showInputMethodMenuOnRequesterEDT(Component requester)
+        throws InterruptedException, InvocationTargetException {
+
+        if (requester == null){
+            return;
+        }
+
+        class AWTInvocationLock {}
+        Object lock = new AWTInvocationLock();
+
+        InvocationEvent event =
+                new InvocationEvent(requester,
+                                    new Runnable() {
+                                        public void run() {
+                                            showInputMethodMenu();
+                                        }
+                                    },
+                                    lock,
+                                    true);
+
+        AppContext requesterAppContext = SunToolkit.targetToAppContext(requester);
+        synchronized (lock) {
+            SunToolkit.postEvent(requesterAppContext, event);
+        }
+
+        Throwable eventThrowable = event.getThrowable();
+        if (eventThrowable != null) {
+            throw new InvocationTargetException(eventThrowable);
+        }
     }
 
     void setInputContext(InputContext inputContext) {
@@ -389,9 +429,8 @@ class ExecutableInputMethodManager extends InputMethodManager
             try {
                 AccessController.doPrivileged(new PrivilegedExceptionAction() {
                     public Object run() {
-			Iterator ims = Service.installedProviders(InputMethodDescriptor.class);
-			while (ims.hasNext()) {
-			    InputMethodDescriptor descriptor = (InputMethodDescriptor) ims.next();
+                        for (InputMethodDescriptor descriptor :
+                            ServiceLoader.loadInstalled(InputMethodDescriptor.class)) {
 			    ClassLoader cl = descriptor.getClass().getClassLoader();
 			    javaInputMethodLocatorList.add(new InputMethodLocator(descriptor, cl, null));
 			}
@@ -443,7 +482,7 @@ class ExecutableInputMethodManager extends InputMethodManager
 
         // Add menu items for other input methods
         for (int i = 0; i < javaInputMethodLocatorList.size(); i++) {
-            InputMethodLocator locator = (InputMethodLocator) javaInputMethodLocatorList.get(i);
+            InputMethodLocator locator = javaInputMethodLocatorList.get(i);
             selectionMenu.addOneInputMethodToMenu(locator, currentSelection);
         }
 
@@ -480,7 +519,7 @@ class ExecutableInputMethodManager extends InputMethodManager
 	    locator = hostAdapterLocator;
 	} else {
             for (int i = 0; i < javaInputMethodLocatorList.size(); i++) {
-                InputMethodLocator candidate = (InputMethodLocator) javaInputMethodLocatorList.get(i);
+                InputMethodLocator candidate = javaInputMethodLocatorList.get(i);
                 String name = candidate.getActionCommandString();
                 if (name.equals(inputMethodName)) {
                     locator = candidate;
@@ -537,7 +576,7 @@ class ExecutableInputMethodManager extends InputMethodManager
 	initializeInputMethodLocatorList();
 
         for (int i = 0; i < javaInputMethodLocatorList.size(); i++) {
-            InputMethodLocator candidate = (InputMethodLocator) javaInputMethodLocatorList.get(i);
+            InputMethodLocator candidate = javaInputMethodLocatorList.get(i);
             if (candidate.isLocaleAvailable(locale)) {
                 return candidate.deriveLocator(locale);
             }
@@ -593,7 +632,7 @@ class ExecutableInputMethodManager extends InputMethodManager
 	    }
 	    // look for Java input methods
             for (int i = 0; i < javaInputMethodLocatorList.size(); i++) {
-                InputMethodLocator locator = (InputMethodLocator) javaInputMethodLocatorList.get(i);
+                InputMethodLocator locator = javaInputMethodLocatorList.get(i);
                 InputMethodDescriptor descriptor = locator.getDescriptor();
 		if (descriptor.getClass().getName().equals(descriptorName)) {
 		    advertised = getAdvertisedLocale(locator, locale);

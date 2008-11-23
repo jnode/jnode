@@ -90,7 +90,6 @@ import javax.swing.text.*;
  * @see java.text.Format
  * @see java.lang.Comparable
  *
- * @version 1.7 04/09/01
  * @since 1.4
  */
 public class InternationalFormatter extends DefaultFormatter {

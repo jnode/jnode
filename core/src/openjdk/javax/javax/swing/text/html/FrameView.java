@@ -40,7 +40,6 @@ import sun.swing.text.html.FrameEditorPaneTag;
  * marginwidth and marginheight attributes.
  *
  * @author    Sunita Mani
- * @version   1.37, 05/05/07
  */
 
 class FrameView extends ComponentView implements HyperlinkListener {
@@ -477,4 +476,3 @@ class FrameView extends ComponentView implements HyperlinkListener {
         }
     }
 }
-

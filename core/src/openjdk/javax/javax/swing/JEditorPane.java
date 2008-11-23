@@ -186,7 +186,6 @@ import javax.accessibility.*;
  * description: A text component to edit various types of content.
  *
  * @author  Timothy Prinzing
- * @version 1.145 05/05/07
  */
 public class JEditorPane extends JTextComponent {
 
@@ -896,7 +895,8 @@ public class JEditorPane extends JTextComponent {
 		if ((nm != null) && nm.equals(reference)) {
 		    // found a matching reference in the document.
 		    try {
-			Rectangle r = modelToView(iter.getStartOffset());
+                        int pos = iter.getStartOffset();
+                        Rectangle r = modelToView(pos);
 			if (r != null) {
 			    // the view is visible, scroll it to the 
 			    // center of the current visible area.
@@ -904,6 +904,7 @@ public class JEditorPane extends JTextComponent {
 			    //r.y -= (vis.height / 2);
 			    r.height = vis.height;
 			    scrollRectToVisible(r);
+                            setCaretPosition(pos);
 			}
 		    } catch (BadLocationException ble) {
 		        UIManager.getLookAndFeel().provideErrorFeedback(JEditorPane.this);
@@ -2472,4 +2473,3 @@ static class HeaderParser {
  }
 
 }
-

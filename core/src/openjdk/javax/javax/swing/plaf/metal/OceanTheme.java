@@ -47,7 +47,6 @@ import sun.swing.PrintColorUIResource;
  * All colors returned by {@code OceanTheme} are completely
  * opaque.
  *
- * @version 1.27 05/05/07
  * @since 1.5
  * @see MetalLookAndFeel#setCurrentTheme
  */

@@ -92,7 +92,6 @@ import java.text.CharacterIterator;
  * generally independent of the rotation applied to the font (modulo
  * possible grid hinting effects).  See {@link java.awt.Font Font}.
  * 
- * @version 	1.65 05/05/07
  * @author 	Jim Graham
  * @see         java.awt.Font
  * @since       JDK1.0

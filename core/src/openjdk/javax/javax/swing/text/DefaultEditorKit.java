@@ -67,7 +67,6 @@ import javax.swing.UIManager;
  * </dl>
  *
  * @author  Timothy Prinzing
- * @version 1.77 05/05/07
  */
 public class DefaultEditorKit extends EditorKit {
     

@@ -68,7 +68,6 @@ import java.io.IOException;
  *      attribute: isContainer false
  *    description: A divider between menu items.
  *
- * @version 1.58 05/05/07
  * @author Georges Saab
  * @author Jeff Shapiro
  */

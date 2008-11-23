@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)FontLineMetrics.java	1.2 03/08/04
  *
  * (C) Copyright IBM Corp. 2003, All Rights Reserved
  *
@@ -118,4 +117,3 @@ public final class FontLineMetrics extends LineMetrics implements Cloneable {
         }
     }
 }
-

@@ -46,7 +46,6 @@ import javax.swing.plaf.basic.*;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.16 08/28/98
  * @author Jeff Dinkins
  */
 public class MotifTreeUI extends BasicTreeUI

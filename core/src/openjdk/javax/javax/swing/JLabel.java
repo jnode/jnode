@@ -101,7 +101,6 @@ import java.util.*;
  *   attribute: isContainer false
  * description: A component that displays a short string and an icon.
  * 
- * @version 1.131 05/05/07
  * @author Hans Muller
  */
 public class JLabel extends JComponent implements SwingConstants, Accessible

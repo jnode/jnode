@@ -42,7 +42,6 @@ import java.awt.AWTEvent;
  *
  * @author	Fred Ecks
  * @author	David Mendenhall
- * @version	1.27, 05/05/07
  *
  * @see		java.awt.ActiveEvent
  * @see		java.awt.EventQueue#invokeLater

@@ -35,7 +35,6 @@ import javax.swing.text.*;
  * Text editor user interface
  *
  * @author  Timothy Prinzing
- * @version 1.40 05/05/07
  */
 public abstract class TextUI extends ComponentUI
 {

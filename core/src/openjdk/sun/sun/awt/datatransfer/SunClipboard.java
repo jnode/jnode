@@ -58,7 +58,6 @@ import sun.awt.EventListenerAggregate;
  *
  * @author Danila Sinopalnikov
  * @author Alexander Gerasimov
- * @version 1.25, 05/05/07
  *
  * @since 1.3
  */

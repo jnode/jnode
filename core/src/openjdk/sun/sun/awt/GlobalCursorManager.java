@@ -85,11 +85,6 @@ public abstract class GlobalCursorManager {
     private final Object lastUpdateLock = new Object();
 
     /**
-     * The AWT Tree Lock.
-     */
-    private final Object treeLock = new Container().getTreeLock();
-
-    /**
      * Should be called for any activity at the Java level which may affect
      * the global cursor, except for Java MOUSE_MOVED events.
      */
@@ -219,4 +214,3 @@ public abstract class GlobalCursorManager {
         // But we need to update it in case of grab on X.
     }
 }
-

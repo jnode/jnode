@@ -61,7 +61,6 @@ import sun.font.FontManager;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.88 05/05/07
  */
 public class StyleContext implements Serializable, AbstractDocument.AttributeContext {
 

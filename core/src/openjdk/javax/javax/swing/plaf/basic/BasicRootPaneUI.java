@@ -41,7 +41,6 @@ import sun.swing.UIAction;
  * Basic implementation of RootPaneUI, there is one shared between all
  * JRootPane instances.
  *
- * @version 1.23 05/05/07
  * @author Scott Violet
  * @since 1.3
  */

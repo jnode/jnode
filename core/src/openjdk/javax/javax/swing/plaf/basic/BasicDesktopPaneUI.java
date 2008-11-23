@@ -44,7 +44,6 @@ import sun.awt.AppContext;
 /**
  * Basic L&F for a desktop.
  *
- * @version 1.67 05/05/07
  * @author Steve Wilson
  */
 public class BasicDesktopPaneUI extends DesktopPaneUI {

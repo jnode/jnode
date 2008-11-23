@@ -41,7 +41,6 @@ import java.util.EventObject;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.22 05/05/07
  * @author Georges Saab
  * @author David Karlton
  */
@@ -56,4 +55,3 @@ public class MenuEvent extends EventObject {
         super(source);
     }
 }
-

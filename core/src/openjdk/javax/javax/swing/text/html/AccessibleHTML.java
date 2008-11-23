@@ -39,7 +39,6 @@ import java.text.BreakIterator;
  * The AccessibleHTML class provide information about the contents 
  * of a HTML document to assistive technologies.
  * 
- * @version 1.21 05/05/07
  * @author  Lynn Monsanto
  */
 class AccessibleHTML implements Accessible {

@@ -71,7 +71,6 @@ import java.beans.PropertyChangeListener;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.69 05/05/07
  * @author Alan Chung
  * @author Philip Milne
  * @see javax.swing.table.TableColumnModel
@@ -824,8 +823,3 @@ public class TableColumn extends Object implements Serializable {
     }
 
 } // End of class TableColumn
-
-
-
-
-

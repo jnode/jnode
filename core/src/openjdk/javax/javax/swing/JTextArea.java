@@ -121,7 +121,6 @@ import java.io.IOException;
  * description: A multi-line area that displays plain text.
  * 
  * @author  Timothy Prinzing
- * @version 1.104 05/05/07
  * @see JTextPane
  * @see JEditorPane
  */

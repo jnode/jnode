@@ -42,7 +42,6 @@ import java.util.*;
  * not editable, the textarea will not be visible.
  *
  * @author  Scott Violet
- * @version 1.20, 05/05/07
  */
 class CommentView extends HiddenTagView {
     CommentView(Element e) {

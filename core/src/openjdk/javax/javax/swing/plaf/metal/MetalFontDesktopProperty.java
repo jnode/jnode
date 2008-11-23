@@ -32,7 +32,6 @@ import javax.swing.*;
  * DesktopProperty that only uses font height in configuring font. This
  * is only used on Windows.
  *
- * @version @(#)MetalFontDesktopProperty.java	1.11 07/05/05
  */
 class MetalFontDesktopProperty extends com.sun.java.swing.plaf.windows.DesktopProperty {
     /**

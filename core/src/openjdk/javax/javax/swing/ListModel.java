@@ -35,7 +35,6 @@ import javax.swing.event.ListDataListener;
  * length of the data model must be reported to all of the
  * ListDataListeners.
  *
- * @version 0.0 03/01/97
  * @author Hans Muller
  * @see JList
  */
@@ -68,4 +67,3 @@ public interface ListModel
    */  
   void removeListDataListener(ListDataListener l);
 }
-

@@ -55,7 +55,6 @@ import java.awt.Component;
  * <li>To create a new border class, subclass AbstractBorder.   
  * </ul>
  * 
- * @version 1.26 05/05/07
  * @author David Kloba
  * @author Amy Fowler
  * @see javax.swing.BorderFactory

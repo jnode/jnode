@@ -39,7 +39,6 @@ import sun.awt.AppContext;
  * public static methods call into the appropriate instance.
  * 
  * @author Shannon Hickey
- * @version 1.8 05/05/07
  */
 class DragRecognitionSupport {
     private int motionThreshold;

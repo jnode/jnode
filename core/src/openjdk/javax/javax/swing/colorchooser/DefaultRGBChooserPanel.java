@@ -41,7 +41,6 @@ import java.awt.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.31 01/23/03
  * @author Steve Wilson
  * @author Mark Davidson
  * @see JColorChooser
@@ -291,5 +290,3 @@ class DefaultRGBChooserPanel extends AbstractColorChooserPanel implements Change
     }
 
 }
-
-

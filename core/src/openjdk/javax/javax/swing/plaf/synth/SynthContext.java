@@ -35,7 +35,6 @@ import java.util.*;
  * a <code>SynthContext</code> that is passed to you and expect it to
  * remain valid.
  *
- * @version 1.16, 05/05/07
  * @since 1.5
  * @author Scott Violet
  */

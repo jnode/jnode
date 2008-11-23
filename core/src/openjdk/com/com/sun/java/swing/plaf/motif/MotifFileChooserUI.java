@@ -31,17 +31,18 @@ import javax.swing.event.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import sun.awt.shell.ShellFolder;
+import sun.swing.SwingUtilities2;
 
 /**
  * Motif FileChooserUI.
  *
- * @version 1.57 05/05/07
  * @author Jeff Dinkins
  */
 public class MotifFileChooserUI extends BasicFileChooserUI {
@@ -73,11 +74,12 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 
     private static final Insets buttonMargin = new Insets(3, 3, 3, 3);
 
-    private JPanel directoryPanel = new JPanel();
     private JPanel bottomPanel;
 
     protected JButton approveButton;
 
+    private String enterFolderNameLabelText = null;
+    private int enterFolderNameLabelMnemonic = 0;
     private String enterFileNameLabelText = null;
     private int enterFileNameLabelMnemonic = 0;
 
@@ -92,6 +94,18 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 
     private String filterLabelText = null;
     private int filterLabelMnemonic = 0;
+
+    private JLabel fileNameLabel;
+
+    private void populateFileNameLabel() {
+        if (getFileChooser().getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+            fileNameLabel.setText(enterFolderNameLabelText);
+            fileNameLabel.setDisplayedMnemonic(enterFolderNameLabelMnemonic);
+        } else {
+            fileNameLabel.setText(enterFileNameLabelText);
+            fileNameLabel.setDisplayedMnemonic(enterFileNameLabelMnemonic);
+        }
+    }
 
     private String fileNameString(File file) {
         if (file == null) {
@@ -166,25 +180,27 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 		    if(f != null) {
 			setFileName(getFileChooser().getName(f));
 		    }
-        } 
-        else if (prop.equals(JFileChooser.SELECTED_FILES_CHANGED_PROPERTY)) {
+                } else if (prop.equals(JFileChooser.SELECTED_FILES_CHANGED_PROPERTY)) {
             File[] files = (File[]) e.getNewValue();
             JFileChooser fc = getFileChooser();
-            if (files != null && files.length > 0 && (files.length > 1 || fc.isDirectorySelectionEnabled() || !files[0].isDirectory())) {
+                    if (files != null && files.length > 0 && (files.length > 1 || fc.isDirectorySelectionEnabled()
+                            || !files[0].isDirectory())) {
                setFileName(fileNameString(files)); 
             }
+                } else if (prop.equals(JFileChooser.FILE_FILTER_CHANGED_PROPERTY)) {
+                    fileList.clearSelection();
 		} else if(prop.equals(JFileChooser.DIRECTORY_CHANGED_PROPERTY)) {
 		    directoryList.clearSelection();
 		    ListSelectionModel sm = directoryList.getSelectionModel();
                     if (sm instanceof DefaultListSelectionModel) {
 		        ((DefaultListSelectionModel)sm).moveLeadSelectionIndex(0);       
-		        ((DefaultListSelectionModel)sm).setAnchorSelectionIndex(0);
+                        sm.setAnchorSelectionIndex(0);
 		    }
 		    fileList.clearSelection();
 		    sm = fileList.getSelectionModel();
 		    if (sm instanceof DefaultListSelectionModel) {
 		        ((DefaultListSelectionModel)sm).moveLeadSelectionIndex(0);
-		        ((DefaultListSelectionModel)sm).setAnchorSelectionIndex(0);
+                        sm.setAnchorSelectionIndex(0);
 		    }
 		    File currentDirectory = getFileChooser().getCurrentDirectory();
 		    if(currentDirectory != null) {
@@ -198,8 +214,11 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 			}
 		    }
 		} else if(prop.equals(JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY)) {
+                    if (fileNameLabel != null) {
+                        populateFileNameLabel();
+                    }
 		    directoryList.clearSelection();
-		} else if(prop == JFileChooser.MULTI_SELECTION_ENABLED_CHANGED_PROPERTY) {
+                } else if (prop.equals(JFileChooser.MULTI_SELECTION_ENABLED_CHANGED_PROPERTY)) {
 		    if(getFileChooser().isMultiSelectionEnabled()) {
 			fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		    } else {
@@ -207,7 +226,7 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 			fileList.clearSelection();
 			getFileChooser().setSelectedFiles(null);
 		    }
-		} else if(prop == JFileChooser.ACCESSORY_CHANGED_PROPERTY) {
+                } else if (prop.equals(JFileChooser.ACCESSORY_CHANGED_PROPERTY)) {
 		    if(getAccessoryPanel() != null) {
 			if(e.getOldValue() != null) {
 			    getAccessoryPanel().remove((JComponent) e.getOldValue());
@@ -222,9 +241,9 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 			    getAccessoryPanel().setMaximumSize(ZERO_ACC_SIZE);
 			}
 		    }
-		} else if (prop == JFileChooser.APPROVE_BUTTON_TEXT_CHANGED_PROPERTY ||
-			   prop == JFileChooser.APPROVE_BUTTON_TOOL_TIP_TEXT_CHANGED_PROPERTY ||
-			   prop == JFileChooser.DIALOG_TYPE_CHANGED_PROPERTY) {
+                } else if (prop.equals(JFileChooser.APPROVE_BUTTON_TEXT_CHANGED_PROPERTY) ||
+                        prop.equals(JFileChooser.APPROVE_BUTTON_TOOL_TIP_TEXT_CHANGED_PROPERTY) ||
+                        prop.equals(JFileChooser.DIALOG_TYPE_CHANGED_PROPERTY)) {
 		    approveButton.setText(getApproveButtonText(getFileChooser()));
 		    approveButton.setToolTipText(getApproveButtonToolTipText(getFileChooser()));
 		} else if (prop.equals(JFileChooser.CONTROL_BUTTONS_ARE_SHOWN_CHANGED_PROPERTY)) {
@@ -387,10 +406,10 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 	interior.add(Box.createRigidArea(vstrut10));
 
 	// add the filename field PENDING(jeff) - I18N
-	l = new JLabel(enterFileNameLabelText);
-	l.setDisplayedMnemonic(enterFileNameLabelMnemonic);
-	align(l);
-	interior.add(l);
+        fileNameLabel = new JLabel();
+        populateFileNameLabel();
+        align(fileNameLabel);
+        interior.add(fileNameLabel);
 
 	filenameTextField = new JTextField() {
 	    public Dimension getMaximumSize() {
@@ -400,7 +419,7 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 	    }
 	};
         filenameTextField.setInheritsPopupMenu(true);
-	l.setLabelFor(filenameTextField);
+        fileNameLabel.setLabelFor(filenameTextField);
 	filenameTextField.addActionListener(getApproveSelectionAction());
 	align(filenameTextField);
 	filenameTextField.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -506,6 +525,8 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 
         Locale l = fc.getLocale();
 
+        enterFolderNameLabelText = UIManager.getString("FileChooser.enterFolderNameLabelText",l);
+        enterFolderNameLabelMnemonic = UIManager.getInt("FileChooser.enterFolderNameLabelMnemonic");
 	enterFileNameLabelText = UIManager.getString("FileChooser.enterFileNameLabelText",l);
 	enterFileNameLabelMnemonic = UIManager.getInt("FileChooser.enterFileNameLabelMnemonic"); 
 	
@@ -546,6 +567,18 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 	fileList.setCellRenderer(new FileCellRenderer());
 	fileList.addListSelectionListener(createListSelectionListener(getFileChooser()));
 	fileList.addMouseListener(createDoubleClickListener(getFileChooser(), fileList));
+        fileList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                JFileChooser chooser = getFileChooser();
+                if (SwingUtilities.isLeftMouseButton(e) && !chooser.isMultiSelectionEnabled()) {
+                    int index = SwingUtilities2.loc2IndexFileList(fileList, e.getPoint());
+                    if (index >= 0) {
+                        File file = (File) fileList.getModel().getElementAt(index);
+                        setFileName(chooser.getName(file));
+                    }
+                }
+            }
+        });
 	align(fileList);
 	JScrollPane scrollpane = new JScrollPane(fileList);
 	scrollpane.setPreferredSize(prefListSize);
@@ -746,10 +779,10 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 
 	public void propertyChange(PropertyChangeEvent e) {
 	    String prop = e.getPropertyName();
-	    if(prop == JFileChooser.CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY) {
+            if(prop.equals(JFileChooser.CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY)) {
 		filters = (FileFilter[]) e.getNewValue();
 		fireContentsChanged(this, -1, -1);
-	    } else if (prop == JFileChooser.FILE_FILTER_CHANGED_PROPERTY) {
+            } else if (prop.equals(JFileChooser.FILE_FILTER_CHANGED_PROPERTY)) {
 		fireContentsChanged(this, -1, -1);
 	    }
 	}
@@ -770,12 +803,12 @@ public class MotifFileChooserUI extends BasicFileChooserUI {
 	    FileFilter currentFilter = getFileChooser().getFileFilter();
 	    boolean found = false;
 	    if(currentFilter != null) {
-		for(int i=0; i < filters.length; i++) {
-		    if(filters[i] == currentFilter) {
+                for (FileFilter filter : filters) {
+                    if (filter == currentFilter) {
 			found = true;
 		    }
 		}
-		if(found == false) {
+                if (!found) {
 		    getFileChooser().addChoosableFileFilter(currentFilter);
 		}
 	    }

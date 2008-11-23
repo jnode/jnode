@@ -52,7 +52,6 @@ package java.awt.dnd;
  * @see DragSourceMotionListener
  *
  * @author David Mendenhall
- * @version 1.13, 05/05/07
  * @since 1.4
  */
 public abstract class DragSourceAdapter 

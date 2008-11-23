@@ -653,7 +653,7 @@ public class AppletClassLoader extends URLClassLoader {
     private AppletThreadGroup threadGroup;
     private AppContext appContext;
 
-    ThreadGroup getThreadGroup() {
+    public ThreadGroup getThreadGroup() {
       synchronized (threadGroupSynchronizer) {
 	if (threadGroup == null || threadGroup.isDestroyed()) {
 	    AccessController.doPrivileged(new PrivilegedAction() {
@@ -692,7 +692,7 @@ public class AppletClassLoader extends URLClassLoader {
     /*
      * Get the AppContext, if any, corresponding to this AppletClassLoader.
      */
-    AppContext getAppContext()  {
+    public AppContext getAppContext()  {
         return appContext;
     }
 

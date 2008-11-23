@@ -55,7 +55,7 @@ import sun.java2d.pipe.CompositePipe;
 import sun.java2d.pipe.GeneralCompositePipe;
 import sun.java2d.pipe.SpanClipRenderer;
 import sun.java2d.pipe.SpanShapeRenderer;
-import sun.java2d.pipe.DuctusShapeRenderer;
+import sun.java2d.pipe.AAShapePipe;
 import sun.java2d.pipe.AlphaPaintPipe;
 import sun.java2d.pipe.AlphaColorPipe;
 import sun.java2d.pipe.PixelToShapeConverter;
@@ -366,9 +366,9 @@ public abstract class SurfaceData
     protected static final TextPipe colorText;
     protected static final CompositePipe clipColorPipe;
     protected static final TextPipe clipColorText;
-    protected static final DuctusShapeRenderer AAColorShape;
+    protected static final AAShapePipe AAColorShape;
     protected static final PixelToShapeConverter AAColorViaShape;
-    protected static final DuctusShapeRenderer AAClipColorShape;
+    protected static final AAShapePipe AAClipColorShape;
     protected static final PixelToShapeConverter AAClipColorViaShape;
 
     protected static final CompositePipe paintPipe;
@@ -377,9 +377,9 @@ public abstract class SurfaceData
     protected static final TextPipe paintText;
     protected static final CompositePipe clipPaintPipe;
     protected static final TextPipe clipPaintText;
-    protected static final DuctusShapeRenderer AAPaintShape;
+    protected static final AAShapePipe AAPaintShape;
     protected static final PixelToShapeConverter AAPaintViaShape;
-    protected static final DuctusShapeRenderer AAClipPaintShape;
+    protected static final AAShapePipe AAClipPaintShape;
     protected static final PixelToShapeConverter AAClipPaintViaShape;
 
     protected static final CompositePipe compPipe;
@@ -388,9 +388,9 @@ public abstract class SurfaceData
     protected static final TextPipe compText;
     protected static final CompositePipe clipCompPipe;
     protected static final TextPipe clipCompText;
-    protected static final DuctusShapeRenderer AACompShape;
+    protected static final AAShapePipe AACompShape;
     protected static final PixelToShapeConverter AACompViaShape;
-    protected static final DuctusShapeRenderer AAClipCompShape;
+    protected static final AAShapePipe AAClipCompShape;
     protected static final PixelToShapeConverter AAClipCompViaShape;
 
     protected static final DrawImagePipe imagepipe;
@@ -409,9 +409,9 @@ public abstract class SurfaceData
 	colorText = new TextRenderer(colorPipe);
 	clipColorPipe = new SpanClipRenderer(colorPipe);
 	clipColorText = new TextRenderer(clipColorPipe);
-	AAColorShape = new DuctusShapeRenderer(colorPipe);
+        AAColorShape = new AAShapePipe(colorPipe);
 	AAColorViaShape = new PixelToShapeConverter(AAColorShape);
-	AAClipColorShape = new DuctusShapeRenderer(clipColorPipe);
+        AAClipColorShape = new AAShapePipe(clipColorPipe);
 	AAClipColorViaShape = new PixelToShapeConverter(AAClipColorShape);
 
 	paintPipe = new AlphaPaintPipe();
@@ -420,9 +420,9 @@ public abstract class SurfaceData
 	paintText = new TextRenderer(paintPipe);
 	clipPaintPipe = new SpanClipRenderer(paintPipe);
 	clipPaintText = new TextRenderer(clipPaintPipe);
-	AAPaintShape = new DuctusShapeRenderer(paintPipe);
+        AAPaintShape = new AAShapePipe(paintPipe);
 	AAPaintViaShape = new PixelToShapeConverter(AAPaintShape);
-	AAClipPaintShape = new DuctusShapeRenderer(clipPaintPipe);
+        AAClipPaintShape = new AAShapePipe(clipPaintPipe);
 	AAClipPaintViaShape = new PixelToShapeConverter(AAClipPaintShape);
 
 	compPipe = new GeneralCompositePipe();
@@ -431,9 +431,9 @@ public abstract class SurfaceData
 	compText = new TextRenderer(compPipe);
 	clipCompPipe = new SpanClipRenderer(compPipe);
 	clipCompText = new TextRenderer(clipCompPipe);
-	AACompShape = new DuctusShapeRenderer(compPipe);
+        AACompShape = new AAShapePipe(compPipe);
 	AACompViaShape = new PixelToShapeConverter(AACompShape);
-	AAClipCompShape = new DuctusShapeRenderer(clipCompPipe);
+        AAClipCompShape = new AAShapePipe(clipCompPipe);
 	AAClipCompViaShape = new PixelToShapeConverter(AAClipCompShape);
 
 	imagepipe = new DrawImage();
@@ -449,10 +449,8 @@ public abstract class SurfaceData
         // For now the answer can only be true in the following cases:
         if (sg2d.compositeState <= SunGraphics2D.COMP_ISCOPY &&
 	    sg2d.paintState <= SunGraphics2D.PAINT_ALPHACOLOR &&
-	    sg2d.clipState <= SunGraphics2D.CLIP_RECTANGULAR &&
-	    // This last test is a workaround until we fix loop selection
-	    // in the pipe validation
-	    sg2d.antialiasHint != SunHints.INTVAL_ANTIALIAS_ON) {
+            sg2d.clipState <= SunGraphics2D.CLIP_RECTANGULAR)
+        {
             if (haveLCDLoop == LCDLOOP_UNKNOWN) {
                 DrawGlyphListLCD loop =
 		    DrawGlyphListLCD.locate(SurfaceType.AnyColor,
@@ -546,7 +544,13 @@ public abstract class SurfaceData
                     sg2d.drawpipe = AAColorViaShape;
                     sg2d.fillpipe = AAColorViaShape;
                     sg2d.shapepipe = AAColorShape;
+                    if (sg2d.paintState > sg2d.PAINT_OPAQUECOLOR ||
+                        sg2d.compositeState > sg2d.COMP_ISCOPY)
+                    {
                     sg2d.textpipe = colorText;
+                    } else {
+                        sg2d.textpipe = getTextPipe(sg2d, true /* AA==ON */);
+                    }
                 }
             } else {
                 if (sg2d.clipState == sg2d.CLIP_SHAPE) {
@@ -596,39 +600,62 @@ public abstract class SurfaceData
 		sg2d.fillpipe = colorPrimitives;
 	    }
 
+            sg2d.textpipe = getTextPipe(sg2d, false /* AA==OFF */);
+            sg2d.shapepipe = colorPrimitives;
+            sg2d.loops = getRenderLoops(sg2d);
+            // assert(sg2d.surfaceData == this);
+        }
+    }
+
+    /* Return the text pipe to be used based on the graphics AA hint setting,
+     * and the rest of the graphics state is compatible with these loops.
+     * If the text AA hint is "DEFAULT", then the AA graphics hint requests
+     * the AA text renderer, else it requests the B&W text renderer.
+     */
+    private TextPipe getTextPipe(SunGraphics2D sg2d, boolean aaHintIsOn) {
+
 	    /* Try to avoid calling getFontInfo() unless its needed to
 	     * resolve one of the new AA types.
 	     */
 	    switch (sg2d.textAntialiasHint) {
 	    case SunHints.INTVAL_TEXT_ANTIALIAS_DEFAULT:
-		/* equating to OFF which it is for us */
+            if (aaHintIsOn) {
+                return aaTextRenderer;
+            } else {
+                return solidTextRenderer;
+            }
 	    case SunHints.INTVAL_TEXT_ANTIALIAS_OFF:
-		sg2d.textpipe = solidTextRenderer;
-		break;
+            return solidTextRenderer;
 
 	    case SunHints.INTVAL_TEXT_ANTIALIAS_ON:
-		sg2d.textpipe = aaTextRenderer;
-		break;
+            return aaTextRenderer;
 
 	    default:
 		switch (sg2d.getFontInfo().aaHint) {
 
 		case SunHints.INTVAL_TEXT_ANTIALIAS_LCD_HRGB:
 		case SunHints.INTVAL_TEXT_ANTIALIAS_LCD_VRGB:
-		    sg2d.textpipe = lcdTextRenderer;
-		    break;
+                return lcdTextRenderer;
 
 		case SunHints.INTVAL_TEXT_ANTIALIAS_ON:
-		    sg2d.textpipe = aaTextRenderer;
-		    break;
+                return aaTextRenderer;
 
+            case SunHints.INTVAL_TEXT_ANTIALIAS_OFF:
+                return solidTextRenderer;
+
+                 /* This should not be reached as the FontInfo will
+                 * always explicitly set its hint value. So whilst
+                 * this could be collapsed to returning say just
+                 * solidTextRenderer, or even removed, its left
+                 * here in case DEFAULT is ever passed in.
+                 */
 		default:
-		sg2d.textpipe = solidTextRenderer;
+                if (aaHintIsOn) {
+                    return aaTextRenderer;
+                } else {
+                    return solidTextRenderer;
 		}
 	    }
-	    sg2d.shapepipe = colorPrimitives;
-	    sg2d.loops = getRenderLoops(sg2d);
-	    // assert(sg2d.surfaceData == this);
 	}
     }
 

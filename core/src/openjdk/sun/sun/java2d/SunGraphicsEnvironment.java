@@ -71,7 +71,6 @@ import sun.font.NativeFont;
  *
  * @see GraphicsDevice
  * @see GraphicsConfiguration
- * @version 1.145 05/05/07
  */
 
 public abstract class SunGraphicsEnvironment extends GraphicsEnvironment
@@ -813,6 +812,33 @@ public abstract class SunGraphicsEnvironment extends GraphicsEnvironment
 		       name.startsWith(".PFA", offset) ||
 		       name.startsWith(".PFB", offset));
 	    }
+        }
+    }
+
+     public static class TTorT1Filter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+
+            /* all conveniently have the same suffix length */
+            int offset = name.length()-4;
+            if (offset <= 0) { /* must be at least A.ttf or A.pfa */
+                return false;
+            } else {
+                boolean isTT =
+                    name.startsWith(".ttf", offset) ||
+                    name.startsWith(".TTF", offset) ||
+                    name.startsWith(".ttc", offset) ||
+                    name.startsWith(".TTC", offset);
+                if (isTT) {
+                    return true;
+                } else if (noType1Font) {
+                    return false;
+                } else {
+                    return(name.startsWith(".pfa", offset) ||
+                           name.startsWith(".pfb", offset) ||
+                           name.startsWith(".PFA", offset) ||
+                           name.startsWith(".PFB", offset));
+                }
+            }
         }
     }
 

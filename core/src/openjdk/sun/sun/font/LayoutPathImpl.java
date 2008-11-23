@@ -996,5 +996,3 @@ public abstract class LayoutPathImpl extends LayoutPath {
         }
     }
 }
-
-

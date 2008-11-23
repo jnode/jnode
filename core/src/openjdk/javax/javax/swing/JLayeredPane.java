@@ -151,7 +151,6 @@ import javax.accessibility.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  * 
- * @version 1.36 02/02/00
  * @author David Kloba
  */
 public class JLayeredPane extends JComponent implements Accessible {
@@ -779,5 +778,3 @@ public class JLayeredPane extends JComponent implements Accessible {
         }
     }
 }
-
-

@@ -28,7 +28,6 @@ package javax.swing.plaf;
 /**
  * Pluggable look and feel interface for JTable.
  *
- * @version 1.19 05/05/07
  * @author Alan Chung
  */
 public abstract class TableUI extends ComponentUI {

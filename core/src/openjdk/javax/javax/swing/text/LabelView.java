@@ -34,7 +34,6 @@ import javax.swing.event.*;
  * used for rendering.
  *
  * @author Timothy Prinzing
- * @version 1.76 05/05/07
  */
 public class LabelView extends GlyphView implements TabableView {
 
@@ -315,4 +314,3 @@ public class LabelView extends GlyphView implements TabableView {
     private boolean subscript;
 
 }
-

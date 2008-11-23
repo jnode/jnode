@@ -103,7 +103,6 @@ import javax.swing.text.*;
  *
  * @author Timothy Prinzing
  * @author Sunita Mani
- * @version 1.35 05/05/07
  */
 public class FormView extends ComponentView implements ActionListener {
 

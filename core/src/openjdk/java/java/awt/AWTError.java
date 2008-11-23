@@ -28,7 +28,6 @@ package java.awt;
 /**
  * Thrown when a serious Abstract Window Toolkit error has occurred. 
  *
- * @version 	1.22 05/05/07
  * @author 	Arthur van Hoff
  */
 public class AWTError extends Error {

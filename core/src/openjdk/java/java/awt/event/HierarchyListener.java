@@ -43,7 +43,6 @@ import java.util.EventListener;
  * of whether a program registers a <code>HierarchyListener</code> or not.
  *
  * @author	David Mendenhall
- * @version	1.15, 05/05/07
  * @see		HierarchyEvent
  * @since 	1.3
  */

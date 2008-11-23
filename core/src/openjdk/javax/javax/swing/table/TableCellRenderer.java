@@ -32,7 +32,6 @@ import javax.swing.*;
  * This interface defines the method required by any object that
  * would like to be a renderer for cells in a <code>JTable</code>.
  *
- * @version 1.28 05/05/07
  * @author Alan Chung
  */
 

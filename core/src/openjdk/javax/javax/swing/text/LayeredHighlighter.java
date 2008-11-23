@@ -31,7 +31,6 @@ import java.awt.Shape;
  * 
  * @author  Scott Violet
  * @author  Timothy Prinzing
- * @version 1.14 05/05/07
  * @see     Highlighter
  */
 public abstract class LayeredHighlighter implements Highlighter {

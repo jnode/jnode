@@ -49,7 +49,6 @@ import sun.security.util.SecurityConstants;
 /**
  * This class defines an applet security policy
  *
- * @version 	1.120, 05/05/07
  */
 public
 class AppletSecurity extends AWTSecurityManager {

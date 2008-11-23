@@ -46,7 +46,6 @@ import sun.swing.plaf.synth.SynthUI;
  * @see SynthLookAndFeel
  * @see SynthStyleFactory
  *
- * @version 1.44, 05/05/07
  * @since 1.5
  * @author Scott Violet
  */

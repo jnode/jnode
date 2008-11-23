@@ -44,7 +44,6 @@ import java.awt.geom.Dimension2D;
  * negative, the behavior of some methods defined by other objects is 
  * undefined. 
  * 
- * @version 	1.40, 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @see         java.awt.Component

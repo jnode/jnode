@@ -31,7 +31,6 @@ import javax.swing.plaf.synth.*;
 /**
  * SynthUI is used to fetch the SynthContext for a particular Component.
  *
- * @version 1.18, 05/05/07
  * @author Scott Violet
  */
 public interface SynthUI extends SynthConstants {

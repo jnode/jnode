@@ -44,7 +44,6 @@ import javax.swing.event.*;
  * as of 1.4.
  *
  * @author  Scott Violet
- * @version 1.64 05/05/07
  * @see IconView
  * @since 1.4
  */

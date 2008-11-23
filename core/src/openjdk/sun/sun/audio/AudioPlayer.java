@@ -67,7 +67,6 @@ import java.security.PrivilegedAction;
  * @see AudioDevice
  * @see AudioStream
  * @author Arthur van Hoff, Thomas Ball
- * @version 1.19 07/05/05
  */
 
 public

@@ -41,7 +41,6 @@ import java.io.Serializable;
 
 /**
  * Factory object that can vend Borders appropriate for the basic L & F.
- * @version 1.42 05/05/07
  * @author Georges Saab
  * @author Amy Fowler
  */

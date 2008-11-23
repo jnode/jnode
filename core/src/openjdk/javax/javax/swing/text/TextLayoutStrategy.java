@@ -41,7 +41,6 @@ import sun.font.BidiUtils;
  * that uses TextLayout is plugged into the GlyphView.
  *
  * @author  Timothy Prinzing
- * @version 1.31 05/05/07
  */
 class TextLayoutStrategy extends FlowView.FlowStrategy {
 

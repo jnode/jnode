@@ -58,7 +58,6 @@ import sun.swing.SwingUtilities2;
  * @since 1.3
  *
  * @author  Timothy Prinzing
- * @version 1.49 05/05/07
  */
 public class GlyphView extends View implements TabableView, Cloneable {
 
@@ -1322,4 +1321,3 @@ public class GlyphView extends View implements TabableView, Cloneable {
 	}
     }
 }
-

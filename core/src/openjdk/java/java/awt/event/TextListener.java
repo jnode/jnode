@@ -38,7 +38,6 @@ import java.util.EventListener;
  * <code>textValueChanged</code> method is invoked.
  *
  * @author Georges Saab
- * @version 1.20 05/05/07
  *
  * @see TextEvent
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/textlistener.html">Tutorial: Writing a Text Listener</a>

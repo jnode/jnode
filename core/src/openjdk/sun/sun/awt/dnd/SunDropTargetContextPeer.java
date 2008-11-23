@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package sun.awt.dnd;
 
-import java.awt.AWTPermission;
 import java.awt.Component;
 import java.awt.Point;
 
@@ -47,12 +46,14 @@ import java.awt.dnd.peer.DropTargetContextPeer;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Arrays;
+
+import java.util.logging.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import sun.awt.AppContext;
-import sun.awt.DebugHelper;
 import sun.awt.SunToolkit;
 import sun.awt.datatransfer.DataTransferer;
 import sun.awt.datatransfer.ToolkitThreadBlockedHandler;
@@ -63,7 +64,6 @@ import sun.awt.datatransfer.ToolkitThreadBlockedHandler;
  * the interaction between a windowing systems DnD system and Java.
  * </p>
  *
- * @version 1.7.12/20/00
  * @since JDK1.3.1
  *
  */
@@ -99,8 +99,7 @@ public abstract class SunDropTargetContextPeer implements DropTargetContextPeer,
 
     protected static final Object _globalLock = new Object();
 
-    private static final DebugHelper dbg = 
-        DebugHelper.create(SunDropTargetContextPeer.class);
+    private static final Logger dndLog = Logger.getLogger("sun.awt.dnd.SunDropTargetContextPeer");
 
     /*
      * a primitive mechanism for advertising intra-JVM Transferables
@@ -733,7 +732,8 @@ public abstract class SunDropTargetContextPeer implements DropTargetContextPeer,
             this.nativeCtxt   = nativeCtxt;
             this.dropAction   = dropAction;
             this.actions      = actions; 
-            this.formats      = formats;
+            this.formats =
+                     (null == formats) ? null : Arrays.copyOf(formats, formats.length);
             this.dispatchType = dispatchType;
         }
 
@@ -845,8 +845,8 @@ public abstract class SunDropTargetContextPeer implements DropTargetContextPeer,
 
         void registerEvent(SunDropTargetEvent e) {
             handler.lock();
-            if (!eventSet.add(e) && dbg.on) {
-                dbg.assertion(false, "Event is already registered: " + e);
+            if (!eventSet.add(e) && dndLog.isLoggable(Level.FINE)) {
+                dndLog.log(Level.FINE, "Event is already registered: " + e);
             }
             handler.unlock();
         }

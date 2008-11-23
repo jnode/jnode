@@ -43,7 +43,6 @@ package sun.awt;
   * AppContext object.
   * 
   * @author  Fred Ecks
-  * @version 1.14 05/05/07
   */
 public class AWTSecurityManager extends SecurityManager {
 

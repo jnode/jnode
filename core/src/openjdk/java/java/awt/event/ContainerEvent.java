@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package java.awt.event;
 
-import java.awt.AWTEvent;
 import java.awt.Container;
 import java.awt.Component;
 
@@ -53,7 +52,6 @@ import java.awt.Component;
  *
  * @author Tim Prinzing
  * @author Amy Fowler
- * @version 1.26 05/05/07
  * @since 1.1
  */
 public class ContainerEvent extends ComponentEvent {

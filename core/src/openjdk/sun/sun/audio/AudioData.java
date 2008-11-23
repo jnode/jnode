@@ -35,7 +35,6 @@ import javax.sound.sampled.*;
  *
  * @author  Arthur van Hoff
  * @author  Kara Kytle
- * @version 1.19 07/05/05
  * @see     AudioDataStream
  * @see     AudioPlayer
  */

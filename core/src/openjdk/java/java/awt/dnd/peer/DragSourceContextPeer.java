@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-1999 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,19 +25,10 @@
 
 package java.awt.dnd.peer;
 
-import java.awt.event.InputEvent;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
-
-import java.awt.datatransfer.Transferable;
-
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragSourceContext;
-import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 
 
@@ -48,7 +39,6 @@ import java.awt.dnd.InvalidDnDOperationException;
  * the same
  * </p>
  *
- * @version 	1.22, 05/05/07
  * @since 1.2
  *
  */

@@ -54,7 +54,6 @@ import sun.swing.SwingUtilities2;
 /**
  * Synth's SliderUI.
  *
- * @version 1.35, 05/05/07
  * @author Joshua Outwater
  */
 class SynthSliderUI extends BasicSliderUI implements PropertyChangeListener,
@@ -246,6 +245,9 @@ class SynthSliderUI extends BasicSliderUI implements PropertyChangeListener,
         } else {
             d.width = 200;
         }
+        Insets i = slider.getInsets();
+        d.width += i.left + i.right;
+        d.height += i.top + i.bottom;
         return d;
     }
 
@@ -635,6 +637,9 @@ class SynthSliderUI extends BasicSliderUI implements PropertyChangeListener,
     protected void recalculateIfInsetsChanged() {
         SynthContext context = getContext(slider);
         Insets newInsets = style.getInsets(context, null);
+        Insets compInsets = slider.getInsets();
+        newInsets.left += compInsets.left; newInsets.right += compInsets.right;
+        newInsets.top += compInsets.top; newInsets.bottom += compInsets.bottom;
         if (!newInsets.equals(insetCache)) {
             insetCache = newInsets;
             calculateGeometry();
@@ -713,8 +718,8 @@ class SynthSliderUI extends BasicSliderUI implements PropertyChangeListener,
             // For horizontal sliders, make sure value is not painted
             // outside slider bounds.
             if (slider.getOrientation() == JSlider.HORIZONTAL) {
-                if (valueRect.x + labelWidth > contentDim.width) {
-                    valueRect.x = contentDim.width - labelWidth;
+                if (valueRect.x + labelWidth > insetCache.left + contentDim.width) {
+                    valueRect.x =  (insetCache.left + contentDim.width) - labelWidth;
                 }
                 valueRect.x = Math.max(valueRect.x, 0);
             }

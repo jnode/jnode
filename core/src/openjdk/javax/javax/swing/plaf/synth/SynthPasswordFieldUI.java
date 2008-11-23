@@ -38,7 +38,6 @@ import javax.swing.plaf.*;
  * real text contained in the field.
  *
  * @author  Shannon Hickey
- * @version 1.14 05/05/07
  */
 class SynthPasswordFieldUI extends SynthTextFieldUI {
 

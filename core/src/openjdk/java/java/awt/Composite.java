@@ -64,7 +64,6 @@ import java.awt.image.ColorModel;
  * @see AlphaComposite
  * @see CompositeContext
  * @see Graphics2D#setComposite
- * @version 10 Feb 1997
  */
 public interface Composite {
 

@@ -64,11 +64,6 @@ public abstract class PhysicalStrike extends FontStrike {
      */
     ConcurrentHashMap<Integer, Point2D.Float> glyphPointMapCache;
 
-    /* If there are more than this number of glyphs in the font, then
-     * don't cache advances as it will take > 4Kbytes
-     */
-    protected static final int MAXADVANCECACHESIZE = 1000;
-
     protected boolean getImageWithAdvance;
     protected static final int complexTX =
 	AffineTransform.TYPE_FLIP |

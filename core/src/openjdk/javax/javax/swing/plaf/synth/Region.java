@@ -63,7 +63,6 @@ import java.util.*;
  * &lt;bind style="splitPaneStyle" type="region" key="SplitPane"/>
  * </pre>
  *
- * @version 1.37, 05/05/07
  * @since 1.5
  * @author Scott Violet
  */

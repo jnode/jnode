@@ -39,7 +39,6 @@ import javax.swing.*;
  * as a JPanel that contains 
  *
  * @author Sunita Mani
- * @version 1.18, 05/05/07
  */
 
 class IsindexView extends ComponentView implements ActionListener {

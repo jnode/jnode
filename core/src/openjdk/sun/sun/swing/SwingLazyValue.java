@@ -35,7 +35,6 @@ import javax.swing.UIDefaults;
  * should never be used in a place where the developer could supply the
  * arguments.
  *
- * @version 1.11 05/05/07
  */
 public class SwingLazyValue implements UIDefaults.LazyValue {
     private String className;

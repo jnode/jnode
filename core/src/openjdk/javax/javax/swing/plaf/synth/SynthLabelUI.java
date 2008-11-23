@@ -48,7 +48,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's LabelUI.
  *
- * @version 1.26, 05/05/07
  * @author Scott Violet
  */
 class SynthLabelUI extends BasicLabelUI implements SynthUI {

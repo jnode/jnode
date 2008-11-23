@@ -40,7 +40,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's SplitPaneUI.
  *
- * @version 1.23, 05/05/07
  * @author Scott Violet
  */
 class SynthSplitPaneUI extends BasicSplitPaneUI implements

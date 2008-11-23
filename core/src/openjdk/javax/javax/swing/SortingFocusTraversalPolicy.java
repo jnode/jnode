@@ -54,7 +54,6 @@ import java.util.logging.*;
  * policy is used to perform the search operation.
  *
  * @author David Mendenhall
- * @version 1.16, 05/05/07
  *
  * @see java.util.Comparator
  * @since 1.4

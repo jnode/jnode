@@ -92,7 +92,6 @@ import java.lang.reflect.Array;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.43 05/05/07
  * @author Georges Saab
  * @author Hans Muller
  * @author James Gosling

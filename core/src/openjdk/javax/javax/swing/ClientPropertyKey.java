@@ -54,7 +54,6 @@ package javax.swing;
  * needs to know about when it cannot be serialized.
  *
  * @author  Shannon Hickey
- * @version 1.6 05/05/07
  */
 enum ClientPropertyKey {
 

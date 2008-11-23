@@ -42,7 +42,6 @@ import java.util.ArrayList;
  * A default L&F implementation of MenuUI.  This implementation 
  * is a "combined" view/controller.
  *
- * @version 1.169 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber
@@ -442,7 +441,7 @@ public class BasicMenuUI extends BasicMenuItemUI
 	    MenuSelectionManager manager = 
 		MenuSelectionManager.defaultManager();
             if(menu.isTopLevelMenu()) {
-		if(menu.isSelected()) {
+                if(menu.isSelected() && menu.getPopupMenu().isShowing()) {
 		    manager.clearSelectedPath();
 		} else {
 		    Container cnt = menu.getParent();
@@ -523,7 +522,9 @@ public class BasicMenuUI extends BasicMenuItemUI
 		    // a JMenuBar
 		    newPath[0] = (MenuElement)menu.getParent();
 		    newPath[1] = menu;
+                    if (BasicPopupMenuUI.getLastPopup() != null) {
 		    newPath[2] = menu.getPopupMenu();
+                    }
 		    manager.setSelectedPath(newPath);
 		}
 	    }

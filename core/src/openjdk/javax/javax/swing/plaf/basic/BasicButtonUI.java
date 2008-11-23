@@ -41,7 +41,6 @@ import javax.swing.text.View;
 /**
  * BasicButton implementation
  *
- * @version 1.124 05/05/07
  * @author Jeff Dinkins
  */
 public class BasicButtonUI extends ButtonUI{

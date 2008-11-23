@@ -37,7 +37,6 @@ import javax.swing.text.StyleContext;
  * @author  Timothy Prinzing
  * @author  Sunita Mani
  *
- * @version 1.49 05/05/07
  */
 public class HTML {
 

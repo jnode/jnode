@@ -30,7 +30,6 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
-import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.*;
@@ -44,7 +43,6 @@ import javax.swing.plaf.basic.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
-import sun.swing.SwingUtilities2;
 import sun.awt.shell.*;
 
 /**
@@ -57,7 +55,6 @@ import sun.awt.shell.*;
  * implementation of BasicFileChooserUI, and is intended to be API compatible
  * with earlier implementations of MetalFileChooserUI and WindowsFileChooserUI.
  * 
- * @version 1.40, 05/05/07
  * @author Leif Samuelsson
  */
 public class FilePane extends JPanel implements PropertyChangeListener {
@@ -96,9 +93,121 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     private String megaByteString;
     private String gigaByteString;
 
+    private String renameErrorTitleText;
+    private String renameErrorText;
 
     private static final Cursor waitCursor =
 	Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+
+    private final KeyListener detailsKeyListener = new KeyAdapter() {
+        private final long timeFactor;
+
+        private final StringBuilder typedString = new StringBuilder();
+
+        private long lastTime = 1000L;
+
+        {
+            Long l = (Long) UIManager.get("Table.timeFactor");
+            timeFactor = (l != null) ? l : 1000L;
+        }
+
+        /**
+         * Moves the keyboard focus to the first element whose prefix matches
+         * the sequence of alphanumeric keys pressed by the user with delay
+         * less than value of <code>timeFactor</code>. Subsequent same key
+         * presses move the keyboard focus to the next object that starts with
+         * the same letter until another key is pressed, then it is treated
+         * as the prefix with appropriate number of the same letters followed
+         * by first typed another letter.
+         */
+        public void keyTyped(KeyEvent e) {
+            BasicDirectoryModel model = getModel();
+            int rowCount = model.getSize();
+
+            if (detailsTable == null || rowCount == 0 ||
+                    e.isAltDown() || e.isControlDown() || e.isMetaDown()) {
+                return;
+            }
+
+            InputMap inputMap = detailsTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+
+            if (inputMap != null && inputMap.get(key) != null) {
+                return;
+            }
+
+            int startIndex = detailsTable.getSelectionModel().getLeadSelectionIndex();
+
+            if (startIndex < 0) {
+                startIndex = 0;
+            }
+
+            if (startIndex >= rowCount) {
+                startIndex = rowCount - 1;
+            }
+
+            char c = e.getKeyChar();
+
+            long time = e.getWhen();
+
+            if (time - lastTime < timeFactor) {
+                if (typedString.length() == 1 && typedString.charAt(0) == c) {
+                    // Subsequent same key presses move the keyboard focus to the next
+                    // object that starts with the same letter.
+                    startIndex++;
+                } else {
+                    typedString.append(c);
+                }
+            } else {
+                startIndex++;
+
+                typedString.setLength(0);
+                typedString.append(c);
+            }
+
+            lastTime = time;
+
+            if (startIndex >= rowCount) {
+                startIndex = 0;
+            }
+
+            // Find next file
+            int index = getNextMatch(startIndex, rowCount - 1);
+
+            if (index < 0 && startIndex > 0) { // wrap
+                index = getNextMatch(0, startIndex - 1);
+            }
+
+            if (index >= 0) {
+                detailsTable.getSelectionModel().setSelectionInterval(index, index);
+
+                Rectangle cellRect = detailsTable.getCellRect(index,
+                        detailsTable.convertColumnIndexToView(COLUMN_FILENAME), false);
+                detailsTable.scrollRectToVisible(cellRect);
+            }
+        }
+
+        private int getNextMatch(int startIndex, int finishIndex) {
+            BasicDirectoryModel model = getModel();
+            JFileChooser fileChooser = getFileChooser();
+            DetailsTableRowSorter rowSorter = getRowSorter();
+
+            String prefix = typedString.toString().toLowerCase();
+
+            // Search element
+            for (int index = startIndex; index <= finishIndex; index++) {
+                File file = (File) model.getElementAt(rowSorter.convertRowIndexToModel(index));
+
+                String fileName = fileChooser.getName(file).toLowerCase();
+
+                if (fileName.startsWith(prefix)) {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+    };
 
     private FocusListener editorFocusListener = new FocusAdapter() {
 	public void focusLost(FocusEvent e) {
@@ -337,6 +446,9 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	kiloByteString = UIManager.getString("FileChooser.fileSizeKiloBytes", l);
 	megaByteString = UIManager.getString("FileChooser.fileSizeMegaBytes", l);
 	gigaByteString = UIManager.getString("FileChooser.fileSizeGigaBytes", l);
+
+        renameErrorTitleText = UIManager.getString("FileChooser.renameErrorTitleText", l);
+        renameErrorText = UIManager.getString("FileChooser.renameErrorText", l);
     }
 
     /**
@@ -575,8 +687,16 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         }
 
         void updateColumnInfo() {
-            ShellFolderColumnInfo[] allColumns =
-                    ShellFolder.getFolderColumns(chooser.getCurrentDirectory());
+            File dir = chooser.getCurrentDirectory();
+            if (dir != null && fileChooserUIAccessor.usesShellFolder()) {
+                try {
+                    dir = ShellFolder.getShellFolder(dir);
+                } catch (FileNotFoundException e) {
+                    // Leave dir without changing
+                }
+            }
+
+            ShellFolderColumnInfo[] allColumns = ShellFolder.getFolderColumns(dir);
 
             ArrayList<ShellFolderColumnInfo> visibleColumns =
                     new ArrayList<ShellFolderColumnInfo>();
@@ -660,19 +780,22 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 			// rename
 			FileSystemView fsv = chooser.getFileSystemView();
 			File f2 = fsv.createFileObject(f.getParentFile(), newFileName);
-			if (!f2.exists() && FilePane.this.getModel().renameFile(f, f2)) {
+                        if (!f2.exists()) {
+                            if (FilePane.this.getModel().renameFile(f, f2)) {
 			    if (fsv.isParent(chooser.getCurrentDirectory(), f2)) {
 				if (chooser.isMultiSelectionEnabled()) {
-				    chooser.setSelectedFiles(new File[] { f2 });
+                                        chooser.setSelectedFiles(new File[]{f2});
 				} else {
 				    chooser.setSelectedFile(f2);
 				}
 			    } else {
-				//Could be because of delay in updating Desktop folder
-				//chooser.setSelectedFile(null);
+                                    // Could be because of delay in updating Desktop folder
+                                    // chooser.setSelectedFile(null);
 			    }
 			} else {
-			    // PENDING(jeff) - show a dialog indicating failure
+                                JOptionPane.showMessageDialog(chooser, MessageFormat.format(renameErrorText, oldFileName),
+                                        renameErrorTitleText, JOptionPane.ERROR_MESSAGE);
+                            }
 			}
 		    }
 		}
@@ -687,9 +810,9 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	public void contentsChanged(ListDataEvent e) {
             // Update the selection after the model has been updated
             new DelayedSelectionUpdater();
-
-            updateColumnInfo();
+            fireTableDataChanged();
 	}
+
 	public void intervalAdded(ListDataEvent e) {
             int i0 = e.getIndex0();
             int i1 = e.getIndex1();
@@ -926,7 +1049,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 
             // formatting cell text
             // TODO: it's rather a temporary trick, to be revised
-            String text = null;
+            String text;
 
             if (value == null) {
                 text = "";
@@ -998,6 +1121,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	detailsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	detailsTable.setShowGrid(false);
 	detailsTable.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
+        detailsTable.addKeyListener(detailsKeyListener);
 
 	Font font = list.getFont();
 	detailsTable.setFont(font);
@@ -1248,10 +1372,11 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 		// rename
 		FileSystemView fsv = chooser.getFileSystemView();
 		File f2 = fsv.createFileObject(editFile.getParentFile(), newFileName);
-		if (!f2.exists() && getModel().renameFile(editFile, f2)) {
+                if (!f2.exists()) {
+                    if (getModel().renameFile(editFile, f2)) {
 		    if (fsv.isParent(chooser.getCurrentDirectory(), f2)) {
 			if (chooser.isMultiSelectionEnabled()) {
-			    chooser.setSelectedFiles(new File[] { f2 });
+                                chooser.setSelectedFiles(new File[]{f2});
 			} else {
 			    chooser.setSelectedFile(f2);
 			}
@@ -1260,7 +1385,9 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 			//chooser.setSelectedFile(null);
 		    }
 		} else {
-		    // PENDING(jeff) - show a dialog indicating failure
+                        JOptionPane.showMessageDialog(chooser, MessageFormat.format(renameErrorText, oldFileName),
+                                renameErrorTitleText, JOptionPane.ERROR_MESSAGE);
+                    }
 		}
 	    }
 	} 
@@ -1384,15 +1511,14 @@ public class FilePane extends JPanel implements PropertyChangeListener {
                 if (listSelectionModel instanceof DefaultListSelectionModel) {
                     ((DefaultListSelectionModel)listSelectionModel).
                         moveLeadSelectionIndex(lead);
-                    ((DefaultListSelectionModel)listSelectionModel).
-                        setAnchorSelectionIndex(anchor);
+                    listSelectionModel.setAnchorSelectionIndex(anchor);
                 }
 	    } finally {
 		listSelectionModel.setValueIsAdjusting(false);
 	    }
 	} else {
 	    JFileChooser chooser = getFileChooser();
-	    File f = null;
+            File f;
 	    if (isDirectorySelected()) {
 		f = getDirectory();
 	    } else {
@@ -1450,6 +1576,8 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     }
     
     private void doDirectoryChanged(PropertyChangeEvent e) {
+        getDetailsTableModel().updateColumnInfo();
+
 	JFileChooser fc = getFileChooser();
 	FileSystemView fsv = fc.getFileSystemView();
 
@@ -1516,7 +1644,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	} else if (s.equals("componentOrientation")) {
 	    ComponentOrientation o = (ComponentOrientation)e.getNewValue();
 	    JFileChooser cc = (JFileChooser)e.getSource();
-	    if (o != (ComponentOrientation)e.getOldValue()) {
+            if (o != e.getOldValue()) {
 		cc.applyComponentOrientation(o);
 	    }
 	    if (detailsTable != null) {
@@ -1553,7 +1681,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	    listSelectionModel.clearSelection();
 	    if (listSelectionModel instanceof DefaultListSelectionModel) {
 		((DefaultListSelectionModel)listSelectionModel).moveLeadSelectionIndex(0);
-		((DefaultListSelectionModel)listSelectionModel).setAnchorSelectionIndex(0);
+                listSelectionModel.setAnchorSelectionIndex(0);
 	    }
 	}
     }
@@ -1798,16 +1926,27 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	return null;
     }
 
-    public static boolean canWrite(File f) {
-	boolean writeable = false;
-	if (f != null) {
+    public boolean canWrite(File f) {
+        // Return false for non FileSystem files or if file doesn't exist.
+        if (!f.exists()) {
+            return false;
+        }
+
+        if (f instanceof ShellFolder) {
+            return ((ShellFolder) f).isFileSystem();
+        } else {
+            if (fileChooserUIAccessor.usesShellFolder()) {
 	    try {
-		writeable = f.canWrite();
-	    } catch (AccessControlException ex) {
-		writeable = false;
+                    return ShellFolder.getShellFolder(f).isFileSystem();
+                } catch (FileNotFoundException ex) {
+                    // File doesn't exist
+                    return false;
+                }
+            } else {
+                // Ordinary file
+                return true;
 	    }
 	}
-	return writeable;
     }
 
     // This interface is used to access methods in the FileChooserUI
@@ -1824,5 +1963,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 	public Action getNewFolderAction();
 	public MouseListener createDoubleClickListener(JList list);
 	public ListSelectionListener createListSelectionListener();
+        public boolean usesShellFolder();
     }
 }

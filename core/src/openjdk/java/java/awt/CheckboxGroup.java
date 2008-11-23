@@ -50,7 +50,6 @@ package java.awt;
  * alt="Shows three checkboxes, arranged vertically, labeled one, two, and three. Checkbox one is in the on state."
  * ALIGN=center HSPACE=10 VSPACE=7> 
  * <p>
- * @version 	1.43 05/05/07
  * @author 	Sami Shaio
  * @see         java.awt.Checkbox
  * @since       JDK1.0

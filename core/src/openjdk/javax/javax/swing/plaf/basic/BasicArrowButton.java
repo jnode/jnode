@@ -43,7 +43,6 @@ import javax.swing.plaf.UIResource;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.35 05/05/07
  * @author David Kloba
  */
 public class BasicArrowButton extends JButton implements SwingConstants
@@ -99,13 +98,10 @@ public class BasicArrowButton extends JButton implements SwingConstants
 
         /**
          * Returns the direction of the arrow.
-         *
-         * @param direction the direction of the arrow; one of
-         *         {@code SwingConstants.NORTH},
-         *         {@code SwingConstants.SOUTH}, {@code SwingConstants.EAST}
-         *         or {@code SwingConstants.WEST}
          */
-        public int getDirection() { return direction; }
+        public int getDirection() {
+            return direction;
+        }
 
         /**
          * Sets the direction of the arrow.
@@ -115,7 +111,9 @@ public class BasicArrowButton extends JButton implements SwingConstants
          *        {@code SwingConstants.SOUTH}, 
          *        {@code SwingConstants.EAST} or {@code SwingConstants.WEST}
          */
-        public void setDirection(int dir) { direction = dir; }
+        public void setDirection(int direction) {
+            this.direction = direction;
+        }
 
 	public void paint(Graphics g) {
 	    Color origColor;
@@ -308,4 +306,3 @@ public class BasicArrowButton extends JButton implements SwingConstants
 	}
 	
 }
-

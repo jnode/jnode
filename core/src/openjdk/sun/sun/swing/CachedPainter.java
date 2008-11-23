@@ -50,7 +50,6 @@ import java.util.*;
  * </ol>
  * 
  *
- * @version 1.15, 05/05/07
  */
 public abstract class CachedPainter {
     // CacheMap maps from class to ImageCache.
@@ -205,7 +204,7 @@ public abstract class CachedPainter {
     protected Image createImage(Component c, int w, int h,
                                 GraphicsConfiguration config, Object[] args) {
         return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-/* jnode todo we need volatile image support for this        
+/* jnode todo we need volatile image support for this
         if (config == null) {
             return new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         }

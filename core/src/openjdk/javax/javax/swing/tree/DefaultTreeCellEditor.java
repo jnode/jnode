@@ -58,7 +58,6 @@ import java.util.Vector;
  *
  * @see javax.swing.JTree
  *
- * @version 1.38 05/05/07
  * @author Scott Violet
  */
 public class DefaultTreeCellEditor implements ActionListener, TreeCellEditor,

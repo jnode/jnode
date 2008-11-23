@@ -55,7 +55,6 @@ import java.util.Locale;
  * has a corresponding <code>set<i>attributeName</i>ToDefault</code> method.
  * Default value fields are not provided.
  *
- * @version	1.15, 05/05/07
  * @author	David Mendenhall
  * @since 1.3
  */

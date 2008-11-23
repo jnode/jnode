@@ -68,7 +68,6 @@ import org.xml.sax.SAXParseException;
 import com.sun.beans.ObjectHandler;
 
 /**
- * @version 1.23, 09/12/05
  */
 class SynthParser extends HandlerBase {
     //

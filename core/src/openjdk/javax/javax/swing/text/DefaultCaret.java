@@ -103,7 +103,6 @@ import sun.swing.SwingUtilities2;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.154 05/05/07
  * @see     Caret
  */
 public class DefaultCaret extends Rectangle implements Caret, FocusListener, MouseListener, MouseMotionListener {
@@ -1916,4 +1915,3 @@ public class DefaultCaret extends Rectangle implements Caret, FocusListener, Mou
         }
     }
 }
-

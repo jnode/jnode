@@ -33,7 +33,6 @@ import javax.swing.plaf.UIResource;
  * components.  
  *
  * @author  Timothy Prinzing
- * @version 1.16 05/05/07
  */
 class BasicTransferable implements Transferable, UIResource {
     

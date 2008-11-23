@@ -49,7 +49,6 @@ import javax.accessibility.*;
  * (an instance of <code>Menu</code>), or a check box (an instance of
  * <code>CheckboxMenuItem</code>).
  *
- * @version 1.85, 05/05/07
  * @author Sami Shaio
  * @see     java.awt.MenuItem
  * @see     java.awt.CheckboxMenuItem

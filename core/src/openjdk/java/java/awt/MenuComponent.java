@@ -41,7 +41,6 @@ import javax.accessibility.*;
  * Menu components receive and process AWT events, just as components do,
  * through the method <code>processEvent</code>.
  *
- * @version 	1.88, 05/05/07
  * @author 	Arthur van Hoff
  * @since       JDK1.0
  */

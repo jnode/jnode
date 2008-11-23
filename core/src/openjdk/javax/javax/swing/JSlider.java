@@ -78,7 +78,6 @@ import java.beans.*;
  *      attribute: isContainer false
  *    description: A component that supports selecting a integer value from a range.
  * 
- * @version 1.116 05/05/07
  * @author David Kloba
  */
 public class JSlider extends JComponent implements SwingConstants, Accessible {
@@ -570,7 +569,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible {
      * If the new minimum value is different from the previous minimum value,
      * all change listeners are notified.
      *
-     * @param  n       the new minimum
+     * @param minimum  the new minimum
      * @see #getMinimum
      * @see    #addChangeListener
      * @see BoundedRangeModel#setMinimum
@@ -611,7 +610,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible {
      * If the new maximum value is different from the previous maximum value,
      * all change listeners are notified.
      *
-     * @param  n       the new maximum
+     * @param maximum  the new maximum
      * @see #getMaximum
      * @see    #addChangeListener
      * @see BoundedRangeModel#setMaximum

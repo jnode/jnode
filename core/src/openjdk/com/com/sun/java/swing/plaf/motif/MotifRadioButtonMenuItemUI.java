@@ -45,7 +45,6 @@ import java.io.Serializable;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.51 05/05/07
  * @author Georges Saab
  * @author Rich Schiavi
  */
@@ -112,11 +111,3 @@ public class MotifRadioButtonMenuItemUI extends BasicRadioButtonMenuItemUI
     }
 
 }
-
-
-
-
-
-
-
-

@@ -48,7 +48,6 @@ import sun.swing.SwingUtilities2;
 /**
  * A Basic L&F implementation of the SplitPaneUI.
  *
- * @version 1.89 05/05/07
  * @author Scott Violet
  * @author Steve Wilson
  * @author Ralph Kar

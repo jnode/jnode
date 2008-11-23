@@ -41,7 +41,6 @@ package javax.swing.text.html.parser;
  * @see Element
  * @see ContentModel
  * @author Arthur van Hoff
- * @version 	1.18 05/05/07
  */
 class ContentModelState {
     ContentModel model;

@@ -41,7 +41,6 @@ import javax.swing.text.JTextComponent;
  * configuration.
  *
  * @author  Timothy Prinzing
- * @version 1.36 05/05/07
  */
 
 public class ParagraphView extends javax.swing.text.ParagraphView {
@@ -301,4 +300,3 @@ public class ParagraphView extends javax.swing.text.ParagraphView {
     private CSS.LengthValue cssWidth;
     private CSS.LengthValue cssHeight;
 }
-

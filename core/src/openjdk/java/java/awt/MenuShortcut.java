@@ -40,7 +40,6 @@ import java.awt.event.KeyEvent;
  * via {@link Toolkit#getMenuShortcutKeyMask}.
  *
  * @author Thomas Ball
- * @version 1.32, 05/05/07
  * @since JDK1.1
  */
 public class MenuShortcut implements java.io.Serializable

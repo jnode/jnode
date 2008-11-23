@@ -40,7 +40,6 @@ import java.io.*;
  * been hard coded, then that traversal is provided either by the custom
  * DefaultFocusManager, or by a wrapped FocusTraversalPolicy instance.
  *
- * @version 1.13, 05/05/07
  * @author David Mendenhall
  */
 final class LegacyGlueFocusTraversalPolicy extends FocusTraversalPolicy

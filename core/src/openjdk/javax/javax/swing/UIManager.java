@@ -25,8 +25,6 @@
 package javax.swing;
 
 import java.awt.Component; 
-import java.awt.Container; 
-import java.awt.Window; 
 import java.awt.Font; 
 import java.awt.Color; 
 import java.awt.Insets; 
@@ -44,26 +42,19 @@ import javax.swing.border.Border;
 
 import javax.swing.event.SwingPropertyChangeSupport;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.BufferedInputStream;
 
 import java.util.ArrayList; 
-import java.util.Enumeration; 
-import java.util.Hashtable; 
 import java.util.Properties; 
 import java.util.StringTokenizer; 
 import java.util.Vector; 
 import java.util.Locale;
 
 import sun.awt.SunToolkit;
+import sun.awt.OSInfo;
 import sun.security.action.GetPropertyAction;
 import sun.swing.SwingUtilities2;
 import java.lang.reflect.Method;
@@ -176,7 +167,6 @@ import java.lang.reflect.Method;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.133 05/05/07
  * @author Thomas Ball
  * @author Hans Muller
  */
@@ -395,9 +385,8 @@ public class UIManager implements Serializable
                   "com.sun.java.swing.plaf.motif.MotifLookAndFeel"));
 
         // Only include windows on Windows boxs.
-	String osName = (String)AccessController.doPrivileged(
-                             new GetPropertyAction("os.name"));
-        if (osName != null && osName.indexOf("Windows") != -1) {
+        OSInfo.OSType osType = AccessController.doPrivileged(OSInfo.getOSTypeAction());
+        if (osType == OSInfo.OSType.WINDOWS) {
             iLAFs.add(new LookAndFeelInfo("Windows",
                         "com.sun.java.swing.plaf.windows.WindowsLookAndFeel"));
             if (Toolkit.getDefaultToolkit().getDesktopProperty(
@@ -615,38 +604,27 @@ public class UIManager implements Serializable
      * @see #getCrossPlatformLookAndFeelClassName
      */
     public static String getSystemLookAndFeelClassName() {
-	String systemLAF = (String)AccessController.doPrivileged(
+        String systemLAF = AccessController.doPrivileged(
                              new GetPropertyAction("swing.systemlaf"));
         if (systemLAF != null) {
             return systemLAF;
         }
-	String osName = (String)AccessController.doPrivileged(
-                             new GetPropertyAction("os.name"));
-
-        if (osName != null) {
-            if (osName.indexOf("Windows") != -1) {
+        OSInfo.OSType osType = AccessController.doPrivileged(OSInfo.getOSTypeAction());
+        if (osType == OSInfo.OSType.WINDOWS) {
                 return "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-            }
-            else {
-                String desktop = (String)AccessController.doPrivileged(
-                             new GetPropertyAction("sun.desktop"));
+        } else {
+            String desktop = AccessController.doPrivileged(new GetPropertyAction("sun.desktop"));
                 Toolkit toolkit = Toolkit.getDefaultToolkit();
                 if ("gnome".equals(desktop) &&
                     toolkit instanceof SunToolkit &&
-                    ((SunToolkit)toolkit).isNativeGTKAvailable())
-                {
+                    ((SunToolkit) toolkit).isNativeGTKAvailable()) {
                     // May be set on Linux and Solaris boxs.
                     return "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
                 }
-                if ((osName.indexOf("Solaris") != -1) || 
-		             (osName.indexOf("SunOS") != -1)) {
+            if (osType == OSInfo.OSType.SOLARIS) {
                     return "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
                 }
             }
-            //jnode--
-            return "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-            //--jnode
-        }
         return getCrossPlatformLookAndFeelClassName();
     }
 
@@ -1457,7 +1435,6 @@ public class UIManager implements Serializable
 
         // Install Swing's PaintEventDispatcher
         if (RepaintManager.HANDLE_TOP_LEVEL_PAINT) {
-
              sun.awt.PaintEventDispatcher.setPaintEventDispatcher(
                                         new SwingPaintEventDispatcher());
         }
@@ -1500,7 +1477,4 @@ public class UIManager implements Serializable
             assert false;
         }
     }
-
-
 }
-

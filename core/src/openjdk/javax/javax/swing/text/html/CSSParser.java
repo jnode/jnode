@@ -54,7 +54,6 @@ import java.io.*;
  * something similar.
  *
  * @author Scott Violet
- * @version 1.15 05/05/07
  */
 class CSSParser {
     // Parsing something like the following:

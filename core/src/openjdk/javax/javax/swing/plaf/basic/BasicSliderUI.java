@@ -54,7 +54,6 @@ import sun.swing.UIAction;
 /**
  * A Basic L&F implementation of SliderUI.
  *
- * @version 1.113 05/05/07
  * @author Tom Santos
  */
 public class BasicSliderUI extends SliderUI{

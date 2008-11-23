@@ -61,7 +61,6 @@ import javax.accessibility.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.46 05/05/07
  * @author Hans Muller
  */
 public class CellRendererPane extends Container implements Accessible
@@ -226,5 +225,3 @@ public class CellRendererPane extends Container implements Accessible
         }
     } // inner class AccessibleCellRendererPane
 }
-
-

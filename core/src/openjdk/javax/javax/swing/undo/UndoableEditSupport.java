@@ -32,7 +32,6 @@ import java.util.*;
  * A support class used for managing <code>UndoableEdit</code> listeners.
  *
  * @author Ray Ryan
- * @version 1.27 05/05/07
  */
 public class UndoableEditSupport {
     protected int updateLevel;
@@ -176,5 +175,3 @@ public class UndoableEditSupport {
 	    " compoundEdit: " + compoundEdit;
     }
 }
-
-

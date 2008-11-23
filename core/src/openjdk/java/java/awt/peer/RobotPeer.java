@@ -35,7 +35,6 @@ import java.awt.*;
  * java.awt.* hierarchy; it is not to be considered public and is subject
  * to change.
  *
- * @version 	1.17, 05/05/07
  * @author 	Robi Khan
  */
 public interface RobotPeer

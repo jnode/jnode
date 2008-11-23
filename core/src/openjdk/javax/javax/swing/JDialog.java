@@ -95,7 +95,6 @@ import java.applet.Applet;
  *      attribute: containerDelegate getContentPane
  *    description: A toplevel window for creating dialog boxes.
  *
- * @version 1.99 05/05/07
  * @author David Kloba
  * @author James Gosling
  * @author Scott Violet

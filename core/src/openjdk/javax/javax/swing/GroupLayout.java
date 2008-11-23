@@ -203,7 +203,6 @@ import static javax.swing.SwingConstants.VERTICAL;
  * @author Tomas Pavek
  * @author Jan Stola
  * @author Scott Violet
- * @version 1.9, 05/05/07
  * @since 1.6
  */
 public class GroupLayout implements LayoutManager2 {

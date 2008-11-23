@@ -33,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
@@ -843,6 +842,15 @@ public class TrueTypeFont extends FileFont {
 	}
     }
 
+    /* NB: is it better to move declaration to Font2D? */
+    long getLayoutTableCache() {
+        try {
+          return getScaler().getLayoutTableCache();
+        } catch(FontScalerException fe) {
+            return 0L;
+        }
+    }
+
     byte[] getTableBytes(int tag) {
 	ByteBuffer buffer = getTableBuffer(tag);
 	if (buffer == null) {
@@ -1145,32 +1153,12 @@ public class TrueTypeFont extends FileFont {
 	return directoryCount;
     }
 
-    /* Short term solution until can fix the rendering of specific glyphs */
-    private int[] bwGlyphs;
-    private void initBWGlyphs() {
-        if ("Courier New".equals(fullName)) {
-            bwGlyphs = new int[2];
-            CharToGlyphMapper mapper = getMapper();
-            bwGlyphs[0] = mapper.charToGlyph('W');
-            bwGlyphs[1] = mapper.charToGlyph('w');
+    protected synchronized FontScaler getScaler() {
+        if (scaler == null) {
+            scaler = FontManager.getScaler(this, fontIndex,
+                supportsCJK, fileSize);
         }
-    }
-
-    private native long createScaler(int fileSize, int fontIndex,
-                                     boolean supportsCJK, int[] bwGlyphs);
-
-    protected synchronized long getScaler() {
-	if (pScaler == 0L) {
-            initBWGlyphs();
-            pScaler = createScaler(fileSize, fontIndex, supportsCJK, bwGlyphs);
-	    if (pScaler != 0L) {
-		Disposer.addObjectRecord(this, new FileFontDisposer(pScaler));
-	    } else {
-		pScaler = getNullScaler();
-		FontManager.deRegisterBadFont(this);
-	    }
-	}
-	return pScaler;
+        return scaler;
     }
 
 
@@ -1284,9 +1272,15 @@ public class TrueTypeFont extends FileFont {
 
     /*  Used by the OpenType engine for mark positioning.
      */
-    native synchronized Point2D.Float getGlyphPoint(long pScalerContext,
-						    int glyphCode,
-						    int ptNumber);
+    Point2D.Float getGlyphPoint(long pScalerContext,
+                                int glyphCode, int ptNumber) {
+        try {
+            return getScaler().getGlyphPoint(pScalerContext,
+                                             glyphCode, ptNumber);
+        } catch(FontScalerException fe) {
+            return null;
+        }
+    }
 
     private char[] gaspTable;
 

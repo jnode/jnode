@@ -49,7 +49,6 @@ import java.beans.*;
  *
  * @see MetalComboBoxEditor
  * @see MetalComboBoxButton
- * @version 1.59 05/05/07
  * @author Tom Santos
  */
 public class MetalComboBoxUI extends BasicComboBoxUI {
@@ -384,5 +383,3 @@ public class MetalComboBoxUI extends BasicComboBoxUI {
 	}
     }
 }
-
-

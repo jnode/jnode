@@ -39,7 +39,6 @@ package javax.swing.event;
  * @see InternalFrameListener
  * @see java.awt.event.WindowListener
  *
- * @version 1.19 05/05/07
  * @author Thomas Ball
  */
 public abstract class InternalFrameAdapter implements InternalFrameListener {

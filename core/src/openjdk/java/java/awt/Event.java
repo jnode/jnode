@@ -56,7 +56,6 @@ import java.io.*;
  * <code>Event</code> class (<code>PGUP</code>,
  * <code>PGDN</code>, <code>F1</code>, <code>F2</code>, etc).
  *
- * @version 1.82 05/05/07
  * @author     Sami Shaio
  * @since      JDK1.0
  */

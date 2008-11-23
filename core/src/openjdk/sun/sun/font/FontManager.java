@@ -29,6 +29,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.FontFormatException;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -51,10 +52,16 @@ import sun.awt.AppContext;
 import sun.awt.FontConfiguration;
 import sun.awt.SunHints;
 import sun.awt.SunToolkit;
-
-import sun.java2d.FontSupport;
 import sun.java2d.HeadlessGraphicsEnvironment;
 import sun.java2d.SunGraphicsEnvironment;
+
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
+import java.lang.reflect.Constructor;
+
+import sun.java2d.Disposer;
 
 /*
  * Interface between Java Fonts (java.awt.Font) and the underlying
@@ -223,10 +230,7 @@ public final class FontManager {
 	java.security.AccessController.doPrivileged(
 				    new java.security.PrivilegedAction() {
   	   public Object run() {
-	       /* REMIND do we really have to load awt here? */
-	       System.loadLibrary("awt");
-	       System.loadLibrary("t2k");
-	       System.loadLibrary("fontmanager");
+               FontManagerNativeLibrary.load();
 
 	       // JNI throws an exception if a class/method/field is not found,
 	       // so there's no need to do anything explicit here.
@@ -1158,12 +1162,20 @@ public final class FontManager {
     /* The directories which contain platform fonts */
     private static String[] pathDirs = null;
 
-    private static String[] getFontFilesFromPath() {
+    private static boolean haveCheckedUnreferencedFontFiles;
+
+    private static String[] getFontFilesFromPath(boolean noType1) {
+        final FilenameFilter filter;
+        if (noType1) {
+            filter = SunGraphicsEnvironment.ttFilter;
+        } else {
+            filter = new SunGraphicsEnvironment.TTorT1Filter();
+        }
         return (String[])AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
                 if (pathDirs.length == 1) {
                     File dir = new File(pathDirs[0]);
-                    String[] files = dir.list(SunGraphicsEnvironment.ttFilter);
+                    String[] files = dir.list(filter);
                     if (files == null) {
                         return new String[0];
                     }
@@ -1175,7 +1187,7 @@ public final class FontManager {
                     ArrayList<String> fileList = new ArrayList<String>();
                     for (int i = 0; i< pathDirs.length; i++) {
                         File dir = new File(pathDirs[i]);
-                        String[] files = dir.list(SunGraphicsEnvironment.ttFilter);
+                        String[] files = dir.list(filter);
                         if (files == null) {
                             continue;
                         }
@@ -1303,7 +1315,12 @@ public final class FontManager {
                 for (String regFile : fontToFileMap.values()) {
                     registryFiles.add(regFile.toLowerCase());
                 }
-                for (String pathFile : getFontFilesFromPath()) {
+                /* We don't look for Type1 files here as windows will
+                 * not enumerate these, so aren't useful in reconciling
+                 * GDI's unmapped files. We do find these later when
+                 * we enumerate all fonts.
+                 */
+                for (String pathFile : getFontFilesFromPath(true)) {
                     if (!registryFiles.contains(pathFile)) {
                         unmappedFontFiles.add(pathFile);
                     }
@@ -1335,6 +1352,84 @@ public final class FontManager {
 		}
 	    }
 	}
+    }
+
+    /**
+     * In some cases windows may have fonts in the fonts folder that
+     * don't show up in the registry or in the GDI calls to enumerate fonts.
+     * The only way to find these is to list the directory. We invoke this
+     * only in getAllFonts/Families, so most searches for a specific
+     * font that is satisfied by the GDI/registry calls don't take the
+     * additional hit of listing the directory. This hit is small enough
+     * that its not significant in these 'enumerate all the fonts' cases.
+     * The basic approach is to cross-reference the files windows found
+     * with the ones in the directory listing approach, and for each
+     * in the latter list that is missing from the former list, register it.
+     */
+    private static synchronized void checkForUnreferencedFontFiles() {
+        if (haveCheckedUnreferencedFontFiles) {
+            return;
+        }
+        haveCheckedUnreferencedFontFiles = true;
+        if (!isWindows) {
+            return;
+        }
+        /* getFontFilesFromPath() returns all lower case names.
+         * To compare we also need lower case
+         * versions of the names from the registry.
+         */
+        ArrayList<String> registryFiles = new ArrayList<String>();
+        for (String regFile : fontToFileMap.values()) {
+            registryFiles.add(regFile.toLowerCase());
+        }
+
+        /* To avoid any issues with concurrent modification, create
+         * copies of the existing maps, add the new fonts into these
+         * and then replace the references to the old ones with the
+         * new maps. ConcurrentHashmap is another option but its a lot
+         * more changes and with this exception, these maps are intended
+         * to be static.
+         */
+        HashMap<String,String> fontToFileMap2 = null;
+        HashMap<String,String> fontToFamilyNameMap2 = null;
+        HashMap<String,ArrayList<String>> familyToFontListMap2 = null;;
+
+        for (String pathFile : getFontFilesFromPath(false)) {
+            if (!registryFiles.contains(pathFile)) {
+                if (logging) {
+                    logger.info("Found non-registry file : " + pathFile);
+                }
+                PhysicalFont f = registerFontFile(getPathName(pathFile));
+                if (f == null) {
+                    continue;
+                }
+                if (fontToFileMap2 == null) {
+                    fontToFileMap2 = new HashMap<String,String>(fontToFileMap);
+                    fontToFamilyNameMap2 =
+                        new HashMap<String,String>(fontToFamilyNameMap);
+                    familyToFontListMap2 = new
+                        HashMap<String,ArrayList<String>>(familyToFontListMap);
+                }
+                String fontName = f.getFontName(null);
+                String family = f.getFamilyName(null);
+                String familyLC = family.toLowerCase();
+                fontToFamilyNameMap2.put(fontName, family);
+                fontToFileMap2.put(fontName, pathFile);
+                ArrayList<String> fonts = familyToFontListMap2.get(familyLC);
+                if (fonts == null) {
+                    fonts = new ArrayList<String>();
+                } else {
+                    fonts = new ArrayList<String>(fonts);
+                }
+                fonts.add(fontName);
+                familyToFontListMap2.put(familyLC, fonts);
+            }
+        }
+        if (fontToFileMap2 != null) {
+            fontToFileMap = fontToFileMap2;
+            familyToFontListMap = familyToFontListMap2;
+            fontToFamilyNameMap = fontToFamilyNameMap2;
+        }
     }
 
     private static void resolveFontFiles(HashSet<String> unmappedFiles,
@@ -1414,6 +1509,7 @@ public final class FontManager {
 	if (getFullNameToFileMap().size() == 0) {
             return null;
 	} 
+        checkForUnreferencedFontFiles();
 	/* This odd code with TreeMap is used to preserve a historical
 	 * behaviour wrt the sorting order .. */
 	ArrayList<String> fontNames = new ArrayList<String>();
@@ -1434,19 +1530,7 @@ public final class FontManager {
 	return fontToFileMap.get(fontNameLC);
     }
 
-    /* Used to register any font files that are found by platform APIs
-     * that weren't previously found in the standard font locations.
-     * the isAbsolute() check is needed since that's whats stored in the
-     * set, and on windows, the fonts in the system font directory that
-     * are in the fontToFileMap are just basenames. We don't want to try
-     * to register those again, but we do want to register other registry
-     * installed fonts.
-     */
-    public static void registerOtherFontFiles(HashSet registeredFontFiles) {
-	if (getFullNameToFileMap().size() == 0) {
-            return;
-	}
-        for (String file : fontToFileMap.values()) {
+    private static PhysicalFont registerFontFile(String file) {
             if (new File(file).isAbsolute() &&
                 !registeredFontFiles.contains(file)) {
 		int fontFormat = FONTFORMAT_NONE;
@@ -1460,10 +1544,27 @@ public final class FontManager {
 		    fontRank = Font2D.TYPE1_RANK;
 		}
 		if (fontFormat == FONTFORMAT_NONE) {
-		    continue;
+                return null;
+            }
+            return registerFontFile(file, null, fontFormat, false, fontRank);
 		}
-                registerFontFile(file, null, fontFormat, false, fontRank);
+        return null;
+    }
+
+    /* Used to register any font files that are found by platform APIs
+     * that weren't previously found in the standard font locations.
+     * the isAbsolute() check is needed since that's whats stored in the
+     * set, and on windows, the fonts in the system font directory that
+     * are in the fontToFileMap are just basenames. We don't want to try
+     * to register those again, but we do want to register other registry
+     * installed fonts.
+     */
+    public static void registerOtherFontFiles(HashSet registeredFontFiles) {
+        if (getFullNameToFileMap().size() == 0) {
+            return;
 	    }
+        for (String file : fontToFileMap.values()) {
+            registerFontFile(file);
 	}
     }
 
@@ -1473,6 +1574,7 @@ public final class FontManager {
 	if (getFullNameToFileMap().size() == 0) {
             return false;
 	}
+        checkForUnreferencedFontFiles();
         for (String name : fontToFamilyNameMap.values()) {
             familyNames.put(name.toLowerCase(requestedLocale), name);
 	}
@@ -3580,5 +3682,75 @@ public final class FontManager {
         } else {
             return false;
         }
+    }
+
+    private static FontScaler nullScaler = null;
+    private static Constructor<FontScaler> scalerConstructor = null;
+
+    //Find preferred font scaler
+    //
+    //NB: we can allow property based preferences
+    //   (theoretically logic can be font type specific)
+    static {
+        Class scalerClass = null;
+        Class arglst[] = new Class[] {Font2D.class, int.class,
+        boolean.class, int.class};
+
+        try {
+            if (SunGraphicsEnvironment.isOpenJDK()) {
+                scalerClass = Class.forName("sun.font.FreetypeFontScaler");
+            } else {
+                scalerClass = Class.forName("sun.font.T2KFontScaler");
+            }
+        } catch (ClassNotFoundException e) {
+                scalerClass = NullFontScaler.class;
+        }
+
+        //NB: rewrite using factory? constructor is ugly way
+        try {
+            scalerConstructor = scalerClass.getConstructor(arglst);
+        } catch (NoSuchMethodException e) {
+            //should not happen
+        }
+    }
+
+    /* At the moment it is harmless to create 2 null scalers
+       so, technically, syncronized keyword is not needed.
+
+       But it is safer to keep it to avoid subtle problems if we will be
+       adding checks like whether scaler is null scaler. */
+    public synchronized static FontScaler getNullScaler() {
+        if (nullScaler == null) {
+            nullScaler = new NullFontScaler();
+        }
+        return nullScaler;
+    }
+
+    /* This is the only place to instantiate new FontScaler.
+     * Therefore this is very convinient place to register
+     * scaler with Disposer as well as trigger deregistring bad font
+     * in case when scaler reports this.
+     */
+
+    public static FontScaler getScaler(Font2D font,
+                                       int indexInCollection,
+                                       boolean supportsCJK,
+                                       int filesize) {
+        FontScaler scaler = null;
+
+        try {
+            Object args[] = new Object[] {font, indexInCollection,
+                                          supportsCJK, filesize};
+            scaler = scalerConstructor.newInstance(args);
+            Disposer.addObjectRecord(font, scaler);
+        } catch (Throwable e) {
+            scaler = nullScaler;
+
+            //if we can not instantiate scaler assume bad font
+            //NB: technically it could be also because of internal scaler
+            //    error but here we are assuming scaler is ok.
+            deRegisterBadFont(font);
+        }
+        return scaler;
     }
 }

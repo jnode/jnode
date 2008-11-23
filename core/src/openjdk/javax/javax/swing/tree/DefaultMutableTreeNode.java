@@ -82,12 +82,12 @@ import java.util.*;
  *
  * @see MutableTreeNode
  *
- * @version 1.31 05/05/07
  * @author Rob Davis
  */
 public class DefaultMutableTreeNode extends Object implements Cloneable,
        MutableTreeNode, Serializable
 {
+    private static final long serialVersionUID = -4298474751201349152L;
 
     /**
      * An enumeration that is always empty. This is used when an enumeration
@@ -1236,13 +1236,13 @@ public class DefaultMutableTreeNode extends Object implements Cloneable,
 
     /**
      * Returns the result of sending <code>toString()</code> to this node's
-     * user object, or the empty string if the node has no user object.
+     * user object, or null if this node has no user object.
      *
      * @see	#getUserObject
      */
     public String toString() {
 	if (userObject == null) {
-	    return "";
+            return null;
 	} else {
 	    return userObject.toString();
 	}

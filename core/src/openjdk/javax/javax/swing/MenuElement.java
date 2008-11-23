@@ -32,7 +32,6 @@ import java.awt.event.*;
  * This interface is used by <code>MenuSelectionManager</code>
  * to handle selection and navigation in menu hierarchies.
  *
- * @version 1.19 05/05/07
  * @author Arnaud Weber
  */
 
@@ -82,4 +81,3 @@ public interface MenuElement {
      */
     public Component getComponent();
 }
-

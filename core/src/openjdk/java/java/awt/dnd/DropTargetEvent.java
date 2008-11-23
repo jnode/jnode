@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2001 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,13 +26,6 @@
 package java.awt.dnd;
 
 import java.util.EventObject;
-
-import java.awt.Component;
-import java.awt.Point;
-
-import java.awt.datatransfer.DataFlavor;
-
-import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetContext;
 
 /**
@@ -43,7 +36,6 @@ import java.awt.dnd.DropTargetContext;
  * Drop operations, in particular the current 
  * <code>DropTargetContext</code>.
  *
- * @version 	1.25, 05/05/07
  * @since 1.2
  *
  */

@@ -40,7 +40,6 @@ import javax.swing.plaf.basic.BasicTextPaneUI;
  * long term persistence.
  *
  * @author  Timothy Prinzing
- * @version 1.24 05/05/07
  */
 public class MotifTextPaneUI extends BasicTextPaneUI {
 
@@ -67,5 +66,3 @@ public class MotifTextPaneUI extends BasicTextPaneUI {
     }
 
 }
-
-

@@ -42,7 +42,6 @@ import sun.swing.plaf.synth.*;
 /**
  * Skinnable TreeUI.
  *
- * @version 1.40, 05/05/07
  * @author Scott Violet
  */
 class SynthTreeUI extends BasicTreeUI implements PropertyChangeListener,

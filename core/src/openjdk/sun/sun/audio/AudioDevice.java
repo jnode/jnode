@@ -55,7 +55,6 @@ import com.sun.media.sound.Toolkit;
  * @author Kara Kytle
  * @author Jan Borgersen
  * @author Florian Bomers
- * @version 1.28 07/05/05
  */
 
 public class
@@ -428,5 +427,3 @@ public class
 
 
 }
-
-

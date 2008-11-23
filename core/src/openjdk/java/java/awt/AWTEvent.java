@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,8 @@ import java.awt.event.*;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * The root event class for all AWT events.
@@ -70,10 +72,10 @@ import java.lang.reflect.Field;
  *
  * @author Carl Quinn
  * @author Amy Fowler
- * @version 1.66 05/05/07
  * @since 1.1
  */
 public abstract class AWTEvent extends EventObject {
+    private static final Logger log = Logger.getLogger("java.awt.AWTEvent");
     private byte bdata[];
 
     /**
@@ -243,7 +245,13 @@ public abstract class AWTEvent extends EventObject {
                                     field.setAccessible(true);
                                     return field;
                                 } catch (SecurityException e) {
+                                    if (log.isLoggable(Level.FINE)) {
+                                        log.log(Level.FINE, "AWTEvent.get_InputEvent_CanAccessSystemClipboard() got SecurityException ", e);
+                                    }
                                 } catch (NoSuchFieldException e) {
+                                    if (log.isLoggable(Level.FINE)) {
+                                        log.log(Level.FINE, "AWTEvent.get_InputEvent_CanAccessSystemClipboard() got NoSuchFieldException ", e);
+                                    }
                                 }
                                 return null;
                             }
@@ -534,6 +542,9 @@ public abstract class AWTEvent extends EventObject {
                     boolean b = field.getBoolean(this);
                     field.setBoolean(that, b);
                 } catch(IllegalAccessException e) {
+                    if (log.isLoggable(Level.FINE)) {
+                        log.log(Level.FINE, "AWTEvent.copyPrivateDataInto() got IllegalAccessException ", e);
+                    }
                 } 
             }
         }
@@ -546,9 +557,11 @@ public abstract class AWTEvent extends EventObject {
                 try {
                     field.setBoolean(this, false);
                 } catch(IllegalAccessException e) {
+                    if (log.isLoggable(Level.FINE)) {
+                        log.log(Level.FINE, "AWTEvent.dispatched() got IllegalAccessException ", e);
+                    }
                 } 
             }
         }
     }            
 } // class AWTEvent
-

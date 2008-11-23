@@ -53,7 +53,6 @@ import java.util.Vector;
  *
  * @see StateEditable
  *
- * @version 1.21 05/05/07
  * @author Ray Ryan
  */
 

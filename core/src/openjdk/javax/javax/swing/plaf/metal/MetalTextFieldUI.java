@@ -46,7 +46,6 @@ import javax.swing.plaf.basic.*;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Steve Wilson
- * @version 1.22 05/05/07
  */
 public class MetalTextFieldUI extends BasicTextFieldUI {
 

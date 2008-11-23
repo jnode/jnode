@@ -214,7 +214,6 @@ import sun.swing.AccumulativeRunnable;
  * {@link java.util.concurrent.Executor} for execution.
  *  
  * @author Igor Kushnirskiy
- * @version 1.14 05/05/07
  * 
  * @param <T> the result type returned by this {@code SwingWorker's}
  *        {@code doInBackground} and {@code get} methods

@@ -188,7 +188,6 @@ A view has the following responsibilities:
 </dl>
  *
  * @author  Timothy Prinzing
- * @version 1.81 05/05/07
  */
 public abstract class View implements SwingConstants {
 
@@ -1342,4 +1341,3 @@ public abstract class View implements SwingConstants {
     private Element elem;
 
 };
-

@@ -40,7 +40,6 @@ import javax.swing.text.Caret;
  * long term persistence.
  *
  * @author  Timothy Prinzing
- * @version 1.30 05/05/07
  */
 public class MotifTextFieldUI extends BasicTextFieldUI {
 
