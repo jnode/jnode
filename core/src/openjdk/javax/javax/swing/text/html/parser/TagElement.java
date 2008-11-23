@@ -30,7 +30,6 @@ import javax.swing.text.html.HTML;
  * A generic HTML TagElement class. The methods define how white
  * space is interpreted around the tag.
  *
- * @version 	1.18, 05/05/07
  * @author      Sunita Mani
  */
 
@@ -73,7 +72,3 @@ public class TagElement {
 	return insertedByErrorRecovery;
     }
 }
-
-
-
-

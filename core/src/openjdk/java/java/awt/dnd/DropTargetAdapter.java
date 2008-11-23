@@ -68,7 +68,6 @@ package java.awt.dnd;
  * @see DropTargetListener
  *
  * @author David Mendenhall
- * @version 1.14, 05/05/07
  * @since 1.4
  */
 public abstract class DropTargetAdapter implements DropTargetListener {

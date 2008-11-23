@@ -73,7 +73,6 @@ import sun.security.action.GetPropertyAction;
  * The <code>Container</code>, message, icon, and buttons are all
  * determined from abstract methods.
  * 
- * @version 1.67 05/05/07
  * @author James Gosling
  * @author Scott Violet
  * @author Amy Fowler

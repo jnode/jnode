@@ -84,7 +84,6 @@ import java.util.TreeSet;
  * @see JInternalFrame.JDesktopIcon
  * @see DesktopManager
  *
- * @version 1.64 05/05/07
  * @author David Kloba
  */
 public class JDesktopPane extends JLayeredPane implements Accessible
@@ -635,4 +634,3 @@ public class JDesktopPane extends JLayeredPane implements Accessible
         }
     }
 }
-

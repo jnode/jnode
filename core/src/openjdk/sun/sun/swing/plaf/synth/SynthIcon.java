@@ -35,7 +35,6 @@ import javax.swing.plaf.UIResource;
  * the variants that take a SynthContext, but must be prepared for the
  * SynthContext to be null.
  *
- * @version 1.15, 05/05/07
  * @author Scott Violet
  */
 public abstract class SynthIcon implements Icon {

@@ -39,7 +39,6 @@ import javax.swing.undo.UndoableEdit;
  * moving the array contents directly to accomodate the change.
  *
  * @author  Timothy Prinzing
- * @version 1.19 05/05/07
  * @see GapContent
  */
 abstract class GapVector implements Serializable {
@@ -298,5 +297,3 @@ abstract class GapVector implements Serializable {
     }
 
 }
-
-

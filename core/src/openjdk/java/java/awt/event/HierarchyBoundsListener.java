@@ -45,7 +45,6 @@ import java.util.EventListener;
  * program registers an <code>HierarchyBoundsListener</code> or not.
  *
  * @author	David Mendenhall
- * @version	1.14, 05/05/07
  * @see		HierarchyBoundsAdapter
  * @see		HierarchyEvent
  * @since 	1.3

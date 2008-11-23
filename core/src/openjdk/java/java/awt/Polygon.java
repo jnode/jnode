@@ -50,7 +50,6 @@ import java.util.Arrays;
  * methods, use the <i>insideness</i> definition described in the 
  * {@link Shape} class comments.
  *
- * @version     1.26, 07/24/98
  * @author 	Sami Shaio
  * @see Shape
  * @author      Herb Jellinek

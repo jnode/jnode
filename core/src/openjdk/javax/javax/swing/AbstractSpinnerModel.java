@@ -27,7 +27,6 @@ package javax.swing;
 
 import java.util.*;
 import javax.swing.event.*;
-import java.io.Serializable;
 
 
 /** 
@@ -43,11 +42,10 @@ import java.io.Serializable;
  * @see SpinnerNumberModel
  * @see SpinnerDateModel
  * 
- * @version 1.14 05/05/07
  * @author Hans Muller
  * @since 1.4
  */
-public abstract class AbstractSpinnerModel implements SpinnerModel, Serializable
+public abstract class AbstractSpinnerModel implements SpinnerModel
 {
 
     /**
@@ -140,4 +138,3 @@ public abstract class AbstractSpinnerModel implements SpinnerModel, Serializable
 	return listenerList.getListeners(listenerType); 
     }
 }
-

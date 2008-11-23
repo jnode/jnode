@@ -36,7 +36,6 @@ import java.io.Serializable;
 /**
   * A better GridLayout class
   *
-  * @version 1.15 05/05/07
   * @author Steve Wilson
   */
 class SmartGridLayout implements LayoutManager, Serializable {

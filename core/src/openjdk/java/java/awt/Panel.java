@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,7 +24,6 @@
  */
 package java.awt;
 
-import java.awt.peer.PanelPeer;
 import javax.accessibility.*;
 
 /**
@@ -35,7 +34,6 @@ import javax.accessibility.*;
  * The default layout manager for a panel is the
  * <code>FlowLayout</code> layout manager.
  *
- * @version 	1.44, 05/05/07
  * @author 	Sami Shaio
  * @see     java.awt.FlowLayout
  * @since   JDK1.0

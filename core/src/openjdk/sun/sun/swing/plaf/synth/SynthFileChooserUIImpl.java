@@ -54,7 +54,6 @@ import sun.swing.*;
  * incompatible ways between releases. While this class is public, it
  * shoud be considered an implementation detail, and subject to change.
  *
- * @version 1.14, 05/05/07
  * @author Leif Samuelsson
  * @author Jeff Dinkins
  */
@@ -73,6 +72,8 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
     private JToggleButton detailsViewButton;
 
     private boolean useShellFolder;
+
+    private boolean readOnly;
 
     private JPanel buttonPanel;
     private JPanel bottomPanel;
@@ -94,6 +95,8 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 
     private int    fileNameLabelMnemonic = 0;
     private String fileNameLabelText = null;
+    private int    folderNameLabelMnemonic = 0;
+    private String folderNameLabelText = null;
 
     private int    filesOfTypeLabelMnemonic = 0;
     private String filesOfTypeLabelText = null;
@@ -112,6 +115,25 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 
     private String detailsViewButtonToolTipText = null;
     private String detailsViewButtonAccessibleName = null;
+
+    private AlignedLabel fileNameLabel;
+    private final PropertyChangeListener modeListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent event) {
+            if (fileNameLabel != null) {
+                populateFileNameLabel();
+            }
+        }
+    };
+
+    private void populateFileNameLabel() {
+        if (getFileChooser().getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+            fileNameLabel.setText(folderNameLabelText);
+            fileNameLabel.setDisplayedMnemonic(folderNameLabelMnemonic);
+        } else {
+            fileNameLabel.setText(fileNameLabelText);
+            fileNameLabel.setDisplayedMnemonic(fileNameLabelMnemonic);
+        }
+    }
 
     public SynthFileChooserUIImpl(JFileChooser b) {
         super(b);
@@ -163,6 +185,15 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 	public ListSelectionListener createListSelectionListener() {
 	    return SynthFileChooserUIImpl.this.createListSelectionListener(getFileChooser());
 	}
+
+        public boolean usesShellFolder() {
+            return useShellFolder;
+        }
+    }
+
+    protected void installDefaults(JFileChooser fc) {
+        super.installDefaults(fc);
+        readOnly = UIManager.getBoolean("FileChooser.readOnly");
     }
 
     public void installComponents(JFileChooser fc) {
@@ -252,7 +283,7 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
     topButtonPanel.add(Box.createRigidArea(hstrut5));
     
     // New Directory Button
-    if (!UIManager.getBoolean("FileChooser.readOnly")) {
+    if (!readOnly) {
         b = new JButton(filePane.getNewFolderAction());
         b.setText(null);
         b.setIcon(newFolderIcon);
@@ -332,8 +363,8 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 	bottomPanel.add(fileNamePanel);
 	bottomPanel.add(Box.createRigidArea(new Dimension(1, 5)));
 
-     	AlignedLabel fileNameLabel = new AlignedLabel(fileNameLabelText);
-     	fileNameLabel.setDisplayedMnemonic(fileNameLabelMnemonic);
+        fileNameLabel = new AlignedLabel();
+        populateFileNameLabel();
 	fileNamePanel.add(fileNameLabel);
 
 	fileNameTextField = new JTextField(35) {
@@ -391,6 +422,16 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 	groupLabels(new AlignedLabel[] { fileNameLabel, filesOfTypeLabel });
     }
 
+    protected void installListeners(JFileChooser fc) {
+        super.installListeners(fc);
+        fc.addPropertyChangeListener(JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY, modeListener);
+    }
+
+    protected void uninstallListeners(JFileChooser fc) {
+        fc.removePropertyChangeListener(JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY, modeListener);
+        super.uninstallListeners(fc);
+    }
+
     private void updateUseShellFolder() {
 	// Decide whether to use the ShellFolder class to populate shortcut
 	// panel and combobox.
@@ -400,16 +441,7 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 	if (prop != null) {
 	    useShellFolder = prop.booleanValue();
 	} else {
-	    // See if FileSystemView.getRoots() returns the desktop folder,
-	    // i.e. the normal Windows hierarchy.
-	    useShellFolder = false;
-	    File[] roots = fc.getFileSystemView().getRoots();
-	    if (roots != null && roots.length == 1) {
-		File[] cbFolders = (File[])ShellFolder.get("fileChooserComboBoxFolders");
-		if (cbFolders != null && cbFolders.length > 0 && roots[0] == cbFolders[0]) {
-		    useShellFolder = true;
-		}
-	    }
+            useShellFolder = fc.getFileSystemView().equals(FileSystemView.getFileSystemView());
 	}
     }
 
@@ -468,6 +500,8 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 	
 	fileNameLabelMnemonic = getMnemonic("FileChooser.fileNameLabelMnemonic", l);  
 	fileNameLabelText = UIManager.getString("FileChooser.fileNameLabelText", l); 
+        folderNameLabelMnemonic = getMnemonic("FileChooser.folderNameLabelMnemonic", l);
+        folderNameLabelText = UIManager.getString("FileChooser.folderNameLabelText", l);
 	
 	filesOfTypeLabelMnemonic = getMnemonic("FileChooser.filesOfTypeLabelMnemonic", l);  
 	filesOfTypeLabelText = UIManager.getString("FileChooser.filesOfTypeLabelText", l);
@@ -538,8 +572,12 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
 
 	JFileChooser fc = getFileChooser();
 	FileSystemView fsv = fc.getFileSystemView();
+        File currentDirectory = fc.getCurrentDirectory();
 
-	File currentDirectory = getFileChooser().getCurrentDirectory();
+        if (!readOnly && currentDirectory != null) {
+            getNewFolderAction().setEnabled(filePane.canWrite(currentDirectory));
+        }
+
 	if (currentDirectory != null) {
 	    JComponent cb = getDirectoryComboBox();
 	    if (cb instanceof JComboBox) {
@@ -1021,6 +1059,11 @@ public class SynthFileChooserUIImpl extends SynthFileChooserUI {
     private class AlignedLabel extends JLabel {
 	private AlignedLabel[] group;
 	private int maxWidth = 0;
+
+        AlignedLabel() {
+            super();
+            setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        }
 
 	AlignedLabel(String text) {
 	    super(text);

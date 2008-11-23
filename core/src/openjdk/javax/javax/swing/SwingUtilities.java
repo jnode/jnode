@@ -50,7 +50,6 @@ import sun.awt.AppContext;
 /**
  * A collection of utility methods for Swing.
  *
- * @version 1.154 05/05/07
  * @author unknown
  */
 public class SwingUtilities implements SwingConstants

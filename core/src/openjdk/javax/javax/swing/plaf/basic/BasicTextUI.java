@@ -101,7 +101,6 @@ import javax.swing.plaf.basic.DragRecognitionSupport.BeforeDrag;
  *
  * @author Timothy Prinzing
  * @author Shannon Hickey (drag and drop)
- * @version 1.126 05/05/07
  */
 public abstract class BasicTextUI extends TextUI implements ViewFactory {
 
@@ -2649,4 +2648,3 @@ public abstract class BasicTextUI extends TextUI implements ViewFactory {
     }
 
 }
-

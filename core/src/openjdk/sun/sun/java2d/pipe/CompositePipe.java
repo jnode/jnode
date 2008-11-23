@@ -1,5 +1,5 @@
 /*
- * Copyright 1997 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import sun.java2d.SunGraphics2D;
 
 /**
  * This interface defines the set of calls used by a rendering pipeline
- * based on the Ductus Rasterizer to communicate the alpha tile sequence
+ * based on an AATileGenerator to communicate the alpha tile sequence
  * to the output (compositing) stages of the pipeline.
  */
 public interface CompositePipe {

@@ -29,7 +29,6 @@ package java.awt;
  * for components that are laid out using the 
  * <code>GridBagLayout</code> class.
  *
- * @version     1.47, 05/05/07
  * @author Doug Stein
  * @author Bill Spitzak (orignial NeWS & OLIT implementation)
  * @see java.awt.GridBagLayout

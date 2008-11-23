@@ -30,7 +30,6 @@ package java.awt;
  * determine if a given pump should continue to run, or should instead exit
  * and yield control to the parent pump.
  *
- * @version 1.13 05/05/07
  * @author David Mendenhall
  */
 interface Conditional {

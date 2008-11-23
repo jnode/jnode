@@ -26,10 +26,13 @@ package javax.swing.border;
 
 import java.awt.Graphics;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.Color;
 import java.awt.Component;
-import java.beans.ConstructorProperties;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 
 /**
  * A class which implements a line border of arbitrary thickness
@@ -44,7 +47,6 @@ import java.beans.ConstructorProperties;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.30 05/05/07
  * @author David Kloba
  */
 public class LineBorder extends AbstractBorder
@@ -100,7 +102,6 @@ public class LineBorder extends AbstractBorder
      * @param roundedCorners whether or not border corners should be round
      * @since 1.3
      */
-    @ConstructorProperties({"lineColor", "thickness", "roundedCorners"})
     public LineBorder(Color color, int thickness, boolean roundedCorners)  {
         lineColor = color;
         this.thickness = thickness;
@@ -118,18 +119,32 @@ public class LineBorder extends AbstractBorder
      * @param height the height of the painted border
      */
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-        Color oldColor = g.getColor();
-        int i;
+        if ((this.thickness > 0) && (g instanceof Graphics2D)) {
+            Graphics2D g2d = (Graphics2D) g;
 
-	/// PENDING(klobad) How/should do we support Roundtangles?
-        g.setColor(lineColor);
-        for(i = 0; i < thickness; i++)  {
-	    if(!roundedCorners)
-                g.drawRect(x+i, y+i, width-i-i-1, height-i-i-1);
-	    else
-                g.drawRoundRect(x+i, y+i, width-i-i-1, height-i-i-1, thickness, thickness);
+            Color oldColor = g2d.getColor();
+            g2d.setColor(this.lineColor);
+
+            Shape outer;
+            Shape inner;
+
+            int offs = this.thickness;
+            int size = offs + offs;
+            if (this.roundedCorners) {
+                int arc = offs + size;
+                outer = new RoundRectangle2D.Float(x, y, width, height, arc, arc);
+                inner = new RoundRectangle2D.Float(x + offs, y + offs, width - size, height - size, arc, arc);
+            }
+            else {
+                outer = new Rectangle2D.Float(x, y, width, height);
+                inner = new Rectangle2D.Float(x + offs, y + offs, width - size, height - size);
+            }
+            Path2D path = new Path2D.Float(Path2D.WIND_EVEN_ODD);
+            path.append(outer, false);
+            path.append(inner, false);
+            g2d.fill(path);
+            g2d.setColor(oldColor);
         }
-        g.setColor(oldColor);
     }
 
     /**

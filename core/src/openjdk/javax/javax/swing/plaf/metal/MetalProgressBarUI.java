@@ -42,7 +42,6 @@ import java.awt.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.34 05/05/07
  * @author Michael C. Albers
  */
 public class MetalProgressBarUI extends BasicProgressBarUI {

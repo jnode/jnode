@@ -51,7 +51,6 @@ import java.io.IOException;
  * method can be used to associate a string identifier with a given card
  * for fast random access.
  *
- * @version 	1.49 05/05/07
  * @author 	Arthur van Hoff
  * @see         java.awt.Container
  * @since       JDK1.0

@@ -35,7 +35,6 @@ import java.io.Serializable;
  * scrollbar of a <code>ScrollPane</code>.  Objects of this class are
  * returned by <code>ScrollPane</code> methods.
  *
- * @version     1.17 05/05/07
  * @since	1.4
  */
 public class ScrollPaneAdjustable implements Adjustable, Serializable {

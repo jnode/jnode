@@ -358,4 +358,3 @@ public abstract class ComponentUI {
         return SwingUtilities.getAccessibleChild(c, i);
     }
 }
-

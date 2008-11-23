@@ -37,7 +37,6 @@ import sun.swing.SwingUtilities2;
 /**
  * RadioButtonUI implementation for BasicRadioButtonUI
  *
- * @version 1.77 05/05/07
  * @author Jeff Dinkins
  */
 public class BasicRadioButtonUI extends BasicToggleButtonUI 

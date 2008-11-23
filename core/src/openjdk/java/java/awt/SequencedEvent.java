@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,8 +25,6 @@
 
 package java.awt;
 
-import java.awt.AWTEvent;
-import java.awt.ActiveEvent;
 import java.util.LinkedList;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
@@ -40,7 +38,6 @@ import sun.awt.SunToolkit;
  * before the wrapping SequencedEvent was able to be dispatched. In this case,
  * the nested event is never dispatched.
  *
- * @version 1.18, 05/05/07
  * @author David Mendenhall
  */
 class SequencedEvent extends AWTEvent implements ActiveEvent {

@@ -56,7 +56,6 @@ import sun.awt.AppContext;
  * A Windows L&F implementation of PopupMenuUI.  This implementation 
  * is a "combined" view/controller.
  *
- * @version 1.142 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber
@@ -540,13 +539,19 @@ public class BasicPopupMenuUI extends PopupMenuUI {
         private void selectItem(boolean direction) {
             MenuSelectionManager msm = MenuSelectionManager.defaultManager();
             MenuElement path[] = msm.getSelectedPath();
-            if (path.length < 2) {
+            if (path.length == 0) {
                 return;
             }
             int len = path.length;
+            if (len == 1 && path[0] instanceof JPopupMenu) {
 
-            if (path[0] instanceof JMenuBar &&
-                path[1] instanceof JMenu && len == 2) {
+                JPopupMenu popup = (JPopupMenu) path[0];
+                MenuElement[] newPath = new MenuElement[2];
+                newPath[0] = popup;
+                newPath[1] = findEnabledChild(popup.getSubElements(), -1, direction);
+                msm.setSelectedPath(newPath);
+            } else if (len == 2 &&
+                    path[0] instanceof JMenuBar && path[1] instanceof JMenu) {
 
                 // a toplevel menu is selected, but its popup not shown.
                 // Show the popup and select the first item
@@ -736,9 +741,11 @@ public class BasicPopupMenuUI extends PopupMenuUI {
         }
 
         void uninstall() {
+            synchronized (MOUSE_GRABBER_KEY) {
             MenuSelectionManager.defaultManager().removeChangeListener(this);
             ungrabWindow();
-            AppContext.getAppContext().put(MOUSE_GRABBER_KEY, null);
+                AppContext.getAppContext().remove(MOUSE_GRABBER_KEY);
+            }
         }
 
         void grabWindow(MenuElement[] newPath) {
@@ -761,7 +768,7 @@ public class BasicPopupMenuUI extends PopupMenuUI {
             if (invoker instanceof JPopupMenu) {
                 invoker = ((JPopupMenu)invoker).getInvoker();
             }
-            grabbedWindow = (invoker == null || invoker instanceof Window)?
+            grabbedWindow = invoker instanceof Window?
                     (Window)invoker :
                     SwingUtilities.getWindowAncestor(invoker);
             if(grabbedWindow != null) {
@@ -822,9 +829,14 @@ public class BasicPopupMenuUI extends PopupMenuUI {
                 cancelPopupMenu( );
                 return;
             }
-            switch (ev.getID()) {
+            if (!(ev instanceof MouseEvent)) {
+                // We are interested in MouseEvents only
+                return;
+            }
+            MouseEvent me = (MouseEvent) ev;
+            Component src = me.getComponent();
+            switch (me.getID()) {
             case MouseEvent.MOUSE_PRESSED:
-                Component src = (Component)ev.getSource();
                 if (isInPopup(src) ||
                     (src instanceof JMenu && ((JMenu)src).isSelected())) {
                     return;
@@ -842,24 +854,24 @@ public class BasicPopupMenuUI extends PopupMenuUI {
                         UIManager.getBoolean("PopupMenu.consumeEventOnClose");
                     // Consume the event so that normal processing stops.
                     if(consumeEvent && !(src instanceof MenuElement)) {
-                        ((MouseEvent)ev).consume();
+                        me.consume();
                     }
                 }
                 break;
 
             case MouseEvent.MOUSE_RELEASED:
-                src = (Component)ev.getSource();
                 if(!(src instanceof MenuElement)) {
                     // Do not forward event to MSM, let component handle it
+                    if (isInPopup(src)) {
                     break;
+                }
                 }
                 if(src instanceof JMenu || !(src instanceof JMenuItem)) {
                     MenuSelectionManager.defaultManager().
-                        processMouseEvent((MouseEvent)ev);
+                        processMouseEvent(me);
                 }
                 break;
             case MouseEvent.MOUSE_DRAGGED:
-                src = (Component)ev.getSource();
                 if(!(src instanceof MenuElement)) {
                     // For the MOUSE_DRAGGED event the src is
                     // the Component in which mouse button was pressed. 
@@ -870,10 +882,10 @@ public class BasicPopupMenuUI extends PopupMenuUI {
                     }
                 }
                 MenuSelectionManager.defaultManager().
-                    processMouseEvent((MouseEvent)ev);
+                    processMouseEvent(me);
                 break;
             case MouseEvent.MOUSE_WHEEL:
-                if (isInPopup((Component)ev.getSource())) {
+                if (isInPopup(src)) {
                     return;
                 }
                 cancelPopupMenu();
@@ -1137,6 +1149,8 @@ public class BasicPopupMenuUI extends PopupMenuUI {
                     Component c = popup.getInvoker();
                     if(c instanceof JFrame) {
                         invoker = ((JFrame)c).getRootPane();
+                    } else if(c instanceof JDialog) {
+                        invoker = ((JDialog)c).getRootPane();
                     } else if(c instanceof JApplet) {
                         invoker = ((JApplet)c).getRootPane();
                     } else {
@@ -1203,8 +1217,10 @@ public class BasicPopupMenuUI extends PopupMenuUI {
         }
 
         void uninstall() {
+            synchronized (MENU_KEYBOARD_HELPER_KEY) {
             MenuSelectionManager.defaultManager().removeChangeListener(this);
-            AppContext.getAppContext().put(MENU_KEYBOARD_HELPER_KEY, null);
+                AppContext.getAppContext().remove(MENU_KEYBOARD_HELPER_KEY);
+            }
         }
     }
 }

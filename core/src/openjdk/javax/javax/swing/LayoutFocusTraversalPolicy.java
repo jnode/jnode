@@ -41,7 +41,6 @@ import java.io.*;
  * <code>ComponentOrientation</code> for more information. All columns in a
  * row are fully traversed before proceeding to the next row.
  *
- * @version 1.18, 05/05/07
  * @author David Mendenhall
  *
  * @see java.awt.ComponentOrientation

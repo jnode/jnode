@@ -33,7 +33,6 @@ import javax.swing.UIManager;
  * implementing simple responses to all boolean methods in
  * that interface. 
  *
- * @version 1.37 05/05/07
  * @author Ray Ryan
  */
 public class AbstractUndoableEdit implements UndoableEdit, Serializable {
@@ -277,4 +276,3 @@ public class AbstractUndoableEdit implements UndoableEdit, Serializable {
 	    + " alive: " + alive;
     }
 }
-

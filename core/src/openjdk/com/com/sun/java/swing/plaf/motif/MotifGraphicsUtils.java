@@ -42,7 +42,6 @@ import javax.swing.plaf.basic.*;
 import javax.swing.text.View;
 
 /*
- * @version 1.54 05/05/07
  * @author Jeff Dinkins
  * @author Dave Kloba
  */

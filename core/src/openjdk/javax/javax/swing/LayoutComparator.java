@@ -37,7 +37,6 @@ import java.awt.Window;
  * position. Code adapted from original javax.swing.DefaultFocusManager
  * implementation.
  *
- * @version 1.14, 05/05/07
  * @author David Mendenhall
  */
 final class LayoutComparator implements Comparator, java.io.Serializable {

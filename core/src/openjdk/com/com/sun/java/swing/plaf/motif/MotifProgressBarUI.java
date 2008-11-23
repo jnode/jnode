@@ -44,7 +44,6 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.20 05/05/07
  * @author Michael C. Albers
  */
 public class MotifProgressBarUI extends BasicProgressBarUI 

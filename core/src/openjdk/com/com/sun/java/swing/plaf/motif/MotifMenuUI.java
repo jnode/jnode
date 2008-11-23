@@ -39,7 +39,6 @@ import javax.swing.plaf.basic.BasicMenuUI;
  * A Motif L&F implementation of MenuUI.  
  * <p>
  *
- * @version 1.40 05/05/07
  * @author Georges Saab
  * @author Rich Schiavi
  */
@@ -150,8 +149,3 @@ public class MotifMenuUI extends BasicMenuUI
     }
 
 }
-
-
-
-
-

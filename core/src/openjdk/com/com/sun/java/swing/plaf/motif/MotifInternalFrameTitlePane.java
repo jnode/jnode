@@ -39,7 +39,6 @@ import java.beans.PropertyVetoException;
 
 /**
  * Class that manages a Motif title bar
- * @version 1.41 05/05/07
  *
  * @since 1.3
  */

@@ -31,7 +31,6 @@ package java.awt;
  * at each of its edges. The space can be a border, a blank space, or 
  * a title. 
  *
- * @version 	1.37, 05/05/07
  * @author 	Arthur van Hoff
  * @author 	Sami Shaio
  * @see         java.awt.LayoutManager

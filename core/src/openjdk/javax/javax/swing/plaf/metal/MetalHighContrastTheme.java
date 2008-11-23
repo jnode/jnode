@@ -36,7 +36,6 @@ import java.awt.*;
  * A high contrast theme. This is used on Windows if the system property
  * awt.highContrast.on is true.
  *
- * @version @(#)MetalHighContrastTheme.java	1.11 07/05/05
  * @author Michael C. Albers
  */
 class MetalHighContrastTheme extends DefaultMetalTheme {

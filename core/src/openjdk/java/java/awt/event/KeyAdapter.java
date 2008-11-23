@@ -43,7 +43,6 @@ package java.awt.event;
  * and the <code>KeyEvent</code> is passed to it.
  *
  * @author Carl Quinn
- * @version 1.25 05/05/07
  *
  * @see KeyEvent
  * @see KeyListener

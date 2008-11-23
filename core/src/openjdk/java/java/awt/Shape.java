@@ -72,7 +72,6 @@ import java.awt.geom.Rectangle2D;
  * @see java.awt.geom.FlatteningPathIterator
  * @see java.awt.geom.GeneralPath
  *
- * @version 1.19 06/24/98
  * @author Jim Graham
  * @since 1.2
  */

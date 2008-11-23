@@ -27,7 +27,6 @@ package java.awt;
 /**
  * The super class of all menu related containers.
  *
- * @version 	1.23, 05/05/07
  * @author 	Arthur van Hoff
  */
 

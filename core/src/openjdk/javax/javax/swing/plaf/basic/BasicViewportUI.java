@@ -36,7 +36,6 @@ import java.awt.event.*;
 /**
  * BasicViewport implementation
  *
- * @version 1.1 05/01/98
  * @author Rich Schiavi
  */
 public class BasicViewportUI extends ViewportUI {

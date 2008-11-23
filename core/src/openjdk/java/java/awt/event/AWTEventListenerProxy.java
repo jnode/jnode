@@ -1,5 +1,5 @@
 /*
- * Copyright 2001 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2001-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,7 +27,6 @@ package java.awt.event;
 
 import java.util.EventListenerProxy;
 import java.awt.AWTEvent;
-import java.awt.event.AWTEventListener;
 
 /**
  * A class which extends the <code>EventListenerProxy</code>, specifically 

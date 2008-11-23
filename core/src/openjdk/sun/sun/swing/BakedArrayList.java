@@ -41,7 +41,6 @@ import java.util.*;
  * iterating through the elements invoking hashCode. This also assumes you'll
  * only ever compare a BakedArrayList to another BakedArrayList.
  * 
- * @version 1.10, 05/05/07
  * @author Scott Violet
  */
 public class BakedArrayList extends ArrayList {

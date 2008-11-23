@@ -50,7 +50,6 @@ import java.awt.Point;
  * a ComponentColorModel.
  *
  *
- * @version 10 Feb 1997
  */
 public class ShortComponentRaster extends SunWritableRaster {
 
@@ -835,5 +834,3 @@ public class ShortComponentRaster extends SunWritableRaster {
     }
 
 }
-
-

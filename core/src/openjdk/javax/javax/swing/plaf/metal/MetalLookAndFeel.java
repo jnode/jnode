@@ -31,26 +31,18 @@ import java.beans.PropertyChangeListener;
 import javax.swing.plaf.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.*;
-import javax.swing.border.*;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.DefaultEditorKit;
-import java.util.*;
 
-import java.awt.Font;
 import java.awt.Color;
-import java.awt.SystemColor;
 import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
 import java.lang.reflect.*;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.net.URL;
-import java.io.Serializable;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import sun.awt.AppContext;
-import sun.awt.SunToolkit;
+
+import sun.awt.*;
 import sun.security.action.GetPropertyAction;
 import sun.swing.DefaultLayoutStyle;
 import sun.swing.SwingLazyValue;
@@ -88,7 +80,6 @@ import sun.swing.SwingUtilities2;
  * @see DefaultMetalTheme
  * @see OceanTheme
  *
- * @version @(#)MetalLookAndFeel.java	1.212 07/05/05
  * @author Steve Wilson
  */
 public class MetalLookAndFeel extends BasicLookAndFeel
@@ -126,11 +117,10 @@ public class MetalLookAndFeel extends BasicLookAndFeel
      */
     static boolean isWindows() {
         if (!checkedWindows) {
-            String osName = (String)AccessController.doPrivileged(
-                new GetPropertyAction("os.name"));
-            if (osName != null && osName.indexOf("Windows") != -1) {
+            OSInfo.OSType osType = AccessController.doPrivileged(OSInfo.getOSTypeAction());
+            if (osType == OSInfo.OSType.WINDOWS) {
                 isWindows = true;
-                String systemFonts = (String)AccessController.doPrivileged(
+                String systemFonts = AccessController.doPrivileged(
                     new GetPropertyAction("swing.useSystemFontSettings"));
                 useSystemFonts = (systemFonts != null &&
                                (Boolean.valueOf(systemFonts).booleanValue()));
@@ -657,7 +647,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
 	    new SwingLazyValue(
 			 "javax.swing.plaf.metal.MetalBorders$MenuItemBorder");
 
-	Object menuItemAcceleratorDelimiter = new String("-");
+        Object menuItemAcceleratorDelimiter = "-";
         Object toolBarBorder = new SwingLazyValue("javax.swing.plaf.metal.MetalBorders$ToolBarBorder");
 
 	Object progressBarBorder = new SwingLazyValue(
@@ -1682,7 +1672,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
                 else {
                     // Create the default theme. We prefer Ocean, but will
                     // use DefaultMetalTheme if told to.
-                    String theme = (String)AccessController.doPrivileged(
+                    String theme = AccessController.doPrivileged(
                                    new GetPropertyAction("swing.metalTheme"));
                     if ("steel".equals(theme)) {
                         currentTheme = new DefaultMetalTheme();

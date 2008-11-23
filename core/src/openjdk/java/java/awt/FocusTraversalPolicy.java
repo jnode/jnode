@@ -56,7 +56,6 @@ package java.awt;
  * for more information.
  *
  * @author David Mendenhall
- * @version 1.15, 05/05/07
  *
  * @see Container#setFocusTraversalPolicy
  * @see Container#getFocusTraversalPolicy

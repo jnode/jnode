@@ -29,7 +29,6 @@ import java.util.EventListener;
 /**
  * A popup menu listener
  *
- * @version 1.16 05/05/07
  * @author Arnaud Weber
  */
 public interface PopupMenuListener extends EventListener {
@@ -50,4 +49,3 @@ public interface PopupMenuListener extends EventListener {
      */
     void popupMenuCanceled(PopupMenuEvent e);
 }
-

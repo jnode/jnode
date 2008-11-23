@@ -107,7 +107,6 @@ import javax.accessibility.*;
  *      attribute: containerDelegate getContentPane
  *    description: A toplevel window which can be minimized to an icon.
  *
- * @version 1.119 05/05/07
  * @author Jeff Dinkins
  * @author Georges Saab
  * @author David Kloba

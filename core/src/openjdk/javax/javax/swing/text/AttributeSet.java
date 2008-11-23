@@ -42,7 +42,6 @@ import java.util.Enumeration;
  * exists, the key will be resolved through the parent.
  *
  * @author  Timothy Prinzing
- * @version 1.47 05/05/07
  * @see MutableAttributeSet
  */
 public interface AttributeSet {

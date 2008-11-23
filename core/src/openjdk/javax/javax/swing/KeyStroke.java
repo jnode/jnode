@@ -58,7 +58,6 @@ import java.awt.event.KeyEvent;
  * @see javax.swing.text.Keymap
  * @see #getKeyStroke
  *
- * @version 1.57, 05/05/07
  * @author Arnaud Weber
  * @author David Mendenhall
  */

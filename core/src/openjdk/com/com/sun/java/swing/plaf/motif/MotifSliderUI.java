@@ -44,7 +44,6 @@ import javax.swing.plaf.basic.BasicSliderUI;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.29 05/05/07
  * @author Jeff Dinkins
  */
 public class MotifSliderUI extends BasicSliderUI {
@@ -158,4 +157,3 @@ public class MotifSliderUI extends BasicSliderUI {
         }
     }
 }
-

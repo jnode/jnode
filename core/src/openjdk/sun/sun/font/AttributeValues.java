@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)AttributeValues.java	1.23 07/05/05
- *
  * (C) Copyright IBM Corp. 2005 - All Rights Reserved
  *
  * The original version of this source code and documentation is

@@ -29,7 +29,6 @@ package javax.swing;
  * A collection of constants generally used for positioning and orienting
  * components on the screen.
  *
- * @version 1.23 05/05/07
  * @author Jeff Dinkins
  * @author Ralph Kar (orientation support)
  */

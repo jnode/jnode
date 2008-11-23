@@ -23,8 +23,6 @@
  * have any questions.
  */
 /*
- * @(#)ExtendedTextLabel.java	1.21 07/05/05
- *
  * (C) Copyright IBM Corp. 1998-2003- All Rights Reserved.
  */
 

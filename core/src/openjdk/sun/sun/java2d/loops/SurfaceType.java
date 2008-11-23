@@ -458,4 +458,3 @@ public final class SurfaceType {
     }
 
 }
-

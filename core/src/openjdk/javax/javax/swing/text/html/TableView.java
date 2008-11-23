@@ -37,7 +37,6 @@ import javax.swing.text.*;
  * HTML table view.  
  * 
  * @author  Timothy Prinzing
- * @version 1.47 05/05/07
  * @see     View
  */
 /*public*/ class TableView extends BoxView implements ViewFactory {

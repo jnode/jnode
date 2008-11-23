@@ -45,7 +45,6 @@ import javax.swing.text.*;
  *
  * @see java.text.DateFormat
  *
- * @version 1.5 04/09/01
  * @since 1.4
  */
 public class DateFormatter extends InternationalFormatter {

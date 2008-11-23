@@ -43,7 +43,6 @@ import sun.swing.SwingUtilities2;
 /**
  * The class that manages a synth title bar
  *
- * @version 1.33 05/05/07
  * @author David Kloba
  * @author Joshua Outwater
  * @author Steve Wilson

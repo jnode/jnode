@@ -41,7 +41,6 @@ import sun.awt.AppContext;
  * TimerQueue manages a queue of Timers. The Timers are chained
  * together in a linked list sorted by the order in which they will expire.
  *
- * @version 1.45 05/05/07
  * @author Dave Moore
  * @author Igor Kushnirskiy
  */

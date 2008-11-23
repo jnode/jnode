@@ -42,7 +42,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ScrollPaneUI.
  *
- * @version 1.19, 05/05/07
  * @author Scott Violet
  */
 class SynthScrollPaneUI extends BasicScrollPaneUI implements

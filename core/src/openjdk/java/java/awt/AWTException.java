@@ -28,7 +28,6 @@ package java.awt;
 /**
  * Signals that an Absract Window Toolkit exception has occurred.
  *
- * @version 	1.23 05/05/07
  * @author 	Arthur van Hoff
  */
 public class AWTException extends Exception {

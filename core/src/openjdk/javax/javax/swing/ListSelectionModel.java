@@ -38,7 +38,6 @@ import javax.swing.event.*;
  * a closed interval, i.e. the interval includes both index0 and
  * index1.
  * 
- * @version 1.29 05/05/07
  * @author Hans Muller
  * @author Philip Milne
  * @see DefaultListSelectionModel
@@ -311,4 +310,3 @@ public interface ListSelectionModel
      */  
     void removeListSelectionListener(ListSelectionListener x);
 }
-

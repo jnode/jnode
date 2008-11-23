@@ -26,7 +26,6 @@ package javax.swing;
 
 
 import java.awt.*;
-import java.beans.ConstructorProperties;
 import java.io.Serializable;
 
 /**
@@ -49,7 +48,6 @@ import java.io.Serializable;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.34 05/05/07
  * @author   Timothy Prinzing
  */
 public class OverlayLayout implements LayoutManager2,Serializable {
@@ -61,7 +59,6 @@ public class OverlayLayout implements LayoutManager2,Serializable {
      *
      * @param target  the container to do layout against
      */
-    @ConstructorProperties({"target"})
     public OverlayLayout(Container target) {
 	this.target = target;
     }
@@ -287,4 +284,3 @@ public class OverlayLayout implements LayoutManager2,Serializable {
     private SizeRequirements yTotal;
     
 }
-

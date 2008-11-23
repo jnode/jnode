@@ -34,7 +34,6 @@ import java.util.*;
 /**
  * Implements the bumps used throughout the Metal Look and Feel.
  * 
- * @version 1.32 05/05/07
  * @author Tom Santos
  * @author Steve Wilson
  */

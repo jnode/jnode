@@ -39,7 +39,6 @@ import java.io.Serializable;
 
 
 /**
- * @version 1.27 05/05/07
  * @author Dave Moore
  */
 

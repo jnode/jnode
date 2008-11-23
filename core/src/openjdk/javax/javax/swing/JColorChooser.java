@@ -81,7 +81,6 @@ import sun.swing.SwingUtilities2;
  *    description: A component that supports selecting a Color.
  *
  *
- * @version 1.58 05/05/07
  * @author James Gosling
  * @author Amy Fowler
  * @author Steve Wilson
@@ -668,7 +667,7 @@ class ColorChooserDialog extends JDialog {
                 ((AbstractButton)e.getSource()).fireActionPerformed(e);
             }
         }; 
-	KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke((char)KeyEvent.VK_ESCAPE, false);
+        KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 	InputMap inputMap = cancelButton.getInputMap(JComponent.
 						     WHEN_IN_FOCUSED_WINDOW);
 	ActionMap actionMap = cancelButton.getActionMap();
@@ -759,4 +758,3 @@ class ColorTracker implements ActionListener, Serializable {
         return color;
     }
 }
-

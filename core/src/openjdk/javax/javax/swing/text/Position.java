@@ -45,7 +45,6 @@ package javax.swing.text;
  * offset while document content is altered.
  *
  * @author  Timothy Prinzing
- * @version 1.26 05/05/07
  */
 public interface Position {
 

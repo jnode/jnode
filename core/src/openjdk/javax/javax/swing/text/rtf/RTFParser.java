@@ -331,4 +331,3 @@ abstract class RTFParser extends AbstractFilter
   }
 
 }
-

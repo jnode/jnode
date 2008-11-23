@@ -34,7 +34,6 @@ import sun.swing.plaf.synth.*;
 /**
  * Wrapper for primitive graphics calls.
  *
- * @version 1.27, 05/05/07
  * @since 1.5
  * @author Scott Violet
  */

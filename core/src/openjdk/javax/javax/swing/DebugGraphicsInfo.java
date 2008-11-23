@@ -31,7 +31,6 @@ import java.util.*;
 /** Class used by DebugGraphics for maintaining information about how
   * to render graphics calls.
   *
-  * @version 1.20 05/05/07
   * @author Dave Karlton
   */
 class DebugGraphicsInfo {
@@ -70,5 +69,3 @@ class DebugGraphicsInfo {
         stream.println(string);
     }
 }
-
-

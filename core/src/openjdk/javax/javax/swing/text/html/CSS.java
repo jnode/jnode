@@ -111,7 +111,6 @@ import javax.swing.text.*;
  *
  * @author  Timothy Prinzing
  * @author  Scott Violet
- * @version 1.74 05/05/07
  * @see StyleSheet
  */
 public class CSS implements Serializable {

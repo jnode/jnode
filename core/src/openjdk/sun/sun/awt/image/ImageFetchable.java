@@ -35,7 +35,6 @@ package sun.awt.image;
  * @see ImageFetcher
  * @see ImageProducer
  *
- * @version 	1.18 05/05/07
  * @author 	Jim Graham
  */
 public interface ImageFetchable {

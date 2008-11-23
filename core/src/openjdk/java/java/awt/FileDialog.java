@@ -40,7 +40,6 @@ import java.io.ObjectInputStream;
  *
  * @see Window#show
  *
- * @version 	1.62, 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @since       JDK1.0

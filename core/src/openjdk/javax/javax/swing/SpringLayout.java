@@ -179,7 +179,6 @@ import java.util.*;
  * @see Spring
  * @see SpringLayout.Constraints
  *
- * @version  1.32 05/05/07
  * @author 	Philip Milne
  * @author 	Scott Violet
  * @author 	Joe Winchester

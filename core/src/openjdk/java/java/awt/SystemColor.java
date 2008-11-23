@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,9 +24,6 @@
  */
 package java.awt;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.ColorModel;
 import java.io.ObjectStreamException;
 
 /**
@@ -47,7 +44,6 @@ import java.io.ObjectStreamException;
  *
  * @see Toolkit#getDesktopProperty
  *
- * @version 	1.33, 05/05/07
  * @author 	Carl Quinn
  * @author      Amy Fowler
  */
@@ -508,7 +504,7 @@ public final class SystemColor extends Color implements java.io.Serializable {
      * serialized form of the object to replace the serialized
      * object with the equivalent static object constant field
      * of {@code SystemColor}.
-     * See the {@link writeReplace} method for more information
+     * See the {@link #writeReplace} method for more information
      * on the serialized form of these objects.
      * @return one of the {@code SystemColor} static object
      *         fields that refers to the same system color.
@@ -529,7 +525,7 @@ public final class SystemColor extends Color implements java.io.Serializable {
      * The value field of a serialized {@code SystemColor} object
      * contains the array index of the system color instead of the
      * rgb data for the system color.
-     * This index is used by the {@link readResolve} method to
+     * This index is used by the {@link #readResolve} method to
      * resolve the deserialized objects back to the original
      * static constant versions to ensure unique instances of
      * each {@code SystemColor} object.

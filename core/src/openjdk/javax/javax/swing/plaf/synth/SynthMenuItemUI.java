@@ -43,7 +43,6 @@ import sun.swing.SwingUtilities2;
 /**
  * Synth's MenuItemUI.
  *
- * @version 1.25, 01/25/05
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber

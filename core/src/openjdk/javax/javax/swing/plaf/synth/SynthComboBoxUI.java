@@ -44,7 +44,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ComboBoxUI.
  *
- * @version 1.25, 05/05/07
  * @author Scott Violet
  */
 class SynthComboBoxUI extends BasicComboBoxUI implements

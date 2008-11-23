@@ -26,7 +26,6 @@ package javax.swing;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.beans.ConstructorProperties;
 import java.net.URL;
 
 import java.io.Serializable;
@@ -59,7 +58,6 @@ import javax.accessibility.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  * 
- * @version 1.60 05/05/07
  * @author Jeff Dinkins
  * @author Lynn Monsanto
  */
@@ -122,7 +120,6 @@ public class ImageIcon implements Icon, Serializable, Accessible {
      * @param filename a String specifying a filename or path
      * @see #getDescription
      */
-    @ConstructorProperties({"description"})
     public ImageIcon (String filename) {
         this(filename, filename);
     }
@@ -631,4 +628,3 @@ public class ImageIcon implements Icon, Serializable, Accessible {
         }
     }  // AccessibleImageIcon
 }
-

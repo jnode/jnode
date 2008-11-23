@@ -27,7 +27,6 @@ package javax.swing;
 
 import java.awt.Component;
 import java.awt.event.*;
-import java.beans.ConstructorProperties;
 import java.lang.Boolean;
 import javax.swing.table.*;
 import javax.swing.event.*;
@@ -47,7 +46,6 @@ import java.io.Serializable;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.57 05/05/07
  * @author Alan Chung
  * @author Philip Milne
  */
@@ -82,7 +80,6 @@ public class DefaultCellEditor extends AbstractCellEditor
      *
      * @param textField  a <code>JTextField</code> object
      */
-    @ConstructorProperties({"component"})
     public DefaultCellEditor(final JTextField textField) {
         editorComponent = textField;
 	this.clickCountToStart = 2;

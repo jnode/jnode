@@ -227,5 +227,3 @@ abstract class AbstractFilter extends OutputStream
      */
     protected abstract void writeSpecial(int b) throws IOException;
 }
-
-

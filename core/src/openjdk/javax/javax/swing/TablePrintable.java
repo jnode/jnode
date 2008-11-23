@@ -93,7 +93,6 @@ import java.text.MessageFormat;
  * changed at any time after creation.
  *
  * @author  Shannon Hickey
- * @version 1.48 05/05/07
  */
 class TablePrintable implements Printable {
 

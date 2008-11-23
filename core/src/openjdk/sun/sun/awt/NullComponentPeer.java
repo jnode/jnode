@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -51,6 +51,8 @@ import java.awt.peer.PanelPeer;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.awt.Rectangle;
+import sun.java2d.pipe.Region;
+
 
 /**
  * Implements the LightweightPeer interface for use in lightweight components
@@ -294,8 +296,15 @@ public class NullComponentPeer implements LightweightPeer,
         return new Rectangle(0, 0, 0, 0);
     }
 
+      /**
+      * Applies the shape to the native component window.
+      * @since 1.7
+      */
+    public void applyShape(Region shape) {
+    }
+
     //jnode
-    //remove these methods after java.awt.peer integration
+    //todo remove these methods after java.awt.peer integration
     public void requestFocus() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -306,7 +315,7 @@ public class NullComponentPeer implements LightweightPeer,
 
     public void setBounds(int x, int y, int width, int height) {
         //To change body of implemented methods use File | Settings | File Templates.
-    }
+}
 
     public void setEventMask(long mask) {
         //To change body of implemented methods use File | Settings | File Templates.

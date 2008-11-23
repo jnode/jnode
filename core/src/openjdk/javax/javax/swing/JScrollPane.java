@@ -168,7 +168,6 @@ import java.beans.*;
  *     attribute: containerDelegate getViewport
  *   description: A specialized container that manages a viewport, optional scrollbars and headers
  *
- * @version 1.116 @(#)JScrollPane.java	1.116
  * @author Hans Muller
  */
 public class JScrollPane extends JComponent implements ScrollPaneConstants, Accessible
@@ -1550,4 +1549,3 @@ public class JScrollPane extends JComponent implements ScrollPaneConstants, Acce
 	}
     }
 }
-

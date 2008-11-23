@@ -33,7 +33,6 @@ import javax.swing.JRootPane;
  * functionality as specified in
  * {@link java.awt.im.spi.InputMethodContext#createInputMethodJFrame}.
  *
- * @version 1.12 05/05/07
  */
 public class InputMethodJFrame
         extends JFrame

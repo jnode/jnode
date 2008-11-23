@@ -32,7 +32,6 @@ package java.awt;
  *
  * @see Toolkit#getPrintJob
  *
- * @version 	1.20 05/05/07
  * @author 	Amy Fowler
  */
 public abstract class PrintJob {

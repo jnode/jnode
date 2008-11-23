@@ -42,7 +42,6 @@ import java.io.*;
  *
  * @see		Element
  * @author      Arthur Van Hoff
- * @version 	1.18 05/05/07
  *
  */
 public final

@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,7 +26,6 @@
 package java.awt.event;
 
 import java.awt.AWTEvent;
-import java.awt.Event;
 import java.awt.Component;
 import java.awt.Rectangle;
 
@@ -59,7 +58,6 @@ import java.awt.Rectangle;
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/componentlistener.html">Tutorial: Writing a Component Listener</a>
  *
  * @author Carl Quinn
- * @version 1.35 05/05/07
  * @since 1.1
  */
 public class ComponentEvent extends AWTEvent {

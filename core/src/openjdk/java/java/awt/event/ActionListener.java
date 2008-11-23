@@ -40,7 +40,6 @@ import java.util.EventListener;
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/eventmodel.html">Tutorial: Java 1.1 Event Model</a>
  *
  * @author Carl Quinn
- * @version 1.24 05/05/07
  * @since 1.1
  */
 public interface ActionListener extends EventListener {

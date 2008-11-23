@@ -44,7 +44,6 @@ import javax.accessibility.*;
 /**
  * The default model for combo boxes.
  *
- * @version 1.26 05/05/07
  * @author Arnaud Weber
  * @author Tom Santos
  */

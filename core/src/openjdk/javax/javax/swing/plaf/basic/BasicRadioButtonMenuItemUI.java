@@ -34,7 +34,6 @@ import javax.swing.border.*;
 /**
  * BasicRadioButtonMenuItem implementation
  *
- * @version 1.52 05/05/07
  * @author Georges Saab
  * @author David Karlton
  */
@@ -67,11 +66,3 @@ public class BasicRadioButtonMenuItemUI extends BasicMenuItemUI
         }
     }
 }
-
-
-
-
-
-
-
-

@@ -47,7 +47,6 @@ import java.lang.reflect.InvocationTargetException;
  * to Use Threads</A> for more information.     
  *
  * @author Alexander Potochkin
- * @version 1.9 05/05/07
  * @since 1.6
  */
 

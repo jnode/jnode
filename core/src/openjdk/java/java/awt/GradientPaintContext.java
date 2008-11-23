@@ -26,7 +26,6 @@
 package java.awt;
 
 import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import sun.awt.image.IntegerComponentRaster;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;

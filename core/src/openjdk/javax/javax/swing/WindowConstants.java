@@ -43,7 +43,6 @@ package javax.swing;
  * @see JInternalFrame#setDefaultCloseOperation(int)
  * 
  *
- * @version 1.28 05/05/07
  * @author Amy Fowler
  */
 public interface WindowConstants

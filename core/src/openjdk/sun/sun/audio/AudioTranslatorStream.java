@@ -33,7 +33,6 @@ import java.io.IOException;
 /**
  * Translator for native audio formats (not implemented in this release).
  *
- * @version 1.14 07/05/05
  */
 public
     class AudioTranslatorStream extends NativeAudioStream {

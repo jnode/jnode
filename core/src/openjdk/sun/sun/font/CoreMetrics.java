@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)CoreMetrics.java	1.4 03/09/18
  *
  * (C) Copyright IBM Corp. 2003, All Rights Reserved
  *
@@ -130,4 +129,3 @@ public final class CoreMetrics {
     public final float   ssOffset;
     public final float   italicAngle;
 }
-

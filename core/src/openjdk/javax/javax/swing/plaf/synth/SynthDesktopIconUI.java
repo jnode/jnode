@@ -40,7 +40,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth L&F for a minimized window on a desktop.
  *
- * @version 1.20, 05/05/07
  * @author Joshua Outwater
  */
 class SynthDesktopIconUI extends BasicDesktopIconUI implements SynthUI,

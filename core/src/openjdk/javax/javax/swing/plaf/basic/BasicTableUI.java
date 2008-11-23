@@ -51,7 +51,6 @@ import sun.swing.UIAction;
 /**
  * BasicTableUI implementation
  *
- * @version 1.165 05/05/07
  * @author Philip Milne
  * @author Shannon Hickey (drag and drop)
  */

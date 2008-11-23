@@ -33,7 +33,6 @@ import java.awt.Shape;
  * with colored areas.
  *
  * @author  Timothy Prinzing
- * @version 1.29 05/05/07
  */
 public interface Highlighter {
 
@@ -151,4 +150,3 @@ public interface Highlighter {
     }
 
 };
-

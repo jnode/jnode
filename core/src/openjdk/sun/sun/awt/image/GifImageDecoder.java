@@ -40,7 +40,6 @@ import java.awt.image.*;
 /**
  * Gif Image converter
  * 
- * @version 1.62 05/05/07
  * @author Arthur van Hoff
  * @author Jim Graham
  */

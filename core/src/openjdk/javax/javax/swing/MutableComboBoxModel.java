@@ -27,7 +27,6 @@ package javax.swing;
 /**
  * A mutable version of <code>ComboBoxModel</code>.
  *
- * @version 1.19 05/05/07
  * @author Tom Santos
  */
 
@@ -70,5 +69,3 @@ public interface MutableComboBoxModel extends ComboBoxModel {
      */
     public void removeElementAt( int index );
 }
-
-

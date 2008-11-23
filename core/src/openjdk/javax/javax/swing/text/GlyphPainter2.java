@@ -46,7 +46,6 @@ import java.awt.geom.Rectangle2D;
  * rendering.
  *
  * @author  Timothy Prinzing
- * @version 1.30 05/05/07
  * @see GlyphView
  */
 class GlyphPainter2 extends GlyphView.GlyphPainter {

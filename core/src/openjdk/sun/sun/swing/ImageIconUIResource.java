@@ -32,7 +32,6 @@ import java.awt.Image;
 /**
  * A subclass of <code>ImageIcon</code> that implements UIResource.
  *
- * @version 1.8 05/05/07
  * @author Shannon Hickey
  * 
  */

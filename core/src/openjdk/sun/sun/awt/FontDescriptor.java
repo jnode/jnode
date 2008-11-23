@@ -118,4 +118,3 @@ public class FontDescriptor implements Cloneable {
         isLE = !"UnicodeBig".equals(enc);
     }
 }
-

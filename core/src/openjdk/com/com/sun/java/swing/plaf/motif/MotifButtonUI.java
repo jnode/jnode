@@ -42,7 +42,6 @@ import javax.swing.plaf.*;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.33 05/05/07
  * @author Rich Schiavi
  */
 public class MotifButtonUI extends BasicButtonUI {
@@ -140,5 +139,3 @@ public class MotifButtonUI extends BasicButtonUI {
 	}
     }
 }
-
-

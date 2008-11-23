@@ -41,7 +41,6 @@ import java.io.*;
  * @see Parser
  * @see DTD
  * @see ContentModelState
- * @version 	1.17, 05/05/07
  * @author 	Arthur van Hoff
  */
 final
@@ -219,5 +218,3 @@ class NPrintWriter extends PrintWriter {
 	numPrinted++;
     }
 }
-
-

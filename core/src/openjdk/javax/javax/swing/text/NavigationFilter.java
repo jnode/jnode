@@ -46,7 +46,6 @@ import java.awt.Shape;
  * @see javax.swing.text.DefaultCaret
  * @see javax.swing.text.View
  *
- * @version 1.12 05/05/07
  * @since 1.4
  */
 public class NavigationFilter {

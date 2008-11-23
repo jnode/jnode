@@ -92,7 +92,6 @@ import sun.swing.text.html.FrameEditorPaneTag;
  * on the EDT though.
  * 
  * @author Igor Kushnirskiy
- * @version 1.14 05/05/07
  * 
  * @since 1.6
  */

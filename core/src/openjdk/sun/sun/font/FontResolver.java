@@ -25,7 +25,6 @@
  */
 
 /*
- * @(#)FontResolver.java	1.7 05/08/26
  * (C) Copyright IBM Corp. 1999,  All rights reserved.
  */
 

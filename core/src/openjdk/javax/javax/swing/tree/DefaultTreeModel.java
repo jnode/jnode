@@ -26,7 +26,6 @@
 package javax.swing.tree;
 
 import java.util.*;
-import java.beans.ConstructorProperties;
 import java.io.*;
 import javax.swing.event.*;
 
@@ -45,7 +44,6 @@ import javax.swing.event.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.63 05/05/07
  * @author Rob Davis
  * @author Ray Ryan
  * @author Scott Violet
@@ -80,7 +78,6 @@ public class DefaultTreeModel implements Serializable, TreeModel {
       * @param root a TreeNode object that is the root of the tree
       * @see #DefaultTreeModel(TreeNode, boolean)
       */
-     @ConstructorProperties({"root"})
      public DefaultTreeModel(TreeNode root) {
         this(root, false);
     }
@@ -464,12 +461,11 @@ public class DefaultTreeModel implements Serializable, TreeModel {
      * is lazily created using the parameters passed into 
      * the fire method.
      *
-     * @param source the source of the {@code TreeModelEvent};
-     *               typically {@code this}
-     * @param path the path to the parent of the nodes that changed; use
-     *             {@code null} to identify the root has changed
+     * @param source the node being changed
+     * @param path the path to the root node
      * @param childIndices the indices of the changed elements
      * @param children the changed elements
+     * @see EventListenerList
      */
     protected void fireTreeNodesChanged(Object source, Object[] path, 
                                         int[] childIndices, 
@@ -496,11 +492,11 @@ public class DefaultTreeModel implements Serializable, TreeModel {
      * is lazily created using the parameters passed into 
      * the fire method.
      *
-     * @param source the source of the {@code TreeModelEvent};
-     *               typically {@code this}
-     * @param path the path to the parent the nodes were added to
+     * @param source the node where new elements are being inserted
+     * @param path the path to the root node
      * @param childIndices the indices of the new elements
      * @param children the new elements
+     * @see EventListenerList
      */
     protected void fireTreeNodesInserted(Object source, Object[] path, 
                                         int[] childIndices, 
@@ -527,11 +523,11 @@ public class DefaultTreeModel implements Serializable, TreeModel {
      * is lazily created using the parameters passed into 
      * the fire method.
      *
-     * @param source the source of the {@code TreeModelEvent};
-     *               typically {@code this}
-     * @param path the path to the parent the nodes were removed from
+     * @param source the node where elements are being removed
+     * @param path the path to the root node
      * @param childIndices the indices of the removed elements
      * @param children the removed elements
+     * @see EventListenerList
      */
     protected void fireTreeNodesRemoved(Object source, Object[] path, 
                                         int[] childIndices, 
@@ -558,12 +554,11 @@ public class DefaultTreeModel implements Serializable, TreeModel {
      * is lazily created using the parameters passed into 
      * the fire method.
      *
-     * @param source the source of the {@code TreeModelEvent};
-     *               typically {@code this}
-     * @param path the path to the parent of the structure that has changed;
-     *             use {@code null} to identify the root has changed
+     * @param source the node where the tree model has changed
+     * @param path the path to the root node
      * @param childIndices the indices of the affected elements
      * @param children the affected elements
+     * @see EventListenerList
      */
     protected void fireTreeStructureChanged(Object source, Object[] path, 
                                         int[] childIndices, 
@@ -584,16 +579,15 @@ public class DefaultTreeModel implements Serializable, TreeModel {
         }
     }
 
-    /**
+    /*
      * Notifies all listeners that have registered interest for
      * notification on this event type.  The event instance 
      * is lazily created using the parameters passed into 
      * the fire method.
      *
-     * @param source the source of the {@code TreeModelEvent};
-     *               typically {@code this}
-     * @param path the path to the parent of the structure that has changed;
-     *             use {@code null} to identify the root has changed
+     * @param source the node where the tree model has changed
+     * @param path the path to the root node
+     * @see EventListenerList
      */
     private void fireTreeStructureChanged(Object source, TreePath path) {
         // Guaranteed to return a non-null array
@@ -681,5 +675,3 @@ public class DefaultTreeModel implements Serializable, TreeModel {
 
 
 } // End of class DefaultTreeModel
-
-

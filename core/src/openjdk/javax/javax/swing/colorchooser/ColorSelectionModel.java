@@ -32,7 +32,6 @@ import java.awt.Color;
 /**
  * A model that supports selecting a <code>Color</code>.
  *
- * @version 1.18 05/05/07
  * @author Steve Wilson
  *
  * @see java.awt.Color

@@ -29,7 +29,6 @@ package javax.swing;
 /**
  * Constants used with the JScrollPane component.
  *
- * @version 1.24 05/05/07
  * @author Hans Muller
  */
 public interface ScrollPaneConstants
@@ -116,4 +115,3 @@ public interface ScrollPaneConstants
      */
     int HORIZONTAL_SCROLLBAR_ALWAYS = 32;
 }
-

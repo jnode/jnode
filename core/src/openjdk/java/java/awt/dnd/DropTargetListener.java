@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,7 +27,6 @@ package java.awt.dnd;
 
 import java.util.EventListener;
 
-import java.awt.dnd.DropTargetContext;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 
@@ -64,7 +63,6 @@ import java.awt.dnd.DropTargetDropEvent;
  * respective listener's method and all the necessary data should be retrieved
  * from the returned <code>Transferable</code> before that method returns.
  *
- * @version 	1.29, 05/05/07
  * @since 1.2
  */
 
@@ -152,10 +150,3 @@ public interface DropTargetListener extends EventListener {
 
     void drop(DropTargetDropEvent dtde);
 }
-
-
-
-
-
-
-

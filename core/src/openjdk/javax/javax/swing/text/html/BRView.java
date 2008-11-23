@@ -30,7 +30,6 @@ import javax.swing.text.*;
  * Processes the &lt;BR&gt; tag.  In other words, forces a line break.
  *
  * @author Sunita Mani
- * @version 1.18 05/05/07
  */
 class BRView extends InlineView {
 

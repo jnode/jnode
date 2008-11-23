@@ -87,7 +87,6 @@ import javax.accessibility.*;
  *      attribute: containerDelegate getContentPane
  *    description: A toplevel window which has no system border or controls.
  *
- * @version 1.74 05/05/07
  * @author David Kloba
  */
 public class JWindow extends Window implements Accessible,

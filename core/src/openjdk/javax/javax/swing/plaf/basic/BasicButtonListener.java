@@ -39,7 +39,6 @@ import javax.swing.plaf.ComponentInputMapUIResource;
 /**
  * Button Listener
  *
- * @version 1.75 05/05/07
  * @author Jeff Dinkins 
  * @author Arnaud Weber (keyboard UI support)
  */

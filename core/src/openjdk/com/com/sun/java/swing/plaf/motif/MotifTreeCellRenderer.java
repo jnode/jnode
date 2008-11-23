@@ -44,7 +44,6 @@ import java.util.*;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.23 05/05/07
  * @author Jeff Dinkins
  */
 public class MotifTreeCellRenderer extends DefaultTreeCellRenderer

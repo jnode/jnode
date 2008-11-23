@@ -43,7 +43,6 @@ import javax.swing.plaf.*;
  * long term persistence.
  *
  * @author  Timothy Prinzing
- * @version 1.27 05/05/07
  */
 public class MotifTextUI {
 

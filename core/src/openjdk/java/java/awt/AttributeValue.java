@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2001 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1999-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,18 +25,22 @@
 
 package java.awt;
 
-import sun.awt.DebugHelper;
+import java.util.logging.*;
 
 abstract class AttributeValue {
+    private static final Logger log = Logger.getLogger("java.awt.AttributeValue");
+
     private final int value;
     private final String[] names;
 
-    private static final DebugHelper dbg =
-        DebugHelper.create(AttributeValue.class);
-
     protected AttributeValue(int value, String[] names) {
-        if (dbg.on) {
-	    dbg.assertion(value >= 0 && names != null && value < names.length);
+        if (log.isLoggable(Level.FINEST)) {
+            log.log(Level.FINEST, "value = " + value + ", names = " + names);
+        }
+        if (log.isLoggable(Level.FINER)) {
+            if ((value < 0) || (names == null) || (value >= names.length)) {
+                log.log(Level.FINER, "Assertion failed");
+            }
 	}
         this.value = value;
 	this.names = names;

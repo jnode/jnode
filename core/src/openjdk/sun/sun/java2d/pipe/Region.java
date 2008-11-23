@@ -26,6 +26,8 @@
 package sun.java2d.pipe;
 
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 
 /**
  * This class encapsulates a definition of a two dimensional region which
@@ -62,6 +64,10 @@ public class Region {
     static final int GROW_SIZE = 50;
 
     static final Region EMPTY_REGION = new Region(0, 0, 0, 0);
+    static final Region WHOLE_REGION = new Region(Integer.MIN_VALUE,
+                                                  Integer.MIN_VALUE,
+                                                  Integer.MAX_VALUE,
+                                                  Integer.MAX_VALUE);
 
     int lox;
     int loy;
@@ -112,6 +118,94 @@ public class Region {
 	this.loy = loy;
 	this.hix = hix;
 	this.hiy = hiy;
+    }
+
+    /**
+     * Returns a Region object covering the pixels which would be
+     * touched by a fill or clip operation on a Graphics implementation
+     * on the specified Shape object under the optionally specified
+     * AffineTransform object.
+     *
+     * @param s a non-null Shape object specifying the geometry enclosing
+     *          the pixels of interest
+     * @param at an optional <code>AffineTransform</code> to be applied to the
+     *          coordinates as they are returned in the iteration, or
+     *          <code>null</code> if untransformed coordinates are desired
+     */
+    public static Region getInstance(Shape s, AffineTransform at) {
+        return getInstance(WHOLE_REGION, false, s, at);
+    }
+
+    /**
+     * Returns a Region object covering the pixels which would be
+     * touched by a fill or clip operation on a Graphics implementation
+     * on the specified Shape object under the optionally specified
+     * AffineTransform object further restricted by the specified
+     * device bounds.
+     * <p>
+     * Note that only the bounds of the specified Region are used to
+     * restrict the resulting Region.
+     * If devBounds is non-rectangular and clipping to the specific
+     * bands of devBounds is needed, then an intersection of the
+     * resulting Region with devBounds must be performed in a
+     * subsequent step.
+     *
+     * @param devBounds a non-null Region specifying some bounds to
+     *          clip the geometry to
+     * @param s a non-null Shape object specifying the geometry enclosing
+     *          the pixels of interest
+     * @param at an optional <code>AffineTransform</code> to be applied to the
+     *          coordinates as they are returned in the iteration, or
+     *          <code>null</code> if untransformed coordinates are desired
+     */
+    public static Region getInstance(Region devBounds,
+                                     Shape s, AffineTransform at)
+    {
+        return getInstance(devBounds, false, s, at);
+    }
+
+    /**
+     * Returns a Region object covering the pixels which would be
+     * touched by a fill or clip operation on a Graphics implementation
+     * on the specified Shape object under the optionally specified
+     * AffineTransform object further restricted by the specified
+     * device bounds.
+     * If the normalize parameter is true then coordinate normalization
+     * is performed as per the 2D Graphics non-antialiasing implementation
+     * of the VALUE_STROKE_NORMALIZE hint.
+     * <p>
+     * Note that only the bounds of the specified Region are used to
+     * restrict the resulting Region.
+     * If devBounds is non-rectangular and clipping to the specific
+     * bands of devBounds is needed, then an intersection of the
+     * resulting Region with devBounds must be performed in a
+     * subsequent step.
+     *
+     * @param devBounds a non-null Region specifying some bounds to
+     *          clip the geometry to
+     * @param normalize a boolean indicating whether or not to apply
+     *          normalization
+     * @param s a non-null Shape object specifying the geometry enclosing
+     *          the pixels of interest
+     * @param at an optional <code>AffineTransform</code> to be applied to the
+     *          coordinates as they are returned in the iteration, or
+     *          <code>null</code> if untransformed coordinates are desired
+     */
+    public static Region getInstance(Region devBounds, boolean normalize,
+                                     Shape s, AffineTransform at)
+    {
+        int box[] = new int[4];
+        ShapeSpanIterator sr = new ShapeSpanIterator(normalize);
+        try {
+            sr.setOutputArea(devBounds);
+            sr.appendPath(s.getPathIterator(at));
+            sr.getPathBox(box);
+            Region r = Region.getInstance(box);
+            r.appendSpans(sr);
+            return r;
+        } finally {
+            sr.dispose();
+        }
     }
 
     /**

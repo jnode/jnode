@@ -45,7 +45,6 @@ import java.awt.Point;
  * bands.  This type of Raster can be used with a
  * ComponentColorModel. This class requires a BandedSampleModel.
  *
- * @version 10 Feb 1997
  */
 public class ShortBandedRaster extends SunWritableRaster {
 
@@ -776,5 +775,3 @@ public class ShortBandedRaster extends SunWritableRaster {
     }
 
 }
-
-

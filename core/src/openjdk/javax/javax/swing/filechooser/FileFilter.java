@@ -46,7 +46,6 @@ import java.io.File;
  * @see javax.swing.JFileChooser#setFileFilter
  * @see javax.swing.JFileChooser#addChoosableFileFilter
  *
- * @version 1.27 05/05/07
  * @author Jeff Dinkins
  */
 public abstract class FileFilter {

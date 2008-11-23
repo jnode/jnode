@@ -37,7 +37,6 @@ import javax.swing.plaf.*;
  * A Motif L&F implementation of PopupMenuSeparatorUI.  This implementation
  * is a "combined" view/controller.
  *
- * @version 1.18 05/05/07
  * @author Jeff Shapiro
  */
 

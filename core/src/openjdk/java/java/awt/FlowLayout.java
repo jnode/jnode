@@ -77,7 +77,6 @@ import java.io.IOException;
  * <p>
  * A flow layout lets each component assume its natural (preferred) size.
  *
- * @version     1.65, 05/05/07
  * @author      Arthur van Hoff
  * @author      Sami Shaio
  * @since       JDK1.0
@@ -133,6 +132,8 @@ public class FlowLayout implements LayoutManager, java.io.Serializable {
      * <code>LEFT</code>
      * <code>RIGHT</code>
      * <code>CENTER</code>
+     * <code>LEADING</code>
+     * <code>TRAILING</code>
      * </ul>
      *
      * @serial

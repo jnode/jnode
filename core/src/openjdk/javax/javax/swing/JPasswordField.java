@@ -73,7 +73,6 @@ import java.util.Arrays;
  * description: Allows the editing of a line of text but doesn't show the characters.
  *
  * @author  Timothy Prinzing
- * @version 1.66 05/05/07
  */
 public class JPasswordField extends JTextField {
 

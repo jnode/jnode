@@ -31,7 +31,6 @@ import java.util.EventListener;
 /**
  * Defines a listener for menu events.
  *
- * @version 1.19 05/05/07
  * @author Georges Saab
  */
 public interface MenuListener extends EventListener {
@@ -54,4 +53,3 @@ public interface MenuListener extends EventListener {
      */
     void menuCanceled(MenuEvent e);
 }
-

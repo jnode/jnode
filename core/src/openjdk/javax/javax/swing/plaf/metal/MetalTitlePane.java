@@ -46,7 +46,6 @@ import javax.accessibility.*;
  * decoration style, and that if the style changes, a new one will
  * be created.
  *
- * @version 1.28 05/05/07
  * @author Terry Kellerman
  * @since 1.4
  */

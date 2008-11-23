@@ -29,7 +29,6 @@ import javax.swing.JMenuItem;
 
 /**
  *
- * @version 1.7 05/05/07
  * @author Igor Kushnirskiy
  */
 

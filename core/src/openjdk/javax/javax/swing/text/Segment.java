@@ -39,7 +39,6 @@ import java.text.CharacterIterator;
  * copying text into a string.
  *
  * @author  Timothy Prinzing
- * @version 1.31 05/05/07
  */
 public class Segment implements Cloneable, CharacterIterator, CharSequence {
 
@@ -315,5 +314,3 @@ public class Segment implements Cloneable, CharacterIterator, CharSequence {
 
 
 }
-
-

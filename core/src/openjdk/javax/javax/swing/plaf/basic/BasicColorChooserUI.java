@@ -44,7 +44,6 @@ import sun.swing.UIAction;
 /**
  * Provides the basic look and feel for a JColorChooser.
  * <p>
- * @version 1.54 05/05/07
  * @author Tom Santos
  * @author Steve Wilson
  */
@@ -340,6 +339,3 @@ public class BasicColorChooserUI extends ColorChooserUI
     }
     
 }
-
-
-

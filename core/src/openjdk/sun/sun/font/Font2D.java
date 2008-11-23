@@ -28,10 +28,8 @@ package sun.font;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Locale;
 
@@ -437,6 +435,11 @@ public abstract class Font2D {
      */
     byte[] getTableBytes(int tag) {
 	return null;
+    }
+
+    /* for layout code */
+    protected long getUnitsPerEm() {
+        return 2048;
     }
 
     boolean supportsEncoding(String encoding) {

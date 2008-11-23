@@ -43,7 +43,6 @@ import sun.swing.plaf.synth.DefaultSynthStyle;
 /**
  * Synth's ButtonUI implementation.
  *
- * @version 1.34, 05/05/07
  * @author Scott Violet
  */
 class SynthButtonUI extends BasicButtonUI implements

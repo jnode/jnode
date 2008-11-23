@@ -58,7 +58,6 @@ import javax.swing.plaf.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.42 05/05/07
  * @author Tom Santos
  */
 public class MetalSliderUI extends BasicSliderUI {

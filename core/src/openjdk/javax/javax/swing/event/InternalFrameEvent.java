@@ -51,7 +51,6 @@ import javax.swing.JInternalFrame;
  * @see JInternalFrame
  * @see InternalFrameListener
  *
- * @version 1.23 05/05/07
  * @author Thomas Ball
  */
 public class InternalFrameEvent extends AWTEvent {

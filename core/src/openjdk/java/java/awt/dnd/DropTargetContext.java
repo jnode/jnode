@@ -51,7 +51,6 @@ import java.util.List;
  * drag under feedback, but also to effect the subsequent data transfer
  * if appropriate.
  *
- * @version 	1.44, 05/05/07
  * @since 1.2
  */
 

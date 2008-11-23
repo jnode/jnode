@@ -43,7 +43,6 @@ import sun.swing.UIAction;
 /**
  * A basic L&F implementation of JInternalFrame.  
  *
- * @version 1.135 05/05/07
  * @author David Kloba
  * @author Rich Schiavi
  */

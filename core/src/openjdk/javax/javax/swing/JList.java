@@ -262,7 +262,6 @@ import static sun.swing.SwingUtilities2.Section.*;
  *   attribute: isContainer false
  * description: A component which allows for the selection of one or more objects from a list.
  *
- * @version 1.142 05/05/07
  * @author Hans Muller
  */
 public class JList extends JComponent implements Scrollable, Accessible
@@ -3682,4 +3681,3 @@ public class JList extends JComponent implements Scrollable, Accessible
         } // inner class AccessibleJListChild
     } // inner class AccessibleJList
 }
-

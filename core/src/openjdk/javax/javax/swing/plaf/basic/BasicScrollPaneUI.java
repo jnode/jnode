@@ -52,7 +52,6 @@ import java.awt.ComponentOrientation;
 /**
  * A default L&F implementation of ScrollPaneUI.
  *
- * @version 1.79 05/05/07
  * @author Hans Muller
  */
 public class BasicScrollPaneUI

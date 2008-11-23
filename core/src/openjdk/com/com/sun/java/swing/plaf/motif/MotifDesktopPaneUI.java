@@ -45,7 +45,6 @@ import java.io.Serializable;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.32 05/05/07
  * @author David Kloba
  */
 public class MotifDesktopPaneUI extends javax.swing.plaf.basic.BasicDesktopPaneUI

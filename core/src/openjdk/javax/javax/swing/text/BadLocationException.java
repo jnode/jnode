@@ -38,7 +38,6 @@ package javax.swing.text;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.27 05/05/07
  */
 public class BadLocationException extends Exception
 {

@@ -59,7 +59,6 @@ import java.io.IOException;
  * @beaninfo
  * description: A generic lightweight container.
  * 
- * @version 1.54 05/05/07
  * @author Arnaud Weber
  * @author Steve Wilson
  */
@@ -247,4 +246,3 @@ public class JPanel extends JComponent implements Accessible
         }
     }
 }
-

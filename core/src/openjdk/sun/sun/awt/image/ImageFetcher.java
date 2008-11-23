@@ -40,7 +40,6 @@ import sun.awt.AppContext;
   * 
   * @author Jim Graham
   * @author Fred Ecks
-  * @version 1.36 05/05/07
   */
 class ImageFetcher extends Thread {
     static final int HIGH_PRIORITY = 8;

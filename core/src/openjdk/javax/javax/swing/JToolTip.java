@@ -63,7 +63,6 @@ import java.io.IOException;
  *
  * @see JComponent#setToolTipText
  * @see JComponent#createToolTip
- * @version 1.57 05/05/07
  * @author Dave Moore
  * @author Rich Shiavi
  */

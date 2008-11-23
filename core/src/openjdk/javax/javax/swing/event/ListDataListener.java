@@ -30,7 +30,6 @@ import java.util.EventListener;
 /**
  * ListDataListener
  *
- * @version 1.20 05/05/07
  * @author Hans Muller
  */
 public interface ListDataListener extends EventListener {
@@ -68,4 +67,3 @@ public interface ListDataListener extends EventListener {
      */
     void contentsChanged(ListDataEvent e);
 }
-

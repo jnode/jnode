@@ -32,7 +32,6 @@ import javax.swing.text.*;
  * A view implementation to display an html list
  *
  * @author  Timothy Prinzing
- * @version 1.35 05/05/07
  */
 public class ListView extends BlockView  {
 

@@ -35,7 +35,6 @@ package sun.swing;
  * intalling the new one. They are also removed prior to serialization.
  *
  * @author Igor Kushnirskiy
- * @version 1.8 05/05/07
  */
 public interface UIClientPropertyKey {
 }

@@ -33,7 +33,6 @@ import java.io.Serializable;
 /**
  * A generic implementation of <code>ColorSelectionModel</code>.
  *
- * @version 1.22 05/05/07
  * @author Steve Wilson
  *
  * @see java.awt.Color

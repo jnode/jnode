@@ -35,7 +35,6 @@ import java.util.EventListener;
  href="http://java.sun.com/docs/books/tutorial/uiswing/events/treemodellistener.html">How to Write a Tree Model Listener</a>,
  * a section in <em>The Java Tutorial.</em>
  *
- * @version 1.24 05/05/07
  * @author Rob Davis
  * @author Ray Ryan
  */

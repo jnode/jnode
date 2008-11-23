@@ -46,7 +46,6 @@ import java.awt.Rectangle;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  * 
- * @version 1.24 05/05/07
  * @author Scott Violet
  */
 public class MotifOptionPaneUI extends BasicOptionPaneUI

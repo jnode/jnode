@@ -88,7 +88,6 @@ import javax.swing.text.*;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.4 03/05/01
  * @since 1.4
  */
 public class NumberFormatter extends InternationalFormatter {

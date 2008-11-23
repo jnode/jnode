@@ -51,7 +51,6 @@ import java.util.logging.*;
  * policy is used to perform the search operation.
  *
  * @author David Mendenhall
- * @version 1.15, 05/05/07
  *
  * @see Container#getComponents
  * @since 1.4

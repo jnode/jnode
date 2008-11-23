@@ -23,7 +23,6 @@
  * have any questions.
  */
 /*
- * @(#)TextLabelFactory.java	1.6 00/10/09
  *
  * (C) Copyright IBM Corp. 1998-2003 All Rights Reserved
  */

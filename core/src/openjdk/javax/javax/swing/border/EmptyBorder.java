@@ -29,7 +29,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Component;
 import java.io.Serializable;
-import java.beans.ConstructorProperties;
 
 /**
  * A class which provides an empty, transparent border which
@@ -44,7 +43,6 @@ import java.beans.ConstructorProperties;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.33 05/05/07
  * @author David Kloba
  */
 public class EmptyBorder extends AbstractBorder implements Serializable
@@ -69,7 +67,6 @@ public class EmptyBorder extends AbstractBorder implements Serializable
      * Creates an empty border with the specified insets.
      * @param borderInsets the insets of the border
      */
-    @ConstructorProperties({"borderInsets"})
     public EmptyBorder(Insets borderInsets)   {
         this.top = borderInsets.top; 
         this.right = borderInsets.right;

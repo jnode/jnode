@@ -42,7 +42,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's SpinnerUI.
  *
- * @version 1.20, 05/05/07
  * @author Hans Muller
  * @author Joshua Outwater
  */
@@ -321,7 +320,7 @@ class SynthSpinnerUI extends BasicSpinnerUI implements PropertyChangeListener,
 
 	public void removeLayoutComponent(Component c) {
 	    if (c == nextButton) {
-		c = null;
+                nextButton = null;
 	    }
 	    else if (c == previousButton) {
 		previousButton = null;

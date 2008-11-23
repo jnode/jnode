@@ -86,7 +86,6 @@ import sun.swing.SwingUtilities2;
  * @see MetalLookAndFeel
  * @see MetalLookAndFeel#setCurrentTheme
  *
- * @version 1.37 05/05/07
  * @author Steve Wilson
  */
 public class DefaultMetalTheme extends MetalTheme {

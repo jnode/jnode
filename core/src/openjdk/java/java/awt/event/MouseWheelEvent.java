@@ -26,7 +26,6 @@
 package java.awt.event;
 
 import java.awt.Component;
-import sun.awt.DebugHelper;
 
 /**
  * An event which indicates that the mouse wheel was rotated in a component.
@@ -77,7 +76,6 @@ import sun.awt.DebugHelper;
  * reflect the most recent settings.
  *
  * @author Brent Christian
- * @version 1.20 05/05/07
  * @see MouseWheelListener
  * @see java.awt.ScrollPane
  * @see java.awt.ScrollPane#setWheelScrollingEnabled(boolean)
@@ -87,8 +85,6 @@ import sun.awt.DebugHelper;
  */
 
 public class MouseWheelEvent extends MouseEvent {
-
-    private static final DebugHelper dbg = DebugHelper.create(MouseWheelEvent.class);
 
     /**
      * Constant representing scrolling by "units" (like scrolling with the
@@ -233,10 +229,6 @@ public class MouseWheelEvent extends MouseEvent {
         this.scrollType = scrollType;
         this.scrollAmount = scrollAmount;
         this.wheelRotation = wheelRotation;
-        
-        if (dbg.on) {
-            dbg.println("MouseWheelEvent constructor");
-        }
     }
 
     /**
@@ -359,4 +351,3 @@ public class MouseWheelEvent extends MouseEvent {
          getWheelRotation();
     }
 }
-

@@ -37,7 +37,6 @@ import java.io.Serializable;
 /**
  * Synth's CheckBoxMenuItemUI.
  *
- * @version 1.14 05/05/07
  * @author Leif Samuelsson
  * @author Georges Saab
  * @author David Karlton

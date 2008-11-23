@@ -37,7 +37,6 @@ import sun.awt.shell.ShellFolder;
 /**
  * Basic implementation of a file list.
  *
- * @version %i% %g%
  * @author Jeff Dinkins
  */
 public class BasicDirectoryModel extends AbstractListModel implements PropertyChangeListener {
@@ -235,6 +234,7 @@ public class BasicDirectoryModel extends AbstractListModel implements PropertyCh
 	}
 
 	public void run0() {
+            try {
 	    FileSystemView fileSystem = filechooser.getFileSystemView();
 
 	    File[] list = fileSystem.getFiles(currentDirectory, filechooser.isFileHidingEnabled());
@@ -332,6 +332,11 @@ public class BasicDirectoryModel extends AbstractListModel implements PropertyCh
 	        }
 		invokeLater(new DoChangeContents(newFileCache, 0, fileCache, 0, fid));
 	    }
+            } catch (RuntimeException e) {
+                if (!(e.getCause() instanceof InterruptedException /* just exit on interruption */)) {
+                    throw e;
+                }
+            }
 	}
 
 
@@ -495,4 +500,3 @@ public class BasicDirectoryModel extends AbstractListModel implements PropertyCh
 	}
     }
 }
-

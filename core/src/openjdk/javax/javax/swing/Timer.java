@@ -140,7 +140,6 @@ import javax.swing.event.EventListenerList;
  * @see java.util.Timer <code>java.util.Timer</code>
  *
  *
- * @version 1.56 05/05/07
  * @author Dave Moore
  */
 public class Timer implements Serializable
@@ -613,4 +612,3 @@ public class Timer implements Serializable
         return timer;
     }
 }
-

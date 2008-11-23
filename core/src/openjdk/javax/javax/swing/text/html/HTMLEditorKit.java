@@ -158,7 +158,6 @@ import java.lang.ref.*;
  * </dl>
  *
  * @author  Timothy Prinzing
- * @version 1.142 05/05/07
  */
 public class HTMLEditorKit extends StyledEditorKit implements Accessible {
 
@@ -1414,13 +1413,13 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
     /** HTML used when inserting pre. */
     private static final String INSERT_PRE_HTML = "<pre></pre>";
 
-    private static NavigateLinkAction nextLinkAction = 
+    private static final NavigateLinkAction nextLinkAction =
 	new NavigateLinkAction("next-link-action");
 
-    private static NavigateLinkAction previousLinkAction = 
+    private static final NavigateLinkAction previousLinkAction =
 	new NavigateLinkAction("previous-link-action");
 
-    private static ActivateLinkAction activateLinkAction = 
+    private static final ActivateLinkAction activateLinkAction =
 	new ActivateLinkAction("activate-link-action");
 	
     private static final Action[] defaultActions = {
@@ -1450,6 +1449,11 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
         new BeginAction(beginAction, false),
         new BeginAction(selectionBeginAction, true)
     };
+
+    // link navigation support
+    private boolean foundLink = false;
+    private int prevHypertextOffset = -1;
+    private Object linkNavigationTag;
 
 
     /**
@@ -1854,24 +1858,18 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
      * javax.accessibility package.  The text package should support
      * keyboard navigation of text elements directly.
      */
-    static class NavigateLinkAction extends TextAction 
-        implements CaretListener {
+    static class NavigateLinkAction extends TextAction implements CaretListener {
 
-	private static int prevHypertextOffset = -1;
-	private static boolean foundLink = false;
-        private static FocusHighlightPainter focusPainter =
+        private static final FocusHighlightPainter focusPainter =
 	    new FocusHighlightPainter(null);
-	private Object selectionTag;
-	private boolean focusBack = false;
+        private final boolean focusBack;
 
         /*
          * Create this action with the appropriate identifier. 
          */
         public NavigateLinkAction(String actionName) {
             super(actionName);
-	    if ("previous-link-action".equals(actionName)) {
-		focusBack = true;
-	    }
+            focusBack = "previous-link-action".equals(actionName);
         }
 	
 	/**
@@ -1880,16 +1878,18 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
 	 * @param e the caret event
 	 */
 	public void caretUpdate(CaretEvent e) {
-	    if (foundLink) {
-		foundLink = false;
+            Object src = e.getSource();
+            if (src instanceof JTextComponent) {
+                JTextComponent comp = (JTextComponent) src;
+                HTMLEditorKit kit = getHTMLEditorKit(comp);
+                if (kit != null && kit.foundLink) {
+                    kit.foundLink = false;
 		// TODO: The AccessibleContext for the editor should register
 		// as a listener for CaretEvents and forward the events to
 		// assistive technologies listening for such events.
-		Object src = e.getSource();
-		if (src instanceof JTextComponent) {
-		    ((JTextComponent)src).getAccessibleContext().firePropertyChange(
+                    comp.getAccessibleContext().firePropertyChange(
                         AccessibleContext.ACCESSIBLE_HYPERTEXT_OFFSET,
-		        new Integer(prevHypertextOffset),
+                        new Integer(kit.prevHypertextOffset),
 		        new Integer(e.getDot()));
 		}
 	    }
@@ -1903,14 +1903,16 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
 	    if (comp == null || comp.isEditable()) {
 		return;
 	    }
+
 	    Document doc = comp.getDocument();
-	    if (doc == null) {
+            HTMLEditorKit kit = getHTMLEditorKit(comp);
+            if (doc == null || kit == null) {
 		return;
 	    }
+
 	    // TODO: Should start successive iterations from the
 	    // current caret position.
 	    ElementIterator ei = new ElementIterator(doc);
-
 	    int currentOffset = comp.getCaretPosition();
 	    int prevStartOffset = -1;
 	    int prevEndOffset = -1;
@@ -1931,21 +1933,21 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
 		    if (elementOffset >= currentOffset &&
 			prevStartOffset >= 0) {
 
-			foundLink = true;
+                        kit.foundLink = true;
 			comp.setCaretPosition(prevStartOffset);
-			moveCaretPosition(comp, prevStartOffset, 
+                        moveCaretPosition(comp, kit, prevStartOffset,
 					  prevEndOffset);
-			prevHypertextOffset = prevStartOffset;
+                        kit.prevHypertextOffset = prevStartOffset;
 			return;
 		    }
 		} else { // focus forward
 		    if (elementOffset > currentOffset) {
 
-			foundLink = true;
+                        kit.foundLink = true;
 			comp.setCaretPosition(elementOffset);
-			moveCaretPosition(comp, elementOffset,
+                        moveCaretPosition(comp, kit, elementOffset,
 					  nextElement.getEndOffset());
-			prevHypertextOffset = elementOffset;
+                        kit.prevHypertextOffset = elementOffset;
 			return;
 		    } 
 		}
@@ -1953,11 +1955,10 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
 		prevEndOffset = nextElement.getEndOffset();
 	    }
             if (focusBack && prevStartOffset >= 0) {
-                foundLink = true;
+                kit.foundLink = true;
                 comp.setCaretPosition(prevStartOffset);
-                moveCaretPosition(comp, prevStartOffset, 
-                                  prevEndOffset);
-                prevHypertextOffset = prevStartOffset;
+                moveCaretPosition(comp, kit, prevStartOffset, prevEndOffset);
+                kit.prevHypertextOffset = prevStartOffset;
                 return;
             }
         }
@@ -1965,22 +1966,33 @@ public class HTMLEditorKit extends StyledEditorKit implements Accessible {
 	/*
 	 * Moves the caret from mark to dot
 	 */
-	private void moveCaretPosition(JTextComponent comp, int mark, int dot) {
+        private void moveCaretPosition(JTextComponent comp, HTMLEditorKit kit,
+                                       int mark, int dot) {
 	    Highlighter h = comp.getHighlighter();
 	    if (h != null) {
 		int p0 = Math.min(dot, mark);
 		int p1 = Math.max(dot, mark);
 		try {
-		    if (selectionTag != null) {
-			h.changeHighlight(selectionTag, p0, p1);
+                    if (kit.linkNavigationTag != null) {
+                        h.changeHighlight(kit.linkNavigationTag, p0, p1);
 		    } else {
-			Highlighter.HighlightPainter p = focusPainter;
-			selectionTag = h.addHighlight(p0, p1, p);
+                        kit.linkNavigationTag =
+                                h.addHighlight(p0, p1, focusPainter);
 		    }
 		} catch (BadLocationException e) {
 		}
 	    }
 	}
+
+        private HTMLEditorKit getHTMLEditorKit(JTextComponent comp) {
+            if (comp instanceof JEditorPane) {
+                EditorKit kit = ((JEditorPane) comp).getEditorKit();
+                if (kit instanceof HTMLEditorKit) {
+                    return (HTMLEditorKit) kit;
+                }
+            }
+            return null;
+        }
 
 	/**
 	 * A highlight painter that draws a one-pixel border around

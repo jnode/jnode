@@ -1513,12 +1513,6 @@ public class ProcessPath {
                                 ProcessLine(hnd, tCoords[0], tCoords[1],
                                             closeCoord[0], closeCoord[1],
                                             pixelInfo);
-
-                                /* Storing last path's point for using in
-                                 * following segments without initial moveTo
-                                 */ 
-                                tCoords[0] = closeCoord[0];
-                                tCoords[1] = closeCoord[1];
                             }
                         }
                         hnd.processEndSubPath();

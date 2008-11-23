@@ -34,7 +34,6 @@ import sun.awt.AppContext;
 /**
  * A MenuSelectionManager owns the selection in menu hierarchy.
  * 
- * @version 1.47 05/05/07
  * @author Arnaud Weber
  */
 public class MenuSelectionManager {
@@ -498,5 +497,3 @@ public class MenuSelectionManager {
         return false;
     }
 }
-
-

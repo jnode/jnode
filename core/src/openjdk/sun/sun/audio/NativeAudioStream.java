@@ -33,7 +33,6 @@ import java.io.IOException;
 /**
  * A Sun-specific AudioStream that supports native audio formats.
  *
- * @version 1.14 07/05/05
  */
 
  /*

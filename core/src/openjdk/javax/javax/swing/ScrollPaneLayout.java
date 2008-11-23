@@ -55,7 +55,6 @@ import java.io.Serializable;
  * @see JScrollPane
  * @see JViewport
  *
- * @version 1.70 05/05/07
  * @author Hans Muller
  */
 public class ScrollPaneLayout
@@ -491,8 +490,10 @@ public class ScrollPaneLayout
 
 	if (viewport !=  null) {
 	    extentSize = viewport.getPreferredSize();
-	    viewSize = viewport.getViewSize();
 	    view = viewport.getView();
+            if (view != null) {
+                viewSize = view.getPreferredSize();
+            }
 	}
 
 	/* If there's a viewport add its preferredSize.

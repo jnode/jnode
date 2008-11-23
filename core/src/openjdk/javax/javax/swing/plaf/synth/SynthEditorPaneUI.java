@@ -38,7 +38,6 @@ import sun.swing.plaf.synth.SynthUI;
  * Synth look and feel.
  *
  * @author  Shannon Hickey
- * @version 1.16 05/05/07
  */
 class SynthEditorPaneUI extends BasicEditorPaneUI implements SynthUI {
     private SynthStyle style;

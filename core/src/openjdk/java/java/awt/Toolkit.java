@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,19 +25,18 @@
 
 package java.awt;
 
+import java.beans.PropertyChangeEvent;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.awt.event.*;
 import java.awt.peer.*;
-import java.awt.*;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.ColorModel;
 import java.awt.datatransfer.Clipboard;
-import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragGestureEvent;
@@ -45,25 +44,20 @@ import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.net.URL;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-import java.util.EventListener;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.WeakHashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.logging.*;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import sun.awt.AppContext;
 
-import sun.awt.DebugHelper;
 import sun.awt.HeadlessToolkit;
 import sun.awt.NullComponentPeer;
+import sun.awt.PeerEvent;
+import sun.awt.SunToolkit;
 import sun.security.util.SecurityConstants;
 
 import sun.util.CoreResourceBundleControl;
@@ -114,7 +108,6 @@ import org.jnode.vm.VmSystem;
  * <code>java.awt.peer</code>. Some methods defined by
  * <code>Toolkit</code> query the native operating system directly.
  *
- * @version 	1.203, 12/19/03
  * @author	Sami Shaio
  * @author	Arthur van Hoff
  * @author	Fred Ecks
@@ -476,9 +469,6 @@ public abstract class  Toolkit {
 /**
      * Controls whether the layout of Containers is validated dynamically
      * during resizing, or statically, after resizing is complete.
-     * Use {@code isDynamicLayoutActive()} to detect if this feature enabled
-     * in this program and is supported by this operating system
-     * and/or window manager.
      * Note that this feature is supported not on all platforms, and
      * conversely, that this feature cannot be turned off on some platforms.
      * On these platforms where dynamic layout during resizing is not supported
@@ -538,16 +528,8 @@ public abstract class  Toolkit {
     /**
      * Returns whether dynamic layout of Containers on resize is
      * currently active (both set in program
-     *( {@code isDynamicLayoutSet()} )
      *, and supported
      * by the underlying operating system and/or window manager).
-     * If dynamic layout is currently inactive then Containers
-     * re-layout their components when resizing is completed. As a result
-     * the {@code Component.validate()} method will be invoked only
-     * once per resize.
-     * If dynamic layout is currently active then Containers
-     * re-layout their components on every native resize event and
-     * the {@code validate()} method will be invoked each time.
      * The OS/WM support can be queried using
      * the getDesktopProperty("awt.dynamicLayoutSupported") method.
      *
@@ -1847,10 +1829,7 @@ public abstract class  Toolkit {
      * @param	pcl The property change listener
      * @since	1.2
      */
-    public synchronized void addPropertyChangeListener(String name, PropertyChangeListener pcl) {
-	if (pcl == null) {
-	    return;
-	}
+    public void addPropertyChangeListener(String name, PropertyChangeListener pcl) {
 	desktopPropsSupport.addPropertyChangeListener(name, pcl);
     }
 
@@ -1863,10 +1842,7 @@ public abstract class  Toolkit {
      * @param	pcl The property change listener
      * @since	1.2
      */
-    public synchronized void removePropertyChangeListener(String name, PropertyChangeListener pcl) {
-	if (pcl == null) {
-	    return;
-	}
+    public void removePropertyChangeListener(String name, PropertyChangeListener pcl) {
 	desktopPropsSupport.removePropertyChangeListener(name, pcl);
     }
 
@@ -1894,13 +1870,14 @@ public abstract class  Toolkit {
      *         been added
      * @since 1.4
      */
-    public synchronized PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
         return desktopPropsSupport.getPropertyChangeListeners(propertyName);
     }
 
-    protected final Map<String,Object> desktopProperties
-	= new HashMap<String,Object>();
-    protected final PropertyChangeSupport desktopPropsSupport = new PropertyChangeSupport(this);
+    protected final Map<String,Object> desktopProperties =
+            new HashMap<String,Object>();
+    protected final PropertyChangeSupport desktopPropsSupport =
+            Toolkit.createPropertyChangeSupport(this);
 
     /**
      * Returns whether the always-on-top mode is supported by this toolkit.
@@ -1952,7 +1929,8 @@ public abstract class  Toolkit {
      */
     public abstract boolean isModalExclusionTypeSupported(Dialog.ModalExclusionType modalExclusionType);
 
-    private static final DebugHelper dbg = DebugHelper.create(Toolkit.class);
+    private static final Logger log = Logger.getLogger("java.awt.Toolkit");
+
     private static final int LONG_BITS = 64;
     private int[] calls = new int[LONG_BITS];
     private static volatile long enabledOnToolkitMask;
@@ -2118,8 +2096,10 @@ public abstract class  Toolkit {
         }
 
     synchronized int countAWTEventListeners(long eventMask) {
-        if (dbg.on) {
-            dbg.assertion(eventMask != 0);
+        if (log.isLoggable(Level.FINE)) {
+            if (eventMask == 0) {
+                log.log(Level.FINE, "Assertion (eventMask != 0) failed");
+            }
         }
 
         int ci = 0;
@@ -2420,7 +2400,6 @@ public abstract class  Toolkit {
 	mapInputMethodHighlight(InputMethodHighlight highlight)
 	throws HeadlessException;
 
-    
     //jnode
     /**
      * Flush a previously instantiate toolkit.
@@ -2429,5 +2408,127 @@ public abstract class  Toolkit {
         toolkit = null;
     }
 
-}
+    private static PropertyChangeSupport createPropertyChangeSupport(Toolkit toolkit) {
+        if (toolkit instanceof SunToolkit || toolkit instanceof HeadlessToolkit) {
+            return new DesktopPropertyChangeSupport(toolkit);
+        } else {
+            return new PropertyChangeSupport(toolkit);
+        }
+    }
+    
+    private static class DesktopPropertyChangeSupport extends PropertyChangeSupport {
+        private static final StringBuilder PROP_CHANGE_SUPPORT_KEY =
+                new StringBuilder("desktop property change support key");
+        private final Object source;
 
+        public DesktopPropertyChangeSupport(Object sourceBean) {
+            super(sourceBean);
+            source = sourceBean;
+    }
+
+        @Override
+        public synchronized void addPropertyChangeListener(
+                String propertyName,
+                PropertyChangeListener listener)
+        {
+            PropertyChangeSupport pcs = (PropertyChangeSupport)
+                    AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+            if (null == pcs) {
+                pcs = new PropertyChangeSupport(source);
+                AppContext.getAppContext().put(PROP_CHANGE_SUPPORT_KEY, pcs);
+            }
+            pcs.addPropertyChangeListener(propertyName, listener);
+        }
+
+        @Override
+        public synchronized void removePropertyChangeListener(
+                String propertyName,
+                PropertyChangeListener listener)
+        {
+            PropertyChangeSupport pcs = (PropertyChangeSupport)
+                    AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+            if (null != pcs) {
+                pcs.removePropertyChangeListener(propertyName, listener);
+            }
+        }
+
+        @Override
+        public synchronized PropertyChangeListener[] getPropertyChangeListeners()
+        {
+            PropertyChangeSupport pcs = (PropertyChangeSupport)
+                    AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+            if (null != pcs) {
+                return pcs.getPropertyChangeListeners();
+            } else {
+                return new PropertyChangeListener[0];
+            }
+        }
+
+        @Override
+        public synchronized PropertyChangeListener[] getPropertyChangeListeners(String propertyName)
+        {
+            PropertyChangeSupport pcs = (PropertyChangeSupport)
+                    AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+            if (null != pcs) {
+                return pcs.getPropertyChangeListeners(propertyName);
+            } else {
+                return new PropertyChangeListener[0];
+            }
+        }
+
+        @Override
+        public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+            PropertyChangeSupport pcs = (PropertyChangeSupport)
+                    AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+            if (null == pcs) {
+                pcs = new PropertyChangeSupport(source);
+                AppContext.getAppContext().put(PROP_CHANGE_SUPPORT_KEY, pcs);
+            }
+            pcs.addPropertyChangeListener(listener);
+        }
+
+        @Override
+        public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+            PropertyChangeSupport pcs = (PropertyChangeSupport)
+                    AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+            if (null != pcs) {
+                pcs.removePropertyChangeListener(listener);
+            }
+        }
+
+        /*
+         * we do expect that all other fireXXX() methods of java.beans.PropertyChangeSupport
+         * use this method.  If this will be changed we will need to change this class.
+         */
+        @Override
+        public void firePropertyChange(final PropertyChangeEvent evt) {
+            Object oldValue = evt.getOldValue();
+            Object newValue = evt.getNewValue();
+            String propertyName = evt.getPropertyName();
+            if (oldValue != null && newValue != null && oldValue.equals(newValue)) {
+                return;
+            }
+            Runnable updater = new Runnable() {
+                public void run() {
+                    PropertyChangeSupport pcs = (PropertyChangeSupport)
+                            AppContext.getAppContext().get(PROP_CHANGE_SUPPORT_KEY);
+                    if (null != pcs) {
+                        pcs.firePropertyChange(evt);
+                    }
+                }
+            };
+            final AppContext currentAppContext = AppContext.getAppContext();
+            for (AppContext appContext : AppContext.getAppContexts()) {
+                if (null == appContext || appContext.isDisposed()) {
+                    continue;
+                }
+                if (currentAppContext == appContext) {
+                    updater.run();
+                } else {
+                    final PeerEvent e = new PeerEvent(source, updater, PeerEvent.ULTIMATE_PRIORITY_EVENT);
+                    SunToolkit.postEvent(appContext, e);
+                }
+            }
+        }
+    }
+}

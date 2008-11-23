@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,29 +25,23 @@
 
 package java.awt;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InvocationEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.PaintEvent;
-import java.awt.event.WindowEvent;
-import java.awt.ActiveEvent;
+import java.awt.event.*;
+
 import java.awt.peer.ComponentPeer;
-import java.awt.peer.LightweightPeer;
-import java.awt.TrayIcon;
-import java.util.EmptyStackException;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
+import java.util.EmptyStackException;
+import java.util.logging.*;
+
+import sun.awt.AppContext;
+import sun.awt.AWTAutoShutdown;
 import sun.awt.PeerEvent;
 import sun.awt.SunToolkit;
-import sun.awt.DebugHelper;
-import sun.awt.AWTAutoShutdown;
-import sun.awt.AppContext;
 
 /**
  * <code>EventQueue</code> is a platform-independent class
@@ -91,11 +85,9 @@ import sun.awt.AppContext;
  * @author Fred Ecks
  * @author David Mendenhall
  *
- * @version 	1.112, 05/05/07
  * @since 	1.1
  */
 public class EventQueue {
-    private static final DebugHelper dbg = DebugHelper.create(EventQueue.class);
 
     // From Thread.java
     private static int threadInitNumber;
@@ -141,11 +133,6 @@ public class EventQueue {
         Thread.currentThread().getContextClassLoader();
 
     /*
-     * Debugging flag -- set true and recompile to enable checking.
-     */
-    private final static boolean debug = false;
-
-    /*
      * The time stamp of the last dispatched InputEvent or ActionEvent.
      */
     private long mostRecentEventTime = System.currentTimeMillis();
@@ -163,6 +150,8 @@ public class EventQueue {
     private int waitForID;
 
     private final String name = "AWT-EventQueue-" + nextThreadNum();
+
+    private static final Logger eventLog = Logger.getLogger("java.awt.event.EventQueue");
 
     public EventQueue() {
         for (int i = 0; i < NUM_PRIORITIES; i++) {
@@ -702,8 +691,8 @@ public class EventQueue {
      * @since           1.2
      */
     public synchronized void push(EventQueue newEventQueue) {
-	if (debug) {
-	    System.out.println("EventQueue.push(" + newEventQueue + ")");
+        if (eventLog.isLoggable(Level.FINE)) {
+            eventLog.log(Level.FINE, "EventQueue.push(" + newEventQueue + ")");
 	}
 
         if (nextQueue != null) {
@@ -717,9 +706,8 @@ public class EventQueue {
 		try {
 		    newEventQueue.postEventPrivate(getNextEvent());
 		} catch (InterruptedException ie) {
-		    if (debug) {
-			System.err.println("interrupted push:");
-			ie.printStackTrace(System.err);
+                    if (eventLog.isLoggable(Level.FINE)) {
+                        eventLog.log(Level.FINE, "Interrupted push", ie);
 		    }
 		}
 	    }
@@ -762,8 +750,8 @@ public class EventQueue {
      * @since           1.2
      */
     protected void pop() throws EmptyStackException {
-	if (debug) {
-	    System.out.println("EventQueue.pop(" + this + ")");
+        if (eventLog.isLoggable(Level.FINE)) {
+            eventLog.log(Level.FINE, "EventQueue.pop(" + this + ")");
 	}
 
 	// To prevent deadlock, we lock on the previous EventQueue before
@@ -786,9 +774,8 @@ public class EventQueue {
 		try {
 		    previousQueue.postEventPrivate(getNextEvent());
 		} catch (InterruptedException ie) {
-		    if (debug) {
-			System.err.println("interrupted pop:");
-			ie.printStackTrace(System.err);
+                    if (eventLog.isLoggable(Level.FINE)) {
+                        eventLog.log(Level.FINE, "Interrupted pop", ie);
 		    }
 		}
 	    }
@@ -1055,4 +1042,3 @@ class EventQueueItem {
         id = evt.getID();
     }
 }
-

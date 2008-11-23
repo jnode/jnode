@@ -56,7 +56,6 @@ import sun.swing.CachedPainter;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.70 05/05/07
  * @author Michael C. Albers
  */
 public class MetalIconFactory implements Serializable {
@@ -2605,7 +2604,7 @@ private static class HorizontalSliderThumbIcon implements Icon, Serializable, UI
                                     GraphicsConfiguration config,
                                     Object[] args) {
             return new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
-/*jnode            
+/*jnode
             if (config == null) {
                 return new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
             }

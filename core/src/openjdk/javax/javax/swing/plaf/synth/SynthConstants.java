@@ -34,7 +34,6 @@ import javax.swing.*;
  * <code>PRESSED</code> or <code>DISABLED</code>, and may also contain
  * <code>FOCUSED</code>, <code>SELECTED</code> or <code>DEFAULT</code>.
  *
- * @version 1.14, 05/05/07
  * @since 1.5
  */
 public interface SynthConstants {

@@ -59,7 +59,6 @@ import java.lang.reflect.Field;
  *
  * @see #getAWTKeyStroke
  *
- * @version 1.36, 05/05/07
  * @author Arnaud Weber
  * @author David Mendenhall
  * @since 1.4
@@ -861,4 +860,3 @@ class VKCollection {
         return (String)code2name.get(code);
     }
 }
-

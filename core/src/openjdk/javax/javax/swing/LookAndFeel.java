@@ -144,7 +144,6 @@ import java.util.StringTokenizer;
  * all of the {@code install} methods throw a {@code NullPointerException} if
  * a {@code null} component is passed in.
  * 
- * @version 1.50 05/05/07
  * @author Tom Ball
  * @author Hans Muller
  */

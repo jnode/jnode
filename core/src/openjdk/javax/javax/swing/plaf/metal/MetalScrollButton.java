@@ -47,7 +47,6 @@ import javax.swing.plaf.basic.BasicArrowButton;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.15 08/28/98
  * @author Tom Santos
  * @author Steve Wilson
  */
@@ -345,4 +344,3 @@ public class MetalScrollButton extends BasicArrowButton
 	    return buttonWidth;
 	}
 }
-

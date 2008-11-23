@@ -183,7 +183,6 @@ import java.security.BasicPermission;
  * @see java.security.PermissionCollection
  * @see java.lang.SecurityManager
  *
- * @version 	1.38, 05/05/07
  *
  * @author Marianne Mueller
  * @author Roland Schemers

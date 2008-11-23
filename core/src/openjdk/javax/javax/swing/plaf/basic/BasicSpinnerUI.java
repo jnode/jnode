@@ -44,7 +44,6 @@ import sun.swing.DefaultLookup;
 /**
  * The default Spinner UI delegate.
  *
- * @version 1.34 05/05/07
  * @author Hans Muller
  * @since 1.4
  */

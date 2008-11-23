@@ -31,7 +31,6 @@ import java.awt.event.*;
  * The interface for objects which have an adjustable numeric value
  * contained within a bounded range of values.
  *
- * @version 1.25 05/05/07
  * @author Amy Fowler
  * @author Tim Prinzing
  */

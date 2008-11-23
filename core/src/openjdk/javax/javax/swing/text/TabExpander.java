@@ -30,7 +30,6 @@ package javax.swing.text;
  * implementations of tab expansion.
  *
  * @author  Timothy Prinzing
- * @version 1.22 05/05/07
  */
 public interface TabExpander {
 

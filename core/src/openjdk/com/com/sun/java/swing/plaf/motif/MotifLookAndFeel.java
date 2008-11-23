@@ -44,6 +44,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 import sun.swing.SwingUtilities2;
+import sun.awt.OSInfo;
 
 /**
  * Implements the Motif Look and Feel.
@@ -57,7 +58,6 @@ import sun.swing.SwingUtilities2;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.192 05/05/07
  * @author unattributed
  */
 public class MotifLookAndFeel extends BasicLookAndFeel
@@ -76,9 +76,7 @@ public class MotifLookAndFeel extends BasicLookAndFeel
 
 
     public boolean isNativeLookAndFeel() {
-        String osName = System.getProperty("os.name");
-        return (osName != null) && 
-	       (osName.indexOf("SunOS") != -1 || osName.indexOf("Solaris") != -1);
+        return OSInfo.getOSType() == OSInfo.OSType.SOLARIS;
     }
 
 
@@ -1285,4 +1283,3 @@ public class MotifLookAndFeel extends BasicLookAndFeel
     }
 
 }
-

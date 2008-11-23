@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2001 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,9 +25,6 @@
 
 package sun.awt;
 
-import java.awt.Component;
-import java.awt.peer.ComponentPeer;
-import java.awt.Container;
 import java.awt.IllegalComponentStateException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -35,7 +32,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.WeakHashMap;
-import sun.awt.DebugHelper;
+
+import java.util.logging.*;
 
 /**
  * This class is used to aid in keeping track of DisplayChangedListeners and
@@ -56,7 +54,7 @@ import sun.awt.DebugHelper;
  * screen to another on a system equipped with multiple displays.
  */
 public class SunDisplayChanger {
-    private static final DebugHelper dbg = DebugHelper.create(SunDisplayChanger.class);
+    private static final Logger log = Logger.getLogger("sun.awt.multiscreen.SunDisplayChanger");
 
     // Create a new synchronizedMap with initial capacity of one listener.  
     // It is asserted that the most common case is to have one GraphicsDevice 
@@ -70,10 +68,14 @@ public class SunDisplayChanger {
      * notified when the display is changed.
      */
     public void add(DisplayChangedListener theListener) {
-        if (dbg.on) {
-            dbg.assertion(theListener != null);
+        if (log.isLoggable(Level.FINE)) {
+            if (theListener == null) {
+                log.log(Level.FINE, "Assertion (theListener != null) failed");
+            }
         }
-
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Adding listener: " + theListener);
+        }
         listeners.put(theListener, null);
     }
 
@@ -81,10 +83,14 @@ public class SunDisplayChanger {
      * Remove the given DisplayChangeListener from this SunDisplayChanger.
      */
     public void remove(DisplayChangedListener theListener) {
-        if (dbg.on) {
-            dbg.assertion(theListener != null);
+        if (log.isLoggable(Level.FINE)) {
+            if (theListener == null) {
+                log.log(Level.FINE, "Assertion (theListener != null) failed");
+            }
         }
-
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Removing listener: " + theListener);
+        }
         listeners.remove(theListener);
     }
 
@@ -93,6 +99,9 @@ public class SunDisplayChanger {
      * taken place by calling their displayChanged() methods.
      */
     public void notifyListeners() {
+        if (log.isLoggable(Level.FINEST)) {
+            log.log(Level.FINEST, "notifyListeners");
+        }
     // This method is implemented by making a clone of the set of listeners,
     // and then iterating over the clone.  This is because during the course
     // of responding to a display change, it may be appropriate for a 
@@ -117,6 +126,9 @@ public class SunDisplayChanger {
             DisplayChangedListener current =
              (DisplayChangedListener) itr.next();
             try {
+                if (log.isLoggable(Level.FINEST)) {
+                    log.log(Level.FINEST, "displayChanged for listener: " + current);
+                }
                 current.displayChanged();
             } catch (IllegalComponentStateException e) {
                 // This DisplayChangeListener is no longer valid.  Most
@@ -134,6 +146,9 @@ public class SunDisplayChanger {
      * taken place by calling their paletteChanged() methods.
      */
     public void notifyPaletteChanged() {
+        if (log.isLoggable(Level.FINEST)) {
+            log.finest("notifyPaletteChanged");
+        }
     // This method is implemented by making a clone of the set of listeners,
     // and then iterating over the clone.  This is because during the course
     // of responding to a display change, it may be appropriate for a 
@@ -157,6 +172,9 @@ public class SunDisplayChanger {
             DisplayChangedListener current = 
              (DisplayChangedListener) itr.next();
             try {
+                if (log.isLoggable(Level.FINEST)) {
+                    log.log(Level.FINEST, "paletteChanged for listener: " + current);
+                }
                 current.paletteChanged();
             } catch (IllegalComponentStateException e) {
                 // This DisplayChangeListener is no longer valid.  Most
@@ -169,4 +187,3 @@ public class SunDisplayChanger {
         }
     }
 }
-

@@ -99,7 +99,6 @@ import java.beans.PropertyChangeEvent;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.282 05/05/07
  * @author unattributed
  */
 public abstract class BasicLookAndFeel extends LookAndFeel implements Serializable
@@ -112,7 +111,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel implements Serializab
     /**
      * Lock used when manipulating clipPlaying.
      */
-    private Object audioLock = new Object();
+    private transient Object audioLock = new Object();
     /**
      * The Clip that is currently playing (set in AudioAction).
      */
@@ -2304,7 +2303,6 @@ public abstract class BasicLookAndFeel extends LookAndFeel implements Serializab
                             // Activate the frame.
                             try { ((JInternalFrame)parent).setSelected(true); }
                             catch (PropertyVetoException e1) { }
-                            break;
                         }
                         parent = parent.getParent();
                     }

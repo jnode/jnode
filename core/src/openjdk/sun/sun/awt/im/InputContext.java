@@ -62,7 +62,6 @@ import sun.awt.SunToolkit;
  * subclass InputMethodContext.
  *
  * @see java.awt.im.InputContext
- * @version 1.63 05/05/07
  * @author JavaSoft Asia/Pacific
  */
 

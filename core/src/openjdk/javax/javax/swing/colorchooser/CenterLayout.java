@@ -31,7 +31,6 @@ import java.io.*;
 
 /**
   * Center-positioning layout manager.
-  * @version 1.17 05/05/07
   * @author Tom Santos
   * @author Steve Wilson
   */

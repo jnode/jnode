@@ -24,8 +24,6 @@
  */
 
 /*
- *  @(#)GlyphLayout.java	1.18 07/05/05
- *
  * (C) Copyright IBM Corp. 1999-2003 - All Rights Reserved
  *
  * The original version of this source code and documentation is
@@ -665,4 +663,3 @@ public final class GlyphLayout {
         }
     }
 }
-

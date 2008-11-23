@@ -40,7 +40,6 @@ import java.awt.image.*;
 /**
  * JPEG Image converter
  *
- * @version 1.29 05/05/07
  * @author Jim Graham
  */
 public class JPEGImageDecoder extends ImageDecoder {

@@ -49,7 +49,6 @@ import javax.swing.SwingUtilities;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.51 05/05/07
  */
 public final class StringContent implements AbstractDocument.Content, Serializable {
 

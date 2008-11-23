@@ -35,7 +35,6 @@ import java.util.EventListener;
  *
  * @see javax.swing.ListSelectionModel
  * 
- * @version 1.19 05/05/07
  * @author Hans Muller
  */
 
@@ -47,5 +46,3 @@ public interface ListSelectionListener extends EventListener
    */
   void valueChanged(ListSelectionEvent e);
 }
-
-

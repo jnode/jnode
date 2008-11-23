@@ -45,7 +45,6 @@ import java.util.Stack;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.30 05/05/07
  * @author Scott Violet
  */
 

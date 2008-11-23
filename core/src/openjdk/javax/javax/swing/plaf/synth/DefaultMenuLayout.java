@@ -39,7 +39,6 @@ import java.awt.Dimension;
  *
  * Derived from javax.swing.plaf.basic.DefaultMenuLayout
  *
- * @version 1.16 05/05/07
  * @author Georges Saab
  */
 

@@ -46,7 +46,6 @@ import java.awt.*;
  * is recommended for the DK.
  *
  * @author  Timothy Prinzing
- * @version 1.27 05/05/07
  * @see GlyphView
  */
 class GlyphPainter1 extends GlyphView.GlyphPainter {

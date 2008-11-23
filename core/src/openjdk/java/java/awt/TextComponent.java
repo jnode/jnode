@@ -53,7 +53,6 @@ import java.awt.im.InputMethodRequests;
  * is the target of editing operations. It is also referred
  * to as the <em>selected text</em>.
  *
- * @version	1.97, 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @since       JDK1.0

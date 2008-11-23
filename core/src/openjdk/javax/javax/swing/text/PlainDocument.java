@@ -54,7 +54,6 @@ import javax.swing.event.*;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.51 05/05/07
  * @see     Document
  * @see     AbstractDocument
  */

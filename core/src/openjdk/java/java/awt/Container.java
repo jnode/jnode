@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,44 +24,42 @@
  */
 package java.awt;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.awt.dnd.DropTarget;
+
+import java.awt.event.*;
+
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
-import sun.awt.PeerEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ContainerEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.ContainerListener;
-import java.util.EventListener;
-import java.io.ObjectStreamField;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.IOException;
-import java.awt.event.AWTEventListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowEvent;
-import java.awt.dnd.DropTarget;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.Arrays;
-import javax.accessibility.*;
+
 import java.beans.PropertyChangeListener;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamField;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+
+import java.util.Arrays;
+import java.util.EventListener;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
+import java.util.logging.*;
+
+import javax.accessibility.*;
+
 import sun.awt.AppContext;
-import sun.awt.DebugHelper;
-import sun.awt.SunToolkit;
-import sun.awt.dnd.SunDropTargetEvent;
 import sun.awt.CausedFocusEvent;
+import sun.awt.PeerEvent;
+import sun.awt.SunToolkit;
+
+import sun.awt.dnd.SunDropTargetEvent;
+
+import sun.java2d.pipe.Region;
 
 /**
  * A generic Abstract Window Toolkit(AWT) container object is a component 
@@ -80,7 +78,6 @@ import sun.awt.CausedFocusEvent;
  * <a href="../../java/awt/doc-files/FocusSpec.html">Focus Specification</a>
  * for more information.
  *
- * @version 	1.295, 05/05/07
  * @author 	Arthur van Hoff
  * @author 	Sami Shaio
  * @see       #add(java.awt.Component, int)
@@ -89,6 +86,9 @@ import sun.awt.CausedFocusEvent;
  * @since     JDK1.0
  */
 public class Container extends Component {
+
+    private static final Logger log = Logger.getLogger("java.awt.Container");
+    private static final Logger eventLog = Logger.getLogger("java.awt.event.Container");
 
     /**
      * The number of components in this container.
@@ -181,8 +181,6 @@ public class Container extends Component {
      */
     private static final long serialVersionUID = 4613797578919906343L;
 
-    private static final DebugHelper dbg = DebugHelper.create(Container.class);
-
     /**
      * A constant which toggles one of the controllable behaviors 
      * of <code>getMouseEventTarget</code>. It is used to specify whether 
@@ -201,6 +199,15 @@ public class Container extends Component {
      * @see #getMouseEventTarget(int, int, boolean, boolean, boolean)
      */
     static final boolean SEARCH_HEAVYWEIGHTS = true;
+
+    /*
+     * Number of HW or LW components in this container (including
+     * all descendant containers).
+     */
+    private transient int numOfHWComponents = 0;
+    private transient int numOfLWComponents = 0;
+
+    private static final Logger mixingLog = Logger.getLogger("java.awt.mixing.Container");
 
     /**
      * @serialField ncomponents                     int
@@ -414,11 +421,6 @@ public class Container extends Component {
 	return comp;
     }
 
-    void checkTreeLock() {
-        if (!Thread.holdsLock(getTreeLock())) {
-            throw new IllegalStateException("This function should be called while holding treeLock");
-        }
-    }
     /**
      * Checks that the component comp can be added to this container
      * Checks :  index in bounds of container's size,
@@ -471,13 +473,15 @@ public class Container extends Component {
      * remove, for example, if newParent and current parent are the same it just changes
      * index without calling removeNotify.
      * Note: Should be called while holding treeLock
+     * Returns whether removeNotify was invoked
      * @since: 1.5
      */
-    private void removeDelicately(Component comp, Container newParent, int newIndex) {
+    private boolean removeDelicately(Component comp, Container newParent, int newIndex) {
         checkTreeLock();
 
         int index = getComponentZOrder(comp);
-        if (isRemoveNotifyNeeded(comp, this, newParent)) {                
+        boolean needRemoveNotify = isRemoveNotifyNeeded(comp, this, newParent);
+        if (needRemoveNotify) {
             comp.removeNotify();
         }
         if (newParent != this) {
@@ -528,6 +532,7 @@ public class Container extends Component {
                 updateCursorImmediately();
             }
         }
+        return needRemoveNotify;
     } 
 
     /**
@@ -564,17 +569,20 @@ public class Container extends Component {
      * @return true if there is at least one heavyweight children in a container, false otherwise
      * @since 1.5
      */
-    private boolean hasHeavyweightChildren() {        
+    private boolean hasHeavyweightDescendants() {
         checkTreeLock();
-        boolean res = true; // true while it is lightweight
-        for (int i = 0; i < getComponentCount() && res; i++) {
-            Component child = getComponent(i);
-            res &= child.isLightweight();
-            if (res && child instanceof Container) {
-                res &= !((Container)child).hasHeavyweightChildren();
+        return numOfHWComponents > 0;
             }
-        }
-        return !res;
+
+    /**
+     * Checks whether or not this container has lightweight children.
+     * Note: Should be called while holding tree lock
+     * @return true if there is at least one lightweight children in a container, false otherwise
+     * @since 1.7
+     */
+    private boolean hasLightweightDescendants() {
+        checkTreeLock();
+        return numOfLWComponents > 0;
     }
 
     /**
@@ -615,7 +623,7 @@ public class Container extends Component {
         if (comp.isLightweight()) {
             if (comp instanceof Container) {
                 // If it has heavyweight children then removeNotify is required
-                return ((Container)comp).hasHeavyweightChildren();
+                return ((Container)comp).hasHeavyweightDescendants();
             } else {
                 // Just a lightweight
                 return false;
@@ -688,15 +696,28 @@ public class Container extends Component {
          synchronized (getTreeLock()) {
              // Store parent because remove will clear it
              Container curParent = comp.parent; 
-             if (curParent == this && index == getComponentZOrder(comp)) {
+             int oldZindex = getComponentZOrder(comp);
+
+             if (curParent == this && index == oldZindex) {
                  return;
              }
              checkAdding(comp, index);
-             if (curParent != null) {
-                 curParent.removeDelicately(comp, this, index);
-             }
+
+             boolean peerRecreated = (curParent != null) ?
+                 curParent.removeDelicately(comp, this, index) : false;
              
              addDelicately(comp, curParent, index);
+
+             // If the oldZindex == -1, the component gets inserted,
+             // rather than it changes its z-order.
+             if (!peerRecreated && oldZindex != -1) {
+                 // The new 'index' cannot be == -1.
+                 // It gets checked at the checkAdding() method.
+                 // Therefore both oldZIndex and index denote
+                 // some existing positions at this point and
+                 // this is actually a Z-order changing.
+                 comp.mixOnZOrderChanging(oldZindex, index);
+             }
          }
     }
 
@@ -1280,28 +1301,33 @@ public class Container extends Component {
         int superListening = super.numListening(mask);
 
         if (mask == AWTEvent.HIERARCHY_EVENT_MASK) {
-	    if (dbg.on) {
+            if (eventLog.isLoggable(Level.FINE)) {
 	        // Verify listeningChildren is correct
 	        int sum = 0;
 		for (int i = 0; i < ncomponents; i++) {
 		    sum += component[i].numListening(mask);
 		}
-		dbg.assertion(listeningChildren == sum);
+                if (listeningChildren != sum) {
+                    eventLog.log(Level.FINE, "Assertion (listeningChildren == sum) failed");
+                }
 	    }
 	    return listeningChildren + superListening;
 	} else if (mask == AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK) {
-	    if (dbg.on) {
+            if (eventLog.isLoggable(Level.FINE)) {
 	        // Verify listeningBoundsChildren is correct
 	        int sum = 0;
 		for (int i = 0; i < ncomponents; i++) {
 		    sum += component[i].numListening(mask);
 		}
-		dbg.assertion(listeningBoundsChildren == sum);
+                if (listeningBoundsChildren != sum) {
+                    eventLog.log(Level.FINE, "Assertion (listeningBoundsChildren == sum) failed");
+                }
 	    }
 	    return listeningBoundsChildren + superListening;
 	} else {
-	    if (dbg.on) {
-	        dbg.assertion(false);
+            // assert false;
+            if (eventLog.isLoggable(Level.FINE)) {
+                eventLog.log(Level.FINE, "This code must never be reached");
 	    }
 	    return superListening;
 	}
@@ -1309,11 +1335,14 @@ public class Container extends Component {
 
     // Should only be called while holding tree lock
     void adjustListeningChildren(long mask, int num) {
-        if (dbg.on) {
-	    dbg.assertion(mask == AWTEvent.HIERARCHY_EVENT_MASK ||
+        if (eventLog.isLoggable(Level.FINE)) {
+            boolean toAssert = (mask == AWTEvent.HIERARCHY_EVENT_MASK ||
 		       mask == AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK ||
 		       mask == (AWTEvent.HIERARCHY_EVENT_MASK |
 				AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK));
+            if (!toAssert) {
+                eventLog.log(Level.FINE, "Assertion failed");
+            }
 	}
 
         if (num == 0)
@@ -1347,13 +1376,15 @@ public class Container extends Component {
 
     // Should only be called while holding tree lock
     int countHierarchyMembers() {
-        if (dbg.on) {
+        if (log.isLoggable(Level.FINE)) {
             // Verify descendantsCount is correct
             int sum = 0;
             for (int i = 0; i < ncomponents; i++) {
                 sum += component[i].countHierarchyMembers();
             }
-            dbg.assertion(descendantsCount == sum);
+            if (descendantsCount != sum) {
+                log.log(Level.FINE, "Assertion (descendantsCount == sum) failed");
+            }
         }
         return descendantsCount + 1;
     }
@@ -3785,6 +3816,169 @@ public class Container extends Component {
         }
     }
 
+    // ************************** MIXING CODE *******************************
+
+    final void increaseComponentCount(Component c) {
+        synchronized (getTreeLock()) {
+            if (!c.isDisplayable()) {
+                throw new IllegalStateException(
+                    "Peer does not exist while invoking the increaseComponentCount() method"
+                );
+            }
+
+            int addHW = 0;
+            int addLW = 0;
+
+            if (c instanceof Container) {
+                addLW = ((Container)c).numOfLWComponents;
+                addHW = ((Container)c).numOfHWComponents;
+            }
+            if (c.isLightweight()) {
+                addLW++;
+            } else {
+                addHW++;
+            }
+
+            for (Container cont = this; cont != null; cont = cont.getContainer()) {
+                cont.numOfLWComponents += addLW;
+                cont.numOfHWComponents += addHW;
+            }
+        }
+    }
+
+    final void decreaseComponentCount(Component c) {
+        synchronized (getTreeLock()) {
+            if (!c.isDisplayable()) {
+                throw new IllegalStateException(
+                    "Peer does not exist while invoking the decreaseComponentCount() method"
+                );
+            }
+
+            int subHW = 0;
+            int subLW = 0;
+
+            if (c instanceof Container) {
+                subLW = ((Container)c).numOfLWComponents;
+                subHW = ((Container)c).numOfHWComponents;
+            }
+            if (c.isLightweight()) {
+                subLW++;
+            } else {
+                subHW++;
+            }
+
+            for (Container cont = this; cont != null; cont = cont.getContainer()) {
+                cont.numOfLWComponents -= subLW;
+                cont.numOfHWComponents -= subHW;
+            }
+        }
+    }
+
+    private int getTopmostComponentIndex() {
+        checkTreeLock();
+        if (getComponentCount() > 0) {
+            return 0;
+        }
+        return -1;
+    }
+
+    private int getBottommostComponentIndex() {
+        checkTreeLock();
+        if (getComponentCount() > 0) {
+            return getComponentCount() - 1;
+        }
+        return -1;
+    }
+
+    final void recursiveSubtractAndApplyShape(Region shape) {
+        recursiveSubtractAndApplyShape(shape, getTopmostComponentIndex(), getBottommostComponentIndex());
+    }
+
+    final void recursiveSubtractAndApplyShape(Region shape, int fromZorder) {
+        recursiveSubtractAndApplyShape(shape, fromZorder, getBottommostComponentIndex());
+    }
+
+    final void recursiveSubtractAndApplyShape(Region shape, int fromZorder, int toZorder) {
+        checkTreeLock();
+        if (mixingLog.isLoggable(Level.FINE)) {
+            mixingLog.fine("this = " + this +
+                "; shape=" + shape + "; fromZ=" + fromZorder + "; toZ=" + toZorder);
+        }
+        if (fromZorder == -1) {
+            return;
+        }
+        for (int index = fromZorder; index <= toZorder; index++) {
+            Component comp = getComponent(index);
+            if (!comp.isLightweight()) {
+                comp.subtractAndApplyShape(shape);
+            } else if (comp instanceof Container &&
+                    ((Container)comp).hasHeavyweightDescendants() && comp.isShowing()) {
+                ((Container)comp).recursiveSubtractAndApplyShape(shape);
+            }
+        }
+    }
+
+    final void recursiveApplyCurrentShape() {
+        recursiveApplyCurrentShape(getTopmostComponentIndex(), getBottommostComponentIndex());
+    }
+
+    final void recursiveApplyCurrentShape(int fromZorder) {
+        recursiveApplyCurrentShape(fromZorder, getBottommostComponentIndex());
+    }
+
+    final void recursiveApplyCurrentShape(int fromZorder, int toZorder) {
+        checkTreeLock();
+        if (mixingLog.isLoggable(Level.FINE)) {
+            mixingLog.fine("this = " + this +
+                "; fromZ=" + fromZorder + "; toZ=" + toZorder);
+        }
+        if (fromZorder == -1) {
+            return;
+        }
+        for (int index = fromZorder; index <= toZorder; index++) {
+            Component comp = getComponent(index);
+            if (!comp.isLightweight()) {
+                comp.applyCurrentShape();
+            } else if (comp instanceof Container &&
+                    ((Container)comp).hasHeavyweightDescendants()) {
+                ((Container)comp).recursiveApplyCurrentShape();
+            }
+        }
+    }
+
+    void mixOnShowing() {
+        synchronized (getTreeLock()) {
+            if (mixingLog.isLoggable(Level.FINE)) {
+                mixingLog.fine("this = " + this);
+            }
+
+            boolean isLightweight = isLightweight();
+
+            if (!isLightweight || (isLightweight && hasHeavyweightDescendants())) {
+                recursiveApplyCurrentShape();
+            }
+
+            super.mixOnShowing();
+        }
+    }
+
+    void mixOnZOrderChanging(int oldZorder, int newZorder) {
+        synchronized (getTreeLock()) {
+            if (mixingLog.isLoggable(Level.FINE)) {
+                mixingLog.fine("this = " + this +
+                    "; oldZ=" + oldZorder + "; newZ=" + newZorder);
+            }
+
+            boolean becameHigher = newZorder < oldZorder;
+
+            if (becameHigher && isLightweight() && hasHeavyweightDescendants()) {
+                recursiveApplyCurrentShape();
+            }
+            super.mixOnZOrderChanging(oldZorder, newZorder);
+        }
+    }
+
+    // ****************** END OF MIXING CODE ********************************
 }
 
 
@@ -3810,7 +4004,7 @@ class LightweightDispatcher implements java.io.Serializable, AWTEventListener {
      */
     private static final int  LWD_MOUSE_DRAGGED_OVER = 1500;
 
-    private static final DebugHelper dbg = DebugHelper.create(LightweightDispatcher.class);
+    private static final Logger eventLog = Logger.getLogger("java.awt.event.LightweightDispatcher");
 
     LightweightDispatcher(Container nativeContainer) {
 	this.nativeContainer = nativeContainer;
@@ -3952,8 +4146,8 @@ class LightweightDispatcher implements java.io.Serializable, AWTEventListener {
             // This may send it somewhere that doesn't have MouseWheelEvents
             // enabled.  In this case, Component.dispatchEventImpl() will
             // retarget the event to a parent that DOES have the events enabled.
-            if (dbg.on && mouseOver != null) {
-                dbg.println("LD retargeting mouse wheel to " +
+            if (eventLog.isLoggable(Level.FINEST) && (mouseOver != null)) {
+                eventLog.log(Level.FINEST, "retargeting mouse wheel to " +
                                 mouseOver.getName() + ", " + 
                                 mouseOver.getClass());
             }

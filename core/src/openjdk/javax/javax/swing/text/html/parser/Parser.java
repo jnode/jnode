@@ -74,7 +74,6 @@ import sun.misc.MessageUtils;
  * @see DTD
  * @see TagElement
  * @see SimpleAttributeSet
- * @version 1.54, 05/05/07
  * @author Arthur van Hoff
  * @author Sunita Mani
  */
@@ -400,7 +399,9 @@ class Parser implements DTDConstants {
 	// start tag that needs to be processed before
 	// handling the tag.
 	//
-        if (!elem.isEmpty() || !last.breaksFlow() || textpos != 0) {
+        if (!elem.isEmpty() ||
+                    ((last != null) && !last.breaksFlow()) ||
+                    (textpos != 0)) {
 	    handleText(tag);
 	} else {
 	    // this variable gets updated in handleText().

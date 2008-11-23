@@ -39,7 +39,6 @@ import javax.swing.text.View;
  * BasicToggleButton implementation
  * <p>
  *
- * @version 1.65 05/05/07
  * @author Jeff Dinkins
  */
 public class BasicToggleButtonUI extends BasicButtonUI {

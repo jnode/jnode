@@ -23,7 +23,6 @@
  * have any questions.
  */
 /*
- * @(#)TextSourceLabel.java     1.8 00/03/15
  *
  * (C) Copyright IBM Corp. 1998, 1999 - All Rights Reserved
  */

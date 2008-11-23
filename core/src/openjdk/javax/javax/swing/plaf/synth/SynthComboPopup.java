@@ -38,7 +38,6 @@ import java.io.Serializable;
 /**
  * Synth's ComboPopup.
  *
- * @version 1.14, 05/05/07
  * @author Scott Violet
  */
 class SynthComboPopup extends BasicComboPopup {

@@ -41,7 +41,6 @@ import java.io.Serializable;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.27 05/05/07
  */
 public class TabStop implements Serializable {
 
@@ -176,4 +175,3 @@ public class TabStop implements Serializable {
 	return buf;
     }
 }
-

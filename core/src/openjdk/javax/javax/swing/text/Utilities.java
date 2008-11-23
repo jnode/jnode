@@ -48,7 +48,6 @@ import sun.swing.SwingUtilities2;
  * related activities.
  * 
  * @author  Timothy Prinzing
- * @version 1.58 05/05/07
  */
 public class Utilities {
     /**

@@ -60,7 +60,6 @@ import sun.swing.plaf.synth.*;
  * result in {@link NotSerializableException}.
  * 
  * @serial exclude 
- * @version 1.48, 05/24/05
  * @since 1.5
  * @author Scott Violet
  */

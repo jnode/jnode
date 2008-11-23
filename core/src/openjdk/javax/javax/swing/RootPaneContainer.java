@@ -76,7 +76,6 @@ import java.awt.Container;
  * @see JApplet
  * @see JInternalFrame
  *
- * @version 1.23 05/05/07
  * @author Hans Muller
  */
 public interface RootPaneContainer
@@ -178,4 +177,3 @@ public interface RootPaneContainer
     Component getGlassPane();
 
 }
-

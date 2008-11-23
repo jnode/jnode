@@ -120,7 +120,6 @@ import javax.accessibility.*;
  * @see SpinnerDateModel
  * @see JFormattedTextField
  * 
- * @version 1.57 05/05/07
  * @author Hans Muller
  * @author Lynn Monsanto (accessibility)
  * @since 1.4
@@ -135,7 +134,7 @@ public class JSpinner extends JComponent implements Accessible
 
     private static final Action DISABLED_ACTION = new DisabledAction();
 
-    private SpinnerModel model;
+    private transient SpinnerModel model;
     private JComponent editor;
     private ChangeListener modelListener;
     private transient ChangeEvent changeEvent;
@@ -143,16 +142,10 @@ public class JSpinner extends JComponent implements Accessible
 
 
     /**
-     * Constructs a spinner for the given model. The spinner has
-     * a set of previous/next buttons, and an editor appropriate
-     * for the model.
-     *
-     * @throws NullPointerException if the model is {@code null}
+     * Constructs a complete spinner with pair of next/previous buttons
+     * and an editor for the <code>SpinnerModel</code>.
      */
     public JSpinner(SpinnerModel model) {
-        if (model == null) {
-            throw new NullPointerException("model cannot be null");
-        }
 	this.model = model;
 	this.editor = createEditor(model);
 	setOpaque(true);
@@ -286,6 +279,7 @@ public class JSpinner extends JComponent implements Accessible
 	    SpinnerModel oldModel = this.model;
 	    this.model = model;
 	    if (modelListener != null) {
+                oldModel.removeChangeListener(modelListener);
 		this.model.addChangeListener(modelListener);
 	    }
 	    firePropertyChange("model", oldModel, model);
@@ -562,6 +556,14 @@ public class JSpinner extends JComponent implements Accessible
      */
     private void writeObject(ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
+        HashMap additionalValues = new HashMap(1);
+        SpinnerModel model = getModel();
+
+        if (model instanceof Serializable) {
+            additionalValues.put("model", model);
+        }
+        s.writeObject(additionalValues);
+
         if (getUIClassID().equals(uiClassID)) {
             byte count = JComponent.getWriteObjCounter(this);
             JComponent.setWriteObjCounter(this, --count);
@@ -569,6 +571,15 @@ public class JSpinner extends JComponent implements Accessible
                 ui.installUI(this);
             }
         }
+    }
+
+    private void readObject(ObjectInputStream s)
+        throws IOException, ClassNotFoundException {
+        s.defaultReadObject();
+
+        Map additionalValues = (Map)s.readObject();
+
+        model = (SpinnerModel)additionalValues.get("model");
     }
 
 

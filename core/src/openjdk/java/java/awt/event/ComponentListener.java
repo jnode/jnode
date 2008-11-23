@@ -49,7 +49,6 @@ import java.util.EventListener;
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/componentlistener.html">Tutorial: Writing a Component Listener</a>
  *
  * @author Carl Quinn
- * @version 1.24 05/05/07
  * @since 1.1
  */
 public interface ComponentListener extends EventListener {

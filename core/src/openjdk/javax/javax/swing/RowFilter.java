@@ -90,7 +90,6 @@ import java.util.regex.Pattern;
  * @param <M> the type of the model; for example <code>PersonModel</code>
  * @param <I> the type of the identifier; when using
  *            <code>TableRowSorter</code> this will be <code>Integer</code>
- * @version 1.12 05/05/07
  * @see javax.swing.table.TableRowSorter
  * @since 1.6
  */

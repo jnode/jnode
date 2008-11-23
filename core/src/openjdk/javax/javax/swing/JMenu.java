@@ -101,7 +101,6 @@ import java.lang.ref.WeakReference;
  *   attribute: isContainer true
  * description: A popup window containing menu items displayed in a menu bar.
  *
- * @version 1.187 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber
@@ -1625,4 +1624,3 @@ public class JMenu extends JMenuItem implements Accessible,MenuElement
     } // inner class AccessibleJMenu
 
 }
-

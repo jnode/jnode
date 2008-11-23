@@ -39,7 +39,6 @@ import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
@@ -47,14 +46,17 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.accessibility.*;
-import sun.awt.DebugHelper;
-import sun.security.action.GetPropertyAction;
-import sun.security.util.SecurityConstants;
+import sun.awt.AppContext;
 import sun.awt.CausedFocusEvent;
 import sun.awt.SunToolkit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import sun.awt.AppContext;
+import sun.awt.util.IdentityArrayList;
+import sun.java2d.pipe.Region;
+import sun.security.action.GetPropertyAction;
+import sun.security.util.SecurityConstants;
 
 /**
  * A <code>Window</code> object is a top-level window with no borders and no
@@ -133,7 +135,6 @@ import sun.awt.AppContext;
  * Windows are capable of generating the following WindowEvents:
  * WindowOpened, WindowClosed, WindowGainedFocus, WindowLostFocus.
  *
- * @version 	@(#)Window.java	1.264 07/05/05
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @see WindowEvent
@@ -205,7 +206,7 @@ public class Window extends Container implements Accessible {
      *
      * @since 1.6
      */
-    static Vector<Window> allWindows = new Vector<Window>();
+    private static final IdentityArrayList<Window> allWindows = new IdentityArrayList<Window>();
 
     /**
      * A vector containing all the windows this
@@ -269,6 +270,18 @@ public class Window extends Container implements Accessible {
      */
     private boolean focusableWindowState = true;
 
+    /**
+     * Indicates whether this window should receive focus on
+     * subsequently being shown (with a call to {@code setVisible(true)}), or
+     * being moved to the front (with a call to {@code toFront()}).
+     *
+     * @serial
+     * @see #setAutoRequestFocus
+     * @see #isAutoRequestFocus
+     * @since 1.7
+     */
+    private transient volatile boolean autoRequestFocus = true;
+
     /*
      * Indicates that this window is being shown. This flag is set to true at
      * the beginning of show() and to false at the end of show().
@@ -286,7 +299,7 @@ public class Window extends Container implements Accessible {
      */
     private static final long serialVersionUID = 4497834738069338734L;
 
-    private static final DebugHelper dbg = DebugHelper.create(Window.class);
+    private static final Logger log = Logger.getLogger("java.awt.Window");
 
     private static final boolean locationByPlatformProp;
 
@@ -649,7 +662,9 @@ public class Window extends Container implements Accessible {
             if (peer == null) {
                 peer = getToolkit().createWindow(this);
             }
+            synchronized (allWindows) {
             allWindows.add(this);
+            }
             super.addNotify();
         }
     }
@@ -659,25 +674,20 @@ public class Window extends Container implements Accessible {
      */
     public void removeNotify() {
         synchronized (getTreeLock()) {
+            synchronized (allWindows) {
             allWindows.remove(this);
+            }
             super.removeNotify();
         }        
     }
 
     /**
      * Causes this Window to be sized to fit the preferred size 
-     * and layouts of its subcomponents. The resulting width and 
-     * height of the window are automatically enlarged if either
-     * of dimensions is less than the minimum size as specified 
-     * by the previous call to the {@code setMinimumSize} method.
-     * <p>
-     * If the window and/or its owner are not displayable yet, 
-     * both of them are made displayable before calculating 
-     * the preferred size. The Window is validated after its 
-     * size is being calculated.
-     *                 
+     * and layouts of its subcomponents.  If the window and/or its owner
+     * are not yet displayable, both are made displayable before
+     * calculating the preferred size.  The Window will be validated
+     * after the preferredSize is calculated.
      * @see Component#isDisplayable
-     * @see #setMinimumSize
      */
     public void pack() {
         Container parent = this.parent;
@@ -708,13 +718,10 @@ public class Window extends Container implements Accessible {
      * <p>
      * If the {@code setSize} or {@code setBounds} methods
      * are called afterwards with a width or height less than
-     * that was specified by the {@code setMinimumSize} method 
-     * the window is automatically enlarged to meet 
-     * the {@code minimumSize} value. The {@code minimumSize} 
-     * value also affects the behaviour of the {@code pack} method.
-     * <p> 
-     * The default behavior is restored by setting the minimum size 
-     * parameter to the {@code null} value.
+     * that specified by {@code setMinimumSize} the window
+     * is automatically enlarged to honor the {@code minimumSize}
+     * value. Setting the minimum size to {@code null} restores
+     * the default behavior.
      * <p>
      * Resizing operation may be restricted if the user tries
      * to resize window below the {@code minimumSize} value.
@@ -725,7 +732,6 @@ public class Window extends Container implements Accessible {
      * @see #getMinimumSize
      * @see #isMinimumSizeSet
      * @see #setSize(Dimension)
-     * @see #pack
      * @since 1.6
      */
     public void setMinimumSize(Dimension minimumSize) {
@@ -872,6 +878,10 @@ public class Window extends Container implements Accessible {
             }   // endfor
             if (!isModalBlocked()) {
                 updateChildrenBlocking();
+            } else {
+                // fix for 6532736: after this window is shown, its blocker
+                // should be raised to front
+                modalBlocker.toFront_NoClientCode();
             }
             if (this instanceof Frame || this instanceof Dialog) {
                 updateChildFocusableWindowState(this);
@@ -1253,6 +1263,9 @@ public class Window extends Container implements Accessible {
      * @since 1.2
      */
     public Window getOwner() {
+        return getOwner_NoClientCode();
+    }
+    final Window getOwner_NoClientCode() {
         return (Window)parent;
     }
 
@@ -1262,6 +1275,9 @@ public class Window extends Container implements Accessible {
      * @since 1.2
      */
     public Window[] getOwnedWindows() {
+        return getOwnedWindows_NoClientCode();
+    }
+    final Window[] getOwnedWindows_NoClientCode() {
         Window realCopy[];
 
 	synchronized(ownedWindowList) {
@@ -1296,12 +1312,14 @@ public class Window extends Container implements Accessible {
         return modalBlocker != null;
     }
 
-    void setModalBlocked(Dialog blocker, boolean blocked) {
+    void setModalBlocked(Dialog blocker, boolean blocked, boolean peerCall) {
         this.modalBlocker = blocked ? blocker : null;
+        if (peerCall) {
         WindowPeer peer = (WindowPeer)this.peer;
         if (peer != null) {
             peer.setModalBlocked(blocker, blocked);
         }
+    }
     }
 
     Dialog getModalBlocker() {
@@ -1315,17 +1333,17 @@ public class Window extends Container implements Accessible {
      * @see #addNotify
      * @see #removeNotify
      */
-    static Vector<Window> getAllWindows() {
+    static IdentityArrayList<Window> getAllWindows() {
         synchronized (allWindows) {
-            Vector<Window> v = new Vector<Window>();
+            IdentityArrayList<Window> v = new IdentityArrayList<Window>();
             v.addAll(allWindows);
             return v;
         }
     }
 
-    static Vector<Window> getAllUnblockedWindows() {
+    static IdentityArrayList<Window> getAllUnblockedWindows() {
         synchronized (allWindows) {
-            Vector<Window> unblocked = new Vector<Window>();
+            IdentityArrayList<Window> unblocked = new IdentityArrayList<Window>();
             for (int i = 0; i < allWindows.size(); i++) {
                 Window w = allWindows.get(i);
                 if (!w.isModalBlocked()) {
@@ -1506,7 +1524,7 @@ public class Window extends Container implements Accessible {
         {
             return true;
         }
-        Window owner = getOwner();
+        Window owner = getOwner_NoClientCode();
         return (owner != null) && owner.isModalExcluded(exclusionType);
     }
 
@@ -2847,8 +2865,8 @@ public class Window extends Container implements Accessible {
                     getDefaultScreenDevice().
                     getDefaultConfiguration();
             }
-            if (dbg.on) {
-                dbg.println("+ Window.resetGC(): new GC is \n+ " + graphicsConfig + "\n+ this is " + this);
+            if (log.isLoggable(Level.FINER)) {
+                log.finer("+ Window.resetGC(): new GC is \n+ " + graphicsConfig + "\n+ this is " + this);
             }
         }
     }
@@ -3164,6 +3182,45 @@ public class Window extends Container implements Accessible {
         // We're overriding isRecursivelyVisible to implement this policy.
         return visible;
     }    
+
+
+    // ************************** MIXING CODE *******************************
+
+    // A window has a parent, but it does NOT have a container
+    @Override
+    final Container getContainer() {
+        return null;
+    }
+
+    /**
+     * Applies the shape to the component
+     * @param shape Shape to be applied to the component
+     */
+    @Override
+    final void applyCompoundShape(Region shape) {
+        // The shape calculated by mixing code is not intended to be applied
+        // to windows or frames
+    }
+
+    @Override
+    final void applyCurrentShape() {
+        // The shape calculated by mixing code is not intended to be applied
+        // to windows or frames
+    }
+
+    @Override
+    final void mixOnReshaping() {
+        // The shape calculated by mixing code is not intended to be applied
+        // to windows or frames
+    }
+
+    @Override
+    final Point getLocationOnWindow() {
+        return new Point(0, 0);
+    }
+
+    // ****************** END OF MIXING CODE ********************************
+
 } // class Window
 
 

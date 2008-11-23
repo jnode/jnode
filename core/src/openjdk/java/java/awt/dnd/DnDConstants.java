@@ -28,7 +28,6 @@ package java.awt.dnd;
 /**
  * This class contains constant values representing
  * the type of action(s) to be performed by a Drag and Drop operation.
- * @version 	1.26, 05/05/07
  * @since 1.2
  */
 
@@ -82,5 +81,3 @@ public final class DnDConstants {
     public static final int ACTION_REFERENCE    = ACTION_LINK;
 
 }
-
-

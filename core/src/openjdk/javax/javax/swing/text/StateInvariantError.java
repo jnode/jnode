@@ -30,7 +30,6 @@ package javax.swing.text;
  * has occurred.
  * 
  * @author  Timothy Prinzing
- * @version 1.24 05/05/07
  */
 class StateInvariantError extends Error
 {

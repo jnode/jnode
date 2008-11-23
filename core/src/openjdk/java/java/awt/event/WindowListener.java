@@ -41,7 +41,6 @@ import java.util.EventListener;
  * <code>WindowEvent</code> is passed to it.
  *
  * @author Carl Quinn
- * @version 1.28, 05/05/07
  *
  * @see WindowAdapter
  * @see WindowEvent

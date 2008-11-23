@@ -33,7 +33,6 @@ import java.awt.print.*;
  * Printable to merge multiple printables into one.
  *
  * @author Igor Kushnirskiy
- * @version 1.8 05/05/07
  * 
  * @since 1.6
  */

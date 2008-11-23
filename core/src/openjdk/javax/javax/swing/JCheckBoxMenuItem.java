@@ -85,7 +85,6 @@ import javax.accessibility.*;
  *   attribute: isContainer false
  * description: A menu item which can be selected or deselected.
  *
- * @version 1.64 05/05/07
  * @author Georges Saab
  * @author David Karlton
  */

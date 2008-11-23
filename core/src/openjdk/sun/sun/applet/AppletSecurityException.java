@@ -28,7 +28,6 @@ package sun.applet;
 /**
  * An applet security exception.
  *
- * @version 	1.22, 05/05/07
  * @author 	Arthur van Hoff
  */
 public

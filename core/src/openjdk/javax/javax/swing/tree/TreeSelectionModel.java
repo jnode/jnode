@@ -83,7 +83,6 @@ import java.beans.PropertyChangeListener;
   * row is then the row that corresponds to the TreePath as determined
   * from the RowMapper.
   *
-  * @version 1.31 05/05/07
   * @author Scott Violet
   */
 

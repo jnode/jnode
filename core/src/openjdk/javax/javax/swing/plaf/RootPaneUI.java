@@ -28,7 +28,6 @@ package javax.swing.plaf;
 /**
  * Pluggable look and feel interface for JRootPane.
  *
- * @version 1.14 05/05/07
  * @author Scott Violet
  * @since 1.3
  */

@@ -31,7 +31,6 @@ import java.awt.event.*;
  * The interface for objects which contain a set of items for
  * which zero or more can be selected.
  *
- * @version 1.23 05/05/07
  * @author Amy Fowler
  */
 

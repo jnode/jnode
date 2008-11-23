@@ -30,7 +30,6 @@ import javax.swing.MenuSelectionManager;
 /**
  * A default MouseListener for menu elements
  *
- * @version 1.16 05/05/07
  * @author Arnaud Weber
  */
 class MotifMenuMouseListener extends MouseAdapter {

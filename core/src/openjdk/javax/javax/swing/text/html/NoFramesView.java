@@ -34,7 +34,6 @@ import java.awt.*;
  * when the JTextComponent the view is contained in is editable.
  *
  * @author  Sunita Mani
- * @version 1.16 05/05/07
  */
 class NoFramesView extends BlockView {
 

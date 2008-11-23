@@ -43,7 +43,6 @@ import java.io.Serializable;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.56 05/05/07
  * @author Amy Fowler
  * @author Philip Milne
  */

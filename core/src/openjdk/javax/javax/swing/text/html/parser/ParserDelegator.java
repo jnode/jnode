@@ -41,7 +41,6 @@ import java.lang.reflect.Method;
  * reference to the dtd.
  *
  * @author  Sunita Mani
- * @version 1.22, 05/05/07
  */
 
 public class ParserDelegator extends HTMLEditorKit.Parser implements Serializable {
@@ -119,5 +118,3 @@ public class ParserDelegator extends HTMLEditorKit.Parser implements Serializabl
 	}
     }
 }
-
-

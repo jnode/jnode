@@ -195,7 +195,6 @@ import sun.security.action.GetBooleanAction;
  * @see <a href="http://java.sun.com/products/jfc/tsc/articles/mixing/">
  * Mixing Heavy and Light Components</a>
  *
- * @version 1.103 05/05/07
  * @author David Kloba
  */
 /// PENDING(klobad) Who should be opaque in this component?

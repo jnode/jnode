@@ -28,7 +28,6 @@ package javax.swing.plaf;
 /**
  * Pluggable look and feel interface for JTableHeader.
  *
- * @version 1.19 05/05/07
  * @author Alan Chung
  */
 public abstract class TableHeaderUI extends ComponentUI {

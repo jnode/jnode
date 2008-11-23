@@ -38,7 +38,6 @@ import sun.swing.SwingUtilities2;
 
 
 /*
- * @version 1.44 02/11/99
  * @author Hans Muller
  */
 

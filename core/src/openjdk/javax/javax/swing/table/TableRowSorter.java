@@ -120,7 +120,6 @@ import javax.swing.SortOrder;
  *
  * @param <M> the type of the model, which must be an implementation of
  *            <code>TableModel</code>
- * @version 1.14 05/05/07
  * @see javax.swing.JTable
  * @see javax.swing.RowFilter
  * @see javax.swing.table.DefaultTableModel

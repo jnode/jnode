@@ -208,7 +208,6 @@ import sun.swing.PrintingStatus;
  *   attribute: isContainer false
  * description: A component which displays data in a two dimensional grid.
  *
- * @version 1.294 05/05/07
  * @author Philip Milne
  * @author Shannon Hickey (printing support)
  * @see javax.swing.table.DefaultTableModel
@@ -1853,6 +1852,7 @@ public class JTable extends JComponent implements TableModelListener, Scrollable
             sortManager = new SortManager(sorter);
         }
         resizeAndRepaint();
+        firePropertyChange("rowSorter", oldRowSorter, sorter);
         firePropertyChange("sorter", oldRowSorter, sorter);
     }
 
@@ -9546,6 +9546,3 @@ public class JTable extends JComponent implements TableModelListener, Scrollable
     }  // inner class AccessibleJTable
 
 }  // End of Class JTable
-
-
-

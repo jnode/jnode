@@ -35,7 +35,6 @@ import java.util.EventListener;
  * type and allows to perform the typical operations on the listeners.
  * This class is thread-safe.
  *
- * @version 1.9, 05/05/07
  * @author Alexander Gerasimov
  *
  * @since 1.5

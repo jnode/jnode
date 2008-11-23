@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -7,6 +7,7 @@
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
+import java.awt.event.InputEvent;
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -16,6 +17,11 @@
  *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
+
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
@@ -46,45 +52,24 @@ import java.util.TooManyListenersException;
 /**
  * The <code>DragSourceContext</code> class is responsible for managing the
  * initiator side of the Drag and Drop protocol. In particular, it is responsible
- * for managing drag event notifications to the
- * {@linkplain DragSourceListener DragSourceListeners}
- * and {@linkplain DragSourceMotionListener DragSourceMotionListeners}, and providing the
- * {@link Transferable} representing the source data for the drag operation.
+ * for managing drag event notifications to the <code>DragSourceListener</code>s
+ * and <code>DragSourceMotionListener</code>s, and providing the
+ * <code>Transferable</code> representing the source data for the drag operation.
  * <p>
  * Note that the <code>DragSourceContext</code> itself 
  * implements the <code>DragSourceListener</code> and
  * <code>DragSourceMotionListener</code> interfaces. 
  * This is to allow the platform peer  
- * (the {@link DragSourceContextPeer} instance) 
- * created by the {@link DragSource} to notify 
+ * (the <code>DragSourceContextPeer</code> instance)
+ * created by the <code>DragSource</code> to notify
  * the <code>DragSourceContext</code> of
  * state changes in the ongoing operation. This allows the
- * <code>DragSourceContext</code> object to interpose 
+ * <code>DragSourceContext</code> to interpose
  * itself between the platform and the
  * listeners provided by the initiator of the drag operation.
- * <p>
- * <a name="defaultCursor" />
- * By default, {@code DragSourceContext} sets the cursor as appropriate
- * for the current state of the drag and drop operation. For example, if 
- * the user has chosen {@linkplain DnDConstants#ACTION_MOVE the move action},
- * and the pointer is over a target that accepts
- * the move action, the default move cursor is shown. When
- * the pointer is over an area that does not accept the transfer,
- * the default "no drop" cursor is shown.
- * <p>
- * This default handling mechanism is disabled when a custom cursor is set
- * by the {@link #setCursor} method. When the default handling is disabled,
- * it becomes the responsibility
- * of the developer to keep the cursor up to date, by listening 
- * to the {@code DragSource} events and calling the {@code setCursor()} method.
- * Alternatively, you can provide custom cursor behavior by providing
- * custom implementations of the {@code DragSource}
- * and the {@code DragSourceContext} classes.
  *
  * @see DragSourceListener
  * @see DragSourceMotionListener
- * @see DnDConstants
- * @version 1.60, 05/05/07
  * @since 1.2
  */
 
@@ -157,10 +142,7 @@ public class DragSourceContext
      *
      * @param dscp       the <code>DragSourceContextPeer</code> for this drag
      * @param trigger    the triggering event
-     * @param dragCursor     the initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see <a href="DragSourceContext.html#defaultCursor">class level documentation</a>
-     *                       for more details on the cursor handling mechanism during drag and drop
+     * @param dragCursor the initial <code>Cursor</code>
      * @param dragImage  the <code>Image</code> to drag (or <code>null</code>)
      * @param offset     the offset of the image origin from the hotspot at the
      *                   instant of the triggering event
@@ -274,11 +256,9 @@ public class DragSourceContext
      * is <code>null</code>, the default drag cursor behavior is
      * activated for this drag operation, otherwise it is deactivated.
      * 
-     * @param c     the initial {@code Cursor} for this drag operation,
-     *                       or {@code null} for the default cursor handling;
-     *                       see {@linkplain #defaultCursor class
-     *                       level documentation} for more details
-     *                       on the cursor handling during drag and drop
+     * @param c the <code>Cursor</code> to display, or
+     *   <code>null</code> to activate the default drag cursor
+     *   behavior
      * 
      */
 
@@ -305,7 +285,7 @@ public class DragSourceContext
      * Note that while <code>null</code> is not prohibited,
      * it is not acceptable as a parameter.
      * <P>
-     * @throws TooManyListenersException if
+     * @throws <code>TooManyListenersException</code> if
      * a <code>DragSourceListener</code> has already been added
      */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1996-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1996-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,8 +26,6 @@
 package java.awt.event;
 
 import java.awt.Component;
-import java.awt.Event;
-
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
@@ -59,7 +57,6 @@ import sun.awt.SunToolkit;
  *
  * @author Carl Quinn
  * @author Amy Fowler
- * @version 1.39 05/05/07
  * @since 1.1
  */
 public class FocusEvent extends ComponentEvent {

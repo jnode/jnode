@@ -348,7 +348,6 @@ import java.util.Arrays;
  * }
  * </pre></blockquote><hr>
  * <p>
- * @version     1.85, 05/05/07
  * @author Doug Stein
  * @author Bill Spitzak (orignial NeWS & OLIT implementation)
  * @see       java.awt.GridBagConstraints

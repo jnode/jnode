@@ -43,7 +43,6 @@ import java.util.Comparator;
  * <a href="../../java/awt/doc-files/FocusSpec.html">Focus Specification</a>
  * for more information.
  *
- * @version 1.36, 05/05/07
  * @author Arnaud Weber
  * @author David Mendenhall
  */

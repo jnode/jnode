@@ -68,10 +68,13 @@ public abstract class SunToolkit extends Toolkit
 
     private static final Logger log = Logger.getLogger("sun.awt.SunToolkit");
 
-    /* Force the debug helper classes to initialize */
-    {
-	DebugHelper.init();
+    /* Load debug settings for native code */
+    static {
+        String nativeDebug = System.getProperty("sun.awt.nativedebug");
+        if ("true".equalsIgnoreCase(nativeDebug)) {
+            DebugSettings.init();
     }
+    };
 
     /**
      * Special mask for the UngrabEvent events, in addition to the
@@ -622,7 +625,7 @@ public abstract class SunToolkit extends Toolkit
         EventQueue eventQueue = (EventQueue) appContext.get(AppContext.EVENT_QUEUE_KEY);
         if (eventQueue != null) {
             eventQueue.postEvent(event);
-        }
+    }
     }
 
     /*
@@ -840,6 +843,22 @@ public abstract class SunToolkit extends Toolkit
         }
     }
 
+    /**
+     * Returns the value of "sun.awt.noerasebackground" property. Default
+     * value is {@code false}.
+     */
+    public static boolean getSunAwtNoerasebackground() {
+        return AccessController.doPrivileged(new GetBooleanAction("sun.awt.noerasebackground"));
+    }
+
+    /**
+     * Returns the value of "sun.awt.erasebackgroundonresize" property. Default
+     * value is {@code false}.
+     */
+    public static boolean getSunAwtErasebackgroundonresize() {
+        return AccessController.doPrivileged(new GetBooleanAction("sun.awt.erasebackgroundonresize"));
+    }
+
     static SoftCache imgCache = new SoftCache();
 
     static synchronized Image getImageFromHash(Toolkit tk, URL url) {
@@ -1011,8 +1030,9 @@ public abstract class SunToolkit extends Toolkit
             //with scale factors x1, x3/4, x2/3, xN, x1/N.
             Image im = i.next();
             if (im == null) {
-                if (log.isLoggable(Level.FINEST)) {
-                    log.finest("SunToolkit.getScaledIconImage: Skipping the image passed into Java because it's null.");
+                if (log.isLoggable(Level.FINER)) {
+                    log.log(Level.FINER, "SunToolkit.getScaledIconImage: " +
+                            "Skipping the image passed into Java because it's null.");
                 }
                 continue;
             }
@@ -1026,8 +1046,9 @@ public abstract class SunToolkit extends Toolkit
                 iw = im.getWidth(null);
                 ih = im.getHeight(null);
             } catch (Exception e){
-                if (log.isLoggable(Level.FINEST)) {
-                    log.finest("SunToolkit.getScaledIconImage: Perhaps the image passed into Java is broken. Skipping this icon.");
+                if (log.isLoggable(Level.FINER)) {
+                    log.log(Level.FINER, "SunToolkit.getScaledIconImage: " +
+                            "Perhaps the image passed into Java is broken. Skipping this icon.");
                 }
                 continue;
             }
@@ -1101,7 +1122,7 @@ public abstract class SunToolkit extends Toolkit
             int x = (width - bestWidth) / 2; 
             int y = (height - bestHeight) / 2;
             if (log.isLoggable(Level.FINER)) {
-                log.finer("WWindowPeer.getScaledIconData() result : " + 
+                log.log(Level.FINER, "WWindowPeer.getScaledIconData() result : " +
                           "w : " + width + " h : " + height + 
                           " iW : " + bestImage.getWidth(null) + " iH : " + bestImage.getHeight(null) + 
                           " sim : " + bestSimilarity + " sf : " + bestScaleFactor + 
@@ -1118,8 +1139,9 @@ public abstract class SunToolkit extends Toolkit
     public static DataBufferInt getScaledIconData(java.util.List<Image> imageList, int width, int height) {
         BufferedImage bimage = getScaledIconImage(imageList, width, height);
         if (bimage == null) {
-             if (log.isLoggable(Level.FINEST)) {
-                 log.finest("SunToolkit.getScaledIconData: Perhaps the image passed into Java is broken. Skipping this icon.");
+             if (log.isLoggable(Level.FINER)) {
+                 log.log(Level.FINER, "SunToolkit.getScaledIconData: " +
+                         "Perhaps the image passed into Java is broken. Skipping this icon.");
              }
             return null;
         }
@@ -1529,17 +1551,35 @@ public abstract class SunToolkit extends Toolkit
     public static class InfiniteLoop extends RuntimeException {
     }
 
-    public static final int WAIT_TIME = 10000;
+    public static class IllegalThreadException extends RuntimeException {
+        public IllegalThreadException(String msg) {
+            super(msg);
+        }
+        public IllegalThreadException() {
+        }
+    }
+
+    public static final int DEFAULT_WAIT_TIME = 10000;
     private static final int MAX_ITERS = 20;
     private static final int MIN_ITERS = 0;
     private static final int MINIMAL_EDELAY = 0;
+
+    /**
+     * Parameterless version of realsync which uses default timout (see DEFAUL_WAIT_TIME).
+     */
+    public void realSync() throws OperationTimedOut, InfiniteLoop {
+        realSync(DEFAULT_WAIT_TIME);
+    }
 
     /**
      * Forces toolkit to synchronize with the native windowing
      * sub-system, flushing all pending work and waiting for all the
      * events to be processed.  This method guarantees that after
      * return no additional Java events will be generated, unless
-     * cause by user.
+     * cause by user. Obviously, the method cannot be used on the
+     * event dispatch thread (EDT). In case it nevertheless gets
+     * invoked on this thread, the method throws the
+     * IllegalThreadException runtime exception.
      *
      * <p> This method allows to write tests without explicit timeouts
      * or wait for some event.  Example:
@@ -1573,8 +1613,14 @@ public abstract class SunToolkit extends Toolkit
      * serie of paint events, a serie of Java focus events, which then
      * generate a serie of paint events which then are processed -
      * three cycles, minimum.
+     *
+     * @param timeout the maximum time to wait in milliseconds, negative means "forever".
      */
-    public void realSync() throws OperationTimedOut, InfiniteLoop {
+    public void realSync(final long timeout) throws OperationTimedOut, InfiniteLoop
+    {
+        if (EventQueue.isDispatchThread()) {
+            throw new IllegalThreadException("The SunToolkit.realSync() method cannot be used on the event dispatch thread (EDT).");
+        }
         int bigLoop = 0;
         do {
             // Let's do sync first
@@ -1587,10 +1633,10 @@ public abstract class SunToolkit extends Toolkit
             // to dispatch.
             int iters = 0;
             while (iters < MIN_ITERS) {
-                syncNativeQueue();
+                syncNativeQueue(timeout);
                 iters++;
             }
-            while (syncNativeQueue() && iters < MAX_ITERS) {
+            while (syncNativeQueue(timeout) && iters < MAX_ITERS) {
                 iters++;
             }
             if (iters >= MAX_ITERS) {
@@ -1606,10 +1652,10 @@ public abstract class SunToolkit extends Toolkit
             // waitForIdle, we may end up with full EventQueue
             iters = 0;
             while (iters < MIN_ITERS) {
-                waitForIdle();
+                waitForIdle(timeout);
                 iters++;
             }
-            while (waitForIdle() && iters < MAX_ITERS) {
+            while (waitForIdle(timeout) && iters < MAX_ITERS) {
                 iters++;
             }
             if (iters >= MAX_ITERS) {
@@ -1620,7 +1666,7 @@ public abstract class SunToolkit extends Toolkit
             // Again, for Java events, it was simple to check for new Java
             // events by checking event queue, but what if Java events
             // resulted in native requests?  Therefor, check native events again.
-        } while ((syncNativeQueue() || waitForIdle()) && bigLoop < MAX_ITERS);
+        } while ((syncNativeQueue(timeout) || waitForIdle(timeout)) && bigLoop < MAX_ITERS);
     }
 
     /**
@@ -1631,7 +1677,7 @@ public abstract class SunToolkit extends Toolkit
      * <code>true</code> if some events were processed,
      * <code>false</code> otherwise.
      */
-    protected abstract boolean syncNativeQueue();
+    protected abstract boolean syncNativeQueue(final long timeout);
 
     private boolean eventDispatched = false;
     private boolean queueEmpty = false;
@@ -1661,7 +1707,7 @@ public abstract class SunToolkit extends Toolkit
      * Should return <code>true</code> if more processing is
      * necessary, <code>false</code> otherwise.
      */
-    protected boolean waitForIdle() {
+    protected final boolean waitForIdle(final long timeout) {
         flushPendingEvents();  
         boolean queueWasEmpty = isEQEmpty();
         queueEmpty = false;
@@ -1677,10 +1723,10 @@ public abstract class SunToolkit extends Toolkit
                               // flush Java events again.
                               int iters = 0;
                               while (iters < MIN_ITERS) {
-                                  syncNativeQueue();
+                                  syncNativeQueue(timeout);
                                   iters++;
                               }
-                              while (syncNativeQueue() && iters < MAX_ITERS) {
+                              while (syncNativeQueue(timeout) && iters < MAX_ITERS) {
                                   iters++;
                               }
                               flushPendingEvents();

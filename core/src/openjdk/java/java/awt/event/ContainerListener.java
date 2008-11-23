@@ -50,7 +50,6 @@ import java.util.EventListener;
  *
  * @author Tim Prinzing
  * @author Amy Fowler
- * @version 1.19 05/05/07
  * @since 1.1
  */
 public interface ContainerListener extends EventListener {

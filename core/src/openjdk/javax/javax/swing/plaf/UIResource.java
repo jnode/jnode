@@ -59,7 +59,6 @@ package javax.swing.plaf;
  * </pre>
  *
  * @see ComponentUI
- * @version 1.17 05/05/07
  * @author Hans Muller
  * 
  */

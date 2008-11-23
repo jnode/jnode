@@ -838,4 +838,3 @@ class PNGFilterInputStream extends FilterInputStream {
 
 
 }
-

@@ -31,7 +31,6 @@ import java.util.EventListener;
 /**
  * MenuKeyListener
  *
- * @version 1.16 05/05/07
  * @author Georges Saab
  */
 public interface MenuKeyListener extends EventListener {
@@ -51,4 +50,3 @@ public interface MenuKeyListener extends EventListener {
      */
     void menuKeyReleased(MenuKeyEvent e);
 }
-

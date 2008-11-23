@@ -49,7 +49,6 @@ import java.awt.Point;
  * result in repeated scroll requests to the <code>Component</code> 
  * until the drag <code>Cursor</code> resumes its motion.
  *
- * @version 	1.20, 05/05/07
  * @since 1.2
  */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2002 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package java.awt;
 
-import java.awt.color.ColorSpace;
 import java.awt.image.Raster;
 import java.awt.image.ColorModel;
 
@@ -40,7 +39,6 @@ import java.awt.image.ColorModel;
  * operation.  In a multi-threaded environment, several
  * contexts can exist simultaneously for a single {@link Paint} object.
  * @see Paint
- * @version 10 Feb 1997
  */
 
 public interface PaintContext {

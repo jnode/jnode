@@ -42,7 +42,6 @@ package javax.swing;
   * @see JInternalFrame
   * @see JInternalFrame.JDesktopIcon
   *
-  * @version 1.22 05/05/07
   * @author David Kloba
   */
 public interface DesktopManager
@@ -117,4 +116,3 @@ public interface DesktopManager
     /** This is a primitive reshape method.*/
     void setBoundsForFrame(JComponent f, int newX, int newY, int newWidth, int newHeight);
 }
-

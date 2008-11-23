@@ -35,7 +35,6 @@ import javax.swing.plaf.UIResource;
 /**
  * Classic sort icons.
  *
- * @version 1.8, 05/05/07
  */
 public class ClassicSortArrowIcon implements Icon, UIResource, Serializable{
     private static final int X_OFFSET = 9;

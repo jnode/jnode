@@ -41,6 +41,7 @@ import java.nio.channels.FileChannel;
 import sun.java2d.Disposer;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.awt.Font;
 
 /* 
  * Adobe Technical Note 5040 details the format of PFB files.
@@ -178,7 +179,6 @@ public class Type1Font extends FileFont {
     protected void close() {
     }
 
-
     /* called from native code to read file into a direct byte buffer */
     void readFile(ByteBuffer buffer) {
 	RandomAccessFile raf = null;
@@ -190,13 +190,13 @@ public class Type1Font extends FileFont {
 			public Object run() {
 			    try {
 				return new RandomAccessFile(platName, "r");
-			    } catch (FileNotFoundException ffne) {
+                            } catch (FileNotFoundException fnfe) {
 			    }
 			    return null;
 		    }
 	    });
 	    fc = raf.getChannel();
-	    fc.read(buffer);
+            while (buffer.remaining() > 0 && fc.read(buffer) != -1) {}
 	} catch (NullPointerException npe) {
 	} catch (ClosedChannelException e) {
 	    try {
@@ -587,19 +587,12 @@ public class Type1Font extends FileFont {
 	return psName;
     }
 
-    private native long createScaler(int fileSize);
-
-    protected synchronized long getScaler() {
-	if (pScaler == 0L) {
-	    pScaler = createScaler(fileSize);
-	    if (pScaler != 0L) {
-		Disposer.addObjectRecord(this, new FileFontDisposer(pScaler));
-	    } else {
-		pScaler = getNullScaler();
-		FontManager.deRegisterBadFont(this);
+    protected synchronized FontScaler getScaler() {
+        if (scaler == null) {
+            scaler = FontManager.getScaler(this, 0, false, fileSize);
 	    }
-	}
-	return pScaler;
+
+        return scaler;
     }
 
     CharToGlyphMapper getMapper() {
@@ -609,14 +602,32 @@ public class Type1Font extends FileFont {
 	return mapper;
     }
 
-    /* These have not been declared synchronized because their native
-     * implementations just return a value.
-     */
-    native int getNumGlyphs(long pScaler);
+    public int getNumGlyphs() {
+        try {
+            return getScaler().getNumGlyphs();
+        } catch (FontScalerException e) {
+            scaler = FontManager.getNullScaler();
+            return getNumGlyphs();
+        }
+    }
 
-    native int getMissingGlyphCode(long pScaler);
+    public int getMissingGlyphCode() {
+        try {
+            return getScaler().getMissingGlyphCode();
+        } catch (FontScalerException e) {
+            scaler = FontManager.getNullScaler();
+            return getMissingGlyphCode();
+        }
+    }
 
-    native synchronized int getGlyphCode(long pScaler, char charCode);
+    public int getGlyphCode(char charCode) {
+        try {
+            return getScaler().getGlyphCode(charCode);
+        } catch (FontScalerException e) {
+            scaler = FontManager.getNullScaler();
+            return getGlyphCode(charCode);
+        }
+    }
 
     public String toString() {
 	return "** Type1 Font: Family="+familyName+ " Name="+fullName+

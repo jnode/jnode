@@ -49,7 +49,6 @@ import java.awt.Point;
  * bands with a PackedColorModel (including a DirectColorModel) for
  * color interpretation.
  *
- * @version 10 Feb 1997
  */
 public class IntegerComponentRaster extends SunWritableRaster {
 
@@ -691,5 +690,3 @@ public class IntegerComponentRaster extends SunWritableRaster {
 //    }
 
 }
-
-

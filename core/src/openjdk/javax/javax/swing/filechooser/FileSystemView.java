@@ -61,7 +61,6 @@ import sun.awt.shell.*;
  * Java Licensees may want to provide a different implementation of
  * FileSystemView to better handle a given operating system.
  *
- * @version 1.55 05/05/07
  * @author Jeff Dinkins
  */
 

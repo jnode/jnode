@@ -35,7 +35,6 @@ import java.awt.image.*;
 /**
  * Implements the default HSB Color chooser
  *
- *  @version 1.33 05/05/07
  *  @author Tom Santos
  *  @author Steve Wilson
  *  @author Mark Davidson

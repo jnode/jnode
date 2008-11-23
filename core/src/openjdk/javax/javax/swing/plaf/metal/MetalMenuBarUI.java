@@ -35,7 +35,6 @@ import javax.swing.plaf.basic.*;
  * Metal implementation of <code>MenuBarUI</code>. This class is responsible
  * for providing the metal look and feel for <code>JMenuBar</code>s.
  *
- * @version 1.13 05/05/07
  * @see javax.swing.plaf.MenuBarUI
  * @since 1.5
  */

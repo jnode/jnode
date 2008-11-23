@@ -132,7 +132,6 @@ import java.io.ObjectInputStream;
  * @author Carl Quinn
  * @author Amy Fowler
  * @author Norbert Lindenberg
- * @version 1.88 05/05/07
  *
  * @see KeyAdapter
  * @see KeyListener
@@ -907,12 +906,6 @@ public class KeyEvent extends InputEvent {
      */
     private static native void initIDs();
 
-    private KeyEvent(Component source, int id, long when, int modifiers,
-                    int keyCode, char keyChar, int keyLocation, boolean isProxyActive) {
-        this(source, id, when, modifiers, keyCode, keyChar, keyLocation);
-        this.isProxyActive = isProxyActive;
-    }
-    
     /**
      * Constructs a <code>KeyEvent</code> object.
      * <p>Note that passing in an invalid <code>id</code> results in
@@ -951,6 +944,11 @@ public class KeyEvent extends InputEvent {
      * @throws IllegalArgumentException if <code>source</code> is null
      * @since 1.4
      */
+    private KeyEvent(Component source, int id, long when, int modifiers,
+                    int keyCode, char keyChar, int keyLocation, boolean isProxyActive) {
+        this(source, id, when, modifiers, keyCode, keyChar, keyLocation);
+        this.isProxyActive = isProxyActive;
+    }
     public KeyEvent(Component source, int id, long when, int modifiers,
                     int keyCode, char keyChar, int keyLocation) {
         super(source, id, when, modifiers);
@@ -1591,4 +1589,3 @@ public class KeyEvent extends InputEvent {
 	}
     }
 }
-

@@ -77,7 +77,6 @@ import javax.swing.text.*;
  * @see ProgressMonitorInputStream
  * @author James Gosling
  * @author Lynn Monsanto (accessibility) 
- * @version 1.43 05/05/07
  */
 public class ProgressMonitor extends Object implements Accessible
 {

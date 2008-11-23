@@ -24,7 +24,6 @@
  */
 
 /*
- * @(#)Decoration.java	1.10 06/06/14
  * (C) Copyright IBM Corp. 1999-2003, All Rights Reserved
  *
  */

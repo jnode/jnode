@@ -66,7 +66,6 @@ import java.lang.reflect.*;
  * </pre>
  *
  * @author Timothy Prinzing
- * @version 1.21 05/05/07
  */
 public class ObjectView extends ComponentView  {
 
@@ -181,4 +180,3 @@ public class ObjectView extends ComponentView  {
     }
 
 }
-

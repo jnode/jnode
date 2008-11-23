@@ -43,7 +43,6 @@ import sun.swing.SwingUtilities2;
 /**
  * A Synth L&F implementation of TabbedPaneUI.
  *
- * @version 1.44, 05/05/07
  * @author Scott Violet
  */
 /**

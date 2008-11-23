@@ -39,7 +39,6 @@ import java.io.InputStream;
  * is called from ParserDelegator.getResourceAsStream.
  *
  * @author  Timothy Prinzing
- * @version 1.13 05/05/07
  */
 class ResourceLoader implements java.security.PrivilegedAction {
 

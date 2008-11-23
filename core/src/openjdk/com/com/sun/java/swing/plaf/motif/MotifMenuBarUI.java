@@ -55,7 +55,6 @@ import javax.swing.plaf.basic.*;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * 1.45 05/05/07
  * @author Georges Saab
  * @author Rich Schiavi
  */
@@ -68,4 +67,3 @@ public class MotifMenuBarUI extends BasicMenuBarUI
     }
 
 } // end class
-

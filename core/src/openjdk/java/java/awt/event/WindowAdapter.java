@@ -50,7 +50,6 @@ package java.awt.event;
  * @author Carl Quinn
  * @author Amy Fowler
  * @author David Mendenhall
- * @version 1.28, 05/05/07
  * @since 1.1
  */
 public abstract class WindowAdapter

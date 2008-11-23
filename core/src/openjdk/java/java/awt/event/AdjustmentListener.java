@@ -31,7 +31,6 @@ import java.util.EventListener;
  * The listener interface for receiving adjustment events. 
  *
  * @author Amy Fowler
- * @version 1.21 05/05/07
  * @since 1.1
  */
 public interface AdjustmentListener extends EventListener {

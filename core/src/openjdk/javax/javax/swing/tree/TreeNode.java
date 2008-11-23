@@ -40,7 +40,6 @@ import java.util.Enumeration;
  href="http://java.sun.com/docs/books/tutorial/uiswing/components/tree.html">How to Use Tree Nodes</a>
  * in <em>The Java Tutorial.</em>
  *
- * @version 1.31 05/05/07
  * @author Rob Davis
  * @author Scott Violet
  */

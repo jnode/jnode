@@ -68,7 +68,6 @@ import sun.util.CoreResourceBundleControl;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @see UIManager
- * @version 1.69 05/05/07
  * @author Hans Muller
  */
 public class UIDefaults extends Hashtable<Object,Object>
@@ -301,8 +300,13 @@ public class UIDefaults extends Hashtable<Object,Object>
             for (int i=resourceBundles.size()-1; i >= 0; i--) {
                 String bundleName = (String)resourceBundles.get(i);
                 try {
-                    ResourceBundle b = ResourceBundle.
-			getBundle(bundleName, l, CoreResourceBundleControl.getRBControlInstance());
+                    Control c = CoreResourceBundleControl.getRBControlInstance(bundleName);
+                    ResourceBundle b;
+                    if (c != null) {
+                        b = ResourceBundle.getBundle(bundleName, l, c);
+                    } else {
+                        b = ResourceBundle.getBundle(bundleName, l);
+                    }
                     Enumeration keys = b.getKeys();
 
                     while (keys.hasMoreElements()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -99,7 +99,6 @@ import javax.accessibility.*;
  * For multiple-selection scrolling lists, it is considered a better
  * user interface to use an external gesture (such as clicking on a
  * button) to trigger the action.
- * @version 	1.117, 05/05/07
  * @author 	Sami Shaio
  * @see         java.awt.event.ItemEvent
  * @see         java.awt.event.ItemListener
@@ -616,8 +615,10 @@ public class List extends Component implements ItemSelectable, Accessible {
     public synchronized void deselect(int index) {
 	ListPeer peer = (ListPeer)this.peer;
 	if (peer != null) {
+            if (isMultipleMode() || (getSelectedIndex() == index)) {
 	    peer.deselect(index);
 	}
+        }
 
 	for (int i = 0 ; i < selected.length ; i++) {
 	    if (selected[i] == index) {

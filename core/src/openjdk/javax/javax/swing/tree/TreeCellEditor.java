@@ -35,7 +35,6 @@ import javax.swing.JTree;
   *
   * @see javax.swing.JTree
   *
-  * @version 1.23 05/05/07
   * @author Scott Violet
   */
 

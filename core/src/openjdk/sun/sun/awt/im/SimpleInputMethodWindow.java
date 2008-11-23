@@ -32,7 +32,6 @@ import java.awt.Frame;
  * functionality as specified in
  * {@link java.awt.im.spi.InputMethodContext#createInputMethodWindow}.
  *
- * @version 1.17 05/05/07
  */
 public class SimpleInputMethodWindow
         extends Frame

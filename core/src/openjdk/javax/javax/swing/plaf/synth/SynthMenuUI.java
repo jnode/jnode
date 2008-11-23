@@ -40,7 +40,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's MenuUI.
  *
- * @version 1.20, 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber

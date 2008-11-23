@@ -50,7 +50,6 @@ import java.awt.Point;
  * ByteComponentRaster using a SinglePixelPackedSampleModel and
  * a ComponentColorModel.
  *
- * @version 10 Feb 1997
  */
 public class ByteComponentRaster extends SunWritableRaster {
 
@@ -925,5 +924,3 @@ public class ByteComponentRaster extends SunWritableRaster {
 
 
 }
-
-

@@ -36,7 +36,6 @@ import javax.swing.text.*;
  * with CSS specifications.
  *
  * @author  Timothy Prinzing
- * @version 1.44 05/05/07
  */
 public class BlockView extends BoxView  {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package java.awt;
 
-import java.awt.Component;
 import java.io.*;
 
 /**
@@ -40,7 +39,6 @@ import java.io.*;
  * @see GraphicsDevice
  * @see GraphicsConfiguration
  *
- * @version 	1.24, 05/05/07
  * @since       1.2
  */
 public abstract class GraphicsConfigTemplate implements Serializable {
@@ -111,4 +109,3 @@ public abstract class GraphicsConfigTemplate implements Serializable {
       isGraphicsConfigSupported(GraphicsConfiguration gc);
 
 }
-

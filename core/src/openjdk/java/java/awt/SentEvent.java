@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,8 +25,6 @@
 
 package java.awt;
 
-import java.awt.AWTEvent;
-import java.awt.ActiveEvent;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
@@ -36,7 +34,6 @@ import sun.awt.SunToolkit;
  * event even if it is currently blocked waiting for a SequencedEvent or
  * another SentEvent to be handled.
  *
- * @version 1.14, 05/05/07
  * @author David Mendenhall
  */
 class SentEvent extends AWTEvent implements ActiveEvent {

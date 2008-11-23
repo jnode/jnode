@@ -38,7 +38,6 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
  * This utility class draws the horizontal bars which indicate a MetalComboBox
  *
  * @see MetalComboBoxUI
- * @version 1.20 05/05/07
  * @author Tom Santos
  */
 public class MetalComboBoxIcon implements Icon, Serializable {

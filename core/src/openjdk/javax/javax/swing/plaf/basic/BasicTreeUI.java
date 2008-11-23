@@ -55,7 +55,6 @@ import sun.swing.UIAction;
  * The basic L&F for a hierarchical data structure.
  * <p>
  *
- * @version 1.202 05/05/07
  * @author Scott Violet
  * @author Shannon Hickey (drag and drop)
  */

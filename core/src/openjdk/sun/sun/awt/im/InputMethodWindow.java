@@ -29,7 +29,6 @@ package sun.awt.im;
  * Interface for input method windows that need special handling
  * by input method window.
  *
- * @version 1.15 05/05/07
  */
 public interface InputMethodWindow {
     

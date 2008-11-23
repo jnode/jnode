@@ -54,7 +54,6 @@ import javax.swing.plaf.*;
  * @see UIManager#addAuxiliaryLookAndFeel
  * @see javax.swing.plaf.multi
  *
- * @version 1.42 05/05/07
  * @author Willie Walker
  */
 public class MultiLookAndFeel extends LookAndFeel {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1998-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1998-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 
 package sun.awt;
 
-import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.SystemTray;
@@ -33,15 +32,14 @@ import java.awt.TrayIcon;
 import java.awt.Toolkit;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.InvocationEvent;
-import java.lang.ref.WeakReference;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Vector;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 
@@ -126,7 +124,6 @@ import java.beans.PropertyChangeListener;
  *
  * @author  Thomas Ball
  * @author  Fred Ecks
- * @version 1.45 05/05/07
  */
 public final class AppContext {
 
@@ -139,14 +136,14 @@ public final class AppContext {
 
     /* A map of AppContexts, referenced by ThreadGroup.
      */
-    private static Hashtable threadGroup2appContext = null;
+    private static final Map<ThreadGroup, AppContext> threadGroup2appContext =
+            Collections.synchronizedMap(new IdentityHashMap<ThreadGroup, AppContext>());
 
     /**
      * Returns a set containing all <code>AppContext</code>s.
      */
-    public static Set getAppContexts() {
-        return ( threadGroup2appContext == null ? new HashSet() :
-                 new HashSet(((Hashtable)threadGroup2appContext.clone()).values()) );
+    public static Set<AppContext> getAppContexts() {
+        return new HashSet<AppContext>(threadGroup2appContext.values());
     }
 
     /* The main "system" AppContext, used by everything not otherwise
@@ -235,9 +232,6 @@ public final class AppContext {
     AppContext(ThreadGroup threadGroup) {
         numAppContexts++;
 
-        if (threadGroup2appContext == null) {
-            threadGroup2appContext = new Hashtable(2, 0.2f);
-        }
         this.threadGroup = threadGroup;
         threadGroup2appContext.put(threadGroup, this);
 
@@ -290,8 +284,7 @@ public final class AppContext {
             // when new AppContext objects are created.
             ThreadGroup currentThreadGroup = currentThread.getThreadGroup();
             ThreadGroup threadGroup = currentThreadGroup;
-            AppContext context =
-                          (AppContext)threadGroup2appContext.get(threadGroup);
+            AppContext context = threadGroup2appContext.get(threadGroup);
             while (context == null) {
                 threadGroup = threadGroup.getParent();
                 if (threadGroup == null) {
@@ -302,7 +295,7 @@ public final class AppContext {
                     // under.
                     throw new RuntimeException("Invalid ThreadGroup");
                 }
-                context = (AppContext)threadGroup2appContext.get(threadGroup);
+                context = threadGroup2appContext.get(threadGroup);
             }
             // In case we did anything in the above while loop, we add
             // all the intermediate ThreadGroups to threadGroup2appContext
@@ -540,8 +533,7 @@ jnode*/
     }
 
     static void stopEventDispatchThreads() {
-        for (Iterator it = getAppContexts().iterator(); it.hasNext();) {
-            AppContext appContext = (AppContext)it.next();
+        for (AppContext appContext: getAppContexts()) {
             if (appContext.isDisposed()) {
                 continue;
             }

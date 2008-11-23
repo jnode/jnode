@@ -43,7 +43,6 @@ package java.awt.event;
  * object is invoked, and the <code>HierarchyEvent</code> is passed to it.
  *
  * @author	David Mendenhall
- * @version	1.14, 05/05/07
  * @see		HierarchyBoundsListener
  * @see		HierarchyEvent
  * @since 	1.3

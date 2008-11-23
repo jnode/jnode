@@ -38,7 +38,6 @@ import javax.swing.text.*;
  * Row of text.
  *
  * @author  Timothy Prinzing
- * @version 1.25 05/05/07
  */
 class LineView extends ParagraphView {
     /** Last place painted at. */

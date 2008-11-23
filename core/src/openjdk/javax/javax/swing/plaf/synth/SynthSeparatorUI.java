@@ -40,7 +40,6 @@ import sun.swing.plaf.synth.SynthUI;
  * A Synth L&F implementation of SeparatorUI.  This implementation 
  * is a "combined" view/controller.
  *
- * @version 1.22 05/05/07
  * @author Shannon Hickey
  * @author Joshua Outwater
  */

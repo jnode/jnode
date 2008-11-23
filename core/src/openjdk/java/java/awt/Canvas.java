@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,6 @@
 package java.awt;
 
 import java.awt.image.BufferStrategy;
-import java.awt.peer.CanvasPeer;
 import javax.accessibility.*;
 
 /**
@@ -38,7 +37,6 @@ import javax.accessibility.*;
  * component. The <code>paint</code> method must be overridden 
  * in order to perform custom graphics on the canvas.
  *
- * @version 	1.46 05/05/07
  * @author 	Sami Shaio
  * @since       JDK1.0
  */

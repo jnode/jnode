@@ -38,7 +38,6 @@ import javax.sound.midi.*;
 /**
  * Convert an InputStream to an AudioStream.
  *
- * @version 1.19 07/05/05
  */
 
 

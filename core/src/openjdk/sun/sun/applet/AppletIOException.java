@@ -30,7 +30,6 @@ import java.io.IOException;
 /**
  * An applet IO exception.
  *
- * @version 	07/05/05
  * @author 	Koji Uno
  */
 public 

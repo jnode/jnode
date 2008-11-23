@@ -44,7 +44,6 @@ import sun.swing.SwingUtilities2;
 /**
  * Basic L&F implementation of a FileChooser.
  *
- * @version %i% %g%
  * @author Jeff Dinkins
  */
 public class BasicFileChooserUI extends FileChooserUI {
@@ -880,11 +879,12 @@ public class BasicFileChooserUI extends FileChooserUI {
 		    // check for wildcard pattern
 		    FileFilter currentFilter = chooser.getFileFilter();
 		    if (!selectedFile.exists() && isGlobPattern(filename)) {
+                        changeDirectory(selectedFile.getParentFile());
 			if (globFilter == null) {
 			    globFilter = new GlobFilter();
 			}
 			try {
-			    globFilter.setPattern(filename);
+                            globFilter.setPattern(selectedFile.getName());
 			    if (!(currentFilter instanceof GlobFilter)) {
 				actualFileFilter = currentFilter;
 			    }

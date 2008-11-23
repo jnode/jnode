@@ -50,7 +50,6 @@ import sun.swing.DefaultLookup;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.104 05/05/07
  */
 public class BasicTextFieldUI extends BasicTextUI {
 

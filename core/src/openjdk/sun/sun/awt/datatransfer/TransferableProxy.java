@@ -53,7 +53,6 @@ import java.util.Set;
  *
  * @author Lawrence P.G. Cable
  * @author David Mendenhall
- * @version 1.14, 05/05/07
  *
  * @since 1.4
  */
@@ -211,4 +210,3 @@ class ClassLoaderObjectInputStream extends ObjectInputStream {
         }
     }
 }
-

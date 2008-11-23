@@ -68,7 +68,6 @@ import javax.accessibility.*;
  * forces any other check box in the same group that is on
  * into the "off" state.
  *
- * @version	1.95 05/05/07
  * @author 	Sami Shaio
  * @see         java.awt.GridLayout
  * @see         java.awt.CheckboxGroup

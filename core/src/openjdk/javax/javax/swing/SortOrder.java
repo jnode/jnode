@@ -27,7 +27,6 @@ package javax.swing;
 /**
  * SortOrder is an enumeration of the possible sort orderings.
  *
- * @version 1.8 05/05/07
  * @see RowSorter
  * @since 1.6
  */

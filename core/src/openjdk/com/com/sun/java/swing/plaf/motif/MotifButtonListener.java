@@ -36,7 +36,6 @@ import javax.swing.event.*;
  * Button Listener
  * <p>
  *
- * @version 1.25 05/05/07
  * @author Rich Schiavi
  */
 public class MotifButtonListener extends BasicButtonListener {
@@ -48,5 +47,3 @@ public class MotifButtonListener extends BasicButtonListener {
 	b.setOpaque( false );
     }
 }
-
-

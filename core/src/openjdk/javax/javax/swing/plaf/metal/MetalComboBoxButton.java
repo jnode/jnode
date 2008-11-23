@@ -46,7 +46,6 @@ import java.io.Serializable;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @see MetalComboBoxButton
- * @version 1.46 05/05/07
  * @author Tom Santos
  */
 public class MetalComboBoxButton extends JButton {

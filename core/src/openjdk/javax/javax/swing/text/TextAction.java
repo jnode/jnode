@@ -57,7 +57,6 @@ import javax.swing.KeyStroke;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.36 05/05/07
  */
 public abstract class TextAction extends AbstractAction {
 

@@ -32,7 +32,6 @@ import javax.swing.plaf.ComponentUI;
  * Provides the look and feel implementation for
  * <code>JFormattedTextField</code>.
  *
- * @version 1.12, 05/05/07
  */
 class SynthFormattedTextFieldUI extends SynthTextFieldUI {
     /**

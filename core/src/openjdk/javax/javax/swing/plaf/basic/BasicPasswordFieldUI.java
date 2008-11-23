@@ -39,7 +39,6 @@ import javax.swing.plaf.*;
  * real text contained in the field.
  *
  * @author  Timothy Prinzing
- * @version 1.39 05/05/07
  */
 public class BasicPasswordFieldUI extends BasicTextFieldUI {
 
@@ -107,8 +106,3 @@ public class BasicPasswordFieldUI extends BasicTextFieldUI {
     }
 
 }
-
-
-
-
-

@@ -46,7 +46,6 @@ import javax.swing.border.*;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author  Timothy Prinzing
- * @version 1.76 05/05/07
  */
 public class BasicTextPaneUI extends BasicEditorPaneUI {
 

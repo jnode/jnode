@@ -31,7 +31,6 @@ import java.util.EventObject;
 /**
  * AppletEvent class.
  *
- * @version 1.20, 05/05/07
  * @author  Sunita Mani
  */
 
@@ -64,5 +63,3 @@ public class AppletEvent extends EventObject {
 	return str;
     }
 }
- 
-

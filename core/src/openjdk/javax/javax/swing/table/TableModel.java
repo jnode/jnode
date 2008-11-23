@@ -43,7 +43,6 @@ import javax.swing.event.*;
  * For further documentation, see <a href="http://java.sun.com/docs/books/tutorial/uiswing/components/table.html#data">Creating a Table Model</a>
  * in <em>The Java Tutorial</em>.
  * <p>
- * @version 1.33 05/05/07
  * @author Philip Milne
  * @see JTable
  */
@@ -142,4 +141,3 @@ public interface TableModel
      */
     public void removeTableModelListener(TableModelListener l);
 }
-

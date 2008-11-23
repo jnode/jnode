@@ -35,7 +35,6 @@ import java.io.IOException;
  * structure consisting of a chain of AppletListeners and is
  * responsible for dispatching events to them.
  * 
- * @version 1.18, 05/05/07
  * @author  Sunita Mani
  */
 public class AppletEventMulticaster implements AppletListener {

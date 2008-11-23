@@ -40,7 +40,6 @@ package sun.audio;
  * @see AudioPlayer
  * @see AudioData
  * @author Arthur van Hoff
- * @version 1.14 07/05/05
  */
 
 public

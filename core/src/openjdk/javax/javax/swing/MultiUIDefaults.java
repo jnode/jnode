@@ -32,7 +32,6 @@ import java.util.Locale;
 
 /**
  * 
- * @version 1.10 02/02/00
  * @author Hans Muller
  */
 class MultiUIDefaults extends UIDefaults

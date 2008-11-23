@@ -83,7 +83,6 @@ import java.io.Serializable;
  * @see SpinnerNumberModel
  * @see Calendar#add
  *
- * @version 1.19 05/05/07
  * @author Hans Muller
  * @since 1.4
  */

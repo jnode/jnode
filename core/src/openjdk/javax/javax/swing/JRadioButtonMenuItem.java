@@ -79,7 +79,6 @@ import javax.accessibility.*;
  *   attribute: isContainer false
  * description: A component within a group of menu items which can be selected.
  *
- * @version 1.58 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @see ButtonGroup
@@ -279,4 +278,3 @@ public class JRadioButtonMenuItem extends JMenuItem implements Accessible {
         }
     } // inner class AccessibleJRadioButtonMenuItem
 }
-

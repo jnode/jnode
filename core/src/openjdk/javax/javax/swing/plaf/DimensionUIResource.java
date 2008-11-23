@@ -45,7 +45,6 @@ import javax.swing.plaf.UIResource;
  * Please see {@link java.beans.XMLEncoder}.
  * 
  * @see javax.swing.plaf.UIResource
- * @version 1.19 05/05/07
  * @author Amy Fowler
  * 
  */

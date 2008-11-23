@@ -43,7 +43,6 @@ import java.beans.PropertyChangeListener;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.10 08/28/98
  * @author Hans Muller
  */
 public class MotifScrollPaneUI extends BasicScrollPaneUI
@@ -142,4 +141,3 @@ public class MotifScrollPaneUI extends BasicScrollPaneUI
 	return new MotifScrollPaneUI();
     }
 }
-

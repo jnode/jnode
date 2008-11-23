@@ -158,7 +158,6 @@ import javax.accessibility.*;
  * encounter issues with painting, key handling, sizing and 
  * positioning.
  *
- * @version 	1.119, 05/05/07
  * @author 	Sami Shaio
  * @see         java.awt.event.AdjustmentEvent
  * @see         java.awt.event.AdjustmentListener
@@ -1331,4 +1330,3 @@ public class Scrollbar extends Component implements Adjustable, Accessible {
     } // AccessibleAWTScrollBar
 
 }
-

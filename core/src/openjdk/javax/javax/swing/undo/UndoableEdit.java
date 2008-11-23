@@ -63,7 +63,6 @@ import javax.swing.event.*;
  * have many smaller edits undone or redone at once.  Similar functionality
  * can also be done using the <code>addEdit</code> method.
  *
- * @version 1.27, 05/05/07
  * @author Ray Ryan
  */
 public interface UndoableEdit {

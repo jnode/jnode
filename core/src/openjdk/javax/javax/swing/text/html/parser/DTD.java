@@ -52,7 +52,6 @@ import java.net.URL;
  * @see ContentModel
  * @see Parser
  * @author Arthur van Hoff
- * @version 1.30 05/05/07
  */
 public
 class DTD implements DTDConstants {

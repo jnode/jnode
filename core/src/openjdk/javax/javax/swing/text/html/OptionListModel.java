@@ -42,7 +42,6 @@ import java.io.Serializable;
  * accurate reset, if the user requests a reset of the form.
  *
   @author Sunita Mani
-  @version 1.18 05/05/07
  */
 
 class OptionListModel extends DefaultListModel implements ListSelectionModel, Serializable {
@@ -570,5 +569,3 @@ class OptionListModel extends DefaultListModel implements ListSelectionModel, Se
 	return initialValue;
     }
 }
-
-

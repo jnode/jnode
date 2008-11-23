@@ -30,7 +30,6 @@ import java.util.Vector;
  * A queue of text layout tasks. 
  *
  * @author  Timothy Prinzing
- * @version 1.13 05/05/07
  * @see     AsyncBoxView
  * @since   1.3 
  */

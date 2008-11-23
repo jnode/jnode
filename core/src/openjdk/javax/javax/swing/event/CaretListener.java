@@ -31,7 +31,6 @@ import java.util.EventListener;
  * Listener for changes in the caret position of a text 
  * component.
  *
- * @version 1.16 05/05/07
  * @author  Timothy Prinzing
  */
 public interface CaretListener extends EventListener {
@@ -43,4 +42,3 @@ public interface CaretListener extends EventListener {
      */
     void caretUpdate(CaretEvent e);
 }
-

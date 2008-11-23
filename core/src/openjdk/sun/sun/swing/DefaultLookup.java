@@ -40,7 +40,6 @@ import sun.awt.AppContext;
  * releases and even patch releases. You should not rely on this class even
  * existing.
  *
- * @version 1.12 05/05/07
  * @author Scott Violet
  */
 public class DefaultLookup {

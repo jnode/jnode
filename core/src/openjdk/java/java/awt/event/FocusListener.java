@@ -45,7 +45,6 @@ import java.util.EventListener;
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/focuslistener.html">Tutorial: Writing a Focus Listener</a>
  *
  * @author Carl Quinn
- * @version 1.23 05/05/07
  * @since 1.1
  */
 public interface FocusListener extends EventListener {

@@ -47,7 +47,6 @@ import java.awt.Point;
  * Raster can be used with a ComponentColorModel if there are multiple
  * bands, or an IndexColorModel if there is only one band.
  *
- * @version 7 Jul 1999
  */
 public class ByteInterleavedRaster extends ByteComponentRaster {
 

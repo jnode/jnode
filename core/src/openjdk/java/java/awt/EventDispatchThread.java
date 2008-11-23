@@ -32,11 +32,11 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import sun.security.action.GetPropertyAction;
-import sun.awt.DebugHelper;
 import sun.awt.AWTAutoShutdown;
 import sun.awt.SunToolkit;
 
 import java.util.Vector;
+import java.util.logging.*;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
@@ -57,11 +57,10 @@ import sun.awt.dnd.SunDragSourceContextPeer;
  * @author Fred Ecks
  * @author David Mendenhall
  * 
- * @version 1.66, 05/05/07
  * @since 1.1
  */
 class EventDispatchThread extends Thread {
-    private static final DebugHelper dbg = DebugHelper.create(EventDispatchThread.class);
+    private static final Logger eventLog = Logger.getLogger("java.awt.event.EventDispatchThread");
 
     private EventQueue theQueue;
     private boolean doDispatch = true;
@@ -269,8 +268,8 @@ class EventDispatchThread extends Thread {
             }
             while (eventOK == false);
                       
-            if (dbg.on) {
-                dbg.println("Dispatching: "+event);
+            if (eventLog.isLoggable(Level.FINEST)) {
+                eventLog.log(Level.FINEST, "Dispatching: " + event);
             }
 
             theQueue.dispatchEvent(event);
@@ -295,6 +294,10 @@ class EventDispatchThread extends Thread {
     }
 
     private void processException(Throwable e, boolean isModal) {
+        if (eventLog.isLoggable(Level.FINE)) {
+            eventLog.log(Level.FINE, "Processing exception: " + e +
+                                     ", isModal = " + isModal);
+        }
         if (!handleException(e)) {
             // See bug ID 4499199.
             // If we are in a modal dialog, we cannot throw

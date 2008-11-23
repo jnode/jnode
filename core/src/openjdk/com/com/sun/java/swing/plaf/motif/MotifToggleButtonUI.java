@@ -44,7 +44,6 @@ import javax.swing.plaf.basic.*;
  * version of Swing.  A future release of Swing will provide support for
  * long term persistence.
  *
- * @version 1.28 05/05/07
  * @author Rich Schiavi
  */
 public class MotifToggleButtonUI extends BasicToggleButtonUI 
@@ -115,5 +114,3 @@ public class MotifToggleButtonUI extends BasicToggleButtonUI
     }
 
 } 
-
-

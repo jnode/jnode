@@ -29,7 +29,6 @@ package javax.swing.text;
  * is intended to capture the spirit of an SGML element.
  *
  * @author  Timothy Prinzing
- * @version 1.30 05/05/07
  */
 public interface Element {
 
@@ -138,4 +137,3 @@ public interface Element {
 
 
 }
-

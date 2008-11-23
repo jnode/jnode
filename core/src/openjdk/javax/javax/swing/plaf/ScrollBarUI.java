@@ -28,7 +28,6 @@ package javax.swing.plaf;
 /**
  * Pluggable look and feel interface for JScrollBar.
  *
- * @version 1.19 07/05/05
  * @author David Kloba
  */
 public abstract class ScrollBarUI extends ComponentUI {

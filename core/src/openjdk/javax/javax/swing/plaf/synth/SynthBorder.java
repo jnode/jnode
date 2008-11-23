@@ -35,7 +35,6 @@ import sun.swing.plaf.synth.SynthUI;
  * SynthBorder is a border that delegates to a Painter. The Insets
  * are determined at construction time.
  *
- * @version 1.21, 05/05/07
  * @author Scott Violet
  */
 class SynthBorder extends AbstractBorder implements UIResource {

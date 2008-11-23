@@ -36,7 +36,6 @@ import java.io.Serializable;
 /**
  * BasicCheckboxMenuItem implementation
  *
- * @version 1.60 05/05/07
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber
@@ -69,11 +68,3 @@ public class BasicCheckBoxMenuItemUI extends BasicMenuItemUI {
         }
     }
 }
-
-
-
-
-
-
-
-

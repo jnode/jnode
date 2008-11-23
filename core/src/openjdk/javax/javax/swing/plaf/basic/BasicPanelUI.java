@@ -36,7 +36,6 @@ import java.awt.event.*;
 /**
  * BasicPanel implementation
  *
- * @version 1.19 05/05/07
  * @author Steve Wilson
  */
 public class BasicPanelUI extends PanelUI {

@@ -74,7 +74,6 @@ import javax.swing.event.*;
  href="http://java.sun.com/docs/books/tutorial/uiswing/overview/anatomy.html">The Anatomy of a Swing-Based Program</a>
  * in <em>The Java Tutorial.</em>
  * 
- * @version 1.36 05/05/07
  * @author Hans Muller
  * @see DefaultBoundedRangeModel
  */

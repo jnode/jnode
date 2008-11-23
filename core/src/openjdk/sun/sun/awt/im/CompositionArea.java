@@ -53,7 +53,6 @@ import javax.swing.border.LineBorder;
  * using an input method in its own user interface environment,
  * typically in a root window.
  *
- * @version 1.41 05/05/07
  * @author JavaSoft International
  */
 

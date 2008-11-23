@@ -41,7 +41,6 @@ import javax.swing.plaf.basic.BasicSeparatorUI;
  * is a "combined" view/controller.
  * <p>
  *
- * @version 1.20 05/05/07
  * @author Jeff Shapiro
  */
 
@@ -87,6 +86,3 @@ public class BasicToolBarSeparatorUI extends BasicSeparatorUI
 	}
     }
 }
-
-
-

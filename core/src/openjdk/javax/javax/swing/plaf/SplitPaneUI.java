@@ -31,7 +31,6 @@ import java.awt.Graphics;
 /**
  * Pluggable look and feel interface for JSplitPane.
  *
- * @version 1.23 05/05/07
  * @author Scott Violet
  */
 public abstract class SplitPaneUI extends ComponentUI

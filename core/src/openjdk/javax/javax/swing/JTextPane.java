@@ -77,7 +77,6 @@ import javax.swing.plaf.*;
  * description: A text component that can be marked up with attributes that are graphically represented.
  *
  * @author  Timothy Prinzing
- * @version 1.101 05/05/07
  * @see javax.swing.text.StyledEditorKit
  */
 public class JTextPane extends JEditorPane {

@@ -131,7 +131,6 @@ import java.util.*;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author Ray Ryan
- * @version 1.45, 05/05/07
  */ 
 public class UndoManager extends CompoundEdit implements UndoableEditListener {
     int indexOfNextAdd;

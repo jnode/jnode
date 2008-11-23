@@ -41,7 +41,6 @@ import sun.swing.SwingUtilities2;
 /**
  * Synth's ProgressBarUI.
  *
- * @version 1.34, 05/05/07
  * @author Joshua Outwater
  */
 class SynthProgressBarUI extends BasicProgressBarUI implements SynthUI,

@@ -66,7 +66,6 @@ import java.util.List;
  * first constant found. If no constant is found the <i>user drop action</i>
  * is <code>DnDConstants.ACTION_NONE</code>.
  * 
- * @version 	1.35, 05/05/07
  * @since 1.2
  */
 

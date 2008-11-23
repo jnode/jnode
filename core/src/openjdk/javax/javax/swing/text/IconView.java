@@ -38,7 +38,6 @@ import javax.swing.event.*;
  * factory.
  *
  * @author Timothy Prinzing
- * @version 1.35 05/05/07
  */
 public class IconView extends View  {
 
@@ -167,4 +166,3 @@ public class IconView extends View  {
 
     private Icon c;
 }
-

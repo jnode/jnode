@@ -55,7 +55,6 @@ import javax.swing.event.*;
  * 
  * @see TreePath
  * 
- * @version 1.32 05/05/07
  * @author Rob Davis
  * @author Ray Ryan
  */

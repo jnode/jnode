@@ -47,7 +47,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ListUI.
  *
- * @version 1.19, 05/05/07
  * @author Scott Violet
  */
 class SynthListUI extends BasicListUI implements PropertyChangeListener,

@@ -36,7 +36,6 @@ import java.awt.image.*;
  * @author      Jeff Dinkins
  * @author      Tom Ball
  * @author      Jim Graham
- * @version     1.22 05/05/07
  */
 public class GrayFilter extends RGBImageFilter {
     private boolean brighter;
@@ -92,4 +91,3 @@ public class GrayFilter extends RGBImageFilter {
         return (rgb & 0xff000000) | (gray << 16) | (gray << 8) | (gray << 0);
     }
 }
-

@@ -39,7 +39,6 @@ import java.util.Hashtable;
  * This does no synchronization, if you need thread safety synchronize on
  * another object before calling this.
  *
- * @version 1.12 05/05/07
  * @author Georges Saab
  * @author Scott Violet
  */

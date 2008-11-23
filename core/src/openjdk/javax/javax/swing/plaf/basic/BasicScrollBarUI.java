@@ -41,7 +41,6 @@ import javax.swing.plaf.*;
 /**
  * Implementation of ScrollBarUI for the Basic Look and Feel
  *
- * @version 1.94 05/05/07
  * @author Rich Schiavi
  * @author David Kloba
  * @author Hans Muller
@@ -1563,5 +1562,3 @@ public class BasicScrollBarUI
         }
     }
 }
-            
-            

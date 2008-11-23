@@ -32,7 +32,6 @@ import java.util.*;
  * An implementation of <code>AttributeSet</code> that can multiplex
  * across a set of <code>AttributeSet</code>s.
  *
- * @version 1.11 05/05/07
  */
 class MuxingAttributeSet implements AttributeSet, Serializable {
     /**

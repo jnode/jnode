@@ -107,10 +107,3 @@ public class MotifMenuItemUI extends BasicMenuItemUI
     }
   
 }
-
-
-
-
-
-
-

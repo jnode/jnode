@@ -38,7 +38,6 @@ import sun.swing.*;
 /**
  * BasicTableHeaderUI implementation
  *
- * @version 1.82 05/05/07
  * @author Alan Chung
  * @author Philip Milne
  */
@@ -231,7 +230,9 @@ public class BasicTableHeaderUI extends TableHeaderUI {
                         cm.moveColumn(columnIndex, newColumnIndex);
                         
                         //Update the selected index.
-                        selectColumn(table.convertColumnIndexToView(selectedIndex));
+                        selectColumn(
+                            table.convertColumnIndexToView(selectedIndex),
+                            false);
 
                         return;
 		    }
@@ -460,16 +461,20 @@ public class BasicTableHeaderUI extends TableHeaderUI {
      * affected header cells and makes sure the newly selected one is visible.
      */
     void selectColumn(int newColIndex) {
+        selectColumn(newColIndex, true);
+    }
+
+    void selectColumn(int newColIndex, boolean doScroll) {
         Rectangle repaintRect = header.getHeaderRect(selectedColumnIndex);
         header.repaint(repaintRect);
         selectedColumnIndex = newColIndex;
         repaintRect = header.getHeaderRect(newColIndex);
         header.repaint(repaintRect);
-                    
+        if (doScroll) {
         scrollToColumn(newColIndex);
+        }
         return;
     }
-    
     /**
      * Used by selectColumn to scroll horizontally, if necessary,
      * to ensure that the newly selected column is visible.

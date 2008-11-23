@@ -172,7 +172,6 @@ import javax.swing.event.*;
  * The Element Interface</a>.
  *
  * @author  Timothy Prinzing
- * @version 1.50 05/05/07
  *
  * @see javax.swing.event.DocumentEvent
  * @see javax.swing.event.DocumentListener

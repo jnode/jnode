@@ -38,7 +38,6 @@ import java.io.*;
  * See Annex H on page 556 of the SGML handbook for more information.
  *
  * @author   Arthur van Hoff
- * @version  1.18,05/05/07
  *
  */
 public final class ContentModel implements Serializable {

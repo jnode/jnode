@@ -28,11 +28,9 @@ package javax.swing.plaf;
 /**
  * Pluggable look and feel interface for JSeparator.
  *
- * @version 1.18 05/05/07
  * @author Georges Saab
  * @author David Karlton
  */
 
 public abstract class SeparatorUI extends ComponentUI {
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2001 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1999-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,14 +27,14 @@ package sun.awt;
 
 import java.awt.*;
 
+import java.util.logging.*;
 
 public abstract class SunGraphicsCallback {
     public static final int HEAVYWEIGHTS = 0x1;
     public static final int LIGHTWEIGHTS = 0x2;
     public static final int TWO_PASSES = 0x4;
 
-    private static final DebugHelper dbg =
-        DebugHelper.create(SunGraphicsCallback.class);
+    private static final Logger log = Logger.getLogger("sun.awt.SunGraphicsCallback");
 
     public abstract void run(Component comp, Graphics cg);
 
@@ -87,11 +87,11 @@ public abstract class SunGraphicsCallback {
         int ncomponents = comps.length;
 	Shape clip = g.getClip();
 
-	if (dbg.on && clip != null) {
+        if (log.isLoggable(Level.FINER) && (clip != null)) {
 	    Rectangle newrect = clip.getBounds();
-	    dbg.println("GraphicsCallback::runComponents : x = " +
-			newrect.x + " y = " + newrect.y + " width = " +
-			newrect.width + " height = " + newrect.height); 
+            log.log(Level.FINER, "x = " + newrect.x + ", y = " + newrect.y +
+                                 ", width = " + newrect.width +
+                                 ", height = " + newrect.height);
 	}
 
         // A seriously sad hack--

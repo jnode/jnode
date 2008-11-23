@@ -33,7 +33,6 @@ import javax.swing.JPopupMenu;
 /**
  * Pluggable look and feel interface for JPopupMenu.
  *
- * @version 1.23 05/05/07
  * @author Georges Saab
  * @author David Karlton
  */
@@ -62,4 +61,3 @@ public abstract class PopupMenuUI extends ComponentUI {
         return popupFactory.getPopup(popup.getInvoker(), popup, x, y);
     }
 }
-

@@ -28,7 +28,6 @@ package sun.applet;
 /**
  * This class defines an applet thread group.
  *
- * @version 	1.20, 05/05/07
  * @author 	Arthur van Hoff
  */
 public class AppletThreadGroup extends ThreadGroup {

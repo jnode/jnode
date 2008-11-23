@@ -65,7 +65,6 @@ import javax.swing.event.*;
  * views of a shared model.
  *
  * @author Timothy Prinzing
- * @version 1.60 05/05/07
  */
 public class ComponentView extends View  {
 
@@ -502,4 +501,3 @@ public class ComponentView extends View  {
     }
 
 }
-

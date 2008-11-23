@@ -91,7 +91,6 @@ import java.text.AttributedCharacterIterator;
  * All drawing or writing is done in the current color, 
  * using the current paint mode, and in the current font. 
  * 
- * @version 	1.80, 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @see     java.awt.Component

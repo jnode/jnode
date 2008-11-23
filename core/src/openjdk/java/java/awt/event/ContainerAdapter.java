@@ -47,7 +47,6 @@ package java.awt.event;
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/containerlistener.html">Tutorial: Writing a Container Listener</a>
  *
  * @author Amy Fowler
- * @version 1.20 05/05/07
  * @since 1.1
  */
 public abstract class ContainerAdapter implements ContainerListener {

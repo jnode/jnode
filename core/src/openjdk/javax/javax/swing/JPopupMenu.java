@@ -76,7 +76,6 @@ import java.applet.Applet;
  *   attribute: isContainer false
  * description: A small window that pops up and displays a series of choices.
  *
- * @version 1.204 @(#)JPopupMenu.java	1.204
  * @author Georges Saab
  * @author David Karlton
  * @author Arnaud Weber
@@ -329,7 +328,6 @@ public class JPopupMenu extends JComponent implements Accessible,MenuElement {
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Rectangle screenBounds;
-        Insets screenInsets;
         GraphicsConfiguration gc = null;
         // Try to find GraphicsConfiguration, that includes mouse
         // pointer position
@@ -354,20 +352,12 @@ public class JPopupMenu extends JComponent implements Accessible,MenuElement {
 
         if(gc != null) {
             // If we have GraphicsConfiguration use it to get
-            // screen bounds and insets
-            screenInsets = toolkit.getScreenInsets(gc);
+            // screen bounds
             screenBounds = gc.getBounds();
         } else {
             // If we don't have GraphicsConfiguration use primary screen
-            // and empty insets
-            screenInsets = new Insets(0, 0, 0, 0);
             screenBounds = new Rectangle(toolkit.getScreenSize());
         }
-
-        int scrWidth = screenBounds.width -
-                    Math.abs(screenInsets.left+screenInsets.right);
-        int scrHeight = screenBounds.height -
-                    Math.abs(screenInsets.top+screenInsets.bottom);
 
         Dimension size;
 
@@ -377,11 +367,11 @@ public class JPopupMenu extends JComponent implements Accessible,MenuElement {
         long pw = (long) p.x + (long) size.width;
         long ph = (long) p.y + (long) size.height;
 
-        if( pw > screenBounds.x + scrWidth )
-             p.x = screenBounds.x + scrWidth - size.width;
+        if( pw > screenBounds.x + screenBounds.width )
+             p.x = screenBounds.x + screenBounds.width - size.width;
 
-        if( ph > screenBounds.y + scrHeight)
-             p.y = screenBounds.y + scrHeight - size.height;
+        if( ph > screenBounds.y + screenBounds.height)
+             p.y = screenBounds.y + screenBounds.height - size.height;
 
         /* Change is made to the desired (X,Y) values, when the
            PopupMenu is too tall OR too wide for the screen
@@ -753,18 +743,11 @@ public class JPopupMenu extends JComponent implements Accessible,MenuElement {
             // This is a popup menu with MenuElement children,
             // set selection path before popping up!
             if (isPopupMenu()) {
-		if (getSubElements().length > 0) {
-		    MenuElement me[] = new MenuElement[2];
-		    me[0]=(MenuElement)this;
-		    me[1]=getSubElements()[0];
-		    MenuSelectionManager.defaultManager().setSelectedPath(me);
-		} else {
 		    MenuElement me[] = new MenuElement[1];
-		    me[0]=(MenuElement)this;
+                me[0] = (MenuElement) this;
 		    MenuSelectionManager.defaultManager().setSelectedPath(me);
 		}
 	    }
-        }
 
         if(b) {
             firePopupMenuWillBecomeVisible();
@@ -863,7 +846,7 @@ public class JPopupMenu extends JComponent implements Accessible,MenuElement {
      * @return true if this menu is a standalone popup menu, otherwise false
      */
     private boolean isPopupMenu() {
-        return  !(invoker instanceof JMenu);
+        return  ((invoker != null) && !(invoker instanceof JMenu));
     }
 
     /**
@@ -1536,4 +1519,3 @@ public class JPopupMenu extends JComponent implements Accessible,MenuElement {
 	return getUI().isPopupTrigger(e);
     }
 }
-

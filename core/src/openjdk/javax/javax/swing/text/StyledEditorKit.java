@@ -43,7 +43,6 @@ import javax.swing.UIManager;
  * provides a minimal set of actions for editing styled text.
  *
  * @author  Timothy Prinzing
- * @version 1.52 05/05/07
  */
 public class StyledEditorKit extends DefaultEditorKit {
 

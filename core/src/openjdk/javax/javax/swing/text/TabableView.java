@@ -30,7 +30,6 @@ package javax.swing.text;
  * 
  * @author  Timothy Prinzing
  * @author  Scott Violet
- * @version 1.17 05/05/07
  * @see TabExpander
  * @see LabelView
  * @see ParagraphView

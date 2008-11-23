@@ -52,7 +52,6 @@ import javax.swing.plaf.basic.*;
  * is a "combined" view/controller.
  * <p>
  *
- * @version 1.48 05/05/07
  * @author Jeff Shapiro
  */
 public class MetalToolBarUI extends BasicToolBarUI

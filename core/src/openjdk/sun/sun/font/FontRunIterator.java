@@ -24,7 +24,6 @@
  */
 
 /*
- *  @(#)FontRunIterator.java	1.2 03/11/26
  *
  * (C) Copyright IBM Corp. 2003 - All Rights Reserved
  */

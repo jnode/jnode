@@ -51,7 +51,6 @@ import java.util.Map;
  *
  * @author David Mendenhall
  * @author Danila Sinopalnikov
- * @version 1.21, 05/05/07
  *
  * @since 1.4 (appeared in modified form as FullyRenderedTransferable in 1.3.1)
  */

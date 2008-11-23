@@ -73,7 +73,6 @@ import java.io.IOException;
  *   attribute: isContainer false
  * description: A component which can be selected or deselected.
  *
- * @version 1.84 05/05/07
  * @author Jeff Dinkins
  */
 public class JCheckBox extends JToggleButton implements Accessible {
@@ -349,4 +348,3 @@ public class JCheckBox extends JToggleButton implements Accessible {
 
     } // inner class AccessibleJCheckBox
 }
-  

@@ -126,7 +126,6 @@ import javax.swing.plaf.ProgressBarUI;
  *      attribute: isContainer false
  *    description: A component that displays an integer value.
  *
- * @version 1.102 05/05/07
  * @author Michael C. Albers
  * @author Kathy Walrath
  */

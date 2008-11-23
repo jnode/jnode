@@ -41,7 +41,6 @@ import java.util.EventListener;
  * object is then invoked, and the <code>KeyEvent</code> is passed to it.
  *
  * @author Carl Quinn
- * @version 1.26 05/05/07
  *
  * @see KeyAdapter
  * @see KeyEvent

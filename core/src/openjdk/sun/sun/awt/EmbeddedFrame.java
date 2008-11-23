@@ -57,7 +57,6 @@ import sun.applet.AppletPanel;
  *   handle should be of the appropriate native type for a specific
  *   platform, as stored in the pData field of the ComponentPeer.
  *
- * @version 	1.15, 04/07/00
  * @author 	Thomas Ball
  */
 public abstract class EmbeddedFrame extends Frame 
@@ -102,6 +101,7 @@ public abstract class EmbeddedFrame extends Frame
 
     protected EmbeddedFrame(long handle, boolean supportsXEmbed) {
         this.supportsXEmbed = supportsXEmbed;
+        registerListeners();
     }
 
     /**
@@ -539,8 +539,8 @@ public abstract class EmbeddedFrame extends Frame
     
     private static class NullEmbeddedFramePeer
         extends NullComponentPeer implements FramePeer {
-        
-        //jnode remove these methods after java.awt.peer integration
+
+        //jnode todo remove these methods after java.awt.peer integration
         public void requestFocus() {
             //To change body of implemented methods use File | Settings | File Templates.
         }

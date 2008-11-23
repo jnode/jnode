@@ -56,7 +56,6 @@ import java.awt.event.MouseMotionListener;
  * follow this convention.
  *
  * @author Laurence P. G. Cable
- * @version 1.21
  *
  * @see java.awt.dnd.DragGestureListener
  * @see java.awt.dnd.DragGestureEvent
@@ -207,5 +206,3 @@ public abstract class MouseDragGestureRecognizer extends DragGestureRecognizer i
 
     public void mouseMoved(MouseEvent e) { }
 }
-
-

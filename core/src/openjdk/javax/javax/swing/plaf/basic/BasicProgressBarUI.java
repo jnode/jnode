@@ -40,7 +40,6 @@ import sun.swing.DefaultLookup;
 /**
  * A Basic L&F implementation of ProgressBarUI.
  *
- * @version 1.80 05/05/07
  * @author Michael C. Albers
  * @author Kathy Walrath
  */

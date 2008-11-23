@@ -40,7 +40,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ToolTipUI.
  *
- * @version 1.16, 05/05/07
  * @author Joshua Outwater
  */
 class SynthToolTipUI extends BasicToolTipUI implements PropertyChangeListener,

@@ -43,7 +43,6 @@ import javax.swing.text.View;
  * Standard tool tip L&F.
  * <p>
  *
- * @version 1.50 05/05/07
  * @author Dave Moore
  */
 public class BasicToolTipUI extends ToolTipUI

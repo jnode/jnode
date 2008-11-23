@@ -7,6 +7,10 @@
  * published by the Free Software Foundation.  Sun designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Sun in the LICENSE file that accompanied this code.
+import java.awt.AWTError;
+import java.awt.AWTException;
+import java.awt.event.InputEvent;
+import java.awt.AWTPermission;
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,6 +22,7 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
+import java.io.Serializable;
  * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
@@ -111,7 +116,6 @@ import sun.security.action.GetIntegerAction;
  * duration of the operation with respect to the 
  * <code>DragSource</code>. 
  *
- * @version 	1.53, 05/05/07
  * @since 1.2
  */
 
@@ -273,18 +277,15 @@ public class DragSource implements Serializable {
      * and the <code>FlavorMap</code>. 
      * <P>
      * @param trigger	     the <code>DragGestureEvent</code> that initiated the drag
-     * @param dragCursor     the initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a>
-     *                       for more details on the cursor handling mechanism during drag and drop
-     * @param dragImage      the image to drag or {@code null}
+     * @param dragCursor     the initial <code>Cursor</code> or <code>null</code> for defaults
+     * @param dragImage      the image to drag or null,
      * @param imageOffset    the offset of the <code>Image</code> origin from the hotspot
      *			     of the <code>Cursor</code> at the instant of the trigger
      * @param transferable   the subject data of the drag
      * @param dsl	     the <code>DragSourceListener</code>
      * @param flavorMap	     the <code>FlavorMap</code> to use, or <code>null</code>
      * <P>
-     * @throws java.awt.dnd.InvalidDnDOperationException 
+     * @throws <code>java.awt.dnd.InvalidDnDOperationException</code>
      *    if the Drag and Drop
      *    system is unable to initiate a drag operation, or if the user
      *    attempts to start a drag while an existing drag operation 
@@ -336,15 +337,13 @@ public class DragSource implements Serializable {
      * <P>
      * @param trigger	     the <code>DragGestureEvent</code> that 
      * initiated the drag
-     * @param dragCursor     the initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a>
-     *                       for more details on the cursor handling mechanism during drag and drop
+     * @param dragCursor     the initial <code>Cursor</code> or
+     * <code>null</code> for defaults
      * @param transferable   the subject data of the drag
      * @param dsl	     the <code>DragSourceListener</code>
      * @param flavorMap	     the <code>FlavorMap</code> to use or <code>null</code>
      * <P>
-     * @throws java.awt.dnd.InvalidDnDOperationException 
+     * @throws <code>java.awt.dnd.InvalidDnDOperationException</code>
      *    if the Drag and Drop
      *    system is unable to initiate a drag operation, or if the user
      *    attempts to start a drag while an existing drag operation 
@@ -371,17 +370,14 @@ public class DragSource implements Serializable {
      * the <code>DragSourceListener</code>. 
      * <P>
      * @param trigger		the <code>DragGestureEvent</code> that initiated the drag
-     * @param dragCursor     the initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a>
-     *                       for more details on the cursor handling mechanism during drag and drop
+     * @param dragCursor        the initial <code>Cursor</code> or <code>null</code> for defaults
      * @param dragImage		the <code>Image</code> to drag or <code>null</code>
      * @param dragOffset	the offset of the <code>Image</code> origin from the hotspot
      *				of the <code>Cursor</code> at the instant of the trigger
      * @param transferable	the subject data of the drag
      * @param dsl		the <code>DragSourceListener</code>
      * <P>
-     * @throws java.awt.dnd.InvalidDnDOperationException
+     * @throws <code>java.awt.dnd.InvalidDnDOperationException</code>
      *    if the Drag and Drop
      *    system is unable to initiate a drag operation, or if the user
      *    attempts to start a drag while an existing drag operation  
@@ -406,14 +402,11 @@ public class DragSource implements Serializable {
      * of the drag, and the <code>DragSourceListener</code>. 
      * <P>
      * @param trigger		the <code>DragGestureEvent</code> that initiated the drag
-     * @param dragCursor     the initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a> class
-     *                       for more details on the cursor handling mechanism during drag and drop
+     * @param dragCursor        the initial <code>Cursor</code> or <code>null</code> for defaults
      * @param transferable	the subject data of the drag
      * @param dsl		the <code>DragSourceListener</code>
      * <P>
-     * @throws java.awt.dnd.InvalidDnDOperationException
+     * @throws <code>java.awt.dnd.InvalidDnDOperationException</code>
      *    if the Drag and Drop
      *    system is unable to initiate a drag operation, or if the user
      *    attempts to start a drag while an existing drag operation 
@@ -428,8 +421,7 @@ public class DragSource implements Serializable {
     }
 
     /**
-     * Creates the {@code DragSourceContext} to handle the current drag
-     * operation.
+     * Creates the <code>DragSourceContext</code> to handle this drag.
      * <p> 
      * To incorporate a new <code>DragSourceContext</code> 
      * subclass, subclass <code>DragSource</code> and
@@ -442,14 +434,15 @@ public class DragSource implements Serializable {
      * If <code>dsl</code> is <code>null</code>, no drag source listener 
      * is registered with the created <code>DragSourceContext</code>,  
      * but <code>NullPointerException</code> is not thrown.
+     * <p>
+     * If <code>dragCursor</code> is <code>null</code>, the default drag
+     * cursors are used for this drag operation.
+     * <code>NullPointerException</code> is not thrown.
      *
      * @param dscp          The <code>DragSourceContextPeer</code> for this drag
      * @param dgl	    The <code>DragGestureEvent</code> that triggered the 
      *                      drag
-     * @param dragCursor     The initial {@code Cursor} for this drag operation
-     *                       or {@code null} for the default cursor handling;
-     *                       see <a href="DragSourceContext.html#defaultCursor">DragSourceContext</a> class
-     *                       for more details on the cursor handling mechanism during drag and drop
+     * @param dragCursor    The initial <code>Cursor</code> to display
      * @param dragImage     The <code>Image</code> to drag or <code>null</code>
      * @param imageOffset   The offset of the <code>Image</code> origin from the 
      *                      hotspot of the cursor at the instant of the trigger

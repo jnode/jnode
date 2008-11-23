@@ -54,7 +54,6 @@ package java.awt;
  * of subsequent rendering would be undefined.
  * @see BasicStroke
  * @see Graphics2D#setStroke
- * @version 1.29, 05/05/07
  */
 public interface Stroke {
     /**
@@ -67,7 +66,3 @@ public interface Stroke {
      */
     Shape createStrokedShape (Shape p);
 }
-
-
-
-

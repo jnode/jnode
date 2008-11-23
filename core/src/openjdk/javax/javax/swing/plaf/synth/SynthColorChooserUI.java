@@ -45,7 +45,6 @@ import sun.swing.plaf.synth.SynthUI;
 /**
  * Synth's ColorChooserUI.
  * 
- * @version 1.18, 05/05/07
  * @author Tom Santos
  * @author Steve Wilson
  */

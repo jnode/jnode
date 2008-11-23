@@ -35,7 +35,6 @@ import javax.swing.text.View;
 /**
  * Synth's ToggleButtonUI.
  * <p>
- * @version 1.13, 05/05/07
  * @author Jeff Dinkins
  */
 class SynthToggleButtonUI extends SynthButtonUI {

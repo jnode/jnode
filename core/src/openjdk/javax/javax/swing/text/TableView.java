@@ -65,7 +65,6 @@ import javax.swing.text.html.HTML;
  * spans if desired).
  * 
  * @author  Timothy Prinzing
- * @version 1.42 05/05/07
  * @see     View
  */
 public abstract class TableView extends BoxView {

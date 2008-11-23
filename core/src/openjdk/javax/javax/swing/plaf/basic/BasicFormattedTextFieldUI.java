@@ -31,7 +31,6 @@ import javax.swing.plaf.ComponentUI;
  * Provides the look and feel implementation for
  * <code>JFormattedTextField</code>.
  *
- * @version 1.11 05/05/07
  * @since 1.4
  */
 public class BasicFormattedTextFieldUI extends BasicTextFieldUI {

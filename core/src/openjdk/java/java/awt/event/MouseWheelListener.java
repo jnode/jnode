@@ -45,7 +45,6 @@ import java.util.EventListener;
  * the class description for {@link MouseWheelEvent}.
  *
  * @author Brent Christian
- * @version 1.12 05/05/07
  * @see MouseWheelEvent
  * @since 1.4
  */

@@ -48,8 +48,7 @@ import javax.swing.table.TableCellRenderer;
 import sun.swing.PrintColorUIResource;
 import sun.swing.ImageIconUIResource;
 import sun.print.ProxyPrintGraphics;
-import sun.awt.AppContext;
-import sun.awt.SunToolkit;
+import sun.awt.*;
 import sun.security.action.GetPropertyAction;
 import sun.security.util.SecurityConstants;
 import java.io.*;
@@ -69,7 +68,6 @@ import java.util.concurrent.FutureTask;
  * releases and even patch releases. You should not rely on this class even
  * existing.
  *
- * @version 1.58 05/05/07
  */
 public class SwingUtilities2 {
     /**
@@ -171,8 +169,8 @@ public class SwingUtilities2 {
                             new StringBuffer("ComponentUIPropertyKey");
     
     /** Client Property key for the text maximal offsets for BasicMenuItemUI */
-    public static final Object BASICMENUITEMUI_MAX_TEXT_OFFSET = 
-        new StringBuilder("maxTextOffset"); 
+    public static final StringUIClientPropertyKey BASICMENUITEMUI_MAX_TEXT_OFFSET =
+        new StringUIClientPropertyKey ("maxTextOffset");
 
     // security stuff
     private static Field inputEvent_CanAccessSystemClipboard_Field = null;
@@ -292,7 +290,7 @@ public class SwingUtilities2 {
                                   boolean isLeftBearing) {
         //jnode
         if(true) return 1;
-        
+
         if (fm == null) {
             if (comp == null) {
                 return 0;
@@ -461,6 +459,11 @@ public class SwingUtilities2 {
         String clipString = "...";
         int stringLength = string.length();
         availTextWidth -= SwingUtilities2.stringWidth(c, fm, clipString);
+        if (availTextWidth <= 0) {
+            //can not fit any characters
+            return clipString;
+        }
+
         boolean needsTextLayout = false;
 
         synchronized (charsBufferLock) {
@@ -795,7 +798,8 @@ public class SwingUtilities2 {
                                        g2d.getFont(),
                                        deviceFontRenderContext);
                     float screenWidth = (float)g2d.getFont().
-                        getStringBounds(data, offset, length, frc).getWidth();
+                        getStringBounds(data, offset, offset + length, frc).
+                        getWidth();
                     layout = layout.getJustifiedLayout(screenWidth);
 
                     /* Use alternate print color if specified */
@@ -1488,7 +1492,7 @@ public class SwingUtilities2 {
         try {
             // On Windows just return true. Permission to read os.name
             // is granted to all code but wrapped in try to be safe.
-            if (System.getProperty("os.name").startsWith("Windows")) {
+            if (OSInfo.getOSType() == OSInfo.OSType.WINDOWS) {
                 return true;
             }
             // Else probably Solaris or Linux in which case may be remote X11

@@ -41,7 +41,6 @@ import sun.swing.SwingUtilities2;
  * layout semantics.
  *
  * @author  Timothy Prinzing
- * @version 1.33 05/05/07
  * @since 1.3
  */
 public class BasicHTML {

@@ -72,7 +72,6 @@ import javax.swing.event.*;
  * large zones efficiently.
  *
  * @author  Timothy Prinzing
- * @version 1.25 05/05/07
  * @see     View
  * @since   1.3
  */

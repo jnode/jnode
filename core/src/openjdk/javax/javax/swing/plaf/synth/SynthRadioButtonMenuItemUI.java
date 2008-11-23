@@ -34,7 +34,6 @@ import javax.swing.border.*;
 /**
  * Synth's RadioButtonMenuItemUI.
  *
- * @version 1.12, 05/05/07
  * @author Georges Saab
  * @author David Karlton
  */

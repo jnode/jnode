@@ -29,7 +29,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Color;
 import java.awt.Component;
-import java.beans.ConstructorProperties;
 
 /**
  * A class which implements a simple two-line bevel border.
@@ -43,7 +42,6 @@ import java.beans.ConstructorProperties;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.27 05/05/07
  * @author David Kloba
  */
 public class BevelBorder extends AbstractBorder
@@ -93,7 +91,6 @@ public class BevelBorder extends AbstractBorder
      * @param shadowOuterColor the color to use for the bevel outer shadow
      * @param shadowInnerColor the color to use for the bevel inner shadow
      */
-    @ConstructorProperties({"bevelType", "highlightOuterColor", "highlightInnerColor", "shadowOuterColor", "shadowInnerColor"})
     public BevelBorder(int bevelType, Color highlightOuterColor, 
                        Color highlightInnerColor, Color shadowOuterColor, 
                        Color shadowInnerColor) {

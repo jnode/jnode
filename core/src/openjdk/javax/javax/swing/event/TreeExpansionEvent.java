@@ -47,7 +47,6 @@ import javax.swing.tree.TreePath;
  * Please see {@link java.beans.XMLEncoder}.
  *
  * @author Scott Violet
- * @version 1.27 05/05/07
  */
 public class TreeExpansionEvent extends EventObject
 {

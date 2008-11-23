@@ -41,7 +41,6 @@ import java.util.EventListener;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.54 05/05/07
  * @author David Kloba
  * @author Hans Muller
  * @see BoundedRangeModel
@@ -423,4 +422,3 @@ public class DefaultBoundedRangeModel implements BoundedRangeModel, Serializable
 	return listenerList.getListeners(listenerType); 
     }
 }
-

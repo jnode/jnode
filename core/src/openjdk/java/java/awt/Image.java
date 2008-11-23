@@ -38,7 +38,6 @@ import sun.awt.image.SurfaceManager;
  * classes that represent graphical images. The image must be 
  * obtained in a platform-specific manner.
  *
- * @version 	1.50, 05/05/07
  * @author 	Sami Shaio
  * @author 	Arthur van Hoff
  * @since       JDK1.0

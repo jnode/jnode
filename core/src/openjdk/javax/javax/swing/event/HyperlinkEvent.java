@@ -42,7 +42,6 @@ import javax.swing.text.Element;
  * has been added to the <code>java.beans</code> package.
  * Please see {@link java.beans.XMLEncoder}.
  *
- * @version 1.25 05/05/07
  * @author  Timothy Prinzing
  */
 public class HyperlinkEvent extends EventObject {
@@ -186,4 +185,3 @@ public class HyperlinkEvent extends EventObject {
 	private String typeString;
     }
 }
-

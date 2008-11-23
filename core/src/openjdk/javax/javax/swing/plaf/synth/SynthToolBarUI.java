@@ -43,7 +43,6 @@ import sun.swing.plaf.synth.*;
  * is a "combined" view/controller.
  * <p>
  *
- * @version 1.20, 05/05/07
  */
 class SynthToolBarUI extends BasicToolBarUI implements PropertyChangeListener,
            SynthUI {

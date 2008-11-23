@@ -35,7 +35,6 @@ import java.awt.dnd.DropTarget;
  * of the nearsest enclosing native Container (in the case of lightweights)
  * </p>
  *
- * @version 	1.17, 05/05/07
  * @since 1.2
  *
  */

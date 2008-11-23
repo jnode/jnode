@@ -209,5 +209,3 @@ public class MotifScrollBarButton extends BasicArrowButton
 	}
     }
 }
-
-

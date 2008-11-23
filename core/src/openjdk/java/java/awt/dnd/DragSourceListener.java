@@ -43,7 +43,6 @@ import java.util.EventListener;
  * <li> is not followed by a <code>dragExit()</code> invocation on this listener.
  * </ul>
  *
- * @version 	1.27, 05/05/07
  * @since 1.2
  */
 
@@ -125,9 +124,3 @@ public interface DragSourceListener extends EventListener {
      */
     void dragDropEnd(DragSourceDropEvent dsde);
 }
-
-
-
-
-
-

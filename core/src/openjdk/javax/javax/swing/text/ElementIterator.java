@@ -65,7 +65,6 @@ import java.util.Enumeration;
  *    }
  *
  * @author Sunita Mani
- * @version 1.21 05/05/07
  *
  */
 

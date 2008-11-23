@@ -36,7 +36,6 @@ import javax.swing.text.*;
  * removed).
  *
  * @author  Timothy Prinzing
- * @version 1.30 05/05/07
  * @see javax.swing.text.Document
  * @see DocumentListener
  */

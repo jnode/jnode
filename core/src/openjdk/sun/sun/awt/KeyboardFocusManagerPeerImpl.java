@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2003-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,11 +24,15 @@
  */
 package sun.awt;
 
-import java.awt.event.*;
-import java.awt.*;
-import java.util.logging.*;
-import java.lang.reflect.*;
-import java.awt.peer.*;
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
+import java.awt.Window;
+
+import java.awt.peer.KeyboardFocusManagerPeer;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 
 public class KeyboardFocusManagerPeerImpl implements KeyboardFocusManagerPeer {
     static native Window getNativeFocusedWindow();
@@ -36,9 +40,6 @@ public class KeyboardFocusManagerPeerImpl implements KeyboardFocusManagerPeer {
     static native void clearNativeGlobalFocusOwner(Window activeWindow);
 
     KeyboardFocusManagerPeerImpl(KeyboardFocusManager manager) {
-    }
-
-    public void setCurrentFocusedWindow(Window win) {
     }
 
     public Window getCurrentFocusedWindow() {

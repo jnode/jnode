@@ -32,7 +32,6 @@ package javax.swing.text.html.parser;
  *
  * @see DTD
  * @see Element
- * @version 1.17, 05/05/07
  * @author Arthur van Hoff
  */
 public

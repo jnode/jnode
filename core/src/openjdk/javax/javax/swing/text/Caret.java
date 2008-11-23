@@ -48,7 +48,6 @@ import javax.swing.event.ChangeListener;
  * the mark is left at whatever position it previously had.
  *
  * @author  Timothy Prinzing
- * @version 1.38 05/05/07
  */
 public interface Caret {
 
@@ -203,4 +202,3 @@ public interface Caret {
     public void moveDot(int dot);
 
 };
-    

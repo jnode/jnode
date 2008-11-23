@@ -36,7 +36,6 @@ import javax.swing.JPasswordField;
  * component to a JPasswordField).
  *
  * @author  Timothy Prinzing
- * @version 1.29 05/05/07
  * @see     View
  */
 public class PasswordView extends FieldView {

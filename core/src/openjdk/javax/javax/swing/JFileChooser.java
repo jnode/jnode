@@ -33,7 +33,6 @@ import javax.accessibility.*;
 
 import java.io.File;
 import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 
 import java.util.Vector;
@@ -86,7 +85,6 @@ import java.lang.ref.WeakReference;
  *   attribute: isContainer false
  * description: A component which allows for the interactive selection of a file.
  *
- * @version 1.122 05/05/07
  * @author Jeff Dinkins
  *
  */
@@ -249,8 +247,6 @@ public class JFileChooser extends JComponent implements Accessible {
     private String approveButtonText = null;
     private String approveButtonToolTipText = null;
     private int approveButtonMnemonic = 0;
-
-    private ActionListener actionListener = null;
 
     private Vector filters = new Vector(5);
     private JDialog dialog = null;
@@ -461,7 +457,7 @@ public class JFileChooser extends JComponent implements Accessible {
 
     /**
      * Returns the selected file. This can be set either by the
-     * programmer via <code>setFile</code> or by a user action, such as
+     * programmer via <code>setSelectedFile</code> or by a user action, such as
      * either typing the filename into the UI or selecting the
      * file from a list in the UI.
      * 
@@ -521,12 +517,15 @@ public class JFileChooser extends JComponent implements Accessible {
      */
     public void setSelectedFiles(File[] selectedFiles) {
 	File[] oldValue = this.selectedFiles;
-	if (selectedFiles != null && selectedFiles.length == 0) {
+        if (selectedFiles == null || selectedFiles.length == 0) {
 	    selectedFiles = null;
+            this.selectedFiles = null;
+            setSelectedFile(null);
+        } else {
+            this.selectedFiles = selectedFiles.clone();
+            setSelectedFile(this.selectedFiles[0]);
 	}
-	this.selectedFiles = selectedFiles;
-	setSelectedFile((selectedFiles != null) ? selectedFiles[0] : null);
-	firePropertyChange(SELECTED_FILES_CHANGED_PROPERTY, oldValue, this.selectedFiles);
+        firePropertyChange(SELECTED_FILES_CHANGED_PROPERTY, oldValue, selectedFiles);
     }
 
     /**
@@ -1124,8 +1123,10 @@ public class JFileChooser extends JComponent implements Accessible {
 	    FileFilter[] oldValue = getChoosableFileFilters();
 	    filters.addElement(filter);
 	    firePropertyChange(CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY, oldValue, getChoosableFileFilters());
-	} 
+            if (fileFilter == null && filters.size() == 1) {
 	setFileFilter(filter);
+    }
+        }
     }
 
     /**

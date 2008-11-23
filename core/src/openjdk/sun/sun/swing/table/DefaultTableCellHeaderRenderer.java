@@ -32,7 +32,6 @@ import javax.swing.border.Border;
 import javax.swing.table.*;
 
 /**
- * @version 1.13 05/05/07
  */
 public class DefaultTableCellHeaderRenderer extends DefaultTableCellRenderer
         implements UIResource {
@@ -82,11 +81,9 @@ public class DefaultTableCellHeaderRenderer extends DefaultTableCellRenderer
                     // set a text position, change to leading.
                     setHorizontalTextPosition(JLabel.LEADING);
                 }
-                java.util.List<? extends RowSorter.SortKey> sortKeys =
-                        table.getRowSorter().getSortKeys();
-                if (sortKeys.size() > 0 && sortKeys.get(0).getColumn() ==
-                        table.convertColumnIndexToModel(column)) {
-                    switch(sortKeys.get(0).getSortOrder()) {
+                SortOrder sortOrder = getColumnSortOrder(table, column);
+                if (sortOrder != null) {
+                    switch(sortOrder) {
                     case ASCENDING:
                         sortIcon = UIManager.getIcon(
                             "Table.ascendingSortIcon");
@@ -117,5 +114,19 @@ public class DefaultTableCellHeaderRenderer extends DefaultTableCellRenderer
         setBorder(border);
         
         return this;
+    }
+
+    public static SortOrder getColumnSortOrder(JTable table, int column) {
+        SortOrder rv = null;
+        if (table.getRowSorter() == null) {
+            return rv;
+        }
+        java.util.List<? extends RowSorter.SortKey> sortKeys =
+            table.getRowSorter().getSortKeys();
+        if (sortKeys.size() > 0 && sortKeys.get(0).getColumn() ==
+            table.convertColumnIndexToModel(column)) {
+            rv = sortKeys.get(0).getSortOrder();
+        }
+        return rv;
     }
 }

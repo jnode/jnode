@@ -35,7 +35,6 @@ import javax.swing.event.*;
  * child element as a line of text.
  *
  * @author  Timothy Prinzing
- * @version 1.84 05/05/07
  * @see     View
  */
 public class PlainView extends View implements TabExpander {

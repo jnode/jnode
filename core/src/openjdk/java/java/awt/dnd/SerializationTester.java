@@ -34,7 +34,6 @@ import java.io.Serializable;
  * Tests if an object can truly be serialized by serializing it to a null
  * OutputStream.
  *
- * @version 1.12, 05/05/07
  * @since 1.4
  */
 final class SerializationTester {

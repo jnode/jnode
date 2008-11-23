@@ -47,7 +47,6 @@ package java.awt.event;
  * @see <a href="http://java.sun.com/docs/books/tutorial/post1.0/ui/focuslistener.html">Tutorial: Writing a Focus Listener</a>
  *
  * @author Carl Quinn
- * @version 1.24 05/05/07
  * @since 1.1
  */
 public abstract class FocusAdapter implements FocusListener {

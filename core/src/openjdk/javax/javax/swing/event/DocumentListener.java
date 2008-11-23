@@ -46,7 +46,6 @@ import java.util.EventListener;
  * (i.e. the associated Document)</em>.
  *
  * @author  Timothy Prinzing
- * @version 1.21 05/05/07
  * @see javax.swing.text.Document
  * @see javax.swing.text.StyledDocument
  * @see DocumentEvent

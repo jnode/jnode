@@ -171,9 +171,6 @@ class JInputMethodPopupMenu extends InputMethodPopupMenu {
 	synchronized (this) {
 	    if (delegate == null) {
         	delegate = new JPopupMenu(title);
-                // To ensure that popup menu will work with proper AppContext
-                // we should make it heavyweight. See 6492266.
-                delegate.setLightWeightPopupEnabled(false);
 	    }
 	}
     }
@@ -194,11 +191,7 @@ class JInputMethodPopupMenu extends InputMethodPopupMenu {
     }
             
     Object createSubmenu(String label) {
-        JMenu menu = new JMenu(label);
-        // To ensure that popup menu will work with proper AppContext
-        // we should make it heavyweight. See 6492266.
-        menu.getPopupMenu().setLightWeightPopupEnabled(false);
-        return menu;
+        return new JMenu(label);
     }
             
     void add(Object menuItem) {
