@@ -8554,6 +8554,10 @@ public class ORBUtilSystemException extends LogWrapperBase {
     public UNKNOWN unknownExceptionInDispatch(  ) {
         return unknownExceptionInDispatch( CompletionStatus.COMPLETED_NO, null  ) ;
     }
-    
-    
+
+
+    public UNKNOWN bufferReadManagerTimeout() {
+        //todo throw the right exception here
+        return unknownExceptionInDispatch(CompletionStatus.COMPLETED_NO);
+    }
 }
