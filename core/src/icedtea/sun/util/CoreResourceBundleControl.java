@@ -71,6 +71,26 @@ public class CoreResourceBundleControl extends ResourceBundle.Control {
     public static CoreResourceBundleControl getRBControlInstance() {
 	return resourceBundleControlInstance;
     }
+
+    /**
+     * This method is to provide a customized ResourceBundle.Control to speed
+     * up the search of resources in JDK, with the bundle's package name check.
+     *
+     * @param bundleName bundle name to check
+     * @return the instance of resource bundle control if the bundle is JDK's,
+     *    otherwise returns null.
+     */
+    public static CoreResourceBundleControl getRBControlInstance(String bundleName) {
+        if (bundleName.startsWith("com.sun.") ||
+            bundleName.startsWith("java.") ||
+            bundleName.startsWith("javax.") ||
+            bundleName.startsWith("sun.")) {
+            return resourceBundleControlInstance;
+        } else {
+            return null;
+        }
+    }
+
  
     /*
      * @returns a list of candidate locales to search from.

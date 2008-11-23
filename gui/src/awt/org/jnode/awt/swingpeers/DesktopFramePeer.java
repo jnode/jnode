@@ -54,6 +54,7 @@ import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics2D;
 import org.jnode.awt.GraphicsFactory;
 import sun.awt.CausedFocusEvent;
+import sun.java2d.pipe.Region;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -656,5 +657,9 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
             toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent
                 .getBounds()));
         }
+    }
+
+    public void applyShape(Region shape) {
+        //TODO implement it
     }
 }

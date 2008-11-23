@@ -56,6 +56,7 @@ import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics2D;
 import org.jnode.awt.JNodeToolkit;
 import sun.awt.CausedFocusEvent;
+import sun.java2d.pipe.Region;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -529,5 +530,9 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     public void reparent(ContainerPeer parent) {
         //TODO implement it
+    }
+
+    public void applyShape(Region shape) {
+        //TODO
     }
 }

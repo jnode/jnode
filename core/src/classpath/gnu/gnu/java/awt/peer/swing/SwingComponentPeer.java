@@ -68,6 +68,7 @@ import java.awt.peer.LightweightPeer;
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import sun.awt.CausedFocusEvent;
+import sun.java2d.pipe.Region;
 
 /**
  * The base class for Swing based component peers. This provides the basic
@@ -1116,5 +1117,8 @@ public class SwingComponentPeer
         if (swingComponent != null)
             swingComponent.getJComponent().requestFocus();
         return swingComponent != null;
+    }
+
+    public void applyShape(Region shape) {
     }
 }

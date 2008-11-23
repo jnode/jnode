@@ -61,6 +61,7 @@
       <export name="sun.awt.dnd.*"/>
       <export name="sun.awt.geom.*"/>
       <export name="sun.awt.shell.*"/>
+      <export name="sun.awt.util.*"/>
       <export name="sun.dc.path.*"/>
       <export name="sun.dc.pr.*"/>
       <export name="sun.font.*"/>
