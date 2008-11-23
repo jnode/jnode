@@ -22,7 +22,9 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.Dialog;
+import java.awt.Window;
 import java.awt.peer.DialogPeer;
+import java.util.List;
 
 /**
  * AWT dialog peer implemented as a {@link javax.swing.JInternalFrame}.
@@ -51,6 +53,10 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
         if (!targetComponent.isUndecorated()) {
             super.setTitle(title);
         }
+    }
+
+    public void blockWindows(List<Window> windows) {
+        //TODO implement it
     }
 }
 

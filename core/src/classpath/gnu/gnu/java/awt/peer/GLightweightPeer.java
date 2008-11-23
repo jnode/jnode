@@ -62,6 +62,7 @@ import java.awt.image.VolatileImage;
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.LightweightPeer;
 import sun.awt.CausedFocusEvent;
+import sun.java2d.pipe.Region;
 
 /**
  * A stub class that implements the ComponentPeer and ContainerPeer
@@ -454,5 +455,9 @@ public class GLightweightPeer
     //jnode+openjdk
     public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
         return false;
+    }
+
+    public void applyShape(Region shape) {
+        
     }
 }
