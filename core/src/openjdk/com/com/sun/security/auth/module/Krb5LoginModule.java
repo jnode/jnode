@@ -344,7 +344,6 @@ import sun.misc.HexDumpEncoder;
  * via AS exchange. For initiators, set this value to true, or leave this
  * option unset, in which case default value (true) will be used.
  *
- * @version 1.18, 01/11/00
  * @author Ram Marti
  */
 

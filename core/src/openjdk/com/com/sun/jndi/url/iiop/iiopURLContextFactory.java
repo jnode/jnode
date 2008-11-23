@@ -36,7 +36,6 @@ import com.sun.jndi.cosnaming.CNCtx;
  * An IIOP URL context factory.
  * 
  * @author Rosanna Lee
- * @version 1.17 07/05/05
  */
 
 public class iiopURLContextFactory implements ObjectFactory {

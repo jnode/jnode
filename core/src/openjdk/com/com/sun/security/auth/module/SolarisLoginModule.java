@@ -51,7 +51,6 @@ import com.sun.security.auth.SolarisNumericGroupPrincipal;
  *             is here to allow for a smooth transition to the new
  *             UnixLoginModule.
  *
- * @version 1.19, 01/11/00
  */
 @Deprecated
 public class SolarisLoginModule implements LoginModule {

@@ -46,5 +46,3 @@ public interface ModificationWatchpointEvent extends WatchpointEvent {
      */
     Value valueToBe();
 }
-    
-

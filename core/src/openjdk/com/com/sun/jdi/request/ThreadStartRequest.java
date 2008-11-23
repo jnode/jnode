@@ -56,6 +56,3 @@ public interface ThreadStartRequest extends EventRequest {
      */
     void addThreadFilter(ThreadReference thread);
 }
-
-
-			

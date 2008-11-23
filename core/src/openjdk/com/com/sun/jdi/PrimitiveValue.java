@@ -121,4 +121,3 @@ public interface PrimitiveValue extends Value
      */
     double doubleValue();
 }
-

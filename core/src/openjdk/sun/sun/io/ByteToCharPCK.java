@@ -33,7 +33,6 @@ import sun.nio.cs.ext.JIS_X_0208_Solaris_Decoder;
  * @author Mark Son-Bell
  * @author Ian Little
  *
- * @version 1.12, 07/05/05
  *
  * PCK Converter for Solaris ja locales
  * refer to : Solaris manpage man PCK(5) 
@@ -78,4 +77,3 @@ public class ByteToCharPCK extends ByteToCharSJIS {
         return Integer.toString(i,16);
     }
 }
-

@@ -44,7 +44,6 @@ import com.sun.mirror.declaration.AnnotationTypeDeclaration;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.16 07/05/05
  * @since 1.5
  */
 

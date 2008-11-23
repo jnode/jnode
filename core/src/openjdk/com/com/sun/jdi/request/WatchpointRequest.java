@@ -118,6 +118,3 @@ public interface WatchpointRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-
-
-			

@@ -62,7 +62,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
  * The default port is 900.
  *
  * @author Rosanna Lee
- * @version 1.15 07/05/05
  */
 
 public final class IiopUrl {

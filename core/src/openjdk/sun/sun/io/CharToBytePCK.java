@@ -31,7 +31,6 @@ import sun.nio.cs.ext.JIS_X_0208_Solaris_Encoder;
  * @author Limin Shi
  * @author Mark Son-Bell
  * @author Ian Little
- * @version 1.12, 07/05/05
  *
  * PCK char->byte converter for Solaris platform containing additional
  * mappings for vendor defined chars (NEC row 13 & IBM extension chars)
@@ -95,6 +94,3 @@ public class CharToBytePCK extends CharToByteSJIS {
 	return result;
     }
 }
-
-
-

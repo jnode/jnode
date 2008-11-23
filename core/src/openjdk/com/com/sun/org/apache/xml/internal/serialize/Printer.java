@@ -39,7 +39,6 @@ import java.io.IOException;
  * {@link IndentPrinter} supports indentation and line wrapping by
  * extending this class.
  *
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:16 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  */
 public class Printer

@@ -76,10 +76,3 @@ public interface Tie {
     public void _invoke(MessageInfo messageInfo);
 
 } // end Tie
-
-
-
-
-
-
-

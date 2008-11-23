@@ -153,4 +153,3 @@ public interface LocalVariable extends Mirror, Comparable<LocalVariable> {
      */
     int hashCode();
 }
-

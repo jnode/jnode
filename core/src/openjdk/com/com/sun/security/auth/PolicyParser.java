@@ -77,7 +77,6 @@ import sun.security.util.PropertyExpander;
  *             {@link sun.security.provider.PolicyParser}.
  *             This class is entirely deprecated.
  * 
- * @version 1.50, 05/05/07
  * @author Roland Schemers
  *
  * @since 1.2
@@ -706,7 +705,7 @@ class PolicyParser {
 		while (pli.hasNext()) {
 		    out.print("\tPrincipal ");
 		    PrincipalEntry pe = pli.next();
-		    out.print((String)pe.principalClass +
+                    out.print(pe.principalClass +
 				" \"" + pe.principalName + "\"");
 		    if (pli.hasNext())
 			out.print(",\n");

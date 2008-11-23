@@ -35,4 +35,3 @@ public interface PathComponent
   public int getAnalysisBits();
 
 }
-

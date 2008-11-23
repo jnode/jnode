@@ -33,6 +33,7 @@ import com.sun.jmx.remote.util.EnvHelp;
 
 import java.beans.ConstructorProperties;
 import java.io.InvalidObjectException;
+import java.lang.annotation.ElementType;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -237,7 +238,7 @@ public abstract class OpenConverter {
                     putPermanentConverter(primitiveType,
                                           primitiveConv);
                     if (primitiveType != void.class) {
-                        final Class primitiveArrayType =
+                        final Class<?> primitiveArrayType =
                             Array.newInstance(primitiveType, 0).getClass();
                         final OpenType primitiveArrayOpenType =
                             ArrayType.getPrimitiveArrayType(primitiveArrayType);
@@ -293,9 +294,12 @@ public abstract class OpenConverter {
                 ((GenericArrayType) objType).getGenericComponentType();
             return makeArrayOrCollectionConverter(objType, componentType);
         } else if (objType instanceof Class) {
-            Class objClass = (Class<?>) objType;
+            Class<?> objClass = (Class<?>) objType;
             if (objClass.isEnum()) {
-                return makeEnumConverter(objClass);
+                // Huge hack to avoid compiler warnings here.  The ElementType
+                // parameter is ignored but allows us to obtain a type variable
+                // T that matches <T extends Enum<T>>.
+                return makeEnumConverter(objClass, ElementType.class);
             } else if (objClass.isArray()) {
                 Type componentType = objClass.getComponentType();
                 return makeArrayOrCollectionConverter(objClass, componentType);
@@ -311,8 +315,9 @@ public abstract class OpenConverter {
     }
 
     private static <T extends Enum<T>> OpenConverter
-	    makeEnumConverter(Class<T> enumClass) {
-	return new EnumConverter<T>(enumClass);
+            makeEnumConverter(Class<?> enumClass, Class<T> fake) {
+        Class<T> enumClassT = Util.cast(enumClass);
+        return new EnumConverter<T>(enumClassT);
     }
 
     /* Make the converter for an array type, or a collection such as
@@ -325,11 +330,11 @@ public abstract class OpenConverter {
 	    throws OpenDataException {
 
         final OpenConverter elementConverter = toConverter(elementType);
-	final OpenType elementOpenType = elementConverter.getOpenType();
-	final ArrayType openType = new ArrayType(1, elementOpenType);
-	final Class elementOpenClass = elementConverter.getOpenClass();
+        final OpenType<?> elementOpenType = elementConverter.getOpenType();
+        final ArrayType<?> openType = ArrayType.getArrayType(elementOpenType);
+        final Class<?> elementOpenClass = elementConverter.getOpenClass();
 
-	final Class openArrayClass;
+        final Class<?> openArrayClass;
         final String openArrayClassName;
         if (elementOpenClass.isArray())
             openArrayClassName = "[" + elementOpenClass.getName();
@@ -397,8 +402,7 @@ public abstract class OpenConverter {
         if (rawType instanceof Class) {
             Class c = (Class<?>) rawType;
             if (c == List.class || c == Set.class || c == SortedSet.class) {
-                Type[] actuals =
-                    ((ParameterizedType) objType).getActualTypeArguments();
+                Type[] actuals = objType.getActualTypeArguments();
                 assert(actuals.length == 1);
                 if (c == SortedSet.class)
                     mustBeComparable(c, actuals[0]);
@@ -406,8 +410,7 @@ public abstract class OpenConverter {
             } else {
                 boolean sortedMap = (c == SortedMap.class);
                 if (c == Map.class || sortedMap) {
-                    Type[] actuals =
-                            ((ParameterizedType) objType).getActualTypeArguments();
+                    Type[] actuals = objType.getActualTypeArguments();
                     assert(actuals.length == 2);
                     if (sortedMap)
                         mustBeComparable(c, actuals[0]);
@@ -654,7 +657,7 @@ public abstract class OpenConverter {
 	    final Object[] openArray = (Object[]) openValue;
 	    final Collection<Object> valueCollection;
 	    try {
-		valueCollection = collectionClass.newInstance();
+                valueCollection = Util.cast(collectionClass.newInstance());
 	    } catch (Exception e) {
                 throw invalidObjectException("Cannot create collection", e);
 	    }
@@ -739,7 +742,7 @@ public abstract class OpenConverter {
 
 	final Object toNonNullOpenValue(MXBeanLookup lookup, Object value)
                 throws OpenDataException {
-	    final Map<Object, Object> valueMap = (Map<Object, Object>) value;
+            final Map<Object, Object> valueMap = Util.cast(value);
             if (valueMap instanceof SortedMap) {
                 Comparator comparator = ((SortedMap) valueMap).comparator();
                 if (comparator != null) {
@@ -770,8 +773,7 @@ public abstract class OpenConverter {
 	public final Object fromNonNullOpenValue(MXBeanLookup lookup, Object openValue)
                 throws InvalidObjectException {
 	    final TabularData table = (TabularData) openValue;
-	    final Collection<CompositeData> rows =
-		(Collection<CompositeData>) table.values();
+            final Collection<CompositeData> rows = Util.cast(table.values());
             final Map<Object, Object> valueMap =
                 sortedMap ? newSortedMap() : newMap();
 	    for (CompositeData row : rows) {
@@ -922,7 +924,7 @@ public abstract class OpenConverter {
             this.itemNames = itemNames;
 	}
 
-	Class getTargetClass() {
+        Class<?> getTargetClass() {
 	    return targetClass;
 	}
 
@@ -943,7 +945,7 @@ public abstract class OpenConverter {
                                           OpenConverter[] converters)
                 throws InvalidObjectException;
 
-	private final Class targetClass;
+        private final Class<?> targetClass;
         private final String[] itemNames;
     }
 
@@ -959,7 +961,7 @@ public abstract class OpenConverter {
 	String applicable(Method[] getters) throws InvalidObjectException {
 	    // See if it has a method "T from(CompositeData)"
 	    // as is conventional for a CompositeDataView
-	    Class targetClass = getTargetClass();
+            Class<?> targetClass = getTargetClass();
 	    try {
 		Method fromMethod =
 		    targetClass.getMethod("from",
@@ -1051,7 +1053,7 @@ public abstract class OpenConverter {
 
         String applicable(Method[] getters) {
             try {
-                Constructor c = getTargetClass().getConstructor((Class[]) null);
+                Constructor<?> c = getTargetClass().getConstructor((Class[]) null);
             } catch (Exception e) {
                 return "does not have a public no-arg constructor";
             }
@@ -1116,11 +1118,11 @@ public abstract class OpenConverter {
             final Class<ConstructorProperties> propertyNamesClass = ConstructorProperties.class;
 
 	    Class targetClass = getTargetClass();
-	    Constructor[] constrs = targetClass.getConstructors();
+            Constructor<?>[] constrs = targetClass.getConstructors();
 
             // Applicable if and only if there are any annotated constructors
-            List<Constructor> annotatedConstrList = newList();
-            for (Constructor constr : constrs) {
+            List<Constructor<?>> annotatedConstrList = newList();
+            for (Constructor<?> constr : constrs) {
                 if (Modifier.isPublic(constr.getModifiers())
                         && constr.getAnnotation(propertyNamesClass) != null)
                     annotatedConstrList.add(constr);
@@ -1150,7 +1152,7 @@ public abstract class OpenConverter {
             // Also remember the set of properties in that constructor
             // so we can test unambiguity.
             Set<BitSet> getterIndexSets = newSet();
-            for (Constructor constr : annotatedConstrList) {
+            for (Constructor<?> constr : annotatedConstrList) {
                 String[] propertyNames =
                     constr.getAnnotation(propertyNamesClass).value();
 
@@ -1307,10 +1309,10 @@ public abstract class OpenConverter {
         }
 
         private static class Constr {
-            final Constructor constructor;
+            final Constructor<?> constructor;
             final int[] paramIndexes;
             final BitSet presentParams;
-            Constr(Constructor constructor, int[] paramIndexes,
+            Constr(Constructor<?> constructor, int[] paramIndexes,
                    BitSet presentParams) {
                 this.constructor = constructor;
                 this.paramIndexes = paramIndexes;

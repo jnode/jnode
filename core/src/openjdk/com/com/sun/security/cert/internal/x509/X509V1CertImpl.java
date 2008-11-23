@@ -46,7 +46,6 @@ import java.util.Vector;
  * sun.security.x509.X509Cert certificates when running under JDK1.1.x.
  *
  * @author Jeff Nisewanger
- * @version 1.24
  */
 public class X509V1CertImpl extends X509Certificate implements Serializable {
     static final long serialVersionUID = -2048442350420423405L;

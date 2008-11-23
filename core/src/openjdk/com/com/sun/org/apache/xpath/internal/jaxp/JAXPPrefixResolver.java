@@ -126,4 +126,3 @@ public class JAXPPrefixResolver implements PrefixResolver
     }
 
 }
-

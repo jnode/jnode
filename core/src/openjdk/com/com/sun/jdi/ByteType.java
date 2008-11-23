@@ -38,4 +38,3 @@ package com.sun.jdi;
 public interface ByteType extends PrimitiveType
 {
 }
-

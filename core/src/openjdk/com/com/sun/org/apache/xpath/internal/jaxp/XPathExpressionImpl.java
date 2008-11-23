@@ -50,7 +50,6 @@ import org.xml.sax.InputSource;
 /**
  * The XPathExpression interface encapsulates a (compiled) XPath expression.
  *
- * @version $Revision: 1.3 $
  * @author  Ramesh Mandava
  */
 public class XPathExpressionImpl  implements javax.xml.xpath.XPathExpression{

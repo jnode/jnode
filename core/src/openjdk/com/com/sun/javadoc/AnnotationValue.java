@@ -30,7 +30,6 @@ package com.sun.javadoc;
  * Represents a value of an annotation type element.
  * 
  * @author Scott Seligman
- * @version 1.10 07/05/05
  * @since 1.5
  */
 public interface AnnotationValue {

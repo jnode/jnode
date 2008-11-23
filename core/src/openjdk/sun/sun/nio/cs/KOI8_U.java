@@ -321,6 +321,3 @@ public class KOI8_U
         };
     }
 }
-
-
-

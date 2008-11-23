@@ -35,7 +35,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
 /**
  * Define the structure and ordering of "bands" in a packed file.
  * @author John Rose
- * @version 1.36, 05/05/07
  */
 abstract
 class BandStructure implements Constants {
@@ -2662,5 +2661,3 @@ class BandStructure implements Constants {
 	return realloc(a, Math.max(10, a.length*2));
     }
 }
-
-

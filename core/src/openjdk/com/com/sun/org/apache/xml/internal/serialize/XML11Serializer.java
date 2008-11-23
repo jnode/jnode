@@ -79,7 +79,6 @@ import org.w3c.dom.DOMError;
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:rahul.srivastava@sun.com">Rahul Srivastava</a>
  * @author Elena Litani IBM
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:18 $
  * @see Serializer
  */
 public class XML11Serializer
@@ -536,7 +535,3 @@ extends XMLSerializer {
     }
 
 }
-
-
-
-

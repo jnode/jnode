@@ -37,7 +37,6 @@ import javax.naming.*;
  * empty component at position 0).
  *
  * @author Scott Seligman
- * @version 1.23 07/05/05
  */
 
 class Resolver {

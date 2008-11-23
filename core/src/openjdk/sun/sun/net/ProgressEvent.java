@@ -110,6 +110,3 @@ public class ProgressEvent extends EventObject	{
 	     + ", content-type=" + contentType + ", progress=" + progress + ", expected=" + expected + "]";
     }
 }
-
-
-

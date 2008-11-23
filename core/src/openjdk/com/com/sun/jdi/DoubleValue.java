@@ -59,4 +59,3 @@ public interface DoubleValue extends PrimitiveValue, Comparable<DoubleValue>
      */
     int hashCode();
 }
-

@@ -74,6 +74,3 @@ public interface ClassUnloadRequest extends EventRequest {
      */
     void addClassExclusionFilter(String classPattern);
 }
-
-
-			

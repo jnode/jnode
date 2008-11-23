@@ -70,4 +70,3 @@ import com.sun.jdi.*;
  */
 public interface VMDeathEvent extends Event {
 }
-

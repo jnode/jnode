@@ -49,7 +49,7 @@ final class ExternalClient implements SaslClient {
     ExternalClient(String authorizationID) throws SaslException {
 	if (authorizationID != null) {
 	    try {
-		username = ((String)authorizationID).getBytes("UTF8");
+                username = authorizationID.getBytes("UTF8");
 	    } catch (java.io.UnsupportedEncodingException e) {
 		throw new SaslException("Cannot convert " + authorizationID +
 		    " into UTF-8", e);
@@ -157,4 +157,3 @@ final class ExternalClient implements SaslClient {
 	}
     }
 }
-

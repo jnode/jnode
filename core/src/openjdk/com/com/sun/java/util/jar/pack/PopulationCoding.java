@@ -32,7 +32,6 @@ import java.io.*;
  * Population-based coding.
  * See the section "Encodings of Uncorrelated Values" in the Pack200 spec.
  * @author John Rose
- * @version 1.17, 05/05/07
  */
 // This tactic alone reduces the final zipped rt.jar by about a percent.
 class PopulationCoding implements Constants, CodingMethod {

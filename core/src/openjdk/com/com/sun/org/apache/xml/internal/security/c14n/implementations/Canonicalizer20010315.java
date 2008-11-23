@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
  * XML Version 1.0</A>, a W3C Recommendation from 15 March 2001.
  *
  * @author Christian Geuer-Pollmann <geuerp@apache.org>
- * @version $Revision: 1.37 $
  */
 public abstract class Canonicalizer20010315 extends CanonicalizerBase {
 	boolean firstCall=true;

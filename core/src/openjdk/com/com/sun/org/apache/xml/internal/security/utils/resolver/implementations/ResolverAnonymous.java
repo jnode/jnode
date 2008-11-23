@@ -79,4 +79,3 @@ public class ResolverAnonymous extends ResourceResolverSpi {
       return new String[0];
    }
 }
-

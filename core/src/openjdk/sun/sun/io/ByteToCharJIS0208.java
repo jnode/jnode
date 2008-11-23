@@ -30,7 +30,6 @@ package sun.io;
  * Tables and data to convert JIS0208 to Unicode
  *
  * @author  ConverterGenerator tool
- * @version >= JDK1.1.6
  */
 
 import sun.nio.cs.ext.JIS_X_0208_Decoder;

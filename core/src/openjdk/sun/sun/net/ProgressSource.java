@@ -208,6 +208,3 @@ public class ProgressSource
 	    + ", content-type=" + contentType + ", progress=" + progress + ", expected=" + expected + "]";
     }
 }
-
-
-

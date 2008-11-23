@@ -47,7 +47,6 @@ import org.w3c.dom.Node;
  * <i>THIS </i> implementation is a complete rewrite of the algorithm.
  * 
  * @author Christian Geuer-Pollmann <geuerp@apache.org>
- * @version $Revision: 1.21 $ 
  * @see <a href="http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/ Exclusive#">
  *          XML Canonicalization, Version 1.0</a>
  */
@@ -322,4 +321,3 @@ public abstract class Canonicalizer20010315Excl extends CanonicalizerBase {
 		return result.iterator(); 
 	}
 }
-

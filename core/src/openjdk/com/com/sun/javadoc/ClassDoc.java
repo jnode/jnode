@@ -338,5 +338,3 @@ public interface ClassDoc extends ProgramElementDoc, Type {
     @Deprecated
     PackageDoc[] importedPackages();
 }
-
-

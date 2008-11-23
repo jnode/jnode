@@ -52,7 +52,6 @@ import javax.sql.rowset.spi.*;
  * Standard JDBC RowSet implementations provide an object instance of this
  * reader by invoking the <code>SyncProvider.getRowSetReader()</code> method.
  *
- * @version 0.2
  * @author Jonathan Bruce
  * @see javax.sql.rowset.spi.SyncProvider
  * @see javax.sql.rowset.spi.SyncFactory
@@ -82,6 +81,16 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
     private boolean userCon = false;
 
     private int startPosition;
+
+    private JdbcRowSetResourceBundle resBundle;
+
+    public CachedRowSetReader() {
+        try {
+                resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
 
 
     /**
@@ -120,7 +129,7 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
      */
     public void readData(RowSetInternal caller) throws SQLException 
     {
-        
+        Connection con = null;
         try {
             CachedRowSet crs = (CachedRowSet)caller;
 
@@ -145,11 +154,11 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
             // connection.
 	    userCon = false;
 
-            Connection con = this.connect(caller);
+            con = this.connect(caller);
 
             // Check our assumptions.
             if (con == null || crs.getCommand() == null)
-                throw new SQLException();
+                throw new SQLException(resBundle.handleGetObject("crsreader.connecterr").toString());
 
             try {
                 con.setTransactionIsolation(crs.getTransactionIsolation());
@@ -171,7 +180,7 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
                  * drivers may not support the above - esp. older
                  * drivers being used by the bridge..
                  */ 
-                ;
+                throw new SQLException(ex.getMessage());
             } 
            
             if(crs.getCommand().toLowerCase().indexOf("select") != -1) { 
@@ -205,7 +214,7 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
                            * drivers may not support the above - esp. older
                            * drivers being used by the bridge..
                            */
-                                                            ;
+                            throw new SQLException(ex.getMessage());
                           }
                        rs = pstmt.executeQuery();
                        crs.populate(rs,startPosition);
@@ -229,6 +238,29 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
         catch (SQLException ex) {
             // Throw an exception if reading fails for any reason.
             throw ex;
+        } finally {
+            try {
+                // only close connections we created...
+                if (con != null && getCloseConnection() == true) {
+                    try {
+                        if (!con.getAutoCommit()) {
+                            con.rollback();
+                        }
+                    } catch (Exception dummy) {
+                        /*
+                         * not an error condition, we're closing anyway, but
+                         * we'd like to clean up any locks if we can since
+                         * it is not clear the connection pool will clean
+                         * these connections in a timely manner
+                         */
+                    }
+                    con.close();
+                    con = null;
+                }
+            } catch (SQLException e) {
+                // will get exception if something already went wrong, but don't
+                // override that exception with this one
+            }
         }
     }
     
@@ -299,7 +331,9 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
                 }     
             }
             catch (javax.naming.NamingException ex) {
-                throw new SQLException("(JNDI) Unable to connect");
+                SQLException sqlEx = new SQLException(resBundle.handleGetObject("crsreader.connect").toString());
+                sqlEx.initCause(ex);
+                throw sqlEx;
             }
         } else if (((RowSet)caller).getUrl() != null) {
             // Connect using the driver manager.
@@ -354,15 +388,15 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
 		    if (param[0] instanceof java.sql.Date ||
 			param[0] instanceof java.sql.Time ||
 			param[0] instanceof java.sql.Timestamp) {
-			System.err.println("Detected a Date");
+                        System.err.println(resBundle.handleGetObject("crsreader.datedetected").toString());
 			if (param[1] instanceof java.util.Calendar) {
-			    System.err.println("Detected a Calendar");
+                            System.err.println(resBundle.handleGetObject("crsreader.caldetected").toString());
 			    pstmt.setDate(i + 1, (java.sql.Date)param[0], 
 				       (java.util.Calendar)param[1]);
 			    continue;
 			}
 			else {
-			    throw new SQLException("Unable to deduce param type");
+                            throw new SQLException(resBundle.handleGetObject("crsreader.paramtype").toString());
 			}
 		    }
 
@@ -403,7 +437,7 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
 					      (java.io.InputStream)param[0],
 					      ((Integer)param[1]).intValue());
 			default:
-			    throw new SQLException("Unable to deduce parameter type");
+                            throw new SQLException(resBundle.handleGetObject("crsreader.paramtype").toString());
 			}
 		    }
 
@@ -417,7 +451,7 @@ public class CachedRowSetReader implements RowSetReader, Serializable {
 			continue;
 		    }
                 
-		    throw new SQLException("Unable to deduce param type");
+                    throw new SQLException(resBundle.handleGetObject("crsreader.paramtype").toString());
             
 		} else {
 		    // common case - this catches all SQL92 types

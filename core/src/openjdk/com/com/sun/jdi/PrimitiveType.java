@@ -39,4 +39,3 @@ package com.sun.jdi;
  */
 public interface PrimitiveType extends Type {
 }
-

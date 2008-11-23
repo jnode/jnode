@@ -438,4 +438,3 @@ class LdapNamingEnumeration implements NamingEnumeration, ReferralEnumeration {
 	cleanup();
     }
 }
-

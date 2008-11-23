@@ -45,7 +45,6 @@ import static java.util.Locale.ENGLISH;
  *
  * @since 1.4
  * 
- * @version 1.5 11/20/00
  * @author Philip Milne
  */
 public class ObjectHandler extends HandlerBase {
@@ -204,7 +203,7 @@ public class ObjectHandler extends HandlerBase {
 	
     private Class classForName2(String name) {
         try { 
-            return ClassFinder.findClass(name, this.ldr);
+            return ClassFinder.resolveClass(name, this.ldr);
         }
         catch (ClassNotFoundException e) { 
             if (is != null) {
@@ -363,11 +362,25 @@ public class ObjectHandler extends HandlerBase {
         if (name == "char") {
             String value = (String) map.get("code");
             if (value != null) {
-                int code = Integer.decode(value);
-                for (char ch : Character.toChars(code)) {
-                    this.chars.append(ch);
+                this.chars.append(parseIntAsChar(value));
                 }
             }
+        }
+
+    private static char parseIntAsChar(String data) {
+        try {
+            int i = data.startsWith("#")
+                    ? Integer.parseInt(data.substring(1), 16)
+                    : Integer.parseInt(data);
+
+            // be convinced, that valid character code is read
+            char ch = (char) i;
+            if (ch == i)
+                return ch;
+
+            throw new IllegalArgumentException("Wrong character code: '" + data + "'");
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Wrong character code: '" + data + "'", exception);
         }
     }
 

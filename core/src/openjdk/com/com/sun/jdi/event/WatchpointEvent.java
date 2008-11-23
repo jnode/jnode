@@ -65,5 +65,3 @@ public interface WatchpointEvent extends LocatableEvent {
      */
     Value valueCurrent();
 }
-    
-

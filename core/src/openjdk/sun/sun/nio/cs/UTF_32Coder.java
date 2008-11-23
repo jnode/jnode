@@ -187,4 +187,3 @@ class UTF_32Coder {
 
     }
 }
-

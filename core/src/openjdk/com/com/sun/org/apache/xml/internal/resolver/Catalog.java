@@ -188,7 +188,6 @@ import com.sun.org.apache.xml.internal.resolver.helpers.FileURL;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  *
  * <p>Derived from public domain code originally published by Arbortext,
  * Inc.</p>
@@ -2211,4 +2210,3 @@ public class Catalog {
     }
   }
 }
-

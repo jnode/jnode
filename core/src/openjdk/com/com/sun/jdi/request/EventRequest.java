@@ -208,6 +208,3 @@ public interface EventRequest extends Mirror {
      */
     Object getProperty(Object key);
 }
-
-
-			

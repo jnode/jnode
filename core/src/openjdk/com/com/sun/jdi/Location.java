@@ -259,4 +259,3 @@ public interface Location extends Mirror, Comparable<Location> {
      */
     int hashCode();
 }
-

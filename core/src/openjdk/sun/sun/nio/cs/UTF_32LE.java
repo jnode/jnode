@@ -47,4 +47,3 @@ public class UTF_32LE extends Unicode
 	return new UTF_32Coder.Encoder(this, UTF_32Coder.LITTLE, false);
     }
 }
-

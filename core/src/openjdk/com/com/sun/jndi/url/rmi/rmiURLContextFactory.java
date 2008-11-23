@@ -39,7 +39,6 @@ import javax.naming.spi.ObjectFactory;
  * factory will resolve all the way to the named registry or object.
  *
  * @author Scott Seligman
- * @version 1.16 07/05/05
  *
  * @see rmiURLContext
  */

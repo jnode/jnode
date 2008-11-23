@@ -35,7 +35,6 @@ import java.util.Properties;
  * CharToByteConverter classes.
  *
  * @author   Mark Reinhold
- * @version  1.7, 00/07/07
  * @since    1.2
  *
  * @deprecated Replaced by {@link java.nio.charset}.  THIS API WILL BE

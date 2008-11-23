@@ -41,7 +41,6 @@ import org.omg.CosNaming.NameComponent;
   * escape character.
   *
   * @author Rosanna Lee
-  * @version 1.16 07/05/05
   */
 
 final public class CNNameParser implements NameParser {

@@ -230,7 +230,7 @@ public final class DNSNameService implements NameService {
     public DNSNameService() throws Exception {
     
 	// default domain 
-        String domain =  (String)AccessController.doPrivileged(
+        String domain = AccessController.doPrivileged(
             new GetPropertyAction("sun.net.spi.nameservice.domain"));
         if (domain != null && domain.length() > 0) {
             domainList = new LinkedList();
@@ -238,8 +238,7 @@ public final class DNSNameService implements NameService {
         }
 
 	// name servers
-	String nameservers
-            = (String)AccessController.doPrivileged(
+        String nameservers = AccessController.doPrivileged(
             new GetPropertyAction("sun.net.spi.nameservice.nameservers"));
         if (nameservers != null && nameservers.length() > 0) {
 	    nameProviderUrl = createProviderURL(nameservers);

@@ -37,7 +37,6 @@ import org.xml.sax.helpers.*;
  *
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
- * @version 1.0
  */
 public class SAXParserHandler extends DefaultHandler {
   private EntityResolver er = null;

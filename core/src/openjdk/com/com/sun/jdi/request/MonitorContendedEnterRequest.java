@@ -114,4 +114,3 @@ public interface MonitorContendedEnterRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-

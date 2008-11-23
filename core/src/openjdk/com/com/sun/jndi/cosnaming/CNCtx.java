@@ -53,7 +53,6 @@ import java.applet.Applet;
   *
   * @author Raj Krishnamurthy
   * @author Rosanna Lee
-  * @version 1.23 07/05/05
   */
 
 public class CNCtx implements javax.naming.Context {

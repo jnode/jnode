@@ -37,7 +37,6 @@ import com.sun.jndi.ldap.LdapURL;
  * 
  * @author Rosanna Lee
  * @author Scott Seligman
- * @version 1.15 07/05/05
  */
 
 final public class ldapURLContext

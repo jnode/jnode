@@ -25,6 +25,7 @@
 
 package com.sun.rowset.internal;
 
+import com.sun.rowset.JdbcRowSetResourceBundle;
 import java.sql.*;
 import javax.sql.*;
 import java.io.*;
@@ -51,6 +52,8 @@ public class InsertRow extends BaseRow implements Serializable, Cloneable {
  */
     private int cols;
 
+    private JdbcRowSetResourceBundle resBundle;
+
 /**
  * Creates an <code>InsertRow</code> object initialized with the
  * given number of columns, an array for keeping track of the
@@ -65,6 +68,11 @@ public class InsertRow extends BaseRow implements Serializable, Cloneable {
         origVals = new Object[numCols];
         colsInserted = new BitSet(numCols);
         cols = numCols;
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
 /**
@@ -126,7 +134,7 @@ public class InsertRow extends BaseRow implements Serializable, Cloneable {
  */
     public Object getColumnObject(int idx) throws SQLException {
         if (colsInserted.get(idx - 1) == false) {
-            throw new SQLException("No value has been inserted");
+            throw new SQLException(resBundle.handleGetObject("insertrow.novalue").toString());
         }
         return (origVals[idx - 1]);
     }

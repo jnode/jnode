@@ -526,4 +526,3 @@ public final class TreeWalker
     }
   }
 }  //TreeWalker
-

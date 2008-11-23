@@ -112,4 +112,3 @@ final class UnsolicitedResponseImpl implements UnsolicitedNotification {
 
     private static final long serialVersionUID = 5913778898401784775L;
 }
-

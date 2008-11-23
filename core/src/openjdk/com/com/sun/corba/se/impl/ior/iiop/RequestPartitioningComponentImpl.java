@@ -24,7 +24,6 @@
  */
 
 /**
- * @(#)RequestPartitioningComponentImpl.java	1.7 07/05/05
  */
 package com.sun.corba.se.impl.ior.iiop;
 

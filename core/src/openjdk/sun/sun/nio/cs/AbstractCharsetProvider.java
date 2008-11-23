@@ -40,7 +40,6 @@ import sun.misc.ASCIICaseInsensitiveComparator;
  * Abstract base class for charset providers.
  *
  * @author Mark Reinhold
- * @version 1.21, 07/05/05
  */
 
 public class AbstractCharsetProvider

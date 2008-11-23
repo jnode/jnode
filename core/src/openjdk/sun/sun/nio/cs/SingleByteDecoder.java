@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)SingleByteDecoder.java	1.21 07/05/05
- */
+
 
 package sun.nio.cs;
 

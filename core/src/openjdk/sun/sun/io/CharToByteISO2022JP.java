@@ -317,4 +317,3 @@ public class CharToByteISO2022JP extends CharToByteJIS0208 {
     }
 
 }
-

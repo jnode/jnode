@@ -46,7 +46,6 @@ import com.sun.mirror.util.*;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.13 07/05/05
  *
  * @see Declarations
  * @see TypeMirror

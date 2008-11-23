@@ -57,6 +57,3 @@ import com.sun.jdi.*;
  */
 public interface ModificationWatchpointRequest extends WatchpointRequest {
 }
-
-
-			

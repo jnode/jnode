@@ -33,7 +33,6 @@ import javax.xml.xpath.XPathVariableResolver;
 /**
  * The XPathFactory builds XPaths.
  *
- * @version $Revision: 1.2 $
  * @author  Ramesh Mandava
  */
 public  class XPathFactoryImpl extends XPathFactory {
@@ -262,6 +261,3 @@ public  class XPathFactoryImpl extends XPathFactory {
 		xPathVariableResolver = resolver;
 	}
 }
-
-
-

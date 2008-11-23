@@ -38,7 +38,7 @@ import java.util.Collections;
  */
 public class IllegalConnectorArgumentsException extends Exception
 {
-    List names;
+    List<String> names;
 
     /**
      * Construct an <code>IllegalConnectorArgumentsException</code>
@@ -50,7 +50,7 @@ public class IllegalConnectorArgumentsException extends Exception
     public IllegalConnectorArgumentsException(String s,
                                               String name) {
         super(s);
-        names = new ArrayList(1);
+        names = new ArrayList<String>(1);
         names.add(name);
     }
 
@@ -65,7 +65,7 @@ public class IllegalConnectorArgumentsException extends Exception
     public IllegalConnectorArgumentsException(String s, List<String> names) {
         super(s);
 
-        this.names = new ArrayList(names);
+        this.names = new ArrayList<String>(names);
     }
 
     /**

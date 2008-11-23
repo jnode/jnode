@@ -31,7 +31,6 @@ import sun.nio.cs.ext.IBM943;
  * Tables and data to convert Cp943 to Unicode
  *
  * @author  BuildTable tool
- * @version >= JDK1.1.6
  */
 
 public class ByteToCharCp943 extends ByteToCharDBCS_ASCII {

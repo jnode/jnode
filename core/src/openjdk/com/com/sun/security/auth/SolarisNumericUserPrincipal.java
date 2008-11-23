@@ -41,7 +41,6 @@ import java.security.Principal;
  *             {@link UnixNumericUserPrincipal}.
  *             This class is entirely deprecated.
  * 
- * @version 1.25, 05/05/07
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  */

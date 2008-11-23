@@ -25,11 +25,12 @@
 
 package com.sun.rowset.providers;
 
+import com.sun.rowset.JdbcRowSetResourceBundle;
+import java.io.IOException;
 import java.sql.*;
 import javax.sql.*;
 
 import javax.sql.rowset.spi.*;
-import javax.sql.rowset.*;
 
 /**
  * A reference implementation of a JDBC RowSet synchronization provider 
@@ -91,6 +92,8 @@ public final class RIXMLProvider extends SyncProvider {
      */
     private String versionNumber = "1.0";       
     
+    private JdbcRowSetResourceBundle resBundle;
+
     private XmlReader xmlReader;
     private XmlWriter xmlWriter;
 
@@ -100,6 +103,11 @@ public final class RIXMLProvider extends SyncProvider {
      */ 
     public RIXMLProvider() {        
         providerID = this.getClass().getName();
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     /**
@@ -199,7 +207,7 @@ public final class RIXMLProvider extends SyncProvider {
      * function with non-locking XML data sources.
      */
     public void setDataSourceLock(int lock) throws SyncProviderException {
-        throw new UnsupportedOperationException("Unsupported with RIXMLProvider");
+        throw new UnsupportedOperationException(resBundle.handleGetObject("rixml.unsupp").toString());
     }   
 
     /**

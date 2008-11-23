@@ -24,12 +24,6 @@
  */
 
 /* 
- * @(#)file      SingleEntryRegistry.java 
- * @(#)author    Sun Microsystems, Inc. 
- * @(#)version   1.10 
- * @(#)date      07/05/05 
- * @(#)build	 @BUILD_TAG_PLACEHOLDER@
- * 
  * @COPYRIGHT_MINI_LEGAL_NOTICE_PLACEHOLDER@
  */ 
 

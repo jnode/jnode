@@ -36,7 +36,6 @@ import java.util.Map;
  * Abstract base class for fast charset providers.
  *
  * @author Mark Reinhold
- * @version 1.9, 07/05/05
  */
 
 public class FastCharsetProvider

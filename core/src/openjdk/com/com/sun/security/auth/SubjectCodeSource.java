@@ -42,7 +42,6 @@ import javax.security.auth.Subject;
  * or a linked list of Principals/PrincipalComparators
  * (that represent a "subject" in a <code>Policy</code>).
  *
- * @version 1.30, 05/05/07
  */
 class SubjectCodeSource extends CodeSource implements java.io.Serializable {
 

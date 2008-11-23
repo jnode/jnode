@@ -37,7 +37,6 @@ import com.sun.mirror.type.*;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.10 07/05/05
  * @since 1.5
  */
 

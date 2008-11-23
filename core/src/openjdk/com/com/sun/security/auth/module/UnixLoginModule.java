@@ -46,7 +46,6 @@ import com.sun.security.auth.UnixNumericGroupPrincipal;
  * If set to true in the login Configuration,
  * debug messages will be output to the output stream, System.out.
  *
- * @version 1.16, 05/05/07
  */
 public class UnixLoginModule implements LoginModule {
 

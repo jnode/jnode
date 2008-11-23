@@ -121,5 +121,3 @@ public abstract class ResolverConfiguration {
      */
     public abstract Options options();
 }
-
-

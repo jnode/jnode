@@ -37,7 +37,6 @@ package com.sun.javadoc;
  * or explicit <i>super</i> bounds or neither, but not both.
  *
  * @author Scott Seligman
- * @version 1.9 07/05/05
  * @since 1.5
  */
 public interface WildcardType extends Type {

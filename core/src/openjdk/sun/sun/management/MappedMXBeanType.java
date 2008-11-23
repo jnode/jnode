@@ -57,6 +57,9 @@ import com.sun.management.VMOption;
  *
  * OpenDataException will be thrown if a Java type is not supported.
  */
+// Suppress unchecked cast warnings at line 442, 523 and 546
+// Suppress unchecked calls at line 235, 284, 380 and 430.
+@SuppressWarnings("unchecked")
 public abstract class MappedMXBeanType {
     private static final WeakHashMap<Type,MappedMXBeanType> convertedTypes =
         new WeakHashMap<Type,MappedMXBeanType>();
@@ -557,7 +560,7 @@ public abstract class MappedMXBeanType {
 
             final TabularData td = (TabularData) data;
  
-            Map result = new HashMap();
+            Map<Object, Object> result = new HashMap<Object, Object>();
             for (CompositeData row : (Collection<CompositeData>) td.values()) {
                 Object key = keyType.toJavaTypeData(row.get(KEY));
                 Object value = valueType.toJavaTypeData(row.get(VALUE));
@@ -567,7 +570,7 @@ public abstract class MappedMXBeanType {
         }
     }
 
-    private static final Class COMPOSITE_DATA_CLASS = 
+    private static final Class<?> COMPOSITE_DATA_CLASS =
         javax.management.openmbean.CompositeData.class;
 
     // Classes that have a static from method
@@ -600,7 +603,7 @@ public abstract class MappedMXBeanType {
     //   its element type is determined as described above. 
     //
     static class CompositeDataMXBeanType extends MappedMXBeanType {
-        final Class javaClass;
+        final Class<?> javaClass;
         final boolean isCompositeData;
         Method fromMethod = null;
 
@@ -610,9 +613,8 @@ public abstract class MappedMXBeanType {
 
             // check if a static from method exists
             try {
-                fromMethod = (Method)
-                    AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                        public Object run() throws NoSuchMethodException {
+                fromMethod = AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+                        public Method run() throws NoSuchMethodException {
                             return javaClass.getMethod("from", COMPOSITE_DATA_CLASS);
                         }
                     });
@@ -631,9 +633,9 @@ public abstract class MappedMXBeanType {
                 this.isCompositeData = false;
 
                 // Make a CompositeData containing all the getters
-                final Method[] methods = (Method[])
-                    AccessController.doPrivileged(new PrivilegedAction() {
-                        public Object run() {
+                final Method[] methods =
+                    AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+                        public Method[] run() {
                             return javaClass.getMethods();
                         }
                     });

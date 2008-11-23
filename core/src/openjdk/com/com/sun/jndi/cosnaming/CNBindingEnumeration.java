@@ -42,7 +42,6 @@ import org.omg.CORBA.*;
   *
   * @author Raj Krishnamurthy
   * @author Rosanna Lee
-  * @version 1.17 07/05/05
   */
 
 final class CNBindingEnumeration implements NamingEnumeration {

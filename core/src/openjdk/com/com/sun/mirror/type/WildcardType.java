@@ -43,7 +43,6 @@ import java.util.Collection;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.12 07/05/05
  * @since 1.5
  */
 

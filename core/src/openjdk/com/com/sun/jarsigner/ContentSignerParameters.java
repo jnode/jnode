@@ -33,7 +33,6 @@ import java.util.zip.ZipFile;
  * This interface encapsulates the parameters for a ContentSigner object.
  *
  * @since 1.5
- * @version 1.9, 05/05/07
  * @author Vincent Ryan
  */
 

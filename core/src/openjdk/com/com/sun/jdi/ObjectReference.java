@@ -449,4 +449,3 @@ public interface ObjectReference extends Value
      */
     int hashCode();
 }
-

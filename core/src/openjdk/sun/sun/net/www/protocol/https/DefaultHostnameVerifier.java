@@ -36,7 +36,6 @@ import javax.net.ssl.SSLSession;
  *
  * The default implementation will deny such connections.
  *
- * @version 1.7, 05/05/07
  * @author Xuelei Fan
  */
 final public class DefaultHostnameVerifier implements HostnameVerifier {

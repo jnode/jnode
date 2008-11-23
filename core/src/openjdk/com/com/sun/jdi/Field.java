@@ -133,4 +133,3 @@ public interface Field extends TypeComponent, Comparable<Field> {
      */
     int hashCode();
 }
-

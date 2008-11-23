@@ -57,4 +57,3 @@ public class CharToByteISO2022CN_CNS extends CharToByteISO2022
         return "ISO2022CN_CNS";
     }
 }
-

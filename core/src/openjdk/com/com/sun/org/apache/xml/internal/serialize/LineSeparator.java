@@ -23,7 +23,6 @@ package com.sun.org.apache.xml.internal.serialize;
 
 
 /**
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:16 $
  * @author <a href="mailto:arkin@intalio..com">Assaf Arkin</a>
  * @see OutputFormat
  */
@@ -56,5 +55,3 @@ public final class LineSeparator
     
     
 }
-
-

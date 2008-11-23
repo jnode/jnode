@@ -29,7 +29,6 @@ import sun.nio.cs.ext.JIS_X_0208_Solaris_Encoder;
 import sun.nio.cs.ext.JIS_X_0212_Solaris_Encoder;
 
 /**
- * @version 1.11, 07/05/05
  * @author Limin Shi
  * @author Ian Little
  * 
@@ -212,4 +211,3 @@ public class CharToByteEUC_JP_Solaris extends CharToByteEUC_JP {
         return 3;
     }
 }
-

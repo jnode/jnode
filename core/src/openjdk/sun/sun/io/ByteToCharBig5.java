@@ -30,7 +30,6 @@ package sun.io;
  * Tables and data to convert Big5 to Unicode
  *
  * @author  ConverterGenerator tool
- * @version >= JDK1.1.6
  */
 
 public class ByteToCharBig5 extends ByteToCharDoubleByte {

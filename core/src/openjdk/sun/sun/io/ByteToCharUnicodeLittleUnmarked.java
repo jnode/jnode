@@ -32,7 +32,6 @@ import java.io.*;
  * Unicode characters, assuming a little-endian byte order and requiring no
  * byte-order mark.
  *
- * @version 	1.13, 07/05/05
  * @author	Mark Reinhold
  */
 

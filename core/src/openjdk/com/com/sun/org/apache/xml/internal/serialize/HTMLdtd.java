@@ -46,7 +46,6 @@ import java.util.Locale;
  * first time any of these methods is called for fast and efficient access.
  *
  *
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:14 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  */
 public final class HTMLdtd
@@ -556,4 +555,3 @@ public final class HTMLdtd
 
 
 }
-

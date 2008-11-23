@@ -237,4 +237,3 @@ public interface StackFrame extends Mirror, Locatable
     List<Value> getArgumentValues();
 
 }
-

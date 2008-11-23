@@ -45,7 +45,6 @@ import com.sun.mirror.util.TypeVisitor;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.10 07/05/05
  *
  * @see Declaration
  * @see Types

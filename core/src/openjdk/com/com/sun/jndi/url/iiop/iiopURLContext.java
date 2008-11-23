@@ -37,7 +37,6 @@ import com.sun.jndi.cosnaming.CorbanameUrl;
  * An IIOP URL context.
  * 
  * @author Rosanna Lee
- * @version 1.15 07/05/05
  */
 
 public class iiopURLContext

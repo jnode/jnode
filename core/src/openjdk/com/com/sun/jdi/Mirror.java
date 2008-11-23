@@ -74,4 +74,3 @@ public interface Mirror {
      */
     String toString();
 }
-

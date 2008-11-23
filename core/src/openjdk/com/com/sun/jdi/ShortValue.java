@@ -59,4 +59,3 @@ public interface ShortValue extends PrimitiveValue, Comparable<ShortValue>
      */
     int hashCode();
 }
-

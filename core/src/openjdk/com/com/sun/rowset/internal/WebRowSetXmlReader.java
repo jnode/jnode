@@ -34,9 +34,9 @@ import org.xml.sax.helpers.*;
 import javax.xml.parsers.*;
 
 import com.sun.rowset.*;
+import java.text.MessageFormat;
 import javax.sql.rowset.*;
 import javax.sql.rowset.spi.*;
-import com.sun.rowset.providers.*;
 
 /**
  * An implementation of the <code>XmlReader</code> interface, which
@@ -69,6 +69,17 @@ public class WebRowSetXmlReader implements XmlReader, Serializable {
      *            reader for the given rowset
      * @see XmlReaderContentHandler
      */
+
+    private JdbcRowSetResourceBundle resBundle;
+
+    public WebRowSetXmlReader(){
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
     public void readXML(WebRowSet caller, java.io.Reader reader) throws SQLException {
         try {
             // Crimson Parser(as in J2SE 1.4.1 is NOT able to handle 
@@ -81,11 +92,9 @@ public class WebRowSetXmlReader implements XmlReader, Serializable {
 	    InputSource is = new InputSource(reader);
 	    DefaultHandler dh = new XmlErrorHandler();
             XmlReaderContentHandler hndr = new XmlReaderContentHandler((RowSet)caller);
-	    
 	    SAXParserFactory factory = SAXParserFactory.newInstance();
 	    factory.setNamespaceAware(true);
 	    factory.setValidating(true);
-	    
 	    SAXParser parser = factory.newSAXParser() ;
 	    
 	    parser.setProperty(
@@ -100,10 +109,7 @@ public class WebRowSetXmlReader implements XmlReader, Serializable {
             reader1.parse(is);
 
         } catch (SAXParseException err) {
-            System.out.println ("** Parsing error" 
-                                + ", line " + err.getLineNumber ()
-                                + ", uri " + err.getSystemId ());
-            System.out.println("   " + err.getMessage ());
+            System.out.println (MessageFormat.format(resBundle.handleGetObject("wrsxmlreader.parseerr").toString(), new Object[]{ err.getMessage (), err.getLineNumber(), err.getSystemId()}));
             err.printStackTrace();
 	    throw new SQLException(err.getMessage());
             
@@ -119,10 +125,10 @@ public class WebRowSetXmlReader implements XmlReader, Serializable {
         // Will be here if trying to write beyond the RowSet limits
         
          catch (ArrayIndexOutOfBoundsException aie) {
-	      throw new SQLException("End of Rowset reached. Invalid cursor position");	
+              throw new SQLException(resBundle.handleGetObject("wrsxmlreader.invalidcp").toString());
         }     
         catch (Throwable e) {
-	    throw new SQLException("readXML: " + e.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("wrsxmlreader.readxml").toString() , e.getMessage()));
 	}            
         
     } 
@@ -177,9 +183,7 @@ public class WebRowSetXmlReader implements XmlReader, Serializable {
             reader1.parse(is);
 
         } catch (SAXParseException err) {
-            System.out.println ("** Parsing error" 
-                                + ", line " + err.getLineNumber ()
-                                + ", uri " + err.getSystemId ());
+            System.out.println (MessageFormat.format(resBundle.handleGetObject("wrsxmlreader.parseerr").toString(), new Object[]{err.getLineNumber(), err.getSystemId() }));
             System.out.println("   " + err.getMessage ());
             err.printStackTrace();
 	    throw new SQLException(err.getMessage());
@@ -196,11 +200,11 @@ public class WebRowSetXmlReader implements XmlReader, Serializable {
         // Will be here if trying to write beyond the RowSet limits
         
          catch (ArrayIndexOutOfBoundsException aie) {
-	      throw new SQLException("End of Rowset reached. Invalid cursor position");	
+              throw new SQLException(resBundle.handleGetObject("wrsxmlreader.invalidcp").toString());
         }     
         
         catch (Throwable e) {
-	    throw new SQLException("readXML: " + e.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("wrsxmlreader.readxml").toString() , e.getMessage()));
 	}
     } 
 

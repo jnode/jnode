@@ -33,7 +33,6 @@ import com.sun.jndi.url.iiop.iiopURLContextFactory;
  * so that NamingManager.getURLContext() will find it.
  * 
  * @author Rosanna Lee
- * @version 1.13 07/05/05
  */
 final public class iiopnameURLContextFactory extends iiopURLContextFactory {
 }

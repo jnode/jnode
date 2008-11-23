@@ -54,4 +54,3 @@ public class CharToByteMS932 extends CharToByteMS932DB {
 	return 1;
     }
 }
-

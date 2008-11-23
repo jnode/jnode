@@ -51,4 +51,3 @@ public interface ExpressionNode extends SourceLocator
   /** Return the number of children the node has. */
   public int exprGetNumChildren();
 }
-

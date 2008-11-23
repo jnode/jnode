@@ -831,4 +831,3 @@ public interface ReferenceType
      byte[] constantPool();
 
 }
-

@@ -34,7 +34,6 @@ import javax.naming.InvalidNameException;
  * RFC 1035.
  *
  * @author Scott Seligman
- * @version 1.22 07/05/05
  */
 
 

@@ -35,7 +35,6 @@ import javax.naming.*;
  * The RemoteReference interface wraps a Reference in a Remote wrapper.
  *
  * @author Scott Seligman
- * @version 1.13 07/05/05
  */
 
 

@@ -29,7 +29,6 @@ package sun.io;
  * A table to convert JIS0201 to Unicode
  *
  * @author  ConverterGenerator tool
- * @version >= JDK1.1.6
  */
 
 class ByteToCharJIS0201 extends ByteToCharSingleByte {

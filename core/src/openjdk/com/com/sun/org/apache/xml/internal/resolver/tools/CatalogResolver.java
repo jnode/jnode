@@ -61,7 +61,6 @@ import com.sun.org.apache.xml.internal.resolver.helpers.FileURL;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class CatalogResolver implements EntityResolver, URIResolver {
   /** Make the parser Namespace aware? */

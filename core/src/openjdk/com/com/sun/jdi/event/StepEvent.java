@@ -49,5 +49,3 @@ import com.sun.jdi.*;
 public interface StepEvent extends LocatableEvent {
 
 }
-    
-

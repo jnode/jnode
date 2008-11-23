@@ -33,7 +33,6 @@ import java.util.Properties;
  * This class allows for centralized access to Networking properties.
  * Default values are loaded from the file jre/lib/net.properties
  *
- * @version 1.8, 05/05/07
  *
  * @author Jean-Christophe Collet
  *

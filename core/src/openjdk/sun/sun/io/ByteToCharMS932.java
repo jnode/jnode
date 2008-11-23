@@ -30,7 +30,6 @@ package sun.io;
  *
  * @author Limin Shi
  * @author Mark Son-Bell
- * @version >= JDK1.1.6
  */
 
 public class ByteToCharMS932 extends ByteToCharMS932DB {

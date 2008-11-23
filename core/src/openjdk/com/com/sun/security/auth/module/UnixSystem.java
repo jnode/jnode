@@ -32,7 +32,6 @@ import javax.security.auth.login.*;
  * <p> This class implementation retrieves and makes available Unix
  * UID/GID/groups information for the current user.
  * 
- * @version 1.13, 05/05/07
  */
 public class UnixSystem {
 

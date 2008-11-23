@@ -28,6 +28,9 @@ import java.util.Locale;
 import com.sun.org.apache.xerces.internal.util.MessageFormatter;
 import com.sun.org.apache.xerces.internal.impl.msg.XMLMessageFormatter;
 
+import com.sun.xml.internal.stream.util.BufferAllocator;
+import com.sun.xml.internal.stream.util.ThreadLocalBufferAllocator;
+
 /**
  * <p>A UTF-8 reader.</p>
  * 
@@ -114,7 +117,11 @@ public class UTF8Reader
     public UTF8Reader(InputStream inputStream, int size,
             MessageFormatter messageFormatter, Locale locale) {
         fInputStream = inputStream;
+        BufferAllocator ba = ThreadLocalBufferAllocator.getBufferAllocator();
+        fBuffer = ba.getByteBuffer(size);
+        if (fBuffer == null) {
         fBuffer = new byte[size];
+        }
         fFormatter = messageFormatter;
         fLocale = locale;
     } // <init>(InputStream, int, MessageFormatter, Locale)
@@ -652,6 +659,9 @@ public class UTF8Reader
      * @exception  IOException  If an I/O error occurs
      */
     public void close() throws IOException {
+        BufferAllocator ba = ThreadLocalBufferAllocator.getBufferAllocator();
+        ba.returnByteBuffer(fBuffer);
+        fBuffer = null;
         fInputStream.close();
     } // close()
 

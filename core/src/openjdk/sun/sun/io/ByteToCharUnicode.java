@@ -44,7 +44,6 @@ import java.io.*;
  * @see ByteToCharUnicodeBig
  * @see ByteToCharUnicodeBigUnmarked
  *
- * @version 	1.20, 07/05/05
  * @author	Mark Reinhold
  */
 

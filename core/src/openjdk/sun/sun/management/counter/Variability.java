@@ -30,7 +30,6 @@ package sun.management.counter;
  * instrumentation objects.
  *
  * @author   Brian Doherty
- * @version  1.11, 05/05/07
  */
 public class Variability implements java.io.Serializable {
   

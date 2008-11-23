@@ -90,7 +90,6 @@ import org.xml.sax.SAXException;
  * recommended that new applications use JAXP's Transformation API 
  * for XML (TrAX) for serializing HTML. See the Xerces documentation
  * for more information.
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:14 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @see Serializer
  */
@@ -880,7 +879,3 @@ public class HTMLSerializer
 
 
 }
-
-
-
-

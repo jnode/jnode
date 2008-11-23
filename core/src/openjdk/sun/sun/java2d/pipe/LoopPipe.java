@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1999-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -37,8 +37,6 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.IllegalPathStateException;
 import java.awt.geom.Path2D;
 import java.awt.font.GlyphVector;
-import sun.dc.path.PathConsumer;
-import sun.dc.path.PathException;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.FontInfo;
@@ -50,6 +48,8 @@ public class LoopPipe
 	       PixelFillPipe,
 	       ShapeDrawPipe
 {
+    final static RenderingEngine RenderEngine = RenderingEngine.getInstance();
+
     public void drawLine(SunGraphics2D sg2d,
 			 int x1, int y1, int x2, int y2)
     {
@@ -154,7 +154,7 @@ public class LoopPipe
 			    int xPoints[], int yPoints[],
 			    int nPoints)
     {
-	ShapeSpanIterator sr = new ShapeSpanIterator(sg2d, false);
+        ShapeSpanIterator sr = getFillSSI(sg2d);
 
 	try {
 	    sr.setOutputArea(sg2d.getCompClip());
@@ -203,10 +203,55 @@ public class LoopPipe
         }
     }
 
+    /**
+     * Return a ShapeSpanIterator instance that normalizes as
+     * appropriate for a fill operation as per the settings in
+     * the specified SunGraphics2D object.
+     *
+     * The ShapeSpanIterator will be newly constructed and ready
+     * to start taking in geometry.
+     *
+     * Note that the caller is responsible for calling dispose()
+     * on the returned ShapeSpanIterator inside a try/finally block:
+     * <pre>
+     *     ShapeSpanIterator ssi = LoopPipe.getFillSSI(sg2d);
+     *     try {
+     *         ssi.setOutputArea(clip);
+     *         ssi.appendPath(...); // or appendPoly
+     *         // iterate the spans from ssi and operate on them
+     *     } finally {
+     *         ssi.dispose();
+     *     }
+     * </pre>
+     */
+    public static ShapeSpanIterator getFillSSI(SunGraphics2D sg2d) {
+        boolean adjust = ((sg2d.stroke instanceof BasicStroke) &&
+                          sg2d.strokeHint != SunHints.INTVAL_STROKE_PURE);
+        return new ShapeSpanIterator(adjust);
+    }
+
     /*
-     * Return a ShapeSpanIterator to iterate the spans of the wide
+     * Return a ShapeSpanIterator ready to iterate the spans of the wide
      * outline of Shape s using the attributes of the SunGraphics2D
      * object.
+     *
+     * The ShapeSpanIterator returned will be fully constructed
+     * and filled with the geometry from the Shape widened by the
+     * appropriate BasicStroke and normalization parameters taken
+     * from the SunGraphics2D object and be ready to start returning
+     * spans.
+     *
+     * Note that the caller is responsible for calling dispose()
+     * on the returned ShapeSpanIterator inside a try/finally block.
+     * <pre>
+     *     ShapeSpanIterator ssi = LoopPipe.getStrokeSpans(sg2d, s);
+     *     try {
+     *         // iterate the spans from ssi and operate on them
+     *     } finally {
+     *         ssi.dispose();
+     *     }
+     * </pre>
+     *
      * REMIND: This should return a SpanIterator interface object
      * but the caller needs to dispose() the object and that method
      * is only on ShapeSpanIterator.
@@ -215,40 +260,24 @@ public class LoopPipe
     public static ShapeSpanIterator getStrokeSpans(SunGraphics2D sg2d,
 						   Shape s)
     {
-	ShapeSpanIterator sr = new ShapeSpanIterator(sg2d, true);
+        ShapeSpanIterator sr = new ShapeSpanIterator(false);
 
 	try {
 	    sr.setOutputArea(sg2d.getCompClip());
 	    sr.setRule(PathIterator.WIND_NON_ZERO);
 
 	    BasicStroke bs = (BasicStroke) sg2d.stroke;
-	    AffineTransform transform =
-		(sg2d.transformState >= sg2d.TRANSFORM_TRANSLATESCALE
-		 ? sg2d.transform : null);
 	    boolean thin = (sg2d.strokeState <= sg2d.STROKE_THINDASHED);
-
-	    PathConsumer stroker =
-		DuctusRenderer.createStroker(sr, bs, thin, transform);
-
-	    try {
-		transform =
-		    ((sg2d.transformState == sg2d.TRANSFORM_ISIDENT)
-		     ? null
-		     : sg2d.transform);
-		PathIterator pi = s.getPathIterator(transform);
-
-		boolean adjust =
+            boolean normalize =
 		    (sg2d.strokeHint != SunHints.INTVAL_STROKE_PURE);
-		DuctusRenderer.feedConsumer(pi, stroker, adjust, 0.25f);
-	    } catch (PathException e) {
-		throw new InternalError("Unable to Stroke shape ("+
-					e.getMessage()+")");
-	    } finally {
-		DuctusRenderer.disposeStroker(stroker, sr);
-	    }
+
+            RenderEngine.strokeTo(s,
+                                  sg2d.transform, bs,
+                                  thin, normalize, false, sr);
 	} catch (Throwable t) {
 	    sr.dispose();
 	    sr = null;
+            t.printStackTrace();
 	    throw new InternalError("Unable to Stroke shape ("+
 				    t.getMessage()+")");
 	}
@@ -278,7 +307,7 @@ public class LoopPipe
             return;
         }
 
-	ShapeSpanIterator sr = new ShapeSpanIterator(sg2d, false);
+        ShapeSpanIterator sr = getFillSSI(sg2d);
 	try {
 	    sr.setOutputArea(sg2d.getCompClip());
 	    AffineTransform at =

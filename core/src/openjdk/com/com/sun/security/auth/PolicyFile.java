@@ -237,7 +237,6 @@ import sun.security.util.PropertyExpander;
  *             <code>sun.security.provider.PolicyFile</code>.
  *             This class is entirely deprecated.
  *
- * @version 1.22, 01/25/00
  * @see java.security.CodeSource
  * @see java.security.Permissions
  * @see java.security.ProtectionDomain 
@@ -924,8 +923,7 @@ public class PolicyFile extends javax.security.auth.Policy {
 
 	   if (entry.codesource.implies(codesource[0])) {
 	       for (int j = 0; j < entry.permissions.size(); j++) {
-		    Permission p = 
-		       (Permission) entry.permissions.elementAt(j);
+                    Permission p = entry.permissions.elementAt(j);
 		    if (debug != null) {
 		       debug.println("  granting " + p);
 		    }
@@ -1335,7 +1333,6 @@ public class PolicyFile extends javax.security.auth.Policy {
      * 
      * @author Marianne Mueller
      * @author Roland Schemers
-     * @version 1.6, 03/04/97
      * @see java.security.CodeSource
      * @see java.security.Policy
      * @see java.security.Permissions
@@ -1442,7 +1439,7 @@ class PolicyPermissions extends PermissionCollection {
 	    if (additionalPerms != null) {
 		Enumeration<Permission> e = additionalPerms.elements();
 		while (e.hasMoreElements()) {
-		    perms.add((Permission)e.nextElement());
+                    perms.add(e.nextElement());
 		}
 		additionalPerms = null;
 	    }

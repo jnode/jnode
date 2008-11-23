@@ -21,8 +21,6 @@
  */
 package com.sun.org.apache.xml.internal.security.utils.resolver.implementations;
 
-
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,25 +117,27 @@ public class ResolverDirectHTTP extends ResourceResolverSpi {
             useProxy = true;
          }
 
-         String oldProxySet =
-            (String) System.getProperties().get("http.proxySet");
-         String oldProxyHost =
-            (String) System.getProperties().get("http.proxyHost");
-         String oldProxyPort =
-            (String) System.getProperties().get("http.proxyPort");
+         // switch on proxy usage
+         String oldProxySet = null;
+         String oldProxyHost = null;
+         String oldProxyPort = null;
+         if (useProxy) {
+            if (log.isLoggable(java.util.logging.Level.FINE)) {
+               log.log(java.util.logging.Level.FINE,
+                  "Use of HTTP proxy enabled: " + proxyHost + ":"
+                      + proxyPort);
+         }
+            oldProxySet = System.getProperty("http.proxySet");
+            oldProxyHost = System.getProperty("http.proxyHost");
+            oldProxyPort = System.getProperty("http.proxyPort");
+            System.setProperty("http.proxySet", "true");
+            System.setProperty("http.proxyHost", proxyHost);
+            System.setProperty("http.proxyPort", proxyPort);
+         }
+
          boolean switchBackProxy = ((oldProxySet != null)
                                     && (oldProxyHost != null)
                                     && (oldProxyPort != null));
-
-         // switch on proxy usage
-         if (useProxy) {
-            if (true)
-            	if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "Use of HTTP proxy enabled: " + proxyHost + ":"
-                      + proxyPort);
-            System.getProperties().put("http.proxySet", "true");
-            System.getProperties().put("http.proxyHost", proxyHost);
-            System.getProperties().put("http.proxyPort", proxyPort);
-         }
 
          // calculate new URI
          URI uriNew = getNewURI(uri.getNodeValue(), BaseURI);
@@ -215,8 +215,11 @@ public class ResolverDirectHTTP extends ResourceResolverSpi {
             summarized += read;
          }
 
-         if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "Fetched " + summarized + " bytes from URI "
+         if (log.isLoggable(java.util.logging.Level.FINE)) {
+            log.log(java.util.logging.Level.FINE,
+               "Fetched " + summarized + " bytes from URI "
                    + uriNew.toString());
+         }
 
          XMLSignatureInput result = new XMLSignatureInput(baos.toByteArray());
 
@@ -225,10 +228,10 @@ public class ResolverDirectHTTP extends ResourceResolverSpi {
          result.setMIMEType(mimeType);
 
          // switch off proxy usage
-         if (switchBackProxy) {
-            System.getProperties().put("http.proxySet", oldProxySet);
-            System.getProperties().put("http.proxyHost", oldProxyHost);
-            System.getProperties().put("http.proxyPort", oldProxyPort);
+         if (useProxy && switchBackProxy) {
+            System.setProperty("http.proxySet", oldProxySet);
+            System.setProperty("http.proxyHost", oldProxyHost);
+            System.setProperty("http.proxyPort", oldProxyPort);
          }
 
          return result;
@@ -250,33 +253,39 @@ public class ResolverDirectHTTP extends ResourceResolverSpi {
     */
    public boolean engineCanResolve(Attr uri, String BaseURI) {
       if (uri == null) {
-         if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "quick fail, uri == null");
-
+         if (log.isLoggable(java.util.logging.Level.FINE)) {
+            log.log(java.util.logging.Level.FINE, "quick fail, uri == null");
+         }
          return false;
       }
 
       String uriNodeValue = uri.getNodeValue();
 
       if (uriNodeValue.equals("") || (uriNodeValue.charAt(0)=='#')) {
-         if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "quick fail for empty URIs and local ones");
-
+         if (log.isLoggable(java.util.logging.Level.FINE)) {
+            log.log(java.util.logging.Level.FINE,
+               "quick fail for empty URIs and local ones");
+         }
          return false;
       }
 
-      if (true)
-      	if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "I was asked whether I can resolve " + uriNodeValue);
-
+      if (log.isLoggable(java.util.logging.Level.FINE)) {
+         log.log(java.util.logging.Level.FINE,
+               "I was asked whether I can resolve " + uriNodeValue);
+      }
       if ( uriNodeValue.startsWith("http:") ||
 				 BaseURI.startsWith("http:")) {
-         if (true)
-         	if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "I state that I can resolve " + uriNodeValue);
-
+         if (log.isLoggable(java.util.logging.Level.FINE)) {
+            log.log(java.util.logging.Level.FINE,
+                  "I state that I can resolve " + uriNodeValue);
+         }
          return true;
       }
 
-      if (true)
-      	if (log.isLoggable(java.util.logging.Level.FINE))                                     log.log(java.util.logging.Level.FINE, "I state that I can't resolve " + uriNodeValue);
-
+      if (log.isLoggable(java.util.logging.Level.FINE)) {
+         log.log(java.util.logging.Level.FINE,
+            "I state that I can't resolve " + uriNodeValue);
+      }
       return false;
    }
 

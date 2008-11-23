@@ -114,4 +114,3 @@ public interface MethodEntryRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-

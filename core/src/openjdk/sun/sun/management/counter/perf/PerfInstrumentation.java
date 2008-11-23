@@ -36,7 +36,7 @@ public class PerfInstrumentation {
     private long lastModificationTime;
     private long lastUsed;
     private int  nextEntry;
-    private SortedMap  map;
+    private SortedMap<String, Counter>  map;
 
     public PerfInstrumentation(ByteBuffer b) {
         prologue = new Prologue(b);
@@ -73,7 +73,7 @@ public class PerfInstrumentation {
         buffer.position(prologue.getEntryOffset());
         nextEntry = buffer.position(); 
         // rebuild all the counters
-        map = new TreeMap();
+        map = new TreeMap<String, Counter>();
     }
 
     boolean hasNext() {
@@ -147,17 +147,17 @@ public class PerfInstrumentation {
         return counter;
     }
 
-    public synchronized List getAllCounters() {
+    public synchronized List<Counter> getAllCounters() {
         while (hasNext()) {        
             Counter c = getNextCounter();
             if (c != null) {
                 map.put(c.getName(), c);
             }
         }
-        return new ArrayList(map.values());
+        return new ArrayList<Counter>(map.values());
     }
 
-    public synchronized List findByPattern(String patternString) {
+    public synchronized List<Counter> findByPattern(String patternString) {
         while (hasNext()) {        
             Counter c = getNextCounter();
             if (c != null) {
@@ -167,7 +167,7 @@ public class PerfInstrumentation {
     
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher("");
-        List matches = new ArrayList();
+        List<Counter> matches = new ArrayList<Counter>();
 
         Iterator iter = map.entrySet().iterator();
         while (iter.hasNext()) {

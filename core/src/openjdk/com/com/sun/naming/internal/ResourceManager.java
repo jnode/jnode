@@ -47,7 +47,6 @@ import javax.naming.*;
   * 
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.20 07/05/05
   */
 
 public final class ResourceManager {

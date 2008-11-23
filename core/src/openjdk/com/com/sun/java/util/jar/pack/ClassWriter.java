@@ -34,7 +34,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
 /**
  * Writer for a class file that is incorporated into a package.
  * @author John Rose
- * @version 1.21, 05/05/07
  */
 class ClassWriter implements Constants {
     int verbose;

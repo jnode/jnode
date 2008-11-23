@@ -58,4 +58,3 @@ public interface ByteValue extends PrimitiveValue, Comparable<ByteValue>
      */
     int hashCode();
 }
-

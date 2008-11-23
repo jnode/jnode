@@ -54,7 +54,7 @@ class HotspotMemory
     private static final String GC_COUNTER_NAME_PATTERN =
         JAVA_GC + "|" + COM_SUN_GC + "|" + SUN_GC;
 
-    public java.util.List getInternalMemoryCounters() {
+    public java.util.List<Counter> getInternalMemoryCounters() {
         return jvm.getInternalCounters(GC_COUNTER_NAME_PATTERN); 
     } 
 }

@@ -27,6 +27,8 @@ package sun.management;
 
 import java.util.Map;
 import java.util.HashMap;
+import sun.management.counter.Counter;
+
 
 /**
  * Implementation class of HotspotThreadMBean interface.
@@ -48,15 +50,15 @@ class HotspotThread
 
     public native int getInternalThreadCount();
 
-    public Map getInternalThreadCpuTimes() {
+    public Map<String, Long> getInternalThreadCpuTimes() {
         int count = getInternalThreadCount();
         if (count == 0) {
-            return java.util.Collections.EMPTY_MAP;
+            return java.util.Collections.emptyMap();
         }
         String[] names = new String[count];
         long[] times = new long[count];
         int numThreads = getInternalThreadTimes0(names, times);
-        Map result = new HashMap(numThreads);
+        Map<String, Long> result = new HashMap<String, Long>(numThreads);
         for (int i = 0; i < numThreads; i++) {
             result.put(names[i], new Long(times[i]));
         }
@@ -71,7 +73,7 @@ class HotspotThread
     private static final String THREADS_COUNTER_NAME_PATTERN =
         JAVA_THREADS + "|" + COM_SUN_THREADS + "|" + SUN_THREADS;
 
-    public java.util.List getInternalThreadingCounters() {
+    public java.util.List<Counter> getInternalThreadingCounters() {
         return jvm.getInternalCounters(THREADS_COUNTER_NAME_PATTERN);
     }
 }

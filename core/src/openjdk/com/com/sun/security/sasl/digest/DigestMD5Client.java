@@ -321,7 +321,7 @@ final class DigestMD5Client extends DigestMD5Base implements SaslClient {
 		    realmTokens = new String[realmChoices.size()];
 		    for (int i = 0; i < realmTokens.length; i++) {
 			realmTokens[i] = 
-			    new String((byte[])realmChoices.get(i), encoding);
+                            new String(realmChoices.get(i), encoding);
 		    }
 		}
 	    } 	    

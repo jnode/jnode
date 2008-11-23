@@ -155,10 +155,11 @@ class VMManagementImpl implements VMManagement {
     public String   getLibraryPath()  {
         return System.getProperty("java.library.path");
     }
+
     public String   getBootClassPath( ) {
-        PrivilegedAction pa
+        PrivilegedAction<String> pa
             = new GetPropertyAction("sun.boot.class.path");
-        String result = (String) AccessController.doPrivileged(pa);
+        String result =  AccessController.doPrivileged(pa);
         return result;
     }
 
@@ -166,7 +167,8 @@ class VMManagementImpl implements VMManagement {
     public synchronized List<String> getVmArguments() {
         if (vmArgs == null) {
             String[] args = getVmArguments0();
-            List<String> l = (args != null ? Arrays.asList(args) : Collections.EMPTY_LIST);
+            List<String> l = ((args != null && args.length != 0) ? Arrays.asList(args) :
+                                        Collections.<String>emptyList());
             vmArgs = Collections.unmodifiableList(l); 
         }
         return vmArgs;
@@ -178,9 +180,9 @@ class VMManagementImpl implements VMManagement {
 
     // Compilation Subsystem
     public String   getCompilerName() {
-        String name = (String) AccessController.doPrivileged(
-            new PrivilegedAction() {
-                public Object run() {
+        String name =  AccessController.doPrivileged(
+            new PrivilegedAction<String>() {
+                public String run() {
                     return System.getProperty("sun.management.compiler");
                 }
             });
@@ -229,7 +231,7 @@ class VMManagementImpl implements VMManagement {
         }
 
         // construct PerfInstrumentation object 
-        Perf perf = (Perf) AccessController.doPrivileged(new Perf.GetPerfAction());
+        Perf perf =  AccessController.doPrivileged(new Perf.GetPerfAction());
         try {
             ByteBuffer bb = perf.attach(0, "r");
             if (bb.capacity() == 0) {
@@ -247,12 +249,12 @@ class VMManagementImpl implements VMManagement {
         return perfInstr;
     }
 
-    public List    getInternalCounters(String pattern) {
+    public List<Counter> getInternalCounters(String pattern) {
         PerfInstrumentation perf = getPerfInstrumentation();
         if (perf != null) {
             return perf.findByPattern(pattern);
         } else {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 }

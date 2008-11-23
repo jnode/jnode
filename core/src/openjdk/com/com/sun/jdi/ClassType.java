@@ -374,5 +374,3 @@ public interface ClassType extends ReferenceType {
      */
     Method concreteMethodByName(String name, String signature);
 }
-
-

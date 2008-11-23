@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.security.AccessControlException;
 import java.security.AccessController;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,6 +45,7 @@ import javax.management.remote.JMXPrincipal;
 
 import com.sun.jmx.remote.util.ClassLogger;
 import com.sun.jmx.remote.util.EnvHelp;
+import sun.management.jmxremote.ConnectorBootstrap;
 
 import sun.security.action.GetPropertyAction;
 
@@ -113,7 +115,7 @@ public class FileLoginModule implements LoginModule {
 	AccessController.doPrivileged(new GetPropertyAction("java.home")) +
 	File.separatorChar + "lib" +
 	File.separatorChar + "management" + File.separatorChar +
-            "jmxremote.password";
+        ConnectorBootstrap.DefaultValues.PASSWORD_FILE_NAME;
 
     // Key to retrieve the stored username
     private static final String USERNAME_KEY = 
@@ -199,7 +201,7 @@ public class FileLoginModule implements LoginModule {
             } catch (SecurityException e) {
                 hasJavaHomePermission = false;
                 passwordFileDisplayName =
-                        "jmxremote.password";
+                        ConnectorBootstrap.DefaultValues.PASSWORD_FILE_NAME;
             }
 	}
     }

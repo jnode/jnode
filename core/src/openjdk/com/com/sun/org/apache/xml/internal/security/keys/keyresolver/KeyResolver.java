@@ -40,7 +40,6 @@ import org.w3c.dom.Node;
  * represent child element of KeyInfo.
  *
  * @author $Author: raul $
- * @version 1.9, 05/04/07
  */
 public class KeyResolver {
 

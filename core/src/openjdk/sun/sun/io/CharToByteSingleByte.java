@@ -35,7 +35,6 @@ package sun.io;
 *
 * @author Lloyd Honomichl
 * @author Asmus Freytag
-* @version 8/28/96
 */
 
 public abstract class CharToByteSingleByte extends CharToByteConverter {

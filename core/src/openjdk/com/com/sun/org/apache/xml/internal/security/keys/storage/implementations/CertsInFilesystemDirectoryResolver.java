@@ -158,7 +158,6 @@ public class CertsInFilesystemDirectoryResolver extends StorageResolverSpi {
     * Class FilesystemIterator
     *
     * @author $Author: raul $
-    * @version $Revision: 1.9 $
     */
    class FilesystemIterator implements Iterator {
 

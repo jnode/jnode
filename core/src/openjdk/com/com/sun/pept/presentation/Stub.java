@@ -65,10 +65,3 @@ public interface Stub {
     public Delegate _getDelegate();
 
 } // end Stub
-
-
-
-
-
-
-

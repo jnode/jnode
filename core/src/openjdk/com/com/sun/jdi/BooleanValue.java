@@ -59,4 +59,3 @@ public interface BooleanValue extends PrimitiveValue
      */
     int hashCode();
 }
-

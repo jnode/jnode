@@ -59,4 +59,3 @@ public interface IntegerValue extends PrimitiveValue, Comparable<IntegerValue>
      */
     int hashCode();
 }
-

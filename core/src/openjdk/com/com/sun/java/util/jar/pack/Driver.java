@@ -136,7 +136,7 @@ class Driver {
 		    for (Map.Entry<Object,Object> me : fileProps.entrySet())
 			engProps.put((String)me.getKey(), (String)me.getValue());
 		} else if (state == "--version") {
-			System.out.println(MessageFormat.format(RESOURCE.getString(DriverResource.VERSION), Driver.class.getName(), "1.31, 07/05/05"));
+                        System.out.println(MessageFormat.format(RESOURCE.getString(DriverResource.VERSION), Driver.class.getName(), "1.32, 08/01/25"));
 		    return;
 		} else if (state == "--help") {
 		    printUsage(doPack, true, System.out);
@@ -692,5 +692,3 @@ class Driver {
 	return resultString;
     }
 }
-
-

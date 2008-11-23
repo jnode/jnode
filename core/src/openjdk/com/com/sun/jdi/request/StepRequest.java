@@ -133,6 +133,3 @@ public interface StepRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-
-
-			

@@ -108,7 +108,6 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
      */
     private WebRowSet wrs;
     
-    private transient JdbcRowSetResourceBundle joinResBundle;
     
     /**
      * Constructor for <code>JoinRowSetImpl</code> class. Configures various internal data
@@ -120,11 +119,6 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
      */
     public JoinRowSetImpl() throws SQLException {
     
-        try {
-	   joinResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
-	} catch(IOException ioe) {
-
-        }
         vecRowSetsInJOIN = new Vector();
         crsInternal = new CachedRowSetImpl();
 	vecJoinType = new Vector();
@@ -162,25 +156,29 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 	CachedRowSetImpl cRowset;
 	
         if(!(rowset instanceof RowSet)) {
-            throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.notinstance").toString());
+            throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.notinstance").toString());
         } 
 
 	if(rowset instanceof JdbcRowSetImpl ) {
 	    cRowset = new CachedRowSetImpl();
 	    cRowset.populate((RowSet)rowset);
             if(cRowset.size() == 0){
-                throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.emptyrowset").toString());
+                throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.emptyrowset").toString());
             }
 
 	    
 	    try {
-	      cRowset.setMatchColumn(rowset.getMatchColumnIndexes()[0]);
-	    } catch(SQLException sqle) {
-	    
+                int matchColumnCount = 0;
+                for(int i=0; i< rowset.getMatchColumnIndexes().length; i++) {
+                    if(rowset.getMatchColumnIndexes()[i] != -1)
+                        ++ matchColumnCount;
+                    else
+                        break;
 	    }
-	    
-	    try {
-	    	cRowset.setMatchColumn(rowset.getMatchColumnNames()[0]);
+                int[] pCol = new int[matchColumnCount];
+                for(int i=0; i<matchColumnCount; i++)
+                   pCol[i] = rowset.getMatchColumnIndexes()[i];
+                cRowset.setMatchColumn(pCol);
 	    } catch(SQLException sqle) {
 	    
 	    }
@@ -188,7 +186,7 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 	} else {
        	     cRowset = (CachedRowSetImpl)rowset;
              if(cRowset.size() == 0){
-                 throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.emptyrowset").toString());
+                 throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.emptyrowset").toString());
              }
     	}
     	
@@ -211,14 +209,25 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 
 	if(boolColId && boolColName) {
 	   // neither setter methods have been used to set
-	   throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.matchnotset").toString());
+           throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.matchnotset").toString());
 	} else {
 	   //if(boolColId || boolColName)
 	   // either of the setter methods have been set.
 	   if(boolColId){
 	      //
+              ArrayList indices = new ArrayList();
+              for(int i=0;i<cRowset.getMatchColumnNames().length;i++) {
+                  if( (strMatchKey = (cRowset.getMatchColumnNames())[i]) != null) {
 	      iMatchKey = cRowset.findColumn(strMatchKey);
-	      cRowset.setMatchColumn(iMatchKey);
+                      indices.add(iMatchKey);
+                  }
+                  else
+                      break;
+              }
+              int[] indexes = new int[indices.size()];
+              for(int i=0; i<indices.size();i++)
+                  indexes[i] = ((Integer)indices.get(i)).intValue();
+              cRowset.setMatchColumn(indexes);
 	      // Set the match column here because join will be
 	      // based on columnId,
 	      // (nested for loop in initJOIN() checks for equality
@@ -263,7 +272,9 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
      */
     public void addRowSet(RowSet rowset, int columnIdx) throws SQLException {
         //passing the rowset as well as the columnIdx to form the joinrowset.
+
         ((CachedRowSetImpl)rowset).setMatchColumn(columnIdx);
+
         addRowSet((Joinable)rowset);
     }
 
@@ -326,7 +337,7 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
     //validate if length of rowset array is same as length of int array.
      if(rowset.length != columnIdx.length) {
         throw new SQLException
-             (joinResBundle.handleGetObject("joinrowsetimpl.numnotequal").toString());
+             (resBundle.handleGetObject("joinrowsetimpl.numnotequal").toString());
      } else {
      	for(int i=0; i< rowset.length; i++) {
      	   ((CachedRowSetImpl)rowset[i]).setMatchColumn(columnIdx[i]);
@@ -373,7 +384,7 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 
      if(rowset.length != columnName.length) {
         throw new SQLException
-                 (joinResBundle.handleGetObject("joinrowsetimpl.numnotequal").toString());
+                 (resBundle.handleGetObject("joinrowsetimpl.numnotequal").toString());
      } else {
      	for(int i=0; i< rowset.length; i++) {
      	   ((CachedRowSetImpl)rowset[i]).setMatchColumn(columnName[i]);
@@ -532,13 +543,13 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
        if (type >= JoinRowSet.CROSS_JOIN && type <= JoinRowSet.FULL_JOIN) {	   
 	   if (type != JoinRowSet.INNER_JOIN) {
 	       // This 'if' will be removed after all joins are implemented.
-	       throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.notsupported").toString());	       
+               throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.notsupported").toString());
 	   } else {
 	      Integer Intgr = new Integer(JoinRowSet.INNER_JOIN);
 	      vecJoinType.add(Intgr);
 	   }
        } else {
-          throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.notdefined").toString());
+          throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.notdefined").toString());
        }  //end if
     }
 
@@ -573,7 +584,7 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 	       commenting this out for present
 	       
 	    if (!supportedJOINs[1]) {
-		throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.notsupported").toString());
+                throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.notsupported").toString());
 	    }
 	    
 	    */
@@ -631,9 +642,17 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 				
 		// total columns in the new CachedRowSet will be sum of both -1
 		// (common column)
+                int matchColumnCount = 0;
+                for(int i=0; i< crsInternal.getMatchColumnIndexes().length; i++) {
+                    if(crsInternal.getMatchColumnIndexes()[i] != -1)
+                        ++ matchColumnCount;
+                    else
+                        break;
+                }
+
 		rsmd.setColumnCount
 		    (crsInternal.getMetaData().getColumnCount() +
-		     cRowset.getMetaData().getColumnCount() - 1);		     
+                     cRowset.getMetaData().getColumnCount() - matchColumnCount);
 		
 		crsTemp.setMetaData(rsmd);				
 		crsInternal.beforeFirst();		
@@ -644,16 +663,20 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
                    	   }  		 
 		  if(crsInternal.next()) {		  	          
 		    cRowset.beforeFirst();
-		       
 		        for(int j = 1 ; j <= rowCount2 ; j++) {		         
 		         if( cRowset.isAfterLast()) {                   	       
                        		break;
                    	   }
 		        if(cRowset.next()) {			 			          	          	   
-                   	               
-	                  if (crsInternal.getObject(
-						  crsInternal.getMatchColumnIndexes()[0]).equals
-			   (cRowset.getObject(cRowset.getMatchColumnIndexes()[0]))) {
+                             boolean match = true;
+                             for(int k=0; k<matchColumnCount; k++) {
+                                 if (!crsInternal.getObject( crsInternal.getMatchColumnIndexes()[k]).equals
+                                         (cRowset.getObject(cRowset.getMatchColumnIndexes()[k]))) {
+                                     match = false;
+                                     break;
+                                 }
+                             }
+                             if (match) {
 			    
 			    int p;
 			    int colc = 0; 	// reset this variable everytime you loop
@@ -664,7 +687,14 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 			    for( p=1;
 				p<=crsInternal.getMetaData().getColumnCount();p++) {
   	                  
-				if ( p != cRowset.getMatchColumnIndexes()[0] ) {
+                                match = false;
+                                for(int k=0; k<matchColumnCount; k++) {
+                                 if (p == crsInternal.getMatchColumnIndexes()[k] ) {
+                                     match = true;
+                                     break;
+                                 }
+                                }
+                                    if ( !match ) {
 
 				    crsTemp.updateObject(++colc, crsInternal.getObject(p));
 				    // column type also needs to be passed.
@@ -695,7 +725,7 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 				    
 				    crsTemp.updateObject(++colc, crsInternal.getObject(p));
 
-				    rsmd.setColumnName(colc, "MergedCol");
+                                    rsmd.setColumnName(colc, crsInternal.getMetaData().getColumnName(p));
 				    rsmd.setTableName
 					(colc, crsInternal.getTableName()+
 					 "#"+
@@ -727,7 +757,14 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 			    for(int q=1;
 				q<= cRowset.getMetaData().getColumnCount();q++) {
 			   
-				if ( q != cRowset.getMatchColumnIndexes()[0] ) {
+                                match = false;
+                                for(int k=0; k<matchColumnCount; k++) {
+                                 if (q == cRowset.getMatchColumnIndexes()[k] ) {
+                                     match = true;
+                                     break;
+                                 }
+                                }
+                                    if ( !match ) {
 				    
 				    crsTemp.updateObject(++colc, cRowset.getObject(q));
 				    
@@ -743,10 +780,10 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 				      * So decrement value of 'p' by 1 else `p+q-1` will be out of range.
 				      **/
 				      
-				    if((p+q-1) > ((crsInternal.getMetaData().getColumnCount()) +
-				                  (cRowset.getMetaData().getColumnCount())     - 1)) {				    
-				       --p;
-				    }
+                                    //if((p+q-1) > ((crsInternal.getMetaData().getColumnCount()) +
+                                      //            (cRowset.getMetaData().getColumnCount())     - 1)) {
+                                      // --p;
+                                    //}
 		                    rsmd.setColumnType(p+q-1, cRowset.getMetaData().getColumnType(q));
 		                    rsmd.setAutoIncrement(p+q-1, cRowset.getMetaData().isAutoIncrement(q));
 		                    rsmd.setCaseSensitive(p+q-1, cRowset.getMetaData().isCaseSensitive(q));
@@ -763,6 +800,9 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 		                    rsmd.setSearchable(p+q-1, cRowset.getMetaData().isSearchable(q));
 		                    rsmd.setSigned(p+q-1, cRowset.getMetaData().isSigned(q));
 				}
+                                else {
+                                    --p;
+                                }
 			    }
 			    crsTemp.insertRow();
 			    crsTemp.moveToCurrentRow();
@@ -785,9 +825,10 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 		// Now the join is done.
 	       // Make crsInternal = crsTemp, to be ready for next merge, if at all.
 
-		int pCol = crsInternal.getMatchColumnIndexes()[0];
+                int[] pCol = new int[matchColumnCount];
+                for(int i=0; i<matchColumnCount; i++)
+                   pCol[i] = crsInternal.getMatchColumnIndexes()[i];
 
-		crsInternal = new CachedRowSetImpl();
 		crsInternal = (CachedRowSetImpl)crsTemp.createCopy();
 
 		// Because we add the first rowset as crsInternal to the
@@ -805,10 +846,10 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
 	} catch(SQLException sqle) {
 	    // %%% Exception should not dump here:
 	    sqle.printStackTrace();
-	    throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.initerror").toString() + sqle);
+            throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.initerror").toString() + sqle);
 	} catch (Exception e) {
             e.printStackTrace();
-	    throw new SQLException(joinResBundle.handleGetObject("joinrowsetimpl.genericerr").toString() + e);
+            throw new SQLException(resBundle.handleGetObject("joinrowsetimpl.genericerr").toString() + e);
 	}
     }
 
@@ -4133,6 +4174,138 @@ public class JoinRowSetImpl extends WebRowSetImpl implements JoinRowSet {
         Integer i = (Integer)(vecJoinType.get(vecJoinType.size()-1));        
         return i.intValue();                
     }
+
+    /**
+    * The listener will be notified whenever an event occurs on this <code>JoinRowSet</code>
+    * object.
+    * <P>
+    * A listener might, for example, be a table or graph that needs to
+    * be updated in order to accurately reflect the current state of
+    * the <code>RowSet</code> object.
+    * <p>
+    * <b>Note</b>: if the <code>RowSetListener</code> object is
+    * <code>null</code>, this method silently discards the <code>null</code>
+    * value and does not add a null reference to the set of listeners.
+    * <p>
+    * <b>Note</b>: if the listener is already set, and the new <code>RowSetListerner</code>
+    * instance is added to the set of listeners already registered to receive
+    * event notifications from this <code>RowSet</code>.
+    *
+    * @param listener an object that has implemented the
+    *     <code>javax.sql.RowSetListener</code> interface and wants to be notified
+    *     of any events that occur on this <code>JoinRowSet</code> object; May be
+    *     null.
+    * @see #removeRowSetListener
+    */
+    public void addRowSetListener(RowSetListener listener) {
+        crsInternal.addRowSetListener(listener);
+    }
+
+    /**
+    * Removes the designated object from this <code>JoinRowSet</code> object's list of listeners.
+    * If the given argument is not a registered listener, this method
+    * does nothing.
+    *
+    *  <b>Note</b>: if the <code>RowSetListener</code> object is
+    * <code>null</code>, this method silently discards the <code>null</code>
+    * value.
+    *
+    * @param listener a <code>RowSetListener</code> object that is on the list
+    *        of listeners for this <code>JoinRowSet</code> object
+    * @see #addRowSetListener
+    */
+     public void removeRowSetListener(RowSetListener listener) {
+        crsInternal.removeRowSetListener(listener);
+    }
+
+    /**
+     * Converts this <code>JoinRowSetImpl</code> object to a collection
+     * of tables. The sample implementation utilitizes the <code>TreeMap</code>
+     * collection type.
+     * This class guarantees that the map will be in ascending key order,
+     * sorted according to the natural order for the key's class.
+     *
+     * @return a <code>Collection</code> object consisting of tables,
+     *         each of which is a copy of a row in this
+     *         <code>JoinRowSetImpl</code> object
+     * @throws SQLException if an error occurs in generating the collection
+     * @see #toCollection(int)
+     * @see #toCollection(String)
+     * @see java.util.TreeMap
+     */
+     public Collection<?> toCollection() throws SQLException {
+        return crsInternal.toCollection();
+    }
+
+    /**
+     * Returns the specified column of this <code>JoinRowSetImpl</code> object
+     * as a <code>Collection</code> object.  This method makes a copy of the
+     * column's data and utilitizes the <code>Vector</code> to establish the
+     * collection. The <code>Vector</code> class implements a growable array
+     * objects allowing the individual components to be accessed using an
+     * an integer index similar to that of an array.
+     *
+     * @return a <code>Collection</code> object that contains the value(s)
+     *         stored in the specified column of this
+     *         <code>JoinRowSetImpl</code>
+     *         object
+     * @throws SQLException if an error occurs generated the collection; or
+     *          an invalid column is provided.
+     * @see #toCollection()
+     * @see #toCollection(String)
+     * @see java.util.Vector
+     */
+    public Collection<?> toCollection(int column) throws SQLException {
+        return crsInternal.toCollection(column);
+    }
+
+    /**
+     * Returns the specified column of this <code>JoinRowSetImpl</code> object
+     * as a <code>Collection</code> object.  This method makes a copy of the
+     * column's data and utilitizes the <code>Vector</code> to establish the
+     * collection. The <code>Vector</code> class implements a growable array
+     * objects allowing the individual components to be accessed using an
+     * an integer index similar to that of an array.
+     *
+     * @return a <code>Collection</code> object that contains the value(s)
+     *         stored in the specified column of this
+     *         <code>JoinRowSetImpl</code>
+     *         object
+     * @throws SQLException if an error occurs generated the collection; or
+     *          an invalid column is provided.
+     * @see #toCollection()
+     * @see #toCollection(int)
+     * @see java.util.Vector
+     */
+    public Collection<?> toCollection(String column) throws SQLException {
+        return crsInternal.toCollection(column);
+    }
+
+    /**
+     * Creates a <code>RowSet</code> object that is a copy of
+     * this <code>JoinRowSetImpl</code> object's table structure
+     * and the constraints only.
+     * There will be no data in the object being returned.
+     * Updates made on a copy are not visible to the original rowset.
+     * <P>
+     * This helps in getting the underlying XML schema which can
+     * be used as the basis for populating a <code>WebRowSet</code>.
+     *
+     * @return a new <code>CachedRowSet</code> object that is a copy
+     * of this <code>JoinRowSetImpl</code> object's schema and
+     * retains all the constraints on the original rowset but contains
+     * no data
+     * @throws SQLException if an error occurs in generating the copy
+     * of the <code>CachedRowSet</code> object
+     * @see #createShared
+     * @see #createCopy
+     * @see #createCopyNoConstraints
+     * @see javax.sql.RowSetEvent
+     * @see javax.sql.RowSetListener
+     */
+     public CachedRowSet createCopySchema() throws SQLException {
+         return crsInternal.createCopySchema();
+     }
 
 	static final long serialVersionUID = -5590501621560008453L;
 }

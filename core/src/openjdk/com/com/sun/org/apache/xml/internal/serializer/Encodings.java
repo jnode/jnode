@@ -43,7 +43,6 @@ import java.security.AccessController;
  * to override encoding names and provide the last printable character
  * for each encoding.
  *
- * @version $Revision: 1.3 $ $Date: 2005/09/28 13:49:04 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  */
 

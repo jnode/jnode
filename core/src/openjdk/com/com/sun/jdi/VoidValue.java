@@ -49,4 +49,3 @@ public interface VoidValue extends Value {
      */
     int hashCode();
 }
-

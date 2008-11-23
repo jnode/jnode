@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)ISO_8859_1.java	1.22 07/05/05
- */
+
 
 package sun.nio.cs;
 

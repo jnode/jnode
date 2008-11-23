@@ -38,7 +38,6 @@ package sun.net;
  * Subclassers can override or extend this behavior to support different
  * or additional canonicalization policies.
  *
- * @version 	1.19, 05/05/07
  * @author	Steve Byrne
  */
  
@@ -126,5 +125,3 @@ public class URLCanonicalizer {
 	return true;
     }
 }
-
-

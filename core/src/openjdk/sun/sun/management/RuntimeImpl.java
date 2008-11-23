@@ -132,7 +132,7 @@ class RuntimeImpl implements RuntimeMXBean {
 
     public Map<String,String> getSystemProperties() {
         Properties sysProps = System.getProperties();
-        Map<String,String> map = new HashMap();
+        Map<String,String> map = new HashMap<String, String>();
 
         // Properties.entrySet() does not include the entries in
         // the default properties.  So use Properties.stringPropertyNames()
@@ -146,4 +146,3 @@ class RuntimeImpl implements RuntimeMXBean {
         return map;
     }
 }
-

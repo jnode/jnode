@@ -33,7 +33,6 @@ import java.util.*;
  * This is a schema of encodings which incorporates varying lengths,
  * varying degrees of length variability, and varying amounts of signed-ness.
  * @author John Rose
- * @version 1.21, 05/05/07
  */
 class Coding implements Constants, Comparable, CodingMethod, Histogram.BitMetric {
     /*

@@ -134,7 +134,7 @@ final class CramMD5Server extends CramMD5Base implements SaslServer {
 		    "CRAMSRV01:Generated challenge: {0}", challengeStr);
 	    
 		challengeData = challengeStr.getBytes("UTF8");
-		return (byte[]) challengeData.clone();
+                return challengeData.clone();
 
 	    } else {
 		// Examine response to see if correctly encrypted challengeData

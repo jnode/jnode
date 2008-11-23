@@ -210,6 +210,13 @@ public class NodeSequence extends XObject
    */
   public void setRoot(int nodeHandle, Object environment)
   {
+        // If root is DTM.NULL, then something's wrong with the context
+        if (nodeHandle == DTM.NULL) 
+        {
+            throw new RuntimeException("Unable to evaluate expression using " +
+                    "this context");
+        }
+        
   	if(null != m_iter)
   	{
   		XPathContext xctxt = (XPathContext)environment;
@@ -643,4 +650,3 @@ public class NodeSequence extends XObject
       return insertIndex;
     } // end addNodeInDocOrder(Vector v, Object obj)
 }
-

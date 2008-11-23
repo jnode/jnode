@@ -35,7 +35,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
 /**
  * Define the main data structure transmitted by pack/unpack.
  * @author John Rose
- * @version 1.34, 05/05/07
  */
 class Package implements Constants {
     int verbose;
@@ -1303,5 +1302,3 @@ class Package implements Constants {
     static final List noMethods = Arrays.asList(new Class.Method[0]);
     static final List noInnerClasses = Arrays.asList(new InnerClass[0]);
 }
-
-

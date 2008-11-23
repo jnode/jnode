@@ -150,7 +150,6 @@ import sun.security.util.AuthResources;
  *                  have completed.
  * </pre>
  *
- * @version 1.19, 05/05/07
  */
 public class JndiLoginModule implements LoginModule {
 

@@ -33,7 +33,6 @@ import javax.naming.*;
  * The Header class represents the header of a DNS message.
  *
  * @author Scott Seligman
- * @version 1.12 07/05/05
  */
 
 

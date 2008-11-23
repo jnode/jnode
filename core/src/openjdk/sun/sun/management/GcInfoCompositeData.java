@@ -183,8 +183,7 @@ public class GcInfoCompositeData extends LazyCompositeData {
             getMemoryUsageBeforeGc(CompositeData cd) {
         try {
             TabularData td = (TabularData) cd.get(MEMORY_USAGE_BEFORE_GC);
-            return (Map<String,MemoryUsage>)
-                memoryUsageMapType.toJavaTypeData(td);
+            return cast(memoryUsageMapType.toJavaTypeData(td));
         } catch (InvalidObjectException e) {
             // Should never reach here
             throw Util.newAssertionError(e);
@@ -193,12 +192,17 @@ public class GcInfoCompositeData extends LazyCompositeData {
             throw Util.newAssertionError(e);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, MemoryUsage> cast(Object x) {
+        return (Map<String, MemoryUsage>) x;
+    }
     public static Map<String, MemoryUsage> 
             getMemoryUsageAfterGc(CompositeData cd) {
         try {
             TabularData td = (TabularData) cd.get(MEMORY_USAGE_AFTER_GC);
-            return (Map<String,MemoryUsage>)
-                memoryUsageMapType.toJavaTypeData(td);
+            //return (Map<String,MemoryUsage>)
+            return cast(memoryUsageMapType.toJavaTypeData(td));
         } catch (InvalidObjectException e) {
             // Should never reach here
             throw Util.newAssertionError(e);

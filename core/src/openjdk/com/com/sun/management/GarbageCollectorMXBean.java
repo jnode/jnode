@@ -35,7 +35,6 @@ import javax.management.openmbean.CompositeType;
  * collection implementation that supports this extension.
  *
  * @author  Mandy Chung
- * @version 1.13, 05/05/07
  * @since   1.5
  */
 public interface GarbageCollectorMXBean

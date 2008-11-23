@@ -53,7 +53,6 @@ import javax.sql.rowset.spi.*;
  * Standard JDBC RowSet implementations provide an object instance of this
  * writer by invoking the <code>SyncProvider.getRowSetWriter()</code> method.
  *
- * @version 0.2
  * @author Jonathan Bruce
  * @see javax.sql.rowset.spi.SyncProvider
  * @see javax.sql.rowset.spi.SyncFactory
@@ -191,6 +190,16 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
  */
     private int iChangedValsinDbOnly ;
 
+    private JdbcRowSetResourceBundle resBundle;
+
+    public CachedRowSetWriter() {
+       try {
+               resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+       } catch(IOException ioe) {
+               throw new RuntimeException(ioe);
+       }
+    }
+
 /**
  * Propagates changes in the given <code>RowSet</code> object
  * back to its underlying data source and returns <code>true</code>
@@ -265,8 +274,9 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
 
         con = reader.connect(caller);
 
+
         if (con == null) {
-            throw new SQLException("Unable to get Connection");
+            throw new SQLException(resBundle.handleGetObject("crswriter.connect").toString());
         }
      
         /*
@@ -301,7 +311,7 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
         this.crsResolve.setMetaData(rsmdResolv);
 
         // moved outside the insert inner loop
-        pstmtIns = con.prepareStatement(insertCmd);
+        //pstmtIns = con.prepareStatement(insertCmd);
 
         if (callerColumnCount < 1) {
             // No data, so return success.
@@ -330,6 +340,8 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
 
            } else if (crs.rowInserted()) {
     	        // The row has been inserted.
+
+                pstmtIns = con.prepareStatement(insertCmd);
 		        if ( (conflict = insertNewRow(crs, pstmtIns, this.crsResolve)) == true) {
 		          status.add(rows, new Integer(SyncResolver.INSERT_ROW_CONFLICT));
                 } else {
@@ -371,6 +383,7 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
       } //end while
 
         // close the insert statement
+        if(pstmtIns!=null)
         pstmtIns.close();
         // reset
         crs.setShowDeleted(showDel);
@@ -389,8 +402,7 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
         this.crsResolve.beforeFirst();
 
     if(boolConf) {
-
-        SyncProviderException spe = new SyncProviderException(status.size() - 1+" conflicts while synchronizing ");
+        SyncProviderException spe = new SyncProviderException(status.size() - 1+resBundle.handleGetObject("crswriter.conflictsno").toString());
         //SyncResolver syncRes = spe.getSyncResolver();
 
          SyncResolverImpl syncResImpl = (SyncResolverImpl) spe.getSyncResolver();
@@ -780,9 +792,13 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
             primaryKeys[k] = pkcolname;
             k++;
         }
+
         if(rs.next()) {
             for(int j=0;j<primaryKeys.length;j++) {
                 if(primaryKeys[j] != null) {
+                    if(crs.getObject(primaryKeys[j]) == null){
+                        break;
+                    }
                     String crsPK = (crs.getObject(primaryKeys[j])).toString();
                     String rsPK = (rs.getObject(primaryKeys[j])).toString();
                     if(crsPK.equals(rsPK)) {
@@ -1010,7 +1026,7 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
              */
             table = callerMd.getTableName(1);
             if (table == null || table.length() == 0) {
-                throw new SQLException("writeData cannot determine the table name.");
+                throw new SQLException(resBundle.handleGetObject("crswriter.tname").toString());
             }
 	}
         String catalog = callerMd.getCatalogName(1);
@@ -1306,6 +1322,18 @@ public class CachedRowSetWriter implements TransactionalWriter, Serializable {
      */
     public void commit() throws SQLException {
         con.commit();
+        if (reader.getCloseConnection() == true) {
+            con.close();
+        }
+    }
+
+     public void commit(CachedRowSetImpl crs, boolean updateRowset) throws SQLException {
+        con.commit();
+        if(updateRowset) {
+          if(crs.getCommand() != null)
+            crs.execute(con);
+        }
+
         if (reader.getCloseConnection() == true) {
             con.close();
         }

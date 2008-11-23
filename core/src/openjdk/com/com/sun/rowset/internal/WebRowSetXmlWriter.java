@@ -25,20 +25,15 @@
 
 package com.sun.rowset.internal;
 
+import com.sun.rowset.JdbcRowSetResourceBundle;
 import java.sql.*;
 import javax.sql.*;
 import java.io.*;
-import java.math.*;
+import java.text.MessageFormat;
 import java.util.*;
-import java.text.*;
-
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
 
 import javax.sql.rowset.*;
 import javax.sql.rowset.spi.*;
-import com.sun.rowset.providers.*;
 
 /**
  * An implementation of the <code>XmlWriter</code> interface, which writes a
@@ -61,6 +56,17 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
      * <code>WebRowSet</code> object as an XML document.
      */
     private java.util.Stack stack;
+
+    private  JdbcRowSetResourceBundle resBundle;
+
+    public WebRowSetXmlWriter() {
+
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
 
     /**
      * Writes the given <code>WebRowSet</code> object as an XML document
@@ -144,7 +150,7 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
 		endHeader();
 		
             } catch (java.io.IOException ex) {
-                throw new SQLException("IOException: " + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("wrsxmlwriter.ioex").toString(), ex.getMessage()));
             }
     }
 
@@ -250,7 +256,7 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
 	    endSection("sync-provider");
 	    
 	} catch (SQLException ex) {
-	    throw new java.io.IOException("SQLException: " + ex.getMessage());
+            throw new java.io.IOException(MessageFormat.format(resBundle.handleGetObject("wrsxmlwriter.sqlex").toString(), ex.getMessage()));
 	}
 
 	endSection("properties");
@@ -296,7 +302,7 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
 		endSection("column-definition");
 	    }
 	} catch (SQLException ex) {
-	    throw new java.io.IOException("SQLException: " + ex.getMessage());
+            throw new java.io.IOException(MessageFormat.format(resBundle.handleGetObject("wrsxmlwriter.sqlex").toString(), ex.getMessage()));
 	}
 
 	endSection("metadata");
@@ -351,7 +357,7 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
 	    }
 	    endSection("data");
         } catch (SQLException ex) {
-	    throw new java.io.IOException("SQLException: " + ex.getMessage());
+            throw new java.io.IOException(MessageFormat.format(resBundle.handleGetObject("wrsxmlwriter.sqlex").toString(), ex.getMessage()));
         }
     }
 
@@ -440,12 +446,11 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
 		writeStringData(caller.getString(idx));
 		break;
 	    default:
-		System.out.println("Not a proper type");
+                    System.out.println(resBundle.handleGetObject("wsrxmlwriter.notproper").toString());
 		//Need to take care of BLOB, CLOB, Array, Ref here
 	    }
 	} catch (SQLException ex) {
-	    throw new java.io.IOException("Failed to writeValue: " + 
-		ex.getMessage());
+            throw new java.io.IOException(resBundle.handleGetObject("wrsxmlwriter.failedwrite").toString()+ ex.getMessage());
 	}
     }
     
@@ -632,17 +637,14 @@ public class WebRowSetXmlWriter implements XmlWriter, Serializable {
     
     private String processSpecialCharacters(String s) {
     
-       if(s == null)
-       {
+        if(s == null) {
           return null;
        }
        char []charStr = s.toCharArray();
        String specialStr = new String();
              
-       for(int i = 0; i < charStr.length; i++)
-       {
-          if(charStr[i] == '&')
-          {
+        for(int i = 0; i < charStr.length; i++) {
+            if(charStr[i] == '&') {
              specialStr = specialStr.concat("&amp;");  
           } else if(charStr[i] == '<') {
              specialStr = specialStr.concat("&lt;");

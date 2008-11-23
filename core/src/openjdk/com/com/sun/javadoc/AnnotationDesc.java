@@ -31,7 +31,6 @@ package com.sun.javadoc;
  * An annotation associates a value with each element of an annotation type.
  * 
  * @author Scott Seligman
- * @version 1.10 07/05/05
  * @since 1.5
  */
 public interface AnnotationDesc {
@@ -59,7 +58,6 @@ public interface AnnotationDesc {
      * and one of its values.
      * 
      * @author Scott Seligman
-     * @version 1.10 07/05/05
      * @since 1.5
      */
     public interface ElementValuePair {

@@ -221,10 +221,3 @@ public interface MessageStruct {
     public Method getMethod();
 
 } // end MessageStruct
-
-
-
-
-
-
-

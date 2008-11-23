@@ -50,7 +50,6 @@ import com.sun.org.apache.xml.internal.resolver.CatalogException;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class TR9401CatalogReader extends TextCatalogReader {
 

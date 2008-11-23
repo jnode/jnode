@@ -71,7 +71,7 @@ abstract class NotificationEmitterSupport implements NotificationEmitter {
 	   efficient solution would be to clone the listener list
 	   every time a notification is sent.  */
 	synchronized (listenerLock) {
-	    List newList = new ArrayList(listenerList.size() + 1);
+            List<ListenerInfo> newList = new ArrayList<ListenerInfo>(listenerList.size() + 1);
 	    newList.addAll(listenerList);
 	    newList.add(new ListenerInfo(listener, filter, handback));
 	    listenerList = newList;
@@ -82,7 +82,7 @@ abstract class NotificationEmitterSupport implements NotificationEmitter {
         throws ListenerNotFoundException {
 
 	synchronized (listenerLock) {
-	    List newList = new ArrayList(listenerList);
+            List<ListenerInfo> newList = new ArrayList<ListenerInfo>(listenerList);
 	    /* We scan the list of listeners in reverse order because
 	       in forward order we would have to repeat the loop with
 	       the same index after a remove.  */
@@ -106,7 +106,7 @@ abstract class NotificationEmitterSupport implements NotificationEmitter {
 	boolean found = false;
 
 	synchronized (listenerLock) {
-	    List newList = new ArrayList(listenerList);
+            List<ListenerInfo> newList = new ArrayList<ListenerInfo>(listenerList);
 	    final int size = newList.size();
 	    for (int i = 0; i < size; i++) {
 		ListenerInfo li = (ListenerInfo) newList.get(i);
@@ -141,7 +141,7 @@ abstract class NotificationEmitterSupport implements NotificationEmitter {
 	    return;
 	}
         
-	List currentList;
+        List<ListenerInfo> currentList;
 	synchronized (listenerLock) {
 	    currentList = listenerList;
 	}
@@ -192,7 +192,7 @@ abstract class NotificationEmitterSupport implements NotificationEmitter {
      * listeners end up depending on other threads that are themselves
      * accessing this NotificationBroadcasterSupport.
      */
-    private List listenerList = Collections.EMPTY_LIST;
+    private List<ListenerInfo> listenerList = Collections.emptyList();
 
     abstract public MBeanNotificationInfo[] getNotificationInfo();
 }

@@ -207,7 +207,7 @@ public class TextCallbackHandler implements CallbackHandler {
 	    String[] optionStrings = confirmation.getOptions();
 	    options = new OptionInfo[optionStrings.length];
 	    for (int i = 0; i < options.length; i++) {
-		options[i].value = i;
+                options[i] = new OptionInfo(optionStrings[i], i);
 	    }
 	    break;
 	default:

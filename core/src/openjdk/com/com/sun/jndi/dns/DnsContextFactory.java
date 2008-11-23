@@ -48,7 +48,6 @@ import sun.net.dns.ResolverConfiguration;	// available since 1.4.1
  * If the property is not set, the default "dns:" is used.
  *
  * @author Scott Seligman
- * @version 1.18 07/05/05
  */
 
 

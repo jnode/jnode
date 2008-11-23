@@ -123,4 +123,3 @@ public abstract class Authenticator {
      */
     public abstract Result authenticate (HttpExchange exch);
 }
-

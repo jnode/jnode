@@ -68,10 +68,3 @@ public interface Encoder {
     public ByteBuffer encode(MessageInfo messageInfo);
 
 } // end Encoder
-
-
-
-
-
-
-

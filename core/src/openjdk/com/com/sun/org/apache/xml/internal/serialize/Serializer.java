@@ -54,7 +54,6 @@ import org.xml.sax.DocumentHandler;
  * UTF-8 encoding and now indentation.
  * 
  *
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:17 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:Scott_Boag/CAM/Lotus@lotus.com">Scott Boag</a>
  * @see DocumentHandler
@@ -122,8 +121,3 @@ public interface Serializer
 
 
 }
-
-
-
-
-

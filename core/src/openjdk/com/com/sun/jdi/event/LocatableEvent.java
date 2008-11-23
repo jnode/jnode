@@ -46,5 +46,3 @@ public interface LocatableEvent extends Event, Locatable {
      */
     public ThreadReference thread();
 }
-    
-

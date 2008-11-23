@@ -34,7 +34,6 @@ import java.security.cert.CertificateException;
  * Implementations must be instantiable using a zero-argument constructor.
  *
  * @since 1.5
- * @version 1.9, 05/05/07
  * @author Vincent Ryan
  */
 

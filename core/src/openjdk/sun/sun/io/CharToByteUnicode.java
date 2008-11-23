@@ -31,7 +31,6 @@ import java.io.*;
  * Convert arrays containing Unicode characters into arrays of bytes, using the
  * platform-default byte order.
  *
- * @version 	1.24, 07/05/05
  * @author	Mark Reinhold
  */
 

@@ -41,7 +41,6 @@ import javax.naming.spi.NamingManager;
  * A RegistryContext is a context representing a remote RMI registry.
  *
  * @author Scott Seligman
- * @version 1.19 07/05/05
  */
 
 

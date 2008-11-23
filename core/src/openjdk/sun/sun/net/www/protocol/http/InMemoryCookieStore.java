@@ -41,7 +41,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A simple in-memory java.net.CookieStore implementation
  *
- * @version %I%, %E%
  * @author Edward Wang
  * @since 1.6
  */

@@ -299,8 +299,7 @@ final class DigestMD5Server extends DigestMD5Base implements SaslServer {
 	// Realms (>= 0)
 	for (int i = 0; realms != null && i < realms.size(); i++) {
 	    out.write("realm=\"".getBytes(encoding));
-	    writeQuotedStringValue(out, 
-		((String)(realms.get(i))).getBytes(encoding));
+            writeQuotedStringValue(out, realms.get(i).getBytes(encoding));
 	    out.write('"');
 	    out.write(',');
 	}

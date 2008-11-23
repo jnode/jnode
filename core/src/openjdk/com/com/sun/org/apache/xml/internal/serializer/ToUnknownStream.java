@@ -270,6 +270,27 @@ public final class ToUnknownStream extends SerializerBase
         String localName,
         String rawName,
         String type,
+        String value)
+        throws SAXException
+    {
+        addAttribute(uri, localName, rawName, type, value, false);
+    }
+
+    /**
+     * Adds an attribute to the currenly open tag
+     * @param uri the URI of a namespace
+     * @param localName the attribute name, without prefix
+     * @param rawName the attribute name, with prefix (if any)
+     * @param type the type of the attribute, typically "CDATA"
+     * @param value the value of the parameter
+     * @param XSLAttribute true if this attribute is coming from an xsl:attribute element
+     * @see ExtendedContentHandler#addAttribute(String, String, String, String, String)
+     */
+    public void addAttribute(
+        String uri,
+        String localName,
+        String rawName,
+        String type,
         String value,
         boolean XSLAttribute)
         throws SAXException

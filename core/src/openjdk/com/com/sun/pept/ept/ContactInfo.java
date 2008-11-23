@@ -56,10 +56,3 @@ public interface ContactInfo extends EPTFactory {
     public Connection getConnection(MessageInfo messageInfo);
 
 } // end ContactInfo
-
-
-
-
-
-
-

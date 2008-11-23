@@ -38,7 +38,6 @@ import org.xml.sax.*;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public interface SAXCatalogParser extends ContentHandler, DocumentHandler {
     /** Set the Catalog for which parsing is being performed. */

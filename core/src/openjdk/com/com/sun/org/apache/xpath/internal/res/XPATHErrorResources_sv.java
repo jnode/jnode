@@ -1249,5 +1249,3 @@ public static final int MAX_CODE = 108;  // this is needed to keep track of the 
   public static final String QUERY_HEADER = "M\u00d6NSTER ";
 
 }
-
-

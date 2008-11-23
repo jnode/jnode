@@ -45,7 +45,6 @@ import java.util.Hashtable;
  * <p> All access is unsynchronized.
  *
  * @author Scott Seligman
- * @version 1.12 07/05/05
  */
 
 

@@ -29,7 +29,6 @@ package sun.management.counter;
  * Interface for performance counter wrapping <code>byte[]</code> objects.
  *
  * @author   Brian Doherty
- * @version  1.10, 05/05/07
  */
 public interface ByteArrayCounter extends Counter {
 

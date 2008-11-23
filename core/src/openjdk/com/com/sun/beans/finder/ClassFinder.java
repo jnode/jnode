@@ -30,7 +30,6 @@ package com.sun.beans.finder;
  *
  * @since 1.7
  *
- * @version 1.8 05/05/07
  * @author Sergey A. Malenkov
  */
 public final class ClassFinder {

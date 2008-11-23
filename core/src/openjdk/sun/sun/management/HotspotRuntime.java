@@ -27,6 +27,8 @@ package sun.management;
 
 import java.util.List;
 import java.util.ArrayList;
+import sun.management.counter.Counter;
+
 
 /**
  * Implementation class of HotspotRuntimeMBean interface.
@@ -69,7 +71,7 @@ class HotspotRuntime
         JAVA_RT + "|" + COM_SUN_RT + "|" + SUN_RT + "|" +
         JAVA_PROPERTY + "|" + COM_SUN_PROPERTY + "|" + SUN_PROPERTY;
 
-    public java.util.List getInternalRuntimeCounters() {
+    public java.util.List<Counter> getInternalRuntimeCounters() {
         return jvm.getInternalCounters(RT_COUNTER_NAME_PATTERN); 
     } 
 }

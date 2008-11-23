@@ -30,7 +30,6 @@ package com.sun.naming.internal;
  * A NamedWeakReference is a WeakReference with an immutable string name.
  *
  * @author Scott Seligman
- * @version 1.11 07/05/05
  */
 
 

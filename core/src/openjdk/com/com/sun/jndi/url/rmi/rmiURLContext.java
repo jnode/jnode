@@ -45,7 +45,6 @@ import com.sun.jndi.rmi.registry.RegistryContext;
  * Otherwise, the URL resolves to the specified RMI registry.
  *
  * @author Scott Seligman
- * @version 1.14 07/05/05
  */
 public class rmiURLContext extends GenericURLContext {
 
