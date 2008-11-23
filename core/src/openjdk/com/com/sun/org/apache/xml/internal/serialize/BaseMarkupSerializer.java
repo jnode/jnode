@@ -121,7 +121,6 @@ import org.xml.sax.ext.LexicalHandler;
  * another element.
  *
  *
- * @version $Revision: 1.4 $ $Date: 2006/01/23 06:47:25 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:rahul.srivastava@sun.com">Rahul Srivastava</a>
  * @author Elena Litani, IBM 

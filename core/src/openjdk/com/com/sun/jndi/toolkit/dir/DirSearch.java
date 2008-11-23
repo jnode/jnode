@@ -68,5 +68,3 @@ public class DirSearch {
 	return search(ctx, strfilter, cons);
     }
 }	
-
-

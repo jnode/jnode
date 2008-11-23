@@ -96,4 +96,3 @@ class SimpleClientId extends ClientId {
 	return super.toString() + ":" + username; // omit password for security
     }
 }
-

@@ -44,7 +44,6 @@ import java.io.UnsupportedEncodingException;
  * stamp and interval measurement purposes.
  *
  * @author   Brian Doherty
- * @version  1.14, 05/05/07
  * @since    1.4.2
  * @see      #getPerf
  * @see      sun.misc.Perf$GetPerfAction
@@ -71,7 +70,7 @@ public final class Perf {
      * <blockquote><pre>
      * class MyTrustedClass {
      *   private static final Perf perf =
-     *       (Perf)AccessController.doPrivileged(new Perf.GetPerfAction());
+     *       AccessController.doPrivileged(new Perf.GetPerfAction<Perf>());
      *   ...
      * }
      * </pre></blockquote>
@@ -87,14 +86,14 @@ public final class Perf {
      * @see  java.security.AccessController#doPrivileged(PrivilegedAction)
      * @see  java.lang.RuntimePermission
      */
-    public static class GetPerfAction implements PrivilegedAction
+    public static class GetPerfAction implements PrivilegedAction<Perf>
     {
         /**
          * Run the <code>Perf.getPerf()</code> method in a privileged context.
          *
          * @see #getPerf
          */
-        public Object run() {
+        public Perf run() {
             return getPerf();
         }
     }

@@ -31,7 +31,6 @@ import java.io.*;
  * Convert byte arrays containing Unicode characters into arrays of actual
  * Unicode characters, assuming a big-endian byte order.
  *
- * @version 	1.18, 07/05/05
  * @author	Mark Reinhold
  */
 

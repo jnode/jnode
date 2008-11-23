@@ -46,7 +46,6 @@ import java.util.HashSet;
 /**
  * The DnsClient class performs DNS client operations in support of DnsContext.
  *
- * @version 1.27 07/05/05
  */
 
 public class DnsClient {
@@ -522,7 +521,7 @@ public class DnsClient {
 	//
 	if (debug) {
 	    dprint("LOOKUP for: " + xid +
-		"	Response Q:" + resps);
+                "\tResponse Q:" + resps);
 	}
 	byte[] pkt;
 	if ((pkt = (byte[]) resps.get(xid)) != null) {

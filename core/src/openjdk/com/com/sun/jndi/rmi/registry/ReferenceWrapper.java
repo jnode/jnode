@@ -38,7 +38,6 @@ import javax.naming.*;
  * Reference accessible to clients.
  *
  * @author Scott Seligman
- * @version 1.14 07/05/05
  */
 
 

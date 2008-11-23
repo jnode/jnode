@@ -65,8 +65,12 @@ import org.xml.sax.ext.LexicalHandler;
  * and the only requirement is that deliverMoreNodes(false) be called if you want to
  * discard the rest of the stream and the previous deliverMoreNodes() didn't return
  * false.
+ *
+ * This class is final and package private for security reasons. Please
+ * see CR 6537912 for further details.
+ *
  * */
-public class IncrementalSAXSource_Filter
+final class IncrementalSAXSource_Filter
 implements IncrementalSAXSource, ContentHandler, DTDHandler, LexicalHandler, ErrorHandler, Runnable
 {
   boolean DEBUG=false; //Internal status report

@@ -678,4 +678,3 @@ public class DOM2DTMdefaultNamespaceDeclarationNode implements Attr,TypeInfo
         return null;
     }
 }
-

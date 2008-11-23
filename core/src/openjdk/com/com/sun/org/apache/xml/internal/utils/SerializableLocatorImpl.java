@@ -40,7 +40,6 @@ package com.sun.org.apache.xml.internal.utils;
  * @see org.xml.sax.Locator Locator
  * @since XalanJ2
  * @author Joe Kesselman
- * @version 1.0
  */
 public class SerializableLocatorImpl
 implements org.xml.sax.Locator, java.io.Serializable

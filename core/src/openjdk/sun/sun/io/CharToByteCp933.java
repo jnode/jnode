@@ -483,4 +483,3 @@ public class CharToByteCp933 extends CharToByteConverter
         return true;
     }
 }
-

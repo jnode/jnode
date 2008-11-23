@@ -35,6 +35,8 @@ import javax.sql.*;
 
 import javax.sql.rowset.*;
 import com.sun.rowset.*;
+import java.io.IOException;
+import java.text.MessageFormat;
 
 /**
  * The document handler that receives parse events that an XML parser sends while it
@@ -415,6 +417,8 @@ public class XmlReaderContentHandler extends DefaultHandler {
      */
     private final static int DATA = 3;
 
+    private  JdbcRowSetResourceBundle resBundle;
+
     /**
      * Constructs a new <code>XmlReaderContentHandler</code> object that will
      * assist the SAX parser in reading a <code>WebRowSet</code> object in the
@@ -446,6 +450,12 @@ public class XmlReaderContentHandler extends DefaultHandler {
 	tempStr = "";	
 	tempUpdate = "";
 	tempCommand = "";
+
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     /**
@@ -652,8 +662,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		          typeMap.put(Key_map,Class.forName(Value_map));
 		        
 		        }catch(ClassNotFoundException ex) {
-		     	  throw new SAXException("Error setting Map: " +
-					   ex.getMessage());
+                          throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errmap").toString(), ex.getMessage()));
 		        }
 		      break;
 		      
@@ -686,8 +695,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		    rs.setMetaData(md);
 		    state = INITIAL;
 		} catch (SQLException ex) {
-		    throw new SAXException("Error setting Metadata: " +
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errmetadata").toString(), ex.getMessage()));
 		}
 	    } else {
 		try {		     
@@ -698,8 +706,8 @@ public class XmlReaderContentHandler extends DefaultHandler {
 			setMetaDataValue(metaDataValue);
 		    }
 		} catch (SQLException ex) {
-		    throw new SAXException("Error setting Metadata: " +
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errmetadata").toString(), ex.getMessage()));
+
 		}    
 		// metaDataValue needs to be reset to an empty string
 		metaDataValue = new String("");
@@ -730,8 +738,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		    // columnValue now need to be reset to the empty string
 		    columnValue = new String("");
 		} catch (SQLException ex) {
-		    throw new SAXException("Error inserting values: " +
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errinsert").toString(), ex.getMessage()));
 		}
 		break;
 	    case RowTag:
@@ -746,8 +753,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		    
 		    applyUpdates();
 		} catch (SQLException ex) {
-		    throw new SAXException("Error constructing row: " +
-					   ex.getMessage());   
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errconstr").toString(), ex.getMessage()));
 		} 
 		break;
 	    case DelTag:
@@ -758,8 +764,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		    rs.setOriginalRow();
 		    applyUpdates();
 		} catch (SQLException ex) {
-		    throw new SAXException("Error constructing deleted row: " +
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errdel").toString() , ex.getMessage()));
 		}
 		break;
 	    case InsTag:
@@ -769,8 +774,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		    rs.next();
 		    applyUpdates();
 		} catch (SQLException ex) {
-		    throw new SAXException("Error constructing inserted row: " +
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errinsert").toString() , ex.getMessage()));
 		}
 		break;
 				
@@ -782,8 +786,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		    rs.setOriginalRow();
 		    applyUpdates();
 		} catch (SQLException ex) {
-		    throw new SAXException("Error constructing insdel row: " +
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errinsdel").toString() , ex.getMessage()));
 	        }
 	        break;
 	        
@@ -800,8 +803,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 	     		    updates.add(upd);
 	     		 }
 	      	 }  catch(SQLException ex) {
-	     	        throw new SAXException("Error constructing update row: " +
-					   ex.getMessage());
+                        throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errupdate").toString() , ex.getMessage()));
 	         }
 	        break;
 	        	    
@@ -830,8 +832,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
 		
 		rs.updateRow();
 		} catch (SQLException ex) {
-		    throw new SAXException("Error updating row: " + 
-					   ex.getMessage());
+                    throw new SAXException(MessageFormat.format(resBundle.handleGetObject("xmlrch.errupdrow").toString() , ex.getMessage()));
 		}
 	    updates.removeAllElements();
 	}
@@ -905,7 +906,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
                 ;
             }  
         } catch (SQLException ex) {
-            throw new SAXException("characters: " + ex.getMessage());
+            throw new SAXException(resBundle.handleGetObject("xmlrch.chars").toString() + ex.getMessage());
         }
     }   
 
@@ -1036,7 +1037,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case ConcurrencyTag:
             if (nullValue) 
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setConcurrency(getIntegerValue(s));
             break;
@@ -1048,25 +1049,25 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case EscapeProcessingTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setEscapeProcessing(getBooleanValue(s));
             break;
         case FetchDirectionTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setFetchDirection(getIntegerValue(s));
             break;
         case FetchSizeTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setFetchSize(getIntegerValue(s));
             break;
         case IsolationLevelTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setTransactionIsolation(getIntegerValue(s));
             break;
@@ -1081,31 +1082,31 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case MaxFieldSizeTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setMaxFieldSize(getIntegerValue(s));
             break;            
         case MaxRowsTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setMaxRows(getIntegerValue(s));
             break;
         case QueryTimeoutTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setQueryTimeout(getIntegerValue(s));
             break;
         case ReadOnlyTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setReadOnly(getBooleanValue(s));
             break;
         case RowsetTypeTag:
             if (nullValue) {
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             } else {
                 //rs.setType(getIntegerValue(s));
                 String strType = getStringValue(s);
@@ -1123,7 +1124,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case ShowDeletedTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable property");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue").toString());
             else
                 rs.setShowDeleted(getBooleanValue(s));
             break;            
@@ -1176,7 +1177,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
             idx = 0;
 
             if (nullValue) {
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             } else {
                 md.setColumnCount(getIntegerValue(s));
 	    }
@@ -1188,43 +1189,43 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case AutoIncrementTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setAutoIncrement(idx, getBooleanValue(s));
             break;
         case CaseSensitiveTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setCaseSensitive(idx, getBooleanValue(s));
             break;
         case CurrencyTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setCurrency(idx, getBooleanValue(s));
             break;
         case NullableTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setNullable(idx, getIntegerValue(s));
             break;
         case SignedTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setSigned(idx, getBooleanValue(s));
             break;
         case SearchableTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setSearchable(idx, getBooleanValue(s));
             break;
         case ColumnDisplaySizeTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setColumnDisplaySize(idx, getIntegerValue(s));
             break;
@@ -1249,13 +1250,13 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case ColumnPrecisionTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setPrecision(idx, getIntegerValue(s));
             break;
         case ColumnScaleTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setScale(idx, getIntegerValue(s));
             break;
@@ -1273,7 +1274,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
             break;
         case ColumnTypeTag:
             if (nullValue)
-                throw new SQLException("Bad value; non-nullable metadata");
+                throw new SQLException(resBundle.handleGetObject("xmlrch.badvalue1").toString());
             else
                 md.setColumnType(idx, getIntegerValue(s));
             break;
@@ -1409,10 +1410,7 @@ public class XmlReaderContentHandler extends DefaultHandler {
      * @param err a warning generated by the SAX parser
      */
     public void warning (SAXParseException err) throws SAXParseException {
-        System.out.println ("** Warning" 
-                            + ", line " + err.getLineNumber ()
-                            + ", uri " + err.getSystemId ());
-        System.out.println("   " + err.getMessage ());
+        System.out.println (MessageFormat.format(resBundle.handleGetObject("xmlrch.warning").toString(), new Object[] { err.getMessage(), err.getLineNumber(), err.getSystemId() }));
     }
 
     /**

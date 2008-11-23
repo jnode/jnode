@@ -66,7 +66,6 @@ import java.io.*;
  *    set mapping.
  * </pre>
  *
- * @version 1.28, 05/05/07
  * @author	Jonathan Payne
  */
 
@@ -150,4 +149,3 @@ public class TelnetInputStream extends FilterInputStream {
 	return (off > offStart) ? off - offStart : -1;
     }
 }
-

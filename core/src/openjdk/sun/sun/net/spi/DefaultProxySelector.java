@@ -189,7 +189,7 @@ public class DefaultProxySelector extends ProxySelector {
 	 */
 	final String proto = protocol;
 	final NonProxyInfo nprop = pinfo;
-	final String urlhost = host;
+        final String urlhost = host.toLowerCase();
 
 	/**
 	 * This is one big doPrivileged call, but we're trying to optimize

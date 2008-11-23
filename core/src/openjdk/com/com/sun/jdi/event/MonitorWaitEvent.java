@@ -63,4 +63,3 @@ public interface MonitorWaitEvent extends LocatableEvent {
      */
     public long  timeout();
 }
-

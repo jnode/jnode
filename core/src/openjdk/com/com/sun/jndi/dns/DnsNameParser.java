@@ -33,7 +33,6 @@ import javax.naming.*;
  * A name parser for DNS names.
  *
  * @author Scott Seligman
- * @version 1.12 07/05/05
  */
 
 

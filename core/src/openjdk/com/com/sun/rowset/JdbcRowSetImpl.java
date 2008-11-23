@@ -100,7 +100,8 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      */
        private Vector strMatchColumns;
        
-       private transient JdbcRowSetResourceBundle jdbcResBundle;
+
+    protected transient JdbcRowSetResourceBundle jdbcResBundle;
        
     /**
      * Constructs a default <code>JdbcRowSet</code> object. 
@@ -134,7 +135,6 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * properties are set or [3] if no connection to a data source exists.
      */
     public JdbcRowSetImpl() {
-	
 	conn = null;
 	ps   = null;
 	rs   = null;
@@ -142,7 +142,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	try {
 	   jdbcResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
 	} catch(IOException ioe) {
-
+            throw new RuntimeException(ioe);
         }
 	
 	propertyChangeSupport = new PropertyChangeSupport(this);
@@ -154,43 +154,43 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	try {
 	    setShowDeleted(false);
 	} catch(SQLException sqle) {
-	     System.err.println("JdbcRowSet (setShowDeleted) :" + 
-	     			sqle.getMessage());      
+             System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setshowdeleted").toString() +
+                                sqle.getLocalizedMessage());
 	}
 	
 	try {
 	    setQueryTimeout(0);
 	} catch(SQLException sqle) {
-	     System.err.println("JdbcRowSet (setQueryTimeout) :" + 
-	     			sqle.getMessage());      
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setquerytimeout").toString() +
+                                sqle.getLocalizedMessage());
 	}
 
 	try {
  	    setMaxRows(0);
 	} catch(SQLException sqle) {
-	     System.err.println("JdbcRowSet (setMaxRows) :" + 
-	     			sqle.getMessage());      
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setmaxrows").toString() +
+                                sqle.getLocalizedMessage());
 	}
 
 	try {
 	    setMaxFieldSize(0);
 	} catch(SQLException sqle) {
-	     System.err.println("JdbcRowSet (setMaxFieldSize) :" + 
-	     			sqle.getMessage());      
+             System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setmaxfieldsize").toString() +
+                                sqle.getLocalizedMessage());
 	}
 
 	try {
 	    setEscapeProcessing(true);
 	} catch(SQLException sqle) {
-	     System.err.println("JdbcRowSet (setEscapeProcessing) :" + 
-		     			sqle.getMessage());      
+             System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setescapeprocessing").toString() +
+                                sqle.getLocalizedMessage());
 	}
         
         try {
             setConcurrency(ResultSet.CONCUR_UPDATABLE);            
         } catch (SQLException sqle) {
-            System.err.println("JdbcRowSet (setConcurrency) :" +
-            sqle.getMessage());                        
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setconcurrency").toString() +
+                                sqle.getLocalizedMessage());
         }
 
         setTypeMap(null);
@@ -198,7 +198,8 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
         try { 
             setType(ResultSet.TYPE_SCROLL_INSENSITIVE);   
         } catch(SQLException sqle){
-          sqle.getMessage();
+          System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.settype").toString() +
+                                sqle.getLocalizedMessage());
         }
                 
         setReadOnly(true);
@@ -206,7 +207,8 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
         try {
             setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED); 
         } catch(SQLException sqle){
-            sqle.getMessage();
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.settransactionisolation").toString() +
+                                sqle.getLocalizedMessage());
         }
         
         //Instantiating the vector for MatchColumns
@@ -263,7 +265,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	try {
 	   jdbcResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
 	} catch(IOException ioe) {
-
+            throw new RuntimeException(ioe);
         }
 	
 	propertyChangeSupport = new PropertyChangeSupport(this);
@@ -338,7 +340,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	try {
 	   jdbcResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
 	} catch(IOException ioe) {
-
+            throw new RuntimeException(ioe);
         }
 	
 	propertyChangeSupport = new PropertyChangeSupport(this);
@@ -430,7 +432,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
         try {
 	   jdbcResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
 	} catch(IOException ioe) {
-
+            throw new RuntimeException(ioe);
         }
         
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -591,29 +593,29 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	try {
 	    ps.setEscapeProcessing(getEscapeProcessing());
 	} catch (SQLException ex) {
-	    System.err.println("JdbcRowSet (setEscapeProcessing): " + 
-			       ex.getMessage());
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setescapeprocessing").toString() +
+                                ex.getLocalizedMessage());
 	}
 	
 	try {
 	    ps.setMaxFieldSize(getMaxFieldSize());
 	} catch (SQLException ex) {
-	    System.err.println("JdbcRowSet (setMaxFieldSize): " + 
-			       ex.getMessage());
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setmaxfieldsize").toString() +
+                                ex.getLocalizedMessage());
 	}
 
 	try {
 	    ps.setMaxRows(getMaxRows());
 	} catch (SQLException ex) {
-	    System.err.println("JdbcRowSet (setMaxRows): " + 
-			       ex.getMessage());
+           System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setmaxrows").toString() +
+                                ex.getLocalizedMessage());
 	}
 
 	try {
 	    ps.setQueryTimeout(getQueryTimeout());
 	} catch (SQLException ex) {
-	    System.err.println("JdbcRowSet (setQueryTimeout): " + 
-			       ex.getMessage());
+           System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.setquerytimeout").toString() +
+                                ex.getLocalizedMessage());
 	}
 
     }
@@ -642,7 +644,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
                     (getDataSourceName());
                 //return ds.getConnection(getUsername(),getPassword()); 
                 
-                if(getUsername() != null) {
+                if(getUsername() != null && !getUsername().equals("")) {
                      return ds.getConnection(getUsername(),getPassword());
                 } else {
                      return ds.getConnection();
@@ -672,20 +674,15 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	conn = connect();		
 	
 	try {
-	    conn.setTypeMap(getTypeMap());	    
-	} catch (Throwable ex) {
-	    System.err.println("JdbcRowSet (setTypeMap): " +
-			       ex.getMessage());
-	}
-	    
-	try {
-	    // int type = getType();
-	    // int concur = getConcurrency();
 
+            Map aMap = getTypeMap();
+            if( aMap != null) {
+                conn.setTypeMap(aMap);
+            }
 	    ps = conn.prepareStatement(getCommand(),ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);	    
 	} catch (SQLException ex) {
-	    System.err.println("JdbcRowSet (execute): " +
-			       ex.getMessage());
+            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.prepare").toString() +
+                                ex.getLocalizedMessage());
 
 	    if (ps != null)
 		ps.close();
@@ -724,9 +721,9 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 		    if (param[0] instanceof java.sql.Date ||
 			param[0] instanceof java.sql.Time ||
 			param[0] instanceof java.sql.Timestamp) {
-			System.err.println("Detected a Date");
+                        System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.detecteddate"));
 			if (param[1] instanceof java.util.Calendar) {
-			    System.err.println("Detected a Calendar");
+                            System.err.println(jdbcResBundle.handleGetObject("jdbcrowsetimpl.detectedcalendar"));
 			    ps.setDate(i + 1, (java.sql.Date)param[0], 
 				       (java.util.Calendar)param[1]);
 			    continue;
@@ -2112,12 +2109,16 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 	} catch(SQLException sqle) {     
 	    return super.getType();
 	}
-        try {
+
+        // If the ResultSet has not been created, then return the default type
+        // otherwise return the type from the ResultSet.
+        if(rs == null) {
+            return super.getType();
+        } else {
             int rstype = rs.getType();
             return rstype;
-        } catch(NullPointerException npe) {
-             throw new SQLException("Cannot return the type of a closed ResultSet : " + npe);
         }
+
 
     }
 
@@ -3939,8 +3940,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      */
     public void setMatchColumn(String columnName) throws SQLException {
         // validate, if col is ok to be set
-        columnName = columnName.trim();
-        if( columnName == "" || columnName.equals(null)) {
+        if(columnName.equals(null) || ((columnName = columnName.trim()) == "" )) {
             throw new SQLException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.matchcols2").toString());
         } else {
             // set strMatchColumn
@@ -4642,7 +4642,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public SQLXML getSQLXML(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -4653,7 +4653,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @throws SQLException if a database access error occurs
      */
     public SQLXML getSQLXML(String colName) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
     
     /**
@@ -4668,7 +4668,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public RowId getRowId(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
     
     /**
@@ -4683,7 +4683,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public RowId getRowId(String columnName) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
     
     /**
@@ -4699,7 +4699,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public void updateRowId(int columnIndex, RowId x) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
     
     /**
@@ -4715,7 +4715,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public void updateRowId(String columnName, RowId x) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -4725,7 +4725,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -4736,7 +4736,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public boolean isClosed() throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -4748,7 +4748,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public void updateNString(int columnIndex, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -4760,7 +4760,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public void updateNString(String columnName, String nString) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
 
@@ -4773,7 +4773,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -4785,7 +4785,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public void updateNClob(String columnName, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
    
     /**
@@ -4800,7 +4800,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public NClob getNClob(int i) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     
@@ -4816,7 +4816,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 6.0
      */
     public NClob getNClob(String colName) throws SQLException {
-        throw new UnsupportedOperationException();
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
          
     public <T> T unwrap(java.lang.Class<T> iface) throws java.sql.SQLException{
@@ -4836,7 +4836,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
       * @since 1.6
       */
      public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-         throw new UnsupportedOperationException("operation not yet supported");
+         throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
     /**
@@ -4848,7 +4848,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public void setSQLXML(String parameterName, SQLXML xmlObject) throws SQLException {
-         throw new UnsupportedOperationException("operation not yet supported");
+         throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
     /**
@@ -4863,7 +4863,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
-         throw new UnsupportedOperationException("operation not yet supported");
+         throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
     /**
@@ -4877,7 +4877,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
     * @since 1.6
     */
    public void setRowId(String parameterName, RowId x) throws SQLException {
-         throw new UnsupportedOperationException("operation not yet supported");
+         throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
 
@@ -4897,7 +4897,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
      public void setNString(int parameterIndex, String value) throws SQLException {
-         throw new UnsupportedOperationException("operation not yet supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
 
@@ -4925,7 +4925,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
     * @since 1.6
     */
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");   
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
   /**
@@ -4940,7 +4940,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
     * @since 1.6
     */
     public void setNClob(String parameterName, NClob value) throws SQLException {
-         throw new UnsupportedOperationException("operation not yet supported");
+         throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
 
@@ -4960,7 +4960,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public java.io.Reader getNCharacterStream(int columnIndex) throws SQLException {
-       throw new UnsupportedOperationException("Operation ot yet supported");
+       throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
 
@@ -4980,7 +4980,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public java.io.Reader getNCharacterStream(String columnName) throws SQLException {
-       throw new UnsupportedOperationException("Operation ot yet supported");
+       throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
      }
 
     /**
@@ -4996,7 +4996,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5013,7 +5013,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public void updateSQLXML(String columnName, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
      /**
@@ -5031,7 +5031,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public String getNString(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5049,7 +5049,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      * @since 1.6
      */
     public String getNString(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
      /**
@@ -5071,7 +5071,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
                             java.io.Reader x,
                             long length)
                             throws SQLException {
-          throw new UnsupportedOperationException("Operation not yet supported");
+          throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
        }
 
      /**
@@ -5093,7 +5093,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
                             java.io.Reader x,
                             long length)
                             throws SQLException {
-          throw new UnsupportedOperationException("Operation not yet supported");
+          throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
        }
     
     /**
@@ -5123,7 +5123,7 @@ public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
      */
     public void updateNCharacterStream(int columnIndex,
                              java.io.Reader x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5155,7 +5155,7 @@ bel is the name of the column
      */
     public void updateNCharacterStream(String columnLabel,
                              java.io.Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
  
     /**
@@ -5188,7 +5188,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /** 
@@ -5221,7 +5221,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5256,7 +5256,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(int columnIndex, InputStream inputStream) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5291,7 +5291,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5323,7 +5323,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(int columnIndex,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /** 
@@ -5355,7 +5355,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(String columnLabel,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5389,7 +5389,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(int columnIndex,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5424,7 +5424,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(String columnLabel,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
    /**
@@ -5458,7 +5458,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(int columnIndex,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported"); 
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5492,7 +5492,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(String columnLabel,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5528,7 +5528,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(int columnIndex,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5565,7 +5565,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(String columnLabel,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
 
@@ -5590,7 +5590,7 @@ bel is the name of the column
     public void updateAsciiStream(int columnIndex, 
 			   java.io.InputStream x, 
 			   long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /** 
@@ -5614,7 +5614,7 @@ bel is the name of the column
     public void updateBinaryStream(int columnIndex, 
 			    java.io.InputStream x,
        			    long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5638,7 +5638,7 @@ bel is the name of the column
     public void updateCharacterStream(int columnIndex,
 			     java.io.Reader x,
 			     long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
      /** 
@@ -5662,7 +5662,7 @@ bel is the name of the column
     public void updateAsciiStream(String columnLabel, 
 			   java.io.InputStream x, 
 			   long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5687,7 +5687,7 @@ bel is the name of the column
      */
     public void updateAsciiStream(int columnIndex,
                            java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5713,7 +5713,7 @@ bel is the name of the column
      */
     public void updateAsciiStream(String columnLabel,
                            java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
 
@@ -5738,7 +5738,7 @@ bel is the name of the column
     public void updateBinaryStream(String columnLabel, 
 			    java.io.InputStream x,
 			    long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5763,7 +5763,7 @@ bel is the name of the column
      */
     public void updateBinaryStream(int columnIndex,
                             java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
   
@@ -5790,7 +5790,7 @@ bel is the name of the column
      */
     public void updateBinaryStream(String columnLabel,
                             java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
 
@@ -5816,7 +5816,7 @@ bel is the name of the column
     public void updateCharacterStream(String columnLabel,
 			     java.io.Reader reader,
 			     long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5841,7 +5841,7 @@ bel is the name of the column
      */
     public void updateCharacterStream(int columnIndex,
                              java.io.Reader x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -5868,7 +5868,7 @@ bel is the name of the column
      */
     public void updateCharacterStream(String columnLabel,
                              java.io.Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
 
@@ -5885,7 +5885,7 @@ bel is the name of the column
   * @since 1.4
   */
   public void setURL(int parameterIndex, java.net.URL x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
    
@@ -5914,7 +5914,7 @@ bel is the name of the column
   */
   public void setNClob(int parameterIndex, Reader reader)
     throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
    /**
@@ -5942,7 +5942,7 @@ bel is the name of the column
             */
             public void setNClob(String parameterName, Reader reader, long length)
     throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -5969,7 +5969,7 @@ bel is the name of the column
   */
   public void setNClob(String parameterName, Reader reader)
     throws SQLException{
-             throw new SQLFeatureNotSupportedException("Feature not supported");
+             throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -5996,7 +5996,7 @@ bel is the name of the column
      */
      public void setNClob(int parameterIndex, Reader reader, long length)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6012,7 +6012,7 @@ a
      * @since 1.6
      */
      public void setNClob(int parameterIndex, NClob value) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6029,7 +6029,7 @@ a
   */
  public void setNString(String parameterName, String value)
          throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6046,7 +6046,7 @@ a
   * @since 1.6
   */
   public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6066,7 +6066,7 @@ a
   */
  public void setNCharacterStream(String parameterName, Reader value, long length)
          throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -6092,7 +6092,7 @@ a
   * @since 1.6
   */
   public void setNCharacterStream(String parameterName, Reader value) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -6118,7 +6118,7 @@ a
     */
     public void setTimestamp(String parameterName, java.sql.Timestamp x, Calendar cal)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -6144,7 +6144,7 @@ a
               */
       public  void setClob(String parameterName, Reader reader, long length)
       throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6163,7 +6163,7 @@ a
     * @since 1.6
     */
     public void setClob (String parameterName, Clob x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6188,7 +6188,7 @@ a
     */
     public void setClob(String parameterName, Reader reader)
       throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6210,7 +6210,7 @@ a
     */
     public void setDate(String parameterName, java.sql.Date x)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
    /**
@@ -6236,7 +6236,7 @@ a
     */
    public void setDate(String parameterName, java.sql.Date x, Calendar cal)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6256,7 +6256,7 @@ a
     */
    public void setTime(String parameterName, java.sql.Time x)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6282,7 +6282,7 @@ a
     */
    public void setTime(String parameterName, java.sql.Time x, Calendar cal)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
    /**
@@ -6308,7 +6308,7 @@ a
    */
    public void setClob(int parameterIndex, Reader reader)
      throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6333,7 +6333,7 @@ a
    */
    public void setClob(int parameterIndex, Reader reader, long length)
      throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6363,7 +6363,7 @@ a
     */
     public void setBlob(int parameterIndex, InputStream inputStream, long length)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6395,7 +6395,7 @@ a
     */
     public void setBlob(int parameterIndex, InputStream inputStream)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6426,7 +6426,7 @@ a
       */
       public void setBlob(String parameterName, InputStream inputStream, long length)
          throws SQLException{
-         throw new SQLFeatureNotSupportedException("Feature not supported");
+         throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
     }
 
 
@@ -6444,7 +6444,7 @@ a
     * @since 1.6
     */
    public void setBlob (String parameterName, Blob x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6470,7 +6470,7 @@ a
     */
     public void setBlob(String parameterName, InputStream inputStream)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -6516,7 +6516,7 @@ a
   */
   public void setObject(String parameterName, Object x, int targetSqlType, int scale)
      throws SQLException{
-      throw new SQLFeatureNotSupportedException("Feature not supported");
+      throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
  }
 
   /**
@@ -6542,7 +6542,7 @@ a
     */
     public void setObject(String parameterName, Object x, int targetSqlType)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6582,7 +6582,7 @@ a
    * @since 1.4
    */
    public void setObject(String parameterName, Object x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -6609,7 +6609,7 @@ a
   */
  public void setAsciiStream(String parameterName, java.io.InputStream x, int length)
      throws SQLException{
-      throw new SQLFeatureNotSupportedException("Feature not supported");
+      throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
  }
 
   
@@ -6636,7 +6636,7 @@ a
   */
  public void setBinaryStream(String parameterName, java.io.InputStream x,
                       int length) throws SQLException{
-      throw new SQLFeatureNotSupportedException("Feature not supported");
+      throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
  }
 
  /**
@@ -6665,7 +6665,7 @@ a
   public void setCharacterStream(String parameterName,
                           java.io.Reader reader,
                           int length) throws SQLException{
-       throw new SQLFeatureNotSupportedException("Feature not supported");
+       throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
   }
 
   /**
@@ -6692,7 +6692,7 @@ a
   */
   public void setAsciiStream(String parameterName, java.io.InputStream x)
           throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6719,7 +6719,7 @@ a
     */
    public void setBinaryStream(String parameterName, java.io.InputStream x)
    throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6748,7 +6748,7 @@ a
     */
    public void setCharacterStream(String parameterName,
                          java.io.Reader reader) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
    /**
@@ -6767,7 +6767,7 @@ a
     * @since 1.4
     */
    public void setBigDecimal(String parameterName, BigDecimal x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6788,7 +6788,7 @@ a
     * @since 1.4
     */
    public void setString(String parameterName, String x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6810,7 +6810,7 @@ a
     * @since 1.4
     */
    public void setBytes(String parameterName, byte x[]) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6830,7 +6830,7 @@ a
     */
    public void setTimestamp(String parameterName, java.sql.Timestamp x)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -6847,7 +6847,7 @@ a
     * @since 1.4
     */
    public void setNull(String parameterName, int sqlType) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6884,7 +6884,7 @@ a
     */
    public void setNull (String parameterName, int sqlType, String typeName)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6902,7 +6902,7 @@ a
     * @since 1.4
     */
    public void setBoolean(String parameterName, boolean x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6922,7 +6922,7 @@ a
     * @since 1.4
     */
    public void setByte(String parameterName, byte x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6941,7 +6941,7 @@ a
     * @since 1.4
     */
    public void setShort(String parameterName, short x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6960,7 +6960,7 @@ a
     * @since 1.4
     */
    public void setInt(String parameterName, int x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -6978,7 +6978,7 @@ a
     * @since 1.4
     */
    public void setLong(String parameterName, long x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -6997,7 +6997,7 @@ a
     * @since 1.4
     */
    public void setFloat(String parameterName, float x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
    }
 
  /**
@@ -7015,9 +7015,23 @@ a
     * @since 1.4
     */
    public void setDouble(String parameterName, double x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(jdbcResBundle.handleGetObject("jdbcrowsetimpl.featnotsupp").toString());
+   }
+
+    /**
+     * This method re populates the resBundle
+     * during the deserialization process
+     *
+     */
+    protected void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        // Default state initialization happens here
+        ois.defaultReadObject();
+        // Initialization of transient Res Bundle happens here .
+        try {
+           jdbcResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {}
+
    }
 
 	static final long serialVersionUID = -3591946023893483003L;
 }
-

@@ -72,5 +72,3 @@ public class CharToByteCp834 extends CharToByteCp933
        return "Cp834";
     }
 }
-
-

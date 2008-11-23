@@ -45,7 +45,7 @@ public class BooleanEditor extends PropertyEditorSupport {
         Object value = getValue();
         return (value instanceof Boolean)
              ? getValidName((Boolean) value)
-             : null;
+             : "null";
     }
 
     public void setAsText(String text) throws java.lang.IllegalArgumentException {
@@ -74,4 +74,3 @@ public class BooleanEditor extends PropertyEditorSupport {
         return getValidName(value).equalsIgnoreCase(name);
     }
 }
-

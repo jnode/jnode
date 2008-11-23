@@ -113,4 +113,3 @@ public interface MonitorWaitRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-

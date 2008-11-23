@@ -49,7 +49,6 @@ import java.util.*;
  * directory.
  * <P>
  *
- * @version 1.15, 05/05/07
  *
  * @author Ann Wollrath
  *

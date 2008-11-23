@@ -27,7 +27,6 @@ package com.sun.rowset.internal;
 
 import java.sql.*;
 import javax.sql.*;
-import java.lang.*;
 import java.util.*;
 import java.math.BigDecimal;
 
@@ -35,8 +34,7 @@ import javax.sql.rowset.*;
 import javax.sql.rowset.spi.*;
 
 import com.sun.rowset.*;
-import com.sun.rowset.internal.*;
-import java.lang.Comparable;
+import java.io.IOException;
 
 /**
  * There will be two sets of data which will be maintained by the rowset at the
@@ -99,6 +97,8 @@ public class SyncResolverImpl extends CachedRowSetImpl implements SyncResolver {
      */
     private CachedRowSet row;
 
+    private JdbcRowSetResourceBundle resBundle;
+
     /**
      * Public constructor
      */
@@ -109,6 +109,12 @@ public class SyncResolverImpl extends CachedRowSetImpl implements SyncResolver {
             crw = new CachedRowSetWriter();
             row = new CachedRowSetImpl();
             rowStatus = 1;
+            try {
+                resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+            } catch(IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
+
         } catch(SQLException sqle) {        
         }   
      }
@@ -184,11 +190,11 @@ public class SyncResolverImpl extends CachedRowSetImpl implements SyncResolver {
         try {
             // check whether the index is in range
             if(index<=0 || index > crsSync.getMetaData().getColumnCount() ) {
-                throw new SQLException("Index value out of range :"+ index);
+                throw new SQLException(resBundle.handleGetObject("syncrsimpl.indexval").toString()+ index);
             }
              // check whether index col is in conflict
             if(crsRes.getObject(index) == null) {
-                throw new SQLException("This column not in conflict");
+                throw new SQLException(resBundle.handleGetObject("syncrsimpl.noconflict").toString());
             }
         } catch (SQLException sqle) {
             // modify method to throw for SQLException
@@ -266,13 +272,12 @@ public class SyncResolverImpl extends CachedRowSetImpl implements SyncResolver {
                           * due to some reasons.
                           * Also will prevent from going into a loop of SPE's
                           **/
-                         throw new SQLException("Synchronization not possible");
+                         throw new SQLException(resBundle.handleGetObject("syncrsimpl.syncnotpos").toString());
                      }
                   } //end if(bool)
 
              } else {
-                 throw new SQLException("Value to be resolved can be either of "+
-                       "database or inside CachedRowSet ");
+                 throw new SQLException(resBundle.handleGetObject("syncrsimpl.valtores").toString());
              } //end if (crs.getObject ...) block
 
 
@@ -4833,4 +4838,3 @@ public class SyncResolverImpl extends CachedRowSetImpl implements SyncResolver {
           throw new UnsupportedOperationException("Operation not yet supported");
        }
 } //end class
-

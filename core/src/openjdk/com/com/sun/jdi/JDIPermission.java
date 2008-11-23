@@ -67,7 +67,6 @@ package com.sun.jdi;
  * the security policy file.
  *
  * @author  Tim Bell
- * @version 1.9, 05/05/07 
  * @since   1.5
  *
  * @see com.sun.jdi.Bootstrap

@@ -42,7 +42,6 @@ import com.sun.mirror.type.InterfaceType;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.8 07/05/05
  *
  * @see InterfaceType
  * @since 1.5

@@ -159,7 +159,6 @@ public class StorageResolver {
     * Class StorageResolverIterator
     *
     * @author $Author: raul $
-    * @version $Revision: 1.10 $
     */
    class StorageResolverIterator implements Iterator {
 

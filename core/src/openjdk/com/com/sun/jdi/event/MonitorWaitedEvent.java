@@ -65,4 +65,3 @@ public interface MonitorWaitedEvent extends LocatableEvent {
     
     
 }
-

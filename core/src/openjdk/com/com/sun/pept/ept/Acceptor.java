@@ -52,10 +52,3 @@ public interface Acceptor extends EPTFactory {
     public void accept();
 
 } // end Acceptor
-
-
-
-
-
-
-

@@ -40,7 +40,6 @@ import javax.naming.spi.ObjectFactory;
  * See com.sun.jndi.dns.DnsUrl for a description of the URL format.
  *
  * @author Scott Seligman
- * @version 1.13 07/05/05
  */
 
 

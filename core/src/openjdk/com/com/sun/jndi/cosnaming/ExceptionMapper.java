@@ -36,7 +36,6 @@ import org.omg.CORBA.*;
 /**
   * A convenience class to map the COS Naming exceptions to the JNDI exceptions.
   * @author Raj Krishnamurthy
-  * @version 1.16 07/05/05
   */
 
 public final class ExceptionMapper {

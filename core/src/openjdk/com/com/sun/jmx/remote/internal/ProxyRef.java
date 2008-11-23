@@ -90,4 +90,3 @@ public class ProxyRef implements RemoteRef {
 
     protected RemoteRef ref;
 }
-    

@@ -71,4 +71,3 @@ public interface MethodExitEvent extends LocatableEvent {
     
     public Value returnValue();
 }
-

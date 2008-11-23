@@ -43,6 +43,3 @@ public interface ProgressMeteringPolicy
      */
     public int getProgressUpdateThreshold();        
 }   
-
-
-

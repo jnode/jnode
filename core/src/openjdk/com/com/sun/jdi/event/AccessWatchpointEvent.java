@@ -39,5 +39,3 @@ import com.sun.jdi.*;
  */
 public interface AccessWatchpointEvent extends WatchpointEvent {
 }
-    
-

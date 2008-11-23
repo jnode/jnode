@@ -215,7 +215,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * The <code>ResultSet</code> object that is used to maintain the data when
      * a ResultSet and start position are passed as parameters to the populate function
      */
-    private ResultSet resultSet;
+    private transient ResultSet resultSet;
 
     /**
      * The integer value indicating the end position in the ResultSetwhere the picking
@@ -311,7 +311,9 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      */
     private TransactionalWriter tWriter = null;
     
-    private transient JdbcRowSetResourceBundle resBundle;
+    protected transient JdbcRowSetResourceBundle resBundle;
+
+    private boolean updateOnInsert;
         
        
        
@@ -350,7 +352,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {           
            resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();           
         } catch(IOException ioe) {
-        
+            throw new RuntimeException(ioe);
         }
         
         // set the Reader, this maybe overridden latter
@@ -453,8 +455,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
            resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
         } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
         }
-        
         
         if (env == null) {
             throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.nullhash").toString());
@@ -473,11 +475,6 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         initParams(); // allocate the parameters collection
         initContainer();
         initProperties(); // set up some default values
-        
-        // insert row setup
-        onInsertRow = false;
-        insertRow = null;               
-        
     }
     
     /**
@@ -502,9 +499,12 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
     
     private void initProperties() throws SQLException {
     
+        if(resBundle == null) {
         try {
            resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
         } catch(IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
         }
         setShowDeleted(false);
         setQueryTimeout(0);
@@ -616,6 +616,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      *          violated while populating the RowSet
      * @see #execute
      */
+
     public void populate(ResultSet data) throws SQLException {
         int rowsFetched;
         Row currentRow;
@@ -628,7 +629,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         if (data == null) {
             throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.populate").toString());
         }
-
+        this.resultSet = data;
        
         // get the meta data for this ResultSet
         RSMD = data.getMetaData();
@@ -713,35 +714,55 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         md.setColumnCount(numCols);
         for (int col=1; col <= numCols; col++) {
             md.setAutoIncrement(col, rsmd.isAutoIncrement(col));
+            if(rsmd.isAutoIncrement(col))
+                updateOnInsert = true;
             md.setCaseSensitive(col, rsmd.isCaseSensitive(col));
             md.setCurrency(col, rsmd.isCurrency(col));
             md.setNullable(col, rsmd.isNullable(col));
             md.setSigned(col, rsmd.isSigned(col));
             md.setSearchable(col, rsmd.isSearchable(col));
-            md.setColumnDisplaySize(col, rsmd.getColumnDisplaySize(col));
+             /*
+             * The PostgreSQL drivers sometimes return negative columnDisplaySize,
+             * which causes an exception to be thrown.  Check for it.
+             */
+            int size = rsmd.getColumnDisplaySize(col);
+            if (size < 0) {
+                size = 0;
+            }
+            md.setColumnDisplaySize(col, size);
             md.setColumnLabel(col, rsmd.getColumnLabel(col));
             md.setColumnName(col, rsmd.getColumnName(col));
             md.setSchemaName(col, rsmd.getSchemaName(col));
-            md.setPrecision(col, rsmd.getPrecision(col));
-            md.setScale(col, rsmd.getScale(col));
+            /*
+             * Drivers return some strange values for precision, for non-numeric data, including reports of
+             * non-integer values; maybe we should check type, & set to 0 for non-numeric types.
+             */
+            int precision = rsmd.getPrecision(col);
+            if (precision < 0) {
+                precision = 0;
+            }
+            md.setPrecision(col, precision);
+
+            /*
+             * It seems, from a bug report, that a driver can sometimes return a negative
+             * value for scale.  javax.sql.rowset.RowSetMetaDataImpl will throw an exception
+             * if we attempt to set a negative value.  As such, we'll check for this case.
+             */
+            int scale = rsmd.getScale(col);
+            if (scale < 0) {
+                scale = 0;
+            }
+            md.setScale(col, scale);
             md.setTableName(col, rsmd.getTableName(col));
             md.setCatalogName(col, rsmd.getCatalogName(col));
             md.setColumnType(col, rsmd.getColumnType(col));
             md.setColumnTypeName(col, rsmd.getColumnTypeName(col));
+        }
             
             if( conn != null){
-            
-              try {
+           // JDBC 4.0 mandates as does the Java EE spec that all DataBaseMetaData methods
+           // must be implemented, therefore, the previous fix for 5055528 is being backed out
                     dbmslocatorsUpdateCopy = conn.getMetaData().locatorsUpdateCopy();
-              } catch(SQLException sqle) {
-                  /* 
-                   * Since the Lobs and this method is not mandated by J2EE spec,
-                   * drivers are not implementing it. We need to catch this 
-                   * and do nothing in this block and help populate() 
-                   * method do it's task(bug id 5055528)
-                   */
-              }
-            }
         }
     }
     
@@ -781,35 +802,11 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         RowSetMD = (RowSetMetaDataImpl)this.getMetaData();
         
         if(conn != null){
-        
-          try {
+            // JDBC 4.0 mandates as does the Java EE spec that all DataBaseMetaData methods
+            // must be implemented, therefore, the previous fix for 5055528 is being backed out
                  dbmslocatorsUpdateCopy = conn.getMetaData().locatorsUpdateCopy();
-          } catch(SQLException sqle) {
-                  /* 
-                   * Since the Lobs and this method is not mandated by J2EE spec,
-                   * drivers are not implementing it. We need to catch this 
-                   * and do nothing in this block and help populate() 
-                   * method do it's task
-                   */
-          } //end catch
-          
-        } else {
-        
-                  CachedRowSetReader crsTempReader = (CachedRowSetReader)rowSetReader;
-                  Connection tempCon = crsTempReader.connect((RowSetInternal)this);
+        }
 
-           try {
-                  dbmslocatorsUpdateCopy = tempCon.getMetaData().locatorsUpdateCopy();
-           } catch(SQLException sqle) {
-                  /* 
-                   * Since the Lobs and this method is not mandated by J2EE spec,
-                   * drivers are not implementing it. We need to catch this 
-                   * and do nothing in this block and help populate() 
-                   * method do it's task(bug id 5055528)
-                   */
-           } //end catch
-           tempCon = null;   
-        } // end if ... else
     }
     
     /**
@@ -889,7 +886,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                     success = false;
                 } else {
                     tWriter = (TransactionalWriter)rowSetWriter;                    
-                    tWriter.commit();
+                    ((CachedRowSetWriter)tWriter).commit(this, updateOnInsert);
                     success = true;
                 }
             }
@@ -1160,7 +1157,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
             out = new ObjectOutputStream(bOut);
             out.writeObject(this);
         } catch (IOException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() , ex.getMessage()));
         }
         
         ObjectInputStream in;
@@ -1169,9 +1166,9 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
             ByteArrayInputStream bIn = new ByteArrayInputStream(bOut.toByteArray());
             in = new ObjectInputStream(bIn);
         } catch (StreamCorruptedException ex) {
-            throw new SQLException("Clone failed: " + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() , ex.getMessage()));
         } catch (IOException ex) {
-            throw new SQLException("Clone failed: " + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() , ex.getMessage()));
         }
         
         try {
@@ -1181,11 +1178,11 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
             return ((CachedRowSet)crsTemp);
             
         } catch (ClassNotFoundException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() , ex.getMessage()));
         } catch (OptionalDataException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() , ex.getMessage()));
         } catch (IOException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() + ex.getMessage());
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.clonefail").toString() , ex.getMessage()));
         }
     }
     
@@ -1284,23 +1281,17 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      */
     public Collection<?> toCollection() throws SQLException {
        
-        System.out.println("in crs toColl"); 
         TreeMap tMap;
         int count = 0;
         Row origRow;
         Vector newRow;
        
         int colCount = ((RowSetMetaDataImpl)this.getMetaData()).getColumnCount(); 
-        //int colCount = RowSetMD.getColumnCount();
-
-        System.out.println("in crs toColl 2");
 
         tMap = new TreeMap();
         
         for (int i = 0; i<numRows; i++) {
-            System.out.println("in crs toColl 3");
             tMap.put(new Integer(i), rvh.get(i));
-            System.out.println("in crs toColl 4");
         }
         
         return (tMap.values());
@@ -1397,7 +1388,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         (SyncProvider)SyncFactory.getInstance(providerStr);
         
         rowSetReader = provider.getRowSetReader();
-        rowSetWriter = (TransactionalWriter)provider.getRowSetWriter();
+        rowSetWriter = provider.getRowSetWriter();
     }
     
     
@@ -1587,9 +1578,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         lastValueNull = value;
     }
     
-    //======================================================================
     // Methods for accessing results by column index
-    //======================================================================
     
     /**
      * Checks to see whether the given index is a valid column number
@@ -1773,8 +1762,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                 return true;
             }
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.boolfail").toString() + 
-                  value.toString().trim() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.boolfail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -1816,8 +1805,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return ((new Byte(value.toString())).byteValue());
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.bytefail").toString() +
-                  value.toString() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.bytefail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -1860,8 +1849,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return ((new Short(value.toString().trim())).shortValue());
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.shortfail").toString() +
-                  value.toString() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.shortfail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -1903,8 +1892,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return ((new Integer(value.toString().trim())).intValue());
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.intfail").toString() +
-                  value.toString() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.intfail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -1946,8 +1935,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return ((new Long(value.toString().trim())).longValue());
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.longfail").toString() +
-                  value.toString().trim() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.longfail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -1989,8 +1978,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return ((new Float(value.toString())).floatValue());
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.floatfail").toString() +
-                  value.toString().trim() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.floatfail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -2033,8 +2022,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return ((new Double(value.toString().trim())).doubleValue());
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.doublefail").toString() +
-                  value.toString().trim() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.doublefail").toString(),
+                  new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -2171,13 +2160,13 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                     DateFormat df = DateFormat.getDateInstance();
                     return ((java.sql.Date)(df.parse(value.toString())));
                 } catch (ParseException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.datefail").toString() +
-                          value.toString().trim() + columnIndex);
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.datefail").toString(),
+                        new Object[] {value.toString().trim(), columnIndex}));
                 }
             }
             default: {
-                throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.datefail").toString() +
-                value.toString().trim() + columnIndex );
+                throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.datefail").toString(),
+                        new Object[] {value.toString().trim(), columnIndex}));
             }
         }
     }
@@ -2234,13 +2223,13 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                     DateFormat tf = DateFormat.getTimeInstance();
                     return ((java.sql.Time)(tf.parse(value.toString())));
                 } catch (ParseException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString() +
-                    value.toString().trim() + columnIndex);
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString(),
+                        new Object[] {value.toString().trim(), columnIndex}));
                 }
             }
             default: {
-                throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString() +
-                value.toString().trim() + columnIndex );
+                throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString(),
+                        new Object[] {value.toString().trim(), columnIndex}));
             }
         }
     }
@@ -2301,13 +2290,13 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                     DateFormat tf = DateFormat.getTimeInstance();
                     return ((java.sql.Timestamp)(tf.parse(value.toString())));
                 } catch (ParseException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString() +
-                    value.toString().trim() + columnIndex);
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString(),
+                        new Object[] {value.toString().trim(), columnIndex}));
                 }
             }
             default: {
-                throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString() +
-                value.toString().trim() + columnIndex);
+                throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.timefail").toString(),
+                        new Object[] {value.toString().trim(), columnIndex}));
             }
         }
     }
@@ -2476,9 +2465,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
     }
     
     
-    //======================================================================
     // Methods for accessing results by column name
-    //======================================================================
     
     /**
      * Retrieves the value stored in the designated column
@@ -2834,9 +2821,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
     }
     
     
-    //=====================================================================
     // Advanced features:
-    //=====================================================================
     
     /**
      * The first warning reported by calls on this <code>CachedRowSetImpl</code>
@@ -2986,11 +2971,11 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                 try {
                     obj = (SQLData)c.newInstance();
                 } catch (java.lang.InstantiationException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString() +
-                    ex.getMessage());
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString(),
+                    ex.getMessage()));
                 } catch (java.lang.IllegalAccessException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString() +
-                    ex.getMessage());
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString(),
+                    ex.getMessage()));
                 }
                 // get the attributes from the struct
                 Object attribs[] = s.getAttributes(map);
@@ -3177,8 +3162,8 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         try {
             return (new BigDecimal(value.toString().trim()));
         } catch (NumberFormatException ex) {
-            throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.doublefail").toString() +
-            value.toString().trim() + columnIndex);
+            throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.doublefail").toString(),
+                new Object[] {value.toString().trim(), columnIndex}));
         }
     }
     
@@ -3345,7 +3330,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      *            is <code>ResultSet.TYPE_FORWARD_ONLY</code>
      */
     public boolean first() throws SQLException {
-        if (getType() == ResultSet.TYPE_FORWARD_ONLY) {
+        if(getType() == ResultSet.TYPE_FORWARD_ONLY) {
             throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.first").toString());
         }
         
@@ -5737,11 +5722,11 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                 try {
                     obj = (SQLData)c.newInstance();
                 } catch (java.lang.InstantiationException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString()+
-                    ex.getMessage());
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString(),
+                    ex.getMessage()));
                 } catch (java.lang.IllegalAccessException ex) {
-                    throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString() +
-                    ex.getMessage());
+                    throw new SQLException(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.unableins").toString(),
+                    ex.getMessage()));
                 }
                 // get the attributes from the struct
                 Object attribs[] = s.getAttributes(map);
@@ -5818,7 +5803,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         checkCursor();
         
         if (RowSetMD.getColumnType(columnIndex) != java.sql.Types.BLOB) {
-            System.out.println(resBundle.handleGetObject("cachedrowsetimpl.type").toString()+RowSetMD.getColumnType(columnIndex));
+            System.out.println(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.type").toString(), RowSetMD.getColumnType(columnIndex)));
             throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.dtypemismt").toString());
         }
         
@@ -5858,7 +5843,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         checkCursor();
         
         if (RowSetMD.getColumnType(columnIndex) != java.sql.Types.CLOB) {
-            System.out.println(resBundle.handleGetObject("cachedrowsetimpl.type").toString()+RowSetMD.getColumnType(columnIndex));
+            System.out.println(MessageFormat.format(resBundle.handleGetObject("cachedrowsetimpl.type").toString(), RowSetMD.getColumnType(columnIndex)));
             throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.dtypemismt").toString());
         }
         
@@ -7137,8 +7122,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      */
     public void setMatchColumn(String columnName) throws SQLException {
         // validate, if col is ok to be set
-        columnName = columnName.trim();
-        if( columnName == "" || columnName.equals(null)) {
+        if(columnName.equals(null) || ((columnName = columnName.trim()) == "" )) {
             throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.matchcols2").toString());
         } else {
             // set strMatchColumn
@@ -7416,11 +7400,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
          if (populatecallcount == 0){
              throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.nextpage").toString());
          }
-         if (populatecallcount == 1){
-             populatecallcount++;
-             return pagenotend;
-         }
-         else{
+         // Fix for 6554186
              onFirstPage = false;
             if(callWithCon){
                 crsReader.setStartPosition(endPos);
@@ -7432,7 +7412,6 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
             }
             return pagenotend;
          }
-     }
 
     /**
      * This is the setter function for setting the size of the page, which specifies
@@ -7719,7 +7698,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
         checkCursor();
 
         if(onInsertRow == true)
-          throw new SQLException("Invalid Operation on insert Row");
+          throw new SQLException(resBundle.handleGetObject("cachedrowsetimpl.invalidop").toString());
 
         if( insertFlag ) {
           ((Row)getCurrentRow()).setInserted();
@@ -7737,7 +7716,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public SQLXML getSQLXML(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7748,7 +7727,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @throws SQLException if a database access error occurs
      */
     public SQLXML getSQLXML(String colName) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7763,7 +7742,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public RowId getRowId(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
     
     /**
@@ -7778,7 +7757,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public RowId getRowId(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
     
     /**
@@ -7794,7 +7773,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public void updateRowId(int columnIndex, RowId x) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
     
     /**
@@ -7810,7 +7789,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public void updateRowId(String columnName, RowId x) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7820,7 +7799,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7831,7 +7810,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public boolean isClosed() throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7843,7 +7822,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public void updateNString(int columnIndex, String nString) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7855,7 +7834,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public void updateNString(String columnName, String nString) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
 
@@ -7868,7 +7847,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -7880,7 +7859,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public void updateNClob(String columnName, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+       throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
    
     /**
@@ -7895,7 +7874,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public NClob getNClob(int i) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     
@@ -7911,7 +7890,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 6.0
      */
     public NClob getNClob(String colName) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     public <T> T unwrap(java.lang.Class<T> iface) throws java.sql.SQLException {
@@ -7932,7 +7911,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
       * @since 1.6
       */
      public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-         throw new UnsupportedOperationException("Operation ot yet supported");
+         throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
    /**
@@ -7944,7 +7923,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public void setSQLXML(String parameterName, SQLXML xmlObject) throws SQLException {
-         throw new UnsupportedOperationException("Operation ot yet supported");
+         throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
 
@@ -7960,7 +7939,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
-         throw new UnsupportedOperationException("Operation ot yet supported");
+         throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
 
@@ -7975,7 +7954,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
     * @since 1.6
     */
    public void setRowId(String parameterName, RowId x) throws SQLException {
-         throw new UnsupportedOperationException("Operation ot yet supported");
+         throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
 
@@ -8002,7 +7981,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
      public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
      }
 
 
@@ -8018,7 +7997,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
     * @since 1.6
     */
     public void setNClob(String parameterName, NClob value) throws SQLException {
-         throw new UnsupportedOperationException("Operation ot yet supported");
+         throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
 
@@ -8038,7 +8017,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public java.io.Reader getNCharacterStream(int columnIndex) throws SQLException {
-       throw new UnsupportedOperationException("Operation ot yet supported");
+       throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
 
@@ -8058,7 +8037,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public java.io.Reader getNCharacterStream(String columnName) throws SQLException {
-       throw new UnsupportedOperationException("Operation ot yet supported");
+       throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
      }
 
 
@@ -8075,7 +8054,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -8092,7 +8071,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public void updateSQLXML(String columnName, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
      /**
@@ -8110,7 +8089,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public String getNString(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
     /**
@@ -8128,7 +8107,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      * @since 1.6
      */
     public String getNString(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("Operation not yet supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
     }
 
      /**
@@ -8150,7 +8129,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                             java.io.Reader x,
                             long length)
                             throws SQLException {
-          throw new UnsupportedOperationException("Operation not yet supported");
+          throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
        }
 
      /**
@@ -8172,7 +8151,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
                             java.io.Reader x,
                             long length)
                             throws SQLException {
-          throw new UnsupportedOperationException("Operation not yet supported");
+          throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.opnotysupp").toString());
        }
 
      /**
@@ -8202,7 +8181,7 @@ public class CachedRowSetImpl extends BaseRowSet implements RowSet, RowSetIntern
      */
     public void updateNCharacterStream(int columnIndex,
                              java.io.Reader x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8234,7 +8213,7 @@ bel is the name of the column
      */
     public void updateNCharacterStream(String columnLabel,
                              java.io.Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
 //////////////////////////
@@ -8269,7 +8248,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported"); 
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /** 
@@ -8302,7 +8281,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8337,7 +8316,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(int columnIndex, InputStream inputStream) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8372,7 +8351,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8404,7 +8383,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(int columnIndex,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /** 
@@ -8436,7 +8415,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(String columnLabel,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
    /**
@@ -8470,7 +8449,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(int columnIndex,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8505,7 +8484,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateClob(String columnLabel,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
    /**
@@ -8539,7 +8518,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(int columnIndex,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8573,7 +8552,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(String columnLabel,  Reader reader, long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8609,7 +8588,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(int columnIndex,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8646,7 +8625,7 @@ bel is the name of the column
      * @since 1.6
      */
     public void updateNClob(String columnLabel,  Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
         /** 
@@ -8717,7 +8696,7 @@ bel is the name of the column
     public void updateCharacterStream(int columnIndex,
 			     java.io.Reader x,
 			     long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8743,7 +8722,7 @@ bel is the name of the column
     public void updateCharacterStream(String columnLabel,
                              java.io.Reader reader,
                              long length) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
      /** 
      * Updates the designated column with an ascii stream value, which will have
@@ -8813,7 +8792,7 @@ bel is the name of the column
      */
     public void updateBinaryStream(int columnIndex,
                             java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
    
@@ -8840,7 +8819,7 @@ bel is the name of the column
      */
     public void updateBinaryStream(String columnLabel,
                             java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8865,7 +8844,7 @@ bel is the name of the column
      */
     public void updateCharacterStream(int columnIndex,
                              java.io.Reader x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8892,7 +8871,7 @@ bel is the name of the column
      */
     public void updateCharacterStream(String columnLabel,
                              java.io.Reader reader) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8917,7 +8896,7 @@ bel is the name of the column
      */
     public void updateAsciiStream(int columnIndex,
                            java.io.InputStream x) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
     }
 
     /**
@@ -8959,7 +8938,7 @@ bel is the name of the column
   * @since 1.4
   */
   public void setURL(int parameterIndex, java.net.URL x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -8987,7 +8966,7 @@ bel is the name of the column
   */
   public void setNClob(int parameterIndex, Reader reader)
     throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -9015,7 +8994,7 @@ bel is the name of the column
             */
             public void setNClob(String parameterName, Reader reader, long length)
     throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9042,7 +9021,7 @@ bel is the name of the column
   */
   public void setNClob(String parameterName, Reader reader)
     throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9070,7 +9049,7 @@ bel is the name of the column
      */
      public void setNClob(int parameterIndex, Reader reader, long length)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9086,7 +9065,7 @@ a
      * @since 1.6
      */
      public void setNClob(int parameterIndex, NClob value) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9106,7 +9085,7 @@ a
   * @since 1.6
   */
   public void setNString(int parameterIndex, String value) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9123,7 +9102,7 @@ a
   */
  public void setNString(String parameterName, String value)
          throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9141,7 +9120,7 @@ a
   * @since 1.6
   */
   public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9160,7 +9139,7 @@ a
   */
  public void setNCharacterStream(String parameterName, Reader value, long length)
          throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
   
   /**
@@ -9186,7 +9165,7 @@ a
   * @since 1.6
   */
   public void setNCharacterStream(String parameterName, Reader value) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
   /**
@@ -9212,7 +9191,7 @@ a
     */
     public void setTimestamp(String parameterName, java.sql.Timestamp x, Calendar cal)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -9238,7 +9217,7 @@ a
               */
       public  void setClob(String parameterName, Reader reader, long length)
       throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9256,7 +9235,7 @@ a
     * @since 1.6
     */
     public void setClob (String parameterName, Clob x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9282,7 +9261,7 @@ a
     */
     public void setClob(String parameterName, Reader reader)
       throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9304,7 +9283,7 @@ a
     */
     public void setDate(String parameterName, java.sql.Date x)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9331,7 +9310,7 @@ a
     */
    public void setDate(String parameterName, java.sql.Date x, Calendar cal)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
  
@@ -9351,7 +9330,7 @@ a
     */
    public void setTime(String parameterName, java.sql.Time x)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9378,7 +9357,7 @@ a
     */
    public void setTime(String parameterName, java.sql.Time x, Calendar cal)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    } 
 
    /**
@@ -9404,7 +9383,7 @@ a
    */
    public void setClob(int parameterIndex, Reader reader)
      throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -9428,7 +9407,7 @@ a
    */
    public void setClob(int parameterIndex, Reader reader, long length)
      throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    } 
 
     
@@ -9458,7 +9437,7 @@ a
     */
     public void setBlob(int parameterIndex, InputStream inputStream, long length)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9488,7 +9467,7 @@ a
     */
     public void setBlob(int parameterIndex, InputStream inputStream)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9520,7 +9499,7 @@ a
      */
      public void setBlob(String parameterName, InputStream inputStream, long length)
         throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9538,7 +9517,7 @@ a
     * @since 1.6
     */
    public void setBlob (String parameterName, Blob x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9565,7 +9544,7 @@ a
     */
     public void setBlob(String parameterName, InputStream inputStream)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -9611,7 +9590,7 @@ a
     */
     public void setObject(String parameterName, Object x, int targetSqlType, int scale)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9639,7 +9618,7 @@ a
     */
     public void setObject(String parameterName, Object x, int targetSqlType)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9680,7 +9659,7 @@ a
    * @since 1.4
    */
    public void setObject(String parameterName, Object x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -9707,7 +9686,7 @@ a
     */
    public void setAsciiStream(String parameterName, java.io.InputStream x, int length)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9734,7 +9713,7 @@ a
     */
    public void setBinaryStream(String parameterName, java.io.InputStream x,
                         int length) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9764,7 +9743,7 @@ a
    public void setCharacterStream(String parameterName,
                            java.io.Reader reader,
                            int length) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9792,7 +9771,7 @@ a
   */
   public void setAsciiStream(String parameterName, java.io.InputStream x)
           throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9819,7 +9798,7 @@ a
     */
    public void setBinaryStream(String parameterName, java.io.InputStream x)
    throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9850,7 +9829,7 @@ a
     */
    public void setCharacterStream(String parameterName,
                          java.io.Reader reader) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
    /**
@@ -9869,7 +9848,7 @@ a
     * @since 1.4
     */
    public void setBigDecimal(String parameterName, BigDecimal x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9892,7 +9871,7 @@ a
     * @since 1.4
     */
    public void setString(String parameterName, String x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9914,7 +9893,7 @@ a
     * @since 1.4
     */
    public void setBytes(String parameterName, byte x[]) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9936,7 +9915,7 @@ a
     */
    public void setTimestamp(String parameterName, java.sql.Timestamp x)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
     /**
@@ -9953,7 +9932,7 @@ a
     * @since 1.4
     */
    public void setNull(String parameterName, int sqlType) throws SQLException {
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -9991,7 +9970,7 @@ a
     */
    public void setNull (String parameterName, int sqlType, String typeName)
        throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10011,7 +9990,7 @@ a
     * @since 1.4
     */
    public void setBoolean(String parameterName, boolean x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10031,7 +10010,7 @@ a
     * @since 1.4
     */
    public void setByte(String parameterName, byte x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10051,7 +10030,7 @@ a
     * @since 1.4
     */
    public void setShort(String parameterName, short x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10070,7 +10049,7 @@ a
     * @since 1.4
     */
    public void setInt(String parameterName, int x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10089,7 +10068,7 @@ a
     * @since 1.4
     */
    public void setLong(String parameterName, long x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10108,7 +10087,7 @@ a
     * @since 1.4
     */
    public void setFloat(String parameterName, float x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
    }
 
 
@@ -10127,8 +10106,24 @@ a
     * @since 1.4
     */
    public void setDouble(String parameterName, double x) throws SQLException{
-        throw new SQLFeatureNotSupportedException("Feature not supported");
+        throw new SQLFeatureNotSupportedException(resBundle.handleGetObject("cachedrowsetimpl.featnotsupp").toString());
+   }
+
+   /**
+     * This method re populates the resBundle
+     * during the deserialization process
+     *
+     */
+    protected void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        // Default state initialization happens here
+        ois.defaultReadObject();
+        // Initialization of transient Res Bundle happens here .
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+
    }
 	static final long serialVersionUID =1884577171200622428L;
 }
-

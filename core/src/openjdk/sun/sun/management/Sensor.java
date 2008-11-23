@@ -44,7 +44,6 @@ import java.util.HashMap;
  * </ul>
  *
  * @author  Mandy Chung
- * @version 1.11, 05/05/07 
  * @since   1.5
  */
 

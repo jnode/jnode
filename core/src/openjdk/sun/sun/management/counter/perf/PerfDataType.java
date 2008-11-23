@@ -35,7 +35,6 @@ import java.io.UnsupportedEncodingException;
  * kept in sychronization with the PerfDataType enum in the
  * globalsDefinitions.hpp file in the HotSpot source base.</p>
  *
- * @version 1.0, 8/17/02
  * @author  Brian Doherty
  */
 class PerfDataType {

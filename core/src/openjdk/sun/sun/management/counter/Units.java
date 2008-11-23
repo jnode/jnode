@@ -30,7 +30,6 @@ package sun.management.counter;
  * attribute for instrumentation objects.
  *
  * @author   Brian Doherty
- * @version  1.10, 05/05/07
  */
 public class Units implements java.io.Serializable {
 

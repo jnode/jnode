@@ -38,7 +38,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
  *
  * @see PackageWriter
  * @author John Rose
- * @version 1.32, 05/05/07
  */
 class PackageReader extends BandStructure {
     Package pkg;

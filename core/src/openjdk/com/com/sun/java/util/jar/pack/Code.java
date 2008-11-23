@@ -33,7 +33,6 @@ import java.lang.reflect.Modifier;
 /**
  * Represents a chunk of bytecodes.
  * @author John Rose
- * @version 1.20, 05/05/07
  */
 class Code extends Attribute.Holder implements Constants {
     Class.Method m;

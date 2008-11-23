@@ -71,4 +71,3 @@ public interface ClassPrepareEvent extends Event {
      */
     public ReferenceType referenceType();
 }
-

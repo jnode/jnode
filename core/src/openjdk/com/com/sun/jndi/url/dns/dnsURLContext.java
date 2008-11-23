@@ -40,7 +40,6 @@ import com.sun.jndi.toolkit.url.GenericURLDirContext;
  * See com.sun.jndi.dns.DnsUrl for a description of the URL format.
  *
  * @author Scott Seligman
- * @version 1.14 07/05/05
  */
 
 

@@ -96,9 +96,9 @@ public final class InetAddressCachePolicy {
 
 	try {
 	    tmp = new Integer(
-              (String)java.security.AccessController.doPrivileged (
-		new PrivilegedAction() {
-		  public Object run() {
+              java.security.AccessController.doPrivileged (
+                new PrivilegedAction<String>() {
+                  public String run() {
 		      return Security.getProperty(cachePolicyProp);
 		  }
 	      }));
@@ -112,7 +112,7 @@ public final class InetAddressCachePolicy {
 	    }
 	    set = true;
 	} else {
-	    tmp = (Integer)java.security.AccessController.doPrivileged
+            tmp = java.security.AccessController.doPrivileged
 		(new sun.security.action.GetIntegerAction(cachePolicyPropFallback));
 	    if (tmp != null) {
 		cachePolicy = tmp.intValue();
@@ -125,9 +125,9 @@ public final class InetAddressCachePolicy {
 
 	try {
 	    tmp = new Integer(
-              (String)java.security.AccessController.doPrivileged (
-		new PrivilegedAction() {
-		  public Object run() {
+              java.security.AccessController.doPrivileged (
+                new PrivilegedAction<String>() {
+                  public String run() {
 		      return Security.getProperty(negativeCachePolicyProp);
 		  }
 	      }));
@@ -142,7 +142,7 @@ public final class InetAddressCachePolicy {
 	    }
 	    negativeSet = true;
 	} else {
-	    tmp = (Integer)java.security.AccessController.doPrivileged
+            tmp = java.security.AccessController.doPrivileged
 		(new sun.security.action.GetIntegerAction(negativeCachePolicyPropFallback));
 	    if (tmp != null) {
 		negativeCachePolicy = tmp.intValue();
@@ -233,7 +233,3 @@ public final class InetAddressCachePolicy {
 	}
     }
 }
-	
-
-
-

@@ -70,8 +70,6 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
 
     private SyncProvider provider; 
     
-    private transient JdbcRowSetResourceBundle wrsResBundle;
-    
     /**
      * Constructs a new <code>WebRowSet</code> object initialized with the
      * default values for a <code>CachedRowSet</code> object instance. This 
@@ -87,12 +85,6 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
     public WebRowSetImpl() throws SQLException {
         super();
         
-        try {
-	   wrsResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
-	} catch(IOException ioe) {
-
-        }
-
 	// %%%
 	// Needs to use to SPI  XmlReader,XmlWriters
 	//
@@ -111,14 +103,8 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
      */
     public WebRowSetImpl(Hashtable env) throws SQLException {
     
-        try {
-	   wrsResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
-	} catch(IOException ioe) {
-
-        }
-
 	if ( env == null) {
-            throw new SQLException(wrsResBundle.handleGetObject("webrowsetimpl.nullhash").toString());
+            throw new SQLException(resBundle.handleGetObject("webrowsetimpl.nullhash").toString());
         }
 
         String providerName = 
@@ -171,7 +157,7 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
 	
 	    xmlWriter.writeXML(this, writer);
 	} else {
-	    throw new SQLException(wrsResBundle.handleGetObject("webrowsetimpl.invalidwr").toString());
+            throw new SQLException(resBundle.handleGetObject("webrowsetimpl.invalidwr").toString());
 	}    
     }
   
@@ -202,7 +188,7 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
                 } 
                                
             } else {
-                throw new SQLException(wrsResBundle.handleGetObject("webrowsetimpl.invalidrd").toString());
+                throw new SQLException(resBundle.handleGetObject("webrowsetimpl.invalidrd").toString());
             }
         } catch (Exception e) {
             throw new SQLException(e.getMessage());
@@ -234,7 +220,7 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
                 } 
                                
 	} else {
-	    throw new SQLException(wrsResBundle.handleGetObject("webrowsetimpl.invalidrd").toString());
+            throw new SQLException(resBundle.handleGetObject("webrowsetimpl.invalidrd").toString());
         }
     }
 
@@ -255,7 +241,7 @@ public class WebRowSetImpl extends CachedRowSetImpl implements WebRowSet {
 	    
 	    xmlWriter.writeXML(this, oStream);
 	} else {
-	    throw new SQLException(wrsResBundle.handleGetObject("webrowsetimpl.invalidwr").toString());
+            throw new SQLException(resBundle.handleGetObject("webrowsetimpl.invalidwr").toString());
 	}    
 	    
     }

@@ -51,7 +51,6 @@ import org.xml.sax.InputSource;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class BootstrapResolver implements EntityResolver, URIResolver {
   /** URI of the W3C XML Schema for OASIS XML Catalog files. */

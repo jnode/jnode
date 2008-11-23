@@ -1293,6 +1293,19 @@ public final class ToHTMLStream extends ToStream
                 // We now we reset the next possible clean character.
                 cleanStart = i + 1;    
             }
+            else if (ch == '&')
+            {
+                // HTML 4.01 reads, "Authors should use "&amp;" (ASCII decimal 38)
+                // instead of "&" to avoid confusion with the beginning of a character
+                // reference (entity reference open delimiter).
+                if (cleanLength > 0)
+                {
+                    writer.write(chars, cleanStart, cleanLength);
+                    cleanLength = 0;
+                }
+                writer.write("&amp;");
+                cleanStart = i + 1;
+            }
             else
             {
                 // no processing for this character, just count how

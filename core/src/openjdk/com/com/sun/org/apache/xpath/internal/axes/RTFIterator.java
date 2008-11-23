@@ -42,4 +42,3 @@ public class RTFIterator extends NodeSetDTM {
 		super(root, manager);
 	}
 }
-

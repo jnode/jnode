@@ -115,6 +115,3 @@ public class AnnotationProcessors {
 	return new CompositeAnnotationProcessor(aps);
     }
 }
-
-
-

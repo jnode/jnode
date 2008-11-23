@@ -34,7 +34,6 @@ package com.sun.mirror.apt;
  *
  * @author Joseph D. Darcy
  * @author Scott Seligman
- * @version 1.9 07/05/05
  * @since 1.5
  */
 public abstract class RoundCompleteEvent extends java.util.EventObject {

@@ -29,7 +29,6 @@ package com.sun.security.auth;
  * <p> This class abstracts an NT security token
  * and provides a mechanism to do same-process security impersonation.
  *
- * @version 1.21, 05/05/07
  */
 
 public class NTNumericCredential {

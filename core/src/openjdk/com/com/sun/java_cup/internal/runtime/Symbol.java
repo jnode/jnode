@@ -30,7 +30,6 @@ package com.sun.java_cup.internal.runtime;
  * and nonterminals while parsing.  The lexer should pass CUP Symbols 
  * and CUP returns a Symbol.
  *
- * @version last updated: 7/3/96
  * @author  Frank Flannery
  */
 
@@ -128,9 +127,3 @@ public class Symbol {
     ****************************/
   public String toString() { return "#"+sym; }
 }
-
-
-
-
-
-

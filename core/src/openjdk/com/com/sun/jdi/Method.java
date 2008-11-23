@@ -429,4 +429,3 @@ public interface Method extends TypeComponent, Locatable, Comparable<Method> {
      */
     int hashCode();
 }
-

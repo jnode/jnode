@@ -431,4 +431,3 @@ public class XML11Char {
      }
 
 } // class XML11Char
-

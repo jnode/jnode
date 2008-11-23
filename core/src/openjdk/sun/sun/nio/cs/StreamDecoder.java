@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)StreamDecoder.java	1.24 07/05/05
- */
+
 
 package sun.nio.cs;
 

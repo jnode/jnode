@@ -79,4 +79,3 @@ public interface InterfaceType extends ReferenceType {
      */
     List<ClassType> implementors();
 }
-

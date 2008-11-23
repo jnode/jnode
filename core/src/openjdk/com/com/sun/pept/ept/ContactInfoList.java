@@ -53,10 +53,3 @@ public interface ContactInfoList {
     public ContactInfoListIterator iterator();
 
 } // end ContactInfoList
-
-
-
-
-
-
-

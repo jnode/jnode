@@ -29,7 +29,6 @@ package com.sun.java.util.jar.pack;
  * A parsed bytecode instruction.
  * Provides accessors to various relevant bits.
  * @author John Rose
- * @version 1.19, 05/05/07
  */
 class Instruction implements Constants {
     protected byte[] bytes;  // bytecodes

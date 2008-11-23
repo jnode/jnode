@@ -163,7 +163,7 @@ final class LdapSchemaCtx extends HierMemDirCtx {
         if (!setupMode) {
 	    throw new SchemaViolationException("Cannot rename a schema object");
 	} else {
-	    doRename(oldname, newname);
+            super.doRename(oldname, newname);
 	}
     }
 

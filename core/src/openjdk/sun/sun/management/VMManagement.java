@@ -26,7 +26,7 @@
 package sun.management;
 
 import java.util.List;
-
+import sun.management.counter.Counter;
 /**
  * An interface for the monitoring and management of the 
  * Java virtual machine.
@@ -99,5 +99,5 @@ public interface VMManagement {
     public long    getClassVerificationTime();
 
     // Performance counter support
-    public List    getInternalCounters(String pattern);
+    public List<Counter>   getInternalCounters(String pattern);
 }

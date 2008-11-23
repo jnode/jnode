@@ -42,7 +42,6 @@ import org.w3c.dom.Element;
  * </PRE>
  *
  * @author $Author: raul $
- * @version $Revision: 1.11 $
  */
 public abstract class KeyResolverSpi {
 

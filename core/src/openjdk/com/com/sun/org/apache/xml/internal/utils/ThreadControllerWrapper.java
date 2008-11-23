@@ -53,6 +53,34 @@ public class ThreadControllerWrapper
   {
 
     /**
+      * This class was introduced as a fix for CR 6607339.
+      */
+     final class SafeThread extends Thread {
+          private volatile boolean ran = false;
+                  
+          public SafeThread(Runnable target) {
+              super(target);
+          }
+                  
+          public final void run() {
+              if (Thread.currentThread() != this) {
+                  throw new IllegalStateException("The run() method in a"
+                      + " SafeThread cannot be called from another thread.");
+              }
+              synchronized (this) {
+                 if (!ran) {
+                     ran = true;
+                 }
+                 else {
+                  throw new IllegalStateException("The run() method in a"
+                      + " SafeThread cannot be called more than once.");
+                 }                 
+              }             
+              super.run();
+          }
+     }
+ 
+     /**
      * Will get a thread from the pool, execute the task
      *  and return the thread to the pool.
      *
@@ -68,7 +96,7 @@ public class ThreadControllerWrapper
     public Thread run(Runnable task, int priority)
     {
 
-      Thread t = new Thread(task);
+      Thread t = new SafeThread(task);
 
       t.start();
 

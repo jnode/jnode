@@ -25,6 +25,7 @@
 
 package com.sun.rowset.providers;
 
+import com.sun.rowset.JdbcRowSetResourceBundle;
 import javax.sql.*;
 import java.io.*;
 
@@ -107,6 +108,11 @@ public final class RIOptimisticProvider extends SyncProvider implements Serializ
     private String versionNumber = "1.0";
 
     /** 
+     * ResourceBundle
+     */
+    private JdbcRowSetResourceBundle resBundle;
+
+    /**
      * Creates an <code>RIOptimisticProvider</code> object initialized with the
      * fully qualified class name of this <code>SyncProvider</code> implementation
      * and a default reader and writer.
@@ -118,6 +124,11 @@ public final class RIOptimisticProvider extends SyncProvider implements Serializ
         providerID = this.getClass().getName();
         reader = new CachedRowSetReader();
         writer = new CachedRowSetWriter();
+        try {
+           resBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     /**
@@ -185,7 +196,7 @@ public final class RIOptimisticProvider extends SyncProvider implements Serializ
      */
     public void setDataSourceLock(int datasource_lock) throws SyncProviderException {
         if(datasource_lock != SyncProvider.DATASOURCE_NO_LOCK ) {
-          throw new SyncProviderException("Locking classsification is not supported");
+          throw new SyncProviderException(resBundle.handleGetObject("riop.locking").toString());
         }   
     }
 

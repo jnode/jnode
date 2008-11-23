@@ -123,7 +123,7 @@ public class ManagementFactory {
 
     public static List<MemoryPoolMXBean> getMemoryPoolMXBeans() {
         MemoryPoolMXBean[] pools = MemoryImpl.getMemoryPools();
-        List list = new ArrayList(pools.length);
+        List<MemoryPoolMXBean> list = new ArrayList<MemoryPoolMXBean>(pools.length);
         for (int i = 0; i < pools.length; i++) {
             MemoryPoolMXBean p = pools[i];
             list.add(p);
@@ -133,7 +133,7 @@ public class ManagementFactory {
 
     public static List<MemoryManagerMXBean> getMemoryManagerMXBeans() {
         MemoryManagerMXBean[]  mgrs = MemoryImpl.getMemoryManagers();
-        List result = new ArrayList(mgrs.length);
+        List<MemoryManagerMXBean> result = new ArrayList<MemoryManagerMXBean>(mgrs.length);
         for (int i = 0; i < mgrs.length; i++) {
             MemoryManagerMXBean m = mgrs[i];
             result.add(m);
@@ -143,7 +143,7 @@ public class ManagementFactory {
 
     public static List<GarbageCollectorMXBean> getGarbageCollectorMXBeans() {
         MemoryManagerMXBean[]  mgrs = MemoryImpl.getMemoryManagers();
-        List result = new ArrayList(mgrs.length);
+        List<GarbageCollectorMXBean> result = new ArrayList<GarbageCollectorMXBean>(mgrs.length);
         for (int i = 0; i < mgrs.length; i++) {
             if (mgrs[i] instanceof GarbageCollectorMXBean) {
                 GarbageCollectorMXBean gc = (GarbageCollectorMXBean) mgrs[i];
@@ -288,7 +288,7 @@ public class ManagementFactory {
             final MBeanServer mbs0 = mbs;
             final Object mbean0 = mbean;
             final boolean ignore = ignoreConflicts;
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws InstanceAlreadyExistsException,
                                            MBeanRegistrationException,
                                            NotCompliantMBeanException {
@@ -409,7 +409,7 @@ public class ManagementFactory {
 
             // inner class requires these fields to be final
             final MBeanServer mbs0 = mbs;
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws MBeanRegistrationException,
                                            RuntimeOperationsException  {
                     try {

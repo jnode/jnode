@@ -109,4 +109,3 @@ public abstract class Doclet {
 	return LanguageVersion.JAVA_1_1;
     }
 }
-

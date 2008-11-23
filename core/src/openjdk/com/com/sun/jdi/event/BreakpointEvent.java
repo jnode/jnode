@@ -50,5 +50,3 @@ import java.util.List;
 public interface BreakpointEvent extends LocatableEvent {
 
 }
-    
-

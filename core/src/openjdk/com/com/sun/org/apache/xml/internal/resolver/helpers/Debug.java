@@ -33,7 +33,6 @@ package com.sun.org.apache.xml.internal.resolver.helpers;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class Debug {
   /** The internal debug level. */

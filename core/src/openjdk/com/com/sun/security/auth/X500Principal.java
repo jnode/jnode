@@ -41,7 +41,6 @@ import sun.security.x509.X500Name;
  * on how to achieve this.  Authorization decisions can then be based upon 
  * the Principals associated with a <code>Subject</code>.
  * 
- * @version 1.21, 05/05/07
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  * @deprecated A new X500Principal class is available in the Java platform.

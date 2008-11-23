@@ -38,4 +38,3 @@ package com.sun.jdi;
 public interface LongType extends PrimitiveType
 {
 }
-

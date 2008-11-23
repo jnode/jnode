@@ -398,7 +398,6 @@ public abstract class IntegrityHmac extends SignatureAlgorithmSpi {
     * Class IntegrityHmacSHA1
     *
     * @author $Author: raul $
-    * @version $Revision: 1.13 $
     */
    public static class IntegrityHmacSHA1 extends IntegrityHmac {
 
@@ -425,7 +424,6 @@ public abstract class IntegrityHmac extends SignatureAlgorithmSpi {
     * Class IntegrityHmacSHA256
     *
     * @author $Author: raul $
-    * @version $Revision: 1.13 $
     */
    public static class IntegrityHmacSHA256 extends IntegrityHmac {
 
@@ -452,7 +450,6 @@ public abstract class IntegrityHmac extends SignatureAlgorithmSpi {
     * Class IntegrityHmacSHA384
     *
     * @author $Author: raul $
-    * @version $Revision: 1.13 $
     */
    public static class IntegrityHmacSHA384 extends IntegrityHmac {
 
@@ -479,7 +476,6 @@ public abstract class IntegrityHmac extends SignatureAlgorithmSpi {
     * Class IntegrityHmacSHA512
     *
     * @author $Author: raul $
-    * @version $Revision: 1.13 $
     */
    public static class IntegrityHmacSHA512 extends IntegrityHmac {
 
@@ -506,7 +502,6 @@ public abstract class IntegrityHmac extends SignatureAlgorithmSpi {
     * Class IntegrityHmacRIPEMD160
     *
     * @author $Author: raul $
-    * @version $Revision: 1.13 $
     */
    public static class IntegrityHmacRIPEMD160 extends IntegrityHmac {
 
@@ -533,7 +528,6 @@ public abstract class IntegrityHmac extends SignatureAlgorithmSpi {
     * Class IntegrityHmacMD5
     *
     * @author $Author: raul $
-    * @version $Revision: 1.13 $
     */
    public static class IntegrityHmacMD5 extends IntegrityHmac {
 

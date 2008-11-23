@@ -317,6 +317,3 @@ class NativeUnpack {
 	if (_verbose > 0) Utils.log.info("Writing " + Utils.zeString(z));
     }
 }
-
-
-

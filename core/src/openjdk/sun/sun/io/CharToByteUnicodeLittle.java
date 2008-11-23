@@ -30,7 +30,6 @@ package sun.io;
  * Convert arrays containing Unicode characters into arrays of bytes, using
  * little-endian byte order.
  *
- * @version 	1.17, 07/05/05
  * @author	Mark Reinhold
  */
 

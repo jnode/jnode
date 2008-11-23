@@ -94,10 +94,13 @@ public class XMLReaderManager {
         }
 
         // If the cached reader for this thread is in use, construct a new
-        // one; otherwise, return the cached reader.
+        // one; otherwise, return the cached reader unless it isn't an
+        // instance of the class set in the 'org.xml.sax.driver' property
         reader = (XMLReader) m_readers.get();
         boolean threadHasReader = (reader != null);
-        if (!threadHasReader || m_inUse.get(reader) == Boolean.TRUE) {
+        String factory = SecuritySupport.getInstance().getSystemProperty("org.xml.sax.driver");
+        if (!threadHasReader || m_inUse.get(reader) == Boolean.TRUE ||
+                !reader.getClass().getName().equals(factory)) {
             try {
                 try {
                     // According to JAXP 1.2 specification, if a SAXSource

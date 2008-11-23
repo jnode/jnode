@@ -112,7 +112,7 @@ class HotspotCompilation
     private CompilerThreadInfo[] threads;
     private int numActiveThreads; // number of active compiler threads
 
-    private Map counters; 
+    private Map<String, Counter> counters;
     private Counter lookup(String name) {
         Counter c = null;
 
@@ -137,7 +137,7 @@ class HotspotCompilation
     private void initCompilerCounters() {
         // Build a tree map of the current list of performance counters 
         ListIterator iter = getInternalCompilerCounters().listIterator(); 
-        counters = new TreeMap();
+        counters = new TreeMap<String, Counter>();
         while (iter.hasNext()) {
             Counter c = (Counter) iter.next();
             counters.put(c.getName(), c);
@@ -199,8 +199,8 @@ class HotspotCompilation
         return nmethodSize.longValue();
     }
 
-    public java.util.List getCompilerThreadStats() {
-        List list = new ArrayList(threads.length);
+    public java.util.List<CompilerThreadStat> getCompilerThreadStats() {
+        List<CompilerThreadStat> list = new ArrayList<CompilerThreadStat>(threads.length);
         int i = 0;
         if (threads[0] == null) {
             // no adaptor thread
@@ -230,7 +230,7 @@ class HotspotCompilation
                               -1);
     }
 
-    public java.util.List getInternalCompilerCounters() {
+    public java.util.List<Counter> getInternalCompilerCounters() {
         return jvm.getInternalCounters(CI_COUNTER_NAME_PATTERN); 
     } 
 }

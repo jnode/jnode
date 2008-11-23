@@ -38,7 +38,6 @@ import java.beans.PropertyChangeEvent;
  * </pre></blockquote>
  * @author John Rose
  * @author Kumar Srinivasan
- * @version 1.40, 05/05/07
  */
 
 
@@ -620,10 +619,3 @@ public class PackerImpl implements Pack200.Packer {
 	}
     }
 }
-
-
-
-
-
-
-

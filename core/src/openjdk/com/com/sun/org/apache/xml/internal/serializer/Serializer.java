@@ -221,4 +221,3 @@ public interface Serializer {
      */
     public boolean reset();
 }
-

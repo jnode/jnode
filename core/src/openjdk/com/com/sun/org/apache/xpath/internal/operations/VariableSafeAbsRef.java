@@ -73,4 +73,3 @@ public class VariableSafeAbsRef extends Variable
   }
 
 }
-

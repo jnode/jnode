@@ -56,7 +56,6 @@ import org.xml.sax.SAXException;
  * org.xml.sax.DocumentHandler#endDocument}.
  *
  *
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:18 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @see Serializer
  */
@@ -389,5 +388,3 @@ public class TextSerializer
 
 
 }
-
-

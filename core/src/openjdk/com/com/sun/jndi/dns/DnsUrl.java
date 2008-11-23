@@ -51,7 +51,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
  * the domain name must be %-escaped as described in RFC 2396.
  *
  * @author Scott Seligman
- * @version 1.14 07/05/05
  */
 
 

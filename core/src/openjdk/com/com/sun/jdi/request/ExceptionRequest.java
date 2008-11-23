@@ -153,6 +153,3 @@ public interface ExceptionRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-
-
-			

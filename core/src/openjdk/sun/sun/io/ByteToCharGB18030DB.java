@@ -35,7 +35,6 @@ import sun.nio.cs.ext.GB18030;
  * convenience of the main GB18030 converter.
  *
  * @author  ConverterGenerator tool
- * @version >= JDK1.4
  */
 
 abstract class ByteToCharGB18030DB extends ByteToCharDoubleByte {

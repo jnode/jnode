@@ -147,4 +147,3 @@ public interface Type extends Mirror
      */
     String name();
 }
-

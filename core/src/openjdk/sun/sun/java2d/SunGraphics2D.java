@@ -84,7 +84,7 @@ import sun.java2d.pipe.Region;
 import sun.java2d.pipe.RegionIterator;
 import sun.java2d.pipe.TextPipe;
 import sun.java2d.pipe.DrawImagePipe;
-import sun.java2d.pipe.DuctusRenderer;
+import sun.java2d.pipe.LoopPipe;
 import sun.java2d.loops.FontInfo;
 import sun.java2d.loops.RenderLoops;
 import sun.java2d.loops.CompositeType;
@@ -109,7 +109,6 @@ import sun.misc.PerformanceLogger;
  * general framework for performing all of the requests in the
  * Graphics and Graphics2D APIs.
  *
- * @version 1.211 05/07/98
  * @author Jim Graham
  */
 public final class SunGraphics2D
@@ -919,6 +918,7 @@ public final class SunGraphics2D
 	    compositeState = newCompState;
 	    imageComp = newCompType;
 	    invalidatePipe();
+            validFontInfo = false;
         }
 	composite = comp;
         if (paintState <= PAINT_ALPHACOLOR) {
@@ -967,14 +967,17 @@ public final class SunGraphics2D
         } else {
             paintState = PAINT_CUSTOM;
         }
+        validFontInfo = false;
         invalidatePipe();
     }
 
     static final int NON_UNIFORM_SCALE_MASK =
 	(AffineTransform.TYPE_GENERAL_TRANSFORM |
 	 AffineTransform.TYPE_GENERAL_SCALE);
-    public static final double MinPenSizeAASquared = 
-	(DuctusRenderer.MinPenSizeAA * DuctusRenderer.MinPenSizeAA);
+    public static final double MinPenSizeAA =
+        sun.java2d.pipe.RenderingEngine.getInstance().getMinimumAAPenSize();
+    public static final double MinPenSizeAASquared =
+        (MinPenSizeAA * MinPenSizeAA);
     // Since inaccuracies in the trig package can cause us to
     // calculated a rotated pen width of just slightly greater
     // than 1.0, we add a fudge factor to our comparison value
@@ -986,7 +989,7 @@ public final class SunGraphics2D
 	boolean aa = (antialiasHint == SunHints.INTVAL_ANTIALIAS_ON);
 	if (transformState < TRANSFORM_TRANSLATESCALE) {
 	    if (aa) {
-		if (bs.getLineWidth() <= DuctusRenderer.MinPenSizeAA) {
+                if (bs.getLineWidth() <= MinPenSizeAA) {
 		    if (bs.getDashArray() == null) {
 			strokeState = STROKE_THIN;
 		    } else {
@@ -1155,9 +1158,7 @@ public final class SunGraphics2D
 		if (stateChanged) {
 		    textStateChanged =
 			(textAntialiasHint ==
-                         SunHints.INTVAL_TEXT_ANTIALIAS_DEFAULT) ||
-                        (textAntialiasHint >=
-                         SunHints.INTVAL_TEXT_ANTIALIAS_LCD_HRGB);
+                         SunHints.INTVAL_TEXT_ANTIALIAS_DEFAULT);
 		    if (strokeState != STROKE_CUSTOM) {
 			validateBasicStroke((BasicStroke) stroke);
 		    }
@@ -1703,6 +1704,7 @@ public final class SunGraphics2D
 		compositeState = COMP_ALPHA;
 	    }
 	}
+        validFontInfo = false;
 	invalidatePipe();
     }
 
@@ -1842,7 +1844,7 @@ public final class SunGraphics2D
 	} else {
             PathIterator cpi = usrClip.getPathIterator(null);
             int box[] = new int[4];
-            ShapeSpanIterator sr = new ShapeSpanIterator(this, false);
+            ShapeSpanIterator sr = LoopPipe.getFillSSI(this);
             try {
                 sr.setOutputArea(devClip);
                 sr.appendPath(cpi);
@@ -1859,6 +1861,7 @@ public final class SunGraphics2D
 	if (origClipState != clipState &&
 	    (clipState == CLIP_SHAPE || origClipState == CLIP_SHAPE))
 	{
+            validFontInfo = false;
 	    invalidatePipe();
 	}
     }
@@ -3253,12 +3256,33 @@ public final class SunGraphics2D
     }
     private FontRenderContext cachedFRC;
 
+    /**
+     * This object has no resources to dispose of per se, but the
+     * doc comments for the base method in java.awt.Graphics imply
+     * that this object will not be useable after it is disposed.
+     * So, we sabotage the object to prevent further use to prevent
+     * developers from relying on behavior that may not work on
+     * other, less forgiving, VMs that really need to dispose of
+     * resources.
+     */
     public void dispose() {
 	surfaceData = NullSurfaceData.theInstance;
 	invalidatePipe();
     }
 
+    /**
+     * Graphics has a finalize method that automatically calls dispose()
+     * for subclasses.  For SunGraphics2D we do not need to be finalized
+     * so that method simply causes us to be enqueued on the Finalizer
+     * queues for no good reason.  Unfortunately, that method and
+     * implementation are now considered part of the public contract
+     * of that base class so we can not remove or gut the method.
+     * We override it here with an empty method and the VM is smart
+     * enough to know that if our override is empty then it should not
+     * mark us as finalizeable.
+     */
     public void finalize() {
+        // DO NOT REMOVE THIS METHOD
     }
 
     /**

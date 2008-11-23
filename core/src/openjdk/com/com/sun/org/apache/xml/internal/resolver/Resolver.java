@@ -45,7 +45,6 @@ import javax.xml.parsers.SAXParserFactory;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class Resolver extends Catalog {
   /**
@@ -689,7 +688,3 @@ public class Resolver extends Catalog {
 	}
     }
 }
-
-
-
-

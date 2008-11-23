@@ -27,6 +27,9 @@ import java.util.Locale;
 import com.sun.org.apache.xerces.internal.util.MessageFormatter;
 import com.sun.org.apache.xerces.internal.impl.msg.XMLMessageFormatter;
 
+import com.sun.xml.internal.stream.util.BufferAllocator;
+import com.sun.xml.internal.stream.util.ThreadLocalBufferAllocator;
+
 /**
  * A simple ASCII byte reader. This is an optimized reader for reading
  * byte streams that only contain 7-bit ASCII characters.
@@ -93,7 +96,11 @@ public class ASCIIReader
     public ASCIIReader(InputStream inputStream, int size,
             MessageFormatter messageFormatter, Locale locale) {
         fInputStream = inputStream;
+        BufferAllocator ba = ThreadLocalBufferAllocator.getBufferAllocator();
+        fBuffer = ba.getByteBuffer(size);
+        if (fBuffer == null) {
         fBuffer = new byte[size];
+        }
         fFormatter = messageFormatter;
         fLocale = locale;
     } // <init>(InputStream,int, MessageFormatter, Locale)
@@ -232,6 +239,9 @@ public class ASCIIReader
      * @exception  IOException  If an I/O error occurs
      */
      public void close() throws IOException {
+         BufferAllocator ba = ThreadLocalBufferAllocator.getBufferAllocator();
+         ba.returnByteBuffer(fBuffer);
+         fBuffer = null;
          fInputStream.close();
      } // close()
 

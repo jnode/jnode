@@ -31,7 +31,6 @@ import java.util.*;
 /**
  * Representation of constant pool entries and indexes.
  * @author John Rose
- * @version 1.25, 05/05/07
  */
 abstract
 class ConstantPool implements Constants {

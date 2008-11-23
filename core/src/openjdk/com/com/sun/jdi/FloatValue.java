@@ -59,4 +59,3 @@ public interface FloatValue extends PrimitiveValue, Comparable<FloatValue>
      */
     int hashCode();
 }
-

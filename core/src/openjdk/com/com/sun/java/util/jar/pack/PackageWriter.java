@@ -36,7 +36,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
 /**
  * Writer for a package file.
  * @author John Rose
- * @version 1.33, 05/05/07
  */
 class PackageWriter extends BandStructure {
     Package pkg;
@@ -1619,4 +1618,3 @@ class PackageWriter extends BandStructure {
 	}
     }
 }
-

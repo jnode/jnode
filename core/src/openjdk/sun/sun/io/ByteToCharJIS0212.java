@@ -31,7 +31,6 @@ import sun.nio.cs.ext.JIS_X_0212_Decoder;
  * Tables and data to convert JIS0212 to Unicode
  *
  * @author  ConverterGenerator tool
- * @version >= JDK1.1.6
  */
 
 

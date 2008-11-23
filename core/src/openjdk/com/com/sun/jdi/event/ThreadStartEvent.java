@@ -61,5 +61,3 @@ public interface ThreadStartEvent extends Event {
      */
     public ThreadReference thread();
 }
-    
-

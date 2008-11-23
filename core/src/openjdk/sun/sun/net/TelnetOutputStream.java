@@ -66,7 +66,6 @@ import java.io.*;
  *    set mapping.
  * </pre>
  *
- * @version	1.29, 05/05/07
  * @author	Jonathan Payne
  */
 

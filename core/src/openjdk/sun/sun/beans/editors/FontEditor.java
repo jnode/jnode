@@ -119,7 +119,7 @@ public class FontEditor extends Panel implements java.beans.PropertyEditor {
         if (this.font == null)
             return "null";
 
-	return "new java.awt.Font(\"" + font.getFamily() + "\", " +
+        return "new java.awt.Font(\"" + font.getName() + "\", " +
   	           font.getStyle() + ", " + font.getSize() + ")";
     }
 
@@ -154,10 +154,10 @@ public class FontEditor extends Panel implements java.beans.PropertyEditor {
 
     public String getAsText() {
         if (this.font == null) {
-            return null;
+            return "null";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(this.font.getFamily());
+        sb.append(this.font.getName());
         sb.append(' ');
 
         boolean b = this.font.isBold();
@@ -216,4 +216,3 @@ public class FontEditor extends Panel implements java.beans.PropertyEditor {
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 }
-

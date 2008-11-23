@@ -38,4 +38,3 @@ public interface Hurryable {
     boolean hurry();
 
 }
-

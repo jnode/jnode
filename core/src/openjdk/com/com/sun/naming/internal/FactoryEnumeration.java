@@ -33,7 +33,6 @@ import javax.naming.NamingException;
   * 
   * @author Rosanna Lee
   * @author Scott Seligman
-  * @version 1.15 07/05/05
  */
 
 // no need to implement Enumeration since this is only for internal use

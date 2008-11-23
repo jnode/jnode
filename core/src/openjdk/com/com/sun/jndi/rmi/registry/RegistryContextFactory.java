@@ -50,7 +50,6 @@ import com.sun.jndi.url.rmi.rmiURLContextFactory;
  * same logical resource.  The order of the addresses is not significant.
  *
  * @author Scott Seligman
- * @version 1.17 07/05/05
  */
 
 

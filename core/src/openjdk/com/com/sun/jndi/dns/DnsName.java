@@ -100,7 +100,6 @@ import javax.naming.*;
  * concurrent access by multiple threads.
  *
  * @author Scott Seligman
- * @version 1.15 07/05/05
  */
 
 

@@ -33,7 +33,6 @@ import java.util.zip.*;
  * Heuristic chooser of basic encodings.
  * Runs "zip" to measure the apparent information content after coding.
  * @author John Rose
- * @version 1.22, 05/05/07
  */
 class CodingChooser implements Constants {
     int verbose;

@@ -37,7 +37,6 @@ import java.beans.PropertyChangeEvent;
  * </pre></blockquote>
  * @author John Rose
  * @author Kumar Srinivasan
- * @version 1.10, 05/05/07
  */
 
 

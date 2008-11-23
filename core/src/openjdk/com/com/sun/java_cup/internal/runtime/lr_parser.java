@@ -133,7 +133,6 @@ import java.util.Stack;
  * @see     com.sun.java_cup.internal.runtime.Symbol
  * @see     com.sun.java_cup.internal.runtime.Symbol
  * @see     com.sun.java_cup.internal.runtime.virtual_parse_stack
- * @version last updated: 7/3/96
  * @author  Frank Flannery
  */
 
@@ -1250,4 +1249,3 @@ public abstract class lr_parser {
       return result;
     }
 }
-

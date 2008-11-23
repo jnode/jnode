@@ -43,7 +43,6 @@ import com.sun.org.apache.xml.internal.resolver.*;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class ResolvingXMLReader extends ResolvingXMLFilter {
   /** Make the parser Namespace aware? */
@@ -92,4 +91,3 @@ public class ResolvingXMLReader extends ResolvingXMLFilter {
     }
   }
 }
-

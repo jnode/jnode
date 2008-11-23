@@ -58,4 +58,3 @@ public interface MonitorContendedEnteredEvent extends LocatableEvent {
     public ObjectReference  monitor();
     
 }
-

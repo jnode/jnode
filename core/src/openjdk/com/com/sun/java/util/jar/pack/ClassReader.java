@@ -34,7 +34,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
 /**
  * Reader for a class file that is being incorporated into a package.
  * @author John Rose
- * @version 1.24, 05/05/07
  */
 class ClassReader implements Constants {
     int verbose;
@@ -465,4 +464,3 @@ class ClassReader implements Constants {
 	// (Later, ics may be transferred to the pkg.)
     }
 }
-

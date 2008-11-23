@@ -31,7 +31,6 @@ import java.io.UnsupportedEncodingException;
 /**
  * Utilities for dealing with URLs.
  * @author Vincent Ryan
- * @version 1.16 07/05/05
  */
 
 final public class UrlUtil {

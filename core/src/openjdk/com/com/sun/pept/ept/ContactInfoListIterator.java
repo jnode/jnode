@@ -62,10 +62,3 @@ public interface ContactInfoListIterator {
     public ContactInfo next();
 
 } // end ContactInfoListIterator
-
-
-
-
-
-
-

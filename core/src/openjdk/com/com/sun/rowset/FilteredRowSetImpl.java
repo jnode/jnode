@@ -51,19 +51,12 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
     
     private boolean onInsertRow = false;
     
-    private transient JdbcRowSetResourceBundle frsResBundle;
 
     /**
      * Construct a <code>FilteredRowSet</code>
      */
     public FilteredRowSetImpl() throws SQLException {
         super();
-        
-        try {
-	   frsResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
-	} catch(IOException ioe) {
-
-        }
     }
    
     /**
@@ -75,12 +68,6 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
      */
     public FilteredRowSetImpl(Hashtable env) throws SQLException {
         super(env);
-        
-        try {
-	   frsResBundle = JdbcRowSetResourceBundle.getJdbcRowSetResourceBundle();
-	} catch(IOException ioe) {
-
-        }
     }
 
     /**
@@ -310,7 +297,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
       boolean boolval = false;
       
       if(getType() == ResultSet.TYPE_FORWARD_ONLY) {
-         throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.relative").toString());
+         throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.relative").toString());
       }
       
       if( rows > 0 ) {
@@ -338,7 +325,8 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
          }
          retval = boolval;
       }
-      
+      if(rows != 0)
+          notifyCursorMoved();
       return retval;
    }
    
@@ -393,14 +381,13 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
    
       boolean retval;
       boolean bool = false;
-      boolean boolval = false;
       
       if(rows == 0 || getType() == ResultSet.TYPE_FORWARD_ONLY) {
-         throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.absolute").toString());
+         throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.absolute").toString());
       }
    
       if (rows > 0) {
-         internalFirst();
+         bool = internalFirst();
          
          int i = 0;
          while(i < (rows-1)) {
@@ -412,19 +399,19 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
          }
          retval = bool;
       } else {
-         internalLast();
+         bool = internalLast();
          
          int j = rows;
          while((j+1) < 0 ) {
             if( isBeforeFirst() ) {
                return false;
 	    }
-            boolval = internalPrevious();
+            bool = internalPrevious();
             j++;
          }
-         retval = boolval;
+         retval = bool;
       }
-      
+      notifyCursorMoved();
       return retval;
    }
    
@@ -515,7 +502,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
            bool = p.evaluate(new Integer(x),columnIndex);
         
            if(!bool) {
-              throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+              throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
            }
         } 
      }
@@ -582,7 +569,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(new Boolean(x) , columnIndex);
          
             if(!bool) {
-               throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+               throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
          }
       }
@@ -650,7 +637,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(new Byte(x),columnIndex);
          
             if(!bool) {
-                throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
           } 
       }
@@ -719,7 +706,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(new Short(x), columnIndex);
          
             if(!bool) {
-               throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+               throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
           }
       }
@@ -787,7 +774,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(new Long(x), columnIndex);
          
             if(!bool) {
-               throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+               throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
           }
       }
@@ -854,7 +841,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(new Float(x) , columnIndex);
          
             if(!bool) {
-               throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+               throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
           }
       }
@@ -921,7 +908,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(new Double(x) , columnIndex);
          
             if(!bool) {
-               throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+               throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
           }
       }
@@ -988,7 +975,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
             bool = p.evaluate(x,columnIndex);
          
             if(!bool) {
-               throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+               throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
             }
           }
       }
@@ -1058,7 +1045,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
            bool = p.evaluate(x,columnIndex);
          
            if(!bool) {
-              throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());    
+              throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
            }
          }
       }
@@ -1134,7 +1121,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(val,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString()); 
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }
@@ -1202,7 +1189,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }
@@ -1272,7 +1259,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x, columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }
@@ -1343,7 +1330,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }
@@ -1413,7 +1400,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }         
       }
@@ -1482,7 +1469,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }
@@ -1556,7 +1543,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }         
       }
@@ -1627,7 +1614,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }
@@ -1699,7 +1686,7 @@ public class FilteredRowSetImpl extends WebRowSetImpl implements Serializable, C
              bool = p.evaluate(x,columnIndex);
          
              if(!bool) {
-                 throw new SQLException(frsResBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
+                 throw new SQLException(resBundle.handleGetObject("filteredrowsetimpl.notallowed").toString());
              }
          }
       }

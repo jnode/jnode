@@ -179,4 +179,3 @@ public interface Value extends Mirror
      */
     Type type();
 }
-

@@ -39,7 +39,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
  * <p>
  * 
  * @author John Rose
- * @version 1.13, 05/05/07
  */
 class Fixups extends AbstractCollection implements Constants {
     byte[] bytes;    // the subject of the relocations

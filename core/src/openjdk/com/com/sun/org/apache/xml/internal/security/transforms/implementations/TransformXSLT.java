@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -104,6 +105,8 @@ public class TransformXSLT extends TransformSpi {
          }
 
          TransformerFactory tFactory = TransformerFactory.newInstance();
+         // Process XSLT stylesheets in a secure manner
+         tFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
          /*
           * This transform requires an octet stream as input. If the actual

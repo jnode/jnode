@@ -40,7 +40,6 @@ import com.sun.jndi.toolkit.ctx.*;
  * A DnsContext is a directory context representing a DNS node.
  *
  * @author Scott Seligman
- * @version 1.30 07/05/05
  */
 
 

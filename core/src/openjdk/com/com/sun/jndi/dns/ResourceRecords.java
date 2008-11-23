@@ -37,7 +37,6 @@ import javax.naming.*;
  * The additional records section is currently ignored.
  *
  * @author Scott Seligman
- * @version 1.12 07/05/05
  */
 
 

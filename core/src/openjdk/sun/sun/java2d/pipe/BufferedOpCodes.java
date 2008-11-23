@@ -48,7 +48,6 @@ public class BufferedOpCodes {
     public static final int DRAW_GLYPH_LIST      = 40;
 
     // state-related ops
-    public static final int SET_COLOR            = 50;
     public static final int SET_RECT_CLIP        = 51;
     public static final int BEGIN_SHAPE_CLIP     = 52;
     public static final int SET_SHAPE_CLIP_SPANS = 53;
@@ -76,14 +75,12 @@ public class BufferedOpCodes {
     public static final int NOOP                 = 90;
 
     // paint-related ops
-    public static final int ENABLE_GRADIENT_PAINT         = 100;
-    public static final int DISABLE_GRADIENT_PAINT        = 101;
-    public static final int ENABLE_LINEAR_GRADIENT_PAINT  = 102;
-    public static final int DISABLE_LINEAR_GRADIENT_PAINT = 103;
-    public static final int ENABLE_RADIAL_GRADIENT_PAINT  = 104;
-    public static final int DISABLE_RADIAL_GRADIENT_PAINT = 105;
-    public static final int ENABLE_TEXTURE_PAINT          = 106;
-    public static final int DISABLE_TEXTURE_PAINT         = 107;
+    public static final int RESET_PAINT               = 100;
+    public static final int SET_COLOR                 = 101;
+    public static final int SET_GRADIENT_PAINT        = 102;
+    public static final int SET_LINEAR_GRADIENT_PAINT = 103;
+    public static final int SET_RADIAL_GRADIENT_PAINT = 104;
+    public static final int SET_TEXTURE_PAINT         = 105;
 
     // BufferedImageOp-related ops
     public static final int ENABLE_CONVOLVE_OP     = 120;

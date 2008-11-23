@@ -33,7 +33,6 @@ import java.util.*;
  * The ExecOptionPermission class represents permission for rmid to use
  * a specific command-line option when launching an activation group.
  * <P>
- * @version 1.13, 05/05/07
  *
  * @author Ann Wollrath
  *

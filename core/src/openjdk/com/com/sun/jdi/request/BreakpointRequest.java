@@ -85,6 +85,3 @@ public interface BreakpointRequest extends EventRequest, Locatable {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-
-
-			

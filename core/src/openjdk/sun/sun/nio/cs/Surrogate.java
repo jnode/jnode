@@ -35,7 +35,6 @@ import java.nio.charset.UnmappableCharacterException;
  * Utility class for dealing with surrogates.
  *
  * @author Mark Reinhold
- * @version 1.19, 07/05/05
  */
 
 public class Surrogate {

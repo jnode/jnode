@@ -31,7 +31,6 @@ import java.util.StringTokenizer;
 /**
  *
  *
- * @version $Revision: 1.2.6.1 $ $Date: 2005/09/09 07:26:17 $
  * @author <a href="mailto:Scott_Boag/CAM/Lotus@lotus.com">Scott Boag</a>
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  */
@@ -147,5 +146,3 @@ public abstract class SerializerFactory
 
 
 }
-
-

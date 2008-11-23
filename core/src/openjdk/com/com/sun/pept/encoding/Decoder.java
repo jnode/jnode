@@ -67,10 +67,3 @@ public interface Decoder {
     public void receiveAndDecode(MessageInfo messageInfo);
 
 } // end Decoder
-
-
-
-
-
-
-

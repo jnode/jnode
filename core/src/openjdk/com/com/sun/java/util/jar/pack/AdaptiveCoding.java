@@ -32,7 +32,6 @@ import java.io.*;
  * Adaptive coding.
  * See the section "Adaptive Encodings" in the Pack200 spec.
  * @author John Rose
- * @version 1.12, 05/05/07
  */
 class AdaptiveCoding implements Constants, CodingMethod {
     CodingMethod headCoding;

@@ -31,7 +31,6 @@ package sun.io;
  * little-endian byte order; do not write a byte-order mark before the first
  * converted character.
  *
- * @version 	1.18, 07/05/05
  * @author	Mark Reinhold
  */
 

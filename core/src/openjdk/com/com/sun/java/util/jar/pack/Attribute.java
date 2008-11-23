@@ -36,7 +36,6 @@ import com.sun.java.util.jar.pack.ConstantPool.*;
  * Implements the "little language" of Pack200 for describing
  * attribute layouts.
  * @author John Rose
- * @version 1.27, 05/05/07
  */
 class Attribute implements Comparable, Constants {
     // Attribute instance fields.

@@ -236,7 +236,6 @@ public abstract class SignatureBaseRSA extends SignatureAlgorithmSpi {
     * Class SignatureRSASHA1
     *
     * @author $Author: raul $
-    * @version $Revision: 1.12 $
     */
    public static class SignatureRSASHA1 extends SignatureBaseRSA {
 
@@ -259,7 +258,6 @@ public abstract class SignatureBaseRSA extends SignatureAlgorithmSpi {
     * Class SignatureRSASHA256
     *
     * @author $Author: raul $
-    * @version $Revision: 1.12 $
     */
    public static class SignatureRSASHA256 extends SignatureBaseRSA {
 
@@ -282,7 +280,6 @@ public abstract class SignatureBaseRSA extends SignatureAlgorithmSpi {
     * Class SignatureRSASHA384
     *
     * @author $Author: raul $
-    * @version $Revision: 1.12 $
     */
    public static class SignatureRSASHA384 extends SignatureBaseRSA {
 
@@ -305,7 +302,6 @@ public abstract class SignatureBaseRSA extends SignatureAlgorithmSpi {
     * Class SignatureRSASHA512
     *
     * @author $Author: raul $
-    * @version $Revision: 1.12 $
     */
    public static class SignatureRSASHA512 extends SignatureBaseRSA {
 
@@ -328,7 +324,6 @@ public abstract class SignatureBaseRSA extends SignatureAlgorithmSpi {
     * Class SignatureRSARIPEMD160
     *
     * @author $Author: raul $
-    * @version $Revision: 1.12 $
     */
    public static class SignatureRSARIPEMD160 extends SignatureBaseRSA {
 
@@ -351,7 +346,6 @@ public abstract class SignatureBaseRSA extends SignatureAlgorithmSpi {
     * Class SignatureRSAMD5
     *
     * @author $Author: raul $
-    * @version $Revision: 1.12 $
     */
    public static class SignatureRSAMD5 extends SignatureBaseRSA {
 

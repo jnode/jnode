@@ -42,4 +42,3 @@ public class StringArrayWrapper {
         return m_string.length;
     }
 }
-

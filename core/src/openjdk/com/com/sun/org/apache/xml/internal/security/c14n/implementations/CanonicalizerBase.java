@@ -57,7 +57,6 @@ import org.xml.sax.SAXException;
  * Abstract base class for canonicalization algorithms.
  *
  * @author Christian Geuer-Pollmann <geuerp@apache.org>
- * @version $Revision: 1.23 $
  */
 public abstract class CanonicalizerBase extends CanonicalizerSpi {
    //Constants to be outputed, In char array form, so

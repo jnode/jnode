@@ -96,4 +96,3 @@ public interface ArrayType extends ReferenceType {
      */
     Type componentType() throws ClassNotLoadedException;
 }
-

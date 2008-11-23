@@ -129,4 +129,3 @@ public interface TypeComponent extends Mirror, Accessible {
      */
     boolean isSynthetic();
 }
-

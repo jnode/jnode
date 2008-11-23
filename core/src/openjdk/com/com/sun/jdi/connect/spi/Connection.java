@@ -198,4 +198,3 @@ public abstract class Connection {
      */
     public abstract boolean isOpen();
 }
-

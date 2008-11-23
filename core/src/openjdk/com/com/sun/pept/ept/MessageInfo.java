@@ -149,10 +149,3 @@ public interface MessageInfo extends MessageStruct {
     public void setConnection(Connection connection);
 
 } // end MessageInfo
-
-
-
-
-
-
-

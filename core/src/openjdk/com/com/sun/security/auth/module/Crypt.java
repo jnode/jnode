@@ -48,7 +48,6 @@
  * alphabet as the salt.  The first two characters are the salt
  * itself.
  * 
- * @version 1.5, 01/11/00
  * @author Roland Schemers
  */
 

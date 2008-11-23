@@ -31,7 +31,6 @@ import javax.security.auth.login.LoginException;
  * <p> This class implementation retrieves and makes available NT
  * security information for the current user.
  * 
- * @version 1.17, 05/05/07
  */
 public class NTSystem {
     

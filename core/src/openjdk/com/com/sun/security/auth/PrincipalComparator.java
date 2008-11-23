@@ -47,7 +47,6 @@ package com.sun.security.auth;
  * the <code>PrincipalComparator</code> interface by itself,
  * or both at the same time.
  *
- * @version 1.17, 05/05/07
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  */

@@ -102,4 +102,3 @@ public class HttpPrincipal implements Principal {
 	return getName();
     }
 }
-

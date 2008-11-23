@@ -54,5 +54,3 @@ public interface ThreadDeathEvent extends Event {
      */
     public ThreadReference thread();
 }
-    
-

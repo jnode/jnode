@@ -76,4 +76,3 @@ abstract class VersionHelper {
 
     abstract Thread createThread(Runnable r);
 }
-

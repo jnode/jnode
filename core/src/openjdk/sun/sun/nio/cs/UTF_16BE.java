@@ -63,4 +63,3 @@ class UTF_16BE extends Unicode
     }
 
 }
-

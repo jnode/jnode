@@ -78,7 +78,6 @@ import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class SAXCatalogReader implements CatalogReader, ContentHandler, DocumentHandler {
   /** The SAX Parser Factory */

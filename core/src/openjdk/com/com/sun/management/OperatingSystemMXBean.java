@@ -37,7 +37,6 @@ package com.sun.management;
  * its underlying operating system.
  *
  * @author  Mandy Chung
- * @version 1.16, 05/05/07
  * @since   1.5
  */
 public interface OperatingSystemMXBean extends

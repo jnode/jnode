@@ -86,7 +86,6 @@ import sun.security.util.PropertyExpander;
  * is exactly that syntax specified in the
  * <code>javax.security.auth.login.Configuration</code> class.
  * 
- * @version 1.31, 05/05/07
  * @see javax.security.auth.login.LoginContext
  */
 public class ConfigFile extends javax.security.auth.login.Configuration {
@@ -203,8 +202,7 @@ public class ConfigFile extends javax.security.auth.login.Configuration {
 		} catch (java.net.MalformedURLException mue) {
 		    File configFile = new File(extra_config);
 		    if (configFile.exists()) {
-			configURL = new URL("file:" +
-					configFile.getCanonicalPath());
+                        configURL = configFile.toURI().toURL();
 		    } else {
 			MessageFormat form = new MessageFormat
 			    (ResourcesMgr.getString
@@ -267,7 +265,7 @@ public class ConfigFile extends javax.security.auth.login.Configuration {
             // No longer throws an exception when there's no config file
             // at all. Returns an empty Configuration instead.
             if (new File(userConfigFile).exists()) {
-                init(new URL("file:" + userConfigFile),
+                init(new File(userConfigFile).toURI().toURL(),
                     newConfig);
             }
 	}

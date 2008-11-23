@@ -1,5 +1,5 @@
 /*
- * Copyright 1998-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1998-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,8 +34,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import sun.awt.SunHints;
-import sun.dc.path.PathConsumer;
-import sun.dc.path.PathException;
 
 /**
  * This class is used to convert raw geometry into a span iterator
@@ -44,6 +42,8 @@ import sun.dc.path.PathException;
  * perform the actual rendering.
  */
 public abstract class SpanShapeRenderer implements ShapeDrawPipe {
+    final static RenderingEngine RenderEngine = RenderingEngine.getInstance();
+
     public static class Composite extends SpanShapeRenderer {
 	CompositePipe comppipe;
 
@@ -83,50 +83,15 @@ public abstract class SpanShapeRenderer implements ShapeDrawPipe {
 
     public void draw(SunGraphics2D sg, Shape s) {
 	if (sg.stroke instanceof BasicStroke) {
-	    ShapeSpanIterator sr = new ShapeSpanIterator(sg, true);
+            ShapeSpanIterator sr = LoopPipe.getStrokeSpans(sg, s);
 	    try {
-		drawBasicStroke(sg, s, sr);
+                renderSpans(sg, sg.getCompClip(), s, sr);
 	    } finally {
 		sr.dispose();
 	    }
 	} else {
-	    renderPath(sg, sg.stroke.createStrokedShape(s));
+            fill(sg, sg.stroke.createStrokedShape(s));
 	}
-    }
-
-    public void drawBasicStroke(SunGraphics2D sg, Shape s,
-				ShapeSpanIterator sr)
-    {
-	Region clipRegion = sg.getCompClip();
-	sr.setOutputArea(clipRegion);
-	sr.setRule(PathIterator.WIND_NON_ZERO);
-
-	BasicStroke bs = (BasicStroke) sg.stroke;
-	AffineTransform transform =
-	    (sg.transformState >= sg.TRANSFORM_TRANSLATESCALE
-	     ? sg.transform : null);
-	boolean thin = (sg.strokeState <= sg.STROKE_THINDASHED);
-
-	PathConsumer stroker =
-	    DuctusRenderer.createStroker(sr, bs, thin, transform);
-
-	try {
-	    transform =
-		((sg.transformState != sg.TRANSFORM_ISIDENT)
-		 ? sg.transform : null);
-	    PathIterator pi = s.getPathIterator(transform);
-
-	    boolean adjust =
-		(sg.strokeHint != SunHints.INTVAL_STROKE_PURE);
-	    DuctusRenderer.feedConsumer(pi, stroker, adjust, 0.25f);
-	} catch (PathException e) {
-	    throw new InternalError("Unable to Stroke shape ("+
-				    e.getMessage()+")");
-	} finally {
-	    DuctusRenderer.disposeStroker(stroker, sr);
-	}
-
-	renderSpans(sg, clipRegion, s, sr);
     }
 
     public static final int NON_RECTILINEAR_TRANSFORM_MASK =
@@ -140,7 +105,16 @@ public abstract class SpanShapeRenderer implements ShapeDrawPipe {
 	    renderRect(sg, (Rectangle2D) s);
 	    return;
 	}
-	renderPath(sg, s);
+
+        Region clipRegion = sg.getCompClip();
+        ShapeSpanIterator sr = LoopPipe.getFillSSI(sg);
+        try {
+            sr.setOutputArea(clipRegion);
+            sr.appendPath(s.getPathIterator(sg.transform));
+            renderSpans(sg, clipRegion, s, sr);
+        } finally {
+            sr.dispose();
+        }
     }
 
     public abstract Object startSequence(SunGraphics2D sg, Shape s,
@@ -198,19 +172,6 @@ public abstract class SpanShapeRenderer implements ShapeDrawPipe {
 	    }
 	}
 	endSequence(context);
-    }
-
-    public void renderPath(SunGraphics2D sg, Shape s) {
-	Region clipRegion = sg.getCompClip();
-	
-	ShapeSpanIterator sr = new ShapeSpanIterator(sg, false);
-	try {
-	    sr.setOutputArea(clipRegion);
-	    sr.appendPath(s.getPathIterator(sg.transform));
-	    renderSpans(sg, clipRegion, s, sr);
-	} finally {
-	    sr.dispose();
-	}
     }
 
     public void renderSpans(SunGraphics2D sg, Region clipRegion, Shape s,

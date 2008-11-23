@@ -52,4 +52,3 @@ public interface MethodEntryEvent extends LocatableEvent {
      */
     public Method method();
 }
-

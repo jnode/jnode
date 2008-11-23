@@ -41,7 +41,6 @@ package com.sun.javadoc;
  * </pre>
  *
  * @author Scott Seligman
- * @version 1.12 07/05/05
  * @since 1.5
  */
 public interface ParameterizedType extends Type {

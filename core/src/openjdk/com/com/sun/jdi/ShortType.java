@@ -37,4 +37,3 @@ package com.sun.jdi;
  */
 public interface ShortType extends PrimitiveType {
 }
-

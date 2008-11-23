@@ -41,7 +41,6 @@ import java.io.File;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public abstract class FileURL {
   protected FileURL() { }

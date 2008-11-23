@@ -95,7 +95,7 @@ final public class PolicyUtils {
     public static String[] filterMechs(String[] mechs, int[] policies, 
 	Map props) {
 	if (props == null) {
-	    return (String[])mechs.clone();
+            return mechs.clone();
 	}
 
 	boolean[] passed = new boolean[mechs.length];

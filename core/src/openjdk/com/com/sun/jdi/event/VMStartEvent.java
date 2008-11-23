@@ -52,4 +52,3 @@ public interface VMStartEvent extends Event {
      */
     public ThreadReference thread();
 }
-

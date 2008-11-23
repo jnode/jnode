@@ -39,7 +39,6 @@ import org.w3c.dom.Element;
  * Class TransformC14NExclusive
  *
  * @author $Author: raul $
- * @version $Revision: 1.11 $
  */
 public class TransformC14NExclusive extends TransformSpi {
 

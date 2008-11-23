@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)CharToByteGB18030.java	1.16 07/05/05
- */
+
 
 
 package sun.io;

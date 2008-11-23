@@ -40,7 +40,6 @@ import org.w3c.dom.ProcessingInstruction;
  * Class XMLSignatureInputDebugger
  * 
  * @author $Author: raul $
- * @version $Revision: 1.3 $
  */
 public class XMLSignatureInputDebugger {
 

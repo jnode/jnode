@@ -41,4 +41,3 @@ public interface ValueHelper extends BoxedValueHelper {
     String[] get_truncatable_base_ids();
     TypeCode get_type();
 }
-

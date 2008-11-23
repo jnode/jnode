@@ -1209,7 +1209,3 @@ public class DOMSerializerImpl implements LSSerializer, DOMConfiguration {
     }
 
 }//DOMSerializerImpl
-
-
-
-

@@ -173,6 +173,11 @@ class MemoryPoolImpl implements MemoryPoolMXBean {
                 "Usage threshold is not supported");
         }
 
+        // return false if usage threshold crossing checking is disabled
+        if (usageThreshold == 0) {
+            return false;
+        }
+
         MemoryUsage u = getUsage0();
         return (u.getUsed() >= usageThreshold || 
                 usageSensor.isOn());
@@ -235,6 +240,11 @@ class MemoryPoolImpl implements MemoryPoolMXBean {
         if (!isCollectionUsageThresholdSupported()) {
             throw new UnsupportedOperationException(
                 "CollectionUsage threshold is not supported");
+        }
+
+        // return false if usage threshold crossing checking is disabled
+        if (collectionThreshold == 0) {
+            return false;
         }
 
         MemoryUsage u = getCollectionUsage0();

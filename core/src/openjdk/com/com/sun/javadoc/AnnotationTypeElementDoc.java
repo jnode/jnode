@@ -30,7 +30,6 @@ package com.sun.javadoc;
  * Represents an element of an annotation type.
  * 
  * @author Scott Seligman
- * @version 1.10 07/05/05
  * @since 1.5
  */
 public interface AnnotationTypeElementDoc extends MethodDoc {

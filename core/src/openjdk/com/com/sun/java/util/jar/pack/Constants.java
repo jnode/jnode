@@ -30,7 +30,6 @@ import java.util.*;
 /**
  * Shared constants
  * @author John Rose
- * @version 1.30, 05/05/07
  */
 interface Constants {
     public final static int JAVA_MAGIC = 0xCAFEBABE;

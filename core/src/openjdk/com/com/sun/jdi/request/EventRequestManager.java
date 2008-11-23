@@ -542,8 +542,3 @@ public interface EventRequestManager extends Mirror {
      */
     List<VMDeathRequest> vmDeathRequests();
 }
-
-
-
-
-			               

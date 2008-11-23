@@ -42,7 +42,6 @@ import javax.xml.parsers.*;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
- * @version 1.0
  */
 public class XCatalogReader extends SAXCatalogReader implements SAXCatalogParser {
   /** The catalog object needs to be stored by the object so that

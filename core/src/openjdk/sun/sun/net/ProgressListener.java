@@ -49,6 +49,3 @@ public interface ProgressListener extends EventListener
      */    
     public void progressFinish(ProgressEvent evt);
 }
-
-
-

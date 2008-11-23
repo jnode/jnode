@@ -65,10 +65,3 @@ public interface Delegate {
     public void send(MessageStruct message);
 
 } // end Delegate
-
-
-
-
-
-
-

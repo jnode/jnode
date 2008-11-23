@@ -30,7 +30,6 @@ package com.sun.java_cup.internal.runtime;
  * implementation of <code>lr_parser.scan()</code>.  Integration
  * of scanners implementing <code>Scanner</code> is facilitated.
  *
- * @version last updated 23-Jul-1999
  * @author David MacMahon <davidm@smartsc.com>
  */
 

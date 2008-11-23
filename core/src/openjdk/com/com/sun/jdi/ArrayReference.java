@@ -207,4 +207,3 @@ public interface ArrayReference extends ObjectReference {
             throws InvalidTypeException,
                    ClassNotLoadedException;
 }
-

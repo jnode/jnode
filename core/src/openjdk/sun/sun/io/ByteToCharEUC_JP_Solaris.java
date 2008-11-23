@@ -28,7 +28,6 @@ package sun.io;
 import sun.nio.cs.ext.JIS_X_0208_Solaris_Decoder;
 import sun.nio.cs.ext.JIS_X_0212_Solaris_Decoder;
 /**
- * @version 1.11, 07/05/05
  *
  * @author Limin Shi
  * @author Ian Little
@@ -208,4 +207,3 @@ public class ByteToCharEUC_JP_Solaris extends ByteToCharEUC_JP {
     }
 
 }
-

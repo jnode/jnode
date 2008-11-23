@@ -165,7 +165,7 @@ public class ColorEditor extends Panel implements PropertyEditor {
     public String getAsText() {
         return (this.color != null)
                 ? this.color.getRed() + "," + this.color.getGreen() + "," + this.color.getBlue()
-                : null;
+                : "null";
     }
 
     public String[] getTags() {
@@ -210,4 +210,3 @@ public class ColorEditor extends Panel implements PropertyEditor {
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 }
-

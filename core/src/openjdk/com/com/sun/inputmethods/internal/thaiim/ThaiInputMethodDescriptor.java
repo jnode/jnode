@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)ThaiInputMethodDescriptor.java	1.12 07/05/05
- *
  * (C) Copyright IBM Corp. 2000 - All Rights Reserved
  *
  * The original version of this source code and documentation is
@@ -98,4 +96,3 @@ public class ThaiInputMethodDescriptor implements InputMethodDescriptor {
         return getClass().getName();
     }
 }
-

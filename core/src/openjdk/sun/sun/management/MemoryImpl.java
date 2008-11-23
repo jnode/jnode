@@ -190,4 +190,3 @@ class MemoryImpl extends NotificationEmitterSupport
     }
 
 }
-

@@ -117,4 +117,3 @@ public interface MethodExitRequest extends EventRequest {
      */
     void addInstanceFilter(ObjectReference instance);
 }
-

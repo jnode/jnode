@@ -59,6 +59,3 @@ import com.sun.jdi.*;
 public interface VMDeathRequest extends EventRequest {
 
 }
-
-
-			

@@ -59,4 +59,3 @@ public interface LongValue extends PrimitiveValue, Comparable<LongValue>
      */
     int hashCode();
 }
-

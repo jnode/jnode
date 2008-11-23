@@ -29,7 +29,6 @@ package sun.management.counter;
  * The base class for a performance counter.
  *
  * @author   Brian Doherty
- * @version  1.11, 05/05/07
  */
 public interface Counter extends java.io.Serializable {
 

@@ -31,7 +31,6 @@ import java.io.*;
  * An unexpected result was received by the client when talking to the
  * telnet server.
  * 
- * @version     1.25,05/05/07
  * @author      Jonathan Payne 
  */
 

@@ -123,4 +123,3 @@ public class HasPositionalPredChecker extends XPathVisitor
 
 
 }
-

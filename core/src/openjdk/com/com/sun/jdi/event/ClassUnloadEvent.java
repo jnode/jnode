@@ -50,4 +50,3 @@ public interface ClassUnloadEvent extends Event {
      */
     public String classSignature();
 }
-

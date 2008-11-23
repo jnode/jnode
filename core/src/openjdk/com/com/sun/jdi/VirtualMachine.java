@@ -861,7 +861,3 @@ public interface VirtualMachine extends Mirror {
      */
     void setDebugTraceMode(int traceFlags);
 }
-
-
-
-            
