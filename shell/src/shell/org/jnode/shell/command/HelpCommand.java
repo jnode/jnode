@@ -58,7 +58,8 @@ public class HelpCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws NameNotFoundException, ClassNotFoundException, NoSuchAliasException {
+    public void execute() throws NameNotFoundException, ClassNotFoundException, 
+        HelpException, NoSuchAliasException {
         // The above exceptions are either bugs or configuration errors and should be allowed
         // to propagate so that the shell can diagnose them appropriately.
         String alias;
@@ -77,11 +78,15 @@ public class HelpCommand extends AbstractCommand {
             shell = (CommandShell) ShellUtils.getShellManager().getCurrentShell();
             CommandInfo cmdInfo =  shell.getCommandInfo(alias);
             Help cmdHelp = HelpFactory.getHelpFactory().getHelp(alias, shell.getCommandInfo(alias));
+            if (cmdHelp == null) {
+                err.println("No help information is available for alias / class '" + alias + "'");
+                exit(1);
+            }
             cmdHelp.help(out);
             otherAliases(shell.getAliasManager(), alias, cmdInfo.getCommandClass().getName(), out);
         } catch (HelpException ex) {
-            err.println("No help information is available for alias / class '" + alias + "'");
-            exit(1);
+            err.println("Error getting help for alias / class '" + alias + "': " + ex.getMessage());
+            throw ex;
         } catch (ClassNotFoundException ex) {
             try {
                 String className = shell.getAliasManager().getAliasClassName(alias);
