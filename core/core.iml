@@ -17,8 +17,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/icedtea" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/com" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/corba" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/javax" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/jaxws" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/langtools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/org" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/sun" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/vm" isTestSource="false" />

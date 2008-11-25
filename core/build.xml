@@ -33,6 +33,11 @@
 	<pathelement location="${my-src.dir}/openjdk/sun"/>
 	<pathelement location="${my-src.dir}/openjdk/vm"/>
   </path>
+  <path id="classpath-sources2">
+	<pathelement location="${my-src.dir}/openjdk/corba"/>
+	<pathelement location="${my-src.dir}/openjdk/jaxws"/>
+	<pathelement location="${my-src.dir}/openjdk/langtools"/>
+  </path>  
   <path id="my-sources1">
 	<path refid="classpath-sources"/>
 	<pathelement location="${my-src.dir}/core"/>
@@ -134,6 +139,14 @@
       <src refid="my-sources" />
       <classpath refid="my-cp"/>
     </jnode.compile>
+    <jnode.compile>
+      <bootclasspath>
+      	<pathelement location="${classpath-sources}" />
+		<pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
+      </bootclasspath>
+      <src refid="classpath-sources2" />
+      <classpath refid="my-cp"/>
+    </jnode.compile>
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
 	    <fileset dir="${my-src.dir}/classpath/gnu" excludes="${my-non-resources}"/>
@@ -148,6 +161,9 @@
 	    <fileset dir="${my-src.dir}/openjdk/com" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/sun" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/vm" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/openjdk/corba" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/openjdk/jaxws" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/openjdk/langtools" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/icedtea" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/core" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/endorsed/nanoxml" excludes="${my-non-resources}"/>
