@@ -18,6 +18,7 @@ import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.AbstractNameSpace;
+import org.jnode.naming.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -34,28 +35,7 @@ import org.jnode.shell.def.DefaultShellManager;
 public class Emu {
     protected static void initEnv() throws NamingException {
         if (true) {
-            InitialNaming.setNameSpace(new AbstractNameSpace() {
-                private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
-
-                public <T> void bind(Class<T> name, T service) throws NamingException, NameAlreadyBoundException {
-                    if (space.get(name) != null) throw new NameAlreadyBoundException();
-                    space.put(name, service);
-                }
-
-                public void unbind(Class<?> name) {
-                    space.remove(name);
-                }
-
-                public <T> T lookup(Class<T> name) throws NameNotFoundException {
-                    T obj = (T) space.get(name);
-                    if (obj == null) throw new NameNotFoundException(name.getName());
-                    return obj;
-                }
-
-                public Set<Class<?>> nameSet() {
-                    return space.keySet();
-                }
-            });
+            InitialNaming.setNameSpace(new BasicNameSpace());
             InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
             final AliasManager aliasMgr = new DefaultAliasManager(new DummyExtensionPoint());
             final ShellManager shellMgr = new DefaultShellManager();

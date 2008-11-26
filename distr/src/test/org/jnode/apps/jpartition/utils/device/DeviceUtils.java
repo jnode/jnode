@@ -9,7 +9,6 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.swingview.FileDeviceView;
-import org.jnode.apps.jpartition.utils.BasicNameSpace;
 import org.jnode.apps.vmware.disk.VMWareDisk;
 import org.jnode.apps.vmware.disk.tools.DiskFactory;
 import org.jnode.driver.Device;
@@ -20,6 +19,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
+import org.jnode.naming.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
 import org.jnode.plugin.Extension;
@@ -30,6 +30,7 @@ import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
+import org.jnode.plugin.model.DummyPluginDescriptor;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.util.OsUtils;
 
@@ -49,124 +50,7 @@ public class DeviceUtils {
 
                 InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
 
-                PluginDescriptor desc = new PluginDescriptor() {
-
-                    public void addListener(PluginDescriptorListener listener) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    public boolean depends(String id) {
-                        // TODO Auto-generated method stub
-                        return false;
-                    }
-
-                    public String getCustomPluginClassName() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public ExtensionPoint getExtensionPoint(String extensionPointId) {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public ExtensionPoint[] getExtensionPoints() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public Extension[] getExtensions() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public String getId() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public String getLicenseName() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public String getLicenseUrl() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public String getName() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public Plugin getPlugin() throws PluginException {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public ClassLoader getPluginClassLoader() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public PluginPrerequisite[] getPrerequisites() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public int getPriority() {
-                        // TODO Auto-generated method stub
-                        return 0;
-                    }
-
-                    public String getProviderName() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public String getProviderUrl() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public Runtime getRuntime() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public String getVersion() {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-
-                    public boolean hasCustomPluginClass() {
-                        // TODO Auto-generated method stub
-                        return false;
-                    }
-
-                    public boolean isAutoStart() {
-                        // TODO Auto-generated method stub
-                        return false;
-                    }
-
-                    public boolean isFragment() {
-                        // TODO Auto-generated method stub
-                        return false;
-                    }
-
-                    public boolean isSystemPlugin() {
-                        // TODO Auto-generated method stub
-                        return true;
-                    }
-
-                    public void removeListener(PluginDescriptorListener listener) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                };
+                PluginDescriptor desc = new DummyPluginDescriptor(true);
                 FileSystemService fss = new FileSystemPlugin(desc);
                 namespace.bind(FileSystemService.class, fss);
             } catch (NameAlreadyBoundException e) {

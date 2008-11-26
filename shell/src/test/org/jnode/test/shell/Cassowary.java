@@ -30,6 +30,7 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.jnode.naming.AbstractNameSpace;
+import org.jnode.naming.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;
@@ -51,33 +52,7 @@ public class Cassowary {
         if (initialized) {
             return;
         }
-        InitialNaming.setNameSpace(new AbstractNameSpace() {
-            private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
-
-            public <T> void bind(Class<T> name, T service)
-                throws NamingException, NameAlreadyBoundException {
-                if (space.get(name) != null) {
-                    throw new NameAlreadyBoundException();
-                }
-                space.put(name, service);
-            }
-
-            public void unbind(Class<?> name) {
-                space.remove(name);
-            }
-
-            public <T> T lookup(Class<T> name) throws NameNotFoundException {
-                T obj = (T) space.get(name);
-                if (obj == null) {
-                    throw new NameNotFoundException(name.getName());
-                }
-                return obj;
-            }
-
-            public Set<Class<?>> nameSet() {
-                return space.keySet();
-            }
-        });
+        InitialNaming.setNameSpace(new BasicNameSpace());
         InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
         AliasManager alias_mgr =
             new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
