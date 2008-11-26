@@ -1,3 +1,23 @@
+/*
+ * $Id: NameSpace.java 4564 2008-09-18 22:01:10Z fduminy $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.emu;
 
 import java.io.BufferedReader;
@@ -13,6 +33,7 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.jnode.naming.AbstractNameSpace;
+import org.jnode.naming.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.shell.ShellManager;
@@ -29,6 +50,9 @@ import org.jnode.shell.syntax.SyntaxSpecLoader;
 import org.jnode.shell.syntax.XMLSyntaxSpecAdapter;
 
 /**
+ * This class is the core of a light-weight JNode emulator that allows (some) JNode
+ * applications to be run using a classic JVM in the context of a JNode development sandbox.
+ * 
  * @author Levente S\u00e1ntha
  * @author Stephen Crawley
  */
@@ -57,28 +81,7 @@ public abstract class Emu {
                 root = new File("").getAbsoluteFile();
                 System.err.println("Assuming that the JNode root is '" + root + "'");
             }
-            InitialNaming.setNameSpace(new AbstractNameSpace() {
-                private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
-
-                public <T> void bind(Class<T> name, T service) throws NamingException, NameAlreadyBoundException {
-                    if (space.get(name) != null) throw new NameAlreadyBoundException();
-                    space.put(name, service);
-                }
-
-                public void unbind(Class<?> name) {
-                    space.remove(name);
-                }
-
-                public <T> T lookup(Class<T> name) throws NameNotFoundException {
-                    T obj = (T) space.get(name);
-                    if (obj == null) throw new NameNotFoundException(name.getName());
-                    return obj;
-                }
-
-                public Set<Class<?>> nameSet() {
-                    return space.keySet();
-                }
-            });
+            InitialNaming.setNameSpace(new BasicNameSpace());
 
             try {
                 InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
@@ -89,7 +92,9 @@ public abstract class Emu {
                 for (String pluginName : PLUGIN_NAMES) {
                     configurePluginCommands(root, pluginName, aliasMgr, syntaxMgr);
                 }
-                System.setProperty("jnode.invoker", "default");
+                System.setProperty("jnode.invoker", "thread");
+                System.setProperty("jnode.interpreter", "redirecting");
+                System.setProperty("jnode.debug", "true");
                 InitialNaming.bind(AliasManager.NAME, aliasMgr);
                 InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
                 InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);

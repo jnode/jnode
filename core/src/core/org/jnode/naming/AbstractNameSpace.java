@@ -61,7 +61,6 @@ public abstract class AbstractNameSpace implements NameSpace {
             l.serviceBound(lookup(name));
         } catch (NameNotFoundException e) {
             // no service bound for that name => ignore
-            Unsafe.debugStackTrace(e);
         }
     }
     

@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
+import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
 import org.jnode.shell.CommandShell;
 
 /**
@@ -17,7 +18,7 @@ public class ShellEmu extends Emu {
             return;
         }
         initEnv(argv.length > 0 ? new File(argv[0]) : null);
-        SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
+        TextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         new Thread(new CommandShell(cm.createConsole(
             "Console 1",
             (ConsoleManager.CreateOptions.TEXT |
