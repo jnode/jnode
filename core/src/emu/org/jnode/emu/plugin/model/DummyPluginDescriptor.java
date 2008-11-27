@@ -1,4 +1,4 @@
-package org.jnode.plugin.model;
+package org.jnode.emu.plugin.model;
 
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;

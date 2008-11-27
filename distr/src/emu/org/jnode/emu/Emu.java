@@ -24,16 +24,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
-import javax.naming.NameAlreadyBoundException;
-import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
-import org.jnode.naming.AbstractNameSpace;
-import org.jnode.naming.BasicNameSpace;
+import org.jnode.emu.naming.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.shell.ShellManager;

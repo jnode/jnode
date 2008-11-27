@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/emu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/endorsed/nanoxml" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/icedtea" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
