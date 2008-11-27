@@ -26,7 +26,7 @@ import java.util.Properties;
 
 import org.jtestserver.common.ConfigUtils;
 
-class Config {
+public class Config {
 
     public static Config read() throws IOException {
         Properties properties = new Properties();
@@ -40,14 +40,28 @@ class Config {
     private final File workDir;
     private final String[] excludingFilters;
     private final boolean forceUseMauveList;
+    private final File vmwareVmxFile;
+    private final int watchDogPollInterval;
+    
+    private final String userName;
+    private final String password;
+    private final String vmName;
     
     private Config(Properties properties) {
-        this.clientTimeout = ConfigUtils.getInt(properties, "client.timeout", 30000);
-        this.serverName = properties.getProperty("server.name", "localhost");
-        this.serverPort = ConfigUtils.getInt(properties, "client.timeout", 10000);
-        this.workDir = ConfigUtils.getDirectory(properties, "work.dir", new File("."));
-        this.excludingFilters = ConfigUtils.getStringArray(properties, "excluding.filters");
-        this.forceUseMauveList = ConfigUtils.getBoolean(properties, "force.use.mauve.list", false);
+        clientTimeout = ConfigUtils.getInt(properties, "client.timeout", 30000);
+        serverName = properties.getProperty("server.name", "localhost");
+        serverPort = ConfigUtils.getInt(properties, "client.timeout", 10000);
+        workDir = ConfigUtils.getDirectory(properties, "work.dir", new File("."));
+        excludingFilters = ConfigUtils.getStringArray(properties, "excluding.filters");
+        forceUseMauveList = ConfigUtils.getBoolean(properties, "force.use.mauve.list", false);
+        watchDogPollInterval = ConfigUtils.getInt(properties, "watchdog.poll.interval", 10000);
+        userName = ConfigUtils.getString(properties, "vmware.server.username");
+        password = ConfigUtils.getString(properties, "vmware.server.password");
+        vmName = ConfigUtils.getString(properties, "vmware.server.vmName");
+        
+        //FIXME
+        //this.vmwareVmxFile = ConfigUtils.getFile(properties, "vmware.vmx.file", true);
+        this.vmwareVmxFile = null;
     }
 
     public int getClientTimeout() {
@@ -66,11 +80,31 @@ class Config {
         return workDir;
     }
     
+    public File getVmwareVmxFile() {
+        return vmwareVmxFile;
+    }
+    
     public boolean isForceUseMauveList() {
         return forceUseMauveList;
     }
 
     public String[] getExcludingFilters() {
         return excludingFilters;
+    }
+
+    public String getVMwareServerUser() {
+        return userName;
+    }
+
+    public String getVMwareServerPassword() {
+        return password;
+    }
+
+    public int getWatchDogPollInterval() {
+        return watchDogPollInterval;
+    }
+
+    public String getVmName() {
+        return vmName;
     }
 }

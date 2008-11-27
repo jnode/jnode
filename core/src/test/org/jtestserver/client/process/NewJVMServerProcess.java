@@ -17,19 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.client;
+package org.jtestserver.client.process;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
+import org.jtestserver.client.utils.ProcessRunner;
 import org.jtestserver.server.TestServer;
 
-public class NewProcessLauncher implements TestServerLauncher {
-    private static final Logger LOGGER = Logger.getLogger(NewProcessLauncher.class.getName());
+
+public class NewJVMServerProcess implements ServerProcess {
+    private ProcessRunner runner = new ProcessRunner();
+    
+    public NewJVMServerProcess() {
+    }
     
     @Override
-    public Process launch() throws IOException {
+    public void start() throws IOException {
         String javaHome = "/home/fabien/apps/java/";
         String java = javaHome + "bin/java";
         String jnodeCore = "/home/fabien/data/Projets/JNode/jnode/core/";
@@ -38,8 +42,23 @@ public class NewProcessLauncher implements TestServerLauncher {
         String classpath = "." + File.pathSeparatorChar + jnodeCore + "lib/mauve.jar";
         String command = java + " -cp " + classpath + " " + mainClass;
         
-        LOGGER.finer("command: " + command);
-        return Runtime.getRuntime().exec(command, new String[0], new File(classesDir));
+        runner.execute(command, new File(classesDir));        
+    }
+    
+    @Override
+    public void stop() throws IOException {
+        runner.getProcess().destroy();
     }
 
+    @Override
+    public boolean isAlive() {
+        boolean alive = false;
+        
+        try {
+            runner.getProcess().exitValue();
+        } catch (IllegalThreadStateException e) {
+            alive = true;
+        }
+        return alive;
+    }
 }

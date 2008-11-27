@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.client;
+package org.jtestserver.client.utils;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -30,22 +30,35 @@ import java.util.logging.Logger;
 public class PipeInputStream {
     private final InputStream input;
     private final Logger logger;
-    private final Level level; 
-    
-    private PipeThread pipeThread;
-    
+    private final Level level;     
+    private final PipeThread pipeThread;
+
     public PipeInputStream(final InputStream input, final Logger logger, Level level) {
+        this(input, logger, level, null);
+    }
+    
+    public PipeInputStream(final InputStream input, final Logger logger, Level level, Listener listener) {
         this.level = level;
         this.input = input;
         this.logger = logger;
-        this.pipeThread = new PipeThread();
+        this.pipeThread = new PipeThread(listener);
     }
     
     public void start() {
         pipeThread.start();
     }
     
+    public static interface Listener {
+        void lineReceived(String line);
+    }
+    
     private class PipeThread extends Thread {
+        private Listener listener;
+        
+        private PipeThread(Listener listener) {
+            this.listener = listener;
+        }
+        
         public void run() {
             final InputStreamReader isr = new InputStreamReader(input);
             final BufferedReader br = new BufferedReader(isr, 100);
@@ -54,6 +67,10 @@ public class PipeInputStream {
                 try {
                     while ((line = br.readLine()) != null) {
                         logger.log(level, line);
+                        
+                        if (listener != null) {
+                            listener.lineReceived(line);
+                        }
                     }
                 } catch (EOFException e) {
                     // ignore
