@@ -2,13 +2,8 @@ package org.jnode.test.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import javax.naming.NameAlreadyBoundException;
-import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
@@ -17,8 +12,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.DriverException;
-import org.jnode.naming.AbstractNameSpace;
-import org.jnode.naming.BasicNameSpace;
+import org.jnode.emu.naming.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;

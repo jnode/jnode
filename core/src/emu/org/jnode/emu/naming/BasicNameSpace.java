@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.naming;
+package org.jnode.emu.naming;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+import org.jnode.naming.AbstractNameSpace;
 
 /**
  * This implementation of NameSpace does not make use of Class.getVmClass() and

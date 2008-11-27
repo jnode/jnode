@@ -47,6 +47,7 @@
 	<pathelement location="${my-src.dir}/driver"/>
 	<pathelement location="${my-src.dir}/icedtea"/>
 	<pathelement location="${my-src.dir}/test"/>
+	<pathelement location="${my-src.dir}/emu"/>
   </path>
   <path id="my-sources">
 	<path refid="my-sources1"/>
