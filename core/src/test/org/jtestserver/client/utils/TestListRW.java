@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.client;
+package org.jtestserver.client.utils;
 
 import gnu.testlet.runner.Filter;
 import gnu.testlet.runner.Filter.LineProcessor;
@@ -36,6 +36,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.jtestserver.client.Config;
+
 
 public class TestListRW {
     private static final Logger LOGGER = Logger.getLogger(TestListRW.class.getName());

@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jtestserver.client.process.ServerProcess;
+import org.jtestserver.client.process.VMwareServerProcess;
+import org.jtestserver.client.utils.TestListRW;
+import org.jtestserver.client.utils.WatchDog;
 import org.jtestserver.common.Status;
 import org.jtestserver.common.protocol.Protocol;
 import org.jtestserver.common.protocol.ProtocolException;
@@ -60,24 +64,41 @@ public class TestDriver {
         UDPProtocol protocol = UDPProtocol.createClient(serverAddress, serverPort);
         protocol.setTimeout(config.getClientTimeout());
         
-        return new TestDriver(config, protocol, new NewProcessLauncher());
+        ServerProcess process = new VMwareServerProcess(config);
+        return new TestDriver(config, protocol, process);
     }
     
     private final TestClient client;
-    private final TestServerProcess serverProcess;
+    private final ServerProcess process;
     private final List<String> tests = new ArrayList<String>();
     private final Config config;
     private final TestListRW testListRW;
+    private final WatchDog watchDog;
     
-    private TestDriver(Config config, Protocol protocol, TestServerLauncher launcher) {
+    private TestDriver(Config config, Protocol protocol, ServerProcess process) {
         this.config = config;
-        this.client = new DefaultTestClient(protocol);
-        this.serverProcess = new TestServerProcess(launcher);
-        this.testListRW = new TestListRW(config);
+        client = new DefaultTestClient(protocol);
+        this.process = process;
+        testListRW = new TestListRW(config);
+        watchDog = new WatchDog(process, config) {
+
+            @Override
+            protected void processDead() {
+                LOGGER.warning("process is dead. restarting it.");
+                try {
+                    TestDriver.this.start();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "error while restarting", e);
+                } catch (ProtocolException e) {
+                    LOGGER.log(Level.SEVERE, "error while restarting", e);
+                }
+            }
+        };
     }
     
     public void killRunningServers() throws ProtocolException {
         LOGGER.info("killing running servers");
+        
         try {
             // kill server that might still be running
             client.shutdown();
@@ -93,14 +114,23 @@ public class TestDriver {
                 LOGGER.log(Level.SEVERE, "a timeout happened", e);
                 killed = true;
             }
-        }        
+        }
+
+        // stop the watch dog before actually stopping the process
+        watchDog.stopWatching();
+        try {
+            process.stop();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "and error happened while stopping", e);
+        }
     }
     
     public void start() throws IOException, ProtocolException {
-        //killRunningServers();
+        killRunningServers();
         
-        //serverProcess.start();
-
+        process.start();
+        watchDog.startWatching();
+        
         final File workingFile = new File(config.getWorkDir(), "working-tests.txt");
         final File crashingFile = new File(config.getWorkDir(), "crashing-tests.txt");
         
@@ -117,6 +147,7 @@ public class TestDriver {
         testListRW.writeList(workingFile, workingList);
         testListRW.writeList(crashingFile, crashingList);
         
+        watchDog.stopWatching();
         killRunningServers();
     }
     

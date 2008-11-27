@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class, TestOutputMessage.class })
+@SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class,
+    TestOutputMessage.class, TestVMware.class })
 public class AllTests {
 }

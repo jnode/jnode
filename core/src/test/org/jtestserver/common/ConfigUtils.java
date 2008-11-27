@@ -78,4 +78,38 @@ public class ConfigUtils {
 
         return value;
     }
+
+    public static File getFile(Properties properties, String name, boolean mustExist) {
+        String fileStr = properties.getProperty(name);
+        File file = null;
+        
+        if ((fileStr != null) && !fileStr.trim().isEmpty()) {
+            file = new File(fileStr);
+
+            if ((!file.exists() && mustExist) || !file.isFile()) {
+                file = null;
+            }
+        }
+        
+        if (file == null) {
+            final String msg;
+            if (mustExist) {
+                msg = "parameter " + name + " must be an existing file";
+            } else {
+                msg = "parameter " + name + " must be a file";
+            }
+            throw new IllegalArgumentException(msg);
+        }
+
+        return file;
+    }
+
+    public static String getString(Properties properties, String name) {
+        String value = properties.getProperty(name, null);
+        if ((value == null) || value.trim().isEmpty()) {
+            throw new IllegalArgumentException("property " + name + " must be specified");
+        }
+        
+        return value;
+    }
 }
