@@ -23,6 +23,19 @@ package org.jnode.test.fs.filesystem;
 
 import junit.extensions.jfunc.JFuncSuite;
 import junit.extensions.jfunc.textui.JFuncRunner;
+
+import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.emu.plugin.model.DummyConfigurationElement;
+import org.jnode.emu.plugin.model.DummyExtension;
+import org.jnode.emu.plugin.model.DummyExtensionPoint;
+import org.jnode.emu.plugin.model.DummyPluginDescriptor;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.fs.service.def.FileSystemPlugin;
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.ConfigurationElement;
+import org.jnode.plugin.Extension;
+import org.jnode.plugin.ExtensionPoint;
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.fs.filesystem.tests.BasicFSTest;
 import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
@@ -31,6 +44,28 @@ import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 
 public class FSTestSuite extends JFuncSuite {
     public static void main(String[] args) throws Throwable {
+        InitialNaming.setNameSpace(new BasicNameSpace());
+        
+        // Build a plugin descriptor that is sufficient for the FileSystemPlugin to 
+        // configure file system types for testing.
+        DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
+        DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
+        desc.addExtensionPoint(ep);
+        String[] fsTypeNames = new String[] {
+            org.jnode.fs.ext2.Ext2FileSystemType.class.getName(),
+            org.jnode.fs.fat.FatFileSystemType.class.getName()
+        };
+        for (String fsTypeName : fsTypeNames) {
+            DummyExtension extension = new DummyExtension();
+            DummyConfigurationElement element = new DummyConfigurationElement();
+            element.addAttribute("class", fsTypeName);
+            extension.addElement(element);
+            ep.addExtension(extension);
+        }
+        
+        FileSystemService fss = new FileSystemPlugin(desc);
+        InitialNaming.bind(FileSystemService.class, fss);
+        
         JFuncRunner.run(FSTestSuite.suite());
         //JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
         //JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
