@@ -13,6 +13,7 @@ import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.DriverException;
 import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.emu.plugin.model.DummyExtensionPoint;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -35,37 +36,6 @@ public class Emu {
             final ShellManager shellMgr = new DefaultShellManager();
             InitialNaming.bind(AliasManager.NAME, aliasMgr);
             InitialNaming.bind(ShellManager.NAME, shellMgr);
-        }
-    }
-
-    private static class DummyExtensionPoint implements ExtensionPoint {
-        public String getSimpleIdentifier() {
-            return "A";
-        }
-
-        public String getUniqueIdentifier() {
-            return "aaa";
-        }
-
-        public String getName() {
-            return "B";
-        }
-
-        public Extension[] getExtensions() {
-            return new Extension[0];
-        }
-
-        public void addListener(ExtensionPointListener listener) {
-        }
-
-        public void addPriorityListener(ExtensionPointListener listener) {
-        }
-
-        public void removeListener(ExtensionPointListener listener) {
-        }
-
-        public PluginDescriptor getDeclaringPluginDescriptor() {
-            return null;
         }
     }
 
