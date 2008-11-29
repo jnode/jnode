@@ -24,6 +24,7 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.emu.plugin.model.DummyExtensionPoint;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;

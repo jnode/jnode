@@ -28,6 +28,7 @@ import java.io.IOException;
 import javax.naming.NamingException;
 
 import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.emu.plugin.model.DummyExtensionPoint;
 import org.jnode.naming.InitialNaming;
 import org.jnode.nanoxml.XMLElement;
 import org.jnode.shell.ShellManager;
