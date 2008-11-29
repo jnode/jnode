@@ -42,6 +42,15 @@ import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 
+/**
+ * This class runs a suite of functional tests on the JNode file system
+ * implementation.  The tests are designed to be run from the JNode development
+ * sandbox.  The JNode core project needs to be on the bootclasspath to avoid 
+ * classloader security problems.
+ * 
+ * @author Fabien DUMINY
+ * @author crawley@jnode.org
+ */
 public class FSTestSuite extends JFuncSuite {
     public static void main(String[] args) throws Throwable {
         InitialNaming.setNameSpace(new BasicNameSpace());
