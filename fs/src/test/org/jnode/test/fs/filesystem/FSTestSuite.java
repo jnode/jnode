@@ -32,11 +32,8 @@ import org.jnode.emu.plugin.model.DummyPluginDescriptor;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.ConfigurationElement;
-import org.jnode.plugin.Extension;
-import org.jnode.plugin.ExtensionPoint;
-import org.jnode.plugin.PluginDescriptor;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
+import org.jnode.test.fs.filesystem.config.FSType;
 import org.jnode.test.fs.filesystem.tests.BasicFSTest;
 import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
@@ -60,14 +57,10 @@ public class FSTestSuite extends JFuncSuite {
         DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
         DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
         desc.addExtensionPoint(ep);
-        String[] fsTypeNames = new String[] {
-            org.jnode.fs.ext2.Ext2FileSystemType.class.getName(),
-            org.jnode.fs.fat.FatFileSystemType.class.getName()
-        };
-        for (String fsTypeName : fsTypeNames) {
+        for (FSType fsType : FSType.values()) {
             DummyExtension extension = new DummyExtension();
             DummyConfigurationElement element = new DummyConfigurationElement();
-            element.addAttribute("class", fsTypeName);
+            element.addAttribute("class", fsType.getFsTypeClass().getName());
             extension.addElement(element);
             ep.addExtension(extension);
         }
