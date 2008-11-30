@@ -44,6 +44,8 @@ public enum FSType {
         new String[]{".", "..", "lost+found"}),
     FAT("fat", FatFileSystem.class, FatFileSystemType.class,
         null),
+    JFAT("jfat", org.jnode.fs.jfat.FatFileSystem.class, org.jnode.fs.jfat.FatFileSystemType.class,
+            null),
 
     ISO9660("iso9660", ISO9660FileSystem.class, ISO9660FileSystemType.class,
         new String[]{".", ".."}),
