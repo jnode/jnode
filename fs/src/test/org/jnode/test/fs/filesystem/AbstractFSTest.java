@@ -68,6 +68,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
         super.setUp();
         this.config = config;
         this.device = config.getDeviceParam().createDevice();
+        this.fs = config.getFileSystem().format(this.device);
         this.fs = config.getFileSystem().mount(this.device);
     }
 
