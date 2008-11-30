@@ -34,9 +34,9 @@ import org.jnode.fs.Formatter;
 public class FS {
     private final FSType type;
     private final boolean readOnly;
-    private final Formatter<? extends FileSystem> formatter;
+    private final Formatter<? extends FileSystem<?>> formatter;
 
-    public FS(FSType type, boolean readOnly, Formatter<? extends FileSystem> formatter) {
+    public FS(FSType type, boolean readOnly, Formatter<? extends FileSystem<?>> formatter) {
         this.type = type;
         this.readOnly = readOnly;
         this.formatter = formatter;
@@ -56,11 +56,18 @@ public class FS {
         return readOnly;
     }
 
-    public FileSystem mount(Device device)
-        throws FileSystemException, IOException, InstantiationException, IllegalAccessException, NameNotFoundException {
-        if (formatter != null)
+    public FileSystem<?> format(Device device) throws FileSystemException {
+        FileSystem<?> fs = null;
+        
+        if (formatter != null) {
             formatter.format(device);
+        }
+        
+        return fs;
+    }
 
+    public FileSystem<?> mount(Device device)
+        throws FileSystemException, IOException, InstantiationException, IllegalAccessException, NameNotFoundException {
         return type.mount(device, readOnly);
     }
 
