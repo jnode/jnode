@@ -66,14 +66,16 @@ public abstract class AbstractFSTest extends JFuncTestCase {
     protected final void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException,
         InstantiationException, IllegalAccessException, Exception {
         super.setUp();
-
         this.config = config;
         this.device = config.getDeviceParam().createDevice();
         this.fs = config.getFileSystem().mount(this.device);
     }
 
     public final void tearDown() throws Exception {
-        config.getDeviceParam().tearDown(device);
+        // Some tests don't call setup(config), which means that config will be null when teardown is called.
+        if (config != null) {
+            config.getDeviceParam().tearDown(device);
+        }
         super.tearDown();
     }
 
