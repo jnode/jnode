@@ -88,9 +88,10 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
     }
 
     protected void createReaders(Monitor monitor, FSFile file) {
-        for (int i = 0; i < NB_READERS; i++)
+        for (int i = 0; i < NB_READERS; i++) {
             monitor.addWorker(new Reader(monitor, file, i * 2, NB_READERS * 2,
                 MIN_SLEEP, MAX_SLEEP));
+        }
     }
 
     protected void createWriters(Monitor monitor, FSFile file) {
@@ -104,8 +105,6 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
 
         ByteBuffer data = ByteBuffer.allocate(expData.length);
         file.read(0, data);
-        //byte[] data = new byte[expData.length];
-        //file.read(0, data, 0, data.length);
 
         return TestUtils.equals(expData, data.array());
     }
@@ -133,57 +132,50 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
 }
 
 class Monitor {
-    private int runningWorkers;
-
-    private Throwable throwable;
-
     private Vector<Worker> workers = new Vector<Worker>();
+    private Vector<Worker> finishedWorkers = new Vector<Worker>();
+    private boolean failed = false;
 
     public void addWorker(Worker worker) {
         workers.add(worker);
     }
 
     public void notifyEnd(Worker worker) {
-        // System.out.println(runningWorkers+" ");
-        runningWorkers--;
-        workers.remove(worker);
+        finishedWorkers.add(worker);
     }
 
     public void notifyError(Worker worker, Throwable throwable) {
-        runningWorkers--;
-        workers.remove(worker);
-
-        this.throwable = new Error(worker.getClass().getName() + " failed !",
-            throwable);
+        System.err.println(worker.getClass().getName() + " failed !");
+        throwable.printStackTrace();
+        failed = true;
     }
 
     public void waitAll() throws Throwable {
-        runningWorkers = workers.size();
-        for (int i = 0; i < workers.size(); i++)
-            new Thread(workers.get(i)).start();
+        for (Worker worker : workers) {
+            new Thread(worker).start();
+        }
 
-        // System.out.println("Monitor is waiting for "+workers.size()+"
-        // workers");
-        while (workers.size() != 0) {
+        while (finishedWorkers.size() != workers.size()) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                //empty
+                // ignore
             }
-            if (throwable != null)
-                throw throwable;
         }
-        // System.out.println("All workers are finished");
+        
+        if (failed) {
+            throw new Error("At least one of the workers had an error (see above messages)");
+        }
     }
 }
 
 class Reader extends Worker {
     /**
-     * @param file
+     * {@inheritDoc}
      */
-    public Reader(Monitor monitor, FSFile file, int start, int step,
+    public Reader(Monitor monitor, FSFile file, int offsetStart, int offsetStep,
                   int minSleep, int maxSleep) {
-        super(monitor, file, start, step, minSleep, maxSleep);
+        super(monitor, file, offsetStart, offsetStep, minSleep, maxSleep);
     }
 
     public void doRun(long offset) throws IOException {
@@ -201,15 +193,24 @@ abstract class Worker implements Runnable {
 
     protected Monitor monitor;
 
-    protected int start;
+    protected int offsetStart;
 
-    protected int step;
+    protected int offsetStep;
 
-    public Worker(Monitor monitor, FSFile file, int start, int step,
+    /**
+     * 
+     * @param monitor
+     * @param file the file on which to work
+     * @param offsetStart file's offset from which to start
+     * @param offsetStep value to add to file's offset at each iteration
+     * @param minSleep minimum delay to sleep between 2 iterations
+     * @param maxSleep maximum delay to sleep between 2 iterations
+     */
+    public Worker(Monitor monitor, FSFile file, int offsetStart, int offsetStep,
                   int minSleep, int maxSleep) {
         this.file = file;
-        this.step = step;
-        this.start = start;
+        this.offsetStart = offsetStart;
+        this.offsetStep = offsetStep;
         this.minSleep = minSleep;
         this.maxSleep = maxSleep;
         this.monitor = monitor;
@@ -220,7 +221,7 @@ abstract class Worker implements Runnable {
     public final void run() {
         long length = file.getLength();
         try {
-            for (int i = start; i < (length - 1); i += step) {
+            for (int i = offsetStart; i < (length - 1); i += offsetStep) {
                 try {
                     doRun(i);
                 } catch (IOException e1) {
@@ -235,22 +236,21 @@ abstract class Worker implements Runnable {
                 }
             }
         } catch (Throwable t) {
-            // worker has finished with an error
             monitor.notifyError(this, t);
+        } finally {
+            // worker has finished properly
+            monitor.notifyEnd(this);
         }
-
-        // worker has finished properly
-        monitor.notifyEnd(this);
     }
 }
 
 class Writer extends Worker {
     /**
-     * @param file
+     * {@inheritDoc}
      */
-    public Writer(Monitor monitor, FSFile file, int start, int step,
+    public Writer(Monitor monitor, FSFile file, int offsetStart, int offsetStep,
                   int minSleep, int maxSleep) {
-        super(monitor, file, start, step, minSleep, maxSleep);
+        super(monitor, file, offsetStart, offsetStep, minSleep, maxSleep);
     }
 
     public void doRun(long offset) throws IOException {
