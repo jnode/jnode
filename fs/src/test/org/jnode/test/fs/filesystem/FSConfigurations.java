@@ -50,6 +50,9 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
             FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT32), diskFileName, "1M"));
 
+        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.JFAT,
+                FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT32), diskFileName, "1M"));
+
 //        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.ISO9660,
 //                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
 
@@ -65,15 +68,15 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
     }
 
     private List<FSTestConfig> createFileConfigs(OsType osType, FSType fsType,
-                                                 FSAccessMode accessMode, Formatter<? extends FileSystem> formatter,
-                                                 String fileSize, String fileName) {
-        FileParam fp = new FileParam(fileSize, fileName);
+                                                 FSAccessMode accessMode, Formatter<? extends FileSystem<?>> formatter,
+                                                 String fileName, String fileSize) {
+        FileParam fp = new FileParam(fileName, fileSize);
         return createConfigs(osType, fsType,
             accessMode, formatter, fp);
     }
 
     private List<FSTestConfig> createConfigs(OsType osType, FSType fsType,
-                                             FSAccessMode accessMode, Formatter<? extends FileSystem> formatter,
+                                             FSAccessMode accessMode, Formatter<? extends FileSystem<?>> formatter,
                                              DeviceParam device) {
         List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
 
