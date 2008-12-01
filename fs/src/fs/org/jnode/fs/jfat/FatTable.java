@@ -18,11 +18,11 @@ public class FatTable {
     }
 
     public FatEntry put(FatEntry entry) {
-        if (table.containsKey(entry.getName()))
+    	FatKey key = new FatKey(entry.getName());
+        if (table.containsKey(key)){
             throw new IllegalArgumentException("shouldn't happen");
-
-        table.put(new FatKey(entry.getName()), entry);
-
+        }
+        table.put(key, entry);
         return entry;
     }
 
@@ -59,17 +59,25 @@ public class FatTable {
         return table.size();
     }
 
+    /**
+     * Print FAT table content.
+     */
     public String toString() {
-        StrWriter out = new StrWriter();
+    	StrWriter out = null;
+    	try{
+    		out = new StrWriter();
 
-        Iterator<FatKey> i = table.keySet().iterator();
+    		Iterator<FatKey> i = table.keySet().iterator();
 
-        out.println("Entries [");
-        while (i.hasNext())
-            out.println("\t\t  " + i.next());
-        out.print("\t\t]");
+    		out.println("Entries [");
+    		while (i.hasNext())
+    			out.println("\t\t  " + i.next());
+    		out.print("\t\t]");
 
-        return out.toString();
+    		return out.toString();
+    	} finally {
+    		out.close();
+    	}
     }
 
     private class FatKey {
