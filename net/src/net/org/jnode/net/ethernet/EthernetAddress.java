@@ -186,7 +186,7 @@ public class EthernetAddress implements HardwareAddress, Serializable {
      */
     public boolean isBroadcast() {
         for (int i = 0; i < length; i++) {
-            if (address[i] != 0xFF) {
+            if ((0xFF & address[i]) != 0xFF) {
                 return false;
             }
         }
