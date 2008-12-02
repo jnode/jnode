@@ -573,7 +573,7 @@ public final class URL implements Serializable
         int at = (host == null) ? -1 : host.indexOf('@');
       String h = at < 0 ? this.host : host.substring(at + 1, host.length());
       //jnode
-      return (h != null && h.trim().length() == 0) ? null : h;
+      return (h != null && h.trim().length() == 0) ? "" : h;
     }
 
     /**
