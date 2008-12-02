@@ -33,11 +33,15 @@
 	<pathelement location="${my-src.dir}/openjdk/sun"/>
 	<pathelement location="${my-src.dir}/openjdk/vm"/>
   </path>
-  <path id="classpath-sources2">
-	<pathelement location="${my-src.dir}/openjdk/corba"/>
-	<pathelement location="${my-src.dir}/openjdk/jaxws"/>
-	<pathelement location="${my-src.dir}/openjdk/langtools"/>
-  </path>  
+  <path id="classpath-sources-corba">
+    <pathelement location="${my-src.dir}/openjdk/corba"/>
+  </path>
+  <path id="classpath-sources-jaxws">
+    <pathelement location="${my-src.dir}/openjdk/jaxws"/>
+  </path>
+  <path id="classpath-sources-langtools">
+    <pathelement location="${my-src.dir}/openjdk/langtools"/>
+  </path>
   <path id="my-sources1">
 	<path refid="classpath-sources"/>
 	<pathelement location="${my-src.dir}/core"/>
@@ -140,14 +144,33 @@
       <src refid="my-sources" />
       <classpath refid="my-cp"/>
     </jnode.compile>
-    <jnode.compile>
-      <bootclasspath>
-      	<pathelement location="${classpath-sources}" />
-		<pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
-      </bootclasspath>
-      <src refid="classpath-sources2" />
-      <classpath refid="my-cp"/>
-    </jnode.compile>
+    <parallel >
+      <jnode.compile>
+        <bootclasspath>
+      	  <pathelement location="${classpath-sources}" />
+		  <pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
+        </bootclasspath>
+        <src refid="classpath-sources-corba" />
+        <classpath refid="my-cp"/>
+      </jnode.compile>
+      <jnode.compile>
+        <bootclasspath>
+          <pathelement location="${classpath-sources}" />
+          <pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
+        </bootclasspath>
+        <src refid="classpath-sources-jaxws" />
+        <classpath refid="my-cp"/>
+      </jnode.compile>
+      <jnode.compile>
+        <bootclasspath>
+          <pathelement location="${classpath-sources}" />
+          <pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
+        </bootclasspath>
+        <src refid="classpath-sources-langtools" />
+        <classpath refid="my-cp"/>
+      </jnode.compile>
+    </parallel>
+
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
 	    <fileset dir="${my-src.dir}/classpath/gnu" excludes="${my-non-resources}"/>
