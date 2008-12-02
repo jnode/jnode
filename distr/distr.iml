@@ -38,7 +38,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="gui" />
     <orderEntry type="module" module-name="fs" />
-    <orderEntryProperties />
   </component>
 </module>
 

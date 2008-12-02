@@ -17,7 +17,6 @@
     <orderEntry type="module" module-name="core" />
     <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module" module-name="shell" />
-    <orderEntryProperties />
   </component>
 </module>
 

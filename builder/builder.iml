@@ -121,7 +121,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="fs" />
-    <orderEntryProperties />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../core/lib/ant.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
