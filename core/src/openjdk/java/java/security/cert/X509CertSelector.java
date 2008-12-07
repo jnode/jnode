@@ -80,7 +80,6 @@ import sun.security.x509.*;
  * @see CertSelector
  * @see X509Certificate
  *
- * @version 	1.29, 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  */

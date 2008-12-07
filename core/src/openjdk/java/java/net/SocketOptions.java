@@ -37,7 +37,6 @@ package java.net;
  * type-safe methods to get/set each of these options in Socket, ServerSocket,
  * DatagramSocket and MulticastSocket.
  * <P>
- * @version 1.40, 05/05/07
  * @author David Brown
  */
 
@@ -328,9 +327,3 @@ public interface SocketOptions {
      */
     public final static int SO_OOBINLINE = 0x1003;
 }
-
-
-
-
-
-

@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)ExpiringCache.java	1.12 07/05/05
- */
+
 
 package java.io;
 

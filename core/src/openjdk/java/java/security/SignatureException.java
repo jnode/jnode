@@ -28,7 +28,6 @@ package java.security;
 /**
  * This is the generic Signature exception. 
  * 
- * @version 1.23 05/05/07
  * @author Benjamin Renaud 
  */
 

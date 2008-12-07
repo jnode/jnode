@@ -38,7 +38,6 @@ import java.util.*;
  * consult this documentation.</strong>
  *
  * @author  Josh Bloch
- * @version 1.12, 05/05/07
  * @see     Preferences
  * @since   1.4
  */

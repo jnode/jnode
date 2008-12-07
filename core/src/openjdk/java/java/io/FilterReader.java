@@ -34,7 +34,6 @@ package java.io;
  * should override some of these methods and may also provide
  * additional methods and fields.
  *
- * @version 	1.25, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

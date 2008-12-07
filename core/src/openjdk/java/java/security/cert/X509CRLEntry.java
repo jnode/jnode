@@ -27,8 +27,6 @@ package java.security.cert;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.Set;
-
 import javax.security.auth.x500.X500Principal;
 
 /**
@@ -62,7 +60,6 @@ import javax.security.auth.x500.X500Principal;
  * @see X509Extension
  *
  * @author Hemma Prafullchandra
- * @version 1.23 07/05/05
  */
 
 public abstract class X509CRLEntry implements X509Extension {

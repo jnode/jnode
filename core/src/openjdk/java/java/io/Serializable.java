@@ -159,7 +159,6 @@ package java.io;
  * serialVersionUID values is waived for array classes.
  *
  * @author  unascribed
- * @version 1.31, 05/05/07
  * @see java.io.ObjectOutputStream
  * @see java.io.ObjectInputStream
  * @see java.io.ObjectOutput

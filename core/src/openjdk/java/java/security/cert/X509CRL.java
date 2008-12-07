@@ -108,7 +108,6 @@ import sun.security.x509.X509CRLImpl;
  *
  * @author Hemma Prafullchandra
  *
- * @version 1.38, 05/05/07
  *
  * @see CRL
  * @see CertificateFactory

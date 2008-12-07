@@ -33,7 +33,6 @@ import sun.security.action.GetPropertyAction;
  * regular-expression pattern.
  *
  * @author  unascribed
- * @version 1.22, 07/05/05
  * @since 1.4
  * @spec JSR-51
  */

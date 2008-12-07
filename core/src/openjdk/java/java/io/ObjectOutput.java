@@ -31,7 +31,6 @@ package java.io;
  * extends that interface to include objects, arrays, and Strings.
  *
  * @author  unascribed
- * @version 1.23, 05/05/07
  * @see java.io.InputStream
  * @see java.io.ObjectOutputStream
  * @see java.io.ObjectInputStream

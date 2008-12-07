@@ -37,7 +37,6 @@ package java.security;
  * <li>ExpiredKeyException
  * </ul>
  *
- * @version 1.25 07/05/05
  * @author Benjamin Renaud
  *
  * @see Key

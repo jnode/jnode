@@ -79,7 +79,6 @@ import java.util.Set;
  *
  * @see CertPathValidator
  *
- * @version 	1.25 05/05/07
  * @since	1.4
  * @author	Sean Mullan
  * @author	Yassir Elley

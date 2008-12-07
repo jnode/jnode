@@ -37,7 +37,6 @@ import java.util.Arrays;
  * @see ECFieldF2m
  *
  * @author Valerie Peng
- * @version 1.11, 05/05/07
  *
  * @since 1.5
  */
@@ -116,7 +115,7 @@ public class EllipticCurve {
         this.a = a;
         this.b = b;
 	if (seed != null) {
-	    this.seed = (byte[]) seed.clone();
+            this.seed = seed.clone();
 	} else {
 	    this.seed = null;
 	}
@@ -158,7 +157,7 @@ public class EllipticCurve {
      */
     public byte[] getSeed() {
 	if (seed == null) return null;
-	else return (byte[]) seed.clone();
+        else return seed.clone();
     }
 
     /**

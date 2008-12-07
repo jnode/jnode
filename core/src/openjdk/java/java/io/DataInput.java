@@ -186,7 +186,6 @@ package java.io;
  *     are represented in the form of surrogate pairs.
  * </ul>
  * @author  Frank Yellin
- * @version 1.31, 05/05/07
  * @see     java.io.DataInputStream
  * @see     java.io.DataOutput
  * @since   JDK1.0

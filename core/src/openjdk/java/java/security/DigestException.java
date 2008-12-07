@@ -28,7 +28,6 @@ package java.security;
 /**
  * This is the generic Message Digest exception. 
  * 
- * @version 1.24, 07/05/05
  * @author Benjamin Renaud 
  */
 public class DigestException extends GeneralSecurityException {

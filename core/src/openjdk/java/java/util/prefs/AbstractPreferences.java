@@ -117,7 +117,6 @@ import java.lang.Double;
  * with normal <tt>Preferences</tt> usage and would lead to great confusion.
  *
  * @author  Josh Bloch
- * @version 1.32, 05/05/07
  * @see     Preferences
  * @since   1.4
  */

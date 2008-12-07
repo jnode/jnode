@@ -109,7 +109,6 @@ import java.io.IOException;
  *
  * <p>The implementation conforms to RFC 2965, section 3.3.
  *
- * @version %I%, %E%
  * @author Edward Wang
  * @since 1.6
  */

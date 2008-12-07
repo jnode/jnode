@@ -32,7 +32,6 @@ package java.security.cert;
  * <code>CertPath</code> parameter specifications must implement this 
  * interface.  
  *
- * @version 	1.12 05/05/07
  * @author	Yassir Elley
  * @see 	CertPathValidator#validate(CertPath, CertPathParameters)
  * @see 	CertPathBuilder#build(CertPathParameters)

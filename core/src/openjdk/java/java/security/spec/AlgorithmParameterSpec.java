@@ -34,7 +34,6 @@ package java.security.spec;
  * 
  * @author Jan Luehe
  *
- * @version 1.21, 05/05/07
  *
  * @see java.security.AlgorithmParameters
  * @see DSAParameterSpec

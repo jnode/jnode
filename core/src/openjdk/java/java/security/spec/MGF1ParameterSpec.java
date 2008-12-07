@@ -53,7 +53,6 @@ import java.security.spec.AlgorithmParameterSpec;
  *
  * @author Valerie Peng
  *
- * @version 1.11, 05/05/07
  * @since 1.5
  */
 public class MGF1ParameterSpec implements AlgorithmParameterSpec {

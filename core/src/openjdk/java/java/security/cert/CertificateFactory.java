@@ -95,7 +95,6 @@ import sun.security.jca.GetInstance.Instance;
  * @author Jan Luehe
  * @author Sean Mullan
  *
- * @version 1.38, 05/05/07
  *
  * @see Certificate
  * @see X509Certificate

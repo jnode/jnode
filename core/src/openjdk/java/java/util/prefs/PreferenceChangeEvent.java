@@ -36,7 +36,6 @@ import java.io.NotSerializableException;
  * serialization methods are implemented to throw NotSerializableException. 
  *
  * @author  Josh Bloch
- * @version 1.13, 05/05/07
  * @see Preferences
  * @see PreferenceChangeListener
  * @see NodeChangeEvent

@@ -48,7 +48,6 @@ import java.security.spec.InvalidParameterSpecException;
  *
  * @author Jan Luehe
  *
- * @version 1.33, 05/05/07
  *
  * @see java.security.spec.AlgorithmParameterSpec
  * @see java.security.spec.DSAParameterSpec

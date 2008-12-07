@@ -36,7 +36,6 @@ import sun.security.x509.GeneralNameInterface;
  * implementation dependent APIs in CertPath framework.
  *
  * @author Andreas Sterbenz
- * @version 1.12, 05/05/07
  */
 class CertPathHelperImpl extends CertPathHelper {
     

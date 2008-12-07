@@ -36,7 +36,6 @@ package java.security;
  * security policy.  Such information should be given whenever
  * possible at the time the exception is thrown.
  *
- * @version 	1.20, 05/05/07
  * @author Li Gong
  * @author Roland Schemers
  */
@@ -81,4 +80,3 @@ public class AccessControlException extends SecurityException {
 	return perm;
     }
 }
-

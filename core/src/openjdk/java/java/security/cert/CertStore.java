@@ -75,7 +75,6 @@ import sun.security.jca.GetInstance.Instance;
  * Multiple threads may concurrently invoke the static methods defined in
  * this class with no ill effects.
  *
- * @version 	1.24 05/05/07
  * @since	1.4
  * @author	Sean Mullan, Steve Hanna
  */

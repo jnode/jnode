@@ -52,7 +52,6 @@ import java.util.Collection;
  * <code>engineGetCertificates</code> and <code>engineGetCRLs</code> methods.
  * More sophisticated ones may allow truly concurrent access.
  *
- * @version 	1.14 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  */

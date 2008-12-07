@@ -45,7 +45,6 @@ import java.security.GeneralSecurityException;
  *
  * @see CertPathBuilder
  *
- * @version 	1.14 05/05/07
  * @since	1.4
  * @author 	Sean Mullan
  */

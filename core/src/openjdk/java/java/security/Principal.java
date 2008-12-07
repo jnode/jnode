@@ -32,7 +32,6 @@ package java.security;
  *
  * @see java.security.cert.X509Certificate
  *
- * @version 1.29, 07/05/05
  * @author Li Gong
  */
 public interface Principal {

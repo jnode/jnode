@@ -50,7 +50,6 @@ import java.lang.NullPointerException;	// for javadoc
  *
  * <p>HttpCookie class can accept all these 3 forms of syntax.
  *
- * @version 1.11, 07/05/05
  * @author Edward Wang
  * @since 1.6
  */
@@ -1163,4 +1162,3 @@ public final class HttpCookie implements Cloneable {
         return cookies;
     }
 }
-

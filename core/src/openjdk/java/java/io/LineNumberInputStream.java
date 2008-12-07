@@ -39,7 +39,6 @@ package java.io;
  * <code>1</code> when a <code>read</code> returns a newline character.
  *
  * @author     Arthur van Hoff
- * @version    1.34, 05/05/07
  * @see        java.io.LineNumberReader
  * @since      JDK1.0
  * @deprecated This class incorrectly assumes that bytes adequately represent

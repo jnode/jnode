@@ -31,7 +31,6 @@ package java.security;
  * which may be subclassed by Providers to
  * throw specialized, provider-specific runtime errors.
  *
- * @version 1.23, 05/05/07
  * @author Benjamin Renaud
  */
 public class ProviderException extends RuntimeException {

@@ -71,7 +71,6 @@ import java.security.spec.MGF1ParameterSpec;
  *
  * @author Valerie Peng
  *
- * @version 1.15 07/05/05
  *
  * @since 1.4
  */

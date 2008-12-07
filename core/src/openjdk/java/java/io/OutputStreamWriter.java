@@ -70,7 +70,6 @@ import sun.nio.cs.StreamEncoder;
  * @see OutputStream
  * @see java.nio.charset.Charset
  *
- * @version 	1.56, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

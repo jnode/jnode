@@ -55,7 +55,6 @@ package java.io;
  * @see FileReader
  * @see InputStreamReader
  *
- * @version 	1.43, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

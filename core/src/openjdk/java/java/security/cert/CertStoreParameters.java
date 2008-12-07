@@ -43,7 +43,6 @@ package java.security.cert;
  *
  * @see CertStore#getInstance
  *
- * @version 	1.12 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  */

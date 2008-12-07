@@ -33,7 +33,6 @@ import java.math.BigInteger;
  * coordinates.
  *
  * @author Valerie Peng
- * @version 1.10, 05/05/07
  *
  * @since 1.5
  */

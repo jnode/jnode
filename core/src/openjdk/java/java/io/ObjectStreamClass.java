@@ -62,7 +62,6 @@ import sun.reflect.ReflectionFactory;
  *
  * @author	Mike Warres
  * @author	Roger Riggs
- * @version 1.158, 05/05/07
  * @see ObjectStreamField
  * @see <a href="../../../platform/serialization/spec/class.html">Object Serialization Specification, Section 4, Class Descriptors</a>
  * @since   JDK1.1
@@ -794,7 +793,7 @@ public class ObjectStreamClass implements Serializable {
      * returned.
      */
     ObjectStreamField[] getFields(boolean copy) {
-	return copy ? (ObjectStreamField[]) fields.clone() : fields;
+        return copy ? fields.clone() : fields;
     }
     
     /**

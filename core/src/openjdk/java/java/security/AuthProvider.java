@@ -37,7 +37,6 @@ import javax.security.auth.callback.CallbackHandler;
  * if it determines that a login must be performed
  * prior to certain operations.
  *
- * @version 1.10, 05/05/07
  * @since 1.5
  */
 public abstract class AuthProvider extends Provider {

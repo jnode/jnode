@@ -31,7 +31,6 @@ package java.security.cert;
  * are found in the Certificate.
  *
  * @author Hemma Prafullchandra
- * 1.19
  */
 public class CertificateParsingException extends CertificateException {
 

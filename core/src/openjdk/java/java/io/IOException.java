@@ -31,7 +31,6 @@ package java.io;
  * interrupted I/O operations.
  *
  * @author  unascribed
- * @version 1.30, 05/05/07
  * @see     java.io.InputStream
  * @see     java.io.OutputStream
  * @since   JDK1.0

@@ -35,7 +35,6 @@ import java.security.spec.RSAOtherPrimeInfo;
  *
  * @author Valerie Peng
  *
- * @version 1.13 07/05/05
  * 
  * @see java.security.spec.RSAPrivateKeySpec
  * @see java.security.spec.RSAMultiPrimePrivateCrtKeySpec

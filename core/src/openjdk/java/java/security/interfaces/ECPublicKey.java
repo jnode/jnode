@@ -32,7 +32,6 @@ import java.security.spec.ECPoint;
  *
  * @author Valerie Peng
  *
- * @version 1.10, 05/05/07
  *
  * @see PublicKey
  * @see ECKey

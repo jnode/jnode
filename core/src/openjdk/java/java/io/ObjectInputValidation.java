@@ -31,7 +31,6 @@ package java.io;
  * been deserialized.
  *
  * @author  unascribed
- * @version 1.25, 05/05/07
  * @see     ObjectInputStream
  * @see     ObjectInputStream#registerValidation(java.io.ObjectInputValidation, int)
  * @since   JDK1.1

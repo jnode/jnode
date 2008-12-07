@@ -44,7 +44,6 @@ package java.io;
  * piped output stream is no longer alive.
  *
  * @author  James Gosling
- * @version 1.40, 12/01/05
  * @see     java.io.PipedOutputStream
  * @since   JDK1.0
  */

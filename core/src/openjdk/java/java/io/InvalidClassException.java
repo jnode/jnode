@@ -36,7 +36,6 @@ package java.io;
  * </UL>
  *
  * @author  unascribed
- * @version 1.30, 05/05/07
  * @since   JDK1.1
  */
 public class InvalidClassException extends ObjectStreamException {

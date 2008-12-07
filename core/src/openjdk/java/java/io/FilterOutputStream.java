@@ -39,7 +39,6 @@ package java.io;
  * methods as well as provide additional methods and fields. 
  *
  * @author  Jonathan Payne
- * @version 1.38, 05/05/07
  * @since   JDK1.0
  */
 public

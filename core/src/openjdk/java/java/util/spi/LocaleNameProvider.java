@@ -33,7 +33,6 @@ import java.util.Locale;
  * {@link java.util.Locale Locale} class.
  *
  * @since        1.6
- * @version      @(#)LocaleNameProvider.java	1.8 07/05/05
  */
 public abstract class LocaleNameProvider extends LocaleServiceProvider {
 

@@ -44,7 +44,6 @@ import java.security.spec.AlgorithmParameterSpec;
  *
  * @author Jan Luehe
  *
- * @version 1.21, 05/05/07
  *
  * @see AlgorithmParameterGenerator
  * @see AlgorithmParameters

@@ -47,7 +47,6 @@ import java.util.Collections;
  * provide the necessary locking. Multiple threads each manipulating
  * separate objects need not synchronize.
  *
- * @version 	1.16 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  * @see         java.util.Collection

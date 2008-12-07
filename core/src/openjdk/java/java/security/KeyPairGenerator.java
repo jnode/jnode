@@ -107,7 +107,6 @@ import sun.security.jca.GetInstance.Instance;
  *
  * @author Benjamin Renaud
  *
- * @version 1.65, 05/05/07
  *
  * @see java.security.spec.AlgorithmParameterSpec
  */
@@ -684,4 +683,3 @@ public abstract class KeyPairGenerator extends KeyPairGeneratorSpi {
     }
 
 }
-

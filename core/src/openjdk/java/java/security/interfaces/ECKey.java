@@ -31,7 +31,6 @@ import java.security.spec.ECParameterSpec;
  *
  * @author Valerie Peng
  *
- * @version 1.9, 05/05/07
  * @since 1.5
  */
 public interface ECKey {

@@ -152,5 +152,3 @@ public interface AclEntry extends Cloneable {
      */
     public Object clone();
 }
-
-

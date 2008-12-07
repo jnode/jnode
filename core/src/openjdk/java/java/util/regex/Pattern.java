@@ -610,7 +610,6 @@ import java.util.Arrays;
  * @author      Mike McCloskey
  * @author      Mark Reinhold
  * @author	JSR-51 Expert Group
- * @version 	1.133, 07/05/05
  * @since       1.4
  * @spec	JSR-51
  */

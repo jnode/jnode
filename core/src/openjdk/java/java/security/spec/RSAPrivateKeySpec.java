@@ -32,7 +32,6 @@ import java.math.BigInteger;
  *
  * @author Jan Luehe
  *
- * @version 1.17 07/05/05
  *
  * @see java.security.Key
  * @see java.security.KeyFactory

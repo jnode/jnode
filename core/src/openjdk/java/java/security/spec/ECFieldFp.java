@@ -34,7 +34,6 @@ import java.util.Arrays;
  * @see ECField
  *
  * @author Valerie Peng
- * @version 1.10, 05/05/07
  *
  * @since 1.5
  */

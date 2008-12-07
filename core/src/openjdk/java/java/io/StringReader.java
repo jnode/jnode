@@ -29,7 +29,6 @@ package java.io;
 /**
  * A character stream whose source is a string.
  *
- * @version 	1.32, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

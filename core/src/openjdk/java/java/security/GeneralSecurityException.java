@@ -30,7 +30,6 @@ package java.security;
  * security exception class that provides type safety for all the
  * security-related exception classes that extend from it.
  *
- * @version 1.23, 07/05/05
  * @author Jan Luehe
  */
 

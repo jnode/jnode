@@ -31,7 +31,6 @@ package java.net;
  * URI reference.
  *
  * @author Mark Reinhold
- * @version 1.13, 07/05/05
  * @see URI
  * @since 1.4
  */

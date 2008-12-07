@@ -46,7 +46,6 @@ package java.io;
  *
  * @author  David Connelly
  * @author  Jonathan Payne
- * @version 1.49, 05/05/07
  * @since   JDK1.0
  */
 public

@@ -30,7 +30,6 @@ package java.io;
  * A character-stream reader that allows characters to be pushed back into the
  * stream.
  *
- * @version 	1.27, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

@@ -29,7 +29,6 @@ package java.io;
 /**
  * Piped character-output streams.
  *
- * @version 	1.25, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

@@ -32,7 +32,6 @@ package java.io;
  * system for each byte written.
  *
  * @author  Arthur van Hoff
- * @version 1.40, 05/05/07
  * @since   JDK1.0
  */
 public 

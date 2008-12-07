@@ -37,7 +37,6 @@ package java.io;
  * which modified UTF-8 strings are read and written.
  *
  * @author  Frank Yellin
- * @version 1.20, 05/05/07
  * @see     java.io.DataInput
  * @see     java.io.DataInputStream#readUTF(java.io.DataInput)
  * @see     java.io.IOException

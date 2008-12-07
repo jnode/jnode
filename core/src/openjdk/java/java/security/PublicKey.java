@@ -41,7 +41,6 @@ package java.security;
  * @see java.security.interfaces.DSAPublicKey
  * @see java.security.interfaces.RSAPublicKey
  *
- * @version 1.39 07/05/05
  */
 
 public interface PublicKey extends Key {

@@ -103,7 +103,6 @@ import sun.security.x509.X509CertImpl;
  *
  * @author Hemma Prafullchandra
  *
- * @version 1.48
  *
  * @see Certificate
  * @see CertificateFactory

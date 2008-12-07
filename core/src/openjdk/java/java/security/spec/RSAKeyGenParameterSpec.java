@@ -33,7 +33,6 @@ import java.security.spec.AlgorithmParameterSpec;
  * key pair.
  * 
  * @author Jan Luehe
- * @version 1.15 05/05/07
  *
  * @see java.security.KeyPairGenerator#initialize(java.security.spec.AlgorithmParameterSpec)
  *

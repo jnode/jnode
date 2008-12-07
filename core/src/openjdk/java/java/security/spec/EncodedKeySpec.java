@@ -30,7 +30,6 @@ package java.security.spec;
  *
  * @author Jan Luehe
  *
- * @version 1.29, 05/05/07
  *
  * @see java.security.Key
  * @see java.security.KeyFactory
@@ -54,7 +53,7 @@ public abstract class EncodedKeySpec implements KeySpec {
      * is null.
      */
     public EncodedKeySpec(byte[] encodedKey) {
-	this.encodedKey = (byte[])encodedKey.clone();
+        this.encodedKey = encodedKey.clone();
     }
 
     /**
@@ -64,7 +63,7 @@ public abstract class EncodedKeySpec implements KeySpec {
      * this method is called.
      */
     public byte[] getEncoded() {
-	return (byte[])this.encodedKey.clone();
+        return this.encodedKey.clone();
     }
 
     /**

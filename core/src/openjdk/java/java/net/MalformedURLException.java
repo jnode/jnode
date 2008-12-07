@@ -33,7 +33,6 @@ import java.io.IOException;
  * string could not be parsed. 
  *
  * @author  Arthur van Hoff
- * @version 1.23, 05/05/07
  * @since   JDK1.0
  */
 public class MalformedURLException extends IOException {

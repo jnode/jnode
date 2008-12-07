@@ -31,7 +31,6 @@ package java.io;
  * ObjectInput extends that interface to include objects, arrays, and Strings.
  *
  * @author  unascribed
- * @version 1.26, 05/05/07
  * @see java.io.InputStream
  * @see java.io.ObjectOutputStream
  * @see java.io.ObjectInputStream

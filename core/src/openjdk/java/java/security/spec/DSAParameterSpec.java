@@ -32,7 +32,6 @@ import java.math.BigInteger;
  * 
  * @author Jan Luehe
  *
- * @version 1.23, 05/05/07
  *
  * @see AlgorithmParameterSpec
  *

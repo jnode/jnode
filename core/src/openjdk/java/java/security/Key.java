@@ -97,7 +97,6 @@ package java.security;
  * @see Identity
  * @see Signer
  *
- * @version 1.64 07/05/05
  * @author Benjamin Renaud
  */
 

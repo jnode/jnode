@@ -52,7 +52,6 @@ import java.security.GeneralSecurityException;
  *
  * @see CertPathValidator
  *
- * @version 	1.18 05/05/07
  * @since	1.4
  * @author 	Yassir Elley
  */

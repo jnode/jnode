@@ -220,7 +220,6 @@ import java.lang.Double;
  * </ol>
  *
  * @author  Josh Bloch
- * @version 1.36, 05/05/07
  * @since   1.4
  */
 public abstract class Preferences {

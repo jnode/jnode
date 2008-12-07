@@ -51,7 +51,6 @@ import java.security.PublicKey;
  *
  * @see CertPathValidatorResult
  *
- * @version 	1.16 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  * @author	Sean Mullan

@@ -41,7 +41,6 @@ package java.io;
  * method, as well as the aforementioned "legacy field."
  *
  * @author  unascribed
- * @version 1.27, 05/05/07
  * @since   JDK1.1
  */
 public class WriteAbortedException extends ObjectStreamException {

@@ -34,7 +34,6 @@ package java.util.regex;
  * a <code>MatchResult</code>.
  *
  * @author  Michael McCloskey
- * @version 1.12 05/05/07
  * @see Matcher
  * @since 1.5
  */

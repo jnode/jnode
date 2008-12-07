@@ -38,7 +38,6 @@ import java.io.IOException;
  * response or writing to the cache, the current cache store operation
  * will be aborted.
  *
- * @version 1.1, 03/09/22
  * @author Yingxian Wang
  * @since 1.5
  */

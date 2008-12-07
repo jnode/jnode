@@ -34,7 +34,6 @@ import java.io.IOException;
  * read-only URL connection. 
  *
  * @author  unascribed
- * @version 1.21, 05/05/07
  * @since   JDK1.0
  */
 public class UnknownServiceException extends IOException {

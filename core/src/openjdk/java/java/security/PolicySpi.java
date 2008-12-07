@@ -38,7 +38,6 @@ package java.security;
  * an IllegalArgumentException if it does not understand the
  * <code>Policy.Parameters</code> input.
  *
- * @version 1.8, 05/05/07
  *
  * @since 1.6
  */

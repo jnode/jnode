@@ -130,7 +130,6 @@ import sun.security.action.GetPropertyAction;
  * created, the abstract pathname represented by a <code>File</code> object
  * will never change.
  *
- * @version 1.147, 05/05/07
  * @author  unascribed
  * @since   JDK1.0
  */
@@ -1694,11 +1693,10 @@ public class File
     private static String tmpdir; /* Protected by tmpFileLock */
 
     private static String getTempDir() {
-	if (tmpdir == null) {
-	    GetPropertyAction a = new GetPropertyAction("java.io.tmpdir");
-	    tmpdir = ((String) AccessController.doPrivileged(a));
-            tmpdir = fs.normalize(tmpdir);
-	}
+        if (tmpdir == null)
+            tmpdir = fs.normalize(
+                AccessController.doPrivileged(
+                    new GetPropertyAction("java.io.tmpdir")));
 	return tmpdir;
     }
 

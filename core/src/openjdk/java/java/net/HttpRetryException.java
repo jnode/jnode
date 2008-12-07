@@ -33,7 +33,6 @@ import java.io.IOException;
  * being enabled.
  *
  * @author  Michael McMahon
- * @version 1.8, 05/05/07
  * @since   1.5
  */
 public 

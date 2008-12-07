@@ -164,7 +164,6 @@ import javax.security.auth.callback.*;
  *
  * @author Jan Luehe
  *
- * @version 1.61, 05/05/07
  *
  * @see java.security.PrivateKey
  * @see javax.crypto.SecretKey
@@ -249,8 +248,7 @@ public class KeyStore {
 	 * @param password the password, which may be <code>null</code>
 	 */
 	public PasswordProtection(char[] password) {
-	    this.password = (password == null) ?
-				null : (char[])password.clone();
+            this.password = (password == null) ? null : password.clone();
 	}
 
 	/**
@@ -383,7 +381,7 @@ public class KeyStore {
 				("invalid zero-length input chain");
 	    }
 
-	    Certificate[] clonedChain = (Certificate[])chain.clone();
+            Certificate[] clonedChain = chain.clone();
 	    String certType = clonedChain[0].getType();
 	    for (int i = 1; i < clonedChain.length; i++) {
 		if (!certType.equals(clonedChain[i].getType())) {
@@ -433,7 +431,7 @@ public class KeyStore {
 	 *	<code>X509Certificate[]</code>.
 	 */
 	public Certificate[] getCertificateChain() {
-	    return (Certificate[])chain.clone();
+            return chain.clone();
 	}
 
 	/**

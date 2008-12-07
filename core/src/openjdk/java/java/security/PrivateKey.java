@@ -42,7 +42,6 @@ package java.security;
  * @see java.security.interfaces.RSAPrivateKey
  * @see java.security.interfaces.RSAPrivateCrtKey
  *
- * @version 1.36 07/05/05
  * @author Benjamin Renaud
  * @author Josh Bloch
  */

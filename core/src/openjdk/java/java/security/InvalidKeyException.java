@@ -30,7 +30,6 @@ package java.security;
  * This is the exception for invalid Keys (invalid encoding, wrong
  * length, uninitialized, etc).
  *
- * @version 1.23, 05/05/07
  * @author Benjamin Renaud 
  */
 

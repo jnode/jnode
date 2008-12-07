@@ -44,7 +44,6 @@ import java.util.Locale;
  * constructors may.  The client may inquire as to whether any errors have
  * occurred by invoking {@link #checkError checkError()}.
  *
- * @version 	1.49, 05/05/07
  * @author	Frank Yellin
  * @author	Mark Reinhold
  * @since	JDK1.1
@@ -93,7 +92,7 @@ public class PrintWriter extends Writer {
 	super(out);
 	this.out = out;
 	this.autoFlush = autoFlush;
-	lineSeparator = (String) java.security.AccessController.doPrivileged(
+        lineSeparator = java.security.AccessController.doPrivileged(
                new sun.security.action.GetPropertyAction("line.separator"));
     }
 

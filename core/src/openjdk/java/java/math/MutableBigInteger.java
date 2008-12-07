@@ -111,7 +111,7 @@ class MutableBigInteger {
      * specified BigInteger.
      */
     MutableBigInteger(BigInteger b) {
-        value = (int[]) b.mag.clone();
+        value = b.mag.clone();
         intLen = value.length;
     }
 
@@ -762,8 +762,8 @@ class MutableBigInteger {
             } else {
                 divWord(qWord, dividendEstimate, divisor);
             }
-            quotient.value[intLen - xlen] = (int)qWord[0];
-            rem = (int)qWord[1];
+            quotient.value[intLen - xlen] = qWord[0];
+            rem = qWord[1];
             remLong = rem & LONG_MASK;
         }
         
@@ -1071,7 +1071,7 @@ class MutableBigInteger {
 
         int x;
         int aZeros = 0;
-        while ((x = (int)a & 0xff) == 0) {
+        while ((x = a & 0xff) == 0) {
             a >>>= 8;
             aZeros += 8;
         }
@@ -1080,7 +1080,7 @@ class MutableBigInteger {
         a >>>= y;
 
         int bZeros = 0;
-        while ((x = (int)b & 0xff) == 0) {
+        while ((x = b & 0xff) == 0) {
             b >>>= 8;
             bZeros += 8;
         }
@@ -1094,13 +1094,13 @@ class MutableBigInteger {
             if ((a+0x80000000) > (b+0x80000000)) {  // a > b as unsigned
                 a -= b;
 
-                while ((x = (int)a & 0xff) == 0)
+                while ((x = a & 0xff) == 0)
                     a >>>= 8;
                 a >>>= BigInteger.trailingZeroTable[x];
             } else {
                 b -= a;
 
-                while ((x = (int)b & 0xff) == 0)
+                while ((x = b & 0xff) == 0)
                     b >>>= 8;
                 b >>>= BigInteger.trailingZeroTable[x];
             }

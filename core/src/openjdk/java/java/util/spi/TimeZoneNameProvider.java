@@ -37,7 +37,6 @@ import java.util.Locale;
  * DateFormatSymbols.getZoneStrings()} method.
  *
  * @since        1.6
- * @version      @(#)TimeZoneNameProvider.java	1.8 07/05/05
  */
 public abstract class TimeZoneNameProvider extends LocaleServiceProvider {
 

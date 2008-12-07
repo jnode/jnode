@@ -271,11 +271,11 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     /**
      * Translates the String representation of a BigInteger in the
      * specified radix into a BigInteger.  The String representation
-     * consists of an optional minus or plus sign followed by a
-     * sequence of one or more digits in the specified radix.  The
-     * character-to-digit mapping is provided by {@code
-     * Character.digit}.  The String may not contain any extraneous
-     * characters (whitespace, for example).
+     * consists of an optional minus followed by a sequence of one or
+     * more digits in the specified radix.  The character-to-digit
+     * mapping is provided by {@code Character.digit}.  The String may
+     * not contain any extraneous characters (whitespace, for
+     * example).
      *
      * @param val String representation of BigInteger.
      * @param radix radix to be used in interpreting {@code val}.
@@ -296,19 +296,17 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
 
 	// Check for at most one leading sign
 	signum = 1;
-        int index1 = val.lastIndexOf('-');
-        int index2 = val.lastIndexOf('+');
-	if ((index1 + index2) <= -1) {
-	    // No leading sign character or at most one leading sign character
-            if (index1 == 0 || index2 == 0) {
-		cursor = 1;
+        int index = val.lastIndexOf('-');
+        if (index != -1) {
+            if (index == 0 ) {
                 if (val.length() == 1)
                     throw new NumberFormatException("Zero length BigInteger");
-	    }
-	    if (index1 == 0)
 		signum = -1;
-	} else
+                cursor = 1;
+            } else {
 	    throw new NumberFormatException("Illegal embedded sign character");
+            }
+        }
 
         // Skip leading zeros and compute number of digits in magnitude
 	while (cursor < len &&
@@ -362,10 +360,6 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
 	    if (len == 1)
 		throw new NumberFormatException("Zero length BigInteger");
 	    signum = -1;
-	    cursor = 1;
-	} else if (val[0] == '+') {
-	    if (len == 1)
-		throw new NumberFormatException("Zero length BigInteger");
 	    cursor = 1;
 	}
 
@@ -1017,7 +1011,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     static {
 	for (int i = 1; i <= MAX_CONSTANT; i++) {
 	    int[] magnitude = new int[1];
-	    magnitude[0] = (int) i;
+            magnitude[0] = i;
 	    posConst[i] = new BigInteger(magnitude,  1);
 	    negConst[i] = new BigInteger(magnitude, -1);
 	}
@@ -1680,7 +1674,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
         if (signum==0)
             return ZERO;
 
-        int[] base = (int[])mag.clone();
+        int[] base = mag.clone();
         int[] exp = y.mag;
         int[] mod = z.mag;
         int modLen = mod.length;
@@ -1805,7 +1799,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
             // Perform multiply
             if (ebits == multpos) {
                 if (isone) {
-                    b = (int[])mult.clone();
+                    b = mult.clone();
                     isone = false;
                 } else {
                     t = b;
@@ -2152,7 +2146,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     public BigInteger and(BigInteger val) {
 	int[] result = new int[Math.max(intLength(), val.intLength())];
 	for (int i=0; i<result.length; i++)
-	    result[i] = (int) (getInt(result.length-i-1)
+            result[i] = (getInt(result.length-i-1)
 				& val.getInt(result.length-i-1));
 
 	return valueOf(result);
@@ -2169,7 +2163,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     public BigInteger or(BigInteger val) {
 	int[] result = new int[Math.max(intLength(), val.intLength())];
 	for (int i=0; i<result.length; i++)
-	    result[i] = (int) (getInt(result.length-i-1)
+            result[i] = (getInt(result.length-i-1)
 				| val.getInt(result.length-i-1));
 
 	return valueOf(result);
@@ -2186,7 +2180,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     public BigInteger xor(BigInteger val) {
 	int[] result = new int[Math.max(intLength(), val.intLength())];
 	for (int i=0; i<result.length; i++)
-	    result[i] = (int) (getInt(result.length-i-1)
+            result[i] = (getInt(result.length-i-1)
 				^ val.getInt(result.length-i-1));
 
 	return valueOf(result);
@@ -2202,7 +2196,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     public BigInteger not() {
 	int[] result = new int[intLength()];
 	for (int i=0; i<result.length; i++)
-	    result[i] = (int) ~getInt(result.length-i-1);
+            result[i] = ~getInt(result.length-i-1);
 
 	return valueOf(result);
     }
@@ -2220,7 +2214,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
     public BigInteger andNot(BigInteger val) {
 	int[] result = new int[Math.max(intLength(), val.intLength())];
 	for (int i=0; i<result.length; i++)
-	    result[i] = (int) (getInt(result.length-i-1)
+            result[i] = (getInt(result.length-i-1)
 				& ~val.getInt(result.length-i-1));
 
 	return valueOf(result);
@@ -3042,12 +3036,12 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
 
     /* Returns sign bit */
     private int signBit() {
-	return (signum < 0 ? 1 : 0);
+        return signum < 0 ? 1 : 0;
     }
 
     /* Returns an int of sign bits */
     private int signInt() {
-	return (int) (signum < 0 ? -1 : 0);
+        return signum < 0 ? -1 : 0;
     }
 
     /**
@@ -3064,7 +3058,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
 
 	int magInt = mag[mag.length-n-1];
 
-	return (int) (signum >= 0 ? magInt :
+        return (signum >= 0 ? magInt :
 		       (n <= firstNonzeroIntNum() ? -magInt : ~magInt));
     }
 
@@ -3136,7 +3130,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
         ObjectInputStream.GetField fields = s.readFields();
             
         // Read the alternate persistent fields that we care about
-        signum = (int)fields.get("signum", -2);
+        signum = fields.get("signum", -2);
         byte[] magnitude = (byte[])fields.get("magnitude", null);
 
         // Validate signum

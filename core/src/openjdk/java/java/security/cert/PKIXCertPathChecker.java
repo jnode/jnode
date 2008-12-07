@@ -83,7 +83,6 @@ import java.util.Set;
  * @see PKIXParameters 
  * @see PKIXBuilderParameters
  *
- * @version 	1.14 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  * @author	Sean Mullan

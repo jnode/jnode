@@ -81,7 +81,6 @@ import javax.security.auth.login.Configuration;
  *     <td><code>provider.getClass().getName()</code></td>
  * </table>
  *
- * @version 1.84, 05/05/07
  * @author Benjamin Renaud
  * @author Andreas Sterbenz
  */
@@ -603,7 +602,7 @@ public abstract class Provider extends Properties {
 	    String type = getEngineName(typeAndAlg[0]);
 	    String aliasAlg = typeAndAlg[1].intern();
 	    ServiceKey key = new ServiceKey(type, stdAlg, true);
-	    Service s = (Service)legacyMap.get(key);
+            Service s = legacyMap.get(key);
 	    if (s == null) {
 		s = new Service(this);
 		s.type = type;
@@ -624,7 +623,7 @@ public abstract class Provider extends Properties {
 		String stdAlg = typeAndAlg[1].intern();
 		String className = value;
 		ServiceKey key = new ServiceKey(type, stdAlg, true);
-		Service s = (Service)legacyMap.get(key);
+                Service s = legacyMap.get(key);
 		if (s == null) {
 		    s = new Service(this);
 		    s.type = type;
@@ -645,7 +644,7 @@ public abstract class Provider extends Properties {
 		}
 		attributeName = attributeName.intern();
 		ServiceKey key = new ServiceKey(type, stdAlg, true);
-		Service s = (Service)legacyMap.get(key);
+                Service s = legacyMap.get(key);
 		if (s == null) {
 		    s = new Service(this);
 		    s.type = type;
@@ -1478,4 +1477,3 @@ public abstract class Provider extends Properties {
     }
 
 }
-

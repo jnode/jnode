@@ -34,7 +34,6 @@ import java.io.NotSerializableException;
  * specification.
  *
  * @author  Josh Bloch
- * @version 1.14, 05/05/07
  * @see     Preferences
  * @since   1.4
  */

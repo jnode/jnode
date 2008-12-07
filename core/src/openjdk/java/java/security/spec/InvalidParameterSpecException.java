@@ -32,7 +32,6 @@ import java.security.GeneralSecurityException;
  *
  * @author Jan Luehe
  *
- * @version 1.22, 05/05/07
  *
  * @see java.security.AlgorithmParameters
  * @see AlgorithmParameterSpec

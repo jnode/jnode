@@ -82,7 +82,6 @@ import java.util.StringTokenizer;
  * @see java.security.PermissionCollection
  * @see java.lang.SecurityManager
  *
- * @version 1.29, 05/05/07
  *
  * @author Joe Fialli
  * @since 1.2

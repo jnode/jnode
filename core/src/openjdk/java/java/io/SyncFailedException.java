@@ -29,7 +29,6 @@ package java.io;
  * Signals that a sync operation has failed.
  *
  * @author  Ken Arnold
- * @version 1.22, 05/05/07
  * @see     java.io.FileDescriptor#sync
  * @see	    java.io.IOException
  * @since   JDK1.1

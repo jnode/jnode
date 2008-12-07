@@ -55,7 +55,6 @@ import java.util.Date;
  * the duty of the application implementing this interface to verify
  * the certificate and satisfy itself of its validity.
  *
- * @version 	1.45, 05/05/07
  * @author Benjamin Renaud 
  * @deprecated A new certificate handling package is created in the Java platform.
  *             This Certificate interface is entirely deprecated and

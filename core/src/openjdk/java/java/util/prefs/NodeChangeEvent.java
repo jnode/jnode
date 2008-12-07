@@ -36,7 +36,6 @@ import java.io.NotSerializableException;
  * serialization methods are implemented to throw NotSerializableException. 
  *
  * @author  Josh Bloch
- * @version $I$, $G$ 
  * @see     Preferences
  * @see     NodeChangeListener
  * @see     PreferenceChangeEvent
@@ -103,4 +102,3 @@ public class NodeChangeEvent extends java.util.EventObject {
     // searches for missing serialVersionUID fields are done.
     private static final long serialVersionUID = 8068949086596572957L;
 }
-

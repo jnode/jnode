@@ -39,7 +39,6 @@ package java.security.spec;
  *
  * @author Jan Luehe
  *
- * @version 1.28, 05/05/07
  *
  * @see java.security.Key
  * @see java.security.KeyFactory

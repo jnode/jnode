@@ -40,7 +40,6 @@ import java.io.*;
  * stream is no longer alive.
  *
  * @author  James Gosling
- * @version 1.34, 05/05/07
  * @see     java.io.PipedInputStream
  * @since   JDK1.0
  */

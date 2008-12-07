@@ -31,7 +31,6 @@ import java.io.IOException;
  * Thrown to indicate that there is an error creating or accessing a Socket.
  *
  * @author  Jonathan Payne
- * @version 1.25, 05/05/07
  * @since   JDK1.0
  */
 public 

@@ -36,7 +36,6 @@ import java.math.BigInteger;
  * @see java.security.Key
  * @see java.security.Signature
  * 
- * @version 1.27 07/05/05
  * @author Benjamin Renaud 
  * @author Josh Bloch 
  */
