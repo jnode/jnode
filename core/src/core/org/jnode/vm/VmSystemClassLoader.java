@@ -235,11 +235,6 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             int j = 0;
             for (ClassInfo ci : classInfos.values()) {
                 result[j++] = ci.getVmClass();
-                if (systemRtJar != null) {
-                    final String cfName = ci.getName().replace('.', '/')
-                        + ".class";
-                    systemRtJar.remove(cfName);
-                }
             }
             bootClasses = result;
             return result;
@@ -450,7 +445,6 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             // Try the system RT jar first
             final byte[] data = (byte[]) systemRtJar.get(fName);
             if (data != null) {
-                systemRtJar.remove(fName);
                 return ByteBuffer.wrap(data);
             }
 
