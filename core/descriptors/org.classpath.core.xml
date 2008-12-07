@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.classpath.core"
+<plugin id="rt"
   name="Core java classes"
   version="@VERSION@"
   system="true"

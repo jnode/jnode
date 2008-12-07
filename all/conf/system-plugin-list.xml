@@ -8,7 +8,7 @@ These (system) plugins are always included in the init-jar.
 
     <plugin id="org.apache.jakarta.log4j"/>
     <plugin id="nanoxml"/>
-    <plugin id="org.classpath.core"/>
+    <plugin id="rt"/>
 
     <plugin id="org.jnode.runtime"/>
     <plugin id="org.jnode.runtime.core"/>

@@ -4,7 +4,7 @@
 <fragment id="javax.ext.tools"
   name="The javax.tools.* and related classes."
   version="@VERSION@"
-  plugin-id="org.classpath.core"
+  plugin-id="rt"
   plugin-version="@VERSION@"
   provider-name="Sun Microsystems"
   provider-url="http://sun.com"
