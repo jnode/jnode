@@ -91,7 +91,7 @@ public final class Monitor {
     Monitor(VmThread owner, int lockCount) {
         this.monitorLock = 0;
         this.owner = owner;
-        if(owner != null)
+        if (owner != null)
             addToOwner();
         this.lockCount = lockCount;
         if (lockCount < 1) {
@@ -110,7 +110,7 @@ public final class Monitor {
     final void initialize(VmThread owner, int lockcount) {
         dropFromOwner();
         this.owner = owner;
-        if(owner != null)
+        if (owner != null)
             addToOwner();
         this.lockCount = lockcount;
     }
