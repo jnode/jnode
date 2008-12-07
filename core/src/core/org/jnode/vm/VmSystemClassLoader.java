@@ -251,9 +251,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     public synchronized void addLoadedClass(String name, VmType cls) {
         if (failOnNewLoad) {
-            throw new RuntimeException(
-                "Cannot load a new class when failOnNewLoad is set ("
-                    + name + ")");
+            throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ")");
         }
         if (classInfos != null) {
             classInfos.put(name, new ClassInfo(cls));
@@ -273,7 +271,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         if (name == null) {
             Unsafe.debug(" getClassInfo(null)!! ");
         }
-        ClassInfo ci = (ClassInfo) classInfos.get(name);
+        ClassInfo ci = classInfos.get(name);
         if (ci != null) {
             return ci;
         } else if (create) {
@@ -338,9 +336,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                     ci.setVmClass(loadNormalClass(name));
                 }
                 if (failOnNewLoad) {
-                    throw new RuntimeException(
-                        "Cannot load a new class when failOnNewLoad is set ("
-                            + name + ")");
+                    throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ")");
                 }
             } catch (ClassNotFoundException ex) {
                 ci.setLoadError(ex.toString());
@@ -360,7 +356,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         return ci.getVmClass();
     }
 
-    private final void addFailedClassName(String name) {
+    private void addFailedClassName(String name) {
         if (failedClassNames == null) {
             failedClassNames = new HashSet<String>();
         }
@@ -402,13 +398,10 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         final String archN = arch.getName();
         boolean allowNatives = VmUtils.allowNatives(name, archN);
 
-        // System.out.println("bvi.loadClass: " +name);
         final ByteBuffer image = getClassData(name);
 
         if (failOnNewLoad) {
-            throw new RuntimeException(
-                "Cannot load a new class when failOnNewLoad is set ("
-                    + name + ")");
+            throw new RuntimeException("Cannot load a new class when failOnNewLoad is set (" + name + ")");
         }
 
         return ClassDecoder.defineClass(name, image, !allowNatives, this, null);
@@ -436,14 +429,13 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    private ByteBuffer getClassData(String clsName)
-        throws MalformedURLException, IOException, ClassNotFoundException {
+    private ByteBuffer getClassData(String clsName) throws IOException, ClassNotFoundException {
 
         final String fName = clsName.replace('.', '/') + ".class";
 
         if (systemRtJar != null) {
             // Try the system RT jar first
-            final byte[] data = (byte[]) systemRtJar.get(fName);
+            final byte[] data = systemRtJar.get(fName);
             if (data != null) {
                 return ByteBuffer.wrap(data);
             }
@@ -469,7 +461,6 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 while ((len = is.read(buf)) > 0) {
                     bos.write(buf, 0, len);
                 }
-                buf = null;
                 is.close();
 
                 return ByteBuffer.wrap(bos.toByteArray());
@@ -532,7 +523,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             if (verbose) {
                 System.out.println("Loading resource " + name + " from systemRtJar");
             }
-            final byte[] data = (byte[]) systemRtJar.get(name);
+            final byte[] data = systemRtJar.get(name);
             if (verbose) {
                 System.out.println(">>>>>> findResource(" + name + "), (data==null)=" + (data == null));
             }
@@ -569,8 +560,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public InputStream getResourceAsStream(String name)
-        throws MalformedURLException, IOException {
+    public InputStream getResourceAsStream(String name) throws IOException {
         if (name.startsWith("/")) {
             name = name.substring(1);
         }
@@ -579,13 +569,12 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 System.out.println("Loading resource " + name + " from " + classesURL);
             }
             URL url = new URL(classesURL, name);
-            // System.out.println("url=" + url);
             return url.openStream();
         } else if (systemRtJar != null) {
             if (verbose) {
                 System.out.println("Loading resource " + name + " from systemRtJar");
             }
-            final byte[] data = (byte[]) systemRtJar.get(name);
+            final byte[] data = systemRtJar.get(name);
             if (data != null) {
                 return new ByteArrayInputStream(data);
             } else {
@@ -677,8 +666,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     public CompiledIMT compileIMT(IMTBuilder builder) {
         final IMTCompiler cmp = arch.getIMTCompiler();
-        return cmp.compile(resolver, builder.getImt(), builder
-            .getImtCollisions());
+        return cmp.compile(resolver, builder.getImt(), builder.getImtCollisions());
     }
 
     /**
