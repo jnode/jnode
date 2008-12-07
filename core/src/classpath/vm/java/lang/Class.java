@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Enumeration;
 
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.SoftByteCodes;
@@ -1003,7 +1004,14 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
         if (ld != null) {
             return ld.getResource(name);
         } else {
-            return ClassLoader.getSystemResource(name);
+            try {
+            Enumeration resources = vmClass.getLoader().asClassLoader().getResources(name);
+
+            return resources.hasMoreElements() ? (URL) resources.nextElement() : null;
+            } catch (Exception x) {
+                return null;
+            }
+            //return ClassLoader.getSystemResource(name);
         }
     }
 

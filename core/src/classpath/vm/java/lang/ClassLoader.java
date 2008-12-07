@@ -615,9 +615,15 @@ public abstract class ClassLoader {
             if (vmClassLoader.resourceExists(name)) {
                 try {
                     if (name.startsWith("/")) {
-                    	result = new URL("system://" + name);
+                        //todo:  adjust the rt.jar path to match the future configurations
+                        //todo:  one possibility is ${java.home}/lib/rt.jar
+                    	result = new URL("jar:file:/jifs/lib/rt.jar!" + name);
+                    	//result = new URL("system://" + name);
                     } else {
-                    	result = new URL("system:///" + name);
+                        //todo:  adjust the rt.jar path to match the future configurations
+                        //todo:  one possibility is ${java.home}/lib/rt.jar
+                    	result = new URL("jar:file:/jifs/lib/rt.jar!/" + name);
+                    	//result = new URL("system:///" + name);
                     }
                 } catch (MalformedURLException ex) {
                     ex.printStackTrace();
