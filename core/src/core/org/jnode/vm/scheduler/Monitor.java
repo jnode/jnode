@@ -91,7 +91,8 @@ public final class Monitor {
     Monitor(VmThread owner, int lockCount) {
         this.monitorLock = 0;
         this.owner = owner;
-        addToOwner();
+        if(owner != null)
+            addToOwner();
         this.lockCount = lockCount;
         if (lockCount < 1) {
             throw new IllegalArgumentException("LockCount must be >= 1");
@@ -109,7 +110,8 @@ public final class Monitor {
     final void initialize(VmThread owner, int lockcount) {
         dropFromOwner();
         this.owner = owner;
-        addToOwner();
+        if(owner != null)
+            addToOwner();
         this.lockCount = lockcount;
     }
 
