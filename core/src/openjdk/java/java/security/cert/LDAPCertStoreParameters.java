@@ -40,7 +40,6 @@ package java.security.cert;
  * provide the necessary locking. Multiple threads each manipulating
  * separate objects need not synchronize.
  *
- * @version 	1.15 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  * @see         CertStore

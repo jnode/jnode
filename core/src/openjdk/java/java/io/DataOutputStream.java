@@ -31,7 +31,6 @@ package java.io;
  * then use a data input stream to read the data back in. 
  *
  * @author  unascribed
- * @version 1.50, 05/05/07
  * @see     java.io.DataInputStream
  * @since   JDK1.0
  */

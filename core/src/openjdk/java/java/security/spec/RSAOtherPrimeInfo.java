@@ -43,7 +43,6 @@ import java.math.BigInteger;
  *
  * @author Valerie Peng
  *
- * @version 1.13 07/05/05
  *
  * @see RSAPrivateCrtKeySpec
  * @see java.security.interfaces.RSAMultiPrimePrivateCrtKey

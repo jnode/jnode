@@ -34,7 +34,6 @@ import java.math.BigInteger;
  * @see ECParameterSpec
  *
  * @author Valerie Peng
- * @version 1.10, 05/05/07
  *
  * @since 1.5
  */

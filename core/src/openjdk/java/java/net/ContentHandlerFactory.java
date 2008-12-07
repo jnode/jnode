@@ -34,7 +34,6 @@ package java.net;
  * to create a <code>ContentHandler</code> for a MIME type.
  *
  * @author  James Gosling
- * @version 1.19, 05/05/07
  * @see     java.net.ContentHandler
  * @see     java.net.URLStreamHandler
  * @since   JDK1.0

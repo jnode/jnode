@@ -331,7 +331,7 @@ public final class MathContext implements Serializable {
      *
      * @param s the stream being read.
      */
-    private synchronized void readObject(java.io.ObjectInputStream s)
+    private void readObject(java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException {
         s.defaultReadObject();     // read in all fields
         // validate possibly bad fields

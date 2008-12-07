@@ -46,7 +46,6 @@ import sun.security.util.SecurityConstants;
  * href="http://www.ietf.org/rfc/rfc2965.txt""><i>RFC&nbsp;2965: HTTP
  * State Management Mechanism</i></a>
  *
- * @version 1.4, 03/08/09
  * @author Yingxian Wang
  * @since 1.5
  */

@@ -33,7 +33,6 @@ import java.security.cert.CertPath;
  * It is immutable.
  *
  * @since 1.5
- * @version 1.11, 05/05/07
  * @author Vincent Ryan
  */
 

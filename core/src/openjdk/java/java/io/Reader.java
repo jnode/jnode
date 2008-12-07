@@ -44,7 +44,6 @@ package java.io;
  * @see StringReader
  * @see Writer
  *
- * @version 	1.36, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

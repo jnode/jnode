@@ -36,7 +36,6 @@ package java.io;
  * methods in this class.
  *
  * @author  Arthur van Hoff
- * @version 1.83, 05/05/07
  * @see     java.io.DataOutputStream
  * @since   JDK1.0
  */

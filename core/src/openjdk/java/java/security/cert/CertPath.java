@@ -101,7 +101,6 @@ import java.util.List;
  * @see CertificateFactory
  * @see CertPathBuilder
  *
- * @version 1.18 05/05/07
  * @author	Yassir Elley
  * @since	1.4
  */

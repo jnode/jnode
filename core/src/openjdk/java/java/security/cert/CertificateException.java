@@ -31,7 +31,6 @@ import java.security.GeneralSecurityException;
  * This exception indicates one of a variety of certificate problems.
  *
  * @author Hemma Prafullchandra
- * @version 1.40
  * @see Certificate
  */
 public class CertificateException extends GeneralSecurityException {

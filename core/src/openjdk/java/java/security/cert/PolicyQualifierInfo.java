@@ -80,7 +80,6 @@ import sun.security.util.DerValue;
  *
  * @author 	seth proctor
  * @author 	Sean Mullan
- * @version 	1.18 05/05/07
  * @since 	1.4
  */
 public class PolicyQualifierInfo {
@@ -99,7 +98,7 @@ public class PolicyQualifierInfo {
      * valid and parsable policy qualifier
      */
     public PolicyQualifierInfo(byte[] encoded) throws IOException {
-	mEncoded = (byte[]) encoded.clone();
+        mEncoded = encoded.clone();
 		
 	DerValue val = new DerValue(mEncoded);
 	if (val.tag != DerValue.tag_Sequence)
@@ -136,7 +135,7 @@ public class PolicyQualifierInfo {
      * this method is called.
      */
     public final byte[] getEncoded() {
-	return (byte[]) mEncoded.clone();
+        return mEncoded.clone();
     }
 	
     /**
@@ -148,7 +147,7 @@ public class PolicyQualifierInfo {
      * time this method is called.
      */
     public final byte[] getPolicyQualifier() {
-	return (mData == null ? null : (byte[]) mData.clone());
+        return (mData == null ? null : mData.clone());
     }
 
     /**

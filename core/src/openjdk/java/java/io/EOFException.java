@@ -35,7 +35,6 @@ package java.io;
  * <p>
  *
  * @author  Frank Yellin
- * @version 1.20, 05/05/07
  * @see     java.io.DataInputStream
  * @see     java.io.IOException
  * @since   JDK1.0

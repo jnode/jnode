@@ -32,7 +32,6 @@ package java.security;
  * service provider who wishes to supply the implementation
  * of a cryptographically strong pseudo-random number generator.
  *
- * @version 1.19, 05/05/07
  *
  * @see SecureRandom
  * @since 1.2

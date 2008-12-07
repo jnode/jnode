@@ -35,7 +35,6 @@ import java.util.Arrays;
  * @see ECFieldF2m
  *
  * @author Valerie Peng
- * @version 1.11, 05/05/07
  *
  * @since 1.5
  */

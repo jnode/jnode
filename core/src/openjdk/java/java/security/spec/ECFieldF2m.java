@@ -34,7 +34,6 @@ import java.util.Arrays;
  * @see ECField
  *
  * @author Valerie Peng
- * @version 1.10, 05/05/07
  *
  * @since 1.5
  */
@@ -134,7 +133,7 @@ public class ECFieldF2m implements ECField {
     public ECFieldF2m(int m, int[] ks) {
 	// check m and ks
         this.m = m;
-        this.ks = (int[]) ks.clone();
+        this.ks = ks.clone();
 	if (m <= 0) {
 	    throw new IllegalArgumentException("m is not positive");
 	}
@@ -204,7 +203,7 @@ public class ECFieldF2m implements ECField {
 	if (ks == null) { 
 	    return null; 
 	} else {
-	    return (int[]) ks.clone();
+            return ks.clone();
 	}
     }
  

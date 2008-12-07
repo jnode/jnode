@@ -43,7 +43,6 @@ package java.io;
  * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
  * immediately by a linefeed.
  *
- * @version 	1.29, 07/05/05
  * @author	Mark Reinhold
  * @since       JDK1.1
  */

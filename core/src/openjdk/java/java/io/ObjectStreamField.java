@@ -33,7 +33,6 @@ import java.lang.reflect.Field;
  *
  * @author	Mike Warres
  * @author	Roger Riggs
- * @version 1.53, 07/05/05
  * @see ObjectStreamClass
  * @since 1.2
  */

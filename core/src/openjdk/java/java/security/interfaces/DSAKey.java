@@ -33,7 +33,6 @@ package java.security.interfaces;
  * @see java.security.Key
  * @see java.security.Signature
  * 
- * @version 1.24 07/05/05
  * @author Benjamin Renaud 
  * @author Josh Bloch 
  */

@@ -34,7 +34,6 @@ import java.math.BigInteger;
  *
  * @author Valerie Peng
  *
- * @version 1.15 07/05/05
  *
  * @see java.security.Key
  * @see java.security.KeyFactory
@@ -141,7 +140,7 @@ public class RSAMultiPrimePrivateCrtKeySpec extends RSAPrivateKeySpec {
 	    throw new IllegalArgumentException("the otherPrimeInfo " +
 						"parameter must not be empty");
 	} else {
-	    this.otherPrimeInfo = (RSAOtherPrimeInfo[])otherPrimeInfo.clone();
+            this.otherPrimeInfo = otherPrimeInfo.clone();
 	}
     }
 
@@ -208,6 +207,6 @@ public class RSAMultiPrimePrivateCrtKeySpec extends RSAPrivateKeySpec {
      */
     public RSAOtherPrimeInfo[] getOtherPrimeInfo() {
 	if (otherPrimeInfo == null) return null;
-	return (RSAOtherPrimeInfo[]) otherPrimeInfo.clone();
+        return otherPrimeInfo.clone();
     }
 }

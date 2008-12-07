@@ -30,7 +30,6 @@ package java.security;
  *
  * @author Jan Luehe
  *
- * @version 1.21, 05/05/07
  *
  * @see AlgorithmParameters
  * @see java.security.spec.AlgorithmParameterSpec

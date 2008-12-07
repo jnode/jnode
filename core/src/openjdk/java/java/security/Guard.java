@@ -36,7 +36,6 @@ package java.security;
  *
  * @see GuardedObject
  *
- * @version 1.19 07/05/05
  * @author Roland Schemers
  * @author Li Gong
  */

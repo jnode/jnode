@@ -42,7 +42,6 @@ package java.security.cert;
  * @see CertStore
  * @see CertStore#getCRLs
  *
- * @version 	1.12 05/05/07
  * @author	Steve Hanna
  * @since	1.4
  */

@@ -39,7 +39,6 @@ import java.util.Arrays;
  * generating an <tt>IOException</tt>.
  *
  * @author  Arthur van Hoff
- * @version 1.59, 05/05/07
  * @since   JDK1.0
  */
 

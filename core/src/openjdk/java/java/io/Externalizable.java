@@ -56,7 +56,6 @@ import java.io.ObjectInput;
  * interface.<br>
  *
  * @author  unascribed
- * @version 1.26, 05/05/07
  * @see java.io.ObjectOutputStream
  * @see java.io.ObjectInputStream
  * @see java.io.ObjectOutput

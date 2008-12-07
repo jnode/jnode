@@ -53,7 +53,6 @@ import java.security.PublicKey;
  *
  * @see CertPathBuilderResult
  *
- * @version	1.16 05/05/07
  * @since	1.4
  * @author	Anne Anderson
  */

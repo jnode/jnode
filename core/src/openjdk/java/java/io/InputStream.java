@@ -33,7 +33,6 @@ package java.io;
  * must always provide a method that returns the next byte of input.
  *
  * @author  Arthur van Hoff
- * @version 1.58, 05/05/07
  * @see     java.io.BufferedInputStream
  * @see     java.io.ByteArrayInputStream
  * @see     java.io.DataInputStream

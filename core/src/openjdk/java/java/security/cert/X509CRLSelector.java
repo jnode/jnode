@@ -67,7 +67,6 @@ import sun.security.x509.X500Name;
  * @see CRLSelector
  * @see X509CRL
  *
- * @version 	1.26 05/05/07
  * @since	1.4
  * @author	Steve Hanna
  */

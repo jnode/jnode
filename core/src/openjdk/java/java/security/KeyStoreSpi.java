@@ -45,7 +45,6 @@ import javax.security.auth.callback.*;
  *
  * @author Jan Luehe
  *
- * @version 1.28, 05/05/07
  *
  * @see KeyStore
  *

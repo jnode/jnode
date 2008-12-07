@@ -45,7 +45,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  * the contained input stream.
  *
  * @author  Arthur van Hoff
- * @version 1.63, 05/05/07
  * @since   JDK1.0
  */
 public

@@ -51,7 +51,6 @@ import javax.crypto.spec.SecretKeySpec;
  * @see java.security.spec.X509EncodedKeySpec
  * @see java.security.spec.PKCS8EncodedKeySpec
  *
- * @version 1.16, 07/05/05
  * @since 1.5
  */
 
@@ -139,7 +138,7 @@ public class KeyRep implements Serializable {
 	this.type = type;
 	this.algorithm = algorithm;
 	this.format = format.toUpperCase();
-	this.encoded = (byte[])encoded.clone();
+        this.encoded = encoded.clone();
     }
  
     /**

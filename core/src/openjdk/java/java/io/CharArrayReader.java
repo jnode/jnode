@@ -30,7 +30,6 @@ package java.io;
  * character-input stream.
  *
  * @author	Herb Jellinek
- * @version 	1.31, 05/05/07
  * @since       JDK1.1
  */
 public class CharArrayReader extends Reader {

@@ -39,7 +39,6 @@ package java.io;
  * @see InputStreamReader
  * @see FileInputStream
  *
- * @version 	1.22, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */
@@ -84,4 +83,3 @@ public class FileReader extends InputStreamReader {
     }
 
 }
-

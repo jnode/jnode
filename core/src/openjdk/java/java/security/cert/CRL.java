@@ -36,7 +36,6 @@ package java.security.cert;
  *
  * @author Hemma Prafullchandra
  *
- * @version 1.20, 05/05/07
  *
  * @see X509CRL
  * @see CertificateFactory

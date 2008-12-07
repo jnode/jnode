@@ -69,7 +69,6 @@ import sun.security.jca.GetInstance.Instance;
  *
  * @see CertPath
  *
- * @version 	1.20 05/05/07
  * @since	1.4
  * @author	Yassir Elley
  */

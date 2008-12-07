@@ -32,7 +32,6 @@ import java.io.IOException;
  * flush method is invoked to write any buffered output to the underlying
  * stream.
  *
- * @version 1.8 07/05/05
  * @since 1.5
  */
 

@@ -55,7 +55,6 @@ import java.security.spec.InvalidKeySpecException;
  *
  * @author Jan Luehe
  *
- * @version 1.19, 05/05/07
  *
  * @see KeyFactory
  * @see Key

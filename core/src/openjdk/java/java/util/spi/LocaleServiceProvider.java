@@ -111,7 +111,6 @@ import java.util.Locale;
  * described above as if the locale was not supported.
  * 
  * @since        1.6
- * @version      @(#)LocaleServiceProvider.java	1.10 07/05/05
  */
 public abstract class LocaleServiceProvider {
 

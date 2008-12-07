@@ -37,7 +37,6 @@ import java.util.Date;
  * Timestamping Authority (TSA) which generated and signed the timestamp.
  *
  * @since 1.5
- * @version 1.9, 05/05/07
  * @author Vincent Ryan
  */
 

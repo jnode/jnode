@@ -49,7 +49,6 @@ import java.security.InvalidAlgorithmParameterException;
  * manipulating a different <code>CertPathBuilderSpi</code> instance need not
  * synchronize.
  *
- * @version 	1.12 05/05/07
  * @since	1.4
  * @author	Sean Mullan
  */

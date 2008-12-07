@@ -42,7 +42,6 @@ package java.io;
  * an <code>IOException</code> is thrown.
  *
  * @author  Frank Yellin
- * @version 1.29, 05/05/07
  * @see     java.io.DataInput
  * @see     java.io.DataOutputStream
  * @since   JDK1.0

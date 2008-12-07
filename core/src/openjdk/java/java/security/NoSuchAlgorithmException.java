@@ -29,7 +29,6 @@ package java.security;
  * This exception is thrown when a particular cryptographic algorithm is
  * requested but is not available in the environment.
  * 
- * @version 1.32, 07/05/05
  * @author Benjamin Renaud 
  */
 

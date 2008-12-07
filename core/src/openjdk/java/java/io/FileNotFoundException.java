@@ -37,7 +37,6 @@ package java.io;
  * example when an attempt is made to open a read-only file for writing.
  *
  * @author  unascribed
- * @version 1.30, 05/05/07
  * @since   JDK1.0
  */
 

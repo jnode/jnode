@@ -36,7 +36,6 @@ import java.math.BigInteger;
  * @see DSAKey
  * @see DSAPublicKey
  *
- * @version 1.26 07/05/05
  * @author Benjamin Renaud
  */
 public interface DSAPrivateKey extends DSAKey, java.security.PrivateKey {
@@ -57,5 +56,3 @@ public interface DSAPrivateKey extends DSAKey, java.security.PrivateKey {
      */
     public BigInteger getX();
 }
-
-

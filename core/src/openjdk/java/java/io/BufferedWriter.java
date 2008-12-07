@@ -58,7 +58,6 @@ package java.io;
  * @see FileWriter
  * @see OutputStreamWriter
  *
- * @version 	1.35, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */
@@ -106,7 +105,7 @@ public class BufferedWriter extends Writer {
 	nChars = sz;
 	nextChar = 0;
 
-	lineSeparator =	(String) java.security.AccessController.doPrivileged(
+        lineSeparator = java.security.AccessController.doPrivileged(
                new sun.security.action.GetPropertyAction("line.separator"));
     }
 

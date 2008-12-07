@@ -58,7 +58,6 @@ import sun.security.x509.X500Name;
  * @see PKIXParameters#PKIXParameters(Set)
  * @see PKIXBuilderParameters#PKIXBuilderParameters(Set, CertSelector)
  *
- * @version     1.19 05/05/07
  * @since       1.4
  * @author      Sean Mullan
  */

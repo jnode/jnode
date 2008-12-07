@@ -196,7 +196,6 @@ import static java.io.ObjectStreamClass.processQueue;
  *
  * @author	Mike Warres
  * @author	Roger Riggs
- * @version 1.181, 07/05/05
  * @see java.io.DataInput
  * @see java.io.ObjectOutputStream
  * @see java.io.Serializable
@@ -1256,9 +1255,9 @@ public class ObjectInputStream
      * is "safe", false otherwise.
      */
     private static boolean auditSubclass(final Class subcl) {
-	Boolean result = (Boolean) AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
+        Boolean result = AccessController.doPrivileged(
+            new PrivilegedAction<Boolean>() {
+                public Boolean run() {
 		    for (Class cl = subcl;
 			 cl != ObjectInputStream.class;
 			 cl = cl.getSuperclass())
@@ -1800,7 +1799,7 @@ public class ObjectInputStream
     {
 	CallbackContext oldContext = curContext;
 	curContext = null;	
-
+        try {
 	boolean blocked = desc.hasBlockExternalData();
 	if (blocked) {
 	    bin.setBlockDataMode(true);
@@ -1810,10 +1809,11 @@ public class ObjectInputStream
 		obj.readExternal(this);
 	    } catch (ClassNotFoundException ex) {
 		/*
-		 * In most cases, the handle table has already propagated a
-		 * CNFException to passHandle at this point; this mark call is
-		 * included to address cases where the readExternal method has
-		 * cons'ed and thrown a new CNFException of its own.
+                     * In most cases, the handle table has already propagated
+                     * a CNFException to passHandle at this point; this mark
+                     * call is included to address cases where the readExternal
+                     * method has cons'ed and thrown a new CNFException of its
+                     * own.
 		 */
 		handles.markException(passHandle, ex);
 	    }
@@ -1821,7 +1821,9 @@ public class ObjectInputStream
 	if (blocked) {
 	    skipCustomData();
 	}
-	
+        } finally {
+            curContext = oldContext;
+        }
 	/*
 	 * At this point, if the externalizable data was not written in
 	 * block-data form and either the externalizable class doesn't exist
@@ -1834,8 +1836,6 @@ public class ObjectInputStream
 	 * externalizable data remains in the stream, a subsequent read will
 	 * most likely throw a StreamCorruptedException.
 	 */
-
-	curContext = oldContext;
     }
     
     /**
@@ -1857,10 +1857,11 @@ public class ObjectInputStream
 		    handles.lookupException(passHandle) == null) 
 		{
 		    CallbackContext oldContext = curContext;
+
+                    try {
 		    curContext = new CallbackContext(obj, slotDesc);
 
 		    bin.setBlockDataMode(true);
-		    try {
 			slotDesc.invokeReadObject(obj, this);
 		    } catch (ClassNotFoundException ex) {
 			/*
@@ -1873,9 +1874,8 @@ public class ObjectInputStream
 			handles.markException(passHandle, ex);
 		    } finally {
 			curContext.setUsed();
-		    }
-		    
 		    curContext = oldContext;
+                    }
 
 		    /*
 		     * defaultDataEnd may have been set indirectly by custom

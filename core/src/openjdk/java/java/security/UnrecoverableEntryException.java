@@ -28,7 +28,6 @@ package java.security;
 /**
  * This exception is thrown if an entry in the keystore cannot be recovered.
  *
- * @version 1.9, 05/05/07
  *
  * @since 1.5
  */

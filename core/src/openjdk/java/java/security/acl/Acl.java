@@ -85,7 +85,6 @@ import java.security.Principal;
  * @see java.security.acl.Owner
  * @see java.security.acl.Acl#getPermissions
  * 
- * @version 1.30, 07/05/05
  * @author Satish Dharmaraj 
  */
 
@@ -240,19 +239,3 @@ public interface Acl extends Owner {
      */
     public String toString();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

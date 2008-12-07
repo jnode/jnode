@@ -45,7 +45,6 @@ import sun.security.jca.JCAUtil;
  *
  * @author Benjamin Renaud 
  *
- * @version 1.32, 05/05/07
  *
  * @see Signature
  */
@@ -389,11 +388,3 @@ public abstract class SignatureSpi {
 	}
     }
 }
-    
-	    
-
-
-
-	    
-	    
-	

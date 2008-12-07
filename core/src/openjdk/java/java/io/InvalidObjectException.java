@@ -33,7 +33,6 @@ package java.io;
  * @since JDK1.1
  *
  * @author  unascribed
- * @version 1.25, 05/05/07
  * @since   JDK1.1
  */
 public class InvalidObjectException extends ObjectStreamException {

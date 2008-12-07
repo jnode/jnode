@@ -86,7 +86,6 @@ import sun.nio.cs.StreamEncoder;
  * </pre></blockquote>
  *
  * @author  Xueming Shen
- * @version 1.17, 05/05/07
  * @since   1.6
  */
 
@@ -561,4 +560,3 @@ public final class Console implements Flushable
 	rcb = new char[1024];
     }
 }
-

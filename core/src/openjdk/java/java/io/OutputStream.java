@@ -35,7 +35,6 @@ package java.io;
  * that writes one byte of output.
  *
  * @author  Arthur van Hoff
- * @version 1.36, 05/05/07
  * @see     java.io.BufferedOutputStream
  * @see     java.io.ByteArrayOutputStream
  * @see     java.io.DataOutputStream

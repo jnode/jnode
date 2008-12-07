@@ -32,7 +32,6 @@ import java.io.IOException;
  * The close method is invoked to release resources that the object is 
  * holding (such as open files).
  *
- * @version 1.11 07/05/05
  * @since 1.5
  */
 

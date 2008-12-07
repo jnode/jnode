@@ -32,7 +32,6 @@ import java.security.GeneralSecurityException;
  *
  * @author Jan Luehe
  *
- * @version 1.23, 05/05/07
  *
  * @see KeySpec
  *

@@ -31,7 +31,6 @@ package java.io;
  * this exception. The argument should be the name of the class.
  *
  * @author  unascribed
- * @version 1.23, 05/05/07
  * @since   JDK1.1
  */
 public class NotSerializableException extends ObjectStreamException {

@@ -29,7 +29,6 @@ package java.security;
  * This exception is thrown when a particular security provider is
  * requested but is not available in the environment.
  *
- * @version 1.27 07/05/05
  * @author Benjamin Renaud 
  */
 

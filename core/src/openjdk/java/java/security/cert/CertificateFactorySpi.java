@@ -52,7 +52,6 @@ import java.security.NoSuchProviderException;
  * @author Jan Luehe
  * @author Sean Mullan
  *
- * @version 1.27, 05/05/07
  *
  * @see CertificateFactory
  * @see Certificate

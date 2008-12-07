@@ -59,7 +59,6 @@ import java.util.Set;
  * with no ill effects. This stipulation applies to all public fields and 
  * methods of this class and any added or overridden by subclasses. 
  *
- * @version     1.16 05/05/07
  * @since       1.4
  * @author      Sean Mullan
  */

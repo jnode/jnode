@@ -39,7 +39,6 @@ import org.w3c.dom.*;
  * nodes and subtrees.
  *
  * @author  Josh Bloch and Mark Reinhold
- * @version 1.17, 05/05/07
  * @see     Preferences
  * @since   1.4
  */

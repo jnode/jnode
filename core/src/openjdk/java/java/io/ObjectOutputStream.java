@@ -150,7 +150,6 @@ import static java.io.ObjectStreamClass.processQueue;
  *
  * @author	Mike Warres
  * @author	Roger Riggs
- * @version     1.165, 07/05/05
  * @see java.io.DataOutput
  * @see java.io.ObjectInputStream
  * @see java.io.Serializable
@@ -207,9 +206,9 @@ public class ObjectOutputStream
      * as true or false for extended information about exception's place
      */
     private static final boolean extendedDebugInfo =
-	((Boolean) java.security.AccessController.doPrivileged(
+        java.security.AccessController.doPrivileged(
             new sun.security.action.GetBooleanAction(
-		"sun.io.serialization.extendedDebugInfo"))).booleanValue();
+                "sun.io.serialization.extendedDebugInfo")).booleanValue();
 
     /**
      * Creates an ObjectOutputStream that writes to the specified OutputStream.
@@ -1055,9 +1054,9 @@ public class ObjectOutputStream
      * is "safe", false otherwise.
      */
     private static boolean auditSubclass(final Class subcl) {
-	Boolean result = (Boolean) AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
+        Boolean result = AccessController.doPrivileged(
+            new PrivilegedAction<Boolean>() {
+                public Boolean run() {
 		    for (Class cl = subcl;
 			 cl != ObjectOutputStream.class;
 			 cl = cl.getSuperclass())

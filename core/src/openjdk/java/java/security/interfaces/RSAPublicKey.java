@@ -32,7 +32,6 @@ import java.math.BigInteger;
  *
  * @author Jan Luehe
  *
- * @version 1.17 07/05/05
  */
 
 public interface RSAPublicKey extends java.security.PublicKey, RSAKey

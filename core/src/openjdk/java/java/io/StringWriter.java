@@ -34,7 +34,6 @@ package java.io;
  * can be called after the stream has been closed without generating an
  * <tt>IOException</tt>.
  *
- * @version 	1.32, 07/05/05
  * @author	Mark Reinhold
  * @since	JDK1.1
  */

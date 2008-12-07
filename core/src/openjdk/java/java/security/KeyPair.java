@@ -35,7 +35,6 @@ import java.util.*;
  * @see PublicKey
  * @see PrivateKey
  *
- * @version 1.22 07/05/05
  * @author Benjamin Renaud
  */
 

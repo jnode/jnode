@@ -55,7 +55,6 @@ import sun.nio.cs.StreamDecoder;
  * @see InputStream
  * @see java.nio.charset.Charset
  *
- * @version     1.53, 07/05/05
  * @author      Mark Reinhold
  * @since       JDK1.1
  */

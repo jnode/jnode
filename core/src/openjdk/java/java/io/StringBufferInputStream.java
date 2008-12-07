@@ -35,7 +35,6 @@ package java.io;
  * this class.
  *
  * @author     Arthur van Hoff
- * @version    1.33, 05/05/07
  * @see        java.io.ByteArrayInputStream
  * @see        java.io.StringReader
  * @since      JDK1.0

@@ -2869,22 +2869,24 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
             throw new ArithmeticException("Rounding necessary");
         // round to an integer, with Exception if decimal part non-0
         BigDecimal num = this.setScale(0, ROUND_UNNECESSARY).inflate();
-        if (num.precision() >= 19) {    // need to check carefully
-            if (LONGMIN == null) {      // initialize constants
-                LONGMIN = BigInteger.valueOf(Long.MIN_VALUE);
-                LONGMAX = BigInteger.valueOf(Long.MAX_VALUE);
+        if (num.precision() >= 19) // need to check carefully
+            LongOverflow.check(num);
+        return num.intVal.longValue();
             }
+
+    private static class LongOverflow {
+        /** BigInteger equal to Long.MIN_VALUE. */
+        private static final BigInteger LONGMIN = BigInteger.valueOf(Long.MIN_VALUE);
+
+        /** BigInteger equal to Long.MAX_VALUE. */
+        private static final BigInteger LONGMAX = BigInteger.valueOf(Long.MAX_VALUE);
+
+        public static void check(BigDecimal num) {
             if ((num.intVal.compareTo(LONGMIN) < 0) ||
                 (num.intVal.compareTo(LONGMAX) > 0))
                 throw new java.lang.ArithmeticException("Overflow");
         }
-        return num.intVal.longValue();
     }
-    // These constants are only initialized if needed
-    /** BigInteger equal to Long.MIN_VALUE. */
-    private static BigInteger LONGMIN = null;
-    /** BigInteger equal to Long.MAX_VALUE. */
-    private static BigInteger LONGMAX = null;
 
     /**
      * Converts this {@code BigDecimal} to an {@code int}.  This
@@ -3228,7 +3230,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
      *
      * @param s the stream being read.
      */
-    private synchronized void readObject(java.io.ObjectInputStream s)
+    private void readObject(java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException {
         // Read in all fields
         s.defaultReadObject();

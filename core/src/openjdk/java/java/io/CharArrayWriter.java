@@ -37,7 +37,6 @@ import java.util.Arrays;
  * without generating an IOException.
  *
  * @author	Herb Jellinek
- * @version 	1.31, 05/05/07
  * @since       JDK1.1
  */
 public

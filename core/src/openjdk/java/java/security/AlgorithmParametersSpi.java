@@ -40,7 +40,6 @@ import java.security.spec.InvalidParameterSpecException;
  *
  * @author Jan Luehe
  *
- * @version 1.20, 05/05/07
  *
  * @see AlgorithmParameters
  * @see java.security.spec.AlgorithmParameterSpec

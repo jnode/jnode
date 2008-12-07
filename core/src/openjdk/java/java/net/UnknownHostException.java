@@ -31,7 +31,6 @@ import java.io.IOException;
  * Thrown to indicate that the IP address of a host could not be determined.
  *
  * @author  Jonathan Payne 
- * @version 1.22, 05/05/07
  * @since   JDK1.0
  */
 public 

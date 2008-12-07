@@ -34,7 +34,6 @@ package java.io;
  * the interruption occurred.
  *
  * @author  unascribed
- * @version 1.26, 05/05/07
  * @see     java.io.InputStream
  * @see     java.io.OutputStream
  * @see     java.lang.Thread#interrupt()

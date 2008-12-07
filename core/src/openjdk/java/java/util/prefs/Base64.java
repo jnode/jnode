@@ -30,7 +30,6 @@ package java.util.prefs;
  * and vice-versa.
  *
  * @author  Josh Bloch
- * @version 1.13, 05/05/07
  * @see     Preferences
  * @since   1.4
  */

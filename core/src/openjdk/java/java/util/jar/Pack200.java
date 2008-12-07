@@ -107,7 +107,6 @@ import java.security.PrivilegedAction;
  *
  * @author John Rose
  * @author Kumar Srinivasan
- * @version 1.22, 05/05/07
  * @since 1.5
  */
 public abstract class Pack200 {
@@ -722,9 +721,8 @@ public abstract class Pack200 {
 	    Class impl = (prop == PACK_PROVIDER)? packerImpl: unpackerImpl;
 	    if (impl == null) {
 		// The first time, we must decide which class to use.
-		implName = (String)
-		    java.security.AccessController.doPrivileged
-		    (new sun.security.action.GetPropertyAction(prop,""));
+                implName = java.security.AccessController.doPrivileged(
+                    new sun.security.action.GetPropertyAction(prop,""));
 		if (implName != null && !implName.equals(""))
 		    impl = Class.forName(implName);
 		else if (prop == PACK_PROVIDER)
@@ -750,4 +748,3 @@ public abstract class Pack200 {
     }
 
 }
-

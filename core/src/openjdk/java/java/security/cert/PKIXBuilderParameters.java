@@ -72,7 +72,6 @@ import java.util.Set;
  *
  * @see CertPathBuilder
  * 
- * @version 	1.22 05/05/07
  * @since 	1.4
  * @author	Sean Mullan
  */

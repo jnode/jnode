@@ -44,7 +44,6 @@ import java.security.spec.AlgorithmParameterSpec;
  *
  * @author Benjamin Renaud
  *
- * @version 1.21, 05/05/07
  *
  * @see KeyPairGenerator
  * @see java.security.spec.AlgorithmParameterSpec

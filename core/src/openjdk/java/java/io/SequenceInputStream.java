@@ -40,7 +40,6 @@ import java.util.Vector;
  * on the last of the contained input streams.
  *
  * @author  Author van Hoff
- * @version 1.39, 05/05/07
  * @since   JDK1.0
  */
 public

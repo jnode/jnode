@@ -29,7 +29,6 @@ package java.io;
  * Thrown when a serious I/O error has occurred. 
  *
  * @author  Xueming Shen
- * @version 1.9 05/05/07
  * @since   1.6
  */
 public class IOError extends Error {
