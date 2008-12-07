@@ -4,7 +4,7 @@
 <fragment id="mx4j"
     name="MX4J Management Extensions"
     version="3.0.1"
-    plugin-id="org.classpath.core"
+    plugin-id="rt"
     plugin-version="@VERSION@"
     provider-name="mx4j.org"
     provider-url="http://mx4j.org"

@@ -4,7 +4,7 @@
 <fragment id="org.classpath.tools"
   name="Core java tools"
   version="@VERSION@"
-  plugin-id="org.classpath.core"
+  plugin-id="rt"
   plugin-version="@VERSION@"
   provider-name="Classpath"
   provider-url="http://classpath.org"
