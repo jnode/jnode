@@ -41,10 +41,10 @@ import org.jnode.shell.syntax.SyntaxBundle;
  * This class represents the command line as command name and a sequence of
  * argument strings. It also can carry the i/o stream environment for launching
  * the command.
- * 
+ * <p/>
  * TODO This class needs to be fully "shell and command syntax agnostic".
  * TODO Get rid of API methods using a String argument representation.
- * 
+ *
  * @author crawley@jnode.org
  */
 @SuppressWarnings("deprecation")
@@ -107,16 +107,16 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Create a new instance using Tokens instead of Strings.
-     * 
-     * @param commandToken the command name token or <code>null</code>.
+     *
+     * @param commandToken   the command name token or <code>null</code>.
      * @param argumentTokens the argument token list or <code>null</code>.
-     * @param ios the io stream array or <code>null</code>.
+     * @param ios            the io stream array or <code>null</code>.
      */
     public CommandLine(Token commandToken, Token[] argumentTokens,
-            CommandIO[] ios) {
+                       CommandIO[] ios) {
         this.commandToken = commandToken;
         this.argumentTokens = (argumentTokens == null || argumentTokens.length == 0) ? NO_TOKENS
-                : argumentTokens.clone();
+            : argumentTokens.clone();
         this.ios = setupStreams(ios);
     }
 
@@ -126,10 +126,10 @@ public class CommandLine implements Completable, Iterable<String> {
      * String array is substituted. If 'streams' is <code>null</code> , an
      * array of length 4 is substituted. A non-null 'streams' argument must have
      * a length of at least 4.
-     * 
+     *
      * @param commandName the command name or <code>null</code>.
-     * @param arguments the argument list or <code>null</code>.
-     * @param ios the io stream array or <code>null</code>.
+     * @param arguments   the argument list or <code>null</code>.
+     * @param ios         the io stream array or <code>null</code>.
      */
     public CommandLine(String commandName, String[] arguments, CommandIO[] ios) {
         this.commandToken = commandName == null ? null : new Token(commandName);
@@ -148,9 +148,9 @@ public class CommandLine implements Completable, Iterable<String> {
     /**
      * Create a new instance. Equivalent to CommandLine(commandName, arguments,
      * null);
-     * 
+     *
      * @param commandName the command name or <code>null</code>.
-     * @param arguments the argument list or <code>null</code>.
+     * @param arguments   the argument list or <code>null</code>.
      */
     public CommandLine(String commandName, String[] arguments) {
         this(commandName, arguments, null);
@@ -158,7 +158,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Create a new instance. Equivalent to CommandLine(null, arguments, null);
-     * 
+     *
      * @param arguments the argument list or <code>null</code>.
      * @deprecated It is a bad idea to leave out the command name.
      */
@@ -183,7 +183,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * This method returns an Iterator for the arguments represented as Strings.
-     * 
+     *
      * @deprecated
      */
     public SymbolSource<String> iterator() {
@@ -303,7 +303,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Get the command name
-     * 
+     *
      * @return the command name
      */
     public String getCommandName() {
@@ -312,7 +312,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Get the command name in token form
-     * 
+     *
      * @return the command token
      */
     public Token getCommandToken() {
@@ -321,7 +321,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Get the arguments as String[].
-     * 
+     *
      * @return the arguments as String[]
      */
     public String[] getArguments() {
@@ -338,7 +338,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Get the arguments as String[].
-     * 
+     *
      * @return the arguments as String[]
      * @deprecated this method name is wrong.
      */
@@ -348,7 +348,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Returns the entire command line as a string.
-     * 
+     *
      * @return the entire command line
      */
     public String toString() {
@@ -362,7 +362,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Gets the remaining number of parts
-     * 
+     *
      * @return the remaining number of parts
      */
     public int getLength() {
@@ -386,13 +386,13 @@ public class CommandLine implements Completable, Iterable<String> {
          * This field holds the "cooked" representation of command line token.
          * By the time we reach the CommandLine, all shell meta-characters
          * should have been processed so that the value of the field represents
-         * a command name or argument.  
+         * a command name or argument.
          */
         public final String token;
 
         /**
          * This field represents the type of the token. The meaning is
-         * interpreter specific.  The value -1 indicates that no token type is 
+         * interpreter specific.  The value -1 indicates that no token type is
          * available.
          */
         public final int tokenType;
@@ -400,7 +400,7 @@ public class CommandLine implements Completable, Iterable<String> {
         /**
          * This field denotes the character offset of the first character of
          * this token in the source character sequence passed to the
-         * interpreter.  The value -1 indicates that no source start position is 
+         * interpreter.  The value -1 indicates that no source start position is
          * available.
          */
         public final int start;
@@ -408,7 +408,7 @@ public class CommandLine implements Completable, Iterable<String> {
         /**
          * This field denotes the character offset + 1 for the last character of
          * this token in the source character sequence passed to the
-         * interpreter.  The value -1 indicates that no source end position is 
+         * interpreter.  The value -1 indicates that no source end position is
          * available.
          */
         public final int end;
@@ -456,7 +456,7 @@ public class CommandLine implements Completable, Iterable<String> {
             if (tokenType != other.tokenType)
                 return false;
             return true;
-        } 
+        }
 
         public String toString() {
             return "Token{'" + token + "'," + start + "," + end + "," + tokenType + "}";
@@ -470,12 +470,12 @@ public class CommandLine implements Completable, Iterable<String> {
         new Escape(ESCAPE_CHAR, ESCAPE_CHAR), new Escape(ESCAPE_B, B),
         new Escape(ESCAPE_N, N), new Escape(ESCAPE_R, R),
         new Escape(ESCAPE_T, T),
-        new Escape(FULL_ESCAPE_CHAR, FULL_ESCAPE_CHAR) };
+        new Escape(FULL_ESCAPE_CHAR, FULL_ESCAPE_CHAR)};
 
     /**
      * Escape a single command line argument for the Shell. Same as calling
      * escape(arg, <code>false</code>)
-     * 
+     *
      * @param arg the unescaped argument
      * @return the escaped argument
      */
@@ -485,10 +485,10 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Escape a single command line argument for the Shell.
-     * 
-     * @param arg the unescaped argument
+     *
+     * @param arg        the unescaped argument
      * @param forceQuote if <code>true</code>, forces the argument to be
-     *        returned in quotes even if not necessary
+     *                   returned in quotes even if not necessary
      * @return the escaped argument
      * @deprecated This method does not belong here. Escaping is an interpreter
      *             concern, and this class needs to be interpreter specific.
@@ -539,7 +539,7 @@ public class CommandLine implements Completable, Iterable<String> {
     /**
      * Get the IO stream context for executing the command. The result is
      * guaranteed to be non-null and to have at least 4 entries.
-     * 
+     *
      * @return the stream context as described above.
      */
     public CommandIO[] getStreams() {
@@ -548,7 +548,7 @@ public class CommandLine implements Completable, Iterable<String> {
 
     /**
      * Set the IO stream context for executing the command.
-     * 
+     *
      * @param ios the command's new stream context.
      */
     public void setStreams(CommandIO[] ios) {
@@ -563,11 +563,11 @@ public class CommandLine implements Completable, Iterable<String> {
      * This locates the command's class and a suitable command line syntax, then
      * parses against the Syntax, binding the command arguments to Argument objects
      * in an ArgumentBundle object obtained from the Command object.
-     * 
+     *
      * @param shell the context for resolving command aliases and locating syntaxes
      * @return a CompandInfo which includes the command instance to which the arguments have been bound
      * @throws CommandSyntaxException if the chosen syntax doesn't match the command
-     * line arguments.
+     *                                line arguments.
      */
     public CommandInfo parseCommandLine(CommandShell shell) throws ShellException {
         String cmd = (commandToken == null) ? "" : commandToken.token.trim();
@@ -620,7 +620,7 @@ public class CommandLine implements Completable, Iterable<String> {
             // Get the command's argument bundle and syntax
             ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
             SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
-            
+
             if (bundle == null) {
                 // We're missing the argument bundle.  We assume this is a 'classic' Java application 
                 // that does its own argument parsing and completion like a UNIX shell; i.e. 
@@ -628,14 +628,14 @@ public class CommandLine implements Completable, Iterable<String> {
                 Syntax syntax = new RepeatSyntax(new ArgumentSyntax("argument"));
                 syntaxes = new SyntaxBundle(cmd, syntax);
                 bundle = new ArgumentBundle(
-                        new FileArgument("argument", Argument.MULTIPLE));
+                    new FileArgument("argument", Argument.MULTIPLE));
             } else if (syntaxes == null) {
                 // We're missing the syntax, but we do have an argument bundle.  Generate
                 // a default syntax from the bundle.
                 syntaxes = new SyntaxBundle(cmd, bundle.createDefaultSyntax());
             }
             try {
-               bundle.complete(this, syntaxes, completion);
+                bundle.complete(this, syntaxes, completion);
             } catch (CommandSyntaxException ex) {
                 throw new CompletionException("Command syntax problem", ex);
             }

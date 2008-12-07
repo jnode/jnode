@@ -28,8 +28,6 @@ import java.util.Map;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.vm.Unsafe;
-
 /**
  * Partial implementation of {@link NameSpace} interface : 
  * only listener stuff has been implemented. 
@@ -42,7 +40,6 @@ public abstract class AbstractNameSpace implements NameSpace {
     private final Map<Class<?>, List<NameSpaceListener<?>>> listeners = 
         new HashMap<Class<?>, List<NameSpaceListener<?>>>();
     
-    @Override
     public final <T> void addNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
         List<NameSpaceListener<?>> list = listeners.get(name);
         if (list == null) {
@@ -64,7 +61,6 @@ public abstract class AbstractNameSpace implements NameSpace {
         }
     }
     
-    @Override
     public final <T> void removeNameSpaceListener(Class<T> name, NameSpaceListener<T> l) {
         List<NameSpaceListener<?>> list = listeners.get(name);
         if (list != null) {
@@ -73,7 +69,6 @@ public abstract class AbstractNameSpace implements NameSpace {
             if (list.isEmpty()) {
                 // no more listeners for that name => remove the empty list
                 listeners.remove(name);
-                list = null;
             }
         }
     }
