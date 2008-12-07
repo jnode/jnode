@@ -18,7 +18,6 @@
       <export name="sun.tools.javac.*"/>
       <export name="sun.tools.javac.resources.*"/>
       <export name="sun.tools.javap.*"/>
-      <export name="sun.tools.javap.oldjavap.*"/>
       <export name="sun.tools.tree.*"/>
       <export name="sun.tools.util.*"/>
     </library>
