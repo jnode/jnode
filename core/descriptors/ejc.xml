@@ -7,11 +7,7 @@
         provider-name="eclipse.org"
         provider-url="http://eclipse.org"
         license-name="epl">
-                
-  <requires>
-    <import plugin="org.apache.tools.ant-launcher"/>
-  </requires>
-        
+
   <runtime>
     <library name="ejc.jar">
       <export name="*"/>
