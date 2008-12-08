@@ -13,7 +13,6 @@
   <runtime>
     <library name="jnode-core.jar">
         
-      <export name="com.sun.imageio.metadata.*"/>
       <export name="com.sun.imageio.stream.*"/>
       <export name="com.sun.imageio.spi.*"/>
       <export name="com.sun.imageio.plugins.common.*"/>

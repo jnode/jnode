@@ -43,10 +43,6 @@
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.*"/>
       <export name="sun.security.jca.*"/>
-      <export name="sun.security.provider.PolicyFile"/>
-      <export name="sun.security.provider.PolicyInfo"/>
-      <export name="sun.security.provider.PolicyParser"/>
-      <export name="sun.security.provider.SelfPermission"/>
       <export name="sun.misc.Service"/>
       <export name="sun.misc.ServiceConfigurationError"/>
       <export name="sun.nio.cs.StreamEncoder"/>
