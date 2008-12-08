@@ -138,6 +138,7 @@ public class NTFSEntry implements FSEntry {
     public FSDirectory getDirectory() throws IOException {
         if (this.isDirectory()) {
             if (cachedFSObject == null) {
+                // XXX: Why can't this just use getFileRecord()?
                 cachedFSObject =
                         new NTFSDirectory(fs, getFileRecord().getVolume().getMFT()
                                 .getIndexedFileRecord(indexEntry));
@@ -193,5 +194,10 @@ public class NTFSEntry implements FSEntry {
      */
     public boolean isDirty() throws IOException {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + '(' + indexEntry + ')';
     }
 }

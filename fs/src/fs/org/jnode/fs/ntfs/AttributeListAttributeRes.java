@@ -22,14 +22,14 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
 
 /**
  * $ATTRIBUTE_LIST attribute, resident version.
  *
  * XXX: Is there a sensible way we can merge this with the non-resident version?
  *
- * @author Daniel Noll (daniel@nuix.com.au)
+ * @author Daniel Noll (daniel@noll.id.au)
  */
 final class AttributeListAttributeRes extends NTFSResidentAttribute implements
         AttributeListAttribute {
@@ -43,20 +43,16 @@ final class AttributeListAttributeRes extends NTFSResidentAttribute implements
     }
 
     /**
-     * Gets an entry from the attribute list.
+     * Gets an iterator over all the entries in the attribute list.
      *
-     * XXX: What if there are multiple?  In the case I've seen, there are multiple but only the first
-     *      one contains any data.
-     *
-     * @param attrTypeID the type of attribute to find.
-     * @return the attribute entry.
-     * @throws IOException if there is an error reading the attribute's non-resident data.
+     * @return an iterator of all attribute list entries.
+     * @throws IOException if there is an error reading the attribute's data.
      */
-    public List<AttributeListEntry> getEntries(int attrTypeID) throws IOException {
+    public Iterator<AttributeListEntry> getAllEntries() throws IOException {
         final byte[] data = new byte[getAttributeLength()];
         getData(getAttributeOffset(), data, 0, data.length);
         AttributeListBlock listBlock = new AttributeListBlock(data, 0, getAttributeLength());
-        return listBlock.getEntries(attrTypeID);
+        return listBlock.getAllEntries();
     }
 
 }

@@ -22,25 +22,22 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
 
 /**
  * Common interface for both resident and non-resident attribute list
  * attributes.
  *
- * @author Daniel Noll (daniel@nuix.com.au)
+ * @author Daniel Noll (daniel@noll.id.au)
  */
 interface AttributeListAttribute {
 
     /**
-     * Gets an entry from the attribute list.
+     * Gets an iterator over all the entries in the attribute list.
      *
-     * XXX: What if there are multiple?  In the case I've seen, there are multiple but only the first
-     *      one contains any data.
-     *
-     * @param attrTypeID the type of attribute to find.
-     * @return the attribute entry.
-     * @throws IOException if there is an error reading the attribute's non-resident data.
+     * @return an iterator of all attribute list entries.
+     * @throws IOException if there is an error reading the attribute's data.
      */
-    List<AttributeListEntry> getEntries(int attrTypeID) throws IOException;
+    Iterator<AttributeListEntry> getAllEntries() throws IOException;
+
 }

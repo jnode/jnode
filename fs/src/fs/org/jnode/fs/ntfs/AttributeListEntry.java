@@ -56,8 +56,33 @@ final class AttributeListEntry extends NTFSStructure {
     }
 
     /**
+     * Gets the length of the name.  Not so useful for callers, hence private.
+     * @return the name length.
+     */
+    private int getNameLength() {
+        return getUInt8(0x06);
+    }
+
+    /**
+     * Gets the offset of the name.  Not so useful for callers, hence private.
+     * @return the name offset (from the front of the entry.)
+     */
+    private int getNameOffset() {
+        return getUInt8(0x07);
+    }
+
+    /**
+     * Gets the starting VCN of the attribute, zero if the attribute is resident.
+     * @return the starting VCN.
+     */
+    public int getStartingVCN() {
+        return getUInt16(0x08);
+    }
+
+    /**
      * Gets the file reference number, which is the lowest 48 bits of the MFT
-     * reference.
+     * reference.  This may point to the same file record which contains the
+     * attribute list. 
      * 
      * @return the file reference number.
      */
@@ -75,10 +100,46 @@ final class AttributeListEntry extends NTFSStructure {
         return getUInt48(0x16);
     }
 
-    // TODO:
-    // 0x06 1 Name length (N)
-    // 0x07 1 Offset to Name (a)
-    // 0x08 8 Starting VCN (b)
-    // 0x18 2 Attribute Id (c)
-    // 0x1A 2N Name in Unicode (if N >0)
+    /**
+     * Gets the ID of the attribute.  This ID is unique within all attributes.
+     * @return the attribute ID.
+     */
+    public int getAttributeID() {
+        return getUInt16(0x18);
+    }
+
+    /**
+     * Gets the name of the attribute.  Some attributes don't have names, and the names
+     * on attributes are supposedly unique within a given attribute type.
+     *
+     * @return the name of the attribute referenced by this entry.  Returns the empty string
+     *         if the attribute has no name.
+     */
+    public String getName() {
+        final int nameLength = getNameLength();
+        if (nameLength == 0) {
+            return "";
+        } else {
+            char[] name = new char[nameLength];
+            for (int i = 0, off = getNameOffset(); i < nameLength; i++, off += 2) {
+                name[i] = getChar16(off);
+            }
+            return new String(name);
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(super.toString());
+        builder.append("[type=").append(getType());
+        builder.append(",name=").append(getName());
+        if (getStartingVCN() == 0) {
+            builder.append(",resident");
+        } else {
+            builder.append(",ref=").append(getFileReferenceNumber());
+            builder.append(",vcn=").append(getStartingVCN());
+        }
+        builder.append(",id=").append(getAttributeID()).append("]");
+        return builder.toString();
+    }
 }

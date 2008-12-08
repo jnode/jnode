@@ -62,7 +62,7 @@ final class NTFSIndex {
     public IndexRootAttribute getIndexRootAttribute() {
         if (indexRootAttribute == null) {
             indexRootAttribute = (IndexRootAttribute) 
-                    fileRecord.getAttribute(NTFSAttribute.Types.INDEX_ROOT);
+                    fileRecord.findAttributeByType(NTFSAttribute.Types.INDEX_ROOT);
             log.debug("getIndexRootAttribute: " + indexRootAttribute);
         }
         return indexRootAttribute;
@@ -76,7 +76,7 @@ final class NTFSIndex {
     public IndexAllocationAttribute getIndexAllocationAttribute() {
         if (indexAllocationAttribute == null) {
             indexAllocationAttribute = (IndexAllocationAttribute) 
-                    fileRecord.getAttribute(NTFSAttribute.Types.INDEX_ALLOCATION);
+                    fileRecord.findAttributeByType(NTFSAttribute.Types.INDEX_ALLOCATION);
         }
         return indexAllocationAttribute;
     }

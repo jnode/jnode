@@ -91,7 +91,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      *
      * @return the size allocated to the attribute.
      */
-    public long getAttributeAlocatedSize() {
+    public long getAttributeAllocatedSize() {
         return getUInt32(0x28);
     }
 
@@ -125,11 +125,13 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         }
         // check the dataruns
         final int clusterSize = getFileRecord().getVolume().getClusterSize();
-        if (this.numberOfVCNs != this.getAttributeAlocatedSize() / clusterSize) {
-            log.error("ERROR: The number of VCNs from the data runs is different than the allocated size!: - " +
-                    this.numberOfVCNs);
-            log.error("Alocatedsize = " + getAttributeAlocatedSize() / clusterSize);
-            log.error("number of data runs = " + dataRuns.size());
+        // Rounds up but won't work for 0, which shouldn't occur here.
+        final long allocatedVCNs = (getAttributeAllocatedSize() - 1) / clusterSize + 1;
+        if (this.numberOfVCNs != allocatedVCNs) {
+            // Probably not a problem, often multiple attributes make up one allocation.
+            log.debug("VCN mismatch between data runs and allocated size, possibly a composite attribute. " +
+                      "data run VCNs = " + this.numberOfVCNs + ", allocated size = " + allocatedVCNs +
+                      ", data run count = " + dataRuns.size());
         }
     }
 
