@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)IBM942C.java	1.11 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

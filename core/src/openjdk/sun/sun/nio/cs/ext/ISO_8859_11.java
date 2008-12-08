@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)ISO_8859_11.java	1.9	07/05/05
- *
  * NIO charset Support for Latin/Thai x-ISO-8859-11 charset
  * (Currently not IANA registered)
  */

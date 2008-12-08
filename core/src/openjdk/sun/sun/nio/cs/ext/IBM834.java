@@ -24,9 +24,7 @@
  * have any questions.
  */
 
-/*
- * @(#)IBM834.java	1.7 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

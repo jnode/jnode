@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)Big5_Solaris.java	1.10	07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

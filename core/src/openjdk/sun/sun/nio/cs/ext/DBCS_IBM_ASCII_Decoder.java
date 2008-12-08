@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)DBCS_IBM_ASCII_Decoder.java	1.10	07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

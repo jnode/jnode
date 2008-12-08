@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)DBCS_IBM_EBCDIC_Decoder.java	1.11	07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)JIS_X_0212_Solaris_Decoder.java	1.11 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

@@ -1616,4 +1616,3 @@ class JIS_X_0212_MS5022X_Encoder extends JIS_X_0212_Encoder
     };
 
 }
-

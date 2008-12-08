@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)SimpleEUCDecoder.java	1.10	07/05/05
- */
+
 
 /**
  * Simple EUC-like decoder used by IBM01383 and IBM970

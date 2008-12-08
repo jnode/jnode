@@ -24,8 +24,6 @@
  */
 
 /*
- * @(#)DBCSDecoderMapping.java	1.9	07/05/05
- *
  * package private helper class which provides decoder (native->ucs) 
  * mapping capability for the benefit of compound encoders/decoders
  * whose individual component submappings do not need an association with 

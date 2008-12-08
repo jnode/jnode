@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)ISO2022_CN.java	1.13	07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

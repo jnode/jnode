@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)ExtendedCharsets.java	1.51 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 
@@ -1112,8 +1110,8 @@ public class ExtendedCharsets
 	if (!sun.misc.VM.isBooted())
 	    return;
 
-	GetPropertyAction a = new GetPropertyAction("sun.nio.cs.map");
-	String map = ((String)AccessController.doPrivileged(a));
+        String map = AccessController.doPrivileged(
+            new GetPropertyAction("sun.nio.cs.map"));
 	boolean sjisIsMS932 = false;
 	boolean iso2022jpIsMS50221 = false;
 	boolean iso2022jpIsMS50220 = false;
@@ -1233,8 +1231,8 @@ public class ExtendedCharsets
 
 	    }
 	}
-	a = new GetPropertyAction("os.name");
-	String osName = ((String)AccessController.doPrivileged(a));
+        String osName = AccessController.doPrivileged(
+            new GetPropertyAction("os.name"));
         if ("SunOS".equals(osName) || "Linux".equals(osName)) {
 	    charset("x-COMPOUND_TEXT", "COMPOUND_TEXT",
 		    new String[] {

@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)MS950_HKSCS.java	1.14 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

@@ -24,9 +24,7 @@
  * have any questions.
  */
 
-/*
- * @(#)HKSCS.java	1.13 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

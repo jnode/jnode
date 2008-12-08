@@ -3305,4 +3305,3 @@ class JIS_X_0208_MS5022X_Encoder
         innerIndex6
     };
 }
-

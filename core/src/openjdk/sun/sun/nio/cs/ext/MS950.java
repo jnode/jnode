@@ -24,9 +24,7 @@
  * have any questions.
  */
 
-/*
- * @(#)MS950.java	1.15 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 
