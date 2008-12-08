@@ -55,7 +55,7 @@ final class IndexEntry extends NTFSStructure {
     }
 
     public boolean hasSubNodes() {
-        return (getFlags() & 0x01) != 0;
+        return (getIndexFlags() & 0x01) != 0;
     }
 
     /**
@@ -70,12 +70,12 @@ final class IndexEntry extends NTFSStructure {
      * Gets the flags of this index entry.
      * @return
      */
-    public int getFlags() {
+    public int getIndexFlags() {
         return getUInt8(0x0C);
     }
 
     public boolean isLastIndexEntryInSubnode() {
-        return (getFlags() & 0x02) != 0;
+        return (getIndexFlags() & 0x02) != 0;
     }
 
     /**
@@ -88,7 +88,7 @@ final class IndexEntry extends NTFSStructure {
     }
 
     public boolean isDirectory() {
-        return (getUInt32(0x48) & 0x10000000L) != 0;
+        return (getFileFlags() & 0x10000000L) != 0;
     }
 
     public String getFileName() {
@@ -125,5 +125,13 @@ final class IndexEntry extends NTFSStructure {
             name[i] = getChar16(0x52 + (i * 2));
         }
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+               "[fileName=" + getFileName() +
+               ",indexFlags=" + getIndexFlags() +
+               ",fileFlags=" + getFileFlags() + "]";
     }
 }

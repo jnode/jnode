@@ -123,7 +123,7 @@ final class MasterFileTable extends FileRecord {
      * @throws IOException
      */
     public MasterFileTable(NTFSVolume volume, byte[] buffer, int offset) throws IOException {
-        super(volume, buffer, offset);
+        super(volume, SystemFiles.MFT, buffer, offset);
     }
 
     /**
@@ -142,7 +142,7 @@ final class MasterFileTable extends FileRecord {
         // read the buffer
         final byte[] buffer = new byte[bytesPerFileRecord];
         readData(offset, buffer, 0, bytesPerFileRecord);
-        return new FileRecord(volume, buffer, 0);
+        return new FileRecord(volume, index, buffer, 0);
     }
 
     public FileRecord getIndexedFileRecord(IndexEntry indexEntry) throws IOException {

@@ -21,8 +21,8 @@
  
 package org.jnode.fs.ntfs;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Data structure containing a list of {@link AttributeListEntry} entries.
@@ -46,32 +46,71 @@ final class AttributeListBlock extends NTFSStructure {
     }
 
     /**
-     * Finds all entries from the attribute list with the given type ID.
+     * Gets an iterator over all the entries in the attribute list.
      *
-     * XXX: What if there are multiple?  In the case I've seen, there are
-     *      multiple but only the first one contains any data.
-     *
-     * @param attrTypeID the type of attribute to find.
-     * @return the attribute entry.
+     * @return an iterator of all attribute list entries.
      */
-    public List<AttributeListEntry> getEntries(int attrTypeID) {
-        final List<AttributeListEntry> entries = new ArrayList<AttributeListEntry>();
-        int offset = 0;
-        while (offset + 4 <= length) // Should be just (offset < length) but it seems we have some uneven lengths.
-        {
-            try {
-                int type = getUInt32AsInt(offset + 0x00);
-                if (type == attrTypeID) {
-                    entries.add(new AttributeListEntry(this, offset));
-                }
-
-                int length = getUInt16(offset + 0x04);
-                offset += length;
-            } catch (ArrayIndexOutOfBoundsException e) {
-                log.error("...");
-            }
-        }
-        return entries;
+    public Iterator<AttributeListEntry> getAllEntries() {
+        return new AttributeListEntryIterator();
     }
 
+    /**
+     * Iteration of attribute list entries.
+     */
+    private class AttributeListEntryIterator implements Iterator<AttributeListEntry> {
+
+        /**
+         * The next element to return.
+         */
+        private AttributeListEntry nextElement;
+
+        /**
+         * Current offset being looked at.
+         */
+        private int offset = 0;
+
+        /**
+         * Returns {@code true} if there are more elements in the iteration.
+         *
+         * @return {@code true} if there are more elements in the iteration.
+         */
+        public boolean hasNext() {
+            // Safety check in case hasNext is called twice without calling next.
+            if (nextElement != null) {
+                return true;
+            }
+
+            // If the length is specified, use it to determine where the block ends.
+            if (offset + 4 > length) {
+                return false;
+            }
+            
+            int length = getUInt16(offset + 0x04);
+            nextElement = new AttributeListEntry(AttributeListBlock.this, offset);
+            offset += length;
+            return true;
+        }
+
+        /**
+         * Gets the next entry from the iteration.
+         *
+         * @return the next entry from the iteration.
+         */
+        public AttributeListEntry next() {
+            if (hasNext()) {
+                AttributeListEntry result = nextElement;
+                nextElement = null;
+                return result;
+            } else {
+                throw new NoSuchElementException("Iterator has no more entries");
+            }
+        }
+
+        /**
+         * @throws UnsupportedOperationException always.
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
 }
