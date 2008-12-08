@@ -230,4 +230,3 @@ class JIS_X_0212_MS5022X_Decoder extends JIS_X_0212_Decoder
     };
 
 }
-

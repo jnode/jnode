@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)EUC_JP_Open.java	1.11 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

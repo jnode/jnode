@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)GB18030.java	1.22 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

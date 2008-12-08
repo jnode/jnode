@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)ISCII91.java	1.18 07/05/05
- */
+
 
 
 package sun.nio.cs.ext;

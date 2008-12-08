@@ -23,9 +23,7 @@
  * have any questions.
  */
 
-/*
- * @(#)JIS_X_0201.java	1.13 07/05/05
- */
+
 
 package sun.nio.cs.ext;
 

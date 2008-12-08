@@ -3242,4 +3242,3 @@ class JIS_X_0208_MS932_Encoder
     };
 
 }
-

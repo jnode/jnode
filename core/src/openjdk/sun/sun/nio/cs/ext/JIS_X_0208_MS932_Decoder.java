@@ -1046,4 +1046,3 @@ class JIS_X_0208_MS932_Decoder
         innerIndex5
     };
 }
-
