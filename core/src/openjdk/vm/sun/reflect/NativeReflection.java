@@ -28,8 +28,7 @@ class NativeReflection {
      * @see Reflection#getClassAccessFlags(Class)
      */
     static int getClassAccessFlags(Class c) {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        return c.getVmClass().getAccessFlags();
     }
 }
 

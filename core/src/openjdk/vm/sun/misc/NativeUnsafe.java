@@ -18,6 +18,8 @@ import org.vmmagic.unboxed.Address;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmConstString;
+import org.jnode.vm.classmgr.VmField;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.Vm;
@@ -36,15 +38,17 @@ class NativeUnsafe {
     public static int getInt(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getInt((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadInt();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadInt();
     }
 
     public static void putInt(Unsafe instance, Object o, long offset, int x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setInt(x, (int)offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     /**
@@ -53,8 +57,9 @@ class NativeUnsafe {
     public static Object getObject(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getObject((int)offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadObjectReference().toObject();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadObjectReference().toObject();
     }
 
     /**
@@ -63,106 +68,121 @@ class NativeUnsafe {
     public static void putObject(Unsafe instance, Object o, long offset, Object x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setObject(x, (int)offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(ObjectReference.fromObject(x));
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(ObjectReference.fromObject(x));
     }
 
     public static boolean getBoolean(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getBoolean((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadByte() != 0;
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadByte() != 0;
     }
 
     public static void putBoolean(Unsafe instance, Object o, long offset, boolean x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setBoolean(x, (int)offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store((byte)(x ? 1 : 0));
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store((byte)(x ? 1 : 0));
     }
 
     public static byte getByte(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getByte((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadByte();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadByte();
     }
 
     public static void putByte(Unsafe instance, Object o, long offset, byte x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setByte(x, (int) offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static short getShort(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getShort((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadShort();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadShort();
     }
 
     public static void putShort(Unsafe instance, Object o, long offset, short x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setShort(x, (int) offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static char getChar(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getChar((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadChar();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadChar();
     }
 
     public static void putChar(Unsafe instance, Object o, long offset, char x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setChar(x, (int) offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static long getLong(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getLong((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadLong();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadLong();
     }
 
     public static void putLong(Unsafe instance, Object o, long offset, long x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setLong(x, (int) offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static float getFloat(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getFloat((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadFloat();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadFloat();
     }
 
     public static void putFloat(Unsafe instance, Object o, long offset, float x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setFloat(x, (int) offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static double getDouble(Unsafe instance, Object o, long offset) {
         if(o instanceof StaticAccess){
             return ((StaticAccess) o).getDouble((int) offset);
+        } else {
+            return ObjectReference.fromObject(o).toAddress().add((int) offset).loadDouble();
         }
-        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadDouble();
     }
 
     public static void putDouble(Unsafe instance, Object o, long offset, double x) {
         if(o instanceof StaticAccess){
             ((StaticAccess) o).setDouble(x, (int) offset);
+        } else {
+            ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
         }
-        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static byte getByte(Unsafe instance, long address) {
@@ -353,6 +373,7 @@ class NativeUnsafe {
         @Override
         void setObject(Object obj, int offset){
             //do nothing - since this is access if for final fields
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -362,7 +383,7 @@ class NativeUnsafe {
     public static Object staticFieldBase(Unsafe instance, Field f) {
         final VmProcessor proc = VmProcessor.current();
 		final Address tablePtr;
-        VmStaticField sf = (VmStaticField)f.getVmField();
+        VmStaticField sf = (VmStaticField) getVmField(f);
         if (sf.isShared()) {
             tablePtr = VmMagic.getArrayData(proc.getSharedStaticsTable());
         } else {
@@ -381,7 +402,7 @@ class NativeUnsafe {
      */
     public static long staticFieldOffset(Unsafe instance, Field f) {
 		final int offset;
-        VmStaticField sf = (VmStaticField)f.getVmField();
+        VmStaticField sf = (VmStaticField) getVmField(f);
         if (sf.isShared()) {
             offset = sf.getSharedStaticsIndex() << 2;
         } else {
@@ -391,7 +412,13 @@ class NativeUnsafe {
     }
 
     public static long objectFieldOffset(Unsafe instance, Field f) {
-        return ((VmInstanceField)f.getVmField()).getOffset();
+        return ((VmInstanceField) getVmField(f)).getOffset();
+    }
+
+    private static VmField getVmField(Field f) {
+        VmType<?> vmClass = f.getDeclaringClass().getVmClass();
+        vmClass.link();
+        return vmClass.getField(f.getName());
     }
 
     public static void ensureClassInitialized(Unsafe instance, Class c) {
@@ -495,87 +522,108 @@ class NativeUnsafe {
     }
 
     public static Object getObjectVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo implement volatile semantics
+        return getObject(instance, o,  offset);
     }
 
     public static void putObjectVolatile(Unsafe instance, Object o, long offset, Object x) {
-        throw new UnsupportedOperationException();
+        //todo implement volatile semantics
+        putObject(instance, o, offset, x);
     }
 
     public static int getIntVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo implement volatile semantics
+        return getInt(instance, o, offset);
     }
 
     public static void putIntVolatile(Unsafe instance, Object o, long offset, int x) {
-        throw new UnsupportedOperationException();
+        //todo implement volatile semantics
+        putInt(instance, o, offset, x);
     }
 
     public static boolean getBooleanVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getBoolean(instance, o, offset);
     }
 
     public static void putBooleanVolatile(Unsafe instance, Object o, long offset, boolean x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putBoolean(instance, o, offset, x);
     }
 
     public static byte getByteVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getByte(instance, o, offset);
     }
 
     public static void putByteVolatile(Unsafe instance, Object o, long offset, byte x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putByte(instance, o, offset, x);
     }
 
     public static short getShortVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getShort(instance, o, offset);
     }
 
     public static void putShortVolatile(Unsafe instance, Object o, long offset, short x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putShort(instance, o, offset, x);
     }
 
     public static char getCharVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getChar(instance, o, offset);
     }
 
     public static void putCharVolatile(Unsafe instance, Object o, long offset, char x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putChar(instance, o, offset, x);
     }
 
     public static long getLongVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getLong(instance, o, offset);
     }
 
     public static void putLongVolatile(Unsafe instance, Object o, long offset, long x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putLong(instance, o, offset, x);
     }
 
     public static float getFloatVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getFloat(instance, o, offset);
     }
 
     public static void putFloatVolatile(Unsafe instance, Object o, long offset, float x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putFloat(instance, o, offset, x);
     }
 
     public static double getDoubleVolatile(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        return getDouble(instance, o, offset);
     }
 
     public static void putDoubleVolatile(Unsafe instance, Object o, long offset, double x) {
-        throw new UnsupportedOperationException();
+        //todo ensure volatile semantics
+        putDouble(instance, o, offset, x);
     }
 
     public static void putOrderedObject(Unsafe instance, Object o, long offset, Object x) {
-        throw new UnsupportedOperationException();
+        //todo ensure ordered semantics
+        putObject(instance, o, offset, x);
     }
 
     public static void putOrderedInt(Unsafe instance, Object o, long offset, int x) {
-        throw new UnsupportedOperationException();
+        //todo ensure ordered semantics
+        putInt(instance, o, offset, x);
     }
 
     public static void putOrderedLong(Unsafe instance, Object o, long offset, long x) {
-        throw new UnsupportedOperationException();
+        //todo ensure ordered semantics
+        putLong(instance, o, offset, x);
     }
 
     static final Map<Object, ThreadParker> parking = new HashMap<Object, ThreadParker>();
