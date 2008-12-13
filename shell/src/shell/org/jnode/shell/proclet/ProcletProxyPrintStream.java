@@ -79,6 +79,7 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
         }
     }
 
+    @SuppressWarnings("unchecked")
     public PrintStream getRealStream() throws ProxyStreamException {
         PrintStream ps = proxiedPrintStream();
         if (ps instanceof ProxyStream) {
@@ -100,6 +101,7 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
         return proxiedPrintStream();
     }
 
+    @SuppressWarnings("unchecked")
     public boolean sameStream(PrintStream obj) throws ProxyStreamException {
         PrintStream rs = getRealStream();
         if (obj == rs) {

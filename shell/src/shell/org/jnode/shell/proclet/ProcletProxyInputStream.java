@@ -149,6 +149,7 @@ public class ProcletProxyInputStream extends InputStream implements
         }
     }
 
+    @SuppressWarnings("unchecked")
     public boolean sameStream(InputStream obj) throws ProxyStreamException {
         InputStream rs = getRealStream();
         if (obj == rs) {
