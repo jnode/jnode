@@ -47,7 +47,7 @@ public class VmConstantPool extends ConstantPool {
         VmConstFieldRef f = cp.getConstFieldRef(index);
         f.doResolve(loader);
         VmField vmf = f.getResolvedVmField();
-        return new Field(vmf);
+        return vmf.asField();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class VmConstantPool extends ConstantPool {
         VmConstFieldRef f = cp.getConstFieldRef(index);
         try {
             VmField vmf = f.getResolvedVmField();
-            return new Field(vmf);
+            return vmf.asField();
         } catch (NotResolvedYetException x) {
             return null;
         }

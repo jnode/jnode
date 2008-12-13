@@ -122,15 +122,16 @@ public abstract class VmField extends VmMember {
         }
         Field javaField = javaFieldHolder.get();
         if (javaField == null) {
-            javaFieldHolder.set(javaField = new Field(this));
+            //todo add annotations
+            javaField = new Field(getDeclaringClass().asClass(), getName(), getType().asClass(), getModifiers(), -1,
+                getSignature(), null);
+            javaFieldHolder.set(javaField);
         }
         return javaField;
     }
 
     /**
      * Resolve the type of this field
-     *
-     * @param cl
      */
     protected final synchronized void resolve() {
         try {
