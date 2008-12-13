@@ -37,6 +37,7 @@
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.net.spi.nameservice.NameService"/>
       <export name="sun.net.spi.nameservice.NameServiceDescriptor"/>
+      <export name="sun.nio.ByteBuffered"/>
       <export name="sun.nio.ch.Interruptible"/>
       <export name="sun.security.acl.GroupImpl"/>
       <export name="sun.security.util.Debug"/>

@@ -1331,6 +1331,21 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.nogc");
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.ms");
 
+        //todo review for boot image size reduction
+        addCompileHighOptLevel("sun.misc");
+//        addCompileHighOptLevel("sun.reflect");  <-- // this kills jnode while booting, maybe Reflection static{...}
+        addCompileHighOptLevel("sun.reflect.annotation");
+        addCompileHighOptLevel("sun.reflect.generics");
+        addCompileHighOptLevel("sun.reflect.generics.factory");
+        addCompileHighOptLevel("sun.reflect.generics.parser");
+        addCompileHighOptLevel("sun.reflect.generics.reflectiveObjects");
+        addCompileHighOptLevel("sun.reflect.generics.repository");
+        addCompileHighOptLevel("sun.reflect.generics.scope");
+        addCompileHighOptLevel("sun.reflect.generics.tree");
+        addCompileHighOptLevel("sun.reflect.generics.visitor");
+        addCompileHighOptLevel("sun.reflect.misc");
+        addCompileHighOptLevel("sun.nio");
+
         if (false) {
             addCompileHighOptLevel("org.mmtk.plan");
             addCompileHighOptLevel("org.mmtk.policy");
