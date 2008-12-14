@@ -41,6 +41,7 @@ package java.lang;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.HashMap;
+import java.lang.reflect.Constructor;
 
 
 import org.jnode.security.JNodePermission;
@@ -1365,7 +1366,13 @@ public class Thread implements Runnable
     static {
         ThreadGroup g = null;
         try {
-            g = ThreadGroup.class.getDeclaredConstructor().newInstance();
+            /*
+            Constructor<ThreadGroup> constr = ThreadGroup.class.getDeclaredConstructor();
+            constr.setAccessible(true);
+            g = constr.newInstance();
+            constr.setAccessible(false);
+                        */
+            g = new ThreadGroup();
         }catch (Exception e){
             e.printStackTrace();
             org.jnode.vm.Unsafe.die("Root ThreadGroup creation failure.");

@@ -68,12 +68,12 @@ class ThreadGroup implements Thread.UncaughtExceptionHandler {
 
     int ngroups;
     ThreadGroup groups[];
-
+    //jnode
     /**
      * Creates an empty Thread group that is not in any Thread group. 
      * This method is used to create the system Thread group.
      */
-    private ThreadGroup() {	// called from C code
+    public ThreadGroup() {	// called from C code
 	this.name = "system";
 	this.maxPriority = Thread.MAX_PRIORITY;
     }
