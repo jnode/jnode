@@ -194,7 +194,41 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         Member javaMember = javaMemberHolder.get();
         if (javaMember == null) {
             if (isConstructor()) {
-                javaMember = new Constructor(this);
+                //parameter types
+                int arg_count = getNoArguments();
+                Class[] args = new Class[arg_count];
+                for (int i = 0; i < arg_count; i++) {
+                    args[i] = getArgumentType(i).asClass();
+                }
+
+                //checked exceptions
+                final VmExceptions exceptions = getExceptions();
+                int ce_count = exceptions.getLength();
+                final Class[] ces = new Class[ce_count];
+                for (int i = 0; i < ce_count; i++) {
+                    VmConstClass vmConstClass = exceptions.getException(i);
+                    if (!vmConstClass.isResolved()) {
+                        vmConstClass.doResolve(getDeclaringClass().getLoader());
+                    }
+                    ces[i] = vmConstClass.getResolvedVmClass().asClass();
+                }
+
+                //slot
+                VmType decl_type = getDeclaringClass();
+                int slot = -1;
+                for (int i = 0; i < decl_type.getNoDeclaredMethods(); i++) {
+                    if (this == decl_type.getDeclaredMethod(i)) {
+                        slot = i;
+                        break;
+                    }
+                }
+
+                if (slot == -1) {
+                    throw new ClassFormatError("Invalid constructor");
+                }
+
+                javaMember = new Constructor(getDeclaringClass().asClass(), args, ces, getModifiers(), slot,
+                    getSignature(), getRawAnnotations(), getRawParameterAnnotations());
             } else {
                 javaMember = new Method(this);
             }

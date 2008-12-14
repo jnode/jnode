@@ -319,7 +319,7 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
     // 128 is a reasonable buffer initial size for constructor
     StringBuilder sb = new StringBuilder(128);
     sb.append(Modifier.toString(getModifiers())).append(' ');
-    Constructor.addTypeParameters(sb, getTypeParameters());
+    addTypeParameters(sb, getTypeParameters());
     sb.append(getGenericReturnType()).append(' ');
     sb.append(getDeclaringClass().getName()).append('.');
     sb.append(getName()).append('(');
@@ -596,4 +596,18 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
         return result;
     }
 
+    static <X extends GenericDeclaration>
+  void addTypeParameters(StringBuilder sb, TypeVariable<X>[] typeArgs)
+  {
+    if (typeArgs.length == 0)
+      return;
+    sb.append('<');
+    for (int i = 0; i < typeArgs.length; ++i)
+      {
+        if (i > 0)
+          sb.append(',');
+        sb.append(typeArgs[i]);
+      }
+    sb.append("> ");
+  }
 }
