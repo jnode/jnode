@@ -27,7 +27,7 @@ import java.util.Arrays;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DataRun extends NTFSStructure {
+final class DataRun extends NTFSStructure implements DataRunInterface {
 
     /** Type of this datarun */
     private final int type;
@@ -40,6 +40,9 @@ final class DataRun extends NTFSStructure {
 
     /** Length of datarun in clusters */
     private final int length;
+
+    /** Flag indicating that the data is not stored on disk but is all zero. */
+    private boolean sparse = false;
 
     /** Size in bytes of this datarun descriptor */
     private final int size;
@@ -87,6 +90,7 @@ final class DataRun extends NTFSStructure {
         final int cluster;
         switch (clusterlen) {
             case 0x00:
+                sparse = true;
                 cluster = 0;
                 break;
             case 0x01:
@@ -105,6 +109,17 @@ final class DataRun extends NTFSStructure {
                 throw new IllegalArgumentException("Unknown cluster length " + clusterlen);
         }
         this.cluster = cluster == 0 ? 0 : cluster + previousLCN;
+    }
+
+    /**
+     * Tests if this data run is a sparse run.  Sparse runs don't actually refer to
+     * stored data, and are effectively a way to store a run of zeroes without storage
+     * penalty.
+     *
+     * @return {@code true} if the run is sparse, {@code false} if it is not.
+     */
+    public boolean isSparse() {
+        return sparse;
     }
 
     /**
@@ -137,17 +152,8 @@ final class DataRun extends NTFSStructure {
      * 
      * @return Returns the vcn.
      */
-    public final long getFirstVcn() {
+    public long getFirstVcn() {
         return this.vcn;
-    }
-
-    /**
-     * Sets the first VCN of this datarun.
-     * 
-     * @param vcn the new VCN.
-     */
-    final void setFirstVcn(long vcn) {
-        this.vcn = vcn;
     }
 
     /**
@@ -171,7 +177,9 @@ final class DataRun extends NTFSStructure {
 
         final long reqLastVcn = vcn + nrClusters - 1;
 
-        log.debug("me:" + myFirstVcn + "-" + myLastVcn + ", req:" + vcn + "-" + reqLastVcn);
+        if (log.isDebugEnabled()) {
+            log.debug("me:" + myFirstVcn + "-" + myLastVcn + ", req:" + vcn + "-" + reqLastVcn);
+        }
 
         if ((vcn > myLastVcn) || (myFirstVcn > reqLastVcn)) {
             // Not my region
@@ -194,10 +202,12 @@ final class DataRun extends NTFSStructure {
             actCluster = getCluster() + vcnDelta;
         }
 
-        log.debug("cluster=" + cluster + ", length=" + length + ", dstOffset=" + dstOffset);
-        log.debug("cnt=" + count + ", actclu=" + actCluster + ", actdstoff=" + actDstOffset);
+        if (log.isDebugEnabled()) {
+            log.debug("cluster=" + cluster + ", length=" + length + ", dstOffset=" + dstOffset);
+            log.debug("cnt=" + count + ", actclu=" + actCluster + ", actdstoff=" + actDstOffset);
+        }
 
-        if (actCluster == 0) {
+        if (isSparse()) {
             // Not really stored on disk -- sparse files, etc.
             Arrays.fill(dst, actDstOffset, actDstOffset + count * clusterSize, (byte) 0);
         } else {

@@ -33,6 +33,7 @@ import org.jnode.util.NumberUtils;
  * 
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Daniel Noll (daniel@noll.id.au) (new attribute iteration support)
  */
 class FileRecord extends NTFSRecord {
 
@@ -67,8 +68,22 @@ class FileRecord extends NTFSRecord {
         attributeListAttribute = (AttributeListAttribute)
             findStoredAttributeByType(NTFSAttribute.Types.ATTRIBUTE_LIST);
 
-        //  check for the magic number to see if we have a filerecord
+        //  check for the magic numberb to see if we have a filerecord
         if (getMagic() != Magic.FILE) {
+            log.debug("Invalid magic number found for FILE record: " + getMagic() + " -- dumping buffer");
+            for (int off = 0; off < buffer.length; off += 32) {
+                StringBuilder builder = new StringBuilder();
+                for (int i = off; i < off + 32 && i < buffer.length; i++) {
+                    String hex = Integer.toHexString(buffer[i]);
+                    while (hex.length() < 2) {
+                        hex = '0' + hex;
+                    }
+
+                    builder.append(' ').append(hex);
+                }
+                log.debug(builder.toString());
+            }
+
             throw new IOException("Invalid magic found: " + getMagic());
         }
 
@@ -107,7 +122,7 @@ class FileRecord extends NTFSRecord {
     public boolean isInUse() {
         return (getFlags() & 0x01) != 0;
     }
-
+    
     /**
      * Is this a directory?
      * 
@@ -164,6 +179,16 @@ class FileRecord extends NTFSRecord {
     }
 
     /**
+     * Gets the reference number of this record within the MFT.  This value
+     * is not actually stored in the record, but passed in from the outside.
+     *
+     * @return the reference number.
+     */
+    public long getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    /**
      * @return Returns the updateSequenceOffset.
      */
     public int getUpdateSequenceOffset() {
@@ -189,7 +214,7 @@ class FileRecord extends NTFSRecord {
     /**
      * Gets the name of this file.
      * 
-     * @return
+     * @return the filename.
      */
     public String getFileName() {
         final FileNameAttribute fnAttr = getFileNameAttribute();
@@ -203,7 +228,7 @@ class FileRecord extends NTFSRecord {
     /**
      * Gets the filename attribute of this filerecord.
      * 
-     * @return
+     * @return the filename attribute.
      */
     public FileNameAttribute getFileNameAttribute() {
         if (fileNameAttribute == null) {
@@ -213,7 +238,7 @@ class FileRecord extends NTFSRecord {
     }
 
     /**
-     * Gets an attribute in this filerecord with a given id.
+     * Gets the attributes stored in this file record.
      *
      * @return an iteratover over attributes stored in this file record.
      */
@@ -328,6 +353,14 @@ class FileRecord extends NTFSRecord {
      * @throws IOException if an error occurs reading from the filesystem.
      */
     public void readData(long fileOffset, byte[] dest, int off, int len) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug("readData: offset " + fileOffset + " length " + len + ", file record = " + this);
+        }
+
+        if (len == 0) {
+            return;
+        }
+
         // Explicitly look for the attribute with no name, to avoid getting alternate streams.
         // XXX: Add API for getting length and content from alternate streams.
         final AttributeIterator dataAttrs = findAttributesByTypeAndName(NTFSAttribute.Types.DATA, null);
@@ -348,11 +381,17 @@ class FileRecord extends NTFSRecord {
                         "b) is not large enough to read:" + len + "b");
             }
             resData.getData(resData.getAttributeOffset() + (int) fileOffset, dest, off, len);
+
+            if (log.isDebugEnabled()) {
+                log.debug("readData: read from resident data");
+            }
+
             return;
         }
 
-        // calculate start and end cluster
+        // At this point we know that at least the first attribute is non-resident.
 
+        // calculate start and end cluster
         final int clusterSize = getVolume().getClusterSize();
         final long startCluster = fileOffset / clusterSize;
         final long endCluster = (fileOffset + len - 1) / clusterSize;
@@ -380,8 +419,13 @@ class FileRecord extends NTFSRecord {
             attr = dataAttrs.next();
         } while (attr != null);
 
+        if (log.isDebugEnabled()) {
+            log.debug("readData: read " + readClusters + " from non-resident attributes");
+        }
+
         if (readClusters != nrClusters) {
-            throw new IOException("Requested " + nrClusters + " clusters but only read " + readClusters);
+            throw new IOException("Requested " + nrClusters + " clusters but only read " + readClusters +
+                                  ", file record = " + this);
         }
 
         System.arraycopy(tmp, (int) fileOffset % clusterSize, dest, off, len);

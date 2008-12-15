@@ -189,7 +189,7 @@ public abstract class NTFSAttribute extends NTFSStructure {
         }
 
         // check the resident flag
-        if (fileRecord.getUInt8(offset + 0x08) == 0) {
+        if (resident) {
             // resident
             return new NTFSResidentAttribute(fileRecord, offset);
         } else {
