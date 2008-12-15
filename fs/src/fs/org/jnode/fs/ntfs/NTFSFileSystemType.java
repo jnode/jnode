@@ -26,8 +26,6 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
 import org.jnode.partitions.PartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
 
 /**
  * @author Chira
@@ -35,24 +33,19 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  */
 public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSystem> {
     public static final Class<NTFSFileSystemType> ID = NTFSFileSystemType.class;
-    public static final String TAG = "NTFS";
+    public static final String TAG = "NTFS    ";
 
     public String getName() {
         return "NTFS";
     }
 
     /**
-     * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[],
-     *      FSBlockDeviceAPI)
+     * @see org.jnode.fs.BlockDeviceFileSystemType#supports(org.jnode.partitions.PartitionTableEntry,
+     * byte[], org.jnode.driver.block.FSBlockDeviceAPI) 
      */
     public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-        if (pte instanceof IBMPartitionTableEntry) {
-            IBMPartitionTableEntry iPte = (IBMPartitionTableEntry) pte;
-            if (iPte.getSystemIndicator() == IBMPartitionTypes.PARTTYPE_NTFS) {
-                return new String(firstSector, 0x03, 8).startsWith(TAG);
-            }
-        }
-        return false;
+        // Intentionally not checking the PARTTYPE because that often lies.
+        return new String(firstSector, 0x03, 8).equals(TAG);
     }
 
     /**
