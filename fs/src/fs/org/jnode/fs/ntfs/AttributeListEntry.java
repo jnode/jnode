@@ -23,7 +23,7 @@ package org.jnode.fs.ntfs;
 
 
 /**
- * @author Daniel Noll (daniel@nuix.com.au)
+ * @author Daniel Noll (daniel@noll.id.au)
  */
 final class AttributeListEntry extends NTFSStructure {
 
@@ -97,7 +97,7 @@ final class AttributeListEntry extends NTFSStructure {
      * @return the file sequence number.
      */
     public long getFileSequenceNumber() {
-        return getUInt48(0x16);
+        return getUInt16(0x16);
     }
 
     /**

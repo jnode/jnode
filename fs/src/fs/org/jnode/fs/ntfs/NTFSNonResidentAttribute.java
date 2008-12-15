@@ -31,12 +31,13 @@ import java.util.List;
  *  
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Daniel Noll (daniel@noll.id.au) (compression support)
  */
 public class NTFSNonResidentAttribute extends NTFSAttribute {
 
     private int numberOfVCNs = 0;
 
-    private final List<DataRun> dataRuns = new ArrayList<DataRun>();
+    private final List<DataRunInterface> dataRuns = new ArrayList<DataRunInterface>();
 
     /**
      * @param fileRecord
@@ -48,11 +49,6 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
          * process the dataruns...all non resident attributes have their data
          * outside. can find where using data runs
          */
-        final int flags = getFlags();
-        if (flags > 0) {
-            log.info("flags & 0x0001 = " + (flags & 0x0001));
-        }
-
         final int dataRunsOffset = getDataRunsOffset();
         if (dataRunsOffset > 0) {
             readDataRuns(dataRunsOffset);
@@ -86,6 +82,16 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
+     * Gets the compression unit size.  2 to the power of this value is the number of clusters
+     * per compression unit.
+     *
+     * @return the compression unit size. 
+     */
+    public int getCompressionUnitSize() {
+        return getUInt16(0x22);
+    }
+
+    /**
      * Gets the size allocated to the attribute.  May be larger than the actual size of the
      * attribute data.
      *
@@ -111,18 +117,55 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         int offset = parentoffset;
 
         long previousLCN = 0;
-        final List<DataRun> dataruns = getDataRuns();
+        final List<DataRunInterface> dataruns = getDataRuns();
         long vcn = 0;
+
+        // If this attribute is compressed we will coalesce compressed/sparse
+        // data run pairs into a single data run object for convenience when reading.
+        boolean compressed = (getFlags() & 0x0001) != 0;
+        boolean expectingSparseRunNext = false;
+        int compUnitSize = 1 << getCompressionUnitSize();
 
         while (getUInt8(offset) != 0x0) {
             final DataRun dataRun = new DataRun(this, offset, vcn, previousLCN);
-            // map VCN-> datarun
-            dataruns.add(dataRun);
-            this.numberOfVCNs += dataRun.getLength();
+
+            if (compressed) {
+                if (dataRun.isSparse() && expectingSparseRunNext) {
+                    // This is the sparse run which follows a compressed run.
+                    // The number of runs it contains does not count towards the total
+                    // as the compressed run reports holding all the runs for the pair.
+                    // But we do need to move the offsets.  Leaving this block open in case
+                    // later it makes sense to put some logic in here.
+                } else if (dataRun.getLength() == compUnitSize) {
+                    // Compressed/sparse pairs always add to the compression unit size.  If
+                    // the unit only compresses to 16, the system will store it uncompressed.
+                    // So this whole unit is stored as-is, we'll leave it as a normal data run.
+                    dataruns.add(dataRun);
+                    this.numberOfVCNs += dataRun.getLength();
+                    vcn += dataRun.getLength();
+                    previousLCN = dataRun.getCluster();
+                } else {
+                    // TODO: Is it possible for the length to be GREATER than the unit size?
+                    dataruns.add(new CompressedDataRun(dataRun, compUnitSize));
+                    if (dataRun.getLength() != compUnitSize) {
+                        expectingSparseRunNext = true;
+                    }
+
+                    this.numberOfVCNs += compUnitSize;
+                    vcn += compUnitSize;
+                    previousLCN = dataRun.getCluster();
+                }
+            } else {
+                // map VCN-> datarun
+                dataruns.add(dataRun);
+                this.numberOfVCNs += dataRun.getLength();
+                vcn += dataRun.getLength();
+                previousLCN = dataRun.getCluster();
+            }
+
             offset += dataRun.getSize();
-            previousLCN = dataRun.getCluster();
-            vcn += dataRun.getLength();
         }
+
         // check the dataruns
         final int clusterSize = getFileRecord().getVolume().getClusterSize();
         // Rounds up but won't work for 0, which shouldn't occur here.
@@ -136,25 +179,10 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * @return Returns the dataRuns.
+     * @return Returns the data runs.
      */
-    public List<DataRun> getDataRuns() {
+    private List<DataRunInterface> getDataRuns() {
         return dataRuns;
-    }
-
-    /**
-     * Appends extra data runs to this attribute, taken from another attribute.
-     * The starting VCN of the added runs are repositioned such the new runs line
-     * up with the end of the runs already contained in this attribute.
-     *
-     * @param dataRuns the data runs to append.
-     */
-    public void appendDataRuns(List<DataRun> dataRuns) {
-        for (DataRun dataRun : dataRuns) {
-            dataRun.setFirstVcn(this.numberOfVCNs);
-            this.dataRuns.add(dataRun);
-            this.numberOfVCNs += dataRun.getLength();
-        }
     }
 
     /**
@@ -167,16 +195,30 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      * @throws IOException
      */
     public int readVCN(long vcn, byte[] dst, int dstOffset, int nrClusters) throws IOException {
+        final int flags = getFlags();
+        if ((flags & 0x4000) != 0) {
+            throw new IOException("Reading encrypted files is not supported");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("readVCN: wants start " + vcn + " length " + nrClusters +
+                      ", we have start " + getStartVCN() + " length " + getNumberOfVCNs());
+        }
+
         final NTFSVolume volume = getFileRecord().getVolume();
         final int clusterSize = volume.getClusterSize();
-
         int readClusters = 0;
-        for (DataRun dataRun : this.getDataRuns()) {
+        for (DataRunInterface dataRun : this.getDataRuns()) {
             readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
             if (readClusters == nrClusters) {
                 break;
             }
         }
+
+        if (log.isDebugEnabled()) {
+            log.debug("readVCN: read " + readClusters);
+        }
+
         return readClusters;
     }
 

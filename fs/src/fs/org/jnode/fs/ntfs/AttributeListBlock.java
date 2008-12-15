@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 /**
  * Data structure containing a list of {@link AttributeListEntry} entries.
  *
- * @author Daniel Noll (daniel@nuix.com.au)
+ * @author Daniel Noll (daniel@noll.id.au)
  */
 final class AttributeListBlock extends NTFSStructure {
 
@@ -39,6 +39,7 @@ final class AttributeListBlock extends NTFSStructure {
     /**
      * @param data binary data for the block.
      * @param offset the offset into the binary data.
+     * @param length the length of the attribute list block, or 0 if unknown.
      */
     public AttributeListBlock(byte[] data, int offset, long length) {
         super(data, offset);
