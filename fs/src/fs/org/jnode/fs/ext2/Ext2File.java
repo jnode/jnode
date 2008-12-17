@@ -290,10 +290,8 @@ public class Ext2File extends AbstractFSFile {
                     long copyLength = Math.min(len - bytesWritten, blockSize - blockOffset);
 
                     //If only a part of the block is written, then read the
-                    // block
-                    //and update its contents with the data in src. If the
-                    // whole block
-                    //is overwritten, then skip reading it.
+                    //block and update its contents with the data in src. If the
+                    //whole block is overwritten, then skip reading it.
                     byte[] dest;
                     if (!((blockOffset == 0) && (copyLength == blockSize)) && (blockIndex < blocksAllocated))
                         dest = iNode.getDataBlock(blockIndex);
@@ -323,6 +321,9 @@ public class Ext2File extends AbstractFSFile {
 
                 iNode.setMtime(System.currentTimeMillis() / 1000);
             }
+        } catch (IOException ex) {
+            // ... this avoids wrapping an IOException inside another one.
+            throw ex;
         } catch (Throwable ex) {
             final IOException ioe = new IOException();
             ioe.initCause(ex);
@@ -342,8 +343,7 @@ public class Ext2File extends AbstractFSFile {
         log.debug("Ext2File.flush()");
         iNode.update();
         //update the group descriptors and superblock: needed if blocks have
-        // been
-        //allocated or deallocated
+        //been allocated or deallocated
         iNode.getExt2FileSystem().updateFS();
     }
 }
