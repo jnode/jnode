@@ -153,7 +153,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         public void addWorker(Worker worker) {
             workers.add(worker);
         }
-
+        
         public void notifyEnd(Worker worker) {
             finishedWorkers.add(worker);
         }
@@ -193,7 +193,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         }
         
         public Throwable unwrap(Throwable throwable) {
-            if (throwable.getClass().equals(Error.class) &&
+            if (throwable.getClass().equals(RuntimeException.class) &&
                     throwable.getCause() != null) {
                 throwable = throwable.getCause();
             }
@@ -254,7 +254,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
                     try {
                         doRun(i);
                     } catch (IOException ex) {
-                        throw new Error("Error in worker thread", ex);
+                        throw new RuntimeException("Error in worker thread", ex);
                     }
                     int sleep = (int) (minSleep + Math.random() * (maxSleep - minSleep));
                     try {
