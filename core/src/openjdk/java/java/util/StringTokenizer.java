@@ -96,7 +96,6 @@ import java.lang.*;
  * </pre></blockquote>
  *
  * @author  unascribed
- * @version 1.41, 05/05/07
  * @see     java.io.StreamTokenizer
  * @since   JDK1.0
  */

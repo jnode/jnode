@@ -49,7 +49,6 @@ package java.util;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.35, 05/05/07
  * @see Collection
  * @see AbstractCollection
  * @see Set

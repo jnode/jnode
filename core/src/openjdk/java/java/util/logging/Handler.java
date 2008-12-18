@@ -42,7 +42,6 @@ import java.io.UnsupportedEncodingException;
  * <tt>Handler</tt> class.
  *
  *
- * @version 1.27, 05/05/07
  * @since 1.4
  */
 

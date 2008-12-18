@@ -27,15 +27,15 @@ package java.lang.reflect;
 
 /**
  * WildcardType represents a wildcard type expression, such as
- * <tt>?</tt>, <tt>? extends Number</tt>, or <tt>? super Integer</tt>.
+ * {@code ?}, {@code ? extends Number}, or {@code ? super Integer}.
  *
  * @since 1.5
  */
 public interface WildcardType extends Type {
     /**
-     * Returns an array of <tt>Type</tt> objects representing the  upper
+     * Returns an array of {@code Type} objects representing the  upper
      * bound(s) of this type variable.  Note that if no upper bound is
-     * explicitly declared, the upper bound is <tt>Object</tt>.
+     * explicitly declared, the upper bound is {@code Object}.
      *
      * <p>For each upper bound B :
      * <ul>
@@ -56,9 +56,9 @@ public interface WildcardType extends Type {
     Type[] getUpperBounds();
 
     /**
-     * Returns an array of <tt>Type</tt> objects representing the 
+     * Returns an array of {@code Type} objects representing the
      * lower bound(s) of this type variable.  Note that if no lower bound is
-     * explicitly declared, the lower bound is the type of <tt>null</tt>.
+     * explicitly declared, the lower bound is the type of {@code null}.
      * In this case, a zero length array is returned.
      * 
      * <p>For each lower bound B :
@@ -81,4 +81,3 @@ public interface WildcardType extends Type {
     // one or many? Up to language spec; currently only one, but this API
     // allows for generalization. 
 }
-

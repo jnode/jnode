@@ -55,7 +55,6 @@ package java.util;
  * should be used only to detect bugs.</i>
  *
  * @author  Josh Bloch
- * @version 1.26, 05/05/07
  * @see	    Collection
  * @see     Iterator
  * @see     ListIterator

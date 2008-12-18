@@ -30,7 +30,6 @@ package java.util;
  * <tt>-1</tt>, the conversion does not support a precision, or the value is
  * otherwise unsupported.
  *
- * @version 	1.11, 05/05/07
  * @since 1.5
  */
 public class IllegalFormatPrecisionException extends IllegalFormatException {

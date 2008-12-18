@@ -141,7 +141,6 @@ import sun.security.action.GetPropertyAction;
  * <p> 
  * All methods on the LogManager object are multi-thread safe.
  *
- * @version 1.59, 05/05/07
  * @since 1.4
 */
 
@@ -326,6 +325,21 @@ public class LogManager {
 	changes.removePropertyChangeListener(l);
     }
 
+    // Package-level method.
+    // Find or create a specified logger instance. If a logger has
+    // already been created with the given name it is returned.
+    // Otherwise a new logger instance is created and registered
+    // in the LogManager global namespace.
+    synchronized Logger demandLogger(String name) {
+        Logger result = getLogger(name);
+        if (result == null) {
+            result = new Logger(name, null);
+            addLogger(result);
+            result = getLogger(name);
+        }
+        return result;
+    }
+
     // If logger.getUseParentHandlers() returns 'true' and any of the logger's
     // parents have levels or handlers defined, make sure they are instantiated.
     private void processParentHandlers(Logger logger, String name) {
@@ -341,7 +355,7 @@ public class LogManager {
                 getProperty(pname+".handlers") != null) {
                 // This pname has a level/handlers definition.
                 // Make sure it exists.
-                Logger.getLogger(pname);
+                demandLogger(pname);
             }
 	    ix = ix2+1;
 	}

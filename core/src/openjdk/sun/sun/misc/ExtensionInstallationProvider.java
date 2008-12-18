@@ -31,7 +31,6 @@ package sun.misc;
  * install new extensions on the user's disk
  *
  * @author  Jerome Dochez
- * @version 1.15, 05/05/07
  */
 public interface ExtensionInstallationProvider {
     

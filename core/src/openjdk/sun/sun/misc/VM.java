@@ -226,7 +226,7 @@ public class VM {
     public static boolean allowArraySyntax() {
 	if (!booted) {
 	    String s
-		= (String) System.getProperty("sun.lang.ClassLoader.allowArraySyntax");
+                = System.getProperty("sun.lang.ClassLoader.allowArraySyntax");
 	    allowArraySyntax = (s == null 
 				? defaultAllowArraySyntax
 				: Boolean.parseBoolean(s));

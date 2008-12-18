@@ -32,7 +32,6 @@ import java.lang.LinkageError;
  * a jar file contains incorrect information.
  *
  * @author   Zhenghua Li
- * @version  1.13, 05/05/07
  * @since   1.3
  */
 

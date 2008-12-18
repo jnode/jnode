@@ -77,7 +77,6 @@ import java.nio.ByteBuffer;
  * Several useful decoders have already been written and are
  * referenced in the See Also list below.
  *
- * @version	05/05/07, 1.29
  * @author	Chuck McManis
  * @see		CEFormatException
  * @see		CharacterEncoder

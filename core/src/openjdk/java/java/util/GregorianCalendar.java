@@ -293,7 +293,6 @@ import sun.util.calendar.ZoneInfo;
  * </blockquote>
  *
  * @see          TimeZone
- * @version      1.99
  * @author David Goldsmith, Mark Davis, Chen-Lieh Huang, Alan Liu
  * @since JDK1.1
  */

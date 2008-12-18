@@ -50,7 +50,6 @@ package java.util;
  * Java Collections Framework</a>.
  *
  * @author  Josh Bloch
- * @version 1.35, 05/05/07
  * @see Collection
  * @see List
  * @see Iterator

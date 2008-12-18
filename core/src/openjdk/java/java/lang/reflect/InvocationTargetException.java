@@ -56,8 +56,8 @@ public class InvocationTargetException extends Exception {
     private Throwable target;
 
     /**
-     * Constructs an <code>InvocationTargetException</code> with 
-     * <code>null</code> as the target exception.
+     * Constructs an {@code InvocationTargetException} with
+     * {@code null} as the target exception.
      */
     protected InvocationTargetException() {
 	super((Throwable)null);  // Disallow initCause
@@ -100,7 +100,7 @@ public class InvocationTargetException extends Exception {
 
     /**
      * Returns the cause of this exception (the thrown target exception,
-     * which may be <tt>null</tt>).
+     * which may be {@code null}).
      *
      * @return  the cause of this exception.
      * @since   1.4

@@ -72,7 +72,6 @@ import sun.misc.FileURLMapper;
  * and resources from both JAR files and directories.
  *
  * @author  David Connelly
- * @version 1.95, 05/05/07
  */
 public class URLClassPath {
     final static String USER_AGENT_JAVA_VERSION = "UA-Java-Version";
@@ -80,7 +79,7 @@ public class URLClassPath {
     private static final boolean DEBUG;
 
     static {
- 	JAVA_VERSION = (String) java.security.AccessController.doPrivileged(
+        JAVA_VERSION = java.security.AccessController.doPrivileged(
             new sun.security.action.GetPropertyAction("java.version"));
  	DEBUG        = (java.security.AccessController.doPrivileged(
             new sun.security.action.GetPropertyAction("sun.misc.URLClassPath.debug")) != null);
@@ -128,13 +127,10 @@ public class URLClassPath {
     /**
      * Appends the specified URL to the search path of directory and JAR
      * file URLs from which to load classes and resources.
-     * <p>
-     * If the URL specified is null or is already in the list of 
-     * URLs, then invoking this method has no effect.
      */
     public void addURL(URL url) {
 	synchronized (urls) {
-            if (url == null || path.contains(url))
+            if (path.contains(url))
                 return;
 
 	    urls.add(0, url);
@@ -833,8 +829,7 @@ public class URLClassPath {
 			     * merge it into the parent's index, taking into
 			     * account the relative path.
 			     */
-			    JarIndex newIndex = 
-				((JarLoader)newLoader).getIndex();
+                            JarIndex newIndex = newLoader.getIndex();
 			    if(newIndex != null) {
 				int pos = jarName.lastIndexOf("/");
 				newIndex.merge(this.index, (pos == -1 ? 

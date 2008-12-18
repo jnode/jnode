@@ -32,7 +32,6 @@ package java.util;
  * method or constructor in this class will cause a {@link
  * NullPointerException} to be thrown.
  *
- * @version 	1.9, 05/05/07
  * @since 1.5
  */
 public class UnknownFormatFlagsException extends IllegalFormatException {

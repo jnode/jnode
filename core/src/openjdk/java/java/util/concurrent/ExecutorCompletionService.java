@@ -38,7 +38,7 @@ package java.util.concurrent;
 /**
  * A {@link CompletionService} that uses a supplied {@link Executor}
  * to execute tasks.  This class arranges that submitted tasks are,
- * upon completion, placed on a queue accessible using <tt>take</tt>.
+ * upon completion, placed on a queue accessible using {@code take}.
  * The class is lightweight enough to be suitable for transient use
  * when processing groups of tasks.
  *
@@ -47,46 +47,45 @@ package java.util.concurrent;
  * <b>Usage Examples.</b>
  *
  * Suppose you have a set of solvers for a certain problem, each
- * returning a value of some type <tt>Result</tt>, and would like to
+ * returning a value of some type {@code Result}, and would like to
  * run them concurrently, processing the results of each of them that
- * return a non-null value, in some method <tt>use(Result r)</tt>. You
+ * return a non-null value, in some method {@code use(Result r)}. You
  * could write this as:
  *
- * <pre>
+ * <pre> {@code
  *   void solve(Executor e,
- *              Collection&lt;Callable&lt;Result&gt;&gt; solvers)
+ *            Collection<Callable<Result>> solvers)
  *     throws InterruptedException, ExecutionException {
- *       CompletionService&lt;Result&gt; ecs
- *           = new ExecutorCompletionService&lt;Result&gt;(e);
- *       for (Callable&lt;Result&gt; s : solvers)
+ *     CompletionService<Result> ecs
+ *         = new ExecutorCompletionService<Result>(e);
+ *     for (Callable<Result> s : solvers)
  *           ecs.submit(s);
  *       int n = solvers.size();
- *       for (int i = 0; i &lt; n; ++i) {
+ *     for (int i = 0; i < n; ++i) {
  *           Result r = ecs.take().get();
  *           if (r != null)
  *               use(r);
  *       }
- *   }
- * </pre>
+ * }}</pre>
  *
  * Suppose instead that you would like to use the first non-null result
  * of the set of tasks, ignoring any that encounter exceptions,
  * and cancelling all other tasks when the first one is ready:
  *
- * <pre>
+ * <pre> {@code
  *   void solve(Executor e,
- *              Collection&lt;Callable&lt;Result&gt;&gt; solvers)
+ *            Collection<Callable<Result>> solvers)
  *     throws InterruptedException {
- *       CompletionService&lt;Result&gt; ecs
- *           = new ExecutorCompletionService&lt;Result&gt;(e);
+ *     CompletionService<Result> ecs
+ *         = new ExecutorCompletionService<Result>(e);
  *       int n = solvers.size();
- *       List&lt;Future&lt;Result&gt;&gt; futures
- *           = new ArrayList&lt;Future&lt;Result&gt;&gt;(n);
+ *     List<Future<Result>> futures
+ *         = new ArrayList<Future<Result>>(n);
  *       Result result = null;
  *       try {
- *           for (Callable&lt;Result&gt; s : solvers)
+ *         for (Callable<Result> s : solvers)
  *               futures.add(ecs.submit(s));
- *           for (int i = 0; i &lt; n; ++i) {
+ *         for (int i = 0; i < n; ++i) {
  *               try {
  *                   Result r = ecs.take().get();
  *                   if (r != null) {
@@ -97,14 +96,13 @@ package java.util.concurrent;
  *           }
  *       }
  *       finally {
- *           for (Future&lt;Result&gt; f : futures)
+ *         for (Future<Result> f : futures)
  *               f.cancel(true);
  *       }
  *
  *       if (result != null)
  *           use(result);
- *   }
- * </pre>
+ * }}</pre>
  */
 public class ExecutorCompletionService<V> implements CompletionService<V> {
     private final Executor executor;
@@ -143,7 +141,7 @@ public class ExecutorCompletionService<V> implements CompletionService<V> {
      * {@link LinkedBlockingQueue} as a completion queue.
      *
      * @param executor the executor to use
-     * @throws NullPointerException if executor is <tt>null</tt>
+     * @throws NullPointerException if executor is {@code null}
      */
     public ExecutorCompletionService(Executor executor) {
         if (executor == null)
@@ -161,8 +159,11 @@ public class ExecutorCompletionService<V> implements CompletionService<V> {
      *
      * @param executor the executor to use
      * @param completionQueue the queue to use as the completion queue
-     * normally one dedicated for use by this service
-     * @throws NullPointerException if executor or completionQueue are <tt>null</tt>
+     *        normally one dedicated for use by this service. This
+     *        queue is treated as unbounded -- failed attempted
+     *        {@code Queue.add} operations for completed taskes cause
+     *        them not to be retrievable.
+     * @throws NullPointerException if executor or completionQueue are {@code null}
      */
     public ExecutorCompletionService(Executor executor,
                                      BlockingQueue<Future<V>> completionQueue) {

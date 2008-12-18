@@ -55,7 +55,6 @@ package sun.misc;
  *	}
  * </pre>
  *
- * @version 	1.28, 05/05/07
  * @author 	Peter King
  */
 public

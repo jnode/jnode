@@ -30,7 +30,6 @@ package sun.misc;
  * <code>float</code> type.
  * 
  * @author Joseph D. Darcy
- * @version  1.7, 05/05/07
  */
 
 public class FloatConsts {

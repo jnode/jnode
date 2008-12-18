@@ -34,7 +34,6 @@ import java.util.TreeSet;
 /**
  * Support for garbage-collection latency requests.
  *
- * @version  1.17, 07/05/05
  * @author   Mark Reinhold
  * @since    1.2
  */

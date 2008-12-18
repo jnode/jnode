@@ -340,7 +340,6 @@ import sun.misc.LRUCache;
  *
  * <p> Whitespace is not significant in the above regular expressions.
  *
- * @version 1.33, 05/05/07 
  * @since   1.5
  */
 public final class Scanner implements Iterator<String> {
@@ -766,7 +765,7 @@ public final class Scanner implements Iterator<String> {
         typeCache = null;
     }
 
-    // Also clears the both the regular cache and the type cache
+    // Also clears both the regular cache and the type cache
     private String getCachedResult() {
         position = hasNextPosition;
         hasNextPattern = null;
@@ -774,7 +773,7 @@ public final class Scanner implements Iterator<String> {
         return hasNextResult;
     }
 
-    // Also clears the both the regular cache and the type cache
+    // Also clears both the regular cache and the type cache
     private void useTypeCache() {
         if (closed)
             throw new IllegalStateException("Scanner closed");
@@ -2607,4 +2606,3 @@ public final class Scanner implements Iterator<String> {
         return this;
     } 
 }
-

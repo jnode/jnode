@@ -54,7 +54,6 @@ package java.util;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.44, 05/05/07
  * @see Collection
  * @since 1.2
  */

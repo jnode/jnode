@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2008 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -93,7 +93,6 @@ package java.util;
  * @param <V> the type of mapped values
  *
  * @author  Josh Bloch and Doug Lea
- * @version 1.73, 05/10/06
  * @see Map
  * @see HashMap
  * @see Hashtable
@@ -1022,7 +1021,7 @@ public class TreeMap<K,V>
     }
 
     Iterator<K> descendingKeyIterator() {
-        return new DescendingKeyIterator(getFirstEntry());
+        return new DescendingKeyIterator(getLastEntry());
     }
 
     static final class KeySet<E> extends AbstractSet<E> implements NavigableSet<E> {

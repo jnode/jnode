@@ -29,8 +29,8 @@
  * file:
  *
  * Written by Doug Lea with assistance from members of JCP JSR-166
- * Expert Group and released to the public domain. Use, modify, and
- * redistribute this code in any way without acknowledgement.
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/licenses/publicdomain
  */
 
 package java.util.concurrent;

@@ -39,7 +39,6 @@ import java.util.zip.*;
  * resource from. 
  *
  * @author  Zhenghua Li
- * @version 1.16, 05/05/07
  * @since   1.3
  */
 

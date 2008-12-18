@@ -135,7 +135,6 @@ import java.io.*;
  * @param <V> the type of mapped values
  *
  * @author  Josh Bloch
- * @version 1.32, 05/05/07
  * @see     Object#hashCode()
  * @see     Collection
  * @see     Map

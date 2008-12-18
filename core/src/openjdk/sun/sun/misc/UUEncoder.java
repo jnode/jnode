@@ -61,7 +61,6 @@ import java.io.IOException;
  * length of zero. This is immediately followed by a line which contains
  * the word 'end[newline]'
  *
- * @version     1.27, 05/05/07
  * @author      Chuck McManis
  * @see		CharacterEncoder
  * @see		UUDecoder

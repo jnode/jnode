@@ -29,7 +29,6 @@ package sun.misc;
  * MessageUtils: miscellaneous utilities for handling error and status
  * properties and messages.
  *
- * @version 1.24, 05/05/07
  * @author Herb Jellinek
  */
 

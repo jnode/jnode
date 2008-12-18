@@ -114,7 +114,6 @@ import java.io.IOException;
  * any method in this interface will cause a {@link
  * NullPointerException} to be thrown.
  *
- * @version 	1.10, 05/05/07
  * @since  1.5
  */
 public interface Formattable {

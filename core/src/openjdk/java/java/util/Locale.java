@@ -396,10 +396,10 @@ public final class Locale implements Cloneable, Serializable {
         // it's OK if more than one default locale happens to be created
         if (defaultLocale == null) {
             String language, region, country, variant;
-            language = (String) AccessController.doPrivileged(
+            language = AccessController.doPrivileged(
                             new GetPropertyAction("user.language", "en"));
             // for compatibility, check for old user.region property
-            region = (String) AccessController.doPrivileged(
+            region = AccessController.doPrivileged(
                             new GetPropertyAction("user.region"));
             if (region != null) {
                 // region can be of form country, country_variant, or _variant
@@ -412,9 +412,9 @@ public final class Locale implements Cloneable, Serializable {
                     variant = "";
                 }
             } else {
-                country = (String) AccessController.doPrivileged(
+                country = AccessController.doPrivileged(
                                 new GetPropertyAction("user.country", ""));
-                variant = (String) AccessController.doPrivileged(
+                variant = AccessController.doPrivileged(
                                 new GetPropertyAction("user.variant", ""));
             }
             defaultLocale = getInstance(language, country, variant);

@@ -90,7 +90,6 @@ package java.util;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.32, 05/05/07
  * @see Comparable
  * @see java.io.Serializable
  * @since 1.2
@@ -138,7 +137,6 @@ public interface Comparator<T> {
     int compare(T o1, T o2);
 
     /**
-     *
      * Indicates whether some other object is &quot;equal to&quot; this
      * comparator.  This method must obey the general contract of
      * {@link Object#equals(Object)}.  Additionally, this method can return

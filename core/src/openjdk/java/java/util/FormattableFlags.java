@@ -31,7 +31,6 @@ package java.util;
  * Formattable Formattables}.  Implementations of {@link Formattable} are
  * responsible for interpreting and validating any flags.
  *
- * @version 	1.8, 05/05/07
  * @since  1.5
  */
 public class FormattableFlags {

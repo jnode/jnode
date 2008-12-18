@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2003-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -1816,7 +1816,6 @@ import sun.misc.FormattedFloatingDecimal;
  * NullPointerException} to be thrown.
  *
  * @author  Iris Clark
- * @version 	1.33, 05/05/07
  * @since 1.5
  */
 public final class Formatter implements Closeable, Flushable {
@@ -2751,12 +2750,12 @@ public final class Formatter implements Closeable, Flushable {
 	    if (arg instanceof Long) {
 		// Note that the following method uses an instance of the
 		// default time zone (TimeZone.getDefaultRef().
-		cal = Calendar.getInstance(l);
+                cal = Calendar.getInstance(l == null ? Locale.US : l);
 		cal.setTimeInMillis((Long)arg);
 	    } else if (arg instanceof Date) {
 		// Note that the following method uses an instance of the
 		// default time zone (TimeZone.getDefaultRef().
-		cal = Calendar.getInstance(l);
+                cal = Calendar.getInstance(l == null ? Locale.US : l);
 		cal.setTime((Date)arg);
 	    } else if (arg instanceof Calendar) {
 		cal = (Calendar) ((Calendar)arg).clone();
@@ -2764,6 +2763,8 @@ public final class Formatter implements Closeable, Flushable {
 	    } else {
 		failConversion(c, arg);
 	    }
+            // Use the provided locale so that invocations of
+            // localizedMagnitude() use optimizations for null.
 	    print(cal, c, l);
 	}
 
@@ -3205,7 +3206,7 @@ public final class Formatter implements Closeable, Flushable {
 		int newW = width;
 		if (width != -1)
 		    newW = adjustWidth(width - exp.length - 1, f, neg);
-		localizedMagnitude(sb, mant, f, newW, null);
+                localizedMagnitude(sb, mant, f, newW, l);
 
 		sb.append(f.contains(Flags.UPPERCASE) ? 'E' : 'e');
 
@@ -3216,7 +3217,7 @@ public final class Formatter implements Closeable, Flushable {
 
 		char[] tmp = new char[exp.length - 1];
 		System.arraycopy(exp, 1, tmp, 0, exp.length - 1);
-		sb.append(localizedMagnitude(null, tmp, flags, -1, null));
+                sb.append(localizedMagnitude(null, tmp, flags, -1, l));
 	    } else if (c == Conversion.DECIMAL_FLOAT) {
 		// Create a new FormattedFloatingDecimal with the desired
 		// precision.
@@ -3278,7 +3279,7 @@ public final class Formatter implements Closeable, Flushable {
 		    else
 			newW = adjustWidth(width, f, neg);
 		}
-		localizedMagnitude(sb, mant, f, newW, null);
+                localizedMagnitude(sb, mant, f, newW, l);
 
 		if (exp != null) {
 		    sb.append(f.contains(Flags.UPPERCASE) ? 'E' : 'e');
@@ -3290,7 +3291,7 @@ public final class Formatter implements Closeable, Flushable {
 
 		    char[] tmp = new char[exp.length - 1];
 		    System.arraycopy(exp, 1, tmp, 0, exp.length - 1);
-		    sb.append(localizedMagnitude(null, tmp, flags, -1, null));
+                    sb.append(localizedMagnitude(null, tmp, flags, -1, l));
 		}
 	    } else if (c == Conversion.HEXADECIMAL_FLOAT) {
 		int prec = precision;
@@ -3536,7 +3537,7 @@ public final class Formatter implements Closeable, Flushable {
 		int newW = width;
 		if (width != -1)
 		    newW = adjustWidth(width - exp.length - 1, f, neg);
-		localizedMagnitude(sb, mant, f, newW, null);
+                localizedMagnitude(sb, mant, f, newW, l);
 
 		sb.append(f.contains(Flags.UPPERCASE) ? 'E' : 'e');
 
@@ -3547,7 +3548,7 @@ public final class Formatter implements Closeable, Flushable {
 
 		char[] tmp = new char[exp.length - 1];
 		System.arraycopy(exp, 1, tmp, 0, exp.length - 1);
-		sb.append(localizedMagnitude(null, tmp, flags, -1, null));
+                sb.append(localizedMagnitude(null, tmp, flags, -1, l));
 	    } else if (c == Conversion.DECIMAL_FLOAT) {
 		// Create a new BigDecimal with the desired precision.
 		int prec = (precision == -1 ? 6 : precision);
@@ -3859,7 +3860,7 @@ public final class Formatter implements Closeable, Flushable {
 		break;
 	    }
 	    case DateTime.ZONE_NUMERIC: { // 'z' ({-|+}####) - ls minus?
-		int i = t.get(Calendar.ZONE_OFFSET);
+                int i = t.get(Calendar.ZONE_OFFSET) + t.get(Calendar.DST_OFFSET);
 		boolean neg = i < 0;
 		sb.append(neg ? '-' : '+');
 		if (neg)
@@ -3876,7 +3877,7 @@ public final class Formatter implements Closeable, Flushable {
 		TimeZone tz = t.getTimeZone();
 		sb.append(tz.getDisplayName((t.get(Calendar.DST_OFFSET) != 0),
 					   TimeZone.SHORT,
-					   l));
+                                            (l == null) ? Locale.US : l));
 		break;
 	    }
 

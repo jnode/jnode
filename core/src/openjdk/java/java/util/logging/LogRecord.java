@@ -60,14 +60,13 @@ import java.io.*;
  *
  * </ul>
  *
- * @version 1.30, 05/05/07
  * @since 1.4
  */
 
 public class LogRecord implements java.io.Serializable {
     private static long globalSequenceNumber;
     private static int nextThreadId=10;
-    private static ThreadLocal threadIds = new ThreadLocal();
+    private static ThreadLocal<Integer> threadIds = new ThreadLocal<Integer>();
 
     /**
      * @serial Logging message level
@@ -147,7 +146,7 @@ public class LogRecord implements java.io.Serializable {
 	// Assign a thread ID and a unique sequence number.
 	synchronized (LogRecord.class) {
 	    sequenceNumber = globalSequenceNumber++;
-	    Integer id = (Integer)threadIds.get();
+            Integer id = threadIds.get();
 	    if (id == null) {
 		id = new Integer(nextThreadId++);
 		threadIds.set(id);

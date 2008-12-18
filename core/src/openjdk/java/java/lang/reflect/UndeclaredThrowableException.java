@@ -28,18 +28,18 @@ package java.lang.reflect;
 /**
  * Thrown by a method invocation on a proxy instance if its invocation
  * handler's {@link InvocationHandler#invoke invoke} method throws a
- * checked exception (a <code>Throwable</code> that is not assignable
- * to <code>RuntimeException</code> or <code>Error</code>) that
+ * checked exception (a {@code Throwable} that is not assignable
+ * to {@code RuntimeException} or {@code Error}) that
  * is not assignable to any of the exception types declared in the
- * <code>throws</code> clause of the method that was invoked on the
+ * {@code throws} clause of the method that was invoked on the
  * proxy instance and dispatched to the invocation handler.
  *
- * <p>An <code>UndeclaredThrowableException</code> instance contains
+ * <p>An {@code UndeclaredThrowableException} instance contains
  * the undeclared checked exception that was thrown by the invocation
  * handler, and it can be retrieved with the
- * <code>getUndeclaredThrowable()</code> method.
- * <code>UndeclaredThrowableException</code> extends
- * <code>RuntimeException</code>, so it is an unchecked exception
+ * {@code getUndeclaredThrowable()} method.
+ * {@code UndeclaredThrowableException} extends
+ * {@code RuntimeException}, so it is an unchecked exception
  * that wraps a checked exception.
  *
  * <p>As of release 1.4, this exception has been retrofitted to
@@ -52,7 +52,6 @@ package java.lang.reflect;
  * method."
  *
  * @author	Peter Jones
- * @version	1.21, 07/05/05
  * @see		InvocationHandler
  * @since	1.3
  */
@@ -66,8 +65,8 @@ public class UndeclaredThrowableException extends RuntimeException {
     private Throwable undeclaredThrowable;
 
     /**
-     * Constructs an <code>UndeclaredThrowableException</code> with the
-     * specified <code>Throwable</code>.
+     * Constructs an {@code UndeclaredThrowableException} with the
+     * specified {@code Throwable}.
      *
      * @param	undeclaredThrowable the undeclared checked exception
      *		that was thrown
@@ -78,8 +77,8 @@ public class UndeclaredThrowableException extends RuntimeException {
     }
 
     /**
-     * Constructs an <code>UndeclaredThrowableException</code> with the
-     * specified <code>Throwable</code> and a detail message.
+     * Constructs an {@code UndeclaredThrowableException} with the
+     * specified {@code Throwable} and a detail message.
      *
      * @param	undeclaredThrowable the undeclared checked exception
      *		that was thrown
@@ -93,8 +92,8 @@ public class UndeclaredThrowableException extends RuntimeException {
     }
 
     /**
-     * Returns the <code>Throwable</code> instance wrapped in this
-     * <code>UndeclaredThrowableException</code>, which may be <tt>null</tt>.
+     * Returns the {@code Throwable} instance wrapped in this
+     * {@code UndeclaredThrowableException}, which may be {@code null}.
      *
      * <p>This method predates the general-purpose exception chaining facility.
      * The {@link Throwable#getCause()} method is now the preferred means of
@@ -107,9 +106,9 @@ public class UndeclaredThrowableException extends RuntimeException {
     }
 
     /**
-     * Returns the cause of this exception (the <code>Throwable</code>
-     * instance wrapped in this <code>UndeclaredThrowableException</code>,
-     * which may be <tt>null</tt>).
+     * Returns the cause of this exception (the {@code Throwable}
+     * instance wrapped in this {@code UndeclaredThrowableException},
+     * which may be {@code null}).
      *
      * @return  the cause of this exception.
      * @since   1.4

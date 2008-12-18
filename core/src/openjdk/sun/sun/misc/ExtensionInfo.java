@@ -39,7 +39,6 @@ import java.lang.Character.*;
  * upgrade a extension on the user's disk
  *
  * @author  Jerome Dochez
- * @version 1.24, 05/05/07
  */
 public class ExtensionInfo {
 

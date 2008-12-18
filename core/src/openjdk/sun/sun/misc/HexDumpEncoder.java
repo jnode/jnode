@@ -40,7 +40,6 @@ import java.io.IOException;
  * by ascii coded hexadecimal bytes followed by the ASCII representation of
  * the bytes or '.' if they are not valid bytes.
  *
- * @version	1.22, 05/05/07
  * @author	Chuck McManis
  */
 

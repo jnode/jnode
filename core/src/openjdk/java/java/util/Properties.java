@@ -110,7 +110,6 @@ import java.io.BufferedWriter;
  * @author  Arthur van Hoff
  * @author  Michael McCloskey
  * @author  Xueming Shen
- * @version 1.102, 05/05/07
  * @since   JDK1.0
  */
 public
@@ -580,7 +579,7 @@ class Properties extends Hashtable<Object,Object> {
                     out[outLen++] = aChar;
                 }
             } else {
-	        out[outLen++] = (char)aChar;
+                out[outLen++] = aChar;
             }
         }
         return new String (out, 0, outLen);

@@ -303,6 +303,7 @@ class LocaleISOData {
 	+ "GD" + "GRD"	// Grenada
 	+ "GE" + "GEO"	// Georgia
 	+ "GF" + "GUF"	// French Guiana
+        + "GG" + "GGY"  // Guernsey
 	+ "GH" + "GHA"	// Ghana, Republic of
 	+ "GI" + "GIB"	// Gibraltar
 	+ "GL" + "GRL"	// Greenland
@@ -325,12 +326,14 @@ class LocaleISOData {
 	+ "ID" + "IDN"	// Indonesia, Republic of
 	+ "IE" + "IRL"	// Ireland
 	+ "IL" + "ISR"	// Israel, State of
+        + "IM" + "IMN"  // Isle of Man
 	+ "IN" + "IND"	// India, Republic of
 	+ "IO" + "IOT"	// British Indian Ocean Territory (Chagos Archipelago)
 	+ "IQ" + "IRQ"	// Iraq, Republic of
 	+ "IR" + "IRN"	// Iran, Islamic Republic of
 	+ "IS" + "ISL"	// Iceland, Republic of
 	+ "IT" + "ITA"	// Italy, Italian Republic
+        + "JE" + "JEY"  // Jersey
 	+ "JM" + "JAM"	// Jamaica
 	+ "JO" + "JOR"	// Jordan, Hashemite Kingdom of
 	+ "JP" + "JPN"	// Japan

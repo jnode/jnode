@@ -1097,7 +1097,7 @@ public abstract class AbstractQueuedLongSynchronizer
      */
     public final Thread getFirstQueuedThread() {
         // handle only fast path, else relay
-        return (head == tail)? null : fullGetFirstQueuedThread();
+        return (head == tail) ? null : fullGetFirstQueuedThread();
     }
 
     /**
@@ -1159,42 +1159,72 @@ public abstract class AbstractQueuedLongSynchronizer
     }
 
     /**
-     * Return {@code true} if the apparent first queued thread, if one
-     * exists, is waiting in exclusive mode. Used only as a heuristic
-     * in ReentrantReadWriteLock.
+     * Returns {@code true} if the apparent first queued thread, if one
+     * exists, is waiting in exclusive mode.  If this method returns
+     * {@code true}, and the current thread is attempting to acquire in
+     * shared mode (that is, this method is invoked from {@link
+     * #tryAcquireShared}) then it is guaranteed that the current thread
+     * is not the first queued thread.  Used only as a heuristic in
+     * ReentrantReadWriteLock.
      */
     final boolean apparentlyFirstQueuedIsExclusive() {
         Node h, s;
-        return (h = head) != null && (s = h.next) != null && ! s.isShared();
+        return (h = head) != null &&
+            (s = h.next)  != null &&
+            !s.isShared()         &&
+            s.thread != null;
     }
 
     /**
-     * Return {@code true} if the queue is empty or if the given thread
-     * is at the head of the queue. This is reliable only if
-     * <tt>current</tt> is actually Thread.currentThread() of caller.
+     * Queries whether any threads have been waiting to acquire longer
+     * than the current thread.
+     *
+     * <p>An invocation of this method is equivalent to (but may be
+     * more efficient than):
+     *  <pre> {@code
+     * getFirstQueuedThread() != Thread.currentThread() &&
+     * hasQueuedThreads()}</pre>
+     *
+     * <p>Note that because cancellations due to interrupts and
+     * timeouts may occur at any time, a {@code true} return does not
+     * guarantee that some other thread will acquire before the current
+     * thread.  Likewise, it is possible for another thread to win a
+     * race to enqueue after this method has returned {@code false},
+     * due to the queue being empty.
+     *
+     * <p>This method is designed to be used by a fair synchronizer to
+     * avoid <a href="AbstractQueuedSynchronizer#barging">barging</a>.
+     * Such a synchronizer's {@link #tryAcquire} method should return
+     * {@code false}, and its {@link #tryAcquireShared} method should
+     * return a negative value, if this method returns {@code true}
+     * (unless this is a reentrant acquire).  For example, the {@code
+     * tryAcquire} method for a fair, reentrant, exclusive mode
+     * synchronizer might look like this:
+     *
+     *  <pre> {@code
+     * protected boolean tryAcquire(int arg) {
+     *   if (isHeldExclusively()) {
+     *     // A reentrant acquire; increment hold count
+     *     return true;
+     *   } else if (hasQueuedPredecessors()) {
+     *     return false;
+     *   } else {
+     *     // try to acquire normally
+     *   }
+     * }}</pre>
+     *
+     * @return {@code true} if there is a queued thread preceding the
+     *         current thread, and {@code false} if the current thread
+     *         is at the head of the queue or the queue is empty
+     * @since 1.7
      */
-    final boolean isFirst(Thread current) {
+    final boolean hasQueuedPredecessors() {
+        // The correctness of this depends on head being initialized
+        // before tail and on head.next being accurate if the current
+        // thread is first in queue.
         Node h, s;
-        return ((h = head) == null ||
-                ((s = h.next) != null && s.thread == current) ||
-                fullIsFirst(current));
-    }
-
-    final boolean fullIsFirst(Thread current) {
-        // same idea as fullGetFirstQueuedThread
-        Node h, s;
-        Thread firstThread = null;
-        if (((h = head) != null && (s = h.next) != null &&
-             s.prev == head && (firstThread = s.thread) != null))
-            return firstThread == current;
-        Node t = tail;
-        while (t != null && t != head) {
-            Thread tt = t.thread;
-            if (tt != null)
-                firstThread = tt;
-            t = t.prev;
-        }
-        return firstThread == current || firstThread == null;
+        return (h = head) != tail &&
+            ((s = h.next) == null || s.thread != Thread.currentThread());
     }
 
 
@@ -1291,7 +1321,7 @@ public abstract class AbstractQueuedLongSynchronizer
      */
     public String toString() {
         long s = getState();
-        String q  = hasQueuedThreads()? "non" : "";
+        String q  = hasQueuedThreads() ? "non" : "";
         return super.toString() +
             "[State = " + s + ", " + q + "empty queue]";
     }
@@ -1682,8 +1712,8 @@ public abstract class AbstractQueuedLongSynchronizer
          * 0 if not interrupted.
          */
         private int checkInterruptWhileWaiting(Node node) {
-            return (Thread.interrupted()) ?
-                ((transferAfterCancelledWait(node))? THROW_IE : REINTERRUPT) :
+            return Thread.interrupted() ?
+                (transferAfterCancelledWait(node) ? THROW_IE : REINTERRUPT) :
                 0;
         }
 

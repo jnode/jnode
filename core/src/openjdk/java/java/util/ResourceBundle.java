@@ -40,10 +40,8 @@
 
 package java.util;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -1354,6 +1352,7 @@ public abstract class ResourceBundle {
 	if (bundle != NONEXISTENT_BUNDLE) {
 	    CacheKey constKey = (CacheKey) cacheKey.clone();
 
+            try {
 	    // Try declaring loading. If beginLoading() returns true,
 	    // then we can proceed. Otherwise, we need to take a look
 	    // at the cache again to see if someone else has loaded
@@ -1380,6 +1379,7 @@ public abstract class ResourceBundle {
 		}
 	    }
 		    
+                try {
 	    bundle = loadBundle(cacheKey, formats, control, expiredBundle);
 	    if (bundle != null) {
 		if (bundle.parent == null) {
@@ -1387,15 +1387,21 @@ public abstract class ResourceBundle {
 		}
 		bundle.locale = targetLocale;	
 		bundle = putBundleInCache(cacheKey, bundle, control);
-		endLoading(constKey);
 		return bundle;
 	    }
 
 	    // Put NONEXISTENT_BUNDLE in the cache as a mark that there's no bundle
 	    // instance for the locale.
 	    putBundleInCache(cacheKey, NONEXISTENT_BUNDLE, control);
+                } finally {
 	    endLoading(constKey);
 	}
+            } finally {
+                if (constKey.getCause() instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
 	assert underConstruction.get(cacheKey) != Thread.currentThread();
 	return parent;
     }
@@ -1417,7 +1423,12 @@ public abstract class ResourceBundle {
 	    try {
 		bundle = control.newBundle(cacheKey.getName(), targetLocale, format,
 					   cacheKey.getLoader(), reload);
-	    } catch (Throwable cause) {
+            } catch (LinkageError error) {
+                // We need to handle the LinkageError case due to
+                // inconsistent case-sensitivity in ClassLoader.
+                // See 6572242 for details.
+                cacheKey.setCause(error);
+            } catch (Exception cause) {
 		cacheKey.setCause(cause);
 	    }
 	    if (bundle != null) {
@@ -1490,6 +1501,8 @@ public abstract class ResourceBundle {
 		try {
 		    worker.wait();
 		} catch (InterruptedException e) {
+                    // record the interruption
+                    constKey.setCause(e);
 		}
 	    }
 	}

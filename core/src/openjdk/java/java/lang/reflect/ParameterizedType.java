@@ -46,18 +46,18 @@ package java.lang.reflect;
  */
 public interface ParameterizedType extends Type {
     /**
-     * Returns an array of <tt>Type</tt> objects representing the actual type
+     * Returns an array of {@code Type} objects representing the actual type
      * arguments to this type.
      * 
      * <p>Note that in some cases, the returned array be empty. This can occur
      * if this type represents a non-parameterized type nested within
      * a parameterized type.
      *
-     * @return an array of <tt>Type</tt> objects representing the actual type
+     * @return an array of {@code Type} objects representing the actual type
      *     arguments to this type
-     * @throws <tt>TypeNotPresentException</tt> if any of the
+     * @throws TypeNotPresentException if any of the
      *     actual type arguments refers to a non-existent type declaration
-     * @throws <tt>MalformedParameterizedTypeException</tt> if any of the 
+     * @throws MalformedParameterizedTypeException if any of the
      *     actual type parameters refer to a parameterized type that cannot
      *     be instantiated for any reason
      * @since 1.5
@@ -65,32 +65,31 @@ public interface ParameterizedType extends Type {
     Type[] getActualTypeArguments();
 
     /**
-     * Returns the <tt>Type</tt> object representing the class or interface
+     * Returns the {@code Type} object representing the class or interface
      * that declared this type.
      *
-     * @return the <tt>Type</tt> object representing the class or interface
+     * @return the {@code Type} object representing the class or interface
      *     that declared this type
      * @since 1.5
      */
     Type getRawType();
 
     /**
-     * Returns a <tt>Type</tt> object representing the type that this type
+     * Returns a {@code Type} object representing the type that this type
      * is a member of.  For example, if this type is {@code O<T>.I<S>},
      * return a representation of {@code O<T>}.
      *
-     * <p>If this type is a top-level type, <tt>null</tt> is returned.
+     * <p>If this type is a top-level type, {@code null} is returned.
      *
-     * @return a <tt>Type</tt> object representing the type that 
+     * @return a {@code Type} object representing the type that
      *     this type is a member of. If this type is a top-level type, 
-     *     <tt>null</tt> is returned
-     * @throws <tt>TypeNotPresentException</tt> if the owner type
+     *     {@code null} is returned
+     * @throws TypeNotPresentException if the owner type
      *     refers to a non-existent type declaration
-     * @throws <tt>MalformedParameterizedTypeException</tt> if the owner type
+     * @throws MalformedParameterizedTypeException if the owner type
      *     refers to a parameterized type that cannot be instantiated 
      *     for any reason
      * @since 1.5
      */
     Type getOwnerType();
 }
-

@@ -37,7 +37,6 @@ package java.util.logging;
  * and tail strings around a set of formatted records. The getHeader
  * and getTail methods can be used to obtain these strings.
  *
- * @version 1.24, 05/05/07
  * @since 1.4
  */
 
@@ -146,6 +145,3 @@ public abstract class Formatter {
 	}
     }
 }
-
-
-

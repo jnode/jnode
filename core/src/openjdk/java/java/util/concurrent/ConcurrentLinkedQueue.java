@@ -463,7 +463,7 @@ public class ConcurrentLinkedQueue<E> extends AbstractQueue<E>
             if (item != null)
                 al.add(item);
         }
-        return (T[])al.toArray(a);
+        return al.toArray(a);
     }
 
     /**

@@ -789,7 +789,7 @@ public class FormattedFloatingDecimal{
 		 * case, we discard it and decrement decExp.
 		 */
 		ndigit = 0;
-		q = (int) ( b / s );
+                q = b / s;
 		b = 10 * ( b % s );
 		m *= 10;
 		low  = (b <  m );
@@ -811,7 +811,7 @@ public class FormattedFloatingDecimal{
 		    high = low = false;
 		}
 		while( ! low && ! high ){
-		    q = (int) ( b / s );
+                    q = b / s;
 		    b = 10 * ( b % s );
 		    m *= 10;
                     assert q < 10 : q; // excessively large digit

@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1995-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,36 +26,38 @@
 package java.util;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.LongBuffer;
 
 /**
  * This class implements a vector of bits that grows as needed. Each
- * component of the bit set has a <code>boolean</code> value. The
- * bits of a <code>BitSet</code> are indexed by nonnegative integers.
+ * component of the bit set has a {@code boolean} value. The
+ * bits of a {@code BitSet} are indexed by nonnegative integers.
  * Individual indexed bits can be examined, set, or cleared. One
- * <code>BitSet</code> may be used to modify the contents of another
- * <code>BitSet</code> through logical AND, logical inclusive OR, and
+ * {@code BitSet} may be used to modify the contents of another
+ * {@code BitSet} through logical AND, logical inclusive OR, and
  * logical exclusive OR operations.
- * <p>
- * By default, all bits in the set initially have the value
- * <code>false</code>.
- * <p>
- * Every bit set has a current size, which is the number of bits
+ *
+ * <p>By default, all bits in the set initially have the value
+ * {@code false}.
+ *
+ * <p>Every bit set has a current size, which is the number of bits
  * of space currently in use by the bit set. Note that the size is
  * related to the implementation of a bit set, so it may change with
  * implementation. The length of a bit set relates to logical length
  * of a bit set and is defined independently of implementation.
- * <p>
- * Unless otherwise noted, passing a null parameter to any of the
- * methods in a <code>BitSet</code> will result in a
- * <code>NullPointerException</code>.
  *
- * <p>A <code>BitSet</code> is not safe for multithreaded use without
+ * <p>Unless otherwise noted, passing a null parameter to any of the
+ * methods in a {@code BitSet} will result in a
+ * {@code NullPointerException}.
+ *
+ * <p>A {@code BitSet} is not safe for multithreaded use without
  * external synchronization.
  *
  * @author  Arthur van Hoff
  * @author  Michael McCloskey
  * @author  Martin Buchholz
- * @version 1.73, 05/05/07
  * @since   JDK1.0
  */
 public class BitSet implements Cloneable, java.io.Serializable {
@@ -118,9 +120,9 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Set the field wordsInUse with the logical size in words of the bit
-     * set.  WARNING:This method assumes that the number of words actually
-     * in use is less than or equal to the current value of wordsInUse!
+     * Sets the field wordsInUse to the logical size in words of the bit set.
+     * WARNING:This method assumes that the number of words actually in use is
+     * less than or equal to the current value of wordsInUse!
      */
     private void recalculateWordsInUse() {
         // Traverse the bitset until a used word is found
@@ -133,7 +135,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Creates a new bit set. All bits are initially <code>false</code>.
+     * Creates a new bit set. All bits are initially {@code false}.
      */
     public BitSet() {
 	initWords(BITS_PER_WORD);
@@ -142,12 +144,12 @@ public class BitSet implements Cloneable, java.io.Serializable {
 
     /**
      * Creates a bit set whose initial size is large enough to explicitly
-     * represent bits with indices in the range <code>0</code> through
-     * <code>nbits-1</code>. All bits are initially <code>false</code>.
+     * represent bits with indices in the range {@code 0} through
+     * {@code nbits-1}. All bits are initially {@code false}.
      *
-     * @param     nbits   the initial size of the bit set.
-     * @exception NegativeArraySizeException if the specified initial size
-     *               is negative.
+     * @param  nbits the initial size of the bit set
+     * @throws NegativeArraySizeException if the specified initial size
+     *         is negative
      */
     public BitSet(int nbits) {
 	// nbits can't be negative; size 0 is OK
@@ -160,6 +162,16 @@ public class BitSet implements Cloneable, java.io.Serializable {
 
     private void initWords(int nbits) {
 	words = new long[wordIndex(nbits-1) + 1];
+    }
+
+    /**
+     * Creates a bit set using words as the internal representation.
+     * The last word (if there is one) must be non-zero.
+     */
+    private BitSet(long[] words) {
+        this.words = words;
+        this.wordsInUse = words.length;
+        checkInvariants();
     }
 
     /**
@@ -207,8 +219,8 @@ public class BitSet implements Cloneable, java.io.Serializable {
      * Sets the bit at the specified index to the complement of its
      * current value.
      *
-     * @param   bitIndex the index of the bit to flip.
-     * @exception IndexOutOfBoundsException if the specified index is negative.
+     * @param  bitIndex the index of the bit to flip
+     * @throws IndexOutOfBoundsException if the specified index is negative
      * @since   1.4
      */
     public void flip(int bitIndex) {
@@ -225,15 +237,15 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets each bit from the specified <tt>fromIndex</tt> (inclusive) to the
-     * specified <tt>toIndex</tt> (exclusive) to the complement of its current
+     * Sets each bit from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive) to the complement of its current
      * value.
      *
-     * @param     fromIndex   index of the first bit to flip.
-     * @param     toIndex index after the last bit to flip.
-     * @exception IndexOutOfBoundsException if <tt>fromIndex</tt> is negative,
-     *            or <tt>toIndex</tt> is negative, or <tt>fromIndex</tt> is
-     *            larger than <tt>toIndex</tt>.
+     * @param  fromIndex index of the first bit to flip
+     * @param  toIndex index after the last bit to flip
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code toIndex} is negative, or {@code fromIndex} is
+     *         larger than {@code toIndex}
      * @since   1.4
      */
     public void flip(int fromIndex, int toIndex) {
@@ -269,10 +281,10 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets the bit at the specified index to <code>true</code>.
+     * Sets the bit at the specified index to {@code true}.
      *
-     * @param     bitIndex   a bit index.
-     * @exception IndexOutOfBoundsException if the specified index is negative.
+     * @param  bitIndex a bit index
+     * @throws IndexOutOfBoundsException if the specified index is negative
      * @since     JDK1.0
      */
     public void set(int bitIndex) {
@@ -290,9 +302,9 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * Sets the bit at the specified index to the specified value.
      *
-     * @param     bitIndex   a bit index.
-     * @param     value a boolean value to set.
-     * @exception IndexOutOfBoundsException if the specified index is negative.
+     * @param  bitIndex a bit index
+     * @param  value a boolean value to set
+     * @throws IndexOutOfBoundsException if the specified index is negative
      * @since     1.4
      */
     public void set(int bitIndex, boolean value) {
@@ -303,14 +315,14 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets the bits from the specified <tt>fromIndex</tt> (inclusive) to the
-     * specified <tt>toIndex</tt> (exclusive) to <code>true</code>.
+     * Sets the bits from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive) to {@code true}.
      *
-     * @param     fromIndex   index of the first bit to be set.
-     * @param     toIndex index after the last bit to be set.
-     * @exception IndexOutOfBoundsException if <tt>fromIndex</tt> is negative,
-     *            or <tt>toIndex</tt> is negative, or <tt>fromIndex</tt> is
-     *            larger than <tt>toIndex</tt>.
+     * @param  fromIndex index of the first bit to be set
+     * @param  toIndex index after the last bit to be set
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code toIndex} is negative, or {@code fromIndex} is
+     *         larger than {@code toIndex}
      * @since     1.4
      */
     public void set(int fromIndex, int toIndex) {
@@ -346,15 +358,15 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets the bits from the specified <tt>fromIndex</tt> (inclusive) to the
-     * specified <tt>toIndex</tt> (exclusive) to the specified value.
+     * Sets the bits from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive) to the specified value.
      *
-     * @param     fromIndex   index of the first bit to be set.
+     * @param  fromIndex index of the first bit to be set
      * @param     toIndex index after the last bit to be set
      * @param     value value to set the selected bits to
-     * @exception IndexOutOfBoundsException if <tt>fromIndex</tt> is negative,
-     *            or <tt>toIndex</tt> is negative, or <tt>fromIndex</tt> is
-     *            larger than <tt>toIndex</tt>.
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code toIndex} is negative, or {@code fromIndex} is
+     *         larger than {@code toIndex}
      * @since     1.4
      */
     public void set(int fromIndex, int toIndex, boolean value) {
@@ -365,10 +377,10 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets the bit specified by the index to <code>false</code>.
+     * Sets the bit specified by the index to {@code false}.
      *
-     * @param     bitIndex   the index of the bit to be cleared.
-     * @exception IndexOutOfBoundsException if the specified index is negative.
+     * @param  bitIndex the index of the bit to be cleared
+     * @throws IndexOutOfBoundsException if the specified index is negative
      * @since     JDK1.0
      */
     public void clear(int bitIndex) {
@@ -386,14 +398,14 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets the bits from the specified <tt>fromIndex</tt> (inclusive) to the
-     * specified <tt>toIndex</tt> (exclusive) to <code>false</code>.
+     * Sets the bits from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive) to {@code false}.
      *
-     * @param     fromIndex   index of the first bit to be cleared.
-     * @param     toIndex index after the last bit to be cleared.
-     * @exception IndexOutOfBoundsException if <tt>fromIndex</tt> is negative,
-     *            or <tt>toIndex</tt> is negative, or <tt>fromIndex</tt> is
-     *            larger than <tt>toIndex</tt>.
+     * @param  fromIndex index of the first bit to be cleared
+     * @param  toIndex index after the last bit to be cleared
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code toIndex} is negative, or {@code fromIndex} is
+     *         larger than {@code toIndex}
      * @since     1.4
      */
     public void clear(int fromIndex, int toIndex) {
@@ -435,7 +447,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Sets all of the bits in this BitSet to <code>false</code>.
+     * Sets all of the bits in this BitSet to {@code false}.
      *
      * @since   1.4
      */
@@ -446,13 +458,13 @@ public class BitSet implements Cloneable, java.io.Serializable {
 
     /**
      * Returns the value of the bit with the specified index. The value
-     * is <code>true</code> if the bit with the index <code>bitIndex</code>
-     * is currently set in this <code>BitSet</code>; otherwise, the result
-     * is <code>false</code>.
+     * is {@code true} if the bit with the index {@code bitIndex}
+     * is currently set in this {@code BitSet}; otherwise, the result
+     * is {@code false}.
      *
-     * @param     bitIndex   the bit index.
-     * @return    the value of the bit with the specified index.
-     * @exception IndexOutOfBoundsException if the specified index is negative.
+     * @param  bitIndex   the bit index
+     * @return the value of the bit with the specified index
+     * @throws IndexOutOfBoundsException if the specified index is negative
      */
     public boolean get(int bitIndex) {
 	if (bitIndex < 0)
@@ -466,15 +478,15 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns a new <tt>BitSet</tt> composed of bits from this <tt>BitSet</tt>
-     * from <tt>fromIndex</tt> (inclusive) to <tt>toIndex</tt> (exclusive).
+     * Returns a new {@code BitSet} composed of bits from this {@code BitSet}
+     * from {@code fromIndex} (inclusive) to {@code toIndex} (exclusive).
      *
-     * @param     fromIndex   index of the first bit to include.
-     * @param     toIndex     index after the last bit to include.
-     * @return    a new <tt>BitSet</tt> from a range of this <tt>BitSet</tt>.
-     * @exception IndexOutOfBoundsException if <tt>fromIndex</tt> is negative,
-     *            or <tt>toIndex</tt> is negative, or <tt>fromIndex</tt> is
-     *            larger than <tt>toIndex</tt>.
+     * @param  fromIndex index of the first bit to include
+     * @param  toIndex index after the last bit to include
+     * @return a new {@code BitSet} from a range of this {@code BitSet}
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code toIndex} is negative, or {@code fromIndex} is
+     *         larger than {@code toIndex}
      * @since   1.4
      */
     public BitSet get(int fromIndex, int toIndex) {
@@ -522,21 +534,22 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns the index of the first bit that is set to <code>true</code>
+     * Returns the index of the first bit that is set to {@code true}
      * that occurs on or after the specified starting index. If no such
-     * bit exists then -1 is returned.
+     * bit exists then {@code -1} is returned.
      *
-     * To iterate over the <code>true</code> bits in a <code>BitSet</code>,
+     * <p>To iterate over the {@code true} bits in a {@code BitSet},
      * use the following loop:
      *
-     * <pre>
+     *  <pre> {@code
      * for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
      *     // operate on index i here
-     * }</pre>
+     * }}</pre>
      *
-     * @param   fromIndex the index to start checking from (inclusive).
-     * @return  the index of the next set bit.
-     * @throws  IndexOutOfBoundsException if the specified index is negative.
+     * @param  fromIndex the index to start checking from (inclusive)
+     * @return the index of the next set bit, or {@code -1} if there
+     *         is no such bit
+     * @throws IndexOutOfBoundsException if the specified index is negative
      * @since   1.4
      */
     public int nextSetBit(int fromIndex) {
@@ -561,12 +574,12 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns the index of the first bit that is set to <code>false</code>
+     * Returns the index of the first bit that is set to {@code false}
      * that occurs on or after the specified starting index.
      *
-     * @param   fromIndex the index to start checking from (inclusive).
-     * @return  the index of the next clear bit.
-     * @throws  IndexOutOfBoundsException if the specified index is negative.
+     * @param  fromIndex the index to start checking from (inclusive)
+     * @return the index of the next clear bit
+     * @throws IndexOutOfBoundsException if the specified index is negative
      * @since   1.4
      */
     public int nextClearBit(int fromIndex) {
@@ -593,11 +606,11 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns the "logical size" of this <code>BitSet</code>: the index of
-     * the highest set bit in the <code>BitSet</code> plus one. Returns zero
-     * if the <code>BitSet</code> contains no set bits.
+     * Returns the "logical size" of this {@code BitSet}: the index of
+     * the highest set bit in the {@code BitSet} plus one. Returns zero
+     * if the {@code BitSet} contains no set bits.
      *
-     * @return  the logical size of this <code>BitSet</code>.
+     * @return the logical size of this {@code BitSet}
      * @since   1.2
      */
     public int length() {
@@ -609,10 +622,10 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns true if this <code>BitSet</code> contains no bits that are set
-     * to <code>true</code>.
+     * Returns true if this {@code BitSet} contains no bits that are set
+     * to {@code true}.
      *
-     * @return    boolean indicating whether this <code>BitSet</code> is empty.
+     * @return boolean indicating whether this {@code BitSet} is empty
      * @since     1.4
      */
     public boolean isEmpty() {
@@ -620,13 +633,12 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns true if the specified <code>BitSet</code> has any bits set to
-     * <code>true</code> that are also set to <code>true</code> in this
-     * <code>BitSet</code>.
+     * Returns true if the specified {@code BitSet} has any bits set to
+     * {@code true} that are also set to {@code true} in this {@code BitSet}.
      *
-     * @param	set <code>BitSet</code> to intersect with
-     * @return  boolean indicating whether this <code>BitSet</code> intersects
-     *          the specified <code>BitSet</code>.
+     * @param  set {@code BitSet} to intersect with
+     * @return boolean indicating whether this {@code BitSet} intersects
+     *         the specified {@code BitSet}
      * @since   1.4
      */
     public boolean intersects(BitSet set) {
@@ -637,11 +649,9 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns the number of bits set to <tt>true</tt> in this
-     * <code>BitSet</code>.
+     * Returns the number of bits set to {@code true} in this {@code BitSet}.
      *
-     * @return  the number of bits set to <tt>true</tt> in this
-     *          <code>BitSet</code>.
+     * @return the number of bits set to {@code true} in this {@code BitSet}
      * @since   1.4
      */
     public int cardinality() {
@@ -654,11 +664,11 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * Performs a logical <b>AND</b> of this target bit set with the
      * argument bit set. This bit set is modified so that each bit in it
-     * has the value <code>true</code> if and only if it both initially
-     * had the value <code>true</code> and the corresponding bit in the
-     * bit set argument also had the value <code>true</code>.
+     * has the value {@code true} if and only if it both initially
+     * had the value {@code true} and the corresponding bit in the
+     * bit set argument also had the value {@code true}.
      *
-     * @param   set   a bit set.
+     * @param set a bit set
      */
     public void and(BitSet set) {
 	if (this == set)
@@ -678,11 +688,11 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * Performs a logical <b>OR</b> of this bit set with the bit set
      * argument. This bit set is modified so that a bit in it has the
-     * value <code>true</code> if and only if it either already had the
-     * value <code>true</code> or the corresponding bit in the bit set
-     * argument has the value <code>true</code>.
+     * value {@code true} if and only if it either already had the
+     * value {@code true} or the corresponding bit in the bit set
+     * argument has the value {@code true}.
      *
-     * @param   set   a bit set.
+     * @param set a bit set
      */
     public void or(BitSet set) {
 	if (this == set)
@@ -712,16 +722,16 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * Performs a logical <b>XOR</b> of this bit set with the bit set
      * argument. This bit set is modified so that a bit in it has the
-     * value <code>true</code> if and only if one of the following
+     * value {@code true} if and only if one of the following
      * statements holds:
      * <ul>
-     * <li>The bit initially has the value <code>true</code>, and the
-     *     corresponding bit in the argument has the value <code>false</code>.
-     * <li>The bit initially has the value <code>false</code>, and the
-     *     corresponding bit in the argument has the value <code>true</code>.
+     * <li>The bit initially has the value {@code true}, and the
+     *     corresponding bit in the argument has the value {@code false}.
+     * <li>The bit initially has the value {@code false}, and the
+     *     corresponding bit in the argument has the value {@code true}.
      * </ul>
      *
-     * @param   set   a bit set.
+     * @param  set a bit set
      */
     public void xor(BitSet set) {
         int wordsInCommon = Math.min(wordsInUse, set.wordsInUse);
@@ -746,11 +756,11 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Clears all of the bits in this <code>BitSet</code> whose corresponding
-     * bit is set in the specified <code>BitSet</code>.
+     * Clears all of the bits in this {@code BitSet} whose corresponding
+     * bit is set in the specified {@code BitSet}.
      *
-     * @param     set the <code>BitSet</code> with which to mask this
-     *            <code>BitSet</code>.
+     * @param  set the {@code BitSet} with which to mask this
+     *         {@code BitSet}
      * @since     1.2
      */
     public void andNot(BitSet set) {
@@ -798,10 +808,10 @@ public class BitSet implements Cloneable, java.io.Serializable {
 
     /**
      * Returns the number of bits of space actually in use by this
-     * <code>BitSet</code> to represent bit values.
+     * {@code BitSet} to represent bit values.
      * The maximum element in the set is the size - 1st element.
      *
-     * @return  the number of bits currently in this bit set.
+     * @return the number of bits currently in this bit set
      */
     public int size() {
 	return words.length * BITS_PER_WORD;
@@ -809,18 +819,17 @@ public class BitSet implements Cloneable, java.io.Serializable {
 
     /**
      * Compares this object against the specified object.
-     * The result is <code>true</code> if and only if the argument is
-     * not <code>null</code> and is a <code>Bitset</code> object that has
-     * exactly the same set of bits set to <code>true</code> as this bit
-     * set. That is, for every nonnegative <code>int</code> index <code>k</code>,
+     * The result is {@code true} if and only if the argument is
+     * not {@code null} and is a {@code Bitset} object that has
+     * exactly the same set of bits set to {@code true} as this bit
+     * set. That is, for every nonnegative {@code int} index {@code k},
      * <pre>((BitSet)obj).get(k) == this.get(k)</pre>
      * must be true. The current sizes of the two bit sets are not compared.
-     * <p>Overrides the <code>equals</code> method of <code>Object</code>.
      *
-     * @param   obj   the object to compare with.
-     * @return  <code>true</code> if the objects are the same;
-     *          <code>false</code> otherwise.
-     * @see     java.util.BitSet#size()
+     * @param  obj the object to compare with
+     * @return {@code true} if the objects are the same;
+     *         {@code false} otherwise
+     * @see    #size()
      */
     public boolean equals(Object obj) {
 	if (!(obj instanceof BitSet))
@@ -845,15 +854,13 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Cloning this <code>BitSet</code> produces a new <code>BitSet</code>
+     * Cloning this {@code BitSet} produces a new {@code BitSet}
      * that is equal to it.
      * The clone of the bit set is another bit set that has exactly the
-     * same bits set to <code>true</code> as this bit set.
+     * same bits set to {@code true} as this bit set.
      *
-     * <p>Overrides the <code>clone</code> method of <code>Object</code>.
-     *
-     * @return  a clone of this bit set.
-     * @see     java.util.BitSet#size()
+     * @return a clone of this bit set
+     * @see    #size()
      */
     public Object clone() {
 	if (! sizeIsSticky)
@@ -882,7 +889,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Save the state of the <tt>BitSet</tt> instance to a stream (i.e.,
+     * Save the state of the {@code BitSet} instance to a stream (i.e.,
      * serialize it).
      */
     private void writeObject(ObjectOutputStream s)
@@ -899,7 +906,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Reconstitute the <tt>BitSet</tt> instance from a stream (i.e.,
+     * Reconstitute the {@code BitSet} instance from a stream (i.e.,
      * deserialize it).
      */
     private void readObject(ObjectInputStream s)
@@ -919,26 +926,26 @@ public class BitSet implements Cloneable, java.io.Serializable {
 
     /**
      * Returns a string representation of this bit set. For every index
-     * for which this <code>BitSet</code> contains a bit in the set
+     * for which this {@code BitSet} contains a bit in the set
      * state, the decimal representation of that index is included in
      * the result. Such indices are listed in order from lowest to
      * highest, separated by ",&nbsp;" (a comma and a space) and
      * surrounded by braces, resulting in the usual mathematical
-     * notation for a set of integers.<p>
-     * Overrides the <code>toString</code> method of <code>Object</code>.
+     * notation for a set of integers.
+     *
      * <p>Example:
      * <pre>
      * BitSet drPepper = new BitSet();</pre>
-     * Now <code>drPepper.toString()</code> returns "<code>{}</code>".<p>
+     * Now {@code drPepper.toString()} returns "{@code {}}".<p>
      * <pre>
      * drPepper.set(2);</pre>
-     * Now <code>drPepper.toString()</code> returns "<code>{2}</code>".<p>
+     * Now {@code drPepper.toString()} returns "{@code {2}}".<p>
      * <pre>
      * drPepper.set(4);
      * drPepper.set(10);</pre>
-     * Now <code>drPepper.toString()</code> returns "<code>{2, 4, 10}</code>".
+     * Now {@code drPepper.toString()} returns "{@code {2, 4, 10}}".
      *
-     * @return  a string representation of this bit set.
+     * @return a string representation of this bit set
      */
     public String toString() {
 	checkInvariants();

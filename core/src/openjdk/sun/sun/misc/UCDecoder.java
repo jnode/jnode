@@ -78,7 +78,6 @@ import java.io.IOException;
  *    "UCDecoder: CRC check failed."
  * </pre>
  *
- * @version     1.25, 05/05/07
  * @author      Chuck McManis
  * @see		CharacterEncoder
  * @see		UCEncoder

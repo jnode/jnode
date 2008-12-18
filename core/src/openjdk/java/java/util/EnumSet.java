@@ -73,7 +73,6 @@ import sun.misc.SharedSecrets;
  * Java Collections Framework</a>.
  *
  * @author Josh Bloch
- * @version 1.21, 05/05/07
  * @since 1.5
  * @see EnumMap
  * @serial exclude
@@ -334,9 +333,8 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      *
      * @param from the first element in the range
      * @param to the last element in the range
-     * @throws NullPointerException if <tt>first</tt> or <tt>last</tt> are
-     *     null
-     * @throws IllegalArgumentException if <tt>first.compareTo(last) &gt; 0</tt>
+     * @throws NullPointerException if {@code from} or {@code to} are null
+     * @throws IllegalArgumentException if {@code from.compareTo(to) > 0}
      * @return an enum set initially containing all of the elements in the
      *     range defined by the two specified endpoints
      */
@@ -418,7 +416,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
 
         SerializationProxy(EnumSet<E> set) {
             elementType = set.elementType;
-            elements = (Enum[]) set.toArray(ZERO_LENGTH_ENUM_ARRAY);
+            elements = set.toArray(ZERO_LENGTH_ENUM_ARRAY);
         }
 
         private Object readResolve() {
@@ -433,5 +431,12 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
 
     Object writeReplace() {
         return new SerializationProxy<E>(this);
+    }
+
+    // readObject method for the serialization proxy pattern
+    // See Effective Java, Second Ed., Item 78.
+    private void readObject(java.io.ObjectInputStream stream)
+        throws java.io.InvalidObjectException {
+        throw new java.io.InvalidObjectException("Proxy required");
     }
 }

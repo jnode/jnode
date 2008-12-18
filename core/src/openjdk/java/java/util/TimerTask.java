@@ -29,7 +29,6 @@ package java.util;
  * A task that can be scheduled for one-time or repeated execution by a Timer.
  *
  * @author  Josh Bloch
- * @version 1.17, 05/05/07
  * @see	    Timer
  * @since   1.3
  */

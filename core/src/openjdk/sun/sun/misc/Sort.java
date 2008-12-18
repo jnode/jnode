@@ -27,7 +27,6 @@
  * Sort: a class that uses the quicksort algorithm to sort an
  *	 array of objects.
  *
- * @version 1.19, 05/05/07
  * @author Sunita Mani
  */
 
@@ -73,4 +72,3 @@ public class Sort {
         quicksort(arr, 0, arr.length-1, comp);
     }
 }
-

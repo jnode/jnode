@@ -107,7 +107,6 @@ import java.io.*;
  * @author  Arthur van Hoff
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.122, 05/05/07
  * @see     Object#equals(java.lang.Object)
  * @see     Object#hashCode()
  * @see     Hashtable#rehash()
@@ -557,7 +556,7 @@ public class Hashtable<K,V>
 
     private <T> Enumeration<T> getEnumeration(int type) {
 	if (count == 0) {
-	    return (Enumeration<T>)emptyEnumerator;
+            return Collections.emptyEnumeration();
 	} else {
 	    return new Enumerator<T>(type, false);
 	}
@@ -565,7 +564,7 @@ public class Hashtable<K,V>
 
     private <T> Iterator<T> getIterator(int type) {
 	if (count == 0) {
-	    return (Iterator<T>) emptyIterator;
+            return Collections.emptyIterator();
 	} else {
 	    return new Enumerator<T>(type, true);
 	}
@@ -1080,50 +1079,4 @@ public class Hashtable<K,V>
 	    }
 	}
     }
-
-
-    private static Enumeration emptyEnumerator = new EmptyEnumerator();
-    private static Iterator emptyIterator = new EmptyIterator();
-
-    /**
-     * A hashtable enumerator class for empty hash tables, specializes
-     * the general Enumerator
-     */
-    private static class EmptyEnumerator implements Enumeration<Object> {
-
-	EmptyEnumerator() {
-	}
-
-	public boolean hasMoreElements() {
-	    return false;
-	}
-
-	public Object nextElement() {
-	    throw new NoSuchElementException("Hashtable Enumerator");
-	}
-    }
-
-
-    /**
-     * A hashtable iterator class for empty hash tables
-     */
-    private static class EmptyIterator implements Iterator<Object> {
-
-	EmptyIterator() {
-	}
-
-	public boolean hasNext() {
-	    return false;
-	}
-
-	public Object next() {
-	    throw new NoSuchElementException("Hashtable Iterator");
-	}
-
-	public void remove() {
-	    throw new IllegalStateException("Hashtable Iterator");
-	}
-
-    }
-
 }

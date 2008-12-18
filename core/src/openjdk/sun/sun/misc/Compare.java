@@ -27,7 +27,6 @@
  * Compare: an interface to enable users to define the result of
  * 	    a comparison of two objects.
  *
- * @version 1.19, 05/05/07
  * @author Sunita Mani
  */
 

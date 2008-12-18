@@ -39,7 +39,6 @@ import javax.xml.transform.stream.*;
  * code outside of Properties helps reduce the number of classes loaded
  * when Properties is loaded.
  *
- * @version 1.9, 01/23/03
  * @author  Michael McCloskey
  * @since   1.3
  */

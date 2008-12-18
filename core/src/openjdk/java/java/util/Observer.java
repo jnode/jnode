@@ -29,7 +29,6 @@ package java.util;
  * wants to be informed of changes in observable objects.
  *
  * @author  Chris Warth
- * @version 1.26, 05/05/07
  * @see     java.util.Observable
  * @since   JDK1.0
  */

@@ -67,7 +67,6 @@ import java.nio.ByteBuffer;
  * Several useful encoders have already been written and are
  * referenced in the See Also list below.
  *
- * @version	1.44, 05/05/07
  * @author	Chuck McManis
  * @see		CharacterDecoder;
  * @see		UCEncoder

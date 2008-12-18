@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,47 +22,15 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+package sun.misc;
 
-package java.util;
+import java.io.FileDescriptor;
 
-/**
- * Unchecked exception thrown when an unknown conversion is given.
- *
- * <p> Unless otherwise specified, passing a <tt>null</tt> argument to
- * any method or constructor in this class will cause a {@link
- * NullPointerException} to be thrown.
- *
- * @since 1.5
+/*
+ * @author Chris Hegarty
  */
-public class UnknownFormatConversionException extends IllegalFormatException {
 
-    private static final long serialVersionUID = 19060418L;
-
-    private String s;
-
-    /**
-     * Constructs an instance of this class with the unknown conversion.
-     *
-     * @param  s
-     *         Unknown conversion
-     */
-    public UnknownFormatConversionException(String s) {
-	if (s == null)
-	    throw new NullPointerException();
-	this.s = s;
-    }
-
-    /**
-     * Returns the unknown conversion.
-     *
-     * @return  The unknown conversion.
-     */
-    public String getConversion() {
-	return s;
-    }
-
-    // javadoc inherited from Throwable.java
-    public String getMessage() {
-	return String.format("Conversion = '%s'", s);
-    }
+public interface JavaIOFileDescriptorAccess {
+    public void set(FileDescriptor obj, int fd);
+    public int get(FileDescriptor fd);
 }
