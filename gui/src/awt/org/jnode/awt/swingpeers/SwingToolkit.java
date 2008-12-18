@@ -82,6 +82,8 @@ import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
 import java.beans.PropertyVetoException;
 import java.util.WeakHashMap;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
@@ -266,8 +268,9 @@ public final class SwingToolkit extends JNodeToolkit {
                     synchronized (ret) {
                         ret[0] = new DesktopFramePeer(SwingToolkit.this, (DesktopFrame) target);
                         try {
-                            AWTAutoShutdown.class.getMethod("registerPeer", Object.class, Object.class).
-                                invoke(AWTAutoShutdown.getInstance(), target, ret[0]);
+                            Method method = AWTAutoShutdown.class.getMethod("registerPeer", Object.class, Object.class);
+                            method.setAccessible(true);
+                            method.invoke(AWTAutoShutdown.getInstance(), target, ret[0]);
                         } catch (Exception x) {
                             x.printStackTrace();
                         }
@@ -300,7 +303,9 @@ public final class SwingToolkit extends JNodeToolkit {
             EventQueue eq = (EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
             if (eq != null) {
                 try {
-                    EventQueue.class.getMethod("initDispatchThread").invoke(eq);
+                    Method met = EventQueue.class.getMethod("initDispatchThread");
+                    met.setAccessible(true);
+                    met.invoke(eq);
                 } catch (Exception x) {
                     x.printStackTrace();
                 }
@@ -318,7 +323,9 @@ public final class SwingToolkit extends JNodeToolkit {
         }
 
         try {
-            Thread edt = (Thread) EventQueue.class.getField("dispatchThread").get(eq);
+            Field field = EventQueue.class.getField("dispatchThread");
+            field.setAccessible(true);
+            Thread edt = (Thread) field.get(eq);
             if (Thread.currentThread() == edt) {
                 run.run();
                 synchronized (ret) {
