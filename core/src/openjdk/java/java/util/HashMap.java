@@ -113,7 +113,6 @@ import java.io.*;
  * @author  Josh Bloch
  * @author  Arthur van Hoff
  * @author  Neal Gafter
- * @version 1.79, 05/05/07
  * @see     Object#hashCode()
  * @see     Collection
  * @see	    Map

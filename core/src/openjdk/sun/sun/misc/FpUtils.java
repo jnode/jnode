@@ -36,7 +36,6 @@ import sun.misc.DoubleConsts;
  * floating-point standard.
  *
  * @author Joseph D. Darcy
- * @version  1.9, 05/05/07
  */
 
 public class FpUtils {

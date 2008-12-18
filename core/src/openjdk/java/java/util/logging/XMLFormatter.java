@@ -40,7 +40,6 @@ import java.util.*;
  * but it is recommended that it normally be used with UTF-8.  The
  * character encoding can be set on the output Handler.
  *
- * @version 1.33, 05/05/07
  * @since 1.4
  */
 

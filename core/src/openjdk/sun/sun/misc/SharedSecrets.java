@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2002-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,7 +28,7 @@ package sun.misc;
 import java.util.jar.JarFile;
 import java.io.Console;
 import java.io.File;
-import org.jnode.vm.annotation.SharedStatics;
+import java.io.FileDescriptor;
 
 /** A repository of "shared secrets", which are a mechanism for
     calling implementation-private methods in another package without
@@ -46,6 +46,7 @@ public class SharedSecrets {
     private static JavaIOAccess javaIOAccess;
     private static JavaIODeleteOnExitAccess javaIODeleteOnExitAccess;
     private static JavaNetAccess javaNetAccess;
+    private static JavaIOFileDescriptorAccess javaIOFileDescriptorAccess;
 
     public static JavaUtilJarAccess javaUtilJarAccess() {
         if (javaUtilJarAccess == null) {
@@ -97,4 +98,16 @@ public class SharedSecrets {
         }
         return javaIODeleteOnExitAccess;
     }
+
+    public static void setJavaIOFileDescriptorAccess(JavaIOFileDescriptorAccess jiofda) {
+        javaIOFileDescriptorAccess = jiofda;
+    }
+
+    public static JavaIOFileDescriptorAccess getJavaIOFileDescriptorAccess() {
+        if (javaIOFileDescriptorAccess == null)
+            unsafe.ensureClassInitialized(FileDescriptor.class);
+
+        return javaIOFileDescriptorAccess;
+    }
+
 }

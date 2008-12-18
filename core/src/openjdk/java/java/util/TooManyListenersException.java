@@ -43,7 +43,6 @@ package java.util;
  * @see java.util.EventObject
  * @see java.util.EventListener
  * 
- * @version 1.20 07/05/05
  * @author Laurence P. G. Cable
  * @since  JDK1.1
  */
@@ -69,4 +68,3 @@ public class TooManyListenersException extends Exception {
 	super(s);
     }
 }
-

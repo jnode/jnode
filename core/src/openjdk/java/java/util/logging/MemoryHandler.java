@@ -69,7 +69,6 @@ package java.util.logging;
  *	  (no default).
  * </ul>
  *
- * @version 1.32, 05/05/07
  * @since 1.4
  */
 

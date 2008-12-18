@@ -40,7 +40,6 @@ import sun.nio.ByteBuffered;
  * from the class path.
  *
  * @author  David Connelly
- * @version 1.24, 05/05/07
  * @since   1.2
  */
 public abstract class Resource {

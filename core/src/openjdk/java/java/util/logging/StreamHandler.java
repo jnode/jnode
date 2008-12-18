@@ -55,7 +55,6 @@ import java.io.*;
  *	  the default platform encoding).
  * </ul>
  *
- * @version 1.26, 05/05/07
  * @since 1.4
  */
 

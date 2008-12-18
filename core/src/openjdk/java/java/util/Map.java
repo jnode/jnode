@@ -106,7 +106,6 @@ package java.util;
  * @param <V> the type of mapped values
  *
  * @author  Josh Bloch
- * @version 1.62, 05/05/07
  * @see HashMap
  * @see TreeMap
  * @see Hashtable

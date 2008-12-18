@@ -68,7 +68,6 @@ import java.util.Hashtable;
  *
  * @author   Sheng Liang
  * @author   Bill Shannon
- * @version  @(#)Signal.java	1.18 07/05/05
  * @see      sun.misc.SignalHandler
  * @since    1.2
  */

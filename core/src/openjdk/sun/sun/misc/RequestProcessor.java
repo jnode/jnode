@@ -30,7 +30,6 @@ package sun.misc;
  * in arbitrary threads, and to be posted for execution in a non-restricted
  * thread.
  *
- * @version 	1.20, 05/05/07
  * @author	Steven B. Byrne
  */
 

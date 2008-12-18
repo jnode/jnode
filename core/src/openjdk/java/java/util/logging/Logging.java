@@ -38,7 +38,6 @@ import java.util.ArrayList;
  * 
  * @author Ron Mann
  * @author Mandy Chung
- * @version 1.15, 05/05/07
  * @since 1.5
  *
  * @see javax.management

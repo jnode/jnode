@@ -82,8 +82,8 @@ interface Member {
     public int getModifiers();
 
     /**
-     * Returns <tt>true</tt> if this member was introduced by
-     * the compiler; returns <tt>false</tt> otherwise.
+     * Returns {@code true} if this member was introduced by
+     * the compiler; returns {@code false} otherwise.
      *
      * @return true if and only if this member was introduced by
      * the compiler.

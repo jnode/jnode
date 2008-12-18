@@ -69,7 +69,6 @@ import java.io.IOException;
  *           included in the CRC.
  * </pre>
  *
- * @version     1.29, 05/05/07
  * @author      Chuck McManis
  * @see		CharacterEncoder
  * @see		UCDecoder

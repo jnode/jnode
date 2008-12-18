@@ -99,7 +99,6 @@ package java.util;
  * @param <V> the type of mapped values
  *
  * @author  Josh Bloch
- * @version 1.34, 05/05/07
  * @see Map
  * @see TreeMap
  * @see SortedSet

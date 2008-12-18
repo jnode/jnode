@@ -712,7 +712,7 @@ public class FloatingDecimal{
 		 * case, we discard it and decrement decExp.
 		 */
 		ndigit = 0;
-		q = (int) ( b / s );
+                q = b / s;
 		b = 10 * ( b % s );
 		m *= 10;
 		low  = (b <  m );
@@ -734,7 +734,7 @@ public class FloatingDecimal{
 		    high = low = false;
 		}
 		while( ! low && ! high ){
-		    q = (int) ( b / s );
+                    q = b / s;
 		    b = 10 * ( b % s );
 		    m *= 10;
                     assert q < 10 : q; // excessively large digit
@@ -2866,11 +2866,10 @@ class FDBigInt {
 	}
 	for( ; i> 0 ; i-- ){
 	    r.append( Integer.toHexString( data[i] ) );
-	    r.append( (char) ' ' );
+            r.append(' ');
 	}
 	r.append( Integer.toHexString( data[0] ) );
-	r.append( (char) ']' );
+        r.append(']');
 	return new String( r );
     }
 }
-

@@ -50,7 +50,6 @@ import java.lang.reflect.*;
  * @author  Josh Bloch
  * @author  Neal Gafter
  * @author  John Rose
- * @version 1.78, 05/05/07
  * @since   1.2
  */
 
@@ -407,9 +406,7 @@ public class Arrays {
         int i = fromIndex, n = toIndex;
         while(i < n) {
             if (a[i] != a[i]) {
-		double swap = a[i];
-                a[i] = a[--n];
-                a[n] = swap;
+                swap(a, i, --n);
             } else {
                 if (a[i]==0 && Double.doubleToLongBits(a[i])==NEG_ZERO_BITS) {
                     a[i] = 0.0d;
@@ -427,7 +424,7 @@ public class Arrays {
             int j = binarySearch0(a, fromIndex, n, 0.0d); // posn of ANY zero
             do {
                 j--;
-            } while (j>=0 && a[j]==0.0d);
+            } while (j>=fromIndex && a[j]==0.0d);
 
             // j is now one less than the index of the FIRST zero
             for (int k=0; k<numNegZeros; k++)
@@ -451,9 +448,7 @@ public class Arrays {
         int i = fromIndex, n = toIndex;
         while(i < n) {
             if (a[i] != a[i]) {
-		float swap = a[i];
-                a[i] = a[--n];
-                a[n] = swap;
+                swap(a, i, --n);
             } else {
                 if (a[i]==0 && Float.floatToIntBits(a[i])==NEG_ZERO_BITS) {
                     a[i] = 0.0f;
@@ -471,7 +466,7 @@ public class Arrays {
             int j = binarySearch0(a, fromIndex, n, 0.0f); // posn of ANY zero
             do {
                 j--;
-            } while (j>=0 && a[j]==0.0f);
+            } while (j>=fromIndex && a[j]==0.0f);
 
             // j is now one less than the index of the FIRST zero
             for (int k=0; k<numNegZeros; k++)
@@ -1809,25 +1804,20 @@ public class Arrays {
 	    int mid = (low + high) >>> 1;
 	    double midVal = a[mid];
 
-            int cmp;
-            if (midVal < key) {
-                cmp = -1;   // Neither val is NaN, thisVal is smaller
-            } else if (midVal > key) {
-                cmp = 1;    // Neither val is NaN, thisVal is larger
-            } else {
+            if (midVal < key)
+                low = mid + 1;  // Neither val is NaN, thisVal is smaller
+            else if (midVal > key)
+                high = mid - 1; // Neither val is NaN, thisVal is larger
+            else {
                 long midBits = Double.doubleToLongBits(midVal);
                 long keyBits = Double.doubleToLongBits(key);
-                cmp = (midBits == keyBits ?  0 : // Values are equal
-                       (midBits < keyBits ? -1 : // (-0.0, 0.0) or (!NaN, NaN)
-                        1));                     // (0.0, -0.0) or (NaN, !NaN)
-            }
-
-	    if (cmp < 0)
+                if (midBits == keyBits)     // Values are equal
+                    return mid;             // Key found
+                else if (midBits < keyBits) // (-0.0, 0.0) or (!NaN, NaN)
 		low = mid + 1;
-	    else if (cmp > 0)
+                else                        // (0.0, -0.0) or (NaN, !NaN)
 		high = mid - 1;
-	    else
-		return mid; // key found
+            }
 	}
 	return -(low + 1);  // key not found.
     }
@@ -1905,25 +1895,20 @@ public class Arrays {
 	    int mid = (low + high) >>> 1;
 	    float midVal = a[mid];
 
-            int cmp;
-            if (midVal < key) {
-                cmp = -1;   // Neither val is NaN, thisVal is smaller
-            } else if (midVal > key) {
-                cmp = 1;    // Neither val is NaN, thisVal is larger
-            } else {
+            if (midVal < key)
+                low = mid + 1;  // Neither val is NaN, thisVal is smaller
+            else if (midVal > key)
+                high = mid - 1; // Neither val is NaN, thisVal is larger
+            else {
                 int midBits = Float.floatToIntBits(midVal);
                 int keyBits = Float.floatToIntBits(key);
-                cmp = (midBits == keyBits ?  0 : // Values are equal
-                       (midBits < keyBits ? -1 : // (-0.0, 0.0) or (!NaN, NaN)
-                        1));                     // (0.0, -0.0) or (NaN, !NaN)
-            }
-
-	    if (cmp < 0)
+                if (midBits == keyBits)     // Values are equal
+                    return mid;             // Key found
+                else if (midBits < keyBits) // (-0.0, 0.0) or (!NaN, NaN)
 		low = mid + 1;
-	    else if (cmp > 0)
+                else                        // (0.0, -0.0) or (NaN, !NaN)
 		high = mid - 1;
-	    else
-		return mid; // key found
+            }
 	}
 	return -(low + 1);  // key not found.
     }
@@ -2425,7 +2410,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(long[] a, long val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2447,7 +2433,7 @@ public class Arrays {
      */
     public static void fill(long[] a, int fromIndex, int toIndex, long val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2459,7 +2445,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(int[] a, int val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2481,7 +2468,7 @@ public class Arrays {
      */
     public static void fill(int[] a, int fromIndex, int toIndex, int val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2493,7 +2480,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(short[] a, short val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2515,7 +2503,7 @@ public class Arrays {
      */
     public static void fill(short[] a, int fromIndex, int toIndex, short val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2527,7 +2515,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(char[] a, char val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2549,7 +2538,7 @@ public class Arrays {
      */
     public static void fill(char[] a, int fromIndex, int toIndex, char val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2561,7 +2550,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(byte[] a, byte val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2583,7 +2573,7 @@ public class Arrays {
      */
     public static void fill(byte[] a, int fromIndex, int toIndex, byte val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2595,7 +2585,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(boolean[] a, boolean val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2618,7 +2609,7 @@ public class Arrays {
     public static void fill(boolean[] a, int fromIndex, int toIndex,
                             boolean val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2630,7 +2621,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(double[] a, double val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2652,7 +2644,7 @@ public class Arrays {
      */
     public static void fill(double[] a, int fromIndex, int toIndex,double val){
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2664,7 +2656,8 @@ public class Arrays {
      * @param val the value to be stored in all elements of the array
      */
     public static void fill(float[] a, float val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2686,7 +2679,7 @@ public class Arrays {
      */
     public static void fill(float[] a, int fromIndex, int toIndex, float val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -2700,7 +2693,8 @@ public class Arrays {
      *         runtime type that can be stored in the specified array
      */
     public static void fill(Object[] a, Object val) {
-        fill(a, 0, a.length, val);
+        for (int i = 0, len = a.length; i < len; i++)
+            a[i] = val;
     }
 
     /**
@@ -2724,7 +2718,7 @@ public class Arrays {
      */
     public static void fill(Object[] a, int fromIndex, int toIndex, Object val) {
         rangeCheck(a.length, fromIndex, toIndex);
-        for (int i=fromIndex; i<toIndex; i++)
+        for (int i = fromIndex; i < toIndex; i++)
             a[i] = val;
     }
 
@@ -4144,11 +4138,15 @@ public class Arrays {
             buf.append("null");
             return;
         }
+        int iMax = a.length - 1;
+        if (iMax == -1) {
+            buf.append("[]");
+            return;
+        }
+
         dejaVu.add(a);
         buf.append('[');
-        for (int i = 0; i < a.length; i++) {
-            if (i != 0)
-                buf.append(", ");
+        for (int i = 0; ; i++) {
 
             Object element = a[i];
             if (element == null) {
@@ -4183,6 +4181,9 @@ public class Arrays {
                     buf.append(element.toString());
                 }
             }
+            if (i == iMax)
+                break;
+            buf.append(", ");
         }
         buf.append(']');
         dejaVu.remove(a);

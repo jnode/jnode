@@ -74,7 +74,6 @@ package java.util;
  * Java Collections Framework</a>.
  *
  * @since 1.5
- * @version 1.22, 05/05/07
  * @author Josh Bloch, Doug Lea
  * @param <E> the type of elements held in this collection
  */

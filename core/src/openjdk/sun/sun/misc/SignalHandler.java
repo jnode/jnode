@@ -30,7 +30,6 @@ package sun.misc;
  *
  * @author   Sheng Liang
  * @author   Bill Shannon
- * @version  @(#)SignalHandler.java	1.16 07/05/05
  * @see      sun.misc.Signal
  * @since    1.2
  */

@@ -114,7 +114,6 @@ import java.security.*;
  * Note that the use of unique ids to avoid conflicts is only guaranteed
  * to work reliably when using a local disk file system.
  *
- * @version 1.42, 05/05/07
  * @since 1.4
  */
 
@@ -128,7 +127,7 @@ public class FileHandler extends StreamHandler {
     private FileOutputStream lockStream;
     private File files[];
     private static final int MAX_LOCKS = 100;
-    private static java.util.HashMap locks = new java.util.HashMap();
+    private static java.util.HashMap<String, String> locks = new java.util.HashMap<String, String>();
 
     // A metered stream is a subclass of OutputStream that
     //   (a) forwards all its output to a target stream
@@ -578,7 +577,7 @@ public class FileHandler extends StreamHandler {
 	    // it is OK to write the target files, even if we are
 	    // currently being called from untrusted code.
             // So it is safe to raise privilege here.
-	    AccessController.doPrivileged(new PrivilegedAction() {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
 		public Object run() {
 		    rotate();
 		    return null;
@@ -624,4 +623,3 @@ public class FileHandler extends StreamHandler {
     // Private native method to check if we are in a set UID program.
     private static native boolean isSetUID();
 }
-

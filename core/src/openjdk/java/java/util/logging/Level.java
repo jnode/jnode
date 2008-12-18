@@ -55,12 +55,11 @@ import java.util.ResourceBundle;
  * they maintain the Object uniqueness property across serialization
  * by defining a suitable readResolve method.
  *
- * @version 1.26, 05/05/07
  * @since 1.4
  */
 
 public class Level implements java.io.Serializable {
-    private static java.util.ArrayList known = new java.util.ArrayList();
+    private static java.util.ArrayList<Level> known = new java.util.ArrayList<Level>();
     private static String defaultBundle = "sun.util.logging.resources.logging";
 
     /**
@@ -269,7 +268,7 @@ public class Level implements java.io.Serializable {
     private Object readResolve() {
 	synchronized (Level.class) {
 	    for (int i = 0; i < known.size(); i++) {
-		Level other = (Level) known.get(i);
+                Level other = known.get(i);
 		if (this.name.equals(other.name) && this.value == other.value
 			&& (this.resourceBundleName == other.resourceBundleName ||
 			    (this.resourceBundleName != null &&
@@ -316,7 +315,7 @@ public class Level implements java.io.Serializable {
 
 	// Look for a known Level with the given non-localized name.
 	for (int i = 0; i < known.size(); i++) {
-	    Level l = (Level) known.get(i);
+            Level l = known.get(i);
 	    if (name.equals(l.name)) {
 		return l;
 	    }
@@ -328,7 +327,7 @@ public class Level implements java.io.Serializable {
 	try {
 	    int x = Integer.parseInt(name);
 	    for (int i = 0; i < known.size(); i++) {
-	        Level l = (Level) known.get(i);
+                Level l = known.get(i);
 		if (l.value == x) {
 		    return l;
 		}
@@ -344,7 +343,7 @@ public class Level implements java.io.Serializable {
 	// in the current default locale.
 	// This is relatively expensive, but not excessively so.
 	for (int i = 0; i < known.size(); i++) {
-	    Level l = (Level) known.get(i);
+            Level l =  known.get(i);
 	    if (name.equals(l.getLocalizedName())) {
 		return l;
 	    }

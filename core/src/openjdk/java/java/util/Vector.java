@@ -1,5 +1,5 @@
 /*
- * Copyright 1994-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1994-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -41,15 +41,18 @@ package java.util;
  * capacity of a vector before inserting a large number of
  * components; this reduces the amount of incremental reallocation.
  *
- * <p>The Iterators returned by Vector's iterator and listIterator
- * methods are <em>fail-fast</em>: if the Vector is structurally modified
- * at any time after the Iterator is created, in any way except through the
- * Iterator's own remove or add methods, the Iterator will throw a
- * ConcurrentModificationException.  Thus, in the face of concurrent
- * modification, the Iterator fails quickly and cleanly, rather than risking
- * arbitrary, non-deterministic behavior at an undetermined time in the future.
- * The Enumerations returned by Vector's elements method are <em>not</em>
- * fail-fast.
+ * <p><a name="fail-fast"/>
+ * The iterators returned by this class's {@link #iterator() iterator} and
+ * {@link #listIterator(int) listIterator} methods are <em>fail-fast</em>:
+ * if the vector is structurally modified at any time after the iterator is
+ * created, in any way except through the iterator's own
+ * {@link ListIterator#remove() remove} or
+ * {@link ListIterator#add(Object) add} methods, the iterator will throw a
+ * {@link ConcurrentModificationException}.  Thus, in the face of
+ * concurrent modification, the iterator fails quickly and cleanly, rather
+ * than risking arbitrary, non-deterministic behavior at an undetermined
+ * time in the future.  The {@link Enumeration Enumerations} returned by
+ * the {@link #elements() elements} method are <em>not</em> fail-fast.
  *
  * <p>Note that the fail-fast behavior of an iterator cannot be guaranteed
  * as it is, generally speaking, impossible to make any hard guarantees in the
@@ -67,7 +70,6 @@ package java.util;
  *
  * @author  Lee Boynton
  * @author  Jonathan Payne
- * @version 1.112, 05/05/07
  * @see Collection
  * @see List
  * @see ArrayList
@@ -317,7 +319,7 @@ public class Vector<E>
 	    public E nextElement() {
 		synchronized (Vector.this) {
 		    if (count < elementCount) {
-			return (E)elementData[count++];
+                        return elementData(count++);
 		    }
 		}
 		throw new NoSuchElementException("Vector Enumeration");
@@ -445,7 +447,7 @@ public class Vector<E>
 	    throw new ArrayIndexOutOfBoundsException(index + " >= " + elementCount);
 	}
 
-        return (E)elementData[index];
+        return elementData(index);
     }
 
     /**
@@ -459,7 +461,7 @@ public class Vector<E>
 	if (elementCount == 0) {
 	    throw new NoSuchElementException();
 	}
-	return (E)elementData[0];
+        return elementData(0);
     }
 
     /**
@@ -473,7 +475,7 @@ public class Vector<E>
 	if (elementCount == 0) {
 	    throw new NoSuchElementException();
 	}
-	return (E)elementData[elementCount - 1];
+        return elementData(elementCount - 1);
     }
 
     /**
@@ -641,6 +643,7 @@ public class Vector<E>
      */
     public synchronized Object clone() {
 	try {
+            @SuppressWarnings("unchecked")
 	    Vector<E> v = (Vector<E>) super.clone();
 	    v.elementData = Arrays.copyOf(elementData, elementCount);
 	    v.modCount = 0;
@@ -684,6 +687,7 @@ public class Vector<E>
      * @throws NullPointerException if the given array is null
      * @since 1.2
      */
+    @SuppressWarnings("unchecked")
     public synchronized <T> T[] toArray(T[] a) {
         if (a.length < elementCount)
             return (T[]) Arrays.copyOf(elementData, elementCount, a.getClass());
@@ -698,6 +702,11 @@ public class Vector<E>
 
     // Positional Access Operations
 
+    @SuppressWarnings("unchecked")
+    E elementData(int index) {
+        return (E) elementData[index];
+    }
+
     /**
      * Returns the element at the specified position in this Vector.
      *
@@ -711,7 +720,7 @@ public class Vector<E>
 	if (index >= elementCount)
 	    throw new ArrayIndexOutOfBoundsException(index);
 
-	return (E)elementData[index];
+        return elementData(index);
     }
 
     /**
@@ -729,9 +738,9 @@ public class Vector<E>
 	if (index >= elementCount)
 	    throw new ArrayIndexOutOfBoundsException(index);
 
-	Object oldValue = elementData[index];
+        E oldValue = elementData(index);
 	elementData[index] = element;
-	return (E)oldValue;
+        return oldValue;
     }
 
     /**
@@ -793,7 +802,7 @@ public class Vector<E>
 	modCount++;
 	if (index >= elementCount)
 	    throw new ArrayIndexOutOfBoundsException(index);
-	Object oldValue = elementData[index];
+        E oldValue = elementData(index);
 
 	int numMoved = elementCount - index - 1;
 	if (numMoved > 0)
@@ -801,7 +810,7 @@ public class Vector<E>
 			     numMoved);
 	elementData[--elementCount] = null; // Let gc do its work
 
-	return (E)oldValue;
+        return oldValue;
     }
 
     /**
@@ -998,14 +1007,11 @@ public class Vector<E>
     }
 
     /**
-     * Removes from this List all of the elements whose index is between
-     * fromIndex, inclusive and toIndex, exclusive.  Shifts any succeeding
-     * elements to the left (reduces their index).
-     * This call shortens the ArrayList by (toIndex - fromIndex) elements.  (If
-     * toIndex==fromIndex, this operation has no effect.)
-     *
-     * @param fromIndex index of first element to be removed
-     * @param toIndex index after last element to be removed
+     * Removes from this list all of the elements whose index is between
+     * {@code fromIndex}, inclusive, and {@code toIndex}, exclusive.
+     * Shifts any succeeding elements to the left (reduces their index).
+     * This call shortens the list by {@code (toIndex - fromIndex)} elements.
+     * (If {@code toIndex==fromIndex}, this operation has no effect.)
      */
     protected synchronized void removeRange(int fromIndex, int toIndex) {
 	modCount++;
@@ -1028,5 +1034,142 @@ public class Vector<E>
         throws java.io.IOException
     {
 	s.defaultWriteObject();
+    }
+
+    /**
+     * Returns a list iterator over the elements in this list (in proper
+     * sequence), starting at the specified position in the list.
+     * The specified index indicates the first element that would be
+     * returned by an initial call to {@link ListIterator#next next}.
+     * An initial call to {@link ListIterator#previous previous} would
+     * return the element with the specified index minus one.
+     *
+     * <p>The returned list iterator is <a href="#fail-fast"><i>fail-fast</i></a>.
+     *
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
+    public synchronized ListIterator<E> listIterator(int index) {
+        if (index < 0 || index > elementCount)
+            throw new IndexOutOfBoundsException("Index: "+index);
+        return new ListItr(index);
+    }
+
+    /**
+     * Returns a list iterator over the elements in this list (in proper
+     * sequence).
+     *
+     * <p>The returned list iterator is <a href="#fail-fast"><i>fail-fast</i></a>.
+     *
+     * @see #listIterator(int)
+     */
+    public synchronized ListIterator<E> listIterator() {
+        return new ListItr(0);
+    }
+
+    /**
+     * Returns an iterator over the elements in this list in proper sequence.
+     *
+     * <p>The returned iterator is <a href="#fail-fast"><i>fail-fast</i></a>.
+     *
+     * @return an iterator over the elements in this list in proper sequence
+     */
+    public synchronized Iterator<E> iterator() {
+        return new Itr();
+    }
+
+    /**
+     * An optimized version of AbstractList.Itr
+     */
+    private class Itr implements Iterator<E> {
+        int cursor;       // index of next element to return
+        int lastRet = -1; // index of last element returned; -1 if no such
+        int expectedModCount = modCount;
+
+        public boolean hasNext() {
+            // Racy but within spec, since modifications are checked
+            // within or after synchronization in next/previous
+            return cursor != elementCount;
+        }
+
+        public E next() {
+            synchronized (Vector.this) {
+                checkForComodification();
+                int i = cursor;
+                if (i >= elementCount)
+                    throw new NoSuchElementException();
+                cursor = i + 1;
+                return elementData(lastRet = i);
+            }
+        }
+
+        public void remove() {
+            if (lastRet == -1)
+                throw new IllegalStateException();
+            synchronized (Vector.this) {
+                checkForComodification();
+                Vector.this.remove(lastRet);
+                expectedModCount = modCount;
+            }
+            cursor = lastRet;
+            lastRet = -1;
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
+    }
+
+    /**
+     * An optimized version of AbstractList.ListItr
+     */
+    final class ListItr extends Itr implements ListIterator<E> {
+        ListItr(int index) {
+            super();
+            cursor = index;
+        }
+
+        public boolean hasPrevious() {
+            return cursor != 0;
+        }
+
+        public int nextIndex() {
+            return cursor;
+        }
+
+        public int previousIndex() {
+            return cursor - 1;
+        }
+
+        public E previous() {
+            synchronized (Vector.this) {
+                checkForComodification();
+                int i = cursor - 1;
+                if (i < 0)
+                    throw new NoSuchElementException();
+                cursor = i;
+                return elementData(lastRet = i);
+            }
+        }
+
+        public void set(E e) {
+            if (lastRet == -1)
+                throw new IllegalStateException();
+            synchronized (Vector.this) {
+                checkForComodification();
+                Vector.this.set(lastRet, e);
+            }
+        }
+
+        public void add(E e) {
+            int i = cursor;
+            synchronized (Vector.this) {
+                checkForComodification();
+                Vector.this.add(i, e);
+                expectedModCount = modCount;
+            }
+            cursor = i + 1;
+            lastRet = -1;
+        }
     }
 }

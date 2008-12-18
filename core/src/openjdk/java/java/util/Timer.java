@@ -80,7 +80,6 @@ import java.util.Date;
  * <p>Implementation note: All constructors start a timer thread.
  *
  * @author  Josh Bloch
- * @version 1.27, 05/05/07
  * @see     TimerTask
  * @see     Object#wait(long)
  * @since   1.3

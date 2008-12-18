@@ -43,7 +43,6 @@ import java.security.*;
  * the security policy file.
  *
  *
- * @version 1.17, 05/05/07
  * @since 1.4
  * @see java.security.BasicPermission
  * @see java.security.Permission

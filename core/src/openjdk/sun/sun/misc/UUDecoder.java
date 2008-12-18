@@ -72,7 +72,6 @@ import java.io.IOException;
  *	"UUDecoder: Missing 'end' line."
  * </pre>
  *
- * @version     1.25, 05/05/07
  * @author      Chuck McManis
  * @see		CharacterDecoder
  * @see		UUEncoder

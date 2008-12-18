@@ -36,7 +36,6 @@ package sun.misc;
  * simply call Unlock(), that thread will not be able to acquire the
  * lock until the state variable equals its desired value. <p>
  *
- * @version 	1.30, 05/05/07
  * @author 	Peter King
  */
 public final

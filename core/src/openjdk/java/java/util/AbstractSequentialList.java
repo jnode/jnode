@@ -59,7 +59,6 @@ package java.util;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.42, 05/05/07
  * @see Collection
  * @see List
  * @see AbstractList

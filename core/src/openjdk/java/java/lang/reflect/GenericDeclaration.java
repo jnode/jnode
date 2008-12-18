@@ -32,13 +32,13 @@ package java.lang.reflect;
  */
 public interface GenericDeclaration {
     /**
-     * Returns an array of <tt>TypeVariable</tt> objects that
+     * Returns an array of {@code TypeVariable} objects that
      * represent the type variables declared by the generic
-     * declaration represented by this <tt>GenericDeclaration</tt>
+     * declaration represented by this {@code GenericDeclaration}
      * object, in declaration order.  Returns an array of length 0 if
      * the underlying generic declaration declares no type variables.
      *
-     * @return an array of <tt>TypeVariable</tt> objects that represent
+     * @return an array of {@code TypeVariable} objects that represent
      *     the type variables declared by this generic declaration
      * @throws GenericSignatureFormatError if the generic
      *     signature of this generic declaration does not conform to

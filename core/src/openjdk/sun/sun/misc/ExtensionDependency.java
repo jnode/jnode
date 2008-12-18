@@ -66,7 +66,6 @@ import sun.net.www.ParseUtil;
  * extensions dependencies declared in jar file manifest. 
  * </p>
  * @author  Jerome Dochez
- * @version 1.28, 05/05/07
  */
 public class ExtensionDependency {
 
@@ -430,7 +429,7 @@ public class ExtensionDependency {
      * </p>
      */
     private static File[] getExtDirs() {
-	String s = (String) java.security.AccessController.doPrivileged(
+        String s = java.security.AccessController.doPrivileged(
 		new sun.security.action.GetPropertyAction("java.ext.dirs"));
 	
 	File[] dirs;
@@ -514,13 +513,11 @@ public class ExtensionDependency {
 	    File[] installedExts = getInstalledExtensions();
 	    for (int i=0;i<installedExts.length;i++) {
 		final File instFile = installedExts[i];
-		URL instURL = (URL) AccessController.doPrivileged
-		    (
-		     new PrivilegedAction() {
-			 public Object run() {
+                URL instURL = AccessController.doPrivileged(
+                    new PrivilegedAction<URL>() {
+                        public URL run() {
 			     try {
-				 return (URL) ParseUtil.fileToEncodedURL(
-                                     instFile);
+                                return ParseUtil.fileToEncodedURL(instFile);
 			     } catch (MalformedURLException e) {
 				 debugException(e);
 				 return null;

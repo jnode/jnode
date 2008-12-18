@@ -40,7 +40,6 @@ package java.util;
  * implement the Map interface, rather than extending this class.</strong>
  *
  * @author  unascribed
- * @version 1.30, 05/05/07
  * @see	    java.util.Map
  * @see     java.lang.Object#equals(java.lang.Object)
  * @see     java.lang.Object#hashCode()

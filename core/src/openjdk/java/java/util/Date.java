@@ -121,7 +121,6 @@ import sun.util.calendar.ZoneInfo;
  * @author  James Gosling
  * @author  Arthur van Hoff
  * @author  Alan Liu
- * @version 1.90, 05/05/07
  * @see     java.text.DateFormat
  * @see     java.util.Calendar
  * @see     java.util.TimeZone

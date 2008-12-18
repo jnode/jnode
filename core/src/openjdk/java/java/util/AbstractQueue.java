@@ -41,7 +41,7 @@ package java.util;
  * the base implementation does <em>not</em> allow <tt>null</tt>
  * elements.  Methods {@link #add add}, {@link #remove remove}, and
  * {@link #element element} are based on {@link #offer offer}, {@link
- * #poll poll}, and {@link #peek peek}, respectively but throw
+ * #poll poll}, and {@link #peek peek}, respectively, but throw
  * exceptions instead of indicating failure via <tt>false</tt> or
  * <tt>null</tt> returns.
  *

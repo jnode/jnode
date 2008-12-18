@@ -33,13 +33,11 @@ import java.util.Comparator;
     the "generalized" java.lang.String case-insensitive comparator
     which converts each character to both upper and lower case. */
 
-public class ASCIICaseInsensitiveComparator implements Comparator {
-    public static final Comparator CASE_INSENSITIVE_ORDER =
+public class ASCIICaseInsensitiveComparator implements Comparator<String> {
+    public static final Comparator<String> CASE_INSENSITIVE_ORDER =
         new ASCIICaseInsensitiveComparator();
 
-    public int compare(Object o1, Object o2) {
-        String s1 = (String) o1;
-        String s2 = (String) o2;
+    public int compare(String s1, String s2) {
         int n1=s1.length(), n2=s2.length();
 	int minLen = n1 < n2 ? n1 : n2;
         for (int i=0; i < minLen; i++) {

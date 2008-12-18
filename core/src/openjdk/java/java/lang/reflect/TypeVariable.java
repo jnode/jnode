@@ -50,9 +50,9 @@ package java.lang.reflect;
  */
 public interface TypeVariable<D extends GenericDeclaration> extends Type {
     /**
-     * Returns an array of <tt>Type</tt> objects representing the 
+     * Returns an array of {@code Type} objects representing the
      * upper bound(s) of this type variable.  Note that if no upper bound is
-     * explicitly declared, the upper bound is <tt>Object</tt>.
+     * explicitly declared, the upper bound is {@code Object}.
      *
      * <p>For each upper bound B: <ul> <li>if B is a parameterized
      * type or a type variable, it is created, (see {@link
@@ -65,13 +65,13 @@ public interface TypeVariable<D extends GenericDeclaration> extends Type {
      * @throws MalformedParameterizedTypeException if any of the 
      *     bounds refer to a parameterized type that cannot be instantiated 
      *     for any reason
-     * @return an array of <tt>Type</tt>s representing the upper
+     * @return an array of {@code Type}s representing the upper
      *     bound(s) of this type variable
     */
     Type[] getBounds();
 
     /**
-     * Returns the <tt>GenericDeclaration</tt> object representing the 
+     * Returns the {@code GenericDeclaration} object representing the
      * generic declaration declared this type variable.
      *
      * @return the generic declaration declared for this type variable.
@@ -87,4 +87,3 @@ public interface TypeVariable<D extends GenericDeclaration> extends Type {
      */
     String getName();
 }
-

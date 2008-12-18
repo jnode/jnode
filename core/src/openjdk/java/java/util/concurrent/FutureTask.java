@@ -326,14 +326,19 @@ public class FutureTask<V> implements RunnableFuture<V> {
         void innerRun() {
             if (!compareAndSetState(READY, RUNNING))
                 return;
-            try {
+
                 runner = Thread.currentThread();
-                if (getState() == RUNNING) // recheck after setting thread
-                    set(callable.call());
-                else
-                    releaseShared(0); // cancel
+            if (getState() == RUNNING) { // recheck after setting thread
+                V result;
+                try {
+                    result = callable.call();
             } catch (Throwable ex) {
                 setException(ex);
+                    return;
+                }
+                set(result);
+            } else {
+                releaseShared(0); // cancel
             }
         }
 

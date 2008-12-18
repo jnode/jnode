@@ -144,7 +144,6 @@ import sun.util.calendar.Gregorian;
  * @see      Calendar
  * @see      GregorianCalendar
  * @see      TimeZone
- * @version  1.58 05/05/07
  * @author   David Goldsmith, Mark Davis, Chen-Lieh Huang, Alan Liu
  */
 

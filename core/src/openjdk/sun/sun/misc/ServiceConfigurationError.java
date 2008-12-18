@@ -38,7 +38,6 @@ package sun.misc;
  *   </ul>
  *
  * @author Mark Reinhold
- * @version 1.14, 07/05/05
  * @since 1.3
  */
 

@@ -53,7 +53,6 @@ import java.io.PrintStream;
  *    "BASE64Decoder: Not enough bytes for an atom."
  * </pre>
  *
- * @version	1.30, 05/05/07
  * @author	Chuck McManis
  * @see		CharacterEncoder
  * @see		BASE64Decoder

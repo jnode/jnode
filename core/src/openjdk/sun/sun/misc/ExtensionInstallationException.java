@@ -30,7 +30,6 @@ package sun.misc;
  * any reason
  *
  * @author  Jerome Dochez
- * @version 1.14, 05/05/07
  */
 
 public class ExtensionInstallationException extends Exception {

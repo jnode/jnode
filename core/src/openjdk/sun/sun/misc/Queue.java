@@ -32,7 +32,6 @@ import java.util.NoSuchElementException;
  * Queue: implements a simple queue mechanism.  Allows for enumeration of the 
  * elements.
  *
- * @version 1.21, 05/05/07
  * @author Herb Jellinek
  */
 
@@ -213,4 +212,3 @@ class QueueElement {
 	    (next == null ? " null" : " next")+"]";
     }
 }
-

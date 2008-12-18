@@ -61,7 +61,6 @@ import java.lang.reflect.Array;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.113, 05/05/07
  * @see	    Collection
  * @see	    Set
  * @see	    List
@@ -759,9 +758,9 @@ public class Collections {
      */
     public static void rotate(List<?> list, int distance) {
         if (list instanceof RandomAccess || list.size() < ROTATE_THRESHOLD)
-            rotate1((List)list, distance);
+            rotate1(list, distance);
         else
-            rotate2((List)list, distance);
+            rotate2(list, distance);
     }
 
     private static <T> void rotate1(List<T> list, int distance) {
@@ -1002,7 +1001,6 @@ public class Collections {
      * @serial include
      */
     static class UnmodifiableCollection<E> implements Collection<E>, Serializable {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
 	private static final long serialVersionUID = 1820017752578914078L;
 
 	final Collection<? extends E> c;
@@ -1022,7 +1020,7 @@ public class Collections {
 
 	public Iterator<E> iterator() {
 	    return new Iterator<E>() {
-		Iterator<? extends E> i = c.iterator();
+                private final Iterator<? extends E> i = c.iterator();
 
 		public boolean hasNext() {return i.hasNext();}
 		public E next() 	 {return i.next();}
@@ -1032,7 +1030,7 @@ public class Collections {
 	    };
         }
 
-	public boolean add(E e){
+        public boolean add(E e) {
 	    throw new UnsupportedOperationException();
         }
 	public boolean remove(Object o) {
@@ -1158,7 +1156,7 @@ public class Collections {
      */
     static class UnmodifiableList<E> extends UnmodifiableCollection<E>
     				  implements List<E> {
-        static final long serialVersionUID = -283967356065247728L;
+        private static final long serialVersionUID = -283967356065247728L;
 	final List<? extends E> list;
 
 	UnmodifiableList(List<? extends E> list) {
@@ -1188,7 +1186,8 @@ public class Collections {
 
 	public ListIterator<E> listIterator(final int index) {
 	    return new ListIterator<E>() {
-		ListIterator<? extends E> i = list.listIterator(index);
+                private final ListIterator<? extends E> i
+                    = list.listIterator(index);
 
 		public boolean hasNext()     {return i.hasNext();}
 		public E next()		     {return i.next();}
@@ -1282,7 +1281,6 @@ public class Collections {
      * @serial include
      */
     private static class UnmodifiableMap<K,V> implements Map<K,V>, Serializable {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
 	private static final long serialVersionUID = -1034234728574286014L;
 
 	private final Map<? extends K, ? extends V> m;
@@ -1355,7 +1353,7 @@ public class Collections {
             }
             public Iterator<Map.Entry<K,V>> iterator() {
                 return new Iterator<Map.Entry<K,V>>() {
-		    Iterator<? extends Map.Entry<? extends K, ? extends V>> i = c.iterator();
+                    private final Iterator<? extends Map.Entry<? extends K, ? extends V>> i = c.iterator();
 
                     public boolean hasNext() {
                         return i.hasNext();
@@ -1403,7 +1401,8 @@ public class Collections {
             public boolean contains(Object o) {
                 if (!(o instanceof Map.Entry))
                     return false;
-                return c.contains(new UnmodifiableEntry<K,V>((Map.Entry<K,V>) o));
+                return c.contains(
+                    new UnmodifiableEntry<Object,Object>((Map.Entry<?,?>) o));
             }
 
             /**
@@ -1554,7 +1553,6 @@ public class Collections {
      * @serial include
      */
     static class SynchronizedCollection<E> implements Collection<E>, Serializable {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
 	private static final long serialVersionUID = 3053995032091335093L;
 
 	final Collection<E> c;  // Backing Collection
@@ -1810,7 +1808,7 @@ public class Collections {
     static class SynchronizedList<E>
 	extends SynchronizedCollection<E>
 	implements List<E> {
-        static final long serialVersionUID = -7754090372962971524L;
+        private static final long serialVersionUID = -7754090372962971524L;
 
 	final List<E> list;
 
@@ -1910,7 +1908,7 @@ public class Collections {
             }
         }
 
-        static final long serialVersionUID = 1530674583602358482L;
+        private static final long serialVersionUID = 1530674583602358482L;
 
         /**
          * Allows instances to be deserialized in pre-1.4 JREs (which do
@@ -1959,7 +1957,6 @@ public class Collections {
      */
     private static class SynchronizedMap<K,V>
 	implements Map<K,V>, Serializable {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
 	private static final long serialVersionUID = 1978198479659022715L;
 
 	private final Map<K,V> m;     // Backing Map
@@ -1980,13 +1977,13 @@ public class Collections {
 	public int size() {
 	    synchronized(mutex) {return m.size();}
         }
-	public boolean isEmpty(){
+        public boolean isEmpty() {
 	    synchronized(mutex) {return m.isEmpty();}
         }
 	public boolean containsKey(Object key) {
 	    synchronized(mutex) {return m.containsKey(key);}
         }
-	public boolean containsValue(Object value){
+        public boolean containsValue(Object value) {
 	    synchronized(mutex) {return m.containsValue(value);}
         }
 	public V get(Object key) {
@@ -2147,13 +2144,14 @@ public class Collections {
     // Dynamically typesafe collection wrappers
 
     /**
-     * Returns a dynamically typesafe view of the specified collection.  Any
-     * attempt to insert an element of the wrong type will result in an
-     * immediate <tt>ClassCastException</tt>.  Assuming a collection contains
-     * no incorrectly typed elements prior to the time a dynamically typesafe
-     * view is generated, and that all subsequent access to the collection
-     * takes place through the view, it is <i>guaranteed</i> that the
-     * collection cannot contain an incorrectly typed element.
+     * Returns a dynamically typesafe view of the specified collection.
+     * Any attempt to insert an element of the wrong type will result in an
+     * immediate {@link ClassCastException}.  Assuming a collection
+     * contains no incorrectly typed elements prior to the time a
+     * dynamically typesafe view is generated, and that all subsequent
+     * access to the collection takes place through the view, it is
+     * <i>guaranteed</i> that the collection cannot contain an incorrectly
+     * typed element.
      *
      * <p>The generics mechanism in the language provides compile-time
      * (static) type checking, but it is possible to defeat this mechanism
@@ -2165,7 +2163,7 @@ public class Collections {
      * inserting an element of the wrong type.
      *
      * <p>Another use of dynamically typesafe views is debugging.  Suppose a
-     * program fails with a <tt>ClassCastException</tt>, indicating that an
+     * program fails with a {@code ClassCastException}, indicating that an
      * incorrectly typed element was put into a parameterized collection.
      * Unfortunately, the exception can occur at any time after the erroneous
      * element is inserted, so it typically provides little or no information
@@ -2173,14 +2171,14 @@ public class Collections {
      * one can quickly determine its source by temporarily modifying the
      * program to wrap the collection with a dynamically typesafe view.
      * For example, this declaration:
-     * <pre>
-     *     Collection&lt;String&gt; c = new HashSet&lt;String&gt;();
-     * </pre>
+     *  <pre> {@code
+     *     Collection<String> c = new HashSet<String>();
+     * }</pre>
      * may be replaced temporarily by this one:
-     * <pre>
-     *     Collection&lt;String&gt; c = Collections.checkedCollection(
-     *         new HashSet&lt;String&gt;(), String.class);
-     * </pre>
+     *  <pre> {@code
+     *     Collection<String> c = Collections.checkedCollection(
+     *         new HashSet<String>(), String.class);
+     * }</pre>
      * Running the program again will cause it to fail at the point where
      * an incorrectly typed element is inserted into the collection, clearly
      * identifying the source of the problem.  Once the problem is fixed, the
@@ -2188,22 +2186,31 @@ public class Collections {
      *
      * <p>The returned collection does <i>not</i> pass the hashCode and equals
      * operations through to the backing collection, but relies on
-     * <tt>Object</tt>'s <tt>equals</tt> and <tt>hashCode</tt> methods.  This
+     * {@code Object}'s {@code equals} and {@code hashCode} methods.  This
      * is necessary to preserve the contracts of these operations in the case
      * that the backing collection is a set or a list.
      *
      * <p>The returned collection will be serializable if the specified
      * collection is serializable.
      *
+     * <p>Since {@code null} is considered to be a value of any reference
+     * type, the returned collection permits insertion of null elements
+     * whenever the backing collection does.
+     *
      * @param c the collection for which a dynamically typesafe view is to be
      *             returned
-     * @param type the type of element that <tt>c</tt> is permitted to hold
+     * @param type the type of element that {@code c} is permitted to hold
      * @return a dynamically typesafe view of the specified collection
      * @since 1.5
      */
     public static <E> Collection<E> checkedCollection(Collection<E> c,
                                                       Class<E> type) {
         return new CheckedCollection<E>(c, type);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> T[] zeroLengthArray(Class<T> type) {
+        return (T[]) Array.newInstance(type, 0);
     }
 
     /**
@@ -2216,10 +2223,13 @@ public class Collections {
         final Class<E> type;
 
         void typeCheck(Object o) {
-            if (!type.isInstance(o))
-                throw new ClassCastException("Attempt to insert " +
-                   o.getClass() + " element into collection with element type "
-                   + type);
+            if (o != null && !type.isInstance(o))
+                throw new ClassCastException(badElementMsg(o));
+        }
+
+        private String badElementMsg(Object o) {
+            return "Attempt to insert " + o.getClass() +
+                " element into collection with element type " + type;
         }
 
         CheckedCollection(Collection<E> c, Class<E> type) {
@@ -2236,6 +2246,8 @@ public class Collections {
         public <T> T[] toArray(T[] a)       { return c.toArray(a); }
         public String toString()            { return c.toString(); }
         public boolean remove(Object o)     { return c.remove(o); }
+        public void clear()               {        c.clear(); }
+
         public boolean containsAll(Collection<?> coll) {
             return c.containsAll(coll);
         }
@@ -2245,76 +2257,82 @@ public class Collections {
         public boolean retainAll(Collection<?> coll) {
             return c.retainAll(coll);
         }
-        public void clear() {
-            c.clear();
-        }
 
         public Iterator<E> iterator() {
+            final Iterator<E> it = c.iterator();
 	    return new Iterator<E>() {
-		private final Iterator<E> it = c.iterator();
 		public boolean hasNext() { return it.hasNext(); }
 		public E next()          { return it.next(); }
 		public void remove()     {        it.remove(); }};
 	}
 
-	public boolean add(E e){
+        public boolean add(E e) {
             typeCheck(e);
             return c.add(e);
         }
 
-        public boolean addAll(Collection<? extends E> coll) {
-            /*
-             * Dump coll into an array of the required type.  This serves
-             * three purposes: it insulates us from concurrent changes in
-             * the contents of coll, it type-checks all of the elements in
-             * coll, and it provides all-or-nothing semantics (which we
-             * wouldn't get if we type-checked each element as we added it).
-             */
-            E[] a = null;
-            try {
-                a = coll.toArray(zeroLengthElementArray());
-            } catch (ArrayStoreException e) {
-                throw new ClassCastException();
-            }
-
-            boolean result = false;
-            for (E e : a)
-                result |= c.add(e);
-            return result;
-        }
-
         private E[] zeroLengthElementArray = null; // Lazily initialized
 
-        /*
-         * We don't need locking or volatile, because it's OK if we create
-         * several zeroLengthElementArrays, and they're immutable.
-         */
-        E[] zeroLengthElementArray() {
-            if (zeroLengthElementArray == null)
-                zeroLengthElementArray = (E[]) Array.newInstance(type, 0);
-            return zeroLengthElementArray;
+        private E[] zeroLengthElementArray() {
+            return zeroLengthElementArray != null ? zeroLengthElementArray :
+                (zeroLengthElementArray = zeroLengthArray(type));
+        }
+
+        @SuppressWarnings("unchecked")
+        Collection<E> checkedCopyOf(Collection<? extends E> coll) {
+            Object[] a = null;
+            try {
+                E[] z = zeroLengthElementArray();
+                a = coll.toArray(z);
+                // Defend against coll violating the toArray contract
+                if (a.getClass() != z.getClass())
+                    a = Arrays.copyOf(a, a.length, z.getClass());
+            } catch (ArrayStoreException ignore) {
+                // To get better and consistent diagnostics,
+                // we call typeCheck explicitly on each element.
+                // We call clone() to defend against coll retaining a
+                // reference to the returned array and storing a bad
+                // element into it after it has been type checked.
+                a = coll.toArray().clone();
+                for (Object o : a)
+                    typeCheck(o);
+            }
+            // A slight abuse of the type system, but safe here.
+            return (Collection<E>) Arrays.asList(a);
+        }
+
+        public boolean addAll(Collection<? extends E> coll) {
+            // Doing things this way insulates us from concurrent changes
+            // in the contents of coll and provides all-or-nothing
+            // semantics (which we wouldn't get if we type-checked each
+            // element as we added it)
+            return c.addAll(checkedCopyOf(coll));
         }
     }
 
     /**
      * Returns a dynamically typesafe view of the specified set.
      * Any attempt to insert an element of the wrong type will result in
-     * an immediate <tt>ClassCastException</tt>.  Assuming a set contains
+     * an immediate {@link ClassCastException}.  Assuming a set contains
      * no incorrectly typed elements prior to the time a dynamically typesafe
      * view is generated, and that all subsequent access to the set
      * takes place through the view, it is <i>guaranteed</i> that the
      * set cannot contain an incorrectly typed element.
      *
      * <p>A discussion of the use of dynamically typesafe views may be
-     * found in the documentation for the {@link #checkedCollection checkedCollection}
-     * method.
+     * found in the documentation for the {@link #checkedCollection
+     * checkedCollection} method.
      *
      * <p>The returned set will be serializable if the specified set is
      * serializable.
      *
+     * <p>Since {@code null} is considered to be a value of any reference
+     * type, the returned set permits insertion of null elements whenever
+     * the backing set does.
+     *
      * @param s the set for which a dynamically typesafe view is to be
      *             returned
-     * @param type the type of element that <tt>s</tt> is permitted to hold
+     * @param type the type of element that {@code s} is permitted to hold
      * @return a dynamically typesafe view of the specified set
      * @since 1.5
      */
@@ -2337,24 +2355,29 @@ public class Collections {
     }
 
     /**
-     * Returns a dynamically typesafe view of the specified sorted set.  Any
-     * attempt to insert an element of the wrong type will result in an
-     * immediate <tt>ClassCastException</tt>.  Assuming a sorted set contains
-     * no incorrectly typed elements prior to the time a dynamically typesafe
-     * view is generated, and that all subsequent access to the sorted set
-     * takes place through the view, it is <i>guaranteed</i> that the sorted
-     * set cannot contain an incorrectly typed element.
+     * Returns a dynamically typesafe view of the specified sorted set.
+     * Any attempt to insert an element of the wrong type will result in an
+     * immediate {@link ClassCastException}.  Assuming a sorted set
+     * contains no incorrectly typed elements prior to the time a
+     * dynamically typesafe view is generated, and that all subsequent
+     * access to the sorted set takes place through the view, it is
+     * <i>guaranteed</i> that the sorted set cannot contain an incorrectly
+     * typed element.
      *
      * <p>A discussion of the use of dynamically typesafe views may be
-     * found in the documentation for the {@link #checkedCollection checkedCollection}
-     * method.
+     * found in the documentation for the {@link #checkedCollection
+     * checkedCollection} method.
      *
      * <p>The returned sorted set will be serializable if the specified sorted
      * set is serializable.
      *
+     * <p>Since {@code null} is considered to be a value of any reference
+     * type, the returned sorted set permits insertion of null elements
+     * whenever the backing sorted set does.
+     *
      * @param s the sorted set for which a dynamically typesafe view is to be
      *             returned
-     * @param type the type of element that <tt>s</tt> is permitted to hold
+     * @param type the type of element that {@code s} is permitted to hold
      * @return a dynamically typesafe view of the specified sorted set
      * @since 1.5
      */
@@ -2382,36 +2405,39 @@ public class Collections {
         public E last()                    { return ss.last(); }
 
         public SortedSet<E> subSet(E fromElement, E toElement) {
-            return new CheckedSortedSet<E>(ss.subSet(fromElement,toElement),
-                                           type);
+            return checkedSortedSet(ss.subSet(fromElement,toElement), type);
         }
         public SortedSet<E> headSet(E toElement) {
-            return new CheckedSortedSet<E>(ss.headSet(toElement), type);
+            return checkedSortedSet(ss.headSet(toElement), type);
         }
         public SortedSet<E> tailSet(E fromElement) {
-            return new CheckedSortedSet<E>(ss.tailSet(fromElement), type);
+            return checkedSortedSet(ss.tailSet(fromElement), type);
         }
     }
 
     /**
      * Returns a dynamically typesafe view of the specified list.
      * Any attempt to insert an element of the wrong type will result in
-     * an immediate <tt>ClassCastException</tt>.  Assuming a list contains
+     * an immediate {@link ClassCastException}.  Assuming a list contains
      * no incorrectly typed elements prior to the time a dynamically typesafe
      * view is generated, and that all subsequent access to the list
      * takes place through the view, it is <i>guaranteed</i> that the
      * list cannot contain an incorrectly typed element.
      *
      * <p>A discussion of the use of dynamically typesafe views may be
-     * found in the documentation for the {@link #checkedCollection checkedCollection}
-     * method.
+     * found in the documentation for the {@link #checkedCollection
+     * checkedCollection} method.
      *
-     * <p>The returned list will be serializable if the specified list is
-     * serializable.
+     * <p>The returned list will be serializable if the specified list
+     * is serializable.
+     *
+     * <p>Since {@code null} is considered to be a value of any reference
+     * type, the returned list permits insertion of null elements whenever
+     * the backing list does.
      *
      * @param list the list for which a dynamically typesafe view is to be
      *             returned
-     * @param type the type of element that <tt>list</tt> is permitted to hold
+     * @param type the type of element that {@code list} is permitted to hold
      * @return a dynamically typesafe view of the specified list
      * @since 1.5
      */
@@ -2424,10 +2450,11 @@ public class Collections {
     /**
      * @serial include
      */
-    static class CheckedList<E> extends CheckedCollection<E>
+    static class CheckedList<E>
+        extends CheckedCollection<E>
                                 implements List<E>
     {
-        static final long serialVersionUID = 65247728283967356L;
+        private static final long serialVersionUID = 65247728283967356L;
         final List<E> list;
 
         CheckedList(List<E> list, Class<E> type) {
@@ -2453,22 +2480,14 @@ public class Collections {
         }
 
         public boolean addAll(int index, Collection<? extends E> c) {
-            // See CheckCollection.addAll, above, for an explanation
-            E[] a = null;
-            try {
-                a = c.toArray(zeroLengthElementArray());
-            } catch (ArrayStoreException e) {
-                throw new ClassCastException();
-            }
-
-            return list.addAll(index, Arrays.asList(a));
+            return list.addAll(index, checkedCopyOf(c));
         }
         public ListIterator<E> listIterator()   { return listIterator(0); }
 
         public ListIterator<E> listIterator(final int index) {
-            return new ListIterator<E>() {
-                ListIterator<E> i = list.listIterator(index);
+            final ListIterator<E> i = list.listIterator(index);
 
+            return new ListIterator<E>() {
                 public boolean hasNext()     { return i.hasNext(); }
                 public E next()              { return i.next(); }
                 public boolean hasPrevious() { return i.hasPrevious(); }
@@ -2513,14 +2532,14 @@ public class Collections {
     }
 
     /**
-     * Returns a dynamically typesafe view of the specified map.  Any attempt
-     * to insert a mapping whose key or value have the wrong type will result
-     * in an immediate <tt>ClassCastException</tt>.  Similarly, any attempt to
-     * modify the value currently associated with a key will result in an
-     * immediate <tt>ClassCastException</tt>, whether the modification is
-     * attempted directly through the map itself, or through a {@link
-     * Map.Entry} instance obtained from the map's {@link Map#entrySet()
-     * entry set} view.
+     * Returns a dynamically typesafe view of the specified map.
+     * Any attempt to insert a mapping whose key or value have the wrong
+     * type will result in an immediate {@link ClassCastException}.
+     * Similarly, any attempt to modify the value currently associated with
+     * a key will result in an immediate {@link ClassCastException},
+     * whether the modification is attempted directly through the map
+     * itself, or through a {@link Map.Entry} instance obtained from the
+     * map's {@link Map#entrySet() entry set} view.
      *
      * <p>Assuming a map contains no incorrectly typed keys or values
      * prior to the time a dynamically typesafe view is generated, and
@@ -2529,20 +2548,25 @@ public class Collections {
      * map cannot contain an incorrectly typed key or value.
      *
      * <p>A discussion of the use of dynamically typesafe views may be
-     * found in the documentation for the {@link #checkedCollection checkedCollection}
-     * method.
+     * found in the documentation for the {@link #checkedCollection
+     * checkedCollection} method.
      *
      * <p>The returned map will be serializable if the specified map is
      * serializable.
      *
+     * <p>Since {@code null} is considered to be a value of any reference
+     * type, the returned map permits insertion of null keys or values
+     * whenever the backing map does.
+     *
      * @param m the map for which a dynamically typesafe view is to be
      *             returned
-     * @param keyType the type of key that <tt>m</tt> is permitted to hold
-     * @param valueType the type of value that <tt>m</tt> is permitted to hold
+     * @param keyType the type of key that {@code m} is permitted to hold
+     * @param valueType the type of value that {@code m} is permitted to hold
      * @return a dynamically typesafe view of the specified map
      * @since 1.5
      */
-    public static <K, V> Map<K, V> checkedMap(Map<K, V> m, Class<K> keyType,
+    public static <K, V> Map<K, V> checkedMap(Map<K, V> m,
+                                              Class<K> keyType,
                                               Class<V> valueType) {
         return new CheckedMap<K,V>(m, keyType, valueType);
     }
@@ -2551,8 +2575,8 @@ public class Collections {
     /**
      * @serial include
      */
-    private static class CheckedMap<K,V> implements Map<K,V>,
-                                                         Serializable
+    private static class CheckedMap<K,V>
+        implements Map<K,V>, Serializable
     {
         private static final long serialVersionUID = 5742860141034234728L;
 
@@ -2561,15 +2585,21 @@ public class Collections {
         final Class<V> valueType;
 
         private void typeCheck(Object key, Object value) {
-            if (!keyType.isInstance(key))
-                throw new ClassCastException("Attempt to insert " +
-                    key.getClass() + " key into collection with key type "
-                    + keyType);
+            if (key != null && !keyType.isInstance(key))
+                throw new ClassCastException(badKeyMsg(key));
 
-            if (!valueType.isInstance(value))
-                throw new ClassCastException("Attempt to insert " +
-                    value.getClass() +" value into collection with value type "
-                    + valueType);
+            if (value != null && !valueType.isInstance(value))
+                throw new ClassCastException(badValueMsg(value));
+        }
+
+        private String badKeyMsg(Object key) {
+            return "Attempt to insert " + key.getClass() +
+                " key into map with key type " + keyType;
+        }
+
+        private String badValueMsg(Object value) {
+            return "Attempt to insert " + value.getClass() +
+                " value into map with value type " + valueType;
         }
 
         CheckedMap(Map<K, V> m, Class<K> keyType, Class<V> valueType) {
@@ -2598,45 +2628,26 @@ public class Collections {
             return m.put(key, value);
         }
 
+        @SuppressWarnings("unchecked")
         public void putAll(Map<? extends K, ? extends V> t) {
-            // See CheckCollection.addAll, above, for an explanation
-            K[] keys = null;
-            try {
-                keys = t.keySet().toArray(zeroLengthKeyArray());
-            } catch (ArrayStoreException e) {
-                throw new ClassCastException();
-            }
-            V[] values = null;
-            try {
-                values = t.values().toArray(zeroLengthValueArray());
-            } catch (ArrayStoreException e) {
-                throw new ClassCastException();
-            }
-
-            if (keys.length != values.length)
-                throw new ConcurrentModificationException();
-
-            for (int i = 0; i < keys.length; i++)
-                m.put(keys[i], values[i]);
+            // Satisfy the following goals:
+            // - good diagnostics in case of type mismatch
+            // - all-or-nothing semantics
+            // - protection from malicious t
+            // - correct behavior if t is a concurrent map
+            Object[] entries = t.entrySet().toArray();
+            List<Map.Entry<K,V>> checked =
+                new ArrayList<Map.Entry<K,V>>(entries.length);
+            for (Object o : entries) {
+                Map.Entry<?,?> e = (Map.Entry<?,?>) o;
+                Object k = e.getKey();
+                Object v = e.getValue();
+                typeCheck(k, v);
+                checked.add(
+                    new AbstractMap.SimpleImmutableEntry<K,V>((K) k, (V) v));
         }
-
-        // Lazily initialized
-        private K[] zeroLengthKeyArray   = null;
-        private V[] zeroLengthValueArray = null;
-
-        /*
-         * We don't need locking or volatile, because it's OK if we create
-         * several zeroLengthValueArrays, and they're immutable.
-         */
-        private K[] zeroLengthKeyArray() {
-            if (zeroLengthKeyArray == null)
-                zeroLengthKeyArray = (K[]) Array.newInstance(keyType, 0);
-            return zeroLengthKeyArray;
-        }
-        private V[] zeroLengthValueArray() {
-            if (zeroLengthValueArray == null)
-                zeroLengthValueArray = (V[]) Array.newInstance(valueType, 0);
-            return zeroLengthValueArray;
+            for (Map.Entry<K,V> e : checked)
+                m.put(e.getKey(), e.getValue());
         }
 
         private transient Set<Map.Entry<K,V>> entrySet = null;
@@ -2656,8 +2667,8 @@ public class Collections {
          * @serial exclude
          */
         static class CheckedEntrySet<K,V> implements Set<Map.Entry<K,V>> {
-            Set<Map.Entry<K,V>> s;
-            Class<V> valueType;
+            private final Set<Map.Entry<K,V>> s;
+            private final Class<V> valueType;
 
             CheckedEntrySet(Set<Map.Entry<K, V>> s, Class<V> valueType) {
                 this.s = s;
@@ -2668,38 +2679,30 @@ public class Collections {
             public boolean isEmpty()            { return s.isEmpty(); }
             public String toString()            { return s.toString(); }
             public int hashCode()               { return s.hashCode(); }
-            public boolean remove(Object o)     { return s.remove(o); }
-            public boolean removeAll(Collection<?> coll) {
-                return s.removeAll(coll);
-            }
-            public boolean retainAll(Collection<?> coll) {
-                return s.retainAll(coll);
-            }
-            public void clear() {
-                s.clear();
-            }
+            public void clear()      {        s.clear(); }
 
-            public boolean add(Map.Entry<K, V> e){
+            public boolean add(Map.Entry<K, V> e) {
                 throw new UnsupportedOperationException();
             }
             public boolean addAll(Collection<? extends Map.Entry<K, V>> coll) {
                 throw new UnsupportedOperationException();
             }
 
-
             public Iterator<Map.Entry<K,V>> iterator() {
-                return new Iterator<Map.Entry<K,V>>() {
-                    Iterator<Map.Entry<K, V>> i = s.iterator();
+                final Iterator<Map.Entry<K, V>> i = s.iterator();
+                final Class<V> valueType = this.valueType;
 
+                return new Iterator<Map.Entry<K,V>>() {
                     public boolean hasNext() { return i.hasNext(); }
                     public void remove()     { i.remove(); }
 
                     public Map.Entry<K,V> next() {
-                        return new CheckedEntry<K,V>(i.next(), valueType);
+                        return checkedEntry(i.next(), valueType);
                     }
                 };
             }
 
+            @SuppressWarnings("unchecked")
             public Object[] toArray() {
                 Object[] source = s.toArray();
 
@@ -2712,22 +2715,23 @@ public class Collections {
                                  new Object[source.length]);
 
                 for (int i = 0; i < source.length; i++)
-                    dest[i] = new CheckedEntry<K,V>((Map.Entry<K,V>)source[i],
+                    dest[i] = checkedEntry((Map.Entry<K,V>)source[i],
                                                     valueType);
                 return dest;
             }
 
+            @SuppressWarnings("unchecked")
             public <T> T[] toArray(T[] a) {
                 // We don't pass a to s.toArray, to avoid window of
                 // vulnerability wherein an unscrupulous multithreaded client
                 // could get his hands on raw (unwrapped) Entries from s.
-                Object[] arr = s.toArray(a.length==0 ? a : Arrays.copyOf(a, 0));
+                T[] arr = s.toArray(a.length==0 ? a : Arrays.copyOf(a, 0));
 
                 for (int i=0; i<arr.length; i++)
-                    arr[i] = new CheckedEntry<K,V>((Map.Entry<K,V>)arr[i],
+                    arr[i] = (T) checkedEntry((Map.Entry<K,V>)arr[i],
                                                    valueType);
                 if (arr.length > a.length)
-                    return (T[])arr;
+                    return arr;
 
                 System.arraycopy(arr, 0, a, 0, arr.length);
                 if (a.length > arr.length)
@@ -2744,21 +2748,46 @@ public class Collections {
             public boolean contains(Object o) {
                 if (!(o instanceof Map.Entry))
                     return false;
+                Map.Entry<?,?> e = (Map.Entry<?,?>) o;
                 return s.contains(
-                    new CheckedEntry<K,V>((Map.Entry<K,V>) o, valueType));
+                    (e instanceof CheckedEntry) ? e : checkedEntry(e, valueType));
             }
 
             /**
-             * The next two methods are overridden to protect against
-             * an unscrupulous collection whose contains(Object o) method
-             * senses when o is a Map.Entry, and calls o.setValue.
+             * The bulk collection methods are overridden to protect
+             * against an unscrupulous collection whose contains(Object o)
+             * method senses when o is a Map.Entry, and calls o.setValue.
              */
-            public boolean containsAll(Collection<?> coll) {
-                Iterator<?> e = coll.iterator();
-                while (e.hasNext())
-                    if (!contains(e.next())) // Invokes safe contains() above
+            public boolean containsAll(Collection<?> c) {
+                for (Object o : c)
+                    if (!contains(o)) // Invokes safe contains() above
                         return false;
                 return true;
+            }
+
+            public boolean remove(Object o) {
+                if (!(o instanceof Map.Entry))
+                    return false;
+                return s.remove(new AbstractMap.SimpleImmutableEntry
+                                <Object, Object>((Map.Entry<?,?>)o));
+            }
+
+            public boolean removeAll(Collection<?> c) {
+                return batchRemove(c, false);
+            }
+            public boolean retainAll(Collection<?> c) {
+                return batchRemove(c, true);
+            }
+            private boolean batchRemove(Collection<?> c, boolean complement) {
+                boolean modified = false;
+                Iterator<Map.Entry<K,V>> it = iterator();
+                while (it.hasNext()) {
+                    if (c.contains(it.next()) != complement) {
+                        it.remove();
+                        modified = true;
+                    }
+                }
+                return modified;
             }
 
             public boolean equals(Object o) {
@@ -2767,9 +2796,13 @@ public class Collections {
                 if (!(o instanceof Set))
                     return false;
                 Set<?> that = (Set<?>) o;
-                if (that.size() != s.size())
-                    return false;
-                return containsAll(that); // Invokes safe containsAll() above
+                return that.size() == s.size()
+                    && containsAll(that); // Invokes safe containsAll() above
+            }
+
+            static <K,V,T> CheckedEntry<K,V,T> checkedEntry(Map.Entry<K,V> e,
+                                                            Class<T> valueType) {
+                return new CheckedEntry<K,V,T>(e, valueType);
             }
 
             /**
@@ -2777,13 +2810,13 @@ public class Collections {
              * the client from modifying the backing Map, by short-circuiting
              * the setValue method, and it protects the backing Map against
              * an ill-behaved Map.Entry that attempts to modify another
-             * Map Entry when asked to perform an equality check.
+             * Map.Entry when asked to perform an equality check.
              */
-            private static class CheckedEntry<K,V> implements Map.Entry<K,V> {
-                private Map.Entry<K, V> e;
-                private Class<V> valueType;
+            private static class CheckedEntry<K,V,T> implements Map.Entry<K,V> {
+                private final Map.Entry<K, V> e;
+                private final Class<T> valueType;
 
-                CheckedEntry(Map.Entry<K, V> e, Class<V> valueType) {
+                CheckedEntry(Map.Entry<K, V> e, Class<T> valueType) {
                     this.e = e;
                     this.valueType = valueType;
                 }
@@ -2793,35 +2826,38 @@ public class Collections {
                 public int hashCode()    { return e.hashCode(); }
                 public String toString() { return e.toString(); }
 
-
                 public V setValue(V value) {
-                    if (!valueType.isInstance(value))
-                        throw new ClassCastException("Attempt to insert " +
-                        value.getClass() +
-                        " value into collection with value type " + valueType);
+                    if (value != null && !valueType.isInstance(value))
+                        throw new ClassCastException(badValueMsg(value));
                     return e.setValue(value);
                 }
 
+                private String badValueMsg(Object value) {
+                    return "Attempt to insert " + value.getClass() +
+                        " value into map with value type " + valueType;
+                }
+
                 public boolean equals(Object o) {
+                    if (o == this)
+                        return true;
                     if (!(o instanceof Map.Entry))
                         return false;
-                    Map.Entry t = (Map.Entry)o;
-                    return eq(e.getKey(),   t.getKey()) &&
-                           eq(e.getValue(), t.getValue());
+                    return e.equals(new AbstractMap.SimpleImmutableEntry
+                                    <Object, Object>((Map.Entry<?,?>)o));
                 }
             }
         }
     }
 
     /**
-     * Returns a dynamically typesafe view of the specified sorted map.  Any
-     * attempt to insert a mapping whose key or value have the wrong type will
-     * result in an immediate <tt>ClassCastException</tt>.  Similarly, any
-     * attempt to modify the value currently associated with a key will result
-     * in an immediate <tt>ClassCastException</tt>, whether the modification
-     * is attempted directly through the map itself, or through a {@link
-     * Map.Entry} instance obtained from the map's {@link Map#entrySet() entry
-     * set} view.
+     * Returns a dynamically typesafe view of the specified sorted map.
+     * Any attempt to insert a mapping whose key or value have the wrong
+     * type will result in an immediate {@link ClassCastException}.
+     * Similarly, any attempt to modify the value currently associated with
+     * a key will result in an immediate {@link ClassCastException},
+     * whether the modification is attempted directly through the map
+     * itself, or through a {@link Map.Entry} instance obtained from the
+     * map's {@link Map#entrySet() entry set} view.
      *
      * <p>Assuming a map contains no incorrectly typed keys or values
      * prior to the time a dynamically typesafe view is generated, and
@@ -2830,16 +2866,20 @@ public class Collections {
      * map cannot contain an incorrectly typed key or value.
      *
      * <p>A discussion of the use of dynamically typesafe views may be
-     * found in the documentation for the {@link #checkedCollection checkedCollection}
-     * method.
+     * found in the documentation for the {@link #checkedCollection
+     * checkedCollection} method.
      *
      * <p>The returned map will be serializable if the specified map is
      * serializable.
      *
+     * <p>Since {@code null} is considered to be a value of any reference
+     * type, the returned map permits insertion of null keys or values
+     * whenever the backing map does.
+     *
      * @param m the map for which a dynamically typesafe view is to be
      *             returned
-     * @param keyType the type of key that <tt>m</tt> is permitted to hold
-     * @param valueType the type of value that <tt>m</tt> is permitted to hold
+     * @param keyType the type of key that {@code m} is permitted to hold
+     * @param valueType the type of value that {@code m} is permitted to hold
      * @return a dynamically typesafe view of the specified map
      * @since 1.5
      */
@@ -2870,29 +2910,146 @@ public class Collections {
         public K lastKey()                        { return sm.lastKey(); }
 
         public SortedMap<K,V> subMap(K fromKey, K toKey) {
-            return new CheckedSortedMap<K,V>(sm.subMap(fromKey, toKey),
+            return checkedSortedMap(sm.subMap(fromKey, toKey),
                                              keyType, valueType);
         }
-
         public SortedMap<K,V> headMap(K toKey) {
-            return new CheckedSortedMap<K,V>(sm.headMap(toKey),
-                                             keyType, valueType);
+            return checkedSortedMap(sm.headMap(toKey), keyType, valueType);
         }
-
         public SortedMap<K,V> tailMap(K fromKey) {
-            return new CheckedSortedMap<K,V>(sm.tailMap(fromKey),
-                                             keyType, valueType);
+            return checkedSortedMap(sm.tailMap(fromKey), keyType, valueType);
         }
     }
 
-    // Miscellaneous
+    // Empty collections
+
+    /**
+     * Returns an iterator that has no elements.  More precisely,
+     *
+     * <ul compact>
+     *
+     * <li>{@link Iterator#hasNext hasNext} always returns {@code
+     * false}.
+     *
+     * <li>{@link Iterator#next next} always throws {@link
+     * NoSuchElementException}.
+     *
+     * <li>{@link Iterator#remove remove} always throws {@link
+     * IllegalStateException}.
+     *
+     * </ul>
+     *
+     * <p>Implementations of this method are permitted, but not
+     * required, to return the same object from multiple invocations.
+     *
+     * @return an empty iterator
+     * @since 1.7
+     */
+    @SuppressWarnings("unchecked")
+    static <T> Iterator<T> emptyIterator() {
+        return (Iterator<T>) EmptyIterator.EMPTY_ITERATOR;
+    }
+
+    private static class EmptyIterator<E> implements Iterator<E> {
+        static final EmptyIterator<Object> EMPTY_ITERATOR
+            = new EmptyIterator<Object>();
+
+        public boolean hasNext() { return false; }
+        public E next() { throw new NoSuchElementException(); }
+        public void remove() { throw new IllegalStateException(); }
+    }
+
+    /**
+     * Returns a list iterator that has no elements.  More precisely,
+     *
+     * <ul compact>
+     *
+     * <li>{@link Iterator#hasNext hasNext} and {@link
+     * ListIterator#hasPrevious hasPrevious} always return {@code
+     * false}.
+     *
+     * <li>{@link Iterator#next next} and {@link ListIterator#previous
+     * previous} always throw {@link NoSuchElementException}.
+     *
+     * <li>{@link Iterator#remove remove} and {@link ListIterator#set
+     * set} always throw {@link IllegalStateException}.
+     *
+     * <li>{@link ListIterator#add add} always throws {@link
+     * UnsupportedOperationException}.
+     *
+     * <li>{@link ListIterator#nextIndex nextIndex} always returns
+     * {@code 0} .
+     *
+     * <li>{@link ListIterator#previousIndex previousIndex} always
+     * returns {@code -1}.
+     *
+     * </ul>
+     *
+     * <p>Implementations of this method are permitted, but not
+     * required, to return the same object from multiple invocations.
+     *
+     * @return an empty list iterator
+     * @since 1.7
+     */
+    @SuppressWarnings("unchecked")
+    static <T> ListIterator<T> emptyListIterator() {
+        return (ListIterator<T>) EmptyListIterator.EMPTY_ITERATOR;
+    }
+
+    private static class EmptyListIterator<E>
+        extends EmptyIterator<E>
+        implements ListIterator<E>
+    {
+        static final EmptyListIterator<Object> EMPTY_ITERATOR
+            = new EmptyListIterator<Object>();
+
+        public boolean hasPrevious() { return false; }
+        public E previous() { throw new NoSuchElementException(); }
+        public int nextIndex()     { return 0; }
+        public int previousIndex() { return -1; }
+        public void set(E e) { throw new IllegalStateException(); }
+        public void add(E e) { throw new UnsupportedOperationException(); }
+    }
+
+    /**
+     * Returns an enumeration that has no elements.  More precisely,
+     *
+     * <ul compact>
+     *
+     * <li>{@link Enumeration#hasMoreElements hasMoreElements} always
+     * returns {@code false}.
+     *
+     * <li> {@link Enumeration#nextElement nextElement} always throws
+     * {@link NoSuchElementException}.
+     *
+     * </ul>
+     *
+     * <p>Implementations of this method are permitted, but not
+     * required, to return the same object from multiple invocations.
+     *
+     * @return an empty enumeration
+     * @since 1.7
+     */
+    @SuppressWarnings("unchecked")
+    static <T> Enumeration<T> emptyEnumeration() {
+        return (Enumeration<T>) EmptyEnumeration.EMPTY_ENUMERATION;
+    }
+
+    private static class EmptyEnumeration<E> implements Enumeration<E> {
+        static final EmptyEnumeration<Object> EMPTY_ENUMERATION
+            = new EmptyEnumeration<Object>();
+
+        public boolean hasMoreElements() { return false; }
+        public E nextElement() { throw new NoSuchElementException(); }
+    }
 
     /**
      * The empty set (immutable).  This set is serializable.
      *
      * @see #emptySet()
      */
-    public static final Set EMPTY_SET = new EmptySet();
+    @SuppressWarnings("unchecked")
+    public static final Set EMPTY_SET = new EmptySet<Object>();
 
     /**
      * Returns the empty set (immutable).  This set is serializable.
@@ -2910,6 +3067,7 @@ public class Collections {
      * @see #EMPTY_SET
      * @since 1.5
      */
+    @SuppressWarnings("unchecked")
     public static final <T> Set<T> emptySet() {
 	return (Set<T>) EMPTY_SET;
     }
@@ -2917,27 +3075,27 @@ public class Collections {
     /**
      * @serial include
      */
-    private static class EmptySet extends AbstractSet<Object> implements Serializable {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
+    private static class EmptySet<E>
+        extends AbstractSet<E>
+        implements Serializable
+    {
 	private static final long serialVersionUID = 1582296315990362920L;
 
-        public Iterator<Object> iterator() {
-            return new Iterator<Object>() {
-                public boolean hasNext() {
-                    return false;
-                }
-                public Object next() {
-                    throw new NoSuchElementException();
-                }
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
+        public Iterator<E> iterator() { return emptyIterator(); }
 
         public int size() {return 0;}
+        public boolean isEmpty() {return true;}
 
         public boolean contains(Object obj) {return false;}
+        public boolean containsAll(Collection<?> c) { return c.isEmpty(); }
+
+        public Object[] toArray() { return new Object[0]; }
+
+        public <T> T[] toArray(T[] a) {
+            if (a.length > 0)
+                a[0] = null;
+            return a;
+        }
 
         // Preserves singleton property
         private Object readResolve() {
@@ -2950,7 +3108,8 @@ public class Collections {
      *
      * @see #emptyList()
      */
-    public static final List EMPTY_LIST = new EmptyList();
+    @SuppressWarnings("unchecked")
+    public static final List EMPTY_LIST = new EmptyList<Object>();
 
     /**
      * Returns the empty list (immutable).  This list is serializable.
@@ -2967,6 +3126,7 @@ public class Collections {
      * @see #EMPTY_LIST
      * @since 1.5
      */
+    @SuppressWarnings("unchecked")
     public static final <T> List<T> emptyList() {
 	return (List<T>) EMPTY_LIST;
     }
@@ -2974,19 +3134,41 @@ public class Collections {
     /**
      * @serial include
      */
-    private static class EmptyList
-	extends AbstractList<Object>
+    private static class EmptyList<E>
+        extends AbstractList<E>
 	implements RandomAccess, Serializable {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
 	private static final long serialVersionUID = 8842843931221139166L;
 
+        public Iterator<E> iterator() {
+            return emptyIterator();
+        }
+        public ListIterator<E> listIterator() {
+            return emptyListIterator();
+        }
+
         public int size() {return 0;}
+        public boolean isEmpty() {return true;}
 
         public boolean contains(Object obj) {return false;}
+        public boolean containsAll(Collection<?> c) { return c.isEmpty(); }
 
-        public Object get(int index) {
+        public Object[] toArray() { return new Object[0]; }
+
+        public <T> T[] toArray(T[] a) {
+            if (a.length > 0)
+                a[0] = null;
+            return a;
+        }
+
+        public E get(int index) {
             throw new IndexOutOfBoundsException("Index: "+index);
         }
+
+        public boolean equals(Object o) {
+            return (o instanceof List) && ((List<?>)o).isEmpty();
+        }
+
+        public int hashCode() { return 1; }
 
         // Preserves singleton property
         private Object readResolve() {
@@ -3000,7 +3182,8 @@ public class Collections {
      * @see #emptyMap()
      * @since 1.3
      */
-    public static final Map EMPTY_MAP = new EmptyMap();
+    @SuppressWarnings("unchecked")
+    public static final Map EMPTY_MAP = new EmptyMap<Object,Object>();
 
     /**
      * Returns the empty map (immutable).  This map is serializable.
@@ -3017,36 +3200,28 @@ public class Collections {
      * @see #EMPTY_MAP
      * @since 1.5
      */
+    @SuppressWarnings("unchecked")
     public static final <K,V> Map<K,V> emptyMap() {
 	return (Map<K,V>) EMPTY_MAP;
     }
 
-    private static class EmptyMap
-	extends AbstractMap<Object,Object>
-	implements Serializable {
-
+    private static class EmptyMap<K,V>
+        extends AbstractMap<K,V>
+        implements Serializable
+    {
         private static final long serialVersionUID = 6428348081105594320L;
 
         public int size()                          {return 0;}
-
         public boolean isEmpty()                   {return true;}
-
         public boolean containsKey(Object key)     {return false;}
-
         public boolean containsValue(Object value) {return false;}
-
-	public Object get(Object key)              {return null;}
-
-        public Set<Object> keySet()                {return Collections.<Object>emptySet();}
-
-        public Collection<Object> values()         {return Collections.<Object>emptySet();}
-
-        public Set<Map.Entry<Object,Object>> entrySet() {
-	    return Collections.emptySet();
-	}
+        public V get(Object key)                   {return null;}
+        public Set<K> keySet()                     {return emptySet();}
+        public Collection<V> values()              {return emptySet();}
+        public Set<Map.Entry<K,V>> entrySet()      {return emptySet();}
 
         public boolean equals(Object o) {
-            return (o instanceof Map) && ((Map)o).size()==0;
+            return (o instanceof Map) && ((Map<?,?>)o).isEmpty();
         }
 
         public int hashCode()                      {return 0;}
@@ -3056,6 +3231,8 @@ public class Collections {
             return EMPTY_MAP;
         }
     }
+
+    // Singleton collections
 
     /**
      * Returns an immutable set containing only the specified object.
@@ -3068,21 +3245,7 @@ public class Collections {
 	return new SingletonSet<T>(o);
     }
 
-    /**
-     * @serial include
-     */
-    private static class SingletonSet<E>
-	extends AbstractSet<E>
-	implements Serializable
-    {
-	// use serialVersionUID from JDK 1.2.2 for interoperability
-	private static final long serialVersionUID = 3193687207550431679L;
-
-        final private E element;
-
-        SingletonSet(E e) {element = e;}
-
-        public Iterator<E> iterator() {
+    static <E> Iterator<E> singletonIterator(final E e) {
             return new Iterator<E>() {
                 private boolean hasNext = true;
                 public boolean hasNext() {
@@ -3091,7 +3254,7 @@ public class Collections {
                 public E next() {
                     if (hasNext) {
                         hasNext = false;
-                        return element;
+                    return e;
                     }
                     throw new NoSuchElementException();
                 }
@@ -3099,6 +3262,23 @@ public class Collections {
                     throw new UnsupportedOperationException();
                 }
             };
+        }
+
+    /**
+     * @serial include
+     */
+    private static class SingletonSet<E>
+        extends AbstractSet<E>
+        implements Serializable
+    {
+        private static final long serialVersionUID = 3193687207550431679L;
+
+        final private E element;
+
+        SingletonSet(E e) {element = e;}
+
+        public Iterator<E> iterator() {
+            return singletonIterator(element);
         }
 
         public int size() {return 1;}
@@ -3122,11 +3302,15 @@ public class Collections {
 	extends AbstractList<E>
 	implements RandomAccess, Serializable {
 
-        static final long serialVersionUID = 3093736618740652951L;
+        private static final long serialVersionUID = 3093736618740652951L;
 
         private final E element;
 
         SingletonList(E obj)                {element = obj;}
+
+        public Iterator<E> iterator() {
+            return singletonIterator(element);
+        }
 
         public int size()                   {return 1;}
 
@@ -3201,6 +3385,8 @@ public class Collections {
 
     }
 
+    // Miscellaneous
+
     /**
      * Returns an immutable list consisting of <tt>n</tt> copies of the
      * specified object.  The newly allocated data object is tiny (it contains
@@ -3229,7 +3415,7 @@ public class Collections {
 	extends AbstractList<E>
 	implements RandomAccess, Serializable
     {
-        static final long serialVersionUID = 2739099268398711800L;
+        private static final long serialVersionUID = 2739099268398711800L;
 
         final int n;
         final E element;
@@ -3293,7 +3479,7 @@ public class Collections {
 	    if (fromIndex > toIndex)
 		throw new IllegalArgumentException("fromIndex(" + fromIndex +
 						   ") > toIndex(" + toIndex + ")");
-	    return new CopiesList(toIndex - fromIndex, element);
+            return new CopiesList<E>(toIndex - fromIndex, element);
 	}
     }
 
@@ -3326,10 +3512,9 @@ public class Collections {
     private static class ReverseComparator
 	implements Comparator<Comparable<Object>>, Serializable {
 
-	// use serialVersionUID from JDK 1.2.2 for interoperability
 	private static final long serialVersionUID = 7207038068494060240L;
 
-	private static final ReverseComparator REVERSE_ORDER
+        static final ReverseComparator REVERSE_ORDER
 	    = new ReverseComparator();
 
         public int compare(Comparable<Object> c1, Comparable<Object> c2) {
@@ -3378,7 +3563,7 @@ public class Collections {
          *
          * @serial
          */
-        private final Comparator<T> cmp;
+        final Comparator<T> cmp;
 
         ReverseComparator2(Comparator<T> cmp) {
             assert cmp != null;
@@ -3411,7 +3596,7 @@ public class Collections {
      */
     public static <T> Enumeration<T> enumeration(final Collection<T> c) {
 	return new Enumeration<T>() {
-	    Iterator<T> i = c.iterator();
+            private final Iterator<T> i = c.iterator();
 
 	    public boolean hasMoreElements() {
 		return i.hasNext();
@@ -3448,8 +3633,8 @@ public class Collections {
     /**
      * Returns true if the specified arguments are equal, or both null.
      */
-    private static boolean eq(Object o1, Object o2) {
-        return (o1==null ? o2==null : o1.equals(o2));
+    static boolean eq(Object o1, Object o2) {
+        return o1==null ? o2==null : o1.equals(o2);
     }
 
     /**

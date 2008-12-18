@@ -31,7 +31,6 @@ package java.util;
  * explicit subtypes of this exception which correspond to specific errors
  * should be instantiated.
  *
- * @version 	1.10, 05/05/07
  * @since 1.5
  */
 public class IllegalFormatException extends IllegalArgumentException {

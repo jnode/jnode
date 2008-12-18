@@ -54,7 +54,6 @@ import java.security.PrivilegedAction;
  *
  *
  * @author Mark Reinhold
- * @version 1.10, 07/05/05
  */
 
 public class Cleaner

@@ -44,7 +44,6 @@ package java.util;
  * Signals that a resource is missing.
  * @see java.lang.Exception
  * @see ResourceBundle
- * @version     1.25, 05/05/07
  * @author      Mark Davis
  * @since       JDK1.1
  */

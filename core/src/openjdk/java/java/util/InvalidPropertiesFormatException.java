@@ -38,7 +38,6 @@ import java.io.IOException;
  * interface from Exception, it is not intended to be Serializable. Appropriate
  * serialization methods are implemented to throw NotSerializableException.
  *
- * @version 1.10 07/05/05
  * @see     Properties
  * @since   1.5
  * @serial exclude

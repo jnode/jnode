@@ -156,7 +156,6 @@ import java.lang.ref.WeakReference;
  * All the other logging methods are implemented as calls on this
  * log(LogRecord) method.
  *
- * @version 1.56, 05/05/07
  * @since 1.4
  */
 
@@ -166,7 +165,7 @@ public class Logger {
     private static final int offValue = Level.OFF.intValue();
     private LogManager manager;
     private String name;
-    private ArrayList handlers;
+    private ArrayList<Handler> handlers;
     private String resourceBundleName;
     private boolean useParentHandlers = true;
     private Filter filter;
@@ -182,26 +181,23 @@ public class Logger {
     // We keep weak references from parents to children, but strong
     // references from children to parents.
     private Logger parent;    // our nearest parent.
-    private ArrayList kids;   // WeakReferences to loggers that have us as parent
+    private ArrayList<WeakReference<Logger>> kids;   // WeakReferences to loggers that have us as parent
     private Level levelObject;
     private volatile int levelValue;  // current effective level value
 
     /**
      * GLOBAL_LOGGER_NAME is a name for the global logger.
-     * 
+     * This name is provided as a convenience to developers who are making
+     * casual use of the Logging package.  Developers who are making serious
+     * use of the logging package (for example in products) should create
+     * and use their own Logger objects, with appropriate names, so that
+     * logging can be controlled on a suitable per-Logger granularity.
+     * <p>
+     * The preferred way to get the global logger object is via the call
+     * <code>Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)</code>.
      * @since 1.6
      */
     public static final String GLOBAL_LOGGER_NAME = "global";
-
-    /**
-     * Return global logger object with the name Logger.GLOBAL_LOGGER_NAME.
-     * 
-     * @return global logger object
-     * @since 1.7
-     */
-    public static final Logger getGlobal() {
-        return global;
-    }
 
     /**
      * The "global" Logger object is provided as a convenience to developers
@@ -215,12 +211,8 @@ public class Logger {
      * The field must be initialized by the Logger class initialization
      * which may cause deadlocks with the LogManager class initialization.
      * In such cases two class initialization wait for each other to complete.
-     * The preferred way to get the global logger object is via the call
-     * <code>Logger.getGlobal()</code>.
-     * For compatibility with old JDK versions where the
-     * <code>Logger.getGlobal()</code> is not available use the call
-     * <code>Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)</code>
-     * or <code>Logger.getLogger("global")</code>.
+     * As of JDK version 1.6, the preferred way to get the global logger object
+     * is via the call <code>Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)</code>.
      */
     @Deprecated
     public static final Logger global = new Logger(GLOBAL_LOGGER_NAME);
@@ -297,13 +289,7 @@ public class Logger {
      */
     public static synchronized Logger getLogger(String name) {
 	LogManager manager = LogManager.getLogManager();
-	Logger result = manager.getLogger(name);
-	if (result == null) {
-	    result = new Logger(name, null);
-	    manager.addLogger(result);
-	    result = manager.getLogger(name);
-	}
-	return result;
+        return manager.demandLogger(name);
     }
 
     /**
@@ -338,14 +324,7 @@ public class Logger {
      */
     public static synchronized Logger getLogger(String name, String resourceBundleName) {
 	LogManager manager = LogManager.getLogManager();
-	Logger result = manager.getLogger(name);
-	if (result == null) {
-	    // Create a new logger.
-	    // Note: we may get a MissingResourceException here.
-	    result = new Logger(name, resourceBundleName);
-	    manager.addLogger(result);
-	    result = manager.getLogger(name);
-	}
+        Logger result = manager.demandLogger(name);
 	if (result.resourceBundleName == null) {
 	    // Note: we may get a MissingResourceException here.
 	    result.setupResourceInfo(resourceBundleName);
@@ -452,7 +431,7 @@ public class Logger {
      * @exception  SecurityException  if a security manager exists and if
      *             the caller does not have LoggingPermission("control").
      */
-    public void setFilter(Filter newFilter) throws SecurityException {
+    public synchronized void setFilter(Filter newFilter) throws SecurityException {
 	checkAccess();
 	filter = newFilter;
     }
@@ -462,7 +441,7 @@ public class Logger {
      *
      * @return  a filter object (may be null)
      */
-    public Filter getFilter() {
+    public synchronized Filter getFilter() {
 	return filter;
     }
 
@@ -1201,7 +1180,7 @@ public class Logger {
 	handler.getClass();
 	checkAccess();
 	if (handlers == null) {
-	    handlers = new ArrayList();
+            handlers = new ArrayList<Handler>();
 	}
 	handlers.add(handler);
     }
@@ -1235,9 +1214,7 @@ public class Logger {
 	if (handlers == null) {
 	    return emptyHandlers;
 	}
-	Handler result[] = new Handler[handlers.size()];
-	result = (Handler [])handlers.toArray(result);
-	return result;
+        return handlers.toArray(new Handler[handlers.size()]);
     }
 
     /**
@@ -1405,9 +1382,9 @@ public class Logger {
 	    // Remove ourself from any previous parent.
 	    if (parent != null) {
 		// assert parent.kids != null;
-		for (Iterator iter = parent.kids.iterator(); iter.hasNext(); ) {
-		    WeakReference ref = (WeakReference) iter.next();
-		    Logger kid = (Logger) ref.get();
+                for (Iterator<WeakReference<Logger>> iter = parent.kids.iterator(); iter.hasNext(); ) {
+                    WeakReference<Logger> ref =  iter.next();
+                    Logger kid =  ref.get();
 		    if (kid == this) {
 		        iter.remove();
 			break;
@@ -1419,9 +1396,9 @@ public class Logger {
 	    // Set our new parent.
 	    parent = newParent;
 	    if (parent.kids == null) {
-	        parent.kids = new ArrayList(2);
+                parent.kids = new ArrayList<WeakReference<Logger>>(2);
 	    }
-	    parent.kids.add(new WeakReference(this));
+            parent.kids.add(new WeakReference<Logger>(this));
 
 	    // As a result of the reparenting, the effective level
 	    // may have changed for us and our children.
@@ -1461,8 +1438,8 @@ public class Logger {
 	// Recursively update the level on each of our kids.
 	if (kids != null) {
 	    for (int i = 0; i < kids.size(); i++) {
-	        WeakReference ref = (WeakReference)kids.get(i);
-		Logger kid = (Logger) ref.get();
+                WeakReference<Logger> ref = kids.get(i);
+                Logger kid =  ref.get();
 		if (kid != null) {
 		    kid.updateEffectiveLevel();
  		}

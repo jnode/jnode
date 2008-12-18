@@ -43,7 +43,6 @@ package java.util;
  *   Deque<Integer> stack = new ArrayDeque<Integer>();}</pre>
  *
  * @author  Jonathan Payne
- * @version 1.36, 05/05/07
  * @since   JDK1.0
  */
 public

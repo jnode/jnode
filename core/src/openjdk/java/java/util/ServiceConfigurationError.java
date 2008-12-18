@@ -53,7 +53,6 @@ package java.util;
  *
  *
  * @author Mark Reinhold
- * @version 1.11, 07/05/05
  * @since 1.6
  */
 

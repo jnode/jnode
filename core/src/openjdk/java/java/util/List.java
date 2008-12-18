@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -91,7 +91,6 @@ package java.util;
  *
  * @author  Josh Bloch
  * @author  Neal Gafter
- * @version 1.55, 05/05/07
  * @see Collection
  * @see Set
  * @see ArrayList
@@ -345,8 +344,8 @@ public interface List<E> extends Collection<E> {
     /**
      * Retains only the elements in this list that are contained in the
      * specified collection (optional operation).  In other words, removes
-     * from this list all the elements that are not contained in the specified
-     * collection.
+     * from this list all of its elements that are not contained in the
+     * specified collection.
      *
      * @param c collection containing elements to be retained in this list
      * @return <tt>true</tt> if this list changed as a result of the call
@@ -395,11 +394,8 @@ public interface List<E> extends Collection<E> {
      * is defined to be the result of the following calculation:
      * <pre>
      *  int hashCode = 1;
-     *  Iterator&lt;E&gt; i = list.iterator();
-     *  while (i.hasNext()) {
-     *      E obj = i.next();
-     *      hashCode = 31*hashCode + (obj==null ? 0 : obj.hashCode());
-     *  }
+     *  for (E e : list)
+     *      hashCode = 31*hashCode + (e==null ? 0 : e.hashCode());
      * </pre>
      * This ensures that <tt>list1.equals(list2)</tt> implies that
      * <tt>list1.hashCode()==list2.hashCode()</tt> for any two lists,
@@ -531,19 +527,19 @@ public interface List<E> extends Collection<E> {
     ListIterator<E> listIterator();
 
     /**
-     * Returns a list iterator of the elements in this list (in proper
-     * sequence), starting at the specified position in this list.
+     * Returns a list iterator over the elements in this list (in proper
+     * sequence), starting at the specified position in the list.
      * The specified index indicates the first element that would be
      * returned by an initial call to {@link ListIterator#next next}.
      * An initial call to {@link ListIterator#previous previous} would
      * return the element with the specified index minus one.
      *
-     * @param index index of first element to be returned from the
-     *              list iterator (by a call to the <tt>next</tt> method)
-     * @return a list iterator of the elements in this list (in proper
-     *         sequence), starting at the specified position in this list
+     * @param index index of the first element to be returned from the
+     *        list iterator (by a call to {@link ListIterator#next next})
+     * @return a list iterator over the elements in this list (in proper
+     *         sequence), starting at the specified position in the list
      * @throws IndexOutOfBoundsException if the index is out of range
-     *         (<tt>index &lt; 0 || index &gt; size()</tt>)
+     *         ({@code index < 0 || index > size()})
      */
     ListIterator<E> listIterator(int index);
 

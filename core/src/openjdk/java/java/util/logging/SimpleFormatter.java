@@ -34,7 +34,6 @@ import java.util.Date;
  * Print a brief summary of the LogRecord in a human readable
  * format.  The summary will typically be 1 or 2 lines.
  *
- * @version 1.22, 05/05/07
  * @since 1.4
  */
 
@@ -48,7 +47,7 @@ public class SimpleFormatter extends Formatter {
 
     // Line separator string.  This is the value of the line.separator
     // property at the moment that the SimpleFormatter was created.
-    private String lineSeparator = (String) java.security.AccessController.doPrivileged(
+    private String lineSeparator = java.security.AccessController.doPrivileged(
                new sun.security.action.GetPropertyAction("line.separator"));
 
     /**

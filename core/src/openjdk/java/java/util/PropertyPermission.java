@@ -82,7 +82,6 @@ import sun.security.util.SecurityConstants;
  * @see java.security.PermissionCollection
  * @see java.lang.SecurityManager
  *
- * @version 1.41 07/05/05
  *
  * @author Roland Schemers
  * @since 1.2
@@ -430,7 +429,6 @@ public final class PropertyPermission extends BasicPermission {
  * @see java.security.Permissions
  * @see java.security.PermissionCollection
  *
- * @version 1.41, 05/05/07
  *
  * @author Roland Schemers
  *

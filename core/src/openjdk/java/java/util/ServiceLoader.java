@@ -175,7 +175,6 @@ import java.util.NoSuchElementException;
  *         The type of the service to be loaded by this loader
  *
  * @author Mark Reinhold
- * @version 1.16, 07/05/05
  * @since 1.6
  */
 

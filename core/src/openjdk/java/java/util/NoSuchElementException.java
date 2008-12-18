@@ -31,7 +31,6 @@ package java.util;
  * elements in the enumeration. 
  *
  * @author  unascribed
- * @version 1.28, 05/05/07
  * @see     java.util.Enumeration
  * @see     java.util.Enumeration#nextElement()
  * @since   JDK1.0

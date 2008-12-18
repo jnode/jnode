@@ -73,7 +73,6 @@ import sun.misc.SharedSecrets;
  * Java Collections Framework</a>.
  *
  * @author Josh Bloch
- * @version 1.22, 05/05/07
  * @see EnumSet
  * @since 1.5
  */

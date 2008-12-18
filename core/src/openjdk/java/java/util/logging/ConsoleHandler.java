@@ -52,7 +52,6 @@ import java.net.*;
  *	  the default platform encoding).
  * </ul>
  * <p>
- * @version 1.19, 05/05/07
  * @since 1.4
  */
 
@@ -116,4 +115,3 @@ public class ConsoleHandler extends StreamHandler {
 	flush();
     }
 }
-

@@ -35,7 +35,6 @@ import java.lang.reflect.*;
  * limited because only trusted code can obtain instances of it.
  *
  * @author John R. Rose
- * @version  1.27, 07/05/05
  * @see #getUnsafe
  */
 @org.jnode.vm.annotation.MagicPermission

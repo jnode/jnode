@@ -634,7 +634,7 @@ class TimerTickThread extends Thread {
 
     public void run() {
         do {
-	    ((Timeable)timer.owner).tick(timer);
+            timer.owner.tick(timer);
             synchronized (TimerThread.timerThread) {
 		synchronized (timer) {
 		    if (lastSleepUntil == timer.sleepUntil) {

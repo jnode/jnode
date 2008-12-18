@@ -61,7 +61,6 @@ import java.net.*;
  * The output IO stream is buffered, but is flushed after each
  * <tt>LogRecord</tt> is written.
  *
- * @version 1.25, 05/05/07
  * @since 1.4
  */
 

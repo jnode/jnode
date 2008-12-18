@@ -95,7 +95,6 @@ import java.util.NoSuchElementException;
  * key set, the value set, and the entry set to yield successively smaller
  * numbers of elements.
  *
- * @version	1.15, 07/05/05
  * @author	Mark Reinhold
  * @since	1.2
  * @see		java.util.HashMap

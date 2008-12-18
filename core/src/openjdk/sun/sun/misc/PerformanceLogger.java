@@ -57,6 +57,11 @@ import java.io.Writer;
  * to the console and a value of "file:<filename>" will cause 
  * that given filename to be created and used for all output.
  * <P>
+ * By default, times are measured using System.currentTimeMillis().  To use
+ * System.nanoTime() instead, add the command-line parameter:<BR>
+       -Dsun.perflog.nano=true
+ * <BR>
+ * <P>
  * <B>Warning: Use at your own risk!</B> 
  * This class is intended for internal testing 
  * purposes only and may be removed at any time.  More
@@ -72,16 +77,26 @@ public class PerformanceLogger {
     private static final int LAST_RESERVED  = START_INDEX;
 
     private static boolean perfLoggingOn = false;
+    private static boolean useNanoTime = false;
     private static Vector times;
     private static String logFileName = null;
     private static Writer logWriter = null;
 
     static {
         String perfLoggingProp = 
-	    (String) java.security.AccessController.doPrivileged(
+            java.security.AccessController.doPrivileged(
             new sun.security.action.GetPropertyAction("sun.perflog"));
 	if (perfLoggingProp != null) {
 	    perfLoggingOn = true;
+
+            // Check if we should use nanoTime
+            String perfNanoProp =
+                java.security.AccessController.doPrivileged(
+                new sun.security.action.GetPropertyAction("sun.perflog.nano"));
+            if (perfNanoProp != null) {
+                useNanoTime = true;
+            }
+
 	    // Now, figure out what the user wants to do with the data
 	    if (perfLoggingProp.regionMatches(true, 0, "file:", 0, 5)) {
 		logFileName = perfLoggingProp.substring(5);
@@ -149,6 +164,17 @@ public class PerformanceLogger {
     }
 
     /**
+     * Return the current time, in millis or nanos as appropriate
+     */
+    private static long getCurrentTime() {
+        if (useNanoTime) {
+            return System.nanoTime();
+        } else {
+            return System.currentTimeMillis();
+        }
+    }
+
+    /**
      * Sets the start time.  Ideally, this is the earliest time available
      * during the startup of a Java applet or application.  This time is
      * later used to analyze the difference between the initial startup 
@@ -156,7 +182,7 @@ public class PerformanceLogger {
      */
     public static void setStartTime(String message) {
 	if (loggingEnabled()) {
-	    long nowTime = System.currentTimeMillis();
+            long nowTime = getCurrentTime();
 	    setStartTime(message, nowTime);
 	}
     }
@@ -193,7 +219,7 @@ public class PerformanceLogger {
      */
     public static int setTime(String message) {
 	if (loggingEnabled()) {
-	    long nowTime = System.currentTimeMillis();
+            long nowTime = getCurrentTime();
 	    return setTime(message, nowTime);
 	} else {
 	    return 0;
@@ -234,7 +260,7 @@ public class PerformanceLogger {
     }
 
     /**
-     * Returns time at given index.
+     * Returns message at given index.
      */
     public static String getMessageAtIndex(int index) {
 	if (loggingEnabled()) {

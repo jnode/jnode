@@ -81,7 +81,6 @@ package java.util;
  * Java Collections Framework</a>.
  *
  * @author  Josh Bloch
- * @version 1.73, 05/05/07
  * @see	    List
  * @see	    ArrayList
  * @see	    Vector

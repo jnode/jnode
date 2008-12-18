@@ -122,7 +122,6 @@ import java.util.TreeSet;
  * class from within a privileged security context.
  *
  * @author Mark Reinhold
- * @version 1.18, 07/05/05
  * @since 1.3
  */
 

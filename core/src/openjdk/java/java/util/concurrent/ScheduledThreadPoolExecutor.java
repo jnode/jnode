@@ -177,6 +177,9 @@ public class ScheduledThreadPoolExecutor
          */
         private final long period;
 
+        /** The actual task to be re-enqueued by reExecutePeriodic */
+        RunnableScheduledFuture<V> outerTask = this;
+
         /**
          * Creates a one-shot action with given nanoTime-based trigger time.
          */
@@ -263,7 +266,7 @@ public class ScheduledThreadPoolExecutor
                 ScheduledFutureTask.super.run();
             else if (ScheduledFutureTask.super.runAndReset()) {
                 setNextRunTime();
-                reExecutePeriodic(this);
+                reExecutePeriodic(outerTask);
             }
         }
     }
@@ -450,10 +453,6 @@ public class ScheduledThreadPoolExecutor
               new DelayedWorkQueue(), threadFactory, handler);
     }
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     */
     public ScheduledFuture<?> schedule(Runnable command,
                                        long delay,
                                        TimeUnit unit) {
@@ -462,15 +461,11 @@ public class ScheduledThreadPoolExecutor
         if (delay < 0) delay = 0;
         long triggerTime = now() + unit.toNanos(delay);
         RunnableScheduledFuture<?> t = decorateTask(command,
-            new ScheduledFutureTask<Boolean>(command, null, triggerTime));
+            new ScheduledFutureTask<Void>(command, null, triggerTime));
         delayedExecute(t);
         return t;
     }
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     */
     public <V> ScheduledFuture<V> schedule(Callable<V> callable,
                                            long delay,
                                            TimeUnit unit) {
@@ -484,11 +479,6 @@ public class ScheduledThreadPoolExecutor
         return t;
     }
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     * @throws IllegalArgumentException   {@inheritDoc}
-     */
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,
                                                   long initialDelay,
                                                   long period,
@@ -499,20 +489,17 @@ public class ScheduledThreadPoolExecutor
             throw new IllegalArgumentException();
         if (initialDelay < 0) initialDelay = 0;
         long triggerTime = now() + unit.toNanos(initialDelay);
-        RunnableScheduledFuture<?> t = decorateTask(command,
-            new ScheduledFutureTask<Object>(command,
+        ScheduledFutureTask<Void> sft =
+            new ScheduledFutureTask<Void>(command,
                                             null,
                                             triggerTime,
-                                            unit.toNanos(period)));
+                                          unit.toNanos(period));
+        RunnableScheduledFuture<Void> t = decorateTask(command, sft);
+        sft.outerTask = t;
         delayedExecute(t);
         return t;
     }
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     * @throws IllegalArgumentException   {@inheritDoc}
-     */
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
                                                      long initialDelay,
                                                      long delay,
@@ -523,11 +510,13 @@ public class ScheduledThreadPoolExecutor
             throw new IllegalArgumentException();
         if (initialDelay < 0) initialDelay = 0;
         long triggerTime = now() + unit.toNanos(initialDelay);
-        RunnableScheduledFuture<?> t = decorateTask(command,
-            new ScheduledFutureTask<Boolean>(command,
+        ScheduledFutureTask<Void> sft =
+            new ScheduledFutureTask<Void>(command,
                                              null,
                                              triggerTime,
-                                             unit.toNanos(-delay)));
+                                          unit.toNanos(-delay));
+        RunnableScheduledFuture<Void> t = decorateTask(command, sft);
+        sft.outerTask = t;
         delayedExecute(t);
         return t;
     }
@@ -558,27 +547,15 @@ public class ScheduledThreadPoolExecutor
 
     // Override AbstractExecutorService methods
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     */
     public Future<?> submit(Runnable task) {
         return schedule(task, 0, TimeUnit.NANOSECONDS);
     }
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     */
     public <T> Future<T> submit(Runnable task, T result) {
         return schedule(Executors.callable(task, result),
                         0, TimeUnit.NANOSECONDS);
     }
 
-    /**
-     * @throws RejectedExecutionException {@inheritDoc}
-     * @throws NullPointerException       {@inheritDoc}
-     */
     public <T> Future<T> submit(Callable<T> task) {
         return schedule(task, 0, TimeUnit.NANOSECONDS);
     }
@@ -656,8 +633,6 @@ public class ScheduledThreadPoolExecutor
      * {@code ContinueExistingPeriodicTasksAfterShutdownPolicy} has
      * been set {@code true}, future executions of existing periodic
      * tasks will be cancelled.
-     *
-     * @throws SecurityException {@inheritDoc}
      */
     public void shutdown() {
         super.shutdown();

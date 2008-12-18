@@ -173,11 +173,11 @@ public class CountDownLatch {
             return getState();
         }
 
-        public int tryAcquireShared(int acquires) {
+        protected int tryAcquireShared(int acquires) {
             return getState() == 0? 1 : -1;
         }
 
-        public boolean tryReleaseShared(int releases) {
+        protected boolean tryReleaseShared(int releases) {
             // Decrement count; signal when transition to zero
             for (;;) {
                 int c = getState();

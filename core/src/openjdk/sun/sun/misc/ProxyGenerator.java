@@ -48,7 +48,6 @@ import sun.security.action.GetBooleanAction;
  * "generateProxyClass" method.
  *
  * @author	Peter Jones
- * @version	1.20, 07/05/05
  * @since	1.3
  */
 public class ProxyGenerator {
@@ -310,9 +309,9 @@ public class ProxyGenerator {
 
     /** debugging flag for saving generated class files */
     private final static boolean saveGeneratedFiles =
-	((Boolean) java.security.AccessController.doPrivileged(
+        java.security.AccessController.doPrivileged(
 	    new GetBooleanAction(
-		"sun.misc.ProxyGenerator.saveGeneratedFiles"))).booleanValue();
+                "sun.misc.ProxyGenerator.saveGeneratedFiles")).booleanValue();
 
     /**
      * Generate a proxy class given a name and a list of proxy interfaces.

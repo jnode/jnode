@@ -95,7 +95,6 @@ package java.util;
  * @param <E> the type of elements maintained by this set
  *
  * @author  Josh Bloch
- * @version 1.38, 05/05/07
  * @see Set
  * @see TreeSet
  * @see SortedMap

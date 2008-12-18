@@ -33,7 +33,6 @@ package sun.misc;
  * This class uses undocumented, unpublished, private data structures inside
  * java.net.URLClassLoader and sun.misc.URLClassPath.  Use with extreme caution.
  *
- * @version     1.7, 05/05/07
  * @author      tjquinn
  */
 

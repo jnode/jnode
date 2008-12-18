@@ -35,7 +35,6 @@ import java.io.FilenameFilter;
  * <p>
  *
  * @author  Michael Colburn
- * @version 1.15, 05/05/07
  */ 
 public class JarFilter implements FilenameFilter {
 

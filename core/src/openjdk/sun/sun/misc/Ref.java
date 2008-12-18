@@ -43,7 +43,6 @@ import java.lang.ref.SoftReference;
  *
  * @see java.util.SoftReference
  *
- * @version     1.40, 05/05/07
  */
 @Deprecated
 
