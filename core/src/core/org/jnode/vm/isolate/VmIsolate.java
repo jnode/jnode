@@ -981,6 +981,7 @@ public final class VmIsolate {
             //add to parent
             this.creator.addChild(this);
 
+            mainMethod.setAccessible(true);
             // Run main method.
             mainMethod.invoke(null, new Object[]{args});
         } catch (Throwable ex) {
