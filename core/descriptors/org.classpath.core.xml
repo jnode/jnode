@@ -72,7 +72,6 @@
       <export name="gnu.classpath.SystemProperties"/>
       <export name="gnu.classpath.VMSystemProperties"/>
       <export name="gnu.classpath.VMStackWalker"/>
-      <export name="gnu.classpath.NotImplementedException"/>
       <export name="gnu.classpath.ServiceFactory"/>
       <export name="gnu.classpath.ServiceFactory$ServiceIterator"/>
       <export name="gnu.classpath.ServiceProviderLoadingAction"/>
