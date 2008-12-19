@@ -24,28 +24,39 @@ import org.jnode.util.NumberUtils;
 public class Superblock extends HFSPlusObject { 
     private final Logger log = Logger.getLogger(getClass());
     
+    /** Volume header data length */
     public static final int SUPERBLOCK_LENGTH = 1024;
     
-    /** Data bytes array that contains superblock information */
+    /** Data bytes array that contains volume header information */
     private byte[] data;
 
+    /**
+     * Default constructor for empty volume header.
+     */
     public Superblock() {
         super(null);
         data = new byte[SUPERBLOCK_LENGTH];
         log.setLevel(Level.INFO);
     }
-
+    
+    /**
+     * Create the volume header and load information for the file system passed as parameter.
+     *  
+     * @param fs The file system contains HFS+ partition.
+     * 
+     * @throws FileSystemException If magic number (0X482B) is incorrect or not available.
+     */
     public Superblock(final HfsPlusFileSystem fs) throws FileSystemException {
         super(fs);
         log.setLevel(Level.INFO);
         try {
             ByteBuffer b = ByteBuffer.allocate(SUPERBLOCK_LENGTH);
-            // skip the first 1024 bytes (bootsector) and read the superblock
+            // skip the first 1024 bytes (boot sector) and read the volume header.
             fs.getApi().read(1024, b);
             data = new byte[SUPERBLOCK_LENGTH];
             System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
             if (getMagic() != HFSPLUS_SUPER_MAGIC) {
-                throw new FileSystemException("Not hfs+ superblock (" + getMagic() + ": bad magic)");
+                throw new FileSystemException("Not hfs+ volume header (" + getMagic() + ": bad magic)");
             }
         } catch (IOException e) {
             throw new FileSystemException(e);
@@ -86,7 +97,7 @@ public class Superblock extends HFSPlusObject {
     }
 
     /**
-     * Check if a specific attribute is set.
+     * Check if the attribute corresponding to maskBit parameter is set.
      * 
      * @param maskBit See constants.
      * 
@@ -267,6 +278,10 @@ public class Superblock extends HFSPlusObject {
         return new HFSPlusForkData(data, 432);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     public final String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("Magic: 0x").append(NumberUtils.hex(getMagic(), 4)).append("\n");
