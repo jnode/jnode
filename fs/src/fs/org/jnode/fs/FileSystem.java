@@ -44,13 +44,13 @@ public interface FileSystem<T extends FSEntry> {
     public T getRootEntry() throws IOException;
 
     /**
-     * Is the filesystem mounted in readonly mode ?
+     * Is the file system. mounted in read-only mode ?
      */
     public boolean isReadOnly();
 
     /**
-     * Close this filesystem. After a close, all invocations of method of this
-     * filesystem or objects created by this filesystem will throw an
+     * Close this file system. After a close, all invocations of method of this
+     * file system. or objects created by this file system. will throw an
      * IOException.
      * 
      * @throws IOException
@@ -58,7 +58,7 @@ public interface FileSystem<T extends FSEntry> {
     public void close() throws IOException;
 
     /**
-     * Is this filesystem closed.
+     * Is this file system. closed.
      */
     public boolean isClosed();
 
@@ -77,7 +77,7 @@ public interface FileSystem<T extends FSEntry> {
     public long getFreeSpace() throws IOException;
 
     /**
-     * The usabe space of this file system.
+     * The usable space of this file system.
      * @return if -1 this feature is unsupported
      * @throws IOException if an I/O error occurs
      */
