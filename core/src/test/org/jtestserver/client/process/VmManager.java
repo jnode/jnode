@@ -23,10 +23,35 @@ package org.jtestserver.client.process;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Interface for a manager that handles a specific kind of VM (vmware, kvm, ...).
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public interface VmManager {
+    /**
+     * Starts the VM given by its name. 
+     * @param vm name of the VM to start
+     * @return true on success
+     * @throws IOException
+     */
     boolean start(String vm) throws IOException;
     
+    /**
+     * Stops the VM given by its name.
+     * 
+     * @param vm name of the vm to stop
+     * @return true on success
+     * @throws IOException
+     */
     boolean stop(String vm) throws IOException;
 
+    /**
+     * Get the names of the currently running VMs.
+     * 
+     * @return list of VM names
+     * @throws IOException
+     */
     List<String> getRunningVMs() throws IOException;
 }

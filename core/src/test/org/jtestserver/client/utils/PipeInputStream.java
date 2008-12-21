@@ -27,16 +27,49 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Class that manages the redirection of an {@link InputStream} to a {@link java.util.logging.Logger} at a given level.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class PipeInputStream {
+    /**
+     * Input stream that will be redirected to a logger.
+     */
     private final InputStream input;
+    
+    /**
+     * Logger to use for the redirection of the input stream.
+     */
     private final Logger logger;
-    private final Level level;     
+    
+    /**
+     * Logging level to use.
+     */
+    private final Level level;
+    
+    /**
+     * Thread that will get messages from the input stream and redirect them to the logger.
+     */
     private final PipeThread pipeThread;
 
+    /**
+     * 
+     * @param input stream to redirect
+     * @param logger to which stream is redirected. 
+     * @param level of logging.
+     */
     public PipeInputStream(final InputStream input, final Logger logger, Level level) {
         this(input, logger, level, null);
     }
-    
+
+    /**
+     * 
+     * @param input stream to redirect
+     * @param logger to which stream is redirected. 
+     * @param level of logging.
+     * @param listener optional listener used to do additional processing on lines received from the input stream.
+     */
     public PipeInputStream(final InputStream input, final Logger logger, Level level, Listener listener) {
         this.level = level;
         this.input = input;
@@ -44,21 +77,44 @@ public class PipeInputStream {
         this.pipeThread = new PipeThread(listener);
     }
     
+    /**
+     * Starts the redirection process.
+     */
     public void start() {
         pipeThread.start();
     }
     
+    /**
+     * Interface to implement for doing additional processing on the received lines. 
+     * @author Fabien DUMINY (fduminy@jnode.org)
+     *
+     */
     public static interface Listener {
         void lineReceived(String line);
     }
     
+    /**
+     * Thread class that is doing the actual redirection of the input stream lines.
+     * @author Fabien DUMINY (fduminy@jnode.org)
+     *
+     */
     private class PipeThread extends Thread {
+        /**
+         * 
+         */
         private Listener listener;
         
+        /**
+         * 
+         * @param listener
+         */
         private PipeThread(Listener listener) {
             this.listener = listener;
         }
         
+        /**
+         * 
+         */
         public void run() {
             final InputStreamReader isr = new InputStreamReader(input);
             final BufferedReader br = new BufferedReader(isr, 100);
