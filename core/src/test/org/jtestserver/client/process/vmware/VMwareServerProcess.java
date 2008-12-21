@@ -23,24 +23,52 @@ import java.io.IOException;
 
 import org.jtestserver.client.process.ServerProcess;
 
+/**
+ * Implementation of {@link ServerProcess} that starts a new 
+ * <a href="http://www.vmware.com/">VMware</a> process.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class VMwareServerProcess implements ServerProcess {
+    /**
+     * Configuration of machine to run in VMware.
+     */
     private final VMwareConfig config;
-    private final VMware vmware; 
+    
+    /**
+     * Manager for the VMware machine.
+     */
+    private final VMware vmware;
+    
+    /**
+     * 
+     * @param config configuration of the machine to run in VMware server.
+     */
     public VMwareServerProcess(VMwareConfig config) {
         this.config = config;
         vmware = new VMware(config);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void start() throws IOException {
         vmware.start(config.getVmName());
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void stop() throws IOException {        
         vmware.stop(config.getVmName());        
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isAlive() throws IOException {
         boolean isRunning = false;

@@ -26,13 +26,27 @@ import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.client.utils.ProcessRunner;
 import org.jtestserver.server.TestServer;
 
-
+/**
+ * Implementation of {@link ServerProcess} that starts a new JVM process.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class NewJVMServerProcess implements ServerProcess {
+    /**
+     * The {@link ProcessRunner} used to manage the new JVM process.
+     */
     private ProcessRunner runner = new ProcessRunner();
     
+    /**
+     * 
+     */
     public NewJVMServerProcess() {
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start() throws IOException {
         String javaHome = "/home/fabien/apps/java/";
@@ -47,11 +61,17 @@ public class NewJVMServerProcess implements ServerProcess {
         runner.execute(command);        
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() throws IOException {
         runner.getProcess().destroy();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isAlive() {
         boolean alive = false;

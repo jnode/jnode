@@ -27,13 +27,45 @@ import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.client.process.VMConfig;
 import org.jtestserver.common.ConfigUtils;
 
+/**
+ * Implementation of {@link VMConfig} to configure {@link KVM} and specify 
+ * the parameters of the machine to run in the 
+ * <a href="http://kvm.qumranet.com/kvmwiki/Front_Page">Kernel Virtual Machine</a>.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class KVMConfig implements VMConfig {
+    /**
+     * Megabytes to give to the machine.
+     */
     private final int memory;
+    
+    /**
+     * CDROM file to use.
+     */
     private final File cdrom;
+    
+    /**
+     * Miscellaneous options.
+     */
     private final String options;
+    
+    /**
+     * Destination of data sent to the serial port of the machine.
+     */
     private final String serial;
+    
+    /**
+     * Locale used for the machine's keyboard.
+     */
     private final String keyboard;
     
+    /**
+     * Build an instance from the given {@link Properties}. 
+     * Only properties whose key starts with <b>kvm.</b> will be used.
+     * @param properties
+     */
     public KVMConfig(Properties properties) {
         memory = ConfigUtils.getInt(properties, "kvm.memory", 256);
         cdrom = ConfigUtils.getFile(properties, "kvm.cdrom", true);
@@ -62,11 +94,17 @@ public class KVMConfig implements VMConfig {
         return keyboard;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getVmName() {
         return getCdrom().getAbsolutePath();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final ServerProcess createServerProcess() {
         return new KVMServerProcess(this);

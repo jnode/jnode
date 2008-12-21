@@ -24,25 +24,52 @@ import java.io.IOException;
 
 import org.jtestserver.client.process.ServerProcess;
 
+/**
+ * Implementation of {@link ServerProcess} that starts a new 
+ * <a href="http://kvm.qumranet.com/kvmwiki/Front_Page">Kernel Virtual Machine</a> process.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class KVMServerProcess implements ServerProcess {
+    /**
+     * Configuration of machine to run in KVM.
+     */
     private final KVMConfig config;
+    
+    /**
+     * Manager for the KVM machine.
+     */
     private final KVM kvm; 
     
+    /**
+     * 
+     * @param config configuration of the KVM machine.
+     */
     public KVMServerProcess(KVMConfig config) {
         this.config = config;
         kvm = new KVM(config);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void start() throws IOException {
         kvm.start(config.getVmName());
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void stop() throws IOException {        
         kvm.stop(config.getVmName());        
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isAlive() throws IOException {
         boolean isRunning = false;
