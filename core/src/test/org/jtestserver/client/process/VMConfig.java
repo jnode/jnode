@@ -1,5 +1,6 @@
 /*
 JTestServer is a client/server framework for testing any JVM implementation.
+
  
 Copyright (C) 2008  Fabien DUMINY (fduminy@jnode.org)
 
@@ -17,18 +18,10 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.tests;
+package org.jtestserver.client.process;
 
-import java.io.File;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
-@RunWith(Suite.class)
-@SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class,
-    TestOutputMessage.class, TestVMware.class, TestKVM.class })
-public class AllTests {
-    public static final File CONFIG_DIRECTORY =
-            new File(AllTests.class.getResource("config.properties").getFile()).getParentFile();
+public interface VMConfig {
+    String getVmName();
+    
+    ServerProcess createServerProcess();
 }

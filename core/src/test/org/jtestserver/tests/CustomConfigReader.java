@@ -19,16 +19,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.tests;
 
-import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.jtestserver.client.Config;
+import org.jtestserver.client.ConfigReader;
+import org.jtestserver.client.process.VMConfig;
 
-@RunWith(Suite.class)
-@SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class,
-    TestOutputMessage.class, TestVMware.class, TestKVM.class })
-public class AllTests {
-    public static final File CONFIG_DIRECTORY =
-            new File(AllTests.class.getResource("config.properties").getFile()).getParentFile();
+class CustomConfigReader extends ConfigReader {
+    private final String type;
+    public CustomConfigReader(String type) {
+        this.type = type;
+    }
+    
+    Config readConfig() throws IOException {
+        return read(AllTests.CONFIG_DIRECTORY);
+    }
+    
+    @Override
+    protected VMConfig createVMConfig(Properties vmProperties, String vm)
+        throws IOException {
+        vmProperties.put(VM_TYPE, type);
+        return super.createVMConfig(vmProperties, vm);
+    }
 }

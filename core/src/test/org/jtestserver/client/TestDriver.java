@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jtestserver.client.process.ServerProcess;
-import org.jtestserver.client.process.VMwareServerProcess;
 import org.jtestserver.client.utils.TestListRW;
 import org.jtestserver.client.utils.WatchDog;
 import org.jtestserver.common.Status;
@@ -37,13 +36,17 @@ import org.jtestserver.common.protocol.Protocol;
 import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
 import org.jtestserver.common.protocol.UDPProtocol;
+import org.jtestserver.tests.AllTests;
 
 public class TestDriver {
     private static final Logger LOGGER = Logger.getLogger(TestDriver.class.getName());
     
     public static void main(String[] args) {
+        File configDir = AllTests.CONFIG_DIRECTORY;
+        //File configDir = new File(".");
+        
         try {
-            TestDriver testDriver = createUDPTestDriver();
+            TestDriver testDriver = createUDPTestDriver(configDir);
             
             if ((args.length > 0) && "kill".equals(args[0])) {
                 testDriver.killRunningServers();
@@ -57,14 +60,14 @@ public class TestDriver {
         }
     }
     
-    private static TestDriver createUDPTestDriver() throws ProtocolException, IOException {
-        Config config = Config.read();
+    private static TestDriver createUDPTestDriver(File configDir) throws ProtocolException, IOException {         
+        Config config = new ConfigReader().read(configDir);
         InetAddress serverAddress = InetAddress.getByName(config.getServerName());
         int serverPort = config.getServerPort();
         UDPProtocol protocol = UDPProtocol.createClient(serverAddress, serverPort);
         protocol.setTimeout(config.getClientTimeout());
         
-        ServerProcess process = new VMwareServerProcess(config);
+        ServerProcess process = config.getVMConfig().createServerProcess();
         return new TestDriver(config, protocol, process);
     }
     
@@ -116,7 +119,7 @@ public class TestDriver {
             }
         }
 
-        // stop the watch dog before actually stopping the process
+        // stop the watch dog before actually stop the process
         watchDog.stopWatching();
         try {
             process.stop();
@@ -130,7 +133,7 @@ public class TestDriver {
         
         process.start();
         watchDog.startWatching();
-        
+ 
         final File workingFile = new File(config.getWorkDir(), "working-tests.txt");
         final File crashingFile = new File(config.getWorkDir(), "crashing-tests.txt");
         
