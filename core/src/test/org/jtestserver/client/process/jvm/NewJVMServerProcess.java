@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.client.process;
+package org.jtestserver.client.process.jvm;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.jtestserver.client.process.ServerProcess;
 import org.jtestserver.client.utils.ProcessRunner;
 import org.jtestserver.server.TestServer;
 
@@ -42,7 +43,8 @@ public class NewJVMServerProcess implements ServerProcess {
         String classpath = "." + File.pathSeparatorChar + jnodeCore + "lib/mauve.jar";
         String command = java + " -cp " + classpath + " " + mainClass;
         
-        runner.execute(command, new File(classesDir));        
+        runner.setWorkDir(new File(classesDir));
+        runner.execute(command);        
     }
     
     @Override

@@ -1,5 +1,6 @@
 /*
 JTestServer is a client/server framework for testing any JVM implementation.
+
  
 Copyright (C) 2008  Fabien DUMINY (fduminy@jnode.org)
 
@@ -17,38 +18,36 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-package org.jtestserver.client.process;
+package org.jtestserver.client.process.kvm;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
-import org.jtestserver.client.Config;
+import org.jtestserver.client.process.ServerProcess;
 
-public class VMwareServerProcess implements ServerProcess {
-    private static final Logger LOGGER = Logger.getLogger(VMwareServerProcess.class.getName());
-
-    private final String vmName;
-    private final VMware vmware; 
-    public VMwareServerProcess(Config config) {
-        vmName = config.getVmName();
-        vmware = new VMware(config.getVMwareServerUser(), config.getVMwareServerPassword());
+public class KVMServerProcess implements ServerProcess {
+    private final KVMConfig config;
+    private final KVM kvm; 
+    
+    public KVMServerProcess(KVMConfig config) {
+        this.config = config;
+        kvm = new KVM(config);
     }
     
     @Override
     public synchronized void start() throws IOException {
-        vmware.start(vmName);        
+        kvm.start(config.getVmName());
     }
     
     @Override
     public synchronized void stop() throws IOException {        
-        vmware.stop(vmName);        
+        kvm.stop(config.getVmName());        
     }
 
     @Override
     public boolean isAlive() throws IOException {
         boolean isRunning = false;
-        for (String vm : vmware.getRunningVMs()) {
-            if (vmName.equals(vm)) {
+        for (String vm : kvm.getRunningVMs()) {
+            if (config.getVmName().equals(vm)) {
                 isRunning = true;
                 break;
             }

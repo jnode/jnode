@@ -72,4 +72,9 @@ public class TestProtocol {
     private void sendReceive(String message) throws ProtocolException, TimeoutException {
         TestUtils.sendReceive(client, message, server);
     }
+    
+    @Override
+    public String toString() {
+        return "TOTO";
+    }
 }

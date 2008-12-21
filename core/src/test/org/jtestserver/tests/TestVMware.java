@@ -19,61 +19,44 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.tests;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-import java.util.List;
+import java.util.Properties;
 
 import org.jtestserver.client.Config;
-import org.jtestserver.client.process.VMware;
-import org.junit.Assert;
+import org.jtestserver.client.ConfigReader;
+import org.jtestserver.client.process.VMConfig;
+import org.jtestserver.client.process.vmware.VMware;
+import org.jtestserver.client.process.vmware.VMwareConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestVMware {
-    private String vmName;
-
-    private VMware vmware;
-    
+public class TestVMware extends TestVmManager {
     @Before
     public void setUp() throws IOException {
-        Config config = Config.read();
-        vmware = new VMware(config.getVMwareServerUser(), config.getVMwareServerPassword());
-        vmName  = config.getVmName();
-    }
-    
-    @Test    
-    public void testGetRunningVMs() throws IOException {
-        List<String> vms = vmware.getRunningVMs();
-        assertNotNull(vms);
+        Config config = new CustomConfigReader(ConfigReader.VMWARE_TYPE).readConfig();
+        VMwareConfig vmwareConfig = (VMwareConfig) config.getVMConfig();
+        
+        vmManager = new VMware(vmwareConfig);
+        vmName  = vmwareConfig.getVmName();
     }
     
     @Test(expected = IOException.class)    
     public void testGetRunningVMsWithWrongAuthentification() throws IOException {
-        VMware vmware = new VMware("anObviouslyWrongLogin", "ThisIsNotAValidPassword");
+        CustomConfigReader reader = new CustomConfigReader(ConfigReader.VMWARE_TYPE) {
+            @Override
+            protected VMConfig createVMConfig(Properties vmProperties, String vm)
+                throws IOException {
+                vmProperties.put(VMwareConfig.USERNAME, "anObviouslyWrongLogin");
+                vmProperties.put(VMwareConfig.PASSWORD, "ThisIsNotAValidPassword");
+                
+                return super.createVMConfig(vmProperties, vm);
+            }
+        };
+        
+        Config config = reader.readConfig();
+        VMwareConfig vmwareConfig = (VMwareConfig) config.getVMConfig();
+        
+        VMware vmware = new VMware(vmwareConfig);
         vmware.getRunningVMs();
-    }
-    
-    @Test    
-    public void testStartStop() throws IOException {
-        List<String> vms = vmware.getRunningVMs();
-        final int initialNbVMs = vms.size();
-        
-        // start
-        boolean success = vmware.start(vmName);        
-        assertTrue("start must work", success);
-        
-        vms = vmware.getRunningVMs();
-        Assert.assertTrue("list of running VMs must contains " + vmName, vms.contains(vmName));
-        Assert.assertEquals("wrong number of running VMs", initialNbVMs + 1, vms.size());
-        
-        // stop
-        success = vmware.stop(vmName);        
-        assertTrue("stop must work", success);
-        
-        vms = vmware.getRunningVMs();
-        Assert.assertFalse("list of running VMs must not contains " + vmName, vms.contains(vmName));
-        Assert.assertEquals("wrong number of running VMs", initialNbVMs, vms.size());
     }
 }

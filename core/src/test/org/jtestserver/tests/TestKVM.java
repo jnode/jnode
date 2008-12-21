@@ -19,16 +19,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.tests;
 
-import java.io.File;
+import java.io.IOException;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
-@SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class,
-    TestOutputMessage.class, TestVMware.class, TestKVM.class })
-public class AllTests {
-    public static final File CONFIG_DIRECTORY =
-            new File(AllTests.class.getResource("config.properties").getFile()).getParentFile();
+import org.jtestserver.client.Config;
+import org.jtestserver.client.ConfigReader;
+import org.jtestserver.client.process.kvm.KVM;
+import org.jtestserver.client.process.kvm.KVMConfig;
+import org.junit.Before;
+
+public class TestKVM extends TestVmManager {
+    @Before
+    public void setUp() throws IOException {
+        Config config = new CustomConfigReader(ConfigReader.KVM_TYPE).read(AllTests.CONFIG_DIRECTORY);
+        KVMConfig kvmConfig = (KVMConfig) config.getVMConfig();
+        vmManager = new KVM(kvmConfig);
+        vmName  = kvmConfig.getVmName();
+    }
 }
