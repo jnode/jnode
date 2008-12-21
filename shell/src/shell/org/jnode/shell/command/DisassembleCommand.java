@@ -80,7 +80,7 @@ public class DisassembleCommand extends AbstractCommand {
             // not reached
             return;  
         }
-        final VmType<?> type = cls.getVmClass();
+        final VmType<?> type = VmType.fromClass((Class<?>) cls);
         if (test) {
             if (maxTestLevel == -1) {
                 err.println("No test compilers are currently registered");

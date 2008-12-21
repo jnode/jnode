@@ -82,7 +82,7 @@ public class CompileCommand extends AbstractCommand {
         final Class<?> cls;
         try {
             cls = cl.loadClass(className);
-            final VmType<?> type = cls.getVmClass();
+            final VmType<?> type = VmType.fromClass((Class<?>) cls);
             final long start = System.currentTimeMillis();
             final int count = type.compileRuntime(level, test);
             final long end = System.currentTimeMillis();

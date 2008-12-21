@@ -67,7 +67,7 @@ public class ClassCommand extends AbstractCommand {
         final VmType<?> vmType = AccessController.doPrivileged(
                 new PrivilegedAction<VmType<?>>() {
                     public VmType<?> run() {
-                        return type.getVmClass();
+                        return VmType.fromClass((Class<?>) type);
                     }
                 });
         out.println("Name             : " + type.getName());

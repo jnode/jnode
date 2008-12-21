@@ -180,7 +180,7 @@ public final class VmSystem {
         //todo this will be moved to java.lang.System during openjdk integration
         sun.misc.SharedSecrets.setJavaLangAccess(new sun.misc.JavaLangAccess() {
             public sun.reflect.ConstantPool getConstantPool(Class klass) {
-                return new VmConstantPool(klass.getVmClass());
+                return new VmConstantPool(VmType.fromClass(klass));
             }
 
             public void setAnnotationType(Class klass, AnnotationType type) {
@@ -212,9 +212,15 @@ public final class VmSystem {
      * @return the system output stream
      */
     public static PrintStream getSystemOut() {
+        SystemOutputStream sout = null;
+        if (bootOut == null) {
+            // initialization trick to avoid circularity and setting bootOut twice
+            //todo review when migrating java.lang.System to OpenJDK
+            sout = new SystemOutputStream();
+        }
 
         if (bootOut == null) {
-            bootOut = new SystemOutputStream();
+            bootOut = sout;
             bootOutStream = new PrintStream(bootOut, true);
             IOContext ioContext = getIOContext();
             ioContext.setGlobalOutStream(bootOutStream);
@@ -1066,7 +1072,7 @@ public final class VmSystem {
     @PrivilegedActionPragma
     public static void setStaticField(Class<?> clazz, String fieldName,
                                       Object value) {
-        final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
+        final VmStaticField f = (VmStaticField) VmType.fromClass((Class<?>) clazz).getField(
             fieldName);
         final Object staticsTable;
         final Offset offset;

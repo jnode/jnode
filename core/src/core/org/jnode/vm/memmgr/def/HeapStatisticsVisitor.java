@@ -48,7 +48,7 @@ final class HeapStatisticsVisitor extends ObjectVisitor implements
     public final boolean visit(Object object) {
         int size = 0;
         if (!heapStatistics.contains(object.getClass().getName())) {
-            final VmType<?> type = object.getClass().getVmClass();
+            final VmType<?> type = VmType.fromClass(object.getClass());
             size = (type instanceof VmNormalClass ? ((VmNormalClass<?>) type)
                 .getObjectSize() : 0);
         }

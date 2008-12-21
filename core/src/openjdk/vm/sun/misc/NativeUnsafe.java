@@ -11,7 +11,6 @@ import java.security.CodeSource;
 import java.security.Policy;
 import java.security.cert.Certificate;
 import java.util.Map;
-import java.util.Hashtable;
 import java.util.HashMap;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Address;
@@ -416,13 +415,13 @@ class NativeUnsafe {
     }
 
     private static VmField getVmField(Field f) {
-        VmType<?> vmClass = f.getDeclaringClass().getVmClass();
+        VmType<?> vmClass = VmType.fromClass((Class<?>) f.getDeclaringClass());
         vmClass.link();
         return vmClass.getField(f.getName());
     }
 
     public static void ensureClassInitialized(Unsafe instance, Class c) {
-        c.getVmClass().initialize();
+        VmType.fromClass(c).initialize();
     }
 
     public static int arrayBaseOffset(Unsafe instance, Class arrayClass) {

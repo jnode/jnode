@@ -18,7 +18,7 @@ class NativeObjectStreamClass {
      * @see java.io.ObjectStreamClass#hasStaticInitializer(java.lang.Class)
      */
     private static boolean hasStaticInitializer(Class clazz) {
-        VmType vmt = clazz.getVmClass();
+        VmType vmt = VmType.fromClass(clazz);
         VmMethod met = vmt.getDeclaredMethod("<clinit>", "()V");
         return met != null && met.isStatic();
     }

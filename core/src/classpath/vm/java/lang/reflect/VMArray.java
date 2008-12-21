@@ -70,7 +70,7 @@ class VMArray
         final VmType vmClass = AccessController.doPrivileged(
             new PrivilegedAction<VmType>() {
                 public VmType run() {
-                    return type.getVmClass();
+                    return VmType.fromClass(type);
                 }
             });
 

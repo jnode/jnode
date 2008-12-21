@@ -343,7 +343,7 @@ public final class VmReflection {
 
             Unsafe.pushObject(o);
             if (!method.isConstructor()) {
-                method = o.getClass().getVmClass().getMethod(method.getName(), method.getSignature());
+                method = VmType.fromClass(o.getClass()).getMethod(method.getName(), method.getSignature());
             }            
         } else {
             method.getDeclaringClass().initialize();

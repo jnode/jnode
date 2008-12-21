@@ -991,28 +991,28 @@ public final class ClassDecoder {
                         if (vtm.isPrimitive()) {
                             switch (vtm.getJvmType()) {
                                 case JvmType.BOOLEAN:
-                                    vtm = Boolean.class.getVmClass();
+                                    vtm = VmType.fromClass(Boolean.class);
                                     break;
                                 case JvmType.BYTE:
-                                    vtm = Byte.class.getVmClass();
+                                    vtm = VmType.fromClass(Byte.class);
                                     break;
                                 case JvmType.SHORT:
-                                    vtm = Short.class.getVmClass();
+                                    vtm = VmType.fromClass(Short.class);
                                     break;
                                 case JvmType.CHAR:
-                                    vtm = Character.class.getVmClass();
+                                    vtm = VmType.fromClass(Character.class);
                                     break;
                                 case JvmType.INT:
-                                    vtm = Integer.class.getVmClass();
+                                    vtm = VmType.fromClass(Integer.class);
                                     break;
                                 case JvmType.FLOAT:
-                                    vtm = Float.class.getVmClass();
+                                    vtm = VmType.fromClass(Float.class);
                                     break;
                                 case JvmType.LONG:
-                                    vtm = Long.class.getVmClass();
+                                    vtm = VmType.fromClass(Long.class);
                                     break;
                                 case JvmType.DOUBLE:
-                                    vtm = Double.class.getVmClass();
+                                    vtm = VmType.fromClass(Double.class);
                                     break;
 
                             }
@@ -1239,28 +1239,28 @@ public final class ClassDecoder {
                     if (vtm.isPrimitive()) {
                         switch (vtm.getJvmType()) {
                             case JvmType.BOOLEAN:
-                                vtm = Boolean.class.getVmClass();
+                                vtm = VmType.fromClass(Boolean.class);
                                 break;
                             case JvmType.BYTE:
-                                vtm = Byte.class.getVmClass();
+                                vtm = VmType.fromClass(Byte.class);
                                 break;
                             case JvmType.SHORT:
-                                vtm = Short.class.getVmClass();
+                                vtm = VmType.fromClass(Short.class);
                                 break;
                             case JvmType.CHAR:
-                                vtm = Character.class.getVmClass();
+                                vtm = VmType.fromClass(Character.class);
                                 break;
                             case JvmType.INT:
-                                vtm = Integer.class.getVmClass();
+                                vtm = VmType.fromClass(Integer.class);
                                 break;
                             case JvmType.FLOAT:
-                                vtm = Float.class.getVmClass();
+                                vtm = VmType.fromClass(Float.class);
                                 break;
                             case JvmType.LONG:
-                                vtm = Long.class.getVmClass();
+                                vtm = VmType.fromClass(Long.class);
                                 break;
                             case JvmType.DOUBLE:
-                                vtm = Double.class.getVmClass();
+                                vtm = VmType.fromClass(Double.class);
                                 break;
 
                         }
