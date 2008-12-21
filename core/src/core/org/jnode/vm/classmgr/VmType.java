@@ -50,7 +50,9 @@ import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.isolate.VmIsolateLocal;
+import org.jnode.security.JNodePermission;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
 
 @SharedStatics
 @Uninterruptible
@@ -223,6 +225,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     private static VmNormalClass VoidClass;
 
+    private static VmNormalClass ClassClass;
+
     private static VmArrayClass<boolean[]> BooleanArrayClass;
 
     private static VmArrayClass<byte[]> ByteArrayClass;
@@ -344,12 +348,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     public static VmType[] initializeForBootImage(VmSystemClassLoader clc)
         throws ClassNotFoundException {
         ObjectClass = (VmNormalClass) clc.loadClass("java.lang.Object", false);
+        ClassClass = (VmNormalClass) clc.loadClass("java.lang.Class", false);
         CloneableClass = (VmInterfaceClass) clc.loadClass(
             "java.lang.Cloneable", false);
         SerializableClass = (VmInterfaceClass) clc.loadClass(
             "java.io.Serializable", false);
 
         ObjectClass.link();
+        ClassClass.link();
         CloneableClass.link();
         SerializableClass.link();
 
@@ -403,7 +409,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         DoubleArrayClass.link();
         ObjectArrayClass.link();
 
-        return new VmType[]{ObjectClass, CloneableClass, SerializableClass,
+        return new VmType[]{ObjectClass, ClassClass, CloneableClass, SerializableClass,
             BooleanClass, ByteClass, CharClass, ShortClass, IntClass,
             FloatClass, LongClass, DoubleClass, VoidClass,
             BooleanArrayClass, ByteArrayClass, CharArrayClass,
@@ -466,6 +472,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             } else {
                 if (name.equals("java.lang.Object")) {
                     ObjectClass = (VmNormalClass) vmClass;
+                } else if (name.equals("java.lang.Class")) {
+                    ClassClass = (VmNormalClass) vmClass;
                 } else if (name.equals("java.lang.Cloneable")) {
                     CloneableClass = (VmInterfaceClass) vmClass;
                 } else if (name.equals("java.io.Serializable")) {
@@ -2417,5 +2425,24 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      */
     public final int getIsolatedStaticsIndex() {
         return isolatedStaticsIndex;
+    }
+
+    /**
+     * Permission used in {@link #fromClass(Class)}
+     */
+    private static final JNodePermission GETVMCLASS = new JNodePermission("getVmClass");
+    private static int FIELD_OFFSET = -1;
+    public static <V> VmType<V> fromClass(Class<V> clazz) {
+        if (FIELD_OFFSET == -1) {
+            FIELD_OFFSET = ((VmInstanceField) ClassClass.getDeclaredField("vmClass")).getOffset();
+        }
+
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(GETVMCLASS);
+        }
+
+        return (VmType<V>) ObjectReference.fromObject(clazz).toAddress().add(FIELD_OFFSET).
+            loadObjectReference().toObject();
     }
 }

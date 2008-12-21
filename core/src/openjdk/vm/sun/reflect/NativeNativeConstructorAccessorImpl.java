@@ -16,7 +16,7 @@ class NativeNativeConstructorAccessorImpl {
     private static Object newInstance0(Constructor arg1, Object[] arg2) throws InstantiationException,
                IllegalArgumentException,
         InvocationTargetException{
-        VmType vmt = arg1.getDeclaringClass().getVmClass();
+        VmType vmt = VmType.fromClass(arg1.getDeclaringClass());
         VmMethod vmm = vmt.getDeclaredMethod(arg1.getSlot());
         try {
             return VmReflection.newInstance(vmm, arg2);

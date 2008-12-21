@@ -18,7 +18,9 @@ import org.vmmagic.unboxed.ObjectReference;
  */
 @MagicPermission
 class NativeThrowable {
-    private static int BACKTRACE_OFFSET = ((VmInstanceField)Throwable.class.getVmClass().getField("backtrace")).getOffset();
+    private static int BACKTRACE_OFFSET = ((VmInstanceField) VmType.fromClass(Throwable.class).
+        getField("backtrace")).getOffset();
+
     private static synchronized Throwable fillInStackTrace(Throwable instance){
         ObjectReference.fromObject(instance).toAddress().add(BACKTRACE_OFFSET).
                 store(ObjectReference.fromObject(VmThread.getStackTrace(VmProcessor.current().getCurrentThread())));

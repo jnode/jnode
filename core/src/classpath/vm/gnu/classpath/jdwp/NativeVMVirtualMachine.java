@@ -4,11 +4,8 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.nio.ByteBuffer;
 import java.lang.reflect.Method;
-import java.io.DataOutputStream;
 import gnu.classpath.jdwp.util.MethodResult;
 import gnu.classpath.jdwp.event.EventRequest;
-import gnu.classpath.jdwp.exception.JdwpException;
-import gnu.classpath.jdwp.id.ReferenceTypeId;
 import org.jnode.vm.Vm;
 import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -167,10 +164,10 @@ class NativeVMVirtualMachine {
     }
 
     public static void redefineClass(Class oldClass, byte[] classData){
-        VmType old_type = oldClass.getVmClass();
+        VmType old_type = VmType.fromClass(oldClass);
         VmType new_type = ClassDecoder.defineClass(oldClass.getName(),
                 ByteBuffer.wrap(classData), false,
-                oldClass.getVmClass().getLoader(),
+                VmType.fromClass(oldClass).getLoader(),
                 oldClass.getProtectionDomain());
         for(int i = 0; i < old_type.getNoDeclaredMethods(); i++){
             VmMethod old_method = old_type.getDeclaredMethod(i);

@@ -34,7 +34,7 @@ public class ViewMethodTest {
         final String mname = (args.length > 1) ? args[1] : null;
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        final VmType cls = cl.loadClass(className).getVmClass();
+        final VmType cls = VmType.fromClass(cl.loadClass(className));
 
         final int cnt = cls.getNoDeclaredMethods();
         for (int i = 0; i < cnt; i++) {

@@ -114,12 +114,6 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      */
     private static final long serialVersionUID = 3206093459760846163L;
 
-    /**
-     * Permission used in {@link #getVmClass()}
-     */
-    private static final JNodePermission GETVMCLASS = new JNodePermission(
-            "getVmClass");
-
     private final VmType<T> vmClass;
 
     private Constructor[] declaredConstructors;
@@ -1047,22 +1041,6 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
         } else {
             return ClassLoader.getSystemResourceAsStream(name);
         }
-    }
-
-    /**
-     * Gets the JNode VmType (internal) representation of this class. If there
-     * is a security manager installed, this method first calls the security
-     * manager's checkPermission method with a RuntimePermission("getVmClass")
-     * permission to ensure it's ok to get the internal representation.
-     * 
-     * @return the JNode internal representation of this class.
-     */
-    public final VmType<T> getVmClass() {
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(GETVMCLASS);
-        }
-        return vmClass;
     }
 
     /**

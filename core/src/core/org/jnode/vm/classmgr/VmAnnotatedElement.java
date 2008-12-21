@@ -62,7 +62,7 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
     public final <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
         if (runtimeAnnotations.length > 0) {
             final VmClassLoader loader = getLoader();
-            final VmType<T> reqType = annotationClass.getVmClass();
+            final VmType<T> reqType = VmType.fromClass(annotationClass);
             for (VmAnnotation ann : runtimeAnnotations) {
                 if (ann.annotationType(loader) == reqType) {
                     try {
@@ -133,7 +133,7 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
         Class<? extends Annotation> annotationClass) {
         if (runtimeAnnotations.length > 0) {
             final VmClassLoader loader = getLoader();
-            final VmType<?> reqType = annotationClass.getVmClass();
+            final VmType<?> reqType = VmType.fromClass((Class<? extends Annotation>) annotationClass);
             for (VmAnnotation ann : runtimeAnnotations) {
                 if (ann.annotationType(loader) == reqType) {
                     return true;

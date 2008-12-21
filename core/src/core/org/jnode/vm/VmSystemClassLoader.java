@@ -299,7 +299,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         if ((parent != null) && !parent.skipParentLoader(name)) {
             try {
                 final Class<?> cls = parent.loadClass(name);
-                return cls.getVmClass();
+                return VmType.fromClass((Class<?>) cls);
             } catch (ClassNotFoundException ex) {
                 // Don't care, try it ourselves.
             }

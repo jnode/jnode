@@ -15,7 +15,7 @@ class NativeNativeMethodAccessorImpl {
      */
     private static Object invoke0(Method arg1, Object arg2, Object[] arg3) throws IllegalArgumentException,
         InvocationTargetException {
-        VmType vmt = arg1.getDeclaringClass().getVmClass();
+        VmType vmt = VmType.fromClass((Class<?>) arg1.getDeclaringClass());
         VmMethod vmm = vmt.getDeclaredMethod(arg1.getSlot());
         return VmReflection.invoke(vmm, arg2, arg3);
     }

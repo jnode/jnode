@@ -4,6 +4,7 @@
 package sun.reflect;
 
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * @see sun.reflect.Reflection
@@ -28,7 +29,7 @@ class NativeReflection {
      * @see Reflection#getClassAccessFlags(Class)
      */
     static int getClassAccessFlags(Class c) {
-        return c.getVmClass().getAccessFlags();
+        return VmType.fromClass(c).getAccessFlags();
     }
 }
 

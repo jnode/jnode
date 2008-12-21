@@ -160,7 +160,7 @@ public final class SoftByteCodes {
             String cname = classRef.getClassName();
             try {
                 Class<?> cls = curLoader.asClassLoader().loadClass(cname);
-                VmType<?> vmClass = cls.getVmClass();
+                VmType<?> vmClass = VmType.fromClass(cls);
 
                 /*
                  * VmClass vmClass = curLoader.loadClass(cname, true); //VmClass

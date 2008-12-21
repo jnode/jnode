@@ -54,10 +54,10 @@ public class DefaultNameSpace extends AbstractNameSpace {
             throw new IllegalArgumentException("name == null");
         }
         synchronized (namespace) {
-            if (namespace.containsKey(name.getVmClass())) {
+            if (namespace.containsKey(VmType.fromClass(name))) {
                 throw new NameAlreadyBoundException(name.getName());
             }
-            namespace.put(name.getVmClass(), service);
+            namespace.put(VmType.fromClass(name), service);
         }
         
         // notify listeners
@@ -74,7 +74,7 @@ public class DefaultNameSpace extends AbstractNameSpace {
     public void unbind(Class<?> name) {
         final Object service;
         synchronized (namespace) {
-            service = namespace.remove(name.getVmClass());
+            service = namespace.remove(VmType.fromClass((Class<?>) name));
         }
                 
         // notify listeners
@@ -89,7 +89,7 @@ public class DefaultNameSpace extends AbstractNameSpace {
      */
     @PrivilegedActionPragma
     public <T> T lookup(Class<T> name) throws NameNotFoundException {
-        final Object result = namespace.get(name.getVmClass());
+        final Object result = namespace.get(VmType.fromClass(name));
         if (result == null) {
 //            if (!VmIsolate.isRoot()) {
 //                System.out.println("Looking for " + name.getVmClass().hashCode());
