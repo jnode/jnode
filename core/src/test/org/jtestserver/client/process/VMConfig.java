@@ -20,8 +20,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.client.process;
 
+/**
+ * Interface for the configuration of a VM.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public interface VMConfig {
+    /**
+     * Get the name of this VM.
+     * 
+     * @return name of this VM
+     */
     String getVmName();
     
+    /**
+     * 
+     * @return a new instance of {@link ServerProcess} for this VM.
+     */
     ServerProcess createServerProcess();
 }

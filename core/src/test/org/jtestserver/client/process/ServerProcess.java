@@ -22,9 +22,30 @@ package org.jtestserver.client.process;
 
 import java.io.IOException;
 
-
+/**
+ * Interface with the process that manages a VM life cycle.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public interface ServerProcess {
+    
+    /**
+     * Start the VM. 
+     * @throws IOException
+     */
     void start() throws IOException;
+    
+    /**
+     * Stop the VM.
+     * @throws IOException
+     */
     void stop() throws IOException;
+    
+    /**
+     * Checks if the VM is alive.
+     * @return true if the VM is alive.
+     * @throws IOException
+     */
     boolean isAlive() throws IOException;
 }
