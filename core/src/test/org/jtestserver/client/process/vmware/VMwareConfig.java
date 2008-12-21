@@ -25,16 +25,54 @@ import java.util.Properties;
 import org.jtestserver.client.process.VMConfig;
 import org.jtestserver.common.ConfigUtils;
 
+/**
+ * Implementation of {@link VMConfig} to configure {@link VMware} and specify 
+ * the parameters of the machine to run in <a href="http://www.vmware.com/">VMware</a>.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class VMwareConfig implements VMConfig {
+    /**
+     * Key for the username parameter in the config file.
+     */
     public static final String USERNAME = "vmware.server.username";
-    public static final String PASSWORD = "vmware.server.password";
     
+    /**
+     * Key for the password parameter in the config file.
+     */
+    public static final String PASSWORD = "vmware.server.password";
+
+    /**
+     * Host of VMware server.
+     */
     private final String host;
+    
+    /**
+     * Port of VMware server.
+     */
     private final int port;
+    
+    /**
+     * Username to connect to VMware server.
+     */
     private final String userName;
+    
+    /**
+     * password to connect to VMware server.
+     */
     private final String password;
+    
+    /**
+     * Name of the machine to run in the VMware server. 
+     */
     private final String vmName;
     
+    /**
+     * Build an instance from the given {@link Properties}. 
+     * Only properties whose key starts with <b>vmware.</b> will be used.
+     * @param properties
+     */
     public VMwareConfig(Properties properties) {
         host = ConfigUtils.getString(properties, "vmware.server.host");
         port = ConfigUtils.getInt(properties, "vmware.server.port", 8222);
@@ -55,11 +93,17 @@ public class VMwareConfig implements VMConfig {
         return password;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getVmName() {
         return vmName;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public VMwareServerProcess createServerProcess() {
         return new VMwareServerProcess(this);

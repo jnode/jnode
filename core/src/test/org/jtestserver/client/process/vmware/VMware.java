@@ -29,27 +29,54 @@ import org.jtestserver.client.utils.PipeInputStream;
 import org.jtestserver.client.utils.ProcessRunner;
 import org.jtestserver.client.utils.PipeInputStream.Listener;
 
+/**
+ * Implementation of {@link VmManager} for <a href="http://www.vmware.com/">VMware</a>.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class VMware implements VmManager {
+    /**
+     * The {@link ProcessRunner} used to manage the new VMware process.
+     */
     private ProcessRunner runner = new ProcessRunner();
     
+    /**
+     * Base command needed by all commands sent to VMware server.
+     */
     private final String[] baseCommand;
     
+    /**
+     * 
+     * @param config
+     */
     public VMware(VMwareConfig config) {
         String url = "http://" + config.getHost() + ":" + config.getPort() + "/sdk";
         baseCommand = new String[] {"vmrun", "-T", "server", "-h", url, "-u", 
             config.getUserName(), "-p", config.getPassword()};
     }
     
+    /**
+     * {@inheritDoc}
+     * The implementation is using the command line to communicate with the VMware server.
+     */
     @Override
     public boolean start(String vm) throws IOException {
         return executeCommand("start", vm);
     }
     
+    /**
+     * {@inheritDoc}
+     * The implementation is using the command line to communicate with the VMware server.
+     */
     @Override
     public boolean stop(String vm) throws IOException {        
         return executeCommand("stop", vm);
     }
 
+    /**
+     * {@inheritDoc}
+     * The implementation is using the command line to communicate with the VMware server.
+     */
     @Override
     public List<String> getRunningVMs() throws IOException {
         final List<String> runningVMs = new ArrayList<String>();
@@ -69,10 +96,29 @@ public class VMware implements VmManager {
         return runningVMs;        
     }
 
+    /**
+     * Helper method that execute a command by appending the {@link #baseCommand} 
+     * with the given parameters.
+     * 
+     * @param command parameters to append to the {@link #baseCommand}
+     * @return true on success.
+     * @throws IOException
+     */
     private boolean executeCommand(String... command) throws IOException {
         return executeCommand(null, command);
     }
     
+    /**
+     * Helper method that execute a command by appending the {@link #baseCommand} 
+     * with the given parameters.
+     * 
+     * @param listener an optional {@link Listener} that will receive standard and error 
+     * outputs from the process.
+     * 
+     * @param command parameters to append to the {@link #baseCommand}
+     * @return true on success.
+     * @throws IOException
+     */
     private boolean executeCommand(Listener listener, String... command) throws IOException {
         String[] fullCommand = new String[baseCommand.length + command.length];
         System.arraycopy(baseCommand, 0, fullCommand, 0, baseCommand.length);

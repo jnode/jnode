@@ -29,21 +29,49 @@ import org.jtestserver.client.process.VmManager;
 import org.jtestserver.client.utils.PipeInputStream;
 import org.jtestserver.client.utils.ProcessRunner;
 
+/**
+ * Implementation of {@link VmManager} for the 
+ * <a href="http://kvm.qumranet.com/kvmwiki/Front_Page">Kernel Virtual Machine</a> (KVM).
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class KVM implements VmManager {
+    /**
+     * Option used to specify the actual operating system to run in KVM.
+     */
     private static final String OPTION_CDROM = "-cdrom";
     
+    /**
+     * The {@link ProcessRunner} used to manage the new KVM process.
+     */
     private final ProcessRunner runner = new ProcessRunner();
+    
+    /**
+     * Configuration used to build the command line that will launch KVM.
+     */
     private final KVMConfig config;
     
+    /**
+     * 
+     * @param config Configuration used to build the command line that will launch KVM.
+     */
     public KVM(KVMConfig config) {
         this.config = config;
     }
     
+    /**
+     * {@inheritDoc}
+     * The implementation is launching {@code ps} through a command line.
+     */
     @Override
     public List<String> getRunningVMs() throws IOException {
         return getRunningVMs(false);                
     }
 
+    /**
+     * {@inheritDoc}
+     * The implementation is launching {@code kvm} through a command line.  
+     */
     @Override
     public boolean start(String vm) throws IOException {
         CommandLineBuilder cmdLine = new CommandLineBuilder("kvm"); 
@@ -56,6 +84,10 @@ public class KVM implements VmManager {
         return execute(cmdLine);
     }
 
+    /**
+     * {@inheritDoc}
+     * The implementation is launching {@code kill} through a command line.
+     */
     @Override
     public boolean stop(String vm) throws IOException {
         boolean success = true;
@@ -69,6 +101,15 @@ public class KVM implements VmManager {
         return success;
     }
 
+    /**
+     * Actual implementation of {@link #getRunningVMs()} that can both 
+     * return a list of Process IDentifiers (PID) or a list of CDROMs representing the machines
+     * being run with KVM.
+     *  
+     * @param pid if true, return a list of PIDs else return a list of CDROMs
+     * @return list of PIDs or list of CDROMs
+     * @throws IOException
+     */
     private List<String> getRunningVMs(final boolean pid) throws IOException {
         final List<String> runningVMs = new ArrayList<String>();
         boolean success  = runner.executeAndWait(new PipeInputStream.Listener() {
@@ -103,6 +144,13 @@ public class KVM implements VmManager {
         return runningVMs;                
     }
     
+    /**
+     * Execute the given command line.
+     * 
+     * @param cmdLine command line to execute
+     * @return true if the execution succeed
+     * @throws IOException
+     */
     private boolean execute(CommandLineBuilder cmdLine) throws IOException {
         final List<Boolean> errors = new Vector<Boolean>();
         runner.execute(null, new PipeInputStream.Listener() {
