@@ -27,16 +27,38 @@ import java.util.logging.Logger;
 import org.jtestserver.client.Config;
 import org.jtestserver.client.process.ServerProcess;
 
+/**
+ * That abstract utility class is used to watch a {@link ServerProcess} and 
+ * check regularly that it is alive. Users have to implement the abstract 
+ * method {@link #processDead()}, which is called when the WatchDog has detected
+ *  that the process is not alive.
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public abstract class WatchDog extends Thread {
     private static final Logger LOGGER = Logger.getLogger(WatchDog.class.getName());
         
     /**
-     * 
+     * The {@link ServerProcess} to watch.
      */
     private final ServerProcess process;
+    
+    /**
+     * Configuration of the WatchDog.
+     */
     private final Config config;
+    
+    /**
+     * Is the WatchDog actually watching the {@link ServerProcess} ? 
+     */
     private boolean watch = false;
 
+    /**
+     * Create a WatchDog for the given {@link ServerProcess}, 
+     * with the provided configuration.
+     * @param process to watch.
+     * @param config
+     */
     public WatchDog(ServerProcess process, Config config) {
         this.process = process;
         this.config = config;
@@ -44,14 +66,23 @@ public abstract class WatchDog extends Thread {
         start();
     }
 
+    /**
+     * Start watching the {@link ServerProcess}
+     */
     public void startWatching() {
         watch = true;
     }
 
+    /**
+     * Stop watching the {@link ServerProcess}
+     */
     public void stopWatching() {
         watch = false;
     }
     
+    /**
+     * Manage the activity of the WatchDog and notify when the process is dead.
+     */
     @Override
     public void run() {
         while (true) {
@@ -67,8 +98,14 @@ public abstract class WatchDog extends Thread {
         }
     }
     
+    /**
+     * Callback method used to notify that the watched process is dead.
+     */
     protected abstract void processDead();
     
+    /**
+     * Sleep for the amount of time specified in the configuration.
+     */
     private void goSleep() {
         try {
             Thread.sleep(config.getWatchDogPollInterval());

@@ -39,16 +39,37 @@ import java.util.logging.Logger;
 
 import org.jtestserver.client.Config;
 
-
+/**
+ * Utility class used to read from a text file and also to write it.
+ *  
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class TestListRW {
+    /**
+     * My logger
+     */
     private static final Logger LOGGER = Logger.getLogger(TestListRW.class.getName());
     
+    /**
+     * Configuration used to filter the list of lines.
+     */
     private final Config config;
     
+    /**
+     * Create an instance from the given configuration.
+     * @param config
+     */
     public TestListRW(Config config) {
         this.config = config;
     }
     
+    /**
+     * Read the mauve tests list but don't take lines containing '[' 
+     * and also apply additional filters specified in configuration. 
+     * @return
+     * @throws IOException
+     */
     public List<String> readCompleteList() throws IOException {
         final List<String> list = new ArrayList<String>();
         Filter.readTestList(new LineProcessor() {
@@ -66,6 +87,13 @@ public class TestListRW {
         return list;
     }
     
+    /**
+     * Read a list from the given file but don't take lines starting with '#' (comments) 
+     * and also apply additional filters specified in configuration.
+     * @param file from which to read the list.
+     * @return
+     * @throws IOException
+     */
     public List<String> readList(File file) throws IOException {
         List<String> list = new ArrayList<String>();
         
@@ -82,6 +110,12 @@ public class TestListRW {
         return list;
     }
     
+    /**
+     * Check if a test should be kept or not according to the filters specified 
+     * in the configuration.
+     * @param test name of the test top filter.
+     * @return true if the test should be kept.
+     */
     public boolean acceptTest(String test) {
         boolean accept = true;
         
@@ -94,7 +128,13 @@ public class TestListRW {
         
         return accept;
     }
-    
+
+    /**
+     * Write a list to the given file.
+     * @param file to which the list is written.
+     * @param list the list to write.
+     * @throws IOException
+     */
     public void writeList(File file, List<String> list) throws IOException {
         OutputStream out = new FileOutputStream(file);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
