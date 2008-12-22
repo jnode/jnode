@@ -25,18 +25,60 @@ import java.util.Properties;
 import org.jtestserver.client.process.VMConfig;
 import org.jtestserver.common.ConfigUtils;
 
+/**
+ * Class containing various parameters used to configure JTestServer.
+ *  
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class Config {
 
+    /**
+     * Client side timeout for connection with the server.
+     */
     private final int clientTimeout;
+    
+    /**
+     * Name of the server. <br>Examples : server.mydomain.org, 123.456.789.1
+     */
     private final String serverName;
+    
+    /**
+     * Port of the server.
+     */
     private final int serverPort;
+    
+    /**
+     * Work directory.
+     */
     private final File workDir;
+    
+    /**
+     * Excluding filters, used to remove some tests from a list.
+     */
     private final String[] excludingFilters;
+    
+    /**
+     * Should we force reading the mauve list on startup instead of getting it 
+     * from previous run (that save it in the work directory) ?
+     */
     private final boolean forceUseMauveList;
+    
+    /**
+     * Time between 2 checks of the WatchDog.
+     */
     private final int watchDogPollInterval;
     
+    /**
+     * Configuration of the VM in which tests will actually be run.
+     */
     private final VMConfig vmConfig;
     
+    /**
+     * 
+     * @param properties configuration parameters of JTestServer
+     * @param vmConfig configuration of the VM in which tests will actually be run.
+     */
     Config(Properties properties, VMConfig vmConfig) {
         clientTimeout = ConfigUtils.getInt(properties, "client.timeout", 30000);
         serverName = properties.getProperty("server.name", "localhost");
