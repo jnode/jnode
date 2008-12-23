@@ -152,9 +152,9 @@ public class ReaderInputStream extends InputStream {
     }
 
     private void resetAndThrowOnError() throws CharacterCodingException {
+        // Reset the encoder so that it will work next time we try to use it.
+        encoder.reset();
         if (cr != null && cr.isError()) {
-            // Reset the encoder so that it will work next time we try to use it.
-            encoder.reset();
             // Skip over the problem characters
             for (int i = 0; i < cr.length(); i++) {
                 chars.get();
