@@ -268,7 +268,8 @@ public final class SwingToolkit extends JNodeToolkit {
                     synchronized (ret) {
                         ret[0] = new DesktopFramePeer(SwingToolkit.this, (DesktopFrame) target);
                         try {
-                            Method method = AWTAutoShutdown.class.getMethod("registerPeer", Object.class, Object.class);
+                            Method method = AWTAutoShutdown.class.getDeclaredMethod("registerPeer",
+                                Object.class, Object.class);
                             method.setAccessible(true);
                             method.invoke(AWTAutoShutdown.getInstance(), target, ret[0]);
                         } catch (Exception x) {
@@ -303,7 +304,7 @@ public final class SwingToolkit extends JNodeToolkit {
             EventQueue eq = (EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
             if (eq != null) {
                 try {
-                    Method met = EventQueue.class.getMethod("initDispatchThread");
+                    Method met = EventQueue.class.getDeclaredMethod("initDispatchThread");
                     met.setAccessible(true);
                     met.invoke(eq);
                 } catch (Exception x) {

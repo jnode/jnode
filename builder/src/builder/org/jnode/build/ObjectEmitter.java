@@ -245,6 +245,15 @@ public class ObjectEmitter {
                 bis.writeObjectRef(null);
                 // annotationType
                 bis.writeObjectRef(null);
+
+                //see the fields of java.lang.Class
+                bis.writeObjectRef(null);
+                bis.writeObjectRef(null);
+                bis.writeObjectRef(null);
+                bis.writeObjectRef(null);
+                bis.writeObjectRef(null);
+                bis.writeObjectRef(null);
+                bis.writeObjectRef(null);
             }
         } catch (ClassNotFoundException ex) {
             throw new BuildException("emitting object: [" + c + "]", ex);

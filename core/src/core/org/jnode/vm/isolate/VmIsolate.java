@@ -365,7 +365,7 @@ public final class VmIsolate {
             synchronized (classesMap) {
                 result = (Class<T>) classesMap.get(type);
                 if (result == null) {
-                    result = new Class<T>(type);
+                    result = type.newClass();
                     classesMap.put(type, result);
                 }
             }
@@ -957,7 +957,8 @@ public final class VmIsolate {
 
             // Find main method
             final Method mainMethod = cls.getMethod("main",
-                IsolatedStaticData.mainTypes);
+                new Class[]{String[].class});
+//                IsolatedStaticData.mainTypes);
 
             //inherit properties
             AccessController.doPrivileged(new PrivilegedAction<Object>() {
