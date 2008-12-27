@@ -773,11 +773,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         @Override
         public int read(byte[] buf) throws IOException {
-            int res = super.read(buf);
-            for (int i = 0; i < res; i++) {
-                filter(buf[i]);
-            }
-            return res;
+            return read(buf, 0, buf.length);
         }
 
         private void filter(byte b) {
