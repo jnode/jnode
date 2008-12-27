@@ -894,4 +894,74 @@ public abstract class ClassLoader {
         // Circumvent security check since this is package-private
         return caller.getClassLoader0();
     }
+
+    // Returns true if the specified class loader can be found in this class
+    // loader's delegation chain.
+    boolean isAncestor(ClassLoader cl) {
+        ClassLoader acl = this;
+        do {
+            acl = acl.parent;
+            if (cl == acl) {
+                return true;
+            }
+        } while (acl != null);
+        return false;
+    }
+
+/**
+     * Returns the assertion status that would be assigned to the specified
+     * class if it were to be initialized at the time this method is invoked.
+     * If the named class has had its assertion status set, the most recent
+     * setting will be returned; otherwise, if any package default assertion
+     * status pertains to this class, the most recent setting for the most
+     * specific pertinent package default assertion status is returned;
+     * otherwise, this class loader's default assertion status is returned.
+     * </p>
+     *
+     * @param  className
+     *         The fully qualified class name of the class whose desired
+     *         assertion status is being queried.
+     *
+     * @return  The desired assertion status of the specified class.
+     *
+     * @see  #setClassAssertionStatus(String, boolean)
+     * @see  #setPackageAssertionStatus(String, boolean)
+     * @see  #setDefaultAssertionStatus(boolean)
+     *
+     * @since  1.4
+     */
+    synchronized boolean desiredAssertionStatus(String className) {
+        Boolean result;
+
+        // assert classAssertionStatus   != null;
+        // assert packageAssertionStatus != null;
+
+        // Check for a class entry
+        result = (Boolean)classAssertionStatus.get(className);
+        if (result != null)
+            return result.booleanValue();
+
+        // Check for most specific package entry
+        int dotIndex = className.lastIndexOf(".");
+        if (dotIndex < 0) { // default package
+            result = (Boolean)packageAssertionStatus.get(null);
+            if (result != null)
+                return result.booleanValue();
+        }
+        while(dotIndex > 0) {
+            className = className.substring(0, dotIndex);
+            result = (Boolean)packageAssertionStatus.get(className);
+            if (result != null)
+                return result.booleanValue();
+            dotIndex = className.lastIndexOf(".", dotIndex-1);
+        }
+
+        // Return the classloader default
+        return defaultAssertionStatus;
+    }
+
+    {
+        packageAssertionStatus = new HashMap();
+    }
+
 }

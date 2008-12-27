@@ -22,6 +22,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.Vm;
+import org.jnode.vm.VmReflection;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.SharedStatics;
 
@@ -463,7 +464,12 @@ class NativeUnsafe {
 
     public static Object allocateInstance(Unsafe instance, Class cls)
             throws InstantiationException {
-        throw new UnsupportedOperationException();
+        //todo improve exception handling
+        try {
+            return VmReflection.newInstance(VmType.fromClass(cls).getMethod("<init>", new VmType[]{}));
+        } catch (Exception x) {
+            throw new InstantiationException("Reason: " + x.getMessage());
+        }
     }
 
     public static void monitorEnter(Unsafe instance, Object o) {

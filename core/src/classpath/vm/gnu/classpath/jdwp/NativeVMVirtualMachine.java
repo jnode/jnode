@@ -16,6 +16,8 @@ import org.jnode.vm.classmgr.VmMethod;
 
 /**
  * @see gnu.classpath.jdwp.VMVirtualMachine
+ *
+ * @author Levente S\u00e1ntha
  */
 class NativeVMVirtualMachine {
     /**
@@ -66,7 +68,7 @@ class NativeVMVirtualMachine {
             }
 
             public Object next() {
-                return new Class(iter.next());
+                return iter.next().newClass();
             }
 
             public void remove() {

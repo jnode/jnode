@@ -626,10 +626,9 @@ public final class ClassDecoder {
      * @param data
      * @param cp
      * @param slotSize
-     * @param pragmaFlags
+     * @param loader
      */
-    private static FieldData[] readFields(ByteBuffer data, VmCP cp,
-                                          int slotSize, VmClassLoader loader) {
+    private static FieldData[] readFields(ByteBuffer data, VmCP cp, int slotSize, VmClassLoader loader) {
         final int fcount = data.getChar();
         if (fcount > 0) {
             final FieldData[] ftable = new FieldData[fcount];
@@ -1016,7 +1015,7 @@ public final class ClassDecoder {
                                     break;
 
                             }
-                            r_class = new Class(vtm);
+                            r_class = vtm.newClass();
                         } else {
                             try {
                                 r_class = Class.forName(vtm.getName(), false, vtm.getLoader().asClassLoader());
@@ -1025,7 +1024,7 @@ public final class ClassDecoder {
                             }
                         }
                         Object defo = AnnotationParser.parseMemberValue(r_class, data, new VmConstantPool(cls),
-                            new Class(cls));
+                            cls.newClass());
                         mts.setAnnotationDefault(defo);
                     } else {
                         skip(data, length);
@@ -1264,7 +1263,7 @@ public final class ClassDecoder {
                                 break;
 
                         }
-                        r_class = new Class(vtm);
+                        r_class = vtm.newClass();
                     } else {
                         try {
                             r_class = vtm.getLoader().asClassLoader().loadClass(vtm.getName());

@@ -726,7 +726,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                     throw new NoClassDefFoundError(getName());
                 }
             } else {
-                javaClassHolder.set(new Class(this));
+//                javaClassHolder.set(new Class(this));
+                javaClassHolder.set(newClass());
             }
             return javaClassHolder.get();
         } else {
@@ -2437,12 +2438,18 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             FIELD_OFFSET = ((VmInstanceField) ClassClass.getDeclaredField("vmClass")).getOffset();
         }
 
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(GETVMCLASS);
-        }
+//        final SecurityManager sm = System.getSecurityManager();
+//        if (sm != null) { //todo: misplaced securty check -> stack overflow in gnu.testlet.
+//                          //todo:                            TestSecurityManager.checkPermission
+                            //todo secure this method
+//            sm.checkPermission(GETVMCLASS);
+//        }
 
         return (VmType<V>) ObjectReference.fromObject(clazz).toAddress().add(FIELD_OFFSET).
             loadObjectReference().toObject();
+    }
+
+    public Class newClass() {
+        return new Class(this);
     }
 }

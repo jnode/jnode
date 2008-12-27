@@ -69,7 +69,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
         if (Modifier.isWide(signature)) {
             modifiers |= Modifier.ACC_WIDE;
         }
-        this.name = name;
+        this.name = name.intern(); //todo review interning, this might not be needed here
         this.signature = signature;
         this.modifiers = modifiers;
         this.declaringClass = declaringClass;
