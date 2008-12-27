@@ -1038,4 +1038,9 @@ class Field extends AccessibleObject implements Member {
         }
         return declaredAnnotations;
     }
+
+    //jnode
+    public int getSlot() {
+        return slot;
+    }
 }

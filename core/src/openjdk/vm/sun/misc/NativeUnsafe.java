@@ -417,8 +417,8 @@ class NativeUnsafe {
 
     private static VmField getVmField(Field f) {
         VmType<?> vmClass = VmType.fromClass((Class<?>) f.getDeclaringClass());
-        vmClass.link();
-        return vmClass.getField(f.getName());
+        //vmClass.link();
+        return vmClass.getDeclaredField(f.getSlot());
     }
 
     public static void ensureClassInitialized(Unsafe instance, Class c) {

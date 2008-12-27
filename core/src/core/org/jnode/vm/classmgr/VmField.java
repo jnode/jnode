@@ -122,8 +122,20 @@ public abstract class VmField extends VmMember {
         }
         Field javaField = javaFieldHolder.get();
         if (javaField == null) {
+            //slot
+            VmType<?> d_class = getDeclaringClass();
+            int slot = -1;
+            for (int i = 0; i < d_class.getNoDeclaredFields(); i++) {
+                if (this == d_class.getDeclaredField(i)) {
+                    slot = i;
+                    break;
+                }
+            }
+            if (slot == -1) {
+                throw new ClassFormatError("Invalid field: " + this.getName());
+            }
             //todo add annotations
-            javaField = new Field(getDeclaringClass().asClass(), getName(), getType().asClass(), getModifiers(), -1,
+            javaField = new Field(d_class.asClass(), getName(), getType().asClass(), getModifiers(), slot,
                 getSignature(), null);
             javaFieldHolder.set(javaField);
         }
