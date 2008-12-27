@@ -24,6 +24,7 @@
 
     <extension point="org.jnode.security.permissions">
         <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+        <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
     </extension>
 
 </plugin>
