@@ -645,8 +645,8 @@ public final class VmSystem {
      * @param length
      */
     @PrivilegedActionPragma
-    public static void arrayCopy(Object src, int srcPos, Object dst,
-                                 int dstPos, int length) {
+    public static void arrayCopy(final Object src, final int srcPos,
+                                 final Object dst, final int dstPos, final int length) {
         Class<?> src_class = src.getClass();
         Class<?> dst_class = dst.getClass();
 
@@ -763,7 +763,28 @@ public final class VmSystem {
         final Address dstPtr = dstAddr.add(dataOffset + (dstPos * elemsize));
         final Extent size = Extent.fromIntZeroExtend(length * elemsize);
 
-        Unsafe.copy(srcPtr, dstPtr, size);
+
+        if (isObjectArray) {
+            Class dst_comp_class = dst_class.getComponentType();
+            Class src_comp_class = src_class.getComponentType();
+            if (!dst_comp_class.isAssignableFrom(src_comp_class)) {
+                //todo optimize for speed
+                Object[] srca = (Object[]) src;
+                Object[] dsta = (Object[]) dst;
+                for (int i = 0; i < length; i++) {
+                    Object o = srca[srcPos + i];
+                    if (o == null || dst_comp_class.isInstance(o)) {
+                        dsta[dstPos + i] = o;
+                    } else {
+                        throw new ArrayStoreException();
+                    }
+                }
+            } else {
+                Unsafe.copy(srcPtr, dstPtr, size);
+            }
+        } else {
+            Unsafe.copy(srcPtr, dstPtr, size);
+        }
 
         if (isObjectArray) {
             final VmWriteBarrier wb = Vm.getHeapManager().getWriteBarrier();
