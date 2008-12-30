@@ -106,7 +106,9 @@ public class IOUtils {
                 try {
                     Class<FilterInputStream> cls = FilterInputStream.class;
                     Field field = cls.getDeclaredField("in");
+                    field.setAccessible(true);
                     Object in = field.get(inputStream);
+                    field.setAccessible(false);
                     return (InputStream) in;
                 } catch (Exception ex) {
                     Logger.getLogger(IOUtils.class).error("Cannot extract the 'in' field", ex);

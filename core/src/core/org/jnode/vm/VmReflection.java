@@ -82,7 +82,7 @@ public final class VmReflection {
             return (byte) getStaticFieldAddress(sf).loadInt();
         } else {
             final VmInstanceField inf = (VmInstanceField) field;
-            return (byte) getInstanceFieldAddress(o, inf).loadByte();
+            return getInstanceFieldAddress(o, inf).loadByte();
         }
     }
 
@@ -93,7 +93,7 @@ public final class VmReflection {
             return (char) getStaticFieldAddress(sf).loadInt();
         } else {
             final VmInstanceField inf = (VmInstanceField) field;
-            return (char) getInstanceFieldAddress(o, inf).loadChar();
+            return getInstanceFieldAddress(o, inf).loadChar();
         }
     }
 
@@ -104,7 +104,7 @@ public final class VmReflection {
             return (short) getStaticFieldAddress(sf).loadInt();
         } else {
             final VmInstanceField inf = (VmInstanceField) field;
-            return (short) getInstanceFieldAddress(o, inf).loadShort();
+            return getInstanceFieldAddress(o, inf).loadShort();
         }
     }
 
@@ -343,39 +343,133 @@ public final class VmReflection {
 
             Unsafe.pushObject(o);
             if (!method.isConstructor()) {
-                method = VmType.fromClass(o.getClass()).getMethod(method.getName(), method.getSignature());
+                //todo implement dynamic method lookup according to JLS 15.12.4.4
+                if(method.isAbstract())
+                    method = VmType.fromClass(o.getClass()).getMethod(method.getName(), method.getSignature());
+                else if(java.lang.reflect.Proxy.isProxyClass(o.getClass())) {
+                    method = VmType.fromClass(o.getClass()).getMethod(method.getName(), method.getSignature());
+                }
             }            
         } else {
             method.getDeclaringClass().initialize();
         }
+        
         for (int i = 0; i < argCount; i++) {
             final VmType<?> argType = method.getArgumentType(i);
             final Object arg = args[i];
             if (argType.isPrimitive()) {
+                if (arg == null)
+                    throw new IllegalArgumentException();
+
                 int v = 0;
                 long lv = 0;
                 boolean wide = false;
-                if (arg == null) {
-                    /* do nothing */
-                } else if (arg instanceof Boolean) {
-                    v = ((Boolean) arg).booleanValue() ? 1 : 0;
-                } else if (arg instanceof Byte) {
-                    v = ((Byte) arg).byteValue();
-                } else if (arg instanceof Character) {
-                    v = ((Character) arg).charValue();
-                } else if (arg instanceof Short) {
-                    v = ((Short) arg).shortValue();
-                } else if (arg instanceof Integer) {
-                    v = ((Integer) arg).intValue();
-                } else if (arg instanceof Long) {
-                    lv = ((Long) arg).longValue();
-                    wide = true;
-                } else if (arg instanceof Float) {
-                    v = Float.floatToRawIntBits(((Float) arg).floatValue());
-                } else if (arg instanceof Double) {
-                    lv = Double.doubleToRawLongBits(((Double) arg)
-                        .doubleValue());
-                    wide = true;
+                switch (argType.getJvmType()) {
+                    case JvmType.BOOLEAN: {
+                        if (arg instanceof Boolean) {
+                            v = (Boolean) arg ? 1 : 0;
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.INT: {
+                        if (arg instanceof Integer) {
+                            v = (Integer) arg;
+                        } else if (arg instanceof Byte) {
+                            v = (Byte) arg;
+                        } else if (arg instanceof Character) {
+                            v = (Character) arg;
+                        } else if (arg instanceof Short) {
+                            v = (Short) arg;
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.CHAR: {
+                        if (arg instanceof Character) {
+                            v = (Character) arg;
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.BYTE: {
+                        if (arg instanceof Byte) {
+                            v = (Byte) arg;
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.SHORT: {
+                        if (arg instanceof Short) {
+                            v = (Short) arg;
+                        } else if (arg instanceof Byte) {
+                            v = (Byte) arg;
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.FLOAT: {
+                        if (arg instanceof Float) {
+                            v = Float.floatToRawIntBits((Float) arg);
+                        } else if (arg instanceof Byte) {
+                            v = Float.floatToRawIntBits((Byte) arg);
+                        } else if (arg instanceof Short) {
+                            v = Float.floatToRawIntBits((Short) arg);
+                        } else if (arg instanceof Integer) {
+                            v = Float.floatToRawIntBits((Integer) arg);
+                        } else if (arg instanceof Character) {
+                            v = Float.floatToRawIntBits((Character) arg);
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.LONG: {
+                        wide = true;
+                        if (arg instanceof Long) {
+                            lv = (Long) arg;
+                        } else if (arg instanceof Integer) {
+                            lv = (Integer) arg;
+                        } else if (arg instanceof Byte) {
+                            lv = (Byte) arg;
+                        } else if (arg instanceof Short) {
+                            lv = (Short) arg;
+                        } else if (arg instanceof Character) {
+                            lv = (Character) arg;
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    case JvmType.DOUBLE: {
+                        wide = true;
+                        if (arg instanceof Double) {
+                            lv = Double.doubleToRawLongBits((Double) arg);
+                        } else if (arg instanceof Integer) {
+                            lv = Double.doubleToRawLongBits((Integer) arg);
+                        } else if (arg instanceof Byte) {
+                            lv = Double.doubleToRawLongBits((Byte) arg);
+                        } else if (arg instanceof Short) {
+                            lv = Double.doubleToRawLongBits((Short) arg);
+                        } else if (arg instanceof Character) {
+                            lv = Double.doubleToRawLongBits((Character) arg);
+                        } else if (arg instanceof Float) {
+                            lv = Double.doubleToRawLongBits((Float) arg);
+                        } else if (arg instanceof Long) {
+                            lv = Double.doubleToRawLongBits((Long) arg);
+                        } else {
+                            throw new IllegalArgumentException("argument type mismatch");
+                        }
+                        break;
+                    }
+                    default: {
+                        throw new RuntimeException("invalid argument type: " + argType);
+                    }
                 }
 
                 final Class argClass = argType.asClass();
@@ -395,6 +489,11 @@ public final class VmReflection {
                     }
                 }
             } else {
+                if(arg != null) {
+                    if(!argType.isAssignableFrom(VmType.fromClass(arg.getClass()))) {
+                        throw new IllegalArgumentException ("argument type mismatch");
+                    }
+                }
                 // Non-primitive argument
                 Unsafe.pushObject(arg);
             }
@@ -410,25 +509,25 @@ public final class VmReflection {
                 long rc = Unsafe.invokeLong(method);
                 final Class<?> retType = method.getReturnType().asClass();
                 if (Long.TYPE == retType) {
-                    return new Long(rc);
+                    return rc;
                 } else {
-                    return new Double(Double.longBitsToDouble(rc));
+                    return Double.longBitsToDouble(rc);
                 }
             } else {
                 int rc = Unsafe.invokeInt(method);
                 final Class retType = method.getReturnType().asClass();
                 if (Byte.TYPE == retType) {
-                    return new Byte((byte) rc);
+                    return (byte) rc;
                 } else if (Boolean.TYPE == retType) {
-                    return Boolean.valueOf(rc != 0);
+                    return rc != 0;
                 } else if (Character.TYPE == retType) {
-                    return new Character((char) rc);
+                    return (char) rc;
                 } else if (Short.TYPE == retType) {
-                    return new Short((short) rc);
+                    return (short) rc;
                 } else if (Float.TYPE == retType) {
-                    return new Float(Float.intBitsToFloat(rc));
+                    return Float.intBitsToFloat(rc);
                 } else {
-                    return new Integer(rc);
+                    return rc;
                 }
             }
         } catch (Throwable ex) {
