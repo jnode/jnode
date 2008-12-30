@@ -23,6 +23,7 @@ package org.jnode.vm.classmgr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import gnu.java.lang.VMClassHelper;
 
 /**
  * @author epr
@@ -103,6 +104,27 @@ public final class TIBBuilder implements TIBLayout {
         method.setTibOffset(index);
     }
 
+    //todo review rules for overriding and do more testing
+    /**
+     * Check if the method has the correct visibility ofr overriding the method at index.
+     * It asumed that the signutares were already checked and they match
+     * @param index
+     * @param method
+     * @return
+     */
+    boolean overrides(int index, VmInstanceMethod method) {
+        if (tibAsArray != null) {
+            throw new RuntimeException("This VMT is locked");
+        }
+        if (index < FIRST_METHOD_INDEX) {
+            throw new IndexOutOfBoundsException("Index (" + index + ")must be >= " + FIRST_METHOD_INDEX);
+        }
+        VmInstanceMethod met = (VmInstanceMethod) tibAsList.get(index);
+        return (met.isPublic() || met.isProtected() || (!met.isPrivate() &&
+            VMClassHelper.getPackagePortion(met.getDeclaringClass().getName()).
+                equals(VMClassHelper.getPackagePortion(method.getDeclaringClass().getName()))));
+    }
+    
     /**
      * Search through a given VMT for a method with a given name & signature.
      * Return the index in the VMT (0..length-1) if found, -1 otherwise.

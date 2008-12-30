@@ -68,7 +68,7 @@ class NativeVMVirtualMachine {
             }
 
             public Object next() {
-                return iter.next().newClass();
+                return iter.next().asClass();
             }
 
             public void remove() {

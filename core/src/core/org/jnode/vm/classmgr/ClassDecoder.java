@@ -1015,7 +1015,7 @@ public final class ClassDecoder {
                                     break;
 
                             }
-                            r_class = vtm.newClass();
+                            r_class = vtm.asClass();
                         } else {
                             try {
                                 r_class = Class.forName(vtm.getName(), false, vtm.getLoader().asClassLoader());
@@ -1024,7 +1024,7 @@ public final class ClassDecoder {
                             }
                         }
                         Object defo = AnnotationParser.parseMemberValue(r_class, data, new VmConstantPool(cls),
-                            cls.newClass());
+                            cls.asClass());
                         mts.setAnnotationDefault(defo);
                     } else {
                         skip(data, length);
@@ -1263,7 +1263,7 @@ public final class ClassDecoder {
                                 break;
 
                         }
-                        r_class = vtm.newClass();
+                        r_class = vtm.asClass();
                     } else {
                         try {
                             r_class = vtm.getLoader().asClassLoader().loadClass(vtm.getName());

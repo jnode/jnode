@@ -148,7 +148,11 @@ public abstract class VmClassType<T> extends VmType<T> {
                 final int index = vmt.indexOf(name, signature);
                 if (index >= 0) {
                     // The method existed in the super class, overwrite it
-                    vmt.set(index, method);
+                    if(vmt.overrides(index, method)){
+                        vmt.set(index, method);
+                    } else {
+                        vmt.add(method);
+                    }
                 } else {
                     // The method does not exist yet.
                     vmt.add(method);
