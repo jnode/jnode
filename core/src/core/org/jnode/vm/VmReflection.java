@@ -344,16 +344,16 @@ public final class VmReflection {
             Unsafe.pushObject(o);
             if (!method.isConstructor()) {
                 //todo implement dynamic method lookup according to JLS 15.12.4.4
-                if(method.isAbstract())
+                if (method.isAbstract())
                     method = VmType.fromClass(o.getClass()).getMethod(method.getName(), method.getSignature());
-                else if(java.lang.reflect.Proxy.isProxyClass(o.getClass())) {
+                else if (java.lang.reflect.Proxy.isProxyClass(o.getClass())) {
                     method = VmType.fromClass(o.getClass()).getMethod(method.getName(), method.getSignature());
                 }
-            }            
+            }
         } else {
             method.getDeclaringClass().initialize();
         }
-        
+
         for (int i = 0; i < argCount; i++) {
             final VmType<?> argType = method.getArgumentType(i);
             final Object arg = args[i];
@@ -489,9 +489,9 @@ public final class VmReflection {
                     }
                 }
             } else {
-                if(arg != null) {
-                    if(!argType.isAssignableFrom(VmType.fromClass(arg.getClass()))) {
-                        throw new IllegalArgumentException ("argument type mismatch");
+                if (arg != null) {
+                    if (!argType.isAssignableFrom(VmType.fromClass(arg.getClass()))) {
+                        throw new IllegalArgumentException("argument type mismatch");
                     }
                 }
                 // Non-primitive argument
