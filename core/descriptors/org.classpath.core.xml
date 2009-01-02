@@ -109,6 +109,7 @@
       <export name="gnu.javax.net.ssl.provider.*"/>
 
       <export name="java.awt.AWTPermission"/>
+      <export name="java.beans.ChangeListenerMap" />
       <export name="java.beans.PropertyChangeListener" />
       <export name="java.beans.PropertyChangeListenerProxy" />
       <export name="java.beans.PropertyChangeSupport" />
