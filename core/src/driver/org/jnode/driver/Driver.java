@@ -25,6 +25,8 @@ import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.system.BootLog;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 
 /**
@@ -49,7 +51,12 @@ public abstract class Driver {
      * Default constructor
      */
     public Driver() {
-        final ClassLoader loader = getClass().getClassLoader();
+        final ClassLoader loader = AccessController.doPrivileged(
+            new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return getClass().getClassLoader();
+                }
+            });
         if (loader instanceof PluginClassLoader) {
             final PluginDescriptor descr = ((PluginClassLoader) loader).getDeclaringPluginDescriptor();
             descr.addListener(new PluginListener());
