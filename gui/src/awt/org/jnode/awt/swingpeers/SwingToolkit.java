@@ -84,6 +84,8 @@ import java.beans.PropertyVetoException;
 import java.util.WeakHashMap;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
@@ -253,7 +255,7 @@ public final class SwingToolkit extends JNodeToolkit {
     protected FramePeer createFrame(final Frame target) {
         final FramePeer[] ret = new FramePeer[1];
 
-        Runnable run = new Runnable() {
+        final Runnable run = new Runnable() {
             public void run() {
 
                 if (!isGuiActive()) {
@@ -296,68 +298,78 @@ public final class SwingToolkit extends JNodeToolkit {
         }   */
             }
         };
+        AccessController.doPrivileged(new PrivilegedAction<Object>(){
+            public Object run() {
 
-        //peer frames should be created in the same app context where the desktop is
-        //todo refactor this into a generic inter-appcontext invoke and wait
-        AppContext ac = SunToolkit.targetToAppContext(target);
-        if (ac != null) {
-            EventQueue eq = (EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
-            if (eq != null) {
+
+                //peer frames should be created in the same app context where the desktop is
+                //todo refactor this into a generic inter-appcontext invoke and wait
+                AppContext ac = SunToolkit.targetToAppContext(target);
+                if (ac != null) {
+                    EventQueue eq = (EventQueue) ac.get(sun.awt.AppContext.EVENT_QUEUE_KEY);
+                    if (eq != null) {
+                        try {
+                            Method met = EventQueue.class.getDeclaredMethod("initDispatchThread");
+                            met.setAccessible(true);
+                            met.invoke(eq);
+                        } catch (Exception x) {
+                            x.printStackTrace();
+                        }
+                    }
+                }
+
+                // invoke and wait --
+                EventQueue eq = getMainEventQueue();
+
+                if (eq == getSystemEventQueueImpl()) {
+                    run.run();
+                    synchronized (ret) {
+                        return ret[0];
+                    }
+                }
+
                 try {
-                    Method met = EventQueue.class.getDeclaredMethod("initDispatchThread");
-                    met.setAccessible(true);
-                    met.invoke(eq);
+                    Field field = EventQueue.class.getField("dispatchThread");
+                    field.setAccessible(true);
+                    Thread edt = (Thread) field.get(eq);
+                    if (Thread.currentThread() == edt) {
+                        run.run();
+                        synchronized (ret) {
+                            return ret[0];
+                        }
+                    }
                 } catch (Exception x) {
-                    x.printStackTrace();
+                    throw new RuntimeException(x);
                 }
-            }
-        }
 
-        // invoke and wait --
-        EventQueue eq = getMainEventQueue();
-
-        if (eq == getSystemEventQueueImpl()) {
-            run.run();
-            synchronized (ret) {
-                return ret[0];
-            }
-        }
-
-        try {
-            Field field = EventQueue.class.getField("dispatchThread");
-            field.setAccessible(true);
-            Thread edt = (Thread) field.get(eq);
-            if (Thread.currentThread() == edt) {
-                run.run();
-                synchronized (ret) {
-                    return ret[0];
+                class AWTInvocationLock {
                 }
+                Object lock = new AWTInvocationLock();
+
+                InvocationEvent event = new InvocationEvent(Toolkit.getDefaultToolkit(), run, lock, true);
+
+                try {
+                    synchronized (lock) {
+                        eq.postEvent(event);
+                        lock.wait();
+                    }
+                } catch (Exception x) {
+                    throw new RuntimeException(x);
+                }
+
+                Throwable eventThrowable = event.getThrowable();
+                if (eventThrowable != null) {
+                    throw new RuntimeException(eventThrowable);
+                }
+
+                 // --invoke and wait
+
+
+                return null;
             }
-        } catch (Exception x) {
-            throw new RuntimeException(x);
-        }
+        });
 
-        class AWTInvocationLock {
-        }
-        Object lock = new AWTInvocationLock();
 
-        InvocationEvent event = new InvocationEvent(Toolkit.getDefaultToolkit(), run, lock, true);
-
-        try {
-            synchronized (lock) {
-                eq.postEvent(event);
-                lock.wait();
-            }
-        } catch (Exception x) {
-            throw new RuntimeException(x);
-        }
-
-        Throwable eventThrowable = event.getThrowable();
-        if (eventThrowable != null) {
-            throw new RuntimeException(eventThrowable);
-        }
-
-        // --invoke and wait
 
         synchronized (ret) {
             return ret[0];

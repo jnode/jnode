@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.isolate.IsolateStatus;
@@ -772,7 +774,7 @@ public final class VmIsolate {
     */
 
 
-    private java.util.concurrent.ExecutorService executor;
+    private ExecutorService executor;
 
     /**
      * Execute a task within this isolate and wait for completion.
@@ -781,7 +783,11 @@ public final class VmIsolate {
      */
     public synchronized void invokeAndWait(final Runnable task) {
         if (executor == null) {
-            executor = java.util.concurrent.Executors.newSingleThreadExecutor(new IsolateThreadFactory2(this));
+            executor = AccessController.doPrivileged(new PrivilegedAction<ExecutorService>(){
+                public ExecutorService run() {
+                    return Executors.newSingleThreadExecutor(new IsolateThreadFactory2(VmIsolate.this));
+                }
+            });
         }
         if (task == null)
             return;
