@@ -31,6 +31,7 @@
     <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read,write"/>
     
     <permission class="java.lang.RuntimePermission" name="getClassLoader" />
+    <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers" />
     <permission class="java.util.PropertyPermission" name="java.util.logging.manager" actions="read"/>
     <permission class="java.util.logging.LoggingPermission" name="control" actions="" />
     <permission class="java.util.PropertyPermission" name="java.util.logging.config.class" actions="read" />
