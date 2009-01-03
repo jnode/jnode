@@ -1,8 +1,10 @@
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -35,13 +37,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         super(device, readOnly, type);
     }
 
-    /**
-     * 
-     * @throws FileSystemException
-     */
-    public void create() throws FileSystemException {
-        // TODO implements file system creation.
-    }
+    
 
     /**
      * 
@@ -113,5 +109,22 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
     public final Superblock getVolumeHeader() {
         return sb;
+    }
+    
+    /**
+     * 
+     * @throws FileSystemException
+     */
+    public void create(int blockSize) throws FileSystemException {
+    	sb = new Superblock();
+    	try {
+    		sb.create(this,blockSize, false);
+    		this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
+    		flush();
+    	} catch (IOException e) {
+    		throw new FileSystemException("Unable to create HFS+ filesystem", e);
+    	} catch (ApiNotFoundException e) {
+    		throw new FileSystemException("Unable to create HFS+ filesystem", e);
+		}
     }
 }

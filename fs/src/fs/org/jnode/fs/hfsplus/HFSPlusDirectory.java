@@ -9,6 +9,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
+import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.FSEntryTable;
@@ -32,7 +33,20 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 
     @Override
     protected final FSEntry createDirectoryEntry(final String name) throws IOException {
-        throw new ReadOnlyFileSystemException();
+    	if(!canWrite()){
+    		throw new ReadOnlyFileSystemException();
+    	}
+    	Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
+    	CatalogFolder newFolder = new CatalogFolder(new CatalogNodeId(volumeHeader.getNextCatalogId()));
+    	log.debug("New catalog folder :\n" + newFolder.toString());
+    	CatalogKey key = new CatalogKey(this.folder.getFolderId(),new HFSUnicodeString(name));
+    	log.debug("New catalog key :\n" + key.toString());
+    	LeafRecord folderRecord = new LeafRecord(key,newFolder.getBytes());
+    	log.debug("New record folder :\n" + folderRecord.toString());
+    	HFSPlusEntry newEntry = new HFSPlusEntry( (HfsPlusFileSystem) getFileSystem(),null,this,name,folderRecord);
+    	volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
+    	log.debug("New volume header :\n" + volumeHeader.toString());
+    	return newEntry;
     }
 
     @Override
@@ -54,7 +68,7 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
                     rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
                 String name = ((CatalogKey) rec.getKey()).getNodeName().getUnicodeString();
                 HFSPlusEntry e =
-                        new HFSPlusEntry((HfsPlusFileSystem) getFileSystem(), null, null, name, rec);
+                        new HFSPlusEntry((HfsPlusFileSystem) getFileSystem(), null, this, name, rec);
                 pathList.add(e);
             }
         }

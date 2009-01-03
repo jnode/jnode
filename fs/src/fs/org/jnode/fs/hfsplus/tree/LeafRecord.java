@@ -13,6 +13,17 @@ public class LeafRecord {
         System.arraycopy(nodeData, offset + key.getKeyLength() + 2, recordData, 0, recordDataSize);
     }
 
+    /**
+     * 
+     * @param key
+     * @param recordData
+     */
+    public LeafRecord(final Key key, final byte[] recordData){
+    	this.key = key;
+    	this.recordData = new byte[recordData.length];
+    	System.arraycopy(recordData,0, this.recordData, 0, recordData.length);
+    }
+    
     public final Key getKey() {
         return key;
     }

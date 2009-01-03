@@ -11,6 +11,20 @@ public class CatalogThread {
         System.arraycopy(src, 0, data, 0, 512);
     }
 
+    /**
+     * Create a new catalog thread.
+     * 
+     * @param type
+     * @param parent
+     * @param name
+     */
+    public CatalogThread(int type, CatalogNodeId parent, HFSUnicodeString name){
+    	BigEndian.setInt16(data, 0, type);
+    	BigEndian.setInt32(data, 4, parent.getId());
+    	System.arraycopy(parent.getBytes(), 0, data, 4, 4);
+    	System.arraycopy(name.getBytes(), 0, data, 8, name.getBytes().length);
+    }
+    
     public final int getRecordType() {
         return BigEndian.getInt16(data, 0);
     }

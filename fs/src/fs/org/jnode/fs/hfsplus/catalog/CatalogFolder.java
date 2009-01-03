@@ -1,5 +1,7 @@
 package org.jnode.fs.hfsplus.catalog;
 
+import org.jnode.fs.hfsplus.HFSUtils;
+import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.util.BigEndian;
 
 public class CatalogFolder {
@@ -8,6 +10,19 @@ public class CatalogFolder {
     public CatalogFolder(final byte[] src) {
         data = new byte[88];
         System.arraycopy(src, 0, data, 0, 88);
+    }
+    
+    /**
+     * Create a new catalog folder.
+     * 
+     * @param folderId
+     * 
+     */
+    public CatalogFolder(CatalogNodeId folderId){
+    	data = new byte[88];
+    	BigEndian.setInt16(data, 0, HfsPlusConstants.RECORD_TYPE_FOLDER);
+    	BigEndian.setInt32(data, 4, 0);
+    	System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
     }
 
     public final int getRecordType() {
@@ -21,12 +36,31 @@ public class CatalogFolder {
     public final CatalogNodeId getFolderId() {
         return new CatalogNodeId(data, 8);
     }
+    
+    public final int getCreateDate() {
+    	return BigEndian.getInt32(data, 12);
+    }
+    
+    public final int getContentModDate() {
+    	return BigEndian.getInt32(data, 16);
+    }
+    
+    public final int getAttrModDate() {
+    	return BigEndian.getInt32(data, 20);
+    }
+    
+    public byte[] getBytes(){
+    	return data;
+    }
 
     public final String toString() {
         StringBuffer s = new StringBuffer();
         s.append("Record type: ").append(getRecordType()).append("\n");
         s.append("Valence: ").append(getValence()).append("\n");
         s.append("Folder ID: ").append(getFolderId().getId()).append("\n");
+        s.append("Creation Date :").append(HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+        s.append("Content Mod Date  :").append(HFSUtils.printDate(getContentModDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
+        s.append("Attr Mod Date  :").append(HFSUtils.printDate(getAttrModDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
 }

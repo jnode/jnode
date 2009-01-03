@@ -14,11 +14,5 @@ public class LeafNode extends Node {
         records = new LeafRecord[offsets.length - 1];
     }
 
-    /**
-     * 
-     * @return
-     */
-    public final LeafRecord[] getRecords() {
-        return records;
-    }
+   
 }
