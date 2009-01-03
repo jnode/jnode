@@ -23,13 +23,9 @@ package org.jnode.log4j.config;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.WriterAppender;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.TextConsole;
-import org.jnode.naming.InitialNaming;
 import org.jnode.vm.Unsafe;
 
 /**

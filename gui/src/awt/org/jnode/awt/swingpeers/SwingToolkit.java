@@ -298,7 +298,7 @@ public final class SwingToolkit extends JNodeToolkit {
         }   */
             }
         };
-        AccessController.doPrivileged(new PrivilegedAction<Object>(){
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
 
 

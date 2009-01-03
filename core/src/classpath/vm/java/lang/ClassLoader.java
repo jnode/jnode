@@ -964,4 +964,8 @@ public abstract class ClassLoader {
         packageAssertionStatus = new HashMap();
     }
 
+    public static void loadLibrary(Class fromClass, String libname, boolean b) {
+        //do nothing
+    }
+
 }
