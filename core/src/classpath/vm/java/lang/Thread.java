@@ -55,6 +55,7 @@ import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
 import sun.security.util.SecurityConstants;
+import sun.nio.ch.Interruptible;
 
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
 * "The Java Language Specification", ISBN 0-201-63451-1
@@ -1457,5 +1458,14 @@ public class Thread implements Runnable
     private static Thread[] getThreads() {
         //todo implement it
         throw new UnsupportedOperationException();
+    }
+
+    /* Set the blocker field; invoked via sun.misc.SharedSecrets from java.nio code
+     */
+    void blockedOn(Interruptible b) {
+        //todo implement it
+//        synchronized (blockerLock) {
+  //          blocker = b;
+    //    }
     }
 }

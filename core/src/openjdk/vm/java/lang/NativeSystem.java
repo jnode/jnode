@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.io.InputStream;
 import java.util.Properties;
 import org.jnode.vm.VmSystem;
+import gnu.classpath.SystemProperties;
 
 
 /**
@@ -15,19 +16,23 @@ import org.jnode.vm.VmSystem;
 public class NativeSystem {
 
 
-    private static void registerNatives(){}
+    private static void registerNatives() {
+    }
+
     private static void setIn0(InputStream in) {
-        //todo implement it
+        VMSystem.setIn(in);
     }
+
     private static void setOut0(PrintStream out) {
-        //todo implement it
+        VMSystem.setOut(out);
     }
+
     private static void setErr0(PrintStream err) {
-        //todo implement it
+        VMSystem.setErr(err);
     }
 
     /**
-     * @see     System#currentTimeMillis()
+     * @see System#currentTimeMillis()
      */
     private static long currentTimeMillis() {
         return VmSystem.currentTimeMillis();
@@ -43,8 +48,8 @@ public class NativeSystem {
     /**
      * @see System#arraycopy(Object, int, Object, int, int)
      */
-    private static void arraycopy(Object src,  int  srcPos,
-                                        Object dest, int destPos, int length) {
+    private static void arraycopy(Object src, int srcPos,
+                                  Object dest, int destPos, int length) {
         VmSystem.arrayCopy(src, srcPos, dest, destPos, length);
     }
 
@@ -56,14 +61,15 @@ public class NativeSystem {
     }
 
     private static Properties initProperties(Properties props) {
-        //todo implement it
+        Properties sys_prop = SystemProperties.getProperties();
+        props.putAll(sys_prop);
         return props;
     }
 
     /**
      * @see System#mapLibraryName(String)
      */
-    private static String mapLibraryName(String libname){
+    private static String mapLibraryName(String libname) {
         return libname;
     }
 }

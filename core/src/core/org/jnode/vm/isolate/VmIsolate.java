@@ -783,7 +783,7 @@ public final class VmIsolate {
      */
     public synchronized void invokeAndWait(final Runnable task) {
         if (executor == null) {
-            executor = AccessController.doPrivileged(new PrivilegedAction<ExecutorService>(){
+            executor = AccessController.doPrivileged(new PrivilegedAction<ExecutorService>() {
                 public ExecutorService run() {
                     return Executors.newSingleThreadExecutor(new IsolateThreadFactory2(VmIsolate.this));
                 }
