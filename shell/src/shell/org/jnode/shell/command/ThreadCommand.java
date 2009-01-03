@@ -22,6 +22,8 @@
 package org.jnode.shell.command;
 
 import java.io.PrintWriter;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
@@ -103,10 +105,16 @@ public class ThreadCommand extends AbstractCommand {
             final Thread t = ts[i];
             if (t != null) {
                 if ((threadName == null) || threadName.equals(t.getName())) {
+                    VmThread vmThread = AccessController
+                    .doPrivileged(new PrivilegedAction<VmThread>() {
+                        public VmThread run() {
+                            return t.getVmThread();
+                        }
+                    });
                     out.println(SLASH_T + t.getId() + SEPARATOR + t.getName() + SEPARATOR +
-                            t.getPriority() + SEPARATOR + t.getVmThread().getThreadStateName());
+                            t.getPriority() + SEPARATOR + vmThread.getThreadStateName());
                     if (threadName != null) {
-                        final Object[] trace = VmThread.getStackTrace(t.getVmThread());
+                        final Object[] trace = VmThread.getStackTrace(vmThread);
                         final int traceLen = trace.length;
                         out.println(SLASH_T + SLASH_T + TRACE);
                         for (int k = 0; k < traceLen; k++) {
