@@ -17,10 +17,10 @@ public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
     @Override
     public final HfsPlusFileSystem format(final Device device) throws FileSystemException {
         try {
-            FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-            HfsPlusFileSystemType type = fSS.getFileSystemType(HfsPlusFileSystemType.ID);
+            FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+            HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
             HfsPlusFileSystem fs = type.create(device, false);
-            fs.create();
+            fs.create(HfsPlusConstants.OPTIMAL_BLOCK_SIZE);
             return fs;
         } catch (NameNotFoundException e) {
             throw new FileSystemException(e);

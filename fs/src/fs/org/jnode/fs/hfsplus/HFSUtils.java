@@ -1,29 +1,40 @@
 package org.jnode.fs.hfsplus;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
 public class HFSUtils {
-    public static final long DIFF_TO_JAVA_DATE_IN_MILLIS = 2082844800000L;
+	
+	/** 
+	 * Difference in second between 01/01/1970 00:00:00 (java reference time)
+	 * and 01/01/1904 00:00:00 (HFS reference time).
+	 */
+    public static final long MAC_DATE_CONVERTION = 2082844800L;
 
     /**
+     * Convert time from/to java time to/from mac time.
+     *  
+     * @param time in seconds since reference date.
+     * @param encode if set to true, convert from java to mac. If set to false, 
+     * convert from mac to java.
      * 
-     * @param time time in second since midnight, January 1, 1904, GMT.
      * @return
      */
-    public static Date decodeDate(final int time) {
-        return new Date(time * 1000 - DIFF_TO_JAVA_DATE_IN_MILLIS);
+    public static long getDate(long time, boolean encode){
+    	time = (encode)? time + MAC_DATE_CONVERTION:time - MAC_DATE_CONVERTION;
+    	return time; 
     }
-
+    
     /**
      * 
      * @param time
      * @param dateFormat
      * @return
      */
-    public static String printDate(final int time, final String dateFormat) {
-        Date date = decodeDate(time);
+    public static String printDate(final long time, final String dateFormat) {
+    	Calendar cal = Calendar.getInstance();
+    	cal.setTimeInMillis(getDate(time, false)*1000);
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        return sdf.format(date.getTime());
+        return sdf.format(cal.getTime());
     }
 }

@@ -39,5 +39,9 @@ public class CatalogNodeId {
     public final int getId() {
         return BigEndian.getInt32(cnid, 0);
     }
+    
+    public final byte[] getBytes(){
+    	return cnid;
+    }
 
 }

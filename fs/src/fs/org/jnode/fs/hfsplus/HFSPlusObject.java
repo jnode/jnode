@@ -3,7 +3,7 @@ package org.jnode.fs.hfsplus;
 import org.jnode.fs.FSObject;
 
 public class HFSPlusObject implements FSObject {
-    private HfsPlusFileSystem fs;
+    protected HfsPlusFileSystem fs;
 
     public HFSPlusObject(final HfsPlusFileSystem fileSystem) {
         this.fs = fileSystem;
