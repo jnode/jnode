@@ -37,6 +37,7 @@
     <alias name="kill" class="org.jnode.shell.command.KillCommand"/>
     <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
     <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
+    <alias name="man" class="org.jnode.shell.command.HelpCommand"/>
     <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
@@ -232,6 +233,10 @@
           </optional>
         </optional>
       </sequence>
+    </syntax>
+    <syntax alias="man">
+      <empty description="Print help about 'man'"/>
+      <argument argLabel="alias" description="Print help about a command alias or class"/>
     </syntax>
     <syntax alias="memory" description="Show JNode memory usage"/>
     <syntax alias="namespace" description="Print the contents of the system namespace"/>
