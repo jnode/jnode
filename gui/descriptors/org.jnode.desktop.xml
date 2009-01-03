@@ -32,12 +32,14 @@
     
     <permission class="java.lang.RuntimePermission" name="getClassLoader" />
     <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers" />
+    <permission class="java.lang.RuntimePermission" name="preferences" />
     <permission class="java.util.PropertyPermission" name="java.util.logging.manager" actions="read"/>
     <permission class="java.util.logging.LoggingPermission" name="control" actions="" />
     <permission class="java.util.PropertyPermission" name="java.util.logging.config.class" actions="read" />
     <permission class="java.util.PropertyPermission" name="java.util.logging.config.file" actions="read" />
     <permission class="java.util.PropertyPermission" name="gnu.classpath.home.url" actions="read" />
     <permission class="java.awt.AWTPermission" name="listenToAllAWTEvents" actions="read" />
+    <permission class="java.awt.AWTPermission" name="setWindowAlwaysOnTop" />
   </extension>
         
 </plugin>
