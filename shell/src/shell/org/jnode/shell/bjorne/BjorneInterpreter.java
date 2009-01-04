@@ -1,3 +1,23 @@
+/*
+ * $Id: Command.java 3772 2008-02-10 15:02:53Z lsantha $
+ *
+ * JNode.org
+ * Copyright (C) 2007-2008 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.shell.bjorne;
 
 import static org.jnode.shell.bjorne.BjorneToken.TOK_CLOBBER;
@@ -16,6 +36,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
@@ -25,6 +46,7 @@ import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
+import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
@@ -133,8 +155,21 @@ public class BjorneInterpreter implements CommandInterpreter {
 
     @Override
     public Completable parsePartial(CommandShell shell, String partial) throws ShellSyntaxException {
-        // TODO Auto-generated method stub
-        return null;
+        init(shell);
+        BjorneTokenizer tokens = new BjorneTokenizer(partial);
+        final CommandNode tree = new BjorneParser(tokens).parse();
+        if (tree instanceof BjorneCompletable) {
+            return new Completable() {
+                @Override
+                public void complete(CompletionInfo completion,
+                        CommandShell shell) throws CompletionException {
+                    ((BjorneCompletable) tree).complete(completion, context, shell);
+                }
+                
+            };
+        } else {
+            return null;
+        }
     }
     
     @Override
@@ -145,21 +180,15 @@ public class BjorneInterpreter implements CommandInterpreter {
 
     @Override
     public String escapeWord(String word) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO implement this properly
+        return word;
     }
 
     int interpret(CommandShell shell, String command, OutputStream capture, boolean source) 
         throws ShellException {
         BjorneContext myContext;
         if (capture == null) {
-            if (this.shell != shell) {
-                if (this.shell != null) {
-                    throw new ShellFailureException("my shell changed");
-                }
-                this.shell = shell;
-                this.context = new BjorneContext(this);
-            }
+            init(shell);
             myContext = this.context;
         } else {
             myContext = new BjorneContext(this);
@@ -183,6 +212,16 @@ public class BjorneInterpreter implements CommandInterpreter {
                 default:
                     throw new ShellFailureException("unknown control " + ex.getControl());
             }
+        }
+    }
+
+    private void init(CommandShell shell) {
+        if (this.shell != shell) {
+            if (this.shell != null) {
+                throw new ShellFailureException("my shell changed");
+            }
+            this.shell = shell;
+            this.context = new BjorneContext(this);
         }
     }
 

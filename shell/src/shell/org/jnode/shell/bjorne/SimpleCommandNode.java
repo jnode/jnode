@@ -1,14 +1,34 @@
-/**
- * 
+/*
+ * $Id: Command.java 3772 2008-02-10 15:02:53Z lsantha $
+ *
+ * JNode.org
+ * Copyright (C) 2007-2008 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.jnode.shell.bjorne;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
+import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 
-public class SimpleCommandNode extends CommandNode {
+public class SimpleCommandNode extends CommandNode implements BjorneCompletable {
 
     private BjorneToken[] assignments;
 
@@ -87,5 +107,16 @@ public class SimpleCommandNode extends CommandNode {
             rc = (rc == 0) ? -1 : 0;
         }
         return rc;
+    }
+
+    @Override
+    public void complete(CompletionInfo completion, BjorneContext context, CommandShell shell)
+            throws CompletionException {
+        try {
+            CommandLine command = context.expandAndSplit(words);
+            command.complete(completion, shell);
+        } catch (ShellException ex) {
+            throw new CompletionException("Shell exception", ex);
+        }
     }
 }

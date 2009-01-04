@@ -1,3 +1,23 @@
+/*
+ * $Id: Command.java 3772 2008-02-10 15:02:53Z lsantha $
+ *
+ * JNode.org
+ * Copyright (C) 2007-2008 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.shell.bjorne;
 
 import java.io.IOException;
@@ -5,12 +25,16 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.List;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
+import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ThreadExitListener;
 import org.jnode.shell.bjorne.BjorneContext.StreamHolder;
+import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandOutput;
@@ -18,7 +42,7 @@ import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
 
 
-public class ListCommandNode extends CommandNode {
+public class ListCommandNode extends CommandNode implements Completable {
     private static class PipelineStage {
         private CommandLine command;
         private BjorneContext context;
@@ -204,5 +228,12 @@ public class ListCommandNode extends CommandNode {
             }
         }
         return stages;
+    }
+
+    @Override
+    public void complete(CompletionInfo completion, CommandShell shell)
+            throws CompletionException {
+        // TODO Auto-generated method stub
+        
     }
 }
