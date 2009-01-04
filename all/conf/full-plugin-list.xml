@@ -31,7 +31,6 @@
 
   <plugin id="thinlet"/>
 
-  <plugin id="org.jnode.shell.bjorne"/>
   <plugin id="org.jnode.shell.command.unix"/>  
 
   <plugin id="org.jnode.apps.jpartition"/>

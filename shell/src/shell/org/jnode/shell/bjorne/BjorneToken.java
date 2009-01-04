@@ -129,6 +129,10 @@ public class BjorneToken extends CommandLine.Token {
         super(text == null ? "" : text, tokenType, start, end);
         validate();
     }
+    
+    public BjorneToken remake(String newText) {
+        return new BjorneToken(this.tokenType, newText, this.start, this.end);
+    }
 
     private void validate() {
         switch (tokenType) {

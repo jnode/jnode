@@ -156,6 +156,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.acplt.oncrpc"/>
 
     <plugin id="org.jnode.shell"/>
+    <plugin id="org.jnode.shell.bjorne"/>
     <plugin id="org.jnode.shell.help"/>
     <plugin id="org.jnode.shell.syntax"/>
     <plugin id="org.jnode.shell.command"/>

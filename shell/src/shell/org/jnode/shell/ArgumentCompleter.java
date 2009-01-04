@@ -25,7 +25,7 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.syntax.Argument;
 
 /**
- * This class wraps an old-style Argument as a Completable for use in a default syntax.
+ * This class wraps an Argument as a Completable for use in a default syntax.
  * 
  * @author crawley@jnode.org
  */
