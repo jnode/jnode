@@ -20,15 +20,15 @@ public class NativeSystem {
     }
 
     private static void setIn0(InputStream in) {
-        VMSystem.setIn(in);
+        VmSystem.setIn(in);
     }
 
     private static void setOut0(PrintStream out) {
-        VMSystem.setOut(out);
+        VmSystem.setOut(out);
     }
 
     private static void setErr0(PrintStream err) {
-        VMSystem.setErr(err);
+        VmSystem.setErr(err);
     }
 
     /**

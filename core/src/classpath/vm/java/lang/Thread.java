@@ -41,7 +41,6 @@ package java.lang;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.HashMap;
-import java.lang.reflect.Constructor;
 
 
 import org.jnode.security.JNodePermission;
@@ -50,7 +49,6 @@ import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
-import org.jnode.vm.isolate.IsolateThread;
 import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
@@ -1258,7 +1256,7 @@ public class Thread implements Runnable
             if (!isAlive()) {
                 return EMPTY_STACK_TRACE;
             }
-	        return VMThrowable.backTrace2stackTrace(VmThread.getStackTrace(vmThread));
+	        return NativeThrowable.backTrace2stackTrace(VmThread.getStackTrace(vmThread));
         } else {
 	        // Don't need JVM help for current thread
 	        return (new Exception()).getStackTrace();
@@ -1468,4 +1466,5 @@ public class Thread implements Runnable
   //          blocker = b;
     //    }
     }
+
 }
