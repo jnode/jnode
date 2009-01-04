@@ -15,8 +15,7 @@ import org.jnode.util.BigEndian;
 public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusFileSystem> {
     public static final Class<HfsPlusFileSystemType> ID = HfsPlusFileSystemType.class;
 
-    public final HfsPlusFileSystem create(final Device device, final boolean readOnly)
-        throws FileSystemException {
+    public final HfsPlusFileSystem create(final Device device, final boolean readOnly) throws FileSystemException {
         HfsPlusFileSystem fs = new HfsPlusFileSystem(device, readOnly, this);
         fs.read();
         return fs;
@@ -26,7 +25,7 @@ public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusF
         return "HFS+";
     }
 
-    public final boolean supports(final PartitionTableEntry pte, final byte[] firstSector,
+    public final boolean supports(final PartitionTableEntry pte, final byte[] firstSector, 
             final FSBlockDeviceAPI devApi) {
         if (pte != null) {
             if (pte instanceof IBMPartitionTableEntry) {

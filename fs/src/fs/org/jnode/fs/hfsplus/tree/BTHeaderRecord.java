@@ -36,9 +36,7 @@ public class BTHeaderRecord {
     }
 
     public final String toString() {
-        return ("Root node:  " + getRootNode() + "\n" +
-                "First leaf: " + getFirstLeafNode() + "\n" +
-                "Last leaf:  " + getLastLeafNode() + "\n" +
-                "node size:  " + getNodeSize() + "\n");
+        return ("Root node:  " + getRootNode() + "\n" + "First leaf: " + getFirstLeafNode() + "\n" + "Last leaf:  "
+                + getLastLeafNode() + "\n" + "node size:  " + getNodeSize() + "\n");
     }
 }

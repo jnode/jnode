@@ -6,14 +6,14 @@ import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 
 public class FormatHfsPlusCommand extends AbstractFormatCommand<HfsPlusFileSystem> {
 
-	public FormatHfsPlusCommand() {
-		super("Format a block device with HFS+ filesystem");
-	}
+    public FormatHfsPlusCommand() {
+        super("Format a block device with HFS+ filesystem");
+    }
 
-	@Override
-	protected Formatter<HfsPlusFileSystem> getFormatter() {
-		// TODO implement it.
-		return null;
-	}
+    @Override
+    protected Formatter<HfsPlusFileSystem> getFormatter() {
+        // TODO implement it.
+        return null;
+    }
 
 }

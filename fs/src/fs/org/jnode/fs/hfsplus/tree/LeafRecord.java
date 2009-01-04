@@ -6,8 +6,7 @@ public class LeafRecord {
     private final Key key;
     private final byte[] recordData;
 
-    public LeafRecord(final Key key, final byte[] nodeData, final int offset,
-            final int recordDataSize) {
+    public LeafRecord(final Key key, final byte[] nodeData, final int offset, final int recordDataSize) {
         this.key = key;
         recordData = new byte[recordDataSize];
         System.arraycopy(nodeData, offset + key.getKeyLength() + 2, recordData, 0, recordDataSize);
@@ -18,12 +17,12 @@ public class LeafRecord {
      * @param key
      * @param recordData
      */
-    public LeafRecord(final Key key, final byte[] recordData){
-    	this.key = key;
-    	this.recordData = new byte[recordData.length];
-    	System.arraycopy(recordData,0, this.recordData, 0, recordData.length);
+    public LeafRecord(final Key key, final byte[] recordData) {
+        this.key = key;
+        this.recordData = new byte[recordData.length];
+        System.arraycopy(recordData, 0, this.recordData, 0, recordData.length);
     }
-    
+
     public final Key getKey() {
         return key;
     }

@@ -19,19 +19,18 @@ import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.util.BigEndian;
 import org.jnode.util.NumberUtils;
 
-
 /**
  * HFS+ volume header definition.
  * 
  * @author Fabien L.
  * 
  */
-public class Superblock extends HFSPlusObject { 
+public class Superblock extends HFSPlusObject {
     private final Logger log = Logger.getLogger(getClass());
-    
+
     /** Volume header data length */
     public static final int SUPERBLOCK_LENGTH = 1024;
-    
+
     /** Data bytes array that contains volume header information */
     private byte[] data;
 
@@ -43,20 +42,24 @@ public class Superblock extends HFSPlusObject {
         data = new byte[SUPERBLOCK_LENGTH];
         log.setLevel(Level.INFO);
     }
-    
+
     /**
-     * Create the volume header and load information for the file system passed as parameter.
-     *  
-     * @param fs The file system contains HFS+ partition.
+     * Create the volume header and load information for the file system passed
+     * as parameter.
      * 
-     * @throws FileSystemException If magic number (0X482B) is incorrect or not available.
+     * @param fs
+     *            The file system contains HFS+ partition.
+     * 
+     * @throws FileSystemException
+     *             If magic number (0X482B) is incorrect or not available.
      */
     public Superblock(final HfsPlusFileSystem fs) throws FileSystemException {
         super(fs);
         log.setLevel(Level.INFO);
         try {
             ByteBuffer b = ByteBuffer.allocate(SUPERBLOCK_LENGTH);
-            // skip the first 1024 bytes (boot sector) and read the volume header.
+            // skip the first 1024 bytes (boot sector) and read the volume
+            // header.
             fs.getApi().read(1024, b);
             data = new byte[SUPERBLOCK_LENGTH];
             System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
@@ -67,82 +70,82 @@ public class Superblock extends HFSPlusObject {
             throw new FileSystemException(e);
         }
     }
-    
-    
-    
+
     /**
      * Create a new volume header.
      * 
      * @param fs
      * @param blockSize
-     * @throws ApiNotFoundException 
+     * @throws ApiNotFoundException
      */
-    public void create(HfsPlusFileSystem fs, int blockSize,boolean journaled) throws IOException, ApiNotFoundException, FileSystemException {
-    	
-    	this.fs = fs;
-    	int burnedBlocksBeforeVH = 0;
-    	int	burnedBlocksAfterAltVH = 0;
-    	/* 
-    	 * Volume header is located at sector 2. Block before this position
-    	 * must be invalidated.
-    	 */
-    	if ( blockSize == 512 ) {
-    		burnedBlocksBeforeVH = 2;		
-    		burnedBlocksAfterAltVH = 1;		
-    	} else if ( blockSize == 1024 ) {
-    		burnedBlocksBeforeVH = 1;
-    	}
-    	long size = fs.getApi().getLength();
-    	long sectorCount = size / fs.getFSApi().getSectorSize();
-		long blocks = size / blockSize;
-		long allocationClumpSize = getClumpSize(blocks);
-    	long bitmapBlocks = allocationClumpSize/blockSize;
-    	long blockUsed = 2+ burnedBlocksBeforeVH +  burnedBlocksAfterAltVH + bitmapBlocks;
-    	// Populate volume header.
-    	this.setMagic(HfsPlusConstants.HFSPLUS_SUPER_MAGIC);
-    	this.setVersion(HfsPlusConstants.HFSPLUS_MIN_VERSION);
-    	//Set attributes.
-    	this.setAttribute(HFSPLUS_VOL_UNMNT_BIT);
-    	this.setLastMountedVersion(0x446534a);
-    	//TODO Put correct dates.
-    	Calendar now = Calendar.getInstance();
-    	now.setTime(new Date());
-    	int macDate = (int)HFSUtils.getDate(now.getTimeInMillis()/1000, true);
-    	this.setCreateDate(macDate);
-    	this.setModifyDate(macDate);
-    	this.setBackupDate(0);
-    	this.setCheckedDate(macDate);
-    	//---
-    	this.setFileCount(0);
-    	this.setFolderCount(0);
-    	this.setBlockSize(blockSize);
-    	this.setTotalBlocks((int)blocks);
-    	this.setFreeBlocks((int)blocks);
-    	this.setRsrcClumpSize(HfsPlusConstants.RESOURCE_CLUMP_FACTOR * blockSize);
-    	this.setDataClumpSize(HfsPlusConstants.DATA_CLUMP_FACTOR * blockSize);
-    	this.setNextCatalogId(CatalogNodeId.HFSPLUS_FIRSTUSER_CNID.getId());
-    	// Allocation file creation
-    	initAllocationFile((int)allocationClumpSize, (int)bitmapBlocks, burnedBlocksBeforeVH);
-    	int nextBlock = 0;
-    	// Journal creation
-    	ExtentDescriptor desc = this.getAllocationFile().getExtents()[0];
-    	if(journaled){
-    		int journalSize = 8*1024*1024;
-    		this.setFileCount(2);
-    		this.setAttribute(HFSPLUS_VOL_JOURNALED_BIT);
-    		this.setNextCatalogId(this.getNextCatalogId() + 2);
-    		this.setJournalInfoBlock(desc.getStartBlock() + desc.getBlockCount());
-    		blockUsed = blockUsed + 1 + (journalSize / blockSize);
-    	} else {
-    		this.setJournalInfoBlock(0);
-    		nextBlock = desc.getStartBlock() + desc.getBlockCount();
-    	}
-    	blockUsed += initExtents(0,blockSize,nextBlock, (int)sectorCount, blockUsed);
-    	blockUsed += initCatalog(0,blockSize,nextBlock, (int)sectorCount, blockUsed);
-    	this.setFreeBlocks(this.getFreeBlocks() - (int)blockUsed);
-    	this.setNextAllocation((int)blockUsed - 1 - burnedBlocksAfterAltVH + 10 * (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
+    public void create(HfsPlusFileSystem fs, int blockSize, boolean journaled) throws IOException,
+            ApiNotFoundException, FileSystemException {
+
+        this.fs = fs;
+        int burnedBlocksBeforeVH = 0;
+        int burnedBlocksAfterAltVH = 0;
+        /*
+         * Volume header is located at sector 2. Block before this position must
+         * be invalidated.
+         */
+        if (blockSize == 512) {
+            burnedBlocksBeforeVH = 2;
+            burnedBlocksAfterAltVH = 1;
+        } else if (blockSize == 1024) {
+            burnedBlocksBeforeVH = 1;
+        }
+        long size = fs.getApi().getLength();
+        long sectorCount = size / fs.getFSApi().getSectorSize();
+        long blocks = size / blockSize;
+        long allocationClumpSize = getClumpSize(blocks);
+        long bitmapBlocks = allocationClumpSize / blockSize;
+        long blockUsed = 2 + burnedBlocksBeforeVH + burnedBlocksAfterAltVH + bitmapBlocks;
+        // Populate volume header.
+        this.setMagic(HfsPlusConstants.HFSPLUS_SUPER_MAGIC);
+        this.setVersion(HfsPlusConstants.HFSPLUS_MIN_VERSION);
+        // Set attributes.
+        this.setAttribute(HFSPLUS_VOL_UNMNT_BIT);
+        this.setLastMountedVersion(0x446534a);
+        // TODO Put correct dates.
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
+        this.setCreateDate(macDate);
+        this.setModifyDate(macDate);
+        this.setBackupDate(0);
+        this.setCheckedDate(macDate);
+        // ---
+        this.setFileCount(0);
+        this.setFolderCount(0);
+        this.setBlockSize(blockSize);
+        this.setTotalBlocks((int) blocks);
+        this.setFreeBlocks((int) blocks);
+        this.setRsrcClumpSize(HfsPlusConstants.RESOURCE_CLUMP_FACTOR * blockSize);
+        this.setDataClumpSize(HfsPlusConstants.DATA_CLUMP_FACTOR * blockSize);
+        this.setNextCatalogId(CatalogNodeId.HFSPLUS_FIRSTUSER_CNID.getId());
+        // Allocation file creation
+        initAllocationFile((int) allocationClumpSize, (int) bitmapBlocks, burnedBlocksBeforeVH);
+        int nextBlock = 0;
+        // Journal creation
+        ExtentDescriptor desc = this.getAllocationFile().getExtents()[0];
+        if (journaled) {
+            int journalSize = 8 * 1024 * 1024;
+            this.setFileCount(2);
+            this.setAttribute(HFSPLUS_VOL_JOURNALED_BIT);
+            this.setNextCatalogId(this.getNextCatalogId() + 2);
+            this.setJournalInfoBlock(desc.getStartBlock() + desc.getBlockCount());
+            blockUsed = blockUsed + 1 + (journalSize / blockSize);
+        } else {
+            this.setJournalInfoBlock(0);
+            nextBlock = desc.getStartBlock() + desc.getBlockCount();
+        }
+        blockUsed += initExtents(0, blockSize, nextBlock, (int) sectorCount, blockUsed);
+        blockUsed += initCatalog(0, blockSize, nextBlock, (int) sectorCount, blockUsed);
+        this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);
+        this.setNextAllocation((int) blockUsed - 1 - burnedBlocksAfterAltVH + 10
+                * (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
     }
-    
+
     /**
      * 
      * @param clumpSize
@@ -150,18 +153,18 @@ public class Superblock extends HFSPlusObject {
      * @param burnedBlocksBeforeVH
      * @return
      */
-    private void initAllocationFile(int clumpSize, int bitmapBlocks, int burnedBlocksBeforeVH){
-    	HFSPlusForkData forkdata = new HFSPlusForkData();
-    	forkdata.setTotalSize(clumpSize);
-    	forkdata.setClumpSize(clumpSize);
-    	forkdata.setTotalBlocks(bitmapBlocks);
-    	ExtentDescriptor desc = new ExtentDescriptor();
-    	desc.setStartBlock(1 + burnedBlocksBeforeVH);
-    	desc.setBlockCount(0);
-    	forkdata.setExtentDescriptor(0, desc);
-    	System.arraycopy(forkdata.getBytes(), 0, data, 112, forkdata.FORK_DATA_LENGTH);
+    private void initAllocationFile(int clumpSize, int bitmapBlocks, int burnedBlocksBeforeVH) {
+        HFSPlusForkData forkdata = new HFSPlusForkData();
+        forkdata.setTotalSize(clumpSize);
+        forkdata.setClumpSize(clumpSize);
+        forkdata.setTotalBlocks(bitmapBlocks);
+        ExtentDescriptor desc = new ExtentDescriptor();
+        desc.setStartBlock(1 + burnedBlocksBeforeVH);
+        desc.setBlockCount(0);
+        forkdata.setExtentDescriptor(0, desc);
+        System.arraycopy(forkdata.getBytes(), 0, data, 112, forkdata.FORK_DATA_LENGTH);
     }
-    
+
     /**
      * 
      * @param extentsClumpBlock
@@ -169,26 +172,26 @@ public class Superblock extends HFSPlusObject {
      * @param nextBlock
      * @return
      */
-    private long initExtents(int extentsClumpBlock, int blockSize, int nextBlock, int sectorCount, long blockUsed){
-    	int extentNodeSize = 4096;
-    	long clumpSize = 0;
-    	if(extentsClumpBlock == 0){
-    		clumpSize = getBTreeClumpSize(blockSize, extentNodeSize, sectorCount, false);
-    	} else {
-    		clumpSize = clumpSizeCalculation(extentsClumpBlock, blockSize);
-    	}
-    	HFSPlusForkData forkdata = new HFSPlusForkData();
-    	forkdata.setTotalSize(clumpSize);
-    	forkdata.setClumpSize((int)clumpSize);
-    	forkdata.setTotalBlocks((int)(clumpSize/blockSize));
-    	ExtentDescriptor desc = new ExtentDescriptor();
-    	desc.setStartBlock(nextBlock);
-    	desc.setBlockCount(forkdata.getTotalBlocks());
-    	forkdata.setExtentDescriptor(0, desc);
-    	System.arraycopy(forkdata.getBytes(), 0, data, 192, forkdata.FORK_DATA_LENGTH);
-    	return blockUsed + forkdata.getTotalBlocks();
+    private long initExtents(int extentsClumpBlock, int blockSize, int nextBlock, int sectorCount, long blockUsed) {
+        int extentNodeSize = 4096;
+        long clumpSize = 0;
+        if (extentsClumpBlock == 0) {
+            clumpSize = getBTreeClumpSize(blockSize, extentNodeSize, sectorCount, false);
+        } else {
+            clumpSize = clumpSizeCalculation(extentsClumpBlock, blockSize);
+        }
+        HFSPlusForkData forkdata = new HFSPlusForkData();
+        forkdata.setTotalSize(clumpSize);
+        forkdata.setClumpSize((int) clumpSize);
+        forkdata.setTotalBlocks((int) (clumpSize / blockSize));
+        ExtentDescriptor desc = new ExtentDescriptor();
+        desc.setStartBlock(nextBlock);
+        desc.setBlockCount(forkdata.getTotalBlocks());
+        forkdata.setExtentDescriptor(0, desc);
+        System.arraycopy(forkdata.getBytes(), 0, data, 192, forkdata.FORK_DATA_LENGTH);
+        return blockUsed + forkdata.getTotalBlocks();
     }
-    
+
     /**
      * 
      * @param extentsClumpBlock
@@ -197,57 +200,61 @@ public class Superblock extends HFSPlusObject {
      * @param sectorCount
      * @param blockUsed
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
-    private long initCatalog(int catalogClumpBlock, int blockSize, int nextBlock, int sectorCount, long blockUsed) throws FileSystemException{
-    	int catalogNodeSize = 8192;
-    	try{
-    	if(blockSize < HfsPlusConstants.OPTIMAL_BLOCK_SIZE || fs.getApi().getLength() < 0x40000000){
-    		catalogNodeSize = 4096;
-    	}
-    	long clumpSize = 0;
-    	if(catalogClumpBlock == 0){
-    		clumpSize = getBTreeClumpSize(blockSize, catalogNodeSize, sectorCount, true);
-    	} else {
-    		clumpSize = clumpSizeCalculation(catalogClumpBlock, blockSize);
-    		if(clumpSize % catalogNodeSize != 0){
-    			throw new FileSystemException("clump size is not a multiple of node size");
-    		}
-    	}
-    	
-    	HFSPlusForkData forkdata = new HFSPlusForkData();
-    	forkdata.setTotalSize(clumpSize);
-    	forkdata.setClumpSize((int)clumpSize);
-    	forkdata.setTotalBlocks((int)(clumpSize/blockSize));
-    	ExtentDescriptor desc = new ExtentDescriptor();
-    	desc.setStartBlock(this.getExtentsFile().getExtents()[0].getStartBlock() + this.getExtentsFile().getExtents()[0].getBlockCount());
-    	desc.setBlockCount(forkdata.getTotalBlocks());
-    	forkdata.setExtentDescriptor(0, desc);
-    	System.arraycopy(forkdata.getBytes(), 0, data, 272, forkdata.FORK_DATA_LENGTH);
-    	return blockUsed + forkdata.getTotalBlocks();
-    	} catch(IOException e){
-    		throw new FileSystemException(e);
-    	}
+    private long initCatalog(int catalogClumpBlock, int blockSize, int nextBlock, int sectorCount, long blockUsed)
+        throws FileSystemException {
+        int catalogNodeSize = 8192;
+        try {
+            if (blockSize < HfsPlusConstants.OPTIMAL_BLOCK_SIZE || fs.getApi().getLength() < 0x40000000) {
+                catalogNodeSize = 4096;
+            }
+            long clumpSize = 0;
+            if (catalogClumpBlock == 0) {
+                clumpSize = getBTreeClumpSize(blockSize, catalogNodeSize, sectorCount, true);
+            } else {
+                clumpSize = clumpSizeCalculation(catalogClumpBlock, blockSize);
+                if (clumpSize % catalogNodeSize != 0) {
+                    throw new FileSystemException("clump size is not a multiple of node size");
+                }
+            }
+
+            HFSPlusForkData forkdata = new HFSPlusForkData();
+            forkdata.setTotalSize(clumpSize);
+            forkdata.setClumpSize((int) clumpSize);
+            forkdata.setTotalBlocks((int) (clumpSize / blockSize));
+            ExtentDescriptor desc = new ExtentDescriptor();
+            desc.setStartBlock(this.getExtentsFile().getExtents()[0].getStartBlock()
+                    + this.getExtentsFile().getExtents()[0].getBlockCount());
+            desc.setBlockCount(forkdata.getTotalBlocks());
+            forkdata.setExtentDescriptor(0, desc);
+            System.arraycopy(forkdata.getBytes(), 0, data, 272, forkdata.FORK_DATA_LENGTH);
+            return blockUsed + forkdata.getTotalBlocks();
+        } catch (IOException e) {
+            throw new FileSystemException(e);
+        }
     }
-    
+
     /**
      * Calculate the number of blocks needed for bitmap.
      * 
-     * @param totalBlocks Total of blocks found in the device.
+     * @param totalBlocks
+     *            Total of blocks found in the device.
      * 
      * @return long - Number of blocks.
      * 
      * @throws IOException
      */
     private long getClumpSize(long totalBlocks) throws IOException {
-    	long clumpSize;
-    	long minClumpSize = totalBlocks >> 3;
-    	if ((totalBlocks & 7) == 0){
-    		++minClumpSize;
-    	}
-    	clumpSize = minClumpSize;
-    	return clumpSize;
+        long clumpSize;
+        long minClumpSize = totalBlocks >> 3;
+        if ((totalBlocks & 7) == 0) {
+            ++minClumpSize;
+        }
+        clumpSize = minClumpSize;
+        return clumpSize;
     }
+
     /**
      * 
      * @param blockSize
@@ -257,39 +264,41 @@ public class Superblock extends HFSPlusObject {
      * @return
      */
 
-    private int[] extentClumpTable = new int[]{4,4,4,5,5,6,7,8,9,11,14,16,20,25,32};
-    private int[] catalogClumpTable = new int[]{4,6,8,11,14,19,25,34,45,60,80,107,144,192,256};
-    private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors, boolean catalog){
-    	long clumpSize = 0;
-    	if(sectors < 0x200000){
-    		clumpSize = (sectors << 2);
-    		if(clumpSize < (8*nodeSize)){
-    			clumpSize = (8*nodeSize);
-    		}
-    	} else {
-    		sectors = sectors >> 22;
-    		for(int i=0;sectors != 0 && (i < 14);++i){
-    			if(catalog){
-    				clumpSize = catalogClumpTable[i] * 1024 * 1024;
-    			} else {
-    				clumpSize = extentClumpTable[i] * 1024 * 1024;
-    			}
-    			sectors = sectors >> 1;
-    		}
-    	}
-    	
-    	return clumpSize;
+    private int[] extentClumpTable = new int[] {4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32 };
+    private int[] catalogClumpTable = new int[] {4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256 };
+
+    private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors, boolean catalog) {
+        long clumpSize = 0;
+        if (sectors < 0x200000) {
+            clumpSize = (sectors << 2);
+            if (clumpSize < (8 * nodeSize)) {
+                clumpSize = (8 * nodeSize);
+            }
+        } else {
+            sectors = sectors >> 22;
+            for (int i = 0; sectors != 0 && (i < 14); ++i) {
+                if (catalog) {
+                    clumpSize = catalogClumpTable[i] * 1024 * 1024;
+                } else {
+                    clumpSize = extentClumpTable[i] * 1024 * 1024;
+                }
+                sectors = sectors >> 1;
+            }
+        }
+
+        return clumpSize;
     }
-    
-    private int clumpSizeCalculation(long clumpBlocks, int blockSize){
-    	long clumpSize = clumpBlocks * blockSize;
-    	if((clumpSize & 0XFFFFFFFF00000000L) == 0){
-    		//ERROR
-    	}
-    	return (int)clumpSize;
+
+    private int clumpSizeCalculation(long clumpBlocks, int blockSize) {
+        long clumpSize = clumpBlocks * blockSize;
+        if ((clumpSize & 0XFFFFFFFF00000000L) == 0) {
+            // ERROR
+        }
+        return (int) clumpSize;
     }
+
     // Getters/setters
-    
+
     public final int getMagic() {
         return BigEndian.getInt16(data, 0);
     }
@@ -309,12 +318,12 @@ public class Superblock extends HFSPlusObject {
 
     //
     public final int getAttributes() {
-    	
+
         return BigEndian.getInt32(data, 4);
     }
-    
+
     public final void setAttribute(final int attributeMaskBit) {
-    	BigEndian.setInt32(data, 4,(getAttributes() >> attributeMaskBit) | 0x1);
+        BigEndian.setInt32(data, 4, (getAttributes() >> attributeMaskBit) | 0x1);
     }
 
     //
@@ -487,51 +496,53 @@ public class Superblock extends HFSPlusObject {
     public final HFSPlusForkData getStartupFile() {
         return new HFSPlusForkData(data, 432);
     }
-    
+
     /**
      * Get string representation of attribute.
      * 
      * @return
      */
     public final String getAttributesAsString() {
-        return ((isAttribute(HFSPLUS_VOL_UNMNT_BIT)) ? " kHFSVolumeUnmountedBit" : "") +
-                ((isAttribute(HFSPLUS_VOL_INCNSTNT_BIT)) ? " kHFSBootVolumeInconsistentBit" : "") +
-                ((isAttribute(HFSPLUS_VOL_JOURNALED_BIT)) ? " kHFSVolumeJournaledBit" : "");
+        return ((isAttribute(HFSPLUS_VOL_UNMNT_BIT)) ? " kHFSVolumeUnmountedBit" : "")
+                + ((isAttribute(HFSPLUS_VOL_INCNSTNT_BIT)) ? " kHFSBootVolumeInconsistentBit" : "")
+                + ((isAttribute(HFSPLUS_VOL_JOURNALED_BIT)) ? " kHFSVolumeJournaledBit" : "");
     }
 
     /**
      * Check if the corresponding attribute corresponding is set.
      * 
-     * @param maskBit Bit position of the attribute. See constants.
+     * @param maskBit
+     *            Bit position of the attribute. See constants.
      * 
      * @return true if attribute is set.
      */
     public final boolean isAttribute(final int maskBit) {
         return (((getAttributes() >> maskBit) & 0x1) != 0);
     }
-    
-    public byte[] getBytes(){
-    	return data;
+
+    public byte[] getBytes() {
+        return data;
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public final String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("Magic: 0x").append(NumberUtils.hex(getMagic(), 4)).append("\n");
         buffer.append("Version: ").append(getVersion()).append("\n").append("\n");
-        buffer.append("Attributes: ").append(getAttributesAsString()).append(" (").append(getAttributes()).append(")").append("\n").append("\n");
-        buffer.append("Create date: ").append(
-                HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
-        buffer.append("Modify date: ").append(
-                HFSUtils.printDate(getModifyDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
-        buffer.append("Backup date: ").append(
-                HFSUtils.printDate(getBackupDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
-        buffer.append("Checked date: ").append(
-                HFSUtils.printDate(getCheckedDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n")
-                .append("\n");
+        buffer.append("Attributes: ").append(getAttributesAsString()).append(" (").append(getAttributes()).append(")")
+                .append("\n").append("\n");
+        buffer.append("Create date: ").append(HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append(
+                "\n");
+        buffer.append("Modify date: ").append(HFSUtils.printDate(getModifyDate(), "EEE MMM d HH:mm:ss yyyy")).append(
+                "\n");
+        buffer.append("Backup date: ").append(HFSUtils.printDate(getBackupDate(), "EEE MMM d HH:mm:ss yyyy")).append(
+                "\n");
+        buffer.append("Checked date: ").append(HFSUtils.printDate(getCheckedDate(), "EEE MMM d HH:mm:ss yyyy")).append(
+                "\n").append("\n");
         buffer.append("File count: ").append(getFileCount()).append("\n");
         buffer.append("Folder count: ").append(getFolderCount()).append("\n").append("\n");
         buffer.append("Block size: ").append(getBlockSize()).append("\n");

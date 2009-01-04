@@ -5,7 +5,7 @@ public class HfsPlusConstants {
 
     public static final int HFSPLUS_MIN_VERSION = 0x0004; /* HFS+ */
     public static final int HFSPLUS_CURRENT_VERSION = 5; /* HFSX */
-    
+
     /* HFS+ volume attributes */
     public static final int HFSPLUS_VOL_UNMNT_BIT = 8;
     public static final int HFSPLUS_VOL_SPARE_BLK_BIT = 9;
@@ -14,12 +14,12 @@ public class HfsPlusConstants {
     public static final int HFSPLUS_VOL_NODEID_REUSED_BIT = 12;
     public static final int HFSPLUS_VOL_JOURNALED_BIT = 13;
     public static final int HFSPLUS_VOL_SOFTLOCK_BIT = 15;
-    
+
     public static final int BT_LEAF_NODE = -1;
     public static final int BT_INDEX_NODE = 0;
     public static final int BT_HEADER_NODE = 1;
     public static final int BT_MAP_NODE = 2;
-    
+
     /* Types */
     public static final int RECORD_TYPE_FOLDER = 0x0001;
     public static final int RECORD_TYPE_FILE = 0x0002;
@@ -32,10 +32,10 @@ public class HfsPlusConstants {
 
     public static final byte EK_DATA_FORK = (byte) 0x00;
     public static final byte EK_RESOURCE_FORK = (byte) 0xFF;
-    
+
     public static final int MINIMAL_BLOCK_SIZE = 512;
     public static final int OPTIMAL_BLOCK_SIZE = 4096;
-    
+
     public static final int DATA_CLUMP_FACTOR = 16;
     public static final int RESOURCE_CLUMP_FACTOR = 16;
 }

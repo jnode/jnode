@@ -8,7 +8,7 @@ public class HFSPlusForkData {
     private static final int EXTENT_OFFSET = 16;
 
     private byte[] data;
-    
+
     /**
      * 
      * @param src
@@ -18,7 +18,7 @@ public class HFSPlusForkData {
         data = new byte[FORK_DATA_LENGTH];
         System.arraycopy(src, offset, data, 0, FORK_DATA_LENGTH);
     }
-    
+
     /**
      * 
      * Create a new empty fork data object.
@@ -27,50 +27,49 @@ public class HFSPlusForkData {
      * @param clumpSize
      * @param totalBock
      */
-    public HFSPlusForkData(){
-    	data = new byte[FORK_DATA_LENGTH];
+    public HFSPlusForkData() {
+        data = new byte[FORK_DATA_LENGTH];
     }
 
     public final long getTotalSize() {
         return BigEndian.getInt64(data, 0);
     }
 
-    public final void setTotalSize(long totalSize){
-    	BigEndian.setInt64(data, 0, totalSize);
+    public final void setTotalSize(long totalSize) {
+        BigEndian.setInt64(data, 0, totalSize);
     }
-    
+
     public final int getClumpSize() {
         return BigEndian.getInt32(data, 8);
     }
 
-    public final void setClumpSize(int clumpSize){
-    	BigEndian.setInt32(data, 8, clumpSize);
+    public final void setClumpSize(int clumpSize) {
+        BigEndian.setInt32(data, 8, clumpSize);
     }
-    
+
     public final int getTotalBlocks() {
         return BigEndian.getInt32(data, 12);
     }
 
-    public final void setTotalBlocks(int totalBlock){
-    	BigEndian.setInt32(data, 12, totalBlock);
+    public final void setTotalBlocks(int totalBlock) {
+        BigEndian.setInt32(data, 12, totalBlock);
     }
-    
+
     public final ExtentDescriptor[] getExtents() {
         ExtentDescriptor[] list = new ExtentDescriptor[8];
         for (int i = 0; i < 8; i++) {
-            list[i] = new ExtentDescriptor(
-                    data, EXTENT_OFFSET + (i * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH));
+            list[i] = new ExtentDescriptor(data, EXTENT_OFFSET + (i * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH));
         }
         return list;
     }
-    
-    public final void setExtentDescriptor(int position, ExtentDescriptor desc){
-    	 int offset = EXTENT_OFFSET + (position * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH);
-    	 System.arraycopy(desc.getBytes(), 0, data, offset, ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH);
+
+    public final void setExtentDescriptor(int position, ExtentDescriptor desc) {
+        int offset = EXTENT_OFFSET + (position * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH);
+        System.arraycopy(desc.getBytes(), 0, data, offset, ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH);
     }
-    
-    public byte[] getBytes(){
-    	return data;
+
+    public byte[] getBytes() {
+        return data;
     }
 
     public final String toString() {
