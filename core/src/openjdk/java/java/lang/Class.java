@@ -2985,7 +2985,7 @@ public final
             if (universe == null)
                 throw new IllegalArgumentException(
                     getName() + " is not an enum type");
-            Map<String, T> m = new org.jnode.util.BootableHashMap<String, T>(2 * universe.length);
+            Map<String, T> m = new HashMap<String, T>(2 * universe.length);
             for (T constant : universe)
                 m.put(((Enum)constant).name(), constant);
             enumConstantDirectory = m;
@@ -3100,7 +3100,7 @@ public final
         if (superClass == null) {
             annotations = declaredAnnotations;
         } else {
-            annotations = new org.jnode.util.BootableHashMap<Class, Annotation>();
+            annotations = new HashMap<Class, Annotation>();
             superClass.initAnnotationsIfNecessary();
             for (Map.Entry<Class, Annotation> e : superClass.annotations.entrySet()) {
                 Class annotationClass = e.getKey();
