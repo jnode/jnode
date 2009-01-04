@@ -231,9 +231,8 @@ public class ListCommandNode extends CommandNode implements Completable {
     }
 
     @Override
-    public void complete(CompletionInfo completion, CommandShell shell)
-            throws CompletionException {
+    public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
         // TODO Auto-generated method stub
-        
+
     }
 }
