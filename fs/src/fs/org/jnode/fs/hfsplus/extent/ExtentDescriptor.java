@@ -14,7 +14,7 @@ public class ExtentDescriptor {
     public ExtentDescriptor() {
         data = new byte[EXTENT_DESCRIPTOR_LENGTH];
     }
-    
+
     public ExtentDescriptor(final byte[] src, final int offset) {
         data = new byte[EXTENT_DESCRIPTOR_LENGTH];
         System.arraycopy(src, offset, data, 0, EXTENT_DESCRIPTOR_LENGTH);
@@ -24,22 +24,22 @@ public class ExtentDescriptor {
         return BigEndian.getInt32(data, 0);
     }
 
-    public final void setStartBlock(int start){
-    	BigEndian.setInt32(data, 0, start);
+    public final void setStartBlock(int start) {
+        BigEndian.setInt32(data, 0, start);
     }
-    
+
     public final int getBlockCount() {
         return BigEndian.getInt32(data, 4);
     }
-    
-    public final void setBlockCount(int count){
-    	BigEndian.setInt32(data, 4, count);
+
+    public final void setBlockCount(int count) {
+        BigEndian.setInt32(data, 4, count);
     }
 
-    public final byte[] getBytes(){
-    	return data;
+    public final byte[] getBytes() {
+        return data;
     }
-    
+
     public final String toString() {
         return "Start block : " + getStartBlock() + "\tBlock count : " + getBlockCount() + "\n";
     }

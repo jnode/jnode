@@ -8,8 +8,8 @@ public class HFSPlusEntry extends AbstractFSEntry {
 
     private LeafRecord record;
 
-    public HFSPlusEntry(final HfsPlusFileSystem fs, final FSEntryTable table,
-            final HFSPlusDirectory parent, final String name, final LeafRecord record) {
+    public HFSPlusEntry(final HfsPlusFileSystem fs, final FSEntryTable table, final HFSPlusDirectory parent,
+            final String name, final LeafRecord record) {
         super(fs, table, parent, name, getFSEntryType(name, record));
         this.record = record;
     }

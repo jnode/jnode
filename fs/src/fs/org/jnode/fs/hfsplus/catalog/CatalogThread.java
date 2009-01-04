@@ -18,13 +18,13 @@ public class CatalogThread {
      * @param parent
      * @param name
      */
-    public CatalogThread(int type, CatalogNodeId parent, HFSUnicodeString name){
-    	BigEndian.setInt16(data, 0, type);
-    	BigEndian.setInt32(data, 4, parent.getId());
-    	System.arraycopy(parent.getBytes(), 0, data, 4, 4);
-    	System.arraycopy(name.getBytes(), 0, data, 8, name.getBytes().length);
+    public CatalogThread(int type, CatalogNodeId parent, HFSUnicodeString name) {
+        BigEndian.setInt16(data, 0, type);
+        BigEndian.setInt32(data, 4, parent.getId());
+        System.arraycopy(parent.getBytes(), 0, data, 4, 4);
+        System.arraycopy(name.getBytes(), 0, data, 8, name.getBytes().length);
     }
-    
+
     public final int getRecordType() {
         return BigEndian.getInt16(data, 0);
     }

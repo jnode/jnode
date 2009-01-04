@@ -15,7 +15,6 @@ import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFileSystem;
 
-
 public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     private final Logger log = Logger.getLogger(getClass());
 
@@ -32,12 +31,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
      * @param type
      * @throws FileSystemException
      */
-    public HfsPlusFileSystem(final Device device, final boolean readOnly,
-            final HfsPlusFileSystemType type) throws FileSystemException {
+    public HfsPlusFileSystem(final Device device, final boolean readOnly, final HfsPlusFileSystemType type)
+        throws FileSystemException {
         super(device, readOnly, type);
     }
-
-    
 
     /**
      * 
@@ -48,8 +45,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
         log.debug("Superblock informations:\n" + sb.toString());
         if (!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)) {
-            log.info(getDevice().getId() +
-                    " Filesystem has not been cleanly unmounted, mounting it readonly");
+            log.info(getDevice().getId() + " Filesystem has not been cleanly unmounted, mounting it readonly");
             setReadOnly(true);
         }
         if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_SOFTLOCK_BIT)) {
@@ -57,8 +53,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             setReadOnly(true);
         }
         if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT)) {
-            log.info(getDevice().getId() +
-                    " Filesystem is journaled, write access is not supported. Mounting it readonly");
+            log.info(getDevice().getId()
+                    + " Filesystem is journaled, write access is not supported. Mounting it readonly");
             setReadOnly(true);
         }
         try {
@@ -110,21 +106,21 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     public final Superblock getVolumeHeader() {
         return sb;
     }
-    
+
     /**
      * 
      * @throws FileSystemException
      */
     public void create(int blockSize) throws FileSystemException {
-    	sb = new Superblock();
-    	try {
-    		sb.create(this,blockSize, false);
-    		this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
-    		flush();
-    	} catch (IOException e) {
-    		throw new FileSystemException("Unable to create HFS+ filesystem", e);
-    	} catch (ApiNotFoundException e) {
-    		throw new FileSystemException("Unable to create HFS+ filesystem", e);
-		}
+        sb = new Superblock();
+        try {
+            sb.create(this, blockSize, false);
+            this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
+            flush();
+        } catch (IOException e) {
+            throw new FileSystemException("Unable to create HFS+ filesystem", e);
+        } catch (ApiNotFoundException e) {
+            throw new FileSystemException("Unable to create HFS+ filesystem", e);
+        }
     }
 }

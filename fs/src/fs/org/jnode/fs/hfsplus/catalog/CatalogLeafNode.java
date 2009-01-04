@@ -10,8 +10,7 @@ import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogLeafNode extends LeafNode {
 
-    public CatalogLeafNode(final NodeDescriptor descriptor, final byte[] nodeData,
-            final int nodeSize) {
+    public CatalogLeafNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize) {
         super(descriptor, nodeData, nodeSize);
         for (int i = 0; i < records.length; ++i) {
             int currentOffset = offsets[i];
@@ -47,8 +46,7 @@ public class CatalogLeafNode extends LeafNode {
         List<LeafRecord> list = new LinkedList<LeafRecord>();
         for (LeafRecord rec : records) {
             Key key = rec.getKey();
-            if (key instanceof CatalogKey &&
-                    ((CatalogKey) key).getParentId().getId() == parentId.getId()) {
+            if (key instanceof CatalogKey && ((CatalogKey) key).getParentId().getId() == parentId.getId()) {
                 list.add(rec);
             }
         }
