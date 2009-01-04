@@ -34,7 +34,7 @@ public final class Strings {
     }
 
     public static float parseFloat(String value) {
-        return (float)VMDouble.parseDouble(value);
+        return (float)Double.parseDouble(value);
     }
 
     /**
