@@ -351,4 +351,28 @@ public class CodeSource implements Serializable
             }
         }
     }
+
+    //jnode openjdk
+    /**
+     * Constructs a CodeSource and associates it with the specified
+     * location and set of code signers.
+     *
+     * @param url the location (URL).
+     * @param signers the code signers. It may be null. The contents of the
+     * array are copied to protect against subsequent modification.
+     *
+     * @since 1.5
+     */
+    public CodeSource(URL url, CodeSigner[] signers) {
+        this.location = url;
+
+        // Copy the supplied signers
+        if (signers != null) {
+            this.signers = signers.clone();
+        }
+    }
+    /*
+     * The code signers.
+     */
+    private transient CodeSigner[] signers = null;
 } // class CodeSource
