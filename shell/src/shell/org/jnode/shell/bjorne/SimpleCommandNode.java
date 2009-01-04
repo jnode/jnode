@@ -111,7 +111,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
 
     @Override
     public void complete(CompletionInfo completion, BjorneContext context, CommandShell shell)
-            throws CompletionException {
+        throws CompletionException {
         try {
             CommandLine command = context.expandAndSplit(words);
             command.complete(completion, shell);
