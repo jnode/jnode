@@ -51,10 +51,10 @@ import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
- * This is a Java implementation of the Bourne Shell language.
+ * This is the JNode implementation of the Bourne Shell language.  The long term
+ * goal is to faithfully implement the POSIX Shell specification.
  * 
  * @author crawley@jnode.org
- * 
  */
 public class BjorneInterpreter implements CommandInterpreter {
 
@@ -141,6 +141,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     private BjorneContext context;
 
     public BjorneInterpreter() {
+        this.context = new BjorneContext(this);
     }
 
     @Override
@@ -155,15 +156,15 @@ public class BjorneInterpreter implements CommandInterpreter {
 
     @Override
     public Completable parsePartial(CommandShell shell, String partial) throws ShellSyntaxException {
-        init(shell);
+        bindShell(shell);
         BjorneTokenizer tokens = new BjorneTokenizer(partial);
         final CommandNode tree = new BjorneParser(tokens).parse();
         if (tree instanceof BjorneCompletable) {
             return new Completable() {
                 @Override
-                public void complete(CompletionInfo completion,
+                public void complete(CompletionInfo completions,
                         CommandShell shell) throws CompletionException {
-                    ((BjorneCompletable) tree).complete(completion, context, shell);
+                    ((BjorneCompletable) tree).complete(completions, context, shell);
                 }
                 
             };
@@ -187,8 +188,10 @@ public class BjorneInterpreter implements CommandInterpreter {
     int interpret(CommandShell shell, String command, OutputStream capture, boolean source) 
         throws ShellException {
         BjorneContext myContext;
+        // FIXME ... I think there is something wrong / incomplete with the way I'm handling
+        // the contexts here ...
         if (capture == null) {
-            init(shell);
+            bindShell(shell);
             myContext = this.context;
         } else {
             myContext = new BjorneContext(this);
@@ -215,13 +218,12 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
     }
 
-    private void init(CommandShell shell) {
+    private void bindShell(CommandShell shell) {
         if (this.shell != shell) {
             if (this.shell != null) {
                 throw new ShellFailureException("my shell changed");
             }
             this.shell = shell;
-            this.context = new BjorneContext(this);
         }
     }
 

@@ -199,7 +199,7 @@ public class BjorneContext {
     }
 
     /**
-     * Crreat a copy of a context with the same initial variable bindings and
+     * Create a copy of a context with the same initial variable bindings and
      * streams. Stream ownership is not transferred.
      * 
      * @param parent the context that gives us our initial state.
@@ -305,111 +305,123 @@ public class BjorneContext {
     }
 
     /**
-     * Perform expand-and-split processing on an array of word/name tokens.
+     * Perform expand-and-split processing on an array of word tokens. The resulting
+     * wordTokens are assembled into a CommandLine.  
      * 
      * @param tokens the tokens to be expanded and split into words
-     * @return the resulting words
+     * @return the command line
      * @throws ShellException
      */
     public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
-        LinkedList<String> words = new LinkedList<String>();
+        LinkedList<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
         for (BjorneToken token : tokens) {
-            splitAndAppend(expand(token.getText()), words);
+            splitAndAppend(token, wordTokens);
         }
-        return makeCommandLine(words);
+        return makeCommandLine(wordTokens);
     }
 
     /**
-     * Perform expand-and-split processing on sequence of characters
+     * Perform expand-and-split processing on a sequence of characters.  The resulting
+     * wordTokens are assembled into a CommandLine.  This method is only used in tests
+     * at the moment, and probably should be removed.  (It does not set token attributes
+     * properly ...)
      * 
      * @param text the characters to be split
-     * @return the resulting words
+     * @return the command line 
      * @throws ShellException
      */
     public CommandLine expandAndSplit(CharSequence text) throws ShellException {
-        LinkedList<String> words = split(expand(text));
+        LinkedList<BjorneToken> words = split(expand(text));
         return makeCommandLine(words);
     }
 
-    private CommandLine makeCommandLine(LinkedList<String> words) {
+    private CommandLine makeCommandLine(LinkedList<BjorneToken> wordTokens) {
         if (globbing || tildes) {
-            LinkedList<String> globbedWords = new LinkedList<String>();
-            for (String word : words) {
+            LinkedList<BjorneToken> globbedWordTokens = new LinkedList<BjorneToken>();
+            for (BjorneToken wordToken : wordTokens) {
                 if (tildes) {
-                    word = tildeExpand(word);
+                    wordToken = tildeExpand(wordToken);
                 }
                 if (globbing) {
-                    globAndAppend(word, globbedWords);
+                    globAndAppend(wordToken, globbedWordTokens);
                 } else {
-                    globbedWords.add(word);
+                    globbedWordTokens.add(wordToken);
                 }
             }
-            words = globbedWords;
+            wordTokens = globbedWordTokens;
         }
-        int nosWords = words.size();
+        int nosWords = wordTokens.size();
         if (nosWords == 0) {
             return new CommandLine(null, null);
-        } else if (nosWords == 1) {
-            return new CommandLine(words.get(0), null);
         } else {
-            String alias = words.removeFirst();
-            String[] args = words.toArray(new String[nosWords - 1]);
-            return new CommandLine(alias, args);
+            BjorneToken alias = wordTokens.removeFirst();
+            BjorneToken[] args = wordTokens.toArray(new BjorneToken[nosWords - 1]);
+            return new CommandLine(alias, args, null);
         }
     }
     
-    private String tildeExpand(String word) {
+    private BjorneToken tildeExpand(BjorneToken wordToken) {
+        String word = wordToken.getText();
         if (word.startsWith("~")) {
             int slashPos = word.indexOf(File.separatorChar);
             String name = (slashPos >= 0) ? word.substring(1, slashPos) : "";
-            // FIXME ... support "~username" when we have kind of user info / management.
+            // FIXME ... support "~username" when we have some kind of user info / management.
             String home = (name.length() == 0) ? System.getProperty("user.home", "") : "";
             if (home.length() == 0) {
-                return word;
-            } else if (slashPos == -1) {
-                return home;
-            } else {
-                return home + word.substring(slashPos);
-            }
+                return wordToken;
+            } 
+            String expansion = (slashPos == -1) ?
+                home : (home + word.substring(slashPos));
+            return wordToken.remake(expansion);
         } else {
-            return word;
+            return wordToken;
         }
     }
     
-    private void globAndAppend(String word, LinkedList<String> globbedWords) {
+    private void globAndAppend(BjorneToken wordToken, LinkedList<BjorneToken> globbedWordTokens) {
         // Try to deal with the 'not-a-pattern' case quickly and cheaply.
+        String word = wordToken.getText();
         if (!PathnamePattern.isPattern(word)) {
-            globbedWords.add(word);
+            globbedWordTokens.add(wordToken);
             return;
         }
         PathnamePattern pattern = PathnamePattern.compile(word);
         LinkedList<String> paths = pattern.expand(new File("."));
         // If it doesn't match anything, a pattern 'expands' to itself.
         if (paths.isEmpty()) {
-            globbedWords.add(word);
+            globbedWordTokens.add(wordToken);
         } else {
-            globbedWords.addAll(paths);
+            for (String path : paths) {
+                globbedWordTokens.add(wordToken.remake(path));
+            }
         }
     }
 
     /**
-     * Split a character sequence into words, dealing with and removing any
-     * non-literal quotes.
+     * Split a character sequence into word tokens, dealing with and removing any
+     * non-literal
      * 
      * @param text the characters to be split
-     * @return the resulting list of words.
+     * @return the destination for the tokens.
      * @throws ShellException
      */
-    public LinkedList<String> split(CharSequence text) throws ShellException {
-        LinkedList<String> words = new LinkedList<String>();
-        splitAndAppend(text, words);
-        return words;
+    public LinkedList<BjorneToken> split(CharSequence text) throws ShellException {
+        LinkedList<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
+        splitAndAppend(new BjorneToken(-1, text.toString(), -1, -1), wordTokens);
+        return wordTokens;
     }
     
     /**
-     * This method does the work of 'split'; see above.
+     * Split a token into a series of word tokens, dealing with and removing any
+     * non-literal quotes.  The resulting tokens are appended to a supplied list.
+     * 
+     * @param token the token to be split
+     * @param wordTokens the destination for the tokens.
+     * @throws ShellException
      */
-    private void splitAndAppend(CharSequence text, LinkedList<String> words) throws ShellException {
+    private void splitAndAppend(BjorneToken token, LinkedList<BjorneToken> wordTokens)
+        throws ShellException {
+        String text = token.getText();
         StringBuffer sb = null;
         int len = text.length();
         int quote = 0;
@@ -433,7 +445,7 @@ public class BjorneContext {
                 case '\t':
                     if (quote == 0) {
                         if (sb != null) {
-                            words.add(sb.toString());
+                            wordTokens.add(token.remake(sb.toString()));
                             sb = null;
                         }
                     } else {
@@ -452,7 +464,7 @@ public class BjorneContext {
             }
         }
         if (sb != null) {
-            words.add(sb.toString());
+            wordTokens.add(token.remake(sb.toString()));
         }
     }
 
