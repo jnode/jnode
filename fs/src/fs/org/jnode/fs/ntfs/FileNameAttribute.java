@@ -128,6 +128,15 @@ final class FileNameAttribute extends NTFSResidentAttribute {
     }
 
     /**
+     * Gets the time when the MFT record last changed.
+     *
+     * @return the MFT change time, as a 64-bit NTFS filetime value.
+     */
+    public long getMftChangeTime() {
+        return getInt64(getAttributeOffset() + 0x18);
+    }
+
+    /**
      * Gets the access time.
      *
      * @return the access time, as a 64-bit NTFS filetime value.

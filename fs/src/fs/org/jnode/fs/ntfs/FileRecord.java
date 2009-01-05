@@ -48,6 +48,11 @@ class FileRecord extends NTFSRecord {
     private AttributeListAttribute attributeListAttribute;
 
     /**
+     * Cached standard information attribute.
+     */
+    private StandardInformationAttribute standardInformationAttribute;
+
+    /**
      * Cached file name attribute.
      */
     private FileNameAttribute fileNameAttribute;
@@ -226,9 +231,22 @@ class FileRecord extends NTFSRecord {
     }
 
     /**
-     * Gets the filename attribute of this filerecord.
+     * Gets the standard information attribute for this file record.
+     *
+     * @return the standard information attribute.
+     */
+    public StandardInformationAttribute getStandardInformationAttribute() {
+        if (standardInformationAttribute == null) {
+            standardInformationAttribute =
+                (StandardInformationAttribute) findAttributeByType(NTFSAttribute.Types.STANDARD_INFORMATION);
+        }
+        return standardInformationAttribute;
+    }
+
+    /**
+     * Gets the file name attribute for this file record.
      * 
-     * @return the filename attribute.
+     * @return the file name attribute.
      */
     public FileNameAttribute getFileNameAttribute() {
         if (fileNameAttribute == null) {
