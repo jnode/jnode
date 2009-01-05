@@ -174,6 +174,8 @@ public abstract class NTFSAttribute extends NTFSStructure {
         final int type = fileRecord.getUInt32AsInt(offset + 0x00);
 
         switch (type) {
+            case Types.STANDARD_INFORMATION:
+                return new StandardInformationAttribute(fileRecord, offset);
             case Types.ATTRIBUTE_LIST:
                 if (resident) {
                     return new AttributeListAttributeRes(fileRecord, offset);
