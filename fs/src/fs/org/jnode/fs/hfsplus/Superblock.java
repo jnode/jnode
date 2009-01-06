@@ -35,15 +35,6 @@ public class Superblock extends HFSPlusObject {
     private byte[] data;
 
     /**
-     * Default constructor for empty volume header.
-     */
-    public Superblock() {
-        super(null);
-        data = new byte[SUPERBLOCK_LENGTH];
-        log.setLevel(Level.INFO);
-    }
-
-    /**
      * Create the volume header and load information for the file system passed
      * as parameter.
      * 
@@ -53,18 +44,21 @@ public class Superblock extends HFSPlusObject {
      * @throws FileSystemException
      *             If magic number (0X482B) is incorrect or not available.
      */
-    public Superblock(final HfsPlusFileSystem fs) throws FileSystemException {
+    public Superblock(final HfsPlusFileSystem fs, boolean create) throws FileSystemException {
         super(fs);
         log.setLevel(Level.INFO);
+        data = new byte[SUPERBLOCK_LENGTH];
         try {
-            ByteBuffer b = ByteBuffer.allocate(SUPERBLOCK_LENGTH);
-            // skip the first 1024 bytes (boot sector) and read the volume
-            // header.
-            fs.getApi().read(1024, b);
-            data = new byte[SUPERBLOCK_LENGTH];
-            System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
-            if (getMagic() != HFSPLUS_SUPER_MAGIC) {
-                throw new FileSystemException("Not hfs+ volume header (" + getMagic() + ": bad magic)");
+            if (!create) {
+                // skip the first 1024 bytes (boot sector) and read the volume
+                // header.
+                ByteBuffer b = ByteBuffer.allocate(SUPERBLOCK_LENGTH);
+                fs.getApi().read(1024, b);
+                data = new byte[SUPERBLOCK_LENGTH];
+                System.arraycopy(b.array(), 0, data, 0, SUPERBLOCK_LENGTH);
+                if (getMagic() != HFSPLUS_SUPER_MAGIC) {
+                    throw new FileSystemException("Not hfs+ volume header (" + getMagic() + ": bad magic)");
+                }
             }
         } catch (IOException e) {
             throw new FileSystemException(e);
@@ -74,20 +68,19 @@ public class Superblock extends HFSPlusObject {
     /**
      * Create a new volume header.
      * 
-     * @param fs
-     * @param blockSize
+     * @param params
+     * 
      * @throws ApiNotFoundException
      */
-    public void create(HfsPlusFileSystem fs, int blockSize, boolean journaled) throws IOException,
+    public void create(HFSPlusParams params) throws IOException,
             ApiNotFoundException, FileSystemException {
-
-        this.fs = fs;
         int burnedBlocksBeforeVH = 0;
         int burnedBlocksAfterAltVH = 0;
         /*
          * Volume header is located at sector 2. Block before this position must
          * be invalidated.
          */
+        int blockSize = params.getBlockSize();
         if (blockSize == 512) {
             burnedBlocksBeforeVH = 2;
             burnedBlocksAfterAltVH = 1;
@@ -106,7 +99,6 @@ public class Superblock extends HFSPlusObject {
         // Set attributes.
         this.setAttribute(HFSPLUS_VOL_UNMNT_BIT);
         this.setLastMountedVersion(0x446534a);
-        // TODO Put correct dates.
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
@@ -128,13 +120,12 @@ public class Superblock extends HFSPlusObject {
         int nextBlock = 0;
         // Journal creation
         ExtentDescriptor desc = this.getAllocationFile().getExtents()[0];
-        if (journaled) {
-            int journalSize = 8 * 1024 * 1024;
+        if (params.isJournaled()) {
             this.setFileCount(2);
             this.setAttribute(HFSPLUS_VOL_JOURNALED_BIT);
             this.setNextCatalogId(this.getNextCatalogId() + 2);
             this.setJournalInfoBlock(desc.getStartBlock() + desc.getBlockCount());
-            blockUsed = blockUsed + 1 + (journalSize / blockSize);
+            blockUsed = blockUsed + 1 + (params.getJournalSize() / blockSize);
         } else {
             this.setJournalInfoBlock(0);
             nextBlock = desc.getStartBlock() + desc.getBlockCount();

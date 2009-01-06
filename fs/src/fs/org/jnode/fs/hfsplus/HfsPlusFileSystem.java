@@ -41,7 +41,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
      * @throws FileSystemException
      */
     public final void read() throws FileSystemException {
-        sb = new Superblock(this);
+        sb = new Superblock(this, false);
 
         log.debug("Superblock informations:\n" + sb.toString());
         if (!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)) {
@@ -111,10 +111,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
      * 
      * @throws FileSystemException
      */
-    public void create(int blockSize) throws FileSystemException {
-        sb = new Superblock();
+    public void create(HFSPlusParams params) throws FileSystemException {
+        sb = new Superblock(this, true);
         try {
-            sb.create(this, blockSize, false);
+            sb.create(params);
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();
         } catch (IOException e) {

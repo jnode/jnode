@@ -38,4 +38,7 @@ public class HfsPlusConstants {
 
     public static final int DATA_CLUMP_FACTOR = 16;
     public static final int RESOURCE_CLUMP_FACTOR = 16;
+    
+    public static final int DEFAULT_JOURNAL_SIZE = 8 * 1024 * 1024;
+    
 }
