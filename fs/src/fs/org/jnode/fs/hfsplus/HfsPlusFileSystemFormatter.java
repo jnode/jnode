@@ -9,9 +9,12 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 
 public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
-
-    protected HfsPlusFileSystemFormatter() {
+    
+    private HFSPlusParams params;
+    
+    public HfsPlusFileSystemFormatter(HFSPlusParams params) {
         super(new HfsPlusFileSystemType());
+        this.params = params;
     }
 
     @Override
@@ -20,7 +23,7 @@ public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
             FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
             HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
             HfsPlusFileSystem fs = type.create(device, false);
-            fs.create(HfsPlusConstants.OPTIMAL_BLOCK_SIZE);
+            fs.create(params);
             return fs;
         } catch (NameNotFoundException e) {
             throw new FileSystemException(e);
