@@ -336,6 +336,7 @@ public final class VmSystem {
         res.put("sun.boot.class.path", ":");
 
         res.put("swing.handleTopLevelPaint", "false");
+        res.put("java.protocol.handler.pkgs", "org.jnode.protocol|gnu.java.net.protocol|gnu.inet");
 
         VmSystemSettings.insertSystemProperties(res);
     }

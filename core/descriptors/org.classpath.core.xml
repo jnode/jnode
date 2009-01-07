@@ -33,7 +33,8 @@
       <export name="sun.reflect.misc.*"/>
       <export name="sun.net.InetAddressCachePolicy"/>
       <export name="sun.net.util.IPAddressUtil"/>
-      <export name="sun.net.www.ParseUtil"/>
+      <export name="sun.net.www.*"/>
+      <export name="sun.net.www.protocol.jar.*"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.net.spi.nameservice.NameService"/>
       <export name="sun.net.spi.nameservice.NameServiceDescriptor"/>
