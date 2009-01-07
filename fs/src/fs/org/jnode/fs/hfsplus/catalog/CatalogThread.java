@@ -19,6 +19,7 @@ public class CatalogThread {
      * @param name
      */
     public CatalogThread(int type, CatalogNodeId parent, HFSUnicodeString name) {
+        data = new byte[512];
         BigEndian.setInt16(data, 0, type);
         BigEndian.setInt32(data, 4, parent.getId());
         System.arraycopy(parent.getBytes(), 0, data, 4, 4);
