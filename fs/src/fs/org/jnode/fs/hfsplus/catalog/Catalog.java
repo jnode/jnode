@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HFSUnicodeString;
 import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
@@ -22,7 +23,46 @@ public class Catalog {
     private NodeDescriptor btnd;
     private BTHeaderRecord bthr;
     private int firstNodeOffset;
-
+    
+    /**
+     * Create new Catalog
+     * 
+     * @param params
+     */
+    public Catalog(HFSPlusParams params){
+        btnd = new NodeDescriptor();
+        btnd.setKind(HfsPlusConstants.BT_HEADER_NODE);
+        btnd.setHeight(0);
+        btnd.setRecordCount(3);
+        //
+        bthr = new BTHeaderRecord();
+        bthr.setTreeDepth(1);
+        bthr.setRootNode(1);
+        bthr.settFirstLeafNode(1);
+        bthr.setLastLeafNode(1);
+        bthr.setLeafRecords(params.isJournaled() ? 6 : 2);
+        bthr.setNodeSize(params.getCatalogNodeSize());
+        bthr.setTotalNodes(params.getCatalogClumpSize()/params.getCatalogNodeSize());
+        bthr.setFreeNodes(bthr.getTotalNodes() - 2);
+        bthr.setClumpSize(params.getCatalogClumpSize());
+        //TODO initialize attributes, max key length and key comparaison type.        
+        // Root directory
+        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID,new HFSUnicodeString(params.getVolumeName()));
+        CatalogFolder folder = new CatalogFolder();
+        folder.setFolderId(CatalogNodeId.HFSPLUS_ROOT_CNID);
+        folder.setValence(params.isJournaled() ? 2 : 0);
+        //TODO creation date, content modification date, text encoding and access rights.
+        ck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID,new HFSUnicodeString(""));
+        CatalogThread ct = new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+    }
+    
+    /**
+     * Create Catalog based on catalog file that exist on the file system.
+     * 
+     * @param fs
+     * 
+     * @throws IOException
+     */
     public Catalog(final HfsPlusFileSystem fs) throws IOException {
         log.debug("Initialize catalog\n");
         this.fs = fs;

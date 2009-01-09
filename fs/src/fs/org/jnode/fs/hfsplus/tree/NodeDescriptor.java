@@ -1,11 +1,16 @@
 package org.jnode.fs.hfsplus.tree;
 
+import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.util.BigEndian;
 
 public class NodeDescriptor {
     public static final int BT_NODE_DESCRIPTOR_LENGTH = 14;
     private byte[] data;
 
+    public NodeDescriptor(){
+        data = new byte[BT_NODE_DESCRIPTOR_LENGTH];
+    }
+    
     public NodeDescriptor(final byte[] src) {
         data = new byte[BT_NODE_DESCRIPTOR_LENGTH];
         System.arraycopy(src, 0, data, 0, BT_NODE_DESCRIPTOR_LENGTH);
@@ -22,13 +27,25 @@ public class NodeDescriptor {
     public final int getKind() {
         return BigEndian.getInt8(data, 8);
     }
+    
+    public void setKind(int kind){
+        BigEndian.setInt8(data, 8, kind);
+    }
 
     public final int getHeight() {
         return BigEndian.getInt8(data, 9);
     }
 
+    public void setHeight(int height){
+        BigEndian.setInt8(data, 9, height);
+    }
+    
     public final int getNumRecords() {
         return BigEndian.getInt16(data, 10);
+    }
+    
+    public void setRecordCount(int count){
+        BigEndian.setInt16(data, 10, count);
     }
 
     public final String toString() {
