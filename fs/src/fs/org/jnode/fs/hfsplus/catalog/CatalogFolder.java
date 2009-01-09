@@ -18,23 +18,29 @@ public class CatalogFolder {
      * @param folderId
      * 
      */
-    public CatalogFolder(CatalogNodeId folderId) {
+    public CatalogFolder() {
         data = new byte[88];
         BigEndian.setInt16(data, 0, HfsPlusConstants.RECORD_TYPE_FOLDER);
-        BigEndian.setInt32(data, 4, 0);
-        System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
     }
 
     public final int getRecordType() {
         return BigEndian.getInt16(data, 0);
     }
 
+    public final void setValence(int valence) {
+        BigEndian.setInt32(data, 4, valence);
+    }
+    
     public final int getValence() {
         return BigEndian.getInt32(data, 4);
     }
 
     public final CatalogNodeId getFolderId() {
         return new CatalogNodeId(data, 8);
+    }
+    
+    public final void setFolderId(CatalogNodeId folderId){
+        System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
     }
 
     public final int getCreateDate() {

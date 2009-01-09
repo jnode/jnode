@@ -37,7 +37,8 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
             throw new ReadOnlyFileSystemException();
         }
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
-        CatalogFolder newFolder = new CatalogFolder(new CatalogNodeId(volumeHeader.getNextCatalogId()));
+        CatalogFolder newFolder = new CatalogFolder();
+        newFolder.setFolderId(new CatalogNodeId(volumeHeader.getNextCatalogId()));
         log.debug("New catalog folder :\n" + newFolder.toString());
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), new HFSUnicodeString(name));
         log.debug("New catalog key :\n" + key.toString());
