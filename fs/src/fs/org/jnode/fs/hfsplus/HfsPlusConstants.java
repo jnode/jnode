@@ -33,12 +33,6 @@ public class HfsPlusConstants {
     public static final byte EK_DATA_FORK = (byte) 0x00;
     public static final byte EK_RESOURCE_FORK = (byte) 0xFF;
 
-    public static final int MINIMAL_BLOCK_SIZE = 512;
-    public static final int OPTIMAL_BLOCK_SIZE = 4096;
-
-    public static final int DATA_CLUMP_FACTOR = 16;
-    public static final int RESOURCE_CLUMP_FACTOR = 16;
     
-    public static final int DEFAULT_JOURNAL_SIZE = 8 * 1024 * 1024;
     
 }
