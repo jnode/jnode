@@ -34,6 +34,7 @@ import org.jnode.util.ProxyStream;
 import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.VmExit;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.isolate.VmIsolate;
 
 /**
  * This class implements the proclet-specific state used in the JNode proclet
@@ -46,8 +47,9 @@ import org.jnode.vm.VmSystem;
  * @author crawley@jnode.org
  */
 public class ProcletContext extends ThreadGroup {
+    public static final int NO_SUCH_PID = 0;
+    
     private Properties properties;
-    private Object[] streams;
     private Map<String, String> environment;
     private int threadCount;
     private final int pid;
@@ -66,8 +68,8 @@ public class ProcletContext extends ThreadGroup {
                 properties = parentContext.properties;
             }
             if (properties == null) {
-                properties = AccessController
-                        .doPrivileged(new PrivilegedAction<Properties>() {
+                properties = AccessController.doPrivileged(
+                        new PrivilegedAction<Properties>() {
                             public Properties run() {
                                 return System.getProperties();
                             }
@@ -76,19 +78,13 @@ public class ProcletContext extends ThreadGroup {
             properties = (Properties) properties.clone();
         }
         if (streams == null) {
-            if (parentContext != null) {
-                streams = parentContext.streams;
-            }
-            if (streams == null) {
-                try {
-                    streams = new Object[] {
-                        resolve(System.in), resolve(System.out), resolve(System.err)};
-                } catch (ProxyStreamException ex) {
-                    throw new ProcletException("Broken streams", ex);
-                }
-            } else {
-                streams = (Object[]) streams.clone();
-            }
+            try {
+                streams = new Object[] {
+                        resolve(System.in), resolve(System.out), resolve(System.err)
+                };
+            } catch (ProxyStreamException ex) {
+                throw new ProcletException("Broken streams", ex);
+            } 
         }
         if (environment == null) {
             if (parentContext != null) {
@@ -100,14 +96,17 @@ public class ProcletContext extends ThreadGroup {
         }
         this.environment = environment;
         this.properties = properties;
-        this.streams = streams;
         this.pid = extractPid(getName());
+        ((ProcletIOContext) VmIsolate.getRoot().getIOContext()).setStreamsForNewProclet(pid, streams);
         setDaemon(true);
     }
 
     private Closeable resolve(Closeable stream) throws ProxyStreamException {
-        return (stream instanceof ProxyStream) ? ((ProxyStream<?>) stream)
-                .getProxiedStream() : stream;
+        if (stream instanceof ProxyStream) {
+            return ((ProxyStream<?>) stream).getProxiedStream();
+        } else {
+            return stream;
+        }
     }
 
     /**
@@ -125,44 +124,6 @@ public class ProcletContext extends ThreadGroup {
 
     public synchronized Properties getProperties() {
         return properties;
-    }
-
-    /**
-     * Set the stream object that corresponds to a given 'fd'.
-     * 
-     * @param fd a non-negative index into the streams vector.
-     * @param stream the stream object to set.
-     */
-    synchronized void setStream(int fd, Object stream) {
-        if (stream instanceof ProcletProxyStream) {
-            throw new IllegalArgumentException(
-                    "stream is a proclet proxy stream");
-        }
-        if (fd < 0) {
-            throw new IllegalArgumentException("fd is negative");
-        }
-        if (fd >= streams.length) {
-            Object[] tmp = new Object[fd + 1];
-            System.arraycopy(streams, 0, tmp, 0, streams.length);
-            streams = tmp;
-        }
-        streams[fd] = stream;
-    }
-
-    /**
-     * Get the stream object that corresponds to a given 'fd'.
-     * 
-     * @param fd a non-negative index into the streams vector.
-     * @return the stream object, or <code>null</code>
-     */
-    public synchronized Object getStream(int fd) {
-        if (fd < 0) {
-            throw new IllegalArgumentException("fd is negative");
-        } else if (fd > streams.length) {
-            return null;
-        } else {
-            return streams[fd];
-        }
     }
 
     public synchronized void setProperties(Properties properties) {

@@ -22,10 +22,11 @@
 package org.jnode.shell.proclet;
 
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jnode.util.ProxyStream;
 import org.jnode.util.ProxyStreamException;
-import org.jnode.vm.VmSystem;
 
 /**
  * This class provides a proxy mechanism for System.out,err. If the current
@@ -37,46 +38,64 @@ import org.jnode.vm.VmSystem;
  */
 public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
         ProcletProxyStream<PrintStream> {
+
+    private Map<Integer, PrintStream> streamMap; 
+    
     private final int fd;
 
-    public ProcletProxyPrintStream(int fd) {
+    /**
+     * Construct a proxy print stream with 'out' as the initial global stream.
+     * 
+     * @param proxy
+     * @param ps
+     * @param pid
+     */
+    public ProcletProxyPrintStream(PrintStream ps, int fd) {
         super();
+        if (ps == null) {
+            throw new IllegalArgumentException("null stream");
+        }
         this.fd = fd;
+        streamMap = new HashMap<Integer, PrintStream>();
+        streamMap.put(ProcletIOContext.GLOBAL_STREAM_ID, ps);
     }
-
+    
+    /**
+     * Construct a proxy print stream based on the state of the supplied proxy.
+     * The new proxy has all entries of the existing one except that the entry
+     * for pid is set / reset to in.
+     * 
+     * @param proxy
+     * @param ps
+     * @param pid
+     */
+    public ProcletProxyPrintStream(ProcletProxyPrintStream proxy, PrintStream ps,
+            int pid) {
+        if (ps == null) {
+            throw new IllegalArgumentException("null stream");
+        }
+        streamMap = new HashMap<Integer, PrintStream>(proxy.streamMap);
+        streamMap.put(pid, ps);
+        fd = proxy.fd;
+    }
+    
     /**
      * This method does the work of deciding which printstream to delegate to.
      * 
      * @return the PrintStream we are currently delegating to.
      */
     private PrintStream proxiedPrintStream() throws ProxyStreamException {
-        ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-        if (threadGroup instanceof ProcletContext) {
-            try {
-                Object stream = ((ProcletContext) threadGroup).getStream(fd);
-                if (stream instanceof ProcletProxyStream) {
-                    throw new ProxyStreamException(
-                            "Proclet stream points to another proclet stream");
-                }
-                if (stream instanceof ProxyStream) {
-                    stream = ((ProxyStream<?>) stream).getRealStream();
-                }
-                return (PrintStream) stream;
-            } catch (Exception ex) {
-                throw new ProxyStreamException("Proclet print broken for fd = "
-                        + fd, ex);
-            }
-        } else {
-            switch (fd) {
-                case 1:
-                    return VmSystem.getGlobalOutStream();
-                case 2:
-                    return VmSystem.getGlobalErrStream();
-                default:
-                    throw new ProxyStreamException(
-                            "Proclet print stream broken: wrong fd = " + fd);
-            }
+        ProcletContext procletContext = ProcletContext.currentProcletContext();
+        int pid = (procletContext == null) ? ProcletIOContext.GLOBAL_STREAM_ID : procletContext.getPid();
+        PrintStream ps = getProxiedStream(pid);
+        if (ps == null) {
+            throw new ProxyStreamException(
+                    "Proclet stream not set (fd = " + fd + ")");
+        } else if (ps instanceof ProcletProxyStream) {
+            throw new ProxyStreamException(
+                    "Proclet stream points to another proclet stream (fd = " + fd + ")");
         }
+        return ps;
     }
 
     @SuppressWarnings("unchecked")
@@ -101,18 +120,12 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
         return proxiedPrintStream();
     }
 
-    @SuppressWarnings("unchecked")
-    public boolean sameStream(PrintStream obj) throws ProxyStreamException {
-        PrintStream rs = getRealStream();
-        if (obj == rs) {
-            return true;
-        } else if (rs instanceof ProxyStream) {
-            return ((ProxyStream<PrintStream>) rs).sameStream(obj);
-        } else if (obj instanceof ProxyStream) {
-            return ((ProxyStream<PrintStream>) obj).sameStream(rs);
-        } else {
-            return false;
+    PrintStream getProxiedStream(int pid) {
+        PrintStream ps = streamMap.get(pid);
+        if (ps == null && pid != ProcletIOContext.GLOBAL_STREAM_ID) {
+            ps = streamMap.get(ProcletIOContext.GLOBAL_STREAM_ID);
         }
+        return ps;
     }
 
 }

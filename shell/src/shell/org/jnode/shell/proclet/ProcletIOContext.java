@@ -24,118 +24,105 @@ package org.jnode.shell.proclet;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.IOContext;
 import org.jnode.vm.VmSystem;
 
 /**
+ * The ProcletIOContext is an IOContext implementation that uses Proxy streams to 
+ * direct System.in/out/err traffic to different places depending on the current
+ * proclet.
+ * 
  * @author Levente S\u00e1ntha
  * @author crawley@jnode.org
  */
 public class ProcletIOContext implements IOContext {
-    private static InputStream globalInStream;
-    private static PrintStream globalOutStream;
-    private static PrintStream globalErrStream;
-    private static boolean initialized;
+    
+    public static final int GLOBAL_STREAM_ID = ProcletContext.NO_SUCH_PID;
     
     public ProcletIOContext() {
-        initGlobals();
     }
 
-    private static synchronized void initGlobals() {
-        if (!initialized) {
-            globalInStream = System.in;
-            globalOutStream = System.out;
-            globalErrStream = System.err;
-            initialized = true;
-        }
+    public synchronized void setGlobalInStream(InputStream is) {
+        doSetIn(is, GLOBAL_STREAM_ID);
     }
 
-    public void setGlobalInStream(InputStream in) {
-        globalInStream = in;
+    public synchronized void setGlobalOutStream(PrintStream ps) {
+        doSetOut(ps, GLOBAL_STREAM_ID);
     }
 
-    public void setGlobalOutStream(PrintStream out) {
-        globalOutStream = out;
+    public synchronized void setGlobalErrStream(PrintStream is) {
+        doSetErr(is, GLOBAL_STREAM_ID);
     }
 
-    public PrintStream getGlobalOutStream() {
-        return globalOutStream;
+    public synchronized InputStream getGlobalInStream() {
+        return ((ProcletProxyInputStream) System.in).getProxiedStream(GLOBAL_STREAM_ID);
     }
 
-    public void setGlobalErrStream(PrintStream err) {
-        globalErrStream = err;
+    public synchronized PrintStream getGlobalOutStream() {
+        return ((ProcletProxyPrintStream) System.out).getProxiedStream(GLOBAL_STREAM_ID);
     }
 
-    public PrintStream getGlobalErrStream() {
-        return globalErrStream;
+    public synchronized PrintStream getGlobalErrStream() {
+        return ((ProcletProxyPrintStream) System.err).getProxiedStream(GLOBAL_STREAM_ID);
     }
 
-    public InputStream getGlobalInStream() {
-        return globalInStream;
+    public synchronized void setSystemIn(InputStream is) {
+        doSetIn(is, getCurrentPid());
     }
 
-    public void setSystemIn(InputStream in) {
-        if (in instanceof ProcletProxyInputStream) {
-            try {
-                in = ((ProcletProxyInputStream) in).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new ProcletException("Cannot resolve 'in'", ex);
-            }
-        }
+    public synchronized void setSystemOut(PrintStream ps) {
+        doSetOut(ps, getCurrentPid());
+    }
+
+    public synchronized void setSystemErr(PrintStream ps) {
+        doSetErr(ps, getCurrentPid());
+    }
+    
+    private int getCurrentPid() {
         ProcletContext procletContext = ProcletContext.currentProcletContext();
-        if (procletContext != null) {
-            procletContext.setStream(0, in);
-        } else {
-            globalInStream = in;
+        return (procletContext == null) ? GLOBAL_STREAM_ID : procletContext.getPid();
+    }
+    
+    private void doSetIn(InputStream is, int pid) {
+        if (is instanceof ProcletProxyInputStream) {
+            is = ((ProcletProxyInputStream) is).getProxiedStream(pid);
         }
+        ProcletProxyInputStream newProxyStream = new ProcletProxyInputStream(
+                    (ProcletProxyInputStream) System.in, is, pid);
+        VmSystem.setStaticField(System.class, "in", newProxyStream);
     }
 
-    public void setSystemOut(PrintStream out) {
-        if (out instanceof ProcletProxyPrintStream) {
-            try {
-                out = ((ProcletProxyPrintStream) out).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new ProcletException("Cannot resolve 'out'", ex);
-            }
+    private void doSetOut(PrintStream ps, int pid) {
+        if (ps instanceof ProcletProxyPrintStream) {
+            ps = ((ProcletProxyPrintStream) ps).getProxiedStream(pid);
         }
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
-        if (procletContext != null) {
-            procletContext.setStream(1, out);
-        } else {
-            globalOutStream = out;
-        }
+        ProcletProxyPrintStream newProxyStream = new ProcletProxyPrintStream(
+                (ProcletProxyPrintStream) System.out, ps, pid);
+        VmSystem.setStaticField(System.class, "out", newProxyStream);
     }
 
-    public void setSystemErr(PrintStream err) {
-        if (err instanceof ProcletProxyPrintStream) {
-            try {
-                err = ((ProcletProxyPrintStream) err).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new ProcletException("Cannot resolve 'err'", ex);
-            }
+    private void doSetErr(PrintStream ps, int pid) {
+        if (ps instanceof ProcletProxyPrintStream) {
+            ps = ((ProcletProxyPrintStream) ps).getProxiedStream(pid);
         }
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
-        if (procletContext != null) {
-            procletContext.setStream(2, err);
-        } else {
-            globalErrStream = err;
-        }
+        ProcletProxyPrintStream newProxyStream = new ProcletProxyPrintStream(
+                (ProcletProxyPrintStream) System.err, ps, pid);
+        VmSystem.setStaticField(System.class, "err", newProxyStream);
     }
 
-    public void enterContext() {
+    public synchronized void enterContext() {
         VmSystem.setStaticField(System.class, "in",
-                new ProcletProxyInputStream());
+                new ProcletProxyInputStream(System.in, 0));
         VmSystem.setStaticField(System.class, "out",
-                new ProcletProxyPrintStream(1));
+                new ProcletProxyPrintStream(System.out, 1));
         VmSystem.setStaticField(System.class, "err",
-                new ProcletProxyPrintStream(2));
+                new ProcletProxyPrintStream(System.err, 2));
     }
 
-    public void exitContext() {
-        InputStream in = globalInStream;
-        PrintStream out = globalOutStream;
-        PrintStream err = globalErrStream;
+    public synchronized void exitContext() {
+        InputStream in = getGlobalInStream();
+        PrintStream out = getGlobalOutStream();
+        PrintStream err = getGlobalErrStream();
 
         if (in instanceof ProcletProxyStream) {
             throw new ProcletException(
@@ -154,30 +141,27 @@ public class ProcletIOContext implements IOContext {
         VmSystem.setStaticField(System.class, "err", err);
     }
 
-    public PrintStream getRealSystemErr() {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
-        if (procletContext != null) {
-            return (PrintStream) procletContext.getStream(2);
-        } else {
-            return globalErrStream;
-        }
+    public synchronized PrintStream getRealSystemErr() {
+        return ((ProcletProxyPrintStream) System.err).getProxiedStream(getCurrentPid());
     }
 
-    public InputStream getRealSystemIn() {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
-        if (procletContext != null) {
-            return (InputStream) procletContext.getStream(0);
-        } else {
-            return globalInStream;
-        }
+    public synchronized InputStream getRealSystemIn() {
+        return ((ProcletProxyInputStream) System.in).getProxiedStream(getCurrentPid());
     }
 
-    public PrintStream getRealSystemOut() {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
-        if (procletContext != null) {
-            return (PrintStream) procletContext.getStream(1);
-        } else {
-            return globalOutStream;
-        }
+    public synchronized PrintStream getRealSystemOut() {
+        return ((ProcletProxyPrintStream) System.out).getProxiedStream(getCurrentPid());
+    }
+
+    synchronized void setStreamsForNewProclet(int pid, Object[] streams) {
+        ProcletProxyInputStream in = new ProcletProxyInputStream(
+                (ProcletProxyInputStream) System.in, (InputStream) streams[0], pid);
+        ProcletProxyPrintStream out = new ProcletProxyPrintStream(
+                (ProcletProxyPrintStream) System.out, (PrintStream) streams[1], pid);
+        ProcletProxyPrintStream err = new ProcletProxyPrintStream(
+                (ProcletProxyPrintStream) System.err, (PrintStream) streams[2], pid);
+        VmSystem.setStaticField(System.class, "in", in);
+        VmSystem.setStaticField(System.class, "out", out);
+        VmSystem.setStaticField(System.class, "err", err);
     }
 }
