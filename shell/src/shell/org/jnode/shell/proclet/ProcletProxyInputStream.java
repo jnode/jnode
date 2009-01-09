@@ -23,10 +23,11 @@ package org.jnode.shell.proclet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jnode.util.ProxyStream;
 import org.jnode.util.ProxyStreamException;
-import org.jnode.vm.VmSystem;
 
 /**
  * This class provides a proxy mechanism for System.in. If the current thread is
@@ -38,15 +39,10 @@ import org.jnode.vm.VmSystem;
  */
 public class ProcletProxyInputStream extends InputStream implements
         ProcletProxyStream<InputStream> {
+    
+    private Map<Integer, InputStream> streamMap;
 
     private int fd;
-
-    /**
-     * Construct a proxy input stream for 'standard input'; i.e. fd = 0;
-     */
-    public ProcletProxyInputStream() {
-        this(0);
-    }
 
     /**
      * Construct a proxy input stream for a designated fd. Note that if the fd
@@ -54,10 +50,35 @@ public class ProcletProxyInputStream extends InputStream implements
      * not work in the ProcletContext context if the fd doesn't correspond to an
      * InputStream.
      * 
+     * @param is the initial value for globalInput.
      * @param fd
      */
-    public ProcletProxyInputStream(int fd) {
+    public ProcletProxyInputStream(InputStream is, int fd) {
         this.fd = fd;
+        streamMap = new HashMap<Integer, InputStream>();
+        if (is == null) {
+            throw new IllegalArgumentException("null stream");
+        }
+        streamMap.put(ProcletIOContext.GLOBAL_STREAM_ID, is);
+    }
+
+    /**
+     * Construct a proxy input stream based on the state of the supplied proxy.
+     * The new proxy has all entries of the existing one except that the entry
+     * for pid is set / reset to in.
+     * 
+     * @param proxy
+     * @param is
+     * @param pid
+     */
+    public ProcletProxyInputStream(ProcletProxyInputStream proxy, InputStream is,
+            int pid) {
+        if (is == null) {
+            throw new IllegalArgumentException("null stream");
+        }
+        streamMap = new HashMap<Integer, InputStream>(proxy.streamMap);
+        streamMap.put(pid, is);
+        fd = proxy.fd;
     }
 
     @Override
@@ -124,43 +145,25 @@ public class ProcletProxyInputStream extends InputStream implements
     }
 
     public InputStream getProxiedStream() throws ProxyStreamException {
-        ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-        if (threadGroup instanceof ProcletContext) {
-            try {
-                Object stream = ((ProcletContext) threadGroup).getStream(fd);
-                if (stream instanceof ProcletProxyStream) {
-                    throw new ProxyStreamException(
-                            "Proclet stream points to another proclet stream");
-                }
-                if (stream instanceof ProxyStream) {
-                    stream = ((ProxyStream<?>) stream).getRealStream();
-                }
-                return (InputStream) stream;
-            } catch (Exception ex) {
-                throw new ProxyStreamException("Proclet input broken for fd = "
-                        + fd, ex);
-            }
-        } else {
-            if (fd != 0) {
-                throw new ProxyStreamException(
-                        "Proclet input broken: wrong fd = " + fd);
-            }
-            return VmSystem.getGlobalInStream();
+        ProcletContext procletContext = ProcletContext.currentProcletContext();
+        int pid = (procletContext == null) ? ProcletIOContext.GLOBAL_STREAM_ID : procletContext.getPid();
+        InputStream is = streamMap.get(pid);
+        if (is == null) {
+            throw new ProxyStreamException(
+                    "Proclet stream not set (fd = " + fd + ")");
+        } else if (is instanceof ProcletProxyStream) {
+            throw new ProxyStreamException(
+                    "Proclet stream points to another proclet stream (fd = " + fd + ")");
         }
+        return is;
     }
 
-    @SuppressWarnings("unchecked")
-    public boolean sameStream(InputStream obj) throws ProxyStreamException {
-        InputStream rs = getRealStream();
-        if (obj == rs) {
-            return true;
-        } else if (rs instanceof ProxyStream) {
-            return ((ProxyStream<InputStream>) rs).sameStream(obj);
-        } else if (obj instanceof ProxyStream) {
-            return ((ProxyStream<InputStream>) obj).sameStream(rs);
-        } else {
-            return false;
+    InputStream getProxiedStream(int pid) {
+        InputStream is = streamMap.get(pid);
+        if (is == null && pid != ProcletIOContext.GLOBAL_STREAM_ID) {
+            is = streamMap.get(ProcletIOContext.GLOBAL_STREAM_ID);
         }
+        return is;
     }
 
 }

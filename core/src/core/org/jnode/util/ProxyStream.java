@@ -46,16 +46,4 @@ public interface ProxyStream<T extends Closeable> extends Closeable {
      * @return the wrapped stream for this proxy.
      */
     public T getProxiedStream() throws ProxyStreamException;
-
-    /**
-     * Determine if this proxy refers to the same underlying stream as another
-     * stream object.
-     * 
-     * @param other
-     * @return <code>true</code> if this object and <code>other</code>
-     *         resolve to the same underlying stream, otherwise false. Note: the
-     *         'otherwise' covers cases where <code>other</code> is
-     *         <code>null</code>.
-     */
-    public boolean sameStream(T other) throws ProxyStreamException;
 }
