@@ -22,6 +22,7 @@
       <export name="org.jnode.test.shell.*"/>
       <export name="org.jnode.test.shell.help.*"/>
       <export name="org.jnode.test.shell.syntax.*"/>
+      <export name="org.jnode.test.shell.proclet.*"/>
     </library>
   </runtime>
   
@@ -30,4 +31,8 @@
     <suite class="org.jnode.test.shell.syntax.AllTests" category="shell"/>
     <test class="org.jnode.test.shell.help.DefaultHelpTest" category="shell"/>
   </extension>  
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/> 
+  </extension>
 </plugin>
