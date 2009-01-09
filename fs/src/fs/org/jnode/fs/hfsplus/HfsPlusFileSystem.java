@@ -109,11 +109,14 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
     /**
      * 
+     * @param params
+     * 
      * @throws FileSystemException
      */
     public void create(HFSPlusParams params) throws FileSystemException {
         sb = new Superblock(this, true);
         try {
+            params.initializeDefaultsValues(this.getApi().getLength(), this.getFSApi().getSectorSize());
             sb.create(params);
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();
