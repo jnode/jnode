@@ -30,7 +30,7 @@ public class CatalogFolder {
     public final void setValence(int valence) {
         BigEndian.setInt32(data, 4, valence);
     }
-    
+
     public final int getValence() {
         return BigEndian.getInt32(data, 4);
     }
@@ -38,8 +38,8 @@ public class CatalogFolder {
     public final CatalogNodeId getFolderId() {
         return new CatalogNodeId(data, 8);
     }
-    
-    public final void setFolderId(CatalogNodeId folderId){
+
+    public final void setFolderId(CatalogNodeId folderId) {
         System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
     }
 

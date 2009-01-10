@@ -72,8 +72,7 @@ public class Superblock extends HFSPlusObject {
      * 
      * @throws ApiNotFoundException
      */
-    public void create(HFSPlusParams params) throws IOException,
-            ApiNotFoundException, FileSystemException {
+    public void create(HFSPlusParams params) throws IOException, ApiNotFoundException, FileSystemException {
         int burnedBlocksBeforeVH = 0;
         int burnedBlocksAfterAltVH = 0;
         /*
@@ -87,7 +86,7 @@ public class Superblock extends HFSPlusObject {
         } else if (blockSize == 1024) {
             burnedBlocksBeforeVH = 1;
         }
-        
+
         // Populate volume header.
         this.setMagic(HfsPlusConstants.HFSPLUS_SUPER_MAGIC);
         this.setVersion(HfsPlusConstants.HFSPLUS_MIN_VERSION);
@@ -116,8 +115,8 @@ public class Superblock extends HFSPlusObject {
         long blockUsed = 2 + burnedBlocksBeforeVH + burnedBlocksAfterAltVH + bitmapBlocks;
         HFSPlusForkData forkdata = new HFSPlusForkData();
         forkdata.setTotalSize(allocationClumpSize);
-        forkdata.setClumpSize((int)allocationClumpSize);
-        forkdata.setTotalBlocks((int)bitmapBlocks);
+        forkdata.setClumpSize((int) allocationClumpSize);
+        forkdata.setTotalBlocks((int) bitmapBlocks);
         ExtentDescriptor desc = new ExtentDescriptor();
         desc.setStartBlock(1 + burnedBlocksBeforeVH);
         desc.setBlockCount(0);
@@ -136,7 +135,7 @@ public class Superblock extends HFSPlusObject {
             this.setJournalInfoBlock(0);
             nextBlock = desc.getStartBlock() + desc.getBlockCount();
         }
-       // Extent B-Tree initialization
+        // Extent B-Tree initialization
         forkdata = new HFSPlusForkData();
         forkdata.setTotalSize(params.getExtentClumpSize());
         forkdata.setClumpSize(params.getExtentClumpSize());
@@ -159,12 +158,12 @@ public class Superblock extends HFSPlusObject {
         forkdata.setExtentDescriptor(0, desc);
         System.arraycopy(forkdata.getBytes(), 0, data, 272, forkdata.FORK_DATA_LENGTH);
         blockUsed += forkdata.getTotalBlocks();
-        
+
         this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);
         this.setNextAllocation((int) blockUsed - 1 - burnedBlocksAfterAltVH + 10
                 * (this.getCatalogFile().getClumpSize() / this.getBlockSize()));
     }
-    
+
     /**
      * Calculate the number of blocks needed for bitmap.
      * 

@@ -23,13 +23,13 @@ public class Catalog {
     private NodeDescriptor btnd;
     private BTHeaderRecord bthr;
     private int firstNodeOffset;
-    
+
     /**
      * Create new Catalog
      * 
      * @param params
      */
-    public Catalog(HFSPlusParams params){
+    public Catalog(HFSPlusParams params) {
         btnd = new NodeDescriptor();
         btnd.setKind(HfsPlusConstants.BT_HEADER_NODE);
         btnd.setHeight(0);
@@ -42,20 +42,21 @@ public class Catalog {
         bthr.setLastLeafNode(1);
         bthr.setLeafRecords(params.isJournaled() ? 6 : 2);
         bthr.setNodeSize(params.getCatalogNodeSize());
-        bthr.setTotalNodes(params.getCatalogClumpSize()/params.getCatalogNodeSize());
+        bthr.setTotalNodes(params.getCatalogClumpSize() / params.getCatalogNodeSize());
         bthr.setFreeNodes(bthr.getTotalNodes() - 2);
         bthr.setClumpSize(params.getCatalogClumpSize());
-        //TODO initialize attributes, max key length and key comparaison type.        
+        // TODO initialize attributes, max key length and key comparaison type.
         // Root directory
-        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID,new HFSUnicodeString(params.getVolumeName()));
+        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, new HFSUnicodeString(params.getVolumeName()));
         CatalogFolder folder = new CatalogFolder();
         folder.setFolderId(CatalogNodeId.HFSPLUS_ROOT_CNID);
         folder.setValence(params.isJournaled() ? 2 : 0);
-        //TODO creation date, content modification date, text encoding and access rights.
-        ck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID,new HFSUnicodeString(""));
-        CatalogThread ct = new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+        // TODO creation date, content modification date, text encoding and access rights.
+        ck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+        CatalogThread ct = new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD,
+                CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
     }
-    
+
     /**
      * Create Catalog based on catalog file that exist on the file system.
      * 
@@ -91,7 +92,8 @@ public class Catalog {
      * @return
      * @throws IOException
      */
-    public final LeafRecord getRecord(final CatalogNodeId parentID) throws IOException {
+    public final LeafRecord getRecord(final CatalogNodeId parentID)
+        throws IOException {
         int currentOffset = firstNodeOffset;
         int currentNodeNumber = getBTHeaderRecord().getRootNode();
         int currentNodeSize = getBTHeaderRecord().getNodeSize();
@@ -126,7 +128,8 @@ public class Catalog {
      * @return
      * @throws IOException
      */
-    public final LeafRecord[] getRecords(final CatalogNodeId parentID) throws IOException {
+    public final LeafRecord[] getRecords(final CatalogNodeId parentID)
+        throws IOException {
         return getRecords(parentID, getBTHeaderRecord().getRootNode());
     }
 
@@ -137,7 +140,8 @@ public class Catalog {
      * @return
      * @throws IOException
      */
-    public final LeafRecord[] getRecords(final CatalogNodeId parentID, final int nodeNumber) throws IOException {
+    public final LeafRecord[] getRecords(final CatalogNodeId parentID, final int nodeNumber)
+        throws IOException {
         try {
             int currentOffset = firstNodeOffset;
             int currentNodeNumber = nodeNumber;
@@ -159,8 +163,7 @@ public class Catalog {
                 }
                 return lfList.toArray(new LeafRecord[lfList.size()]);
             } else if (currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
-                CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(),
-                        currentNodeSize);
+                CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(), currentNodeSize);
                 LeafRecord[] lr = leaf.findAll(parentID);
                 log.debug("Leaf record size: " + lr.length);
                 return lr;
@@ -182,8 +185,8 @@ public class Catalog {
      * @return
      * @throws IOException
      */
-    public final LeafRecord getRecord(final CatalogNodeId parentID, 
-            final HFSUnicodeString nodeName) throws IOException {
+    public final LeafRecord getRecord(final CatalogNodeId parentID, final HFSUnicodeString nodeName)
+        throws IOException {
         int currentOffset = firstNodeOffset;
         int currentNodeNumber = getBTHeaderRecord().getRootNode();
         int currentNodeSize = getBTHeaderRecord().getNodeSize();
