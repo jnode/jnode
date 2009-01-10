@@ -66,7 +66,12 @@ public interface Shell extends InputCompleter {
     public Console getConsole();
     
     /**
-     * Run a command file in the shell.
+     * Run a command file in the shell.  If the first line of the file is of the form
+     * "#!&lt;interpreter&gt;", where "&lt;interpreter&gt;" has been registered with
+     * the ShellManager, the file will be run using the nominated interpreter.  Otherwise,
+     * the shell gets to decide which interpreter to use.
+     * 
+     * @param file the command file
      * @throws IOException 
      */
     public int runCommandFile(File file) throws IOException;

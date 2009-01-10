@@ -447,8 +447,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     protected int processCommand(String cmdLineStr, boolean interactive) {
-        clearEof();
+        return processCommand(cmdLineStr, interactive, this.interpreter);
+    }
+        
+    private int processCommand(String cmdLineStr, boolean interactive,
+            CommandInterpreter interpreter) {
         if (interactive) {
+            clearEof();
             readingCommand = false;
             // Each interactive command is launched with a fresh history
             // for input completion
@@ -795,28 +800,35 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             errPW.println("File does not exist: " + file);
             return -1;
         }
+        // FIXME it would be better if the interpreter API included a method
+        // for reading and executing a file, a stream or a reader.  (The problem
+        // with the current approach is that most scripting languages cannot be 
+        // interpreted a line at a time.)
+        boolean enabled = setHistoryEnabled(false);
         try {
-            setHistoryEnabled(false);
             final BufferedReader br = new BufferedReader(new FileReader(file));
             int rc = 0;
+            CommandInterpreter interpreter = null;
             for (String line = br.readLine(); line != null; 
                     line = br.readLine()) {
+                if (interpreter == null) {
+                    if (line.startsWith("#!")) {
+                        String name = line.substring(2);
+                        interpreter = ShellUtils.createInterpreter(name);
+                    } else {
+                        interpreter = this.interpreter;
+                    }
+                }
                 line = line.trim();
-
                 if (line.startsWith("#") || line.equals("")) {
                     continue;
                 }
-                try {
-                    rc = invokeCommand(line);
-                } catch (ShellException ex) {
-                    errPW.println("Shell exception: " + ex.getMessage());
-                    stackTrace(ex);
-                }
+                rc = processCommand(line, false, interpreter);
             }
             br.close();
             return rc;
         } finally {
-            setHistoryEnabled(true);
+            setHistoryEnabled(enabled);
         }
     }
 
@@ -850,8 +862,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return historyEnabled;
     }
 
-    private void setHistoryEnabled(boolean historyEnabled) {
+    private boolean setHistoryEnabled(boolean historyEnabled) {
+        boolean res = this.historyEnabled;
         this.historyEnabled = historyEnabled;
+        return res;
     }
 
     /**
