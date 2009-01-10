@@ -130,8 +130,8 @@ public class BjorneToken extends CommandLine.Token {
         validate();
     }
     
-    public BjorneToken remake(String newText) {
-        return new BjorneToken(this.tokenType, newText, this.start, this.end);
+    public BjorneToken remake(CharSequence newText) {
+        return new BjorneToken(this.tokenType, newText.toString(), this.start, this.end);
     }
 
     private void validate() {
