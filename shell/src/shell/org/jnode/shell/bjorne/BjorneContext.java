@@ -119,83 +119,18 @@ public class BjorneContext {
 
     private StreamHolder[] holders;
 
-    private static class VariableSlot {
-        public String value;
-
-        public boolean exported;
-
-        public VariableSlot(String value, boolean exported) {
-            if (value == null) {
-                throw new ShellFailureException("null value");
-            }
-            this.value = value;
-            this.exported = exported;
-        }
-
-        public VariableSlot(VariableSlot other) {
-            this.value = other.value;
-            this.exported = other.exported;
-        }
+    public BjorneContext(BjorneInterpreter interpreter, StreamHolder[] holders) {
+        this.interpreter = interpreter;
+        this.holders = holders;
+        this.variables = new HashMap<String, VariableSlot>();
     }
 
-    static class StreamHolder {
-        public final CommandIO stream;
-
-        private boolean isMine;
-
-        public StreamHolder(CommandIO stream, boolean isMine) {
-            this.stream = stream;
-            this.isMine = isMine;
-        }
-
-        public StreamHolder(StreamHolder other) {
-            this.stream = other.stream;
-            this.isMine = false;
-        }
-
-        public void close() {
-            if (isMine) {
-                try {
-                    isMine = false; // just in case we call close twice
-                    stream.close();
-                } catch (IOException ex) {
-                    // FIXME - should we squash or report this?
-                }
-            }
-        }
-        
-        public boolean isMine() {
-            return isMine;
-        }
-    }
-
-    private static class CharIterator {
-        private CharSequence str;
-        private int pos, start, limit;
-
-        public CharIterator(CharSequence str) {
-            this.str = str;
-            this.start = pos = 0;
-            this.limit = str.length();
-        }
-
-        public CharIterator(CharSequence str, int start, int limit) {
-            this.str = str;
-            this.start = pos = start;
-            this.limit = limit;
-        }
-
-        public int nextCh() {
-            return (pos >= limit) ? -1 : str.charAt(pos++);
-        }
-
-        public int peekCh() {
-            return (pos >= limit) ? -1 : str.charAt(pos);
-        }
-
-        public int lastCh() {
-            return (pos > start) ? str.charAt(pos - 1) : -1;
-        }
+    public BjorneContext(BjorneInterpreter interpreter) {
+        this(interpreter, new StreamHolder[] {
+            new StreamHolder(CommandLine.DEFAULT_STDIN, false),
+            new StreamHolder(CommandLine.DEFAULT_STDOUT, false),
+            new StreamHolder(CommandLine.DEFAULT_STDERR, false),
+            new StreamHolder(CommandLine.DEFAULT_STDERR, false)});
     }
 
     /**
@@ -237,21 +172,7 @@ public class BjorneContext {
     StreamHolder[] getCopyOfHolders() {
         return copyStreamHolders(holders);
     }
-
-    public BjorneContext(BjorneInterpreter interpreter, StreamHolder[] holders) {
-        this.interpreter = interpreter;
-        this.holders = holders;
-        this.variables = new HashMap<String, VariableSlot>();
-    }
-
-    public BjorneContext(BjorneInterpreter interpreter) {
-        this(interpreter, new StreamHolder[] {
-            new StreamHolder(CommandLine.DEFAULT_STDIN, false),
-            new StreamHolder(CommandLine.DEFAULT_STDOUT, false),
-            new StreamHolder(CommandLine.DEFAULT_STDERR, false),
-            new StreamHolder(CommandLine.DEFAULT_STDERR, false)});
-    }
-
+    
     /**
      * This method implements 'NAME=VALUE'. If variable NAME does not exist, it
      * is created as an unexported shell variable.
@@ -1024,5 +945,85 @@ public class BjorneContext {
     public boolean patternMatch(CharSequence expandedWord, CharSequence pat) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+
+    private static class VariableSlot {
+        public String value;
+
+        public boolean exported;
+
+        public VariableSlot(String value, boolean exported) {
+            if (value == null) {
+                throw new ShellFailureException("null value");
+            }
+            this.value = value;
+            this.exported = exported;
+        }
+
+        public VariableSlot(VariableSlot other) {
+            this.value = other.value;
+            this.exported = other.exported;
+        }
+    }
+
+    static class StreamHolder {
+        public final CommandIO stream;
+
+        private boolean isMine;
+
+        public StreamHolder(CommandIO stream, boolean isMine) {
+            this.stream = stream;
+            this.isMine = isMine;
+        }
+
+        public StreamHolder(StreamHolder other) {
+            this.stream = other.stream;
+            this.isMine = false;
+        }
+
+        public void close() {
+            if (isMine) {
+                try {
+                    isMine = false; // just in case we call close twice
+                    stream.close();
+                } catch (IOException ex) {
+                    // FIXME - should we squash or report this?
+                }
+            }
+        }
+        
+        public boolean isMine() {
+            return isMine;
+        }
+    }
+
+    private static class CharIterator {
+        private CharSequence str;
+        private int pos, start, limit;
+
+        public CharIterator(CharSequence str) {
+            this.str = str;
+            this.start = pos = 0;
+            this.limit = str.length();
+        }
+
+        public CharIterator(CharSequence str, int start, int limit) {
+            this.str = str;
+            this.start = pos = start;
+            this.limit = limit;
+        }
+
+        public int nextCh() {
+            return (pos >= limit) ? -1 : str.charAt(pos++);
+        }
+
+        public int peekCh() {
+            return (pos >= limit) ? -1 : str.charAt(pos);
+        }
+
+        public int lastCh() {
+            return (pos > start) ? str.charAt(pos - 1) : -1;
+        }
     }
 }
