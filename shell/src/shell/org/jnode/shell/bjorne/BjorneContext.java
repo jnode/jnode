@@ -270,7 +270,7 @@ public class BjorneContext {
     }
 
     /**
-     * Test if the variable is currently set here on in an ancestor context.
+     * Test if the variable is currently set here in this context.
      * 
      * @param name the name of the variable to be tested
      * @return <code>true</code> if the variable is set.
@@ -315,7 +315,13 @@ public class BjorneContext {
     public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
         LinkedList<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
         for (BjorneToken token : tokens) {
-            splitAndAppend(token, wordTokens);
+            String word = token.getText();
+            CharSequence expanded = expand(word);
+            if (expanded == word) {
+                splitAndAppend(token, wordTokens);
+            } else {
+                splitAndAppend(token.remake(expanded), wordTokens);
+            }
         }
         return makeCommandLine(wordTokens);
     }
@@ -445,7 +451,7 @@ public class BjorneContext {
                 case '\t':
                     if (quote == 0) {
                         if (sb != null) {
-                            wordTokens.add(token.remake(sb.toString()));
+                            wordTokens.add(token.remake(sb));
                             sb = null;
                         }
                     } else {
@@ -464,7 +470,7 @@ public class BjorneContext {
             }
         }
         if (sb != null) {
-            wordTokens.add(token.remake(sb.toString()));
+            wordTokens.add(token.remake(sb));
         }
     }
 

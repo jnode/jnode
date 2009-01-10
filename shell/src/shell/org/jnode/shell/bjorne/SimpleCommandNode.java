@@ -80,11 +80,11 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 context.evaluateRedirections(getRedirects());
                 rc = 0;
             } else {
+                CommandLine command = context.expandAndSplit(words);
                 // Assignments and redirections are done in the command's context
                 context = new BjorneContext(context);
                 context.performAssignments(assignments);
                 holders = context.evaluateRedirections(getRedirects());
-                CommandLine command = context.expandAndSplit(words);
                 CommandIO[] streams = new CommandIO[holders.length];
                 for (int i = 0; i < streams.length; i++) {
                     streams[i] = holders[i].stream;
