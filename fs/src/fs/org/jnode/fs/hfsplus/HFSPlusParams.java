@@ -53,8 +53,7 @@ public class HFSPlusParams {
      * @throws FileSystemException
      * 
      */
-    public void initializeDefaultsValues(long blockDeviceSize, long sectorSize)
-            throws FileSystemException {
+    public void initializeDefaultsValues(long blockDeviceSize, long sectorSize) throws FileSystemException {
         long clumpSize = 0;
         this.blockDeviceSize = blockDeviceSize;
         if (resourceClumpBlocks == 0) {
@@ -82,55 +81,50 @@ public class HFSPlusParams {
         }
         long sectorCount = blockDeviceSize / sectorSize;
         if (catalogClumpBlocks == 0) {
-            clumpSize = getBTreeClumpSize(blockSize, catalogNodeSize,
-                    sectorCount, true);
+            clumpSize = getBTreeClumpSize(blockSize, catalogNodeSize, sectorCount, true);
         } else {
             clumpSize = clumpSizeCalculation(catalogClumpBlocks);
             if (clumpSize % catalogNodeSize != 0) {
-                throw new FileSystemException(
-                        "clump size is not a multiple of node size");
+                throw new FileSystemException("clump size is not a multiple of node size");
             }
         }
         catalogClumpSize = (int) clumpSize;
         if (extentClumpBlocks == 0) {
-            clumpSize = getBTreeClumpSize(blockSize, extentNodeSize,
-                    sectorCount, false);
+            clumpSize = getBTreeClumpSize(blockSize, extentNodeSize, sectorCount, false);
         } else {
             clumpSize = clumpSizeCalculation(extentClumpBlocks);
         }
         extentClumpSize = (int) clumpSize;
-        
-        if(attributeClumpBlocks == 0){
+
+        if (attributeClumpBlocks == 0) {
             clumpSize = 0;
         } else {
             clumpSize = clumpSizeCalculation(attributeClumpBlocks);
-            if(clumpSize % attributeNodeSize != 0){
+            if (clumpSize % attributeNodeSize != 0) {
                 throw new FileSystemException("clump size is not a multiple of attribute node size");
             }
         }
-        attributeClumpSize = (int)clumpSize;
-        
+        attributeClumpSize = (int) clumpSize;
+
         long totalBlocks = this.getBlockCount();
         long minClumpSize = this.getBlockCount() >> 3;
         if ((totalBlocks & 7) == 0) {
             ++minClumpSize;
         }
-        if(bitmapClumpBlocks == 0){
+        if (bitmapClumpBlocks == 0) {
             clumpSize = minClumpSize;
         } else {
             clumpSize = clumpSizeCalculation(bitmapClumpBlocks);
-            if(clumpSize < minClumpSize){
+            if (clumpSize < minClumpSize) {
                 throw new FileSystemException("bitmap clump size is too small.");
             }
         }
-        allocationClumpSize = (int)clumpSize;
-        
+        allocationClumpSize = (int) clumpSize;
+
     }
 
-    private int[] extentClumpTable = new int[] { 4, 4, 4, 5, 5, 6, 7, 8, 9, 11,
-            14, 16, 20, 25, 32 };
-    private int[] catalogClumpTable = new int[] { 4, 6, 8, 11, 14, 19, 25, 34,
-            45, 60, 80, 107, 144, 192, 256 };
+    private int[] extentClumpTable = new int[] {4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32 };
+    private int[] catalogClumpTable = new int[] {4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256 };
 
     /**
      * 
@@ -140,8 +134,7 @@ public class HFSPlusParams {
      * @param catalog
      * @return
      */
-    private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors,
-            boolean catalog) {
+    private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors, boolean catalog) {
         long clumpSize = 0;
         if (sectors < 0x200000) {
             clumpSize = (sectors << 2);
@@ -172,13 +165,13 @@ public class HFSPlusParams {
     private int clumpSizeCalculation(long clumpBlocks) throws FileSystemException {
         long clumpSize = clumpBlocks * blockSize;
         if ((clumpSize & 0XFFFFFFFF00000000L) == 0) {
-            throw new FileSystemException("Too many blocks (" + clumpBlocks + ") for clump size (" + clumpSize +").");
+            throw new FileSystemException("Too many blocks (" + clumpBlocks + ") for clump size (" + clumpSize + ").");
         }
         return (int) clumpSize;
     }
-    
-    private long round(long x, long y){
-        return (((x+y)-1)/y*y);
+
+    private long round(long x, long y) {
+        return (((x + y) - 1) / y * y);
     }
 
     public String getVolumeName() {

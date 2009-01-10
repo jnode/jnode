@@ -51,7 +51,6 @@ public class CatalogIndexNode extends IndexNode {
             } else if (key.getParentId().getId() == parentId.getId()) {
                 result.addLast(rec);
             }
-
         }
 
         if (largestMatchingKey != null) {
@@ -64,8 +63,8 @@ public class CatalogIndexNode extends IndexNode {
         IndexRecord largestMatchingRecord = null;
         for (int i = 0; i < records.length; ++i) {
             if (records[i].getKey().compareTo(key) <= 0
-                    && (largestMatchingRecord == null || 
-                            records[i].getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
+                    && (largestMatchingRecord == null 
+                    || records[i].getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
                 largestMatchingRecord = records[i];
             }
         }
