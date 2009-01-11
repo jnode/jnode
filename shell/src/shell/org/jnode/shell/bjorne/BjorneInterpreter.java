@@ -30,10 +30,15 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESS;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSAND;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.HashMap;
 
 import org.jnode.driver.console.CompletionInfo;
@@ -222,6 +227,32 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
     }
 
+    @Override
+    public int interpret(CommandShell shell, File file) throws ShellException {
+        // FIXME ... update this to support multi-line commands.
+        Reader r = null;
+        try {
+            r = new FileReader(file);
+            BufferedReader br = new BufferedReader(r);
+            String line;
+            int rc = 0;
+            while ((line = br.readLine()) != null) {
+                rc = interpret(shell, line);
+            }
+            return rc;
+        } catch (IOException ex) {
+            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+        } finally {
+            if (r != null) {
+                try {
+                    r.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
+        }
+    }
+    
     private void bindShell(CommandShell shell) {
         if (this.shell != shell) {
             if (this.shell != null) {

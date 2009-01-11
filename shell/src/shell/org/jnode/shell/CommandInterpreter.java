@@ -21,6 +21,7 @@
 
 package org.jnode.shell;
 
+import java.io.File;
 import java.io.PrintWriter;
 
 /**
@@ -29,6 +30,8 @@ import java.io.PrintWriter;
  * @author crawley@jnode.org
  */
 public interface CommandInterpreter {
+    // FIXME ... change the Shell API so that we can replace occurrences of
+    // CommandShell below with Shell.
 
     public interface Factory {
         CommandInterpreter create();
@@ -46,10 +49,22 @@ public interface CommandInterpreter {
      * @throws ShellException
      */
     int interpret(CommandShell shell, String line) throws ShellException;
+    
+    /**
+     * Parse and execute a command file, returning the resulting return code.
+     * 
+     * @param shell the CommandShell that provides low-level command invocation,
+     *        command history and so on.
+     * @param file the file to be interpreted
+     * @return the return code.
+     * @throws ShellException
+     */
+    int interpret(CommandShell shell, File file) throws ShellException;
 
     /**
      * Parse a partial command line, returning the command line fragment to be
-     * completed.
+     * completed.  If the interpreter does not support completion, this method
+     * should return <code>null</code>.
      * 
      * @param shell the current CommandShell.
      * @param partial a partial command line
@@ -77,7 +92,8 @@ public interface CommandInterpreter {
     String escapeWord(String word);
 
     /**
-     * Get incremental help for the partial command line.
+     * Get incremental help for the partial command line.  If the interpreter
+     * does not support incremental help, it should simply return <code>false</code>.
      * 
      * @param shell the current CommandShell.
      * @param partial a partial command line

@@ -307,8 +307,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         if (jnode_ini.exists()) {
                             runCommandFile(jnode_ini);
                         }
-                    } catch (IOException ex) {
-                        errPW.println("Error while reading " + jnode_ini + ": " + ex.getMessage());
+                    } catch (ShellException ex) {
+                        errPW.println("Error while processing " + jnode_ini + ": " + ex.getMessage());
                         stackTrace(ex);
                     }
                     return null;
@@ -324,8 +324,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     if (shell_ini.exists()) {
                         runCommandFile(shell_ini);
                     }
-                } catch (IOException ex) {
-                    errPW.println("Error while reading " + shell_ini + ": " + ex.getMessage());
+                } catch (ShellException ex) {
+                    errPW.println("Error while processing " + shell_ini + ": " + ex.getMessage());
                     stackTrace(ex);
                 }
                 return null;
@@ -795,39 +795,35 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return ShellUtils.createInvoker("default", this);
     }
 
-    public int runCommandFile(File file) throws IOException {
-        if (!file.exists()) {
-            errPW.println("File does not exist: " + file);
-            return -1;
-        }
+    public int runCommandFile(File file) throws ShellException {
         // FIXME it would be better if the interpreter API included a method
         // for reading and executing a file, a stream or a reader.  (The problem
         // with the current approach is that most scripting languages cannot be 
         // interpreted a line at a time.)
         boolean enabled = setHistoryEnabled(false);
+        Reader r = null; 
         try {
-            final BufferedReader br = new BufferedReader(new FileReader(file));
-            int rc = 0;
-            CommandInterpreter interpreter = null;
-            for (String line = br.readLine(); line != null; 
-                    line = br.readLine()) {
-                if (interpreter == null) {
-                    if (line.startsWith("#!")) {
-                        String name = line.substring(2);
-                        interpreter = ShellUtils.createInterpreter(name);
-                    } else {
-                        interpreter = this.interpreter;
-                    }
-                }
-                line = line.trim();
-                if (line.startsWith("#") || line.equals("")) {
-                    continue;
-                }
-                rc = processCommand(line, false, interpreter);
+            r = new FileReader(file);
+            final BufferedReader br = new BufferedReader(r);
+            CommandInterpreter interpreter;
+            String line = br.readLine();
+            if (line.startsWith("#!")) {
+                String name = line.substring(2);
+                interpreter = ShellUtils.createInterpreter(name);
+            } else {
+                interpreter = this.interpreter;
             }
-            br.close();
-            return rc;
+            return interpreter.interpret(this, file);
+        } catch (IOException ex) {
+            throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {
+            if (r != null) {
+                try {
+                    r.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
             setHistoryEnabled(enabled);
         }
     }

@@ -21,7 +21,12 @@
 
 package org.jnode.shell;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -100,6 +105,38 @@ public class DefaultInterpreter implements CommandInterpreter {
             return shell.invoke(cmd, cmdInfo);
         } catch (CommandSyntaxException ex) {
             throw new ShellException("Command arguments don't match syntax", ex);
+        }
+    }
+    
+    @Override
+    public int interpret(CommandShell shell, File file) throws ShellException {
+        // The default interpreter and subtypes process the command file one line at a time, 
+        // ignoring any line whose first non-whitespace character is '#'.  There is no notion
+        // of multi-line commands.
+        Reader r = null;
+        try {
+            r = new FileReader(file);
+            BufferedReader br = new BufferedReader(r);
+            String line;
+            int rc = 0;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.length() == 0 || line.startsWith("#")) {
+                    continue;
+                }
+                rc = interpret(shell, line);
+            }
+            return rc;
+        } catch (IOException ex) {
+            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+        } finally {
+            if (r != null) {
+                try {
+                    r.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
         }
     }
 
