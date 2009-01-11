@@ -55,7 +55,7 @@ public class URLArgument extends Argument<URL> {
     @Override
     protected URL doAccept(Token value) throws CommandSyntaxException {
         try {
-            return new URL(value.token);
+            return new URL(value.text);
         } catch (MalformedURLException ex) {
             throw new CommandSyntaxException(ex.getMessage());
         }

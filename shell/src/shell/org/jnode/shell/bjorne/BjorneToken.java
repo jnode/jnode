@@ -21,7 +21,6 @@
 package org.jnode.shell.bjorne;
 
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
 
 public class BjorneToken extends CommandLine.Token {
 
@@ -131,7 +130,11 @@ public class BjorneToken extends CommandLine.Token {
     }
     
     public BjorneToken remake(CharSequence newText) {
-        return new BjorneToken(this.tokenType, newText.toString(), this.start, this.end);
+        if (newText.length() == 0) {
+            return null;
+        } else {
+            return new BjorneToken(this.tokenType, newText.toString(), this.start, this.end);
+        }
     }
 
     private void validate() {
@@ -140,28 +143,20 @@ public class BjorneToken extends CommandLine.Token {
             case TOK_IO_NUMBER:
             case TOK_NAME:
             case TOK_ASSIGNMENT:
-                if (token.length() == 0) {
+                if (text == null || text.length() == 0) {
                     throw new IllegalArgumentException("null or empty text");
                 }
                 break;
 
             default:
-                if (token.length() > 0) {
+                if (text != null && text.length() > 0) {
                     throw new IllegalArgumentException("non-empty text");
                 }
         }
     }
 
-    public String getInterpolatedText(BjorneContext context) throws ShellException {
-        switch (tokenType) {
-            case TOK_WORD:
-            default:
-                return toString();
-        }
-    }
-
     public String getText() {
-        return token;
+        return text;
     }
 
     public int getTokenType() {
@@ -169,7 +164,7 @@ public class BjorneToken extends CommandLine.Token {
     }
 
     public boolean isName() {
-        return token != null && isName(token);
+        return text != null && isName(text);
     }
 
     public static boolean isName(String str) {
@@ -255,13 +250,13 @@ public class BjorneToken extends CommandLine.Token {
     public String toString() {
         switch (tokenType) {
             case TOK_WORD:
-                return "WORD{" + token + "}";
+                return "WORD{" + text + "}";
             case TOK_NAME:
-                return "NAME{" + token + "}";
+                return "NAME{" + text + "}";
             case TOK_ASSIGNMENT:
-                return "ASSIGNMENT{" + token + "}";
+                return "ASSIGNMENT{" + text + "}";
             case TOK_IO_NUMBER:
-                return "IO_NUMBER{" + token + "}";
+                return "IO_NUMBER{" + text + "}";
             case TOK_SEMI:
             case TOK_AMP:
             case TOK_BAR:

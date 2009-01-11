@@ -40,7 +40,7 @@ public class IBMPartitionTypeArgument extends Argument<IBMPartitionTypes> {
     @Override
     protected IBMPartitionTypes doAccept(Token value) throws CommandSyntaxException {
         try {
-            int code = Integer.parseInt(value.token, 16);
+            int code = Integer.parseInt(value.text, 16);
             return IBMPartitionTypes.valueOf(code);
         } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("not a valid hexadecimal number");

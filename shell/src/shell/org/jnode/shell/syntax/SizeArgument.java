@@ -47,7 +47,7 @@ public class SizeArgument extends Argument<Long> {
 
     @Override
     protected Long doAccept(Token token) throws CommandSyntaxException {
-        String str = token.token;
+        String str = token.text;
         ScaleFactor factor = scaleFactor(str);
         if (factor != null) { 
             str = str.substring(0, str.length() - factor.getUnit().length());

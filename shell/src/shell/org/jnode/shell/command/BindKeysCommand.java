@@ -126,7 +126,7 @@ public class BindKeysCommand extends AbstractCommand {
 
         @Override
         protected VirtualKey doAccept(Token value) throws CommandSyntaxException {
-            String str = value.token;
+            String str = value.text;
             String[] parts = str.split("\\+");
             int modifiers = 0;
             for (int i = 0; i < parts.length - 1; i++) {
@@ -157,7 +157,7 @@ public class BindKeysCommand extends AbstractCommand {
 
         @Override
         protected Character doAccept(Token value) throws CommandSyntaxException {
-            String str = value.token;
+            String str = value.text;
             String upper = str.toUpperCase();
             for (int i = 0; i < ASCII_NAMES.length; i++) {
                 if (ASCII_NAMES[i].equals(upper)) {

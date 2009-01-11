@@ -98,15 +98,15 @@ public class NFSHostNameArgument extends Argument<String> {
 
     @Override
     protected String doAccept(Token value) throws CommandSyntaxException {
-        int index = value.token.indexOf(':');
+        int index = value.text.indexOf(':');
         if (index == -1) {
             throw new CommandSyntaxException("missing ':'");
         } else if (index == 0) {
             throw new CommandSyntaxException("no hostname before ':'");
-        } else if (index == value.token.length() - 1) {
+        } else if (index == value.text.length() - 1) {
             throw new CommandSyntaxException("no directory after ':'");
         } else {
-            return value.token;
+            return value.text;
         }
     }
 }

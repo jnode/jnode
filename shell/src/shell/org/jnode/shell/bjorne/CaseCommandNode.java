@@ -58,10 +58,10 @@ public class CaseCommandNode extends CommandNode {
     public int execute(BjorneContext context) throws ShellException {
         int rc = -1;
         
-        CharSequence expandedWord = context.expand(word.token);
+        CharSequence expandedWord = context.expand(word.text);
         for (CaseItemNode caseItem : caseItems) {
             for (BjorneToken pattern : caseItem.getPattern()) {
-                CharSequence pat = context.expand(pattern.token);
+                CharSequence pat = context.expand(pattern.text);
                 if (context.patternMatch(expandedWord, pat)) {
                     throw new ShellException("not implemented yet");
                 }

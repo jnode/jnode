@@ -157,7 +157,7 @@ public class MuParser {
             if (DEBUG) {
                 log.debug("Trying kind = " + syntax.getKind() + ", syntax = " + syntax.format());
                 if (source.hasNext()) {
-                    log.debug("source -> " + source.peek().token);
+                    log.debug("source -> " + source.peek().text);
                 } else {
                     log.debug("source at end");
                 }
@@ -169,17 +169,17 @@ public class MuParser {
                     token = source.hasNext() ? source.next() : null;
 
                     if (completion == null || source.hasNext()) {
-                        backtrack = token == null || !token.token.equals(symbol);
+                        backtrack = token == null || !token.text.equals(symbol);
                     } else {
                         if (token == null) {
                             completion.addCompletion(symbol);
                             backtrack = true;
                         } else if (source.whitespaceAfterLast()) {
-                            if (!token.token.equals(symbol)) {
+                            if (!token.text.equals(symbol)) {
                                 backtrack = true;
                             }
                         } else {
-                            if (symbol.startsWith(token.token)) {
+                            if (symbol.startsWith(token.text)) {
                                 completion.addCompletion(symbol);
                                 completion.setCompletionStart(token.start);
                             }
@@ -202,7 +202,7 @@ public class MuParser {
                                     }
                                 }
                             } else {
-                                arg.complete(completion, token.token);
+                                arg.complete(completion, token.text);
                                 completion.setCompletionStart(token.start);
                                 backtrack = true;
                             }

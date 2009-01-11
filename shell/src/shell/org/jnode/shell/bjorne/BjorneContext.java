@@ -43,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.PathnamePattern;
@@ -241,7 +242,10 @@ public class BjorneContext {
             if (expanded == word) {
                 splitAndAppend(token, wordTokens);
             } else {
-                splitAndAppend(token.remake(expanded), wordTokens);
+                BjorneToken newToken = token.remake(expanded);
+                if (newToken != null) {
+                    splitAndAppend(newToken, wordTokens);
+                }
             }
         }
         return makeCommandLine(wordTokens);
@@ -397,9 +401,9 @@ public class BjorneContext {
 
     private String runBacktickCommand(String commandLine) throws ShellException {
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
-        interpreter.interpret(interpreter.getShell(), commandLine, capture,
-                false);
+        interpreter.interpret(interpreter.getShell(), commandLine, capture, false);
         String output = capture.toString();
+        // Trim trailing newlines
         int i;
         for (i = output.length(); i > 0 && output.charAt(i - 1) == '\n'; i--) { /**/
         }
@@ -415,19 +419,13 @@ public class BjorneContext {
     }
 
     /**
-     * Perform '$' expansions. Any quotes and escapes should be preserved.
+     * Perform '$' expansion and backtick substitution. Any quotes and escapes should be preserved (?!?!?)
      * 
      * @param text the characters to be expanded
      * @return the result of the expansion.
      * @throws ShellException
      */
     public CharSequence expand(CharSequence text) throws ShellException {
-        if (text instanceof String && ((String) text).indexOf('$') == -1) {
-            return text;
-        }
-        if (text instanceof StringBuffer && ((StringBuffer) text).indexOf("$") == -1) {
-            return text;
-        }
         CharIterator ci = new CharIterator(text);
         StringBuffer sb = new StringBuffer(text.length());
         char quote = 0;

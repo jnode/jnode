@@ -147,7 +147,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             CommandLine.Token commandToken = tokenizer.next();
             if (commandToken.tokenType == SPECIAL) {
                 throw new ShellSyntaxException("Misplaced '" +
-                        commandToken.token + "': expected a command name");
+                        commandToken.text + "': expected a command name");
             }
             
             CommandLine.Token from = null;
@@ -157,7 +157,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             while (tokenizer.hasNext()) {
                 CommandLine.Token token = tokenizer.next();
                 if (token.tokenType == SPECIAL) {
-                    if (token.token.equals("<")) {
+                    if (token.text.equals("<")) {
                         from = parseFileName(tokenizer, "<");
                         if (from == null && !completing) {
                             throw new ShellSyntaxException("no filename after '<'");
@@ -167,7 +167,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                                     new FileArgument("?", Argument.MANDATORY, null), from);
                         }
                         continue;
-                    } else if (token.token.equals(">")) {
+                    } else if (token.text.equals(">")) {
                         to = parseFileName(tokenizer, ">");
                         if (to == null && !completing) {
                             throw new ShellSyntaxException("no filename after '>'");
@@ -177,7 +177,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                                     new FileArgument("?", Argument.MANDATORY, null), to);
                         }
                         continue;
-                    } else if (token.token.equals("|")) {
+                    } else if (token.text.equals("|")) {
                         pipeTo = true;
                         break;
                     } else {
@@ -219,7 +219,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         if (token.tokenType == SPECIAL) {
             throw new ShellSyntaxException("misplaced '" + token + "'");
         }
-        if (token.token.isEmpty()) {
+        if (token.text.isEmpty()) {
             throw new ShellSyntaxException("empty '" + special + "' file name");
         }
         return token;
@@ -233,19 +233,19 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         try {
             try {
                 if (desc.fromFileName != null) {
-                    in = new CommandInput(new FileInputStream(desc.fromFileName.token));
+                    in = new CommandInput(new FileInputStream(desc.fromFileName.text));
                 }
             } catch (IOException ex) {
                 throw new ShellInvocationException("cannot open '" +
-                        desc.fromFileName.token + "': " + ex.getMessage());
+                        desc.fromFileName.text + "': " + ex.getMessage());
             }
             try {
                 if (desc.toFileName != null) {
-                    out = new CommandOutput(new FileOutputStream(desc.toFileName.token));
+                    out = new CommandOutput(new FileOutputStream(desc.toFileName.text));
                 }
             } catch (IOException ex) {
                 throw new ShellInvocationException("cannot open '" +
-                        desc.toFileName.token + "': " + ex.getMessage());
+                        desc.toFileName.text + "': " + ex.getMessage());
             }
             desc.commandLine.setStreams(new CommandIO[] {in, out, err, CommandLine.DEFAULT_STDERR});
             try {
@@ -289,17 +289,17 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 try {
                     // redirect from
                     if (desc.fromFileName != null) {
-                        in = new CommandInput(new FileInputStream(desc.fromFileName.token));
+                        in = new CommandInput(new FileInputStream(desc.fromFileName.text));
                         desc.openedStreams.add(in);
                     }
                 } catch (IOException ex) {
                     throw new ShellInvocationException("cannot open '" +
-                            desc.fromFileName.token + "': " + ex.getMessage());
+                            desc.fromFileName.text + "': " + ex.getMessage());
                 }
                 try {
                     // redirect to
                     if (desc.toFileName != null) {
-                        out = new CommandOutput(new FileOutputStream(desc.toFileName.token));
+                        out = new CommandOutput(new FileOutputStream(desc.toFileName.text));
                         desc.openedStreams.add(out);
                     }
                 } catch (IOException ex) {

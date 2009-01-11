@@ -63,7 +63,7 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     @Override
     protected E doAccept(Token token) throws CommandSyntaxException {
         try {
-            return E.valueOf(clazz, token.token);
+            return E.valueOf(clazz, token.text);
         } catch (IllegalArgumentException ex) {
             throw new CommandSyntaxException("not a valid <" + argumentKind() + ">");
         }

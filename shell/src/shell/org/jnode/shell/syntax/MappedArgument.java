@@ -78,7 +78,7 @@ public abstract class MappedArgument<V> extends Argument<V> {
      */
     @Override
     protected V doAccept(Token token) throws CommandSyntaxException {
-        String t = caseInsensitive ? token.token.toLowerCase() : token.token;
+        String t = caseInsensitive ? token.text.toLowerCase() : token.text;
         V value = valueMap.get(t);
         if (value == null) {
             throw new CommandSyntaxException("not an acceptable <" + argumentKind() + ">");

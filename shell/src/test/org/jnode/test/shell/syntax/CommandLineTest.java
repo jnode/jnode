@@ -53,16 +53,16 @@ public class CommandLineTest extends TestCase {
 
         SymbolSource<Token> ts = c1.tokenIterator();
         assertEquals(true, ts.hasNext());
-        assertEquals("1", ts.next().token);
+        assertEquals("1", ts.next().text);
         assertEquals(true, ts.hasNext());
-        assertEquals("2", ts.next().token);
+        assertEquals("2", ts.next().text);
         assertEquals(true, ts.hasNext());
-        assertEquals("3", ts.next().token);
+        assertEquals("3", ts.next().text);
         assertEquals(false, ts.hasNext());
 
         CommandLine c2 = new CommandLine("foo", args);
         assertEquals("foo", c2.getCommandName());
-        assertEquals("foo", c2.getCommandToken().token);
+        assertEquals("foo", c2.getCommandToken().text);
     }
 
     @SuppressWarnings("deprecation")
