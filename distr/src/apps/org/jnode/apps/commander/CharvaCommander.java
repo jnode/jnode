@@ -28,15 +28,21 @@ import java.util.Arrays;
 
 /**
  * Charva based file manager.
+ *
  * @author Levente S\u00e1ntha
  */
 public class CharvaCommander extends JFrame {
+    private static final Color BACKGROUND_COLOR = Color.black;
+    private static final Color FOREGROUND_COLOR = Color.cyan;
+    private static final Color HIGHLIGHT_COLOR = Color.yellow;
     private Pane currentPane;
     private Pane otherPane;
     private boolean exitted;
 
     /**
      * Startup method.
+     *
+     * @param argv ignored
      */
     public static void main(String[] argv) {
         CharvaCommander cmd = null;
@@ -56,8 +62,8 @@ public class CharvaCommander extends JFrame {
 
     private CharvaCommander() {
         this._insets = new Insets(0, 0, 0, 0);
-        setBackground(Color.black);
-        setForeground(Color.cyan);
+        setBackground(BACKGROUND_COLOR);
+        setForeground(FOREGROUND_COLOR);
         JPanel content = (JPanel) getContentPane();
         new ButtonPanel();
 
@@ -88,6 +94,7 @@ public class CharvaCommander extends JFrame {
         validate();
 
         currentPane.list.requestFocus();
+        currentPane.border.setTitleColor(HIGHLIGHT_COLOR);
     }
 
     private class ButtonPanel extends JPanel implements ActionListener {
@@ -145,7 +152,7 @@ public class CharvaCommander extends JFrame {
         }
     }
 
-    private void move() {
+    private synchronized void move() {
         String sel = currentPane.getSelection();
         if (sel == null)
             return;
@@ -155,19 +162,21 @@ public class CharvaCommander extends JFrame {
         if (conf != JOptionPane.YES_OPTION)
             return;
 
+        int index = currentPane.list.getSelectedIndex();
         try {
             File source = new File(currentPane.getPath(), sel);
             if (copyRec(source, new File(otherPane.getPath(), sel), true))
                 delete0(source);
         } finally {
             currentPane.setPath(currentPane.getPath());
+            currentPane.list.setCurrentRow(index);
             currentPane.repaint();
-            otherPane.setPath(otherPane.getPath());
+            otherPane.setPath(otherPane.getPath(), sel);
             otherPane.repaint();
         }
     }
 
-    private void view() {
+    private synchronized void view() {
         String sel = currentPane.getSelection();
         if (sel == null)
             return;
@@ -179,7 +188,7 @@ public class CharvaCommander extends JFrame {
         callViewer(f);
     }
 
-    private void mkfile() {
+    private synchronized void mkfile() {
         String str = JOptionPane.showInputDialog(this, "File name: ", "New file", JOptionPane.OK_CANCEL_OPTION);
         if (str == null || str.trim().length() == 0)
             return;
@@ -190,9 +199,18 @@ public class CharvaCommander extends JFrame {
                 .showConfirmDialog(this, file.getName(), "Continue? File already exits:", JOptionPane.YES_NO_OPTION);
             if (conf != JOptionPane.YES_OPTION)
                 return;
+        } else {
+            try {
+                file.createNewFile();
+            } catch (IOException ioe) {
+                JOptionPane.showMessageDialog(this, "Could not create file: " + file.getName());
+                return;
+            }
         }
 
         callEditor(file);
+        currentPane.setPath(currentPane.getPath(), file.getName());
+        currentPane.repaint();
     }
 
     private void callViewer(File file) {
@@ -208,7 +226,7 @@ public class CharvaCommander extends JFrame {
 
     }
 
-    private void edit() {
+    private synchronized void edit() {
         String sel = currentPane.getSelection();
         if (sel == null)
             return;
@@ -232,7 +250,7 @@ public class CharvaCommander extends JFrame {
         }
     }
 
-    private void chdir() {
+    private synchronized void chdir() {
         String str =
             JOptionPane.showInputDialog(this, "Path to directory: ", "Change directory", JOptionPane.OK_CANCEL_OPTION);
         if (str == null || str.trim().length() == 0)
@@ -252,7 +270,7 @@ public class CharvaCommander extends JFrame {
         }
     }
 
-    private void delete() {
+    private synchronized void delete() {
         String sel = currentPane.getSelection();
         if (sel == null)
             return;
@@ -269,10 +287,12 @@ public class CharvaCommander extends JFrame {
                 return;
         }
 
+        int index = currentPane.list.getSelectedIndex();
         try {
             delete0(new File(currentPane.getPath(), sel));
         } finally {
             currentPane.setPath(currentPane.getPath());
+            currentPane.list.setCurrentRow(index);
             currentPane.repaint();
         }
     }
@@ -290,7 +310,7 @@ public class CharvaCommander extends JFrame {
         currentPane.requestFocus();
     }
 
-    private void copy() {
+    private synchronized void copy() {
         String sel = currentPane.getSelection();
         if (sel == null)
             return;
@@ -303,7 +323,7 @@ public class CharvaCommander extends JFrame {
         try {
             copyRec(new File(currentPane.getPath(), sel), new File(otherPane.getPath(), sel), true);
         } finally {
-            otherPane.setPath(otherPane.getPath());
+            otherPane.setPath(otherPane.getPath(), sel);
             otherPane.repaint();
         }
     }
@@ -363,18 +383,18 @@ public class CharvaCommander extends JFrame {
         }
     }
 
-    private void mkdir() {
+    private synchronized void mkdir() {
         String str =
             JOptionPane.showInputDialog(this, "Directory name: ", "Create directory", JOptionPane.OK_CANCEL_OPTION);
         if (str != null && str.trim().length() > 0) {
             File file = new File(currentPane.getPath(), str);
             file.mkdir();
-            currentPane.setPath(currentPane.getPath());
+            currentPane.setPath(currentPane.getPath(), "/" + file.getName());
             currentPane.repaint();
         }
     }
 
-    private void exit() {
+    private synchronized void exit() {
         exitted = true;
         hide();
         Toolkit.getDefaultToolkit().close();
@@ -382,7 +402,7 @@ public class CharvaCommander extends JFrame {
 
     private class Pane extends JScrollPane {
         String path;
-        JList list;
+        MyList list;
         TitledBorder border;
         int w;
         int h;
@@ -391,64 +411,22 @@ public class CharvaCommander extends JFrame {
             this.w = w;
             this.h = h;
             border = new TitledBorder("");
-            border.setTitleColor(Color.cyan);
-            list = new JList() {
-                @Override
-                public void processKeyEvent(KeyEvent ke) {
-                    EventQueue evtqueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-                    int keyCode = ke.getKeyCode();
-                    if (keyCode == KeyEvent.VK_ENTER) {
-                        Object sel = list.getSelectedValue();
-                        String s;
-                        String n = null;
-                        if ("..".equals(sel)) {
-                            File file = new File(path);
-                            n = file.getName();
-                            s = file.getParentFile().getAbsolutePath();
-                        } else {
-                            String sels = String.valueOf(sel);
-                            s = new File(path, sels.substring(1, sels.length())).getAbsolutePath();
-                        }
-                        int sri = setData(s, n);
-                        int dir = _currentRow < sri ? ScrollEvent.UP : ScrollEvent.DOWN;
-                        if (sri > -1)
-                            _currentRow = sri;
-                        setSelectedIndex(_currentRow);
-                        evtqueue.postEvent(new ScrollEvent(this, dir, new Point(0, _currentRow)));
-                        ke.consume();
-                    } else if (keyCode == KeyEvent.VK_HOME) {
-                        _currentRow = 0;
-                        evtqueue.postEvent(new ScrollEvent(
-                            this, ScrollEvent.DOWN, new Point(0, _currentRow)));
-                    }
-                    super.processKeyEvent(ke);
-                    if (keyCode == KeyEvent.VK_UP ||
-                        keyCode == KeyEvent.VK_DOWN ||
-                        keyCode == KeyEvent.VK_PAGE_UP ||
-                        keyCode == KeyEvent.VK_PAGE_DOWN ||
-                        keyCode == KeyEvent.VK_END ||
-                        keyCode == KeyEvent.VK_HOME) {
-                        setSelectedIndex(_currentRow);
-                    }
-                }
-
-                @Override
-                public void requestFocus() {
-                    super.requestFocus();
-                    handleFocus();
-                }
-            };
+            border.setTitleColor(FOREGROUND_COLOR);
+            list = new MyList();
             setViewportView(list);
             list.setVisibleRowCount(h);
             list.setColumns(w);
             this.setViewportBorder(border);
-            this.setForeground(Color.cyan);
+            this.setForeground(FOREGROUND_COLOR);
         }
 
         private void handleFocus() {
             if (currentPane != this) {
                 otherPane = currentPane;
                 currentPane = this;
+                currentPane.border.setTitleColor(HIGHLIGHT_COLOR);
+                otherPane.border.setTitleColor(FOREGROUND_COLOR);
+                otherPane.repaint();
             }
         }
 
@@ -482,7 +460,6 @@ public class CharvaCommander extends JFrame {
                     return 0;
                 } else {
                     i = 0;
-                    n = "/" + n;
                     for (String nn : names) {
                         if (n.equals(nn)) {
                             return i;
@@ -503,6 +480,12 @@ public class CharvaCommander extends JFrame {
         public void setPath(String path) {
             setPath0(path);
             setData(path, null);
+        }
+
+        public void setPath(String path, String selection) {
+            setPath0(path);
+            int index = setData(path, selection);
+            list.setCurrentRow(index);
         }
 
         public String getSelection() {
@@ -527,6 +510,67 @@ public class CharvaCommander extends JFrame {
                 path = path.substring(path.length() - w);
             }
             border.setTitle(path);
+        }
+
+        private class MyList extends JList {
+            @Override
+            public void processKeyEvent(KeyEvent ke) {
+                EventQueue evtqueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+                int keyCode = ke.getKeyCode();
+                if (keyCode == KeyEvent.VK_ENTER) {
+                    Object sel = list.getSelectedValue();
+                    String s;
+                    String n = null;
+                    if ("..".equals(sel)) {
+                        File file = new File(path);
+                        n = file.getName();
+                        s = file.getParentFile().getAbsolutePath();
+                    } else {
+                        String sels = String.valueOf(sel);
+                        s = new File(path, sels.substring(1, sels.length())).getAbsolutePath();
+                    }
+                    int sri = setData(s, "/" + n);
+                    int dir = _currentRow < sri ? ScrollEvent.UP : ScrollEvent.DOWN;
+                    if (sri > -1)
+                        _currentRow = sri;
+                    setSelectedIndex(_currentRow);
+                    evtqueue.postEvent(new ScrollEvent(this, dir, new Point(0, _currentRow)));
+                    ke.consume();
+                } else if (keyCode == KeyEvent.VK_HOME) {
+                    _currentRow = 0;
+                    evtqueue.postEvent(new ScrollEvent(
+                        this, ScrollEvent.DOWN, new Point(0, _currentRow)));
+                }
+                super.processKeyEvent(ke);
+                if (keyCode == KeyEvent.VK_UP ||
+                    keyCode == KeyEvent.VK_DOWN ||
+                    keyCode == KeyEvent.VK_PAGE_UP ||
+                    keyCode == KeyEvent.VK_PAGE_DOWN ||
+                    keyCode == KeyEvent.VK_END ||
+                    keyCode == KeyEvent.VK_HOME) {
+                    setSelectedIndex(_currentRow);
+                }
+            }
+
+            @Override
+            public void requestFocus() {
+                super.requestFocus();
+                handleFocus();
+            }
+
+            void setCurrentRow(int index) {
+                if (index > -1) {
+                    int size = list.getModel().getSize();
+                    if (index >= size) {
+                        index = size - 1;
+                    }
+                    int dir = _currentRow < index ? ScrollEvent.UP : ScrollEvent.DOWN;
+                    _currentRow = index;
+                    setSelectedIndex(_currentRow);
+                    Toolkit.getDefaultToolkit().getSystemEventQueue().
+                        postEvent(new ScrollEvent(this, dir, new Point(0, _currentRow)));
+                }
+            }
         }
     }
 
