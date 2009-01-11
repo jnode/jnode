@@ -43,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.PathnamePattern;

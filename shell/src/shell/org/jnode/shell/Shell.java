@@ -22,7 +22,6 @@
 package org.jnode.shell;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Writer;
 
 import org.jnode.driver.console.Console;
@@ -72,8 +71,8 @@ public interface Shell extends InputCompleter {
      * the shell gets to decide which interpreter to use.
      * 
      * @param file the command file
-     * @throws IOException 
+     * @throws ShellException 
      */
-    public int runCommandFile(File file) throws IOException;
+    public int runCommandFile(File file) throws ShellException;
 
 }
