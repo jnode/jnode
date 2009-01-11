@@ -54,7 +54,7 @@ public class OptionSetSyntax extends GroupSyntax {
 
         @Override
         protected Boolean doAccept(Token token) throws CommandSyntaxException {
-            String value = token.token;
+            String value = token.text;
             int len = value.length();
             if (len < 2 || value.charAt(0) != '-') {
                 throw new CommandSyntaxException("not a flag set");

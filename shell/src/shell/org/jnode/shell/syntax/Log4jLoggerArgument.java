@@ -29,7 +29,7 @@ public class Log4jLoggerArgument extends Argument<Logger> {
      */
     @Override
     protected Logger doAccept(Token value) throws CommandSyntaxException {
-        return Logger.getLogger(value.token);
+        return Logger.getLogger(value.text);
     }
 
     /**

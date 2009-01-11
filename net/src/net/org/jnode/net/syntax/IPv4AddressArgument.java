@@ -26,10 +26,10 @@ public class IPv4AddressArgument extends Argument<IPv4Address> {
 
     @Override
     protected IPv4Address doAccept(Token value) throws CommandSyntaxException {
-        if (value.token.equals("default")) {
+        if (value.text.equals("default")) {
             return new IPv4Address(new byte[]{0, 0, 0, 0}, 0);
         }
-        final StringTokenizer tok = new StringTokenizer(value.token, ".");
+        final StringTokenizer tok = new StringTokenizer(value.text, ".");
         if (tok.countTokens() != 4) {
             throw new CommandSyntaxException("wrong number of components for an IPv4 address");
         }

@@ -487,7 +487,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                             }
                             if (context.token != null) {
                                 errPW.println("   " + context.exception.getMessage() + ": " +
-                                        context.token.token);
+                                        context.token.text);
                             } else {
                                 errPW.println("   " + context.exception.getMessage() + ": " +
                                         context.syntax.format());

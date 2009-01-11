@@ -25,7 +25,7 @@ public class IPv4HostArgument extends Argument<IPv4Address> {
     @Override
     protected IPv4Address doAccept(Token value) throws CommandSyntaxException {
         try {
-            return new IPv4Address(value.token);
+            return new IPv4Address(value.text);
         } catch (IllegalArgumentException ex) {
             throw new CommandSyntaxException("invalid hostname or IPv4 address");
         }

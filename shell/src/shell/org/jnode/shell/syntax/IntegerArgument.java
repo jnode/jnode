@@ -58,11 +58,11 @@ public class IntegerArgument extends Argument<Integer> {
     @Override
     protected Integer doAccept(Token token) throws CommandSyntaxException {
         try {
-            int tmp = Integer.parseInt(token.token);
+            int tmp = Integer.parseInt(token.text);
             if (tmp < min || tmp > max) {
                 throw new CommandSyntaxException("number is out of range");
             }
-            return new Integer(token.token);
+            return new Integer(token.text);
         } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid number");
         }

@@ -200,21 +200,21 @@ public class CommandLine implements Completable, Iterable<String> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                return argumentTokens[pos++].token;
+                return argumentTokens[pos++].text;
             }
 
             public String peek() throws NoSuchElementException {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                return argumentTokens[pos].token;
+                return argumentTokens[pos].text;
             }
 
             public String last() throws NoSuchElementException {
                 if (pos <= 0) {
                     throw new NoSuchElementException();
                 }
-                return argumentTokens[pos - 1].token;
+                return argumentTokens[pos - 1].text;
             }
 
             public void remove() {
@@ -307,7 +307,7 @@ public class CommandLine implements Completable, Iterable<String> {
      * @return the command name
      */
     public String getCommandName() {
-        return commandToken == null ? null : commandToken.token;
+        return commandToken == null ? null : commandToken.text;
     }
 
     /**
@@ -331,7 +331,7 @@ public class CommandLine implements Completable, Iterable<String> {
         }
         String[] arguments = new String[len];
         for (int i = 0; i < len; i++) {
-            arguments[i] = argumentTokens[i].token;
+            arguments[i] = argumentTokens[i].text;
         }
         return arguments;
     }
@@ -352,10 +352,10 @@ public class CommandLine implements Completable, Iterable<String> {
      * @return the entire command line
      */
     public String toString() {
-        StringBuilder sb = new StringBuilder(escape(commandToken.token));
+        StringBuilder sb = new StringBuilder(escape(commandToken.text));
         for (Token arg : argumentTokens) {
             sb.append(' ');
-            sb.append(escape(arg.token));
+            sb.append(escape(arg.text));
         }
         return sb.toString();
     }
@@ -388,7 +388,7 @@ public class CommandLine implements Completable, Iterable<String> {
          * should have been processed so that the value of the field represents
          * a command name or argument.
          */
-        public final String token;
+        public final String text;
 
         /**
          * This field represents the type of the token. The meaning is
@@ -414,7 +414,7 @@ public class CommandLine implements Completable, Iterable<String> {
         public final int end;
 
         public Token(String value, int type, int start, int end) {
-            this.token = value;
+            this.text = value;
             this.tokenType = type;
             this.start = start;
             this.end = end;
@@ -430,7 +430,7 @@ public class CommandLine implements Completable, Iterable<String> {
             int result = 1;
             result = prime * result + end;
             result = prime * result + start;
-            result = prime * result + ((token == null) ? 0 : token.hashCode());
+            result = prime * result + ((text == null) ? 0 : text.hashCode());
             result = prime * result + tokenType;
             return result;
         }
@@ -448,10 +448,10 @@ public class CommandLine implements Completable, Iterable<String> {
                 return false;
             if (start != other.start)
                 return false;
-            if (token == null) {
-                if (other.token != null)
+            if (text == null) {
+                if (other.text != null)
                     return false;
-            } else if (!token.equals(other.token))
+            } else if (!text.equals(other.text))
                 return false;
             if (tokenType != other.tokenType)
                 return false;
@@ -459,7 +459,7 @@ public class CommandLine implements Completable, Iterable<String> {
         }
 
         public String toString() {
-            return "Token{'" + token + "'," + start + "," + end + "," + tokenType + "}";
+            return "Token{'" + text + "'," + start + "," + end + "," + tokenType + "}";
         }
     }
 
@@ -570,7 +570,7 @@ public class CommandLine implements Completable, Iterable<String> {
      *                                line arguments.
      */
     public CommandInfo parseCommandLine(CommandShell shell) throws ShellException {
-        String cmd = (commandToken == null) ? "" : commandToken.token.trim();
+        String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (cmd.equals("")) {
             throw new ShellFailureException("no command name");
         }
@@ -601,7 +601,7 @@ public class CommandLine implements Completable, Iterable<String> {
     }
 
     public void complete(CompletionInfo completion, CommandShell shell) throws CompletionException {
-        String cmd = (commandToken == null) ? "" : commandToken.token.trim();
+        String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
             CommandInfo cmdClass;
             try {
@@ -649,7 +649,7 @@ public class CommandLine implements Completable, Iterable<String> {
     }
 
     public CommandInfo getCommandInfo(CommandShell shell) {
-        String cmd = (commandToken == null) ? "" : commandToken.token.trim();
+        String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (cmd.equals("")) {
             return null;
         }

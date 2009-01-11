@@ -59,11 +59,11 @@ public class LongArgument extends Argument<Long> {
     @Override
     protected Long doAccept(Token token) throws CommandSyntaxException {
         try {
-            long tmp = Long.parseLong(token.token);
+            long tmp = Long.parseLong(token.text);
             if (tmp < min || tmp > max) {
                 throw new CommandSyntaxException("number is out of range");
             }
-            return new Long(token.token);
+            return new Long(token.text);
         } catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid number");
         }

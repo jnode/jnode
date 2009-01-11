@@ -43,8 +43,8 @@ public class LanguageArgument extends Argument<String> {
 
     @Override
     protected String doAccept(Token token) throws CommandSyntaxException {
-        if (validLanguages.contains(token.token)) {
-            return token.token;
+        if (validLanguages.contains(token.text)) {
+            return token.text;
         } else {
             throw new CommandSyntaxException("invalid language code");
         }

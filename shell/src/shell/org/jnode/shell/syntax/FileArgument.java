@@ -47,8 +47,8 @@ public class FileArgument extends Argument<File> {
 
     @Override
     protected File doAccept(Token token) throws CommandSyntaxException {
-        if (token.token.length() > 0) {
-            File file = new File(token.token);
+        if (token.text.length() > 0) {
+            File file = new File(token.text);
             if (isExisting() && !file.exists()) {
                 throw new CommandSyntaxException("this file or directory does not exist");
             }

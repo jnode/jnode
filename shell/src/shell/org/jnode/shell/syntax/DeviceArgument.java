@@ -58,7 +58,7 @@ public class DeviceArgument extends Argument<Device> {
     protected Device doAccept(Token token) throws CommandSyntaxException {
         try {
             final DeviceManager devMgr = getDeviceManager();
-            final Device device = devMgr.getDevice(token.token);
+            final Device device = devMgr.getDevice(token.text);
             if (apiClass == null || device.implementsAPI(apiClass)) {
                 return device;
             } else {
