@@ -2747,9 +2747,10 @@ public final
         for (int i = 0; i < a1.length; i++) {
             //jnode doing param comparision by class name bacause with multiple isolates identity comparision fails
             if(a1[i] instanceof Class && a2[i] instanceof Class) {
-                return ((Class)a1[i]).getName().equals(((Class)a2[i]).getName());
-            }
-            if (a1[i] != a2[i]) {
+                if(!((Class)a1[i]).getName().equals(((Class)a2[i]).getName())){
+                    return false;
+                }
+            } else if (a1[i] != a2[i]) {
                 return false;
             }
         }
