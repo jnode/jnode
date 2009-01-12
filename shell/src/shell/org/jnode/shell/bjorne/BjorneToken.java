@@ -138,21 +138,21 @@ public class BjorneToken extends CommandLine.Token {
     }
 
     private void validate() {
-        switch (tokenType) {
-            case TOK_WORD:
-            case TOK_IO_NUMBER:
-            case TOK_NAME:
-            case TOK_ASSIGNMENT:
-                if (text == null || text.length() == 0) {
-                    throw new IllegalArgumentException("null or empty text");
-                }
-                break;
-
-            default:
-                if (text != null && text.length() > 0) {
-                    throw new IllegalArgumentException("non-empty text");
-                }
-        }
+//        switch (tokenType) {
+//            case TOK_WORD:
+//            case TOK_IO_NUMBER:
+//            case TOK_NAME:
+//            case TOK_ASSIGNMENT:
+//                if (text == null || text.length() == 0) {
+//                    throw new IllegalArgumentException("null or empty text");
+//                }
+//                break;
+//
+//            default:
+//                if (text != null && text.length() > 0) {
+//                    throw new IllegalArgumentException("non-empty text");
+//                }
+//        }
     }
 
     public String getText() {

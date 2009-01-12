@@ -18,14 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.shell.bjorne;
+package org.jnode.test.shell.bjorne;
 
 import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
+import org.jnode.shell.bjorne.BjorneContext;
+import org.jnode.shell.bjorne.BjorneToken;
 
 public class BjorneContextTests extends TestCase {
 
@@ -35,93 +37,93 @@ public class BjorneContextTests extends TestCase {
 
     public void testExpand1() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("");
+        List<BjorneToken> expansion = context.expandAndSplit("");
         checkExpansion(expansion, new String[] {});
     }
 
     public void testExpand2() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("  ");
+        List<BjorneToken> expansion = context.expandAndSplit("  ");
         checkExpansion(expansion, new String[] {});
     }
 
     public void testExpand3() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("hi");
+        List<BjorneToken> expansion = context.expandAndSplit("hi");
         checkExpansion(expansion, new String[] {"hi"});
     }
 
     public void testExpand4() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("hi there ");
+        List<BjorneToken> expansion = context.expandAndSplit("hi there ");
         checkExpansion(expansion, new String[] {"hi", "there"});
     }
 
     public void testExpand5() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("'hi there '");
+        List<BjorneToken> expansion = context.expandAndSplit("'hi there '");
         checkExpansion(expansion, new String[] {"hi there "});
     }
 
     public void testExpand6() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("\"hi there \" ");
+        List<BjorneToken> expansion = context.expandAndSplit("\"hi there \" ");
         checkExpansion(expansion, new String[] {"hi there "});
     }
 
     public void testExpand7() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("hi\\ there");
+        List<BjorneToken> expansion = context.expandAndSplit("hi\\ there");
         checkExpansion(expansion, new String[] {"hi there"});
     }
 
     public void testExpand8() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("\\\"hi\\ there\\\"");
+        List<BjorneToken> expansion = context.expandAndSplit("\\\"hi\\ there\\\"");
         checkExpansion(expansion, new String[] {"\"hi there\""});
     }
 
     public void testExpand9() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
-        CommandLine expansion = context.expandAndSplit("$?");
+        List<BjorneToken> expansion = context.expandAndSplit("$?");
         checkExpansion(expansion, new String[] {"0"});
     }
 
     public void testExpand10() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        CommandLine expansion = context.expandAndSplit("$A");
+        List<BjorneToken> expansion = context.expandAndSplit("$A");
         checkExpansion(expansion, new String[] {"A"});
     }
 
     public void testExpand11() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        CommandLine expansion = context.expandAndSplit("\\$A");
+        List<BjorneToken> expansion = context.expandAndSplit("\\$A");
         checkExpansion(expansion, new String[] {"$A"});
     }
 
     public void testExpand12() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        CommandLine expansion = context.expandAndSplit("\"$A\"");
+        List<BjorneToken> expansion = context.expandAndSplit("\"$A\"");
         checkExpansion(expansion, new String[] {"A"});
     }
 
     public void testExpand13() throws ShellException {
         BjorneContext context = new BjorneContext(null, null);
         context.setVariable("A", "A");
-        CommandLine expansion = context.expandAndSplit("'$A'");
+        List<BjorneToken> expansion = context.expandAndSplit("'$A'");
         checkExpansion(expansion, new String[] {"$A"});
     }
 
     @SuppressWarnings("deprecation")
-    private void checkExpansion(CommandLine expansion, String[] expected) {
+    private void checkExpansion(List<BjorneToken> expansion, String[] expected) {
         int i;
-        Iterator<String> it = expansion.iterator();
+        Iterator<BjorneToken> it = expansion.iterator();
         for (i = 0; i < expected.length; i++) {
             if (it.hasNext()) {
-                assertEquals("incorrect expansion at word " + i, expected[i], it.next());
+                assertEquals("incorrect expansion at word " + i, expected[i], it.next().getText());
             } else {
                 fail("Too few words in expansion at word " + i + ": expecting '" + expected[i] + "'");
             }

@@ -18,11 +18,13 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.shell.bjorne;
+package org.jnode.test.shell.bjorne;
 
 import junit.framework.TestCase;
 
 import org.jnode.shell.ShellException;
+import org.jnode.shell.bjorne.BjorneParser;
+import org.jnode.shell.bjorne.BjorneTokenizer;
 
 public class BjorneParserTests extends TestCase {
 
@@ -34,13 +36,13 @@ public class BjorneParserTests extends TestCase {
 
     public void test1() throws ShellException {
         assertEquals(
-                "SimpleCommand{nodeType=1,command=WORD{foo},arguments=[]}",
+                "SimpleCommand{nodeType=1,words=[WORD{foo}]}",
                 doTest("foo"));
     }
 
     public void test2() throws ShellException {
         assertEquals(
-                "SimpleCommand{nodeType=1,command=WORD{ls},arguments=[WORD{-l}]}",
+                "SimpleCommand{nodeType=1,words=[WORD{ls},WORD{-l}]}",
                 doTest("ls -l"));
     }
 
@@ -49,7 +51,7 @@ public class BjorneParserTests extends TestCase {
                 "SimpleCommand{nodeType=1,"
                         + "redirects=[Redirect{redirectionType=60,io=IO_NUMBER{1},arg=WORD{/tmp/foo}},"
                         + "Redirect{redirectionType=62,arg=WORD{/tmp/bar}}],"
-                        + "command=WORD{ls},arguments=[WORD{-l}]}",
+                        + "words=[WORD{ls},WORD{-l}]}",
                 doTest("ls -l 1< /tmp/foo > /tmp/bar"));
     }
 
@@ -57,31 +59,31 @@ public class BjorneParserTests extends TestCase {
         assertEquals(
                 "ListCommand{nodeType=2,flags=0x10,"
                         + "commands=[SimpleCommand{nodeType=1,assignments=[ASSIGNMENT{FOO=BAR}],"
-                        + "command=WORD{ls},arguments=[WORD{-l}]},"
-                        + "SimpleCommand{nodeType=1,command=WORD{less},arguments=[]}]}",
+                        + "words=[WORD{ls},WORD{-l}]},"
+                        + "SimpleCommand{nodeType=1,words=[WORD{less}]}]}",
                 doTest("FOO=BAR ls -l | less"));
     }
 
     public void test5() throws ShellException {
         assertEquals(
                 "ListCommand{nodeType=2,flags=0x10,commands=["
-                        + "SimpleCommand{nodeType=1,command=WORD{cat},arguments=[WORD{foo}]},"
+                        + "SimpleCommand{nodeType=1,words=[WORD{cat},WORD{foo}]},"
                         + "ListCommand{nodeType=10,commands=["
                         + "ListCommand{nodeType=2,commands=["
-                        + "SimpleCommand{nodeType=1,command=WORD{wc},arguments=[WORD{1}]},"
-                        + "SimpleCommand{nodeType=1,flags=0x2,command=WORD{wc},arguments=[WORD{2}]}]},"
+                        + "SimpleCommand{nodeType=1,words=[WORD{wc},WORD{1}]},"
+                        + "SimpleCommand{nodeType=1,flags=0x2,words=[WORD{wc},WORD{2}]}]},"
                         + "ListCommand{nodeType=2,commands=["
-                        + "SimpleCommand{nodeType=1,command=WORD{wc},arguments=[WORD{3}]},"
-                        + "SimpleCommand{nodeType=1,flags=0x4,command=WORD{wc},arguments=[WORD{4}]}]}]}]}",
+                        + "SimpleCommand{nodeType=1,words=[WORD{wc},WORD{3}]},"
+                        + "SimpleCommand{nodeType=1,flags=0x4,words=[WORD{wc},WORD{4}]}]}]}]}",
                 doTest("cat foo | ( wc 1 && wc 2 ; wc 3 || wc 4 )"));
     }
 
     public void test6() throws ShellException {
         assertEquals(
                 "ListCommand{nodeType=2,commands=["
-                        + "SimpleCommand{nodeType=1,flags=0x1,command=WORD{cat},arguments=[WORD{foo}]},"
-                        + "SimpleCommand{nodeType=1,command=WORD{cat},arguments=[WORD{bar}]},"
-                        + "SimpleCommand{nodeType=1,command=WORD{cat},arguments=[WORD{baz}]}]}",
+                        + "SimpleCommand{nodeType=1,flags=0x1,words=[WORD{cat},WORD{foo}]},"
+                        + "SimpleCommand{nodeType=1,words=[WORD{cat},WORD{bar}]},"
+                        + "SimpleCommand{nodeType=1,words=[WORD{cat},WORD{baz}]}]}",
                 doTest("cat foo & cat bar ; cat baz ;"));
     }
 
@@ -89,7 +91,7 @@ public class BjorneParserTests extends TestCase {
         assertEquals(
                 "LoopCommand{nodeType=3,var=NAME{i},"
                         + "words=[WORD{1},WORD{2},WORD{3},WORD{4},WORD{5}],"
-                        + "body=SimpleCommand{nodeType=1,command=WORD{echo},arguments=[WORD{$i}]}}",
+                        + "body=SimpleCommand{nodeType=1,words=[WORD{echo},WORD{$i}]}}",
                 doTest("for i in 1 2 3 4 5 ; do echo $i ; done"));
     }
 
@@ -97,23 +99,23 @@ public class BjorneParserTests extends TestCase {
         assertEquals(
                 "LoopCommand{nodeType=3,var=NAME{i},"
                         + "words=[WORD{1},WORD{2},WORD{3},WORD{4},WORD{5}],"
-                        + "body=SimpleCommand{nodeType=1,command=WORD{echo},arguments=[WORD{$i}]}}",
+                        + "body=SimpleCommand{nodeType=1,words=[WORD{echo},WORD{$i}]}}",
                 doTest("for i in 1 2 3 4 5 ; do \n echo $i ; done"));
     }
 
     public void test8() throws ShellException {
         assertEquals(
                 "LoopCommand{nodeType=4,"
-                        + "cond=SimpleCommand{nodeType=1,command=WORD{true},arguments=[]},"
-                        + "body=SimpleCommand{nodeType=1,command=WORD{echo},arguments=[WORD{$i}]}}",
+                        + "cond=SimpleCommand{nodeType=1,words=[WORD{true}]},"
+                        + "body=SimpleCommand{nodeType=1,words=[WORD{echo},WORD{$i}]}}",
                 doTest("while true ; do echo $i ; done"));
     }
 
     public void test9() throws ShellException {
         assertEquals(
                 "LoopCommand{nodeType=5,"
-                        + "cond=SimpleCommand{nodeType=1,command=WORD{true},arguments=[]},"
-                        + "body=SimpleCommand{nodeType=1,command=WORD{echo},arguments=[WORD{$i}]}}",
+                        + "cond=SimpleCommand{nodeType=1,words=[WORD{true}]},"
+                        + "body=SimpleCommand{nodeType=1,words=[WORD{echo},WORD{$i}]}}",
                 doTest("until true ; do echo $i ; done"));
     }
 
@@ -121,9 +123,9 @@ public class BjorneParserTests extends TestCase {
         assertEquals(
                 "CaseCommand{nodeType=9,word=WORD{$1},caseItems=["
                         + "CaseItem{,pattern=[],body="
-                        + "SimpleCommand{nodeType=1,command=WORD{ls},arguments=[WORD{-l}]}},"
+                        + "SimpleCommand{nodeType=1,words=[WORD{ls},WORD{-l}]}},"
                         + "CaseItem{,pattern=[],body="
-                        + "SimpleCommand{nodeType=1,command=WORD{ls},arguments=[WORD{-a}]}}]}",
+                        + "SimpleCommand{nodeType=1,words=[WORD{ls},WORD{-a}]}}]}",
                 doTest("case $1 in ( a ) ls -l ;; b ) ls -a ; esac"));
     }
 

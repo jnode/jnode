@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.jnode.shell.bjorne;
+package org.jnode.test.shell.bjorne;
 
 import static org.jnode.shell.bjorne.BjorneToken.RULE_1_CONTEXT;
 import static org.jnode.shell.bjorne.BjorneToken.RULE_5_CONTEXT;
@@ -65,6 +65,10 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_THEN;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
+
+import org.jnode.shell.bjorne.BjorneToken;
+import org.jnode.shell.bjorne.BjorneTokenizer;
+
 import junit.framework.TestCase;
 
 public class BjorneTokenizerTests extends TestCase {
