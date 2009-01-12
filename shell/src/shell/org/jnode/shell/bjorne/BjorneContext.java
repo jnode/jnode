@@ -251,18 +251,16 @@ public class BjorneContext {
     }
 
     /**
-     * Perform expand-and-split processing on a sequence of characters.  The resulting
-     * wordTokens are assembled into a CommandLine.  This method is only used in tests
-     * at the moment, and probably should be removed.  (It does not set token attributes
-     * properly ...)
+     * Perform expand-and-split processing on a sequence of characters.  This method is only 
+     * used in tests at the moment, and probably should be removed.  (It does not set token
+     *  attributes properly ...)
      * 
      * @param text the characters to be split
      * @return the command line 
      * @throws ShellException
      */
-    public CommandLine expandAndSplit(CharSequence text) throws ShellException {
-        LinkedList<BjorneToken> words = split(expand(text));
-        return makeCommandLine(words);
+    public List<BjorneToken> expandAndSplit(CharSequence text) throws ShellException {
+        return split(expand(text));
     }
 
     private CommandLine makeCommandLine(LinkedList<BjorneToken> wordTokens) {
@@ -337,7 +335,7 @@ public class BjorneContext {
      */
     public LinkedList<BjorneToken> split(CharSequence text) throws ShellException {
         LinkedList<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
-        splitAndAppend(new BjorneToken(-1, text.toString(), -1, -1), wordTokens);
+        splitAndAppend(new BjorneToken(BjorneToken.TOK_WORD, text.toString(), -1, -1), wordTokens);
         return wordTokens;
     }
     
