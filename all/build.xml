@@ -748,6 +748,15 @@ clean             Remove all intermediate build results.
                     <fileset dir="${root.dir}/core/src/openjdk/sun">
                         <patternset refid="cp-includes-pattern"/>
                     </fileset>
+                    <fileset dir="${root.dir}/core/src/openjdk/jaxws">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/core/src/openjdk/langtools">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/core/src/openjdk/corba">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
                 </vmsources>
                 <vmspecificsources>
                     <fileset dir="${root.dir}/core/src/openjdk/vm">
@@ -755,7 +764,23 @@ clean             Remove all intermediate build results.
                        </fileset>
                 </vmspecificsources>
                 <classpathsources>
-                    <fileset dir="${root.dir}/../../openjdk/j2se/src/share/classes/">
+                    <fileset dir="${root.dir}/../openjdk/jdk/src/share/classes/">
+                        <patternset refid="cp-includes-pattern"/>
+                        <patternset refid="cp-sources-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/../openjdk/corba/src/share/classes/">
+                        <patternset refid="cp-includes-pattern"/>
+                        <patternset refid="cp-sources-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/../openjdk/jaxp/src/share/classes/">
+                        <patternset refid="cp-includes-pattern"/>
+                        <patternset refid="cp-sources-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/../openjdk/jaxws/src/share/classes/">
+                        <patternset refid="cp-includes-pattern"/>
+                        <patternset refid="cp-sources-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/../openjdk/langtools/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
@@ -953,6 +978,32 @@ clean             Remove all intermediate build results.
             -->
         </checkstyle>
     </target>
+
+  <target name="findbugs" depends="assemble-plugins">
+    <taskdef name="findbugs" classpath="../core/lib/findbugs/lib/findbugs-ant.jar"
+             classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <findbugs home="../core/lib/findbugs/" output="html" outputFile="./build/findbugs.html" >
+      <auxclasspath>
+          <pathelement location="./build/plugins/rt_${jnode-ver}.jar" />
+          <pathelement location="./build/plugins/org.classpath.ext.core_${jnode-ver}.jar" />
+          <pathelement location="./build/plugins/nanoxml_1.4.jar" />
+          <pathelement location="${nanoxml-java.jar}" />
+          <pathelement location="${log4j.jar}" />
+      </auxclasspath>
+      <sourcepath>
+          <pathelement path="../core/src/core/"/>
+      </sourcepath>
+      <class location="./build/plugins/org.jnode.vm_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.vm.core_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.vm.memmgr.def_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.driver_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.runtime_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.runtime.core_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.util_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.work_${jnode-ver}.jar"/>
+      <class location="./build/plugins/org.jnode.security_${jnode-ver}.jar"/>
+    </findbugs>
+  </target>
 
     <!-- Create a patch -->
     <!-- TODO create replacement SVN task
