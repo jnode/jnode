@@ -23,6 +23,8 @@ package org.jnode.vm.bytecode;
 
 import org.jnode.util.BootableArrayList;
 import org.jnode.vm.VmSystemObject;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * A Basic block of instructions.
@@ -177,5 +179,29 @@ public class BasicBlock extends VmSystemObject {
         if (entryBlock != null) {
             this.entryBlocks.add(entryBlock);
         }
+    }
+
+    public boolean isLive() {
+        Set<BasicBlock> checked = new HashSet<BasicBlock>();
+        checked.add(this);
+        return isLive(checked);
+    }
+
+    private boolean isLive(Set<BasicBlock> checked) {
+        if (startPC == 0)
+            return true;
+
+        if (entryBlocks != null) {
+            for (BasicBlock bb : entryBlocks) {
+                if (!checked.contains(bb)) {
+                    checked.add(bb);
+                    if (bb.isLive(checked)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
