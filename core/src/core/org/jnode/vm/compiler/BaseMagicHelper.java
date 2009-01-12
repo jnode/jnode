@@ -26,6 +26,7 @@ import java.util.Map;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -37,6 +38,7 @@ public class BaseMagicHelper {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
+    @SharedStatics
     public enum MagicClass {
         ADDRESS("org.vmmagic.unboxed.Address"),
         EXTENT("org.vmmagic.unboxed.Extent"),
@@ -101,6 +103,7 @@ public class BaseMagicHelper {
      *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
+    @SharedStatics
     public enum MagicMethod {
         ADD("add", false),
         AND("and", false),
