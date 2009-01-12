@@ -111,6 +111,12 @@ public final class LoadCompileService {
      */
     static final void start() {
         initService();
+        /*
+        Disabled the startup of the LoadCompile thread service because multithreaded
+        class loading creates deadlock in URLClassLoader and subclasses.
+        Loading and compilation will happen onthe caller thread.
+        TODO review this: investigate class loading in dedicated threads (probably will not work)
+        TODO and method compilation on dedicated threads (probably will work)
         if (!started) {
             started = true;
             for (int i = 0; i < threadCount; i++) {
@@ -119,6 +125,7 @@ public final class LoadCompileService {
                 thread.start();
             }
         }
+        */
     }
 
     @KernelSpace
