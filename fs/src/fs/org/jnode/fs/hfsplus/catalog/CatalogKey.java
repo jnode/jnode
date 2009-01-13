@@ -6,6 +6,9 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
 public class CatalogKey extends AbstractKey {
+    
+    public final static int MAXIMUM_KEY_LENGTH = 516;
+    
     private int keyLength;
     private CatalogNodeId parentID;
     private HFSUnicodeString nodeName;

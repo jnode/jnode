@@ -111,8 +111,17 @@ public class BTHeaderRecord {
         BigEndian.setInt8(data, 38, type);
     }
 
+    public long getAttributes() {
+        return BigEndian.getInt32(data, 39);
+    }
+
+    public void setAttributes(int attrs) {
+        BigEndian.setInt32(data, 39, attrs);
+    }
+
     public final String toString() {
-        return ("Root node:  " + getRootNode() + "\n" + "First leaf: " + getFirstLeafNode() + "\n" + "Last leaf:  "
+        return ("Root node:  " + getRootNode() + "\n" + "First leaf: "
+                + getFirstLeafNode() + "\n" + "Last leaf:  "
                 + getLastLeafNode() + "\n" + "node size:  " + getNodeSize() + "\n");
     }
 }

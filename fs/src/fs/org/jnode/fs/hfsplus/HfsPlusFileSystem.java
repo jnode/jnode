@@ -118,6 +118,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         try {
             params.initializeDefaultsValues(this.getApi().getLength(), this.getFSApi().getSectorSize());
             sb.create(params);
+            log.debug("Write volume header to disk.");
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();
         } catch (IOException e) {

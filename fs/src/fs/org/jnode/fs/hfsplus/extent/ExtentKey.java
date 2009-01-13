@@ -6,7 +6,7 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
 public class ExtentKey extends AbstractKey {
-
+    
     public static final byte DATA_FORK = (byte) 0x00;
     public static final byte RESOURCE_FORK = (byte) 0xFF;
     public static final int KEY_LENGTH = 12;

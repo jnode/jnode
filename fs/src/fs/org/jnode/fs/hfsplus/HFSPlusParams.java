@@ -250,4 +250,8 @@ public class HFSPlusParams {
     public void setBitmapClumpBlocks(int bitmapClumpBlocks) {
         this.bitmapClumpBlocks = bitmapClumpBlocks;
     }
+
+    public int getExtentNodeSize() {
+        return extentNodeSize;
+    }
 }
