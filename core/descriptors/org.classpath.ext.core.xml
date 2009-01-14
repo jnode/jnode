@@ -36,7 +36,6 @@
       <export name="gnu.java.net.protocol.file.*"/>
       <export name="gnu.java.net.protocol.ftp.*"/>
       <export name="gnu.java.net.protocol.http.*"/>
-      <export name="gnu.java.net.protocol.jar.*"/>
       <export name="gnu.java.rmi.*"/>
       <export name="gnu.java.rmi.dgc.*"/>
       <export name="gnu.java.rmi.server.*"/>
