@@ -525,7 +525,6 @@ public class BjorneParser {
             caseItems.add(parseCaseItem());
             skipLineBreaks();
             token = tokens.peek(RULE_1_CONTEXT);
-            System.err.println("case: token = " + token);
             if (token.getTokenType() == TOK_DSEMI) {
                 tokens.next();
                 skipLineBreaks();
@@ -545,7 +544,6 @@ public class BjorneParser {
         // will not
         // be an 'esac', so there's no point applying rule 4
         BjorneToken token = tokens.peek();
-        System.err.println("item: token = " + token);
         if (token.getTokenType() == TOK_LPAREN) {
             token = tokens.next();
         }
@@ -557,7 +555,6 @@ public class BjorneParser {
         CommandNode body = null;
         skipLineBreaks();
         token = tokens.peek(RULE_1_CONTEXT);
-        System.err.println("item2: token = " + token);
         if (token.getTokenType() != TOK_DSEMI
                 && token.getTokenType() != TOK_ESAC) {
             body = parseCompoundList();
@@ -620,7 +617,6 @@ public class BjorneParser {
 
     private CommandNode parseDoGroup() throws ShellSyntaxException {
         BjorneToken token = tokens.next(RULE_1_CONTEXT);
-        System.err.println("token is " + token);
         if (token.getTokenType() != TOK_DO) {
             throw new ShellSyntaxException("expected the 'do' of a do_group");
         }
@@ -671,6 +667,7 @@ public class BjorneParser {
             case TOK_ELSE:
                 return parseCompoundList();
             default:
+                tokens.backup();
                 return null;
         }
     }
