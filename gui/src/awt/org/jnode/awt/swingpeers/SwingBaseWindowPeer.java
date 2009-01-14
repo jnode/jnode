@@ -128,19 +128,24 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * @see java.awt.peer.ContainerPeer#getInsets()
      */
     public final Insets getInsets() {
-        final Container contentPane = peerComponent.getContentPane();
         final Insets insets = new Insets(0, 0, 0, 0);
-        Component c = contentPane;
-        while (c != peerComponent) {
-            insets.left += c.getX();
-            insets.top += c.getY();
-            c = c.getParent();
+        Object obj = this;   //javac detects error for: this instanceof SwingWindowPeer 
+        if (obj instanceof SwingWindowPeer) {
+            return insets;
+        } else {
+            final Container contentPane = peerComponent.getContentPane();
+            Component c = contentPane;
+            while (c != peerComponent) {
+                insets.left += c.getX();
+                insets.top += c.getY();
+                c = c.getParent();
+            }
+            final int dw = peerComponent.getWidth() - contentPane.getWidth();
+            final int dh = peerComponent.getHeight() - contentPane.getHeight();
+            insets.right = dw - insets.left;
+            insets.bottom = dh - insets.top;
+            return insets;
         }
-        final int dw = peerComponent.getWidth() - contentPane.getWidth();
-        final int dh = peerComponent.getHeight() - contentPane.getHeight();
-        insets.right = dw - insets.left;
-        insets.bottom = dh - insets.top;
-        return insets;
     }
 
     /**
