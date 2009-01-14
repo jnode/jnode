@@ -210,7 +210,7 @@ public class Superblock extends HFSPlusObject {
     }
 
     public final void setAttribute(final int attributeMaskBit) {
-        BigEndian.setInt32(data, 4, (getAttributes() >> attributeMaskBit) | 0x1);
+        BigEndian.setInt32(data, 4, getAttributes() | (1 << attributeMaskBit));
     }
 
     //

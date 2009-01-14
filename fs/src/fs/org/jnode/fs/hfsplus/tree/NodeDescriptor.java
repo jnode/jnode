@@ -47,6 +47,10 @@ public class NodeDescriptor {
         BigEndian.setInt16(data, 10, count);
     }
 
+    public byte[] getBytes() {
+        return data;
+    }
+    
     public final String toString() {
         return ("FLink:  " + getFLink() + "\n" + "BLink:  " + getBLink() + "\n" + "Kind:   " + getKind() + "\n"
                 + "height: " + getHeight() + "\n" + "#rec:   " + getNumRecords() + "\n");
