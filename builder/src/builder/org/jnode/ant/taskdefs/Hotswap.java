@@ -21,7 +21,7 @@ import org.apache.tools.ant.types.FileSet;
 
 /*
 This code is based on http://hotswap.dev.java.net/.
-Adapted to JNode by Levente Sántha.
+Adapted to JNode by Levente S\u00e1ntha.
 */
 
 /**
