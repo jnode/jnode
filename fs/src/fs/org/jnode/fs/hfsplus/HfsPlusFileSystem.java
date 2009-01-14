@@ -32,7 +32,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
      * @throws FileSystemException
      */
     public HfsPlusFileSystem(final Device device, final boolean readOnly, final HfsPlusFileSystemType type)
-        throws FileSystemException {
+    throws FileSystemException {
         super(device, readOnly, type);
     }
 
@@ -85,20 +85,28 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         log.debug("Root entry : No record found.");
         return null;
     }
-
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FileSystem#getFreeSpace()
+     */
     public final long getFreeSpace() {
         return sb.getFreeBlocks() * sb.getBlockSize();
     }
-
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FileSystem#getTotalSpace()
+     */
     public final long getTotalSpace() {
         return sb.getTotalBlocks() * sb.getBlockSize();
     }
-
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FileSystem#getUsableSpace()
+     */
     public final long getUsableSpace() {
-        // TODO Auto-generated method stub
         return -1;
     }
-
+    
     public final Catalog getCatalog() {
         return catalog;
     }
@@ -118,6 +126,12 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         try {
             params.initializeDefaultsValues(this.getApi().getLength(), this.getFSApi().getSectorSize());
             sb.create(params);
+            //---
+            long volumeBlockUsed = sb.getTotalBlocks() - sb.getFreeBlocks();
+            if(sb.getBlockSize() != 512) volumeBlockUsed++;
+            //---
+            log.debug("Write allocation bitmap bits to disk.");
+            //---
             log.debug("Write volume header to disk.");
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();

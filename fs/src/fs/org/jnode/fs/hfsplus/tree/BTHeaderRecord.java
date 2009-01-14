@@ -119,6 +119,10 @@ public class BTHeaderRecord {
         BigEndian.setInt32(data, 39, attrs);
     }
 
+    public byte[] getBytes() {
+        return data;
+    }
+    
     public final String toString() {
         return ("Root node:  " + getRootNode() + "\n" + "First leaf: "
                 + getFirstLeafNode() + "\n" + "Last leaf:  "
