@@ -20,17 +20,6 @@
  */
 package org.jnode.shell.command;
 
-import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
-import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.driver.input.KeyboardListener;
-import org.jnode.naming.InitialNaming;
-import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.ShellManager;
-import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.FileArgument;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,6 +35,17 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.naming.NameNotFoundException;
+
+import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
+import org.jnode.driver.input.KeyboardEvent;
+import org.jnode.driver.input.KeyboardListener;
+import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.ShellManager;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
  * This command is a simple analog of the UNIX/Linux 'more' and 'less' commands.

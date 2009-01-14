@@ -30,8 +30,8 @@ import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 
-import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.vm.VmExit;
