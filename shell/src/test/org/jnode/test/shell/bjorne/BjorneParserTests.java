@@ -128,6 +128,23 @@ public class BjorneParserTests extends TestCase {
                         + "SimpleCommand{nodeType=1,words=[WORD{ls},WORD{-a}]}}]}",
                 doTest("case $1 in ( a ) ls -l ;; b ) ls -a ; esac"));
     }
+    
+    public void test11() throws ShellException {
+        assertEquals(
+                "IfCommand{nodeType=6,cond="
+                        + "SimpleCommand{nodeType=1,words=[WORD{true}]},thenPart="
+                        + "SimpleCommand{nodeType=1,words=[WORD{echo},WORD{yes}]}}",
+                doTest("if true ; then echo yes ; fi"));
+    }
+    
+    public void test12() throws ShellException {
+        assertEquals(
+                "IfCommand{nodeType=6,cond="
+                        + "SimpleCommand{nodeType=1,words=[WORD{true}]},thenPart="
+                        + "SimpleCommand{nodeType=1,words=[WORD{echo},WORD{yes}]},elsePart="
+                        + "SimpleCommand{nodeType=1,words=[WORD{echo},WORD{false}]}}",
+                doTest("if true ; then echo yes ; else echo false ; fi"));
+    }
 
     private String doTest(String input) throws ShellException {
         BjorneParser p = new BjorneParser(new BjorneTokenizer(input, DEBUG));

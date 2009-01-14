@@ -335,6 +335,10 @@ public class CommandLine implements Completable, Iterable<String> {
         }
         return arguments;
     }
+    
+    public Token[] getArgumentTokens() {
+        return argumentTokens;
+    }
 
     /**
      * Get the arguments as String[].

@@ -20,11 +20,14 @@
  */
 package org.jnode.test.shell.bjorne;
 
+import java.io.File;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.bjorne.BjorneContext;
 import org.jnode.shell.bjorne.BjorneToken;
@@ -117,6 +120,38 @@ public class BjorneContextTests extends TestCase {
         checkExpansion(expansion, new String[] {"$A"});
     }
 
+    public void testExpand14() throws ShellException {
+        BjorneContext parentContext = new BjorneContext(null, new BjorneContext.StreamHolder[0]);
+        parentContext.setVariable("A", "A");
+        BjorneContext context = new BjorneContext(parentContext);
+        List<BjorneToken> expansion = context.expandAndSplit("'$A'");
+        checkExpansion(expansion, new String[] {"$A"});
+    }
+
+    public void testExpand15() throws Exception {
+        BjorneContext context = new BjorneContext(null, null);
+        assertEquals(true, context.isGlobbing());
+        assertEquals(true, context.isTildeExpansion());
+        if (new File("../README.txt").exists()) {
+            CommandLine expansion = context.expandAndSplit(context.split("../README.*"));
+            checkExpansion(expansion, new String[] {"../README.txt"});
+        }
+        context.setGlobbing(false);
+        CommandLine expansion = context.expandAndSplit(context.split("../README.*"));
+        checkExpansion(expansion, new String[] {"../README.*"});
+    }
+
+    public void testExpand16() throws Exception {
+        BjorneContext context = new BjorneContext(null, null);
+        assertEquals(true, context.isGlobbing());
+        assertEquals(true, context.isTildeExpansion());
+        CommandLine expansion = context.expandAndSplit(context.split("~"));
+        checkExpansion(expansion, new String[] {System.getProperty("user.home")});
+        context.setTildeExpansion(false);
+        expansion = context.expandAndSplit(context.split("~"));
+        checkExpansion(expansion, new String[] {"~"});
+    }
+
     @SuppressWarnings("deprecation")
     private void checkExpansion(List<BjorneToken> expansion, String[] expected) {
         int i;
@@ -131,5 +166,14 @@ public class BjorneContextTests extends TestCase {
         if (it.hasNext()) {
             fail("Too many words in expansion at word " + i + ": '" + it.next() + "'");
         }
+    }
+    
+    private void checkExpansion(CommandLine expansion, String[] expected) {
+        List<BjorneToken> words = new LinkedList<BjorneToken>();
+        words.add((BjorneToken) expansion.getCommandToken());
+        for (CommandLine.Token word : expansion.getArgumentTokens()) {
+            words.add((BjorneToken) word);
+        }
+        checkExpansion(words, expected);
     }
 }
