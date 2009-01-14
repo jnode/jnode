@@ -65,11 +65,10 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_THEN;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
+import junit.framework.TestCase;
 
 import org.jnode.shell.bjorne.BjorneToken;
 import org.jnode.shell.bjorne.BjorneTokenizer;
-
-import junit.framework.TestCase;
 
 public class BjorneTokenizerTests extends TestCase {
 

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,7 +112,7 @@ public class BjorneContext {
 
     private int lastAsyncPid;
 
-    private boolean tildes = true;
+    private boolean tildeExpansion = true;
     
     private boolean globbing = true;
 
@@ -143,6 +144,24 @@ public class BjorneContext {
         this.interpreter = parent.interpreter;
         this.holders = copyStreamHolders(parent.holders);
         this.variables = copyVariables(parent.variables);
+        this.globbing = parent.globbing;
+        this.tildeExpansion = parent.tildeExpansion;
+    }
+    
+    public boolean isTildeExpansion() {
+        return tildeExpansion;
+    }
+
+    public void setTildeExpansion(boolean tildeExpansion) {
+        this.tildeExpansion = tildeExpansion;
+    }
+
+    public boolean isGlobbing() {
+        return globbing;
+    }
+
+    public void setGlobbing(boolean globbing) {
+        this.globbing = globbing;
     }
 
     /**
@@ -233,8 +252,8 @@ public class BjorneContext {
      * @return the command line
      * @throws ShellException
      */
-    public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
-        LinkedList<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
+    public CommandLine expandAndSplit(Iterable<BjorneToken> tokens) throws ShellException {
+        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
         for (BjorneToken token : tokens) {
             String word = token.getText();
             CharSequence expanded = expand(word);
@@ -248,6 +267,10 @@ public class BjorneContext {
             }
         }
         return makeCommandLine(wordTokens);
+    }
+    
+    public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
+        return expandAndSplit(Arrays.asList(tokens));
     }
 
     /**
@@ -263,11 +286,11 @@ public class BjorneContext {
         return split(expand(text));
     }
 
-    private CommandLine makeCommandLine(LinkedList<BjorneToken> wordTokens) {
-        if (globbing || tildes) {
-            LinkedList<BjorneToken> globbedWordTokens = new LinkedList<BjorneToken>();
+    private CommandLine makeCommandLine(List<BjorneToken> wordTokens) {
+        if (globbing || tildeExpansion) {
+            List<BjorneToken> globbedWordTokens = new LinkedList<BjorneToken>();
             for (BjorneToken wordToken : wordTokens) {
-                if (tildes) {
+                if (tildeExpansion) {
                     wordToken = tildeExpand(wordToken);
                 }
                 if (globbing) {
@@ -282,7 +305,7 @@ public class BjorneContext {
         if (nosWords == 0) {
             return new CommandLine(null, null);
         } else {
-            BjorneToken alias = wordTokens.removeFirst();
+            BjorneToken alias = wordTokens.remove(0);
             BjorneToken[] args = wordTokens.toArray(new BjorneToken[nosWords - 1]);
             return new CommandLine(alias, args, null);
         }
@@ -306,7 +329,7 @@ public class BjorneContext {
         }
     }
     
-    private void globAndAppend(BjorneToken wordToken, LinkedList<BjorneToken> globbedWordTokens) {
+    private void globAndAppend(BjorneToken wordToken, List<BjorneToken> globbedWordTokens) {
         // Try to deal with the 'not-a-pattern' case quickly and cheaply.
         String word = wordToken.getText();
         if (!PathnamePattern.isPattern(word)) {
@@ -333,8 +356,8 @@ public class BjorneContext {
      * @return the destination for the tokens.
      * @throws ShellException
      */
-    public LinkedList<BjorneToken> split(CharSequence text) throws ShellException {
-        LinkedList<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
+    public List<BjorneToken> split(CharSequence text) throws ShellException {
+        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
         splitAndAppend(new BjorneToken(BjorneToken.TOK_WORD, text.toString(), -1, -1), wordTokens);
         return wordTokens;
     }
@@ -347,7 +370,7 @@ public class BjorneContext {
      * @param wordTokens the destination for the tokens.
      * @throws ShellException
      */
-    private void splitAndAppend(BjorneToken token, LinkedList<BjorneToken> wordTokens)
+    private void splitAndAppend(BjorneToken token, List<BjorneToken> wordTokens)
         throws ShellException {
         String text = token.getText();
         StringBuffer sb = null;
@@ -941,6 +964,8 @@ public class BjorneContext {
         // TODO Auto-generated method stub
         return false;
     }
+    
+    
 
 
     private static class VariableSlot {
@@ -962,7 +987,7 @@ public class BjorneContext {
         }
     }
 
-    static class StreamHolder {
+    public static class StreamHolder {
         public final CommandIO stream;
 
         private boolean isMine;
