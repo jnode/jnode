@@ -49,6 +49,8 @@ import java.awt.Image;
 import java.awt.PrintJob;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
@@ -78,6 +80,7 @@ import java.util.Properties;
 import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.naming.NamingException;
+import javax.swing.JDesktopPane;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.image.BufferedImageSurface;
@@ -119,6 +122,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
     private final Dimension screenSize = new Dimension(640, 480);
     private Frame top;
     private Runnable exitAction;
+    private Insets screenInsets;
 
     public JNodeToolkit() {
         refCount = 0;
@@ -1233,5 +1237,27 @@ public abstract class JNodeToolkit extends ClasspathToolkit implements FrameBuff
         }
 
         queue.postEvent(event);
+    }
+
+    @Override
+    public Insets getScreenInsets(GraphicsConfiguration gc) throws HeadlessException {
+        JNodeAwtContext awtc = getAwtContext();
+        if (awtc == null)
+            return super.getScreenInsets(gc);
+
+        Component root = awtc.getTopLevelRootComponent();
+        if (root == null)
+            return super.getScreenInsets(gc);
+
+        JDesktopPane jdp = awtc.getDesktop();
+        if (jdp == null)
+            return super.getScreenInsets(gc);
+
+        Rectangle trc_bounds = root.getBounds();
+        Point jdp_loc = jdp.getLocationOnScreen();
+        Rectangle jdp_bounds = jdp.getBounds();
+
+        return new Insets(jdp_loc.y, jdp_loc.x, trc_bounds.height - jdp_loc.y - jdp_bounds.height,
+            trc_bounds.width - jdp_loc.x - jdp_bounds.width);
     }
 }
