@@ -52,24 +52,40 @@
     <jar jarfile="${jnode-builder.jar}"
         basedir="${my-classes.dir}"
         includes="org/jnode/ant/taskdefs/**"/>        
-  </target>  
+  </target>
 
-<!-- Compile all subproject java files -->
-  <target name="compile" depends="prepare">
+  <target name="javacc" depends="prepare" >
     <javacc target="${jnasm-src.dir}/preprocessor/gen/JNAsmPP.jj"
             javacchome="${javacc.dir}"
             outputdirectory="${jnasm-preprocessor-gen.dir}" />
     <javacc target="${jnasm-src.dir}/assembler/gen/JNAsm.jj"
             javacchome="${javacc.dir}"
             outputdirectory="${jnasm-assembler-gen.dir}" />
-    <native2ascii src="${jnasm-preprocessor-gen.dir}" includes="JNAsmPP.java"
-                  dest="${jnasm-preprocessor-gen.dir}" ext=".tmp"/>
-    <move file="${jnasm-preprocessor-gen.dir}/JNAsmPP.tmp"
-          tofile="${jnasm-preprocessor-gen.dir}/JNAsmPP.java" overwrite="yes"/>
-    <native2ascii src="${jnasm-assembler-gen.dir}" includes="JNAsm.java"
-                  dest="${jnasm-assembler-gen.dir}" ext=".tmp"/>
-    <move file="${jnasm-assembler-gen.dir}/JNAsm.tmp"
-          tofile="${jnasm-assembler-gen.dir}/JNAsm.java" overwrite="yes"/>  
+    <condition property="run.native2ascii">
+        <or>
+            <isfileselected file="${jnasm-assembler-gen.dir}/JNAsm.java">
+                <date datetime="${hotswap.class.tstamp}" pattern="${hotswap.class.tstamp.pattern}" when="after"/>
+            </isfileselected>
+            <isfileselected file="${jnasm-preprocessor-gen.dir}/JNAsmPP.java">
+                <date datetime="${hotswap.class.tstamp}" pattern="${hotswap.class.tstamp.pattern}" when="after"/>
+            </isfileselected>
+        </or>
+    </condition>
+  </target>
+
+  <target name="native2ascii" depends="javacc" if="run.native2ascii">
+      <native2ascii src="${jnasm-preprocessor-gen.dir}" includes="JNAsmPP.java"
+                    dest="${jnasm-preprocessor-gen.dir}" ext=".tmp"/>
+      <move file="${jnasm-preprocessor-gen.dir}/JNAsmPP.tmp"
+            tofile="${jnasm-preprocessor-gen.dir}/JNAsmPP.java" overwrite="yes"/>
+      <native2ascii src="${jnasm-assembler-gen.dir}" includes="JNAsm.java"
+                    dest="${jnasm-assembler-gen.dir}" ext=".tmp"/>
+      <move file="${jnasm-assembler-gen.dir}/JNAsm.tmp"
+            tofile="${jnasm-assembler-gen.dir}/JNAsm.java" overwrite="yes"/>
+  </target>
+
+<!-- Compile all subproject java files -->
+  <target name="compile" depends="native2ascii">
     <jnode.compile>
       <src path="${my-src.dir}/builder"/>
       <src path="${my-src.dir}/configure"/>
