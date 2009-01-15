@@ -25,6 +25,8 @@ import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 import javax.swing.JRootPane;
+import javax.swing.plaf.InternalFrameUI;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
@@ -49,6 +51,13 @@ final class SwingWindow extends SwingBaseWindow<Window, SwingWindow> {
         setIconifiable(false);
         setMaximizable(false);
         setClosable(false);
+        InternalFrameUI ui1 = getUI();
+        if (ui1 instanceof BasicInternalFrameUI) {
+            //removing upper decoration
+            ((BasicInternalFrameUI) ui1).setNorthPane(null);
+        } else {
+            throw new RuntimeException("Unknown UI: " + ui1);
+        }
     }
 
     /**
