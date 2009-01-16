@@ -127,8 +127,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             params.initializeDefaultsValues(this.getApi().getLength(), this.getFSApi().getSectorSize());
             sb.create(params);
             //---
-            long volumeBlockUsed = sb.getTotalBlocks() - sb.getFreeBlocks();
-            if(sb.getBlockSize() != 512) volumeBlockUsed++;
+            long volumeBlockUsed = sb.getTotalBlocks() - sb.getFreeBlocks() - ((sb.getBlockSize() == 512)?2:1);
             //---
             log.debug("Write allocation bitmap bits to disk.");
             //---
