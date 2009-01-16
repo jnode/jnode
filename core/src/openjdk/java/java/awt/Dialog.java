@@ -191,7 +191,7 @@ public class Dialog extends Window {
      *
      * @since 1.6
      */
-    public final static ModalityType DEFAULT_MODALITY_TYPE = ModalityType.APPLICATION_MODAL;
+    public final static ModalityType DEFAULT_MODALITY_TYPE = ModalityType.DOCUMENT_MODAL; //jnode the default blocks the whole desktop if in root isolate: ModalityType.APPLICATION_MODAL; 
 
     /**
      * True if this dialog is modal, false is the dialog is modeless.

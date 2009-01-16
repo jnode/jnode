@@ -613,7 +613,7 @@ public final class SwingToolkit extends JNodeToolkit {
      */
     public boolean isModalityTypeSupported(Dialog.ModalityType modalityType) {
         //todo implement it
-        return false;
+        return true;
     }
 
 }
