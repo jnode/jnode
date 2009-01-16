@@ -58,9 +58,9 @@ public class Catalog {
     }
 
     /**
-     * Create Catalog based on catalog file that exist on the file system.
+     * Create Catalog based on meta-data that exist on the file system.
      * 
-     * @param fs
+     * @param fs HFS+ file system that contains catalog informations.
      * 
      * @throws IOException
      */
@@ -85,7 +85,7 @@ public class Catalog {
             offset = offset + 106;
         }
     }
-
+    
     /**
      * 
      * @param parentID
@@ -123,9 +123,12 @@ public class Catalog {
     }
 
     /**
+     * Find leaf records corresponding to parentID. The search begin at the root node of the tree.
+     *  
+     * @param parentID Parent node id
      * 
-     * @param parentID
-     * @return
+     * @return Array of LeafRecord
+     * 
      * @throws IOException
      */
     public final LeafRecord[] getRecords(final CatalogNodeId parentID)
@@ -134,10 +137,14 @@ public class Catalog {
     }
 
     /**
+     * Find leaf records corresponding to parentID. The search begin at the node correspding 
+     * to the index passed as parameter.
      * 
-     * @param parentID
-     * @param nodeNumber
-     * @return
+     * @param parentID Parent node id
+     * @param nodeNumber Index of node where the search begin.
+     * 
+     * @return Array of LeafRecord
+     * 
      * @throws IOException
      */
     public final LeafRecord[] getRecords(final CatalogNodeId parentID, final int nodeNumber)
