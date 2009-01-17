@@ -32,6 +32,7 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_LESSGREAT;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -228,12 +229,10 @@ public class BjorneInterpreter implements CommandInterpreter {
     }
 
     @Override
-    public int interpret(CommandShell shell, File file) throws ShellException {
+    public int interpret(CommandShell shell, Reader reader) throws ShellException {
         // FIXME ... update this to support multi-line commands.
-        Reader r = null;
         try {
-            r = new FileReader(file);
-            BufferedReader br = new BufferedReader(r);
+            BufferedReader br = new BufferedReader(reader);
             String line;
             int rc = 0;
             while ((line = br.readLine()) != null) {
@@ -243,13 +242,22 @@ public class BjorneInterpreter implements CommandInterpreter {
         } catch (IOException ex) {
             throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
         } finally {
-            if (r != null) {
+            if (reader != null) {
                 try {
-                    r.close();
+                    reader.close();
                 } catch (IOException ex) {
                     // ignore
                 }
             }
+        }
+    }
+
+    @Override
+    public int interpret(CommandShell shell, File file) throws ShellException {
+        try {
+            return interpret(shell, new FileReader(file));
+        } catch (FileNotFoundException ex) {
+            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
         }
     }
     

@@ -1,0 +1,31 @@
+########################################################
+# Example of jnode.ini file                            #
+#                                                      #
+# You can put whatever you want in the jnode.ini file. #
+# Here we are showing how to automatically             #
+# configure network                                    #  
+########################################################
+
+echo waiting for initialization of Network driver ... 
+sleep 40
+
+echo initializing network
+ifconfig loopback 127.0.0.1 255.255.255.255
+sleep 10
+ifconfig loopback 127.0.0.1 255.255.255.255
+sleep 10
+
+# For KVM
+dhcp eth-pci(0,3,0)
+sleep 10
+dhcp eth-pci(0,3,0)
+sleep 10
+route --add 192.168.44.5 eth-pci(0,3,0)
+sleep 10
+
+# For VMware
+#dhcp eth-pci(0,17,0)
+#dhcp eth-pci(0,17,0)
+#route --add 192.168.44.5 eth-pci(0,17,0)
+
+echo network initialized !

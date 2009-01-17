@@ -23,6 +23,7 @@ package org.jnode.shell;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.Reader;
 
 /**
  * This is the API that a shell-based interpreter must implement.
@@ -61,6 +62,17 @@ public interface CommandInterpreter {
      */
     int interpret(CommandShell shell, File file) throws ShellException;
 
+    /**
+     * Parse and execute a command file, returning the resulting return code.
+     * 
+     * @param shell the CommandShell that provides low-level command invocation,
+     *        command history and so on.
+     * @param reader the reader to be interpreted. <b>The implementation must close it.</b> 
+     * @return the return code.
+     * @throws ShellException
+     */
+    int interpret(CommandShell shell, Reader reader) throws ShellException;
+    
     /**
      * Parse a partial command line, returning the command line fragment to be
      * completed.  If the interpreter does not support completion, this method
