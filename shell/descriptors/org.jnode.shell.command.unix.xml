@@ -18,8 +18,19 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
+    <alias name="false" class="org.jnode.shell.command.unix.FalseCommand"/>
     <alias name="test" class="org.jnode.shell.command.unix.UnixTestCommand"/>
+    <alias name="true" class="org.jnode.shell.command.unix.TrueCommand"/>
     <alias name="[" class="org.jnode.shell.command.unix.UnixTestCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="false">
+      <empty description="Set a non-zero return code"/>
+    </syntax>
+    <syntax alias="true">
+      <empty description="Set a zero return code"/>
+    </syntax>
   </extension>
 
   <extension point="org.jnode.security.permissions">
