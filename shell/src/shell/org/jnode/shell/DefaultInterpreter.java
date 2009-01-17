@@ -23,6 +23,7 @@ package org.jnode.shell;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -109,14 +110,12 @@ public class DefaultInterpreter implements CommandInterpreter {
     }
     
     @Override
-    public int interpret(CommandShell shell, File file) throws ShellException {
+    public int interpret(CommandShell shell, Reader reader) throws ShellException {
         // The default interpreter and subtypes process the command file one line at a time, 
         // ignoring any line whose first non-whitespace character is '#'.  There is no notion
         // of multi-line commands.
-        Reader r = null;
         try {
-            r = new FileReader(file);
-            BufferedReader br = new BufferedReader(r);
+            BufferedReader br = new BufferedReader(reader);
             String line;
             int rc = 0;
             while ((line = br.readLine()) != null) {
@@ -130,9 +129,9 @@ public class DefaultInterpreter implements CommandInterpreter {
         } catch (IOException ex) {
             throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
         } finally {
-            if (r != null) {
+            if (reader != null) {
                 try {
-                    r.close();
+                    reader.close();
                 } catch (IOException ex) {
                     // ignore
                 }
@@ -140,6 +139,15 @@ public class DefaultInterpreter implements CommandInterpreter {
         }
     }
 
+    @Override
+    public int interpret(CommandShell shell, File file) throws ShellException {
+        try {
+            return interpret(shell, new FileReader(file));
+        } catch (FileNotFoundException ex) {
+            throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
+        }
+    }
+    
     @Override
     public Completable parsePartial(CommandShell shell, String line) throws ShellException {
         CommandLine res = doParseCommandLine(line);

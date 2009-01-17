@@ -302,10 +302,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 public Void run() {
                     final String java_home = System.getProperty(JAVA_HOME_PROPERTY_NAME, "");
-                    final File jnode_ini = new File(java_home + "/jnode.ini");
+                    final String name = "jnode.ini";
+                    final File jnode_ini = new File(java_home + '/' + name);
                     try {
                         if (jnode_ini.exists()) {
                             runCommandFile(jnode_ini);
+                        } else {
+                            runCommandFile(name);
                         }
                     } catch (ShellException ex) {
                         errPW.println("Error while processing " + jnode_ini + ": " + ex.getMessage());
@@ -319,10 +322,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
                 final String user_home = System.getProperty(USER_HOME_PROPERTY_NAME, "");
-                final File shell_ini = new File(user_home + "/shell.ini");
+                final String name = "shell.ini";
+                final File shell_ini = new File(user_home + '/' + name);
                 try {
                     if (shell_ini.exists()) {
                         runCommandFile(shell_ini);
+                    } else {
+                        runCommandFile(name);
                     }
                 } catch (ShellException ex) {
                     errPW.println("Error while processing " + shell_ini + ": " + ex.getMessage());
@@ -801,33 +807,69 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // with the current approach is that most scripting languages cannot be 
         // interpreted a line at a time.)
         boolean enabled = setHistoryEnabled(false);
-        Reader r = null; 
         try {
-            r = new FileReader(file);
-            final BufferedReader br = new BufferedReader(r);
+            CommandInterpreter interpreter = createInterpreter(new FileReader(file));
+            return (interpreter == null) ? -1 : interpreter.interpret(this, file);
+        } catch (IOException ex) {
+            throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
+        } finally {
+            setHistoryEnabled(enabled);
+        }
+    }
+
+    public int runCommandFile(String resource) throws ShellException {
+        // FIXME it would be better if the interpreter API included a method
+        // for reading and executing a file, a stream or a reader.  (The problem
+        // with the current approach is that most scripting languages cannot be 
+        // interpreted a line at a time.)
+        boolean enabled = setHistoryEnabled(false);
+        try {
+            int result;
+            InputStream input = getClass().getResourceAsStream(resource);
+            if (input == null) {
+                result = -1; // resource doesn't exist
+            } else {
+                CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
+                if (interpreter == null) {
+                    result = -1; // no interpreter !
+                } else {
+                    Reader reader = new InputStreamReader(getClass().getResourceAsStream(resource));
+                    result = interpreter.interpret(this, reader);
+                }
+            }
+            return result;
+        } finally {
+            setHistoryEnabled(enabled);
+        }
+    }
+    
+    public CommandInterpreter createInterpreter(Reader reader) throws ShellException {
+        try {
+            final BufferedReader br = new BufferedReader(reader);
             CommandInterpreter interpreter;
             String line = br.readLine();
-            if (line.startsWith("#!")) {
+            if (line == null) {
+                interpreter = null; // stream is empty
+            } else if (line.startsWith("#!")) {
                 String name = line.substring(2);
                 interpreter = ShellUtils.createInterpreter(name);
             } else {
                 interpreter = this.interpreter;
             }
-            return interpreter.interpret(this, file);
+            return interpreter;
         } catch (IOException ex) {
             throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {
-            if (r != null) {
+            if (reader != null) {
                 try {
-                    r.close();
+                    reader.close();
                 } catch (IOException ex) {
                     // ignore
                 }
             }
-            setHistoryEnabled(enabled);
         }
     }
-
+    
     public void exit() {
         exit0();
         console.close();
