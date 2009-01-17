@@ -10,6 +10,7 @@
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${basedir}/../builder/lib/nanoxml-2.2.3.jar"/>
     <path refid="cp"/>
   </path>
 
