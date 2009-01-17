@@ -18,6 +18,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+/**
+ * Class used for both running all the JUnit tests of JPartition and 
+ * an emulated version of JPartition's console mode. 
+ * 
+ * @author fabien
+ *
+ */
 @RunWith(Suite.class)
 @SuiteClasses({TestNonEmptyDevice.class, TestEmptyDevice.class,
     TestRemovePartitionFromDevice.class, TestOSFacade.class })
@@ -28,6 +35,11 @@ public class JPartitionTest extends TestSuite {
         DeviceUtils.initJNodeCore();
     }
 
+    /**
+     * Main method used for testing purpose.
+     * @param args
+     * @throws Throwable
+     */
     public static void main(String[] args) throws Throwable {
         final ViewFactory vf = new ConsoleViewFactory(System.in, System.out, System.err);
         final ErrorReporter errorReporter = vf.createErrorReporter();
