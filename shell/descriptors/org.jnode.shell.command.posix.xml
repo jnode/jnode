@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.shell.command.unix"
+<plugin id="org.jnode.shell.command.posix"
   name="JNode System Commands"
   version="@VERSION@"
         license-name="lgpl"
@@ -13,15 +13,15 @@
 
   <runtime>
     <library name="jnode-shell.jar">
-      <export name="org.jnode.shell.command.unix.*"/>
+      <export name="org.jnode.shell.command.posix.*"/>
     </library>
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="false" class="org.jnode.shell.command.unix.FalseCommand"/>
-    <alias name="test" class="org.jnode.shell.command.unix.UnixTestCommand"/>
-    <alias name="true" class="org.jnode.shell.command.unix.TrueCommand"/>
-    <alias name="[" class="org.jnode.shell.command.unix.UnixTestCommand"/>
+    <alias name="false" class="org.jnode.shell.command.posix.FalseCommand"/>
+    <alias name="test" class="org.jnode.shell.command.posix.UnixTestCommand"/>
+    <alias name="true" class="org.jnode.shell.command.posix.TrueCommand"/>
+    <alias name="[" class="org.jnode.shell.command.posix.UnixTestCommand"/>
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
@@ -40,7 +40,6 @@
     <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>  
     <permission class="java.lang.RuntimePermission" name="setIO" actions="*" />
-    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
