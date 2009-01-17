@@ -1,5 +1,4 @@
 /*
- * $Id$
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -23,7 +22,6 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Assembler;
@@ -1937,7 +1935,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             if (isfloat) {
                 result = ifac.createFPUStack(JvmType.FLOAT);
                 os.writeFLD32(refr, fieldOffset);
-                vstack.fpuStack.push(result);
+                pushFloat(result);
             } else {
                 final char fieldType = field.getSignature().charAt(0);
                 final WordItem iw = L1AHelper.requestWordRegister(eContext,
@@ -1970,7 +1968,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             if (isfloat) {
                 result = ifac.createFPUStack(JvmType.DOUBLE);
                 os.writeFLD64(refr, fieldOffset);
-                vstack.fpuStack.push(result);
+                pushFloat(result);
             } else {
                 final DoubleWordItem idw = L1AHelper
                     .requestDoubleWordRegisters(eContext, type);
@@ -2022,7 +2020,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
                 L1AHelper.releaseRegister(eContext, tmp);
             }
             final Item result = ifac.createFPUStack(type);
-            vstack.fpuStack.push(result);
+            pushFloat(result);
             vstack.push(result);
         } else if (!fieldRef.isWide()) {
             final WordItem result = L1AHelper.requestWordRegister(eContext,
@@ -4549,5 +4547,14 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             _curInstrLabel = helper.getInstrLabel(this.curAddress);
         }
         return _curInstrLabel;
+    }
+    
+    private void pushFloat(Item floatItem) {
+        // TODO should we do the same check for all calls to vstack.fpuStack.push(Item) ? 
+        if (!vstack.fpuStack.hasCapacity(1)) {
+            vstack.push(eContext);
+        }
+        
+        vstack.fpuStack.push(floatItem);
     }
 }
