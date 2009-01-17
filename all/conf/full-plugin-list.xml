@@ -31,8 +31,6 @@
 
   <plugin id="thinlet"/>
 
-  <plugin id="org.jnode.shell.command.posix"/>  
-
   <plugin id="org.jnode.apps.jpartition"/>
 
   <plugin id="org.apache.jakarta.commons.logging"/>

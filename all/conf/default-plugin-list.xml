@@ -168,6 +168,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.shell.command.driver.console"/>
     <plugin id="org.jnode.shell.command.log4j"/>
     <plugin id="org.jnode.shell.command.plugin"/>
+    <plugin id="org.jnode.shell.command.posix"/>
     <plugin id="org.jnode.shell.command.system"/>
     <plugin id="org.beanshell"/>
     <plugin id="js"/>
