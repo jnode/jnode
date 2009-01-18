@@ -75,7 +75,12 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         this.commandShell = commandShell;
         
         // listen for ctrl-c
-        commandShell.getConsole().addKeyboardListener(this);
+        if (commandShell.getConsole() != null) {
+            commandShell.getConsole().addKeyboardListener(this);
+        }
+        // FIXME ... we need to figure out when / how to detach the listener.
+        // At the moment they probably stay attached for ever.  That is not
+        // great if lots of invokers are created.
     }
 
     public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
