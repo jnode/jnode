@@ -28,6 +28,7 @@
     <jnode.compile>
         <src path="${my-src.dir}/shell"/>
         <src path="${my-src.dir}/test"/>
+        <src path="${my-src.dir}/emu"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
   </target>
