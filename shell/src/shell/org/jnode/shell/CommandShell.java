@@ -802,9 +802,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public int runCommandFile(File file) throws ShellException {
+        // FIXME extend to allow arguments to be passed to the script.
         boolean enabled = setHistoryEnabled(false);
         try {
             CommandInterpreter interpreter = createInterpreter(new FileReader(file));
+            // FIXME throw ShellException if interpreter not found
             return (interpreter == null) ? -1 : interpreter.interpret(this, file);
         } catch (IOException ex) {
             throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
@@ -817,6 +819,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         boolean enabled = setHistoryEnabled(false);
         try {
             int result;
+            // FIXME throw ShellException if resource or interpreter not found
             InputStream input = getClass().getResourceAsStream(resource);
             if (input == null) {
                 result = -1; // resource doesn't exist
