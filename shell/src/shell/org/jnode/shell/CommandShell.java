@@ -176,7 +176,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public static void main(String[] args) 
         throws NameNotFoundException, ShellException {
-        CommandShell shell = new CommandShell();
+        CommandShell shell = new CommandShell(
+                (TextConsole) (InitialNaming.lookup(ConsoleManager.NAME)).getFocus());
         for (String arg : args) {
             if ("boot".equals(arg)) {
                 shell.bootShell = true;
@@ -184,15 +185,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
         }
         shell.run();
-    }
-
-    /**
-     * Create a new instance
-     * 
-     * @see java.lang.Object
-     */
-    public CommandShell() throws NameNotFoundException, ShellException {
-        this((TextConsole) (InitialNaming.lookup(ConsoleManager.NAME)).getFocus());
     }
 
     public CommandShell(TextConsole cons) throws ShellException {
@@ -208,6 +200,27 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             cons.setCompleter(this);
 
             console.addConsoleListener(this);
+            aliasMgr = ShellUtils.getAliasManager().createAliasManager();
+            syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
+            System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+        } catch (NameNotFoundException ex) {
+            throw new ShellException("Cannot find required resource", ex);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * Create a CommandShell that doesn't use a TextConsole or the ConsoleManager.
+     * 
+     * @throws ShellException
+     */
+    public CommandShell() throws ShellException {
+        debugEnabled = true;
+        try {
+            setupStreams(new InputStreamReader(System.in), 
+                    new OutputStreamWriter(System.out), 
+                    new OutputStreamWriter(System.err));
             aliasMgr = ShellUtils.getAliasManager().createAliasManager();
             syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
             System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
