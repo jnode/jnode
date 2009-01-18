@@ -34,9 +34,11 @@ import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.def.DefaultHelpFactory;
 
 /**
- * A Cassowary is another large Australian bird ...
+ * This class assembles a minimal set of JNode services to support unit
+ * testing some shell and syntax infrastructure.
+ * <p>
+ * A Cassowary is another large flightless bird ... like an Emu but different.
  *
- * @author Levente S\u00e1ntha
  * @author crawley@jnode.org
  */
 public class Cassowary {

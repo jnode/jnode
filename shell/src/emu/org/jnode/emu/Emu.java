@@ -45,8 +45,10 @@ import org.jnode.shell.syntax.SyntaxSpecLoader;
 import org.jnode.shell.syntax.XMLSyntaxSpecAdapter;
 
 /**
- * This class is the core of a light-weight JNode emulator that allows (some) JNode
+ * Emu is the core of a light-weight JNode emulator that allows (some) JNode
  * applications to be run using a classic JVM in the context of a JNode development sandbox.
+ * <p>
+ * An Emu is also a large flightless bird ... which seems kind of appropriate.
  * 
  * @author Levente S\u00e1ntha
  * @author Stephen Crawley
@@ -56,8 +58,10 @@ public abstract class Emu {
         "core", "distr", "fs", "gui", "net", "shell", "sound", "textui"
     };
 
+    // FIXME configuring a hard-coded list of command plugins is a bad idea.
     private static final String[] PLUGIN_NAMES = new String[]{
         "org.jnode.shell.command",
+        "org.jnode.shell.command.posix",
         "org.jnode.shell.command.driver.console",
         "org.jnode.apps.editor",
         "org.jnode.apps.edit",

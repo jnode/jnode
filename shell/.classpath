@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/shell"/>
+	<classpathentry kind="src" path="src/emu"/>
 	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
@@ -9,5 +10,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant-launcher.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsh-2.0b5.jar"/>
 	<classpathentry kind="lib" path="lib/rhino1.6r5-jsr223.jar"/>
+	<classpathentry kind="lib" path="/JNode-Builder/lib/nanoxml-2.2.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

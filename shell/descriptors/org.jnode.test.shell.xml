@@ -20,9 +20,13 @@
   <runtime>
     <library name="jnode-shell.jar">
       <export name="org.jnode.test.shell.*"/>
+      <export name="org.jnode.test.shell.bjorne.*"/>
+      <export name="org.jnode.test.shell.harness.*"/>
       <export name="org.jnode.test.shell.help.*"/>
-      <export name="org.jnode.test.shell.syntax.*"/>
       <export name="org.jnode.test.shell.proclet.*"/>
+      <export name="org.jnode.test.shell.io.*"/>
+      <export name="org.jnode.test.shell.proclet.*"/>
+      <export name="org.jnode.test.shell.syntax.*"/>
     </library>
   </runtime>
   
@@ -34,5 +38,6 @@
   
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="setIO"/> 
+    <permission class="java.lang.RuntimePermission" name="exitVM"/> 
   </extension>
 </plugin>
