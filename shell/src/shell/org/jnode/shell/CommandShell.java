@@ -308,7 +308,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         if (jnode_ini.exists()) {
                             runCommandFile(jnode_ini);
                         } else {
-                            runCommandFile(name);
+                            runCommandResource(name);
                         }
                     } catch (ShellException ex) {
                         errPW.println("Error while processing " + jnode_ini + ": " + ex.getMessage());
@@ -328,7 +328,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     if (shell_ini.exists()) {
                         runCommandFile(shell_ini);
                     } else {
-                        runCommandFile(name);
+                        runCommandResource(name);
                     }
                 } catch (ShellException ex) {
                     errPW.println("Error while processing " + shell_ini + ": " + ex.getMessage());
@@ -802,10 +802,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public int runCommandFile(File file) throws ShellException {
-        // FIXME it would be better if the interpreter API included a method
-        // for reading and executing a file, a stream or a reader.  (The problem
-        // with the current approach is that most scripting languages cannot be 
-        // interpreted a line at a time.)
         boolean enabled = setHistoryEnabled(false);
         try {
             CommandInterpreter interpreter = createInterpreter(new FileReader(file));
@@ -817,11 +813,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public int runCommandFile(String resource) throws ShellException {
-        // FIXME it would be better if the interpreter API included a method
-        // for reading and executing a file, a stream or a reader.  (The problem
-        // with the current approach is that most scripting languages cannot be 
-        // interpreted a line at a time.)
+    public int runCommandResource(String resource) throws ShellException {
         boolean enabled = setHistoryEnabled(false);
         try {
             int result;
