@@ -19,9 +19,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 package org.jtestserver.tests;
 
+import java.io.IOException;
 
+import org.jtestserver.client.Config;
+import org.jtestserver.client.ConfigReader;
+import org.jtestserver.client.process.jvm.JVM;
+import org.jtestserver.client.process.jvm.JVMConfig;
+import org.junit.Before;
 
-//@Ignore TODO this give a compile error with jnode's ant script 
-public class TestOutputMessage {
-
+public class TestJVM extends TestVmManager {
+    @Before
+    public void setUp() throws IOException {
+        Config config = new CustomConfigReader(ConfigReader.JVM_TYPE).read(AllTests.CONFIG_DIRECTORY);
+        JVMConfig jvmConfig = (JVMConfig) config.getVMConfig();
+        vmManager = new JVM(jvmConfig);
+        vmName  = jvmConfig.getVmName();
+    }
 }

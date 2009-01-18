@@ -62,6 +62,11 @@ public class KVMConfig implements VMConfig {
     private final String keyboard;
     
     /**
+     * Name of the VM. It's computed dynamically when given to {@link KVM}'s constructor.
+     */
+    private String vmName;
+    
+    /**
      * Build an instance from the given {@link Properties}. 
      * Only properties whose key starts with <b>kvm.</b> will be used.
      * @param properties
@@ -99,7 +104,7 @@ public class KVMConfig implements VMConfig {
      */
     @Override
     public String getVmName() {
-        return getCdrom().getAbsolutePath();
+        return vmName;
     }
     
     /**
@@ -108,5 +113,12 @@ public class KVMConfig implements VMConfig {
     @Override
     public final ServerProcess createServerProcess() {
         return new KVMServerProcess(this);
+    }
+
+    /**
+     * @param vmName name of the VM
+     */
+    void setVmName(String vmName) {
+        this.vmName = vmName;
     }
 }

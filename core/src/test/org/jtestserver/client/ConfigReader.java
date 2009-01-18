@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.jtestserver.client.process.VMConfig;
+import org.jtestserver.client.process.jvm.JVMConfig;
 import org.jtestserver.client.process.kvm.KVMConfig;
 import org.jtestserver.client.process.vmware.VMwareConfig;
 import org.jtestserver.common.ConfigUtils;
@@ -50,6 +51,15 @@ public class ConfigReader {
      * Value assigned to {@link ConfigReader#VM_TYPE} key for a KVM machine.
      */
     public static final String KVM_TYPE = "kvm";
+
+    /**
+     * Value assigned to {@link ConfigReader#VM_TYPE} key for a new JVM machine.
+     */
+    public static final String JVM_TYPE = "jvm";
+
+    
+    private static final String BEGIN_VARIABLE_REF = "${";
+    private static final String END_VARIABLE_REF = "}";
     
     /**
      * Read the JTestServer configuration and the VM configuration.
@@ -82,6 +92,8 @@ public class ConfigReader {
             vmConfig = new KVMConfig(vmProperties);
         } else if (VMWARE_TYPE.equals(type)) {
             vmConfig = new VMwareConfig(vmProperties);
+        } else if (JVM_TYPE.equals(type)) {
+            vmConfig = new JVMConfig(vmProperties);
         } else {
             throw new IllegalArgumentException("unsupported type for " + vm + " vm : " + type);
         }
@@ -100,6 +112,48 @@ public class ConfigReader {
     private Properties readProperties(File configDir, String name) throws IOException {
         Properties properties = new Properties();
         properties.load(new FileInputStream(new File(configDir, name)));
+        expandVariables(properties);
         return properties;
+    }
+    
+    private void expandVariables(Properties properties) {
+        int nbReplace;
+        
+        do {
+            nbReplace = 0;
+            for (String key : properties.stringPropertyNames()) {
+                nbReplace += expandVariables(properties, key);
+            }
+        } while (nbReplace > 0);
+    }
+    
+    private int expandVariables(Properties properties, String key) {
+        int nbReplace = 0;        
+        String value = properties.getProperty(key);
+        
+        boolean replaced;        
+        do {
+            replaced = false;
+            int begin = value.indexOf(BEGIN_VARIABLE_REF);
+            if (begin >= 0) {
+                int beginVariable = begin + BEGIN_VARIABLE_REF.length();
+                int endVariable = value.indexOf(END_VARIABLE_REF, beginVariable + 1);
+                if (endVariable >= 0) {
+                    String variable = value.substring(beginVariable, endVariable);
+                    if (!variable.equals(key)) { // avoid infinite loop on current variable/key
+                        String variableValue = properties.getProperty(variable);
+                        if (variableValue != null) {
+                            value = value.substring(0, begin) + variableValue + 
+                                value.substring(endVariable + END_VARIABLE_REF.length());
+                            properties.put(key, value);
+                            replaced = true;
+                            nbReplace++;
+                        }
+                    }
+                }
+            }
+        } while (replaced);
+        
+        return nbReplace;
     }
 }

@@ -85,6 +85,17 @@ public class PipeInputStream {
     }
     
     /**
+     * Waits that there is no more data to read from the {@link InputStream}.
+     */
+    public void waitFor() {
+        try {
+            pipeThread.join();
+        } catch (InterruptedException e) {
+            // ignore
+        }
+    }
+    
+    /**
      * Interface to implement for doing additional processing on the received lines. 
      * @author Fabien DUMINY (fduminy@jnode.org)
      *

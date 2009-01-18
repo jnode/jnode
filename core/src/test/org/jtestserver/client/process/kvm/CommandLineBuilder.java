@@ -88,4 +88,22 @@ public class CommandLineBuilder {
         return line.toArray(new String[line.size()]);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        boolean firstArg = true;
+        for (String arg : line) {
+            if (!firstArg) {
+                sb.append(' ');
+            }
+            
+            sb.append(arg);
+            
+            firstArg = false;
+        }
+        return sb.toString();
+    }
 }

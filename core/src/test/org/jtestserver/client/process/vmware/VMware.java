@@ -84,7 +84,9 @@ public class VMware implements VmManager {
 
             @Override
             public void lineReceived(String line) {
-                runningVMs.add(line);
+                if (!line.contains("Total running VMs")) {
+                    runningVMs.add(line);
+                }
             }
             
         }, "list");

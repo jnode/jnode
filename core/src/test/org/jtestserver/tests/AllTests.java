@@ -27,7 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({TestProtocol.class, TestUDPProtocol.class, TestInputMessage.class,
-    TestOutputMessage.class, TestVMware.class, TestKVM.class })
+    TestOutputMessage.class, TestVMware.class, TestKVM.class, TestJVM.class })
 public class AllTests {
     public static final File CONFIG_DIRECTORY =
             new File(AllTests.class.getResource("config.properties").getFile()).getParentFile();
