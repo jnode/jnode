@@ -70,7 +70,7 @@ public abstract class Emu {
      * @param root the notional JNode sandbox root directory or <code>null</code>.
      * @throws EmuException
      */
-    protected static void initEnv(File root) throws EmuException {
+    public static void initEnv(File root) throws EmuException {
         if (true) {
             if (root == null) {
                 root = new File("").getAbsoluteFile();
