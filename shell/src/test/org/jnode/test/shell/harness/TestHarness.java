@@ -1,12 +1,12 @@
 package org.jnode.test.shell.harness;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 import net.n3.nanoxml.XMLException;
 
@@ -19,19 +19,6 @@ import net.n3.nanoxml.XMLException;
 public class TestHarness {
     
     private final String commandName = this.getClass().getCanonicalName();
-
-    String[] TESTS = new String[] {
-        "<testSpec>" +
-            "<title>Hi mum</title>" +
-            "<command>org.jnode.test.shell.harness.Test</command>" +
-            "<output>Hi mum\n</output>" +
-            "</testSpec>",
-//        "<testSpec>" +
-//            "<title>exit</title>" +
-//            "<command>org.jnode.test.shell.harness.Test</command>" +
-//            "<args><arg>System.exit</arg></args>" +
-//            "</testSpec>"
-    };
 
     private final String[] args;
     
@@ -59,27 +46,44 @@ public class TestHarness {
     }
 
     private void run() throws Exception {
+        // FIXME ... this argument handling is very 'interim'.
+        boolean useResources = false;
+        int firstArg = 0;
+        TestSpecificationParser parser = new TestSpecificationParser();
+        List<TestSpecification> specs;
         if (args.length == 0) {
-            for (String test : TESTS) {
-                try {
-                    InputStream is = new ByteArrayInputStream(test.getBytes());
-                    spec = new TestSpecification().load(is);
-                    execute(spec);
-                } catch (Exception ex) {
-                    diagnose(ex, "<built-in-tests>");
-                }
-            }
-        } else if (args[0].equals("--package")) {
-            if (args.length != 2) {
-                usage();
-            }
+            usage();
+            return;
+        } else if (args[0].equals("--resource") || 
+                args[0].equals("--resources") || 
+                args[0].equals("-r")) {
+            useResources = true;
+            firstArg++;
+        } else if (args[0].startsWith("-")) {
+            System.err.println("Unrecognized option '" + args[0] + "'");
+            usage();
+            return;
+        }
+
+        if (args.length <= firstArg) {
+            System.err.println("Missing arguments");
+            usage();
+            return;
+        }
+
+        for (int i = firstArg; i < args.length; i++) {
+            String arg = args[i];
             InputStream is = null;
             try {
-                is = this.getClass().getResourceAsStream(args[1]);
-                spec = new TestSpecification().load(is);
-                execute(spec);
+                if (useResources) {
+                    is = this.getClass().getResourceAsStream(arg);
+                } else {
+                    is = new FileInputStream(arg);
+                }
+                specs = parser.parse(is);
+                execute(specs);
             } catch (Exception ex) {
-                diagnose(ex, args[1]);
+                diagnose(ex, arg);
             } 
             finally {
                 if (is != null) {
@@ -87,31 +91,6 @@ public class TestHarness {
                         is.close();
                     } catch (IOException ex) {
                         // ignore
-                    }
-                }
-            }
-        } else if (args[0].startsWith("-")) {
-            System.err.println("Unrecognized option '" + args[0] + "'");
-            usage();
-            return;
-        } else {
-            for (String arg : args) {
-                File file = new File(arg);
-                InputStream is = null;
-                try {
-                    is = new FileInputStream(file);
-                    spec = new TestSpecification().load(is);
-                    execute(spec);
-                } catch (Exception ex) {
-                    diagnose(ex, arg);
-                } 
-                finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException ex) {
-                            // ignore
-                        }
                     }
                 }
             }
@@ -124,6 +103,12 @@ public class TestHarness {
         System.err.println(commandName + " // run tests from builtin specs");
         System.err.println(commandName + " --package <java-package> // run tests from specs on classpath");
         System.err.println(commandName + " <spec-file> ... // run tests from specs read from file system");
+    }
+    
+    private void execute(List<TestSpecification> specs) {
+        for (TestSpecification spec : specs) {
+            execute(spec);
+        }
     }
 
     private void execute(TestSpecification spec) {

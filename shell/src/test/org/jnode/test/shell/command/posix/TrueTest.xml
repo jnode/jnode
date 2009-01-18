@@ -1,6 +1,0 @@
-<testSpec>
-<title>Test 'true'</title>
-<command>org.jnode.shell.command.posix.TrueCommand</command>
-<runMode>AS_ALIAS</runMode>
-<rc>0</rc>
-</testSpec>
