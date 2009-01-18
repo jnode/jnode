@@ -28,6 +28,7 @@ import org.jtestserver.client.process.VMConfig;
 import org.jtestserver.client.process.vmware.VMware;
 import org.jtestserver.client.process.vmware.VMwareConfig;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestVMware extends TestVmManager {

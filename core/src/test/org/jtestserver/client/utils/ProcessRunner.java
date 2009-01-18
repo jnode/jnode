@@ -22,10 +22,13 @@ package org.jtestserver.client.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jtestserver.client.process.kvm.CommandLineBuilder;
 import org.jtestserver.client.utils.PipeInputStream.Listener;
 
 /**
@@ -115,7 +118,7 @@ public class ProcessRunner {
         
         execute(listener, listener, command);
         try {
-            int exitValue  = process.waitFor();
+            int exitValue  = process.waitFor();            
             for (int ec : successExitValue) {
                 if (exitValue == ec) {
                     success = true;
@@ -127,6 +130,9 @@ public class ProcessRunner {
         } catch (InterruptedException e) {
             LOGGER.log(Level.SEVERE, "error while waiting for process", e);
         }
+        
+        outputPipe.waitFor();
+        errorPipe.waitFor();
         
         return success;
     }
@@ -182,5 +188,34 @@ public class ProcessRunner {
      */
     public void setWorkDir(File workDir) {
         this.workDir = ((workDir == null) || !workDir.isDirectory()) ? DEFAULT_WORK_DIR : workDir;
+    }
+
+    
+    /**
+     * Execute the given command line.
+     * 
+     * @param cmdLine command line to execute
+     * @return true if the execution succeed
+     * @throws IOException
+     */
+    public boolean execute(CommandLineBuilder cmdLine) throws IOException {
+        final List<Boolean> errors = new Vector<Boolean>();
+        execute(null, new PipeInputStream.Listener() {
+
+            @Override
+            public void lineReceived(String line) {
+                errors.add(Boolean.TRUE);
+            }            
+        }, cmdLine.toArray());
+
+        // wait a bit to see if an error happen
+        // but don't wait the end of the KVM process 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+        
+        return errors.isEmpty();
     }
 }

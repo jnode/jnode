@@ -42,15 +42,18 @@ public abstract class TestVmManager {
     
     @Test    
     public void testStartStop() throws IOException {
+        ensureNoRunningVMs();
+        
         List<String> vms = vmManager.getRunningVMs();
         final int initialNbVMs = vms.size();
+        Assert.assertTrue("No VM should be running", vms.isEmpty());
         
         // start
         boolean success = vmManager.start(vmName);        
         assertTrue("start must work", success);
         
         vms = vmManager.getRunningVMs();
-        Assert.assertTrue("list of running VMs must contains " + vmName, vms.contains(vmName));
+        Assert.assertTrue("list of running VMs must contains '" + vmName + "'", vms.contains(vmName));
         Assert.assertEquals("wrong number of running VMs", initialNbVMs + 1, vms.size());
         
         // stop
@@ -58,7 +61,22 @@ public abstract class TestVmManager {
         assertTrue("stop must work", success);
         
         vms = vmManager.getRunningVMs();
-        Assert.assertFalse("list of running VMs must not contains " + vmName, vms.contains(vmName));
+        Assert.assertFalse("list of running VMs must not contains '" + vmName + "'", vms.contains(vmName));
         Assert.assertEquals("wrong number of running VMs", initialNbVMs, vms.size());
+    }
+    
+    private void ensureNoRunningVMs() throws IOException {
+        List<String> vms;
+        do {
+            vmManager.stop(vmName);
+            
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            
+            vms = vmManager.getRunningVMs();
+        } while (!vms.isEmpty());
     }
 }

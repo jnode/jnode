@@ -79,26 +79,36 @@ public class ConfigUtils {
         return value;
     }
 
+    public static File getDirectory(Properties properties, String name, boolean mustExist) {
+        return getFile(properties, name, mustExist, true); // directory=true
+    }
+
     public static File getFile(Properties properties, String name, boolean mustExist) {
+        return getFile(properties, name, mustExist, false); // directory=false (aka we want a file)
+    }
+    
+    private static File getFile(Properties properties, String name, boolean mustExist, boolean directory) {
         String fileStr = properties.getProperty(name);
         File file = null;
         
         if ((fileStr != null) && !fileStr.trim().isEmpty()) {
             file = new File(fileStr);
 
-            if ((!file.exists() && mustExist) || !file.isFile()) {
+            boolean validType = (directory && file.isDirectory()) || (!directory && file.isFile()); 
+            if ((!file.exists() && mustExist) || !validType) {
                 file = null;
             }
         }
         
         if (file == null) {
+            final String type = directory ? "directory" : "file";
             final String msg;
             if (mustExist) {
-                msg = "parameter " + name + " must be an existing file";
+                msg = "parameter " + name + " must be an existing " + type;
             } else {
-                msg = "parameter " + name + " must be a file";
+                msg = "parameter " + name + " must be a " + type;
             }
-            throw new IllegalArgumentException(msg);
+            throw new IllegalArgumentException(msg + " (value: " + fileStr + ")");
         }
 
         return file;
@@ -111,5 +121,27 @@ public class ConfigUtils {
         }
         
         return value;
+    }
+
+    /**
+     * @param properties
+     * @param string
+     * @param b
+     * @return
+     */
+    public static String getClasspath(Properties properties, String name, boolean mustExist) {
+        String classpath;
+        
+        if (mustExist) {
+            classpath = getString(properties, name);
+        } else {
+            classpath = properties.getProperty(name, null);
+        }
+        
+        if (classpath != null) {
+            classpath = classpath.replace(',', File.pathSeparatorChar);
+        }
+        
+        return classpath;
     }
 }

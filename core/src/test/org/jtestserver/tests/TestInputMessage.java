@@ -24,6 +24,7 @@ import org.jtestserver.common.protocol.ProtocolException;
 import org.jtestserver.common.protocol.TimeoutException;
 
 
+//@Ignore TODO this give a compile error with jnode's ant script 
 public class TestInputMessage {
     private static class DummyProtocol implements Protocol {
         private String message;

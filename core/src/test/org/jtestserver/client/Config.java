@@ -82,7 +82,7 @@ public class Config {
     Config(Properties properties, VMConfig vmConfig) {
         clientTimeout = ConfigUtils.getInt(properties, "client.timeout", 30000);
         serverName = properties.getProperty("server.name", "localhost");
-        serverPort = ConfigUtils.getInt(properties, "client.timeout", 10000);
+        serverPort = ConfigUtils.getInt(properties, "server.port", 10000);
         workDir = ConfigUtils.getDirectory(properties, "work.dir", new File("."));
         excludingFilters = ConfigUtils.getStringArray(properties, "excluding.filters");
         forceUseMauveList = ConfigUtils.getBoolean(properties, "force.use.mauve.list", false);
