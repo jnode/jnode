@@ -467,7 +467,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs);
@@ -502,7 +502,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length * 2);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 2);
@@ -537,7 +537,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length * 2);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 2);
@@ -572,7 +572,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length * 4);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 4);
@@ -607,7 +607,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length * 4);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 4);
@@ -642,7 +642,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length * 8);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 8);
@@ -677,7 +677,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
             throw new IndexOutOfBoundsException("length < 0");
         }
         if (srcOfs + length > src.length) {
-            throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
+            throw new IndexOutOfBoundsException("srcOfs + length > src.length");
         }
         testMemPtr(dstPtr, length * 8);
         final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 8);
