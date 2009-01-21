@@ -31,8 +31,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
      * @param type
      * @throws FileSystemException
      */
-    public HfsPlusFileSystem(final Device device, final boolean readOnly, final HfsPlusFileSystemType type)
-    throws FileSystemException {
+    public HfsPlusFileSystem(final Device device, final boolean readOnly,
+            final HfsPlusFileSystemType type) throws FileSystemException {
         super(device, readOnly, type);
     }
 
@@ -45,15 +45,19 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
         log.debug("Superblock informations:\n" + sb.toString());
         if (!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)) {
-            log.info(getDevice().getId() + " Filesystem has not been cleanly unmounted, mounting it readonly");
+            log
+            .info(getDevice().getId()
+                    + " Filesystem has not been cleanly unmounted, mounting it readonly");
             setReadOnly(true);
         }
         if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_SOFTLOCK_BIT)) {
-            log.info(getDevice().getId() + " Filesystem is marked locked, mounting it readonly");
+            log.info(getDevice().getId()
+                    + " Filesystem is marked locked, mounting it readonly");
             setReadOnly(true);
         }
         if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT)) {
-            log.info(getDevice().getId()
+            log
+            .info(getDevice().getId()
                     + " Filesystem is journaled, write access is not supported. Mounting it readonly");
             setReadOnly(true);
         }
@@ -65,7 +69,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     }
 
     @Override
-    protected final FSDirectory createDirectory(final FSEntry entry) throws IOException {
+    protected final FSDirectory createDirectory(final FSEntry entry)
+        throws IOException {
         HFSPlusEntry e = (HFSPlusEntry) entry;
         return new HFSPlusDirectory(e);
     }
@@ -85,28 +90,34 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         log.debug("Root entry : No record found.");
         return null;
     }
+
     /*
      * (non-Javadoc)
+     * 
      * @see org.jnode.fs.FileSystem#getFreeSpace()
      */
     public final long getFreeSpace() {
         return sb.getFreeBlocks() * sb.getBlockSize();
     }
+
     /*
      * (non-Javadoc)
+     * 
      * @see org.jnode.fs.FileSystem#getTotalSpace()
      */
     public final long getTotalSpace() {
         return sb.getTotalBlocks() * sb.getBlockSize();
     }
+
     /*
      * (non-Javadoc)
+     * 
      * @see org.jnode.fs.FileSystem#getUsableSpace()
      */
     public final long getUsableSpace() {
         return -1;
     }
-    
+
     public final Catalog getCatalog() {
         return catalog;
     }
@@ -124,13 +135,15 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     public void create(HFSPlusParams params) throws FileSystemException {
         sb = new Superblock(this, true);
         try {
-            params.initializeDefaultsValues(this.getApi().getLength(), this.getFSApi().getSectorSize());
+            params.initializeDefaultsValues(this.getApi().getLength(), this
+                    .getFSApi().getSectorSize());
             sb.create(params);
-            //---
-            long volumeBlockUsed = sb.getTotalBlocks() - sb.getFreeBlocks() - ((sb.getBlockSize() == 512)?2:1);
-            //---
+            // ---
+            long volumeBlockUsed = sb.getTotalBlocks() - sb.getFreeBlocks()
+                - ((sb.getBlockSize() == 512) ? 2 : 1);
+            // ---
             log.debug("Write allocation bitmap bits to disk.");
-            //---
+            // ---
             log.debug("Write volume header to disk.");
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();

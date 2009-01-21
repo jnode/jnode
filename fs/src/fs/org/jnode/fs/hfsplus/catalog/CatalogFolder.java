@@ -40,30 +40,31 @@ public class CatalogFolder {
     }
 
     public final void setFolderId(CatalogNodeId folderId) {
-        System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
+        System.arraycopy(folderId.getBytes(), 0, data, 8,
+                folderId.getBytes().length);
     }
 
     public final int getCreateDate() {
         return BigEndian.getInt32(data, 12);
     }
 
-    public void setCreateDate(int time){
+    public void setCreateDate(int time) {
         BigEndian.setInt32(data, 12, time);
     }
 
     public final int getContentModDate() {
         return BigEndian.getInt32(data, 16);
     }
-    
-    public void setContentModDate(int time){
+
+    public void setContentModDate(int time) {
         BigEndian.setInt32(data, 16, time);
     }
 
     public final int getAttrModDate() {
         return BigEndian.getInt32(data, 20);
     }
-    
-    public void setAttrModDate(int time){
+
+    public void setAttrModDate(int time) {
         BigEndian.setInt32(data, 20, time);
     }
 
@@ -76,11 +77,16 @@ public class CatalogFolder {
         s.append("Record type: ").append(getRecordType()).append("\n");
         s.append("Valence: ").append(getValence()).append("\n");
         s.append("Folder ID: ").append(getFolderId().getId()).append("\n");
-        s.append("Creation Date :").append(HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy")).append("\n");
-        s.append("Content Mod Date  :").append(HFSUtils.printDate(getContentModDate(), "EEE MMM d HH:mm:ss yyyy"))
-        .append("\n");
-        s.append("Attr Mod Date  :").append(HFSUtils.printDate(getAttrModDate(), "EEE MMM d HH:mm:ss yyyy")).append(
-        "\n");
+        s.append("Creation Date :").append(
+                HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy"))
+                .append("\n");
+        s.append("Content Mod Date  :").append(
+                HFSUtils.printDate(getContentModDate(),
+                        "EEE MMM d HH:mm:ss yyyy")).append("\n");
+        s.append("Attr Mod Date  :")
+                .append(
+                        HFSUtils.printDate(getAttrModDate(),
+                                "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
 }
