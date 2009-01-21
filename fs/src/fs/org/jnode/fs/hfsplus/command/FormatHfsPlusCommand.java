@@ -10,7 +10,7 @@ import org.jnode.shell.syntax.StringArgument;
 
 public class FormatHfsPlusCommand extends AbstractFormatCommand<HfsPlusFileSystem> {
 
-    private final StringArgument ARG_VOLUME_NAME = new StringArgument("volumename", Argument.OPTIONAL,
+    private final StringArgument ARG_VOLUME_NAME = new StringArgument("volumeName", Argument.OPTIONAL,
             "set volume name");
 
     public FormatHfsPlusCommand() {
@@ -26,7 +26,7 @@ public class FormatHfsPlusCommand extends AbstractFormatCommand<HfsPlusFileSyste
     @Override
     protected Formatter<HfsPlusFileSystem> getFormatter() {
         HFSPlusParams params = new HFSPlusParams();
-        params.setVolumeName(ARG_VOLUME_NAME.getValue());
+        params.setVolumeName((ARG_VOLUME_NAME.isSet()) ? ARG_VOLUME_NAME.getValue() : "untitled");
         params.setBlockSize(params.OPTIMAL_BLOCK_SIZE);
         params.setJournaled(false);
         params.setJournalSize(params.DEFAULT_JOURNAL_SIZE);

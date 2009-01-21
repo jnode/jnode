@@ -23,6 +23,8 @@ public class Catalog {
     private NodeDescriptor btnd;
     private BTHeaderRecord bthr;
     private int firstNodeOffset;
+    
+    private ByteBuffer buffer;
 
     /**
      * Create new Catalog
@@ -30,10 +32,11 @@ public class Catalog {
      * @param params
      */
     public Catalog(HFSPlusParams params) {
-        btnd = new NodeDescriptor();
-        btnd.setKind(HfsPlusConstants.BT_HEADER_NODE);
-        btnd.setHeight(0);
-        btnd.setRecordCount(3);
+        NodeDescriptor nd = new NodeDescriptor();
+        nd.setKind(HfsPlusConstants.BT_HEADER_NODE);
+        nd.setHeight(0);
+        nd.setRecordCount(3);
+        btnd = nd;
         //
         bthr = new BTHeaderRecord();
         bthr.setTreeDepth(1);
@@ -47,16 +50,31 @@ public class Catalog {
         bthr.setClumpSize(params.getCatalogClumpSize());
         // TODO initialize attributes, max key length and key comparaison type.
         // Root directory
-        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, new HFSUnicodeString(params.getVolumeName()));
+        nd = new NodeDescriptor();
+        nd.setKind(HfsPlusConstants.BT_LEAF_NODE);
+        nd.setHeight(1);
+        nd.setRecordCount(params.isJournaled() ? 6 : 2);
+        HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
+        CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
         CatalogFolder folder = new CatalogFolder();
         folder.setFolderId(CatalogNodeId.HFSPLUS_ROOT_CNID);
         folder.setValence(params.isJournaled() ? 2 : 0);
         // TODO creation date, content modification date, text encoding and access rights.
-        ck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+        ck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, name);
         CatalogThread ct = new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD,
                 CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+        buffer = ByteBuffer.allocate(134);
+        buffer.put(btnd.getBytes());
+        buffer.position(14);
+        buffer.put(bthr.getBytes());
+        buffer.position(120);
+        buffer.put(nd.getBytes());
     }
 
+    public ByteBuffer getBytes() {
+        return buffer;
+    }
+    
     /**
      * Create Catalog based on meta-data that exist on the file system.
      * 
