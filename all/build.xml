@@ -433,9 +433,21 @@ clean             Remove all intermediate build results.
         <mkdir dir="${upload.dir}"/>
         <gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
         <copy todir="${upload.dir}" file="${sources.dist.tar.gz}"/>
+        <checksum algorithm="MD5" forceoverwrite="true">
+            <fileset dir="${upload.dir}">
+                <include name="jnode-x86-${jnode-ver}.iso.gz" />
+                <include name="jnodesources-${jnode-ver}.tar.gz" />
+            </fileset>
+        </checksum>
+        <echo message="FTP upload disabled. Uploadables are in: ${upload.dir}"/>
+        <!--
+        TODO find a way to automatically upload the files 
+        jsch based scp with sftp fails with an error to sourceforge
+        FTP uploads are abandone by sourceforge
         <ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="anonymous" password="${user.name}@users.sourceforge.net">
             <fileset dir="${upload.dir}"/>
         </ftp>
+        -->
     </target>
 	
 	<!-- Save virtualization etc state across 'clean' -->
