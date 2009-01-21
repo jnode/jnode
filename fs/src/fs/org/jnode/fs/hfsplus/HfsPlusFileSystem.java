@@ -144,6 +144,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             // ---
             log.debug("Write allocation bitmap bits to disk.");
             // ---
+            log.debug("Write Catalog to disk.");
+            long offset = sb.getCatalogFile().getExtents()[0].getStartBlock() * sb.getBlockSize();
+            Catalog catalog = new Catalog(params);
+            this.getApi().write(offset, catalog.getBytes());
             log.debug("Write volume header to disk.");
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();
