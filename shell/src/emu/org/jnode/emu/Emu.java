@@ -59,7 +59,7 @@ public abstract class Emu {
     };
 
     // FIXME configuring a hard-coded list of command plugins is a bad idea.
-    private static final String[] PLUGIN_NAMES = new String[]{
+    private static final String[] PLUGIN_NAMES = new String[] {
         "org.jnode.shell.command",
         "org.jnode.shell.command.posix",
         "org.jnode.shell.command.driver.console",
@@ -69,38 +69,36 @@ public abstract class Emu {
     };
 
     /**
-     * Initialize a minimal subset of JNode services to allow us to run JNode commands.
+     * The constructor initializes a minimal subset of JNode services to allow us to run JNode commands.
      *
      * @param root the notional JNode sandbox root directory or <code>null</code>.
      * @throws EmuException
      */
-    public static void initEnv(File root) throws EmuException {
-        if (true) {
-            if (root == null) {
-                root = new File("").getAbsoluteFile();
-                System.err.println("Assuming that the JNode root is '" + root + "'");
-            }
-            InitialNaming.setNameSpace(new BasicNameSpace());
+    public Emu(File root) throws EmuException {
+        if (root == null) {
+            root = new File("").getAbsoluteFile();
+            System.err.println("Assuming that the JNode root is '" + root + "'");
+        }
+        InitialNaming.setNameSpace(new BasicNameSpace());
 
-            try {
-                InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
-                AliasManager aliasMgr =
-                    new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
-                SyntaxManager syntaxMgr =
-                    new DefaultSyntaxManager(new DummyExtensionPoint()).createSyntaxManager();
-                for (String pluginName : PLUGIN_NAMES) {
-                    configurePluginCommands(root, pluginName, aliasMgr, syntaxMgr);
-                }
-                System.setProperty("jnode.invoker", "thread");
-                System.setProperty("jnode.interpreter", "redirecting");
-                System.setProperty("jnode.debug", "true");
-                InitialNaming.bind(AliasManager.NAME, aliasMgr);
-                InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
-                InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);
-                InitialNaming.bind(HelpFactory.NAME, new DefaultHelpFactory());
-            } catch (NamingException ex) {
-                throw new EmuException("Problem setting up InitialNaming bindings", ex);
+        try {
+            InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
+            AliasManager aliasMgr =
+                new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
+            SyntaxManager syntaxMgr =
+                new DefaultSyntaxManager(new DummyExtensionPoint()).createSyntaxManager();
+            for (String pluginName : PLUGIN_NAMES) {
+                configurePluginCommands(root, pluginName, aliasMgr, syntaxMgr);
             }
+            System.setProperty("jnode.invoker", "thread");
+            System.setProperty("jnode.interpreter", "redirecting");
+            System.setProperty("jnode.debug", "true");
+            InitialNaming.bind(AliasManager.NAME, aliasMgr);
+            InitialNaming.bind(ShellManager.NAME, new DefaultShellManager());
+            InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);
+            InitialNaming.bind(HelpFactory.NAME, new DefaultHelpFactory());
+        } catch (NamingException ex) {
+            throw new EmuException("Problem setting up InitialNaming bindings", ex);
         }
     }
 
@@ -113,7 +111,7 @@ public abstract class Emu {
      * @param syntaxMgr  the syntax manager to be populated
      * @throws EmuException
      */
-    private static void configurePluginCommands(File root, String pluginName, AliasManager aliasMgr,
+    private void configurePluginCommands(File root, String pluginName, AliasManager aliasMgr,
                                                 SyntaxManager syntaxMgr) throws EmuException {
         XMLElement pluginDescriptor = loadPluginDescriptor(root, pluginName);
         extractAliases(pluginDescriptor, aliasMgr);
@@ -127,7 +125,7 @@ public abstract class Emu {
      * @param syntaxMgr        the syntax manager to be populated.
      * @throws EmuException
      */
-    private static void extractSyntaxBundles(XMLElement pluginDescriptor, SyntaxManager syntaxMgr)
+    private void extractSyntaxBundles(XMLElement pluginDescriptor, SyntaxManager syntaxMgr)
         throws EmuException {
         XMLElement syntaxesDescriptor = findExtension(pluginDescriptor, SyntaxManager.SYNTAXES_EP_NAME);
         if (syntaxesDescriptor == null) {
@@ -157,7 +155,7 @@ public abstract class Emu {
      * @param aliasMgr         the alias manager to be populated.
      * @throws EmuException
      */
-    private static void extractAliases(XMLElement pluginDescriptor, AliasManager aliasMgr) {
+    private void extractAliases(XMLElement pluginDescriptor, AliasManager aliasMgr) {
         XMLElement aliasesDescriptor = findExtension(pluginDescriptor, AliasManager.ALIASES_EP_NAME);
         if (aliasesDescriptor == null) {
             return;
@@ -178,7 +176,7 @@ public abstract class Emu {
      * @param epName           the extension point's name
      * @return
      */
-    private static XMLElement findExtension(XMLElement pluginDescriptor, String epName) {
+    private XMLElement findExtension(XMLElement pluginDescriptor, String epName) {
         for (XMLElement child : pluginDescriptor.getChildren()) {
             if (child.getName().equals("extension") &&
                 epName.equals(child.getStringAttribute("point"))) {
@@ -197,7 +195,7 @@ public abstract class Emu {
      * @return the loaded plugin descriptor or <code>null</code>
      * @throws EmuException
      */
-    private static XMLElement loadPluginDescriptor(File root, String pluginName)
+    private XMLElement loadPluginDescriptor(File root, String pluginName)
         throws EmuException {
         File file = null;
         for (String projectName : ALL_PROJECTS) {

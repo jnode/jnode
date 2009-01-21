@@ -267,30 +267,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // Here, we are running in the CommandShell (main) Thread
         // so, we can register ourself as the current shell
         // (it will also be the current shell for all children Thread)
-
-        // FIXME - At one point, the 'current shell' had something to do with
-        // dispatching keyboard input to the right application. Now this is
-        // handled by the console layer. Is 'current shell' a meaningful /
-        // useful concept anymore?
-        try {
-            ShellUtils.getShellManager().registerShell(this);
-
-            ShellUtils.registerCommandInvoker(DefaultCommandInvoker.FACTORY);
-            ShellUtils.registerCommandInvoker(ThreadCommandInvoker.FACTORY);
-            ShellUtils.registerCommandInvoker(ProcletCommandInvoker.FACTORY);
-            ShellUtils.registerCommandInvoker(IsolateCommandInvoker.FACTORY);
-            ShellUtils.registerCommandInterpreter(DefaultInterpreter.FACTORY);
-            ShellUtils
-                    .registerCommandInterpreter(RedirectingInterpreter.FACTORY);
-        } catch (NameNotFoundException e1) {
-            e1.printStackTrace();
-        }
-
-        // Configure the shell based on Syetsm properties.
-        setupFromProperties();
-
-        // Now become interactive
-        ownThread = Thread.currentThread();
+        
+        configureShell();
 
         // Run commands from the JNode command line first
         final String cmdLine = System.getProperty(CMDLINE_PROPERTY_NAME, "");
@@ -320,7 +298,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     try {
                         if (jnode_ini.exists()) {
                             runCommandFile(jnode_ini);
-                        } else {
+                        } else if (getClass().getResource(name) != null) {
                             runCommandResource(name);
                         }
                     } catch (ShellException ex) {
@@ -340,7 +318,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 try {
                     if (shell_ini.exists()) {
                         runCommandFile(shell_ini);
-                    } else {
+                    } else if (getClass().getResource(name) != null) {
                         runCommandResource(name);
                     }
                 } catch (ShellException ex) {
@@ -372,6 +350,28 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 stackTrace(ex);
             }
         }
+    }
+
+    public void configureShell() {
+        try {
+            ShellUtils.getShellManager().registerShell(this);
+
+            ShellUtils.registerCommandInvoker(DefaultCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInvoker(ThreadCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInvoker(ProcletCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInvoker(IsolateCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInterpreter(DefaultInterpreter.FACTORY);
+            ShellUtils
+                    .registerCommandInterpreter(RedirectingInterpreter.FACTORY);
+        } catch (NameNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+        // Configure the shell based on System properties.
+        setupFromProperties();
+
+        // Now become interactive
+        ownThread = Thread.currentThread();
     }
 
     private void setupFromProperties() {
@@ -819,8 +819,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         boolean enabled = setHistoryEnabled(false);
         try {
             CommandInterpreter interpreter = createInterpreter(new FileReader(file));
-            // FIXME throw ShellException if interpreter not found
-            return (interpreter == null) ? -1 : interpreter.interpret(this, file);
+            return interpreter.interpret(this, file);
         } catch (IOException ex) {
             throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {
@@ -835,15 +834,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // FIXME throw ShellException if resource or interpreter not found
             InputStream input = getClass().getResourceAsStream(resource);
             if (input == null) {
-                result = -1; // resource doesn't exist
+                throw new ShellException("Cannot find resource '" + resource + "'");
             } else {
                 CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
-                if (interpreter == null) {
-                    result = -1; // no interpreter !
-                } else {
-                    Reader reader = new InputStreamReader(getClass().getResourceAsStream(resource));
-                    result = interpreter.interpret(this, reader);
-                }
+                Reader reader = new InputStreamReader(getClass().getResourceAsStream(resource));
+                result = interpreter.interpret(this, reader);
             }
             return result;
         } finally {
@@ -856,11 +851,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             final BufferedReader br = new BufferedReader(reader);
             CommandInterpreter interpreter;
             String line = br.readLine();
-            if (line == null) {
-                interpreter = null; // stream is empty
-            } else if (line.startsWith("#!")) {
+            if (line != null && line.startsWith("#!")) {
                 String name = line.substring(2);
                 interpreter = ShellUtils.createInterpreter(name);
+                if (interpreter == null) {
+                    throw new ShellException("Cannot execute script: no '" + 
+                            name + "' interpreter is registered");
+                }
             } else {
                 interpreter = this.interpreter;
             }
