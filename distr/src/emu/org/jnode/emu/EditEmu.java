@@ -10,14 +10,21 @@ import org.jnode.driver.console.textscreen.TextScreenConsole;
  * @author Levente S\u00e1ntha
  */
 public class EditEmu extends Emu {
+    
+    public EditEmu(File root) throws EmuException {
+        super(root);
+    }
+    
     public static void main(String[] argv) throws Exception {
         if (argv.length == 0 || argv[0].startsWith("-")) {
             System.err.println("Usage: editEmu <file> [<jnode-home>]");
             return;
         }
 
-        initEnv(argv.length > 1 ? new File(argv[1]) : null);
-
+        new EditEmu(argv.length > 1 ? new File(argv[1]) : null).run(new File(argv[0]));
+    }
+    
+    private void run(File file) throws Exception {
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         final TextScreenConsole console = cm.createConsole(
             null,
@@ -26,7 +33,6 @@ public class EditEmu extends Emu {
                 ConsoleManager.CreateOptions.NO_LINE_EDITTING));
 
         TextEditor te = new TextEditor(console);
-        File f = new File(argv[0]);
-        te.loadFile(f);
+        te.loadFile(file);
     }
 }
