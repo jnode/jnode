@@ -27,7 +27,7 @@ import java.io.InputStream;
  * A NullInputStream instance is the logical equivalent of "/dev/null". Calling
  * a read method returns -1 to indicate EOF.
  * 
- * @author Stephen Crawley
+ * @author crawley@jnode.org
  */
 public class NullInputStream extends InputStream {
 

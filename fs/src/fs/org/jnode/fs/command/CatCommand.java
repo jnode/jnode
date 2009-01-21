@@ -46,7 +46,7 @@ import org.jnode.shell.syntax.URLArgument;
  * 
  * @author epr
  * @author Andreas H\u00e4nel
- * @author Stephen Crawley
+ * @author crawley@jnode.org
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class CatCommand extends AbstractCommand {
