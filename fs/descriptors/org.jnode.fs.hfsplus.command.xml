@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.hfsplus.command"
+        name="Ext2 specific commands"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl">
+
+  <requires>
+	<import plugin="org.jnode.fs.hfsplus"/>
+	<import plugin="org.jnode.fs.command"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.hfsplus.command.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="formatHFSPlus" class="org.jnode.fs.hfsplus.command.FormatHfsPlusCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="formatHFSPlus">
+      <sequence description="format a HFS+ file system">
+        <optional><option argLabel="volumeName" shortName="v" longName="volume"/></optional>
+        <argument argLabel="device"/>
+      </sequence>
+    </syntax>
+  </extension>
+</plugin>
