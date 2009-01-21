@@ -22,7 +22,7 @@ public class HfsPlusFileSystemFormatter extends Formatter<HfsPlusFileSystem> {
         try {
             FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
             HfsPlusFileSystemType type = fss.getFileSystemType(HfsPlusFileSystemType.ID);
-            HfsPlusFileSystem fs = type.create(device, false);
+            HfsPlusFileSystem fs = new HfsPlusFileSystem(device, false, type);
             fs.create(params);
             return fs;
         } catch (NameNotFoundException e) {
