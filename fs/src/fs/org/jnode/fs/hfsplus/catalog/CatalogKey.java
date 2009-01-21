@@ -6,9 +6,9 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
 public class CatalogKey extends AbstractKey {
-    
-    public final static int MAXIMUM_KEY_LENGTH = 516;
-    
+
+    public static final int MAXIMUM_KEY_LENGTH = 516;
+
     private int keyLength;
     private CatalogNodeId parentID;
     private HFSUnicodeString nodeName;
@@ -61,7 +61,8 @@ public class CatalogKey extends AbstractKey {
         if (o instanceof CatalogKey) {
             CatalogKey ck = (CatalogKey) o;
             if (getParentId().getId() == ck.getParentId().getId()) {
-                return nodeName.getUnicodeString().compareTo(ck.getNodeName().getUnicodeString());
+                return nodeName.getUnicodeString().compareTo(
+                        ck.getNodeName().getUnicodeString());
             } else if (getParentId().getId() < ck.getParentId().getId()) {
                 return -1;
             } else {
@@ -76,7 +77,10 @@ public class CatalogKey extends AbstractKey {
         StringBuffer s = new StringBuffer();
         s.append("Key length: ").append(getKeyLength()).append(" ");
         s.append("Parent ID: ").append(getParentId().getId()).append(" ");
-        s.append("Node name: ").append((getNodeName() != null) ? getNodeName().getUnicodeString() : "");
+        s.append("Node name: ")
+                .append(
+                        (getNodeName() != null) ? getNodeName()
+                                .getUnicodeString() : "");
         return s.toString();
     }
 }

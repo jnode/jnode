@@ -35,42 +35,50 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
     }
 
     @Override
-    protected final FSEntry createDirectoryEntry(final String name) throws IOException {
+    protected final FSEntry createDirectoryEntry(final String name)
+        throws IOException {
         if (!canWrite()) {
             throw new ReadOnlyFileSystemException();
         }
-        Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
-        
+        Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem())
+                .getVolumeHeader();
+
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
-        
+        int macDate = (int) HFSUtils
+                .getDate(now.getTimeInMillis() / 1000, true);
+
         HFSUnicodeString dirName = new HFSUnicodeString(name);
-        CatalogThread thread = new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD,this.folder.getFolderId(),dirName);
-        
+        CatalogThread thread = new CatalogThread(
+                HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
+                        .getFolderId(), dirName);
+
         CatalogFolder newFolder = new CatalogFolder();
-        newFolder.setFolderId(new CatalogNodeId(volumeHeader.getNextCatalogId()));
+        newFolder
+                .setFolderId(new CatalogNodeId(volumeHeader.getNextCatalogId()));
         newFolder.setCreateDate(macDate);
         newFolder.setContentModDate(macDate);
         newFolder.setAttrModDate(macDate);
         log.debug("New catalog folder :\n" + newFolder.toString());
-        
+
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);
         log.debug("New catalog key :\n" + key.toString());
-        
-        
+
         LeafRecord folderRecord = new LeafRecord(key, newFolder.getBytes());
         log.debug("New record folder :\n" + folderRecord.toString());
-        
-        HFSPlusEntry newEntry = new HFSPlusEntry((HfsPlusFileSystem) getFileSystem(), null, this, name, folderRecord);
+
+        HFSPlusEntry newEntry = new HFSPlusEntry(
+                (HfsPlusFileSystem) getFileSystem(), null, this, name,
+                folderRecord);
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());
-        
+
         return newEntry;
     }
 
     @Override
-    protected final FSEntry createFileEntry(final String name) throws IOException {
+    protected final FSEntry createFileEntry(final String name)
+        throws IOException {
         throw new ReadOnlyFileSystemException();
     }
 
@@ -83,12 +91,16 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
     @Override
     protected final FSEntryTable readEntries() throws IOException {
         List<FSEntry> pathList = new LinkedList<FSEntry>();
-        LeafRecord[] records = ((HfsPlusFileSystem) getFileSystem()).getCatalog().getRecords(folder.getFolderId());
+        LeafRecord[] records = ((HfsPlusFileSystem) getFileSystem())
+                .getCatalog().getRecords(folder.getFolderId());
         for (LeafRecord rec : records) {
             if (rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER
                     || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
-                String name = ((CatalogKey) rec.getKey()).getNodeName().getUnicodeString();
-                HFSPlusEntry e = new HFSPlusEntry((HfsPlusFileSystem) getFileSystem(), null, this, name, rec);
+                String name = ((CatalogKey) rec.getKey()).getNodeName()
+                        .getUnicodeString();
+                HFSPlusEntry e = new HFSPlusEntry(
+                        (HfsPlusFileSystem) getFileSystem(), null, this, name,
+                        rec);
                 pathList.add(e);
             }
         }
