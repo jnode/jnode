@@ -112,6 +112,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.ext2.command"/>
     <plugin id="org.jnode.fs.hfsplus"/>
+    <plugin id="org.jnode.fs.hfsplus.command"/>
     <plugin id="org.jnode.fs.fat"/>
     <plugin id="org.jnode.fs.fat.command"/>
     <plugin id="org.jnode.fs.jfat"/>
