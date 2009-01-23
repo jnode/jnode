@@ -12,13 +12,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.JNodeFontPeer;
+import org.jnode.awt.font.TGlyphVector;
 import org.jnode.font.bdf.BDFFontContainer;
 import org.jnode.font.bdf.BDFGlyph;
 import org.jnode.font.bdf.BDFMetrics;
 
 import sun.font.CoreMetrics;
 import sun.font.FontLineMetrics;
-import sun.font.StandardGlyphVector;
 
 /**
  * Specific implementation of {@link JNodeFontPeer} for BDF fonts
@@ -167,6 +167,9 @@ public class BDFFontPeer extends JNodeFontPeer<BDFFontProvider, BDFFont> {
         double width = 0;
         double height = 0;
         for (char c = ci.setIndex(begin); ci.getIndex() <= limit; c = ci.next()) {
+            if (c == CharacterIterator.DONE)
+                break;
+            
             BDFGlyph g = container.getGlyph(c);
             if (g != null) {
                 width += g.getDWidth().width;
@@ -210,6 +213,6 @@ public class BDFFontPeer extends JNodeFontPeer<BDFFontProvider, BDFFont> {
                                          char[] chars, int start, int limit, int flags) {
         //TODO work only for latin fonts but not for hindi, arabic ... fonts
         // see GNU Classpath javadoc
-        return new StandardGlyphVector(font, chars, start, limit, frc);
+        return new TGlyphVector(font, chars, start, limit, frc);
     }
 }
