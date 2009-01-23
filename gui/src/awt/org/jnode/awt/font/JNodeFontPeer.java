@@ -82,9 +82,8 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
      *      java.awt.font.FontRenderContext, java.text.CharacterIterator)
      */
     @Override
-    public final GlyphVector createGlyphVector(Font font, FontRenderContext frc,
-                                         CharacterIterator ci) {
-        return new StandardGlyphVector(font, ci, frc);
+    public final GlyphVector createGlyphVector(Font font, FontRenderContext frc, CharacterIterator ci) {
+        return TGlyphVector.create(font, frc, ci);
     }
 
     /**

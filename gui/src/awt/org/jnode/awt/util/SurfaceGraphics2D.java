@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.TGlyphVector;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 
@@ -207,8 +208,14 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
      * @see #setClip
      */
     public void drawGlyphVector(GlyphVector g, float x, float y) {
-        //todo implement it
-        org.jnode.vm.Unsafe.debug("SurfaceGraphics2D.drawGlyphVector() not implemented\n");
+        //todo improve it
+        if (g instanceof TGlyphVector) {
+            char[] chars = ((TGlyphVector) g).getChars();
+            simpleGraphics.drawChars(chars, 0, chars.length, (int)x, (int)y);
+        } else {
+            org.jnode.vm.Unsafe.debug("Unsupported GlyphVector type: " +
+                (g == null ? "null" : g.getClass().getName()) + "\n");
+        }
     }
 
     /**
