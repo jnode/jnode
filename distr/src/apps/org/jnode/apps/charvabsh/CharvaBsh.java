@@ -420,7 +420,7 @@ public class CharvaBsh {
                 if (shell instanceof CommandShell) {
                     CommandShell cs = (CommandShell) shell;
                     try {
-                        cs.invokeCommand(command);
+                        cs.runCommand(command);
                     } catch (ShellException ex) {
                         System.err.println("Command invocation failed: " + ex.getMessage());
                     }

@@ -29,6 +29,7 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
+import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -58,8 +59,7 @@ public class HelpCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws NameNotFoundException, ClassNotFoundException, 
-        HelpException, NoSuchAliasException {
+    public void execute() throws NameNotFoundException, ShellException, HelpException {
         // The above exceptions are either bugs or configuration errors and should be allowed
         // to propagate so that the shell can diagnose them appropriately.
         String alias;
@@ -87,13 +87,8 @@ public class HelpCommand extends AbstractCommand {
         } catch (HelpException ex) {
             err.println("Error getting help for alias / class '" + alias + "': " + ex.getMessage());
             throw ex;
-        } catch (ClassNotFoundException ex) {
-            try {
-                String className = shell.getAliasManager().getAliasClassName(alias);
-                err.println("Cannot load class '" + className + "' for alias '" + alias + "'");
-            } catch (NoSuchAliasException ex2) {
-                err.println("'" + alias + "' is neither an alias or a loadable class name");
-            }
+        } catch (ShellException ex) {
+            err.println(ex.getMessage());
             throw ex;
         } catch (SecurityException ex) {
             err.println("Security exception while loading the class associated with alias '" + alias + "'");

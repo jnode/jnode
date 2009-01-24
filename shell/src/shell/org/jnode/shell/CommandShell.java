@@ -280,7 +280,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 if (e.startsWith(COMMAND_KEY)) {
                     final String cmd = e.substring(COMMAND_KEY.length());
                     outPW.println(prompt() + cmd);
-                    processCommand(cmd, false);
+                    runCommand(cmd, false, this.interpreter);
                 }
             } catch (Throwable ex) {
                 errPW.println("Error while processing bootarg commands: "
@@ -338,7 +338,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 readingCommand = true;
                 String line = readInputLine().trim();
                 if (line.length() > 0) {
-                    processCommand(line, true);
+                    runCommand(line, true, this.interpreter);
                 }
 
                 if (VmSystem.isShuttingDown()) {
@@ -464,12 +464,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             ((KeyboardReader) in).clearSoftEOF();
         }
     }
-
-    protected int processCommand(String cmdLineStr, boolean interactive) {
-        return processCommand(cmdLineStr, interactive, this.interpreter);
-    }
         
-    private int processCommand(String cmdLineStr, boolean interactive,
+    private int runCommand(String cmdLineStr, boolean interactive,
             CommandInterpreter interpreter) {
         if (interactive) {
             clearEof();
@@ -536,8 +532,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @param command the command line.
      * @throws ShellException
      */
-    public int invokeCommand(String command) throws ShellException {
-        return processCommand(command, false);
+    public int runCommand(String command) throws ShellException {
+        return runCommand(command, false, this.interpreter);
     }
 
     /**
@@ -567,14 +563,20 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
     }
 
-    public CommandInfo getCommandInfo(String cmd) throws ClassNotFoundException {
+    public CommandInfo getCommandInfo(String cmd) throws ShellException {
         try {
             Class<?> cls = aliasMgr.getAliasClass(cmd);
             return new CommandInfo(cls, aliasMgr.isInternal(cmd));
+        } catch (ClassNotFoundException ex) {
+            throw new ShellException("Cannot the load command class for alias '" + cmd + "'", ex);
         } catch (NoSuchAliasException ex) {
-            final ClassLoader cl = 
-                Thread.currentThread().getContextClassLoader();
-            return new CommandInfo(cl.loadClass(cmd), false);
+            try {
+                final ClassLoader cl = 
+                    Thread.currentThread().getContextClassLoader();
+                return new CommandInfo(cl.loadClass(cmd), false);
+            } catch (ClassNotFoundException ex2) {
+                throw new ShellException("Cannot find an alias or load a command class for '" + cmd + "'", ex);
+            }
         }
     }
     
