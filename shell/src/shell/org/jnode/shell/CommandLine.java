@@ -573,7 +573,7 @@ public class CommandLine implements Completable, Iterable<String> {
      * @throws CommandSyntaxException if the chosen syntax doesn't match the command
      *                                line arguments.
      */
-    public CommandInfo parseCommandLine(CommandShell shell) throws ShellException {
+    public CommandInfo parseCommandLine(Shell shell) throws ShellException {
         String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (cmd.equals("")) {
             throw new ShellFailureException("no command name");
@@ -595,8 +595,6 @@ public class CommandLine implements Completable, Iterable<String> {
                 bundle.parse(this, syntaxes);
             }
             return cmdInfo;
-        } catch (ClassNotFoundException ex) {
-            throw new ShellException("Command class not found", ex);
         } catch (InstantiationException ex) {
             throw new ShellException("Command class cannot be instantiated", ex);
         } catch (IllegalAccessException ex) {
@@ -610,8 +608,8 @@ public class CommandLine implements Completable, Iterable<String> {
             CommandInfo cmdClass;
             try {
                 cmdClass = shell.getCommandInfo(cmd);
-            } catch (ClassNotFoundException ex) {
-                throw new CompletionException("Command class not found", ex);
+            } catch (ShellException ex) {
+                throw new CompletionException(ex.getMessage(), ex);
             }
 
             Command command;
@@ -652,15 +650,11 @@ public class CommandLine implements Completable, Iterable<String> {
         }
     }
 
-    public CommandInfo getCommandInfo(CommandShell shell) {
+    public CommandInfo getCommandInfo(CommandShell shell) throws ShellException {
         String cmd = (commandToken == null) ? "" : commandToken.text.trim();
         if (cmd.equals("")) {
             return null;
         }
-        try {
-            return shell.getCommandInfo(cmd);
-        } catch (ClassNotFoundException ex) {
-            return null;
-        }
+        return shell.getCommandInfo(cmd);
     }
 }

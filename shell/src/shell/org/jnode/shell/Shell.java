@@ -75,4 +75,14 @@ public interface Shell extends InputCompleter {
      */
     public int runCommandFile(File file) throws ShellException;
 
+    /**
+     * Resolve a command name to a CommandInfo object.
+     * 
+     * @param commmandName this could be a command class name, an alias or some other
+     * supported by the shell.
+     * @return the resolved CommandInfo or <code>null</code>.
+     * @throws ShellException 
+     */
+    public CommandInfo getCommandInfo(String commmandName) throws ShellException;
+
 }
