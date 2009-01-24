@@ -981,4 +981,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
         errPW.println("Testing");
     }
+
+    @Override
+    public String escapeWord(String word) {
+        return interpreter.escapeWord(word);
+    }
 }

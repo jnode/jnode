@@ -85,4 +85,13 @@ public interface Shell extends InputCompleter {
      */
     public CommandInfo getCommandInfo(String commmandName) throws ShellException;
 
+    /**
+     * Add quoting or escape sequences to a word using the escaping conventions of 
+     * the shell's current interpreter.
+     * 
+     * @param word the word to be escaped.
+     * @return the 
+     */
+    public String escapeWord(String word);
+
 }
