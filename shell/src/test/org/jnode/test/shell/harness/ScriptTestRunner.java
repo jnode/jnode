@@ -15,8 +15,6 @@ import java.io.Writer;
  */
 class ScriptTestRunner extends JNodeTestRunnerBase implements TestRunnable {
 
-    
-    
     private File tempScriptFile;
     
     public ScriptTestRunner(TestSpecification spec, TestHarness harness) {

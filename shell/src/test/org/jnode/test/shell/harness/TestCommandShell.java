@@ -1,32 +1,18 @@
 package org.jnode.test.shell.harness;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Writer;
 
-import org.jnode.driver.console.CompletionInfo;
-import org.jnode.driver.console.ConsoleEvent;
-import org.jnode.driver.console.InputHistory;
-import org.jnode.driver.console.TextConsole;
-import org.jnode.shell.CommandInfo;
-import org.jnode.shell.CommandInterpreter;
-import org.jnode.shell.CommandInvoker;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
-import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellException;
-import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandInputOutput;
 import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
-import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.shell.syntax.SyntaxManager;
 
 /**
  * This class modify the shell's stream resolution mechanism so that

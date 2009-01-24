@@ -7,14 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.jnode.shell.CommandInfo;
-import org.jnode.shell.CommandInvoker;
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
-import org.jnode.shell.ShellUtils;
-import org.jnode.shell.ThreadCommandInvoker;
-import org.jnode.shell.alias.AliasManager;
-import org.jnode.shell.alias.NoSuchAliasException;
 
 
 /**
@@ -23,42 +16,25 @@ import org.jnode.shell.alias.NoSuchAliasException;
  * 
  * @author crawley@jnode.org
  */
-class CommandTestRunner implements TestRunnable {
+class CommandTestRunner extends JNodeTestRunnerBase implements TestRunnable {
 
     private ByteArrayOutputStream outBucket;
     private ByteArrayOutputStream errBucket;
     
-    private final TestSpecification spec;
-    private final TestHarness harness;
-    private final CommandShell shell;
-    
-    @SuppressWarnings("unused")
-    private final boolean usingEmu;
-    
+        
     public CommandTestRunner(TestSpecification spec, TestHarness harness) {
-        this.spec = spec;
-        this.harness = harness;
-        this.usingEmu = TestEmu.initEmu(harness.getRoot());
-        this.shell = TestEmu.getShell();
+        super(spec, harness);
     }
 
     @Override
     public int run() throws Exception {
-        String[] args = spec.getArgs().toArray(new String[0]);
-        // FIXME change this to a shell provided by getShell???
-        AliasManager aliasMgr = ShellUtils.getAliasManager();
-        CommandInvoker invoker = new ThreadCommandInvoker(shell);
-        CommandLine cmdLine = new CommandLine(spec.getCommand(), args);
-        CommandInfo cmdInfo;
-        try {
-            Class<?> cls = aliasMgr.getAliasClass(spec.getCommand());
-            cmdInfo = new CommandInfo(cls, aliasMgr.isInternal(spec.getCommand()));
-        } catch (NoSuchAliasException ex) {
-            final ClassLoader cl = 
-                Thread.currentThread().getContextClassLoader();
-            cmdInfo = new CommandInfo(cl.loadClass(spec.getCommand()), false);
+        StringBuffer sb = new StringBuffer();
+        CommandShell shell = getShell();
+        sb.append(shell.escapeWord(spec.getCommand()));
+        for (String arg : spec.getArgs()) {
+            sb.append(" ").append(shell.escapeWord(arg));
         }
-        int rc = invoker.invoke(cmdLine, cmdInfo);
+        int rc = shell.runCommand(sb.toString());
         return check(rc) ? 0 : 1;
     }
 
