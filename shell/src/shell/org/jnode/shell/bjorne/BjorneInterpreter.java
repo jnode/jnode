@@ -204,6 +204,10 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
         BjorneTokenizer tokens = new BjorneTokenizer(command);
         CommandNode tree = new BjorneParser(tokens).parse();
+        if (tree == null) {
+            // An empty command line
+            return 0;
+        }
         if (DEBUG) {
             System.err.println(tree);
         }
