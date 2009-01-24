@@ -1,0 +1,30 @@
+<testSpecs>
+<testSpec>
+<title>simple</title>
+<command>test</command>
+<runMode>AS_SCRIPT</runMode>
+<plugins>
+<plugin>
+<id>org.jnode.shell.bjorne</id>
+<class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
+</plugin>
+</plugins>
+<script>#!bjorne
+echo HI
+</script>
+<output>HI
+</output>
+<rc>0</rc>
+</testSpec>
+<testSpec>
+<title>#if ... then ... fi</title>
+<command>test</command>
+<runMode>AS_SCRIPT</runMode>
+<script>#!bjorne
+if true ; then echo HI ; fi
+</script>
+<output>HI
+</output>
+<rc>0</rc>
+</testSpec>
+</testSpecs>

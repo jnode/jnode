@@ -921,7 +921,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @param stream A real stream or a stream marker
      * @return the real stream that the first argument maps to.
      */
-    CommandIO resolveStream(CommandIO stream) {
+    protected CommandIO resolveStream(CommandIO stream) {
         if (stream == CommandLine.DEFAULT_STDIN) {
             return getInputStream();
         } else if (stream == CommandLine.DEFAULT_STDOUT) {
