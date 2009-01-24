@@ -24,8 +24,8 @@ public class TestHarness {
     
     private PrintWriter reportWriter;
     private int testCount;
-    private int errorCount;
     private int failureCount;
+    private int exceptionCount;
     private TestSpecification spec = null;
     private InputStream savedIn;
     private PrintStream savedOut;
@@ -95,8 +95,8 @@ public class TestHarness {
                 }
             }
         }
-        report("Ran " + testCount + " tests with " + errorCount + 
-                " errors and " + failureCount + " failures");
+        report("Ran " + testCount + " tests with " + failureCount + 
+                " test failures and " + exceptionCount + " errors (exceptions)");
     }
     
     private void usage() {
@@ -112,6 +112,7 @@ public class TestHarness {
     }
 
     private void execute(TestSpecification spec) {
+        this.spec = spec;
         reportVerbose("Running test '" + spec.getTitle() + "'");
         testCount++;
         try {
@@ -123,6 +124,9 @@ public class TestHarness {
                 case AS_ALIAS:
                     runner = new CommandTestRunner(spec, this);
                     break;
+                case AS_SCRIPT:
+                    runner = new ScriptTestRunner(spec, this);
+                    break;
                 default:
                     reportVerbose("Run mode '" + spec.getRunMode() + "' not implemented");
                     return;
@@ -130,14 +134,15 @@ public class TestHarness {
             try {
                 setup();
                 runner.setup();
-                errorCount += runner.run();
+                failureCount += runner.run();
             } finally {
                 runner.cleanup();
                 cleanup();
             }
         } catch (Throwable ex) {
+            report("Uncaught exception in test '" + spec.getTitle() + "': stacktrace follows.");
             ex.printStackTrace(reportWriter);
-            failureCount++;
+            exceptionCount++;
         }
         reportVerbose("Completed test '" + spec.getTitle() + "'");
     }
@@ -187,13 +192,17 @@ public class TestHarness {
         }
     }
 
-    public boolean expect(Object expected, Object actual, String desc) {
+    public boolean expect(Object actual, Object expected, String desc) {
         if (expected.equals(actual)) {
             return true;
         }
-        report("Incorrect test result for '" + desc + "' in test '" + spec.getTitle() + "'");
-        report("   expected '" + expected + "': got '" + actual + "'");
+        report("Incorrect test result for " + asString(desc) + " in test " + asString(spec.getTitle()));
+        report("    expected " + asString(expected) + ": got " + asString(actual) + ".");
         return false;
+    }
+    
+    private String asString(Object obj) {
+        return (obj == null) ? "null" : ("'" + obj + "'");
     }
 
     public File getRoot() {

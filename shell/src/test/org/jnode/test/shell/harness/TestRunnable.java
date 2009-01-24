@@ -5,7 +5,7 @@ package org.jnode.test.shell.harness;
  * use / extend Runnable because we need to propagate any exceptions
  * in the {@link TestRunnable.run()} method.
  * 
- * @author stephen
+ * @author crawley@jnode.org
  */
 public interface TestRunnable {
     

@@ -1,12 +1,12 @@
 <testSpecs>
 <testSpec>
-<title>Test 'true'</title>
+<title>true command</title>
 <command>org.jnode.shell.command.posix.TrueCommand</command>
 <runMode>AS_ALIAS</runMode>
 <rc>0</rc>
 </testSpec>
 <testSpec>
-<title>Test 'false'</title>
+<title>false command</title>
 <command>org.jnode.shell.command.posix.FalseCommand</command>
 <runMode>AS_ALIAS</runMode>
 <rc>1</rc>

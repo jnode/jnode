@@ -51,9 +51,9 @@ import org.jnode.shell.syntax.XMLSyntaxSpecAdapter;
  * An Emu is also a large flightless bird ... which seems kind of appropriate.
  * 
  * @author Levente S\u00e1ntha
- * @author Stephen Crawley
+ * @author crawley@jnode.org
  */
-public abstract class Emu {
+public class Emu {
     private static final String[] ALL_PROJECTS = new String[]{
         "core", "distr", "fs", "gui", "net", "shell", "sound", "textui"
     };
