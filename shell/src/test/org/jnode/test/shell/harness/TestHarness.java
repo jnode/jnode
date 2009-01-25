@@ -1,3 +1,23 @@
+/*
+ * $Id: NameSpace.java 4564 2008-09-18 22:01:10Z fduminy $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.test.shell.harness;
 
 import java.io.File;
@@ -6,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.List;
 
 import net.n3.nanoxml.XMLException;
 
@@ -50,7 +69,7 @@ public class TestHarness {
         boolean useResources = false;
         int firstArg = 0;
         TestSpecificationParser parser = new TestSpecificationParser();
-        List<TestSpecification> specs;
+        TestSetSpecification specs;
         if (args.length == 0) {
             usage();
             return;
@@ -105,8 +124,8 @@ public class TestHarness {
         System.err.println(commandName + " <spec-file> ... // run tests from specs read from file system");
     }
     
-    private void execute(List<TestSpecification> specs) {
-        for (TestSpecification spec : specs) {
+    private void execute(TestSetSpecification specs) {
+        for (TestSpecification spec : specs.getSpecs()) {
             execute(spec);
         }
     }

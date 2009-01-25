@@ -1,6 +1,28 @@
+/*
+ * $Id: NameSpace.java 4564 2008-09-18 22:01:10Z fduminy $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.test.shell.harness;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,20 +33,6 @@ import java.util.Map;
  */
 public class TestSpecification {
     
-    public static class PluginSpec {
-        public final String pluginId;
-        public final String pluginVersion;
-        public final String pseudoPluginClassName;
-        
-        public PluginSpec(String pluginId, String pluginVersion,
-                String pseudoPluginClassName) {
-            super();
-            this.pluginId = pluginId;
-            this.pluginVersion = pluginVersion;
-            this.pseudoPluginClassName = pseudoPluginClassName;
-        }
-    }
-    
     public static enum RunMode {
         AS_SCRIPT,
         AS_CLASS,
@@ -33,20 +41,20 @@ public class TestSpecification {
     
     private final RunMode runMode;
     private final String command;
-    private final List<String> args;
+    private final List<String> args = new ArrayList<String>();
     private final String scriptContent;
     private final String inputContent;
     private final String outputContent;
     private final String errorContent;
     private final String title;
-    private final List<PluginSpec> requiredPlugins;
+    private final List<PluginSpecification> plugins = new ArrayList<PluginSpecification>();
     private final int rc;
-    private final Map<File, String> fileMap;
+    private final Map<File, String> fileMap = new HashMap<File, String>();
+    private TestSetSpecification testSet;
     
     public TestSpecification(RunMode runMode, String command, String scriptContent,
             String inputContent, String outputContent, String errorContent,
-            String title, int rc, List<String> args, Map<File, String> fileMap,
-            List<PluginSpec> requiredPlugins) {
+            String title, int rc) {
         super();
         this.runMode = runMode;
         this.command = command;
@@ -56,9 +64,6 @@ public class TestSpecification {
         this.errorContent = errorContent;
         this.title = title;
         this.rc = rc;
-        this.args = args;
-        this.fileMap = fileMap;
-        this.requiredPlugins = requiredPlugins;
     }
 
     public String getOutputContent() {
@@ -73,6 +78,14 @@ public class TestSpecification {
         return rc;
     }
     
+    public void addArg(String arg) {
+        args.add(arg);
+    }
+
+    public void addPlugin(PluginSpecification plugin) {
+        plugins.add(plugin);
+    }
+
     public void addFile(File file, String content) {
         fileMap.put(file, content);
     }
@@ -105,7 +118,15 @@ public class TestSpecification {
         return title;
     }
 
-    public List<PluginSpec> getRequiredPlugins() {
-        return requiredPlugins;
+    public List<PluginSpecification> getPlugins() {
+        return plugins;
+    }
+    
+    public TestSetSpecification getTestSet() {
+        return testSet;
+    }
+
+    public void setTestSet(TestSetSpecification testSet) {
+        this.testSet = testSet;
     }
 }

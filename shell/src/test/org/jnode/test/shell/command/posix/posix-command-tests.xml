@@ -1,4 +1,8 @@
 <testSpecs>
+<title>POSIX command tests</title>
+<plugin>
+<id>org.jnode.shell.command.posix</id>
+</plugin>
 <testSpec>
 <title>true command</title>
 <command>org.jnode.shell.command.posix.TrueCommand</command>

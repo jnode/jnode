@@ -1,7 +1,28 @@
+/*
+ * $Id: NameSpace.java 4564 2008-09-18 22:01:10Z fduminy $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.test.shell.harness;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +40,7 @@ public class TestEmu {
     private static boolean emuInitialized;
     private static boolean emuAvailable;
     private static CommandShell shell;
+    private static Class<?> emuClass;
     
     @SuppressWarnings("unused")
     private static Object emuObject;
@@ -33,8 +55,8 @@ public class TestEmu {
             // The following infers that we are running on the dev't platform if 
             // the 'Emu' class is not loadable.
             try {
-                Class<?> cls = Class.forName("org.jnode.emu.Emu");
-                Constructor<?> constructor = cls.getConstructor(File.class);
+                emuClass = Class.forName("org.jnode.emu.Emu");
+                Constructor<?> constructor = emuClass.getConstructor(File.class);
                 emuObject = constructor.newInstance(root);
                 emuAvailable = true;
             } catch (Throwable ex) {
@@ -65,18 +87,20 @@ public class TestEmu {
         return shell;
     }
 
-    public static synchronized void loadPseudoPlugin(String pseudoPluginClassName) {
+    public static synchronized void loadPseudoPlugin(String pluginId, String className) {
         if (!emuInitialized) {
             throw new IllegalStateException("Emu not initialized");
         }
-        if (!loadedPseudoPlugins.contains(pseudoPluginClassName)) {
+        if (!loadedPseudoPlugins.contains(className)) {
             try {
-                Class<?> clazz = Class.forName(pseudoPluginClassName);
+                Class<?> clazz = Class.forName(className);
                 clazz.newInstance();
+                Method method = emuClass.getMethod("configurePluginCommands", String.class);
+                method.invoke(emuObject, pluginId);
             } catch (Exception ex) {
-                throw new RuntimeException("Cannot load '" + pseudoPluginClassName + "'", ex);
+                throw new RuntimeException("Cannot configure plugin '" + pluginId + "'", ex);
             }
-            loadedPseudoPlugins.add(pseudoPluginClassName);
+            loadedPseudoPlugins.add(className);
         }
     }
 

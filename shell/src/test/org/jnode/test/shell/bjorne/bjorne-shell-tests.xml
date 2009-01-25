@@ -1,14 +1,16 @@
 <testSpecs>
-<testSpec>
-<title>simple</title>
-<command>test</command>
-<runMode>AS_SCRIPT</runMode>
-<plugins>
+<title>Bjorne interpreter tests</title>
 <plugin>
 <id>org.jnode.shell.bjorne</id>
 <class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
 </plugin>
-</plugins>
+<plugin>
+<id>org.jnode.shell.command.posix</id>
+</plugin>
+<testSpec>
+<title>simple</title>
+<command>test</command>
+<runMode>AS_SCRIPT</runMode>
 <script>#!bjorne
 echo HI
 </script>
