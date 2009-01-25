@@ -1,40 +1,58 @@
+/*
+ * $Id: NameSpace.java 4564 2008-09-18 22:01:10Z fduminy $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.test.shell.harness;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import net.n3.nanoxml.IXMLElement;
 import net.n3.nanoxml.IXMLParser;
 import net.n3.nanoxml.StdXMLReader;
 import net.n3.nanoxml.XMLParserFactory;
 
-import org.jnode.test.shell.harness.TestSpecification.PluginSpec;
 import org.jnode.test.shell.harness.TestSpecification.RunMode;
 
 public class TestSpecificationParser {
 
-    public List<TestSpecification> parse(InputStream in) throws Exception {
+    public TestSetSpecification parse(InputStream in) throws Exception {
         StdXMLReader xr = new StdXMLReader(in);
         IXMLParser parser = XMLParserFactory.createDefaultXMLParser();
         parser.setReader(xr);
-        List<TestSpecification> res = new ArrayList<TestSpecification>();
+        TestSetSpecification res;
         IXMLElement root = (IXMLElement) parser.parse();
         if (root.getName().equals("testSpec")) {
-            res.add(parseTestSpecification(root));
+            res = new TestSetSpecification("");
+            res.addTestSpec(parseTestSpecification(root));
         } else if (root.getName().equals("testSpecs")) {
+            String title = extractElementValue(root, "title");
+            res = new TestSetSpecification(title);
             for (Object obj : root.getChildren()) {
                 if (obj instanceof IXMLElement) {
                     IXMLElement argChild = (IXMLElement) obj;
-                    if (!argChild.getName().equals("testSpec")) {
-                        throw new TestSpecificationException(
-                                "Child elements of 'testSpecs' should be 'testSpec' not '" + 
-                                argChild.getName() + "'");
-                    }
-                    res.add(parseTestSpecification(argChild));
+                    String name = argChild.getName();
+                    if (name.equals("testSpec")) {
+                        res.addTestSpec(parseTestSpecification(argChild));
+                    } else if (name.equals("plugin")) {
+                        res.addPluginSpec(parsePluginSpecification(argChild));
+                    } 
                 }
             }
         } else {
@@ -45,7 +63,6 @@ public class TestSpecificationParser {
     }
     
     private TestSpecification parseTestSpecification(IXMLElement elem) throws TestSpecificationException {
-        
         RunMode runMode = RunMode.valueOf(extractElementValue(elem, "runMode", "AS_CLASS"));
         String title = extractElementValue(elem, "title");
         String command = extractElementValue(elem, "command");
@@ -59,70 +76,41 @@ public class TestSpecificationParser {
         } catch (NumberFormatException ex) {
             throw new TestSpecificationException("'rc' is not an integer");
         }
-        List<String> args = parseArgs(elem.getFirstChildNamed("args"));
-        Map<File, String> fileMap = parseFiles(elem.getFirstChildNamed("files"));
-        List<PluginSpec> plugins = parsePlugins(elem.getFirstChildNamed("plugins"));
-        return new TestSpecification(
+        TestSpecification res = new TestSpecification(
                 runMode, command, scriptContent, inputContent, outputContent, errorContent,
-                title, rc, args, fileMap, plugins);
-    }
-
-    private List<PluginSpec> parsePlugins(IXMLElement pluginsElem) throws TestSpecificationException {
-        List<PluginSpec> plugins = new ArrayList<PluginSpec>();
-        if (pluginsElem != null) {
-            for (Object obj : pluginsElem.getChildren()) {
-                if (obj instanceof IXMLElement) {
-                    IXMLElement child = (IXMLElement) obj;
-                    if (!child.getName().equals("plugin")) {
-                        throw new TestSpecificationException(
-                                "Child elements of 'plugins' should be 'plugin' not '" + child.getName() + "'");
-                    }
-                    String pluginId = extractElementValue(child, "id");
-                    String pluginVersion = extractElementValue(child, "version", "");
-                    String pseudoPluginClassName = extractElementValue(child, "class");
-                    plugins.add(new PluginSpec(pluginId, pluginVersion, pseudoPluginClassName));
+                title, rc);
+        for (Object obj : elem.getChildren()) {
+            if (obj instanceof IXMLElement) {
+                IXMLElement child = (IXMLElement) obj;
+                String name = child.getName();
+                if (name.equals("arg")) {
+                    res.addArg(child.getContent());
+                } else if (name.equals("plugin")) {
+                    res.addPlugin(parsePluginSpecification(child));
+                } else if (name.equals("file")) {
+                    parseFile(child, res);
                 }
             }
         }
-        return plugins;
+        return res;
     }
 
-    private Map<File, String> parseFiles(IXMLElement filesElem) throws TestSpecificationException {
-        Map<File, String> fileMap = new HashMap<File, String>();
-        if (filesElem != null) {
-            for (Object obj : filesElem.getChildren()) {
-                if (obj instanceof IXMLElement) {
-                    IXMLElement fileChild = (IXMLElement) obj;
-                    if (!fileChild.getName().equals("file")) {
-                        throw new TestSpecificationException(
-                                "Child elements of 'files' should be 'file' not '" + fileChild.getName() + "'");
-                    }
-                    String fileName = extractElementValue(fileChild, "name");
-                    String content = extractElementValue(fileChild, "content", "");
-                    fileMap.put(new File(fileName), content);
-                }
-            }
-        }
-        return fileMap;
+    private PluginSpecification parsePluginSpecification(IXMLElement elem) 
+        throws TestSpecificationException {
+        String pluginId = extractElementValue(elem, "id");
+        String pluginVersion = extractElementValue(elem, "version", "");
+        String pseudoPluginClassName = extractElementValue(elem, "class",
+                "org.jnode.test.shell.harness.DummyPseudoPlugin");
+        return new PluginSpecification(pluginId, pluginVersion, pseudoPluginClassName);
     }
 
-    private List<String> parseArgs(IXMLElement argsElem) throws TestSpecificationException {
-        List<String> args = new ArrayList<String>();
-        if (argsElem != null) {
-            for (Object obj : argsElem.getChildren()) {
-                if (obj instanceof IXMLElement) {
-                    IXMLElement argChild = (IXMLElement) obj;
-                    if (!argChild.getName().equals("arg")) {
-                        throw new TestSpecificationException(
-                                "Child elements of 'args' should be 'arg' not '" + argChild.getName() + "'");
-                    }
-                    args.add(argChild.getContent());
-                }
-            }
-        }
-        return args;
+    private void parseFile(IXMLElement elem, TestSpecification res) 
+        throws TestSpecificationException {
+        String fileName = extractElementValue(elem, "name");
+        String content = extractElementValue(elem, "content", "");
+        res.addFile(new File(fileName), content);
     }
-
+    
     private String extractElementValue(IXMLElement parent, String name) throws TestSpecificationException {
         IXMLElement elem = parent.getFirstChildNamed(name);
         if (elem == null) {

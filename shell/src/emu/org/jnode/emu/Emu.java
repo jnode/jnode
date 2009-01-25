@@ -59,14 +59,21 @@ public class Emu {
     };
 
     // FIXME configuring a hard-coded list of command plugins is a bad idea.
-    private static final String[] PLUGIN_NAMES = new String[] {
+    private static final String[] DEFAULT_PLUGIN_NAMES = new String[] {
         "org.jnode.shell.command",
-        "org.jnode.shell.command.posix",
         "org.jnode.shell.command.driver.console",
         "org.jnode.apps.editor",
         "org.jnode.apps.edit",
         "org.jnode.apps.console",
     };
+    
+    private final File root;
+    private final AliasManager aliasMgr;
+    private final SyntaxManager syntaxMgr;
+    
+    public Emu(File root) throws EmuException {
+        this(root, DEFAULT_PLUGIN_NAMES);
+    }
 
     /**
      * The constructor initializes a minimal subset of JNode services to allow us to run JNode commands.
@@ -74,21 +81,20 @@ public class Emu {
      * @param root the notional JNode sandbox root directory or <code>null</code>.
      * @throws EmuException
      */
-    public Emu(File root) throws EmuException {
+    public Emu(File root, String[] pluginNames) throws EmuException {
         if (root == null) {
             root = new File("").getAbsoluteFile();
             System.err.println("Assuming that the JNode root is '" + root + "'");
         }
+        this.root = root;
         InitialNaming.setNameSpace(new BasicNameSpace());
 
         try {
             InitialNaming.bind(DeviceManager.NAME, DeviceManager.INSTANCE);
-            AliasManager aliasMgr =
-                new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
-            SyntaxManager syntaxMgr =
-                new DefaultSyntaxManager(new DummyExtensionPoint()).createSyntaxManager();
-            for (String pluginName : PLUGIN_NAMES) {
-                configurePluginCommands(root, pluginName, aliasMgr, syntaxMgr);
+            aliasMgr = new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
+            syntaxMgr = new DefaultSyntaxManager(new DummyExtensionPoint()).createSyntaxManager();
+            for (String pluginName : pluginNames) {
+                configurePluginCommands(pluginName);
             }
             System.setProperty("jnode.invoker", "thread");
             System.setProperty("jnode.interpreter", "redirecting");
@@ -105,27 +111,22 @@ public class Emu {
     /**
      * Configure any command classes specified by a given plugin's descriptor
      *
-     * @param root       the root directory for the JNode sandbox.
      * @param pluginName the plugin to be processed
-     * @param aliasMgr   the alias manager to be populated
-     * @param syntaxMgr  the syntax manager to be populated
      * @throws EmuException
      */
-    private void configurePluginCommands(File root, String pluginName, AliasManager aliasMgr,
-                                                SyntaxManager syntaxMgr) throws EmuException {
-        XMLElement pluginDescriptor = loadPluginDescriptor(root, pluginName);
-        extractAliases(pluginDescriptor, aliasMgr);
-        extractSyntaxBundles(pluginDescriptor, syntaxMgr);
+    public void configurePluginCommands(String pluginName) throws EmuException {
+        XMLElement pluginDescriptor = loadPluginDescriptor(pluginName);
+        extractAliases(pluginDescriptor);
+        extractSyntaxBundles(pluginDescriptor);
     }
 
     /**
      * Populate the supplied syntax manager with syntax entries from a plugin descriptor.
      *
      * @param pluginDescriptor the plugin descriptor's root XML element
-     * @param syntaxMgr        the syntax manager to be populated.
      * @throws EmuException
      */
-    private void extractSyntaxBundles(XMLElement pluginDescriptor, SyntaxManager syntaxMgr)
+    private void extractSyntaxBundles(XMLElement pluginDescriptor)
         throws EmuException {
         XMLElement syntaxesDescriptor = findExtension(pluginDescriptor, SyntaxManager.SYNTAXES_EP_NAME);
         if (syntaxesDescriptor == null) {
@@ -152,10 +153,9 @@ public class Emu {
      * Populate the supplied alias manager with aliases from a plugin descriptor.
      *
      * @param pluginDescriptor the plugin descriptor's root XML element
-     * @param aliasMgr         the alias manager to be populated.
      * @throws EmuException
      */
-    private void extractAliases(XMLElement pluginDescriptor, AliasManager aliasMgr) {
+    private void extractAliases(XMLElement pluginDescriptor) {
         XMLElement aliasesDescriptor = findExtension(pluginDescriptor, AliasManager.ALIASES_EP_NAME);
         if (aliasesDescriptor == null) {
             return;
@@ -190,12 +190,11 @@ public class Emu {
      * Locate and load a plugin descriptor.  We search the "descriptors" directory of
      * each of the projects listed in ALL_PROJECTS
      *
-     * @param root       the notional root directory for the user's JNode sandbox.
      * @param pluginName the name of the plugin we're trying to locate
      * @return the loaded plugin descriptor or <code>null</code>
      * @throws EmuException
      */
-    private XMLElement loadPluginDescriptor(File root, String pluginName)
+    private XMLElement loadPluginDescriptor(String pluginName)
         throws EmuException {
         File file = null;
         for (String projectName : ALL_PROJECTS) {

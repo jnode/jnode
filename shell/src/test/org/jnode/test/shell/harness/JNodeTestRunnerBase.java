@@ -1,3 +1,23 @@
+/*
+ * $Id: NameSpace.java 4564 2008-09-18 22:01:10Z fduminy $
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.test.shell.harness;
 
 import java.io.ByteArrayInputStream;
@@ -8,7 +28,6 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
-import org.jnode.test.shell.harness.TestSpecification.PluginSpec;
 
 public abstract class JNodeTestRunnerBase implements TestRunnable {
     protected ByteArrayOutputStream outBucket;
@@ -41,7 +60,12 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
 
     @Override
     public void setup() {
-        for (PluginSpec plugin : spec.getRequiredPlugins()) {
+        if (spec.getTestSet() != null) {
+            for (PluginSpecification plugin : spec.getTestSet().getPlugins()) {
+                ensurePluginLoaded(plugin);
+            }
+        }
+        for (PluginSpecification plugin : spec.getPlugins()) {
             ensurePluginLoaded(plugin);
         }
         System.setIn(new ByteArrayInputStream(spec.getInputContent().getBytes()));
@@ -51,17 +75,18 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
         System.setErr(new PrintStream(errBucket));
     }
     
-    protected void ensurePluginLoaded(PluginSpec pluginSpec) {
+    protected void ensurePluginLoaded(PluginSpecification plugin) {
         if (usingEmu) {
-            TestEmu.loadPseudoPlugin(pluginSpec.pseudoPluginClassName);
+            TestEmu.loadPseudoPlugin(plugin.getPluginId(), plugin.getClassName());
         } else {
-            String ver = (pluginSpec.pluginVersion.length() == 0) ? 
-                    System.getProperty("os.version") : pluginSpec.pluginVersion;
+            String ver = (plugin.getPluginVersion().length() == 0) ? 
+                    System.getProperty("os.version") : plugin.getPluginVersion();
             try {
                 PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
-                mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), pluginSpec.pluginId, ver);
+                mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), plugin.getPluginId(), ver);
             } catch (Exception ex) {
-                throw new RuntimeException("Cannot load plugin '" + pluginSpec.pluginId + "/" + ver + "'");
+                throw new RuntimeException(
+                        "Cannot load plugin '" + plugin.getPluginId() + "/" + ver + "'");
             }
         }
     }

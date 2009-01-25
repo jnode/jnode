@@ -20,19 +20,28 @@
  */
 package org.jnode.test.shell.harness;
 
-/**
- * This is the API implemented by the command test runners.  We cannot
- * use / extend Runnable because we need to propagate any exceptions
- * in the {@link TestRunnable.run()} method.
- * 
- * @author crawley@jnode.org
- */
-public interface TestRunnable {
+public class PluginSpecification {
+    private final String pluginId;
+    private final String pluginVersion;
+    private final String pseudoPluginClassName;
     
-    public int run() throws Exception;
-    
-    public void setup();
-    
-    public void cleanup();
+    public PluginSpecification(String pluginId, String pluginVersion,
+            String pseudoPluginClassName) {
+        super();
+        this.pluginId = pluginId;
+        this.pluginVersion = pluginVersion;
+        this.pseudoPluginClassName = pseudoPluginClassName;
+    }
 
+    public String getPluginId() {
+        return pluginId;
+    }
+
+    public String getPluginVersion() {
+        return pluginVersion;
+    }
+
+    public String getClassName() {
+        return pseudoPluginClassName;
+    }
 }
