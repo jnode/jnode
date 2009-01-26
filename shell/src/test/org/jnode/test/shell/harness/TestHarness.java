@@ -242,15 +242,6 @@ public class TestHarness {
         return false;
     }
 
-    public boolean expect(String actual, TextContent expected, String desc) {
-        if (expected.matches(actual)) {
-            return true;
-        }
-        report("Incorrect test result for " + asString(desc) + " in test " + asString(spec.getTitle()));
-        report("    expected " + asString(expected) + ": got " + asString(actual) + ".");
-        return false;
-    }
-
     private String asString(Object obj) {
         return (obj == null) ? "null" : ("'" + obj + "'");
     }

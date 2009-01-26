@@ -35,8 +35,9 @@ import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
 
 /**
- * This class modify the shell's stream resolution mechanism so that
- * in/out/err resolve to the streams supplied in the constructor. 
+ * This class extends CommandShell to modify the shell's stream resolution mechanism.  
+ * The modified resolveStream resolves in/out/err to streams that are supplied in the 
+ * constructor. 
  * 
  * @author crawley@jnode.org
  */

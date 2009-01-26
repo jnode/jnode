@@ -26,7 +26,8 @@ import java.io.Writer;
 
 
 /**
- * This TestRunner runs a script
+ * This TestRunner runs a script.  Typically the first line of the script will
+ * be a "#!" line that says what interpreter to use.
  * 
  * @author crawley@jnode.org
  */
