@@ -20,6 +20,8 @@
  */
 package org.jnode.shell.bjorne;
 
+import org.jnode.shell.ShellException;
+
 public class ForCommandNode extends CommandNode {
     private final CommandNode body;
 
@@ -60,7 +62,12 @@ public class ForCommandNode extends CommandNode {
     }
 
     @Override
-    public int execute(BjorneContext context) {
-        return -1;
+    public int execute(BjorneContext context) throws ShellException {
+        int rc = 0;
+        for (BjorneToken word : words) {
+            context.setVariable(var.getText(), word.getText());
+            rc = body.execute(context);
+        }
+        return rc;
     }
 }

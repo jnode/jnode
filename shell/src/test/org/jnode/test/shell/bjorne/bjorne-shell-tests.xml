@@ -19,17 +19,6 @@ echo HI
         <rc>0</rc>
     </testSpec>
     <testSpec>
-        <title>if ... then ... fi</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
-        <script>#!bjorne
-if true ; then echo HI ; fi
-        </script>
-        <output>HI
-</output>
-        <rc>0</rc>
-    </testSpec>
-    <testSpec>
         <title>$?</title>
         <command>test</command>
         <runMode>AS_SCRIPT</runMode>
@@ -41,6 +30,58 @@ echo $?
 </script>
         <output>0
 1
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>if ... then ... fi</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true ; then echo HI ; fi
+        </script>
+        <output>HI
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>if ... then ... else ... fi</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true ; then echo HI ; else echo HO; fi
+if false ; then echo HI ; else echo HO; fi
+        </script>
+        <output>HI
+HO
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>if ... then ... elif ... else ... fi</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true ; then echo HI ; elif false ; then echo HO ; else echo HUM; fi
+if false ; then echo HI ; elif true ; then echo HO ; else echo HUM; fi
+if false ; then echo HI ; elif false ; then echo HO ; else echo HUM; fi
+        </script>
+        <output>HI
+HO
+HUM
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>for ... do ... done</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+for A in 1 2 3 ; do echo $A ; done
+        </script>
+        <output>1
+2
+3
 </output>
         <rc>0</rc>
     </testSpec>
