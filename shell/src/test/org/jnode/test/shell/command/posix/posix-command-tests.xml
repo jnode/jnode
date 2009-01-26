@@ -1,18 +1,18 @@
 <testSpecs>
-<title>POSIX command tests</title>
-<plugin>
-<id>org.jnode.shell.command.posix</id>
-</plugin>
-<testSpec>
-<title>true command</title>
-<command>org.jnode.shell.command.posix.TrueCommand</command>
-<runMode>AS_ALIAS</runMode>
-<rc>0</rc>
-</testSpec>
-<testSpec>
-<title>false command</title>
-<command>org.jnode.shell.command.posix.FalseCommand</command>
-<runMode>AS_ALIAS</runMode>
-<rc>1</rc>
-</testSpec>
+    <title>POSIX command tests</title>
+        <plugin>
+        <id>org.jnode.shell.command.posix</id>
+    </plugin>
+    <testSpec>
+        <title>true command</title>
+        <command>org.jnode.shell.command.posix.TrueCommand</command>
+        <runMode>AS_ALIAS</runMode>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>false command</title>
+        <command>org.jnode.shell.command.posix.FalseCommand</command>
+        <runMode>AS_ALIAS</runMode>
+        <rc>1</rc>
+    </testSpec>
 </testSpecs>
