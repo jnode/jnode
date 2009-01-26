@@ -36,6 +36,9 @@ import net.n3.nanoxml.XMLException;
  * @author crawley@jnode
  */
 public class TestHarness {
+    // TODO - if someone feels motivated, they could replace the error
+    // reporting with something that generates (say) XML that can be 
+    // processed by a fancy error report generator.
     
     private final String commandName = this.getClass().getCanonicalName();
 
@@ -51,6 +54,7 @@ public class TestHarness {
     private PrintStream savedErr;
 
     private boolean verbose;
+    private File root;
 
     public TestHarness(String[] args) {
         this.args = args;
@@ -65,7 +69,8 @@ public class TestHarness {
     }
 
     private void run() throws Exception {
-        // FIXME ... this argument handling is very 'interim'.
+        // Do argument handling the classic Java way to minimize dependencies
+        // on JNode functionality that we might be testing with the harness.
         boolean useResources = false;
         int firstArg = 0;
         TestSpecificationParser parser = new TestSpecificationParser();
@@ -73,15 +78,26 @@ public class TestHarness {
         if (args.length == 0) {
             usage();
             return;
-        } else if (args[0].equals("--resource") || 
-                args[0].equals("--resources") || 
-                args[0].equals("-r")) {
-            useResources = true;
-            firstArg++;
-        } else if (args[0].startsWith("-")) {
-            System.err.println("Unrecognized option '" + args[0] + "'");
-            usage();
-            return;
+        } 
+        for (int i = 0; i < args.length && args[i].startsWith("-"); i++) {
+            String optName = args[i];
+            if (optName.equals("-r") || optName.equals("--resource") || optName.equals("--resources")) {
+                useResources = true;
+            } else if (optName.equals("-v") || optName.equals("--verbose")) {
+                verbose = true;
+            } else if (optName.equals("-s") || optName.equals("--sandbox")) {
+                if (i++ >= args.length) {
+                    System.err.println("No pathname after sandbox option");
+                    usage();
+                    return;
+                }
+                root = new File(args[i]);
+            } else {
+               System.err.println("Unrecognized option '" + optName + "'");
+               usage();
+               return;
+            }
+            firstArg = i + 1;
         }
 
         if (args.length <= firstArg) {
@@ -96,6 +112,10 @@ public class TestHarness {
             try {
                 if (useResources) {
                     is = this.getClass().getResourceAsStream(arg);
+                    if (is == null) {
+                        report("Cannot find resource for '" + arg + "'");
+                        continue;
+                    }
                 } else {
                     is = new FileInputStream(arg);
                 }
@@ -119,9 +139,11 @@ public class TestHarness {
     }
     
     private void usage() {
-        System.err.println(commandName + " // run tests from builtin specs");
-        System.err.println(commandName + " --package <java-package> // run tests from specs on classpath");
-        System.err.println(commandName + " <spec-file> ... // run tests from specs read from file system");
+        System.err.println(commandName + " [ <opt> ...] <spec-file> ... ");
+        System.err.println("where <opt> is one of: ");
+        System.err.println("    --verbose | - v             output more information about tests run");
+        System.err.println("    --sandbox | -s <dir-name>   specifies the dev't sandbox root directory");
+        System.err.println("    --resource | -r             looks for <spec-file> as a resource on the CLASSPATH");
     }
     
     private void execute(TestSetSpecification specs) {
@@ -219,14 +241,27 @@ public class TestHarness {
         report("    expected " + asString(expected) + ": got " + asString(actual) + ".");
         return false;
     }
-    
+
+    public boolean expect(String actual, TextContent expected, String desc) {
+        if (expected.matches(actual)) {
+            return true;
+        }
+        report("Incorrect test result for " + asString(desc) + " in test " + asString(spec.getTitle()));
+        report("    expected " + asString(expected) + ": got " + asString(actual) + ".");
+        return false;
+    }
+
     private String asString(Object obj) {
         return (obj == null) ? "null" : ("'" + obj + "'");
     }
 
     public File getRoot() {
-        // FIXME ... this should be the workspace root.
-        return new File("..");
+        if (root != null) {
+            return root;
+        } else {
+            // FIXME ... could try to find the workspace root by examining ".", ".." and
+            // so on until we find a directory that looks like a sandbox.
+            return new File("..");
+        }
     }
-
 }

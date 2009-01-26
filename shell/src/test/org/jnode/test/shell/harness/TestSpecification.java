@@ -42,35 +42,35 @@ public class TestSpecification {
     private final RunMode runMode;
     private final String command;
     private final List<String> args = new ArrayList<String>();
-    private final String scriptContent;
-    private final String inputContent;
-    private final String outputContent;
-    private final String errorContent;
+    private final TextContent scriptContent;
+    private final TextContent inputContent;
+    private final TextContent outputContent;
+    private final TextContent errorContent;
     private final String title;
     private final List<PluginSpecification> plugins = new ArrayList<PluginSpecification>();
     private final int rc;
-    private final Map<File, String> fileMap = new HashMap<File, String>();
+    private final Map<File, TextContent> fileMap = new HashMap<File, TextContent>();
     private TestSetSpecification testSet;
     
-    public TestSpecification(RunMode runMode, String command, String scriptContent,
-            String inputContent, String outputContent, String errorContent,
+    public TestSpecification(RunMode runMode, String command, TextContent scriptContent2,
+            TextContent inputContent2, TextContent outputContent2, TextContent errorContent2,
             String title, int rc) {
         super();
         this.runMode = runMode;
         this.command = command;
-        this.scriptContent = scriptContent;
-        this.inputContent = inputContent;
-        this.outputContent = outputContent;
-        this.errorContent = errorContent;
+        this.scriptContent = scriptContent2;
+        this.inputContent = inputContent2;
+        this.outputContent = outputContent2;
+        this.errorContent = errorContent2;
         this.title = title;
         this.rc = rc;
     }
 
-    public String getOutputContent() {
+    public TextContent getOutputContent() {
         return outputContent;
     }
 
-    public String getErrorContent() {
+    public TextContent getErrorContent() {
         return errorContent;
     }
 
@@ -86,11 +86,11 @@ public class TestSpecification {
         plugins.add(plugin);
     }
 
-    public void addFile(File file, String content) {
+    public void addFile(File file, TextContent content) {
         fileMap.put(file, content);
     }
 
-    public Map<File, String> getFileMap() {
+    public Map<File, TextContent> getFileMap() {
         return fileMap;
     }
 
@@ -106,11 +106,11 @@ public class TestSpecification {
         return args;
     }
     
-    public String getScriptContent() {
+    public TextContent getScriptContent() {
         return scriptContent;
     }
 
-    public String getInputContent() {
+    public TextContent getInputContent() {
         return inputContent;
     }
 

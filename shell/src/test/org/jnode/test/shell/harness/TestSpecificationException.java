@@ -28,4 +28,8 @@ public class TestSpecificationException extends Exception {
         super(message);
     }
 
+    public TestSpecificationException(String message, Throwable ex) {
+        super(message, ex);
+    }
+
 }

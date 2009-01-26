@@ -66,10 +66,10 @@ public class TestSpecificationParser {
         RunMode runMode = RunMode.valueOf(extractElementValue(elem, "runMode", "AS_CLASS"));
         String title = extractElementValue(elem, "title");
         String command = extractElementValue(elem, "command");
-        String scriptContent = extractElementValue(elem, "script", "");
-        String inputContent = extractElementValue(elem, "input", "");
-        String outputContent = extractElementValue(elem, "output", "");
-        String errorContent = extractElementValue(elem, "error", "");
+        TextContent scriptContent = extractElementMultiline(elem, "script", "");
+        TextContent inputContent = extractElementMultiline(elem, "input", "");
+        TextContent outputContent = extractElementMultiline(elem, "output", "");
+        TextContent errorContent = extractElementMultiline(elem, "error", "");
         int rc;
         try {
             rc = Integer.parseInt(extractElementValue(elem, "rc", "0").trim());
@@ -107,7 +107,7 @@ public class TestSpecificationParser {
     private void parseFile(IXMLElement elem, TestSpecification res) 
         throws TestSpecificationException {
         String fileName = extractElementValue(elem, "name");
-        String content = extractElementValue(elem, "content", "");
+        TextContent content = extractElementMultiline(elem, "content", "");
         res.addFile(new File(fileName), content);
     }
     
@@ -125,5 +125,16 @@ public class TestSpecificationParser {
     private String extractElementValue(IXMLElement parent, String name, String dflt) {
         IXMLElement elem = parent.getFirstChildNamed(name);
         return elem == null ? dflt : elem.getContent();
+    }
+
+    private TextContent extractElementMultiline(IXMLElement parent, String name, String dflt) 
+        throws TestSpecificationException {
+        IXMLElement elem = parent.getFirstChildNamed(name);
+        if (elem == null) {
+            return new TextContent("", false);
+        } else {
+            return new TextContent(elem.getContent(), 
+                    elem.getAttribute("trim", "yes").equals("yes"));
+        }
     }
 }
