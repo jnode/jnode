@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/shell"/>
-	<classpathentry kind="src" path="src/emu"/>
-	<classpathentry kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/shell"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/junit.jar"/>

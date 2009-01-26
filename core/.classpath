@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/openjdk/vm"/>
-	<classpathentry kind="src" path="src/emu"/>
-	<classpathentry kind="src" path="src/endorsed/nanoxml"/>
-	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/sun"/>
-	<classpathentry kind="src" path="src/openjdk/org"/>
-	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/com"/>
-	<classpathentry kind="src" path="src/icedtea"/>
-	<classpathentry kind="src" path="src/classpath/gnu"/>
-	<classpathentry kind="src" path="src/openjdk/java"/>
-	<classpathentry kind="src" path="src/openjdk/javax"/>
-	<classpathentry kind="src" path="src/classpath/tools"/>
-	<classpathentry kind="src" path="src/classpath/java"/>
-	<classpathentry kind="src" path="src/classpath/javax"/>
-	<classpathentry kind="src" path="src/classpath/ext"/>
-	<classpathentry kind="src" path="src/classpath/vm"/>
-	<classpathentry kind="src" path="src/core"/>
-	<classpathentry kind="src" path="src/vmmagic"/>
-	<classpathentry kind="src" path="src/mmtk-vm"/>
-	<classpathentry kind="src" path="src/driver"/>
-	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="src" path="src/template"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/vm"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/endorsed/nanoxml"/>
+	<classpathentry excluding="**/*-template.java|**/.svn/**" kind="src" path="src/openjdk/sun"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/org"/>
+	<classpathentry excluding="**/*-template.java|**/.svn/**" kind="src" path="src/openjdk/com"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/icedtea"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/gnu"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/java"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/javax"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/tools"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/java"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/javax"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/ext"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/vm"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/core"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/vmmagic"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/mmtk-vm"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/template"/>
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>

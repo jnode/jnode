@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/awt"/>
-	<classpathentry kind="src" path="src/font"/>
-	<classpathentry kind="src" path="src/desktop"/>
-	<classpathentry kind="src" path="src/driver"/>
-	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="src" path="src/thinlet"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/awt"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/font"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/desktop"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/thinlet"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>

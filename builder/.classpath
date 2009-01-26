@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/builder"/>
-	<classpathentry kind="src" path="src/configure"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/builder"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/configure"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="src" path="/JNode-FS"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
