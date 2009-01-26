@@ -67,7 +67,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
     }
 
     @Override
-    public int execute(BjorneContext context) throws ShellException {
+    public int execute(final BjorneContext context) throws ShellException {
         BjorneContext.StreamHolder[] holders = null;
         int rc;
         try {
@@ -76,15 +76,15 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 // No command to run: assignments are done in the shell's context
                 context.performAssignments(assignments);
                 // Surprisingly, we still need to perform the redirections
-                context = new BjorneContext(context);
-                context.evaluateRedirections(getRedirects());
+                BjorneContext childContext = new BjorneContext(context);
+                childContext.evaluateRedirections(getRedirects());
                 rc = 0;
             } else {
                 CommandLine command = context.expandAndSplit(words);
                 // Assignments and redirections are done in the command's context
-                context = new BjorneContext(context);
-                context.performAssignments(assignments);
-                holders = context.evaluateRedirections(getRedirects());
+                BjorneContext childContext = new BjorneContext(context);
+                childContext.performAssignments(assignments);
+                holders = childContext.evaluateRedirections(getRedirects());
                 CommandIO[] streams = new CommandIO[holders.length];
                 for (int i = 0; i < streams.length; i++) {
                     streams[i] = holders[i].stream;
@@ -93,7 +93,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                     throw new ShellFailureException(
                             "asynchronous execution (&) not implemented yet");
                 } else {
-                    rc = context.execute(command, streams);
+                    rc = childContext.execute(command, streams);
                 }
             }
         } finally {
@@ -106,6 +106,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
             rc = (rc == 0) ? -1 : 0;
         }
+        context.setLastReturnCode(rc);
         return rc;
     }
 

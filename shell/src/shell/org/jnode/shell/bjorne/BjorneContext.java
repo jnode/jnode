@@ -800,6 +800,10 @@ public class BjorneContext {
     final int getLastReturnCode() {
         return lastReturnCode;
     }
+    
+    final void setLastReturnCode(int rc) {
+        lastReturnCode = rc;
+    }
 
     final int getShellPid() {
         return shellPid;
@@ -964,9 +968,6 @@ public class BjorneContext {
         // TODO Auto-generated method stub
         return false;
     }
-    
-    
-
 
     private static class VariableSlot {
         public String value;
