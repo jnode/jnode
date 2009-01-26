@@ -66,7 +66,7 @@ class ClassTestRunner implements TestRunnable {
 
     @Override
     public void setup() {
-        System.setIn(new ByteArrayInputStream(spec.getInputContent().getBytes()));
+        System.setIn(new ByteArrayInputStream(spec.getInputContent().toString().getBytes()));
         outBucket = new ByteArrayOutputStream();
         errBucket = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outBucket));

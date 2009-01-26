@@ -46,7 +46,7 @@ class ScriptTestRunner extends JNodeTestRunnerBase implements TestRunnable {
         Writer w = null;
         try {
             w = new FileWriter(tempScriptFile);
-            w.write(spec.getScriptContent());
+            w.write(spec.getScriptContent().toString());
             w.write('\n');
         } finally {
             w.close();

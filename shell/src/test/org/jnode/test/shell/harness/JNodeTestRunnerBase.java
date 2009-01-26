@@ -68,7 +68,7 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
         for (PluginSpecification plugin : spec.getPlugins()) {
             ensurePluginLoaded(plugin);
         }
-        System.setIn(new ByteArrayInputStream(spec.getInputContent().getBytes()));
+        System.setIn(new ByteArrayInputStream(spec.getInputContent().toString().getBytes()));
         outBucket = new ByteArrayOutputStream();
         errBucket = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outBucket));
@@ -79,6 +79,8 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
         if (usingEmu) {
             TestEmu.loadPseudoPlugin(plugin.getPluginId(), plugin.getClassName());
         } else {
+            // TODO - I'm not sure about this.  A simpler alternative is to assume
+            // that all required plugins have already been loaded by JNode.
             String ver = (plugin.getPluginVersion().length() == 0) ? 
                     System.getProperty("os.version") : plugin.getPluginVersion();
             try {
