@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/install"/>
-	<classpathentry kind="src" path="src/emu"/>
-	<classpathentry kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/install"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
-	<classpathentry kind="src" path="src/apps"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="src/apps"/>
 	<classpathentry kind="src" path="/JNode-GUI"/>
 	<classpathentry kind="lib" path="lib/telnetd.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.5.jar"/>
