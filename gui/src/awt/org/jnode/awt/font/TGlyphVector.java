@@ -12,7 +12,7 @@ public class TGlyphVector extends StandardGlyphVector {
     private char[] chars;
     public static TGlyphVector create(Font font, FontRenderContext frc, CharacterIterator ci) {
         StringBuilder sb = new StringBuilder(80);
-        for(char c= ci.first(); (ci.getIndex() <= ci.getEndIndex()) && (c != CharacterIterator.DONE); c = ci.next())
+        for (char c = ci.first(); (ci.getIndex() <= ci.getEndIndex()) && (c != CharacterIterator.DONE); c = ci.next())
             sb.append(c);
 
         return new TGlyphVector(font, sb.toString().toCharArray(), frc);
