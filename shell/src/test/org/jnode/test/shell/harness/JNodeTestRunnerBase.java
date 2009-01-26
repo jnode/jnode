@@ -29,6 +29,13 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 
+/**
+ * This base class supplies functions for getting hold of "the shell" for
+ * testing commands, configuring required plugins and setting up the 
+ * System streams for a command.
+ * 
+ * @author crawley@jnode.org
+ */
 public abstract class JNodeTestRunnerBase implements TestRunnable {
     protected ByteArrayOutputStream outBucket;
     protected ByteArrayOutputStream errBucket;

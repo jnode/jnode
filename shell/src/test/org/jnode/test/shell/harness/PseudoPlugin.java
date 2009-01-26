@@ -20,6 +20,13 @@
  */
 package org.jnode.test.shell.harness;
 
+/**
+ * A pseudo plugin class performs any required initialization of a plugin's state
+ * when regular Plugin loading is not possible.  The initialization must be performed
+ * by a no-args constructor.
+ * 
+ * @author crawley@jnode.org
+ */
 public interface PseudoPlugin {
 
 }

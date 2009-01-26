@@ -42,18 +42,18 @@ public class TestSpecification {
     private final RunMode runMode;
     private final String command;
     private final List<String> args = new ArrayList<String>();
-    private final TextContent scriptContent;
-    private final TextContent inputContent;
-    private final TextContent outputContent;
-    private final TextContent errorContent;
+    private final String scriptContent;
+    private final String inputContent;
+    private final String outputContent;
+    private final String errorContent;
     private final String title;
     private final List<PluginSpecification> plugins = new ArrayList<PluginSpecification>();
     private final int rc;
-    private final Map<File, TextContent> fileMap = new HashMap<File, TextContent>();
+    private final Map<File, String> fileMap = new HashMap<File, String>();
     private TestSetSpecification testSet;
     
-    public TestSpecification(RunMode runMode, String command, TextContent scriptContent2,
-            TextContent inputContent2, TextContent outputContent2, TextContent errorContent2,
+    public TestSpecification(RunMode runMode, String command, String scriptContent2,
+            String inputContent2, String outputContent2, String errorContent2,
             String title, int rc) {
         super();
         this.runMode = runMode;
@@ -66,11 +66,11 @@ public class TestSpecification {
         this.rc = rc;
     }
 
-    public TextContent getOutputContent() {
+    public String getOutputContent() {
         return outputContent;
     }
 
-    public TextContent getErrorContent() {
+    public String getErrorContent() {
         return errorContent;
     }
 
@@ -86,11 +86,11 @@ public class TestSpecification {
         plugins.add(plugin);
     }
 
-    public void addFile(File file, TextContent content) {
+    public void addFile(File file, String content) {
         fileMap.put(file, content);
     }
 
-    public Map<File, TextContent> getFileMap() {
+    public Map<File, String> getFileMap() {
         return fileMap;
     }
 
@@ -106,11 +106,11 @@ public class TestSpecification {
         return args;
     }
     
-    public TextContent getScriptContent() {
+    public String getScriptContent() {
         return scriptContent;
     }
 
-    public TextContent getInputContent() {
+    public String getInputContent() {
         return inputContent;
     }
 
