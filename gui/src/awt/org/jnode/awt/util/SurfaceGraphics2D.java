@@ -211,7 +211,7 @@ public abstract class SurfaceGraphics2D extends Graphics2D {
         //todo improve it
         if (g instanceof TGlyphVector) {
             char[] chars = ((TGlyphVector) g).getChars();
-            simpleGraphics.drawChars(chars, 0, chars.length, (int)x, (int)y);
+            simpleGraphics.drawChars(chars, 0, chars.length, (int) x, (int) y);
         } else {
             org.jnode.vm.Unsafe.debug("Unsupported GlyphVector type: " +
                 (g == null ? "null" : g.getClass().getName()) + "\n");
