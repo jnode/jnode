@@ -1,36 +1,47 @@
 <testSpecs>
-	<title>Bjorne interpreter tests</title>
-	<plugin>
-		<id>org.jnode.shell.bjorne</id>
-		<class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
-	</plugin>
-	<plugin>
-		<id>org.jnode.shell.command.posix</id>
-	</plugin>
-	<testSpec>
-		<title>simple</title>
-		<command>test</command>
-		<runMode>AS_SCRIPT</runMode>
-		<script>
-			#!bjorne
-			echo HI
-		</script>
-		<output>
-			HI
-		</output>
-		<rc>0</rc>
-	</testSpec>
-	<testSpec>
-		<title>if ... then ... fi</title>
-		<command>test</command>
-		<runMode>AS_SCRIPT</runMode>
-		<script>
-			#!bjorne
-			if true ; then echo HI ; fi
-		</script>
-		<output>
-			HI
-		</output>
-		<rc>0</rc>
-	</testSpec>
+    <title>Bjorne interpreter tests</title>
+    <plugin>
+        <id>org.jnode.shell.bjorne</id>
+        <class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
+    </plugin>
+    <plugin>
+        <id>org.jnode.shell.command.posix</id>
+    </plugin>
+    <testSpec>
+        <title>simple</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+echo HI
+        </script>
+        <output>HI
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>if ... then ... fi</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true ; then echo HI ; fi
+        </script>
+        <output>HI
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>$?</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+true
+echo $?
+false
+echo $?
+</script>
+        <output>0
+1
+</output>
+        <rc>0</rc>
+    </testSpec>
 </testSpecs>
