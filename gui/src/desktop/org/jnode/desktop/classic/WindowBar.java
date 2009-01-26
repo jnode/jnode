@@ -24,6 +24,8 @@ package org.jnode.desktop.classic;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -45,6 +47,7 @@ import javax.swing.event.InternalFrameListener;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.swingpeers.ISwingPeer;
 
 /**
  * @author Levente S\u00e1ntha
@@ -62,6 +65,15 @@ public class WindowBar extends JPanel {
 
     public void addFrame(final JInternalFrame frame) {
         log.debug("addFrame " + frame.getTitle());
+        if (frame instanceof ISwingPeer) {
+            ISwingPeer isp = ((ISwingPeer) frame);
+            Component comp = isp.getAWTComponent();
+            if (!(comp instanceof Frame))
+                return;
+            else if (((Frame) comp).isUndecorated())
+                return;
+        }
+        
         final FrameWrapper wrapper = new FrameWrapper(frame);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
