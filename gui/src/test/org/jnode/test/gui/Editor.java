@@ -219,7 +219,7 @@ public class Editor extends JFrame {
     }
 
     private void exit() {
-        hide();
+        setVisible(false);
     }
 
     private void updateTitle(String title) {
