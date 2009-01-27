@@ -127,14 +127,17 @@ public class HFSPlusParams {
     private int[] catalogClumpTable = new int[] {4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256 };
 
     /**
+     * Get the file clump size for Extent and catalog B-Tree files.
      * 
      * @param blockSize
      * @param nodeSize
      * @param sectors
-     * @param catalog
+     * @param catalog If true, calculate catalog clump size. In the other case, calculate extent clump size.
+     * 
      * @return
      */
     private long getBTreeClumpSize(int blockSize, int nodeSize, long sectors, boolean catalog) {
+        int size = Math.max(blockSize, nodeSize);
         long clumpSize = 0;
         if (sectors < 0x200000) {
             clumpSize = (sectors << 2);
@@ -153,6 +156,13 @@ public class HFSPlusParams {
             }
         }
 
+        clumpSize /= size;
+        clumpSize *= size;
+        
+        if (clumpSize == 0) {
+            clumpSize = size;
+        }
+        
         return clumpSize;
     }
 
