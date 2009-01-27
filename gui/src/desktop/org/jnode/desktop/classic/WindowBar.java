@@ -33,7 +33,6 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.DesktopManager;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -112,20 +111,14 @@ public class WindowBar extends JPanel {
             this.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     try {
-                        DesktopManager desktopManager = frame.getDesktopPane().getDesktopManager();
                         if (frame.isIcon()) {
                             frame.setIcon(false);
-                            desktopManager.deiconifyFrame(frame);
                             frame.setSelected(true);
-                            desktopManager.activateFrame(frame);
                         } else if (frame.isSelected()) {
                             frame.setSelected(false);
-                            desktopManager.deactivateFrame(frame);
                             frame.setIcon(true);
-                            desktopManager.iconifyFrame(frame);
                         } else {
                             frame.setSelected(true);
-                            desktopManager.activateFrame(frame);
                         }
                     } catch (PropertyVetoException ex) {
                         log.warn("", ex);
@@ -165,18 +158,14 @@ public class WindowBar extends JPanel {
 
                 public void internalFrameDeiconified(InternalFrameEvent event) {
                     repaint();
-                    frame.getDesktopPane().repaint();
                 }
 
                 public void internalFrameIconified(InternalFrameEvent event) {
                     repaint();
-                    frame.getDesktopPane().repaint();
                 }
 
                 public void internalFrameOpened(InternalFrameEvent event) {
                     frame.requestFocus();
-                    frame.repaint();
-                    frame.getDesktopPane().repaint();
                 }
             });
             final JPopupMenu frameActions = new JPopupMenu();
@@ -188,7 +177,6 @@ public class WindowBar extends JPanel {
                         if (frame.isMaximum())
                             frame.setMaximum(false);
                         frame.setIcon(true);
-                        frame.getDesktopPane().getDesktopManager().iconifyFrame(frame);
                     } catch (PropertyVetoException e) {
                         //ignore
                     }
@@ -202,7 +190,6 @@ public class WindowBar extends JPanel {
                         if (frame.isIcon())
                             frame.setIcon(false);
                         frame.setMaximum(true);
-                        frame.getDesktopPane().getDesktopManager().maximizeFrame(frame);
                     } catch (PropertyVetoException e) {
                         //ignore
                     }
@@ -219,7 +206,6 @@ public class WindowBar extends JPanel {
                         if (frame.isMaximum())
                             frame.setMaximum(false);
                         frame.setSelected(true);
-                        frame.getDesktopPane().getDesktopManager().activateFrame(frame);
                     } catch (PropertyVetoException e) {
                         //ignore
                     }
@@ -232,7 +218,6 @@ public class WindowBar extends JPanel {
                 public void actionPerformed(ActionEvent event) {
                     try {
                         frame.setClosed(true);
-                        frame.getDesktopPane().getDesktopManager().closeFrame(frame);
                     } catch (PropertyVetoException e) {
                         //ignore
                     }
