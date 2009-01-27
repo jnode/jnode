@@ -269,7 +269,8 @@ class NativeUnsafe {
     public static void freeMemory(Unsafe instance, long address) {
         throw new UnsupportedOperationException();
     }
-
+    
+    @MagicPermission
     static class StaticAccess {
         protected long  address;
 
