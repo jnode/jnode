@@ -591,4 +591,8 @@ public abstract class HttpURLConnection extends URLConnection
         //todo implement it
 
     }
+
+     public void setFixedLengthStreamingMode (int contentLength) {
+        //todo implement it
+    }
 }
