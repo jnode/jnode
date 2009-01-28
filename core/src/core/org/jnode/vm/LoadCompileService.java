@@ -94,7 +94,8 @@ public final class LoadCompileService {
     public static final VmType<?> defineClass(String name, ByteBuffer data,
                                               ProtectionDomain protDomain, VmClassLoader loader) {
         initService();
-        if ((!started) || (Thread.currentThread() instanceof LoadCompileThread)) {
+        /* TODO review it: if(true || ... disables class definition load-compile thred*/
+        if (true || (!started) || (Thread.currentThread() instanceof LoadCompileThread)) {
             // Load now
             return service.doDefineClass(name, data, protDomain, loader);
         } else {
@@ -115,8 +116,10 @@ public final class LoadCompileService {
         Disabled the startup of the LoadCompile thread service because multithreaded
         class loading creates deadlock in URLClassLoader and subclasses.
         Loading and compilation will happen onthe caller thread.
+        - load-compile thread are enabled again but only used for compilation
         TODO review this: investigate class loading in dedicated threads (probably will not work)
         TODO and method compilation on dedicated threads (probably will work)
+        */
         if (!started) {
             started = true;
             for (int i = 0; i < threadCount; i++) {
@@ -125,7 +128,7 @@ public final class LoadCompileService {
                 thread.start();
             }
         }
-        */
+
     }
 
     @KernelSpace
