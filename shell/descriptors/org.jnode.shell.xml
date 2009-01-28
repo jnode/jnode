@@ -38,6 +38,7 @@
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="modifyThread"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
     <permission class="java.net.SocketPermission" name="*" actions="resolve,listen,connect"/>
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve,listen"/>
     <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read"/>
