@@ -94,7 +94,7 @@ public final class LoadCompileService {
     public static final VmType<?> defineClass(String name, ByteBuffer data,
                                               ProtectionDomain protDomain, VmClassLoader loader) {
         initService();
-        /* TODO review it: if(true || ... disables class definition load-compile thred*/
+        /* TODO review it: if(true || ... disables class definition on the load-compile thread.*/
         if (true || (!started) || (Thread.currentThread() instanceof LoadCompileThread)) {
             // Load now
             return service.doDefineClass(name, data, protDomain, loader);
