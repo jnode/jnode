@@ -119,7 +119,7 @@ public class Superblock extends HFSPlusObject {
         forkdata.setTotalBlocks((int) bitmapBlocks);
         ExtentDescriptor desc = new ExtentDescriptor();
         desc.setStartBlock(1 + burnedBlocksBeforeVH);
-        desc.setBlockCount(0);
+        desc.setBlockCount((int) bitmapBlocks);
         forkdata.setExtentDescriptor(0, desc);
         System.arraycopy(forkdata.getBytes(), 0, data, 112, forkdata.FORK_DATA_LENGTH);
         // Journal creation

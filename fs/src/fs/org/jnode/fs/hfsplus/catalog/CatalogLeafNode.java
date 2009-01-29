@@ -10,16 +10,22 @@ import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogLeafNode extends LeafNode {
 
+    public CatalogLeafNode(final NodeDescriptor descriptor, final int nodeSize) {
+        super(descriptor, nodeSize);
+    }
+    
     public CatalogLeafNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize) {
         super(descriptor, nodeData, nodeSize);
         for (int i = 0; i < records.length; ++i) {
-            int currentOffset = offsets[i];
-            int recordDataSize = offsets[i + 1] - offsets[i];
+            int currentOffset = getOffset(i);
+            int recordDataSize = getOffset(i + 1) - currentOffset;
             Key key = new CatalogKey(nodeData, currentOffset);
             records[i] = new LeafRecord(key, nodeData, currentOffset, recordDataSize);
         }
     }
-
+    
+    
+    
     /**
      * 
      * @param parentId
@@ -51,5 +57,9 @@ public class CatalogLeafNode extends LeafNode {
             }
         }
         return list.toArray(new LeafRecord[list.size()]);
+    }
+    
+    public byte[] getBytes() {
+        return nodeData;
     }
 }

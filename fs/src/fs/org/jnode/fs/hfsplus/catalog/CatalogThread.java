@@ -3,12 +3,17 @@ package org.jnode.fs.hfsplus.catalog;
 import org.jnode.fs.hfsplus.HFSUnicodeString;
 import org.jnode.util.BigEndian;
 
+
+
 public class CatalogThread {
+    
+    public static final int CATALOG_THREAD_SIZE = 512;
+    
     private byte[] data;
 
     public CatalogThread(final byte[] src) {
         data = new byte[512];
-        System.arraycopy(src, 0, data, 0, 512);
+        System.arraycopy(src, 0, data, 0, CATALOG_THREAD_SIZE);
     }
 
     /**
@@ -36,5 +41,9 @@ public class CatalogThread {
 
     public final HFSUnicodeString getNodeName() {
         return new HFSUnicodeString(data, 8);
+    }
+    
+    public byte[] getBytes() {
+        return data;
     }
 }

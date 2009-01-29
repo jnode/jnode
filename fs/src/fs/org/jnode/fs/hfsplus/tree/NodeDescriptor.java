@@ -10,17 +10,25 @@ public class NodeDescriptor {
         data = new byte[BT_NODE_DESCRIPTOR_LENGTH];
     }
 
-    public NodeDescriptor(final byte[] src) {
+    public NodeDescriptor(final byte[] src, int offset) {
         data = new byte[BT_NODE_DESCRIPTOR_LENGTH];
-        System.arraycopy(src, 0, data, 0, BT_NODE_DESCRIPTOR_LENGTH);
+        System.arraycopy(src, offset, data, 0, BT_NODE_DESCRIPTOR_LENGTH);
     }
 
     public final int getFLink() {
         return BigEndian.getInt32(data, 0);
     }
+    
+    public void setFLink(int link) {
+        BigEndian.setInt32(data, 0, link);
+    }
 
     public final int getBLink() {
         return BigEndian.getInt32(data, 4);
+    }
+    
+    public void setBLink(int link) {
+        BigEndian.setInt32(data, 4, link);
     }
 
     public final int getKind() {

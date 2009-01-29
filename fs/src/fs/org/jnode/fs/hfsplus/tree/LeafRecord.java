@@ -5,7 +5,7 @@ import org.jnode.util.BigEndian;
 public class LeafRecord {
     private final Key key;
     private final byte[] recordData;
-
+    
     public LeafRecord(final Key key, final byte[] nodeData, final int offset, final int recordDataSize) {
         this.key = key;
         recordData = new byte[recordDataSize];
