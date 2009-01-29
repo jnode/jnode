@@ -10,9 +10,9 @@ public class BTHeaderRecord {
         data = new byte[BT_HEADER_RECORD_LENGTH];
     }
 
-    public BTHeaderRecord(final byte[] src) {
+    public BTHeaderRecord(final byte[] src, int offset) {
         data = new byte[BT_HEADER_RECORD_LENGTH];
-        System.arraycopy(src, 0, data, 0, BT_HEADER_RECORD_LENGTH);
+        System.arraycopy(src, offset, data, 0, BT_HEADER_RECORD_LENGTH);
     }
 
     public final int getTreeDepth() {

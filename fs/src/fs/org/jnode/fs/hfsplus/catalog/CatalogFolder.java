@@ -5,11 +5,14 @@ import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.util.BigEndian;
 
 public class CatalogFolder {
+    
+    public static final int CATALOG_FOLDER_SIZE = 88;
+    
     private byte[] data;
 
     public CatalogFolder(final byte[] src) {
         data = new byte[88];
-        System.arraycopy(src, 0, data, 0, 88);
+        System.arraycopy(src, 0, data, 0, CATALOG_FOLDER_SIZE);
     }
 
     /**

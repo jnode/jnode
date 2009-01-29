@@ -73,6 +73,14 @@ public class CatalogKey extends AbstractKey {
         }
     }
 
+    public byte[] getBytes() {
+        byte[] data = new byte[this.getKeyLength()];
+        BigEndian.setInt16(data, 0, this.getKeyLength());
+        System.arraycopy(parentID.getBytes(), 0, data, 2, 4);
+        System.arraycopy(nodeName.getBytes(), 0, data, 6, nodeName.getLength());
+        return data;
+    }
+    
     public final String toString() {
         StringBuffer s = new StringBuffer();
         s.append("Key length: ").append(getKeyLength()).append(" ");

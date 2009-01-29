@@ -14,7 +14,7 @@ public class CatalogIndexNode extends IndexNode {
     public CatalogIndexNode(final NodeDescriptor descriptor, final byte[] nodeData, final int nodeSize) {
         super(descriptor, nodeData, nodeSize);
         for (int i = 0; i < records.length; ++i) {
-            int currentOffset = offsets[i];
+            int currentOffset = getOffset(i);
             Key currentKey = new CatalogKey(nodeData, currentOffset);
             records[i] = new IndexRecord(currentKey, nodeData, currentOffset);
             log.debug("Index record key:" + records[i].getKey().toString());

@@ -147,8 +147,9 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             log.debug("Write Catalog to disk.");
             long offset = sb.getCatalogFile().getExtents()[0].getStartBlock() * sb.getBlockSize();
             Catalog catalog = new Catalog(params);
-            this.getApi().write(offset, catalog.getBytes());
+            this.getApi().write(offset,  catalog.getBytes());
             log.debug("Write volume header to disk.");
+            log.debug(sb.toString());
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();
         } catch (IOException e) {
