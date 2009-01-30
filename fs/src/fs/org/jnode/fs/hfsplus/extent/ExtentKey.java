@@ -40,14 +40,14 @@ public class ExtentKey extends AbstractKey {
     }
 
     @Override
-    public final int getLength() {
-        return KEY_LENGTH;
+    public final int compareTo(final Key key) {
+        return 0;
     }
 
     @Override
-    public final int compareTo(final Key key) {
+    public byte[] getBytes() {
         // TODO Auto-generated method stub
-        return 0;
+        return null;
     }
 
 }
