@@ -27,7 +27,7 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
     public HFSPlusDirectory(final HFSPlusEntry e) {
         super((HfsPlusFileSystem) e.getFileSystem());
         this.record = e.getRecord();
-        this.folder = new CatalogFolder(record.getRecordData());
+        this.folder = new CatalogFolder(record.getData());
         log.debug("Associated record:" + record.toString());
         if (record.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER) {
             log.debug("Associated folder : " + folder.toString());

@@ -2,9 +2,7 @@ package org.jnode.fs.hfsplus.tree;
 
 import org.jnode.util.BigEndian;
 
-public class IndexRecord {
-    private final Key key;
-    private final byte[] index;
+public class IndexRecord extends AbstractNodeRecord {
 
     /**
      * 
@@ -14,15 +12,18 @@ public class IndexRecord {
      */
     public IndexRecord(final Key key, final byte[] nodeData, final int offset) {
         this.key = key;
-        index = new byte[4];
-        System.arraycopy(nodeData, offset + key.getLength() + 2, index, 0, 4);
+        this.recordData = new byte[4];
+        System.arraycopy(nodeData, offset + key.getKeyLength() + 2, recordData, 0, 4);
     }
 
-    public final Key getKey() {
-        return key;
+    @Override
+    public byte[] getBytes() {
+        // TODO Auto-generated method stub
+        return null;
     }
-
+   
     public final int getIndex() {
-        return BigEndian.getInt32(index, 0);
+        return BigEndian.getInt32(recordData, 0);
     }
+    
 }

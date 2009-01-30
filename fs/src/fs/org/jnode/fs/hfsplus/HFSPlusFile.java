@@ -15,12 +15,11 @@ public class HFSPlusFile extends AbstractFSFile {
     public HFSPlusFile(final HFSPlusEntry e) {
         super((HfsPlusFileSystem) e.getFileSystem());
         this.record = e.getRecord();
-        this.file = new CatalogFile(record.getRecordData());
+        this.file = new CatalogFile(record.getData());
     }
 
     @Override
     public void flush() throws IOException {
-        // TODO Auto-generated method stub
 
     }
 

@@ -45,10 +45,6 @@ public class CatalogKey extends AbstractKey {
         return keyLength;
     }
 
-    public final int getLength() {
-        return keyLength;
-    }
-
     public final CatalogNodeId getParentId() {
         return parentID;
     }
@@ -91,4 +87,5 @@ public class CatalogKey extends AbstractKey {
                                 .getUnicodeString() : "");
         return s.toString();
     }
+    
 }
