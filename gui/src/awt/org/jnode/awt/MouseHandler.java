@@ -67,7 +67,7 @@ public class MouseHandler implements PointerListener {
                     }
                 }
             } catch (NameNotFoundException nfe) {
-                //todo handle it
+                nfe.printStackTrace();
             }
         }
 
@@ -263,7 +263,7 @@ public class MouseHandler implements PointerListener {
      */
     void mouseRelease(int buttons) {
         // x, y and z unchanged (false means relative values)
-        pointerStateChanged(lastButtons & (buttons ^ 0xFFFFFFFF), 0, 0, 0, false);
+        pointerStateChanged(lastButtons & (~buttons), 0, 0, 0, false);
     }
 
     /**
@@ -326,16 +326,13 @@ public class MouseHandler implements PointerListener {
         boolean eventFired = false;
         for (int i = 0; i < 3; i++) {
             if (time - buttonClickTime[i] > CLICK_REPEAT_DURATION) {
-                buttonClickTime[i] = 0;
                 buttonClickCount[i] = 0;
-            } else {
-                buttonClickTime[i] = time;
             }
 
             if ((buttons & BUTTON_MASK[i]) != 0) {
                 if (!buttonPressed[i]) {
-                    buttonClickCount[i] += 1;
                     buttonClickTime[i] = time;
+                    buttonClickCount[i] += 1;
                     postEvent(source, MouseEvent.MOUSE_PRESSED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
                     dragSource = source;
                     buttonPressed[i] = true;
@@ -344,6 +341,7 @@ public class MouseHandler implements PointerListener {
                     break;
                 }
             } else if (buttonPressed[i]) {
+                buttonClickTime[i] = time;
                 postEvent(dragSource, MouseEvent.MOUSE_RELEASED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
                 if (postClicked || buttonClickCount[i] > 0) {
                     postEvent(source, MouseEvent.MOUSE_CLICKED, time, buttonClickCount[i], BUTTON_NUMBER[i], 0);
@@ -367,7 +365,6 @@ public class MouseHandler implements PointerListener {
             if (source.isCursorSet())
                 source.setCursor(source.getCursor());
 
-            for (int i = buttonClickTime.length; --i > 0; buttonClickTime[i] = 0) ;
             eventFired = true;
             postClicked = false;
         }
@@ -442,8 +439,9 @@ public class MouseHandler implements PointerListener {
                   " p.x=" + p.x + " p.y=" + p.y +"\n");
         }
         */
-
-        JNodeToolkit.postToTarget(event, source);
+        //todo enable this for isolate support in the gui
+        //JNodeToolkit.postToTarget(event, source);
+        eventQueue.postEvent(event);
     }
 
     private Component findSource() {
