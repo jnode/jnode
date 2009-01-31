@@ -105,14 +105,14 @@ public class ExprCommand extends AbstractCommand {
         if (pos >= args.length) {
             throw new ExprSyntaxException();
         }
-        String tok = args[pos];
-        if (tok.equals("match")) {
+        String op = args[pos];
+        if (op.equals("match")) {
             return parseMatch(evaluate);
-        } else if (tok.equals("index")) {
+        } else if (op.equals("index")) {
             return parseIndex(evaluate);
-        } else if (tok.equals("substr")) {
+        } else if (op.equals("substr")) {
             return parseSubstr(evaluate);
-        } else if (tok.equals("length")) {
+        } else if (op.equals("length")) {
             return parseLength(evaluate);
         } else {
             return parseOrExpr(evaluate);
@@ -202,7 +202,7 @@ public class ExprCommand extends AbstractCommand {
             if (evaluate) {
                 if (op.equals("+")) {
                     res = asInteger(res) + asInteger(res2);
-                } else if (args[pos].equals("-")) {
+                } else if (op.equals("-")) {
                     res = asInteger(res) - asInteger(res2);
                 }
             } 
@@ -219,11 +219,11 @@ public class ExprCommand extends AbstractCommand {
             Object res2 = parseMulExpr(evaluate);
             if (evaluate) {
                 try {
-                    if (args[pos].equals("*")) {
+                    if (op.equals("*")) {
                         return asInteger(res) * asInteger(res2);
-                    } else if (args[pos].equals("/")) {
+                    } else if (op.equals("/")) {
                         return asInteger(res) / asInteger(res2);
-                    } else if (args[pos].equals("%")) {
+                    } else if (op.equals("%")) {
                         return asInteger(res) % asInteger(res2);
                     }
                 } catch (ArithmeticException ex) {
