@@ -160,31 +160,31 @@ public class ExprCommand extends AbstractCommand {
             if (evaluate) {
                 if (isInteger(res) && isInteger(res2)) {
                     if (op.equals("=")) {
-                        res = asInteger(res) == asInteger(res2);
-                    } else if (args[pos].equals("!=")) {
-                        res = asInteger(res) != asInteger(res2);
-                    } else if (args[pos].equals("<")) {
-                        res = asInteger(res) < asInteger(res2);
-                    } else if (args[pos].equals("<=")) {
-                        res = asInteger(res) <= asInteger(res2);
-                    } else if (args[pos].equals(">")) {
-                        res = asInteger(res) > asInteger(res2);
-                    } else if (args[pos].equals(">=")) {
-                        res = asInteger(res) >= asInteger(res2);
+                        res = asInteger(res) == asInteger(res2) ? 1 : 0;
+                    } else if (op.equals("!=")) {
+                        res = asInteger(res) != asInteger(res2) ? 1 : 0;
+                    } else if (op.equals("<")) {
+                        res = asInteger(res) < asInteger(res2) ? 1 : 0;
+                    } else if (op.equals("<=")) {
+                        res = asInteger(res) <= asInteger(res2) ? 1 : 0;
+                    } else if (op.equals(">")) {
+                        res = asInteger(res) > asInteger(res2) ? 1 : 0;
+                    } else if (op.equals(">=")) {
+                        res = asInteger(res) >= asInteger(res2) ? 1 : 0;
                     }
                 } else {
                     if (op.equals("=")) {
-                        res = asString(res).equals(asString(res2));
-                    } else if (args[pos].equals("!=")) {
-                        res = !asString(res).equals(asString(res2));
-                    } else if (args[pos].equals("<")) {
-                        res = asString(res).compareTo(asString(res2)) < 0;
-                    } else if (args[pos].equals("<=")) {
-                        res = asString(res).compareTo(asString(res2)) <= 0;
-                    } else if (args[pos].equals(">")) {
-                        res = asString(res).compareTo(asString(res2)) > 0;
-                    } else if (args[pos].equals(">=")) {
-                        res = asString(res).compareTo(asString(res2)) >= 0;
+                        res = asString(res).equals(asString(res2)) ? 1 : 0;
+                    } else if (op.equals("!=")) {
+                        res = !asString(res).equals(asString(res2)) ? 1 : 0;
+                    } else if (op.equals("<")) {
+                        res = asString(res).compareTo(asString(res2)) < 0 ? 1 : 0;
+                    } else if (op.equals("<=")) {
+                        res = asString(res).compareTo(asString(res2)) <= 0 ? 1 : 0;
+                    } else if (op.equals(">")) {
+                        res = asString(res).compareTo(asString(res2)) > 0 ? 1 : 0;
+                    } else if (op.equals(">=")) {
+                        res = asString(res).compareTo(asString(res2)) >= 0 ? 1 : 0;
                     }
                 } 
             }
