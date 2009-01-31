@@ -3,13 +3,13 @@ package org.jnode.fs.hfsplus.tree;
 import org.jnode.util.BigEndian;
 
 public class LeafRecord extends AbstractNodeRecord {
-    
-    public LeafRecord(final Key key, final byte[] recordData){
+
+    public LeafRecord(final Key key, final byte[] recordData) {
         this.key = key;
         this.recordData = new byte[recordData.length];
-        System.arraycopy(recordData,0, this.recordData, 0, recordData.length);
+        System.arraycopy(recordData, 0, this.recordData, 0, recordData.length);
     }
-    
+
     public LeafRecord(final Key key, final byte[] nodeData, final int offset, final int recordDataSize) {
         this.key = key;
         this.recordData = new byte[recordDataSize];
@@ -27,9 +27,9 @@ public class LeafRecord extends AbstractNodeRecord {
         System.arraycopy(data, key.getKeyLength(), this.recordData, 0, this.recordData.length);
         return data;
     }
-    
+
     public final String toString() {
         return "Type : " + getType() + "\nKey : " + getKey().toString() + "\n";
     }
-   
+
 }

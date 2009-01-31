@@ -28,7 +28,6 @@ import org.jtestserver.client.process.VMConfig;
 import org.jtestserver.client.process.vmware.VMware;
 import org.jtestserver.client.process.vmware.VMwareConfig;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestVMware extends TestVmManager {
@@ -36,12 +35,12 @@ public class TestVMware extends TestVmManager {
     public void setUp() throws IOException {
         Config config = new CustomConfigReader(ConfigReader.VMWARE_TYPE).readConfig();
         VMwareConfig vmwareConfig = (VMwareConfig) config.getVMConfig();
-        
+
         vmManager = new VMware(vmwareConfig);
-        vmName  = vmwareConfig.getVmName();
+        vmName = vmwareConfig.getVmName();
     }
-    
-    @Test(expected = IOException.class)    
+
+    @Test(expected = IOException.class)
     public void testGetRunningVMsWithWrongAuthentification() throws IOException {
         CustomConfigReader reader = new CustomConfigReader(ConfigReader.VMWARE_TYPE) {
             @Override
@@ -49,14 +48,14 @@ public class TestVMware extends TestVmManager {
                 throws IOException {
                 vmProperties.put(VMwareConfig.USERNAME, "anObviouslyWrongLogin");
                 vmProperties.put(VMwareConfig.PASSWORD, "ThisIsNotAValidPassword");
-                
+
                 return super.createVMConfig(vmProperties, vm);
             }
         };
-        
+
         Config config = reader.readConfig();
         VMwareConfig vmwareConfig = (VMwareConfig) config.getVMConfig();
-        
+
         VMware vmware = new VMware(vmwareConfig);
         vmware.getRunningVMs();
     }

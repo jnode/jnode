@@ -30,15 +30,15 @@ import org.jnode.shell.CommandShell;
 /**
  * This TestRunner runs a class by calling its 'static void main(String[])' entry
  * point.  Note that classes that call System.exit(status) are problematic.
- * 
+ *
  * @author crawley@jnode.org
  */
 class CommandTestRunner extends JNodeTestRunnerBase implements TestRunnable {
 
     private ByteArrayOutputStream outBucket;
     private ByteArrayOutputStream errBucket;
-    
-        
+
+
     public CommandTestRunner(TestSpecification spec, TestHarness harness) {
         super(spec, harness);
     }
@@ -56,12 +56,12 @@ class CommandTestRunner extends JNodeTestRunnerBase implements TestRunnable {
     }
 
     private boolean check(int rc) {
-        return 
+        return
             harness.expect(rc, spec.getRc(), "return code") &
-            harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
-            harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
+                harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
+                harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
     }
-    
+
     @Override
     public void cleanup() {
     }
@@ -74,5 +74,5 @@ class CommandTestRunner extends JNodeTestRunnerBase implements TestRunnable {
         System.setOut(new PrintStream(outBucket));
         System.setErr(new PrintStream(errBucket));
     }
-    
+
 }
