@@ -22,6 +22,9 @@ package org.jnode.test.shell.harness;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.jnode.naming.InitialNaming;
@@ -37,6 +40,34 @@ import org.jnode.shell.ShellException;
  * @author crawley@jnode.org
  */
 public abstract class JNodeTestRunnerBase implements TestRunnable {
+    
+    private class TeeStream extends FilterOutputStream {
+        private OutputStream out2;
+
+        public TeeStream(OutputStream out, OutputStream out2) {
+            super(out);
+            this.out2 = out2;
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+            out2.close();
+        }
+
+        @Override
+        public void flush() throws IOException {
+            super.flush();
+            out2.flush();
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            super.write(b);
+            out2.write(b);
+        }
+    }
+    
     protected ByteArrayOutputStream outBucket;
     protected ByteArrayOutputStream errBucket;
     
@@ -78,8 +109,13 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
         System.setIn(new ByteArrayInputStream(spec.getInputContent().toString().getBytes()));
         outBucket = new ByteArrayOutputStream();
         errBucket = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outBucket));
-        System.setErr(new PrintStream(errBucket));
+        if (harness.isDebug()) {
+            System.setOut(new PrintStream(new TeeStream(outBucket, System.out)));
+            System.setErr(new PrintStream(new TeeStream(errBucket, System.err)));
+        } else {
+            System.setOut(new PrintStream(outBucket));
+            System.setErr(new PrintStream(errBucket));
+        }
     }
     
     protected void ensurePluginLoaded(PluginSpecification plugin) {
