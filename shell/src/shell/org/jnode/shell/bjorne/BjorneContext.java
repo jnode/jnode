@@ -120,6 +120,8 @@ public class BjorneContext {
 
     private StreamHolder[] holders;
 
+    private boolean echoExpansions;
+
     public BjorneContext(BjorneInterpreter interpreter, StreamHolder[] holders) {
         this.interpreter = interpreter;
         this.holders = holders;
@@ -766,6 +768,14 @@ public class BjorneContext {
     }
 
     int execute(CommandLine command, CommandIO[] streams) throws ShellException {
+        if (echoExpansions) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(" + ").append(command.getCommandName());
+            for (String arg : command.getArguments()) {
+                sb.append(" ").append(arg);
+            }
+            streams[2].getPrintWriter().println(sb);
+        }
         lastReturnCode = interpreter.executeCommand(command, this, streams);
         return lastReturnCode;
     }
@@ -798,6 +808,14 @@ public class BjorneContext {
 
     public boolean isNoClobber() {
         return isVariableSet("NOCLOBBER");
+    }
+
+    void setEchoExpansions(boolean echoExpansions) {
+        this.echoExpansions = echoExpansions;
+    }
+
+    boolean isEchoExpansions() {
+        return this.echoExpansions;
     }
 
     final int getLastAsyncPid() {

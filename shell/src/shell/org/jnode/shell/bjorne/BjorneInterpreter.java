@@ -140,6 +140,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         BUILTINS.put("continue", new ContinueBuiltin());
         BUILTINS.put("exit", new ExitBuiltin());
         BUILTINS.put("return", new ReturnBuiltin());
+        BUILTINS.put("set", new SetBuiltin());
         BUILTINS.put("source", new SourceBuiltin());
     }
 

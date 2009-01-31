@@ -28,6 +28,14 @@ import java.util.Iterator;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 
+/**
+ * The 'source' built-in executes commands read from a file in the
+ * current shell context.  This differs from running a script in
+ * the normal way in that 1) the current interpreter is used, and
+ * 2) variables etc are set in the current shell context.
+ * 
+ * @author crawley@jnode.org
+ */
 final class SourceBuiltin extends BjorneBuiltin {
     @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
