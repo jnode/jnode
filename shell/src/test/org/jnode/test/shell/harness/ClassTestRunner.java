@@ -56,7 +56,7 @@ class ClassTestRunner implements TestRunnable {
     private boolean check() {
         // When a class is run this way we cannot capture the RC.
         return 
-            harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") && 
+            harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
             harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
     }
     
