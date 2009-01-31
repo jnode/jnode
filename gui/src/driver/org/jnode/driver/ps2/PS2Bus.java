@@ -121,10 +121,11 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
         int status;
         int loops = 0;
         while (((status = readStatus()) & STAT_OBF) != 0) {
-            if (++loops > 1000) {
-                log.error("A lot of PS2 data, probably wrong");
-            }
             final int data = readData();
+            if (++loops > 1000) {
+                log.error("A lot of PS2 data, probably wrong, dropping it");
+                continue;
+            }
 
             // determine which driver shall handle the scancode
             final PS2ByteChannel channel;
