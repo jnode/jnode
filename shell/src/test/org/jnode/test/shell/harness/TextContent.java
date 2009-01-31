@@ -4,7 +4,7 @@ public class TextContent {
     private final String rawText;
     private final boolean trim;
     private final String processedText;
-    
+
     public TextContent(String rawText, boolean trim) {
         super();
         this.rawText = rawText;
@@ -19,7 +19,7 @@ public class TextContent {
     public boolean isTrim() {
         return trim;
     }
-    
+
     @Override
     public String toString() {
         return processedText;
@@ -38,8 +38,8 @@ public class TextContent {
      * <li>Count the number of leading spaces on the (now) first line.
      * <li>Remove this number of leading spaces from all lines.
      * <li>Make sure that the last line has a final newline.
-     * </ol> 
-     * 
+     * </ol>
+     *
      * @param text
      * @return
      */
@@ -62,7 +62,7 @@ public class TextContent {
         int count;
         int len = tmp.length();
         for (count = 0; count < len && tmp.charAt(count) == ' '; count++) {
-            /**/
+             /**/
         }
         if (count > 0) {
             StringBuilder sb = new StringBuilder(len);
@@ -70,18 +70,18 @@ public class TextContent {
             for (int i = 0; i < len; i++) {
                 char ch = tmp.charAt(i);
                 switch (ch) {
-                case ' ':
-                    if (pos++ >= count) {
-                        sb.append(' ');
-                    }
-                    break;
-                case '\n':
-                    sb.append('\n');
-                    pos = 0;
-                    break;
-                default:
-                    pos = count + 1;
-                    sb.append(ch);
+                    case ' ':
+                        if (pos++ >= count) {
+                            sb.append(' ');
+                        }
+                        break;
+                    case '\n':
+                        sb.append('\n');
+                        pos = 0;
+                        break;
+                    default:
+                        pos = count + 1;
+                        sb.append(ch);
                 }
             }
             tmp = sb.toString();

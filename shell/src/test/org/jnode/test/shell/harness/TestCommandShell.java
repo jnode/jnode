@@ -35,20 +35,20 @@ import org.jnode.shell.io.NullInputStream;
 import org.jnode.shell.io.NullOutputStream;
 
 /**
- * This class extends CommandShell to modify the shell's stream resolution mechanism.  
- * The modified resolveStream resolves in/out/err to streams that are supplied in the 
- * constructor. 
- * 
+ * This class extends CommandShell to modify the shell's stream resolution mechanism.
+ * The modified resolveStream resolves in/out/err to streams that are supplied in the
+ * constructor.
+ *
  * @author crawley@jnode.org
  */
 public class TestCommandShell extends CommandShell {
-    
+
     private final CommandInput cin;
     private final CommandOutput cout;
     private final CommandOutput cerr;
 
-    public TestCommandShell(InputStream in, PrintStream out, PrintStream err) 
-    throws ShellException {
+    public TestCommandShell(InputStream in, PrintStream out, PrintStream err)
+        throws ShellException {
         super();
         this.cin = new CommandInput(in);
         this.cout = new CommandOutput(out);

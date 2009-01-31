@@ -32,18 +32,18 @@ import net.n3.nanoxml.XMLException;
 /**
  * This is the entry point class for the command test harness.  Its
  * purpose is to run 'black box' tests on commands and the like.
- * 
+ *
  * @author crawley@jnode
  */
 public class TestHarness {
     // TODO - if someone feels motivated, they could replace the error
     // reporting with something that generates (say) XML that can be 
     // processed by a fancy error report generator.
-    
+
     private final String commandName = this.getClass().getCanonicalName();
 
     private final String[] args;
-    
+
     private PrintWriter reportWriter;
     private int testCount;
     private int failureCount;
@@ -78,7 +78,7 @@ public class TestHarness {
         if (args.length == 0) {
             usage();
             return;
-        } 
+        }
         for (int i = 0; i < args.length && args[i].startsWith("-"); i++) {
             String optName = args[i];
             if (optName.equals("-r") || optName.equals("--resource") || optName.equals("--resources")) {
@@ -93,9 +93,9 @@ public class TestHarness {
                 }
                 root = new File(args[i]);
             } else {
-               System.err.println("Unrecognized option '" + optName + "'");
-               usage();
-               return;
+                System.err.println("Unrecognized option '" + optName + "'");
+                usage();
+                return;
             }
             firstArg = i + 1;
         }
@@ -123,8 +123,7 @@ public class TestHarness {
                 execute(specs);
             } catch (Exception ex) {
                 diagnose(ex, arg);
-            } 
-            finally {
+            } finally {
                 if (is != null) {
                     try {
                         is.close();
@@ -134,10 +133,10 @@ public class TestHarness {
                 }
             }
         }
-        report("Ran " + testCount + " tests with " + failureCount + 
-                " test failures and " + exceptionCount + " errors (exceptions)");
+        report("Ran " + testCount + " tests with " + failureCount +
+            " test failures and " + exceptionCount + " errors (exceptions)");
     }
-    
+
     private void usage() {
         System.err.println(commandName + " [ <opt> ...] <spec-file> ... ");
         System.err.println("where <opt> is one of: ");
@@ -145,7 +144,7 @@ public class TestHarness {
         System.err.println("    --sandbox | -s <dir-name>   specifies the dev't sandbox root directory");
         System.err.println("    --resource | -r             looks for <spec-file> as a resource on the CLASSPATH");
     }
-    
+
     private void execute(TestSetSpecification specs) {
         for (TestSpecification spec : specs.getSpecs()) {
             execute(spec);
@@ -226,7 +225,7 @@ public class TestHarness {
         reportWriter.println(message);
         reportWriter.flush();
     }
-    
+
     public void reportVerbose(String message) {
         if (verbose) {
             report(message);

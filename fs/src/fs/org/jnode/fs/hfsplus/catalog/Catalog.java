@@ -16,16 +16,19 @@ import org.jnode.fs.hfsplus.tree.BTHeaderRecord;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
-import org.jnode.fs.hfsplus.tree.NodeRecord;
 import org.jnode.util.ByteBufferUtils;
 
 public class Catalog {
-    
+
     private final Logger log = Logger.getLogger(getClass());
     private HfsPlusFileSystem fs;
-    /** B-Tree node descriptor */
+    /**
+     * B-Tree node descriptor
+     */
     private NodeDescriptor btnd;
-    /** B-Tree Header record */
+    /**
+     * B-Tree Header record
+     */
     private BTHeaderRecord bthr;
     /** */
     private int catalogHeaderNodeOffset;
@@ -34,9 +37,8 @@ public class Catalog {
 
     /**
      * Create Catalog based on meta-data that exist on the file system.
-     * 
+     *
      * @param fs HFS+ file system that contains catalog informations.
-     * 
      * @throws IOException
      */
     public Catalog(final HfsPlusFileSystem fs) throws IOException {
@@ -46,27 +48,27 @@ public class Catalog {
         ExtentDescriptor firstExtent = sb.getCatalogFile().getExtents()[0];
         catalogHeaderNodeOffset = firstExtent.getStartBlock() * sb.getBlockSize();
         if (firstExtent.getStartBlock() != 0 && firstExtent.getBlockCount() != 0) {
-            buffer = ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH 
-                    + BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
+            buffer = ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH
+                + BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
             fs.getApi().read(catalogHeaderNodeOffset, buffer);
             buffer.rewind();
             byte[] data = ByteBufferUtils.toArray(buffer);
             btnd = new NodeDescriptor(data, 0);
             bthr = new BTHeaderRecord(data, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
-            
+
         }
     }
-    
+
     /**
      * Create new Catalog
-     * 
+     *
      * @param params
      */
     public Catalog(HFSPlusParams params) {
         log.debug("Create B-Tree catalog file.\n");
-        
+
         int nodeSize = params.getCatalogNodeSize();
-        
+
         int bufferLength = 0;
         btnd = new NodeDescriptor();
         btnd.setKind(HfsPlusConstants.BT_HEADER_NODE);
@@ -108,7 +110,7 @@ public class Catalog {
         offset = offset + ck.getKeyLength() + CatalogFolder.CATALOG_FOLDER_SIZE;
         CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, name);
         CatalogThread ct = new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD,
-                CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
+            CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
         record = new LeafRecord(tck, ct.getBytes());
         rootNode.addNodeRecord(1, record, offset);
         buffer = ByteBuffer.allocate(bufferLength + bthr.getNodeSize());
@@ -118,9 +120,8 @@ public class Catalog {
         buffer.put(rootNode.getBytes());
         buffer.rewind();
     }
-    
+
     /**
-     * 
      * @param parentID
      * @return
      * @throws IOException
@@ -136,7 +137,7 @@ public class Catalog {
         byte[] data = ByteBufferUtils.toArray(nodeData);
         CatalogNode node = new CatalogNode(data, nodeSize);
         while (node.isIndexNode()) {
-            IndexRecord record = (IndexRecord)node.find(parentID);
+            IndexRecord record = (IndexRecord) node.find(parentID);
             currentOffset = catalogHeaderNodeOffset + (record.getIndex() * nodeSize);
             nodeData = ByteBuffer.allocate(nodeSize);
             fs.getApi().read(currentOffset, nodeData);
@@ -144,20 +145,18 @@ public class Catalog {
             data = ByteBufferUtils.toArray(nodeData);
             node = new CatalogNode(data, nodeSize);
         }
-        
+
         if (node.isLeafNode()) {
-            lr = (LeafRecord)node.find(parentID);
+            lr = (LeafRecord) node.find(parentID);
         }
         return lr;
     }
 
     /**
      * Find leaf records corresponding to parentID. The search begin at the root node of the tree.
-     *  
+     *
      * @param parentID Parent node id
-     * 
      * @return Array of LeafRecord
-     * 
      * @throws IOException
      */
     public final LeafRecord[] getRecords(final CatalogNodeId parentID)
@@ -166,14 +165,12 @@ public class Catalog {
     }
 
     /**
-     * Find leaf records corresponding to parentID. The search begin at the node correspding 
+     * Find leaf records corresponding to parentID. The search begin at the node correspding
      * to the index passed as parameter.
-     * 
-     * @param parentID Parent node id
+     *
+     * @param parentID   Parent node id
      * @param nodeNumber Index of node where the search begin.
-     * 
      * @return Array of LeafRecord
-     * 
      * @throws IOException
      */
     public final LeafRecord[] getRecords(final CatalogNodeId parentID, final int nodeNumber)
@@ -185,7 +182,7 @@ public class Catalog {
             fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), nodeData);
             CatalogNode node = new CatalogNode(nodeData.array(), nodeSize);
             if (node.isIndexNode()) {
-                IndexRecord[] records = (IndexRecord[])node.findChilds(parentID);
+                IndexRecord[] records = (IndexRecord[]) node.findChilds(parentID);
                 List<LeafRecord> lfList = new LinkedList<LeafRecord>();
                 for (IndexRecord rec : records) {
                     LeafRecord[] lfr = getRecords(parentID, rec.getIndex());
@@ -195,7 +192,7 @@ public class Catalog {
                 }
                 return lfList.toArray(new LeafRecord[lfList.size()]);
             } else if (node.isLeafNode()) {
-                return (LeafRecord[])node.findAll(parentID);
+                return (LeafRecord[]) node.findAll(parentID);
             } else {
                 return null;
             }
@@ -207,7 +204,6 @@ public class Catalog {
     }
 
     /**
-     * 
      * @param parentID
      * @param nodeName
      * @return
@@ -223,7 +219,7 @@ public class Catalog {
         int currentOffset = 0;
         CatalogKey cKey = new CatalogKey(parentID, nodeName);
         while (node.isIndexNode()) {
-            IndexRecord record = (IndexRecord)node.find(cKey);
+            IndexRecord record = (IndexRecord) node.find(cKey);
             currentNodeNumber = record.getIndex();
             currentOffset = catalogHeaderNodeOffset + record.getIndex() * nodeSize;
             nodeData = ByteBuffer.allocate(nodeSize);
@@ -232,7 +228,7 @@ public class Catalog {
         }
         LeafRecord lr = null;
         if (node.isLeafNode()) {
-            lr = (LeafRecord)node.find(parentID);
+            lr = (LeafRecord) node.find(parentID);
         }
         return lr;
     }
@@ -244,9 +240,9 @@ public class Catalog {
     public final BTHeaderRecord getBTHeaderRecord() {
         return bthr;
     }
-    
+
     public ByteBuffer getBytes() {
         return buffer;
     }
-    
+
 }

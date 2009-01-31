@@ -22,16 +22,16 @@ package org.jnode.test.shell.harness;
 
 /**
  * This class holds a simple specification for a plugin required by a test or test set.
- * 
+ *
  * @author crawley@jnode
  */
 public class PluginSpecification {
     private final String pluginId;
     private final String pluginVersion;
     private final String pseudoPluginClassName;
-    
+
     public PluginSpecification(String pluginId, String pluginVersion,
-            String pseudoPluginClassName) {
+                               String pseudoPluginClassName) {
         super();
         this.pluginId = pluginId;
         this.pluginVersion = pluginVersion;
@@ -47,10 +47,10 @@ public class PluginSpecification {
     }
 
     /**
-     * This method returns the classname of a 'pseudo plugin' class that can perform 
+     * This method returns the classname of a 'pseudo plugin' class that can perform
      * minimal plugin specific initialization when a plugin is 'required' in
      * a context where Plugin loading is not possible.
-     * 
+     *
      * @return the class name.
      */
     public String getClassName() {

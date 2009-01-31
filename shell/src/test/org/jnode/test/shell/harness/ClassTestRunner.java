@@ -28,17 +28,17 @@ import java.lang.reflect.Method;
 /**
  * This TestRunner runs a a class by calling its 'static void main(Sting[])' entry
  * point.  Note that classes that call System.exit(status) are problematic.
- * 
+ *
  * @author crawley@jnode.org
  */
 class ClassTestRunner implements TestRunnable {
 
     private ByteArrayOutputStream outBucket;
     private ByteArrayOutputStream errBucket;
-    
+
     private final TestSpecification spec;
     private final TestHarness harness;
-    
+
     public ClassTestRunner(TestSpecification spec, TestHarness harness) {
         this.spec = spec;
         this.harness = harness;
@@ -55,11 +55,11 @@ class ClassTestRunner implements TestRunnable {
 
     private boolean check() {
         // When a class is run this way we cannot capture the RC.
-        return 
+        return
             harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
-            harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
+                harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
     }
-    
+
     @Override
     public void cleanup() {
     }
@@ -72,5 +72,5 @@ class ClassTestRunner implements TestRunnable {
         System.setOut(new PrintStream(outBucket));
         System.setErr(new PrintStream(errBucket));
     }
-    
+
 }
