@@ -25,7 +25,7 @@ class IsolateThreadFactory implements ThreadFactory {
 
         Thread t = new IsolateFactoryThread(group, namePrefix + threadNumber.getAndIncrement(), isolatedStatics) {
             public void start() {
-                org.jnode.vm.Unsafe.debug("factory 1 thread start() " + this.getName() + "\n");
+//                org.jnode.vm.Unsafe.debug("factory 1 thread start() " + this.getName() + "\n");
 //                getVmThread().switchToIsolate(isolatedStatics);
                 super.start();
             }
@@ -73,7 +73,7 @@ class IsolateThreadFactory2 implements ThreadFactory {
 
                             newThread = new Thread(group, runnable, namePrefix + threadNumber.getAndIncrement()) {
                                 public void start() {
-                                    org.jnode.vm.Unsafe.debug("factory thread start() " + this.getName() + "\n");
+//                                    org.jnode.vm.Unsafe.debug("factory thread start() " + this.getName() + "\n");
                                     super.start();
                                 }
                             };
@@ -91,8 +91,8 @@ class IsolateThreadFactory2 implements ThreadFactory {
 
     public synchronized Thread newThread(final Runnable r) {
         Thread ret;
-        org.jnode.vm.Unsafe.debug("IsolateThreadFactory2.newThread() called\n");
-        org.jnode.vm.Unsafe.debugStackTrace();
+//        org.jnode.vm.Unsafe.debug("IsolateThreadFactory2.newThread() called\n");
+//        org.jnode.vm.Unsafe.debugStackTrace();
         synchronized (lock) {
             newThread = null;
             runnable = r;
@@ -108,7 +108,7 @@ class IsolateThreadFactory2 implements ThreadFactory {
             newThread = null;
             lock.notifyAll();
         }
-        org.jnode.vm.Unsafe.debug("IsolateThreadFactory2.newThread() returned\n");
+//        org.jnode.vm.Unsafe.debug("IsolateThreadFactory2.newThread() returned\n");
 
         return ret;
     }
