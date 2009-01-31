@@ -58,8 +58,8 @@ class ScriptTestRunner extends JNodeTestRunnerBase implements TestRunnable {
 
     private boolean check(int rc) {
         return 
-            // harness.expect(rc, spec.getRc(), "return code") && 
-            harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") && 
+            harness.expect(rc, spec.getRc(), "return code") &
+            harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
             harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
     }
     
