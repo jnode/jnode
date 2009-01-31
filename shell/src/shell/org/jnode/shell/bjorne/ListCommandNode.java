@@ -148,7 +148,7 @@ public class ListCommandNode extends CommandNode implements Completable {
         for (PipelineStage stage : stages) {
             CommandIO[] streams = new CommandIO[stage.holders.length];
             for (int i = 0; i < streams.length; i++) {
-                streams[i] = stage.holders[i].stream;
+                streams[i] = stage.holders[i].getStream();
             }
             stage.thread = stage.context.fork(stage.command, streams);
         }
