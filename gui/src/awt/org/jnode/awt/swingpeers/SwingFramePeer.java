@@ -21,7 +21,6 @@
 
 package org.jnode.awt.swingpeers;
 
-import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -29,28 +28,11 @@ import java.awt.MenuBar;
 import java.awt.Rectangle;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
-import javax.swing.JFrame;
 
 final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
 
     public SwingFrame(Frame awtFrame, String title) {
         super(awtFrame, title);
-    }
-
-    @Override
-    public void repaint(long tm, int x, int y, int width, int height) {
-        super.repaint(tm, x, y, width, height);
-    }
-
-    @Override
-    public void update(Graphics g) {
-        super.update(g);
-    }
-
-    @Override
-    public void setIcon(boolean b) throws PropertyVetoException {
-        super.setIcon(b);
-        target.setBounds(this.getBounds());
     }
 
     @Override
@@ -63,82 +45,6 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
     }
-
-    @Override
-    protected void validateTree() {
-        super.validateTree();
-        if (target instanceof JFrame)
-            ((JFrame) target).getRootPane().validate();
-    }
-
-    boolean requestingFocus = false;
-
-    @Override
-    public void requestFocus() {
-        if (target instanceof JFrame) {
-            if (!requestingFocus) {
-                requestingFocus = true;
-                target.requestFocus();
-                requestingFocus = false;
-            }
-        } else
-            super.requestFocus();
-    }
-
-    @Override
-    public boolean requestFocus(boolean temporary) {
-        if (target instanceof JFrame) {
-            if (!requestingFocus) {
-                requestingFocus = true;
-                target.requestFocus();
-                requestingFocus = false;
-            }
-            return true;
-        } else
-            return super.requestFocus(temporary);
-    }
-
-    @Override
-    public boolean requestFocusInWindow() {
-        if (target instanceof JFrame) {
-            if (!requestingFocus) {
-                requestingFocus = true;
-                boolean ret = target.requestFocusInWindow();
-                requestingFocus = false;
-                return ret;
-            }
-            return true;
-        } else
-            return super.requestFocusInWindow();
-    }
-
-    @Override
-    protected boolean requestFocusInWindow(boolean temporary) {
-        if (target instanceof JFrame) {
-            if (!requestingFocus) {
-                requestingFocus = true;
-                boolean ret = target.requestFocusInWindow();
-                requestingFocus = false;
-                return ret;
-            }
-            return true;
-        } else
-            return super.requestFocusInWindow(temporary);
-    }
-
-    boolean settingCursor;
-
-    @Override
-    public void setCursor(Cursor cursor) {
-        super.setCursor(cursor);
-        if (!settingCursor) {
-            settingCursor = true;
-            target.setCursor(cursor);
-            settingCursor = false;
-        }
-    }
-
-
 }
 
 /**

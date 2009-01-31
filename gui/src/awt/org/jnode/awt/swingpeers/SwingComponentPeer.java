@@ -230,11 +230,21 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
             if (event.getID() == PaintEvent.PAINT) {
                 if (!(targetComponent instanceof java.awt.Window))
                     peerComponent.paint(g);
-                targetComponent.paint(g);
+                //todo isolates related
+                //if(targetComponent instanceof RootPaneContainer) {
+                //      JRootPane jRootPane = ((RootPaneContainer) targetComponent).getRootPane();
+                //jRootPane.paintImmediately(0,0, jRootPane.getWidth(), jRootPane.getHeight());
+                //}
             } else {
                 if (!(targetComponent instanceof java.awt.Window))
                     peerComponent.update(g);
-                targetComponent.update(g);
+                //todo isolates related
+                //if(targetComponent instanceof RootPaneContainer)
+                //  ((RootPaneContainer) targetComponent).getRootPane().update(g);
+                //if(targetComponent instanceof RootPaneContainer) {
+                //  JRootPane jRootPane = ((RootPaneContainer) targetComponent).getRootPane();
+                //  jRootPane.paintImmediately(0,0, jRootPane.getWidth(), jRootPane.getHeight());
+                //}
             }
             g.dispose();
         }

@@ -31,6 +31,8 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.Cursor;
+import java.awt.Dialog;
 import java.beans.PropertyVetoException;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -60,6 +62,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
      * The swing peer implementation
      */
     private SwingBaseWindowPeer<awtT, swingPeerT> swingPeer;
+    boolean requestingFocus = false;
 
     public SwingBaseWindow(awtT target) {
         this.target = target;
@@ -87,9 +90,35 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     public void paint(Graphics g) {
         super.paint(g);
         if (target instanceof RootPaneContainer && isVisible()) {
-            //target.paint(g.create());
-            swingPeer.postPaintEvent();
-            //JNodeToolkit.postToTarget(new PaintEvent(target, PaintEvent.UPDATE, target.getBounds()), target);
+            target.paint(g);
+            //todo isolates related
+            //swingPeer.postPaintEvent();
+            //JRootPane rp = ((RootPaneContainer) target).getRootPane();
+            //JNodeToolkit.postToTarget(new PaintEvent(rp, PaintEvent.UPDATE, rp.getBounds()), rp);
+        }
+    }
+
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+        super.repaint(tm, x, y, width, height);
+        if (target instanceof RootPaneContainer && isVisible()) {
+            target.repaint(tm, x, y, width, height);
+            //todo isolates related
+            //swingPeer.postPaintEvent();
+            //JRootPane rp = ((RootPaneContainer) target).getRootPane();
+            //JNodeToolkit.postToTarget(new PaintEvent(rp, PaintEvent.PAINT, new Rectangle(x, y, width, height)), rp);
+        }
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);
+        if (target instanceof RootPaneContainer && isVisible()) {
+            target.update(g);
+            //todo isolates related
+            //swingPeer.postPaintEvent();
+            //JRootPane rp = ((RootPaneContainer) target).getRootPane();
+            //JNodeToolkit.postToTarget(new PaintEvent(rp, PaintEvent.UPDATE, rp.getBounds()), rp);
         }
     }
 
@@ -176,11 +205,6 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         super.repaint();
     }
 
-    @Override
-    public void update(Graphics g) {
-        super.update(g);
-    }
-
     /**
      * @see java.awt.Component#invalidate()
      */
@@ -211,6 +235,77 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
             SwingUtilities.updateComponentTreeUI(target);
     }
 
+    private boolean settingCursor;
+
+    @Override
+    public void setCursor(Cursor cursor) {
+        super.setCursor(cursor);
+        if (!settingCursor) {
+            settingCursor = true;
+            target.setCursor(cursor);
+            settingCursor = false;
+        }
+    }
+
+    @Override
+    public void requestFocus() {
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
+                requestingFocus = true;
+                target.requestFocus();
+                requestingFocus = false;
+            }
+        } else
+            super.requestFocus();
+    }
+
+    @Override
+    public boolean requestFocus(boolean temporary) {
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
+                requestingFocus = true;
+                target.requestFocus();
+                requestingFocus = false;
+            }
+            return true;
+        } else
+            return super.requestFocus(temporary);
+    }
+
+    @Override
+    public boolean requestFocusInWindow() {
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
+                requestingFocus = true;
+                boolean ret = target.requestFocusInWindow();
+                requestingFocus = false;
+                return ret;
+            }
+            return true;
+        } else
+            return super.requestFocusInWindow();
+    }
+
+    @Override
+    protected boolean requestFocusInWindow(boolean temporary) {
+        if (target instanceof JFrame) {
+            if (!requestingFocus) {
+                requestingFocus = true;
+                boolean ret = target.requestFocusInWindow();
+                requestingFocus = false;
+                return ret;
+            }
+            return true;
+        } else
+            return super.requestFocusInWindow(temporary);
+    }
+
+    @Override
+    public void setIcon(boolean b) throws PropertyVetoException {
+        super.setIcon(b);
+        target.setBounds(this.getBounds());
+    }
+
     final class NullContentPane extends JComponent {
         @Override
         public void update(Graphics g) {
@@ -219,9 +314,10 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
 
         @Override
         public void paint(Graphics g) {
-            if (target instanceof Frame && !(target instanceof JFrame)) {
+            if ((target instanceof Frame && !(target instanceof JFrame)) ||
+                (target instanceof Dialog && !(target instanceof JDialog))) {
                 SwingBaseWindow sf = SwingBaseWindow.this;
-                Frame f = (Frame) target;
+                Window f = target;
 
                 Color bg = f.getBackground();
                 if (bg == null) bg = UIManager.getColor("window");
