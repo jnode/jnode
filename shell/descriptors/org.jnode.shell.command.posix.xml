@@ -19,6 +19,7 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="false" class="org.jnode.shell.command.posix.FalseCommand"/>
+    <alias name="expr" class="org.jnode.shell.command.posix.ExprCommand"/>
     <alias name="test" class="org.jnode.shell.command.posix.UnixTestCommand"/>
     <alias name="true" class="org.jnode.shell.command.posix.TrueCommand"/>
     <alias name="[" class="org.jnode.shell.command.posix.UnixTestCommand"/>
