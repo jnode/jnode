@@ -30,13 +30,13 @@ import static org.jnode.shell.bjorne.BjorneInterpreter.REDIR_LESS;
 import static org.jnode.shell.bjorne.BjorneInterpreter.REDIR_LESSAND;
 import static org.jnode.shell.bjorne.BjorneInterpreter.REDIR_LESSGREAT;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -419,15 +419,14 @@ public class BjorneContext {
         }
     }
 
-    private String runBacktickCommand(String commandLine) throws ShellException {
-        ByteArrayOutputStream capture = new ByteArrayOutputStream();
+    private StringBuffer runBacktickCommand(String commandLine) throws ShellException {
+        StringWriter capture = new StringWriter();
         interpreter.interpret(interpreter.getShell(), commandLine, capture, false);
-        String output = capture.toString();
-        // Trim trailing newlines
-        int i;
-        for (i = output.length(); i > 0 && output.charAt(i - 1) == '\n'; i--) { /**/
+        StringBuffer output = capture.getBuffer();
+        while (output.length() > 0 && output.charAt(output.length() - 1) == '\n') {
+            output.setLength(output.length() - 1);
         }
-        return output.substring(0, i);
+        return output;
     }
 
     private StringBuffer accumulate(StringBuffer sb, char ch) {
@@ -466,8 +465,8 @@ public class BjorneContext {
                     if (backtickStart == -1) {
                         backtickStart = sb.length();
                     } else {
-                        String tmp = runBacktickCommand(sb.substring(backtickStart));
-                        sb.replace(backtickStart, sb.length(), tmp);
+                        StringBuffer tmp = runBacktickCommand(sb.substring(backtickStart));
+                        sb.replace(backtickStart, sb.length(), tmp.toString());
                         backtickStart = -1;
                     }
                     break;
@@ -788,6 +787,14 @@ public class BjorneContext {
             return null;
         }
     }
+    
+    void setStream(int index, CommandIO stream, boolean mine) {
+        if (index < 0 || index >= holders.length) {
+            throw new ShellFailureException("negative stream index");
+        } else {
+            holders[index].setStream(stream, mine);
+        }
+    }
 
     public boolean isNoClobber() {
         return isVariableSet("NOCLOBBER");
@@ -989,8 +996,7 @@ public class BjorneContext {
     }
 
     public static class StreamHolder {
-        public final CommandIO stream;
-
+        private CommandIO stream;
         private boolean isMine;
 
         public StreamHolder(CommandIO stream, boolean isMine) {
@@ -1001,6 +1007,16 @@ public class BjorneContext {
         public StreamHolder(StreamHolder other) {
             this.stream = other.stream;
             this.isMine = false;
+        }
+        
+        public CommandIO getStream() {
+            return stream;
+        }
+
+        public void setStream(CommandIO stream, boolean isMine) {
+            close();
+            this.stream = stream;
+            this.isMine = isMine;
         }
 
         public void close() {

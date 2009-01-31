@@ -87,7 +87,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 holders = childContext.evaluateRedirections(getRedirects());
                 CommandIO[] streams = new CommandIO[holders.length];
                 for (int i = 0; i < streams.length; i++) {
-                    streams[i] = holders[i].stream;
+                    streams[i] = holders[i].getStream();
                 }
                 if ((getFlags() & BjorneInterpreter.FLAG_ASYNC) != 0) {
                     throw new ShellFailureException(

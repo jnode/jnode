@@ -36,10 +36,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 import org.jnode.driver.console.CompletionInfo;
@@ -54,6 +54,7 @@ import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandOutput;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
@@ -191,7 +192,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         return word;
     }
 
-    int interpret(CommandShell shell, String command, OutputStream capture, boolean source) 
+    int interpret(CommandShell shell, String command, StringWriter capture, boolean source) 
         throws ShellException {
         BjorneContext myContext;
         // FIXME ... I think there is something wrong / incomplete with the way I'm handling
@@ -201,6 +202,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             myContext = this.context;
         } else {
             myContext = new BjorneContext(this);
+            myContext.setStream(1, new CommandOutput(capture), true);
         }
         BjorneTokenizer tokens = new BjorneTokenizer(command);
         CommandNode tree = new BjorneParser(tokens).parse();
