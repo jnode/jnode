@@ -55,7 +55,7 @@ public class LoopCommandNode extends CommandNode {
         while (true) {
             rc = cond.execute(context);
             if (context.getLastReturnCode() == 0 ^ 
-                getNodeType() == BjorneInterpreter.CMD_UNTIL) {
+                getNodeType() == BjorneInterpreter.CMD_WHILE) {
                 break;
             }
             try {
