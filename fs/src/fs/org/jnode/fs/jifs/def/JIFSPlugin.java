@@ -110,7 +110,7 @@ public class JIFSPlugin extends Plugin {
             final DeviceManager dm = DeviceUtils.getDeviceManager();
             VirtualDevice dev = (VirtualDevice) dm.getDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
             fSS.unregisterFileSystem(dev);
-            log.info("FIFS unmounted");
+            log.info("jifs unmounted");
             dm.unregister(dev);
             log.info("jifs unregistered");
         } catch (NameNotFoundException e) {
