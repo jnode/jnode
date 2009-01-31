@@ -53,6 +53,7 @@ public class TestHarness {
     private PrintStream savedOut;
     private PrintStream savedErr;
 
+    private boolean debug;
     private boolean verbose;
     private File root;
 
@@ -85,6 +86,8 @@ public class TestHarness {
                 useResources = true;
             } else if (optName.equals("-v") || optName.equals("--verbose")) {
                 verbose = true;
+            } else if (optName.equals("-d") || optName.equals("--debug")) {
+                debug = true;
             } else if (optName.equals("-s") || optName.equals("--sandbox")) {
                 if (i++ >= args.length) {
                     System.err.println("No pathname after sandbox option");
@@ -141,6 +144,7 @@ public class TestHarness {
         System.err.println(commandName + " [ <opt> ...] <spec-file> ... ");
         System.err.println("where <opt> is one of: ");
         System.err.println("    --verbose | - v             output more information about tests run");
+        System.err.println("    --debug | - d               enable extra debug support");
         System.err.println("    --sandbox | -s <dir-name>   specifies the dev't sandbox root directory");
         System.err.println("    --resource | -r             looks for <spec-file> as a resource on the CLASSPATH");
     }
@@ -253,5 +257,9 @@ public class TestHarness {
             // so on until we find a directory that looks like a sandbox.
             return new File("..");
         }
+    }
+
+    public boolean isDebug() {
+        return debug;
     }
 }
