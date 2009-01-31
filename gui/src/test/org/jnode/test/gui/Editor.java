@@ -42,7 +42,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.TitledBorder;
+import javax.swing.BorderFactory;
+import javax.swing.border.BevelBorder;
 import org.apache.log4j.Logger;
 
 /**
@@ -54,10 +55,9 @@ public class Editor extends JFrame {
     private JFileChooser fc;
     private String directory;
     private File file;
-    private TitledBorder border;
 
     public Editor(File file) {
-        super("JNote - JNode Text Editor");
+        super("JNote");
         this.file = file;
         setBackground(Color.black);
         setForeground(Color.cyan);
@@ -65,15 +65,16 @@ public class Editor extends JFrame {
         setJMenuBar(createMenu());
         panel.setLayout(new BorderLayout());
         textArea = new JTextArea();
-        border = new TitledBorder("");
         JScrollPane sp = new JScrollPane(textArea);
-        sp.setViewportBorder(border);
+        sp.setViewportBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         panel.add(sp, BorderLayout.CENTER);
         if (file != null) {
             directory = file.getParent();
             readFile(file);
             updateTitle(file.getName());
             textArea.requestFocus();
+        } else {
+            new_();
         }
         setLocation(0, 0);
         setSize(500, 500);
@@ -166,6 +167,7 @@ public class Editor extends JFrame {
                     byte[] data = new byte[fis.available()];
                     fis.read(data);
                     textArea.setText(new String(data));
+                    textArea.setCaretPosition(0);
                     fis.close();
                 } catch (FileNotFoundException fnfe) {
                     JOptionPane.showMessageDialog(Editor.this, "File not found: " + file);
@@ -223,7 +225,7 @@ public class Editor extends JFrame {
     }
 
     private void updateTitle(String title) {
-        border.setTitle(title);
+        setTitle("JNote - " + title);
     }
 
     static void editFile(File file) {
