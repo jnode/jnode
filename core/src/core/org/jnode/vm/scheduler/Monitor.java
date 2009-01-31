@@ -212,12 +212,14 @@ public final class Monitor {
      */
     public final void release(VmThread thread) {
         if (owner != thread) {
-            Unsafe.debug("Current thread is not the owner of this monitor\n");
+            //todo enable this debug message. How can this happen???
+            //Unsafe.debug("Current thread is not the owner of this monitor\n");
             return;
         }
 
         if (lockCount <= 0) {
-            Unsafe.debug("Monitor is not locked\n");
+            //todo enable this debug message. How can this happen???
+            //Unsafe.debug("Monitor is not locked\n");
             return;
         }
 
