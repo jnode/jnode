@@ -247,7 +247,7 @@ public class Desktop implements Runnable {
          */
         public void componentAdded(ContainerEvent event) {
             final Component c = event.getChild();
-            if (c instanceof JInternalFrame && !JNodeToolkit.getJNodeToolkit().isWindow(c)) {
+            if (c instanceof JInternalFrame) {
                 taskBar.windowBar.addFrame((JInternalFrame) c);
             }
         }
