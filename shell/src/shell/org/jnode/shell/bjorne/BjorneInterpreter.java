@@ -164,22 +164,22 @@ public class BjorneInterpreter implements CommandInterpreter {
             return interpret(shell, command, null, false);
         } catch (BjorneControlException ex) {
             switch (ex.getControl()) {
-            case BjorneInterpreter.BRANCH_EXIT:
-                // FIXME this is not right.  If 'exit' is run in an interactive
-                // shell, the shell needs to exit.
-                return ex.getCount();
-            case BjorneInterpreter.BRANCH_BREAK:
-                throw new ShellSyntaxException(
-                        "'break' has been executed in an inappropriate context");
-            case BjorneInterpreter.BRANCH_CONTINUE:
-                throw new ShellSyntaxException(
-                        "'continue' has been executed in an inappropriate context");
-            case BjorneInterpreter.BRANCH_RETURN:
-                throw new ShellSyntaxException(
-                        "'return' has been executed in an inappropriate context");
-            default:
-                throw new ShellFailureException("control exception with bad control code (" +
-                        ex.getControl() + ")");
+                case BjorneInterpreter.BRANCH_EXIT:
+                    // FIXME this is not right.  If 'exit' is run in an interactive
+                    // shell, the shell needs to exit.
+                    return ex.getCount();
+                case BjorneInterpreter.BRANCH_BREAK:
+                    throw new ShellSyntaxException(
+                            "'break' has been executed in an inappropriate context");
+                case BjorneInterpreter.BRANCH_CONTINUE:
+                    throw new ShellSyntaxException(
+                            "'continue' has been executed in an inappropriate context");
+                case BjorneInterpreter.BRANCH_RETURN:
+                    throw new ShellSyntaxException(
+                            "'return' has been executed in an inappropriate context");
+                default:
+                    throw new ShellFailureException("control exception with bad control code (" +
+                            ex.getControl() + ")");
             }
         }
     }
@@ -236,25 +236,11 @@ public class BjorneInterpreter implements CommandInterpreter {
         if (DEBUG) {
             System.err.println(tree);
         }
-//        try {
-            if (capture == null) {
-                // FIXME ... this may add an empty line to the command history
-                shell.addCommandToHistory(command);
-            }
-            return tree.execute((BjorneContext) myContext);
-//        } catch (BjorneControlException ex) {
-//            switch (ex.getControl()) {
-//                case BRANCH_EXIT:
-//                    return ex.getCount();
-//                case BRANCH_BREAK:
-//                case BRANCH_CONTINUE:
-//                    return 0;
-//                case BRANCH_RETURN:
-//                    return (source) ? ex.getCount() : 1;
-//                default:
-//                    throw new ShellFailureException("unknown control " + ex.getControl());
-//            }
-//        }
+        if (capture == null) {
+            // FIXME ... this may add an empty line to the command history
+            shell.addCommandToHistory(command);
+        }
+        return tree.execute((BjorneContext) myContext);
     }
 
     @Override
@@ -269,18 +255,18 @@ public class BjorneInterpreter implements CommandInterpreter {
                     rc = interpret(shell, line, null, false);
                 } catch (BjorneControlException ex) {
                     switch (ex.getControl()) {
-                    case BjorneInterpreter.BRANCH_EXIT:
-                        // The script will exit immediately
-                        return ex.getCount();
-                    case BjorneInterpreter.BRANCH_BREAK:
-                        throw new ShellSyntaxException(
-                                "'break' has been executed in an inappropriate context");
-                    case BjorneInterpreter.BRANCH_CONTINUE:
-                        throw new ShellSyntaxException(
-                                "'continue' has been executed in an inappropriate context");
-                    case BjorneInterpreter.BRANCH_RETURN:
-                        throw new ShellSyntaxException(
-                                "'return' has been executed in an inappropriate context");
+                        case BjorneInterpreter.BRANCH_EXIT:
+                            // The script will exit immediately
+                            return ex.getCount();
+                        case BjorneInterpreter.BRANCH_BREAK:
+                            throw new ShellSyntaxException(
+                                    "'break' has been executed in an inappropriate context");
+                        case BjorneInterpreter.BRANCH_CONTINUE:
+                            throw new ShellSyntaxException(
+                                    "'continue' has been executed in an inappropriate context");
+                        case BjorneInterpreter.BRANCH_RETURN:
+                            throw new ShellSyntaxException(
+                                    "'return' has been executed in an inappropriate context");
                     }
                 } 
             }
