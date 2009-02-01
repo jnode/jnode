@@ -238,7 +238,7 @@ public class BigEndian {
     }
 
     /**
-     * Get  char from the given byte array at the given offset.
+     * Get char from the given byte array at the given offset.
      *
      * @param data
      * @param offset
@@ -247,5 +247,17 @@ public class BigEndian {
         final int v1 = data[offset + 0] & 0xFF;
         final int v0 = data[offset + 1] & 0xFF;
         return (char) ((v1 << 8) | v0);
+    }
+    
+    /**
+     * Set char as byte in the given byte array at the given offset.
+     * 
+     * @param dst
+     * @param offset
+     * @param value
+     */
+    public static void setChar(byte[] dst, int offset, char value) {
+        dst[offset + 1] = (byte)(value & 0xFF);
+        dst[offset + 0] = (byte)((value >>> 8) & 0xFF);
     }
 }
