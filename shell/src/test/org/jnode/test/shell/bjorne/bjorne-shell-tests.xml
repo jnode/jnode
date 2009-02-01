@@ -112,4 +112,27 @@ A is 1
 </output>
         <rc>0</rc>
     </testSpec>
+    <testSpec>
+        <title>while ... do ... break ... done</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+A=5
+while expr $A != 0 ; do echo A is $A ; if expr $A = 2 ; then break ; fi ; A=`expr $A - 1`; done
+        </script>
+        <output>1
+A is 5
+0
+1
+A is 4
+0
+1
+A is 3
+0
+1
+A is 2
+1
+</output>
+        <rc>0</rc>
+    </testSpec>
 </testSpecs>
