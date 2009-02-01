@@ -30,12 +30,18 @@ import java.io.Reader;
 import java.io.Writer;
 
 /**
- * This interface is JNode's command stream API.  A CommandIO instance
- * is a unidirectional or bidirectional data channel holder that can 
- * reify the channel as a character or byte oriented stream using the
- * standard Java APIs.  This API can (will) also support more specialized
- * functions such as testing if the channel is a 'tty' stream (in the
- * UNIX sense.)
+ * This interface is JNode's command stream API.  The purpose of the
+ * API is to allow commands to gain access the "standard" streams as either
+ * byte oriented Input/OutputStreams or character oriented Readers/Writers,
+ * while hiding the underlying implementation.  This API will also support 
+ * more specialized functions such as testing if the channel is a 'tty' stream 
+ * (in the UNIX sense.)
+ * <p>
+ * A CommandIO instance is a unidirectional or bidirectional data channel holder.
+ * It provides a number of getters that reify the channel as a character or byte 
+ * oriented stream using the standard Java APIs.  These getters should return 
+ * objects that preserve the correct order of data read and written, irrespective
+ * of whether flush is called explicitly or implicitly.
  * 
  * @author crawley@jnode.org
  */
