@@ -1,8 +1,8 @@
 /*
- * $Id: Command.java 3772 2008-02-10 15:02:53Z lsantha $
+ * $Id: header.txt 2224 2006-01-01 12:49:03Z epr $
  *
  * JNode.org
- * Copyright (C) 2007-2008 JNode.org
+ * Copyright (C) 2003-2009 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,6 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+ 
 package org.jnode.test.shell.bjorne;
 
 import junit.framework.TestCase;
