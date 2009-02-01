@@ -82,7 +82,6 @@ public class ExprCommand extends AbstractCommand {
             }
             out.println(res);
             out.flush();
-            System.err.println("expr's rc is " + (isTrue(res) ? 0 : 1));
             exit(isTrue(res) ? 0 : 1);
         } catch (ExprSyntaxException ex) {
             err.println(ex.getMessage());
