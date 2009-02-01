@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
-import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -63,21 +62,21 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
             throw new ReadOnlyFileSystemException();
         }
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem())
-                .getVolumeHeader();
+            .getVolumeHeader();
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         int macDate = (int) HFSUtils
-                .getDate(now.getTimeInMillis() / 1000, true);
+            .getDate(now.getTimeInMillis() / 1000, true);
 
         HFSUnicodeString dirName = new HFSUnicodeString(name);
         CatalogThread thread = new CatalogThread(
-                HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
-                        .getFolderId(), dirName);
+            HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
+                .getFolderId(), dirName);
 
         CatalogFolder newFolder = new CatalogFolder();
         newFolder
-                .setFolderId(new CatalogNodeId(volumeHeader.getNextCatalogId()));
+            .setFolderId(new CatalogNodeId(volumeHeader.getNextCatalogId()));
         newFolder.setCreateDate(macDate);
         newFolder.setContentModDate(macDate);
         newFolder.setAttrModDate(macDate);
@@ -90,8 +89,8 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
         log.debug("New record folder :\n" + folderRecord.toString());
 
         HFSPlusEntry newEntry = new HFSPlusEntry(
-                (HfsPlusFileSystem) getFileSystem(), null, this, name,
-                folderRecord);
+            (HfsPlusFileSystem) getFileSystem(), null, this, name,
+            folderRecord);
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());
 
@@ -113,21 +112,21 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
     @Override
     protected final FSEntryTable readEntries() throws IOException {
         List<FSEntry> pathList = new LinkedList<FSEntry>();
-        HfsPlusFileSystem fs = (HfsPlusFileSystem)getFileSystem();
-            if(fs.getVolumeHeader().getFolderCount() > 0) {
-                LeafRecord[] records = fs.getCatalog().getRecords(folder.getFolderId());
-                for (LeafRecord rec : records) {
-                    if (rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER
-                            || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
-                        String name = ((CatalogKey) rec.getKey()).getNodeName()
+        HfsPlusFileSystem fs = (HfsPlusFileSystem) getFileSystem();
+        if (fs.getVolumeHeader().getFolderCount() > 0) {
+            LeafRecord[] records = fs.getCatalog().getRecords(folder.getFolderId());
+            for (LeafRecord rec : records) {
+                if (rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER
+                    || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
+                    String name = ((CatalogKey) rec.getKey()).getNodeName()
                         .getUnicodeString();
-                        HFSPlusEntry e = new HFSPlusEntry(
-                                (HfsPlusFileSystem) getFileSystem(), null, this, name,
-                                rec);
-                        pathList.add(e);
-                    }
+                    HFSPlusEntry e = new HFSPlusEntry(
+                        (HfsPlusFileSystem) getFileSystem(), null, this, name,
+                        rec);
+                    pathList.add(e);
                 }
             }
+        }
         return new FSEntryTable(((HfsPlusFileSystem) getFileSystem()), pathList);
     }
 
