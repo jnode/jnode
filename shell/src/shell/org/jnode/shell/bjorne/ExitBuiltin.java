@@ -32,7 +32,7 @@ final class ExitBuiltin extends BjorneBuiltin {
         Iterator<String> args = command.iterator();
         if (!args.hasNext()) {
             throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT,
-                    context.getLastReturnCode());
+                    context.getParent().getLastReturnCode());
         } else {
             String arg = args.next();
             try {
