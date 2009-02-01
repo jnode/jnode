@@ -15,4 +15,15 @@
         <runMode>AS_ALIAS</runMode>
         <rc>1</rc>
     </testSpec>
+    <testSpec>
+        <title>expr 1 + 1</title>
+        <command>org.jnode.shell.command.posix.ExprCommand</command>
+        <runMode>AS_ALIAS</runMode>
+        <arg>1</arg>
+        <arg>+</arg>
+        <arg>1</arg>
+        <output>2
+</output>
+        <rc>0</rc>
+    </testSpec>
 </testSpecs>

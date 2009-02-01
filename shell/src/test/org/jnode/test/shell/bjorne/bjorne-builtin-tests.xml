@@ -1,0 +1,28 @@
+<testSpecs>
+    <title>Bjorne interpreter tests</title>
+    <plugin>
+        <id>org.jnode.shell.bjorne</id>
+        <class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
+    </plugin>
+    <plugin>
+        <id>org.jnode.shell.command.posix</id>
+    </plugin>
+    <testSpec>
+        <title>exit 0</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+exit 0
+        </script>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>exit 99</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+exit 99
+        </script>
+        <rc>99</rc>
+    </testSpec>
+</testSpecs>
