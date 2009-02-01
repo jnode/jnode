@@ -142,6 +142,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         BUILTINS.put("return", new ReturnBuiltin());
         BUILTINS.put("set", new SetBuiltin());
         BUILTINS.put("source", new SourceBuiltin());
+        BUILTINS.put(":", new ColonBuiltin());
     }
 
     private CommandShell shell;
