@@ -30,7 +30,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyVetoException;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JButton;
@@ -44,9 +48,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeAwtContext;
-import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.swingpeers.ISwingPeer;
+import org.jnode.awt.swingpeers.SwingToolkit;
 
 /**
  * @author Levente S\u00e1ntha
@@ -67,12 +70,17 @@ public class WindowBar extends JPanel {
         if (frame instanceof ISwingPeer) {
             ISwingPeer isp = ((ISwingPeer) frame);
             Component comp = isp.getAWTComponent();
-            if (!(comp instanceof Frame))
+            if (!(comp instanceof Frame) || ((Frame) comp).isUndecorated()) {
+                comp.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentHidden(ComponentEvent e) {
+                        selectNextFrame(frame.getDesktopPane());
+                    }
+                });
                 return;
-            else if (((Frame) comp).isUndecorated())
-                return;
+            }
         }
-        
+
         final FrameWrapper wrapper = new FrameWrapper(frame);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -97,6 +105,29 @@ public class WindowBar extends JPanel {
                 }
             });
         }
+        selectNextFrame(SwingToolkit.getJNodeToolkit().getAwtContext().getDesktop());
+    }
+
+    private void selectNextFrame(JDesktopPane desktop) {
+        JInternalFrame[] frames = desktop.getAllFrames();
+        JInternalFrame sel = null;
+        int z = Integer.MAX_VALUE;
+        for (int i = 0; i < frames.length; i++) {
+            JInternalFrame f = frames[i];
+            if (!f.isIcon() && f.isVisible()) {
+                int fz = desktop.getComponentZOrder(f);
+                if (fz > -1 && fz < z) {
+                    z = fz;
+                    sel = f;
+                }
+            }
+        }
+        try {
+            if (sel != null)
+                sel.setSelected(true);
+        } catch (PropertyVetoException x) {
+            //ignore
+        }
     }
 
     private class FrameWrapper extends JButton {
@@ -117,6 +148,7 @@ public class WindowBar extends JPanel {
                         } else if (frame.isSelected()) {
                             frame.setSelected(false);
                             frame.setIcon(true);
+                            selectNextFrame(frame.getDesktopPane());
                         } else {
                             frame.setSelected(true);
                         }
@@ -131,25 +163,15 @@ public class WindowBar extends JPanel {
                 }
 
                 public void internalFrameClosed(InternalFrameEvent event) {
-                    remove(FrameWrapper.this);
-                    removeFrame(FrameWrapper.this.frame);
-                    final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
-                    final JNodeAwtContext ctx = tk.getAwtContext();
-                    final JDesktopPane desktop = ctx.getDesktop();
-                    desktop.remove(FrameWrapper.this.frame);
-                    revalidate();
-                    repaint();
+                    //empty
                 }
 
                 public void internalFrameClosing(InternalFrameEvent event) {
-                    remove(FrameWrapper.this);
+                    final JDesktopPane desktop = FrameWrapper.this.frame.getDesktopPane();
                     removeFrame(FrameWrapper.this.frame);
-                    final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
-                    final JNodeAwtContext ctx = tk.getAwtContext();
-                    final JDesktopPane desktop = ctx.getDesktop();
-                    JDesktopPane desk = frame.getDesktopPane();
                     desktop.remove(FrameWrapper.this.frame);
-                    desk.repaint();
+                    selectNextFrame(desktop);
+                    desktop.repaint();
                 }
 
                 public void internalFrameDeactivated(InternalFrameEvent event) {
@@ -177,6 +199,7 @@ public class WindowBar extends JPanel {
                         if (frame.isMaximum())
                             frame.setMaximum(false);
                         frame.setIcon(true);
+                        selectNextFrame(frame.getDesktopPane());
                     } catch (PropertyVetoException e) {
                         //ignore
                     }
@@ -234,6 +257,14 @@ public class WindowBar extends JPanel {
                             int h = frameActions.getPreferredSize().height;
                             frameActions.show(frame.getDesktopPane(), p.x, p.y - h);
                         }
+                    }
+                }
+            });
+            frame.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (JInternalFrame.TITLE_PROPERTY.equals(evt.getPropertyName())) {
+                        setText(frame.getTitle());
                     }
                 }
             });

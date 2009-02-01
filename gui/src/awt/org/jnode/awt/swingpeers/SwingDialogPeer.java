@@ -39,7 +39,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
         super(toolkit, target, new SwingDialog(target, target.getTitle()));
         setTitle(target.getTitle());
         setResizable(target.isResizable());
-        peerComponent.setIconifiable(true);
+        peerComponent.setIconifiable(false);
         peerComponent.setMaximizable(true);
         peerComponent.setClosable(true);
         peerComponent.setTitle(target.getTitle());
