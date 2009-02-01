@@ -1,8 +1,8 @@
 /*
- * $Id$
+ * $Id: header.txt 2224 2006-01-01 12:49:03Z epr $
  *
  * JNode.org
- * Copyright (C) 2003-2006 JNode.org
+ * Copyright (C) 2003-2009 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+ 
 package org.jnode.awt.font.spi;
 
 import java.awt.Rectangle;
