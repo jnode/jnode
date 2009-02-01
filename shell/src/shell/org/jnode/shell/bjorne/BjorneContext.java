@@ -630,6 +630,10 @@ public class BjorneContext {
             }
             ch = ci.nextCh();
         }
+        
+        if (braceLevel > 0) {
+            throw new ShellSyntaxException("unmatched '{'");
+        }
 
         // Deal with case where the braces are empty ...
         if (sb.length() == 0) {
