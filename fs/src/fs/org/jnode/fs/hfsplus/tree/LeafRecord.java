@@ -20,14 +20,6 @@ public class LeafRecord extends AbstractNodeRecord {
         return BigEndian.getInt16(this.recordData, 0);
     }
 
-    @Override
-    public byte[] getBytes() {
-        byte[] data = new byte[key.getKeyLength() + this.recordData.length];
-        System.arraycopy(data, 0, key.getBytes(), 0, key.getKeyLength());
-        System.arraycopy(data, key.getKeyLength(), this.recordData, 0, this.recordData.length);
-        return data;
-    }
-
     public final String toString() {
         return "Type : " + getType() + "\nKey : " + getKey().toString() + "\n";
     }

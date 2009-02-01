@@ -15,7 +15,7 @@ public class HFSUnicodeString {
      */
     public HFSUnicodeString(final byte[] src, final int offset) {
         length = BigEndian.getInt16(src, offset);
-        byte[] data = new byte[2 + length * 2];
+        byte[] data = new byte[2 + (length * 2)];
         System.arraycopy(src, offset, data, 0, 2);
         length = BigEndian.getInt16(data, 0);
         data = new byte[length * 2];
@@ -45,7 +45,16 @@ public class HFSUnicodeString {
     }
 
     public final byte[] getBytes() {
-        return (length + "" + string).getBytes();
+        char[] result = new char[length];
+        string.getChars(0, length, result, 0);
+        byte[] name = new byte[length * 2];
+        for (int i = 0; i < length; ++i) {
+            BigEndian.setChar(name, i * 2, result[i]);
+        }
+        byte[] data = new byte[(length * 2) + 2];
+        BigEndian.setInt16(data, 0, length);
+        System.arraycopy(name, 0, data, 2, name.length);
+        return data;
     }
 
 }

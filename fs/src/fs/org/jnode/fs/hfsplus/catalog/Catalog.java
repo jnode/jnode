@@ -89,14 +89,14 @@ public class Catalog {
         // TODO initialize attributes, max key length and key comparaison type.
         bufferLength += BTHeaderRecord.BT_HEADER_RECORD_LENGTH;
         // Create root node 
-        int rootNodePosition = bthr.getRootNode() * bthr.getNodeSize();
+        int rootNodePosition = bthr.getRootNode() * nodeSize;
         bufferLength += (rootNodePosition - bufferLength);
         //Create node descriptor
         NodeDescriptor nd = new NodeDescriptor();
         nd.setKind(HfsPlusConstants.BT_LEAF_NODE);
         nd.setHeight(1);
         nd.setRecordCount(params.isJournaled() ? 6 : 2);
-        CatalogNode rootNode = new CatalogNode(nd, bthr.getNodeSize());
+        CatalogNode rootNode = new CatalogNode(nd, nodeSize);
         int offset = NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH;
         // First record (folder)
         HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
