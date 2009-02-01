@@ -34,7 +34,7 @@ final class SetBuiltin extends BjorneBuiltin {
             String flags = it.next();
             // FIXME ... lots more to implement ...
             if (flags.equals("-x")) {
-                context.setEchoExpansions(true);
+                context.getParent().setEchoExpansions(true);
             }
         }
         return 0;

@@ -44,6 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.PathnamePattern;
@@ -122,6 +123,8 @@ public class BjorneContext {
 
     private boolean echoExpansions;
 
+    private BjorneContext parent;
+
     public BjorneContext(BjorneInterpreter interpreter, StreamHolder[] holders) {
         this.interpreter = interpreter;
         this.holders = holders;
@@ -129,11 +132,16 @@ public class BjorneContext {
     }
 
     public BjorneContext(BjorneInterpreter interpreter) {
-        this(interpreter, new StreamHolder[] {
-            new StreamHolder(CommandLine.DEFAULT_STDIN, false),
-            new StreamHolder(CommandLine.DEFAULT_STDOUT, false),
-            new StreamHolder(CommandLine.DEFAULT_STDERR, false),
-            new StreamHolder(CommandLine.DEFAULT_STDERR, false)});
+        this(interpreter, defaultStreamHolders());
+    }
+    
+    private static StreamHolder[] defaultStreamHolders() {
+        StreamHolder[] res = new StreamHolder[4];
+        res[Command.STD_IN] = new StreamHolder(CommandLine.DEFAULT_STDIN, false);
+        res[Command.STD_OUT] = new StreamHolder(CommandLine.DEFAULT_STDOUT, false);
+        res[Command.STD_ERR] = new StreamHolder(CommandLine.DEFAULT_STDERR, false);
+        res[Command.SHELL_ERR] = new StreamHolder(CommandLine.DEFAULT_STDERR, false);
+        return res;
     }
 
     /**
@@ -143,11 +151,13 @@ public class BjorneContext {
      * @param parent the context that gives us our initial state.
      */
     public BjorneContext(BjorneContext parent) {
+        this.parent = parent;
         this.interpreter = parent.interpreter;
         this.holders = copyStreamHolders(parent.holders);
         this.variables = copyVariables(parent.variables);
         this.globbing = parent.globbing;
         this.tildeExpansion = parent.tildeExpansion;
+        this.echoExpansions = parent.echoExpansions;
     }
     
     public boolean isTildeExpansion() {
@@ -164,6 +174,38 @@ public class BjorneContext {
 
     public void setGlobbing(boolean globbing) {
         this.globbing = globbing;
+    }
+
+    public boolean isNoClobber() {
+        return isVariableSet("NOCLOBBER");
+    }
+
+    void setEchoExpansions(boolean echoExpansions) {
+        this.echoExpansions = echoExpansions;
+    }
+
+    boolean isEchoExpansions() {
+        return this.echoExpansions;
+    }
+
+    final int getLastAsyncPid() {
+        return this.lastAsyncPid;
+    }
+
+    final int getLastReturnCode() {
+        return this.lastReturnCode;
+    }
+    
+    final void setLastReturnCode(int rc) {
+        this.lastReturnCode = rc;
+    }
+
+    final int getShellPid() {
+        return this.shellPid;
+    }
+    
+    final BjorneContext getParent() {
+        return this.parent;
     }
 
     /**
@@ -768,13 +810,13 @@ public class BjorneContext {
     }
 
     int execute(CommandLine command, CommandIO[] streams) throws ShellException {
-        if (echoExpansions) {
+        if (isEchoExpansions()) {
             StringBuilder sb = new StringBuilder();
             sb.append(" + ").append(command.getCommandName());
             for (String arg : command.getArguments()) {
                 sb.append(" ").append(arg);
             }
-            streams[2].getPrintWriter().println(sb);
+            resolvePrintStream(streams[Command.STD_ERR]).println(sb);
         }
         lastReturnCode = interpreter.executeCommand(command, this, streams);
         return lastReturnCode;
@@ -804,34 +846,6 @@ public class BjorneContext {
         } else {
             holders[index].setStream(stream, mine);
         }
-    }
-
-    public boolean isNoClobber() {
-        return isVariableSet("NOCLOBBER");
-    }
-
-    void setEchoExpansions(boolean echoExpansions) {
-        this.echoExpansions = echoExpansions;
-    }
-
-    boolean isEchoExpansions() {
-        return this.echoExpansions;
-    }
-
-    final int getLastAsyncPid() {
-        return lastAsyncPid;
-    }
-
-    final int getLastReturnCode() {
-        return lastReturnCode;
-    }
-    
-    final void setLastReturnCode(int rc) {
-        lastReturnCode = rc;
-    }
-
-    final int getShellPid() {
-        return shellPid;
     }
 
     void performAssignments(BjorneToken[] assignments) throws ShellException {
