@@ -43,7 +43,6 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     public final void read() throws FileSystemException {
         sb = new Superblock(this, false);
 
-        log.debug("Superblock informations:\n" + sb.toString());
         if (!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)) {
             log
             .info(getDevice().getId()
@@ -149,7 +148,6 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             Catalog catalog = new Catalog(params);
             this.getApi().write(offset,  catalog.getBytes());
             log.debug("Write volume header to disk.");
-            log.debug(sb.toString());
             this.getApi().write(1024, ByteBuffer.wrap(sb.getBytes()));
             flush();
         } catch (IOException e) {

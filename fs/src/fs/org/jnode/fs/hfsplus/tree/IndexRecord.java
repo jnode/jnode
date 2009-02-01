@@ -13,13 +13,7 @@ public class IndexRecord extends AbstractNodeRecord {
     public IndexRecord(final Key key, final byte[] nodeData, final int offset) {
         this.key = key;
         this.recordData = new byte[4];
-        System.arraycopy(nodeData, offset + key.getKeyLength() + 2, recordData, 0, 4);
-    }
-
-    @Override
-    public byte[] getBytes() {
-        // TODO Auto-generated method stub
-        return null;
+        System.arraycopy(nodeData, offset + key.getKeyLength(), recordData, 0, 4);
     }
    
     public final int getIndex() {

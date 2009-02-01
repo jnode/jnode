@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
+import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -91,19 +92,21 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
     @Override
     protected final FSEntryTable readEntries() throws IOException {
         List<FSEntry> pathList = new LinkedList<FSEntry>();
-        LeafRecord[] records = ((HfsPlusFileSystem) getFileSystem())
-                .getCatalog().getRecords(folder.getFolderId());
-        for (LeafRecord rec : records) {
-            if (rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER
-                    || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
-                String name = ((CatalogKey) rec.getKey()).getNodeName()
+        HfsPlusFileSystem fs = (HfsPlusFileSystem)getFileSystem();
+            if(fs.getVolumeHeader().getFolderCount() > 0) {
+                LeafRecord[] records = fs.getCatalog().getRecords(folder.getFolderId());
+                for (LeafRecord rec : records) {
+                    if (rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER
+                            || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
+                        String name = ((CatalogKey) rec.getKey()).getNodeName()
                         .getUnicodeString();
-                HFSPlusEntry e = new HFSPlusEntry(
-                        (HfsPlusFileSystem) getFileSystem(), null, this, name,
-                        rec);
-                pathList.add(e);
+                        HFSPlusEntry e = new HFSPlusEntry(
+                                (HfsPlusFileSystem) getFileSystem(), null, this, name,
+                                rec);
+                        pathList.add(e);
+                    }
+                }
             }
-        }
         return new FSEntryTable(((HfsPlusFileSystem) getFileSystem()), pathList);
     }
 

@@ -6,11 +6,10 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
 public class CatalogKey extends AbstractKey {
-
+    
+    public static final int MINIMUM_KEY_LENGTH = 6;
     public static final int MAXIMUM_KEY_LENGTH = 516;
 
-    private int keyLength;
-    private CatalogNodeId parentID;
     private HFSUnicodeString nodeName;
 
     /**
@@ -19,14 +18,17 @@ public class CatalogKey extends AbstractKey {
      * @param offset
      */
     public CatalogKey(final byte[] src, final int offset) {
+        int currentOffset = offset;
         byte[] ck = new byte[2];
-        System.arraycopy(src, offset, ck, 0, 2);
+        System.arraycopy(src, currentOffset, ck, 0, 2);
         keyLength = BigEndian.getInt16(ck, 0);
+        currentOffset += 2;
         ck = new byte[4];
-        System.arraycopy(src, offset + 2, ck, 0, 4);
+        System.arraycopy(src, currentOffset, ck, 0, 4);
         parentID = new CatalogNodeId(ck, 0);
-        if (keyLength > 6) {
-            nodeName = new HFSUnicodeString(src, offset + 6);
+        currentOffset += 4;
+        if (keyLength > MINIMUM_KEY_LENGTH) {
+            nodeName = new HFSUnicodeString(src, currentOffset);
         }
     }
 
@@ -38,7 +40,7 @@ public class CatalogKey extends AbstractKey {
     public CatalogKey(final CatalogNodeId parentID, final HFSUnicodeString name) {
         this.parentID = parentID;
         this.nodeName = name;
-        this.keyLength = 6 + name.getLength();
+        this.keyLength = MINIMUM_KEY_LENGTH + name.getLength();
     }
 
     public final int getKeyLength() {
@@ -79,12 +81,8 @@ public class CatalogKey extends AbstractKey {
     
     public final String toString() {
         StringBuffer s = new StringBuffer();
-        s.append("Key length: ").append(getKeyLength()).append(" ");
-        s.append("Parent ID: ").append(getParentId().getId()).append(" ");
-        s.append("Node name: ")
-                .append(
-                        (getNodeName() != null) ? getNodeName()
-                                .getUnicodeString() : "");
+        s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",").append(getParentId().getId())
+                .append(",").append((getNodeName() != null) ? getNodeName().getUnicodeString() : "");
         return s.toString();
     }
     
