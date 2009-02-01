@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 
@@ -248,16 +248,16 @@ public class BigEndian {
         final int v0 = data[offset + 1] & 0xFF;
         return (char) ((v1 << 8) | v0);
     }
-    
+
     /**
      * Set char as byte in the given byte array at the given offset.
-     * 
+     *
      * @param dst
      * @param offset
      * @param value
      */
     public static void setChar(byte[] dst, int offset, char value) {
-        dst[offset + 1] = (byte)(value & 0xFF);
-        dst[offset + 0] = (byte)((value >>> 8) & 0xFF);
+        dst[offset + 1] = (byte) (value & 0xFF);
+        dst[offset + 0] = (byte) ((value >>> 8) & 0xFF);
     }
 }
