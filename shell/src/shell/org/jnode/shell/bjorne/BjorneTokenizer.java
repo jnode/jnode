@@ -222,7 +222,6 @@ public class BjorneTokenizer {
                 case ';':
                 case '&':
                 case '|':
-                case '#':
                 case ' ':
                 case '\t':
                     if (quoteChar == 0) {
