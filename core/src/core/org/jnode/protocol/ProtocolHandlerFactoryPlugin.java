@@ -1,7 +1,6 @@
 /*
  * $Id$
  *
- * JNode.org
  * Copyright (C) 2003-2009 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it

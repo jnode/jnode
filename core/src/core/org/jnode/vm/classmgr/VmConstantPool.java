@@ -1,7 +1,6 @@
 /*
- * $Id: header.txt 2224 2006-01-01 12:49:03Z epr $
+ * $Id$
  *
- * JNode.org
  * Copyright (C) 2003-2009 JNode.org
  *
  * This library is free software; you can redistribute it and/or modify it
