@@ -31,14 +31,16 @@ vbematch 800 600 32
 module /full.jgz
 
 # ---------------------------
-title JNode (default with MP)
-kernel /jnode32.gz
-module /default.jgz
+# -- disabled
+#title JNode (default with MP)
+#kernel /jnode32.gz
+#module /default.jgz
 
 # ---------------------------
-title JNode (all plugins with MP)
-kernel /jnode32.gz
-module /full.jgz
+# -- disabled
+#title JNode (all plugins with MP)
+#kernel /jnode32.gz
+#module /full.jgz
 
 # ---------------------------
 # -- disabled
@@ -47,16 +49,18 @@ module /full.jgz
 #module /fullgui.jgz
 
 # ---------------------------
-title JNode via dhcp (default with MP)
-dhcp
-kernel (nd)/jnode32.gz
-module (nd)/default.jgz
+# -- disabled
+#title JNode via dhcp (default with MP)
+#dhcp
+#kernel (nd)/jnode32.gz
+#module (nd)/default.jgz
 
 # ---------------------------
-title JNode via dhcp (all plugins with MP)
-dhcp
-kernel (nd)/jnode32.gz
-module (nd)/full.jgz
+# -- disabled
+#title JNode via dhcp (all plugins with MP)
+#dhcp
+#kernel (nd)/jnode32.gz
+#module (nd)/full.jgz
 
 # ---------------------------
 # -- disabled
@@ -66,8 +70,14 @@ module (nd)/full.jgz
 #module (nd)/fullgui.jgz
 
 # ---------------------------
-title JNode tests (all plugins + tests with MP)
-kernel /jnode32.gz
+# -- disabled
+#title JNode tests (all plugins + tests with MP)
+#kernel /jnode32.gz
+#module /tests.jgz
+
+# ---------------------------
+title JNode tests (all plugins + tests)
+kernel /jnode32.gz mp=no
 module /tests.jgz
 
 # ---------------------------
@@ -87,3 +97,9 @@ module /tests.jgz
 #title JNode Install
 #kernel /jnode32.gz
 #module /install.jgz
+
+# ---------------------------
+title JNode via dhcp (all plugins)
+dhcp
+kernel (nd)/jnode32.gz mp=no
+module (nd)/full.jgz
