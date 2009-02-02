@@ -53,7 +53,9 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.desktop"/>
 
     <plugin id="org.jnode.driver.character"/>
+    <!-- temporally disabled
     <plugin id="org.jnode.driver.block.floppy"/>
+    -->
     <plugin id="org.jnode.driver.block.ide.disk"/>
     <plugin id="org.jnode.driver.block.ramdisk"/>
     <plugin id="org.jnode.driver.block.ramdisk.command"/>
@@ -90,7 +92,9 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.net.via_rhine"/>
     <plugin id="org.jnode.driver.ps2"/>
     <plugin id="org.jnode.driver.serial"/>
+    <!-- temporally disabled
     <plugin id="org.jnode.driver.system.acpi"/>
+    -->
     <plugin id="org.jnode.driver.system.cmos"/>
     <plugin id="org.jnode.driver.system.firmware"/>
     <plugin id="org.jnode.driver.system.firmware.bios"/>
@@ -164,7 +168,9 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.shell.command.bsh"/>
     <plugin id="org.jnode.shell.command.debug"/>
     <plugin id="org.jnode.shell.command.driver"/>
+    <!-- temporally disabled
     <plugin id="org.jnode.shell.command.driver.system.acpi"/>
+    -->
     <plugin id="org.jnode.shell.command.driver.system.bus"/>
     <plugin id="org.jnode.shell.command.driver.console"/>
     <plugin id="org.jnode.shell.command.log4j"/>
