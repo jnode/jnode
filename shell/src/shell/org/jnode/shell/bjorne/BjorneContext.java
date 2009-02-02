@@ -741,6 +741,10 @@ public class BjorneContext {
                 return (value == null) ? word : value;
             case COLONHYPHEN:
                 return (value == null || value.length() == 0) ? word : value;
+            case PLUS:
+                return (value == null) ? "" : word;
+            case COLONPLUS:
+                return (value == null || value.length() == 0) ? "" : word;
             case QUERY:
                 if (value == null) {
                     String msg = word.length() > 0 ? word : (parameter + " is unset");
