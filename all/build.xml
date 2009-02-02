@@ -408,7 +408,8 @@ clean             Remove all intermediate build results.
     <target name="cd-x86" depends="assemble">
         <tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**"/>
         <x86-build bits="32" target="java-image"/>
-        <x86-build bits="64" target="java-image"/>
+        <!-- TODO enable this when 64 bit support is working -->
+        <!--x86-build bits="64" target="java-image"/-->
         <property name="jnode.bits" value="32" />
         <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom"/>
     </target>
@@ -655,30 +656,45 @@ clean             Remove all intermediate build results.
 
     <!-- Compare classpath version of jnode with real classpath version -->
     <target name="header-fix" depends="assemble">
+        <!-- todo clean up the excludes -->
         <taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode"/>
 
         <header update="on" headerFile="${root.dir}/all/template/header.txt">
             <fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
             <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/core" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
+                    excludes="gnu/classpath/jdwp/VMFrame.java,
+                               gnu/classpath/jdwp/VMIdManager.java,
+                               gnu/classpath/jdwp/VMMethod.java,
+                               gnu/classpath/jdwp/VMVirtualMachine.java,
+                               gnu/classpath/VMStackWalker.java,
+                               gnu/java/lang/VMInstrumentationImpl.java,
+                               gnu/java/nio/VMChannel.java,
+                               java/lang/Thread.java,
+                               java/lang/VMProcess.java,
+                               java/lang/VMSystem.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/vm" includes="**/*.java" excludes="java/lang/NativeStrictMath.java"/>
+            <fileset dir="${root.dir}/core/src/core" includes="**/*.java" excludes="org/jnode/imageio/jpeg/JPEGDecoder"/>
+            <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" excludes="org/mmtk/vm/**/*.java"/>
             <fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/test" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/test" includes="**/*.java" excludes="org/jnode/test/mauve/**/*.java,org/jtestserver/**/*.java"/>
             <fileset dir="${root.dir}/distr/src/install" includes="**/*.java"/>
             <fileset dir="${root.dir}/distr/src/apps" includes="**/*.java"/>
+            <fileset dir="${root.dir}/distr/src/emu" includes="**/*.java"/>
+            <fileset dir="${root.dir}/distr/src/test" includes="**/*.java"/>
             <fileset dir="${root.dir}/fs/src/fs" includes="**/*.java"/>
             <fileset dir="${root.dir}/fs/src/driver" includes="**/*.java"/>
             <fileset dir="${root.dir}/fs/src/test" includes="**/*.java"/>
-            <fileset dir="${root.dir}/gui/src/awt" includes="**/*.java"/>
+            <fileset dir="${root.dir}/gui/src/awt" includes="**/*.java" excludes="org/jnode/awt/font/bdf/**/*.java"/>
             <fileset dir="${root.dir}/gui/src/desktop" includes="**/*.java"/>
             <fileset dir="${root.dir}/gui/src/driver" includes="**/*.java"/>
             <fileset dir="${root.dir}/gui/src/test" includes="**/*.java"/>
             <fileset dir="${root.dir}/net/src/net" includes="**/*.java"/>
             <fileset dir="${root.dir}/net/src/driver" includes="**/*.java"/>
             <fileset dir="${root.dir}/net/src/test" includes="**/*.java"/>
+            <fileset dir="${root.dir}/shell/src/emu" includes="**/*.java"/>
             <fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
+            <fileset dir="${root.dir}/shell/src/test" includes="**/*.java"/>
         </header>
     </target>
 
