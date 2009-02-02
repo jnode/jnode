@@ -141,14 +141,90 @@ A is 2
         <runMode>AS_SCRIPT</runMode>
         <script>#!bjorne
                 A=cat
+                B=
                 echo A is $A
                 echo A is ${A}
+                echo B is $B
+                echo B is ${B}
+                echo X is $X
+                echo X is ${X}
                 echo A length is ${#A}
+                echo B length is ${#B}
+                echo X length is ${#X}
+                echo A :- dog is ${A:-dog}
+                echo B :- dog is ${B:-dog}
+                echo X :- dog is ${X:-dog}
+                echo A - dog is ${A-dog}
+                echo B - dog is ${B-dog}
+                echo X - dog is ${X-dog}
         </script>
         <output>A is cat
 A is cat
+B is
+B is
+X is
+X is
 A length is 3
+B length is 0
+X length is 0
+A :- dog is cat
+B :- dog is dog
+X :- dog is dog
+A - dog is cat
+B - dog is
+X - dog is dog
 </output>
         <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..?..} expansions #1</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A :? dog is ${A:?dog}
+                echo B :? dog is ${B:?dog}
+                echo X :? dog is ${X:?dog}
+        </script>
+        <output>A :? dog is cat
+</output>
+    <error>dog
+</error>
+        <rc>1</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..?..} expansions #2</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A :? dog is ${A:?dog}
+                echo X :? dog is ${X:?dog}
+        </script>
+        <output>A :? dog is cat
+</output>
+    <error>dog
+</error>
+        <rc>1</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..?..} expansions #3</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A ? dog is ${A?dog}
+                echo B ? dog is ${B?dog}
+                echo X ? dog is ${X?dog}
+        </script>
+        <output>A ? dog is cat
+B ? dog is
+</output>
+    <error>dog
+</error>
+        <rc>1</rc>
     </testSpec>
 </testSpecs>

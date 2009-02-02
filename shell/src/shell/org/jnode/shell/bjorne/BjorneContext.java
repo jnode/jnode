@@ -547,7 +547,7 @@ public class BjorneContext {
         return sb;
     }
 
-    private String dollarExpansion(CharIterator ci, char quote) throws ShellSyntaxException {
+    private String dollarExpansion(CharIterator ci, char quote) throws ShellException {
         int ch = ci.nextCh();
         switch (ch) {
             case -1:
@@ -587,7 +587,7 @@ public class BjorneContext {
         }
     }
 
-    private String dollarBraceExpansion(CharIterator ci) throws ShellSyntaxException {
+    private String dollarBraceExpansion(CharIterator ci) throws ShellException {
         // Scan to the '}' that matches the '${'
         StringBuffer sb = new StringBuffer();
         int braceLevel = 1;
@@ -722,9 +722,10 @@ public class BjorneContext {
                 case HYPHEN:
                 case HASH:
                 case PERCENT:
+                    i++;
                     break;
                 default:
-                    i++;
+                    i += 2;
                     break;
             }
             // Extract the word
@@ -739,6 +740,26 @@ public class BjorneContext {
                 return (value != null) ? value : "";
             case PREHASH:
                 return (value != null) ? Integer.toString(value.length()) : "0";
+            case HYPHEN:
+                return (value == null) ? word : value;
+            case COLONHYPHEN:
+                return (value == null || value.length() == 0) ? word : value;
+            case QUERY:
+                if (value == null) {
+                    String msg = word.length() > 0 ? word : (parameter + " is unset");
+                    resolvePrintStream(getStream(Command.STD_ERR)).println(msg);
+                    throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT, 1);
+                } else {
+                    return value;
+                }
+            case COLONQUERY:
+                if (value == null || value.length() == 0) {
+                    String msg = word.length() > 0 ? word : (parameter + " is unset or null");
+                    resolvePrintStream(getStream(Command.STD_ERR)).println(msg);
+                    throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT, 1);
+                } else {
+                    return value;
+                }
             default:
                 throw new ShellFailureException("not implemented");
         }
