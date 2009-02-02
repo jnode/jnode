@@ -729,9 +729,6 @@ public class BjorneContext {
                     break;
             }
             // Extract the word
-            if (i >= sb.length()) {
-                throw new ShellSyntaxException("bad substitution");
-            }
             word = sb.substring(i);
         }
         String value = variable(parameter);
@@ -757,6 +754,20 @@ public class BjorneContext {
                     String msg = word.length() > 0 ? word : (parameter + " is unset or null");
                     resolvePrintStream(getStream(Command.STD_ERR)).println(msg);
                     throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT, 1);
+                } else {
+                    return value;
+                }
+            case EQUALS:
+                if (value == null) {
+                    setVariable(parameter, word);
+                    return word;
+                } else {
+                    return value;
+                }
+            case COLONEQUALS:
+                if (value == null || value.length() == 0) {
+                    setVariable(parameter, word);
+                    return word;
                 } else {
                     return value;
                 }
