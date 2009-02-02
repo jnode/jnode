@@ -1,24 +1,57 @@
 /*
- * $Id: header.txt 2224 2006-01-01 12:49:03Z epr $
+ * Copyright 2003-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * JNode.org
- * Copyright (C) 2003-2009 JNode.org
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the LICENSE file that accompanied this code.
  *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
- * This library is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
- * License for more details.
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * CA 95054 USA or visit www.sun.com if you need additional information or
+ * have any questions.
  */
- 
+
+/* We use APIs that access the standard Unix environ array, which
+ * is defined by UNIX98 to look like:
+ *
+ *    char **environ;
+ *
+ * These are unsorted, case-sensitive, null-terminated arrays of bytes
+ * of the form FOO=BAR\000 which are usually encoded in the user's
+ * default encoding (file.encoding is an excellent choice for
+ * encoding/decoding these).  However, even though the user cannot
+ * directly access the underlying byte representation, we take pains
+ * to pass on the child the exact byte representation we inherit from
+ * the parent process for any environment name or value not created by
+ * Javaland.  So we keep track of all the byte representations.
+ *
+ * Internally, we define the types Variable and Value that exhibit
+ * String/byteArray duality.  The internal representation of the
+ * environment then looks like a Map<Variable,Value>.  But we don't
+ * expose this to the user -- we only provide a Map<String,String>
+ * view, although we could also provide a Map<byte[],byte[]> view.
+ *
+ * The non-private methods in this class are not for general use even
+ * within this package.  Instead, they are the system-dependent parts
+ * of the system-independent method of the same name.  Don't even
+ * think of using this class unless your method's name appears below.
+ *
+ * @author  Martin Buchholz
+ * @since   1.5
+ */
+
 package java.lang;
 
 import java.io.*;
