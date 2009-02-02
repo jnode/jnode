@@ -163,6 +163,18 @@ A is 2
                 echo A - null is ${A-}
                 echo B - null is ${B-}
                 echo X - null is ${X-}
+                echo A :+ dog is ${A:+dog}
+                echo B :+ dog is ${B:+dog}
+                echo X :+ dog is ${X:+dog}
+                echo A + dog is ${A+dog}
+                echo B + dog is ${B+dog}
+                echo X + dog is ${X+dog}
+                echo A :+ null is ${A:+}
+                echo B :+ null is ${B:+}
+                echo X :+ null is ${X:+}
+                echo A + null is ${A+}
+                echo B + null is ${B+}
+                echo X + null is ${X+}
         </script>
         <output>A is cat
 A is cat
@@ -185,6 +197,18 @@ X :- null is
 A - null is cat
 B - null is
 X - null is
+A :+ dog is dog
+B :+ dog is
+X :+ dog is
+A + dog is dog
+B + dog is dog
+X + dog is
+A :+ null is
+B :+ null is
+X :+ null is
+A + null is
+B + null is
+X + null is
 </output>
         <rc>0</rc>
     </testSpec>
