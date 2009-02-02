@@ -37,5 +37,7 @@
   <plugin id="net.wimpi.telnetd"/>
 
   <plugin id="jetty"/>
+    <!--
   <plugin id="derby"/>
+    -->
 </plugin-list>
