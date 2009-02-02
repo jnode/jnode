@@ -157,6 +157,12 @@ A is 2
                 echo A - dog is ${A-dog}
                 echo B - dog is ${B-dog}
                 echo X - dog is ${X-dog}
+                echo A :- null is ${A:-}
+                echo B :- null is ${B:-}
+                echo X :- null is ${X:-}
+                echo A - null is ${A-}
+                echo B - null is ${B-}
+                echo X - null is ${X-}
         </script>
         <output>A is cat
 A is cat
@@ -173,6 +179,12 @@ X :- dog is dog
 A - dog is cat
 B - dog is
 X - dog is dog
+A :- null is cat
+B :- null is
+X :- null is
+A - null is cat
+B - null is
+X - null is
 </output>
         <rc>0</rc>
     </testSpec>
@@ -226,5 +238,102 @@ B ? dog is
     <error>dog
 </error>
         <rc>1</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..?..} expansions #4</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A :? null is ${A:?}
+                echo B :? null is ${B:?}
+                echo X :? null is ${X:?}
+        </script>
+        <output>A :? null is cat
+</output>
+    <error>B is unset or null
+</error>
+        <rc>1</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..?..} expansions #5</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A :? null is ${A:?}
+                echo X :? null is ${X:?}
+        </script>
+        <output>A :? null is cat
+</output>
+    <error>X is unset or null
+</error>
+        <rc>1</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..?..} expansions #6</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A ? null is ${A?}
+                echo B ? null is ${B?}
+                echo X ? null is ${X?}
+        </script>
+        <output>A ? null is cat
+B ? null is
+</output>
+    <error>X is unset
+</error>
+        <rc>1</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..=..} expansions</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A := dog is ${A:=dog}
+                echo $A
+                echo B := dog is ${B:=dog}
+                echo $B
+                echo X := dog is ${X:=dog}
+                echo $X
+        </script>
+        <output>A := dog is cat
+cat
+B := dog is dog
+dog
+X := dog is dog
+dog
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..=..} expansions #2</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=
+                echo A = dog is ${A=dog}
+                echo $A
+                echo B = dog is ${B=dog}
+                echo $B
+                echo X = dog is ${X=dog}
+                echo $X
+        </script>
+        <output>A = dog is cat
+cat
+B = dog is
+
+X = dog is dog
+dog
+</output>
+        <rc>0</rc>
     </testSpec>
 </testSpecs>
