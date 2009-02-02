@@ -30,6 +30,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Random;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -550,10 +552,16 @@ public class Tetris extends JComponent implements KeyListener, MouseListener {
                 }
                 JFrame frame = new JFrame("Tetris");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                Tetris tetris = new Tetris();
+                final Tetris tetris = new Tetris();
                 tetris.delay = delay;
                 frame.add(tetris, BorderLayout.CENTER);
                 frame.setSize(DIM.width + 7, DIM.height + CELL + CELL / 2);
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        tetris.setUp(false);
+                    }
+                });
                 frame.setVisible(true);
                 tetris.requestFocus();
                 tetris.newGame();
