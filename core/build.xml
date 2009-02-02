@@ -31,6 +31,7 @@
 	<pathelement location="${my-src.dir}/openjdk/org"/>
 	<pathelement location="${my-src.dir}/openjdk/com"/>
 	<pathelement location="${my-src.dir}/openjdk/sun"/>
+	<pathelement location="${my-src.dir}/openjdk/svm"/>
 	<pathelement location="${my-src.dir}/openjdk/vm"/>
   </path>
   <path id="classpath-sources-corba">
@@ -114,6 +115,7 @@
       <fileset dir="${my-src.dir}/openjdk/org" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/com" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/sun" includes="**/*.jav"/>
+      <fileset dir="${my-src.dir}/openjdk/svm" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/vm" includes="**/*.jav"/>
     </copy>
     <ExpandTest classname="PrimitiveIntTest" type="int"/>
@@ -184,6 +186,7 @@
 	    <fileset dir="${my-src.dir}/openjdk/org" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/com" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/sun" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/openjdk/svm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/corba" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/jaxws" excludes="${my-non-resources}"/>
