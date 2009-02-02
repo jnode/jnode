@@ -331,7 +331,7 @@
     </target>
 
     <!-- Give help on possible targets -->
-    <target name="help">
+    <target name="help" description="help on the important targets">
         <echo>
 Welcome to the JNode build system.
 			
@@ -351,11 +351,11 @@ cd-x86-lite       Build the JNode bootable CD-ROM for the X86
                   32-bit architecture.
 cd-x86_64-lite    Build the JNode bootable CD-ROM for the X86
                   64-bit architecture.
-			
+<!--
 create-patch      Create a patch file containing the differences
                   between the local sources and the cvs HEAD
                   branch.
-        	
+-->        	
 boot-files-winNT  Build the JNode boot files for windows NT/2K/XP
                   used together with NTLDR
 
@@ -405,7 +405,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <!-- Create a bootable CDROM image containing all x86 bootable images and the sources -->
-    <target name="cd-x86" depends="assemble">
+    <target name="cd-x86" depends="assemble" description="create a bootable JNode CD image with sources included">
         <tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**"/>
         <x86-build bits="32" target="java-image"/>
         <!-- TODO enable this when 64 bit support is working -->
@@ -457,13 +457,13 @@ clean             Remove all intermediate build results.
 	</target>
 
     <!-- Clean everything files -->
-    <target name="clean" depends="save">
+    <target name="clean" depends="save" description="clean the complete build output">
         <jnode.antall target="clean"/>
         <delete dir="${build.dir}" quiet="on"/>
     </target>
 
     <!-- Generate only the basic api javadoc files -->
-    <target name="javadoc-small">
+    <target name="javadoc-small" description="generate documentation of the basic JNode APIs">
         <jnode.javadoc destdir="${build.dir}/javadoc/small">
             <sourcepath>
                 <pathelement location="${root.dir}/core/src/classpath/gnu"/>
@@ -513,7 +513,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <!-- Generate all javadoc files -->
-    <target name="javadoc">
+    <target name="javadoc" description="generate documentation of all java source files">
         <jnode.javadoc destdir="${build.dir}/javadoc/full">
             <sourcepath>
                 <pathelement location="${root.dir}/core/src/classpath/gnu"/>
@@ -703,7 +703,7 @@ clean             Remove all intermediate build results.
         <fail message="Please set jnode.debugger.port property in jnode.properties." unless="jnode.debugger.port"/>        
     </target>
 
-    <target name="hotswap" depends="check-debugger-properties,assemble-projects">
+    <target name="hotswap" depends="check-debugger-properties,assemble-projects" description="hotswap the modified classes">
       <taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
       <hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
         <fileset dir="../core/build/classes/" includes="**/*.class">
