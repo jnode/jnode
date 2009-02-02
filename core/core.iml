@@ -25,6 +25,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/langtools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/org" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/sun" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/svm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/template" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
