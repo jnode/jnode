@@ -290,7 +290,8 @@ public class KeyboardHandler implements KeyboardListener {
             });
             return true;
 
-        } else if (key_code == KeyEvent.VK_PRINTSCREEN) {
+        } else if (key_code == KeyEvent.VK_PRINTSCREEN ||
+            key_code == KeyEvent.VK_F10 && event.isAltDown() && event.isControlDown()) {
             event.consume();
             new Thread(new Runnable() {
                 public void run() {
@@ -306,6 +307,7 @@ public class KeyboardHandler implements KeyboardListener {
                                         new Robot().createScreenCapture(new Rectangle(0, 0, ss.width, ss.height));
                                     log.debug("Saving screenshot to " + f);
                                     ImageIO.write(capture, "png", f);
+                                    log.debug("Saved " + f);
                                 } catch (Exception e) {
                                     log.error("Error taking screenshot", e);
                                 }
