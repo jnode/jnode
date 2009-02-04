@@ -82,14 +82,18 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
 
 public class BjorneParser {
     private final BjorneTokenizer tokens;
+    
+    private final String continuationPrompt;
 
-    public BjorneParser(BjorneTokenizer tokens) {
+    public BjorneParser(BjorneTokenizer tokens, String continuationPrompt) {
         this.tokens = tokens;
+        this.continuationPrompt = continuationPrompt;
     }
 
     /**
@@ -174,6 +178,7 @@ public class BjorneParser {
     }
 
     private CommandNode parseOptAndOr() throws ShellSyntaxException {
+        skipLineBreaks();
         switch (tokens.peek(RULE_1_CONTEXT).getTokenType()) {
             case TOK_LBRACE:
             case TOK_LPAREN:
@@ -349,9 +354,9 @@ public class BjorneParser {
             return null;
         }
         tokens.next();
-        if (tokens.next().getTokenType() != TOK_RPAREN) {
-            throw new ShellSyntaxException(
-                    "expected matching ')' in function_definition");
+        int tt = tokens.next().getTokenType();
+        if (tt != TOK_RPAREN) {
+            syntaxError("expected matching ')' in function_definition", tt);
         }
         skipLineBreaks();
         return new FunctionDefinitionNode(fname, parseFunctionBody());
@@ -412,8 +417,8 @@ public class BjorneParser {
             io = token;
             token = tokens.next();
         }
-        int tokenType = token.getTokenType();
-        switch (tokenType) {
+        int tt = token.getTokenType();
+        switch (tt) {
             case TOK_LESS:
             case TOK_GREAT:
             case TOK_DGREAT:
@@ -422,15 +427,17 @@ public class BjorneParser {
             case TOK_LESSGREAT:
             case TOK_CLOBBER:
                 arg = tokens.next();
-                if (arg.getTokenType() != TOK_WORD) {
-                    throw new ShellSyntaxException("expected a filename after " + token);
+                tt = arg.getTokenType();
+                if (tt != TOK_WORD) {
+                    syntaxError("expected a filename after " + token, tt);
                 }
                 break;
             case TOK_DLESS:
             case TOK_DLESSDASH:
                 arg = tokens.next();
+                tt = arg.getTokenType();
                 if (arg.getTokenType() != TOK_WORD) {
-                    throw new ShellSyntaxException("expected a here-end marker " + token);
+                    syntaxError("expected a here-end marker " + token, tt);
                 }
                 // TODO ... need to grab the HERE document ...
                 break;
@@ -439,7 +446,7 @@ public class BjorneParser {
         }
         // (The corresponding token type and redirection type values are the
         // same ...)
-        return new RedirectionNode(tokenType, io, arg);
+        return new RedirectionNode(tt, io, arg);
     }
 
     private RedirectionNode[] parseOptRedirects() throws ShellSyntaxException {
@@ -472,8 +479,9 @@ public class BjorneParser {
     private CommandNode parseSubshell() throws ShellSyntaxException {
         tokens.next();
         CommandNode compoundList = parseCompoundList();
-        if (tokens.next().getTokenType() != TOK_RPAREN) {
-            throw new ShellSyntaxException("expected ')'");
+        int tt = tokens.next().getTokenType();
+        if (tt != TOK_RPAREN) {
+            syntaxError("expected ')'", tt);
         }
         compoundList.setNodeType(CMD_SUBSHELL);
         return compoundList;
@@ -486,12 +494,14 @@ public class BjorneParser {
     LOOP: 
         while (command != null) {
             commands.add(command);
-            skipLineBreaks();
             switch (tokens.peek().getTokenType()) {
                 case TOK_SEMI:
                     break;
+                case TOK_END_OF_LINE:
+                    break;
                 case TOK_AMP:
                     command.setFlag(FLAG_ASYNC);
+                    break;
                 default:
                     break LOOP;
             }
@@ -504,8 +514,9 @@ public class BjorneParser {
     private CommandNode parseBraceGroup() throws ShellSyntaxException {
         tokens.next();
         CommandNode compoundList = parseCompoundList();
-        if (tokens.peek().getTokenType() != TOK_RBRACE) {
-            throw new ShellSyntaxException("expected '}'");
+        int tt = tokens.peek().getTokenType();
+        if (tt != TOK_RBRACE) {
+            syntaxError("expected '}'", tt);
         }
         compoundList.setNodeType(CMD_BRACE_GROUP);
         return compoundList;
@@ -516,8 +527,9 @@ public class BjorneParser {
         BjorneToken word = tokens.next();
         List<CaseItemNode> caseItems = new LinkedList<CaseItemNode>();
         skipLineBreaks();
-        if (tokens.next(RULE_6_CONTEXT).getTokenType() != TOK_IN) {
-            throw new ShellSyntaxException("expected 'in' in case_clause");
+        int tt = tokens.next(RULE_6_CONTEXT).getTokenType();
+        if (tt != TOK_IN) {
+            syntaxError("expected 'in' in case_clause", tt);
         }
         skipLineBreaks();
         BjorneToken token = tokens.peek(RULE_1_CONTEXT);
@@ -525,13 +537,13 @@ public class BjorneParser {
             caseItems.add(parseCaseItem());
             skipLineBreaks();
             token = tokens.peek(RULE_1_CONTEXT);
-            if (token.getTokenType() == TOK_DSEMI) {
+            tt = token.getTokenType();
+            if (tt == TOK_DSEMI) {
                 tokens.next();
                 skipLineBreaks();
                 token = tokens.peek(RULE_1_CONTEXT);
-            } else if (token.getTokenType() != TOK_ESAC) {
-                throw new ShellSyntaxException(
-                        "expected ';;' or 'esac' after case_item");
+            } else if (tt != TOK_ESAC) {
+                syntaxError("expected ';;' or 'esac' after case_item", tt);
             }
         }
         tokens.next();
@@ -548,9 +560,9 @@ public class BjorneParser {
             token = tokens.next();
         }
         BjorneToken[] pattern = parsePattern();
-        if (tokens.next().getTokenType() != TOK_RPAREN) {
-            throw new ShellSyntaxException(
-                    "expected ')' after pattern in case_item");
+        int tt = tokens.next().getTokenType();
+        if (tt != TOK_RPAREN) {
+            syntaxError("expected ')' after pattern in case_item", tt);
         }
         CommandNode body = null;
         skipLineBreaks();
@@ -567,9 +579,9 @@ public class BjorneParser {
     private BjorneToken[] parsePattern() throws ShellSyntaxException {
         List<BjorneToken> pattern = new LinkedList<BjorneToken>();
         while (true) {
-            BjorneToken token = tokens.next();
-            if (token.getTokenType() != TOK_WORD) {
-                throw new ShellSyntaxException("expected WORD in pattern");
+            int tt = tokens.next().getTokenType();
+            if (tt != TOK_WORD) {
+                syntaxError("expected WORD in pattern", tt);
             }
             if (tokens.peek().getTokenType() != TOK_BAR) {
                 break;
@@ -582,8 +594,9 @@ public class BjorneParser {
     private ForCommandNode parseForCommand() throws ShellSyntaxException {
         tokens.next();
         BjorneToken var = tokens.next(RULE_5_CONTEXT);
-        if (var.getTokenType() != TOK_NAME) {
-            throw new ShellSyntaxException("expected a NAME following 'for'");
+        int tt = var.getTokenType();
+        if (tt != TOK_NAME) {
+            syntaxError("expected a NAME following 'for'", tt);
         }
         skipLineBreaks();
         List<BjorneToken> words = new LinkedList<BjorneToken>();
@@ -596,10 +609,10 @@ public class BjorneParser {
                 word = tokens.peek();
             }
             if (words.isEmpty()) {
-                throw new ShellSyntaxException(
-                        "expected a wordlist following 'in'");
+                syntaxError("expected a wordlist following 'in'", word.getTokenType());
             }
-            switch (tokens.peek().getTokenType()) {
+            tt = tokens.peek().getTokenType();
+            switch (tt) {
                 case TOK_SEMI:
                     tokens.next();
                     skipLineBreaks();
@@ -608,7 +621,7 @@ public class BjorneParser {
                     skipLineBreaks();
                     break;
                 default:
-                    throw new ShellSyntaxException("expected a ';' following wordlist");
+                    syntaxError("expected a ';' following wordlist", tt);
             }
         }
         return new ForCommandNode(var,
@@ -616,13 +629,16 @@ public class BjorneParser {
     }
 
     private CommandNode parseDoGroup() throws ShellSyntaxException {
-        BjorneToken token = tokens.next(RULE_1_CONTEXT);
-        if (token.getTokenType() != TOK_DO) {
-            throw new ShellSyntaxException("expected the 'do' of a do_group");
+        skipLineBreaks();
+        int tt = tokens.next(RULE_1_CONTEXT).getTokenType();
+        if (tt != TOK_DO) {
+            syntaxError("expected the 'do' of a do_group", tt);
         }
         CommandNode body = parseCompoundList();
-        if (tokens.next(RULE_1_CONTEXT).getTokenType() != TOK_DONE) {
-            throw new ShellSyntaxException("expected a command or 'done'");
+        skipLineBreaks();
+        tt = tokens.next(RULE_1_CONTEXT).getTokenType();
+        if (tt != TOK_DONE) {
+            syntaxError("expected a command or 'done'", tt);
         }
         return body;
     }
@@ -644,23 +660,30 @@ public class BjorneParser {
     private IfCommandNode parseIfCommand() throws ShellSyntaxException {
         tokens.next();
         CommandNode cond = parseCompoundList();
-        if (tokens.next(RULE_1_CONTEXT).getTokenType() != TOK_THEN) {
-            throw new ShellSyntaxException("expected a 'then' in if_clause");
+        skipLineBreaks();
+        int tt = tokens.next(RULE_1_CONTEXT).getTokenType();
+        if (tt != TOK_THEN) {
+            syntaxError("expected a 'then' in if_clause", tt);
         }
         CommandNode thenPart = parseCompoundList();
         CommandNode elsePart = parseOptElsePart();
-        if (tokens.next(RULE_1_CONTEXT).getTokenType() != TOK_FI) {
-            throw new ShellSyntaxException("expected an 'elif', 'else' or 'fi'");
+        skipLineBreaks();
+        tt = tokens.next(RULE_1_CONTEXT).getTokenType();
+        if (tt != TOK_FI) {
+            syntaxError("expected an 'elif', 'else' or 'fi'", tt);
         }
         return new IfCommandNode(CMD_IF, cond, thenPart, elsePart);
     }
 
     private CommandNode parseOptElsePart() throws ShellSyntaxException {
+        skipLineBreaks();
         switch (tokens.next(RULE_1_CONTEXT).getTokenType()) {
             case TOK_ELIF:
                 CommandNode cond = parseCompoundList();
-                if (tokens.next(RULE_1_CONTEXT).getTokenType() != TOK_THEN) {
-                    throw new ShellSyntaxException("expected a 'then' in else_part");
+                skipLineBreaks();
+                int tt = tokens.next(RULE_1_CONTEXT).getTokenType();
+                if (tt != TOK_THEN) {
+                    syntaxError("expected a 'then' in else_part", tt);
                 }
                 return new IfCommandNode(CMD_ELIF, cond, parseCompoundList(),
                         parseOptElsePart());
@@ -669,6 +692,15 @@ public class BjorneParser {
             default:
                 tokens.backup();
                 return null;
+        }
+    }
+    
+    private void syntaxError(String msg, int tt) throws ShellSyntaxException {
+        if (tt == TOK_END_OF_STREAM) {
+            throw new IncompleteCommandException(msg, continuationPrompt);
+        } else {
+            System.err.println("tt is " + tt);
+            throw new ShellSyntaxException(msg);
         }
     }
 

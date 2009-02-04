@@ -31,7 +31,7 @@ public class BjorneParserTests extends TestCase {
     private static final boolean DEBUG = true;
 
     public void testParser() {
-        new BjorneParser(new BjorneTokenizer(""));
+        new BjorneParser(new BjorneTokenizer(""), null);
     }
 
     public void test1() throws ShellException {
@@ -147,7 +147,7 @@ public class BjorneParserTests extends TestCase {
     }
 
     private String doTest(String input) throws ShellException {
-        BjorneParser p = new BjorneParser(new BjorneTokenizer(input, DEBUG));
+        BjorneParser p = new BjorneParser(new BjorneTokenizer(input, DEBUG), null);
         String res = p.parse().toString();
         if (DEBUG) {
             System.err.println(res);

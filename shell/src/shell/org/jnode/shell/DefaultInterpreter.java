@@ -139,6 +139,11 @@ public class DefaultInterpreter implements CommandInterpreter {
     }
 
     @Override
+    public boolean supportsMultilineCommands() {
+        return false;
+    }
+
+    @Override
     public int interpret(CommandShell shell, File file) throws ShellException {
         try {
             return interpret(shell, new FileReader(file));

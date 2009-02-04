@@ -113,4 +113,18 @@ public interface CommandInterpreter {
      * @throws ShellException 
      */
     boolean help(CommandShell shell, String partial, PrintWriter pw) throws ShellException;
+
+    /**
+     * This method should <code>true</code> if the interpreter supports continuation lines.  If so,
+     * it should throw IncompleteCommandException if it is expecting more input from the
+     * user.  The shell will respond by reading the next line from the user, appending it
+     * to the previous input, and attempting to interpret the line again.  Obviously, the
+     * interpreter needs to be side-effect free prior to throwing the exception.
+     * <p>
+     * If this method returns <code>false</code>, the interpreter will treat IncompleteCommandException
+     * as a regular ShellSyntaxException.
+     * 
+     * @return <code>true</code> if this interpreter supports continuation lines.
+     */
+    boolean supportsMultilineCommands();
 }
