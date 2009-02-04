@@ -359,6 +359,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                             }
                         } catch (ShellException ex) {
                             diagnose(ex);
+                            done = true;
                         }
                     } while (!done);
                 }
