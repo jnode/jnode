@@ -63,12 +63,44 @@ if true ; then echo HI ; fi
         <rc>0</rc>
     </testSpec>
     <testSpec>
+        <title>if ... then ... fi multi-line</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true 
+then echo HI
+fi
+        </script>
+        <output>HI
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
         <title>if ... then ... else ... fi</title>
         <command>test</command>
         <runMode>AS_SCRIPT</runMode>
         <script>#!bjorne
 if true ; then echo HI ; else echo HO; fi
 if false ; then echo HI ; else echo HO; fi
+        </script>
+        <output>HI
+HO
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>if ... then ... else ... fi multi-line</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true ; 
+then echo HI ; 
+else echo HO; 
+fi
+if false 
+then echo HI 
+else echo HO
+fi
         </script>
         <output>HI
 HO
@@ -83,6 +115,38 @@ HO
 if true ; then echo HI ; elif false ; then echo HO ; else echo HUM; fi
 if false ; then echo HI ; elif true ; then echo HO ; else echo HUM; fi
 if false ; then echo HI ; elif false ; then echo HO ; else echo HUM; fi
+        </script>
+        <output>HI
+HO
+HUM
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>if ... then ... elif ... else ... fi multi-line</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+if true ; 
+then echo HI ; 
+elif false ; 
+then echo HO ; 
+else 
+echo HUM; 
+fi
+if false ; 
+then echo HI ; 
+elif true ; 
+then 
+echo HO ; 
+else echo HUM; 
+fi
+if false 
+then echo HI 
+elif false 
+then echo HO 
+else echo HUM
+fi
         </script>
         <output>HI
 HO
@@ -113,12 +177,64 @@ A is 1
         <rc>0</rc>
     </testSpec>
     <testSpec>
+        <title>while ... do ... done multi-line</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+A=5
+while expr $A != 0 ;
+do echo A is $A ; 
+A=`expr $A - 1`; 
+done
+        </script>
+        <output>1
+A is 5
+1
+A is 4
+1
+A is 3
+1
+A is 2
+1
+A is 1
+0
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
         <title>while ... do ... break ... done</title>
         <command>test</command>
         <runMode>AS_SCRIPT</runMode>
         <script>#!bjorne
                 A=5
                 while expr $A != 0 ; do echo A is $A ; if expr $A = 2 ; then break ; fi ; A=`expr $A - 1`; done
+        </script>
+        <output>1
+A is 5
+0
+1
+A is 4
+0
+1
+A is 3
+0
+1
+A is 2
+1
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>while ... do ... break ... done multi-line</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=5
+                while expr $A != 0 
+                do 
+                echo A is $A 
+                if expr $A = 2 ; then break ; fi ; A=`expr $A - 1`
+                done
         </script>
         <output>1
 A is 5

@@ -335,9 +335,32 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 clearEof();
                 outPW.print(prompt());
                 readingCommand = true;
-                String line = readInputLine().trim();
+                String line = readInputLine();
                 if (line.length() > 0) {
-                    runCommand(line, true, this.interpreter);
+                    boolean done = false;
+                    do {
+                        try {
+                            runCommand(line, true, this.interpreter);
+                            done = true;
+                        } catch (IncompleteCommandException ex) {
+                            String continuation = null;
+                            if (this.interpreter.supportsMultilineCommands()) {
+                                String prompt = ex.getPrompt();
+                                if (prompt != null) {
+                                    outPW.print(prompt);
+                                }
+                                continuation = readInputLine();
+                            }
+                            if (continuation == null) {
+                                diagnose(ex);
+                                break;
+                            } else {
+                                line = line + "\n" + continuation;
+                            }
+                        } catch (ShellException ex) {
+                            diagnose(ex);
+                        }
+                    } while (!done);
                 }
 
                 if (VmSystem.isShuttingDown()) {
@@ -349,6 +372,47 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 stackTrace(ex);
             }
         }
+    }
+
+    private void diagnose(ShellException ex) {
+        Throwable cause = ex.getCause();
+        // Try to turn this into something that is moderately intelligible
+        // for the common cases ...
+        if (cause != null) {
+            errPW.println(ex.getMessage());
+            if (cause instanceof CommandSyntaxException) {
+                List<Context> argErrors = ((CommandSyntaxException) cause).getArgErrors();
+                if (argErrors != null) {
+                    // The parser can produce many errors as each of the alternatives
+                    // in the tree are explored.  The following assumes that errors
+                    // produced when we get farthest along in the token stream are most
+                    // likely to be the "real" errors.
+                    int rightmostPos = 0;
+                    for (Context context : argErrors) {
+                        if (context.sourcePos > rightmostPos) {
+                            rightmostPos = context.sourcePos;
+                        }
+                    }
+                    for (Context context : argErrors) {
+                        if (context.sourcePos < rightmostPos) {
+                            continue;
+                        }
+                        if (context.token != null) {
+                            errPW.println("   " + context.exception.getMessage() + ": " +
+                                    context.token.text);
+                        } else {
+                            errPW.println("   " + context.exception.getMessage() + ": " +
+                                    context.syntax.format());
+                        }
+                    }
+                }
+            } else {
+                errPW.println(cause.getMessage());
+            }
+        } else {
+            errPW.println("Shell exception: " + ex.getMessage());
+        }
+        stackTrace(ex);
     }
 
     public void configureShell() {
@@ -465,7 +529,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
         
     private int runCommand(String cmdLineStr, boolean interactive,
-            CommandInterpreter interpreter) {
+            CommandInterpreter interpreter) throws ShellException {
         if (interactive) {
             clearEof();
             readingCommand = false;
@@ -473,50 +537,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // for input completion
             applicationHistory.set(new InputHistory());
         }
-        int rc = 0;
-        try {
-            rc = interpreter.interpret(this, cmdLineStr);
-        } catch (ShellException ex) {
-            Throwable cause = ex.getCause();
-            // Try to turn this into something that is moderately intelligible
-            // for the common cases ...
-            if (cause != null) {
-                errPW.println(ex.getMessage());
-                if (cause instanceof CommandSyntaxException) {
-                    List<Context> argErrors = ((CommandSyntaxException) cause).getArgErrors();
-                    if (argErrors != null) {
-                        // The parser can produce many errors as each of the alternatives
-                        // in the tree are explored.  The following assumes that errors
-                        // produced when we get farthest along in the token stream are most
-                        // likely to be the "real" errors.
-                        int rightmostPos = 0;
-                        for (Context context : argErrors) {
-                            if (context.sourcePos > rightmostPos) {
-                                rightmostPos = context.sourcePos;
-                            }
-                        }
-                        for (Context context : argErrors) {
-                            if (context.sourcePos < rightmostPos) {
-                                continue;
-                            }
-                            if (context.token != null) {
-                                errPW.println("   " + context.exception.getMessage() + ": " +
-                                        context.token.text);
-                            } else {
-                                errPW.println("   " + context.exception.getMessage() + ": " +
-                                        context.syntax.format());
-                            }
-                        }
-                    }
-                } else {
-                    errPW.println(cause.getMessage());
-                }
-            } else {
-                errPW.println("Shell exception: " + ex.getMessage());
-            }
-            rc = -1;
-            stackTrace(ex);
-        }
+        int rc = interpreter.interpret(this, cmdLineStr);
 
         if (interactive) {
             applicationHistory.set(null);

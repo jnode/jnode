@@ -49,6 +49,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.Completable;
+import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
@@ -188,7 +189,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     public Completable parsePartial(CommandShell shell, String partial) throws ShellSyntaxException {
         bindShell(shell);
         BjorneTokenizer tokens = new BjorneTokenizer(partial);
-        final CommandNode tree = new BjorneParser(tokens).parse();
+        final CommandNode tree = new BjorneParser(tokens, "> ").parse();
         if (tree instanceof BjorneCompletable) {
             return new Completable() {
                 @Override
@@ -228,7 +229,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             myContext.setStream(1, new CommandOutput(capture), true);
         }
         BjorneTokenizer tokens = new BjorneTokenizer(command);
-        CommandNode tree = new BjorneParser(tokens).parse();
+        CommandNode tree = new BjorneParser(tokens, "> ").parse();
         if (tree == null) {
             // An empty command line
             return 0;
@@ -242,6 +243,11 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
         return tree.execute((BjorneContext) myContext);
     }
+    
+    @Override
+    public boolean supportsMultilineCommands() {
+        return true;
+    }
 
     @Override
     public int interpret(CommandShell shell, Reader reader) throws ShellException {
@@ -251,24 +257,34 @@ public class BjorneInterpreter implements CommandInterpreter {
             String line;
             int rc = 0;
             while ((line = br.readLine()) != null) {
-                try {
-                    rc = interpret(shell, line, null, false);
-                } catch (BjorneControlException ex) {
-                    switch (ex.getControl()) {
+                boolean done = false;
+                do {
+                    try {
+                        rc = interpret(shell, line, null, false);
+                        done = true;
+                    } catch (BjorneControlException ex) {
+                        switch (ex.getControl()) {
                         case BjorneInterpreter.BRANCH_EXIT:
                             // The script will exit immediately
                             return ex.getCount();
                         case BjorneInterpreter.BRANCH_BREAK:
                             throw new ShellSyntaxException(
-                                    "'break' has been executed in an inappropriate context");
+                            "'break' has been executed in an inappropriate context");
                         case BjorneInterpreter.BRANCH_CONTINUE:
                             throw new ShellSyntaxException(
-                                    "'continue' has been executed in an inappropriate context");
+                            "'continue' has been executed in an inappropriate context");
                         case BjorneInterpreter.BRANCH_RETURN:
                             throw new ShellSyntaxException(
-                                    "'return' has been executed in an inappropriate context");
+                            "'return' has been executed in an inappropriate context");
+                        }
+                    } catch (IncompleteCommandException ex) {
+                        String continuation = br.readLine();
+                        if (continuation == null) {
+                            throw ex;
+                        }
+                        line = line + "\n" + continuation;
                     }
-                } 
+                } while (!done);
             }
             return rc;
         } catch (IOException ex) {
