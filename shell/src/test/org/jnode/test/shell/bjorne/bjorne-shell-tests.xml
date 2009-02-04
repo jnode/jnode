@@ -155,6 +155,47 @@ HUM
         <rc>0</rc>
     </testSpec>
     <testSpec>
+        <title>for ... do ... done</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+for A in 5 4 3 2 1 ; do echo A is $A ; done
+        </script>
+        <output>A is 5
+A is 4
+A is 3
+A is 2
+A is 1
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>for ... do ... done multi-line</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+for A in 5 4 3 2 1 ; 
+do echo A is $A ; 
+done
+for A in 5 4 3 2 1 
+do 
+echo A is $A 
+done
+        </script>
+        <output>A is 5
+A is 4
+A is 3
+A is 2
+A is 1
+A is 5
+A is 4
+A is 3
+A is 2
+A is 1
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
         <title>while ... do ... done</title>
         <command>test</command>
         <runMode>AS_SCRIPT</runMode>
