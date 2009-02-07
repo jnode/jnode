@@ -43,7 +43,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.tools.ant.types.Path;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandThread;
@@ -380,7 +383,7 @@ public class BjorneContext {
             globbedWordTokens.add(wordToken);
             return;
         }
-        PathnamePattern pattern = PathnamePattern.compile(word);
+        PathnamePattern pattern = PathnamePattern.compilePathPattern(word);
         LinkedList<String> paths = pattern.expand(new File("."));
         // If it doesn't match anything, a pattern 'expands' to itself.
         if (paths.isEmpty()) {
@@ -775,10 +778,54 @@ public class BjorneContext {
                 } else {
                     return value;
                 }
+            case HASH:
+                return patternEdit(value, word, false, false);
+            case DHASH:
+                return patternEdit(value, word, false, true);
+            case PERCENT:
+                return patternEdit(value, word, true, false);
+            case DPERCENT:
+                return patternEdit(value, word, true, true);
             default:
                 throw new ShellFailureException("not implemented");
         }
     }
+
+    private String patternEdit(String value, String pattern, boolean suffix, boolean eager) {
+        if (value == null || value.length() == 0) {
+            return "";
+        }
+        if (pattern == null || pattern.length() == 0) {
+            return value;
+        }
+        // FIXME ... this does not work for a suffix == true, eager == false.  We
+        // translate '*' to '.*?', but that won't give us the shortest suffix because 
+        // Patterns inherently match from left to right.
+        int flags = (suffix ? PathnamePattern.ANCHOR_RIGHT : PathnamePattern.ANCHOR_LEFT) |
+                (eager ? PathnamePattern.EAGER : 0);
+        Pattern p = PathnamePattern.compilePosixShellPattern(pattern, 
+                PathnamePattern.DEFAULT_FLAGS | flags);
+        Matcher m = p.matcher(value);
+        if (m.find()) {
+            if (suffix) {
+                return value.substring(0, m.start());
+            } else {
+                return value.substring(m.end());
+            }
+        } else {
+            return value;
+        }
+    }
+    
+    @SuppressWarnings("unused")
+    private String reverse(String str) {
+        StringBuilder sb = new StringBuilder(str.length());
+        for (int i = str.length() - 1; i >= 0; i--) {
+            sb.append(str.charAt(i));
+        }
+        return sb.toString();
+    }
+
 
     private String variable(String parameter) throws ShellSyntaxException {
         if (parameter.length() == 1) {

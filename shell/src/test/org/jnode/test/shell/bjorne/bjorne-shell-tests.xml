@@ -517,4 +517,73 @@ dog
 </output>
         <rc>0</rc>
     </testSpec>
+    <testSpec>
+        <title>${..#..} expansions</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=caaat
+                echo A hash ca is ${A#ca}
+                echo B hash ca is ${B#ca}
+                echo A hash c\? is ${A#c?}
+                echo B hash c\? is ${B#c?}
+                echo A hash c\* is ${A#c*}
+                echo B hash c\* is ${B#c*}
+        </script>
+        <output>A hash ca is t
+B hash ca is aat
+A hash c? is t
+B hash c? is aat
+A hash c* is at
+B hash c* is aaat
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..##..} expansions</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=caaat
+                echo A hashhash ca is ${A##ca}
+                echo B hashhash ca is ${B##ca}
+                echo A hashhash c\? is ${A##c?}
+                echo B hashhash c\? is ${B##c?}
+                echo A hashhash c\* is ${A##c*}
+                echo B hashhash c\* is ${B##c*}
+        </script>
+        <output>A hashhash ca is t
+B hashhash ca is aat
+A hashhash c? is t
+B hashhash c? is aat
+A hashhash c* is
+B hashhash c* is
+</output>
+        <rc>0</rc>
+    </testSpec>
+    <testSpec>
+        <title>${..%..} expansions</title>
+        <command>test</command>
+        <runMode>AS_SCRIPT</runMode>
+        <script>#!bjorne
+                A=cat
+                B=caaat
+                echo A % at is ${A%at}
+                echo B % at is ${B%at}
+                echo A % \?t is ${A%?t}
+                echo B % \?t is ${B%?t}
+                echo A % \*t is ${A%*t}
+                echo B % \*t is ${B%*t}
+        </script>
+        <output>A % at is c
+B % at is caa
+A % ?t is c
+B % ?t is caa
+A % *t is ca
+B % *t is caaa
+</output>
+        <rc>0</rc>
+    </testSpec>
 </testSpecs>

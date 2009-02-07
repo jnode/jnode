@@ -43,28 +43,36 @@ import java.util.regex.Pattern;
  * character class "[abz]" matches one of "a", "b" or "z". Ranges are allowed,
  * so that "[0-9A-F]" matches a hexadecimal digit. If the first character of a
  * character class is "!" or "^", the character class is negated; i.e.
- * "[^a-zA-Z]" matches any chatacter that is not an ASCII letter.
+ * "[^a-zA-Z]" matches any character that is not an ASCII letter.
  * <li>A single quote ("'") causes characters up to the next "'" to be treated
  * as literal characters.
  * <li>A backslash ("\") causes the next character (even a single quote) to be
  * treated as a literal character; i.e. any special meaning.
  * </ul>
- * 
+ * <p>
  * Patterns are first split into file components on "/" boundaries, then the
  * sub-patterns are used to match names in a given directory. Neither quoting or
  * escaping affect "/" interpretation, and a "/" in a character class causes it
  * to be treated as literal characters.
- * 
+ * <p>
  * The pattern expander treats "dot" files (i.e. files starting with ".") as
  * hidden. A hidden file is only matched when the pattern has an explicit "." as
  * the first character of a component. Thus the pattern "*" does not match "."
  * or "..", but the pattern ".*" does.
- * 
+ * <p>
+ * This class also exposes a static method for compiling patterns in the UNIX
+ * shell-style syntax to Java {@link Pattern} objects.  The resulting
+ * objects allow you to use the shell-style syntax for matching arbitrary 
+ * strings.  The pathname-specific matching behaviors of PathnamePattern 
+ * such as implicit anchoring, and the handling of '/' in character classes
+ * are supported via flags.
+ * <p>
  * TODO:
  * <ul>
  * <li>Provide a method that returns a "lazy" pathname iterator for cases where
  * we don't want to build a (potentially huge) in-memory list of pathnames.
- * <li>Support expansions of ~ and {..,..} patterns.
+ * <li>Support expansions of ~ and {..,..} patterns.  (Note that the latter are
+ * not part of the POSIX specification.)
  * <li>Add a parameter (or parameters) to allow the caller to limit the size of
  * the result list.
  * </ul>
@@ -100,7 +108,7 @@ public class PathnamePattern {
      * character. For example, the sequence "\*" in a pattern will match a "*"
      * character in a filename.
      */
-    public static final int SLASH_ESCAPES = 0x08;
+    public static final int BACKSLASH_ESCAPES = 0x08;
 
     /**
      * When set, this flag causes characters inside matching single-quote
@@ -115,9 +123,36 @@ public class PathnamePattern {
      * recognized.
      */
     public static final int CHARACTER_CLASSES = 0x20;
+    
+    /**
+     * When set, the pattern is anchored to the left of the string to be searched. 
+     * This is set implicitly by the pathname matching methods.
+     */
+    public static final int ANCHOR_LEFT = 0x40;
+    
+    /**
+     * When set, the pattern is anchored to the right of the string to be searched.  
+     * This is set implicitly by the pathname matching methods.
+     */
+    public static final int ANCHOR_RIGHT = 0x80;
+    
+    /**
+     * When set, '*' is eager, matching as many characters as possible.  
+     * This is set implicitly by the pathname matching methods. 
+     * matching is always eager.
+     */
+    public static final int EAGER = 0x100;
+    
+    /**
+     * When set, an unescaped '/' inside a character class causes the entire class
+     * to be interpreted as a literal character sequence.  
+     * This is set implicitly by the pathname matching methods.
+     */
+    public static final int SLASH_DISABLES_CHARACTER_CLASSES = 0x200;
+    
 
     public static final int DEFAULT_FLAGS = SORT_MATCHES | HIDE_DOT_FILENAMES
-            | INCLUDE_DOT_AND_DOTDOT | SLASH_ESCAPES | SINGLE_QUOTE_ESCAPES
+            | INCLUDE_DOT_AND_DOTDOT | BACKSLASH_ESCAPES | SINGLE_QUOTE_ESCAPES
             | CHARACTER_CLASSES;
 
     private static final boolean DEBUG = false;
@@ -127,7 +162,7 @@ public class PathnamePattern {
     private final boolean isAbsolute;
 
     // Use a weak reference for the pattern cache to avoid storage leakage.
-    private static WeakReference<HashMap<String, PathnamePattern>> compiledPatterns;
+    private static WeakReference<HashMap<String, PathnamePattern>> cache;
 
     private PathnamePattern(String source, Object[] pattern, boolean isAbsolute) {
         this.source = source;
@@ -189,8 +224,7 @@ public class PathnamePattern {
                 }
             };
             // A directory's "." and ".." entries are not returned by
-            // File.listFiles
-            // so we have to match / add them explicitly.
+            // File.listFiles so we have to match / add them explicitly.
             if ((flags & INCLUDE_DOT_AND_DOTDOT) != 0) {
                 if (filter.accept(current, ".")) {
                     matches.add(new File(current, "."));
@@ -228,8 +262,8 @@ public class PathnamePattern {
      * @param source the pattern source
      * @return a compiler pattern for the source.
      */
-    public static PathnamePattern compile(String source) {
-        return compile(source, DEFAULT_FLAGS);
+    public static PathnamePattern compilePathPattern(String source) {
+        return compilePathPattern(source, DEFAULT_FLAGS);
     }
 
     /**
@@ -242,12 +276,11 @@ public class PathnamePattern {
      * @param flags pattern compilation flags
      * @return a compiler pattern for the source.
      */
-    public static PathnamePattern compile(String source, int flags) {
+    public static PathnamePattern compilePathPattern(String source, int flags) {
         String key = flags + ":" + source;
         synchronized (PathnamePattern.class) {
             HashMap<String, PathnamePattern> cp;
-            if (compiledPatterns != null
-                    && (cp = compiledPatterns.get()) != null) {
+            if (cache != null && (cp = cache.get()) != null) {
                 PathnamePattern pat = cp.get(key);
                 if (pat != null) {
                     return pat;
@@ -268,19 +301,22 @@ public class PathnamePattern {
         Object[] res = new Object[parts.length];
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
-            res[i] = (isPattern(part, flags)) ? Pattern.compile(createRegex(
-                    part, flags)) : part;
-            if (DEBUG)
+            if (isPattern(part, flags)) {
+                res[i] = compilePosixShellPattern(part, 
+                        flags | ANCHOR_LEFT | ANCHOR_RIGHT | EAGER | SLASH_DISABLES_CHARACTER_CLASSES);
+            } else {
+                res[i] = part;
+            }
+            if (DEBUG) {
                 System.err.println(i + ": " + res[i]);
+            }
         }
         PathnamePattern pat = new PathnamePattern(source, res, isAbsolute);
         synchronized (PathnamePattern.class) {
             HashMap<String, PathnamePattern> cp = null;
-            if (compiledPatterns == null
-                    || (cp = compiledPatterns.get()) == null) {
+            if (cache == null || (cp = cache.get()) == null) {
                 cp = new HashMap<String, PathnamePattern>();
-                compiledPatterns = new WeakReference<HashMap<String, PathnamePattern>>(
-                        cp);
+                cache = new WeakReference<HashMap<String, PathnamePattern>>(cp);
             }
             cp.put(key, pat);
         }
@@ -320,7 +356,7 @@ public class PathnamePattern {
                     }
                     break;
                 case '\\':
-                    if ((flags & SLASH_ESCAPES) != 0) {
+                    if ((flags & BACKSLASH_ESCAPES) != 0) {
                         return true;
                     }
                     break;
@@ -336,20 +372,25 @@ public class PathnamePattern {
     }
 
     /**
-     * Turn a string representing a pathname component into a regex.
+     * Turn a string in POSIX shell pattern syntax into a regex.  This method
+     * generates a {@link Pattern} that can be matched against a character sequence.
      * 
-     * @param filePattern the pathname pattern component
-     * @return the corresponding regex.
+     * @param pattern the pattern in shell syntax.
+     * @return the corresponding regex as a {@link Pattern}.
      */
-    private static String createRegex(String filePattern, int flags) {
+    public static Pattern compilePosixShellPattern(String pattern, int flags) {
         // This method needs to be really careful to avoid 'ordinary' characters
         // in the source pattern being accidentally mapped to Java regex
         // meta-characters.
-        int len = filePattern.length();
+        int len = pattern.length();
         StringBuffer sb = new StringBuffer(len);
         boolean quoted = false;
+        boolean eager = (flags & EAGER) != 0;
+        if ((flags & ANCHOR_LEFT) != 0) {
+            sb.append('^');
+        }
         for (int i = 0; i < len; i++) {
-            char ch = filePattern.charAt(i);
+            char ch = pattern.charAt(i);
             switch (ch) {
                 case '?':
                     if (quoted) {
@@ -364,23 +405,24 @@ public class PathnamePattern {
                     if (quoted) {
                         sb.append(ch);
                     } else if (i == 0 && (flags & HIDE_DOT_FILENAMES) != 0) {
-                        sb.append("(|[^\\.].*)");
+                        sb.append("(|[^\\.]").append(eager ? ".*" : ".*?").append(")");
                     } else {
-                        sb.append(".*");
+                        sb.append(eager ? ".*" : ".*?");
                     }
                     break;
                 case '[':
                     if ((flags & CHARACTER_CLASSES) != 0) {
                         int j;
                         StringBuffer sb2 = new StringBuffer(len);
+                        boolean charClassOK = true;
                     LOOP: 
                         for (j = i + 1; j < len; j++) {
-                            char ch2 = filePattern.charAt(j);
+                            char ch2 = pattern.charAt(j);
                             switch (ch2) {
                                 case ']':
                                     break LOOP;
                                 case '\\':
-                                    sb2.append(protect(filePattern.charAt(++j)));
+                                    sb2.append(protect(pattern.charAt(++j)));
                                     break;
                                 case '!':
                                 case '^':
@@ -389,12 +431,19 @@ public class PathnamePattern {
                                 case '-':
                                     sb2.append('-');
                                     break;
+                                case '/':
+                                    sb2.append(protect(ch2));
+                                    charClassOK = ((flags & SLASH_DISABLES_CHARACTER_CLASSES) == 0);
+                                    break;
                                 default:
                                     sb2.append(protect(ch2));
                             }
                         }
                         if (j == len) {
-                            sb.append('[');
+                            sb.append(protect('['));
+                        } else if (!charClassOK) {
+                            sb.append(protect('[')).append(sb2).append(protect(']'));
+                            i = j;
                         } else {
                             sb.append("[").append(sb2).append(']');
                             i = j;
@@ -404,8 +453,8 @@ public class PathnamePattern {
                     }
                     break;
                 case '\\':
-                    if ((flags & SLASH_ESCAPES) != 0) {
-                        sb.append(protect(filePattern.charAt(++i)));
+                    if ((flags & BACKSLASH_ESCAPES) != 0) {
+                        sb.append(protect(pattern.charAt(++i)));
                     } else {
                         sb.append(protect(ch));
                     }
@@ -414,7 +463,6 @@ public class PathnamePattern {
                     if ((flags & SINGLE_QUOTE_ESCAPES) != 0) {
                         quoted = !quoted;
                     } else {
-
                         sb.append(protect(ch));
                     }
                     break;
@@ -422,7 +470,10 @@ public class PathnamePattern {
                     sb.append(protect(ch));
             }
         }
-        return sb.toString();
+        if ((flags & ANCHOR_RIGHT) != 0) {
+            sb.append('$');
+        }
+        return Pattern.compile(sb.toString());
     }
 
     private static String protect(char ch) {
