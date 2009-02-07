@@ -55,6 +55,7 @@ public class TestHarness {
 
     private boolean debug;
     private boolean verbose;
+    private boolean useResources;
     private File root;
 
     public TestHarness(String[] args) {
@@ -72,9 +73,7 @@ public class TestHarness {
     private void run() throws Exception {
         // Do argument handling the classic Java way to minimize dependencies
         // on JNode functionality that we might be testing with the harness.
-        boolean useResources = false;
         int firstArg = 0;
-        TestSpecificationParser parser = new TestSpecificationParser();
         TestSetSpecification specs;
         if (args.length == 0) {
             usage();
@@ -111,33 +110,49 @@ public class TestHarness {
 
         for (int i = firstArg; i < args.length; i++) {
             String arg = args[i];
-            InputStream is = null;
             try {
-                if (useResources) {
-                    is = this.getClass().getResourceAsStream(arg);
-                    if (is == null) {
-                        report("Cannot find resource for '" + arg + "'");
-                        continue;
-                    }
-                } else {
-                    is = new FileInputStream(arg);
+                specs = loadTestSetSpecification(arg, useResources ? "/" : ".");
+                if (specs != null) {
+                    execute(specs);
                 }
-                specs = parser.parse(is);
-                execute(specs);
             } catch (Exception ex) {
                 diagnose(ex, arg);
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException ex) {
-                        // ignore
-                    }
-                }
-            }
+            } 
         }
         report("Ran " + testCount + " tests with " + failureCount +
             " test failures and " + exceptionCount + " errors (exceptions)");
+    }
+    
+
+
+    public TestSetSpecification loadTestSetSpecification(String specName, String base) throws Exception {
+        TestSpecificationParser parser = new TestSpecificationParser();
+        InputStream is = null;
+        File file = new File(base, specName);
+        try {
+            if (useResources) {
+                String resourceName = file.getPath();
+                is = this.getClass().getResourceAsStream(resourceName);
+                if (is == null) {
+                    report("Cannot find resource for '" + resourceName + "'");
+                    return null;
+                }
+            } else {
+                is = new FileInputStream(file);
+            }
+            return parser.parse(this, is, file.getParent());
+        } catch (Exception ex) {
+            diagnose(ex, specName);
+            return null;
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
+        }
     }
 
     private void usage() {
@@ -152,6 +167,9 @@ public class TestHarness {
     private void execute(TestSetSpecification specs) {
         for (TestSpecification spec : specs.getSpecs()) {
             execute(spec);
+        } 
+        for (TestSetSpecification set : specs.getSets()) {
+            execute(set);
         }
     }
 

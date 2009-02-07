@@ -1,28 +1,14 @@
-<testSpecs>
-    <title>Bjorne interpreter tests</title>
-    <plugin>
-        <id>org.jnode.shell.bjorne</id>
-        <class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
-    </plugin>
-    <plugin>
-        <id>org.jnode.shell.command.posix</id>
-    </plugin>
-    <testSpec>
-        <title>exit 0</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+<testSet title="Bjorne interpreter tests">
+    <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
+    <plugin id="org.jnode.shell.command.posix"/>
+    <testSpec title="exit 0" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 exit 0
         </script>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>exit 99</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="exit 99" command="test" runMode="AS_SCRIPT" rc="99">
         <script>#!bjorne
 exit 99
         </script>
-        <rc>99</rc>
     </testSpec>
-</testSpecs>
+</testSet>

@@ -98,11 +98,7 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
 
     @Override
     public void setup() {
-        if (spec.getTestSet() != null) {
-            for (PluginSpecification plugin : spec.getTestSet().getPlugins()) {
-                ensurePluginLoaded(plugin);
-            }
-        }
+        ensurePluginsLoaded(spec.getTestSet());
         for (PluginSpecification plugin : spec.getPlugins()) {
             ensurePluginLoaded(plugin);
         }
@@ -118,6 +114,16 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
         }
     }
     
+    private void ensurePluginsLoaded(TestSetSpecification testSet) {
+        if (testSet == null) {
+            return;
+        }
+        ensurePluginsLoaded(testSet.getParentSet());
+        for (PluginSpecification plugin : spec.getTestSet().getPlugins()) {
+            ensurePluginLoaded(plugin);
+        }
+    }
+
     protected void ensurePluginLoaded(PluginSpecification plugin) {
         if (usingEmu) {
             TestEmu.loadPseudoPlugin(plugin.getPluginId(), plugin.getClassName());
