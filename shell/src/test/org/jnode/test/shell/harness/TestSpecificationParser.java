@@ -32,18 +32,18 @@ import org.jnode.test.shell.harness.TestSpecification.RunMode;
 
 public class TestSpecificationParser {
 
-    public TestSetSpecification parse(InputStream in) throws Exception {
+    public TestSetSpecification parse(TestHarness harness, InputStream in, String base) throws Exception {
         StdXMLReader xr = new StdXMLReader(in);
         IXMLParser parser = XMLParserFactory.createDefaultXMLParser();
         parser.setReader(xr);
         TestSetSpecification res;
         IXMLElement root = (IXMLElement) parser.parse();
         if (root.getName().equals("testSpec")) {
-            res = new TestSetSpecification("");
+            res = new TestSetSpecification("", base);
             res.addTestSpec(parseTestSpecification(root));
-        } else if (root.getName().equals("testSpecs")) {
-            String title = extractElementValue(root, "title");
-            res = new TestSetSpecification(title);
+        } else if (root.getName().equals("testSet")) {
+            String title = extractAttribute(root, "title");
+            res = new TestSetSpecification(title, base);
             for (Object obj : root.getChildren()) {
                 if (obj instanceof IXMLElement) {
                     IXMLElement argChild = (IXMLElement) obj;
@@ -52,7 +52,13 @@ public class TestSpecificationParser {
                         res.addTestSpec(parseTestSpecification(argChild));
                     } else if (name.equals("plugin")) {
                         res.addPluginSpec(parsePluginSpecification(argChild));
-                    } 
+                    } else if (name.equals("include")) {
+                        String specName = extractAttribute(argChild, "setName");
+                        TestSetSpecification included = harness.loadTestSetSpecification(specName, base);
+                        if (included != null) {
+                            res.addTestSetSpecification(included);
+                        }
+                    }
                 }
             }
         } else {
@@ -63,16 +69,16 @@ public class TestSpecificationParser {
     }
     
     private TestSpecification parseTestSpecification(IXMLElement elem) throws TestSpecificationException {
-        RunMode runMode = RunMode.valueOf(extractElementValue(elem, "runMode", "AS_CLASS"));
-        String title = extractElementValue(elem, "title");
-        String command = extractElementValue(elem, "command");
+        RunMode runMode = RunMode.valueOf(extractAttribute(elem, "runMode", "AS_CLASS"));
+        String title = extractAttribute(elem, "title");
+        String command = extractAttribute(elem, "command");
         String scriptContent = extractElementValue(elem, "script", "");
         String inputContent = extractElementValue(elem, "input", "");
         String outputContent = extractElementValue(elem, "output", "");
         String errorContent = extractElementValue(elem, "error", "");
         int rc;
         try {
-            rc = Integer.parseInt(extractElementValue(elem, "rc", "0").trim());
+            rc = Integer.parseInt(extractAttribute(elem, "rc", "0").trim());
         } catch (NumberFormatException ex) {
             throw new TestSpecificationException("'rc' is not an integer");
         }
@@ -97,20 +103,21 @@ public class TestSpecificationParser {
 
     private PluginSpecification parsePluginSpecification(IXMLElement elem) 
         throws TestSpecificationException {
-        String pluginId = extractElementValue(elem, "id");
-        String pluginVersion = extractElementValue(elem, "version", "");
-        String pseudoPluginClassName = extractElementValue(elem, "class",
+        String pluginId = extractAttribute(elem, "id");
+        String pluginVersion = extractAttribute(elem, "version", "");
+        String pseudoPluginClassName = extractAttribute(elem, "class",
                 "org.jnode.test.shell.harness.DummyPseudoPlugin");
         return new PluginSpecification(pluginId, pluginVersion, pseudoPluginClassName);
     }
 
     private void parseFile(IXMLElement elem, TestSpecification res) 
         throws TestSpecificationException {
-        String fileName = extractElementValue(elem, "name");
+        String fileName = extractAttribute(elem, "name");
         String content = extractElementValue(elem, "content", "");
         res.addFile(new File(fileName), content);
     }
     
+    @SuppressWarnings("unused")
     private String extractElementValue(IXMLElement parent, String name) throws TestSpecificationException {
         IXMLElement elem = parent.getFirstChildNamed(name);
         if (elem == null) {
@@ -125,5 +132,19 @@ public class TestSpecificationParser {
     private String extractElementValue(IXMLElement parent, String name, String dflt) {
         IXMLElement elem = parent.getFirstChildNamed(name);
         return elem == null ? dflt : elem.getContent();
+    }
+    
+    private String extractAttribute(IXMLElement elem, String name) throws TestSpecificationException {
+        String attr = elem.getAttribute(name, null);
+        if (attr == null) {
+            throw new TestSpecificationException(
+                    "Attribute '" + name + "' not found in '" + elem.getName() + "'");
+        } else {
+            return attr;
+        }
+    }
+
+    private String extractAttribute(IXMLElement elem, String name, String dflt) {
+        return elem.getAttribute(name, dflt);
     }
 }

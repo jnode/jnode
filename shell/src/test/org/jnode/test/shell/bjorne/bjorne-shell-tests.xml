@@ -1,27 +1,14 @@
-<testSpecs>
-    <title>Bjorne interpreter tests</title>
-    <plugin>
-        <id>org.jnode.shell.bjorne</id>
-        <class>org.jnode.test.shell.bjorne.BjornePseudoPlugin</class>
-    </plugin>
-    <plugin>
-        <id>org.jnode.shell.command.posix</id>
-    </plugin>
-    <testSpec>
-        <title>simple</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+<testSet title="Bjorne interpreter tests">
+    <plugin id="org.jnode.shell.bjorne" class="org.jnode.test.shell.bjorne.BjornePseudoPlugin"/>
+    <plugin id="org.jnode.shell.command.posix"/>
+    <testSpec title="simple" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 echo HI
         </script>
         <output>HI
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>$?</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="$?" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 true
 echo $?
@@ -31,12 +18,8 @@ echo $?
         <output>0
 1
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>``</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="``" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 A=1
 echo $A
@@ -49,23 +32,15 @@ echo $C
 2
 1 1
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>if ... then ... fi</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="if ... then ... fi" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true ; then echo HI ; fi
         </script>
         <output>HI
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>if ... then ... fi multi-line</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="if ... then ... fi multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true 
 then echo HI
@@ -73,12 +48,8 @@ fi
         </script>
         <output>HI
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>if ... then ... else ... fi</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="if ... then ... else ... fi" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true ; then echo HI ; else echo HO; fi
 if false ; then echo HI ; else echo HO; fi
@@ -86,12 +57,8 @@ if false ; then echo HI ; else echo HO; fi
         <output>HI
 HO
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>if ... then ... else ... fi multi-line</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="if ... then ... else ... fi multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true ; 
 then echo HI ; 
@@ -105,12 +72,8 @@ fi
         <output>HI
 HO
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>if ... then ... elif ... else ... fi</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="if ... then ... elif ... else ... fi" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true ; then echo HI ; elif false ; then echo HO ; else echo HUM; fi
 if false ; then echo HI ; elif true ; then echo HO ; else echo HUM; fi
@@ -120,12 +83,8 @@ if false ; then echo HI ; elif false ; then echo HO ; else echo HUM; fi
 HO
 HUM
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>if ... then ... elif ... else ... fi multi-line</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="if ... then ... elif ... else ... fi multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 if true ; 
 then echo HI ; 
@@ -152,12 +111,8 @@ fi
 HO
 HUM
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>for ... do ... done</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="for ... do ... done" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 for A in 5 4 3 2 1 ; do echo A is $A ; done
         </script>
@@ -167,12 +122,8 @@ A is 3
 A is 2
 A is 1
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>for ... do ... done multi-line</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="for ... do ... done multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 for A in 5 4 3 2 1 ; 
 do echo A is $A ; 
@@ -193,12 +144,8 @@ A is 3
 A is 2
 A is 1
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>while ... do ... done</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="while ... do ... done" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 A=5
 while expr $A != 0 ; do echo A is $A ; A=`expr $A - 1`; done
@@ -215,12 +162,8 @@ A is 2
 A is 1
 0
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>while ... do ... done multi-line</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="while ... do ... done multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 A=5
 while expr $A != 0 ;
@@ -240,12 +183,8 @@ A is 2
 A is 1
 0
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>while ... do ... break ... done</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="while ... do ... break ... done" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=5
                 while expr $A != 0 ; do echo A is $A ; if expr $A = 2 ; then break ; fi ; A=`expr $A - 1`; done
@@ -263,12 +202,8 @@ A is 3
 A is 2
 1
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>while ... do ... break ... done multi-line</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="while ... do ... break ... done multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=5
                 while expr $A != 0 
@@ -290,12 +225,8 @@ A is 3
 A is 2
 1
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>${...} expansions</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${...} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=
@@ -367,12 +298,8 @@ A + null is
 B + null is
 X + null is
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>${..?..} expansions #1</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..?..} expansions #1" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
                 A=cat
                 B=
@@ -384,12 +311,8 @@ X + null is
 </output>
     <error>dog
 </error>
-        <rc>1</rc>
     </testSpec>
-    <testSpec>
-        <title>${..?..} expansions #2</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..?..} expansions #2" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
                 A=cat
                 B=
@@ -400,12 +323,8 @@ X + null is
 </output>
     <error>dog
 </error>
-        <rc>1</rc>
     </testSpec>
-    <testSpec>
-        <title>${..?..} expansions #3</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..?..} expansions #3" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
                 A=cat
                 B=
@@ -418,12 +337,8 @@ B ? dog is
 </output>
     <error>dog
 </error>
-        <rc>1</rc>
     </testSpec>
-    <testSpec>
-        <title>${..?..} expansions #4</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..?..} expansions #4" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
                 A=cat
                 B=
@@ -435,12 +350,8 @@ B ? dog is
 </output>
     <error>B is unset or null
 </error>
-        <rc>1</rc>
     </testSpec>
-    <testSpec>
-        <title>${..?..} expansions #5</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..?..} expansions #5" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
                 A=cat
                 B=
@@ -451,12 +362,8 @@ B ? dog is
 </output>
     <error>X is unset or null
 </error>
-        <rc>1</rc>
     </testSpec>
-    <testSpec>
-        <title>${..?..} expansions #6</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..?..} expansions #6" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
                 A=cat
                 B=
@@ -469,12 +376,8 @@ B ? null is
 </output>
     <error>X is unset
 </error>
-        <rc>1</rc>
     </testSpec>
-    <testSpec>
-        <title>${..=..} expansions</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..=..} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=
@@ -492,12 +395,8 @@ dog
 X := dog is dog
 dog
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>${..=..} expansions #2</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..=..} expansions #2" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=
@@ -515,12 +414,8 @@ B = dog is
 X = dog is dog
 dog
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>${..#..} expansions</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..#..} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=caaat
@@ -538,12 +433,8 @@ B hash c? is aat
 A hash c* is at
 B hash c* is aaat
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>${..##..} expansions</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..##..} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=caaat
@@ -561,12 +452,8 @@ B hashhash c? is aat
 A hashhash c* is
 B hashhash c* is
 </output>
-        <rc>0</rc>
     </testSpec>
-    <testSpec>
-        <title>${..%..} expansions</title>
-        <command>test</command>
-        <runMode>AS_SCRIPT</runMode>
+    <testSpec title="${..%..} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat
                 B=caaat
@@ -584,6 +471,5 @@ B % ?t is caa
 A % *t is ca
 B % *t is caaa
 </output>
-        <rc>0</rc>
     </testSpec>
-</testSpecs>
+</testSet>

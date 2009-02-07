@@ -28,14 +28,25 @@ public class TestSetSpecification {
     private final List<TestSpecification> specs = 
         new ArrayList<TestSpecification>();
     
+    private final List<TestSetSpecification> sets = 
+        new ArrayList<TestSetSpecification>();
+    
     private final List<PluginSpecification> plugins = 
         new ArrayList<PluginSpecification>();
     
     private final String title;
+    private final String base;
+    
+    private TestSetSpecification parentSet;
 
-    public TestSetSpecification(String title) {
+    public TestSetSpecification(String title, String base) {
         super();
         this.title = title;
+        this.base = base;
+    }
+
+    public List<TestSetSpecification> getSets() {
+        return sets;
     }
 
     public List<TestSpecification> getSpecs() {
@@ -50,6 +61,10 @@ public class TestSetSpecification {
         return title;
     }
     
+    public String getBase() {
+        return base;
+    }
+
     public void addPluginSpec(PluginSpecification plugin) {
         plugins.add(plugin);
     }
@@ -57,5 +72,18 @@ public class TestSetSpecification {
     public void addTestSpec(TestSpecification spec) {
         specs.add(spec);
         spec.setTestSet(this);
+    }
+
+    public void addTestSetSpecification(TestSetSpecification set) {
+        sets.add(set);
+        set.setParentSet(this);
+    }
+
+    private void setParentSet(TestSetSpecification set) {
+        this.parentSet = set;
+    }
+
+    public TestSetSpecification getParentSet() {
+        return parentSet;
     }
 }

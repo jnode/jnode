@@ -1,29 +1,15 @@
-<testSpecs>
-    <title>POSIX command tests</title>
-        <plugin>
-        <id>org.jnode.shell.command.posix</id>
-    </plugin>
-    <testSpec>
-        <title>true command</title>
-        <command>org.jnode.shell.command.posix.TrueCommand</command>
-        <runMode>AS_ALIAS</runMode>
-        <rc>0</rc>
-    </testSpec>
-    <testSpec>
-        <title>false command</title>
-        <command>org.jnode.shell.command.posix.FalseCommand</command>
-        <runMode>AS_ALIAS</runMode>
-        <rc>1</rc>
-    </testSpec>
-    <testSpec>
-        <title>expr 1 + 1</title>
-        <command>org.jnode.shell.command.posix.ExprCommand</command>
-        <runMode>AS_ALIAS</runMode>
+<testSet title="POSIX command tests">
+    <plugin id="org.jnode.shell.command.posix"/>
+    <testSpec title="true command" command="org.jnode.shell.command.posix.TrueCommand" 
+              runMode="AS_ALIAS" rc="0"/>
+    <testSpec title="false command" command="org.jnode.shell.command.posix.FalseCommand"
+              runMode="AS_ALIAS" rc="1"/>
+    <testSpec title="expr 1 + 1" command="org.jnode.shell.command.posix.ExprCommand"
+              runMode="AS_ALIAS" rc="0">
         <arg>1</arg>
         <arg>+</arg>
         <arg>1</arg>
         <output>2
 </output>
-        <rc>0</rc>
     </testSpec>
-</testSpecs>
+</testSet>
