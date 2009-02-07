@@ -337,6 +337,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 readingCommand = true;
                 String line = readInputLine();
                 if (line.length() > 0) {
+                    // This hairy bit of code deals with shell commands that span multiple
+                    // input lines.  If an interpreter encounters the end of the line that
+                    // we have given it and it requires more input to get a complete command,
+                    // it may throw IncompleteCommandException.  The shell responds by 
+                    // outputting a different prompt (supplied in the exception), and then
+                    // attempting to get the next line.  If that succeeds, the line is 
+                    // appended to the input we gave the interpreter last time, and the
+                    // interpreter is called again.  This continues until either the
+                    // interpreter manages to run the command, or we get some other
+                    // shell syntax exception.
                     boolean done = false;
                     do {
                         try {
