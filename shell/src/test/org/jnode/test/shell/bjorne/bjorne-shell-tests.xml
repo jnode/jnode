@@ -491,6 +491,24 @@ arg2
 arg1 arg2
 </output>
     </testSpec>
+    <testSpec title="set arguments" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo $*
+                set newarg1 newarg2
+                echo $*
+                set -- newarg1 newarg2
+                echo $*
+                set --
+                echo $*
+        </script>
+        <arg>arg1</arg>
+        <arg>arg2</arg>
+        <output>arg1 arg2
+newarg1 newarg2
+newarg1 newarg2
+
+</output>
+    </testSpec>
     <testSpec title="quote handling" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 set -x

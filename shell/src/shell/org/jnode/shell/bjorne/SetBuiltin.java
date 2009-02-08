@@ -20,22 +20,53 @@
  
 package org.jnode.shell.bjorne;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
+import org.jnode.shell.ShellSyntaxException;
 
 final class SetBuiltin extends BjorneBuiltin {
+    
     @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
-        Iterator<String> it = command.iterator();
-        if (it.hasNext()) {
-            String flags = it.next();
-            // FIXME ... lots more to implement ...
-            if (flags.equals("-x")) {
-                context.getParent().setEchoExpansions(true);
+        context = context.getParent();
+        boolean optsDone = false;
+        boolean forceNewArgs = false;
+        List<String> newArgs = new ArrayList<String>();
+        String[] args = command.getArguments();
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (optsDone) {
+                newArgs.add(arg);
+            } else if (arg.length() == 0 || 
+                    (arg.charAt(0) != '-' && arg.charAt(0) != '+')) {
+                optsDone = true;
+                newArgs.add(arg);
+            } else if (arg.equals("--")) {
+                optsDone = true;
+                forceNewArgs = true;
+            } else {
+                boolean set = arg.charAt(0) == '-';
+                for (int j = 1; j < arg.length(); j++) {
+                    switch (arg.charAt(j)) {
+                    case 'x': 
+                        context.setEchoExpansions(set);
+                        break;
+                    case 'f': 
+                        context.setGlobbing(!set);
+                        break;
+                    default:
+                        throw new ShellSyntaxException(
+                                "Unknown set option: " + (set ? "-" : "+") + arg.charAt(j));
+                    }
+                }
             }
+        }
+        if (forceNewArgs || newArgs.size() > 0) {
+            context.setArgs(newArgs.toArray(new String[newArgs.size()]));
         }
         return 0;
     }
