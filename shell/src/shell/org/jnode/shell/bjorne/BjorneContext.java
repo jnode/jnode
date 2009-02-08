@@ -1090,4 +1090,12 @@ public class BjorneContext {
         // TODO Auto-generated method stub
         return false;
     }
+
+    public String[] getArgs() {
+        return args.toArray(new String[args.size()]);
+    }
+
+    public int nosArgs() {
+        return args.size();
+    }
 }
