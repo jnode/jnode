@@ -33,7 +33,6 @@ import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ThreadExitListener;
-import org.jnode.shell.bjorne.BjorneContext.StreamHolder;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.shell.io.CommandInput;
