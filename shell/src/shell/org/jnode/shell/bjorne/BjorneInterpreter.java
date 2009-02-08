@@ -266,18 +266,18 @@ public class BjorneInterpreter implements CommandInterpreter {
                         done = true;
                     } catch (BjorneControlException ex) {
                         switch (ex.getControl()) {
-                        case BjorneInterpreter.BRANCH_EXIT:
-                            // The script will exit immediately
-                            return ex.getCount();
-                        case BjorneInterpreter.BRANCH_BREAK:
-                            throw new ShellSyntaxException(
-                            "'break' has been executed in an inappropriate context");
-                        case BjorneInterpreter.BRANCH_CONTINUE:
-                            throw new ShellSyntaxException(
-                            "'continue' has been executed in an inappropriate context");
-                        case BjorneInterpreter.BRANCH_RETURN:
-                            throw new ShellSyntaxException(
-                            "'return' has been executed in an inappropriate context");
+                            case BjorneInterpreter.BRANCH_EXIT:
+                                // The script will exit immediately
+                                return ex.getCount();
+                            case BjorneInterpreter.BRANCH_BREAK:
+                                throw new ShellSyntaxException(
+                                    "'break' has been executed in an inappropriate context");
+                            case BjorneInterpreter.BRANCH_CONTINUE:
+                                throw new ShellSyntaxException(
+                                    "'continue' has been executed in an inappropriate context");
+                            case BjorneInterpreter.BRANCH_RETURN:
+                                throw new ShellSyntaxException(
+                                    "'return' has been executed in an inappropriate context");
                         }
                     } catch (IncompleteCommandException ex) {
                         String continuation = br.readLine();
