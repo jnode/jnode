@@ -26,7 +26,6 @@ import org.jnode.shell.ShellSyntaxException;
 
 final class ShiftBuiltin extends BjorneBuiltin {
     
-    @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
         context = context.getParent();

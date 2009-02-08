@@ -29,7 +29,6 @@ import org.jnode.shell.ShellSyntaxException;
 
 final class SetBuiltin extends BjorneBuiltin {
     
-    @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
         context = context.getParent();
@@ -52,15 +51,15 @@ final class SetBuiltin extends BjorneBuiltin {
                 boolean set = arg.charAt(0) == '-';
                 for (int j = 1; j < arg.length(); j++) {
                     switch (arg.charAt(j)) {
-                    case 'x': 
-                        context.setEchoExpansions(set);
-                        break;
-                    case 'f': 
-                        context.setGlobbing(!set);
-                        break;
-                    default:
-                        throw new ShellSyntaxException(
-                                "Unknown set option: " + (set ? "-" : "+") + arg.charAt(j));
+                        case 'x': 
+                            context.setEchoExpansions(set);
+                            break;
+                        case 'f': 
+                            context.setGlobbing(!set);
+                            break;
+                        default:
+                            throw new ShellSyntaxException(
+                                    "Unknown set option: " + (set ? "-" : "+") + arg.charAt(j));
                     }
                 }
             }
