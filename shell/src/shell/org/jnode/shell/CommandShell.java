@@ -296,9 +296,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     final File jnode_ini = new File(java_home + '/' + name);
                     try {
                         if (jnode_ini.exists()) {
-                            runCommandFile(jnode_ini);
+                            runCommandFile(jnode_ini, null, null);
                         } else if (getClass().getResource(name) != null) {
-                            runCommandResource(name);
+                            runCommandResource(name, null);
                         }
                     } catch (ShellException ex) {
                         errPW.println("Error while processing " + jnode_ini + ": " + ex.getMessage());
@@ -316,9 +316,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 final File shell_ini = new File(user_home + '/' + name);
                 try {
                     if (shell_ini.exists()) {
-                        runCommandFile(shell_ini);
+                        runCommandFile(shell_ini, null, null);
                     } else if (getClass().getResource(name) != null) {
-                        runCommandResource(name);
+                        runCommandResource(name, null);
                     }
                 } catch (ShellException ex) {
                     errPW.println("Error while processing " + shell_ini + ": " + ex.getMessage());
@@ -847,12 +847,15 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return ShellUtils.createInvoker("default", this);
     }
 
-    public int runCommandFile(File file) throws ShellException {
+    public int runCommandFile(File file, String alias, String[] args) throws ShellException {
         // FIXME extend to allow arguments to be passed to the script.
         boolean enabled = setHistoryEnabled(false);
         try {
             CommandInterpreter interpreter = createInterpreter(new FileReader(file));
-            return interpreter.interpret(this, file);
+            if (alias == null) {
+                alias = file.getAbsolutePath();
+            }
+            return interpreter.interpret(this, file, alias, args);
         } catch (IOException ex) {
             throw new ShellException("Cannot open command file: " + ex.getMessage(), ex);
         } finally {
@@ -860,7 +863,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public int runCommandResource(String resource) throws ShellException {
+    public int runCommandResource(String resource, String[] args) throws ShellException {
         boolean enabled = setHistoryEnabled(false);
         try {
             int result;
@@ -871,7 +874,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             } else {
                 CommandInterpreter interpreter = createInterpreter(new InputStreamReader(input));
                 Reader reader = new InputStreamReader(getClass().getResourceAsStream(resource));
-                result = interpreter.interpret(this, reader);
+                result = interpreter.interpret(this, reader, resource, args);
             }
             return result;
         } finally {

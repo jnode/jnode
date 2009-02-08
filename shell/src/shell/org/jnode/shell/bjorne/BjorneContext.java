@@ -39,6 +39,7 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -239,6 +240,14 @@ public class BjorneContext {
         return copyStreamHolders(holders);
     }
     
+    void setArgs(String[] args) {
+        this.args = Arrays.asList(args.clone());
+    }
+
+    void setCommand(String command) {
+        this.command = command;
+    }
+    
     /**
      * This method implements 'NAME=VALUE'. If variable NAME does not exist, it
      * is created as an unexported shell variable.
@@ -262,7 +271,7 @@ public class BjorneContext {
      * @param name the name of the variable to be tested
      * @return <code>true</code> if the variable is set.
      */
-    public boolean isVariableSet(String name) {
+    boolean isVariableSet(String name) {
         return variables.get(name) != null;
     }
 
@@ -271,7 +280,7 @@ public class BjorneContext {
      * 
      * @param name the name of the variable to be unset
      */
-    public void unsetVariableValue(String name) {
+    void unsetVariableValue(String name) {
         variables.remove(name);
     }
 
@@ -280,7 +289,7 @@ public class BjorneContext {
      * 
      * @param name the name of the variable to be exported / unexported
      */
-    public void setExported(String name, boolean exported) {
+    void setExported(String name, boolean exported) {
         VariableSlot var = variables.get(name);
         if (var == null) {
             if (exported) {
@@ -854,8 +863,9 @@ public class BjorneContext {
             case '#':
                 return Integer.toString(args.size());
             case '@':
+                return concatenateArgs(false);
             case '*':
-                throw new ShellFailureException("not implemented");
+                return concatenateArgs(false);
             case '?':
                 return Integer.toString(lastReturnCode);
             case '!':
@@ -872,17 +882,30 @@ public class BjorneContext {
             case '7':
             case '8':
             case '9':
-                return argVariable(ch - '0');
+                return argVariable(ch);
             default:
                 return null;
         }
     }
 
-    private String argVariable(int argNo) {
+    private String concatenateArgs(boolean isStar) {
+        // FIXME - implement $@ versus $* differences; i.e. quoting and $IFS behavior.
+        StringBuilder sb = new StringBuilder();
+        for (String arg : args) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(arg);
+        }
+        return sb.toString();
+    }
+
+    private String argVariable(int argChar) {
+        int argNo = argChar - '0';
         if (argNo == 0) {
             return command;
         } else if (argNo <= args.size()) {
-            return args.get(argNo);
+            return args.get(argNo - 1);
         } else {
             return "";
         }

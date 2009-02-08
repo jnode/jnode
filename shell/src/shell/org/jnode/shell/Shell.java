@@ -70,9 +70,13 @@ public interface Shell extends InputCompleter {
      * the shell gets to decide which interpreter to use.
      * 
      * @param file the command file
+     * @param alias the command alias used to launch the script.  If this parameter is
+     * {@code null}, the command file name will be used.
+     * @param args command line arguments to be passed to the script.  If this parameter 
+     * is {@code null}, no arguments are passed.
      * @throws ShellException 
      */
-    public int runCommandFile(File file) throws ShellException;
+    public int runCommandFile(File file, String alias, String[] args) throws ShellException;
 
     /**
      * Resolve a command name to a CommandInfo object.

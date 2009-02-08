@@ -56,10 +56,13 @@ public interface CommandInterpreter {
      * @param shell the CommandShell that provides low-level command invocation,
      *        command history and so on.
      * @param file the file to be interpreted
+     * @param alias this will supply the script's notional command name to the interpreter.
+     * @param args command line arguments to be passed to the script.  If this parameter 
+     * is {@code null}, no arguments are passed.
      * @return the return code.
      * @throws ShellException
      */
-    int interpret(CommandShell shell, File file) throws ShellException;
+    int interpret(CommandShell shell, File file, String alias, String[] args) throws ShellException;
 
     /**
      * Parse and execute a command file, returning the resulting return code.
@@ -67,10 +70,13 @@ public interface CommandInterpreter {
      * @param shell the CommandShell that provides low-level command invocation,
      *        command history and so on.
      * @param reader the reader to be interpreted. <b>The implementation must close it.</b> 
+     * @param alias this will supply the script's notional command name to the interpreter.
+     * @param args command line arguments to be passed to the script.  If this parameter 
+     * is {@code null}, no arguments are passed.
      * @return the return code.
      * @throws ShellException
      */
-    int interpret(CommandShell shell, Reader reader) throws ShellException;
+    int interpret(CommandShell shell, Reader reader, String alias, String[] args) throws ShellException;
     
     /**
      * Parse a partial command line, returning the command line fragment to be
