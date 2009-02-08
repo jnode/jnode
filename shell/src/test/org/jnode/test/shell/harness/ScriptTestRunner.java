@@ -41,8 +41,6 @@ class ScriptTestRunner extends JNodeTestRunnerBase implements TestRunnable {
 
     @Override
     public int run() throws Exception {
-//      String[] args = spec.getArgs().toArray(new String[0]);
-//      CommandLine cmdLine = new CommandLine(spec.getCommand(), args);
         tempScriptFile = new File(System.getProperty("java.io.tmpdir"), spec.getCommand());
         Writer w = null;
         try {
@@ -52,7 +50,8 @@ class ScriptTestRunner extends JNodeTestRunnerBase implements TestRunnable {
         } finally {
             w.close();
         }
-        int rc = getShell().runCommandFile(tempScriptFile);
+        int rc = getShell().runCommandFile(tempScriptFile, 
+                spec.getCommand(), spec.getArgs().toArray(new String[0]));
         return check(rc) ? 0 : 1;
     }
 

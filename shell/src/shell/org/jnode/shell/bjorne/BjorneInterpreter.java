@@ -250,8 +250,10 @@ public class BjorneInterpreter implements CommandInterpreter {
     }
 
     @Override
-    public int interpret(CommandShell shell, Reader reader) throws ShellException {
-        // FIXME ... update this to support multi-line commands.
+    public int interpret(CommandShell shell, Reader reader, String alias, String[] args) 
+        throws ShellException {
+        context.setCommand(alias == null ? "" : alias);
+        context.setArgs(args == null ? new String[0] : args);
         try {
             BufferedReader br = new BufferedReader(reader);
             String line;
@@ -301,9 +303,9 @@ public class BjorneInterpreter implements CommandInterpreter {
     }
 
     @Override
-    public int interpret(CommandShell shell, File file) throws ShellException {
+    public int interpret(CommandShell shell, File file, String alias, String[] args) throws ShellException {
         try {
-            return interpret(shell, new FileReader(file));
+            return interpret(shell, new FileReader(file), alias, args);
         } catch (FileNotFoundException ex) {
             throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
         }

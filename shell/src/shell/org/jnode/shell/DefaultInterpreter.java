@@ -107,12 +107,22 @@ public class DefaultInterpreter implements CommandInterpreter {
             throw new ShellException("Command arguments don't match syntax", ex);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * The default interpreter and its subtypes treat a command script as a sequence of commands. 
+     * Commands are expected to consist of exactly one line.  Any line whose first non-whitespace 
+     * character is '#' will be ignored.  Command line arguments from the script are not supported,
+     * and will result in a {@link ShellException} being thrown.
+     */
     @Override
-    public int interpret(CommandShell shell, Reader reader) throws ShellException {
-        // The default interpreter and subtypes process the command file one line at a time, 
-        // ignoring any line whose first non-whitespace character is '#'.  There is no notion
-        // of multi-line commands.
+    public int interpret(CommandShell shell, Reader reader, String alias, String[] args) 
+        throws ShellException {
+        if (args != null && args.length > 0) {
+            throw new ShellException(
+                    "The " + getName() + " interpreter does not support script file arguments");
+        }
         try {
             BufferedReader br = new BufferedReader(reader);
             String line;
@@ -143,10 +153,19 @@ public class DefaultInterpreter implements CommandInterpreter {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * The default interpreter and its subtypes treat a command script as a sequence of commands. 
+     * Commands are expected to consist of exactly one line.  Any line whose first non-whitespace 
+     * character is '#' will be ignored.  Command line arguments from the script are not supported,
+     * and will result in a {@link ShellException} being thrown.
+     */
     @Override
-    public int interpret(CommandShell shell, File file) throws ShellException {
+    public int interpret(CommandShell shell, File file, String alias, String[] args) 
+        throws ShellException {
         try {
-            return interpret(shell, new FileReader(file));
+            return interpret(shell, new FileReader(file), alias, args);
         } catch (FileNotFoundException ex) {
             throw new ShellException("Problem reading command file: " + ex.getMessage(), ex);
         }

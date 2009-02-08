@@ -30,6 +30,7 @@ import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * Load and execute a command file.
@@ -39,11 +40,14 @@ import org.jnode.shell.syntax.FileArgument;
  */
 public class RunCommand extends AbstractCommand {
     
-    private final FileArgument ARG_FILE = new FileArgument("file", Argument.MANDATORY, "The command file name");
+    private final FileArgument ARG_FILE = 
+        new FileArgument("file", Argument.MANDATORY, "The command script file name");
+    private final StringArgument ARG_ARGS =
+        new StringArgument("args", Argument.OPTIONAL | Argument.MULTIPLE, "Arguments passed to the script");
     
     public RunCommand() {
         super("Run a command file");
-        registerArguments(ARG_FILE);
+        registerArguments(ARG_FILE, ARG_ARGS);
     }
 
     public static void main(String[] args) throws Exception {
@@ -67,8 +71,10 @@ public class RunCommand extends AbstractCommand {
             err.println("Shell is null.");
             exit(2);
         }
+        
+        String[] args = ARG_ARGS.getValues();
 
-        int rc = shell.runCommandFile(file);
+        int rc = shell.runCommandFile(file, null, args);
         if (rc != 0) {
             exit(rc);
         }

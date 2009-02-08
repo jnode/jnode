@@ -472,4 +472,23 @@ A % *t is ca
 B % *t is caaa
 </output>
     </testSpec>
+    <testSpec title="script arguments" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo $0
+                echo $1
+                echo $2
+                echo $3
+                echo $#
+                echo $*
+        </script>
+        <arg>arg1</arg>
+        <arg>arg2</arg>
+        <output>test
+arg1
+arg2
+
+2
+arg1 arg2
+</output>
+    </testSpec>
 </testSet>
