@@ -212,8 +212,12 @@ public class BjorneInterpreter implements CommandInterpreter {
 
     @Override
     public String escapeWord(String word) {
-        // TODO implement this properly
-        return word;
+        // FIXME ... do this properly
+        if (word.indexOf(' ') == -1 && word.indexOf('\t') == -1) {
+            return word;
+        } else {
+            return "'" + word + "'";
+        }
     }
 
     int interpret(CommandShell shell, String command, StringWriter capture, boolean source) 
