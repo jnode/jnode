@@ -124,7 +124,6 @@ public class TestHarness {
     }
     
 
-
     public TestSetSpecification loadTestSetSpecification(String specName, String base) throws Exception {
         TestSpecificationParser parser = new TestSpecificationParser();
         InputStream is = null;

@@ -68,7 +68,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
 
     @Override
     public int execute(final BjorneContext context) throws ShellException {
-        BjorneContext.StreamHolder[] holders = null;
+        StreamHolder[] holders = null;
         int rc;
         try {
             BjorneToken[] words = getWords();
@@ -98,7 +98,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
             }
         } finally {
             if (holders != null) {
-                for (BjorneContext.StreamHolder holder : holders) {
+                for (StreamHolder holder : holders) {
                     holder.close();
                 }
             }

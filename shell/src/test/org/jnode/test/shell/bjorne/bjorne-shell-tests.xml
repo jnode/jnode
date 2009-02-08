@@ -491,22 +491,34 @@ arg2
 arg1 arg2
 </output>
     </testSpec>
-    <testSpec title="set -x" command="test" runMode="AS_SCRIPT" rc="0">
+    <testSpec title="quote handling" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 set -x
                 echo a b
                 echo 'a b'
                 echo "a b"
+                echo $*
+                echo $@
+                echo "$*"
+                echo "$@"
         </script>
         <arg>arg1</arg>
         <arg>arg2</arg>
         <output>a b
 a b
 a b
+arg1 arg2
+arg1 arg2
+arg1 arg2
+arg1 arg2
 </output>
         <error> + echo a b
  + echo 'a b'
  + echo 'a b'
+ + echo arg1 arg2
+ + echo arg1 arg2
+ + echo 'arg1 arg2'
+ + echo arg1 arg2
 </error>
     </testSpec>
 </testSet>

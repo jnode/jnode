@@ -541,7 +541,8 @@ public class BjorneContext {
                     if (quote == '\'') {
                         sb.append('$');
                     } else {
-                        sb.append(dollarExpansion(ci, quote));
+                        String tmp = dollarExpansion(ci, quote);
+                        sb.append(tmp == null ? "" : tmp);
                     }
                     break;
 
@@ -573,27 +574,16 @@ public class BjorneContext {
             case '?':
             case '!':
             case '-':
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                return specialVariable(ch);
+                return specialVariable(ch, quote == '"');
             default:
                 StringBuffer sb = new StringBuffer().append((char) ch);
                 ch = ci.peekCh();
-                while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= 'a' && ch <= 'z') || ch == '_') {
+                while ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_') {
                     sb.append((char) ch);
                     ci.nextCh();
                     ch = ci.peekCh();
                 }
-                VariableSlot var = variables.get(sb.toString());
-                return (var != null) ? var.value : "";
+                return variable(sb.toString());
         }
     }
 
@@ -741,7 +731,7 @@ public class BjorneContext {
             // Extract the word
             word = sb.substring(i);
         }
-        String value = variable(parameter);
+        String value = dollarExpansion(new CharIterator(parameter), '\000');
         switch (operator) {
             case NONE:
                 return (value != null) ? value : "";
@@ -835,12 +825,6 @@ public class BjorneContext {
 
 
     private String variable(String parameter) throws ShellSyntaxException {
-        if (parameter.length() == 1) {
-            String tmp = specialVariable(parameter.charAt(0));
-            if (tmp != null) {
-                return tmp;
-            }
-        }
         if (BjorneToken.isName(parameter)) {
             VariableSlot var = variables.get(parameter);
             return (var != null) ? var.value : null;
@@ -854,58 +838,49 @@ public class BjorneContext {
         }
     }
 
-    private String specialVariable(int ch) {
+    private String specialVariable(int ch, boolean inDoubleQuotes) {
         switch (ch) {
             case '$':
                 return Integer.toString(shellPid);
             case '#':
                 return Integer.toString(args.size());
             case '@':
-                return concatenateArgs(false);
+                return concatenateArgs(false, inDoubleQuotes);
             case '*':
-                return concatenateArgs(false);
+                return concatenateArgs(true, inDoubleQuotes);
             case '?':
                 return Integer.toString(lastReturnCode);
             case '!':
                 return Integer.toString(lastAsyncPid);
             case '-':
                 return options;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                return argVariable(ch);
             default:
                 return null;
         }
     }
 
-    private String concatenateArgs(boolean isStar) {
-        // FIXME - implement $@ versus $* differences; i.e. quoting and $IFS behavior.
+    private String concatenateArgs(boolean isStar, boolean inDoubleQuotes) {
         StringBuilder sb = new StringBuilder();
         for (String arg : args) {
             if (sb.length() > 0) {
-                sb.append(' ');
+                if (isStar || !inDoubleQuotes) {
+                    sb.append(' ');
+                } else {
+                    sb.append("\" \"");
+                }
             }
             sb.append(arg);
         }
         return sb.toString();
     }
 
-    private String argVariable(int argChar) {
-        int argNo = argChar - '0';
+    private String argVariable(int argNo) {
         if (argNo == 0) {
             return command;
         } else if (argNo <= args.size()) {
             return args.get(argNo - 1);
         } else {
-            return "";
+            return null;
         }
     }
 
@@ -1114,93 +1089,5 @@ public class BjorneContext {
     public boolean patternMatch(CharSequence expandedWord, CharSequence pat) {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    private static class VariableSlot {
-        public String value;
-
-        public boolean exported;
-
-        public VariableSlot(String value, boolean exported) {
-            if (value == null) {
-                throw new ShellFailureException("null value");
-            }
-            this.value = value;
-            this.exported = exported;
-        }
-
-        public VariableSlot(VariableSlot other) {
-            this.value = other.value;
-            this.exported = other.exported;
-        }
-    }
-
-    public static class StreamHolder {
-        private CommandIO stream;
-        private boolean isMine;
-
-        public StreamHolder(CommandIO stream, boolean isMine) {
-            this.stream = stream;
-            this.isMine = isMine;
-        }
-
-        public StreamHolder(StreamHolder other) {
-            this.stream = other.stream;
-            this.isMine = false;
-        }
-        
-        public CommandIO getStream() {
-            return stream;
-        }
-
-        public void setStream(CommandIO stream, boolean isMine) {
-            close();
-            this.stream = stream;
-            this.isMine = isMine;
-        }
-
-        public void close() {
-            if (isMine) {
-                try {
-                    isMine = false; // just in case we call close twice
-                    stream.close();
-                } catch (IOException ex) {
-                    // FIXME - should we squash or report this?
-                }
-            }
-        }
-        
-        public boolean isMine() {
-            return isMine;
-        }
-    }
-
-    private static class CharIterator {
-        private CharSequence str;
-        private int pos, start, limit;
-
-        public CharIterator(CharSequence str) {
-            this.str = str;
-            this.start = pos = 0;
-            this.limit = str.length();
-        }
-
-        public CharIterator(CharSequence str, int start, int limit) {
-            this.str = str;
-            this.start = pos = start;
-            this.limit = limit;
-        }
-
-        public int nextCh() {
-            return (pos >= limit) ? -1 : str.charAt(pos++);
-        }
-
-        public int peekCh() {
-            return (pos >= limit) ? -1 : str.charAt(pos);
-        }
-
-        public int lastCh() {
-            return (pos > start) ? str.charAt(pos - 1) : -1;
-        }
     }
 }
