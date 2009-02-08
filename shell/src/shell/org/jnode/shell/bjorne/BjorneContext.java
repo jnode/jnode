@@ -404,10 +404,10 @@ public class BjorneContext {
 
     /**
      * Split a character sequence into word tokens, dealing with and removing any
-     * non-literal
+     * non-literal quotes.
      * 
      * @param text the characters to be split
-     * @return the destination for the tokens.
+     * @return the resulting list of tokens.
      * @throws ShellException
      */
     public List<BjorneToken> split(CharSequence text) throws ShellException {
@@ -922,7 +922,7 @@ public class BjorneContext {
             StringBuilder sb = new StringBuilder();
             sb.append(" + ").append(command.getCommandName());
             for (String arg : command.getArguments()) {
-                sb.append(" ").append(arg);
+                sb.append(" ").append(interpreter.escapeWord(arg));
             }
             resolvePrintStream(streams[Command.STD_ERR]).println(sb);
         }

@@ -491,4 +491,22 @@ arg2
 arg1 arg2
 </output>
     </testSpec>
+    <testSpec title="set -x" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                set -x
+                echo a b
+                echo 'a b'
+                echo "a b"
+        </script>
+        <arg>arg1</arg>
+        <arg>arg2</arg>
+        <output>a b
+a b
+a b
+</output>
+        <error> + echo a b
+ + echo 'a b'
+ + echo 'a b'
+</error>
+    </testSpec>
 </testSet>
