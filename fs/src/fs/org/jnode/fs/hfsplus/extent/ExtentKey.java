@@ -42,7 +42,7 @@ public class ExtentKey extends AbstractKey {
     public final int getKeyLength() {
         return BigEndian.getInt16(ek, 0);
     }
-
+   
     public final int getForkType() {
         return BigEndian.getInt8(ek, 2);
     }
@@ -61,13 +61,36 @@ public class ExtentKey extends AbstractKey {
 
     @Override
     public final int compareTo(final Key key) {
-        return 0;
+        int res = -1;
+        if (key instanceof ExtentKey) {
+            ExtentKey compareKey = (ExtentKey) key;
+            res = getCatalogNodeId().compareTo(compareKey.getCatalogNodeId());
+            if (res == 0) {
+                res = compareForkType(compareKey.getForkType());
+                if (res == 0) {
+                    return compareStartBlock(compareKey.getStartBlock());
+                }
+            }
+        }
+        return res;
     }
 
     @Override
     public byte[] getBytes() {
-        // TODO Auto-generated method stub
-        return null;
+        byte[] data = new byte[this.getKeyLength()];
+        return data;
+    }
+    
+    private int compareForkType(int fork) {
+        Integer currentForkType = Integer.valueOf(this.getForkType());
+        Integer forkType = Integer.valueOf(fork);
+        return currentForkType.compareTo(forkType);
+    }
+    
+    private int compareStartBlock(int block) {
+        Integer currentStartBlock = Integer.valueOf(this.getStartBlock());
+        Integer startBlock = Integer.valueOf(block);
+        return currentStartBlock.compareTo(startBlock);
     }
 
 }
