@@ -65,8 +65,7 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        int macDate = (int) HFSUtils
-            .getDate(now.getTimeInMillis() / 1000, true);
+        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
 
         HFSUnicodeString dirName = new HFSUnicodeString(name);
         CatalogThread thread = new CatalogThread(

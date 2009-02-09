@@ -58,4 +58,12 @@ public abstract class AbstractNode implements Node {
     public byte[] getBytes() {
         return datas;
     }
+    
+    public String toString() {
+        StringBuffer b = new StringBuffer();
+        b.append((this.isLeafNode()) ? "Leaf node" : "Index node").append("\n");
+        b.append(this.getNodeDescriptor().toString());
+        return b.toString();
+        
+    }
 }

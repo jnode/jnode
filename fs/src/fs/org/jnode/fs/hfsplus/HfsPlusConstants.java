@@ -52,6 +52,9 @@ public class HfsPlusConstants {
 
     public static final byte EK_DATA_FORK = (byte) 0x00;
     public static final byte EK_RESOURCE_FORK = (byte) 0xFF;
+    
+    public static final int BYTES_PER_SECTOR = 512;
+    public static final int BITS_PER_SECTOR = 4096;
 
     
     

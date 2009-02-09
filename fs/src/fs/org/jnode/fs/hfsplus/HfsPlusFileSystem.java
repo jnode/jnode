@@ -162,6 +162,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
                 - ((sb.getBlockSize() == 512) ? 2 : 1);
             // ---
             log.debug("Write allocation bitmap bits to disk.");
+            writeAllocationFile((int) volumeBlockUsed);
             // ---
             log.debug("Write Catalog to disk.");
             long offset = sb.getCatalogFile().getExtents()[0].getStartBlock() * sb.getBlockSize();
@@ -175,5 +176,10 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         } catch (ApiNotFoundException e) {
             throw new FileSystemException("Unable to create HFS+ filesystem", e);
         }
+    }
+    
+    private void writeAllocationFile(int blockUsed) {
+        int bytes = blockUsed >> 3;
+        int bits  = blockUsed & 0x0007;
     }
 }

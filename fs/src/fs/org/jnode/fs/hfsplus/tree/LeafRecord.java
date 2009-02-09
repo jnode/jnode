@@ -33,7 +33,7 @@ public class LeafRecord extends AbstractNodeRecord {
     public LeafRecord(final Key key, final byte[] nodeData, final int offset, final int recordDataSize) {
         this.key = key;
         this.recordData = new byte[recordDataSize];
-        System.arraycopy(nodeData, offset + key.getKeyLength() + 2, this.recordData, 0, recordDataSize);
+        System.arraycopy(nodeData, offset + key.getKeyLength(), this.recordData, 0, recordDataSize);
     }
 
     public final int getType() {
