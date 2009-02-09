@@ -25,6 +25,7 @@ import gnu.java.security.action.InvokeAction;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -93,6 +94,12 @@ public class DefaultCommandInvoker implements CommandInvoker {
             }
             final Method main = cmdInfo.getCommandClass().getMethod("main",
                     MAIN_ARG_TYPES);
+            int modifiers = main.getModifiers();
+            if ((modifiers & Modifier.STATIC) == 0 || (modifiers & Modifier.PUBLIC) == 0) {
+                System.err.println("The 'main' method for " + cmdInfo.getCommandClass() +
+                        " is not public static");
+                return 1;
+            }
             try {
                 try {
                     AccessController.doPrivileged(new PrivilegedAction<Void>() {
@@ -100,6 +107,8 @@ public class DefaultCommandInvoker implements CommandInvoker {
                             System.setOut(shell.resolvePrintStream(ios[1]));
                             System.setErr(shell.resolvePrintStream(ios[2]));
                             System.setIn(shell.resolveInputStream(ios[0]));
+                            // We've checked the method access, and we must ignore the class access.
+                            main.setAccessible(true);
                             return null;
                         }
                     });
