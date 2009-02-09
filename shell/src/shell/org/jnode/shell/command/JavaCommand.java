@@ -85,6 +85,11 @@ public class JavaCommand extends AbstractCommand {
                 err.println("The 'main' method for this class is not public");
                 exit(1);
             }
+            // Disable access checking so that we can execute the method
+            // is the class is not 'public'.  (Strangely, Sun's 'java' command
+            // allows you to run a non-public class. So we should allow this too.)
+            mainMethod.setAccessible(true);
+            
             String[] mainArgs = ARG_ARGS.isSet() ? ARG_ARGS.getValues() : new String[0];
             mainMethod.invoke(null, new Object[]{mainArgs});
         } catch (ClassNotFoundException ex) {

@@ -304,6 +304,7 @@
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
     <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
     <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+    <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
   </extension>
 
 </plugin>

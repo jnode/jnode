@@ -49,6 +49,7 @@
     <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
   </extension>
         
 </plugin>
