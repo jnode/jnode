@@ -53,9 +53,11 @@ public class CatalogKey extends AbstractKey {
     }
 
     /**
+     * Create catalog key based on parent CNID and the name of the file or folder.
      * 
-     * @param parentID
-     * @param name
+     * @param parentID Parent catalog node identifier.
+     * @param name Name of the file or folder.
+     * 
      */
     public CatalogKey(final CatalogNodeId parentID, final HFSUnicodeString name) {
         this.parentID = parentID;
@@ -75,22 +77,30 @@ public class CatalogKey extends AbstractKey {
         return nodeName;
     }
 
-    public final int compareTo(final Key o) {
-        if (o instanceof CatalogKey) {
-            CatalogKey ck = (CatalogKey) o;
-            if (getParentId().getId() == ck.getParentId().getId()) {
-                return nodeName.getUnicodeString().compareTo(
+    /**
+     * Compare two catalog keys. These keys are compared by parent id and next
+     * by node name.
+     * 
+     * @param key
+     * 
+     */
+    public final int compareTo(final Key key) {
+        int res = -1;
+        if (key instanceof CatalogKey) {
+            CatalogKey ck = (CatalogKey) key;
+            res = this.getParentId().compareTo(ck.getParentId());
+            if (res == 0) {
+                res = this.getNodeName().getUnicodeString().compareTo(
                         ck.getNodeName().getUnicodeString());
-            } else if (getParentId().getId() < ck.getParentId().getId()) {
-                return -1;
-            } else {
-                return 1;
             }
-        } else {
-            return -1;
         }
+        return res;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.hfsplus.tree.AbstractKey#getBytes()
+     */
     public byte[] getBytes() {
         byte[] data = new byte[this.getKeyLength()];
         BigEndian.setInt16(data, 0, this.getKeyLength());
@@ -99,6 +109,10 @@ public class CatalogKey extends AbstractKey {
         return data;
     }
     
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     public final String toString() {
         StringBuffer s = new StringBuffer();
         s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",").append(getParentId().getId())
