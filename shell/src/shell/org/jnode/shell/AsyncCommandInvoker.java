@@ -116,26 +116,29 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         } else {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
-                if ((method.getModifiers() & Modifier.STATIC) != 0) {
-                    if (ios[Command.STD_IN] != CommandLine.DEFAULT_STDIN
-                            || ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT
-                            || ios[Command.STD_ERR] != CommandLine.DEFAULT_STDERR) {
-                        throw new ShellInvocationException(
-                                "Entry point method for "
-                                        + cmdInfo.getCommandClass()
-                                        + " does not allow redirection or pipelining");
-                    }
-                    cr = new CommandRunner(
-                            this, cmdInfo, cmdInfo.getCommandClass(), method,
-                            new Object[] {cmdLine.getArguments()}, resolvedIOs);
+                int modifiers = method.getModifiers();
+                if ((modifiers & Modifier.STATIC) == 0 || (modifiers & Modifier.PUBLIC) == 0) {
+                    new ShellInvocationException("The 'main' method for " + 
+                            cmdInfo.getCommandClass() + " is not public static");
                 }
+                if (ios[Command.STD_IN] != CommandLine.DEFAULT_STDIN
+                        || ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT
+                        || ios[Command.STD_ERR] != CommandLine.DEFAULT_STDERR) {
+                    throw new ShellInvocationException(
+                            "The 'main' method for " + cmdInfo.getCommandClass() +
+                            " does not allow redirection or pipelining");
+                }
+                // We've checked the method access, and we must ignore the class access.
+                method.setAccessible(true);
+                cr = new CommandRunner(
+                        this, cmdInfo, cmdInfo.getCommandClass(), method,
+                        new Object[] {cmdLine.getArguments()}, resolvedIOs);
             } catch (NoSuchMethodException e) {
                 // continue;
             }
             if (cr == null) {
                 throw new ShellInvocationException(
-                        "No suitable entry point method for "
-                                + cmdInfo.getCommandClass());
+                        "No entry point method found for " + cmdInfo.getCommandClass());
             }
         }
         
