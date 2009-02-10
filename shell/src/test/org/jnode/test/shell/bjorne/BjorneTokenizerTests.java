@@ -67,16 +67,26 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
 import junit.framework.TestCase;
 
+import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.bjorne.BjorneToken;
 import org.jnode.shell.bjorne.BjorneTokenizer;
 
 public class BjorneTokenizerTests extends TestCase {
 
-    public void testBjorneTokenizer() {
+    public void testBjorneTokenizer() throws IncompleteCommandException {
         new BjorneTokenizer("hello");
     }
 
-    public void testEmpty() {
+    public void testBjorneTokenizer2() {
+        try {
+            new BjorneTokenizer("hello\\");
+            fail("no exception");
+        } catch (IncompleteCommandException ex) {
+            // expected
+        }
+    }
+
+    public void testEmpty() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("");
         BjorneToken token = tokenizer.peek();
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
@@ -88,7 +98,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testNewline() {
+    public void testNewline() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("\n");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_END_OF_LINE, token.getTokenType());
@@ -96,7 +106,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testBlanksAndNewlines() {
+    public void testBlanksAndNewlines() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("  \n\t\n  ");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_END_OF_LINE, token.getTokenType());
@@ -106,7 +116,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testComments() {
+    public void testComments() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "# comment\n  #comment 2\n # comment # 3");
         BjorneToken token = tokenizer.next();
@@ -117,7 +127,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testSymbols() {
+    public void testSymbols() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("; | & < > ( )");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_SEMI, token.getTokenType());
@@ -137,7 +147,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testSymbols2() {
+    public void testSymbols2() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "; ;; | || & && < << > >>");
         BjorneToken token = tokenizer.next();
@@ -164,7 +174,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testSymbols3() {
+    public void testSymbols3() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(";;;|||&&&<<<>>>");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_DSEMI, token.getTokenType());
@@ -188,7 +198,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testSymbols4() {
+    public void testSymbols4() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "< << <<- <& <> > >> >| >&");
         BjorneToken token = tokenizer.next();
@@ -213,7 +223,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testWords() {
+    public void testWords() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("hello there");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_WORD, token.getTokenType());
@@ -225,7 +235,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testWords2() {
+    public void testWords2() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "hello\\ there\\\n friend");
         BjorneToken token = tokenizer.next();
@@ -243,9 +253,20 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals("hello\\ there\\ friend", token.getText());
         token = tokenizer.next();
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
+        
+        tokenizer = new BjorneTokenizer(
+                "hello\\\nthere\\\n friend");
+        token = tokenizer.next();
+        assertEquals(TOK_WORD, token.getTokenType());
+        assertEquals("hellothere", token.getText());
+        token = tokenizer.next();
+        assertEquals(TOK_WORD, token.getTokenType());
+        assertEquals("friend", token.getText());
+        token = tokenizer.next();
+        assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testWords3() {
+    public void testWords3() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("'1 2' \"3 4\" `5 6`");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_WORD, token.getTokenType());
@@ -260,7 +281,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testWords4() {
+    public void testWords4() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("'1 \"2\"' \"3\\\"4\"");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_WORD, token.getTokenType());
@@ -272,7 +293,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testWords5() {
+    public void testWords5() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("1<2>3&4;5|6)7");
         BjorneToken token = tokenizer.next();
         assertEquals(TOK_IO_NUMBER, token.getTokenType());
@@ -311,7 +332,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRule1() {
+    public void testRule1() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "if then else elif fi for done while until "
                         + "case { } ! do in esac");
@@ -351,7 +372,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRule5() {
+    public void testRule5() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "if a a1 9a a_b a,b AB A=b");
         BjorneToken token = tokenizer.next(RULE_5_CONTEXT);
@@ -374,7 +395,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRule6() {
+    public void testRule6() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("if in do");
         BjorneToken token = tokenizer.next(RULE_6_CONTEXT);
         assertEquals(TOK_WORD, token.getTokenType());
@@ -386,7 +407,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRule7a() {
+    public void testRule7a() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "if then else elif fi for done while until "
                         + "case { } ! do in esac a= a=b 1a=b =c");
@@ -434,7 +455,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRule7b() {
+    public void testRule7b() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "if then else elif fi for done while until "
                         + "case { } ! do in esac a= a=b 1a=b =c");
@@ -482,7 +503,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRule8() {
+    public void testRule8() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer(
                 "if then else elif fi for done while until "
                         + "case { } ! do in esac a a_b a= a=b 1a=b =c");
@@ -534,7 +555,7 @@ public class BjorneTokenizerTests extends TestCase {
         assertEquals(TOK_END_OF_STREAM, token.getTokenType());
     }
 
-    public void testRegress() {
+    public void testRegress() throws IncompleteCommandException {
         BjorneTokenizer tokenizer = new BjorneTokenizer("ls -l");
         BjorneToken token = tokenizer.peek(RULE_7a_CONTEXT);
         assertEquals(TOK_WORD, token.getTokenType());

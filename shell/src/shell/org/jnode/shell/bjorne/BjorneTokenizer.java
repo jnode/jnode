@@ -66,6 +66,7 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_UNTIL;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WHILE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_WORD;
 
+import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellFailureException;
 
 public class BjorneTokenizer {
@@ -83,16 +84,79 @@ public class BjorneTokenizer {
 
     private final boolean debug;
 
-    public BjorneTokenizer(String text) {
+    /**
+     * Create a tokenizer for the supplied shell input text.
+     * @param text the text to be tokenized
+     * @throws IncompleteCommandException if the text ends with a line continuation
+     */
+    public BjorneTokenizer(String text) throws IncompleteCommandException {
         this(text, false);
     }
 
-    public BjorneTokenizer(String text, boolean debug) {
-        chars = text.toCharArray();
+    /**
+     * Create a tokenizer for the supplied shell input text.
+     * @param text the text to be tokenized
+     * @param debug if {@code true}, produce debug output
+     * @throws IncompleteCommandException if the text ends with a line continuation
+     */
+    public BjorneTokenizer(String text, boolean debug) throws IncompleteCommandException {
+        chars = foldContinuations(text);
         len = chars.length;
         this.debug = debug;
     }
 
+    /**
+     * Rewrite the supplied text to fold any line continuations.
+     * 
+     * @param text the text to be processed
+     * @return the characters of text with any line continuations removed.
+     * @throws IncompleteCommandException
+     */
+    private char[] foldContinuations(String text) throws IncompleteCommandException {
+        if (text.indexOf('\\') == -1) {
+            return text.toCharArray();
+        }
+        int len = text.length();
+        StringBuilder sb = new StringBuilder(len);
+        boolean escape = false;
+        for (int i = 0; i < len; i++) {
+            char ch = text.charAt(i);
+            switch (ch) {
+                case '\\':
+                    if (escape) {
+                        sb.append('\\');
+                    } else if (i == len - 1) {
+                        // If we get a continuation sequence at the end of the
+                        // text, the simplest thing is to ask for more input.
+                        throw new IncompleteCommandException(
+                                "More input required after '\\<newline>'", " > ");
+                    }
+                    escape = !escape;
+                    break;
+                case '\n':
+                    if (!escape) {
+                        sb.append('\n');
+                    } else {
+                        escape = false;
+                    }
+                    break;
+                default:
+                    if (escape) {
+                        sb.append('\\');
+                        escape = false;
+                    }
+                    sb.append(ch);
+            }
+        }
+        return sb.toString().toCharArray();
+    }
+
+    /**
+     * Get the next token without advancing.  The default tokenization
+     * rules are used.
+     * 
+     * @return the next token
+     */
     public BjorneToken peek() {
         if (current == null) {
             current = advance();
@@ -103,6 +167,13 @@ public class BjorneTokenizer {
         return current;
     }
 
+    /**
+     * Get the next token without advancing, using the tokenization
+     * rules corresponding to the supplied 'context'.
+     * 
+     * @param context gives the tokenization rules
+     * @return the next token
+     */
     public BjorneToken peek(int context) {
         BjorneToken res = reinterpret(peek(), context);
         if (debug) {
@@ -111,10 +182,20 @@ public class BjorneTokenizer {
         return res;
     }
 
+    /**
+     * Test if {@link #next()} will return something other that EOS.
+     * @return <code>true</code> if there are more tokens to be delivered.
+     */
     public boolean hasNext() {
         return peek().getTokenType() != TOK_END_OF_STREAM;
     }
 
+    /**
+     * Get the next token and advance.  The default tokenization
+     * rules are used.
+     * 
+     * @return the next token
+     */
     public BjorneToken next() {
         if (current == null) {
             prev = advance();
@@ -129,6 +210,10 @@ public class BjorneTokenizer {
         return prev;
     }
 
+    /**
+     * Backup one token in the token sequence.  Calling this method twice without
+     * an intervening {@link #next()} call is invalid.
+     */
     public void backup() {
         if (prev == null) {
             throw new ShellFailureException("incorrect backup");
@@ -142,6 +227,13 @@ public class BjorneTokenizer {
         prev = null;
     }
 
+    /**
+     * Get the next token and advance, using the tokenization
+     * rules corresponding to the supplied 'context'.
+     * 
+     * @param context gives the tokenization rules
+     * @return the next token
+     */
     public BjorneToken next(int context) {
         BjorneToken res = reinterpret(next(), context);
         if (debug) {
@@ -150,6 +242,9 @@ public class BjorneTokenizer {
         return res;
     }
 
+    /**
+     * This operation is not supported.
+     */
     public void remove() {
         throw new UnsupportedOperationException("remove not supported");
     }

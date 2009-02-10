@@ -8,6 +8,14 @@ echo HI
         <output>HI
 </output>
     </testSpec>
+    <testSpec title="continuation" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+        echo hello \
+mother
+        </script>
+        <output>hello mother
+</output>
+    </testSpec>
     <testSpec title="$?" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 true

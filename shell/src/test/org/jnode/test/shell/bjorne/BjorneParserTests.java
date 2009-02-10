@@ -30,7 +30,7 @@ public class BjorneParserTests extends TestCase {
 
     private static final boolean DEBUG = true;
 
-    public void testParser() {
+    public void testParser() throws ShellException {
         new BjorneParser(new BjorneTokenizer(""), null);
     }
 
