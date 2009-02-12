@@ -234,6 +234,49 @@ A is 2
 1
 </output>
     </testSpec>
+    <testSpec title="case ... esac" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                case 1 in ( 1 ) echo hi mum ;; 2 ) echo bye mum ; esac
+                case 1 in 1 ) echo hi mum ;; 2 ) echo bye mum ; esac
+                case 2 in ( 1 ) echo hi mum ;; 2 ) echo bye mum ; esac
+                case 2 in ( 1 | 2 ) echo hi mum ;; 3 ) echo bye mum ; esac
+                case 2 in ( 1 | 2 ) echo hi mum ;; 3 ) echo bye mum ;; esac
+                case 3 in ( 1 | 2 ) echo hi mum ;; 3 ) echo bye ; echo mum ; esac
+        </script>
+        <output>hi mum
+hi mum
+bye mum
+hi mum
+hi mum
+bye
+mum
+</output>
+    </testSpec>
+    <testSpec title="case ... esac multi-line" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                case 1 in 
+                   ( 1 ) echo hi mum ;; 
+                     2 ) echo bye mum 
+                esac
+                case 1 in
+                   1 ) echo hi mum ;; 
+                   2 ) echo bye mum ; esac
+                case 2 in ( 1 ) echo hi mum ;; 
+                   2 ) echo bye mum
+                esac
+                case 2 in ( 1 | 2 ) echo hi mum ;; 
+                     3 ) echo bye mum ;; esac
+                case 2 in ( 1 | 2 ) echo hi mum ;; 
+                     3 ) echo bye mum ;; 
+                esac
+        </script>
+        <output>hi mum
+hi mum
+bye mum
+hi mum
+hi mum
+</output>
+    </testSpec>
     <testSpec title="${...} expansions" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 A=cat

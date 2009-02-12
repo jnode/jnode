@@ -42,11 +42,14 @@ public class CaseItemNode {
         StringBuffer sb = new StringBuffer();
         sb.append("CaseItem{");
         if (pattern != null) {
-            sb.append(",pattern=");
+            sb.append("pattern=");
             CommandNode.appendArray(sb, pattern);
         }
         if (body != null) {
-            sb.append(",body=").append(body);
+            if (pattern != null) {
+                sb.append(",");
+            }
+            sb.append("body=").append(body);
         }
         sb.append("}");
         return sb.toString();

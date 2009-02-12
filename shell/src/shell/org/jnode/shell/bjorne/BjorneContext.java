@@ -1086,9 +1086,10 @@ public class BjorneContext {
         return interpreter.fork(command, ios);
     }
 
-    public boolean patternMatch(CharSequence expandedWord, CharSequence pat) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean patternMatch(CharSequence text, CharSequence pat) {
+        int flags = PathnamePattern.EAGER | PathnamePattern.DEFAULT_FLAGS;
+        Pattern regex = PathnamePattern.compilePosixShellPattern(pat, flags);
+        return regex.matcher(text).matches();
     }
 
     public String[] getArgs() {
