@@ -378,7 +378,7 @@ public class PathnamePattern {
      * @param pattern the pattern in shell syntax.
      * @return the corresponding regex as a {@link Pattern}.
      */
-    public static Pattern compilePosixShellPattern(String pattern, int flags) {
+    public static Pattern compilePosixShellPattern(CharSequence pattern, int flags) {
         // This method needs to be really careful to avoid 'ordinary' characters
         // in the source pattern being accidentally mapped to Java regex
         // meta-characters.

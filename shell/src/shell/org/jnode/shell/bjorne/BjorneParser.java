@@ -579,10 +579,12 @@ public class BjorneParser {
     private BjorneToken[] parsePattern() throws ShellSyntaxException {
         List<BjorneToken> pattern = new LinkedList<BjorneToken>();
         while (true) {
-            int tt = tokens.next().getTokenType();
+            BjorneToken token = tokens.next();
+            int tt = token.getTokenType();
             if (tt != TOK_WORD) {
                 syntaxError("expected WORD in pattern", tt);
             }
+            pattern.add(token);
             if (tokens.peek().getTokenType() != TOK_BAR) {
                 break;
             }

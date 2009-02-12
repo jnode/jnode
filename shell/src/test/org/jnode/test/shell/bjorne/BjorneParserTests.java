@@ -122,9 +122,9 @@ public class BjorneParserTests extends TestCase {
     public void test10() throws ShellException {
         assertEquals(
                 "CaseCommand{nodeType=9,word=WORD{$1},caseItems=["
-                        + "CaseItem{,pattern=[],body="
+                        + "CaseItem{pattern=[WORD{a}],body="
                         + "SimpleCommand{nodeType=1,words=[WORD{ls},WORD{-l}]}},"
-                        + "CaseItem{,pattern=[],body="
+                        + "CaseItem{pattern=[WORD{b}],body="
                         + "SimpleCommand{nodeType=1,words=[WORD{ls},WORD{-a}]}}]}",
                 doTest("case $1 in ( a ) ls -l ;; b ) ls -a ; esac"));
     }
