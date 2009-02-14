@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: GetPropertiesAction.java 4973 2009-02-02 07:52:47Z lsantha $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -25,18 +25,17 @@ import java.util.Map;
 import java.util.Properties;
 
 
-
 /**
- * Utility class for getting all system properties in a privileged action.
+ * Utility class for getting the map containing the environment variables in a privileged action.
  * 
- * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
-public class GetPropertiesAction implements PrivilegedAction<Properties> {
+public class GetEnvAction implements PrivilegedAction<Map<String, String>> {
 
     /**
      * @see java.security.PrivilegedAction#run()
      */
-    public Properties run() {
-        return System.getProperties();
+    public Map<String, String> run() {
+        return System.getenv();
     }
 }

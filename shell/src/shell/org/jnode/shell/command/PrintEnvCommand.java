@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: EnvCommand.java 4977 2009-02-02 09:09:41Z lsantha $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -20,41 +20,41 @@
  
 package org.jnode.shell.command;
 
-import gnu.java.security.action.GetPropertiesAction;
+import gnu.java.security.action.GetEnvAction;
 
 import java.io.PrintWriter;
 import java.security.AccessController;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 import org.jnode.shell.AbstractCommand;
 
 /**
- * @author epr
+ * This command prints the current environment variables.  A regular JNode command
+ * cannot set environment variables because the Java APIs do not allow this.  Environment
+ * variable setting is accomplished by the shell / interpreter and builtin commands, it at all.
+ * 
+ * @author crawley@jnode.org
  */
-public class EnvCommand extends AbstractCommand {
-    // FIXME ... this class and the corresponding alias are incorrectly named
+public class PrintEnvCommand extends AbstractCommand {
 
-    public EnvCommand() {
-        super("Print the system properties");
+    public PrintEnvCommand() {
+        super("Print the current environment variables");
     }
 
     public static void main(String[] args) throws Exception {
-        new EnvCommand().execute(args);
+        new PrintEnvCommand().execute(args);
     }
 
     /**
      * Execute this command
      */
     public void execute() throws Exception {
-        final Properties ps = (Properties) AccessController.doPrivileged(new GetPropertiesAction());
-        final TreeMap<Object, Object> sortedPs = new TreeMap<Object, Object>(ps);
+        final Map<String, String> env = (Map<String, String>) AccessController.doPrivileged(new GetEnvAction());
+        final TreeMap<String, String> sortedEnv = new TreeMap<String, String>(env);
         final PrintWriter out = getOutput().getPrintWriter();
-        for (Map.Entry<Object, Object> entry : sortedPs.entrySet()) {
-            final String key = entry.getKey().toString();
-            final String value = entry.getValue().toString();
-            out.println(key + '=' + value);
+        for (Map.Entry<String, String> entry : sortedEnv.entrySet()) {
+            out.println(entry.getKey() + '=' + entry.getValue());
         }
     }
 }

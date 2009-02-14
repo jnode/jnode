@@ -42,6 +42,7 @@
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
     <alias name="page" class="org.jnode.shell.command.PageCommand"/>
+    <alias name="printenv" class="org.jnode.shell.command.PrintEnvCommand"/>
     <alias name="run" class="org.jnode.shell.command.RunCommand"/>
     <alias name="set" class="org.jnode.shell.command.SetCommand"/>
     <alias name="sleep" class="org.jnode.shell.command.SleepCommand"/>
@@ -250,6 +251,7 @@
       <empty description="Filter standard input a page (screen) at a time"/>
       <argument argLabel="file" description="Output the file a page (screen) at a time"/>
     </syntax>
+    <syntax alias="env" description="Print the environment variables"/>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
