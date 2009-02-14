@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.bjorne;
 
 import org.jnode.shell.ShellException;
@@ -57,9 +57,10 @@ public class CaseCommandNode extends CommandNode {
     @Override
     public int execute(BjorneContext context) throws ShellException {
         int rc = 0;
-        
+
         CharSequence expandedWord = context.expand(word.text);
-        LOOP: for (CaseItemNode caseItem : caseItems) {
+    LOOP:
+        for (CaseItemNode caseItem : caseItems) {
             for (BjorneToken pattern : caseItem.getPattern()) {
                 CharSequence pat = context.expand(pattern.text);
                 if (context.patternMatch(expandedWord, pat)) {
@@ -68,7 +69,7 @@ public class CaseCommandNode extends CommandNode {
                 }
             }
         }
-        
+
         if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
             rc = (rc == 0) ? -1 : 0;
         }
