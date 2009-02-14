@@ -1270,4 +1270,9 @@ public class Socket
   {
 		return outputShutdown;
 	}
+
+    //jnode openjdk
+    public void setPerformancePreferences(int connectionTime, int latency, int bandwidth) {
+        //TODO implement it
+    }
 }
