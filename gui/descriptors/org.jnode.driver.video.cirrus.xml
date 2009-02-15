@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.video.cirrus" 
+        name="JNode Cirrus driver"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.driver.video"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.video.cirrus.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper id="1013:00B8" architecture="gd5446" name="Cirrus Logic GD 5446" driver-class="org.jnode.driver.video.cirrus.CirrusDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
+</plugin>
