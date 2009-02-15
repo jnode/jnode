@@ -22,55 +22,22 @@ package org.jnode.vm;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Map;
+import java.util.Properties;
 
 /**
- * This interface provides the hooks for implementing special semantics for System.in, System.out
- * and System.err.  Specifically, it is used to implement 'proclet' mode where the stream objects
- * are proxies for context specific streams.
+ * This interface provides the hooks for implementing special semantics for 
+ * System.in, System.out and System.err.  Specifically, it is used to implement 
+ * 'proclet' mode where the stream objects are proxies for context specific 
+ * streams.  It also supports 'proclet' mode contextualization of the System 
+ * properties ({@link System#getProperties()}) and environment ({@link System#getenv()}).
  *
  * @author Levente S\u00e1ntha
  * @author crawley@jnode.org
  */
 public interface IOContext {
-
-    /**
-     * This hook is used to set the 'global' version of System.in; e.g. the one used
-     * when there is no active proclet context.
-     *
-     * @param in the new global System.in
-     */
-    void setGlobalInStream(InputStream in);
-
-    /**
-     * This hook is used to get the 'global' version of System.in.
-     */
-    InputStream getGlobalInStream();
-
-    /**
-     * This hook is used to set the 'global' version of System.out; e.g. the one used
-     * when there is no active proclet context.
-     *
-     * @param out the new global System.out
-     */
-    void setGlobalOutStream(PrintStream out);
-
-    /**
-     * This hook is used to get the 'global' version of System.out.
-     */
-    PrintStream getGlobalOutStream();
-
-    /**
-     * This hook is used to set the 'global' version of System.err; e.g. the one used
-     * when there is no active proclet context.
-     *
-     * @param err the new global System.err
-     */
-    void setGlobalErrStream(PrintStream err);
-
-    /**
-     * This hook is used to get the 'global' version of System.err.
-     */
-    PrintStream getGlobalErrStream();
+    
+    // FIXME ... the name of this interface is misleading.
 
     /**
      * This hook is used when "setting" System.in; i.e. via System.setIn(in).
@@ -107,8 +74,31 @@ public interface IOContext {
      * This hook is used to get the 'real' stream underlying System.err in the current context.
      */
     PrintStream getRealSystemErr();
+    
+    /**
+     * The hook is used to get the current context's 'system properties'
+     */
+    Properties getProperties();
+    
+    /**
+     * The hook is used to set the current context's 'system properties'
+     */
+    void setProperties(Properties props);
+    
+    /**
+     * The hook is used to get the current context's environment; e.g. containing exported
+     * shell variables.
+     */
+    Map<String, String> getEnv();
+    
+    /**
+     * The hook is used to get the current context's environment.
+     */
+    void setEnv(Map<String, String> env);
 
     void enterContext();
 
     void exitContext();
+    
+    
 }

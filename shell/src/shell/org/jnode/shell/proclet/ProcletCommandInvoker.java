@@ -20,25 +20,34 @@
  
 package org.jnode.shell.proclet;
 
+import java.util.Map;
+import java.util.Properties;
+
 import org.jnode.shell.AsyncCommandInvoker;
 import org.jnode.shell.Command;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInvoker;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
+import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
+import org.jnode.shell.ShellException;
+import org.jnode.shell.SimpleCommandInvoker;
 import org.jnode.shell.io.CommandIO;
 import org.jnode.vm.VmSystem;
 
 /**
  * This command invoker runs commands in their own proclet, giving each one its
- * own stdin,out,err etcetera.
+ * own standard input / output / error stream, system properties and environment
+ * variables.
  * 
  * @author crawley@jnode.org
  */
-public class ProcletCommandInvoker extends AsyncCommandInvoker {
+public class ProcletCommandInvoker extends AsyncCommandInvoker implements CommandInvoker {
 
     public static final Factory FACTORY = new Factory() {
-        public CommandInvoker create(CommandShell shell) {
+        public SimpleCommandInvoker create(CommandShell shell) {
             return new ProcletCommandInvoker(shell);
         }
 
@@ -58,9 +67,23 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         return "proclet";
     }
 
+    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo,
+            Properties sysProps, Map<String, String> env) 
+        throws ShellException {
+        CommandRunner cr = setup(cmdLine, cmdInfo, sysProps, env);
+        return runIt(cmdLine, cmdInfo, cr);
+    }
+
+    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo,
+            Properties sysProps, Map<String, String> env)
+        throws ShellException {
+        CommandRunner cr = setup(cmdLine, cmdInfo, sysProps, env);
+        return forkIt(cmdLine, cmdInfo, cr);
+    }
+    
     protected CommandThreadImpl createThread(CommandRunner cr) {
         CommandIO[] ios = cr.getIos();
-        return ProcletContext.createProclet(cr, null, null, 
+        return ProcletContext.createProclet(cr, cr.getSysProps(), cr.getEnv(), 
                 new Object[] {
                     ios[Command.STD_IN].getInputStream(), 
                     ios[Command.STD_OUT].getPrintStream(),

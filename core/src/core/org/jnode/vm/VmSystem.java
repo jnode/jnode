@@ -171,11 +171,11 @@ public final class VmSystem {
             final ConsoleAppender infoApp = new ConsoleAppender(new PatternLayout(LAYOUT));
             root.addAppender(infoApp);
 
-            initOpenJDKSpeciffics();
+            initOpenJDKSpecifics();
         }
     }
 
-    private static void initOpenJDKSpeciffics() {
+    private static void initOpenJDKSpecifics() {
         //todo this will be moved to java.lang.System during openjdk integration
         sun.misc.SharedSecrets.setJavaLangAccess(new sun.misc.JavaLangAccess() {
             public sun.reflect.ConstantPool getConstantPool(Class klass) {
@@ -199,6 +199,9 @@ public final class VmSystem {
                 throw new UnsupportedOperationException();
             }
         });
+        
+        // Trigger initialization of the global environment variables.
+        System.getenv();
     }
 
     static boolean isInitialized() {
@@ -221,14 +224,13 @@ public final class VmSystem {
         if (bootOut == null) {
             bootOut = sout;
             bootOutStream = new PrintStream(bootOut, true);
-            IOContext ioContext = getIOContext();
-            ioContext.setGlobalOutStream(bootOutStream);
-            ioContext.setGlobalErrStream(bootOutStream);
+            VmIOContext.setGlobalOutStream(bootOutStream);
+            VmIOContext.setGlobalErrStream(bootOutStream);
             return bootOutStream;
         } else if (VmIsolate.isRoot()) {
             return bootOutStream;
         } else {
-            return VmIsolate.currentIsolate().getIOContext().getGlobalOutStream();
+            return  VmIOContext.getGlobalOutStream();
         }
     }
 
@@ -1125,7 +1127,7 @@ public final class VmSystem {
      * @return the global 'err' stream.
      */
     public static PrintStream getGlobalErrStream() {
-        return getIOContext().getGlobalErrStream();
+        return VmIOContext.getGlobalErrStream();
     }
 
     /**
@@ -1134,7 +1136,7 @@ public final class VmSystem {
      * @return the global 'in' stream.
      */
     public static InputStream getGlobalInStream() {
-        return getIOContext().getGlobalInStream();
+        return VmIOContext.getGlobalInStream();
     }
 
     /**
@@ -1143,7 +1145,7 @@ public final class VmSystem {
      * @return the global 'out' stream.
      */
     public static PrintStream getGlobalOutStream() {
-        return getIOContext().getGlobalOutStream();
+        return VmIOContext.getGlobalOutStream();
     }
 
     /**

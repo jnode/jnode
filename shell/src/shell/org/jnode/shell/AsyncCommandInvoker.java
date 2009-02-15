@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Map;
+import java.util.Properties;
 
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
@@ -46,7 +48,7 @@ import org.jnode.shell.io.CommandIO;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author crawley@jnode.org
  */
-public abstract class AsyncCommandInvoker implements CommandInvoker,
+public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         KeyboardListener {
 
     CommandShell commandShell;
@@ -92,8 +94,14 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         CommandRunner cr = setup(cmdLine, cmdInfo);
         return forkIt(cmdLine, cmdInfo, cr);
     }
-    
-    private CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
+
+    protected CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
+        throws ShellException {
+        return setup(cmdLine, cmdInfo, null, null);
+    }
+
+    protected CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo,
+            Properties sysProps, Map<String, String> env)
         throws ShellException {
         Method method;
         CommandRunner cr = null;
@@ -112,7 +120,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
         if (command != null) {
-            cr = new CommandRunner(this, cmdInfo, cmdLine, resolvedIOs);
+            cr = new CommandRunner(this, cmdInfo, cmdLine, resolvedIOs, sysProps, env);
         } else {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
@@ -132,7 +140,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                 method.setAccessible(true);
                 cr = new CommandRunner(
                         this, cmdInfo, cmdInfo.getCommandClass(), method,
-                        new Object[] {cmdLine.getArguments()}, resolvedIOs);
+                        new Object[] {cmdLine.getArguments()}, resolvedIOs, sysProps, env);
             } catch (NoSuchMethodException e) {
                 // continue;
             }
@@ -147,7 +155,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         return cr;
     }
 
-    private int runIt(CommandLine cmdLine, CommandInfo cmdInfo, CommandRunner cr)
+    protected int runIt(CommandLine cmdLine, CommandInfo cmdInfo, CommandRunner cr)
         throws ShellInvocationException {
         try {
             if (cmdInfo.isInternal()) {
@@ -178,7 +186,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
     }
 
-    private CommandThread forkIt(CommandLine cmdLine, CommandInfo cmdInfo,
+    protected CommandThread forkIt(CommandLine cmdLine, CommandInfo cmdInfo,
             CommandRunner cr) throws ShellInvocationException {
         if (cmdInfo.isInternal()) {
             throw new ShellFailureException("unexpected internal command");

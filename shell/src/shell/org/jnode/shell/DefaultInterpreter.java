@@ -102,7 +102,7 @@ public class DefaultInterpreter implements CommandInterpreter {
         shell.addCommandToHistory(line);
         try {
             CommandInfo cmdInfo = cmd.parseCommandLine(shell);
-            return shell.invoke(cmd, cmdInfo);
+            return shell.invoke(cmd, cmdInfo, null, null);
         } catch (CommandSyntaxException ex) {
             throw new ShellException("Command arguments don't match syntax", ex);
         }

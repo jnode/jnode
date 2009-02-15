@@ -22,14 +22,17 @@ package org.jnode.shell.proclet;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Map;
+import java.util.Properties;
 
 import org.jnode.vm.IOContext;
+import org.jnode.vm.VmIOContext;
 import org.jnode.vm.VmSystem;
 
 /**
  * The ProcletIOContext is an IOContext implementation that uses Proxy streams to 
  * direct System.in/out/err traffic to different places depending on the current
- * proclet.
+ * proclet.  
  * 
  * @author Levente S\u00e1ntha
  * @author crawley@jnode.org
@@ -41,48 +44,8 @@ public class ProcletIOContext implements IOContext {
     public ProcletIOContext() {
     }
 
-    public synchronized void setGlobalInStream(InputStream is) {
-        doSetIn(is, GLOBAL_STREAM_ID);
-    }
-
-    public synchronized void setGlobalOutStream(PrintStream ps) {
-        doSetOut(ps, GLOBAL_STREAM_ID);
-    }
-
-    public synchronized void setGlobalErrStream(PrintStream is) {
-        doSetErr(is, GLOBAL_STREAM_ID);
-    }
-
-    public synchronized InputStream getGlobalInStream() {
-        return ((ProcletProxyInputStream) System.in).getProxiedStream(GLOBAL_STREAM_ID);
-    }
-
-    public synchronized PrintStream getGlobalOutStream() {
-        return ((ProcletProxyPrintStream) System.out).getProxiedStream(GLOBAL_STREAM_ID);
-    }
-
-    public synchronized PrintStream getGlobalErrStream() {
-        return ((ProcletProxyPrintStream) System.err).getProxiedStream(GLOBAL_STREAM_ID);
-    }
-
     public synchronized void setSystemIn(InputStream is) {
-        doSetIn(is, getCurrentPid());
-    }
-
-    public synchronized void setSystemOut(PrintStream ps) {
-        doSetOut(ps, getCurrentPid());
-    }
-
-    public synchronized void setSystemErr(PrintStream ps) {
-        doSetErr(ps, getCurrentPid());
-    }
-    
-    private int getCurrentPid() {
-        ProcletContext procletContext = ProcletContext.currentProcletContext();
-        return (procletContext == null) ? GLOBAL_STREAM_ID : procletContext.getPid();
-    }
-    
-    private void doSetIn(InputStream is, int pid) {
+        int pid = getCurrentPid();
         if (is instanceof ProcletProxyInputStream) {
             is = ((ProcletProxyInputStream) is).getProxiedStream(pid);
         }
@@ -91,7 +54,8 @@ public class ProcletIOContext implements IOContext {
         VmSystem.setStaticField(System.class, "in", newProxyStream);
     }
 
-    private void doSetOut(PrintStream ps, int pid) {
+    public synchronized void setSystemOut(PrintStream ps) {
+        int pid = getCurrentPid();
         if (ps instanceof ProcletProxyPrintStream) {
             ps = ((ProcletProxyPrintStream) ps).getProxiedStream(pid);
         }
@@ -100,13 +64,35 @@ public class ProcletIOContext implements IOContext {
         VmSystem.setStaticField(System.class, "out", newProxyStream);
     }
 
-    private void doSetErr(PrintStream ps, int pid) {
+    public synchronized void setSystemErr(PrintStream ps) {
+        int pid = getCurrentPid();
         if (ps instanceof ProcletProxyPrintStream) {
             ps = ((ProcletProxyPrintStream) ps).getProxiedStream(pid);
         }
         ProcletProxyPrintStream newProxyStream = new ProcletProxyPrintStream(
                 (ProcletProxyPrintStream) System.err, ps, pid);
         VmSystem.setStaticField(System.class, "err", newProxyStream);
+    }
+    
+    public Map<String, String> getEnv() {
+        return ProcletContext.currentProcletContext().getEnvironment();
+    }
+
+    public Properties getProperties() {
+        return ProcletContext.currentProcletContext().getProperties();
+    }
+
+    public void setEnv(Map<String, String> env) {
+        ProcletContext.currentProcletContext().setEnvironment(env);
+    }
+
+    public void setProperties(Properties props) {
+        ProcletContext.currentProcletContext().setProperties(props);
+    }
+
+    private int getCurrentPid() {
+        ProcletContext procletContext = ProcletContext.currentProcletContext();
+        return (procletContext == null) ? GLOBAL_STREAM_ID : procletContext.getPid();
     }
 
     public synchronized void enterContext() {
@@ -119,9 +105,9 @@ public class ProcletIOContext implements IOContext {
     }
 
     public synchronized void exitContext() {
-        InputStream in = getGlobalInStream();
-        PrintStream out = getGlobalOutStream();
-        PrintStream err = getGlobalErrStream();
+        InputStream in = VmIOContext.getGlobalInStream();
+        PrintStream out = VmIOContext.getGlobalOutStream();
+        PrintStream err = VmIOContext.getGlobalErrStream();
 
         if (in instanceof ProcletProxyStream) {
             throw new ProcletException(

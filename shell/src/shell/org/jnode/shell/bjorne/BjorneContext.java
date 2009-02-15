@@ -257,7 +257,7 @@ public class BjorneContext {
         value.length(); // Check that the value is non-null.
         VariableSlot var = variables.get(name);
         if (var == null) {
-            variables.put(name, new VariableSlot(value, false));
+            variables.put(name, new VariableSlot(name, value, false));
         } else {
             var.value = value;
         }
@@ -291,7 +291,7 @@ public class BjorneContext {
         VariableSlot var = variables.get(name);
         if (var == null) {
             if (exported) {
-                variables.put(name, new VariableSlot("", exported));
+                variables.put(name, new VariableSlot(name, "", exported));
             }
         } else {
             var.exported = exported;
@@ -901,8 +901,19 @@ public class BjorneContext {
             }
             resolvePrintStream(streams[Command.STD_ERR]).println(sb);
         }
-        lastReturnCode = interpreter.executeCommand(command, this, streams);
+        Map<String, String> env = buildEnvFromExports();
+        lastReturnCode = interpreter.executeCommand(command, this, streams, null, env);
         return lastReturnCode;
+    }
+
+    private Map<String, String> buildEnvFromExports() {
+        HashMap<String, String> map = new HashMap<String, String>(variables.size());
+        for (VariableSlot var : variables.values()) {
+            if (var.exported) {
+                map.put(var.name, var.value);
+            }
+        }
+        return map;
     }
 
     PrintStream resolvePrintStream(CommandIO commandIOIF) {

@@ -41,6 +41,8 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandInfo;
@@ -140,10 +142,12 @@ public class BjorneInterpreter implements CommandInterpreter {
         BUILTINS.put("break", new BreakBuiltin());
         BUILTINS.put("continue", new ContinueBuiltin());
         BUILTINS.put("exit", new ExitBuiltin());
+        BUILTINS.put("export", new ExportBuiltin());
         BUILTINS.put("return", new ReturnBuiltin());
         BUILTINS.put("set", new SetBuiltin());
         BUILTINS.put("shift", new ShiftBuiltin());
         BUILTINS.put(".", new SourceBuiltin());
+        BUILTINS.put("source", new SourceBuiltin());
         BUILTINS.put(":", new ColonBuiltin());
     }
 
@@ -325,7 +329,8 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
     }
 
-    int executeCommand(CommandLine cmdLine, BjorneContext context, CommandIO[] streams) 
+    int executeCommand(CommandLine cmdLine, BjorneContext context, CommandIO[] streams, 
+            Properties sysProps, Map<String, String> env) 
         throws ShellException {
         BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
         if (builtin != null) {
@@ -336,7 +341,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             cmdLine.setStreams(streams);
             try {
                 CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
-                return shell.invoke(cmdLine, cmdInfo);
+                return shell.invoke(cmdLine, cmdInfo, sysProps, env);
             } catch (CommandSyntaxException ex) {
                 throw new ShellException("Command arguments don't match syntax", ex);
             }

@@ -492,8 +492,7 @@ public class BjorneTokenizer {
             case RULE_7b_CONTEXT:
                 int pos = token.getText().indexOf('=');
                 if (pos <= 0
-                        || !BjorneToken.isName(token.getText()
-                                .substring(0, pos - 1))) {
+                        || !BjorneToken.isName(token.getText().substring(0, pos))) {
                     return token;
                 }
                 return remakeToken(TOK_ASSIGNMENT, token);

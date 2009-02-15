@@ -427,17 +427,17 @@ public class BjorneParser {
             case TOK_LESSGREAT:
             case TOK_CLOBBER:
                 arg = tokens.next();
-                tt = arg.getTokenType();
-                if (tt != TOK_WORD) {
-                    syntaxError("expected a filename after " + token, tt);
+                int tt2 = arg.getTokenType();
+                if (tt2 != TOK_WORD) {
+                    syntaxError("expected a filename after " + token, tt2);
                 }
                 break;
             case TOK_DLESS:
             case TOK_DLESSDASH:
                 arg = tokens.next();
-                tt = arg.getTokenType();
-                if (arg.getTokenType() != TOK_WORD) {
-                    syntaxError("expected a here-end marker " + token, tt);
+                int tt3 = arg.getTokenType();
+                if (tt3 != TOK_WORD) {
+                    syntaxError("expected a here-end marker " + token, tt3);
                 }
                 // TODO ... need to grab the HERE document ...
                 break;

@@ -92,7 +92,7 @@ public class ShellUtils {
         return getShellManager().getCurrentShell().getSyntaxManager();
     }
 
-    public static void registerCommandInvoker(CommandInvoker.Factory factory)
+    public static void registerCommandInvoker(SimpleCommandInvoker.Factory factory)
         throws NameNotFoundException {
         getShellManager().registerInvokerFactory(factory);
     }
@@ -102,7 +102,7 @@ public class ShellUtils {
         getShellManager().registerInterpreterFactory(factory);
     }
 
-    public static CommandInvoker createInvoker(String name, CommandShell shell)
+    public static SimpleCommandInvoker createInvoker(String name, CommandShell shell)
         throws IllegalArgumentException {
         try {
             return getShellManager().createInvoker(name, shell);

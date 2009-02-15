@@ -169,6 +169,9 @@ public class BjorneToken extends CommandLine.Token {
 
     public static boolean isName(String str) {
         int len = str.length();
+        if (len == 0) {
+            return false;
+        }
         for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
             switch (ch) {

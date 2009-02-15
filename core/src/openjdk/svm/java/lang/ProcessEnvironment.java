@@ -57,9 +57,16 @@ package java.lang;
 import java.io.*;
 import java.util.*;
 
+import org.jnode.vm.VmIOContext;
+import org.jnode.vm.VmSystem;
+
 
 final class ProcessEnvironment
 {
+    // FIXME ... this class needs some work for JNode,  Redo / remove the
+    // code that populates the map from the 'C environment' and maybe even
+    // get rid of StringEnvironment and replace it with a simple HashMap.
+    
     private static final HashMap<Variable,Value> theEnvironment;
     private static final Map<String,String> theUnmodifiableEnvironment;
     static final int MIN_NAME_LENGTH = 0;
@@ -78,16 +85,18 @@ final class ProcessEnvironment
         theUnmodifiableEnvironment
             = Collections.unmodifiableMap
             (new StringEnvironment(theEnvironment));
+        
+        VmIOContext.setGlobalEnv(theUnmodifiableEnvironment);
     }
 
     /* Only for use by System.getenv(String) */
     static String getenv(String name) {
-        return theUnmodifiableEnvironment.get(name);
+        return VmSystem.getIOContext().getEnv().get(name);
     }
 
     /* Only for use by System.getenv() */
     static Map<String,String> getenv() {
-        return theUnmodifiableEnvironment;
+        return VmSystem.getIOContext().getEnv();
     }
 
     /* Only for use by ProcessBuilder.environment() */
