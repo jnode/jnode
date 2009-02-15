@@ -3,22 +3,23 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/install"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
-	<classpathentry kind="src" path="/JNode-Core"/>
+	<classpathentry kind="src" path="/core"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/apps"/>
-	<classpathentry kind="src" path="/JNode-GUI"/>
+	<classpathentry kind="src" path="/gui"/>
 	<classpathentry kind="lib" path="lib/telnetd.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.5.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-util-6.1.5.jar"/>
 	<classpathentry kind="lib" path="lib/jsp-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-6.1.5.jar"/>
-	<classpathentry kind="src" path="/JNode-Shell"/>
-	<classpathentry kind="src" path="/JNode-TextUI"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JNode-FS"/>
-	<classpathentry kind="lib" path="/JNode-Shell/lib/bsh-2.0b5.jar"/>
+	<classpathentry kind="src" path="/shell"/>
+	<classpathentry kind="src" path="/textui"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/fs"/>
+	<classpathentry kind="lib" path="/shell/lib/bsh-2.0b5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/derby.jar"/>
 	<classpathentry kind="lib" path="lib/derbynet.jar"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

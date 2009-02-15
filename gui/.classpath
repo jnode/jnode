@@ -6,8 +6,8 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/thinlet"/>
-	<classpathentry kind="src" path="/JNode-Core"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
-	<classpathentry kind="src" path="/JNode-Shell"/>
+	<classpathentry kind="src" path="/core"/>
+	<classpathentry kind="src" path="/shell"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
