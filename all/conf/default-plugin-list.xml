@@ -106,6 +106,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.video.cursor"/>    
     <plugin id="org.jnode.driver.video.ati.mach64"/>
     <plugin id="org.jnode.driver.video.ati.radeon"/>
+    <plugin id="org.jnode.driver.video.cirrus"/>
     <plugin id="org.jnode.driver.video.nvidia"/>
     <plugin id="org.jnode.driver.video.vga"/>
     <plugin id="org.jnode.driver.video.vgahw"/>
