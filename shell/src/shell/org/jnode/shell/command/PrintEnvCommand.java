@@ -50,7 +50,8 @@ public class PrintEnvCommand extends AbstractCommand {
      * Execute this command
      */
     public void execute() throws Exception {
-        final Map<String, String> env = (Map<String, String>) AccessController.doPrivileged(new GetEnvAction());
+        final Map<String, String> env = 
+            (Map<String, String>) AccessController.doPrivileged(new GetEnvAction());
         final TreeMap<String, String> sortedEnv = new TreeMap<String, String>(env);
         final PrintWriter out = getOutput().getPrintWriter();
         for (Map.Entry<String, String> entry : sortedEnv.entrySet()) {

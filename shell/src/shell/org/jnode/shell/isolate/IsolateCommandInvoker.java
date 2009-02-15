@@ -23,7 +23,7 @@ package org.jnode.shell.isolate;
 import java.io.IOException;
 
 import org.jnode.shell.AsyncCommandInvoker;
-import org.jnode.shell.CommandInvoker;
+import org.jnode.shell.SimpleCommandInvoker;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
@@ -37,7 +37,7 @@ import org.jnode.shell.ShellInvocationException;
 public class IsolateCommandInvoker extends AsyncCommandInvoker {
 
     public static final Factory FACTORY = new Factory() {
-        public CommandInvoker create(CommandShell shell) {
+        public SimpleCommandInvoker create(CommandShell shell) {
             return new IsolateCommandInvoker(shell);
         }
 

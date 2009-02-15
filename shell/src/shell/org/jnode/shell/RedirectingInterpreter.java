@@ -249,7 +249,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             desc.commandLine.setStreams(new CommandIO[] {in, out, err, CommandLine.DEFAULT_STDERR});
             try {
                 CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
-                return shell.invoke(desc.commandLine, cmdInfo);
+                return shell.invoke(desc.commandLine, cmdInfo, null, null);
             } catch (CommandSyntaxException ex) {
                 throw new ShellException(
                         "Command arguments don't match syntax", ex);

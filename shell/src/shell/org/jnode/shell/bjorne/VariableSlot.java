@@ -23,19 +23,24 @@ import org.jnode.shell.ShellFailureException;
 
 class VariableSlot {
     public String value;
-
+    public final String name;
     public boolean exported;
 
-    public VariableSlot(String value, boolean exported) {
+    public VariableSlot(String name, String value, boolean exported) {
+        if (name == null) {
+            throw new ShellFailureException("null name");
+        }
         if (value == null) {
             throw new ShellFailureException("null value");
         }
         this.value = value;
         this.exported = exported;
+        this.name = name;
     }
 
     public VariableSlot(VariableSlot other) {
         this.value = other.value;
         this.exported = other.exported;
+        this.name = other.name;
     }
 }

@@ -22,6 +22,12 @@ package org.jnode.shell.bjorne;
 
 import org.jnode.shell.ShellException;
 
+/**
+ * This exception is used to implement constructs that exit scopes
+ * in the bjorne interpreter.  It should never be thrown by an application.
+ * 
+ * @author crawley@jnode.org
+ */
 class BjorneControlException extends ShellException {
 
     private static final long serialVersionUID = 1L;

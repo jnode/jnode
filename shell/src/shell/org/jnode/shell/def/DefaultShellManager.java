@@ -23,7 +23,7 @@ package org.jnode.shell.def;
 import java.util.HashMap;
 
 import org.jnode.shell.CommandInterpreter;
-import org.jnode.shell.CommandInvoker;
+import org.jnode.shell.SimpleCommandInvoker;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellManager;
@@ -40,8 +40,8 @@ public class DefaultShellManager implements ShellManager {
     private final InheritableThreadLocal<Shell> currentShell = 
         new InheritableThreadLocal<Shell>();
 
-    private final HashMap<String, CommandInvoker.Factory> invokerFactories =
-        new HashMap<String, CommandInvoker.Factory>();
+    private final HashMap<String, SimpleCommandInvoker.Factory> invokerFactories =
+        new HashMap<String, SimpleCommandInvoker.Factory>();
 
     private final HashMap<String, CommandInterpreter.Factory> interpreterFactories =
         new HashMap<String, CommandInterpreter.Factory>();
@@ -70,8 +70,8 @@ public class DefaultShellManager implements ShellManager {
         return factory.create();
     }
 
-    public CommandInvoker createInvoker(String name, CommandShell shell) throws IllegalArgumentException {
-        CommandInvoker.Factory factory = invokerFactories.get(name);
+    public SimpleCommandInvoker createInvoker(String name, CommandShell shell) throws IllegalArgumentException {
+        SimpleCommandInvoker.Factory factory = invokerFactories.get(name);
         if (factory == null) {
             throw new IllegalArgumentException("Unknown invoker '" + name + "'");
         }
@@ -82,7 +82,7 @@ public class DefaultShellManager implements ShellManager {
         interpreterFactories.put(factory.getName(), factory);
     }
 
-    public void registerInvokerFactory(CommandInvoker.Factory factory) {
+    public void registerInvokerFactory(SimpleCommandInvoker.Factory factory) {
         invokerFactories.put(factory.getName(), factory);
     }
 
@@ -90,7 +90,7 @@ public class DefaultShellManager implements ShellManager {
         interpreterFactories.put(factory.getName(), null);
     }
 
-    public void unregisterInvokerFactory(CommandInvoker.Factory factory) {
+    public void unregisterInvokerFactory(SimpleCommandInvoker.Factory factory) {
         invokerFactories.put(factory.getName(), null);
     }
 }

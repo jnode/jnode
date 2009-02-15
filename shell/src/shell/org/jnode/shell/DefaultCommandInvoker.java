@@ -49,7 +49,7 @@ import org.jnode.vm.VmExit;
  * @author Sam Reid
  * @author crawley@jnode.org
  */
-public class DefaultCommandInvoker implements CommandInvoker {
+public class DefaultCommandInvoker implements SimpleCommandInvoker {
 
     private final PrintWriter err;
     private final CommandShell shell;
@@ -58,7 +58,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
     private static final Class<?>[] MAIN_ARG_TYPES = new Class[] {String[].class};
 
     public static final Factory FACTORY = new Factory() {
-        public CommandInvoker create(CommandShell shell) {
+        public SimpleCommandInvoker create(CommandShell shell) {
             return new DefaultCommandInvoker(shell);
         }
 

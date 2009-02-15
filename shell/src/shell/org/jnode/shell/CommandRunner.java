@@ -29,6 +29,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
+import java.util.Map;
+import java.util.Properties;
 
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.HelpFactory;
@@ -45,7 +47,7 @@ import org.jnode.vm.VmExit;
  */
 public class CommandRunner implements Runnable {
     
-    private final CommandInvoker invoker;
+    private final SimpleCommandInvoker invoker;
     private final CommandIO[] ios;
     final Class<?> targetClass;
     final Method method;
@@ -53,12 +55,14 @@ public class CommandRunner implements Runnable {
     final CommandInfo cmdInfo;
     final CommandLine commandLine;
     final PrintWriter shellErr;
+    final Properties sysProps;
+    final Map<String, String> env;
     private int rc;
     
 
-    public CommandRunner(CommandInvoker invoker,
+    public CommandRunner(SimpleCommandInvoker invoker,
             CommandInfo cmdInfo, Class<?> targetClass, Method method, Object[] args,
-            CommandIO[] ios) {
+            CommandIO[] ios, Properties sysProps, Map<String, String> env) {
         this.invoker = invoker;
         this.targetClass = targetClass;
         this.method = method;
@@ -67,10 +71,13 @@ public class CommandRunner implements Runnable {
         this.args = args;
         this.ios = ios;
         this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
+        this.env = env;
+        this.sysProps = sysProps;
     }
 
-    public CommandRunner(CommandInvoker invoker, 
-            CommandInfo cmdInfo, CommandLine commandLine, CommandIO[] ios) {
+    public CommandRunner(SimpleCommandInvoker invoker, 
+            CommandInfo cmdInfo, CommandLine commandLine, CommandIO[] ios,
+            Properties sysProps, Map<String, String> env) {
         this.invoker = invoker;
         this.targetClass = null;
         this.method = null;
@@ -79,6 +86,8 @@ public class CommandRunner implements Runnable {
         this.commandLine = commandLine;
         this.ios = ios;
         this.shellErr = ios[Command.SHELL_ERR].getPrintWriter();
+        this.env = env;
+        this.sysProps = sysProps;
     }
 
     public void run() {
@@ -199,4 +208,11 @@ public class CommandRunner implements Runnable {
         return commandLine != null ? commandLine.getCommandName() : null;
     }
 
+    public Properties getSysProps() {
+        return sysProps;
+    }
+
+    public Map<String, String> getEnv() {
+        return env;
+    }
 }

@@ -20,10 +20,10 @@
  
 package org.jnode.shell.proclet;
 
+import gnu.java.security.action.GetPropertiesAction;
+
 import java.io.Closeable;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -32,6 +32,7 @@ import org.jnode.shell.CommandThreadImpl;
 import org.jnode.util.ProxyStream;
 import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.VmExit;
+import org.jnode.vm.VmIOContext;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.isolate.VmIsolate;
 
@@ -62,20 +63,6 @@ public class ProcletContext extends ThreadGroup {
         Map<String, String> environment, Object[] streams) throws ProcletException {
         super(parent, nextProcletName());
         ProcletContext parentContext = getParentContext(parent);
-        if (properties == null) {
-            if (parentContext != null) {
-                properties = parentContext.properties;
-            }
-            if (properties == null) {
-                properties = AccessController.doPrivileged(
-                        new PrivilegedAction<Properties>() {
-                            public Properties run() {
-                                return System.getProperties();
-                            }
-                        });
-            }
-            properties = (Properties) properties.clone();
-        }
         if (streams == null) {
             try {
                 streams = new Object[] {
@@ -85,12 +72,20 @@ public class ProcletContext extends ThreadGroup {
                 throw new ProcletException("Broken streams", ex);
             } 
         }
+        if (properties == null) {
+            if (parentContext != null) {
+                properties = parentContext.properties;
+            } else {
+                // FIXME ... temporary
+                properties = AccessController.doPrivileged(new GetPropertiesAction());
+            }
+            properties = (Properties) properties.clone();
+        }
         if (environment == null) {
             if (parentContext != null) {
-                environment = new HashMap<String, String>(
-                        parentContext.environment);
+                environment = parentContext.environment;
             } else {
-                environment = new HashMap<String, String>();
+                environment = VmIOContext.getGlobalEnv();
             }
         }
         this.environment = environment;
@@ -127,6 +122,10 @@ public class ProcletContext extends ThreadGroup {
 
     public synchronized void setProperties(Properties properties) {
         this.properties = properties;
+    }
+    
+    public synchronized void setEnvironment(Map<String, String> environment) {
+        this.environment = environment;
     }
 
     /**
@@ -303,5 +302,4 @@ public class ProcletContext extends ThreadGroup {
         return getClass().getName() + "[name=" + getName() + ",maxpri="
                 + getMaxPriority() + ",pid=" + getPid() + ']';
     }
-
 }

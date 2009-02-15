@@ -26,12 +26,11 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 
 /**
- * This class implements the 'exit' built-in.  This is done by throwing a 
- * BjorneControlException with code 'BRANCH_EXIT'.
+ * This class implements the 'export' built-in.
  * 
  * @author crawley@jnode.org
  */
-final class ExitBuiltin extends BjorneBuiltin {
+final class ExportBuiltin extends BjorneBuiltin {
     @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
@@ -39,15 +38,24 @@ final class ExitBuiltin extends BjorneBuiltin {
         if (!args.hasNext()) {
             throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT,
                     context.getParent().getLastReturnCode());
-        } else {
+        }
+        while (args.hasNext()) {
             String arg = args.next();
-            try {
-                throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT,
-                        Integer.parseInt(arg));
-            } catch (NumberFormatException ex) {
-                error("exit: " + arg + ": numeric argument required", context);
+            int pos = arg.indexOf('=');
+            if (pos == -1) {
+                context.getParent().setExported(arg, true);
+            } else if (pos == 0) { 
+                error("export: " + arg + ": not a valid identifier", context);
+            } else {
+                String name = arg.substring(0, pos);
+                String value = arg.substring(pos + 1);
+                if (!BjorneToken.isName(name)) {
+                    error("export: " + name + ": not a valid identifier", context);
+                }
+                context.getParent().setVariable(name, value);
+                context.getParent().setExported(name, true);
             }
         }
-        return 1;
+        return 0;
     }
 }

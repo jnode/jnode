@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: CommandInvoker.java 4977 2009-02-02 09:09:41Z lsantha $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -20,16 +20,24 @@
  
 package org.jnode.shell;
 
-import java.util.Map;
-import java.util.Properties;
+/*
+ * User: Sam Reid Date: Dec 20, 2003 Time: 1:18:31 AM Copyright (c) Dec 20, 2003
+ * by Sam Reid
+ */
 
 /**
- * This 'advanced' invoker API adds methods for invoking commands with
- * different system properties or environment variables to the parent.
- *
+ * This is the common API for the various mechanisms for running 'commands'.
+ * 
+ * @author Sam Reid
  * @author crawley@jnode.org
  */
-public interface CommandInvoker extends SimpleCommandInvoker {
+public interface SimpleCommandInvoker {
+
+    public interface Factory {
+        SimpleCommandInvoker create(CommandShell shell);
+
+        String getName();
+    }
 
     /**
      * Run a command synchronously, passing back the resulting return code.
@@ -37,18 +45,11 @@ public interface CommandInvoker extends SimpleCommandInvoker {
      * @param commandLine this provides the command name (alias), the command
      *        arguments and (where relevant) the command's i/o stream context.
      * @param cmdInfo a CommandInfo descriptor for the command to be run.
-     * @param sysProps a Properties object containing the command's system
-     *        properties.  If this parameter is {@code null}, a copy of the 
-     *        system properties for the calling context should be used.
-     * @param env a Map object containing the command's environment variables.  
-     *        If this parameter is {@code null}, the environment variables for 
-     *        the calling context should be used.
      * @return an integer return code, with zero indicating command success,
      *         non-zero indicating command failure.
      * @throws ShellException if there was some problem launching the command.
      */
-    int invoke(CommandLine commandLine, CommandInfo cmdInfo,
-            Properties sysProps, Map<String, String> env) 
+    int invoke(CommandLine commandLine, CommandInfo cmdInfo) 
         throws ShellException;
 
     /**
@@ -58,19 +59,22 @@ public interface CommandInvoker extends SimpleCommandInvoker {
      * @param commandLine this provides the command name (alias), the command
      *        arguments and (where relevant) the command's i/o stream context.
      * @param cmdInfo a CommandInfo descriptor for the command to be run.
-     * @param sysProps a Properties object containing the command's system
-     *        properties.  If this parameter is {@code null}, a copy of the 
-     *        system properties for the calling context should be used.
-     * @param env a Map object containing the command's environment variables.  
-     *        If this parameter is {@code null}, the environment variables for 
-     *        the calling context should be used.
      * @return the thread for the command. Calling
      *         {@link java.lang.Thread#start()} will cause the command to
      *         execute.
      * @throws ShellException if there was some problem launching the command.
      */
-    CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo,
-            Properties sysProps, Map<String, String> env) 
+    CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo) 
         throws ShellException;
 
+    /**
+     * Get the invoker's name.
+     * 
+     * @return the name.
+     */
+    String getName();
+
+    boolean isDebugEnabled();
+
+    void setDebugEnabled(boolean enabled);
 }

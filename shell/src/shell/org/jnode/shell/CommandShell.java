@@ -38,6 +38,8 @@ import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.naming.NameNotFoundException;
@@ -151,7 +153,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      */
     private String lastInputLine = "";
 
-    private CommandInvoker invoker;
+    private SimpleCommandInvoker invoker;
     private String invokerName;
 
     private CommandInterpreter interpreter;
@@ -573,11 +575,19 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * command is run using the CommandShell's current invoker.
      * 
      * @param cmdLine the CommandLine object.
+     * @param env 
+     * @param sysProps 
      * @return the command's return code
      * @throws ShellException
      */
-    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
-        return this.invoker.invoke(cmdLine, cmdInfo);
+    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo, 
+            Properties sysProps, Map<String, String> env) 
+        throws ShellException {
+        if (this.invoker instanceof CommandInvoker) {
+            return ((CommandInvoker) this.invoker).invoke(cmdLine, cmdInfo, sysProps, env);
+        } else {
+            return this.invoker.invoke(cmdLine, cmdInfo);
+        }
     }
 
     /**
@@ -843,7 +853,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public CommandInvoker getDefaultCommandInvoker() {
+    public SimpleCommandInvoker getDefaultCommandInvoker() {
         return ShellUtils.createInvoker("default", this);
     }
 

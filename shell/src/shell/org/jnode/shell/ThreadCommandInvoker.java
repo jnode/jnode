@@ -40,7 +40,7 @@ package org.jnode.shell;
 public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
     public static final Factory FACTORY = new Factory() {
-        public CommandInvoker create(CommandShell shell) {
+        public SimpleCommandInvoker create(CommandShell shell) {
             return new ThreadCommandInvoker(shell);
         }
 
