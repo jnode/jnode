@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="/JNode-Builder"/>
-	<classpathentry kind="src" path="/JNode-Core"/>
-	<classpathentry kind="src" path="/JNode-FS"/>
-	<classpathentry kind="src" path="/JNode-GUI"/>
-	<classpathentry kind="src" path="/JNode-Net"/>
-	<classpathentry kind="src" path="/JNode-Shell"/>
+	<classpathentry kind="src" path="/builder"/>
+	<classpathentry kind="src" path="/core"/>
+	<classpathentry kind="src" path="/fs"/>
+	<classpathentry kind="src" path="/gui"/>
+	<classpathentry kind="src" path="/net"/>
+	<classpathentry kind="src" path="/shell"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

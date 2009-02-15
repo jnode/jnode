@@ -3,13 +3,13 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/shell"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
-	<classpathentry kind="src" path="/JNode-Core"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/junit.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/ant-launcher.jar"/>
+	<classpathentry kind="src" path="/core"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsh-2.0b5.jar"/>
 	<classpathentry kind="lib" path="lib/rhino1.6r5-jsr223.jar"/>
-	<classpathentry kind="lib" path="/JNode-Builder/lib/nanoxml-2.2.3.jar"/>
+	<classpathentry kind="lib" path="/core/lib/ant-launcher.jar"/>
+	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
+	<classpathentry kind="lib" path="/core/lib/junit.jar"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="/builder/lib/nanoxml-2.2.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

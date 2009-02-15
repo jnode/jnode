@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/builder"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/configure"/>
-	<classpathentry kind="src" path="/JNode-Core"/>
-	<classpathentry kind="src" path="/JNode-FS"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
-	<classpathentry kind="src" path="/JNode-Shell"/>
+	<classpathentry kind="src" path="/core"/>
+	<classpathentry kind="src" path="/fs"/>
+	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="src" path="/shell"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
 	<classpathentry kind="lib" path="lib/nanoxml-2.2.3.jar"/>

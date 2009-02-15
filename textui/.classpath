@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/textui"/>
-	<classpathentry exported="true" kind="src" path="/JNode-Core"/>
-	<classpathentry exported="true" kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
-	<classpathentry exported="true" kind="src" path="/JNode-Shell"/>
+	<classpathentry exported="true" kind="src" path="/core"/>
+	<classpathentry exported="true" kind="src" path="/shell"/>
+	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
