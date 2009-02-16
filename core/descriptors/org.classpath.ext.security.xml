@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.classpath.ext.security"
+  name="Classpath javax.xml classes"
+  version="@VERSION@"
+  plugin-id="rt"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="sun.security.util.*"/>
+      <export name="sun.security.tools.*"/>
+      <export name="sun.security.timestamp.*"/>
+      <export name="sun.security.acl.*"/>
+      <export name="sun.security.ec.*"/>
+      <export name="sun.security.internal.interfaces*"/>
+      <export name="sun.security.internal.spec*"/>
+      <export name="sun.security.internal.*"/>
+      <export name="sun.security.jca.*"/>
+      <export name="sun.security.jgss.*"/>
+      <export name="sun.security.jgss.krb5.*"/>
+      <export name="sun.security.jgss.spi.*"/>
+      <export name="sun.security.jgss.spnego.*"/>
+      <export name="sun.security.jgss.wrapper.*"/>
+      <export name="sun.security.krb5.*"/>
+      <export name="sun.security.krb5.internal.*"/>
+      <export name="sun.security.krb5.internal.ccache.*"/>
+      <export name="sun.security.krb5.internal.crypto.*"/>
+      <export name="sun.security.krb5.internal.crypto.dk.*"/>
+      <export name="sun.security.krb5.internal.rcache.*"/>
+      <export name="sun.security.krb5.internal.ktab.*"/>
+      <export name="sun.security.krb5.internal.util.*"/>
+      <export name="sun.security.pkcs.*"/>
+      <export name="sun.security.pkcs11.*"/>
+      <export name="sun.security.pkcs11.wrapper.*"/>
+      <export name="sun.security.pkcs12.*"/>
+      <export name="sun.security.provider.*"/>
+      <export name="sun.security.provider.certpath.*"/>
+      <export name="sun.security.rsa.*"/>
+      <export name="sun.security.ssl.*"/>
+      <export name="sun.security.validator.*"/>
+      <export name="sun.security.x509.*"/>
+      <export name="com.sun.crypto.provider.*"/>
+      <export name="com.sun.net.ssl.*"/>
+      <export name="com.sun.net.ssl.internal.ssl.*"/>
+      <export name="com.sun.jarsigner.*"/>
+      <export name="sun.nio.ch.*"/>
+    </library>
+  </runtime>
+  
+</fragment>
