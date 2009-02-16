@@ -20,9 +20,7 @@
  
 package org.jnode.test.shell.harness;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 /**
@@ -31,17 +29,10 @@ import java.lang.reflect.Method;
  *
  * @author crawley@jnode.org
  */
-class ClassTestRunner implements TestRunnable {
-
-    private ByteArrayOutputStream outBucket;
-    private ByteArrayOutputStream errBucket;
-
-    private final TestSpecification spec;
-    private final TestHarness harness;
+class ClassTestRunner extends TestRunnerBase implements TestRunnable {
 
     public ClassTestRunner(TestSpecification spec, TestHarness harness) {
-        this.spec = spec;
-        this.harness = harness;
+        super(spec, harness);
     }
 
     @Override
@@ -53,24 +44,11 @@ class ClassTestRunner implements TestRunnable {
         return check() ? 0 : 1;
     }
 
-    private boolean check() {
+    private boolean check() throws IOException {
         // When a class is run this way we cannot capture the RC.
         return
             harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
-                harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
+                harness.expect(errBucket.toString(), spec.getErrorContent(), "err content") &
+                checkFiles();
     }
-
-    @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void setup() {
-        System.setIn(new ByteArrayInputStream(spec.getInputContent().toString().getBytes()));
-        outBucket = new ByteArrayOutputStream();
-        errBucket = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outBucket));
-        System.setErr(new PrintStream(errBucket));
-    }
-
 }

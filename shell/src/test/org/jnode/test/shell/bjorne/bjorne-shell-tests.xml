@@ -588,9 +588,9 @@ newarg1 newarg2
                 echo 'a b'
                 echo "a b"
                 echo $*
-                echo $@
+                echo $@@
                 echo "$*"
-                echo "$@"
+                echo "$@@"
         </script>
         <arg>arg1</arg>
         <arg>arg2</arg>
@@ -610,5 +610,12 @@ arg1 arg2
  + echo 'arg1 arg2'
  + echo arg1 arg2
 </error>
+    </testSpec>
+    <testSpec title="redirection" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo > @TEMP_DIR@/blablah Hi mum
+        </script>
+        <file name="blablah" input="false">Hi mum
+</file>    
     </testSpec>
 </testSet>

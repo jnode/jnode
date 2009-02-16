@@ -22,8 +22,12 @@ package org.jnode.test.shell.harness;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -31,6 +35,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
+import org.jnode.test.shell.harness.TestSpecification.FileSpecification;
 
 /**
  * This base class supplies functions for getting hold of "the shell" for
@@ -39,7 +44,7 @@ import org.jnode.shell.ShellException;
  * 
  * @author crawley@jnode.org
  */
-public abstract class JNodeTestRunnerBase implements TestRunnable {
+public abstract class TestRunnerBase implements TestRunnable {
     
     private class TeeStream extends FilterOutputStream {
         private OutputStream out2;
@@ -76,7 +81,7 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
     
     protected final boolean usingEmu;
 
-    public JNodeTestRunnerBase(TestSpecification spec, TestHarness harness) {
+    public TestRunnerBase(TestSpecification spec, TestHarness harness) {
         super();
         this.spec = spec;
         this.harness = harness;
@@ -94,10 +99,18 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
     
     @Override
     public void cleanup() {
+        if (!harness.isDebug()) {
+            for (FileSpecification fs : spec.getFiles()) {
+                if (fs.isInput()) {
+                    File tempFile = harness.tempFile(fs.getFile());
+                    tempFile.delete();
+                }
+            }
+        }
     }
 
     @Override
-    public void setup() {
+    public void setup() throws IOException {
         ensurePluginsLoaded(spec.getTestSet());
         for (PluginSpecification plugin : spec.getPlugins()) {
             ensurePluginLoaded(plugin);
@@ -112,6 +125,45 @@ public abstract class JNodeTestRunnerBase implements TestRunnable {
             System.setOut(new PrintStream(outBucket));
             System.setErr(new PrintStream(errBucket));
         }
+        for (FileSpecification fs : spec.getFiles()) {
+            File tempFile = harness.tempFile(fs.getFile());
+            if (fs.isInput()) {
+                OutputStream os = new FileOutputStream(tempFile);
+                try {
+                    byte[] bytes = fs.getFileContent().getBytes();
+                    os.write(bytes);
+                } finally {
+                    os.close();
+                }
+            } else {
+                tempFile.delete();
+            }
+        }
+    }
+    
+    protected boolean checkFiles() throws IOException {
+        boolean ok = true;
+        for (FileSpecification fs : spec.getFiles()) {
+            File tempFile = harness.tempFile(fs.getFile());
+            if (!fs.isInput()) {
+                if (!tempFile.exists()) {
+                    harness.fail("file not created: '" + tempFile + "'"); 
+                    ok = false;
+                } else {
+                    int fileLength = (int) tempFile.length();
+                    byte[] bytes = new byte[fileLength];
+                    InputStream is = new FileInputStream(tempFile);
+                    try {
+                        is.read(bytes);
+                    } finally {
+                        is.close();
+                    }
+                    String content = new String(bytes);
+                    ok = ok & harness.expect(content, fs.getFileContent(), "file content (" + tempFile + ")");
+                } 
+            }
+        }
+        return ok;
     }
     
     private void ensurePluginsLoaded(TestSetSpecification testSet) {

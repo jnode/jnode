@@ -20,9 +20,7 @@
  
 package org.jnode.test.shell.harness;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.IOException;
 
 import org.jnode.shell.CommandShell;
 
@@ -33,11 +31,7 @@ import org.jnode.shell.CommandShell;
  *
  * @author crawley@jnode.org
  */
-class CommandTestRunner extends JNodeTestRunnerBase implements TestRunnable {
-
-    private ByteArrayOutputStream outBucket;
-    private ByteArrayOutputStream errBucket;
-
+class CommandTestRunner extends TestRunnerBase implements TestRunnable {
 
     public CommandTestRunner(TestSpecification spec, TestHarness harness) {
         super(spec, harness);
@@ -55,24 +49,11 @@ class CommandTestRunner extends JNodeTestRunnerBase implements TestRunnable {
         return check(rc) ? 0 : 1;
     }
 
-    private boolean check(int rc) {
+    private boolean check(int rc) throws IOException {
         return
             harness.expect(rc, spec.getRc(), "return code") &
                 harness.expect(outBucket.toString(), spec.getOutputContent(), "output content") &
-                harness.expect(errBucket.toString(), spec.getErrorContent(), "err content");
+                harness.expect(errBucket.toString(), spec.getErrorContent(), "err content") &
+                checkFiles();
     }
-
-    @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void setup() {
-        System.setIn(new ByteArrayInputStream(spec.getInputContent().toString().getBytes()));
-        outBucket = new ByteArrayOutputStream();
-        errBucket = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outBucket));
-        System.setErr(new PrintStream(errBucket));
-    }
-
 }

@@ -113,13 +113,19 @@ public class TestSpecificationParser {
     private void parseFile(IXMLElement elem, TestSpecification res) 
         throws TestSpecificationException {
         String fileName = extractAttribute(elem, "name");
-        String content = extractElementValue(elem, "content", "");
-        res.addFile(new File(fileName), content);
+        boolean isInput = extractAttribute(elem, "input", "false").equals("true");
+        String content = extractElementValue(elem, null, "");
+        File file = new File(fileName);
+        if (file.isAbsolute()) {
+            throw new TestSpecificationException(
+                    "A '" + elem.getName() + "' element must have a relative 'name''");
+        }
+        res.addFile(new TestSpecification.FileSpecification(file, isInput, content));
     }
     
     @SuppressWarnings("unused")
     private String extractElementValue(IXMLElement parent, String name) throws TestSpecificationException {
-        IXMLElement elem = parent.getFirstChildNamed(name);
+        IXMLElement elem = name == null ? parent : parent.getFirstChildNamed(name);
         if (elem == null) {
             throw new TestSpecificationException(
                     "Element '" + name + "' not found in '" + parent.getName() + "'");
@@ -130,7 +136,7 @@ public class TestSpecificationParser {
     }
 
     private String extractElementValue(IXMLElement parent, String name, String dflt) {
-        IXMLElement elem = parent.getFirstChildNamed(name);
+        IXMLElement elem = name == null ? parent : parent.getFirstChildNamed(name);
         return elem == null ? dflt : elem.getContent();
     }
     

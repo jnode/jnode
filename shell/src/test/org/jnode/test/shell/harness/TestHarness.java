@@ -279,4 +279,13 @@ public class TestHarness {
     public boolean isDebug() {
         return debug;
     }
+
+    public File tempFile(File file) {
+        return new File(System.getProperty("java.io.tmpdir"), file.toString());
+    }
+
+    public boolean fail(String msg) {
+        report("Incorrect test result in test " + asString(spec.getTitle()) + ": " + msg);
+        return false;
+    }
 }
