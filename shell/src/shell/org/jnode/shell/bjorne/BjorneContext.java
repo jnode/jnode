@@ -39,6 +39,7 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -913,7 +914,7 @@ public class BjorneContext {
                 map.put(var.name, var.value);
             }
         }
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     PrintStream resolvePrintStream(CommandIO commandIOIF) {
