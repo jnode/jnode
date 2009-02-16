@@ -48,19 +48,22 @@
       <export name="sun.security.pkcs.ParsingException"/>
       <export name="sun.security.provider.SecureRandom"/>
       <export name="sun.security.util.*"/>
+
       <export name="sun.misc.Service"/>
       <export name="sun.misc.ServiceConfigurationError"/>
+
       <export name="sun.nio.cs.StreamEncoder"/>
       <export name="sun.nio.cs.StreamDecoder"/>
       <export name="sun.nio.cs.HistoricallyNamedCharset"/>
       <export name="sun.nio.cs.ThreadLocalCoders"/>
+
       <export name="sun.text.*"/>
       <export name="sun.text.normalizer.*"/>
-
       <export name="sun.text.resources.BreakIteratorInfo"/>
       <export name="sun.text.resources.BreakIteratorRules"/>
       <export name="sun.text.resources.CollationData"/>
       <export name="sun.text.resources.FormatData"/>
+
       <export name="sun.util.calendar.*"/>
       <export name="sun.util.*"/>
       <export name="sun.util.resources.LocaleData"/>
