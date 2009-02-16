@@ -45,6 +45,8 @@
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.*"/>
       <export name="sun.security.jca.*"/>
+      <export name="sun.security.pkcs.ParsingException"/>
+      <export name="sun.security.util.*"/>
       <export name="sun.misc.Service"/>
       <export name="sun.misc.ServiceConfigurationError"/>
       <export name="sun.nio.cs.StreamEncoder"/>
