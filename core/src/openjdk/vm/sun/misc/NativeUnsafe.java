@@ -36,6 +36,7 @@ import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.Vm;
@@ -444,15 +445,42 @@ class NativeUnsafe {
     }
 
     public static int arrayBaseOffset(Unsafe instance, Class arrayClass) {
-        throw new UnsupportedOperationException();
+        return VmArray.DATA_OFFSET * VmProcessor.current().getArchitecture().getReferenceSize();
     }
 
     public static int arrayIndexScale(Unsafe instance, Class arrayClass) {
-        throw new UnsupportedOperationException();
+        //see VmHeapManager.newArray()
+        final int elemSize;
+        VmType arrayCls = VmType.fromClass(arrayClass);
+        if (arrayCls.isPrimitiveArray()) {
+            switch (arrayCls.getSecondNameChar()) {
+                case 'B': // byte
+                case 'Z': // boolean
+                    elemSize = 1;
+                    break;
+                case 'C': // char
+                case 'S': // short
+                    elemSize = 2;
+                    break;
+                case 'I': // int
+                case 'F': // float
+                    elemSize = 4;
+                    break;
+                case 'D': // double
+                case 'J': // long
+                    elemSize = 8;
+                    break;
+                default:
+                    throw new IllegalArgumentException(arrayCls.getName());
+            }
+        } else {
+            elemSize = VmProcessor.current().getArchitecture().getReferenceSize();
+        }
+        return elemSize;
     }
 
     public static int addressSize(Unsafe instance) {
-        throw new UnsupportedOperationException();
+        return VmProcessor.current().getArchitecture().getReferenceSize();
     }
 
     public static int pageSize(Unsafe instance) {
