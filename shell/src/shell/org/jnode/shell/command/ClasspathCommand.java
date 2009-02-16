@@ -17,12 +17,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command;
 
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.syntax.Argument;
@@ -36,7 +38,7 @@ import org.jnode.shell.syntax.URLArgument;
  */
 public class ClasspathCommand extends AbstractCommand {
 
-    private final URLArgument ARG_ADD = 
+    private final URLArgument ARG_ADD =
         new URLArgument("addUrl", Argument.OPTIONAL, "the URL to be added to the classpath");
 
     private final FlagArgument ARG_CLEAR =
@@ -92,8 +94,8 @@ public class ClasspathCommand extends AbstractCommand {
     private void clearClassPath() {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (cl instanceof CPClassLoader) {
-            cl = new CPClassLoader(cl.getParent());
-            Thread.currentThread().setContextClassLoader(cl);
+            final ClassLoader cl2 = new CPClassLoader(cl.getParent());
+            AccessController.doPrivileged(new SetContextClassLoaderAction(cl2));
         }
     }
 
@@ -105,7 +107,7 @@ public class ClasspathCommand extends AbstractCommand {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (!(cl instanceof CPClassLoader)) {
             cl = new CPClassLoader(cl);
-            Thread.currentThread().setContextClassLoader(cl);
+            AccessController.doPrivileged(new SetContextClassLoaderAction(cl));
         }
         return (CPClassLoader) cl;
     }
@@ -113,10 +115,9 @@ public class ClasspathCommand extends AbstractCommand {
     private static class CPClassLoader extends URLClassLoader {
 
         /**
-         * @param parent
-         * @throws SecurityException
+         * @param parent the parent class loader
          */
-        public CPClassLoader(ClassLoader parent) throws SecurityException {
+        public CPClassLoader(ClassLoader parent) {
             super(new URL[0], parent);
         }
 
@@ -126,9 +127,25 @@ public class ClasspathCommand extends AbstractCommand {
 
         public void print(PrintWriter out) {
             URL[] urls = getURLs();
-            for (int i = 0; i < urls.length; i++) {
-                out.println(urls[i]);
+            if (urls != null) {
+                for (URL url : urls) {
+                    out.println(url);
+                }
             }
+        }
+    }
+
+    private static class SetContextClassLoaderAction implements PrivilegedAction<Object> {
+        private final ClassLoader classLoader;
+
+        public SetContextClassLoaderAction(ClassLoader classLoader) {
+            this.classLoader = classLoader;
+        }
+
+        @Override
+        public Object run() {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            return null;
         }
     }
 }
