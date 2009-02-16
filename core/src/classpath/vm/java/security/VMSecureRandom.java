@@ -20,10 +20,6 @@
  
 package java.security;
 
-import gnu.classpath.SystemProperties;
-import gnu.java.security.action.GetSecurityPropertyAction;
-
-import java.net.URL;
 
 /**
  * VM-specific methods for generating real (or almost real) random
