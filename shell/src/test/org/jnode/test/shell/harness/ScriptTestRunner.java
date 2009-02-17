@@ -46,8 +46,9 @@ class ScriptTestRunner extends TestRunnerBase implements TestRunnable {
     @Override
     public int run() throws Exception {
         Properties props = new Properties();
-        props.setProperty("TEMP_DIR", System.getProperty("java.io.tmpdir"));
-        tempScriptFile = new File(System.getProperty("java.io.tmpdir"), spec.getCommand());
+        String tempDir = System.getProperty("java.io.tmpdir");
+        props.setProperty("TEMP_DIR", tempDir);
+        tempScriptFile = new File(tempDir, spec.getCommand());
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(tempScriptFile));

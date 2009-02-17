@@ -91,16 +91,16 @@ public class TestEmu {
         if (!emuInitialized) {
             throw new IllegalStateException("Emu not initialized");
         }
-        if (!loadedPseudoPlugins.contains(className)) {
-            try {
+        try {
+            if (!loadedPseudoPlugins.contains(className)) {
                 Class<?> clazz = Class.forName(className);
                 clazz.newInstance();
-                Method method = emuClass.getMethod("configurePluginCommands", String.class);
-                method.invoke(emuObject, pluginId);
-            } catch (Exception ex) {
-                throw new RuntimeException("Cannot configure plugin '" + pluginId + "'", ex);
+                loadedPseudoPlugins.add(className);
             }
-            loadedPseudoPlugins.add(className);
+            Method method = emuClass.getMethod("configurePlugin", String.class);
+            method.invoke(emuObject, pluginId);
+        } catch (Exception ex) {
+            throw new RuntimeException("Cannot configure plugin '" + pluginId + "'", ex);
         }
     }
 

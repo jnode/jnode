@@ -16,6 +16,7 @@
   <plugin id="net.sf.cglib"/>  
   <plugin id="org.jmock.cglib"/>
   <plugin id="org.jmock"/>  
+  <plugin id="net.n3.nanoxml"/>  
   
   <plugin id="org.jnode.test"/>
   <plugin id="org.jnode.test.fs"/>

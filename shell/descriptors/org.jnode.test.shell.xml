@@ -13,6 +13,7 @@
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.shell.syntax"/>
     <import plugin="org.junit" version="3.8"/>
+    <import plugin="net.n3.nanoxml"/>
     <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.testrunner"/>
   </requires>

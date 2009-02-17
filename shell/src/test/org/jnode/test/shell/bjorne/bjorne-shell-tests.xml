@@ -613,9 +613,20 @@ arg1 arg2
     </testSpec>
     <testSpec title="redirection" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
-                echo > @TEMP_DIR@/blablah Hi mum
+                echo &gt; @TEMP_DIR@/1 Hi mum
+                echo &gt; @TEMP_DIR@/2 Hi mum
+                echo &gt;&gt; @TEMP_DIR@/2 Hi mum again
+                echo Hello mother
+                echo Hello mother again 1&gt;&amp;2
         </script>
-        <file name="blablah" input="false">Hi mum
-</file>    
+        <file name="1" input="false">Hi mum
+</file>
+        <file name="2" input="false">Hi mum
+Hi mum again
+</file>
+    <output>Hello mother
+</output>
+    <error>Hello mother again
+</error>
     </testSpec>
 </testSet>

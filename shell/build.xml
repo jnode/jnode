@@ -10,7 +10,7 @@
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
-    <pathelement location="${basedir}/../builder/lib/nanoxml-2.2.3.jar"/>
+    <pathelement location="${nanoxml-java.jar}"/>
     <path refid="cp"/>
   </path>
 
@@ -19,7 +19,8 @@
     <mkdir dir="${my-classes.dir}"/>
   	<jnode.copy-descriptors/>
     <copy todir="${my-classes.dir}">
-      <fileset dir="${my-src.dir}/shell" excludes="**/*.java,**/package.html"/>
+        <fileset dir="${my-src.dir}/shell" excludes="**/*.java,**/package.html"/>
+        <fileset dir="${my-src.dir}/test" excludes="**/*.java,**/package.html"/>
     </copy>
   </target>
 

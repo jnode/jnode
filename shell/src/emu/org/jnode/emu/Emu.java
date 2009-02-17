@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 
 import javax.naming.NamingException;
 
@@ -59,7 +60,7 @@ public class Emu {
     };
 
     // FIXME configuring a hard-coded list of command plugins is a bad idea.
-    private static final String[] DEFAULT_PLUGIN_NAMES = new String[] {
+    private static final String[] DEFAULT_PLUGIN_IDS = new String[] {
         "org.jnode.shell.command",
         "org.jnode.shell.command.driver.console",
         "org.jnode.apps.editor",
@@ -70,9 +71,10 @@ public class Emu {
     private final File root;
     private final AliasManager aliasMgr;
     private final SyntaxManager syntaxMgr;
+    private final HashSet<String> configuredPlugins = new HashSet<String>();
     
     public Emu(File root) throws EmuException {
-        this(root, DEFAULT_PLUGIN_NAMES);
+        this(root, DEFAULT_PLUGIN_IDS);
     }
 
     /**
@@ -94,7 +96,7 @@ public class Emu {
             aliasMgr = new DefaultAliasManager(new DummyExtensionPoint()).createAliasManager();
             syntaxMgr = new DefaultSyntaxManager(new DummyExtensionPoint()).createSyntaxManager();
             for (String pluginName : pluginNames) {
-                configurePluginCommands(pluginName);
+                configurePlugin(pluginName);
             }
             System.setProperty("jnode.invoker", "thread");
             System.setProperty("jnode.interpreter", "redirecting");
@@ -111,13 +113,16 @@ public class Emu {
     /**
      * Configure any command classes specified by a given plugin's descriptor
      *
-     * @param pluginName the plugin to be processed
+     * @param pluginId the plugin to be processed
      * @throws EmuException
      */
-    public void configurePluginCommands(String pluginName) throws EmuException {
-        XMLElement pluginDescriptor = loadPluginDescriptor(pluginName);
-        extractAliases(pluginDescriptor);
-        extractSyntaxBundles(pluginDescriptor);
+    public void configurePlugin(String pluginId) throws EmuException {
+        if (!configuredPlugins.contains(pluginId)) {
+            XMLElement pluginDescriptor = loadPluginDescriptor(pluginId);
+            extractAliases(pluginDescriptor);
+            extractSyntaxBundles(pluginDescriptor);
+            configuredPlugins.add(pluginId);
+        }
     }
 
     /**

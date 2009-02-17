@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="net.n3.nanoxml" 
+        name="NanoXML Java classes"
+        version="2.2.3"
+        provider-name="nanoxml.org"
+        license-name="zlib">
+        
+  <runtime>
+    <library name="nanoxml-java.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+        
+</plugin>
