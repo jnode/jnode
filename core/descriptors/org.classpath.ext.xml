@@ -12,10 +12,6 @@
 
   <runtime>
     <library name="jnode-core.jar">
-
-      <export name="gnu.javax.security.auth.callback.*"/>
-      <export name="gnu.javax.security.auth.login.*"/>
-
       <export name="javax.security.*"/>
       <export name="javax.security.auth.*"/>
       <export name="javax.security.auth.callback.*"/>
