@@ -12,4 +12,42 @@
         <output>2
 </output>
     </testSpec>
+    <testSpec title="expr 2 * 2" command="org.jnode.shell.command.posix.ExprCommand"
+              runMode="AS_ALIAS" rc="0">
+        <arg>2</arg>
+        <arg>*</arg>
+        <arg>2</arg>
+        <output>4
+</output>
+    </testSpec>
+    <testSpec title="expr 4 / 2" command="org.jnode.shell.command.posix.ExprCommand"
+              runMode="AS_ALIAS" rc="0">
+        <arg>4</arg>
+        <arg>/</arg>
+        <arg>2</arg>
+        <output>2
+</output>
+    </testSpec>
+    <testSpec title="expr 1 + 2 * 2" command="org.jnode.shell.command.posix.ExprCommand"
+              runMode="AS_ALIAS" rc="0">
+        <arg>1</arg>
+        <arg>+</arg>
+        <arg>2</arg>
+        <arg>*</arg>
+        <arg>2</arg>
+        <output>5
+</output>
+    </testSpec>
+    <testSpec title="expr ( 1 + 2 ) * 2" command="org.jnode.shell.command.posix.ExprCommand"
+              runMode="AS_ALIAS" rc="0">
+        <arg>(</arg>
+        <arg>1</arg>
+        <arg>+</arg>
+        <arg>2</arg>
+        <arg>)</arg>
+        <arg>*</arg>
+        <arg>2</arg>
+        <output>6
+</output>
+    </testSpec>
 </testSet>

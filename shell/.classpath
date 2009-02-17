@@ -10,6 +10,6 @@
 	<classpathentry kind="lib" path="/core/lib/ant.jar"/>
 	<classpathentry kind="lib" path="/core/lib/junit.jar"/>
 	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
-	<classpathentry kind="lib" path="/builder/lib/nanoxml-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/nanoxml-2.2.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
