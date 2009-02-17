@@ -51,5 +51,24 @@
       <export name="sun.nio.ch.*"/>
     </library>
   </runtime>
-  
+    
+  <extension point="org.jnode.shell.aliases">
+    <alias name="jarsigner" class="sun.security.tools.JarSigner"/>
+    <alias name="keytool" class="sun.security.tools.KeyTool"/>
+    <alias name="policytool" class="sun.security.tools.PolicyTool"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
+    <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+  </extension>
 </fragment>
