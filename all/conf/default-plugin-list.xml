@@ -153,7 +153,6 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.net.nfs"/>
 
     <plugin id="com.jcraft.jsch"/>
-	<plugin id="crypto-security"/>
 
     <plugin id="org.jnode.protocol"/>
     <plugin id="org.jnode.protocol.ftp"/>

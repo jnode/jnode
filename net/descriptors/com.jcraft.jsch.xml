@@ -10,7 +10,7 @@
   license-url="http://www.jcraft.com/jsch/LICENSE.txt">
 
   <requires>
-    <import plugin="crypto-security"/>
+    <import plugin="org.classpath.ext.security"/>
   </requires>
 
 

@@ -8,7 +8,6 @@
   provider-name="JNode.org">
 
   <requires>
-    <import plugin="crypto-security"/>
     <import plugin="com.jcraft.jsch"/>
   </requires>
 
