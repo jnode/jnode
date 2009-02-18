@@ -26,7 +26,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../builder/lib/nanoxml-2.2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/nanoxml-2.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
