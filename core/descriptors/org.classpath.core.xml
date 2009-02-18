@@ -169,6 +169,7 @@
       <export name="javax.xml.stream.util.*"/>
 
       <export name="javax.crypto.*"/>
+      <export name="javax.crypto.interfaces.*"/>
       <export name="javax.crypto.spec.*"/>
       <export name="javax.security.auth.AuthPermission"/>
       <export name="javax.security.auth.Destroyable"/>
