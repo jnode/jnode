@@ -9,8 +9,6 @@
 	<classpathentry kind="lib" path="lib/jsch-0.1.24.jar"/>
 	<classpathentry kind="lib" path="lib/dnsjava-1.6.6.jar" sourcepath="lib/dnsjava-1.6.6-src.zip"/>
 	<classpathentry kind="lib" path="/core/lib/commons-net-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/core/lib/gnu-crypto.jar"/>
-	<classpathentry kind="lib" path="/core/lib/javax-crypto.jar"/>
 	<classpathentry kind="lib" path="/core/lib/junit.jar"/>
 	<classpathentry kind="lib" path="/core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
