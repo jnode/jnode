@@ -55,24 +55,22 @@ public class TestEmu {
             // The following infers that we are running on the dev't platform if 
             // the 'Emu' class is not loadable.
             try {
-                emuClass = Class.forName("org.jnode.emu.Emu");
-                Constructor<?> constructor = emuClass.getConstructor(File.class);
-                emuObject = constructor.newInstance(root);
-                emuAvailable = true;
-            } catch (Throwable ex) {
-                // debug ...
-                ex.printStackTrace(System.err);
-                emuAvailable = false;
-            }
-            try {
+                try {
+                    emuClass = Class.forName("org.jnode.emu.Emu");
+                    Constructor<?> constructor = emuClass.getConstructor(File.class);
+                    emuObject = constructor.newInstance(root);
+                    emuAvailable = true;
+                } catch (ClassNotFoundException ex) {
+                    emuAvailable = false;
+                } 
                 if (emuAvailable) {
                     shell = null;
                 } else {
                     shell = (CommandShell) ShellUtils.getCurrentShell();
                 }
+            } catch (RuntimeException ex) {
+                throw ex;
             } catch (Exception ex) {
-                // debug ...
-                ex.printStackTrace(System.err);
                 throw new RuntimeException(ex);
             }
             emuInitialized = true;

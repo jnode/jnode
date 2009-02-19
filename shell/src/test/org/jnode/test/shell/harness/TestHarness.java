@@ -55,6 +55,8 @@ public class TestHarness {
 
     private boolean debug;
     private boolean verbose;
+    private boolean stopOnError;
+    private boolean stopOnFailure;
     private boolean useResources;
     private File root;
 
@@ -87,6 +89,10 @@ public class TestHarness {
                 verbose = true;
             } else if (optName.equals("-d") || optName.equals("--debug")) {
                 debug = true;
+            } else if (optName.equals("-F") || optName.equals("--stopOnFailure")) {
+                stopOnFailure = true;
+            } else if (optName.equals("-E") || optName.equals("--stopOnError")) {
+                stopOnError = true;
             } else if (optName.equals("-s") || optName.equals("--sandbox")) {
                 if (i++ >= args.length) {
                     System.err.println("No pathname after sandbox option");
@@ -115,6 +121,9 @@ public class TestHarness {
                 if (specs != null) {
                     execute(specs);
                 }
+            } catch (TestsAbandonedException ex) {
+                report(ex.getMessage());
+                break;
             } catch (Exception ex) {
                 diagnose(ex, arg);
             } 
@@ -157,13 +166,15 @@ public class TestHarness {
     private void usage() {
         System.err.println(commandName + " [ <opt> ...] <spec-file> ... ");
         System.err.println("where <opt> is one of: ");
-        System.err.println("    --verbose | - v             output more information about tests run");
-        System.err.println("    --debug | - d               enable extra debug support");
-        System.err.println("    --sandbox | -s <dir-name>   specifies the dev't sandbox root directory");
-        System.err.println("    --resource | -r             looks for <spec-file> as a resource on the CLASSPATH");
+        System.err.println("    --verbose | -v             output more information about tests run");
+        System.err.println("    --debug | -d               enable extra debug support");
+        System.err.println("    --stopOnError | -E         stop at the first error");
+        System.err.println("    --stopOnFailure | -F       stop at the first test failure");
+        System.err.println("    --sandbox | -s <dir-name>  specifies the dev't sandbox root directory");
+        System.err.println("    --resource | -r            looks for <spec-file> as a resource on the CLASSPATH");
     }
 
-    private void execute(TestSetSpecification specs) {
+    private void execute(TestSetSpecification specs) throws TestsAbandonedException {
         for (TestSpecification spec : specs.getSpecs()) {
             execute(spec);
         } 
@@ -172,7 +183,12 @@ public class TestHarness {
         }
     }
 
-    private void execute(TestSpecification spec) {
+    /**
+     * Run a test.
+     * @param spec the specification of the test
+     * @throws TestsAbandonedException 
+     */
+    private void execute(TestSpecification spec) throws TestsAbandonedException {
         this.spec = spec;
         reportVerbose("Running test '" + spec.getTitle() + "'");
         testCount++;
@@ -189,21 +205,29 @@ public class TestHarness {
                     runner = new ScriptTestRunner(spec, this);
                     break;
                 default:
-                    reportVerbose("Run mode '" + spec.getRunMode() + "' not implemented");
-                    return;
+                    throw new TestsAbandonedException("Run mode '" + spec.getRunMode() + "' not implemented");
             }
             try {
                 setup();
                 runner.setup();
-                failureCount += runner.run();
+                int tmp = runner.run();
+                failureCount += tmp;
+                if (tmp > 0 && stopOnFailure) {
+                    throw new TestsAbandonedException("Stopped due to test failure");
+                }
             } finally {
                 runner.cleanup();
                 cleanup();
             }
+        } catch (TestsAbandonedException ex) {
+            throw ex;
         } catch (Throwable ex) {
             report("Uncaught exception in test '" + spec.getTitle() + "': stacktrace follows.");
             ex.printStackTrace(reportWriter);
             exceptionCount++;
+            if (stopOnError) {
+                throw new TestsAbandonedException("Stopped due to test error");
+            }
         }
         reportVerbose("Completed test '" + spec.getTitle() + "'");
     }

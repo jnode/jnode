@@ -12,5 +12,9 @@
       <export name="*"/>
     </library>
   </runtime>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read"/>
+  </extension>
         
 </plugin>
