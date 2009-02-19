@@ -33,6 +33,7 @@ import java.io.PrintStream;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.PluginRegistry;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 import org.jnode.test.shell.harness.TestSpecification.FileSpecification;
@@ -110,7 +111,7 @@ public abstract class TestRunnerBase implements TestRunnable {
     }
 
     @Override
-    public void setup() throws IOException {
+    public void setup() throws IOException, TestRunnerException {
         ensurePluginsLoaded(spec.getTestSet());
         for (PluginSpecification plugin : spec.getPlugins()) {
             ensurePluginLoaded(plugin);
@@ -166,7 +167,7 @@ public abstract class TestRunnerBase implements TestRunnable {
         return ok;
     }
     
-    private void ensurePluginsLoaded(TestSetSpecification testSet) {
+    private void ensurePluginsLoaded(TestSetSpecification testSet) throws TestRunnerException {
         if (testSet == null) {
             return;
         }
@@ -176,20 +177,23 @@ public abstract class TestRunnerBase implements TestRunnable {
         }
     }
 
-    protected void ensurePluginLoaded(PluginSpecification plugin) {
+    protected void ensurePluginLoaded(PluginSpecification plugin) throws TestRunnerException {
+        String id = plugin.getPluginId();
         if (usingEmu) {
-            TestEmu.loadPseudoPlugin(plugin.getPluginId(), plugin.getClassName());
+            TestEmu.loadPseudoPlugin(id, plugin.getClassName());
         } else {
-            // TODO - I'm not sure about this.  A simpler alternative is to assume
-            // that all required plugins have already been loaded by JNode.
             String ver = (plugin.getPluginVersion().length() == 0) ? 
                     System.getProperty("os.version") : plugin.getPluginVersion();
             try {
                 PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
-                mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), plugin.getPluginId(), ver);
+                PluginRegistry reg = mgr.getRegistry();
+                if (reg.getPluginDescriptor(id) == null) {
+                    reg.loadPlugin(mgr.getLoaderManager(), id, ver);
+                }
             } catch (Exception ex) {
-                throw new RuntimeException(
-                        "Cannot load plugin '" + plugin.getPluginId() + "/" + ver + "'");
+                System.out.println(ex.getMessage());
+                throw new TestRunnerException(
+                        "Cannot load plugin '" + plugin.getPluginId() + "/" + ver + "'", ex);
             }
         }
     }
