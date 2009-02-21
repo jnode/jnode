@@ -228,7 +228,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new ShellFailureException("CommandShell initialization failed", ex);
         }
     }
     
