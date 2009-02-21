@@ -36,6 +36,7 @@ import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.HelpFactory;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandOutput;
 import org.jnode.vm.VmExit;
 
 /**
@@ -45,7 +46,7 @@ import org.jnode.vm.VmExit;
  * @author crawley@jnode.org
  *
  */
-public class CommandRunner implements Runnable {
+public class CommandRunner implements CommandRunnable {
     
     private final SimpleCommandInvoker invoker;
     private final CommandIO[] ios;
@@ -214,5 +215,17 @@ public class CommandRunner implements Runnable {
 
     public Map<String, String> getEnv() {
         return env;
+    }
+
+    public void flushStreams() {
+        for (CommandIO io : ios) {
+            if (io instanceof CommandOutput) {
+                try {
+                    ((CommandOutput) io).flush();
+                } catch (IOException ex) {
+                    // Ignore for now.
+                }
+            }
+        }
     }
 }

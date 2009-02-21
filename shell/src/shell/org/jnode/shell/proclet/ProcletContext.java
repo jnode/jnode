@@ -27,6 +27,7 @@ import java.security.AccessController;
 import java.util.Map;
 import java.util.Properties;
 
+import org.jnode.shell.CommandRunnable;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
 import org.jnode.util.ProxyStream;
@@ -171,7 +172,7 @@ public class ProcletContext extends ThreadGroup {
      * @param target the new Thread's Runnable object.
      * @return the new Thread
      */
-    public static CommandThread createProclet(Runnable target) {
+    public static CommandThread createProclet(CommandRunnable target) {
         return createProclet(target, null, null, null, null, 0);
     }
 
@@ -190,7 +191,7 @@ public class ProcletContext extends ThreadGroup {
      * @param target the new Thread's Runnable object.
      * @return the new Thread
      */
-    public static CommandThread createProclet(Runnable target, Properties properties, 
+    public static CommandThread createProclet(CommandRunnable target, Properties properties, 
             Map<String, String> environment, Object[] streams) {
         return createProclet(target, properties, environment, streams, null, 0);
     }
@@ -212,7 +213,7 @@ public class ProcletContext extends ThreadGroup {
      * @param name an optional Thread name.
      * @return the new Thread
      */
-    public static CommandThreadImpl createProclet(Runnable target,
+    public static CommandThreadImpl createProclet(CommandRunnable target,
             Properties properties, Map<String, String> environment,
             Object[] streams, String name) {
         return createProclet(target, properties, environment, streams, name, 0);
@@ -237,7 +238,7 @@ public class ProcletContext extends ThreadGroup {
      *        stack size.
      * @return the new Thread
      */
-    public static CommandThreadImpl createProclet(Runnable target,
+    public static CommandThreadImpl createProclet(CommandRunnable target,
             Properties properties, Map<String, String> environment,
             Object[] streams, String name, long size) {
         ProcletContext procletContext = new ProcletContext(Thread

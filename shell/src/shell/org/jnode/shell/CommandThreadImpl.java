@@ -28,7 +28,7 @@ package org.jnode.shell;
 public class CommandThreadImpl extends Thread implements CommandThread {
 
     private ThreadExitListener listener;
-    private Runnable runner;
+    private CommandRunnable runner;
 
     /**
      * @param group the parent group for the thread
@@ -36,7 +36,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
      * @param name a thread name
      * @param size the threads stack size
      */
-    public CommandThreadImpl(ThreadGroup group, Runnable runner, String name,
+    public CommandThreadImpl(ThreadGroup group, CommandRunnable runner, String name,
             long size) {
         super(group, runner, name, size);
         this.runner = runner;
@@ -47,7 +47,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
      * @param runner the Runnable that will run the command
      * @param name the thread name
      */
-    public CommandThreadImpl(ThreadGroup group, Runnable runner, String name) {
+    public CommandThreadImpl(ThreadGroup group, CommandRunnable runner, String name) {
         super(group, runner, name);
         this.runner = runner;
     }
@@ -56,7 +56,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
      * @param runner the Runnable that will run the command
      * @param name the thread name
      */
-    public CommandThreadImpl(Runnable runner, String name) {
+    public CommandThreadImpl(CommandRunnable runner, String name) {
         super(runner, name);
         this.runner = runner;
     }
@@ -66,6 +66,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
         try {
             super.run();
         } finally {
+            runner.flushStreams();
             if (listener != null) {
                 listener.notifyThreadExited(this);
             }

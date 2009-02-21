@@ -52,12 +52,20 @@ public class ProcletProxyInputStream extends InputStream implements
      * @param is the initial value for globalInput.
      * @param fd
      */
+    @SuppressWarnings("unchecked")
     public ProcletProxyInputStream(InputStream is, int fd) {
         this.fd = fd;
         streamMap = new HashMap<Integer, InputStream>();
         if (is == null) {
             throw new IllegalArgumentException("null stream");
         }
+        if (is instanceof ProxyStream<?>) {
+            try {
+                is = ((ProxyStream<InputStream>) is).getProxiedStream();
+            } catch (ProxyStreamException ex) {
+                throw new IllegalArgumentException("broken proxy stream", ex);
+            }
+        } 
         streamMap.put(ProcletIOContext.GLOBAL_STREAM_ID, is);
     }
 
@@ -70,11 +78,19 @@ public class ProcletProxyInputStream extends InputStream implements
      * @param is
      * @param pid
      */
+    @SuppressWarnings("unchecked")
     public ProcletProxyInputStream(ProcletProxyInputStream proxy, InputStream is,
             int pid) {
         if (is == null) {
             throw new IllegalArgumentException("null stream");
         }
+        if (is instanceof ProxyStream<?>) {
+            try {
+                is = ((ProxyStream<InputStream>) is).getProxiedStream();
+            } catch (ProxyStreamException ex) {
+                throw new IllegalArgumentException("broken proxy stream", ex);
+            }
+        } 
         streamMap = new HashMap<Integer, InputStream>(proxy.streamMap);
         streamMap.put(pid, is);
         fd = proxy.fd;

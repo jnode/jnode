@@ -27,6 +27,7 @@ import java.util.Map;
 import org.jnode.util.ProxyStream;
 import org.jnode.util.ProxyStreamException;
 
+
 /**
  * This class provides a proxy mechanism for System.out,err. If the current
  * thread is a member thread of a ProcletContext, operations are dispatched to
@@ -49,12 +50,20 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
      * @param ps
      * @param pid
      */
+    @SuppressWarnings("unchecked")
     public ProcletProxyPrintStream(PrintStream ps, int fd) {
         super();
         if (ps == null) {
             throw new IllegalArgumentException("null stream");
         }
         this.fd = fd;
+        if (ps instanceof ProxyStream<?>) {
+            try {
+                ps = ((ProxyStream<PrintStream>) ps).getProxiedStream();
+            } catch (ProxyStreamException ex) {
+                throw new IllegalArgumentException("broken proxy stream", ex);
+            }
+        } 
         streamMap = new HashMap<Integer, PrintStream>();
         streamMap.put(ProcletIOContext.GLOBAL_STREAM_ID, ps);
     }
@@ -68,11 +77,19 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
      * @param ps
      * @param pid
      */
+    @SuppressWarnings("unchecked")
     public ProcletProxyPrintStream(ProcletProxyPrintStream proxy, PrintStream ps,
             int pid) {
         if (ps == null) {
             throw new IllegalArgumentException("null stream");
         }
+        if (ps instanceof ProxyStream<?>) {
+            try {
+                ps = ((ProxyStream<PrintStream>) ps).getProxiedStream();
+            } catch (ProxyStreamException ex) {
+                throw new IllegalArgumentException("broken proxy stream", ex);
+            }
+        } 
         streamMap = new HashMap<Integer, PrintStream>(proxy.streamMap);
         streamMap.put(pid, ps);
         fd = proxy.fd;
