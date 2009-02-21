@@ -64,6 +64,24 @@
       <export name="java.rmi.dgc.*"/>
       <export name="java.rmi.registry.*"/>
       <export name="java.rmi.server.*"/>
+        
+      <export name="javax.rmi.*"/>
+      <export name="javax.rmi.ssl.*"/>
+
+      <export name="sun.rmi.log.*"/>
+      <export name="sun.rmi.registry.*"/>
+      <export name="sun.rmi.registry.resources.*"/>
+      <export name="sun.rmi.rmic.*"/>
+      <export name="sun.rmi.rmic.resources.*"/>
+      <export name="sun.rmi.rmic.iiop.*"/>
+      <export name="sun.rmi.rmic.newrmic.*"/>
+      <export name="sun.rmi.rmic.newrmic.jrmp.*"/>
+      <export name="sun.rmi.runtime.*"/>
+      <export name="sun.rmi.server.*"/>
+      <export name="sun.rmi.server.resources.*"/>
+      <export name="sun.rmi.transport.*"/>
+      <export name="sun.rmi.transport.proxy.*"/>
+      <export name="sun.rmi.transport.tcp.*"/>
 
       <export name="javax.accessibility.*"/>
       <export name="javax.activation.*"/>
