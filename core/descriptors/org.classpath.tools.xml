@@ -24,7 +24,6 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="jar" class="gnu.classpath.tools.jar.Main"/>
     <alias name="native2ascii" class="gnu.classpath.tools.native2ascii.Native2ASCII"/>
     <alias name="rmid" class="gnu.classpath.tools.rmid.Main"/>
     <alias name="rmiregistry" class="gnu.classpath.tools.rmiregistry.Main"/>

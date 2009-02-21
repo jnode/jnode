@@ -11,9 +11,18 @@
 
   <runtime>
     <library name="jnode-core.jar">
+      <export name="com.sun.tools.jconsole.*"/>
       <export name="sun.applet.*"/>
       <export name="sun.applet.resources.*"/>
       <export name="sun.tools.asm.*"/>
+      <export name="sun.tools.jar.*"/>
+      <export name="sun.tools.jar.resources.*"/>
+      <export name="sun.tools.jconsole.*"/>
+      <export name="sun.tools.jconsole.resources.*"/>
+      <export name="sun.tools.jconsole.inspector.*"/>
+      <export name="sun.jvmstat.monitor.*"/>
+      <export name="sun.jvmstat.monitor.event.*"/>
+      <export name="sun.jvmstat.monitor.remote.*"/>
       <export name="sun.tools.java.*"/>
       <export name="sun.tools.javac.*"/>
       <export name="sun.tools.javac.resources.*"/>
@@ -25,6 +34,8 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="javap" class="sun.tools.javap.Main"/>
+    <alias name="jar" class="sun.tools.jar.Main"/>
+    <alias name="jconsole" class="sun.tools.jconsole.JConsole"/>
   </extension>
   
   <extension point="org.jnode.security.permissions">
