@@ -927,6 +927,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             return true;
         }
 
+        for (String s : compileHighOptLevelPackages) {
+            if (s.endsWith("*")) {
+                if (name.startsWith(s.substring(0, s.length() - 1))) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -1033,6 +1041,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     load = true;
                 } else if (preloadPackages.contains(pkg)) {
                     load = true;
+                } else {
+                    for (String s : compileHighOptLevelPackages) {
+                        if (s.endsWith("*")) {
+                            if (cName.startsWith(s.substring(0, s.length() - 1))) {
+                                load = true;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 if (load) {
@@ -1277,27 +1294,73 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     protected void setupCompileHighOptLevelPackages() {
-        addCompileHighOptLevel("java.io");
+        addCompileHighOptLevel("java.io.Data*");
+        addCompileHighOptLevel("java.io.String*");
+        addCompileHighOptLevel("java.io.ByteArray*");
+        addCompileHighOptLevel("java.io.CharArray*");
+        addCompileHighOptLevel("java.io.Print*");
+        addCompileHighOptLevel("java.io.Reader");
+        addCompileHighOptLevel("java.io.Input*");
+        addCompileHighOptLevel("java.io.Buffered*");
+        addCompileHighOptLevel("java.io.Writer");
+        addCompileHighOptLevel("java.io.Output*");
+        addCompileHighOptLevel("java.io.Filter*");
+        addCompileHighOptLevel("java.io.IOException");
+        addCompileHighOptLevel("java.io.ObjectStreamField");
+        addCompileHighOptLevel("java.io.ObjectStreamClass");
+
         addCompileHighOptLevel("java.lang");
         addCompileHighOptLevel("java.lang.ref");
 //        addCompileHighOptLevel("java.lang.reflect");   //<- produces inconsistent bootimage
-        addCompileHighOptLevel("java.net");
-        addCompileHighOptLevel("java.nio");
-        addCompileHighOptLevel("java.security");
-        addCompileHighOptLevel("java.util");
+        
+        addCompileHighOptLevel("java.net.URL");
+
+        addCompileHighOptLevel("java.nio.Buffer");
+        addCompileHighOptLevel("java.nio.ByteBuffer*");
+        addCompileHighOptLevel("java.nio.DirectByteBuffer*");
+        addCompileHighOptLevel("java.nio.ByteOrder");
+
+        addCompileHighOptLevel("java.security.ProtectionDomain");
+        addCompileHighOptLevel("java.security.AccessController");
+        addCompileHighOptLevel("java.security.AccessControlContext");
+        addCompileHighOptLevel("java.security.AccessControlException");
+        addCompileHighOptLevel("java.security.Permission");
+        addCompileHighOptLevel("java.security.PrivilegedAction");
+        addCompileHighOptLevel("java.security.PrivilegedActionException");
+        addCompileHighOptLevel("java.security.PrivilegedExceptionAction");
+        addCompileHighOptLevel("java.security.PermissionCollection");
+        addCompileHighOptLevel("java.security.CodeSource");
+        addCompileHighOptLevel("java.security.Policy");
+        addCompileHighOptLevel("java.security.AllPermission");
+        addCompileHighOptLevel("java.security.Permissions");
+        addCompileHighOptLevel("java.security.Security");
+        addCompileHighOptLevel("java.security.SecurityPermission");
+        addCompileHighOptLevel("java.security.BasicPermission");
+        
+        addCompileHighOptLevel("java.util.Collection*");
+        addCompileHighOptLevel("java.util.Map*");
+        addCompileHighOptLevel("java.util.List*");
+        addCompileHighOptLevel("java.util.Set*");
+        addCompileHighOptLevel("java.util.Iterator*");
+        addCompileHighOptLevel("java.util.Array*");
+        addCompileHighOptLevel("java.util.Abstract*");
+        addCompileHighOptLevel("java.util.Hash*");
+        addCompileHighOptLevel("java.util.TreeMap*");
+        addCompileHighOptLevel("java.util.TreeSet*");
+        addCompileHighOptLevel("java.util.Linked*");
+        addCompileHighOptLevel("java.util.Vector*");
+        addCompileHighOptLevel("java.util.Locale*");
+        addCompileHighOptLevel("java.util.WeakHashMap*");
+        addCompileHighOptLevel("java.util.Properties*");
+        addCompileHighOptLevel("java.util.Dictionary*");
+        addCompileHighOptLevel("java.util.StringTokenizer*");
+        addCompileHighOptLevel("java.util.Property*");
+        addCompileHighOptLevel("java.util.Enum*");
+
         addCompileHighOptLevel("java.util.jar");
         addCompileHighOptLevel("java.util.zip");
 
-        addCompileHighOptLevel("javax.isolate");
-        addCompileHighOptLevel("javax.naming");
-
         addCompileHighOptLevel("gnu.classpath");
-        addCompileHighOptLevel("gnu.java.io");
-        addCompileHighOptLevel("gnu.java.io.decode");
-        addCompileHighOptLevel("gnu.java.io.encode");
-        addCompileHighOptLevel("gnu.java.lang");
-        addCompileHighOptLevel("gnu.java.lang.reflect");
-        addCompileHighOptLevel("gnu.java.locale");
 
         addCompileHighOptLevel("org.jnode.assembler");
         addCompileHighOptLevel("org.jnode.boot");
@@ -1305,8 +1368,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.plugin");
         addCompileHighOptLevel("org.jnode.plugin.manager");
         addCompileHighOptLevel("org.jnode.plugin.model");
-        addCompileHighOptLevel("org.jnode.protocol.plugin");
-        addCompileHighOptLevel("org.jnode.protocol.system");
         addCompileHighOptLevel("org.jnode.security");
         addCompileHighOptLevel("org.jnode.system");
         addCompileHighOptLevel("org.jnode.system.event");
@@ -1325,10 +1386,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
         addCompileHighOptLevel("org.jnode.vm.memmgr");
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
-        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk");
-        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.genrc");
-        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.nogc");
-        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.ms");
+//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk");
+//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.genrc");
+//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.nogc");
+//        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.ms");
 
         //todo review for boot image size reduction
 //        addCompileHighOptLevel("sun.misc");
