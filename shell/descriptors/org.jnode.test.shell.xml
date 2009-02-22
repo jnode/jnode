@@ -40,7 +40,7 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="setIO"/> 
     <permission class="java.lang.RuntimePermission" name="exitVM"/> 
-    <permission class="java.util.PropertyPermission" name="*" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="org.jnode.security.JNodePermission" name="loadPlugin"/>
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read"/>
     <permission class="java.io.FilePermission" name="/jnode/tmp/test" actions="read,write,delete"/>

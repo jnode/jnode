@@ -29,6 +29,8 @@ import java.io.PrintWriter;
 
 import net.n3.nanoxml.XMLException;
 
+import org.jnode.util.ProxyStream;
+
 /**
  * This is the entry point class for the command test harness.  Its
  * purpose is to run 'black box' tests on commands and the like.
@@ -260,10 +262,17 @@ public class TestHarness {
     /**
      * Save the System streams so that they can be restored.
      */
+    @SuppressWarnings({ "unchecked" })
     private void setup() {
-        savedIn = System.in;
-        savedOut = System.out;
-        savedErr = System.err;
+        if (System.in instanceof ProxyStream<?>) {
+            savedIn = ((ProxyStream<InputStream>) System.in).getProxiedStream();
+            savedOut = ((ProxyStream<PrintStream>) System.out).getProxiedStream();
+            savedErr = ((ProxyStream<PrintStream>) System.err).getProxiedStream();
+        } else {
+            savedIn = System.in;
+            savedOut = System.out;
+            savedErr = System.err;
+        }
     }
 
     public void report(String message) {
@@ -273,6 +282,12 @@ public class TestHarness {
 
     public void reportVerbose(String message) {
         if (verbose) {
+            report(message);
+        }
+    }
+
+    public void reportDebug(String message) {
+        if (debug) {
             report(message);
         }
     }

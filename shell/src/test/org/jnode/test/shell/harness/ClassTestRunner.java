@@ -41,6 +41,7 @@ class ClassTestRunner extends TestRunnerBase implements TestRunnable {
         Method method = commandClass.getMethod("main", String[].class);
         String[] args = spec.getArgs().toArray(new String[0]);
         method.invoke(null, (Object) args);
+        flush();
         return check() ? 0 : 1;
     }
 

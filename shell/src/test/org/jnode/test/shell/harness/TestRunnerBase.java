@@ -37,6 +37,7 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 import org.jnode.test.shell.harness.TestSpecification.FileSpecification;
+import org.jnode.util.ProxyStream;
 
 /**
  * This base class supplies functions for getting hold of "the shell" for
@@ -88,13 +89,16 @@ public abstract class TestRunnerBase implements TestRunnable {
         this.harness = harness;
         this.usingEmu = TestEmu.initEmu(harness.getRoot());
     }
-    
+
     public CommandShell getShell() throws ShellException {
-        CommandShell shell = TestEmu.getShell(); 
-        if (shell == null) {
-            shell = new TestCommandShell(System.in, System.out, System.err);
-            shell.configureShell();
-        }
+//      CommandShell shell = TestEmu.getShell(); 
+//      if (shell == null) {
+//      shell = new TestCommandShell(System.in, System.out, System.err);
+//      shell.configureShell();
+//      }
+//      return shell;
+        CommandShell shell = new TestCommandShell(System.in, System.out, System.err);
+        shell.configureShell();
         return shell;
     }
     
@@ -110,6 +114,7 @@ public abstract class TestRunnerBase implements TestRunnable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setup() throws IOException, TestRunnerException {
         ensurePluginsLoaded(spec.getTestSet());
@@ -119,13 +124,25 @@ public abstract class TestRunnerBase implements TestRunnable {
         System.setIn(new ByteArrayInputStream(spec.getInputContent().toString().getBytes()));
         outBucket = new ByteArrayOutputStream();
         errBucket = new ByteArrayOutputStream();
+        OutputStream out, err;
         if (harness.isDebug()) {
-            System.setOut(new PrintStream(new TeeStream(outBucket, System.out)));
-            System.setErr(new PrintStream(new TeeStream(errBucket, System.err)));
+            if (System.out instanceof ProxyStream<?>) {
+                out = ((ProxyStream<PrintStream>) System.out).getProxiedStream();
+                err = ((ProxyStream<PrintStream>) System.err).getProxiedStream();
+            } else {
+                out = System.out;
+                err = System.err;
+            }    
+            out = new TeeStream(outBucket, out);
+            err = new TeeStream(errBucket, err);
         } else {
-            System.setOut(new PrintStream(outBucket));
-            System.setErr(new PrintStream(errBucket));
+            out = outBucket;
+            err = errBucket;
         }
+
+        System.setOut(new PrintStream(out));
+        System.setErr(new PrintStream(err));
+        
         for (FileSpecification fs : spec.getFiles()) {
             File tempFile = harness.tempFile(fs.getFile());
             if (fs.isInput()) {
@@ -141,6 +158,12 @@ public abstract class TestRunnerBase implements TestRunnable {
             }
         }
     }
+    
+    protected void flush() {
+        System.out.flush();
+        System.err.flush();
+    }
+
     
     protected boolean checkFiles() throws IOException {
         boolean ok = true;
