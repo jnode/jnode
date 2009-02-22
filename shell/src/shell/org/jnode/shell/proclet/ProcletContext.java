@@ -31,7 +31,6 @@ import org.jnode.shell.CommandRunnable;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
 import org.jnode.util.ProxyStream;
-import org.jnode.util.ProxyStreamException;
 import org.jnode.vm.VmExit;
 import org.jnode.vm.VmIOContext;
 import org.jnode.vm.VmSystem;
@@ -65,13 +64,10 @@ public class ProcletContext extends ThreadGroup {
         super(parent, nextProcletName());
         ProcletContext parentContext = getParentContext(parent);
         if (streams == null) {
-            try {
-                streams = new Object[] {
-                        resolve(System.in), resolve(System.out), resolve(System.err)
-                };
-            } catch (ProxyStreamException ex) {
-                throw new ProcletException("Broken streams", ex);
-            } 
+            streams = new Object[] {
+                    // FIXME ... the deproxy calls are probably redundant
+                    deproxy(System.in), deproxy(System.out), deproxy(System.err)
+            };
         }
         if (properties == null) {
             if (parentContext != null) {
@@ -96,7 +92,7 @@ public class ProcletContext extends ThreadGroup {
         setDaemon(true);
     }
 
-    private Closeable resolve(Closeable stream) throws ProxyStreamException {
+    private Closeable deproxy(Closeable stream) {
         if (stream instanceof ProxyStream) {
             return ((ProxyStream<?>) stream).getProxiedStream();
         } else {

@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
 import org.jnode.util.IOUtils;
+import org.jnode.util.ProxyStream;
 
 abstract class BaseCommandIO implements CommandIO {
     
@@ -35,6 +36,15 @@ abstract class BaseCommandIO implements CommandIO {
     
     BaseCommandIO(Closeable systemObject) {
         this.systemObject = systemObject;
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected <T extends Closeable> T deproxy(T stream) {
+        if (stream instanceof ProxyStream<?>) {
+            return ((ProxyStream<T>) stream).getProxiedStream();
+        } else {
+            return stream;
+        }
     }
     
     public final String getAssignedEncoding() {
@@ -81,6 +91,11 @@ abstract class BaseCommandIO implements CommandIO {
     @Override
     public final PrintWriter getPrintWriter() throws CommandIOException {
         return this.getPrintWriter(true);
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + "{systemObject=" + systemObject + "}";
     }
     
 }

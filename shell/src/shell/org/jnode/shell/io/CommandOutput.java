@@ -45,7 +45,7 @@ public class CommandOutput extends BaseCommandIO {
 
     public CommandOutput(OutputStream outputStream) {
         super(outputStream);
-        this.outputStream = outputStream;
+        this.outputStream = deproxy(outputStream);
     }
 
     public CommandOutput(Writer writer) {
