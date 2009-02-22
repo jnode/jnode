@@ -47,10 +47,16 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
     private InputStream inputStream;
     private PrintStream printStream;
 
+    /**
+     * Create a 
+     * 
+     * @param inputStream
+     * @param outputStream
+     */
     public CommandInputOutput(InputStream inputStream, OutputStream outputStream) {
         super(outputStream);
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
+        this.inputStream = deproxy(inputStream);
+        this.outputStream = deproxy(outputStream);
     }
 
     public CommandInputOutput(Reader reader, Writer writer) {

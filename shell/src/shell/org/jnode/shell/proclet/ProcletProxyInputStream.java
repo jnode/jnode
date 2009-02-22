@@ -60,11 +60,7 @@ public class ProcletProxyInputStream extends InputStream implements
             throw new IllegalArgumentException("null stream");
         }
         if (is instanceof ProxyStream<?>) {
-            try {
-                is = ((ProxyStream<InputStream>) is).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new IllegalArgumentException("broken proxy stream", ex);
-            }
+            is = ((ProxyStream<InputStream>) is).getProxiedStream();
         } 
         streamMap.put(ProcletIOContext.GLOBAL_STREAM_ID, is);
     }
@@ -85,11 +81,7 @@ public class ProcletProxyInputStream extends InputStream implements
             throw new IllegalArgumentException("null stream");
         }
         if (is instanceof ProxyStream<?>) {
-            try {
-                is = ((ProxyStream<InputStream>) is).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new IllegalArgumentException("broken proxy stream", ex);
-            }
+            is = ((ProxyStream<InputStream>) is).getProxiedStream();
         } 
         streamMap = new HashMap<Integer, InputStream>(proxy.streamMap);
         streamMap.put(pid, is);
@@ -114,20 +106,12 @@ public class ProcletProxyInputStream extends InputStream implements
 
     @Override
     public void mark(int readLimit) {
-        try {
             getRealStream().mark(readLimit);
-        } catch (ProxyStreamException ex) {
-            // ignore
-        }
     }
 
     @Override
     public boolean markSupported() {
-        try {
-            return getRealStream().markSupported();
-        } catch (ProxyStreamException ex) {
-            return false;
-        }
+        return getRealStream().markSupported();
     }
 
     @Override

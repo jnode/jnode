@@ -49,7 +49,7 @@ public class CommandInput extends BaseCommandIO {
 
     public CommandInput(InputStream inputStream) {
         super(inputStream);
-        this.inputStream = inputStream;
+        this.inputStream = deproxy(inputStream);
     }
 
     public synchronized InputStream getInputStream() {

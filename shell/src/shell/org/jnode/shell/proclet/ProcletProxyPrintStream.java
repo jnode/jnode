@@ -58,11 +58,7 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
         }
         this.fd = fd;
         if (ps instanceof ProxyStream<?>) {
-            try {
-                ps = ((ProxyStream<PrintStream>) ps).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new IllegalArgumentException("broken proxy stream", ex);
-            }
+            ps = ((ProxyStream<PrintStream>) ps).getProxiedStream();
         } 
         streamMap = new HashMap<Integer, PrintStream>();
         streamMap.put(ProcletIOContext.GLOBAL_STREAM_ID, ps);
@@ -84,11 +80,7 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
             throw new IllegalArgumentException("null stream");
         }
         if (ps instanceof ProxyStream<?>) {
-            try {
-                ps = ((ProxyStream<PrintStream>) ps).getProxiedStream();
-            } catch (ProxyStreamException ex) {
-                throw new IllegalArgumentException("broken proxy stream", ex);
-            }
+            ps = ((ProxyStream<PrintStream>) ps).getProxiedStream();
         } 
         streamMap = new HashMap<Integer, PrintStream>(proxy.streamMap);
         streamMap.put(pid, ps);
@@ -125,11 +117,7 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
     }
 
     protected PrintStream effectiveOutput() {
-        try {
-            return getRealStream();
-        } catch (ProxyStreamException ex) {
-            return getNullPrintStream();
-        }
+        return getRealStream();
     }
 
     public PrintStream getProxiedStream() throws ProxyStreamException {
