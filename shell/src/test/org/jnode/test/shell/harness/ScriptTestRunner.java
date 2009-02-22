@@ -59,6 +59,7 @@ class ScriptTestRunner extends TestRunnerBase implements TestRunnable {
         }
         int rc = getShell().runCommandFile(tempScriptFile, 
                 spec.getCommand(), spec.getArgs().toArray(new String[0]));
+        flush();
         return check(rc) ? 0 : 1;
     }
 

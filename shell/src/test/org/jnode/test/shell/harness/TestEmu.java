@@ -30,8 +30,8 @@ import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellUtils;
 
 /**
- * This class performs Emu and CommandShell initialization without exposing 
- * the Emu APIs at the class loader level.
+ * This class performs Emu and CommandShell initialization without any static
+ * dependencies on the Emu class.
  * 
  * @author crawley@jnode.org
  */

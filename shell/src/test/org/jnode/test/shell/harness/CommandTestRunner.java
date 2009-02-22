@@ -46,6 +46,7 @@ class CommandTestRunner extends TestRunnerBase implements TestRunnable {
             sb.append(" ").append(shell.escapeWord(arg));
         }
         int rc = shell.runCommand(sb.toString());
+        flush();
         return check(rc) ? 0 : 1;
     }
 
