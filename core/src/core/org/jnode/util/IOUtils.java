@@ -52,11 +52,7 @@ public class IOUtils {
         if (stream instanceof ConsoleStream) {
             return true;
         } else if (stream instanceof ProxyStream<?>) {
-            try {
-                return isTTY(((ProxyStream<?>) stream).getRealStream());
-            } catch (ProxyStreamException ex) {
-                return false;
-            }
+            return isTTY(((ProxyStream<?>) stream).getRealStream());
         } else if (stream instanceof OutputStreamWriter) {
             return isTTY(findOutputStream((OutputStreamWriter) stream));
         } else if (stream instanceof InputStreamReader) {
@@ -78,11 +74,7 @@ public class IOUtils {
         if (stream instanceof ConsoleStream) {
             return stream;
         } else if (stream instanceof ProxyStream<?>) {
-            try {
-                return findBaseStream(((ProxyStream<?>) stream).getRealStream());
-            } catch (ProxyStreamException ex) {
-                return null;
-            }
+            return findBaseStream(((ProxyStream<?>) stream).getRealStream());
         } else if (stream instanceof OutputStreamWriter) {
             return findBaseStream(findOutputStream((OutputStreamWriter) stream));
         } else if (stream instanceof InputStreamReader) {
