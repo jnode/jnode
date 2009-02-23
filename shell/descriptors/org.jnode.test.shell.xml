@@ -22,6 +22,7 @@
     <library name="jnode-shell.jar">
       <export name="org.jnode.test.shell.*"/>
       <export name="org.jnode.test.shell.bjorne.*"/>
+      <export name="org.jnode.test.shell.command.posix.*"/>
       <export name="org.jnode.test.shell.harness.*"/>
       <export name="org.jnode.test.shell.help.*"/>
       <export name="org.jnode.test.shell.proclet.*"/>
