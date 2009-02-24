@@ -20,7 +20,6 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="cat" class="org.jnode.fs.command.CatCommand"/>
     <alias name="cd"  class="org.jnode.fs.command.CdCommand" internal="yes"/>
     <alias name="cp" class="org.jnode.fs.command.CpCommand"/>
     <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
@@ -37,18 +36,6 @@
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
-    <syntax alias="cat">
-      <empty description="copy standard input to standard output"/>
-      <sequence description="fetch and concatenate urls to standard output">
-        <option argLabel="urls" shortName="u" longName="urls"/>
-        <repeat minCount="1">
-          <argument argLabel="url"/>
-        </repeat>
-      </sequence>
-      <repeat minCount="1" description="concatenate files to standard output">
-        <argument argLabel="file"/>
-      </repeat>
-    </syntax>
     <syntax alias="cd">
       <empty description="change the current directory to the 'user.home' directory"/>
       <argument argLabel="directory" description="change the current directory to 'directory'"/>
