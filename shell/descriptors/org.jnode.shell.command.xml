@@ -20,6 +20,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
     <alias name="bindkeys" class="org.jnode.shell.command.BindKeysCommand"/>
+    <alias name="cat" class="org.jnode.shell.command.CatCommand"/>
     <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
     <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
     <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
@@ -83,6 +84,18 @@
           </alternatives>
         </repeat>
       </sequence>
+    </syntax>
+    <syntax alias="cat">
+      <empty description="copy standard input to standard output"/>
+      <sequence description="fetch and concatenate urls to standard output">
+        <option argLabel="urls" shortName="u" longName="urls"/>
+        <repeat minCount="1">
+          <argument argLabel="url"/>
+        </repeat>
+      </sequence>
+      <repeat minCount="1" description="concatenate files to standard output">
+        <argument argLabel="file"/>
+      </repeat>
     </syntax>
     <syntax alias="class" description="Show details of a Java class">
       <argument argLabel="className"/>

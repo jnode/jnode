@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: CatCommand.java 4975 2009-02-02 08:30:52Z lsantha $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.fs.command;
+package org.jnode.shell.command;
 
 import java.io.File;
 import java.io.FileInputStream;
