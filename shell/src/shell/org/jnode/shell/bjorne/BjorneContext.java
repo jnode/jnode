@@ -942,6 +942,12 @@ public class BjorneContext {
             holders[index].setStream(stream, mine);
         }
     }
+    
+    void closeStreams() {
+        for (StreamHolder holder : holders) {
+            holder.close();
+        }
+    }
 
     void performAssignments(BjorneToken[] assignments) throws ShellException {
         if (assignments != null) {
