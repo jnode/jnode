@@ -629,4 +629,45 @@ Hi mum again
     <error>Hello mother again
 </error>
     </testSpec>
+    <testSpec title="pipeline" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo &gt; @TEMP_DIR@/1 Hi mum
+                echo &gt; @TEMP_DIR@/2 Hi mum again
+                cat @TEMP_DIR@/1 @TEMP_DIR@/2 @TEMP_DIR@/1 @TEMP_DIR@/2 | cat
+                cat @TEMP_DIR@/1 @TEMP_DIR@/2 @TEMP_DIR@/1 @TEMP_DIR@/2 | cat > @TEMP_DIR@/3
+        </script>
+        <file name="1" input="false">Hi mum
+</file>
+        <file name="2" input="false">Hi mum again
+</file>
+        <file name="3" input="false">Hi mum
+Hi mum again
+Hi mum
+Hi mum again
+</file>
+    <output>Hi mum
+Hi mum again
+Hi mum
+Hi mum again
+</output>
+    </testSpec>
+    <testSpec title="subshell" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo &gt; @TEMP_DIR@/1 Hi mum
+                echo &gt; @TEMP_DIR@/2 Hi mum again
+                ( cat @TEMP_DIR@/1 ; cat @TEMP_DIR@/2 )
+                ( cat @TEMP_DIR@/1 ; cat @TEMP_DIR@/2 ) > @TEMP_DIR@/3
+        </script>
+        <file name="1" input="false">Hi mum
+</file>
+        <file name="2" input="false">Hi mum again
+</file>
+        <file name="3" input="false">Hi mum
+Hi mum again
+</file>
+        <output>Hi mum
+Hi mum again
+</output>
+    </testSpec>
+    
 </testSet>

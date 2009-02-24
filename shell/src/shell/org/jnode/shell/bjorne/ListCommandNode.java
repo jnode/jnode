@@ -71,43 +71,54 @@ public class ListCommandNode extends CommandNode implements Completable {
 
     @Override
     public int execute(BjorneContext context) throws ShellException {
-        int rc = 0;
-        if (getNodeType() == BjorneInterpreter.CMD_SUBSHELL) {
-            // This simulates creating a 'subshell'.
-            context = new BjorneContext(context);
-        }
         int listFlags = getFlags();
-        if ((listFlags & BjorneInterpreter.FLAG_PIPE) != 0) {
-            PipelineStage[] stages = assemblePipeline(context);
-            boolean done = false;
-            try {
-                rc = runPipeline(stages);
-                done = true;
-            } finally {
-                if (!done) {
-                    // If we are propagating an exception, all streams that
-                    // were opened by 'assemblePipeline' must be closed.
-                    for (PipelineStage stage : stages) {
-                        for (StreamHolder holder : stage.holders) {
-                            holder.close();
+        int rc = 0;
+        try {
+            if (getNodeType() == BjorneInterpreter.CMD_SUBSHELL) {
+                // This simulates creating a 'subshell'.
+                context = new BjorneContext(context);
+                StreamHolder[] holders = context.evaluateRedirections(getRedirects());
+                for (int i = 0; i < holders.length; i++) {
+                    CommandIO stream = holders[i].getStream();
+                    context.setStream(i, stream, holders[i].isMine());
+                }
+            }
+            if ((listFlags & BjorneInterpreter.FLAG_PIPE) != 0) {
+                PipelineStage[] stages = assemblePipeline(context);
+                boolean done = false;
+                try {
+                    rc = runPipeline(stages);
+                    done = true;
+                } finally {
+                    if (!done) {
+                        // If we are propagating an exception, all streams that
+                        // were opened by 'assemblePipeline' must be closed.
+                        for (PipelineStage stage : stages) {
+                            for (StreamHolder holder : stage.holders) {
+                                holder.close();
+                            }
                         }
                     }
                 }
+            } else {
+                for (CommandNode command : commands) {
+                    int commandFlags = command.getFlags();
+                    if ((commandFlags & BjorneInterpreter.FLAG_AND_IF) != 0) {
+                        if (context.getLastReturnCode() != 0) {
+                            break;
+                        }
+                    }
+                    if ((commandFlags & BjorneInterpreter.FLAG_OR_IF) != 0) {
+                        if (context.getLastReturnCode() == 0) {
+                            break;
+                        }
+                    }
+                    rc = command.execute(context);
+                }
             }
-        } else {
-            for (CommandNode command : commands) {
-                int commandFlags = command.getFlags();
-                if ((commandFlags & BjorneInterpreter.FLAG_AND_IF) != 0) {
-                    if (context.getLastReturnCode() != 0) {
-                        break;
-                    }
-                }
-                if ((commandFlags & BjorneInterpreter.FLAG_OR_IF) != 0) {
-                    if (context.getLastReturnCode() == 0) {
-                        break;
-                    }
-                }
-                rc = command.execute(context);
+        } finally {
+            if (getNodeType() == BjorneInterpreter.CMD_SUBSHELL) {
+                context.closeStreams();
             }
         }
         if ((listFlags & BjorneInterpreter.FLAG_BANG) != 0) {
