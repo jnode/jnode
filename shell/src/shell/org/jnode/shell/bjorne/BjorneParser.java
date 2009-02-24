@@ -233,8 +233,9 @@ public class BjorneParser {
             skipLineBreaks();
             commands.add(parseCommand());
         }
+        boolean pipe = commands.size() > 1;
         CommandNode res = listToNode(commands);
-        if (res instanceof ListCommandNode) {
+        if (pipe) {
             res.setFlag(FLAG_PIPE);
         }
         return res;
