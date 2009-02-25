@@ -64,6 +64,8 @@ public class AutoUnzipPlugin extends Plugin {
     }
     
     private void copyResources() {
+        System.out.println("auto unzipping plugin " + getDescriptor().getId());
+        
         try {            
             //FIXME shouldn't be hard coded but use java.home system property instead
             final File jnodeHome = new File("/jnode");
@@ -103,6 +105,7 @@ public class AutoUnzipPlugin extends Plugin {
                     break;
                 }
             }
+            System.out.println("plugin " + getDescriptor().getId() +" has been unzipped to " + pluginRootFile.getAbsolutePath());
         } finally {
             startFinished = true;                
         }        
