@@ -44,9 +44,6 @@
 	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
 	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
-    <property name="mx4j.jar" value="${root.dir}/core/lib/mx4j.jar"/>
-    <property name="mx4j-remote.jar" value="${root.dir}/core/lib/mx4j-remote.jar"/>
-
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
@@ -144,8 +141,6 @@
         <pathelement location="${thinlet.jar}"/>
         <pathelement location="${jnode-textui.jar}"/>
 	    <pathelement location="${bcel-5.1.jar}"/>
-        <pathelement location="${mx4j.jar}"/>
-        <pathelement location="${mx4j-remote.jar}"/>
         <path refid="cp"/>
     </path>
 
@@ -241,8 +236,6 @@
            	<libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
 
         	<libalias name="mmtk.jar" alias="${mmtk.jar}"/>
-            <libalias name="mx4j.jar" alias="${mx4j.jar}"/>
-            <libalias name="mx4j-remote.jar" alias="${mx4j-remote.jar}"/>
 
             <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
             <libalias name="dnsjava-1.6.6.jar" alias="${dnsjava.jar}"/>
@@ -251,7 +244,6 @@
             <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
             <libalias name="nanoxml-java.jar" alias="${nanoxml-java.jar}"/>
             <libalias name="js.jar" alias="${js.jar}"/>
-            <libalias name="lw.jar" alias="${lw.jar}"/>
             <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
 
             <libalias name="junit.jar" alias="${junit.jar}"/>
@@ -266,9 +258,7 @@
         	<libalias name="jfunc.jar" alias="${jfunc.jar}"/>
 
             <libalias name="ant.jar" alias="${ant.jar}"/>
-            <libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}"/>
             <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
-            <libalias name="ant-trax.jar" alias="${ant-trax.jar}"/>
             <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
             <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
             <libalias name="ejc.jar" alias="${ejc.jar}"/>

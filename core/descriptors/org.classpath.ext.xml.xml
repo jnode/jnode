@@ -114,18 +114,6 @@
       <export name="com.sun.org.apache.xpath.internal.patterns.*"/>
       <export name="com.sun.org.apache.xpath.internal.res.*"/>
 
-        <!--
-      <export name="com.sun.xml.internal.bind.*"/>
-      <export name="com.sun.xml.internal.bind.annotation.*"/>
-      <export name="com.sun.xml.internal.bind.api.*"/>
-      <export name="com.sun.xml.internal.bind.api.impl.*"/>
-      <export name="com.sun.xml.internal.bind.marshaller.*"/>
-      <export name="com.sun.xml.internal.bind.unmarshaller.*"/>
-      <export name="com.sun.xml.internal.bind.util.*"/>
-      <export name="com.sun.xml.internal.bind.v2.*"/>
-      <export name="com.sun.xml.internal.bind.v2.bytecode.*"/>
-      <export name="com.sun.xml.internal.bind.v2.model.*"/>
-        -->
       <export name="com.sun.xml.internal.stream.*"/>
       <export name="com.sun.xml.internal.stream.dtd.*"/>
       <export name="com.sun.xml.internal.stream.dtd.nonvalidating.*"/>
@@ -135,12 +123,6 @@
       <export name="com.sun.xml.internal.stream.*"/>  
 
       <export name="javax.xml.*"/>
-      <export name="javax.xml.bind.*"/>  	   	
-      <export name="javax.xml.bind.annotation.*"/> 	  	
-      <export name="javax.xml.bind.annotation.adapters.*"/> 	  	
-      <export name="javax.xml.bind.attachment.*"/>
-      <export name="javax.xml.bind.helpers.*"/>
-      <export name="javax.xml.bind.util.*"/>
       <export name="javax.xml.crypto.*"/>
       <export name="javax.xml.crypto.dom.*"/>	  	
       <export name="javax.xml.crypto.dsig.*"/> 	
@@ -149,16 +131,9 @@
       <export name="javax.xml.crypto.dsig.spec.*"/>
       <export name="javax.xml.datatype.*"/>
       <export name="javax.xml.namespace.*"/>
-      <export name="javax.xml.soap.*"/>
       <export name="javax.xml.transform.sax.*"/>
       <export name="javax.xml.transform.stax.*"/>
       <export name="javax.xml.validation.*"/>
-      <export name="javax.xml.ws.*"/>
-      <export name="javax.xml.ws.handler.*"/>
-      <export name="javax.xml.ws.handler.soap.*"/>
-      <export name="javax.xml.ws.http.*"/>
-      <export name="javax.xml.ws.soap.*"/>
-      <export name="javax.xml.ws.spi.*"/>      
       <export name="javax.xml.xpath.*"/>
       
       <export name="org.jcp.xml.dsig.internal.*"/>
