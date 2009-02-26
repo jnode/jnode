@@ -100,7 +100,6 @@
       <export name="gnu.java.security.util.*"/>
 
       <export name="gnu.java.util.*"/>
-      <export name="gnu.java.util.jar.*"/>
 
       <export name="java.awt.AWTPermission"/>
       <export name="java.beans.ChangeListenerMap" />

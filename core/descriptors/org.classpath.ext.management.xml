@@ -11,8 +11,30 @@
   license-name="classpath">
 
   <runtime>
-    <library name="jnode-core.jar">      
+    <library name="jnode-core.jar">
+      <export name="com.sun.management.*"/>
+      <export name="com.sun.jmx.defaults.*"/>
+      <export name="com.sun.jmx.interceptor.*"/>
+      <export name="com.sun.jmx.mbeanserver.*"/>
+      <export name="com.sun.jmx.remote.internal.*"/>
+      <export name="com.sun.jmx.remote.protocol.iiop.*"/>
+      <export name="com.sun.jmx.remote.protocol.rmi.*"/>
+      <export name="com.sun.jmx.remote.security.*"/>
+      <export name="com.sun.jmx.remote.util.*"/>
+      <export name="java.lang.management.*"/>
+      <export name="javax.management.*"/>
+      <export name="javax.management.loading.*"/>
+      <export name="javax.management.modelmbean.*"/>
+      <export name="javax.management.monitor.*"/>
       <export name="javax.management.openmbean.*"/>
+      <export name="javax.management.relation.*"/>
+      <export name="javax.management.remote.*"/>
+      <export name="javax.management.remote.rmi.*"/>
+      <export name="javax.management.timer.*"/>
+      <export name="sun.management.*"/>
+      <export name="sun.management.counter.*"/>
+      <export name="sun.management.counter.perf.*"/>
+      <export name="sun.management.jmxremote.*"/>
     </library>
   </runtime>
   

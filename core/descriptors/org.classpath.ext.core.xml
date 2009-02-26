@@ -58,7 +58,6 @@
       <export name="java.awt.print.*"/>
       <export name="java.beans.*"/>
       <export name="java.beans.beancontext.*"/>
-      <export name="java.lang.management.*"/>
       <export name="java.rmi.*"/>
       <export name="java.rmi.activation.*"/>
       <export name="java.rmi.dgc.*"/>
@@ -88,8 +87,6 @@
       <export name="javax.activity.*"/>
       <export name="javax.annotation.*"/>
       <export name="javax.annotation.processing.*"/>
-      <export name="javax.jws.*"/>
-      <export name="javax.jws.soap.*"/>
       <export name="javax.lang.model.*"/>	   	
 	  <export name="javax.lang.model.element.*"/> 	  	
 	  <export name="javax.lang.model.type.*"/>

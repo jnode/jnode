@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.classpath.ext.xml.ws.tools"
+  name="Classpath javax.xml classes"
+  version="@VERSION@"
+  plugin-id="rt"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="com.sun.codemodel.internal.*"/>
+      <export name="com.sun.codemodel.internal.fmt.*"/>
+      <export name="com.sun.codemodel.internal.util.*"/>
+      <export name="com.sun.codemodel.internal.writer.*"/>
+      <export name="com.sun.tools.internal.jxc.*"/>
+      <export name="com.sun.tools.internal.jxc.apt.*"/>
+      <export name="com.sun.tools.internal.jxc.gen.config.*"/>
+      <export name="com.sun.tools.internal.jxc.model.nav.*"/>
+      <export name="com.sun.tools.internal.ws.*"/>
+      <export name="com.sun.tools.internal.ws.api.*"/>
+      <export name="com.sun.tools.internal.ws.api.wsdl.*"/>
+      <export name="com.sun.tools.internal.ws.processor.*"/>
+      <export name="com.sun.tools.internal.ws.processor.generator.*"/>
+      <export name="com.sun.tools.internal.ws.processor.model.*"/>
+      <export name="com.sun.tools.internal.ws.processor.model.exporter.*"/>
+      <export name="com.sun.tools.internal.ws.processor.model.java.*"/>
+      <export name="com.sun.tools.internal.ws.processor.model.jaxb.*"/>
+      <export name="com.sun.tools.internal.ws.processor.modeler.*"/>
+      <export name="com.sun.tools.internal.ws.processor.modeler.annotation.*"/>
+      <export name="com.sun.tools.internal.ws.processor.modeler.wsdl.*"/>
+      <export name="com.sun.tools.internal.ws.processor.util.*"/>
+      <export name="com.sun.tools.internal.ws.resources.*"/>
+      <export name="com.sun.tools.internal.ws.spi.*"/>
+      <export name="com.sun.tools.internal.ws.util.*"/>
+      <export name="com.sun.tools.internal.ws.util.xml.*"/>
+      <export name="com.sun.tools.internal.ws.wscompile.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.document.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.document.http.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.document.jaxws.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.document.mime.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.document.schema.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.document.soap.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.framework.*"/>
+      <export name="com.sun.tools.internal.ws.wsdl.parser.*"/>
+      <export name="com.sun.tools.internal.xjc.*"/>
+      <export name="com.sun.tools.internal.xjc.addon.at_generated.*"/>
+      <export name="com.sun.tools.internal.xjc.addon.code_injector.*"/>
+      <export name="com.sun.tools.internal.xjc.addon.episode.*"/>
+      <export name="com.sun.tools.internal.xjc.addon.locator.*"/>
+      <export name="com.sun.tools.internal.xjc.addon.sync.*"/>
+      <export name="com.sun.tools.internal.xjc.api.*"/>
+      <export name="com.sun.tools.internal.xjc.api.impl.j2s.*"/>
+      <export name="com.sun.tools.internal.xjc.api.impl.s2j.*"/>
+      <export name="com.sun.tools.internal.xjc.api.util.*"/>
+      <export name="com.sun.tools.internal.xjc.generator.*"/>
+      <export name="com.sun.tools.internal.xjc.generator.annotation.ri.*"/>
+      <export name="com.sun.tools.internal.xjc.generator.annotation.spec.*"/>
+      <export name="com.sun.tools.internal.xjc.generator.bean.*"/>
+      <export name="com.sun.tools.internal.xjc.generator.bean.field.*"/>
+      <export name="com.sun.tools.internal.xjc.generator.util.*"/>
+      <export name="com.sun.tools.internal.xjc.model.*"/>
+      <export name="com.sun.tools.internal.xjc.model.nav.*"/>
+      <export name="com.sun.tools.internal.xjc.outline.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.dtd.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.dtd.bindinfo.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.gbind.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.internalizer.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.relaxng.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.xmlschema.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.xmlschema.ct.*"/>
+      <export name="com.sun.tools.internal.xjc.reader.xmlschema.parser.*"/>
+      <export name="com.sun.tools.internal.xjc.runtime.*"/>
+      <export name="com.sun.tools.internal.xjc.util.*"/>
+      <export name="com.sun.tools.internal.xjc.writer.*"/>
+    </library>
+      
+  </runtime>
+    <extension point="org.jnode.shell.aliases">
+    <alias name="xjc" class="com.sun.tools.internal.xjc.Driver"/>
+    <alias name="schemagen" class="com.sun.tools.internal.jxc.SchemaGenerator"/>
+    <alias name="wsgen" class="com.sun.tools.internal.ws.WsGen"/>
+    <alias name="wsimport" class="com.sun.tools.internal.ws.WsImport"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+      <permission class="java.lang.RuntimePermission" name="exitVM"/>
+      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="java.util.PropertyPermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="java.util.PropertyPermission" name="*" actions="read"/>
+      <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+      <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+      <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+      <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+      <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+      <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+      <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+      <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+      <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
+      <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+  </extension>
+  
+</fragment>

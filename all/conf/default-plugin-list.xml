@@ -29,7 +29,6 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.classpath.ext.sql"/>
     <plugin id="org.classpath.ext.security"/>
     <plugin id="org.classpath.tools"/>
-    <plugin id="mx4j"/>
 
     <plugin id="org.apache.jakarta.commons.net"/>
     <plugin id="org.xbill.dns"/>
