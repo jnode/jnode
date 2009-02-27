@@ -36,37 +36,42 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 
 /**
- * Abstract class with common things in different FileSystem implementations
+ * This class provide a basic implementation of {@link FileSystem} interface.
  * 
  * @author Fabien DUMINY
  */
 public abstract class AbstractFileSystem<T extends FSEntry> implements FileSystem<T> {
-
+	/** */
     private static final Logger log = Logger.getLogger(AbstractFileSystem.class);
-    private boolean readOnly;
+    /** The device that contains the file system */
     private final Device device;
+    /** API of the block device */
     private final BlockDeviceAPI api;
+    /** Type of the file system */
     private final FileSystemType<? extends FileSystem<T>> type;
-    private boolean closed;
+    /** Root enntry of the file system */
     private T rootEntry;
-
-    // cache of FSFile (key: FSEntry)
+    /** The file system is read-only */
+    private boolean readOnly;
+    /** The file system is closed */
+    private boolean closed;
+    /** The cache of files */
     private HashMap<FSEntry, FSFile> files = new HashMap<FSEntry, FSFile>();
-
-    // cache of FSDirectory (key: FSEntry)
+    /** The cache of directory */
     private HashMap<FSEntry, FSDirectory> directories = new HashMap<FSEntry, FSDirectory>();
 
     /**
      * Construct an AbstractFileSystem in specified readOnly mode
      * 
-     * @param device
-     * @param readOnly
-     * @throws FileSystemException
+     * @param device device contains file system. This paramter is mandatory.
+     * @param readOnly file system should be read-only.
+     * 
+     * @throws FileSystemException device is null or device has no {@link BlockDeviceAPI} defined.
      */
     public AbstractFileSystem(Device device, boolean readOnly,
             FileSystemType<? extends FileSystem<T>> type) throws FileSystemException {
         if (device == null)
-            throw new IllegalArgumentException("null device!");
+            throw new FileSystemException("Device cannot be null.");
 
         this.device = device;
 
@@ -88,6 +93,9 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
         return device;
     }
 
+    /**
+     * @see org.jnode.fs.FileSystem#getType()
+     */
     public final FileSystemType<? extends FileSystem<T>> getType() {
         return type;
     }
@@ -109,20 +117,13 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
      * @see org.jnode.fs.FileSystem#close()
      */
     public void close() throws IOException {
-        if (!isClosed()) {
-            // if readOnly, nothing to do
-            if (!isReadOnly()) {
+        if (!closed) {
+            if (!readOnly) {
                 flush();
             }
-
             api.flush();
             files.clear();
             directories.clear();
-
-            // these fields are final, can't nullify them
-            // device = null;
-            // api = null;
-
             rootEntry = null;
             files = null;
             directories = null;
@@ -131,9 +132,9 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     }
 
     /**
-     * Save the content that have been altered but not saved in the Device
+     * Save any cached data (files, directories, ...) to the device.
      * 
-     * @throws IOException
+     * @throws IOException if error occurs during write of datas on the device.
      */
     public void flush() throws IOException {
         flushFiles();
@@ -141,34 +142,47 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     }
 
     /**
-     * @return Returns the api.
+     * Returns block device api.
+     * 
+     * @return {@link BlockDeviceAPI}.
      */
     public final BlockDeviceAPI getApi() {
         return api;
     }
 
     /**
-     * @return Returns the FSApi.
-     * @throws ApiNotFoundException
+     * Return file system block device api.
+     * 
+     * @return {@link BlockDeviceAPI}
+     * 
+     * @throws ApiNotFoundException if no api found for this file system device.
      */
     public final FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
         return device.getAPI(FSBlockDeviceAPI.class);
     }
 
-    /**
-     * @return if filesystem is closed.
+    /*
+     * (non-Javadoc)
+     * @see org.jnode.fs.FileSystem#isClosed()
      */
     public final boolean isClosed() {
         return closed;
     }
 
     /**
-     * @return if filesystem is readOnly.
+     * Returns <tt>true</tt> if file system is read-only.
+     * 
+     * @return <tt>true</tt> if file system is read-only.
      */
     public final boolean isReadOnly() {
         return readOnly;
     }
 
+    /**
+     * Sets file system as a read-only file system.
+     * 
+     * @param readOnly <tt>true</tt> if file system should be treated as a read-only file system.
+     */
     protected final void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
     }
@@ -177,8 +191,10 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
      * Gets the file for the given entry.
      * 
      * @param entry
-     * @return the FSFile object associated with entry
-     * @throws IOException
+     * 
+     * @return the {@link FSFile} associated with entry.
+     * 
+     * @throws IOException if file system is closed.
      */
     public final synchronized FSFile getFile(FSEntry entry) throws IOException {
         if (isClosed())
@@ -193,18 +209,19 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     }
 
     /**
-     * Abstract method to create a new FSFile from the entry
+     * Creates a new file from the entry
      * 
      * @param entry
-     * @return a new created FSFile
+     * @return a new {@link FSFile}
+     * 
      * @throws IOException
      */
     protected abstract FSFile createFile(FSEntry entry) throws IOException;
 
     /**
-     * Flush all unsaved FSFile in our cache
+     * Save all unsaved files from entry cache.
      * 
-     * @throws IOException
+     * @throws IOException if error occurs during write of datas on the device.
      */
     private final void flushFiles() throws IOException {
         log.info("flushing files ...");
@@ -212,7 +229,6 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
             if (log.isDebugEnabled()) {
                 log.debug("flush: flushing file " + f);
             }
-
             f.flush();
         }
     }
@@ -221,7 +237,9 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
      * Gets the file for the given entry.
      * 
      * @param entry
-     * @return the FSDirectory object associated with this entry
+     * 
+     * @return the {@link FSDirectory} associated with this entry
+     * 
      * @throws IOException
      */
     public final synchronized FSDirectory getDirectory(FSEntry entry) throws IOException {
@@ -237,18 +255,17 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     }
 
     /**
-     * Abstract method to create a new directory from the given entry
+     * Creates a new directory from the entry
      * 
      * @param entry
-     * @return the new created FSDirectory
+     * @return a new {@link FSDirectory}
+     * 
      * @throws IOException
      */
     protected abstract FSDirectory createDirectory(FSEntry entry) throws IOException;
 
     /**
-     * Flush all unsaved FSDirectory in our cache
-     * 
-     * @throws IOException
+     * Save all unsaved files from entry cache.
      */
     private final void flushDirectories() {
         log.info("flushing directories ...");
@@ -256,16 +273,17 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
             if (log.isDebugEnabled()) {
                 log.debug("flush: flushing directory " + d);
             }
-
             //TODO: uncomment this line
             //d.flush();
         }
     }
 
     /**
-     * Abstract method to create a new root entry
-     * @return the new created root entry
-     * @throws IOException
+     * Creates a new root entry
+     * 
+     * @return {@link FSEntry} representing the new created root entry.
+     * 
+     * @throws IOException file system doesn't allow to create a new root entry.
      */
     protected abstract T createRootEntry() throws IOException;
 }
