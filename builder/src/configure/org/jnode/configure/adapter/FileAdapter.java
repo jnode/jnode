@@ -70,7 +70,7 @@ public interface FileAdapter {
     public boolean isLoadSupported();
 
     /**
-     * Test if this adapter supported loading of property values without a template
+     * Test if this adapter supported loading of property values without a template.
      * @return <code>true</code> if saving is supported.
      */
     public boolean isSaveSupported();

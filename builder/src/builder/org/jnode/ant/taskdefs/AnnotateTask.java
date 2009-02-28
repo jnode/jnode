@@ -89,7 +89,7 @@ public class AnnotateTask extends FileSetTask {
     }
 
     /**
-     * Defines the annotation property file where are specified annotations to add
+     * Defines the annotation property file where are specified annotations to add.
      *
      * @param annotationFile
      */
@@ -98,7 +98,7 @@ public class AnnotateTask extends FileSetTask {
     }
 
     /**
-     * Define the time at which build started
+     * Define the time at which build started.
      *
      * @param annotationFile
      */
@@ -107,7 +107,7 @@ public class AnnotateTask extends FileSetTask {
     }
 
     /**
-     * Define the pattern with which buildStartTime is defined
+     * Define the pattern with which buildStartTime is defined.
      *
      * @param annotationFile
      */
@@ -198,7 +198,7 @@ public class AnnotateTask extends FileSetTask {
     }
 
     /**
-     * Actually process a class file (called from parent class)
+     * Actually process a class file (called from parent class).
      */
     @Override
     protected void processFile(File classFile) throws IOException {
@@ -267,7 +267,7 @@ public class AnnotateTask extends FileSetTask {
     }
 
     /**
-     * Add an annotation to a class file
+     * Add an annotation to a class file.
      *
      * @param classFile
      * @param inputClass

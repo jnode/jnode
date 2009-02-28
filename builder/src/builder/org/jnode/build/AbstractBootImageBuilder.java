@@ -95,7 +95,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected static final Label bootHeapStart = new Label("$$bootHeapStart");
 
     /**
-     * System property set to indicate build time
+     * System property set to indicate build time.
      */
     public static final String BUILDTIME_PROPERTY = "org.jnode.buildtime";
 
@@ -111,7 +111,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private static final String zero16 = zero8 + zero8;
 
     /**
-     * Set of jbects that should not yet be emitted
+     * Set of jbects that should not yet be emitted.
      */
     private final Set<Object> blockedObjects = new HashSet<Object>();
 
@@ -119,7 +119,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     /**
      * Classname/packagename of those classes/packages that need highly
-     * optimized compilation
+     * optimized compilation.
      */
     private final HashSet<String> compileHighOptLevelPackages = new HashSet<String>();
 
@@ -150,22 +150,22 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private String version;
 
     /**
-     * Plugin id of the memory manager plugin
+     * Plugin id of the memory manager plugin.
      */
     private String memMgrPluginId;
 
     /**
-     * Nano-kernel source information
+     * Nano-kernel source information.
      */
     private final AsmSourceInfo asmSourceInfo;
 
     /**
-     * Enable the compilation of the nano-kernel source via jnasm
+     * Enable the compilation of the nano-kernel source via jnasm.
      */
     private boolean enableJNasm = false;
 
     /**
-     * Construct a new BootImageBuilder
+     * Construct a new BootImageBuilder.
      */
     public AbstractBootImageBuilder() {
         asmSourceInfo = new AsmSourceInfo();
@@ -173,7 +173,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     /**
-     * Create the kernel-sources element
+     * Create the kernel-sources element.
      *
      * @return
      */
@@ -808,7 +808,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected abstract VmArchitecture getArchitecture() throws BuildException;
 
     /**
-     * Gets the internal class loader
+     * Gets the internal class loader.
      *
      * @return The class loader
      */
@@ -891,7 +891,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     /**
-     * Emit code to bootstrap the java image
+     * Emit code to bootstrap the java image.
      *
      * @param os
      * @param clInitCaller
@@ -949,7 +949,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         throws ClassNotFoundException, UnresolvedObjectRefException;
 
     /**
-     * Load a VmClass for a given java.lang.Class
+     * Load a VmClass for a given java.lang.Class.
      *
      * @param c
      * @return The loaded class
@@ -989,7 +989,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     /**
-     * Load a VmClass with a given name
+     * Load a VmClass with a given name.
      *
      * @param name
      * @return The loaded class
@@ -1001,7 +1001,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     /**
-     * Load a VmClass with a given name
+     * Load a VmClass with a given name.
      *
      * @param name
      * @param resolve
@@ -1063,7 +1063,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected abstract void logStatistics(NativeStream os);
 
     /**
-     * Align the stream on a page boundary
+     * Align the stream on a page boundary.
      *
      * @param os
      * @throws BuildException
@@ -1080,7 +1080,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     /**
      * Print any unresolved labels to the out stream and generate a list file
-     * for all public labels
+     * for all public labels.
      *
      * @param os
      * @param bootClasses
@@ -1215,7 +1215,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     /**
      * Print any unresolved labels to the out stream and generate a list file
-     * for all public labels
+     * for all public labels.
      *
      * @param os
      * @param bootClasses

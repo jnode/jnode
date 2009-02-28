@@ -342,7 +342,7 @@ public class Section {
     }
 
     /**
-     * Add a string and return its index
+     * Add a string and return its index.
      *
      * @param v
      */
@@ -354,7 +354,7 @@ public class Section {
     }
 
     /**
-     * Return the index of a given string, or -1 if not found
+     * Return the index of a given string, or -1 if not found.
      */
     public synchronized int findString(String v) {
         return strTab.findString(v);

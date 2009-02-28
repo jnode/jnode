@@ -29,22 +29,22 @@ import org.jnode.plugin.PluginDescriptor;
 public class PluginData {
 
     /**
-     * The descriptor file of this plugin
+     * The descriptor file of this plugin.
      */
     private final File descriptorFile;
 
     /**
-     * The complete id
+     * The complete id.
      */
     private final String fullId;
 
     /**
-     * The html documentation file of this plugin
+     * The html documentation file of this plugin.
      */
     private String htmlFile;
 
     /**
-     * The parsed descriptor
+     * The parsed descriptor.
      */
     private PluginDescriptor descriptor;
 

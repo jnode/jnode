@@ -39,7 +39,7 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 
 /**
- * <description>
+ * TODO describe the class.
  *
  * @author epr
  */
@@ -50,7 +50,7 @@ public abstract class AbstractAsmConstBuilder {
     private ArrayList<ClassName> classes = new ArrayList<ClassName>();
 
     /**
-     * Execute this task
+     * Execute this task.
      *
      * @throws BuildException
      */
@@ -64,7 +64,7 @@ public abstract class AbstractAsmConstBuilder {
     }
 
     /**
-     * Execute this task
+     * Execute this task.
      *
      * @throws BuildException
      * @throws ClassNotFoundException

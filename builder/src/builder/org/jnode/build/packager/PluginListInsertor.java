@@ -48,14 +48,16 @@ public class PluginListInsertor extends PackagerTask {
     public void insertInto(final PluginList list) throws MalformedURLException, PluginException {
         if (isEnabled()) {
             for (String pluginId : readPluginIds(list.getName())) {
-                log("Adding user plugin " + pluginId, Project.MSG_INFO);            
+                log("Adding user plugin " + pluginId + " to " + list.getName(), Project.MSG_INFO);            
                 list.addPlugin(pluginId);
             }
+        } else {
+            log("PluginListInsertor is disabled", Project.MSG_INFO);
         }
     }
 
     /**
-     * Read the user plugins ids from the properties file
+     * Read the user plugins ids from the properties file.
      * @param pluginListName
      * @return
      */

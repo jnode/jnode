@@ -39,7 +39,7 @@ import org.jnode.build.PluginTask;
 import org.jnode.build.AbstractPluginTask.LibAlias;
 
 /**
- * Class building new jnode plugins from third party jars/resources
+ * Class building new jnode plugins from third party jars/resources.
  * 
  * @author fabien
  *
@@ -48,12 +48,12 @@ public class PluginBuilder extends PackagerTask {
     private final Task parent;
    
     /**
-     * List of user plugin ids 
+     * List of user plugin ids.
      */
     private StringBuilder userPluginIds = new StringBuilder();
     
     /**
-     * {@link Path} to third party jars for compilation purpose
+     * {@link Path} to third party jars for compilation purpose.
      */
     private Path path;
     
@@ -68,7 +68,7 @@ public class PluginBuilder extends PackagerTask {
     }
 
     /**
-     * Define the path reference for compilation
+     * Define the path reference for compilation.
      * @param pathRefId
      */
     public void setPathRefId(String pathRefId) {
@@ -76,7 +76,7 @@ public class PluginBuilder extends PackagerTask {
     }
     
     /**
-     * Main method for build the jnode plugin
+     * Main method for build the jnode plugin.
      * 
      * @param executor
      * @param descriptors
@@ -133,7 +133,7 @@ public class PluginBuilder extends PackagerTask {
     }
 
     /**
-     * Attention : userPluginList must be a StringBuilder because it's accessed from multiple threads
+     * Attention : userPluginList must be a StringBuilder because it's accessed from multiple threads.
      * @param executor
      * @param descriptors
      * @param userJar
@@ -182,7 +182,7 @@ public class PluginBuilder extends PackagerTask {
     }
     
     /**
-     * Build the plugin descriptor
+     * Build the plugin descriptor.
      * 
      * @param userJar
      * @param descriptorFile

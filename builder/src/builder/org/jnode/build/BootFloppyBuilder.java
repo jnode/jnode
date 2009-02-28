@@ -44,7 +44,7 @@ import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.util.FileUtils;
 
 /**
- * <description>
+ * Builder for the boot floppy (in fact, it's not a floppy but a cdrom image in the iso format).
  *
  * @author epr
  */
@@ -59,7 +59,7 @@ public class BootFloppyBuilder extends Task {
     private ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
 
     /**
-     * Build the boot floppy
+     * Build the boot floppy.
      *
      * @throws BuildException
      */
@@ -81,7 +81,7 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * Create the actual bootfloppy
+     * Create the actual bootfloppy.
      *
      * @throws IOException
      * @throws DriverException
@@ -109,7 +109,7 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * Format the given device
+     * Format the given device.
      *
      * @param dev
      * @throws IOException
@@ -137,7 +137,7 @@ public class BootFloppyBuilder extends Task {
     }
 
     /**
-     * Copy the system files to the given device
+     * Copy the system files to the given device.
      *
      * @param device
      * @throws IOException

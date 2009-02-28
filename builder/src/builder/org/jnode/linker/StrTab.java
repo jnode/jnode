@@ -29,24 +29,24 @@ import java.util.Iterator;
 public class StrTab {
 
     /**
-     * (String, Index)*
+     * (String, Index)*.
      */
     private final HashMap str2addr = new HashMap();
     /**
-     * (Index, String)*
+     * (Index, String)*.
      */
     private final HashMap addr2str = new HashMap();
     private int maxIndex;
 
     /**
-     * Create a new instance
+     * Create a new instance.
      */
     public StrTab() {
         maxIndex = 1;
     }
 
     /**
-     * Create a new instance and initialize from the given byte array
+     * Create a new instance and initialize from the given byte array.
      */
     public StrTab(byte[] data, int length) {
         final int cnt = length;
@@ -66,7 +66,7 @@ public class StrTab {
     }
 
     /**
-     * Add a string and return its index
+     * Add a string and return its index.
      *
      * @param v
      */
@@ -83,7 +83,7 @@ public class StrTab {
     }
 
     /**
-     * Gets the String at a given index
+     * Gets the String at a given index.
      *
      * @param index
      */
@@ -92,7 +92,7 @@ public class StrTab {
     }
 
     /**
-     * Return the index of a given string, or -1 if not found
+     * Return the index of a given string, or -1 if not found.
      */
     public int findString(String v) {
         final Integer addr = (Integer) str2addr.get(v);

@@ -98,7 +98,7 @@ public class ConfigureScript {
     }
 
     /**
-     * Add a property to the script's property namespace
+     * Add a property to the script's property namespace.
      * 
      * @param prop the property to be added.
      */

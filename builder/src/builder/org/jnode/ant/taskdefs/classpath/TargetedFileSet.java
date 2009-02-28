@@ -33,13 +33,13 @@ public final class TargetedFileSet extends ZipFileSet {
     private boolean ignoreMissing = false;
 
     /**
-     * Initialize this instance
+     * Initialize this instance.
      */
     public TargetedFileSet() {
     }
 
     /**
-     * Initialize this instance
+     * Initialize this instance.
      *
      * @param arg0
      */
@@ -48,7 +48,7 @@ public final class TargetedFileSet extends ZipFileSet {
     }
 
     /**
-     * Initialize this instance
+     * Initialize this instance.
      *
      * @param arg0
      */
