@@ -26,17 +26,24 @@ import org.jnode.driver.Device;
 
 /**
  * The <tt>FileSystem<tt> interface provide methods common to file system implementations.
+ *  * 
+ * @param <T> {@link FSEntry} sub-type
  * 
- * @author epr
+ *  @author epr
  */
 public interface FileSystem<T extends FSEntry> {
 
+    /**
+     * Return type of the file system.
+     * 
+     * @return {@link FileSystemType} corresponding to this file system
+     */
     public FileSystemType<? extends FileSystem<T>> getType();
 
     /**
      * Gets the device this FS driver operates on.
      * 
-     * @return {@Device} contains this file system.
+     * @return {@link Device} contains this file system.
      */
     public Device getDevice();
 
@@ -45,11 +52,15 @@ public interface FileSystem<T extends FSEntry> {
      * this is not required.
      * 
      * @return {@link FSEntry} corresponding to root entry. 
+     * 
+     * @throws IOException if an I/O error occurs
      */
     public T getRootEntry() throws IOException;
 
     /**
      * Returns <tt>true</tt> if the file system is mounted in read-only mode.
+     * 
+     * @return <tt>true</tt> if it's a read-only file system.
      */
     public boolean isReadOnly();
 
@@ -58,12 +69,16 @@ public interface FileSystem<T extends FSEntry> {
      * file system or objects created by this file system will throw an
      * IOException.
      * 
-     * @throws IOException
+     * 
+     * 
+     * @throws IOException if an I/O error occurs
      */
     public void close() throws IOException;
 
     /**
      * Returns <tt>true</tt> if this file system is close.
+     * 
+     * @return <tt>true</tt> if file system is closed.
      */
     public boolean isClosed();
 
