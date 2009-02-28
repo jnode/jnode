@@ -30,19 +30,35 @@ import java.io.IOException;
  */
 public class UnsupportedFormatException extends IOException {
 
+    /**
+     * 
+     */
     public UnsupportedFormatException() {
         super();
     }
 
+    /**
+     * 
+     * @param s
+     * @param cause
+     */
     public UnsupportedFormatException(String s, Throwable cause) {
         super(s);
         initCause(cause);
     }
 
+    /**
+     * 
+     * @param s
+     */
     public UnsupportedFormatException(String s) {
         super(s);
     }
 
+    /**
+     * 
+     * @param cause
+     */
     public UnsupportedFormatException(Throwable cause) {
         super();
         initCause(cause);

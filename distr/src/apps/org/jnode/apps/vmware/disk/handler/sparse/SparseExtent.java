@@ -41,6 +41,14 @@ public class SparseExtent extends Extent {
     private final AllocationTable redundantAllocationTable;
     private final AllocationTable allocationTable;
 
+    /**
+     * 
+     * @param descriptor
+     * @param extentDecl
+     * @param header
+     * @param redundantAllocationTable
+     * @param allocationTable
+     */
     public SparseExtent(Descriptor descriptor, ExtentDeclaration extentDecl,
             SparseExtentHeader header, AllocationTable redundantAllocationTable,
             AllocationTable allocationTable) {
@@ -85,18 +93,33 @@ public class SparseExtent extends Extent {
         return grainOffset;
     }
 
+    /**
+     * 
+     * @return
+     */
     public SparseExtentHeader getHeader() {
         return header;
     }
 
+    /**
+     * 
+     * @return
+     */
     public AllocationTable getRedundantAllocationTable() {
         return redundantAllocationTable;
     }
 
+    /**
+     * 
+     * @return
+     */
     public AllocationTable getAllocationTable() {
         return allocationTable;
     }
 
+    /**
+     * 
+     */
     @Override
     public String toString() {
         return "SparseExtent[" + getFileName() + "]";

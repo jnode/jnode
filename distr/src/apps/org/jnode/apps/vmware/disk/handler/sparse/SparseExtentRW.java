@@ -40,6 +40,12 @@ public class SparseExtentRW {
     private static final AllocationTableRW ALLOC_TABLE_RW = new AllocationTableRW();
     private static final SparseExtentHeaderRW SPARSE_EXT_HEADER_RW = new SparseExtentHeaderRW();
 
+    /**
+     * 
+     * @param channel
+     * @param extent
+     * @throws IOException
+     */
     public void write(FileChannel channel, SparseExtent extent) throws IOException {
         channel.position(0L);
         SPARSE_EXT_HEADER_RW.write(channel, extent.getHeader());
@@ -55,6 +61,14 @@ public class SparseExtentRW {
         LOG.debug("write: position=" + channel.position());
     }
 
+    /**
+     * 
+     * @param channel
+     * @param fileDescriptor
+     * @param extentDecl
+     * @return
+     * @throws IOException
+     */
     public SparseExtent read(FileChannel channel, SparseFileDescriptor fileDescriptor,
             ExtentDeclaration extentDecl) throws IOException {
         LOG.debug("fileDescriptor=" + fileDescriptor);

@@ -29,9 +29,22 @@ import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Utility methods for copying VMware disks.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class DiskCopier {
     private static final Logger LOG = Logger.getLogger(DiskCopier.class);
 
+    /**
+     * Copy a VMware disk to a given directory.
+     * @param mainFile main file for the VMware disk.
+     * @param toDirectory destination directory for the copied VMware disk.
+     * @return the main file for the copied VMware disk 
+     * @throws IOException
+     */
     public static File copyDisk(final File mainFile, final File toDirectory) throws IOException {
         final String name = mainFile.getName();
         final int idx = name.lastIndexOf('.');
@@ -57,8 +70,15 @@ public class DiskCopier {
         return mainFileCopy;
     }
 
-    public static File copyFile(File file, File dir) throws IOException {
-        LOG.debug("copying file " + file.getName() + " to " + dir.getName());
+    /**
+     * Copy a file to a directory.
+     * @param file to copy
+     * @param toDirectory destination directory
+     * @return the copied file
+     * @throws IOException
+     */
+    public static File copyFile(File file, File toDirectory) throws IOException {
+        LOG.debug("copying file " + file.getName() + " to " + toDirectory.getName());
         FileInputStream fis = null;
         FileOutputStream fos = null;
         File outFile = null;
@@ -67,7 +87,7 @@ public class DiskCopier {
             fis = new FileInputStream(file);
             FileChannel inCh = fis.getChannel();
 
-            outFile = new File(dir, file.getName());
+            outFile = new File(toDirectory, file.getName());
             fos = new FileOutputStream(outFile);
             FileChannel outCh = fos.getChannel();
 

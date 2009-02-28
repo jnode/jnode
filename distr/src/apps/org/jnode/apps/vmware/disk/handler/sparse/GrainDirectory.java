@@ -27,6 +27,10 @@ package org.jnode.apps.vmware.disk.handler.sparse;
  * 
  */
 public class GrainDirectory extends EntryArray {
+    /**
+     * 
+     * @param entries
+     */
     public GrainDirectory(int[] entries) {
         super(entries);
     }

@@ -63,6 +63,15 @@ public abstract class DescriptorRW {
     private static final String HEADS = "ddb.geometry.heads";
     private static final String CYLINDERS = "ddb.geometry.cylinders";
 
+    /**
+     * 
+     * @param file
+     * @param firstSector
+     * @param nbSectors
+     * @return
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public Descriptor read(File file, int firstSector, int nbSectors)
         throws IOException, UnsupportedFormatException {
         RandomAccessFile raf = null;

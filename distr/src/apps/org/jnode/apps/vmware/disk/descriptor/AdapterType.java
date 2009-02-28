@@ -27,5 +27,28 @@ package org.jnode.apps.vmware.disk.descriptor;
  * 
  */
 public enum AdapterType {
-    ide, busLogic, lsiLogic, legacyLogic, legacyESX
+    /**
+     * 
+     */
+    ide,
+    
+    /**
+     * 
+     */
+    busLogic,
+
+    /**
+     * 
+     */
+    lsiLogic,
+    
+    /**
+     * 
+     */
+    legacyLogic,
+    
+    /**
+     * 
+     */
+    legacyESX
 }

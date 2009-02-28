@@ -27,6 +27,10 @@ package org.jnode.apps.vmware.disk.handler.sparse;
  * 
  */
 public class GrainTable extends EntryArray {
+    /**
+     * 
+     * @param entries
+     */
     public GrainTable(int[] entries) {
         super(entries);
     }

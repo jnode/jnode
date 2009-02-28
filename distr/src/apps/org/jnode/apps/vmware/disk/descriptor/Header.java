@@ -42,46 +42,89 @@ public class Header {
 
     private String parentFileNameHint;
 
+    /**
+     * 
+     * @return
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * 
+     * @param version
+     */
     public void setVersion(String version) {
         this.version = version;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getContentID() {
         return contentID;
     }
 
+    /**
+     * 
+     * @param contentID
+     */
     public void setContentID(long contentID) {
         this.contentID = contentID;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getParentContentID() {
         return parentContentID;
     }
 
+    /**
+     * 
+     * @param parentContentID
+     */
     public void setParentContentID(long parentContentID) {
         this.parentContentID = parentContentID;
     }
 
+    /**
+     * 
+     * @return
+     */
     public CreateType getCreateType() {
         return createType;
     }
 
+    /**
+     * 
+     * @param createType
+     */
     public void setCreateType(CreateType createType) {
         this.createType = createType;
     }
 
+    /**
+     * 
+     * @return
+     */
     public String getParentFileNameHint() {
         return parentFileNameHint;
     }
 
+    /**
+     * 
+     * @param parentFileNameHint
+     */
     public void setParentFileNameHint(String parentFileNameHint) {
         this.parentFileNameHint = parentFileNameHint;
     }
 
+    /**
+     * 
+     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Header)) {
@@ -96,6 +139,9 @@ public class Header {
                 IOUtils.equals(this.parentFileNameHint, h.parentFileNameHint);
     }
 
+    /**
+     * 
+     */
     @Override
     public String toString() {
         return "Header[version:" + version + ",contentID:" + contentID + ",parentContentID:" +

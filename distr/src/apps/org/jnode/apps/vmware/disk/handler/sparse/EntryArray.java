@@ -33,18 +33,36 @@ public class EntryArray {
 
     private final int[] entries;
 
+    /**
+     * 
+     * @param entries
+     */
     public EntryArray(int[] entries) {
         this.entries = entries;
     }
 
+    /**
+     * 
+     * @return
+     */
     public int getSize() {
         return entries.length;
     }
 
+    /**
+     * 
+     * @param entryNumber
+     * @return
+     */
     public int getEntry(int entryNumber) {
         return entries[entryNumber];
     }
 
+    /**
+     * 
+     * @param entryNumber
+     * @param value
+     */
     public void setEntry(int entryNumber, int value) {
         entries[entryNumber] = value;
     }

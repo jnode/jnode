@@ -50,6 +50,13 @@ public class SparseExtentHeaderRW {
 
     private static final int numGTEsPerGT = 512;
 
+    /**
+     * 
+     * @param bb
+     * @return
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public SparseExtentHeader read(ByteBuffer bb) throws IOException, UnsupportedFormatException {
         // TODO optimise the size
         // ByteBuffer bb = IOUtils.getByteBuffer(raf, 1024);
@@ -139,6 +146,12 @@ public class SparseExtentHeaderRW {
         return header;
     }
 
+    /**
+     * 
+     * @param channel
+     * @param header
+     * @throws IOException
+     */
     public void write(FileChannel channel, SparseExtentHeader header) throws IOException {
         ByteBuffer bb = IOUtils.allocate(1024);
         bb.putInt(MAGIC_NUMBER);

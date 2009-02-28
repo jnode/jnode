@@ -27,5 +27,38 @@ package org.jnode.apps.vmware.disk.extent;
  * 
  */
 public enum ExtentType {
-    FLAT, SPARSE, ZERO, VMFS, VMFSSPARSE, VMFSRDM, VMFSRAW
+    /**
+     * 
+     */
+    FLAT,
+
+    /**
+     * 
+     */
+    SPARSE,
+
+    /**
+     * 
+     */
+    ZERO,
+
+    /**
+     * 
+     */
+    VMFS,
+
+    /**
+     * 
+     */
+    VMFSSPARSE,
+
+    /**
+     * 
+     */
+    VMFSRDM,
+
+    /**
+     * 
+     */
+    VMFSRAW
 }

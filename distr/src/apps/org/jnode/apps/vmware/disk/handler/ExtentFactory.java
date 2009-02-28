@@ -36,6 +36,13 @@ import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
 public abstract class ExtentFactory {
     private static final Logger LOG = Logger.getLogger(SparseExtentFactory.class);
 
+    /**
+     * 
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public FileDescriptor createFileDescriptor(File file)
         throws IOException, UnsupportedFormatException {
         RandomAccessFile raf = null;
@@ -62,6 +69,13 @@ public abstract class ExtentFactory {
     protected abstract FileDescriptor createFileDescriptor(File file, RandomAccessFile raf)
         throws IOException, UnsupportedFormatException;
 
+    /**
+     * 
+     * @param fileDescriptor
+     * @return
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public abstract IOHandler createIOHandler(FileDescriptor fileDescriptor)
         throws IOException, UnsupportedFormatException;
 }

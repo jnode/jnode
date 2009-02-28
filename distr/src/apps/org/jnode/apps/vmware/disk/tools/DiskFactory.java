@@ -33,10 +33,28 @@ import org.jnode.apps.vmware.disk.handler.sparse.SparseDiskFactory;
 public abstract class DiskFactory {
     private static final SparseDiskFactory SPARSE_FACTORY = new SparseDiskFactory();
 
+    /**
+     * Create a sparse VMware disk.
+     * @param directory
+     * @param name
+     * @param size
+     * @return
+     * @throws IOException
+     */
     public static File createSparseDisk(File directory, String name, long size) throws IOException {
         return SPARSE_FACTORY.createDisk(directory, name, size);
     }
 
+    /**
+     * Generic method for creating a VMware disk. It only provides common checking of the provided parameters. 
+     * The actual implementation is done by {@link #createDiskImpl(File, String, long)}.
+     * 
+     * @param directory where the file(s) will be stored
+     * @param name prefix for the file name(s) 
+     * @param size of the file/VMware disk.
+     * @return the file where the VMware disk is stored.
+     * @throws IOException
+     */
     public File createDisk(File directory, String name, long size) throws IOException {
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
@@ -48,6 +66,15 @@ public abstract class DiskFactory {
         return createDiskImpl(directory, name, size);
     }
 
+    /**
+     * Actual implementation of the creation of a VMware disk.
+     * 
+     * @param directory where the file(s) will be stored
+     * @param name prefix for the file name(s) 
+     * @param size of the file/VMware disk.
+     * @return the file where the VMware disk is stored.
+     * @throws IOException
+     */
     protected abstract File createDiskImpl(File directory, String name, long size)
         throws IOException;
 }

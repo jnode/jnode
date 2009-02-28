@@ -34,8 +34,6 @@ import org.jnode.apps.vmware.disk.handler.IOHandler;
  * 
  */
 public class SparseIOHandler extends IOHandler {
-    public static final Logger LOG = Logger.getLogger(SparseIOHandler.class);
-
     protected SparseIOHandler(Descriptor descriptor) throws IOException {
         super(descriptor);
     }

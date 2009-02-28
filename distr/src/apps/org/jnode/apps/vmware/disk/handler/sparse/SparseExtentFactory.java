@@ -64,6 +64,9 @@ public class SparseExtentFactory extends ExtentFactory {
         return new SparseFileDescriptor(embeddedDescriptor, raf, this, header);
     }
 
+    /**
+     * 
+     */
     public SparseIOHandler createIOHandler(FileDescriptor fileDescriptor) throws IOException {
         SparseFileDescriptor sfd = (SparseFileDescriptor) fileDescriptor;
         SparseIOHandler handler = null;

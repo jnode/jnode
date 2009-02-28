@@ -50,10 +50,18 @@ public class SparseExtentHeader {
     private long overHead;
     private boolean uncleanShutdown;
 
+    /**
+     * 
+     * @return
+     */
     public int getNumGTEsPerGT() {
         return numGTEsPerGT;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getCapacity() {
         return capacity;
     }
@@ -66,90 +74,177 @@ public class SparseExtentHeader {
         return grainTableCoverage;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getGrainSize() {
         return grainSize;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getDescriptorOffset() {
         return descriptorOffset;
     }
 
+    /**
+     * 
+     * @return
+     */
     public boolean isValidNewLineDetectionTest() {
         return validNewLineDetectionTest;
     }
 
+    /**
+     * 
+     * @param validNewLineDetectionTest
+     */
     public void setValidNewLineDetectionTest(boolean validNewLineDetectionTest) {
         this.validNewLineDetectionTest = validNewLineDetectionTest;
     }
 
+    /**
+     * 
+     * @return
+     */
     public boolean isRedundantGrainTableWillBeUsed() {
         return redundantGrainTableWillBeUsed;
     }
 
+    /**
+     * 
+     * @param redundantGrainTableWillBeUsed
+     */
     public void setRedundantGrainTableWillBeUsed(boolean redundantGrainTableWillBeUsed) {
         this.redundantGrainTableWillBeUsed = redundantGrainTableWillBeUsed;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getDescriptorSize() {
         return descriptorSize;
     }
 
+    /**
+     * 
+     * @param descriptorSize
+     */
     public void setDescriptorSize(long descriptorSize) {
         this.descriptorSize = descriptorSize;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getRgdOffset() {
         return rgdOffset;
     }
 
+    /**
+     * 
+     * @param rgdOffset
+     */
     public void setRgdOffset(long rgdOffset) {
         this.rgdOffset = rgdOffset;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getGdOffset() {
         return gdOffset;
     }
 
+    /**
+     * 
+     * @param gdOffset
+     */
     public void setGdOffset(long gdOffset) {
         this.gdOffset = gdOffset;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getOverHead() {
         return overHead;
     }
 
+    /**
+     * 
+     * @param overHead
+     */
     public void setOverHead(long overHead) {
         this.overHead = overHead;
     }
 
+    /**
+     * 
+     * @return
+     */
     public boolean isUncleanShutdown() {
         return uncleanShutdown;
     }
 
+    /**
+     * 
+     * @param uncleanShutdown
+     */
     public void setUncleanShutdown(boolean uncleanShutdown) {
         this.uncleanShutdown = uncleanShutdown;
     }
 
+    /**
+     * 
+     * @param capacity
+     */
     public void setCapacity(long capacity) {
         this.capacity = capacity;
     }
 
+    /**
+     * 
+     * @param grainSize
+     */
     public void setGrainSize(long grainSize) {
         this.grainSize = grainSize;
     }
 
+    /**
+     * 
+     * @param descriptorOffset
+     */
     public void setDescriptorOffset(long descriptorOffset) {
         this.descriptorOffset = descriptorOffset;
     }
 
+    /**
+     * 
+     * @param grainTableCoverage
+     */
     public void setGrainTableCoverage(long grainTableCoverage) {
         this.grainTableCoverage = grainTableCoverage;
     }
 
+    /**
+     * 
+     * @param numGTEsPerGT
+     */
     public void setNumGTEsPerGT(int numGTEsPerGT) {
         this.numGTEsPerGT = numGTEsPerGT;
     }
 
+    /**
+     * 
+     */
     @Override
     public String toString() {
         // flags
