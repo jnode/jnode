@@ -23,18 +23,28 @@ package org.jnode.fs;
 import java.io.IOException;
 
 /**
+ * New exception allowing to handle cases where a FileSystem is mounted readOnly
+ * 
  * @author Fabien DUMINY
  * 
- * New exception allowing to handle cases where a FileSystem is mounted readOnly
+ * 
  */
+@SuppressWarnings("serial")
 public class ReadOnlyFileSystemException extends IOException {
-
-    public ReadOnlyFileSystemException() {
-        super("read-only file system");
-    }
     /**
-     * @param message
-     * @param cause
+     * Constructs a {@code ReadOnlyFileSystemException} with
+     * a default error message.
+     */
+    public ReadOnlyFileSystemException() {
+        super("The file system is flagged as read-only. No modifications allowed.");
+    }
+    
+    /**
+     * Constructs a {@code ReadOnlyFileSystemException} with
+     * the specified cause and message.
+     * 
+     * @param message the detail message of the exception.
+     * @param cause the cause of the exception.
      */
     public ReadOnlyFileSystemException(String message, Throwable cause) {
         super(message);
@@ -42,7 +52,10 @@ public class ReadOnlyFileSystemException extends IOException {
     }
 
     /**
-     * @param cause
+     * Constructs a {@code ReadOnlyFileSystemException} with
+     * the specified cause.
+     * 
+     * @param cause the cause of the exception.
      */
     public ReadOnlyFileSystemException(Throwable cause) {
         super();
@@ -50,7 +63,10 @@ public class ReadOnlyFileSystemException extends IOException {
     }
 
     /**
-     * @param message
+     * Constructs a {@code ReadOnlyFileSystemException} with
+     * the specified message.
+     * 
+     * @param message the detail message of the exception. 
      */
     public ReadOnlyFileSystemException(String message) {
         super(message);
