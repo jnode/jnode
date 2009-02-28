@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 /**
- * This interface described the accessright for a given FSEntry.
+ * <tt>FSAccessRights</tt> interface described the access rights for a given {@link FSEntry}.
  * 
  * @author epr
  */
@@ -33,19 +33,60 @@ public interface FSAccessRights extends FSObject {
     /**
      * Gets the owner of the entry.
      * 
-     * @throws IOException
+     * @return {@link Principal} represent owner of the entry. 
+     * 
+     * @throws IOException if error occurs during retrieve of the owner.
      */
     public Principal getOwner() throws IOException;
 
+    /**
+     * Returns <tt>true</tt> if read is allow for the related entry.
+     * 
+     * @return <tt>true</tt> if read is allow for the related entry.
+     */
     public boolean canRead();
 
+    /**
+     * Returns <tt>true</tt> if write is allow for the related entry.
+     * 
+     * @return <tt>true</tt> if write is allow for the related entry.
+     */
     public boolean canWrite();
 
+    /**
+     * Returns <tt>true</tt> if execution is allow for the related entry.
+     * 
+     * @return <tt>true</tt> if execution is allow for the related entry.
+     */
     public boolean canExecute();
 
+    /**
+     * Set related entry as readable. This right can be limited to the owner.
+     * 
+     * @param enable <tt>true</tt> to allow right to read the related entry.
+     * @param owneronly <tt>true</tt> to limit the read to the owner.
+     * 
+     * @return <tt>true</tt> if read is allowed.
+     */
     public boolean setReadable(boolean enable, boolean owneronly);
 
+    /**
+     * Set related entry as writable. This right can be limited to the owner.
+     * 
+     * @param enable <tt>true</tt> to allow right to write the related entry.
+     * @param owneronly <tt>true</tt> to limit the write to the owner.
+     * 
+     * @return <tt>true</tt> if write is allowed.
+     */
     public boolean setWritable(boolean enable, boolean owneronly);
 
+    /**
+     * Set related entry as executable. This right can be limited to the owner.
+     * 
+     * @param enable <tt>true</tt> to allow right to execute the related entry.
+     * @param owneronly <tt>true</tt> to limit the read to the owner.
+     * 
+     * @return <tt>true</tt> if execution is allowed.
+     */
     public boolean setExecutable(boolean enable, boolean owneronly);
 }

@@ -17,28 +17,37 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs;
 
 import org.jnode.driver.Device;
 
 /**
- * Descriptor and entry point for a class of filesystems.
+ * Descriptor and entry point for a class of file systems.
+ * 
+ * @param <T> {@link FileSystem}
  * 
  * @author epr
+ * 
  */
 public interface FileSystemType<T extends FileSystem<?>> {
 
     /**
      * Gets the unique name of this file system type.
+     * 
+     * @return name of the file system.
      */
     public String getName();
 
     /**
-     * Create a filesystem from a given device.
+     * Create a file system from a given device.
      * 
-     * @param device
-     * @param readOnly
+     * @param device {@link Device} contains the file system.
+     * @param readOnly set to <tt>true</tt> if the new file system must be read
+     *            only.
+     * @return a file system
+     * @throws FileSystemException if error occurs during creation of the new
+     *             file system.
      */
     public T create(Device device, boolean readOnly) throws FileSystemException;
 }
