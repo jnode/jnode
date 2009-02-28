@@ -41,8 +41,6 @@
       <export name="sun.nio.ByteBuffered"/>
       <export name="sun.nio.ch.Interruptible"/>
       <export name="sun.security.acl.GroupImpl"/>
-      <export name="sun.security.util.Debug"/>
-      <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.*"/>
       <export name="sun.security.jca.*"/>
       <export name="sun.security.pkcs.ParsingException"/>
@@ -59,30 +57,13 @@
 
       <export name="sun.text.*"/>
       <export name="sun.text.normalizer.*"/>
-      <export name="sun.text.resources.BreakIteratorInfo"/>
-      <export name="sun.text.resources.BreakIteratorRules"/>
-      <export name="sun.text.resources.CollationData"/>
-      <export name="sun.text.resources.FormatData"/>
+      <export name="sun.text.resources.*"/>
 
       <export name="sun.util.calendar.*"/>
       <export name="sun.util.*"/>
-      <export name="sun.util.resources.LocaleData"/>
-      <export name="sun.util.resources.LocaleNames"/>
-      <export name="sun.util.resources.LocaleNamesBundle"/>
-      <export name="sun.util.resources.OpenListResourceBundle"/>
-      <export name="sun.util.resources.CalendarData"/>
-      <export name="sun.util.resources.CurrencyNames"/>
-      <export name="sun.util.resources.TimeZoneNames"/>
+      <export name="sun.util.resources.*"/>
 
-      <export name="gnu.classpath.Configuration"/>
-      <export name="gnu.classpath.Pointer"/>
-      <export name="gnu.classpath.SystemProperties"/>
-      <export name="gnu.classpath.VMSystemProperties"/>
-      <export name="gnu.classpath.VMStackWalker"/>
-      <export name="gnu.classpath.ServiceFactory"/>
-      <export name="gnu.classpath.ServiceFactory$ServiceIterator"/>
-      <export name="gnu.classpath.ServiceProviderLoadingAction"/>
-
+      <export name="gnu.classpath.*"/>
       <export name="gnu.classpath.debug.*"/>      
 
       <export name="gnu.java.io.*"/>
@@ -170,17 +151,10 @@
       <export name="javax.crypto.*"/>
       <export name="javax.crypto.interfaces.*"/>
       <export name="javax.crypto.spec.*"/>
-      <export name="javax.security.auth.AuthPermission"/>
-      <export name="javax.security.auth.Destroyable"/>
-      <export name="javax.security.auth.DestroyFailedException"/>
-      <export name="javax.security.auth.Subject"/>
-      <export name="javax.security.auth.callback.Callback"/>
-      <export name="javax.security.auth.callback.CallbackHandler"/>
-      <export name="javax.security.auth.callback.PasswordCallback"/>
-      <export name="javax.security.auth.callback.UnsupportedCallbackException"/>
-      <export name="javax.security.auth.login.LoginException"/>
-      <export name="javax.security.auth.login.Configuration$Parameters"/>
-      <export name="javax.security.auth.login.Configuration"/>
+        
+      <export name="javax.security.auth.*"/>
+      <export name="javax.security.auth.callback.*"/>
+      <export name="javax.security.auth.login.*"/>
       <export name="javax.security.auth.x500.*"/>
 
       <export name="org.xml.sax.*"/>

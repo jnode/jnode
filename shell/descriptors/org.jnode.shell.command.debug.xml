@@ -10,6 +10,7 @@
   <requires>
     <import plugin="org.jnode.debug"/>
     <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.classpath.ext.jdwp"/>
   </requires>
 
   <runtime>

@@ -15,23 +15,11 @@
 
       <export name="com.sun.media.sound.*"/>
 
-      <export name="gnu.classpath.*"/>
-
-      <export name="gnu.classpath.jdwp.*"/>
-      <export name="gnu.classpath.jdwp.event.*"/>
-      <export name="gnu.classpath.jdwp.event.filters.*"/>
-      <export name="gnu.classpath.jdwp.exception.*"/>
-      <export name="gnu.classpath.jdwp.id.*"/>
-      <export name="gnu.classpath.jdwp.processor.*"/>
-      <export name="gnu.classpath.jdwp.transport.*"/>
-      <export name="gnu.classpath.jdwp.util.*"/>
-        
       <export name="gnu.java.awt.*"/>
       <export name="gnu.java.awt.color.*"/>
       <export name="gnu.java.awt.peer.*"/>
       <export name="gnu.java.awt.java2d.*"/>
       <export name="gnu.java.awt.print.*"/>
-      <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.net.protocol.*"/>
       <export name="gnu.java.net.protocol.file.*"/>
       <export name="gnu.java.net.protocol.ftp.*"/>
@@ -86,12 +74,6 @@
       <export name="javax.activation.*"/>
       <export name="javax.activity.*"/>
       <export name="javax.annotation.*"/>
-      <export name="javax.annotation.processing.*"/>
-      <export name="javax.lang.model.*"/>	   	
-	  <export name="javax.lang.model.element.*"/> 	  	
-	  <export name="javax.lang.model.type.*"/>
-	  <export name="javax.lang.model.util.*"/>
-      <export name="javax.management.*"/>
       <export name="javax.naming.directory.*"/>
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
@@ -105,8 +87,6 @@
 
       <export name="javax.script.*"/>
 
-      <export name="javax.tools.*"/>
-
 	  <export name="sun.audio.*"/>
 
       <export name="sun.net.*"/>
@@ -119,11 +99,6 @@
       <export name="sun.net.spi.nameservice.dns.META-INF.services.*"/>      
 
       <export name="sun.security.*"/>
-      <export name="sun.security.util.*"/>
-
-      <export name="sun.reflect.misc.*"/>
-      <export name="sun.text.resources.*"/>
-      <export name="sun.util.resources.*"/>
     </library>
   </runtime>
   
