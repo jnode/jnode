@@ -39,6 +39,16 @@ public class ExtentDeclaration {
     private final long offset;
     private final boolean isMainExtent;
 
+    /**
+     * 
+     * @param access
+     * @param sizeInSectors
+     * @param extentType
+     * @param fileName
+     * @param extentFile
+     * @param offset
+     * @param isMainExtent
+     */
     public ExtentDeclaration(Access access, long sizeInSectors, ExtentType extentType,
             String fileName, File extentFile, long offset, boolean isMainExtent) {
         this.access = access;
@@ -50,30 +60,58 @@ public class ExtentDeclaration {
         this.isMainExtent = isMainExtent;
     }
 
+    /**
+     * 
+     * @return
+     */
     public Access getAccess() {
         return access;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getSizeInSectors() {
         return sizeInSectors;
     }
 
+    /**
+     * 
+     * @return
+     */
     public ExtentType getExtentType() {
         return extentType;
     }
 
+    /**
+     * 
+     * @return
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * 
+     * @return
+     */
     public File getExtentFile() {
         return extentFile;
     }
 
+    /**
+     * 
+     * @return
+     */
     public boolean isMainExtent() {
         return isMainExtent;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getOffset() {
         return offset;
     }

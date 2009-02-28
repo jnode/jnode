@@ -39,6 +39,9 @@ import org.jnode.apps.vmware.disk.extent.Extent;
 public abstract class IOHandler {
     private static final Logger LOG = Logger.getLogger(IOHandler.class);
 
+    /**
+     * 
+     */
     public static final int SECTOR_SIZE = 512;
 
     protected static final boolean READ = true;
@@ -56,16 +59,32 @@ public abstract class IOHandler {
         nbSectors = ddb.getCylinders() * ddb.getHeads() * ddb.getSectors();
     }
 
+    /**
+     * 
+     * @param sector
+     * @param data
+     * @throws IOException
+     */
     public void write(long sector, ByteBuffer data) throws IOException {
         int nbSectors = checkBounds(sector, data);
         writeImpl(sector, nbSectors, data);
     }
 
+    /**
+     * 
+     * @param sector
+     * @param data
+     * @throws IOException
+     */
     public void read(long sector, ByteBuffer data) throws IOException {
         int nbSectors = checkBounds(sector, data);
         readImpl(sector, nbSectors, data);
     }
 
+    /**
+     * 
+     * @throws IOException
+     */
     public void flush() throws IOException {
         for (ExtentIO io : extentIOCache.values()) {
             io.flush();
@@ -134,6 +153,13 @@ public abstract class IOHandler {
         return handler;
     }
 
+    /**
+     * 
+     * @param sector
+     * @param nbSectors
+     * @param dst
+     * @throws IOException
+     */
     public void readImpl(long sector, int nbSectors, ByteBuffer dst) throws IOException {
         LOG.debug("readImpl: sector=" + sector + " nbSectors=" + nbSectors + " buffer.remaining=" +
                 dst.remaining());
@@ -144,6 +170,13 @@ public abstract class IOHandler {
         }
     }
 
+    /**
+     * 
+     * @param sector
+     * @param nbSectors
+     * @param src
+     * @throws IOException
+     */
     public void writeImpl(long sector, int nbSectors, ByteBuffer src) throws IOException {
         LOG.debug("writeImpl: sector=" + sector + " nbSectors=" + nbSectors + " buffer.remaining=" +
                 src.remaining());
@@ -154,6 +187,10 @@ public abstract class IOHandler {
         }
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getNbSectors() {
         return nbSectors;
     }

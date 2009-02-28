@@ -43,11 +43,17 @@ public class SimpleExtentFactory extends ExtentFactory {
         return new FileDescriptor(descriptor, raf, this);
     }
 
+    /**
+     * 
+     */
     public SimpleIOHandler createIOHandler(FileDescriptor fileDescriptor)
         throws IOException, UnsupportedFormatException {
         return new SimpleIOHandler(fileDescriptor);
     }
 
+    /**
+     * 
+     */
     @Override
     protected SimpleDescriptorRW getDescriptorRW() {
         return new SimpleDescriptorRW();

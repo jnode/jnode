@@ -40,12 +40,23 @@ public class ExtentIO {
     protected final FileChannel channel;
     protected final Extent extent;
 
+    /**
+     * 
+     * @param raf
+     * @param extent
+     */
     public ExtentIO(RandomAccessFile raf, Extent extent) {
         this.raf = raf;
         this.channel = raf.getChannel();
         this.extent = extent;
     }
 
+    /**
+     * 
+     * @param sector
+     * @param dst
+     * @throws IOException
+     */
     public void read(long sector, ByteBuffer dst) throws IOException {
         int oldLimit = dst.limit();
         dst.limit((int) (dst.position() + IOHandler.SECTOR_SIZE));
@@ -59,11 +70,21 @@ public class ExtentIO {
         dst.limit(oldLimit);
     }
 
+    /**
+     * 
+     * @param sector
+     * @param src
+     * @throws IOException
+     */
     public void write(long sector, ByteBuffer src) throws IOException {
         channel.position(IOHandler.SECTOR_SIZE * sector);
         channel.write(src);
     }
 
+    /**
+     * 
+     * @throws IOException
+     */
     public void flush() throws IOException {
         raf.close();
         channel.close();

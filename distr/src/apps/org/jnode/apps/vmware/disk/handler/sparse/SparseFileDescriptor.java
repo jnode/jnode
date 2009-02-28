@@ -34,6 +34,13 @@ import org.jnode.apps.vmware.disk.handler.FileDescriptor;
 public class SparseFileDescriptor extends FileDescriptor {
     private final SparseExtentHeader header;
 
+    /**
+     * 
+     * @param descriptor
+     * @param raf
+     * @param factory
+     * @param header
+     */
     public SparseFileDescriptor(Descriptor descriptor, RandomAccessFile raf, ExtentFactory factory,
             SparseExtentHeader header) {
         super(descriptor, raf, factory);
@@ -41,6 +48,10 @@ public class SparseFileDescriptor extends FileDescriptor {
         this.header = header;
     }
 
+    /**
+     * 
+     * @return
+     */
     public SparseExtentHeader getHeader() {
         return header;
     }

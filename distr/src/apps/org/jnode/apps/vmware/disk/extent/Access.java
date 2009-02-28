@@ -27,5 +27,18 @@ package org.jnode.apps.vmware.disk.extent;
  * 
  */
 public enum Access {
-    RW, RDONLY, NOACCESS
+    /**
+     * Read and Write access mode. 
+     */
+    RW,
+
+    /**
+     * Read only access mode.
+     */
+    RDONLY,
+
+    /**
+     * No access mode.
+     */
+    NOACCESS
 }

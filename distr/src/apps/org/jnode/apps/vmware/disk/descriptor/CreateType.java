@@ -27,6 +27,58 @@ package org.jnode.apps.vmware.disk.descriptor;
  * 
  */
 public enum CreateType {
-    monolithicSparse, vmfsSparse, monolithicFlat, vmfs, twoGbMaxExtentSparse, twoGbMaxExtentFlat, 
-    fullDevice, vmfsRaw, partitionedDevice, vmfsRawDeviceMap, vmfsPassthroughRawDeviceMap
+    /**
+     * 
+     */
+    monolithicSparse,
+    
+    /**
+     * 
+     */
+    vmfsSparse,
+    
+    /**
+     * 
+     */
+    monolithicFlat,
+    
+    /**
+     * 
+     */
+    vmfs,
+    
+    /**
+     * 
+     */
+    twoGbMaxExtentSparse,
+    
+    /**
+     * 
+     */
+    twoGbMaxExtentFlat,
+    
+    /**
+     * 
+     */
+    fullDevice,
+    
+    /**
+     * 
+     */
+    vmfsRaw,
+    
+    /**
+     * 
+     */
+    partitionedDevice,
+    
+    /**
+     * 
+     */
+    vmfsRawDeviceMap,
+    
+    /**
+     * 
+     */
+    vmfsPassthroughRawDeviceMap
 }

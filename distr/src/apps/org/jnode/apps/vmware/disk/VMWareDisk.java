@@ -44,6 +44,12 @@ public class VMWareDisk {
 
     private final long length;
 
+    /**
+     * 
+     * @param file
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public VMWareDisk(File file) throws IOException, UnsupportedFormatException {
         FileDescriptor fd = IOUtils.readFileDescriptor(file);
 
@@ -56,22 +62,46 @@ public class VMWareDisk {
         LOG.debug("handler for file " + file.getName() + " : " + handler.getClass().getName());
     }
 
+    /**
+     * 
+     * @param sector
+     * @param data
+     * @throws IOException
+     */
     public void write(long sector, ByteBuffer data) throws IOException {
         handler.write(sector, data);
     }
 
+    /**
+     * 
+     * @param sector
+     * @param data
+     * @throws IOException
+     */
     public void read(long sector, ByteBuffer data) throws IOException {
         handler.read(sector, data);
     }
 
+    /**
+     * 
+     * @throws IOException
+     */
     public void flush() throws IOException {
         handler.flush();
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getLength() {
         return length;
     }
 
+    /**
+     * 
+     * @return
+     */
     public Descriptor getDescriptor() {
         return descriptor;
     }

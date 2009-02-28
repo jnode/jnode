@@ -34,20 +34,38 @@ public class FileDescriptor {
     private final RandomAccessFile raf;
     private final ExtentFactory factory;
 
+    /**
+     * 
+     * @param descriptor
+     * @param raf
+     * @param factory
+     */
     public FileDescriptor(Descriptor descriptor, RandomAccessFile raf, ExtentFactory factory) {
         this.descriptor = descriptor;
         this.raf = raf;
         this.factory = factory;
     }
 
+    /**
+     * 
+     * @return
+     */
     public Descriptor getDescriptor() {
         return descriptor;
     }
 
+    /**
+     * 
+     * @return
+     */
     public RandomAccessFile getRandomAccessFile() {
         return raf;
     }
 
+    /**
+     * 
+     * @return
+     */
     public ExtentFactory getExtentFactory() {
         return factory;
     }

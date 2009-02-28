@@ -37,10 +37,19 @@ import org.jnode.apps.vmware.disk.handler.IOHandler;
 public class SparseExtentIO extends ExtentIO {
     private static final Logger LOG = Logger.getLogger(SparseExtentIO.class);
 
+    /**
+     * 
+     * @param raf
+     * @param extent
+     */
     public SparseExtentIO(RandomAccessFile raf, Extent extent) {
         super(raf, extent);
     }
 
+    /**
+     * @param sector
+     * @param dst
+     */
     @Override
     public void read(long sector, ByteBuffer dst) throws IOException {
         SparseExtent spe = (SparseExtent) extent;
@@ -67,6 +76,10 @@ public class SparseExtentIO extends ExtentIO {
         dst.limit(oldLimit);
     }
 
+    /**
+     * @param sector
+     * @param src
+     */
     @Override
     public void write(long sector, ByteBuffer src) throws IOException {
         SparseExtent spe = (SparseExtent) extent;
@@ -79,6 +92,9 @@ public class SparseExtentIO extends ExtentIO {
         channel.write(src);
     }
 
+    /**
+     * 
+     */
     @Override
     public void flush() throws IOException {
         SparseExtent spe = (SparseExtent) extent;

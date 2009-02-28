@@ -37,13 +37,27 @@ public class Extent {
     private Descriptor descriptor;
 
     private final Access access;
-    private final long sizeInSectors; // a sector is 512 bytes
+    
+    /**
+     * Number of sectors. A sector is 512 bytes.
+     */
+    private final long sizeInSectors;
+    
     private final ExtentType extentType;
-    private final String fileName; // relative to the location of the
-                                    // descriptor
+    
+    /**
+     * Filename. Relative to the location of the descriptor.
+     */
+    private final String fileName;
+    
     private final File file;
     private final long offset;
 
+    /**
+     * 
+     * @param descriptor
+     * @param extentDecl
+     */
     public Extent(Descriptor descriptor, ExtentDeclaration extentDecl) {
         this.descriptor = descriptor;
         this.access = extentDecl.getAccess();
@@ -57,30 +71,58 @@ public class Extent {
                 " fileSize=" + file.length());
     }
 
+    /**
+     * 
+     * @return
+     */
     public Access getAccess() {
         return access;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getSizeInSectors() {
         return sizeInSectors;
     }
 
+    /**
+     * 
+     * @return
+     */
     public ExtentType getExtentType() {
         return extentType;
     }
 
+    /**
+     * 
+     * @return
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getOffset() {
         return offset;
     }
 
+    /**
+     * 
+     * @return
+     */
     public final Descriptor getDescriptor() {
         return descriptor;
     }
 
+    /**
+     * 
+     * @param descriptor
+     */
     public void setDescriptor(Descriptor descriptor) {
         if (this.descriptor != null) {
             throw new IllegalStateException("descriptor already assigned");
@@ -89,15 +131,26 @@ public class Extent {
         this.descriptor = descriptor;
     }
 
+    /**
+     * 
+     * @return
+     */
     public File getFile() {
         return file;
     }
 
+    /**
+     * @return 
+     */
     @Override
     public String toString() {
         return "Extent[" + fileName + "]";
     }
 
+    /**
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Extent)) {

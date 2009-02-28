@@ -58,44 +58,89 @@ public class IOUtils {
         new SimpleExtentFactory(), 
     };
 
+    /**
+     * Size of an int, which is also the size of an entry in a VMware disk.
+     */
     public static final int INT_SIZE = 4;
+    
+    /**
+     * {@link ByteOrder} used in VMware disk.
+     */
     public static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
+    /**
+     * Class representing a key/value pair.
+     * 
+     * @author Fabien DUMINY (fduminy@jnode.org)
+     *
+     */
     public static class KeyValue {
         private String key;
         private String value;
 
+        /**
+         * 
+         * @return
+         */
         public String getKey() {
             return key;
         }
 
+        /**
+         * 
+         * @param key
+         */
         public void setKey(String key) {
             this.key = key;
         }
 
+        /**
+         * 
+         * @return
+         */
         public String getValue() {
             return value;
         }
 
+        /**
+         * 
+         * @param value
+         */
         public void setValue(String value) {
             this.value = value;
         }
 
+        /**
+         * 
+         */
         @Override
         public String toString() {
             return "KeyValue[key:" + key + ", value:" + value + "]";
         }
 
+        /**
+         * Nullify the key/value pair.
+         */
         public void setNull() {
             setKey(null);
             setValue(null);
         }
 
+        /**
+         * Is the key/value pair equivalent to null ?
+         * @return true if key is null and value is null.
+         */
         public boolean isNull() {
             return (key == null) && (value == null);
         }
     }
 
+    /**
+     * Read the next non-empty and non-comment line from the provided reader.
+     * @param reader
+     * @return the next useful line or null if end of file has been reached
+     * @throws IOException
+     */
     public static String readLine(BufferedReader reader) throws IOException {
         String line = null;
         while ((line = reader.readLine()) != null) {
@@ -111,11 +156,26 @@ public class IOUtils {
         return null;
     }
 
+    /**
+     * Remove enclosing double quotes (") from the provided string.
+     * Note that no check is done and it assumes that there is one 
+     * double quotes at begin and at end of the string. 
+     * @param value the string to process
+     * @return the result string
+     */
     public static String removeQuotes(String value) {
-        // remove enclosing '"'
         return (value == null) ? null : value.substring(1, value.length() - 1);
     }
 
+    /**
+     * 
+     * @param reader
+     * @param keyValue
+     * @param wantedKey
+     * @param removeQuotes
+     * @return
+     * @throws IOException
+     */
     public static KeyValue readValue(BufferedReader reader, KeyValue keyValue, String wantedKey,
             boolean removeQuotes) throws IOException {
         keyValue = readValue(readLine(reader), keyValue, wantedKey);
@@ -167,6 +227,13 @@ public class IOUtils {
         return keyValue;
     }
 
+    /**
+     * 
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public static FileDescriptor readFileDescriptor(File file)
         throws IOException, UnsupportedFormatException {
         FileDescriptor fileDescriptor = null;
@@ -196,6 +263,16 @@ public class IOUtils {
         return fileDescriptor;
     }
 
+    /**
+     * 
+     * @param mainFile
+     * @param fileName
+     * @param access
+     * @param sizeInSectors
+     * @param extentType
+     * @param offset
+     * @return
+     */
     public static ExtentDeclaration createExtentDeclaration(File mainFile, String fileName,
             Access access, long sizeInSectors, ExtentType extentType, long offset) {
         final File extentFile = IOUtils.getExtentFile(mainFile, fileName);
@@ -204,11 +281,26 @@ public class IOUtils {
                 offset, isMainExtent);
     }
 
+    /**
+     * 
+     * @param mainFile
+     * @param extentFileName
+     * @return
+     */
     public static File getExtentFile(File mainFile, String extentFileName) {
         String path = mainFile.getParentFile().getAbsolutePath();
         return new File(path, extentFileName);
     }
 
+    /**
+     * 
+     * @param lastLine
+     * @param br
+     * @param removeQuotes
+     * @param requiredKeys
+     * @return
+     * @throws IOException
+     */
     public static Map<String, String> readValuesMap(String lastLine, BufferedReader br,
             boolean removeQuotes, String... requiredKeys) throws IOException {
         Map<String, String> values = new HashMap<String, String>();
@@ -238,23 +330,49 @@ public class IOUtils {
 
         return values;
     }
-
+    
+    /**
+     * 
+     * @param o1
+     * @param o2
+     * @return
+     */
     public static boolean equals(Object o1, Object o2) {
         return (o1 == null) ? (o2 == null) : o1.equals(o2);
     }
 
+    /**
+     * 
+     * @param capacity
+     * @return
+     */
     public static ByteBuffer allocate(int capacity) {
         ByteBuffer bb = ByteBuffer.allocate(capacity);
         bb.order(BYTE_ORDER);
         return bb;
     }
 
+    /**
+     * 
+     * @param raf
+     * @param firstSector
+     * @param nbSectors
+     * @return
+     * @throws IOException
+     */
     public static ByteBuffer getSectorsByteBuffer(RandomAccessFile raf, int firstSector,
             int nbSectors) throws IOException {
         IOUtils.positionSector(raf.getChannel(), firstSector);
         return IOUtils.getByteBuffer(raf, nbSectors * IOHandler.SECTOR_SIZE);
     }
 
+    /**
+     * 
+     * @param raf
+     * @param size
+     * @return
+     * @throws IOException
+     */
     public static ByteBuffer getByteBuffer(RandomAccessFile raf, int size) throws IOException {
         FileChannel ch = raf.getChannel();
 
@@ -283,11 +401,22 @@ public class IOUtils {
         return bb;
     }
 
+    /**
+     * Position the channel at the begin of the given sector.
+     * @param channel
+     * @param sector
+     * @throws IOException
+     */
     public static void positionSector(FileChannel channel, long sector) throws IOException {
         channel.position(sector * IOHandler.SECTOR_SIZE);
         LOG.debug("positionSector(sector=" + sector + ") -> " + channel.position());
     }
 
+    /**
+     * Is the provided value a power of 2 ?
+     * @param value the value to test
+     * @return true if value is a power of 2, which means there exists an integer n >= 0 for which value = 2^n
+     */
     public static boolean isPowerOf2(long value) {
         long val = 1;
         if (val == value) {
@@ -304,6 +433,10 @@ public class IOUtils {
         return false;
     }
 
+    /**
+     * Compute the grainTableCoverage property for the provided SparseExtentHeader.
+     * @param header the header used to compute the grain table coverage.  
+     */
     public static void computeGrainTableCoverage(SparseExtentHeader header) {
         header.setGrainTableCoverage(header.getNumGTEsPerGT() * header.getGrainSize());
     }

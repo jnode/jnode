@@ -34,19 +34,37 @@ public class AllocationTable {
     private final GrainDirectory grainDirectory;
     private final GrainTable[] grainTables;
 
+    /**
+     * 
+     * @param grainDirectory
+     * @param grainTables
+     */
     public AllocationTable(GrainDirectory grainDirectory, GrainTable[] grainTables) {
         this.grainDirectory = grainDirectory;
         this.grainTables = grainTables;
     }
 
+    /**
+     * 
+     * @return
+     */
     public GrainDirectory getGrainDirectory() {
         return grainDirectory;
     }
 
+    /**
+     * 
+     * @return
+     */
     public int getNbGrainTables() {
         return grainTables.length;
     }
 
+    /**
+     * 
+     * @param tableNum
+     * @return
+     */
     public GrainTable getGrainTable(int tableNum) {
         if ((tableNum < 0) || (tableNum >= grainTables.length)) {
             // TODO fix the bug

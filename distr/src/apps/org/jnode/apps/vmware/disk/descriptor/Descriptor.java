@@ -39,6 +39,13 @@ public class Descriptor {
     private final List<Extent> extents;
     private final DiskDatabase diskDatabase;
 
+    /**
+     * 
+     * @param mainFile
+     * @param header
+     * @param extents
+     * @param diskDatabase
+     */
     public Descriptor(File mainFile, Header header, List<Extent> extents, DiskDatabase diskDatabase) {
         this.mainFile = mainFile;
         this.header = header;
@@ -46,22 +53,41 @@ public class Descriptor {
         this.diskDatabase = diskDatabase;
     }
 
+    /**
+     * 
+     * @return
+     */
     public Header getHeader() {
         return header;
     }
 
+    /**
+     * 
+     * @return
+     */
     public List<Extent> getExtents() {
         return extents;
     }
 
+    /**
+     * 
+     * @return
+     */
     public DiskDatabase getDiskDatabase() {
         return diskDatabase;
     }
 
+    /**
+     * 
+     * @return
+     */
     public File getMainFile() {
         return mainFile;
     }
 
+    /**
+     * 
+     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Descriptor)) {
@@ -83,6 +109,9 @@ public class Descriptor {
                 this.extents.equals(desc.extents) && this.diskDatabase.equals(desc.diskDatabase);
     }
 
+    /**
+     * 
+     */
     @Override
     public String toString() {
         String file1 = "";

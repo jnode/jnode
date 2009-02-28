@@ -34,11 +34,19 @@ public class RandomAccessFileReader extends Reader {
     private final RandomAccessFile raf;
     private final boolean mustClose;
 
+    /**
+     * Create a reader from the provided RandomAccessFile.
+     * @param raf
+     * @param mustClose
+     */
     public RandomAccessFileReader(RandomAccessFile raf, boolean mustClose) {
         this.raf = raf;
         this.mustClose = mustClose;
     }
 
+    /**
+     * Close the file if the mustClose flag has been set.
+     */
     @Override
     public void close() throws IOException {
         if (mustClose) {
@@ -46,6 +54,11 @@ public class RandomAccessFileReader extends Reader {
         }
     }
 
+    /**
+     * @param buf
+     * @param offset
+     * @param count
+     */
     @Override
     public int read(char[] buf, int offset, int count) throws IOException {
         int nbRead = 0;

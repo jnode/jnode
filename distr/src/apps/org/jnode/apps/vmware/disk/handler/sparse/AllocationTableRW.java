@@ -38,6 +38,13 @@ import org.jnode.apps.vmware.disk.handler.IOHandler;
 public class AllocationTableRW {
     private static final Logger LOG = Logger.getLogger(SparseExtentRW.class);
 
+    /**
+     * 
+     * @param raf
+     * @param header
+     * @return
+     * @throws IOException
+     */
     public AllocationTable read(RandomAccessFile raf, SparseExtentHeader header) throws IOException {
         long nbGrains = header.getCapacity() / header.getGrainSize();
         int nbGrainTables = (int) (nbGrains / header.getNumGTEsPerGT());
@@ -69,6 +76,12 @@ public class AllocationTableRW {
         return new AllocationTable(grainDirectory, grainTables);
     }
 
+    /**
+     * 
+     * @param channel
+     * @param table
+     * @throws IOException
+     */
     public void write(FileChannel channel, AllocationTable table) throws IOException {
         write(channel, table.getGrainDirectory());
         for (int gtNum = 0; gtNum < table.getNbGrainTables(); gtNum++) {

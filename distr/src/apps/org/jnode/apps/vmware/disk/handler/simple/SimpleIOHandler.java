@@ -32,6 +32,12 @@ import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
  * 
  */
 public class SimpleIOHandler extends IOHandler {
+    /**
+     * 
+     * @param fileDescriptor
+     * @throws IOException
+     * @throws UnsupportedFormatException
+     */
     public SimpleIOHandler(FileDescriptor fileDescriptor) throws IOException,
             UnsupportedFormatException {
         super(fileDescriptor.getDescriptor());

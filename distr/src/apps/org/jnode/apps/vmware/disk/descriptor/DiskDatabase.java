@@ -32,38 +32,73 @@ public class DiskDatabase {
     private int heads;
     private int cylinders;
 
+    /**
+     * 
+     * @return
+     */
     public AdapterType getAdapterType() {
         return adapterType;
     }
 
+    /**
+     * 
+     * @param adapterType
+     */
     public void setAdapterType(AdapterType adapterType) {
         this.adapterType = adapterType;
     }
 
+    /**
+     * 
+     * @return
+     */
     public int getSectors() {
         return sectors;
     }
 
+    /**
+     * 
+     * @param sectors
+     */
     public void setSectors(int sectors) {
         this.sectors = sectors;
     }
 
+    /**
+     * 
+     * @return
+     */
     public int getHeads() {
         return heads;
     }
 
+    /**
+     * 
+     * @param heads
+     */
     public void setHeads(int heads) {
         this.heads = heads;
     }
 
+    /**
+     * 
+     * @return
+     */
     public int getCylinders() {
         return cylinders;
     }
 
+    /**
+     * 
+     * @param cylinders
+     */
     public void setCylinders(int cylinders) {
         this.cylinders = cylinders;
     }
 
+    /**
+     * 
+     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof DiskDatabase)) {
@@ -76,6 +111,9 @@ public class DiskDatabase {
                 (this.heads == d.heads) && (this.cylinders == d.cylinders);
     }
 
+    /**
+     * 
+     */
     @Override
     public String toString() {
         return "DiskDatabase[adapterType:" + adapterType + ",sectors:" + sectors + ",heads:" +
