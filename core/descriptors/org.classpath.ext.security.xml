@@ -12,7 +12,6 @@
 
   <runtime>
     <library name="jnode-core.jar">
-      <export name="sun.security.util.*"/>
       <export name="sun.security.tools.*"/>
       <export name="sun.security.timestamp.*"/>
       <export name="sun.security.acl.*"/>
@@ -20,7 +19,6 @@
       <export name="sun.security.internal.interfaces*"/>
       <export name="sun.security.internal.spec*"/>
       <export name="sun.security.internal.*"/>
-      <export name="sun.security.jca.*"/>
       <export name="sun.security.jgss.*"/>
       <export name="sun.security.jgss.krb5.*"/>
       <export name="sun.security.jgss.spi.*"/>

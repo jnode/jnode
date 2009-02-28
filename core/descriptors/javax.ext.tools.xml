@@ -10,9 +10,12 @@
   provider-url="http://sun.com"
   license-name="classpath">
 
+  <requires>
+    <import plugin="org.classpath.ext.core"/>
+  </requires>
+    
   <runtime>
     <library name="jnode-core.jar">
-      <export name="javax.annotation.*"/>
       <export name="javax.annotation.processing.*"/>
       <export name="javax.lang.model.*"/>
       <export name="javax.lang.model.element.*"/>

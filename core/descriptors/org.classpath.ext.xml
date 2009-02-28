@@ -13,9 +13,6 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="javax.security.*"/>
-      <export name="javax.security.auth.*"/>
-      <export name="javax.security.auth.callback.*"/>
-      <export name="javax.security.auth.login.*"/>
       <export name="javax.security.auth.spi.*"/>
       <export name="javax.security.auth.kerberos.*"/>      
       <export name="javax.security.cert.*"/>

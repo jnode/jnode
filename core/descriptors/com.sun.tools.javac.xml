@@ -9,6 +9,9 @@
   provider-url="http://sun.com"
   license-name="classpath">
 
+  <requires>
+    <import plugin="javax.ext.tools"/>
+  </requires>
   <runtime>
     <library name="jnode-core.jar">
       <export name="com.sun.mirror.apt.*"/>
