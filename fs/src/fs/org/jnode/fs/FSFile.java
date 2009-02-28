@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * A FSFile is a representation of a single block of bytes on a filesystem. It
+ * A FSFile is a representation of a single block of bytes on a file system. It
  * is comparable to an inode in Unix.
  * 
  * An FSFile does not have any knowledge of who is using this file. It is also
@@ -36,46 +36,47 @@ import java.nio.ByteBuffer;
 public interface FSFile extends FSObject {
 
     /**
-     * Gets the length (in bytes) of this file
+     * Gets the length in bytes of this file.
      * 
-     * @return long
+     * @return the number of byte in this file.
      */
     public long getLength();
 
     /**
-     * Sets the length of this file.
+     * Sets the length in bytes of this file.
      * 
-     * @param length
-     * @throws IOException
+     * @param length the number of byte in this file.
+     *  
+     * @throws IOException if error occurs during set of file's length.
      */
     public void setLength(long length) throws IOException;
 
     /**
-     * Read <code>len</code> bytes from the given position. The read data is
-     * read fom this file starting at offset <code>fileOffset</code> and
-     * stored in <code>dest</code> starting at offset <code>ofs</code>.
+     * Read from this file starting at offset <code>fileOffset</code> and
+     * stored in <code>dest</code> byte buffer.
      * 
-     * @param fileOffset
-     * @param dest
-     * @throws IOException
+     * @param fileOffset position in the file  where the read begins.
+     * @param dest {@link ByteBuffer} receive contains of the file.
+     * 
+     * @throws IOException if error occurs during reading of the data.
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException;
 
     /**
-     * Write <code>len</code> bytes to the given position. The data is read
-     * from <code>src</code> starting at offset <code>ofs</code> and written
-     * to this file starting at offset <code>fileOffset</code>.
+     * Read bytes from  <code>src</code> byte buffer and written
+     * to this file starting at offset <code>fileOffset</code>
      * 
-     * @param fileOffset
-     * @param src
-     * @throws IOException
+     * @param fileOffset position in the file where datas are written.
+     * @param src {@link ByteBuffer} contains datas to write.
+     * 
+     * @throws IOException if error occurs during write of the datas.
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException;
 
     /**
-     * Flush any cached data to the disk.
+     * Save all unsaved datas from the cache to the device.
      * 
-     * @throws IOException
+     * @throws IOException if error occurs during flush of datas.
      */
     public void flush() throws IOException;
 }
