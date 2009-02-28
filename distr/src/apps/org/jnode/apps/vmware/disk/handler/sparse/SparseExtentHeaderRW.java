@@ -28,7 +28,7 @@ import org.jnode.apps.vmware.disk.IOUtils;
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 

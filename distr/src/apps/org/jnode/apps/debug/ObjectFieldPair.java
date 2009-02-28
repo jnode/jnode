@@ -24,7 +24,7 @@ import java.lang.reflect.Field;
 
 
 /**
- * Just a bean to store a Field and an object which has that field
+ * Just a bean to store a Field and an object which has that field.
  *
  * @author blind
  */

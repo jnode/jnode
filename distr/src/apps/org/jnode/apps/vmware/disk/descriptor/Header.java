@@ -23,14 +23,14 @@ package org.jnode.apps.vmware.disk.descriptor;
 import org.jnode.apps.vmware.disk.IOUtils;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 
  */
 public class Header {
     /**
-     * cid/content id when no parent
+     * cid/content id when no parent.
      */
     public static final long CID_NOPARENT = 0x0;
 

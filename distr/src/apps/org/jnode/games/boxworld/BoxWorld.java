@@ -892,7 +892,7 @@ public class BoxWorld extends JComponent implements WindowListener, KeyListener,
     // STATE PAINTING
 
     /**
-     * Paints the NULL state
+     * Paints the NULL state.
      */
     private void paintNull(Graphics g, int j, int i) {
         // Image img=imgVec[NULL_ST];
