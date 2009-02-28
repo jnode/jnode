@@ -31,7 +31,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
 /**
- * Abstract class used for common stuff among packager tasks
+ * Abstract class used for common stuff among packager tasks.
  * 
  * @author fabien
  *
@@ -40,7 +40,7 @@ public class PackagerTask extends Task {
     protected static final String PROPERTIES_FILE = "plugins.properties";
     
     /**
-     * The default properties for the packager tool
+     * The default properties for the packager tool.
      */
     private static final Properties DEFAULT_PROPERTIES;
     
@@ -61,17 +61,17 @@ public class PackagerTask extends Task {
     protected static final String FORCE_OVERWRITE_SCRIPTS = "force.overwrite.scripts";
     
     /**
-     * Directory for user plugins/resources
+     * Directory for user plugins/resources.
      */
     protected File userApplicationsDir = null;
     
     /**
-     * actual properties for the packager
+     * actual properties for the packager.
      */
     private Properties properties = null;
 
     /**
-     * Define the directory where user put its own plugins/resources to add in jnode cdrom
+     * Define the directory where user put its own plugins/resources to add in jnode cdrom.
      * @param file
      */
     public final void setUserApplicationsDir(File file) {
@@ -91,7 +91,7 @@ public class PackagerTask extends Task {
     }
     
     /**
-     * Get properties file used to configure the packager tool
+     * Get properties file used to configure the packager tool.
      * @return
      */
     protected final File getPropertiesFile() {
@@ -99,7 +99,7 @@ public class PackagerTask extends Task {
     }
     
     /**
-     * Get the properties and if necessary read it from the file
+     * Get the properties and if necessary read it from the file.
      * @return
      */
     protected final synchronized Properties getProperties() {
@@ -111,7 +111,7 @@ public class PackagerTask extends Task {
     }
 
     /**
-     * Read the properties file used to configure the packager tool
+     * Read the properties file used to configure the packager tool.
      * @return
      */
     private final Properties readProperties() {
@@ -132,7 +132,7 @@ public class PackagerTask extends Task {
     }
     
     /**
-     * Read the properties from the given {@link InputStream}
+     * Read the properties from the given {@link InputStream}.
      * 
      * @param input
      * @param defaultProps

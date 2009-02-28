@@ -189,7 +189,7 @@ public class PluginTask extends AbstractPluginTask {
     }
 
     /**
-     * Create a manifest for the given descriptor
+     * Create a manifest for the given descriptor.
      *
      * @param descr plugin descriptor object
      * @return the manifest

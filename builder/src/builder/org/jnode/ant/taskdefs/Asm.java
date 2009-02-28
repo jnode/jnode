@@ -35,7 +35,7 @@ import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
- * Description of the Class
+ * Description of the Class.
  *
  * @author epr
  * @version $Revision$
@@ -98,7 +98,7 @@ public class Asm extends MatchingTask {
     private String version;
 
     /**
-     * Add an includedir
+     * Add an includedir.
      *
      * @param dir
      */
@@ -107,7 +107,7 @@ public class Asm extends MatchingTask {
     }
 
     /**
-     * Description of the Method
+     * Description of the Method.
      *
      * @param srcFile
      * @param dstFile
@@ -179,7 +179,7 @@ public class Asm extends MatchingTask {
     }
 
     /**
-     * Description of the Method
+     * Description of the Method.
      *
      * @throws BuildException Description of Exception
      */
@@ -211,7 +211,7 @@ public class Asm extends MatchingTask {
     }
 
     /**
-     * Description of the Method
+     * Description of the Method.
      *
      * @throws BuildException Description of Exception
      * @throws IOException    Description of the Exception
@@ -359,7 +359,7 @@ public class Asm extends MatchingTask {
     }
 
     /**
-     * Sets the Destdir attribute of the JspC object
+     * Sets the Destdir attribute of the JspC object.
      *
      * @param destDir The new Destdir value
      */

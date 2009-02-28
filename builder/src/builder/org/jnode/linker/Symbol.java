@@ -26,9 +26,9 @@ import java.io.OutputStream;
 
 public class Symbol {
     /**
-     * symbol table - page 4-25, figure 4-15 typedef struct { Elf32_Word
+     * symbol table - page 4-25, figure 4-15 <code>typedef struct { Elf32_Word
      * st_name; Elf32_Addr st_value; Elf32_Word st_size; unsigned char st_info;
-     * unsigned char st_other; Elf32_Half st_shndx; } Elf32_Sym;
+     * unsigned char st_other; Elf32_Half st_shndx; } Elf32_Sym;</code>.
      */
     public static final int SHN_ABS = 0xFFFFFFF1;
 

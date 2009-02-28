@@ -269,7 +269,7 @@ public class Hotswap extends MatchingTask {
 
     /**
      * remove an array of files in a directory, and a list of subdirectories
-     * which will only be deleted if 'includeEmpty' is true
+     * which will only be deleted if 'includeEmpty' is true.
      *
      * @param hsh   the hotswap helper class
      * @param d     directory to work from

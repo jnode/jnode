@@ -189,7 +189,7 @@ public final class PluginList {
     }
 
     /**
-     * Gets the maximum last modification date of all URL's
+     * Gets the maximum last modification date of all URL's.
      *
      * @return last modification date
      * @throws IOException
@@ -207,7 +207,7 @@ public final class PluginList {
     }
 
     /**
-     * Gets all URL's to plugin descriptors
+     * Gets all URL's to plugin descriptors.
      *
      * @return URL[]
      */
@@ -216,7 +216,7 @@ public final class PluginList {
     }
 
     /**
-     * Gets all URL's to the plugin files (jar format)
+     * Gets all URL's to the plugin files (jar format).
      *
      * @return URL[]
      */

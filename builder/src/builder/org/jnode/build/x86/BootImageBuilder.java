@@ -96,7 +96,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
     /**
      * The offset in our (java) image file to the initial jump to our
-     * main-method
+     * main-method.
      */
     public static final int JUMP_MAIN_OFFSET32 = ObjectLayout
         .objectAlign((ObjectLayout.HEADER_SLOTS + 1)
@@ -133,7 +133,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     private final Label vmCurProcessor = new Label("vmCurProcessor");
 
     /**
-     * Construct a new BootImageBuilder
+     * Construct a new BootImageBuilder.
      */
     public BootImageBuilder() {
         System.setProperty("file.encoding", "8859_1");
@@ -227,7 +227,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     }
 
     /**
-     * Align the stream on a page boundary
+     * Align the stream on a page boundary.
      *
      * @param os
      * @throws BuildException
@@ -237,7 +237,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     }
 
     /**
-     * Emit code to bootstrap the java image
+     * Emit code to bootstrap the java image.
      *
      * @param os
      * @param clInitCaller
@@ -384,7 +384,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     }
 
     /**
-     * Emit code to call Main.vmMain
+     * Emit code to call Main.vmMain.
      *
      * @param os
      * @throws BuildException
@@ -606,7 +606,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     }
 
     /**
-     * Patch the Multiboot header
+     * Patch the Multiboot header.
      */
     private static final int MB_MAGIC = 0x1BADB002;
 

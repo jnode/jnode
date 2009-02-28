@@ -57,7 +57,7 @@ public class ObjectEmitter {
     private final HashMap<String, FieldInfo> fieldInfos = new HashMap<String, FieldInfo>();
 
     /**
-     * Construct a new ObjectEmitter *
+     * Construct a new ObjectEmitter.
      *
      * @param b
      * @param os

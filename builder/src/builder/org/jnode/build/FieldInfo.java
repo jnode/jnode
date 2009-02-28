@@ -33,27 +33,27 @@ import org.jnode.vm.classmgr.VmType;
 public final class FieldInfo {
 
     /**
-     * All declared fields in the JDK type
+     * All declared fields in the JDK type.
      */
     private final Field[] jdkFields;
 
     /**
-     * All declared instance fields that are a one-to-one map
+     * All declared instance fields that are a one-to-one map.
      */
     private final Field[] jdkInstanceFields;
 
     /**
-     * All declared statics fields that are a one-to-one map
+     * All declared statics fields that are a one-to-one map.
      */
     private final Field[] jdkStaticFields;
 
     /**
-     * All declared instance fields in the jnode type
+     * All declared instance fields in the jnode type.
      */
     private final List<VmField> jnodeInstanceFields;
 
     /**
-     * All declared static fields in the jnode type
+     * All declared static fields in the jnode type.
      */
     private final List<VmField> jnodeStaticFields;
 

@@ -38,7 +38,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 
 /**
- * Class for searching main methods in a jar
+ * Class for searching main methods in a jar.
  * 
  * @author fabien
  *

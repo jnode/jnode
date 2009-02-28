@@ -443,7 +443,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     }
 
     /**
-     * Build the documentation for the plugin
+     * Build the documentation for the plugin.
      *
      * @param data the plugin's data
      * @throws BuildException

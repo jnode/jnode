@@ -259,7 +259,7 @@ public class LoadUtil {
     }
 
     /**
-     * Load an Xword
+     * Load an Xword.
      *
      * @param out
      * @param e_ident
@@ -276,7 +276,7 @@ public class LoadUtil {
     }
 
     /**
-     * Load an Xword
+     * Load an Xword.
      *
      * @param out
      * @param e_ident

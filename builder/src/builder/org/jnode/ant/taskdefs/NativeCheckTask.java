@@ -55,7 +55,7 @@ public class NativeCheckTask extends FileSetTask {
     private Map<String, List<NativeMethod>> jnodeNativeMethods = new HashMap<String, List<NativeMethod>>();
 
     /**
-     * native methods per class
+     * native methods per class.
      * key: className (String)
      * value: native methods for the class (List<NativeMethod>)
      */

@@ -34,12 +34,12 @@ import java.util.List;
 public final class AsmSourceInfo {
 
     /**
-     * Include directories
+     * Include directories.
      */
     private final List<File> includeDirs = new ArrayList<File>();
 
     /**
-     * Main source file
+     * Main source file.
      */
     private File sourceFile;
 

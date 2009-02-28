@@ -58,7 +58,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
     }
 
     /**
-     * Create the actual bootfloppy
+     * Create the actual bootfloppy.
      *
      * @throws IOException
      * @throws DriverException
@@ -85,7 +85,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
     }
 
     /**
-     * Format the given device
+     * Format the given device.
      *
      * @param device
      * @throws IOException

@@ -37,7 +37,7 @@ import org.jnode.build.BuildException;
 
 /**
  * Build a jnode scripts from both a linux/unix scripts, from msdos scripts or, if none is found,
- * from scratch (with the help of {@link MainFinder})
+ * from scratch (with the help of {@link MainFinder}).
  * 
  * @author fabien
  *
@@ -47,7 +47,7 @@ public class ScriptBuilder extends PackagerTask {
     private static final String DEFINE_SYS_PROPERTY = "-D";
     
     /**
-     * jnode script extension
+     * jnode script extension.
      */
     private static final String JNODE_SCRIPT = ".jns";
     
@@ -295,7 +295,7 @@ public class ScriptBuilder extends PackagerTask {
     }
 
     /**
-     * Build a new command from the given parameters
+     * Build a new command from the given parameters.
      * @param script
      * @param extension
      * @param pathSeparator

@@ -44,7 +44,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
     private File systemPluginListFile;
 
     /**
-     * Gets the pluginlist
+     * Gets the pluginlist.
      *
      * @return The list
      * @throws PluginException
@@ -66,7 +66,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
     }
 
     /**
-     * Get a pluginregistry containing the loaded plugins
+     * Get a pluginregistry containing the loaded plugins.
      *
      * @return The registry
      * @throws PluginException
@@ -85,7 +85,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
     }
 
     /**
-     * Gets the pluginlist
+     * Gets the pluginlist.
      *
      * @return The list
      * @throws PluginException

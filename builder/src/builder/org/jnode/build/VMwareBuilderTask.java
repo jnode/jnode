@@ -83,7 +83,7 @@ public class VMwareBuilderTask extends Task {
     }
 
     /**
-     * The VmdkImage file is a VMX virtual disk image file
+     * The VmdkImage file is a VMX virtual disk image file.
      * 
      * @return Returns the VmdkImage file or <code>null</code>
      */
