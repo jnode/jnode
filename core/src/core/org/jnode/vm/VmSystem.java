@@ -841,7 +841,7 @@ public final class VmSystem {
      * time, which may be in the future (making the value negative).  This
      * method is useful for timing events where nanosecond precision is
      * required.  This is achieved by calling this method before and after the
-     * event, and taking the difference betweent the two times:
+     * event, and taking the difference between the two times:
      * </p>
      * <p>
      * <code>long startTime = System.nanoTime();</code><br />
@@ -859,13 +859,15 @@ public final class VmSystem {
      * @return the time of a system timer in nanoseconds.
      * @since 1.5
      */
-    public static long nanoTime() {
+    public static long nanoTime() {        
         if (ghz == -1) {
+            final long measureDuration = 1000; // in milliseconds
+            
             long start = Unsafe.getCpuCycles();
             long ms_start = currentTimeMillis();
             long ms_end;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(measureDuration);
             } catch (InterruptedException e) {
                 //ignore
             } finally {
@@ -873,17 +875,21 @@ public final class VmSystem {
             }
             long end = Unsafe.getCpuCycles();
             long ms = ms_end - ms_start;
-            if (ms <= 0)
-                ms = 1000;
+            if (ms <= 0) {
+                ms = measureDuration;
+            }
 
             ghz = (end - start) / (ms * 1000000L);
-            if (ghz <= 0)
-                ghz = 0;
-
-        } else if (ghz == 0) {
+            if (ghz <= 0) {
+                ghz = 0;   
+            }         
+        }
+        
+        if (ghz == 0) {
             //todo these are CPUs under 1GHz, improve this case
             return currentTimeMillis() * 1000000L;
         }
+        
         return Unsafe.getCpuCycles() / ghz;
     }
 
