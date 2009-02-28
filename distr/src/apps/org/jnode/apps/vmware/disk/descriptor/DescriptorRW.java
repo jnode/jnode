@@ -44,7 +44,7 @@ import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 import org.jnode.util.ByteBufferInputStream;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 

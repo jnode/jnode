@@ -23,7 +23,7 @@ package org.jnode.apps.debug;
 import java.lang.reflect.Method;
 
 /**
- * Just a bean to store a Method and an object which has that method
+ * Just a bean to store a Method and an object which has that method.
  *
  * @author blind
  */

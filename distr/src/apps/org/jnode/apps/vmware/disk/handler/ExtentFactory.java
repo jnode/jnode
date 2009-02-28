@@ -28,7 +28,7 @@ import org.jnode.apps.vmware.disk.descriptor.DescriptorRW;
 import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 

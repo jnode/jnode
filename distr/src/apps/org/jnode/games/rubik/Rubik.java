@@ -147,7 +147,7 @@ public final class Rubik extends JComponent {
     }
 
     /**
-     * Convert hexadecimal RGB parameter to color
+     * Convert hexadecimal RGB parameter to color.
      * @return
      */
     public Color findBGColor() {
@@ -278,7 +278,7 @@ public final class Rubik extends JComponent {
     }
 
     /**
-     * Produce large and small sub-cube for twisting
+     * Produce large and small sub-cube for twisting.
      */
     public void cutUpCube() {
         boolean check;
@@ -503,7 +503,7 @@ public final class Rubik extends JComponent {
     }
 
     /**
-     * Shift colored fields
+     * Shift colored fields.
      * @param sideNum
      * @param quads
      */
