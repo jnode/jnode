@@ -28,6 +28,7 @@ import net.wimpi.telnetd.io.TerminalIO;
 import org.jnode.driver.textscreen.TextScreenManager;
 
 /**
+ * Implementation of the {@link TextScreenManager} interface for the telnet daemon.
  * 
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
@@ -37,6 +38,10 @@ public final class RemoteTextScreenManager implements TextScreenManager {
             new HashMap<TerminalIO, RemoteTextScreen>();
     private TerminalIO terminalIO;
 
+    /**
+     * Define the actual terminal used to sent textscreen data. 
+     * @param terminalIO
+     */
     public void setTerminalIO(TerminalIO terminalIO) {
         this.terminalIO = terminalIO;
     }

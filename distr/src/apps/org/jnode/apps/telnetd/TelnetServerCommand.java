@@ -26,11 +26,17 @@ import java.util.Properties;
 import net.wimpi.telnetd.TelnetD;
 
 /**
+ * This is the command used to start the telnet daemon.
  * 
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
  */
 public class TelnetServerCommand {
+    /**
+     * Main method.
+     * @param args not used
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         try {
             // 1. prepare daemon

@@ -38,6 +38,11 @@ public class RemoteTextScreen extends AbstractPcTextScreen {
     private final char[] buffer;
     private int cursorOffset;
 
+    /**
+     * Construct a remote text screen for the given terminal.
+     * 
+     * @param terminalIO
+     */
     public RemoteTextScreen(TerminalIO terminalIO) {
         super(terminalIO.getColumns(), terminalIO.getRows());
         this.terminalIO = terminalIO;
@@ -67,24 +72,39 @@ public class RemoteTextScreen extends AbstractPcTextScreen {
         sync(0, buffer.length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void copyContent(int srcOffset, int destOffset, int length) {
         System.arraycopy(buffer, srcOffset * 2, buffer, destOffset * 2, length * 2);
         sync(destOffset * 2, length * 2);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void copyTo(TextScreen dst, int offset, int length) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public char getChar(int offset) {
         return buffer[offset];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getColor(int offset) {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void set(int offset, char ch, int count, int color) {
         buffer[offset] = getCharacter(ch);
         sync(offset, 1);
@@ -95,6 +115,9 @@ public class RemoteTextScreen extends AbstractPcTextScreen {
         return (c == 0) ? ' ' : c;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         char[] cha = new char[ch.length];
         for (int i = 0; i < cha.length; i++) {
@@ -104,10 +127,16 @@ public class RemoteTextScreen extends AbstractPcTextScreen {
         sync(offset, length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors, int colorsOfs) {
         set(offset, ch, chOfs, length, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int setCursor(int x, int y) {
         try {
             terminalIO.setCursor(y, x);
@@ -119,11 +148,17 @@ public class RemoteTextScreen extends AbstractPcTextScreen {
         return cursorOffset;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int setCursorVisible(boolean visible) {
         // ignore : cursor will allways be visible
         return cursorOffset;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void sync(int offset, int length) {
         try {
             final int y = offset / getWidth();

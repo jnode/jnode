@@ -24,8 +24,23 @@ import java.io.IOException;
 
 import net.wimpi.telnetd.io.TerminalIO;
 
+/**
+ * Utility methods for the telnet daemon.
+ * 
+ * @author Fabien DUMINY (fduminy@jnode.org)
+ *
+ */
 public class TelnetUtils {
 
+    /**
+     * Write a buffer to the given terminal.
+     * 
+     * @param terminalIO the terminal to which buffer data should be sent.
+     * @param b the buffer
+     * @param off offset of the first byte to get from the buffer
+     * @param len number of bytes to get from the buffer
+     * @throws IOException
+     */
     public static void write(TerminalIO terminalIO, byte[] b, int off, int len) throws IOException {
         int offset = off;
         for (int i = 0; i < len; i++) {
@@ -36,6 +51,13 @@ public class TelnetUtils {
         }
     }
 
+    /**
+     * Write a buffer to the given terminal.
+     * 
+     * @param terminalIO the terminal to which buffer data should be sent.
+     * @param b the buffer
+     * @throws IOException
+     */
     public static void write(TerminalIO terminalIO, byte[] b) throws IOException {
         terminalIO.getTelnetIO().write(b);
         if (terminalIO.isAutoflushing()) {

@@ -35,7 +35,7 @@ import org.jnode.test.AnnotationTest.Test;
 import org.junit.Ignore;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 
@@ -43,10 +43,18 @@ import org.junit.Ignore;
 public class TestVMWareDisk extends BaseReadWriteTest {
     private static final Logger LOG = Logger.getLogger(TestVMWareDisk.class);
 
+    /**
+     * Construct a test class for a VMware disk stored in a file.
+     * @param diskFile file used to store the VMware disk 
+     * @throws IOException
+     */
     public TestVMWareDisk(File diskFile) throws IOException {
         super(diskFile);
     }
 
+    /**
+     * Do read test.
+     */
     @Test
     public void read() throws Exception {
         VMWareDisk disk = new VMWareDisk(diskFile);
@@ -57,6 +65,9 @@ public class TestVMWareDisk extends BaseReadWriteTest {
         Assert.assertEquals(toString() + ": buffer should be filled", 0, data.remaining());
     }
 
+    /**
+     * Do a write test.
+     */
     @Test
     @Ignore
     public void write() throws Exception {
@@ -68,6 +79,9 @@ public class TestVMWareDisk extends BaseReadWriteTest {
         Assert.assertEquals(toString() + ": buffer should be fully copied", 0, data.remaining());
     }
 
+    /**
+     * Do writes, just followed by reads on the same file.
+     */
     @Test
     @Ignore
     public void writeAndRead() throws Exception {

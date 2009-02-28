@@ -42,7 +42,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 
@@ -81,6 +81,11 @@ public abstract class BaseReadWriteTest extends BaseTest {
         System.out.println("\ndirectory for package " + DISKS_PACKAGE + " : " + DISKS_PATH);
     }
 
+    /**
+     * Get the set of data to use for the read & write tests.
+     *  
+     * @return
+     */
     @Parameters
     public static List<File[]> data() {
         File directory = new File(DISKS_PATH);
@@ -103,10 +108,19 @@ public abstract class BaseReadWriteTest extends BaseTest {
         return list;
     }
 
+    /**
+     * Construct a test class for a VMware disk stored in a file.
+     * @param diskFile file used to store the VMware disk 
+     * @throws IOException
+     */
     public BaseReadWriteTest(File diskFile) throws IOException {
         super(diskFile, true);
     }
 
+    /**
+     * Do a read test.
+     * @throws Exception
+     */
     @Test
     @Ignore
     public void read() throws Exception {
@@ -118,6 +132,10 @@ public abstract class BaseReadWriteTest extends BaseTest {
         Assert.assertEquals(toString() + ": buffer should be filled", 0, data.remaining());
     }
 
+    /**
+     * Do a write test.
+     * @throws Exception
+     */
     @Test
     @Ignore
     public void write() throws Exception {
@@ -129,6 +147,10 @@ public abstract class BaseReadWriteTest extends BaseTest {
         Assert.assertEquals(toString() + ": buffer should be fully copied", 0, data.remaining());
     }
 
+    /**
+     * Do a write & read test.
+     * @throws Exception
+     */
     @Test
     public void writeAndRead() throws Exception {
         Utils.DO_CLEAR = false;

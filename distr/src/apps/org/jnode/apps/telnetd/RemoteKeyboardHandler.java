@@ -36,6 +36,11 @@ import org.jnode.driver.input.KeyboardEvent;
 public class RemoteKeyboardHandler extends KeyboardHandler {
     private final RemoteKeyBoardEventReader kbReader;
 
+    /**
+     * Construct a remote keyboard handler for the given terminal.
+     * 
+     * @param terminalIO
+     */
     public RemoteKeyboardHandler(BasicTerminalIO terminalIO) {
         System.err.println("RemoteKeyboardHandler");
 
@@ -43,6 +48,9 @@ public class RemoteKeyboardHandler extends KeyboardHandler {
         kbReader.start();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws IOException {
         kbReader.close();

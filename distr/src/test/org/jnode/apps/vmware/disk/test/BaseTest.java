@@ -27,7 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 
@@ -38,11 +38,20 @@ public abstract class BaseTest {
     protected final boolean copyDisk;
     protected File diskFile;
 
+    /**
+     * 
+     * @param diskFile
+     * @param copyDisk
+     */
     public BaseTest(File diskFile, boolean copyDisk) {
         this.originalDiskFile = diskFile;
         this.copyDisk = copyDisk;
     }
 
+    /**
+     * 
+     * @throws IOException
+     */
     @Before
     public void setUp() throws IOException {
         this.diskFile =
@@ -50,12 +59,19 @@ public abstract class BaseTest {
                         : originalDiskFile;
     }
 
+    /**
+     * 
+     * @throws IOException
+     */
     @After
     public void tearDown() throws IOException {
         Utils.clearTempDir(true);
         Utils.DO_CLEAR = true;
     }
 
+    /**
+     * 
+     */
     @Override
     public String toString() {
         return diskFile.getName();

@@ -40,11 +40,15 @@ import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.service.def.FileSystemPlugin;
 import org.jnode.emu.naming.BasicNameSpace;
+import org.jnode.emu.plugin.model.DummyConfigurationElement;
+import org.jnode.emu.plugin.model.DummyExtension;
+import org.jnode.emu.plugin.model.DummyExtensionPoint;
 import org.jnode.emu.plugin.model.DummyPluginDescriptor;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
+import org.jnode.test.fs.filesystem.config.FSType;
 import org.jnode.util.OsUtils;
 
 public class DeviceUtils {
@@ -57,15 +61,32 @@ public class DeviceUtils {
         if (!OsUtils.isJNode() && !coreInitialized) {
 
             try {
-                // ShellEmu.main(new String[0]);
-                NameSpace namespace = new BasicNameSpace();
-                InitialNaming.setNameSpace(namespace);
-
-                InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
-
-                PluginDescriptor desc = new DummyPluginDescriptor(true);
+//                // ShellEmu.main(new String[0]);
+//                NameSpace namespace = new BasicNameSpace();
+//                InitialNaming.setNameSpace(namespace);
+//
+//                InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
+//
+//                PluginDescriptor desc = new DummyPluginDescriptor(true);
+//                FileSystemService fss = new FileSystemPlugin(desc);
+//                namespace.bind(FileSystemService.class, fss);
+                
+                // Build a plugin descriptor that is sufficient for the FileSystemPlugin to 
+                // configure file system types for testing.
+                DummyPluginDescriptor desc = new DummyPluginDescriptor(true);
+                DummyExtensionPoint ep = new DummyExtensionPoint("types", "org.jnode.fs.types", "types");
+                desc.addExtensionPoint(ep);
+                for (FSType fsType : FSType.values()) {
+                    DummyExtension extension = new DummyExtension();
+                    DummyConfigurationElement element = new DummyConfigurationElement();
+                    element.addAttribute("class", fsType.getFsTypeClass().getName());
+                    extension.addElement(element);
+                    ep.addExtension(extension);
+                }
+                
                 FileSystemService fss = new FileSystemPlugin(desc);
-                namespace.bind(FileSystemService.class, fss);
+                InitialNaming.bind(FileSystemService.class, fss);
+                
             } catch (NameAlreadyBoundException e) {
                 throw new RuntimeException(e);
             } catch (NamingException e) {

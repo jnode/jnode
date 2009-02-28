@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 
@@ -38,22 +38,36 @@ import org.junit.Test;
 public class TestHeader extends BaseReadWriteTest {
     private static final Logger LOG = Logger.getLogger(TestHeader.class);
 
+    /**
+     * Construct a test class for a VMware disk headers stored in a file.
+     * @param diskFile file to use for the VMware disk.
+     * @throws IOException
+     */
     public TestHeader(File diskFile) throws IOException {
         super(diskFile);
     }
 
+    /**
+     * Do a read test on VMware disk headers.
+     */
     @Test
     public void read() throws Exception {
         VMWareDisk disk = new VMWareDisk(diskFile);
         disk.flush();
     }
 
+    /**
+     * Do a write test on VMware disk headers.
+     */
     @Test
     public void write() throws Exception {
         VMWareDisk disk = new VMWareDisk(diskFile);
         disk.flush();
     }
 
+    /**
+     * Do a write and read test on VMware disk headers.
+     */
     @Test
     public void writeAndRead() throws Exception {
         Utils.DO_CLEAR = false;

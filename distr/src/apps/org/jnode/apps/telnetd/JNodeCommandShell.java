@@ -39,12 +39,18 @@ public class JNodeCommandShell extends CommandShell {
     // this.shell = shell;
     // }
 
+    /**
+     * Construct a JNode command shell for the telnet daemon.
+     */
     public JNodeCommandShell(TextConsole cons, JNodeShell shell) throws ShellException {
         super(cons);
         this.shell = shell;
         System.err.println("JNodeCommandShell");
     }
 
+    /**
+     * Exit the JNode command shell for the telnet daemon.
+     */
     @Override
     public void exit() {
         shell.close();
