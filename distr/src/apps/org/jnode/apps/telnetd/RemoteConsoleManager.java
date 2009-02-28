@@ -39,11 +39,21 @@ public class RemoteConsoleManager extends TextScreenConsoleManager {
     private final RemoteTextScreenManager textScreenManager;
     private TerminalIO terminalIO;
 
+    /**
+     * Construct a manager for remote consoles.
+     * 
+     * @throws ConsoleException
+     */
     public RemoteConsoleManager() throws ConsoleException {
         super();
         this.textScreenManager = new RemoteTextScreenManager();
     }
 
+    /**
+     * Define the actual terminal.
+     * 
+     * @param terminalIO
+     */
     public void setTerminalIO(TerminalIO terminalIO) {
         this.terminalIO = terminalIO;
     }

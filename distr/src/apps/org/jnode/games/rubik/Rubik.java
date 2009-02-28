@@ -19,10 +19,6 @@
  */
  
 package org.jnode.games.rubik;
-// Rubik's Cube 3D simulator
-// Karl H\u00f6rnell, March 11 1996
-// Last modified October 6
-// Adapted to JNode by Levente S\u00e1ntha
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -39,6 +35,13 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+/**
+ * Rubik's Cube 3D simulator.
+ * Adapted to JNode by Levente S\u00e1ntha.
+ *  
+ * @author Karl H\u00f6rnell, March 11 1996 (Last modified October 6)
+ *
+ */
 public final class Rubik extends JComponent {
     int i, j, k, n, o, p, q, lastX, lastY, dx, dy;
     int rectX[], rectY[];
@@ -71,6 +74,9 @@ public final class Rubik extends JComponent {
     Graphics offGraphics;
     Image offImage;
 
+    /**
+     * Initialization of the component.
+     */
     public void init() {
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         setFocusable(true);
@@ -140,7 +146,10 @@ public final class Rubik extends JComponent {
         repaint();
     }
 
-    // Convert hexadecimal RGB parameter to color
+    /**
+     * Convert hexadecimal RGB parameter to color
+     * @return
+     */
     public Color findBGColor() {
         int hex[];
         String s, h = "0123456789abcdef";
@@ -160,18 +169,40 @@ public final class Rubik extends JComponent {
 
 // Various vector manipulation functions
 
+    /**
+     * 
+     */
     public double scalProd(double v1[], int ix1, double v2[], int ix2) {
         return v1[ix1] * v2[ix2] + v1[ix1 + 1] * v2[ix2 + 1] + v1[ix1 + 2] * v2[ix2 + 2];
     }
 
+    /**
+     * 
+     * @param v
+     * @param ix
+     * @return
+     */
     public double vNorm(double v[], int ix) {
         return m.sqrt(v[ix] * v[ix] + v[ix + 1] * v[ix + 1] + v[ix + 2] * v[ix + 2]);
     }
 
+    /**
+     * 
+     * @param v1
+     * @param ix1
+     * @param v2
+     * @param ix2
+     * @return
+     */
     public double cosAng(double v1[], int ix1, double v2[], int ix2) {
         return scalProd(v1, ix1, v2, ix2) / (vNorm(v1, ix1) * vNorm(v2, ix2));
     }
 
+    /**
+     * 
+     * @param v
+     * @param ix
+     */
     public void normalize(double v[], int ix) {
         double t = vNorm(v, ix);
         v[ix] = v[ix] / t;
@@ -179,30 +210,66 @@ public final class Rubik extends JComponent {
         v[ix + 2] = v[ix + 2] / t;
     }
 
+    /**
+     * 
+     * @param v
+     * @param ix
+     * @param a
+     */
     public void scalMult(double v[], int ix, double a) {
         v[ix] = v[ix] * a;
         v[ix + 1] = v[ix + 1] * a;
         v[ix + 2] = v[ix + 2] * a;
     }
 
+    /**
+     * 
+     * @param v1
+     * @param ix1
+     * @param v2
+     * @param ix2
+     */
     public void addVec(double v1[], int ix1, double v2[], int ix2) {
         v2[ix2] += v1[ix1];
         v2[ix2 + 1] += v1[ix1 + 1];
         v2[ix2 + 2] += v1[ix1 + 2];
     }
 
+    /**
+     * 
+     * @param v1
+     * @param ix1
+     * @param v2
+     * @param ix2
+     */
     public void subVec(double v1[], int ix1, double v2[], int ix2) {
         v2[ix2] -= v1[ix1];
         v2[ix2 + 1] -= v1[ix1 + 1];
         v2[ix2 + 2] -= v1[ix1 + 2];
     }
 
+    /**
+     * 
+     * @param v1
+     * @param ix1
+     * @param v2
+     * @param ix2
+     */
     public void copyVec(double v1[], int ix1, double v2[], int ix2) {
         v2[ix2] = v1[ix1];
         v2[ix2 + 1] = v1[ix1 + 1];
         v2[ix2 + 2] = v1[ix1 + 2];
     }
 
+    /**
+     * 
+     * @param v1
+     * @param ix1
+     * @param v2
+     * @param ix2
+     * @param v3
+     * @param ix3
+     */
     public void vecProd(double v1[], int ix1, double v2[], int ix2,
                         double v3[], int ix3) {
         v3[ix3] = v1[ix1 + 1] * v2[ix2 + 2] - v1[ix1 + 2] * v2[ix2 + 1];
@@ -210,7 +277,9 @@ public final class Rubik extends JComponent {
         v3[ix3 + 2] = v1[ix1] * v2[ix2 + 1] - v1[ix1 + 1] * v2[ix2];
     }
 
-    // Produce large and small sub-cube for twisting
+    /**
+     * Produce large and small sub-cube for twisting
+     */
     public void cutUpCube() {
         boolean check;
         // Copy main coordinate data
@@ -285,6 +354,11 @@ public final class Rubik extends JComponent {
         }
     }
 
+    /**
+     * 
+     * @param key
+     * @return
+     */
     public boolean keyPressed(int key) {
         // Restore
         if (key == 114) {
@@ -304,6 +378,12 @@ public final class Rubik extends JComponent {
         return false;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean mouseDragged(int x, int y) {
         boolean check;
         double x1, x2, y1, y2, alpha, beta;
@@ -377,6 +457,12 @@ public final class Rubik extends JComponent {
         return false;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean mousePressed(int x, int y) {
         lastX = x;
         lastY = y;
@@ -384,6 +470,12 @@ public final class Rubik extends JComponent {
         return false;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean mouseReleased(int x, int y) {
         int quads;
         double qu;
@@ -410,7 +502,11 @@ public final class Rubik extends JComponent {
         return false;
     }
 
-    // Shift colored fields
+    /**
+     * Shift colored fields
+     * @param sideNum
+     * @param quads
+     */
     public void colorTwist(int sideNum, int quads) {
         int i, j, k, l = 0;
         k = quads * 2; // quads = number of 90-degree multiples
@@ -472,6 +568,9 @@ public final class Rubik extends JComponent {
         }
     }
 
+    /**
+     * 
+     */
     public void paintComponent(Graphics g) {
         dragReg = 0;
         if (offGraphics == null) {
@@ -542,11 +641,22 @@ public final class Rubik extends JComponent {
         g.drawImage(offImage, 0, 0, this);
     }
 
+    /**
+     * 
+     */
     public void update(Graphics g) {
         paint(g);
     }
 
-    // Draw cube or sub-cube
+    /**
+     * Draw cube or sub-cube.
+     * @param beye
+     * @param beX
+     * @param beY
+     * @param bcorners
+     * @param bblocks
+     * @param mode
+     */
     public void fixBlock(double beye[], double beX[], double beY[],
                          double bcorners[], int bblocks[], int mode) {
         copyVec(beye, 0, light, 0);
@@ -666,6 +776,10 @@ public final class Rubik extends JComponent {
         }
     }
 
+    /**
+     * 
+     * @param argv
+     */
     public static void main(String[] argv) {
         JFrame f = new JFrame("Rubik's Cube");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

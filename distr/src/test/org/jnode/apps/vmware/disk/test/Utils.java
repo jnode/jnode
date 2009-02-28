@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 /**
- * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
+ * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare).
  * 
  * @author Fabien DUMINY (fduminy at jnode dot org)
  * 
@@ -42,8 +42,16 @@ public class Utils {
 
     private static long SEQ_NUMBER = 0L;
 
+    /**
+     * Should we clear the temporary directory ? 
+     */
     public static boolean DO_CLEAR = true;
 
+    /**
+     * Create a temporary directory that will be used to store VMware disks.
+     * @return the temporary directory
+     * @throws IOException
+     */
     public static File createTempDir() throws IOException {
         if (!TEMP_DIR_FILE.exists()) {
             if (!TEMP_DIR_FILE.mkdir()) {
@@ -56,11 +64,23 @@ public class Utils {
         return TEMP_DIR_FILE;
     }
 
+    /**
+     * Create a temporary file in the temporary created (if needed) by {@link #createTempDir()}.
+     * @param prefix for the temporary file
+     * @return
+     * @throws IOException
+     */
     public static File createTempFile(String prefix) throws IOException {
         File tmpDir = createTempDir();
         return new File(tmpDir, String.valueOf(prefix) + SEQ_NUMBER++);
     }
 
+    /**
+     * Clean the temporary directory.
+     * 
+     * @param deleteDir true to also delete the temporary directory.
+     * @throws IOException
+     */
     public static void clearTempDir(boolean deleteDir) throws IOException {
         if (!DO_CLEAR)
             return;

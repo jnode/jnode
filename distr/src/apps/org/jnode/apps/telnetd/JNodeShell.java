@@ -57,7 +57,7 @@ public class JNodeShell implements Shell {
     // private Editfield m_EF;
 
     /**
-     * Method that runs a shell
+     * Method that runs a shell.
      * 
      * @param con Connection that runs the shell.
      */
@@ -244,7 +244,10 @@ public class JNodeShell implements Shell {
         }
     }
 
-    // this implements the ConnectionListener!
+    /**
+     *  this implements the ConnectionListener!
+     *  @param ce
+     */
     public void connectionTimedOut(ConnectionEvent ce) {
         try {
             terminalIO.write("CONNECTION_TIMEDOUT");
@@ -257,6 +260,9 @@ public class JNodeShell implements Shell {
         }
     }// connectionTimedOut
 
+    /**
+     *  @param ce
+     */
     public void connectionIdle(ConnectionEvent ce) {
         try {
             terminalIO.write("CONNECTION_IDLE");
@@ -267,6 +273,9 @@ public class JNodeShell implements Shell {
 
     }// connectionIdle
 
+    /**
+     *  @param ce
+     */
     public void connectionLogoutRequest(ConnectionEvent ce) {
         try {
             terminalIO.write("CONNECTION_LOGOUTREQUEST");
@@ -277,6 +286,9 @@ public class JNodeShell implements Shell {
         }
     }// connectionLogout
 
+    /**
+     *  @param ce
+     */
     public void connectionSentBreak(ConnectionEvent ce) {
         try {
             terminalIO.write("CONNECTION_BREAK");
@@ -287,6 +299,10 @@ public class JNodeShell implements Shell {
         }
     }// connectionSentBreak
 
+    /**
+     * Create a Shell instance for JNode telnet daemon.
+     * @return
+     */
     public static Shell createShell() {
         return new JNodeShell();
     }// createShell
