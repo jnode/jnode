@@ -26,7 +26,7 @@ import org.jnode.driver.Device;
  * 
  * @author Fabien DUMINY (fduminy at jnode.org)
  * 
- * @param <T>
+ * @param <T> a file system implementation.
  */
 public abstract class Formatter<T extends FileSystem<?>> implements Cloneable {
     private final FileSystemType<T> type;
@@ -39,11 +39,18 @@ public abstract class Formatter<T extends FileSystem<?>> implements Cloneable {
      * Format the given device
      * 
      * @param device The device we want to format
+     * 
      * @return the newly created FileSystem
-     * @throws FileSystemException
+     * 
+     * @throws FileSystemException if error occurs during formating of the device
      */
     public abstract T format(Device device) throws FileSystemException;
 
+    /**
+     * Gets type of the formated file system.
+     * 
+     * @return type of the file system.
+     */
     public final FileSystemType<T> getFileSystemType() {
         return type;
     }
