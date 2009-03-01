@@ -61,7 +61,6 @@ public class InitJarBuilder extends AbstractPluginsTask {
         try {
             piList = getPluginList();
 
-            System.err.println("insertor = " + insertor);
             if (insertor != null) {
                 insertor.insertInto(piList);
             }
