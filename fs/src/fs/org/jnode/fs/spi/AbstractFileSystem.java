@@ -41,7 +41,7 @@ import org.jnode.fs.FileSystemType;
  * @author Fabien DUMINY
  */
 public abstract class AbstractFileSystem<T extends FSEntry> implements FileSystem<T> {
-	/** */
+    /** My logger */
     private static final Logger log = Logger.getLogger(AbstractFileSystem.class);
     /** The device that contains the file system */
     private final Device device;
