@@ -169,8 +169,8 @@ public class BootDiskBuilder extends BootFloppyBuilder {
     /**
      * Used by ant to set the geometry property.
      *
-     * @param geometryString String in the format ' <cylinder>/ <heads>/ <sectors>', e.\u00f6g.
-     *                       '64/16/32'.
+     * @param geometryString String in the format 'cylinder/heads/sectors',
+     * e.g. '64/16/32'.
      */
     public void setGeometry(String geometryString) {
         try {

@@ -92,7 +92,7 @@ public class VMwareBuilderTask extends Task {
     }
 
     /**
-     * @param vmdkImage The VmdkImage file to set.
+     * @param vmdkImageFile The VmdkImage file to set.
      */
     public void setVmdkImageFile(String vmdkImageFile) {
         this.vmdkImageFile = vmdkImageFile;
