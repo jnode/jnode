@@ -105,7 +105,8 @@ public class AutoUnzipPlugin extends Plugin {
                     break;
                 }
             }
-            System.out.println("plugin " + getDescriptor().getId() +" has been unzipped to " + pluginRootFile.getAbsolutePath());
+            System.out.print("plugin " + getDescriptor().getId());
+            System.out.println(" has been unzipped to " + pluginRootFile.getAbsolutePath());
         } finally {
             startFinished = true;                
         }        
