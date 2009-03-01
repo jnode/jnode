@@ -22,6 +22,7 @@ package org.jnode.vm.classmgr;
 
 import java.io.UTFDataFormatException;
 import java.nio.ByteBuffer;
+import org.jnode.vm.InternString;
 
 /**
  * VM_UTF8Convert
@@ -127,7 +128,7 @@ public abstract class VmUTF8Convert {
                     + i);
             }
         }
-        return new String(result, 0, result_index).intern();
+        return InternString.internString(new String(result, 0, result_index));
     }
 
     /**

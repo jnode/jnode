@@ -21,6 +21,7 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.InternString;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -68,7 +69,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
         if (Modifier.isWide(signature)) {
             modifiers |= Modifier.ACC_WIDE;
         }
-        this.name = name.intern(); //todo review interning, this might not be needed here
+        this.name = InternString.internString(name); //todo review interning, this might not be needed here
         this.signature = signature;
         this.modifiers = modifiers;
         this.declaringClass = declaringClass;

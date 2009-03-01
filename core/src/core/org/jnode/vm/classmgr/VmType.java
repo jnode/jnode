@@ -38,6 +38,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
+import org.jnode.vm.InternString;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
@@ -313,10 +314,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             }
         }
 
-        this.name = name.intern();
+        this.name = InternString.internString(name);
         this.superClass = superClass;
-        this.superClassName = (superClassName == null) ? null : superClassName
-            .intern();
+        this.superClassName = (superClassName == null) ? null : InternString.internString(superClassName);
         this.modifiers = modifiers;
         this.state = VmTypeState.ST_LOADED;
         this.loader = loader;
@@ -507,7 +507,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                     result[i + 2] = name.charAt(i);
                 }
             }
-            arrayClassName = new String(result).intern();
+            arrayClassName = InternString.internString(new String(result));
         }
         return arrayClassName;
     }
