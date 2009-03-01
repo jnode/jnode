@@ -75,7 +75,7 @@
 	    <classpath refid="cp-jnode" />
 			  	
 	    <formatter type="plain" usefile="false" />
-	    <test name="org.jnode.test.fs.AllFSTest" />
+	    <test name="org.jnode.test.fs.filesystem.FSTestSuite" />
 	  </junit>
 	</target>			
 </project>
