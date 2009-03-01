@@ -30,6 +30,8 @@ import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.ext2.Ext2FileSystemFormatter;
 import org.jnode.fs.fat.FatFileSystemFormatter;
 import org.jnode.fs.fat.FatType;
+import org.jnode.fs.hfsplus.HFSPlusParams;
+import org.jnode.fs.hfsplus.HfsPlusFileSystemFormatter;
 import org.jnode.test.fs.filesystem.config.DeviceParam;
 import org.jnode.test.fs.filesystem.config.FS;
 import org.jnode.test.fs.filesystem.config.FSAccessMode;
@@ -61,6 +63,9 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
 //        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.NTFS,
 //                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
 
+        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.HFS_PLUS,
+                FSAccessMode.BOTH, new HfsPlusFileSystemFormatter(new HFSPlusParams()), diskFileName, "1M"));
+        
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
             FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT12), diskFileName, "1M"));
 
