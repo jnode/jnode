@@ -8,20 +8,22 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -30,6 +32,8 @@ import org.jnode.fs.ext2.Ext2FileSystem;
 import org.jnode.fs.ext2.Ext2FileSystemType;
 import org.jnode.fs.fat.FatFileSystem;
 import org.jnode.fs.fat.FatFileSystemType;
+import org.jnode.fs.hfsplus.HfsPlusFileSystem;
+import org.jnode.fs.hfsplus.HfsPlusFileSystemType;
 import org.jnode.fs.iso9660.ISO9660FileSystem;
 import org.jnode.fs.iso9660.ISO9660FileSystemType;
 import org.jnode.fs.ntfs.NTFSFileSystem;
@@ -49,17 +53,20 @@ public enum FSType {
     ISO9660("iso9660", ISO9660FileSystem.class, ISO9660FileSystemType.class,
         new String[]{".", ".."}),
     NTFS("ntfs", NTFSFileSystem.class, NTFSFileSystemType.class,
-        new String[]{"."});
+        new String[]{"."}),
 
-    private final Class<? extends FileSystem> fsClass;
+    HFS_PLUS("HFS+", HfsPlusFileSystem.class, HfsPlusFileSystemType.class,
+            new String[]{"."});
+    
+    private final Class<? extends FileSystem<?>> fsClass;
 
-    private final Class<? extends FileSystemType> fsTypeClass;
+    private final Class<? extends FileSystemType<?>> fsTypeClass;
 
     private final String name;
     private final String[] emptyDirNames;
 
-    private FSType(String name, Class<? extends FileSystem> fsClass,
-                   Class<? extends FileSystemType> fsTypeClass,
+    private FSType(String name, Class<? extends FileSystem<?>> fsClass,
+                   Class<? extends FileSystemType<?>> fsTypeClass,
                    String[] emptyDirNames) {
         this.name = name;
         this.fsClass = fsClass;
@@ -71,12 +78,12 @@ public enum FSType {
         return emptyDirNames;
     }
 
-    public FileSystem mount(Device device, boolean readOnly)
+    public FileSystem<?> mount(Device device, boolean readOnly)
         throws IOException, FileSystemException, NameNotFoundException, InstantiationException, IllegalAccessException {
 
         // mount the device
-        FileSystemType type = (FileSystemType) fsTypeClass.newInstance();
-        FileSystem fs = type.create(device, readOnly);
+        FileSystemType<?> type = fsTypeClass.newInstance();
+        FileSystem<?> fs = type.create(device, readOnly);
 
         return fs;
     }
@@ -84,14 +91,14 @@ public enum FSType {
     /**
      * @return
      */
-    public Class<? extends FileSystem> getFsClass() {
+    public Class<? extends FileSystem<?>> getFsClass() {
         return fsClass;
     }
 
     /**
      * @return
      */
-    public Class<? extends FileSystemType> getFsTypeClass() {
+    public Class<? extends FileSystemType<?>> getFsTypeClass() {
         return fsTypeClass;
     }
 
