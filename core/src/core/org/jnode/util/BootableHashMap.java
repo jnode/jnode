@@ -250,4 +250,7 @@ public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
         locked = true;
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
 }

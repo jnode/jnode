@@ -17,25 +17,53 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package java.lang;
 
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
+import org.jnode.vm.InternString;
+import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.util.BootableHashMap;
+
 /**
  *
  */
+@SharedStatics
 public class NativeString {
-    static final WeakHashMap<String, WeakReference<String>> internTable = new WeakHashMap<String, WeakReference<String>>();
+    static final WeakHashMap<String, WeakReference<String>> internTable =
+        new WeakHashMap<String, WeakReference<String>>();
+    static boolean booted = false;
+    //keeps live refrences to the string in bootheap
+    //TODO cleanup might still be good in case the bootiamge builder interns unnecessary strings
+    static BootableHashMap<String, String> bootInternTable;
+
+    static void boot() {
+        bootInternTable = InternString.getBootInternTable();
+        for (String instance : bootInternTable.values()) {
+            final WeakReference<String> ref = internTable.get(instance);
+            if(ref == null) {
+                internTable.put(instance, new WeakReference<String>(instance));
+            } else {
+                final String s = ref.get();
+                if(s == null) {
+                    internTable.put(instance, new WeakReference<String>(instance));
+                }
+            }
+        }
+        InternString.boot();
+    }
 
     /**
-     *
-     * @param instance
-     * @return
-     * @see String#intern() 
+     * @see String#intern()
      */
     private static String intern(String instance){
         synchronized (internTable) {
+            if(!booted) {
+                boot();
+                booted = true;
+            }
+            
             final WeakReference<String> ref = internTable.get(instance);
             if (ref != null) {
                 final String s = ref.get();

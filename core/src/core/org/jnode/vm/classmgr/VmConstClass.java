@@ -20,6 +20,8 @@
  
 package org.jnode.vm.classmgr;
 
+import org.jnode.vm.InternString;
+
 /**
  * Entry of a constantpool describing a class reference.
  *
@@ -38,7 +40,7 @@ public final class VmConstClass extends VmResolvableConstObject {
      * @param name
      */
     VmConstClass(String name) {
-        this.data = name.replace('/', '.').intern();
+        this.data = InternString.internString(name.replace('/', '.'));
     }
 
     /**

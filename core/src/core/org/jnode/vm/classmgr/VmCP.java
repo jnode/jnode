@@ -21,6 +21,7 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.InternString;
 
 /**
  * A VmCP is the runtime representation of a constant pool
@@ -162,7 +163,7 @@ public final class VmCP extends VmSystemObject {
     }
 
     protected void setUTF8(int index, String value) {
-        set(index, value.intern());
+        set(index, InternString.internString(value));
     }
 
     public VmConstString getString(int index) {

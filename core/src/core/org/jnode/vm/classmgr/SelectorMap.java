@@ -22,6 +22,7 @@ package org.jnode.vm.classmgr;
 
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.InternString;
 
 /**
  * This class is used to maintain a mapping between a method signature (name+type)
@@ -42,7 +43,7 @@ public class SelectorMap extends VmSystemObject {
      * @return The global unique selector
      */
     public int get(String name, String signature) {
-        final String id = (name + '#' + signature).intern();
+        final String id = InternString.internString(name + '#' + signature);
         final Integer selector = (Integer) map.get(id);
         if (selector != null) {
             return selector.intValue();

@@ -23,6 +23,7 @@ package org.jnode.vm.classmgr;
 import java.util.ArrayList;
 
 import org.jnode.vm.JvmType;
+import org.jnode.vm.InternString;
 
 /**
  * <description>
@@ -247,8 +248,8 @@ public class Signature {
                         }
                     }
                     ofs++;
-                    String sig = new String(signature, start, ofs - start).intern()
-                        .replace('/', '.');
+                    String sig = new String(signature, start, ofs - start).replace('/', '.');
+                    sig = InternString.internString(sig);
                     vmClass = loader.loadClass(sig, true);
                     break;
                 }
@@ -258,8 +259,8 @@ public class Signature {
                     while (signature[ofs] != ';') {
                         ofs++;
                     }
-                    String sig = new String(signature, start, ofs - start).intern()
-                        .replace('/', '.');
+                    String sig = new String(signature, start, ofs - start).replace('/', '.');
+                    sig = InternString.internString(sig);
                     ofs++;
                     vmClass = loader.loadClass(sig, true);
                     break;

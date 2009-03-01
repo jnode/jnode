@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
+import org.jnode.vm.InternString;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.isolate.VmIsolateLocal;
 import org.vmmagic.unboxed.Address;
@@ -254,8 +255,8 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     public final String getMangledName() {
         if (mangledName == null) {
-            mangledName = (declaringClass.getMangledName()
-                + mangle("#" + getName() + '.' + getSignature())).intern();
+            mangledName = InternString.internString(declaringClass.getMangledName()
+                + mangle("#" + getName() + '.' + getSignature()));
         }
         return mangledName;
     }
