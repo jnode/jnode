@@ -50,14 +50,14 @@ public class NativeCheckTask extends FileSetTask {
     /**
      * potential implementation of the native methods for JNode.
      * key: className (String)
-     * value: native methods for the class (List<NativeMethod>)
+     * value: native methods for the class (List&lt;NativeMethod&gt;)
      */
     private Map<String, List<NativeMethod>> jnodeNativeMethods = new HashMap<String, List<NativeMethod>>();
 
     /**
      * native methods per class.
      * key: className (String)
-     * value: native methods for the class (List<NativeMethod>)
+     * value: native methods for the class (List&lt;NativeMethod&gt;)
      */
     private Map<String, List<NativeMethod>> nativeMethods = new HashMap<String, List<NativeMethod>>();
 
