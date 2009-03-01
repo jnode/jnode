@@ -105,7 +105,7 @@ public class Screen {
      * attribute, not the 'token' attribute.
      * 
      * @param script this gives us the context for property lookup
-     * @return <code>true</true> if the screen is executable, <code>false</code> otherwise.
+     * @return <code>true</code> if the screen is executable, <code>false</code> otherwise.
      */
     public boolean isExecutable(ConfigureScript script) {
         if (guardProp == null) {

@@ -333,8 +333,7 @@ public class ObjectEmitter {
 
     /**
      * Allocate and write and object of a given type.
-     *
-     * @param <T>
+     * 
      * @param cls
      * @param obj
      * @param vmType
@@ -352,7 +351,6 @@ public class ObjectEmitter {
     /**
      * Store an object at a given offset.
      *
-     * @param <T>
      * @param offset The offset of the start of the object.
      * @param cls
      * @param obj
