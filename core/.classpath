@@ -25,7 +25,6 @@
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/mx4j.jar"/>
 	<classpathentry kind="lib" path="lib/mmtk/mmtk.jar" sourcepath="D:/epr/cvswork/MMTk/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-1.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-attrs-1.5.3.jar"/>
