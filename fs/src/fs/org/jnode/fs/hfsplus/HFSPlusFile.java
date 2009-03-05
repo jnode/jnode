@@ -17,24 +17,23 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.jnode.fs.FSFile;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
-import org.jnode.fs.spi.AbstractFSFile;
 
-public class HFSPlusFile extends AbstractFSFile {
-    private LeafRecord record;
+public class HFSPlusFile extends HFSPlusEntry implements FSFile {
+
     private CatalogFile file;
 
-    public HFSPlusFile(final HFSPlusEntry e) {
-        super((HfsPlusFileSystem) e.getFileSystem());
-        this.record = e.getRecord();
+    public HFSPlusFile(HfsPlusFileSystem fs, HFSPlusDirectory parent, String name, LeafRecord record) {
+        super(fs, parent, name, record);
         this.file = new CatalogFile(record.getData());
     }
 

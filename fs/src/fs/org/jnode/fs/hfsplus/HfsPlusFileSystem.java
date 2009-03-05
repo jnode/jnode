@@ -90,21 +90,19 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     @Override
     protected final FSDirectory createDirectory(final FSEntry entry)
         throws IOException {
-        HFSPlusEntry e = (HFSPlusEntry) entry;
-        return new HFSPlusDirectory(e);
+        return entry.getDirectory();
     }
 
     @Override
     protected final FSFile createFile(final FSEntry entry) throws IOException {
-        HFSPlusEntry e = (HFSPlusEntry) entry;
-        return new HFSPlusFile(e);
+        return entry.getFile();
     }
 
     @Override
     protected final HFSPlusEntry createRootEntry() throws IOException {
         LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
         if (record != null) {
-            return new HFSPlusEntry(this, null, null, "/", record);
+            return new HFSPlusEntry(this, null, "/", record);
         }
         log.debug("Root entry : No record found.");
         return null;
