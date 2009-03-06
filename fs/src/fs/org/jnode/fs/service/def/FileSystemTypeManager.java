@@ -33,22 +33,28 @@ import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 
 /**
+ * This class contains implementation of methods use to manage {@link FileSystemType}.
+ *  
  * @author epr
  */
 final class FileSystemTypeManager implements ExtensionPointListener {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(FileSystemTypeManager.class);
-    /** All registered types */
+    /** All registered file system types */
     private final Map<Class<?>, FileSystemType<?>> types =
             new HashMap<Class<?>, FileSystemType<?>>();
-    /** The org.jnode.fs.types extension point */
+    /** The extension point for file system types*/
     private final ExtensionPoint typesEP;
 
     /**
-     * Create a new instance
+     * Construct new file system manager.
+     * 
+     * @param typesEP {@link ExtensionPoint} for file system types.
+     * 
+     * @throws IllegalArgumentException if typesEP is null;
      */
-    protected FileSystemTypeManager(ExtensionPoint typesEP) {
+    protected FileSystemTypeManager(ExtensionPoint typesEP) throws IllegalArgumentException{
         this.typesEP = typesEP;
         if (typesEP == null) {
             throw new IllegalArgumentException("The types extension-point cannot be null");
@@ -56,19 +62,22 @@ final class FileSystemTypeManager implements ExtensionPointListener {
         refreshFileSystemTypes();
     }
 
+    
     /**
-     * Gets all registered file system types. All instances of the returned
-     * collection are instance of FileSystemType.
+     * Gets all registered file system types
+     * 
+     * @return synchronized collection of FileSystemType.
      */
     public synchronized Collection<FileSystemType<?>> fileSystemTypes() {
         return new ArrayList<FileSystemType<?>>(types.values());
     }
-
+   
     /**
      * Get a registered filesystemType by its name
      * 
-     * @param name the fileSystemType name
-     * @return null if it doesn't exists
+     * @param name the fileSystemType name.
+     * 
+     * @return a FileSystemType implementation or null if it doesn't exists.
      */
     public synchronized <T extends FileSystemType<?>> T getSystemType(Class<T> name) {
         return (T) types.get(name);
@@ -97,10 +106,10 @@ final class FileSystemTypeManager implements ExtensionPointListener {
     }
 
     /**
-     * Create a filesystem type from a given configuration element
+     * Create a file system type from a given configuration element.
      * 
-     * @param types
-     * @param element
+     * @param types the file system type.
+     * @param element the configuration element.
      */
     private void createType(Map<Class<?>, FileSystemType<?>> types, ConfigurationElement element) {
         final String className = element.getAttribute("class");
