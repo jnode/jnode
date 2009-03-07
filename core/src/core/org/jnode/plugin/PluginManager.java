@@ -56,7 +56,7 @@ public abstract class PluginManager {
      *
      * @throws PluginException
      */
-    public abstract void startSystemPlugins(List<PluginDescriptor> descriptors) throws PluginException;
+    public abstract void startSystemPlugins(List<? extends PluginDescriptor> descriptors) throws PluginException;
 
     /**
      * Stop all plugins that have been started

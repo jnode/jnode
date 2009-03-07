@@ -49,12 +49,12 @@ public class PluginUtils {
         }
     }
 
-    public static String getLocalizedMessage(Class parent, String bundleName,
+    public static String getLocalizedMessage(Class<?> parent, String bundleName,
                                              String messageKey) {
         return getLocalizedMessage(parent, bundleName, messageKey, false);
     }
 
-    public static String getLocalizedMessage(Class parent, String bundleName,
+    public static String getLocalizedMessage(Class<?> parent, String bundleName,
                                              String messageKey, boolean cleanFallback) {
         String fullName;
         ClassLoader loader;

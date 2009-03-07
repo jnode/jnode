@@ -38,7 +38,7 @@ final class PluginsClassLoader extends ClassLoader {
     /**
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
-    protected Class findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         for (PluginDescriptor descr : registry) {
             if (!descr.isSystemPlugin() && !descr.isFragment()) {
                 final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
