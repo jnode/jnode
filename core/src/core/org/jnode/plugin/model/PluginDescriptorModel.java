@@ -245,13 +245,13 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                 // Thread.currentThread().getContextClassLoader().loadClass(className);
                 final ClassLoader cl = getPluginClassLoader();
                 // System.out.println("cl=" + cl.getClass().getName());
-                final Class cls = cl.loadClass(className);
+                final Class<?> cls = cl.loadClass(className);
                 // Loading the class may have triggered the creation of the
                 // plugin already.
                 if (plugin != null) {
                     return plugin;
                 } else {
-                    final Constructor cons = cls
+                    final Constructor<?> cons = cls
                         .getConstructor(new Class[]{PluginDescriptor.class});
                     return (Plugin) cons.newInstance(new Object[]{this});
                 }
@@ -471,8 +471,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
             }
         }
         final VmClassLoader currentVmClassLoader = this.vmClassLoader;
-        final PrivilegedAction a = new PrivilegedAction() {
-            public Object run() {
+        final PrivilegedAction<Object[]> a = new PrivilegedAction<Object[]>() {
+            public Object[] run() {
                 if (currentVmClassLoader != null) {
                     PluginClassLoaderImpl cl = new PluginClassLoaderImpl(
                         currentVmClassLoader, registry,
@@ -486,7 +486,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                 }
             }
         };
-        final Object[] result = (Object[]) AccessController.doPrivileged(a);
+        final Object[] result = AccessController.doPrivileged(a);
         this.vmClassLoader = (VmClassLoader) result[1];
         return (PluginClassLoaderImpl) result[0];
     }
@@ -658,7 +658,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         }
         // BootLog.info("Resolve on plugin " + getId());
         try {
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws PluginException {
                     resolve(registry);
                     final int reqMax = requires.length;

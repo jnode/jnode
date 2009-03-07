@@ -108,7 +108,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
             }
 
             // Now parse plugin.xml
-            root = new XMLElement(new Hashtable(), true, false);
+            root = new XMLElement(new Hashtable<Object, Object>(), true, false);
             final Reader r = new InputStreamReader(new ByteBufferInputStream(buf));
             try {
                 root.parseFromReader(r);

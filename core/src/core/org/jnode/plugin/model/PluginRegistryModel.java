@@ -149,7 +149,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
         while (!descriptors.isEmpty()) {
             boolean change = false;
             for (Iterator<PluginDescriptorModel> i = descriptors.iterator(); i.hasNext();) {
-                final PluginDescriptorModel descr = (PluginDescriptorModel) i.next();
+                final PluginDescriptorModel descr = i.next();
                 if (canResolve(descr)) {
                     descr.resolve(this);
                     i.remove();
@@ -168,7 +168,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * @param descr the descriptor for the plugin at issue.
      * @return <code>true</code> if the plugin is resolvable.
      */
-    private final boolean canResolve(PluginDescriptorModel descr) {
+    private final boolean canResolve(PluginDescriptor descr) {
         final PluginPrerequisite reqs[] = descr.getPrerequisites();
         final int length = reqs.length;
         for (int i = 0; i < length; i++) {
@@ -265,10 +265,10 @@ public final class PluginRegistryModel extends VmSystemObject implements
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {
-            pluginJar = (PluginJar) AccessController
-                .doPrivileged(new PrivilegedExceptionAction() {
+            pluginJar = AccessController
+                .doPrivileged(new PrivilegedExceptionAction<PluginJar>() {
 
-                    public Object run() throws PluginException, IOException {
+                    public PluginJar run() throws PluginException, IOException {
                         return new PluginJar(registry, pluginUrl);
                     }
                 });
@@ -314,7 +314,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
         return descr;
     }
 
-    private final void loadDependencies(PluginLoader loader, PluginDescriptor descr,
+    private final void loadDependencies(PluginLoader loader, PluginDescriptorModel descr,
                                         Map<String, PluginDescriptorModel> descriptors) throws PluginException {
         // Prerequisites
         final PluginPrerequisite reqs[] = descr.getPrerequisites();
@@ -366,10 +366,10 @@ public final class PluginRegistryModel extends VmSystemObject implements
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {
-            pluginJar = (PluginJar) AccessController
-                .doPrivileged(new PrivilegedExceptionAction() {
+            pluginJar = AccessController
+                .doPrivileged(new PrivilegedExceptionAction<PluginJar>() {
 
-                    public Object run() throws PluginException, IOException {
+                    public PluginJar run() throws PluginException, IOException {
                         final ByteBuffer buf = loader.getPluginBuffer(pluginId, pluginVersion);
                         if (buf == null) {
                             throw new PluginException(

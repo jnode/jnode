@@ -135,8 +135,8 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
      * @throws ClassNotFoundException
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
-    protected final Class findClass(String name) throws ClassNotFoundException {
-        final Class cls = findPluginClass(name);
+    protected final Class<?> findClass(String name) throws ClassNotFoundException {
+        final Class<?> cls = findPluginClass(name);
         if (cls != null) {
             return cls;
         } else {
@@ -156,20 +156,20 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
      * @return Class The class, or null if not found.
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
-    private final Class findPluginClass(String name) {
+    private final Class<?> findPluginClass(String name) {
         // Try the prerequisite loaders first
         final int max = prerequisiteLoaders.length;
         for (int i = 0; i < max; i++) {
             final PluginClassLoaderImpl cl = prerequisiteLoaders[i];
             if (cl != null) {
-                final Class cls = cl.findPluginClass(name);
+                final Class<?> cls = cl.findPluginClass(name);
                 if (cls != null) {
                     return cls;
                 }
             }
         }
         // Try the loaded classes first
-        final Class loadedCls = findLoadedClass(name);
+        final Class<?> loadedCls = findLoadedClass(name);
         if (loadedCls != null) {
             return loadedCls;
         }
@@ -226,7 +226,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
                 .doPrivileged(GetPolicyAction.getInstance());
             final ProtectionDomain pd = new ProtectionDomain(cs, policy
                 .getPermissions(cs));
-            final Class cls = defineClass(name, b, pd);
+            final Class<?> cls = defineClass(name, b, pd);
             resolveClass(cls);
             return cls;
         } else {
@@ -303,7 +303,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
         return url;
     }
 
-    public Enumeration getResources(String name) {
+    public Enumeration<?> getResources(String name) {
         System.err.println("getResources " + name);
         final List<URL> urls = new ArrayList<URL>();
 
