@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -101,7 +103,7 @@ public final class DefaultPluginManager extends PluginManager {
      *
      * @throws PluginException
      */
-    public void startSystemPlugins(List descriptors) throws PluginException {
+    public void startSystemPlugins(List  descriptors) throws PluginException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(START_SYSTEM_PLUGINS_PERM);
@@ -231,8 +233,8 @@ public final class DefaultPluginManager extends PluginManager {
     private List<PluginDescriptor> createPluginDescriptorList() throws PluginException {
 
         // Get all descriptors into a hashmap (id, descriptor).
-        final HashMap<String, PluginDescriptor> all = new HashMap<String, PluginDescriptor>();
-        final HashSet<String> systemSet = new HashSet<String>();
+        final Map<String, PluginDescriptor> all = new HashMap<String, PluginDescriptor>();
+        final Set<String> systemSet = new HashSet<String>();
         for (PluginDescriptor descr : registry) {
             all.put(descr.getId(), descr);
             if (descr.isSystemPlugin()) {
@@ -283,8 +285,8 @@ public final class DefaultPluginManager extends PluginManager {
      * @param descr
      * @param nameSet
      */
-    private boolean canAdd(PluginDescriptor descr, HashSet<String> nameSet,
-                           HashSet<String> systemSet) {
+    private boolean canAdd(PluginDescriptor descr, Set<String> nameSet,
+                           Set<String> systemSet) {
         //Syslog.debug("Testing " + descr.getId());
         if (!descr.isSystemPlugin()) {
             if (!systemSet.isEmpty()) {
@@ -308,7 +310,7 @@ public final class DefaultPluginManager extends PluginManager {
      * @param descr
      * @param all
      */
-    private boolean prerequisitesExist(PluginDescriptor descr, HashMap all) {
+    private boolean prerequisitesExist(PluginDescriptor descr, Map<String, PluginDescriptor> all) {
         final PluginPrerequisite[] prereq = descr.getPrerequisites();
         for (int i = 0; i < prereq.length; i++) {
             final PluginPrerequisite pr = prereq[i];
