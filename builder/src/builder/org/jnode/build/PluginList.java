@@ -90,8 +90,12 @@ public final class PluginList {
                     throw new PluginException("id attribute expected on "
                         + e.getName());
                 }
+                
+                // version attribute is optional
+                // if not specified, then the latest version found will be used.
+                final String version = e.getStringAttribute("version");
 
-                addPlugin(descrList, pluginList, id);
+                addPlugin(descrList, pluginList, id, version);
             } else if (e.getName().equals("manifest")) {
                 manifest = parseManifest(e);
             } else if (e.getName().equals("include")) {
@@ -103,39 +107,76 @@ public final class PluginList {
         }
     }
     
-    public void addPlugin(String id) throws MalformedURLException, PluginException {
-        addPlugin(descrList, pluginList, id);
+    /**
+     * 
+     * @param id
+     * @param version optional
+     * @throws MalformedURLException
+     * @throws PluginException
+     */
+    public void addPlugin(String id, String version) throws MalformedURLException, PluginException {
+        addPlugin(descrList, pluginList, id, version);
     }
     
-    private void addPlugin(List<URL> descrList, List<URL> pluginList, String id)
+    /**
+     * 
+     * @param descrList
+     * @param pluginList
+     * @param id
+     * @param version optional parameter
+     * @throws MalformedURLException
+     * @throws PluginException
+     */
+    private void addPlugin(List<URL> descrList, List<URL> pluginList, String id, String version)
         throws MalformedURLException, PluginException {
-        final File f = findPlugin(defaultDir, id);
+        final File f = findPlugin(defaultDir, id, version);
         final URL pluginUrl = f.toURL();
         final URL descrUrl = new URL("jar:" + pluginUrl + "!/plugin.xml");
-
+        
         if (pluginList.contains(pluginUrl)) {
-            throw new PluginException("can't use the same id(" + id + ") for multiple plugins");
+            String versionStr = (version == null) ? "unspecified" : version;
+            throw new PluginException("can't use the same id(" + id + 
+                    ") and version(" + versionStr + ") for multiple plugins");
         }
 
         descrList.add(descrUrl);
         pluginList.add(pluginUrl);
     }
 
-    private File findPlugin(File dir, final String id) {
+    private File findPlugin(File dir, final String id, String version) {
         // System.out.println("Find " + id + " in " + dir);
+        final String begin = id + "_";
+        final String end = ".jar";
+        
         String[] names = dir.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return name.startsWith(id + "_") && name.endsWith(".jar");
+                return name.startsWith(begin) && name.endsWith(end);
             }
         });
 
         if (names.length == 0) {
             throw new IllegalArgumentException("Cannot find plugin " + id
                 + " in " + dir + " for list " + this.name);
-        } else {
-            Arrays.sort(names);
-            return new File(dir, names[names.length - 1]);
         }
+
+        String filename = null;
+        if (version != null) {
+            // version specified, try to find it
+            for (String name : names) {
+                String v = name.substring(begin.length(), name.length() - end.length());
+                if (version.equals(v)) {
+                    filename = name; // found exact version
+                    break;
+                }
+            }            
+        }
+        
+        if (filename == null) {
+            // by default, take the latest version
+            filename = names[names.length - 1];
+        }
+        
+        return new File(dir, filename);
     }
 
     private Manifest parseManifest(XMLElement me) throws PluginException {
@@ -239,11 +280,11 @@ public final class PluginList {
     }
 
     /**
-     * Create an URL to a plugin with a given id.
+     * Create an URL to a plugin with a given id and version.
      */
-    public final URL createPluginURL(String id) {
+    public final URL createPluginURL(String id, String version) {
         try {
-            return findPlugin(defaultDir, id).toURL();
+            return findPlugin(defaultDir, id, version).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

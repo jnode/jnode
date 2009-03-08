@@ -38,6 +38,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
+import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.Runtime;
 import org.jnode.system.BootLog;
 import org.jnode.util.BootableArrayList;
@@ -106,6 +107,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     private final String version;
 
     private final int priority;
+    
+    private PluginReference reference;
 
     /**
      * Create a new instance
@@ -528,6 +531,17 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      */
     public String getVersion() {
         return version;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public PluginReference getPluginReference() {
+        if (reference == null) {
+            // lazy creation
+            reference = new PluginReference(id, version);
+        }
+        return reference;
     }
 
     /**

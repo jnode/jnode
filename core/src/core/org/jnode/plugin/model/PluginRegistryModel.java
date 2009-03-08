@@ -435,7 +435,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
             }
 
             // Now remove it
-            unloadedIds.add(new PluginReference(descr.getId(), descr.getVersion()));
+            unloadedIds.add(descr.getPluginReference());
             descr.unresolve(this);
         }
     }

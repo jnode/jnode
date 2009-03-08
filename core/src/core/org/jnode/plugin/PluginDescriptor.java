@@ -80,7 +80,13 @@ public interface PluginDescriptor {
      * @return the version
      */
     public abstract String getVersion();
-
+    
+    /**
+     * Get the plugin reference, something that uniquely identify a plugin (id + version)
+     * @return
+     */
+    public PluginReference getPluginReference();
+    
     /**
      * Gets the required imports.
      *

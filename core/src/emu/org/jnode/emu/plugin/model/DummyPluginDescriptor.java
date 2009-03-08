@@ -30,6 +30,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
+import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.Runtime;
 
 /**
@@ -157,5 +158,9 @@ public class DummyPluginDescriptor implements PluginDescriptor {
     public void removeListener(PluginDescriptorListener listener) {
         // TODO Auto-generated method stub
 
+    }
+
+    public PluginReference getPluginReference() {
+        return null;
     }
 }

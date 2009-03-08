@@ -49,7 +49,7 @@ public class PluginListInsertor extends PackagerTask {
         if (isEnabled()) {
             for (String pluginId : readPluginIds(list.getName())) {
                 log("Adding user plugin " + pluginId + " to " + list.getName(), Project.MSG_INFO);            
-                list.addPlugin(pluginId);
+                list.addPlugin(pluginId, null);
             }
         } else {
             log("PluginListInsertor is disabled", Project.MSG_INFO);
