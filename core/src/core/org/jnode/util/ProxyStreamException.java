@@ -20,7 +20,6 @@
  
 package org.jnode.util;
 
-import java.io.IOException;
 
 /**
  * This exception indicates an error in a proxy stream mechanism.  This
