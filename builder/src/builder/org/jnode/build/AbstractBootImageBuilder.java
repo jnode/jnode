@@ -407,7 +407,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         try {
             log("plugin-list: " + getPluginListFile(), Project.MSG_DEBUG);
             piList = getPluginList();
-            memMgrPluginURL = piList.createPluginURL(memMgrPluginId);
+            memMgrPluginURL = piList.createPluginURL(memMgrPluginId, version);
             lmPI = Math.max(piList.lastModified(), memMgrPluginURL.openConnection().getLastModified());
         } catch (PluginException ex) {
             throw new BuildException(ex);

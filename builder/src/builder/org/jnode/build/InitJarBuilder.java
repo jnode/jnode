@@ -24,9 +24,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.tools.ant.Project;
@@ -188,20 +190,49 @@ public class InitJarBuilder extends AbstractPluginsTask {
      */
     protected void testPluginPrerequisites(List<PluginJar> pluginJars)
         throws BuildException {
-        final HashSet<String> ids = new HashSet<String>();
-
+        final Map<String, List<String>> idToVersions = new HashMap<String, List<String>>();
+        
+        // get all couples (id, version) in idToVersions 
         for (PluginJar piJar : pluginJars) {
             final PluginDescriptor descr = piJar.getDescriptor();
-            ids.add(descr.getId());
+            
+            List<String> versions = idToVersions.get(descr.getId());
+            if (versions == null) {
+                versions = new ArrayList<String>(); 
+                idToVersions.put(descr.getId(), versions);
+            }
+            
+            versions.add(descr.getVersion());
         }
+        
+        // now, check that each dependency is satisfied
         for (PluginJar piJar : pluginJars) {
             final PluginDescriptor descr = piJar.getDescriptor();
             final PluginPrerequisite[] prereqs = descr.getPrerequisites();
+            
             for (int j = 0; j < prereqs.length; j++) {
-                if (!ids.contains(prereqs[j].getPluginId())) {
+                PluginPrerequisite required = prereqs[j]; 
+                List<String> versions = idToVersions.get(required.getPluginId());
+                
+                boolean versionSpecified = (required.getPluginVersion() == null); 
+
+                boolean satisfied = false;
+                if (versions != null) {
+                    satisfied = !versionSpecified || 
+                        versions.contains(required.getPluginVersion());
+                }
+                
+                if (!satisfied) {
+                    String reqVersionStr =  versionSpecified ? "" : " version " + 
+                            required.getPluginVersion();
+                    
+                    String versionStr =  (descr.getVersion()  == null) ? "" : " version " + 
+                            descr.getVersion();
+                    
                     throw new BuildException("Cannot find plugin "
-                        + prereqs[j].getPluginId()
-                        + ", which is required by " + descr.getId());
+                        + required.getPluginId() + reqVersionStr 
+                        + ", which is required by " + descr.getId() 
+                        + versionStr);
                 }
             }
         }
