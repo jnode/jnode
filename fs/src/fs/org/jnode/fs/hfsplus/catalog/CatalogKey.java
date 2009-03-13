@@ -27,12 +27,19 @@ import org.jnode.util.BigEndian;
 
 public class CatalogKey extends AbstractKey {
     
-    public static final int MINIMUM_KEY_LENGTH = 6;
-    public static final int MAXIMUM_KEY_LENGTH = 516;
-
-    private HFSUnicodeString nodeName;
+	public static final int MINIMUM_KEY_LENGTH = 6;
+	public static final int MAXIMUM_KEY_LENGTH = 516;
+	/**
+	 * Catalog node id of the folder that contains file or folder represented by
+	 * the record. For thread records, contains the catalog node id of the file
+	 * or folder itself.
+	 */
+	private CatalogNodeId parentId;
+	/** Name of the file or folder, empty for thread records. */
+	private HFSUnicodeString nodeName;
 
     /**
+     * Create catalog key from existing data.
      * 
      * @param src
      * @param offset
@@ -45,7 +52,7 @@ public class CatalogKey extends AbstractKey {
         currentOffset += 2;
         ck = new byte[4];
         System.arraycopy(src, currentOffset, ck, 0, 4);
-        parentID = new CatalogNodeId(ck, 0);
+        parentId = new CatalogNodeId(ck, 0);
         currentOffset += 4;
         if (keyLength > MINIMUM_KEY_LENGTH) {
             nodeName = new HFSUnicodeString(src, currentOffset);
@@ -53,24 +60,20 @@ public class CatalogKey extends AbstractKey {
     }
 
     /**
-     * Create catalog key based on parent CNID and the name of the file or folder.
+     * Create new catalog key based on parent CNID and the name of the file or folder.
      * 
      * @param parentID Parent catalog node identifier.
      * @param name Name of the file or folder.
      * 
      */
     public CatalogKey(final CatalogNodeId parentID, final HFSUnicodeString name) {
-        this.parentID = parentID;
+        this.parentId = parentID;
         this.nodeName = name;
         this.keyLength = MINIMUM_KEY_LENGTH + name.getLength();
     }
 
-    public final int getKeyLength() {
-        return keyLength;
-    }
-
     public final CatalogNodeId getParentId() {
-        return parentID;
+        return parentId;
     }
 
     public final HFSUnicodeString getNodeName() {
@@ -104,7 +107,7 @@ public class CatalogKey extends AbstractKey {
     public byte[] getBytes() {
         byte[] data = new byte[this.getKeyLength()];
         BigEndian.setInt16(data, 0, this.getKeyLength());
-        System.arraycopy(parentID.getBytes(), 0, data, 2, 4);
+        System.arraycopy(parentId.getBytes(), 0, data, 2, 4);
         System.arraycopy(nodeName.getBytes(), 0, data, 6, nodeName.getLength());
         return data;
     }

@@ -176,11 +176,9 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
                 new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
                         .getFolderId(), dirName);
 
-        CatalogFolder newFolder = new CatalogFolder();
-        newFolder.setFolderId(new CatalogNodeId(volumeHeader.getNextCatalogId()));
-        newFolder.setCreateDate(macDate);
-        newFolder.setContentModDate(macDate);
-        newFolder.setAttrModDate(macDate);
+        CatalogFolder newFolder =
+                new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()), macDate,
+                        macDate, macDate);
         log.debug("New catalog folder :\n" + newFolder.toString());
 
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);

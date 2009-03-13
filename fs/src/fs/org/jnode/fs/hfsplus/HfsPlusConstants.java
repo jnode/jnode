@@ -46,10 +46,6 @@ public class HfsPlusConstants {
     public static final int RECORD_TYPE_FOLDER_THREAD = 0x0003;
     public static final int RECORD_TYPE_FILE_THREAD = 0x0004;
 
-    public static final int kJIJournalInFSMask = 0x00000001;
-    public static final int kJIJournalOnOtherDeviceMask = 0x00000002;
-    public static final int kJIJournalNeedInitMask = 0x00000004;
-
     public static final byte EK_DATA_FORK = (byte) 0x00;
     public static final byte EK_RESOURCE_FORK = (byte) 0xFF;
     
