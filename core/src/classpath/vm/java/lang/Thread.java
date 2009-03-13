@@ -39,7 +39,6 @@ exception statement from your version. */
 package java.lang;
 
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.HashMap;
 
 
@@ -101,7 +100,6 @@ import sun.nio.ch.Interruptible;
  * @see #start()
  * @see ThreadLocal
  * @since 1.0
- * @status updated to 1.4
  */
 @SharedStatics
 public class Thread implements Runnable 
@@ -141,15 +139,20 @@ public class Thread implements Runnable
     private final Thread parent;
 
     /** The default exception handler.  */
-  private static UncaughtExceptionHandler defaultHandler;
+    private static UncaughtExceptionHandler defaultHandler;
 
-    /** Thread local storage. Package accessible for use by
-     * InheritableThreadLocal.
+     /* ThreadLocal values pertaining to this thread. This map is maintained
+     * by the ThreadLocal class. */
+    ThreadLocal.ThreadLocalMap threadLocals = null;
+
+    /*
+     * InheritableThreadLocal values pertaining to this thread. This map is
+     * maintained by the InheritableThreadLocal class.
      */
-   WeakHashMap locals;
+    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
 
     /** The uncaught exception handler.  */
-  UncaughtExceptionHandler exceptionHandler;
+    UncaughtExceptionHandler exceptionHandler;
 
     /**
      * Name and number of threads created. Used only for generating unique names.
@@ -158,8 +161,7 @@ public class Thread implements Runnable
      */
     private static final HashMap<String, Integer> nameMap = new HashMap<String, Integer>();
 
-    private static final JNodePermission GETVMTHREAD_PERM = new JNodePermission(
-            "getVmThread");
+    private static final JNodePermission GETVMTHREAD_PERM = new JNodePermission("getVmThread");
 
     /**
    * Allocates a new <code>Thread</code> object. This constructor has
@@ -345,8 +347,9 @@ public class Thread implements Runnable
         this.vmThread = VmProcessor.current().createThread(this);
         this.vmThread.setPriority(current.getPriority());
         this.vmThread.updateName();
-        
-        InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
+
+        if (parent.inheritableThreadLocals != null)
+            this.inheritableThreadLocals = ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
     }
 
       /**
@@ -396,7 +399,8 @@ public class Thread implements Runnable
         this.vmThread.setPriority(current.getPriority());
         this.vmThread.updateName();
 
-        InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
+      if (parent.inheritableThreadLocals != null)
+            this.inheritableThreadLocals = ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
   }
 
     /**
@@ -431,8 +435,11 @@ public class Thread implements Runnable
         this.vmThread = VmProcessor.current().createThread(isolatedStatics, this);
         this.vmThread.setPriority(this.getPriority());
         this.vmThread.updateName();
-        
-        InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
+
+        //todo review it: should thread locals be inherited accorss isolates? Probably not... 
+        ThreadLocal.ThreadLocalMap parentLocals = currentThread().inheritableThreadLocals;
+        if (parentLocals != null)
+            this.inheritableThreadLocals = ThreadLocal.createInheritedMap(parentLocals);
     }
 
     /**
@@ -1067,19 +1074,6 @@ public class Thread implements Runnable
     }
 
     /**
-     * Returns the map used by ThreadLocal to store the thread local values.
-     */
-    static Map getThreadLocals() {
-        Thread thread = currentThread();
-        Map locals = thread.locals;
-        if (locals == null)
-        {
-            locals = thread.locals = new WeakHashMap();
-        }
-        return locals;
-    }
-
-    /**
    * Assigns the given <code>UncaughtExceptionHandler</code> to this
    * thread.  This will then be called if the thread terminates due
    * to an uncaught exception, pre-empting that of the
@@ -1213,6 +1207,8 @@ public class Thread implements Runnable
     public final void onExit() {
         if (vmThread.isStopping()) {
             group.remove(this);
+            threadLocals = null;
+            inheritableThreadLocals = null;
         }
     }
 
@@ -1466,5 +1462,4 @@ public class Thread implements Runnable
   //          blocker = b;
     //    }
     }
-
 }
