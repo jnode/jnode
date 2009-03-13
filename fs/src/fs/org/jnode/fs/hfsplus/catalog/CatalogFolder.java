@@ -27,89 +27,103 @@ import org.jnode.util.BigEndian;
 public class CatalogFolder {
     
     public static final int CATALOG_FOLDER_SIZE = 88;
-    
-    private byte[] data;
 
+    private int recordType;
+    private int valence;
+    private CatalogNodeId folderId;
+    private int createDate;
+    private int contentModDate;
+    private int attrModDate;
+
+    /**
+     * 
+     * @param src
+     */
     public CatalogFolder(final byte[] src) {
-        data = new byte[88];
+        byte[] data = new byte[88];
         System.arraycopy(src, 0, data, 0, CATALOG_FOLDER_SIZE);
+        recordType = BigEndian.getInt16(data, 0);
+        valence = BigEndian.getInt32(data, 4);
+        folderId = new CatalogNodeId(data, 8);
+        createDate = BigEndian.getInt32(data, 12);
+        contentModDate = BigEndian.getInt32(data, 16);
+        attrModDate = BigEndian.getInt32(data, 20);
     }
 
     /**
-     * Create a new catalog folder.
      * 
-     * @param folderId
-     * 
+     * @param valence
+     * @param folderID
+     * @param createDate
+     * @param contentModDate
+     * @param attrModDate
      */
-    public CatalogFolder() {
-        data = new byte[88];
-        BigEndian.setInt16(data, 0, HfsPlusConstants.RECORD_TYPE_FOLDER);
+    public CatalogFolder(int valence, CatalogNodeId folderID, int createDate,
+            int contentModDate, int attribModDate) {
+        this.recordType = HfsPlusConstants.RECORD_TYPE_FOLDER;
+        this.valence = valence;
+        this.folderId = folderID;
+        this.createDate = createDate;
+        this.contentModDate = contentModDate;
+        this.attrModDate = attribModDate;
     }
 
-    public final int getRecordType() {
-        return BigEndian.getInt16(data, 0);
-    }
-
-    public final void setValence(int valence) {
-        BigEndian.setInt32(data, 4, valence);
-    }
-
-    public final int getValence() {
-        return BigEndian.getInt32(data, 4);
-    }
-
-    public final CatalogNodeId getFolderId() {
-        return new CatalogNodeId(data, 8);
-    }
-
-    public final void setFolderId(CatalogNodeId folderId) {
-        System.arraycopy(folderId.getBytes(), 0, data, 8,
-                folderId.getBytes().length);
-    }
-
-    public final int getCreateDate() {
-        return BigEndian.getInt32(data, 12);
-    }
-
-    public void setCreateDate(int time) {
-        BigEndian.setInt32(data, 12, time);
-    }
-
-    public final int getContentModDate() {
-        return BigEndian.getInt32(data, 16);
-    }
-
-    public void setContentModDate(int time) {
-        BigEndian.setInt32(data, 16, time);
-    }
-
-    public final int getAttrModDate() {
-        return BigEndian.getInt32(data, 20);
-    }
-
-    public void setAttrModDate(int time) {
-        BigEndian.setInt32(data, 20, time);
-    }
-
+    /**
+     * Return bytes representation of the catalog folder.
+     * 
+     * @return byte array representation.
+     */
     public byte[] getBytes() {
+        byte[] data = new byte[88];
+        BigEndian.setInt16(data, 0, recordType);
+        BigEndian.setInt32(data, 4, valence);
+        System.arraycopy(folderId.getBytes(), 0, data, 8, folderId.getBytes().length);
+        BigEndian.setInt32(data, 12, createDate);
+        BigEndian.setInt32(data, 16, contentModDate);
+        BigEndian.setInt32(data, 20, attrModDate);
         return data;
     }
 
-    public final String toString() {
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
         StringBuffer s = new StringBuffer();
-        s.append("Record type: ").append(getRecordType()).append("\n");
-        s.append("Valence: ").append(getValence()).append("\n");
-        s.append("Folder ID: ").append(getFolderId().getId()).append("\n");
+        s.append("Record type: ").append(recordType).append("\n");
+        s.append("Valence: ").append(valence).append("\n");
+        s.append("Folder ID: ").append(folderId.getId()).append("\n");
         s.append("Creation Date :").append(
-                HFSUtils.printDate(getCreateDate(), "EEE MMM d HH:mm:ss yyyy"))
-                .append("\n");
+                HFSUtils.printDate(createDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         s.append("Content Mod Date  :").append(
-                HFSUtils.printDate(getContentModDate(),
-                        "EEE MMM d HH:mm:ss yyyy")).append("\n");
-        s.append("Attr Mod Date  :")
-                .append(
-                        HFSUtils.printDate(getAttrModDate(),
-                                "EEE MMM d HH:mm:ss yyyy")).append("\n");
+                HFSUtils.printDate(contentModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
+        s.append("Attr Mod Date  :").append(
+                HFSUtils.printDate(attrModDate, "EEE MMM d HH:mm:ss yyyy")).append("\n");
         return s.toString();
     }
+
+    public int getRecordType() {
+        return recordType;
+    }
+
+    public int getValence() {
+        return valence;
+    }
+
+    public CatalogNodeId getFolderId() {
+        return folderId;
+    }
+
+    public int getCreateDate() {
+        return createDate;
+    }
+
+    public int getContentModDate() {
+        return contentModDate;
+    }
+
+    public int getAttrModDate() {
+        return attrModDate;
+    }
+    
 }

@@ -51,7 +51,7 @@ public class HFSPlusFile extends HFSPlusEntry implements FSFile {
     public final void read(final long fileOffset, final ByteBuffer dest) throws IOException {
         HfsPlusFileSystem fs = (HfsPlusFileSystem) getFileSystem();
         for (ExtentDescriptor d : file.getDataFork().getExtents()) {
-            if (d.getStartBlock() != 0 && d.getBlockCount() != 0) {
+            if (!d.isEmpty()) {
                 long firstOffset = d.getStartBlock() * fs.getVolumeHeader().getBlockSize();
                 fs.getApi().read(firstOffset, dest);
             }

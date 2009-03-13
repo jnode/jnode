@@ -23,44 +23,61 @@ package org.jnode.fs.hfsplus.extent;
 import org.jnode.util.BigEndian;
 
 public class ExtentDescriptor {
-
+	/** The size pf the extent descriptor. */
     public static final int EXTENT_DESCRIPTOR_LENGTH = 8;
-
-    private byte[] data;
+    /** The first allocation block. */
+    private int startBlock;
+    /** The length in allocation blocks of the extent. */
+    private int blockCount;
 
     /**
-     * Create empty extent descriptor.
+     * Create a new extent descriptor.
+     * 
+     * @param startBlock first allocation block.
+     * @param blockCount number of blocks in the extent.
      */
-    public ExtentDescriptor() {
-        data = new byte[EXTENT_DESCRIPTOR_LENGTH];
-    }
-
-    public ExtentDescriptor(final byte[] src, final int offset) {
-        data = new byte[EXTENT_DESCRIPTOR_LENGTH];
+    public ExtentDescriptor(int startBlock, int blockCount) {
+		this.startBlock = startBlock;
+		this.blockCount = blockCount;
+	}
+    
+    /**
+     * Create extent descriptor from existing data.
+     * 
+     * @param src byte array contains existing extent descriptor informations.
+     * @param offset position where data for extent descriptor begin.
+     */
+	public ExtentDescriptor(final byte[] src, final int offset) {
+    	byte[] data = new byte[EXTENT_DESCRIPTOR_LENGTH];
         System.arraycopy(src, offset, data, 0, EXTENT_DESCRIPTOR_LENGTH);
+        startBlock = BigEndian.getInt32(data, 0);
+        blockCount = BigEndian.getInt32(data, 4);       
     }
-
-    public final int getStartBlock() {
-        return BigEndian.getInt32(data, 0);
-    }
-
-    public final void setStartBlock(int start) {
-        BigEndian.setInt32(data, 0, start);
-    }
-
-    public final int getBlockCount() {
-        return BigEndian.getInt32(data, 4);
-    }
-
-    public final void setBlockCount(int count) {
-        BigEndian.setInt32(data, 4, count);
-    }
-
+	/**
+	 * 
+	 * @return
+	 */
     public final byte[] getBytes() {
-        return data;
-    }
+		byte[] data = new byte[EXTENT_DESCRIPTOR_LENGTH];
+		BigEndian.setInt32(data, 0, startBlock);
+		BigEndian.setInt32(data, 4, blockCount);
+		return data;
+	}
 
     public final String toString() {
-        return "Start block : " + getStartBlock() + "\tBlock count : " + getBlockCount() + "\n";
+        return "Start block : " + startBlock + "\tBlock count : " + blockCount + "\n";
     }
+
+	public int getStartBlock() {
+		return startBlock;
+	}
+
+	public int getBlockCount() {
+		return blockCount;
+	}
+	
+	public boolean isEmpty(){
+	    return (startBlock == 0 || blockCount == 0);
+	}
+
 }

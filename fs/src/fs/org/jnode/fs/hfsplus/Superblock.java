@@ -133,18 +133,16 @@ public class Superblock extends HFSPlusObject {
         long allocationClumpSize = getClumpSize(params.getBlockCount());
         long bitmapBlocks = allocationClumpSize / blockSize;
         long blockUsed = 2 + burnedBlocksBeforeVH + burnedBlocksAfterAltVH + bitmapBlocks;
-        HFSPlusForkData forkdata = new HFSPlusForkData();
-        forkdata.setTotalSize(allocationClumpSize);
-        forkdata.setClumpSize((int) allocationClumpSize);
-        forkdata.setTotalBlocks((int) bitmapBlocks);
-        ExtentDescriptor desc = new ExtentDescriptor();
-        desc.setStartBlock(1 + burnedBlocksBeforeVH);
-        desc.setBlockCount((int) bitmapBlocks);
-        forkdata.setExtentDescriptor(0, desc);
-        System.arraycopy(forkdata.getBytes(), 0, data, 112, forkdata.FORK_DATA_LENGTH);
+        
+        int startBlock = 1 + burnedBlocksBeforeVH;
+        int blockCount = (int) bitmapBlocks;
+       
+        HFSPlusForkData forkdata = new HFSPlusForkData(allocationClumpSize, (int)allocationClumpSize,(int) bitmapBlocks);
+        ExtentDescriptor desc = new ExtentDescriptor(startBlock, blockCount);
+        forkdata.addDescriptor(0, desc);
+        System.arraycopy(forkdata.getBytes(), 0, data, 112, HFSPlusForkData.FORK_DATA_LENGTH);
         // Journal creation
         int nextBlock = 0;
-
         if (params.isJournaled()) {
             this.setFileCount(2);
             this.setAttribute(HFSPLUS_VOL_JOURNALED_BIT);
@@ -156,27 +154,18 @@ public class Superblock extends HFSPlusObject {
             nextBlock = desc.getStartBlock() + desc.getBlockCount();
         }
         // Extent B-Tree initialization
-        forkdata = new HFSPlusForkData();
-        forkdata.setTotalSize(params.getExtentClumpSize());
-        forkdata.setClumpSize(params.getExtentClumpSize());
-        forkdata.setTotalBlocks((params.getExtentClumpSize() / blockSize));
-        desc = new ExtentDescriptor();
-        desc.setStartBlock(nextBlock);
-        desc.setBlockCount(forkdata.getTotalBlocks());
-        forkdata.setExtentDescriptor(0, desc);
-        System.arraycopy(forkdata.getBytes(), 0, data, 192, forkdata.FORK_DATA_LENGTH);
+        forkdata = new HFSPlusForkData(params.getExtentClumpSize(),params.getExtentClumpSize(),(params.getExtentClumpSize() / blockSize));
+        desc = new ExtentDescriptor(nextBlock, forkdata.getTotalBlocks());
+        forkdata.addDescriptor(0, desc);
+        System.arraycopy(forkdata.getBytes(), 0, data, 192, HFSPlusForkData.FORK_DATA_LENGTH);
         blockUsed += forkdata.getTotalBlocks();
         // Catalog B-Tree initialization
-        forkdata = new HFSPlusForkData();
-        forkdata.setTotalSize(params.getCatalogClumpSize());
-        forkdata.setClumpSize(params.getCatalogClumpSize());
-        forkdata.setTotalBlocks(params.getCatalogClumpSize() / blockSize);
-        desc = new ExtentDescriptor();
-        desc.setStartBlock(this.getExtentsFile().getExtents()[0].getStartBlock()
-                + this.getExtentsFile().getExtents()[0].getBlockCount());
-        desc.setBlockCount(forkdata.getTotalBlocks());
-        forkdata.setExtentDescriptor(0, desc);
-        System.arraycopy(forkdata.getBytes(), 0, data, 272, forkdata.FORK_DATA_LENGTH);
+        forkdata = new HFSPlusForkData(params.getCatalogClumpSize(),params.getCatalogClumpSize(),(params.getCatalogClumpSize() / blockSize));
+        startBlock = this.getExtentsFile().getExtent(0).getStartBlock() + this.getExtentsFile().getExtent(0).getBlockCount();
+        blockCount = forkdata.getTotalBlocks();
+        desc = new ExtentDescriptor(startBlock, blockCount);
+        forkdata.addDescriptor(0, desc);
+        System.arraycopy(forkdata.getBytes(), 0, data, 272, HFSPlusForkData.FORK_DATA_LENGTH);
         blockUsed += forkdata.getTotalBlocks();
 
         this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);

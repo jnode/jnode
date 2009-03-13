@@ -22,12 +22,15 @@ package org.jnode.fs.hfsplus.catalog;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HFSUnicodeString;
+import org.jnode.fs.hfsplus.HFSUtils;
 import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.Superblock;
@@ -65,7 +68,7 @@ public class Catalog {
         log.debug("Load B-Tree catalog file.\n");
         this.fs = fs;
         Superblock sb = fs.getVolumeHeader();
-        ExtentDescriptor firstExtent = sb.getCatalogFile().getExtents()[0];
+        ExtentDescriptor firstExtent = sb.getCatalogFile().getExtent(0);
         catalogHeaderNodeOffset = firstExtent.getStartBlock() * sb.getBlockSize();
         if (firstExtent.getStartBlock() != 0 && firstExtent.getBlockCount() != 0) {
             buffer = ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH
@@ -121,9 +124,13 @@ public class Catalog {
         // First record (folder)
         HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
         CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
-        CatalogFolder folder = new CatalogFolder();
-        folder.setFolderId(CatalogNodeId.HFSPLUS_ROOT_CNID);
-        folder.setValence(params.isJournaled() ? 2 : 0);
+        int valence = params.isJournaled() ? 2 : 0;
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
+        CatalogFolder folder =
+                new CatalogFolder(valence, CatalogNodeId.HFSPLUS_ROOT_CNID, macDate, macDate,
+                        macDate);
         LeafRecord record = new LeafRecord(ck, folder.getBytes());
         rootNode.addNodeRecord(0, record, offset);
         // Second record (thread)
