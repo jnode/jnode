@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
@@ -42,14 +42,16 @@ public class HFSPlusForkData {
      * @param offset
      */
     public HFSPlusForkData(final byte[] src, final int offset) {
-    	byte[] data = new byte[FORK_DATA_LENGTH];
+        byte[] data = new byte[FORK_DATA_LENGTH];
         System.arraycopy(src, offset, data, 0, FORK_DATA_LENGTH);
         totalSize = BigEndian.getInt64(data, 0);
         clumpSize = BigEndian.getInt32(data, 8);
         totalBlock = BigEndian.getInt32(data, 12);
         extents = new ExtentDescriptor[8];
         for (int i = 0; i < 8; i++) {
-        	extents[i] = new ExtentDescriptor(data, EXTENT_OFFSET + (i * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH));
+            extents[i] =
+                    new ExtentDescriptor(data, EXTENT_OFFSET +
+                            (i * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH));
         }
     }
 
@@ -62,24 +64,23 @@ public class HFSPlusForkData {
      * @param totalBock
      */
     public HFSPlusForkData(long totalSize, int clumpSize, int totalBlock) {
-		this.totalSize = totalSize;
-		this.clumpSize = clumpSize;
-		this.totalBlock = totalBlock;
-		this.extents = new ExtentDescriptor[8];
-	}
-    
+        this.totalSize = totalSize;
+        this.clumpSize = clumpSize;
+        this.totalBlock = totalBlock;
+        this.extents = new ExtentDescriptor[8];
+    }
+
     public byte[] getBytes() {
-    	byte[] data = new byte[FORK_DATA_LENGTH];
-    	BigEndian.setInt64(data, 0, totalSize);
-    	BigEndian.setInt32(data, 8, clumpSize);
-    	BigEndian.setInt32(data, 12, totalBlock);
+        byte[] data = new byte[FORK_DATA_LENGTH];
+        BigEndian.setInt64(data, 0, totalSize);
+        BigEndian.setInt32(data, 8, clumpSize);
+        BigEndian.setInt32(data, 12, totalBlock);
         return data;
     }
- 
-    
-    
+
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public final String toString() {
@@ -93,32 +94,32 @@ public class HFSPlusForkData {
         return s.toString();
     }
 
-	public long getTotalSize() {
-		return totalSize;
-	}
+    public long getTotalSize() {
+        return totalSize;
+    }
 
-	public int getClumpSize() {
-		return clumpSize;
-	}
+    public int getClumpSize() {
+        return clumpSize;
+    }
 
-	public int getTotalBlocks() {
-		return totalBlock;
-	}
-	
-	public ExtentDescriptor getExtent(int index){
-		return extents[index];
-	}
-	
-	/**
+    public int getTotalBlocks() {
+        return totalBlock;
+    }
+
+    public ExtentDescriptor getExtent(int index) {
+        return extents[index];
+    }
+
+    /**
      * 
      * @param index
      * @param desc
      */
     public final void addDescriptor(int index, ExtentDescriptor desc) {
-       extents[index] = desc;
+        extents[index] = desc;
     }
 
-    public ExtentDescriptor[] getExtents(){
+    public ExtentDescriptor[] getExtents() {
         return extents;
     }
 

@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.catalog;
 
 import org.jnode.fs.hfsplus.HFSUnicodeString;
@@ -26,17 +26,17 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
 public class CatalogKey extends AbstractKey {
-    
-	public static final int MINIMUM_KEY_LENGTH = 6;
-	public static final int MAXIMUM_KEY_LENGTH = 516;
-	/**
-	 * Catalog node id of the folder that contains file or folder represented by
-	 * the record. For thread records, contains the catalog node id of the file
-	 * or folder itself.
-	 */
-	private CatalogNodeId parentId;
-	/** Name of the file or folder, empty for thread records. */
-	private HFSUnicodeString nodeName;
+
+    public static final int MINIMUM_KEY_LENGTH = 6;
+    public static final int MAXIMUM_KEY_LENGTH = 516;
+    /**
+     * Catalog node id of the folder that contains file or folder represented by
+     * the record. For thread records, contains the catalog node id of the file
+     * or folder itself.
+     */
+    private CatalogNodeId parentId;
+    /** Name of the file or folder, empty for thread records. */
+    private HFSUnicodeString nodeName;
 
     /**
      * Create catalog key from existing data.
@@ -60,7 +60,8 @@ public class CatalogKey extends AbstractKey {
     }
 
     /**
-     * Create new catalog key based on parent CNID and the name of the file or folder.
+     * Create new catalog key based on parent CNID and the name of the file or
+     * folder.
      * 
      * @param parentID Parent catalog node identifier.
      * @param name Name of the file or folder.
@@ -93,8 +94,9 @@ public class CatalogKey extends AbstractKey {
             CatalogKey ck = (CatalogKey) key;
             res = this.getParentId().compareTo(ck.getParentId());
             if (res == 0) {
-                res = this.getNodeName().getUnicodeString().compareTo(
-                        ck.getNodeName().getUnicodeString());
+                res =
+                        this.getNodeName().getUnicodeString().compareTo(
+                                ck.getNodeName().getUnicodeString());
             }
         }
         return res;
@@ -102,6 +104,7 @@ public class CatalogKey extends AbstractKey {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.jnode.fs.hfsplus.tree.AbstractKey#getBytes()
      */
     public byte[] getBytes() {
@@ -111,16 +114,18 @@ public class CatalogKey extends AbstractKey {
         System.arraycopy(nodeName.getBytes(), 0, data, 6, nodeName.getLength());
         return data;
     }
-    
+
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public final String toString() {
         StringBuffer s = new StringBuffer();
-        s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",").append(getParentId().getId())
-                .append(",").append((getNodeName() != null) ? getNodeName().getUnicodeString() : "");
+        s.append("[length, Parent ID, Node name]:").append(getKeyLength()).append(",").append(
+                getParentId().getId()).append(",").append(
+                (getNodeName() != null) ? getNodeName().getUnicodeString() : "");
         return s.toString();
     }
-    
+
 }
