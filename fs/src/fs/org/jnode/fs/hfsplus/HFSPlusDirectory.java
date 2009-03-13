@@ -77,8 +77,8 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
 
     @Override
     public FSEntry getEntry(String name) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        checkEntriesLoaded();
+        return entries.get(name);
     }
 
     @Override
