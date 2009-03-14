@@ -29,9 +29,10 @@ public class HFSUnicodeString {
     private String string;
 
     /**
+     * Create HFSUnicodeString from existing data.
      * 
-     * @param src
-     * @param offset
+     * @param src byte array contains data.
+     * @param offset start of data in the array.
      */
     public HFSUnicodeString(final byte[] src, final int offset) {
         length = BigEndian.getInt16(src, offset);

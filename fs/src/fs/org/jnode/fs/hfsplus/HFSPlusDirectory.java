@@ -166,19 +166,12 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         }
 
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
-
-        Calendar now = Calendar.getInstance();
-        now.setTime(new Date());
-        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
-
         HFSUnicodeString dirName = new HFSUnicodeString(name);
         CatalogThread thread =
-                new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
-                        .getFolderId(), dirName);
-
+            new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
+                    .getFolderId(), dirName);
         CatalogFolder newFolder =
-                new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()), macDate,
-                        macDate, macDate);
+            new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
         log.debug("New catalog folder :\n" + newFolder.toString());
 
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);
