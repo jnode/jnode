@@ -20,6 +20,7 @@
 
 package org.jnode.fs.hfsplus;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,20 +60,55 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
 
     @Override
     public FSEntry addDirectory(String name) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        log.debug("<<< BEGIN addDirectory " + name + " >>>");
+        if (fs.isReadOnly()){
+            throw new ReadOnlyFileSystemException();
+        }
+
+        if (getEntry(name) != null) {
+            throw new IOException("File or Directory already exists" + name);
+        }
+        FSEntry newEntry = createDirectoryEntry(name);
+        setFreeEntry(newEntry);
+        log.debug("<<< END addDirectory " + name + " >>>");
+        return newEntry;
     }
 
     @Override
     public FSEntry addFile(String name) throws IOException {
-        // TODO Auto-generated method stub
+        log.debug("<<< BEGIN addFile " + name + " >>>");
+        if (fs.isReadOnly()){
+            throw new ReadOnlyFileSystemException();
+        }
+        if (getEntry(name) != null) {
+            throw new IOException("File or directory already exists: " + name);
+        }
+        FSEntry newEntry = createFileEntry(name);
+        setFreeEntry(newEntry);
+
+        log.debug("<<< END addFile " + name + " >>>");
+        return newEntry;
+    }
+    
+    private final FSEntry createFileEntry(final String name)
+        throws IOException {
+        //TODO
         return null;
     }
 
     @Override
     public void flush() throws IOException {
-        // TODO Auto-generated method stub
-
+        log.debug("<<< BEGIN flush >>>");
+        if (fs.isReadOnly()) {
+            throw new ReadOnlyFileSystemException();
+        }
+        boolean flushEntries = isEntriesLoaded() && entries.isDirty();
+        if (isDirty() || flushEntries) {
+            writeEntries(entries);
+            //entries.resetDirty();
+            resetDirty();
+        }
+        log.debug("<<< END flush >>>");
     }
 
     @Override
@@ -89,8 +125,16 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
 
     @Override
     public void remove(String name) throws IOException {
-        // TODO Auto-generated method stub
-
+        if (fs.isReadOnly()){
+            throw new ReadOnlyFileSystemException();
+        }
+        if (entries.remove(name) >= 0) {
+            setDirty();
+            flush();
+            return;
+        } else {
+            throw new FileNotFoundException(name);
+        }
     }
 
     // Helper methods
@@ -153,6 +197,11 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         }
         return new FSEntryTable(((HfsPlusFileSystem) getFileSystem()), pathList);
     }
+    
+
+    private void writeEntries(final FSEntryTable entries) throws IOException {
+        // TODO Auto-generated method stub
+    }
 
     /**
      * 
@@ -185,6 +234,21 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         log.debug("New volume header :\n" + volumeHeader.toString());
 
         return newEntry;
+    }
+    
+    /**
+     * Find a free entry and set it with the given entry 
+     * @param newEntry
+     * @throws IOException
+     */
+    private final void setFreeEntry(FSEntry newEntry) throws IOException {
+        checkEntriesLoaded();
+        if (entries.setFreeEntry(newEntry) >= 0) {
+            log.debug("setFreeEntry: free entry found !");
+            setDirty();
+            flush();
+            return;
+        }
     }
 
 }
