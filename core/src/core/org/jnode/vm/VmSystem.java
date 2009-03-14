@@ -338,6 +338,7 @@ public final class VmSystem {
 
         res.put("swing.handleTopLevelPaint", "false");
         res.put("java.protocol.handler.pkgs", "org.jnode.protocol|gnu.java.net.protocol|gnu.inet");
+        res.put("java.content.handler.pkgs", "gnu.java.net.content");
 
         VmSystemSettings.insertSystemProperties(res);
     }
