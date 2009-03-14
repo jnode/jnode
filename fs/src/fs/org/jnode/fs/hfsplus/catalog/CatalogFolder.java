@@ -54,18 +54,14 @@ public class CatalogFolder {
      * 
      * @param valence
      * @param folderID
-     * @param createDate
-     * @param contentModDate
-     * @param attrModDate
      */
-    public CatalogFolder(int valence, CatalogNodeId folderID, int createDate,
-            int contentModDate, int attribModDate) {
+    public CatalogFolder(int valence, CatalogNodeId folderID) {
         this.recordType = HfsPlusConstants.RECORD_TYPE_FOLDER;
         this.valence = valence;
         this.folderId = folderID;
-        this.createDate = createDate;
-        this.contentModDate = contentModDate;
-        this.attrModDate = attribModDate;
+        this.createDate = HFSUtils.getNow();
+        this.contentModDate = HFSUtils.getNow();
+        this.attrModDate = HFSUtils.getNow();
     }
 
     /**

@@ -125,13 +125,8 @@ public class Catalog {
         // First record (folder)
         HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
         CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
-        int valence = params.isJournaled() ? 2 : 0;
-        Calendar now = Calendar.getInstance();
-        now.setTime(new Date());
-        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
         CatalogFolder folder =
-                new CatalogFolder(valence, CatalogNodeId.HFSPLUS_ROOT_CNID, macDate, macDate,
-                        macDate);
+                new CatalogFolder(params.isJournaled() ? 2 : 0, CatalogNodeId.HFSPLUS_ROOT_CNID);
         LeafRecord record = new LeafRecord(ck, folder.getBytes());
         rootNode.addNodeRecord(0, record, offset);
         // Second record (thread)
