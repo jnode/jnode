@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.net.usb.bluetooth;
 
 import org.apache.log4j.Logger;
@@ -84,7 +84,7 @@ public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNe
                 log.debug("*** Set interrupt endpoint");
             }
         }
-        if ((num_bulk_intr != 1) || (num_bulk_intr != 1) || (num_bulk_intr != 1)) {
+        if ((num_bulk_intr != 1) || (num_bulk_out != 1) || (num_bulk_in != 1)) {
             throw new DriverException("Must have one bulk-in (" + num_bulk_in +
                     "), one bulk out (" + num_bulk_out + ") and one interrupt (" + num_bulk_intr +
                     ") endpoints. Driver not bound.");
