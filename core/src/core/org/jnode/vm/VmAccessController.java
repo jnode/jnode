@@ -44,7 +44,7 @@ import org.jnode.vm.scheduler.VmThread;
 public final class VmAccessController {
 
     /**
-     * Checks wether the access control context of the current thread allows the
+     * Checks whether the access control context of the current thread allows the
      * given Permission. Throws an <code>AccessControlException</code> when
      * the permission is not allowed in the current context. Otherwise returns
      * silently without throwing an exception.
