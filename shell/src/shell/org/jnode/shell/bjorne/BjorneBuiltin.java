@@ -30,7 +30,7 @@ abstract class BjorneBuiltin {
             BjorneContext context) throws ShellException;
 
     void error(String msg, BjorneContext context) {
-        context.resolvePrintStream(context.getStream(Command.STD_ERR)).println(msg);
+        context.resolvePrintStream(context.getIO(Command.STD_ERR)).println(msg);
     }
 
 }

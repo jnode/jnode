@@ -86,9 +86,9 @@ public class DefaultCommandInvoker implements SimpleCommandInvoker {
         }
         try {
             final CommandIO[] ios = cmdLine.getStreams();
-            if (ios[0] != CommandLine.DEFAULT_STDIN
-                    || ios[1] != CommandLine.DEFAULT_STDOUT
-                    || ios[2] != CommandLine.DEFAULT_STDERR) {
+            if (ios[0] != CommandLine.DEFAULT_STDIN ||
+                    ios[1] != CommandLine.DEFAULT_STDOUT ||
+                    ios[2] != CommandLine.DEFAULT_STDERR) {
                 err.println("Warning: redirections ignored by the '"
                         + getName() + "' invoker");
             }

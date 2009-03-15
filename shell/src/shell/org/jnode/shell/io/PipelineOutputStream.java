@@ -34,10 +34,9 @@ public final class PipelineOutputStream extends OutputStream {
 
     @Override
     public void flush() throws IOException {
-        if (pipeline == null) {
-            throw new IOException("pipeline closed");
+        if (pipeline != null) {
+            pipeline.flush();
         }
-        pipeline.flush();
     }
 
     @Override

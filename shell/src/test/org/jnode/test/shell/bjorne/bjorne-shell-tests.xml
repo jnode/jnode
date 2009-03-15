@@ -633,7 +633,6 @@ Hi mum again
         <script>#!bjorne
                 echo &gt; @TEMP_DIR@/1 Hi mum
                 echo &gt; @TEMP_DIR@/2 Hi mum again
-                cat @TEMP_DIR@/1 @TEMP_DIR@/2 @TEMP_DIR@/1 @TEMP_DIR@/2 | cat
                 cat @TEMP_DIR@/1 @TEMP_DIR@/2 @TEMP_DIR@/1 @TEMP_DIR@/2 | cat > @TEMP_DIR@/3
         </script>
         <file name="1" input="false">Hi mum
@@ -644,6 +643,17 @@ Hi mum again
 Hi mum again
 Hi mum
 Hi mum again
+</file>
+    </testSpec>   
+    <testSpec title="pipeline 2" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo &gt; @TEMP_DIR@/1 Hi mum
+                echo &gt; @TEMP_DIR@/2 Hi mum again
+                cat @TEMP_DIR@/1 @TEMP_DIR@/2 @TEMP_DIR@/1 @TEMP_DIR@/2 | cat
+        </script>
+        <file name="1" input="false">Hi mum
+</file>
+        <file name="2" input="false">Hi mum again
 </file>
     <output>Hi mum
 Hi mum again
@@ -656,7 +666,20 @@ Hi mum again
                 echo &gt; @TEMP_DIR@/1 Hi mum
                 echo &gt; @TEMP_DIR@/2 Hi mum again
                 ( cat @TEMP_DIR@/1 ; cat @TEMP_DIR@/2 )
-                ( cat @TEMP_DIR@/1 ; cat @TEMP_DIR@/2 ) > @TEMP_DIR@/3
+        </script>
+        <file name="1" input="false">Hi mum
+</file>
+        <file name="2" input="false">Hi mum again
+</file>
+        <output>Hi mum
+Hi mum again
+</output>
+    </testSpec>
+    <testSpec title="subshell 2" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo &gt; @TEMP_DIR@/1 Hi mum
+                echo &gt; @TEMP_DIR@/2 Hi mum again
+                ( cat @TEMP_DIR@/1 ; cat @TEMP_DIR@/2 ) &gt; @TEMP_DIR@/3
         </script>
         <file name="1" input="false">Hi mum
 </file>
@@ -665,9 +688,20 @@ Hi mum again
         <file name="3" input="false">Hi mum
 Hi mum again
 </file>
-        <output>Hi mum
+    </testSpec>
+    <testSpec title="subshell 3" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                echo &gt; @TEMP_DIR@/1 Hi mum
+                echo &gt; @TEMP_DIR@/2 Hi mum again
+                ( cat @TEMP_DIR@/1 ; cat @TEMP_DIR@/2 ) | cat &gt; @TEMP_DIR@/4
+        </script>
+        <file name="1" input="false">Hi mum
+</file>
+        <file name="2" input="false">Hi mum again
+</file>
+        <file name="4" input="false">Hi mum
 Hi mum again
-</output>
+</file>
     </testSpec>
     
 </testSet>

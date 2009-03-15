@@ -97,7 +97,7 @@ public class CommandOutput extends BaseCommandIO {
         return DIRECTION_OUT;
     }
 
-    public void close() throws IOException {
+    void doClose() throws IOException {
         flush();
         if (printWriter != null) {
             printWriter.close();
@@ -113,7 +113,7 @@ public class CommandOutput extends BaseCommandIO {
         }
     }
     
-    public void flush() throws IOException {
+    void doFlush() throws IOException {
         if (writer != null) {
             writer.flush();
         }

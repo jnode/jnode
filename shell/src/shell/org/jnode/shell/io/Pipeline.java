@@ -231,7 +231,7 @@ public class Pipeline {
     }
     
     synchronized void flush() throws IOException {
-        checkState(ACTIVE | CLOSED, "flush");
+        // FIXME This should be unnecessary ... but we'll do it for now to be safe.
         this.notifyAll();
     }
 

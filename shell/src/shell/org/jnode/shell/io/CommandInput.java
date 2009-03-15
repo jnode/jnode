@@ -75,13 +75,17 @@ public class CommandInput extends BaseCommandIO {
         return DIRECTION_IN;
     }
 
-    public void close() throws IOException {
+    void doClose() throws IOException {
         if (inputStream != null) {
             inputStream.close();
         }
         if (reader != null) {
             reader.close();
         }
+    }
+    
+    @Override
+    void doFlush() throws IOException {
     }
 
     @Override

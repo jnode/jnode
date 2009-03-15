@@ -31,7 +31,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.bjorne.BjorneContext;
 import org.jnode.shell.bjorne.BjorneToken;
-import org.jnode.shell.bjorne.StreamHolder;
+import org.jnode.shell.io.CommandIOHolder;
 
 public class BjorneContextTests extends TestCase {
 
@@ -122,7 +122,7 @@ public class BjorneContextTests extends TestCase {
     }
 
     public void testExpand14() throws ShellException {
-        BjorneContext parentContext = new BjorneContext(null, new StreamHolder[0]);
+        BjorneContext parentContext = new BjorneContext(null, new CommandIOHolder[0]);
         parentContext.setVariable("A", "A");
         BjorneContext context = new BjorneContext(parentContext);
         List<BjorneToken> expansion = context.expandAndSplit("'$A'");
@@ -153,7 +153,6 @@ public class BjorneContextTests extends TestCase {
         checkExpansion(expansion, new String[] {"~"});
     }
 
-    @SuppressWarnings("deprecation")
     private void checkExpansion(List<BjorneToken> expansion, String[] expected) {
         int i;
         Iterator<BjorneToken> it = expansion.iterator();

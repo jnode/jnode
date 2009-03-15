@@ -20,6 +20,10 @@
 
 package org.jnode.shell.bjorne;
 
+import org.jnode.shell.CommandRunnable;
+import org.jnode.shell.CommandShell;
+import org.jnode.shell.CommandThread;
+import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.ShellException;
 
 public class CaseCommandNode extends CommandNode {
@@ -74,5 +78,17 @@ public class CaseCommandNode extends CommandNode {
             rc = (rc == 0) ? -1 : 0;
         }
         return rc;
+    }
+    
+    @Override
+    public CommandThread fork(CommandShell shell, final BjorneContext context) 
+        throws ShellException {
+        
+        CommandRunnable cr = new BjorneSubshellRunner(context) {
+            @Override
+            public int doRun() throws ShellException {
+                return CaseCommandNode.this.execute(context);
+            }};
+        return new CommandThreadImpl(cr, context.getName());
     }
 }
