@@ -27,12 +27,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PipedReader;
+import java.io.PipedWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.apache.log4j.Logger;
+import org.jnode.vm.annotation.DoPrivileged;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 
 /**
  * Common utility code for higher-level operations on IO streams.  Notwithstanding the
@@ -43,6 +50,11 @@ import org.apache.log4j.Logger;
  * @author crawley@jnode.org
  */
 public class IOUtils {
+    // FIXME ... these utils (in some cases) attempt to access non-public fields
+    // of various stream classes in order to figure out what the underlying stream
+    // is.  Currently, we have to explicitly grant the calling application permissions
+    // to do this (e.g. via the plugin descriptor).  Ideally, this should be unnecessary
+    // ... but I cannot figure out how to implement this.
     
     private IOUtils() {
         // Prevent instantiation
@@ -70,6 +82,28 @@ public class IOUtils {
         }
     }
     
+    public static boolean isPipe(Closeable stream) {
+        if (stream instanceof PipeStream) {
+            return true;
+        } else if (stream instanceof ProxyStream<?>) {
+            return isPipe(((ProxyStream<?>) stream).getRealStream());
+        } else if (stream instanceof OutputStreamWriter) {
+            return isPipe(findOutputStream((OutputStreamWriter) stream));
+        } else if (stream instanceof InputStreamReader) {
+            return isPipe(findInputStream((InputStreamReader) stream));
+        } else if (stream instanceof ReaderInputStream) {
+            return isPipe(((ReaderInputStream) stream).getReader());
+        } else if (stream instanceof WriterOutputStream) {
+            return isPipe(((WriterOutputStream) stream).getWriter());
+        } else if (stream instanceof FilterInputStream) {
+            return isPipe(findInputStream((FilterInputStream) stream));
+        } else if (stream instanceof FilterOutputStream) {
+            return isPipe(findOutputStream((FilterOutputStream) stream));
+        } else {
+            return false;
+        }
+    }
+
     public static Closeable findBaseStream(Closeable stream) {
         if (stream instanceof ConsoleStream) {
             return stream;
@@ -108,9 +142,9 @@ public class IOUtils {
                 }
             }
         };
-        return pa.run();
+        return AccessController.doPrivileged(pa);
     }
-    
+
     private static OutputStream findOutputStream(final FilterOutputStream outputStream) {
         PrivilegedAction<OutputStream> pa = new PrivilegedAction<OutputStream>() {
             public OutputStream run() {
@@ -125,10 +159,9 @@ public class IOUtils {
                 }
             }
         };
-        return pa.run();
+        return AccessController.doPrivileged(pa);
     }
 
-    
     private static OutputStream findOutputStream(final OutputStreamWriter writer) {
         // This implementation is based on the knowledge that an OutputStreamWriter
         // uses the underlying OutputStream as its 'lock' object.
@@ -145,7 +178,7 @@ public class IOUtils {
                 }
             }
         };
-        return pa.run();
+        return AccessController.doPrivileged(pa);
     }
 
     private static InputStream findInputStream(final InputStreamReader reader) {
@@ -164,7 +197,6 @@ public class IOUtils {
                 }
             }
         };
-        return pa.run();
+        return AccessController.doPrivileged(pa);
     }
-
 }
