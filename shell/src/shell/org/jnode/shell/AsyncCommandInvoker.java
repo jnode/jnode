@@ -107,6 +107,9 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         CommandRunner cr = null;
 
         CommandIO[] ios = cmdLine.getStreams();
+        boolean redirected = ios[Command.STD_IN] != CommandLine.DEFAULT_STDIN ||
+            ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT ||
+            ios[Command.STD_ERR] != CommandLine.DEFAULT_STDERR;
         try {
             commandShell.resolveStreams(ios);
         } catch (ClassCastException ex) {
@@ -128,9 +131,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
                     new ShellInvocationException("The 'main' method for " + 
                             cmdInfo.getCommandClass() + " is not public static");
                 }
-                if (ios[Command.STD_IN] != CommandLine.DEFAULT_STDIN
-                        || ios[Command.STD_OUT] != CommandLine.DEFAULT_STDOUT
-                        || ios[Command.STD_ERR] != CommandLine.DEFAULT_STDERR) {
+                if (redirected) {
                     throw new ShellInvocationException(
                             "The 'main' method for " + cmdInfo.getCommandClass() +
                             " does not allow redirection or pipelining");
