@@ -30,7 +30,6 @@ import org.jnode.shell.ShellException;
  * @author crawley@jnode.org
  */
 final class ColonBuiltin extends BjorneBuiltin {
-    @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
         return 0;

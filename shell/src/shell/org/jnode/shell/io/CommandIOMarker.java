@@ -36,23 +36,37 @@ import java.io.Writer;
  */
 public final class CommandIOMarker extends BaseCommandIO {
     private final String name;
+    private final int direction;
 
     public CommandIOMarker(String name) {
+        this(name, DIRECTION_UNSPECIFIED);
+    }
+
+    public CommandIOMarker(String name, int direction) {
         super(null);
         this.name = name;
+        this.direction = direction;
     }
 
     public String toString() {
-        return name;
+        return name + "(" + direction + ")";
     }
 
     @Override
     public int getDirection() {
-        return DIRECTION_UNSPECIFIED;
+        return direction;
     }
     
-    public void close() {
+    void doClose() {
         // do nothing.
+    }
+
+    void doFlush() {
+        // do nothing.
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

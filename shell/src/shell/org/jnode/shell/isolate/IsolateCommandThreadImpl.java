@@ -61,7 +61,7 @@ public class IsolateCommandThreadImpl implements CommandThread {
     
     public IsolateCommandThreadImpl(CommandRunner cr) throws IOException {
         this.cr = cr;
-        CommandIO[] ios = cr.getIos();
+        CommandIO[] ios = cr.getIOs();
         Properties properties = System.getProperties();
         StreamBindings streamBindings = createStreamBindings(ios);
         isolate = new Isolate(streamBindings, properties, 
@@ -69,7 +69,7 @@ public class IsolateCommandThreadImpl implements CommandThread {
     }
 
     private StreamBindings createStreamBindings(CommandIO[] ios) throws IOException {
-        // FIXME if there are more than 4 CommandIOs, they should be passed
+        // FIXME if there are more than 4 streams, they should be passed
         // to the isolate via a link message.  Note that the 4th one is the command
         // shell's error stream!!
 //        if (ios.length > 3) {

@@ -979,12 +979,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public CommandIO[] resolveStreams(CommandIO[] ios) {
-        CommandIO[] res = new CommandIO[ios.length];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = resolveStream(ios[i]);
+    public void resolveStreams(CommandIO[] ios) {
+        for (int i = 0; i < ios.length; i++) {
+            ios[i] = resolveStream(ios[i]);
         }
-        return res;
     }
 
     public PrintStream resolvePrintStream(CommandIO io) {

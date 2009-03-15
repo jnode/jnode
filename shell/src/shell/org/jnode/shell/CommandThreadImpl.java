@@ -83,11 +83,7 @@ public class CommandThreadImpl extends Thread implements CommandThread {
     }
 
     public int getReturnCode() {
-        if (this.runner instanceof CommandRunner) {
-            return ((CommandRunner) this.runner).getRC();
-        } else {
-            return 0;
-        }
+        return this.runner.getRC();
     }
 
     @SuppressWarnings("deprecation")

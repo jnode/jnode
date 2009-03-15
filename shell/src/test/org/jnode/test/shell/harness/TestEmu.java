@@ -42,7 +42,6 @@ public class TestEmu {
     private static CommandShell shell;
     private static Class<?> emuClass;
     
-    @SuppressWarnings("unused")
     private static Object emuObject;
     
     private static Set<String> loadedPseudoPlugins = new HashSet<String>();

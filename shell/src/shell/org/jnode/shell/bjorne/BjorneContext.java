@@ -49,15 +49,15 @@ import java.util.regex.Pattern;
 
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.CommandThread;
+import org.jnode.shell.CommandShell;
 import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.io.CommandIO;
-import org.jnode.shell.io.CommandIOMarker;
 import org.jnode.shell.io.CommandInput;
 import org.jnode.shell.io.CommandOutput;
+import org.jnode.shell.io.CommandIOHolder;
 
 /**
  * This class holds the shell variable and stream state for a bjorne shell
@@ -70,10 +70,6 @@ import org.jnode.shell.io.CommandOutput;
  */
 public class BjorneContext {
     
-    public static final CommandIOMarker PIPE_IN = new CommandIOMarker("PIPEIN");
-    
-    public static final CommandIOMarker PIPE_OUT = new CommandIOMarker("PIPEOUT");
-
     private static final int NONE = 0;
 
     private static final int PREHASH = 1;
@@ -122,13 +118,13 @@ public class BjorneContext {
 
     private String options = "";
 
-    private StreamHolder[] holders;
+    private CommandIOHolder[] holders;
 
     private boolean echoExpansions;
 
     private BjorneContext parent;
 
-    public BjorneContext(BjorneInterpreter interpreter, StreamHolder[] holders) {
+    public BjorneContext(BjorneInterpreter interpreter, CommandIOHolder[] holders) {
         this.interpreter = interpreter;
         this.holders = holders;
         this.variables = new HashMap<String, VariableSlot>();
@@ -138,12 +134,12 @@ public class BjorneContext {
         this(interpreter, defaultStreamHolders());
     }
     
-    private static StreamHolder[] defaultStreamHolders() {
-        StreamHolder[] res = new StreamHolder[4];
-        res[Command.STD_IN] = new StreamHolder(CommandLine.DEFAULT_STDIN, false);
-        res[Command.STD_OUT] = new StreamHolder(CommandLine.DEFAULT_STDOUT, false);
-        res[Command.STD_ERR] = new StreamHolder(CommandLine.DEFAULT_STDERR, false);
-        res[Command.SHELL_ERR] = new StreamHolder(CommandLine.DEFAULT_STDERR, false);
+    private static CommandIOHolder[] defaultStreamHolders() {
+        CommandIOHolder[] res = new CommandIOHolder[4];
+        res[Command.STD_IN] = new CommandIOHolder(CommandLine.DEFAULT_STDIN, false);
+        res[Command.STD_OUT] = new CommandIOHolder(CommandLine.DEFAULT_STDOUT, false);
+        res[Command.STD_ERR] = new CommandIOHolder(CommandLine.DEFAULT_STDERR, false);
+        res[Command.SHELL_ERR] = new CommandIOHolder(CommandLine.DEFAULT_STDERR, false);
         return res;
     }
 
@@ -227,16 +223,20 @@ public class BjorneContext {
     /**
      * Create a copy of some stream holders without passing ownership.
      */
-    public static StreamHolder[] copyStreamHolders(StreamHolder[] holders) {
-        StreamHolder[] res = new StreamHolder[holders.length];
+    public static CommandIOHolder[] copyStreamHolders(CommandIOHolder[] holders) {
+        CommandIOHolder[] res = new CommandIOHolder[holders.length];
         for (int i = 0; i < res.length; i++) {
-            res[i] = new StreamHolder(holders[i]);
+            res[i] = new CommandIOHolder(holders[i]);
         }
         return res;
     }
     
-    StreamHolder[] getCopyOfHolders() {
+    CommandIOHolder[] getCopyOfHolders() {
         return copyStreamHolders(holders);
+    }
+    
+    CommandIOHolder[] getHolders() {
+        return holders;
     }
     
     void setArgs(String[] args) {
@@ -749,7 +749,7 @@ public class BjorneContext {
             case QUERY:
                 if (value == null) {
                     String msg = word.length() > 0 ? word : (parameter + " is unset");
-                    resolvePrintStream(getStream(Command.STD_ERR)).println(msg);
+                    resolvePrintStream(getIO(Command.STD_ERR)).println(msg);
                     throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT, 1);
                 } else {
                     return value;
@@ -757,7 +757,7 @@ public class BjorneContext {
             case COLONQUERY:
                 if (value == null || value.length() == 0) {
                     String msg = word.length() > 0 ? word : (parameter + " is unset or null");
-                    resolvePrintStream(getStream(Command.STD_ERR)).println(msg);
+                    resolvePrintStream(getIO(Command.STD_ERR)).println(msg);
                     throw new BjorneControlException(BjorneInterpreter.BRANCH_EXIT, 1);
                 } else {
                     return value;
@@ -925,28 +925,52 @@ public class BjorneContext {
         return interpreter.resolveInputStream(stream);
     }
 
-    CommandIO getStream(int index) {
+    CommandIO getIO(int index) {
         if (index < 0) {
             throw new ShellFailureException("negative stream index");
         } else if (index < holders.length) {
-            return holders[index].stream;
+            return holders[index].getIO();
         } else {
             return null;
         }
     }
     
-    void setStream(int index, CommandIO stream, boolean mine) {
+    void setIO(int index, CommandIO io, boolean mine) {
         if (index < 0 || index >= holders.length) {
-            throw new ShellFailureException("negative stream index");
+            throw new ShellFailureException("bad stream index");
         } else {
-            holders[index].setStream(stream, mine);
+            holders[index].setIO(io, mine);
         }
     }
     
-    void closeStreams() {
-        for (StreamHolder holder : holders) {
+    void setIO(int index, CommandIOHolder holder) {
+        if (index < 0 || index >= holders.length) {
+            throw new ShellFailureException("bad stream index");
+        } else {
+            holders[index].setIO(holder);
+        }
+    }
+    
+    void closeIOs() {
+        for (CommandIOHolder holder : holders) {
             holder.close();
         }
+    }
+    
+    void flushIOs() {
+        for (CommandIOHolder holder : holders) {
+            holder.flush();
+        }
+    }
+
+
+    CommandIO[] getIOs() {
+        CommandIO[] io = new CommandIO[holders.length];
+        int i = 0;
+        for (CommandIOHolder holder : holders) {
+            io[i++] = (holder == null) ? null : holder.getIO();
+        }
+        return io;
     }
 
     void performAssignments(BjorneToken[] assignments) throws ShellException {
@@ -972,8 +996,10 @@ public class BjorneContext {
      *         input/outputStreamTuple streams for this command.
      * @throws ShellException
      */
-    StreamHolder[] evaluateRedirections(RedirectionNode[] redirects) throws ShellException {
-        return evaluateRedirections(redirects, copyStreamHolders(holders));
+    CommandIOHolder[] evaluateRedirections(RedirectionNode[] redirects) throws ShellException {
+        CommandIOHolder[] res = copyStreamHolders(holders);
+        evaluateRedirections(redirects, res);
+        return res;
     }
     
     /**
@@ -984,10 +1010,10 @@ public class BjorneContext {
      * @return the stream state after redirections
      * @throws ShellException
      */
-    StreamHolder[] evaluateRedirections(
-            RedirectionNode[] redirects, StreamHolder[] holders) throws ShellException {
+    void evaluateRedirections(
+            RedirectionNode[] redirects, CommandIOHolder[] holders) throws ShellException {
         if (redirects == null) {
-            return holders;
+            return;
         }
         boolean ok = false;
         try {
@@ -1018,12 +1044,12 @@ public class BjorneContext {
                 }
                 // If necessary, grow the fd table.
                 if (fd >= holders.length) {
-                    StreamHolder[] tmp = new StreamHolder[fd + 1];
+                    CommandIOHolder[] tmp = new CommandIOHolder[fd + 1];
                     System.arraycopy(holders, 0, tmp, 0, fd + 1);
                     holders = tmp;
                 }
 
-                StreamHolder stream;
+                CommandIOHolder stream;
                 switch (redir.getRedirectionType()) {
                     case REDIR_DLESS:
                         throw new UnsupportedOperationException("<<");
@@ -1037,9 +1063,9 @@ public class BjorneContext {
                                 throw new ShellException("File already exists");
                             }
                             CommandOutput tmp = new CommandOutput(new FileOutputStream(file));
-                            stream = new StreamHolder(tmp, true);
+                            stream = new CommandIOHolder(tmp, true);
                         } catch (IOException ex) {
-                            throw new ShellException("Cannot open input file", ex);
+                            throw new ShellException("Cannot open output file", ex);
                         }
                         break;
 
@@ -1048,9 +1074,9 @@ public class BjorneContext {
                         try {
                             FileOutputStream tmp = new FileOutputStream(redir.getArg().getText(), 
                                     redir.getRedirectionType() == REDIR_DGREAT);
-                            stream = new StreamHolder(new CommandOutput(tmp), true);
+                            stream = new CommandIOHolder(new CommandOutput(tmp), true);
                         } catch (IOException ex) {
-                            throw new ShellException("Cannot open input file", ex);
+                            throw new ShellException("Cannot open output file", ex);
                         }
                         break;
 
@@ -1058,7 +1084,7 @@ public class BjorneContext {
                         try {
                             File file = new File(redir.getArg().getText());
                             CommandInput tmp = new CommandInput(new FileInputStream(file));
-                            stream = new StreamHolder(tmp, true);
+                            stream = new CommandIOHolder(tmp, true);
                         } catch (IOException ex) {
                             throw new ShellException("Cannot open input file", ex);
                         }
@@ -1067,7 +1093,7 @@ public class BjorneContext {
                     case REDIR_LESSAND:
                         try {
                             int fromFd = Integer.parseInt(redir.getArg().getText());
-                            stream = (fromFd >= holders.length) ? null : new StreamHolder(holders[fromFd]);
+                            stream = (fromFd >= holders.length) ? null : new CommandIOHolder(holders[fromFd]);
                         } catch (NumberFormatException ex) {
                             throw new ShellException("Invalid fd after >&");
                         }
@@ -1076,7 +1102,7 @@ public class BjorneContext {
                     case REDIR_GREATAND:
                         try {
                             int fromFd = Integer.parseInt(redir.getArg().getText());
-                            stream = (fromFd >= holders.length) ? null : new StreamHolder(holders[fromFd]);
+                            stream = (fromFd >= holders.length) ? null : new CommandIOHolder(holders[fromFd]);
                         } catch (NumberFormatException ex) {
                             throw new ShellException("Invalid fd after >&");
                         }
@@ -1092,16 +1118,11 @@ public class BjorneContext {
             ok = true;
         } finally {
             if (!ok) {
-                for (StreamHolder holder : holders) {
+                for (CommandIOHolder holder : holders) {
                     holder.close();
                 }
             }
         }
-        return holders;
-    }
-
-    public CommandThread fork(CommandLine command, CommandIO[] ios)  throws ShellException {
-        return interpreter.fork(command, ios);
     }
 
     public boolean patternMatch(CharSequence text, CharSequence pat) {
@@ -1117,4 +1138,13 @@ public class BjorneContext {
     public int nosArgs() {
         return args.size();
     }
+
+    public CommandShell getShell() {
+        return interpreter.getShell();
+    }
+
+    public String getName() {
+        return interpreter.getUniqueName();
+    }
+
 }

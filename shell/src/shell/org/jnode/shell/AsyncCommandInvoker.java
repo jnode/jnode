@@ -107,9 +107,8 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
         CommandRunner cr = null;
 
         CommandIO[] ios = cmdLine.getStreams();
-        CommandIO[] resolvedIOs;
         try {
-            resolvedIOs = commandShell.resolveStreams(ios);
+            commandShell.resolveStreams(ios);
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
@@ -120,7 +119,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
         if (command != null) {
-            cr = new CommandRunner(this, cmdInfo, cmdLine, resolvedIOs, sysProps, env);
+            cr = new CommandRunner(this, cmdInfo, cmdLine, ios, sysProps, env);
         } else {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
@@ -140,7 +139,7 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
                 method.setAccessible(true);
                 cr = new CommandRunner(
                         this, cmdInfo, cmdInfo.getCommandClass(), method,
-                        new Object[] {cmdLine.getArguments()}, resolvedIOs, sysProps, env);
+                        new Object[] {cmdLine.getArguments()}, ios, sysProps, env);
             } catch (NoSuchMethodException e) {
                 // continue;
             }
@@ -149,9 +148,6 @@ public abstract class AsyncCommandInvoker implements SimpleCommandInvoker,
                         "No entry point method found for " + cmdInfo.getCommandClass());
             }
         }
-        
-        // These are now the real streams ...
-        cmdLine.setStreams(resolvedIOs);
         return cr;
     }
 

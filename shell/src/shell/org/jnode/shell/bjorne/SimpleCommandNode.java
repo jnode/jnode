@@ -21,12 +21,15 @@
 package org.jnode.shell.bjorne;
 
 import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
+import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.io.CommandIO;
+import org.jnode.shell.io.CommandIOHolder;
 
 public class SimpleCommandNode extends CommandNode implements BjorneCompletable {
 
@@ -68,7 +71,7 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
 
     @Override
     public int execute(final BjorneContext context) throws ShellException {
-        StreamHolder[] holders = null;
+        CommandIOHolder[] holders = null;
         int rc;
         try {
             BjorneToken[] words = getWords();
@@ -85,20 +88,20 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 BjorneContext childContext = new BjorneContext(context);
                 childContext.performAssignments(assignments);
                 holders = childContext.evaluateRedirections(getRedirects());
-                CommandIO[] streams = new CommandIO[holders.length];
-                for (int i = 0; i < streams.length; i++) {
-                    streams[i] = holders[i].getStream();
+                CommandIO[] ios = new CommandIO[holders.length];
+                for (int i = 0; i < ios.length; i++) {
+                    ios[i] = holders[i].getIO();
                 }
                 if ((getFlags() & BjorneInterpreter.FLAG_ASYNC) != 0) {
                     throw new ShellFailureException(
                             "asynchronous execution (&) not implemented yet");
                 } else {
-                    rc = childContext.execute(command, streams);
+                    rc = childContext.execute(command, ios);
                 }
             }
         } finally {
             if (holders != null) {
-                for (StreamHolder holder : holders) {
+                for (CommandIOHolder holder : holders) {
                     holder.close();
                 }
             }
@@ -108,6 +111,14 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
         }
         context.setLastReturnCode(rc);
         return rc;
+    }
+    
+    public CommandThread fork(CommandShell shell, BjorneContext context) 
+        throws ShellException {
+        CommandLine command = context.expandAndSplit(getWords());
+        command.setStreams(context.getIOs());
+        CommandInfo cmdInfo = command.parseCommandLine(shell);
+        return shell.invokeAsynchronous(command, cmdInfo);
     }
 
     @Override

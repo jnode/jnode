@@ -49,7 +49,6 @@ import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
-import org.jnode.shell.CommandThread;
 import org.jnode.shell.Completable;
 import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.ShellException;
@@ -137,6 +136,8 @@ public class BjorneInterpreter implements CommandInterpreter {
         new HashMap<String, BjorneBuiltin>();
     
     private static boolean DEBUG = false;
+    
+    private static long subshellCount;
 
     static {
         BUILTINS.put("break", new BreakBuiltin());
@@ -235,7 +236,7 @@ public class BjorneInterpreter implements CommandInterpreter {
             myContext = this.context;
         } else {
             myContext = new BjorneContext(this);
-            myContext.setStream(1, new CommandOutput(capture), true);
+            myContext.setIO(1, new CommandOutput(capture), true);
         }
         BjorneTokenizer tokens = new BjorneTokenizer(command);
         CommandNode tree = new BjorneParser(tokens, "> ").parse();
@@ -363,11 +364,12 @@ public class BjorneInterpreter implements CommandInterpreter {
     public InputStream resolveInputStream(CommandIO stream) {
         return shell.resolveInputStream(stream);
     }
+    
+    private static synchronized long getSubshellNumber() {
+        return subshellCount++;
+    }
 
-    public CommandThread fork(CommandLine command, CommandIO[] streams) 
-        throws ShellException {
-        command.setStreams(streams);
-        CommandInfo cmdInfo = command.parseCommandLine(shell);
-        return shell.invokeAsynchronous(command, cmdInfo);
+    public String getUniqueName() {
+        return getName() + "-" + getSubshellNumber();
     }
 }

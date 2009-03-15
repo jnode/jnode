@@ -332,7 +332,6 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                                 // squash
                             }
                             prevIOs[Command.STD_OUT] = CommandLine.DEVNULL;
-                            prev.commandLine.setStreams(prevIOs);
                         }
                     } else {
                         // the previous stage has explicitly redirected stdout

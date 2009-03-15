@@ -128,7 +128,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
     }
     
     @Override
-    public void close() throws IOException {
+    void doClose() throws IOException {
         flush();
 
         if (printWriter != null) {
@@ -151,7 +151,7 @@ public class CommandInputOutput extends BaseCommandIO implements CommandIO {
         }
     }
     
-    public void flush() throws IOException {
+    void doFlush() throws IOException {
         if (writer != null) {
             writer.flush();
         }

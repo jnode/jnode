@@ -20,6 +20,8 @@
  
 package org.jnode.shell.bjorne;
 
+import org.jnode.shell.CommandShell;
+import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellException;
 
 public abstract class CommandNode {
@@ -59,6 +61,9 @@ public abstract class CommandNode {
 
     public abstract int execute(BjorneContext context) throws ShellException;
 
+    public abstract CommandThread fork(CommandShell shell, BjorneContext context)
+        throws ShellException;
+
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("nodeType=").append(nodeType);
@@ -82,4 +87,9 @@ public abstract class CommandNode {
         }
         sb.append(']');
     }
+
+    public BjornePipeline buildPipeline(BjorneContext context) throws ShellException {
+        return null;
+    }
+
 }

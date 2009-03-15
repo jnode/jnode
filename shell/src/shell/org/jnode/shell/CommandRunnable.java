@@ -4,4 +4,6 @@ public interface CommandRunnable extends Runnable {
     
     void flushStreams();
 
+    int getRC();
+
 }

@@ -93,7 +93,6 @@ public class CommandRunner implements CommandRunnable {
 
     public void run() {
         try {
-            boolean ok = false;
             try {
                 if (method != null) {
                     try {
@@ -121,10 +120,9 @@ public class CommandRunner implements CommandRunnable {
                     // bounce us to the older execute(CommandLine, InputStream, PrintStream,
                     // PrintStream) method.
                     Command cmd = cmdInfo.createCommandInstance();
-                    cmd.initialize(commandLine, getIos());
+                    cmd.initialize(commandLine, getIOs());
                     cmd.execute();
                 }
-                ok = true;
             } catch (PrivilegedActionException ex) {
                 Exception ex2 = ex.getException();
                 if (ex2 instanceof InvocationTargetException) {
@@ -132,26 +130,7 @@ public class CommandRunner implements CommandRunnable {
                 } else {
                     throw ex2;
                 }
-            } finally {
-                IOException savedEx = null;
-                // Make sure that we try to flush all IOs, even if some of the flushes
-                // result in IOExceptions.
-                for (CommandIO io : getIos()) {
-                    try {
-                        io.flush();
-                    } catch (IOException ex) {
-                        shellErr.println("Failed to flush output: " + ex.getMessage());
-                        if (ok) {
-                            savedEx = ex;
-                        }
-                    }
-                }
-                if (savedEx != null) {
-                    // If we weren't already propagating an exception, and the flush failed,
-                    // propagate one of the IOExceptions.
-                    throw savedEx;
-                }
-            }
+            } 
         } catch (SyntaxErrorException ex) {
             try {
                 HelpFactory.getHelpFactory().getHelp(commandLine.getCommandName(), cmdInfo).usage(shellErr);
@@ -197,7 +176,7 @@ public class CommandRunner implements CommandRunnable {
         return args;
     }
 
-    public CommandIO[] getIos() {
+    public CommandIO[] getIOs() {
         return ios;
     }
 

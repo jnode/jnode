@@ -82,7 +82,7 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker implements Comman
     }
     
     protected CommandThreadImpl createThread(CommandRunner cr) {
-        CommandIO[] ios = cr.getIos();
+        CommandIO[] ios = cr.getIOs();
         return ProcletContext.createProclet(cr, cr.getSysProps(), cr.getEnv(), 
                 new Object[] {
                     ios[Command.STD_IN].getInputStream(), 

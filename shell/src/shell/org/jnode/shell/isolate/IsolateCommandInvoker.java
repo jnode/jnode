@@ -23,11 +23,11 @@ package org.jnode.shell.isolate;
 import java.io.IOException;
 
 import org.jnode.shell.AsyncCommandInvoker;
-import org.jnode.shell.SimpleCommandInvoker;
 import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellInvocationException;
+import org.jnode.shell.SimpleCommandInvoker;
 
 /**
  * This command invoker runs commands in their own isolates.

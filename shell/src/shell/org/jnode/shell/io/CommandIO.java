@@ -129,6 +129,13 @@ public interface CommandIO {
      * @return <code>true</code> if the associated stream is interactive.
      */
     public boolean isTTY();
+    
+    /**
+     * Query if this CommandIO is associated with a pipe.
+     * 
+     * @return <code>true</code> if the associated stream is a pipe.
+     */
+    public boolean isPipe();
 
     /**
      * Obtain the 'base' stream object for this CommandIO.  This will be
@@ -155,4 +162,5 @@ public interface CommandIO {
      * @throws IOException
      */
     public void flush() throws IOException;
+
 }

@@ -78,10 +78,25 @@ abstract class BaseCommandIO implements CommandIO {
         }
     }
     
-    public abstract void close() throws IOException;
-    
-    public void flush() throws IOException {
+    public final boolean isPipe() {
+        if (systemObject == null) {
+            return false;
+        } else {
+            return IOUtils.isPipe(systemObject);
+        }
     }
+    
+    public synchronized final void close() throws IOException {
+        doClose();
+    }
+    
+    abstract void doClose() throws IOException;
+    
+    public synchronized final void flush() throws IOException {
+        doFlush();
+    }
+    
+    abstract void doFlush() throws IOException;
 
     @Override
     public final PrintStream getPrintStream() throws CommandIOException {

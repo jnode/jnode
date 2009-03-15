@@ -94,7 +94,7 @@ public abstract class AbstractCommand implements Command {
         CommandIO[] myIOs = new CommandIO[] {
             new CommandInput(System.in), 
             new CommandOutput(System.out), 
-            new CommandOutput(System.err), 
+            new CommandOutput(System.err)
         };
         command.initialize(new CommandLine(args), myIOs);
         command.execute();
