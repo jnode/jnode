@@ -46,7 +46,6 @@ import org.jnode.shell.syntax.SyntaxBundle;
  *
  * @author crawley@jnode.org
  */
-@SuppressWarnings("deprecation")
 public class CommandLine implements Completable, Iterable<String> {
 
     public static final CommandIO DEFAULT_STDIN = new CommandIOMarker("STDIN");
