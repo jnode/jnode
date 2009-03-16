@@ -52,6 +52,7 @@ import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.KeyboardReader;
+import org.jnode.driver.console.textscreen.KeyboardReaderAction;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
@@ -73,6 +74,11 @@ import org.jnode.util.SystemInputStream;
 import org.jnode.vm.VmSystem;
 
 /**
+ * This is the primary implementation of the {@link Shell} interface.  In 
+ * addition to core Shell functionality, this implementation supports 
+ * command-line completion, command and application input history,
+ * switch-able interpreters and invokers, and initialization scripting.
+ * 
  * @author epr
  * @author Fabien DUMINY
  * @author crawley@jnode.org
