@@ -703,5 +703,13 @@ Hi mum again
 Hi mum again
 </file>
     </testSpec>
+    <testSpec title="subshell 4" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                ( echo Hi mum ; echo Hi mum again ) | cat &gt; @TEMP_DIR@/1
+        </script>
+        <file name="1" input="false">Hi mum
+Hi mum again
+</file>
+    </testSpec>
     
 </testSet>

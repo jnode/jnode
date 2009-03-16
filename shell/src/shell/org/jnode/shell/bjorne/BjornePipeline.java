@@ -86,16 +86,8 @@ class BjornePipeline {
     }
 
     void wire() throws ShellException {
-        evaluateRedirections();
         createPipes();
         activatePipes();
-    }
-
-    private void evaluateRedirections() throws ShellException {
-        for (PipelineStage stage : stages) {
-            RedirectionNode[] redirects = stage.command.getRedirects();
-            stage.context.evaluateRedirections(redirects, stage.holders);
-        }
     }
 
     private void createPipes() throws ShellFailureException {
