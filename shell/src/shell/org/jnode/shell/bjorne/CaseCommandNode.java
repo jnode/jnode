@@ -83,12 +83,13 @@ public class CaseCommandNode extends CommandNode {
     @Override
     public CommandThread fork(CommandShell shell, final BjorneContext context) 
         throws ShellException {
-        
+
         CommandRunnable cr = new BjorneSubshellRunner(context) {
             @Override
             public int doRun() throws ShellException {
                 return CaseCommandNode.this.execute(context);
-            }};
+            }
+        };
         return new CommandThreadImpl(cr, context.getName());
     }
 }

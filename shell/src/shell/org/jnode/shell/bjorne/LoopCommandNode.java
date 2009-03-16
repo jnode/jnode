@@ -98,7 +98,8 @@ public class LoopCommandNode extends CommandNode {
             @Override
             public int doRun() throws ShellException {
                 return LoopCommandNode.this.execute(context);
-            }};
+            }
+        };
         return new CommandThreadImpl(cr, context.getName());
     }
 }

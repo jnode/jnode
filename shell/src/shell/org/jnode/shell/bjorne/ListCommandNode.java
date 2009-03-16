@@ -112,7 +112,8 @@ public class ListCommandNode extends CommandNode implements Completable {
             @Override
             public int doRun() throws ShellException {
                 return ListCommandNode.this.execute(context);
-            }};
+            }
+        };
         return new CommandThreadImpl(cr, context.getName());
     }
 

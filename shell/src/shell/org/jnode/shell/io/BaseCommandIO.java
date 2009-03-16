@@ -29,6 +29,11 @@ import java.nio.charset.Charset;
 import org.jnode.util.IOUtils;
 import org.jnode.util.ProxyStream;
 
+/**
+ * Base class for the CommandIO implementations.
+ * 
+ * @author crawley@jnode.org
+ */
 abstract class BaseCommandIO implements CommandIO {
     
     private String assignedEncoding;
@@ -86,13 +91,13 @@ abstract class BaseCommandIO implements CommandIO {
         }
     }
     
-    public synchronized final void close() throws IOException {
+    public final synchronized void close() throws IOException {
         doClose();
     }
     
     abstract void doClose() throws IOException;
     
-    public synchronized final void flush() throws IOException {
+    public final synchronized void flush() throws IOException {
         doFlush();
     }
     

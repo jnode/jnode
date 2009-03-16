@@ -106,7 +106,7 @@ public class ProcletProxyInputStream extends InputStream implements
 
     @Override
     public void mark(int readLimit) {
-            getRealStream().mark(readLimit);
+        getRealStream().mark(readLimit);
     }
 
     @Override
@@ -145,7 +145,8 @@ public class ProcletProxyInputStream extends InputStream implements
 
     public InputStream getProxiedStream() throws ProxyStreamException {
         ProcletContext procletContext = ProcletContext.currentProcletContext();
-        int pid = (procletContext == null) ? ProcletIOContext.GLOBAL_STREAM_ID : procletContext.getPid();
+        int pid = (procletContext == null) ? 
+                ProcletIOContext.GLOBAL_STREAM_ID : procletContext.getPid();
         InputStream is = streamMap.get(pid);
         if (is == null) {
             throw new ProxyStreamException(

@@ -83,7 +83,8 @@ public class ForCommandNode extends CommandNode {
             @Override
             public int doRun() throws ShellException {
                 return ForCommandNode.this.execute(context);
-            }};
+            }
+        };
         return new CommandThreadImpl(cr, context.getName());
     }
 }
