@@ -28,6 +28,7 @@ import javax.naming.NamingException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandInfo;
+import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.SyntaxBundle;
@@ -64,9 +65,9 @@ public abstract class HelpFactory {
     /**
      * Obtain a CommanHelp object for a given command alias and its resolved CommandInfo.
      * 
-     * @param alias
-     * @param cmdInfo
-     * @return
+     * @param alias the alias
+     * @param cmdInfo the resolved CommandInfo
+     * @return a CommandHelp object for the command
      * @throws HelpException
      */
     public abstract Help getHelp(
@@ -94,14 +95,12 @@ public abstract class HelpFactory {
     protected abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintWriter out);
 
     /**
-     * Shows the description of a single argument. Used as a callback in
-     * {@link Argument#describe(HelpFactory)}.
+     * Shows the description of a single argument. 
      */
-    protected abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintWriter out);
+    protected abstract void describeArgument(Argument<?> arg, PrintWriter out);
 
     /**
-     * Shows the description of a single FlagArgument. Used as a callback in
-     * {@link Argument#describe(HelpFactory)}.
+     * Shows the description of a single FlagArgument.
      */
     protected abstract void describeOption(FlagArgument arg, 
             TreeSet<String> flagTokens, PrintWriter out);

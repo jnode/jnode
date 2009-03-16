@@ -123,7 +123,7 @@ public class Pipeline {
     
     /**
      * Test if the pipeline is in the 'active' state.
-     * @return
+     * @return <code>true</code> if the pipeline is active.
      */
     public synchronized boolean isActive() {
         return state == ACTIVE;
@@ -131,7 +131,7 @@ public class Pipeline {
     
     /**
      * Test if the pipeline is in the 'closed' state.
-     * @return
+     * @return <code>true</code> if the pipeline is closed.
      */
     public synchronized boolean isClosed() {
         return state == CLOSED;
@@ -139,7 +139,7 @@ public class Pipeline {
     
     /**
      * Test if the pipeline is in the 'shut down' state.
-     * @return
+     * @return <code>true</code> if the pipeline is shut down.
      */
     public synchronized boolean isShutdown() {
         return state == SHUTDOWN;

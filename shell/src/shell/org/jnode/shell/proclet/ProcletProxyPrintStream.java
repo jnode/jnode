@@ -46,9 +46,8 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
     /**
      * Construct a proxy print stream with 'out' as the initial global stream.
      * 
-     * @param proxy
-     * @param ps
-     * @param pid
+     * @param ps the global stream
+     * @param fd the 'file descriptor' label for the stream.
      */
     @SuppressWarnings("unchecked")
     public ProcletProxyPrintStream(PrintStream ps, int fd) {
@@ -69,9 +68,9 @@ public class ProcletProxyPrintStream extends AbstractProxyPrintStream implements
      * The new proxy has all entries of the existing one except that the entry
      * for pid is set / reset to in.
      * 
-     * @param proxy
-     * @param ps
-     * @param pid
+     * @param proxy the proxy stream that supplies the base settings.
+     * @param ps the new stream that we want to use.
+     * @param pid the pid of the proclet that the stream to be used in.
      */
     @SuppressWarnings("unchecked")
     public ProcletProxyPrintStream(ProcletProxyPrintStream proxy, PrintStream ps,
