@@ -102,14 +102,14 @@ class ScriptTestRunner extends TestRunnerBase implements TestRunnable {
                 StringBuffer sb = new StringBuffer(20);
                 while ((ch = r.read()) != marker) {
                     switch (ch) {
-                    case -1:
-                        throw new TestSpecificationException("Encountered EOF in a " + marker +
-                                "..." + marker + " sequence in script template");
-                    case '\n':
-                        throw new TestSpecificationException("Encountered newline in a " +
-                                marker + "..." + marker + " sequence in script template");
-                    default:
-                        sb.append((char) ch);
+                        case -1:
+                            throw new TestSpecificationException("Encountered EOF in a " + marker +
+                                    "..." + marker + " sequence in script template");
+                        case '\n':
+                            throw new TestSpecificationException("Encountered newline in a " +
+                                    marker + "..." + marker + " sequence in script template");
+                        default:
+                            sb.append((char) ch);
                     }
                 }
                 if (sb.length() == 0) {

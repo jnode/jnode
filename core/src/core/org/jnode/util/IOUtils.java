@@ -27,10 +27,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Field;
@@ -38,8 +34,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.apache.log4j.Logger;
-import org.jnode.vm.annotation.DoPrivileged;
-import org.jnode.vm.annotation.PrivilegedActionPragma;
 
 /**
  * Common utility code for higher-level operations on IO streams.  Notwithstanding the

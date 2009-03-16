@@ -67,7 +67,8 @@ public class FunctionDefinitionNode extends CommandNode {
             @Override
             public int doRun() throws ShellException {
                 return FunctionDefinitionNode.this.execute(context);
-            }};
+            }
+        };
         return new CommandThreadImpl(cr, context.getName());
     }
 
