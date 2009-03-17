@@ -30,7 +30,10 @@ import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.syntax.SyntaxManager;
 
 /**
+ * This is the interface is implemented by JNode command shells. 
+ * 
  * @author epr
+ * @author crawley@jnode.org
  */
 public interface Shell extends InputCompleter {
 
@@ -93,7 +96,7 @@ public interface Shell extends InputCompleter {
      * the shell's current interpreter.
      * 
      * @param word the word to be escaped.
-     * @return the 
+     * @return the escaped word.
      */
     public String escapeWord(String word);
 

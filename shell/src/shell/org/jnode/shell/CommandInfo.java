@@ -21,6 +21,9 @@
 package org.jnode.shell;
 
 /**
+ * A CommandInfo object is a descriptor used by the CommandShell and CommandInvokers
+ * to hold information about a command that is being prepared for execution.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author crawley@jnode.org
  */
@@ -64,7 +67,7 @@ public final class CommandInfo {
     /**
      * Get the Command instance for this CommandInfo, without instantiating one.
      * @return The Command instance to be used for binding argument and executing 
-     * the command, of <code>null</code>
+     * the command, or <code>null</code>.
      */
     public Command getCommandInstance() {
         return instance;

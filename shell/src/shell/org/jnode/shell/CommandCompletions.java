@@ -27,6 +27,9 @@ import java.util.TreeSet;
 import org.jnode.driver.console.CompletionInfo;
 
 /**
+ * A CommandCompletions object is used to accumulate completion strings
+ * during the process of command line completion.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author crawley@jnode.org
  */

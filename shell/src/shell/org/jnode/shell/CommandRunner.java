@@ -44,7 +44,6 @@ import org.jnode.vm.VmExit;
  * provides a convenience method for conditionally printing a command stack-trace.
  * 
  * @author crawley@jnode.org
- *
  */
 public class CommandRunner implements CommandRunnable {
     

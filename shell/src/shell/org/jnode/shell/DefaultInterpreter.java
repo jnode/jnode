@@ -40,7 +40,8 @@ import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This interpreter simply parses the command line into a command name and
- * arguments, with simple quoting and escaping.
+ * arguments, with simple quoting and escaping.  This class also provides
+ * infrastructure that is reused in the RedirectingInterpreter class.
  * 
  * @author crawley@jnode.org
  */
