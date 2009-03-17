@@ -25,7 +25,9 @@ import java.io.PrintWriter;
 import java.io.Reader;
 
 /**
- * This is the API that a shell-based interpreter must implement.
+ * This is the API that a shell-based interpreter must implement.  It provides
+ * methods for executing single command lines and scripts, together with methods
+ * for command completion, argument escaping and incremental help.
  * 
  * @author crawley@jnode.org
  */

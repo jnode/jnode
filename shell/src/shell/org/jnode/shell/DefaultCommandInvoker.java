@@ -43,8 +43,8 @@ import org.jnode.vm.VmExit;
 /**
  * This CommandInvoker runs a command in the current thread, using the command
  * classes <code>public static void main(String[] args)</code> entry point.
- * The {@link #invokeAsynchronous(CommandLine, CommandInfo)} method is not supported for this implementation
- * of the CommandInvoker API.
+ * The {@link #invokeAsynchronous(CommandLine, CommandInfo)} method is not 
+ * supported for this implementation of the CommandInvoker API.
  * 
  * @author Sam Reid
  * @author crawley@jnode.org

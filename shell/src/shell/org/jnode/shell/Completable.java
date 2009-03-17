@@ -23,6 +23,12 @@ package org.jnode.shell;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.CompletionException;
 
+/**
+ * A Completable is an object that is capable of performing completion on
+ * a command shell input line.
+ * 
+ * @author crawley@jnode.org
+ */
 public interface Completable {
 
     void complete(CompletionInfo completion, CommandShell shell)

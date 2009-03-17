@@ -1,0 +1,46 @@
+<html>
+<head>
+    <title>org.jnode.shell</title>
+</head>
+<body>
+
+This package contains the core of the JNode command line interface.
+<p>
+A JNode command shell is an instance of the {@link org.jnode.shell.CommandShell} class, or 
+one of its subclasses.  A JNode command shell reads command lines from
+a {@link org.jnode.driver.console.TextConsole} instance, and uses a 
+{@link org.jnode.shell.CommandInterpreter} to split the input into a command names 
+and arguments.  These commands are then run using a
+{@link org.jnode.shell.CommandInvoker}.  
+<p>
+A JNode command shell support history and command completion, and the 
+{@link org.jnode.shell.CommandInterpreter} and {@link org.jnode.shell.CommandInvoker} 
+implementations support a variety of command line / scripting languages
+and a variety of mechanisms for launching commands.
+<p>
+The package also contains classes that provide infrastructure for JNode command
+classes.  The {@link org.jnode.shell.Command} interface and the corresponding 
+{@link org.jnode.shell.AbstractCommand} class provide the entry point for a native
+JNode command class, the methods for getting the "standard io" streams and raw command
+arguments, and hooks for registering a command's abstract syntax.  The 
+{@link org.jnode.shell.CommandLine} provides a command class with the name or alias
+used to launch the class and the raw arguments.
+<p>
+The org.jnode.shell.* packages are organized as follows:
+<ul>
+<li>{@code org.jnode.shell} - the root package contains code command shell infrastructure as 
+described above.</li>
+<li>{@code org.jnode.shell.alias.*} - this package implements JNode's alias infrastructure that 
+maps simple command names to fully-qualified Java class names.</li>
+<li>{@code org.jnode.shell.bjorne} - this package implements the JNode "bjorne" command interpreter.</li>
+<li>{@code org.jnode.shell.command.*} - these packages contain a wide range of utility commands 
+implemented for JNode.</li>
+<li>{@code org.jnode.shell.help.*} - these packages implement JNode's online help system.</li>
+<li>{@code org.jnode.shell.io} - this package contains the CommandIO classes and other IO classes 
+used by the shell, invokers and interpreters.</li>
+<li>{@code org.jnode.shell.isolate} - this package implements the JNode "isolate" command invoker.</li>
+<li>{@code org.jnode.shell.proclet} - this package implements the JNode "proclet" command invoker.</li>
+<li>{@code org.jnode.shell.syntax} - this package provides JNode's command argument parsing system.</li>
+</ul>
+</body>
+</html>
