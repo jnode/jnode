@@ -22,8 +22,6 @@ package org.jnode.fs.hfsplus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +59,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
     @Override
     public FSEntry addDirectory(String name) throws IOException {
         log.debug("<<< BEGIN addDirectory " + name + " >>>");
-        if (fs.isReadOnly()){
+        if (fs.isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
 
@@ -77,7 +75,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
     @Override
     public FSEntry addFile(String name) throws IOException {
         log.debug("<<< BEGIN addFile " + name + " >>>");
-        if (fs.isReadOnly()){
+        if (fs.isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
         if (getEntry(name) != null) {
@@ -89,10 +87,9 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         log.debug("<<< END addFile " + name + " >>>");
         return newEntry;
     }
-    
-    private final FSEntry createFileEntry(final String name)
-        throws IOException {
-        //TODO
+
+    private final FSEntry createFileEntry(final String name) throws IOException {
+        // TODO
         return null;
     }
 
@@ -105,7 +102,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         boolean flushEntries = isEntriesLoaded() && entries.isDirty();
         if (isDirty() || flushEntries) {
             writeEntries(entries);
-            //entries.resetDirty();
+            // entries.resetDirty();
             resetDirty();
         }
         log.debug("<<< END flush >>>");
@@ -125,7 +122,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
 
     @Override
     public void remove(String name) throws IOException {
-        if (fs.isReadOnly()){
+        if (fs.isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
         if (entries.remove(name) >= 0) {
@@ -197,7 +194,6 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         }
         return new FSEntryTable(((HfsPlusFileSystem) getFileSystem()), pathList);
     }
-    
 
     private void writeEntries(final FSEntryTable entries) throws IOException {
         // TODO Auto-generated method stub
@@ -217,10 +213,10 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         HFSUnicodeString dirName = new HFSUnicodeString(name);
         CatalogThread thread =
-            new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
-                    .getFolderId(), dirName);
+                new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
+                        .getFolderId(), dirName);
         CatalogFolder newFolder =
-            new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
+                new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
         log.debug("New catalog folder :\n" + newFolder.toString());
 
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);
@@ -235,9 +231,10 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
 
         return newEntry;
     }
-    
+
     /**
-     * Find a free entry and set it with the given entry 
+     * Find a free entry and set it with the given entry
+     * 
      * @param newEntry
      * @throws IOException
      */
