@@ -22,15 +22,12 @@ package org.jnode.fs.hfsplus.catalog;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HFSUnicodeString;
-import org.jnode.fs.hfsplus.HFSUtils;
 import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.Superblock;
@@ -100,17 +97,13 @@ public class Catalog {
         btnd.setRecordCount(3);
         bufferLength += NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH;
         //
-        bthr = new BTHeaderRecord();
-        bthr.setTreeDepth(1);
-        bthr.setRootNode(1);
-        bthr.settFirstLeafNode(1);
-        bthr.setLastLeafNode(1);
-        bthr.setLeafRecords(params.isJournaled() ? 6 : 2);
-        bthr.setNodeSize(nodeSize);
-        bthr.setTotalNodes(params.getCatalogClumpSize() / params.getCatalogNodeSize());
-        bthr.setFreeNodes(bthr.getTotalNodes() - 2);
-        bthr.setClumpSize(params.getCatalogClumpSize());
-        // TODO initialize attributes, max key length and key comparaison type.
+        int leafRecords = params.isJournaled() ? 6 : 2;
+        int totalNodes = params.getCatalogClumpSize() / params.getCatalogNodeSize();
+        int freeNodes = totalNodes - 2;
+        bthr =
+                new BTHeaderRecord(1, 1, leafRecords, 1, 1, nodeSize, 0, totalNodes, freeNodes,
+                        params.getCatalogClumpSize(), 0, 0, 0);
+
         bufferLength += BTHeaderRecord.BT_HEADER_RECORD_LENGTH;
         // Create root node
         int rootNodePosition = bthr.getRootNode() * nodeSize;

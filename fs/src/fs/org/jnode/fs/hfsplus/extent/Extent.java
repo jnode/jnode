@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus.extent;
 
 import org.jnode.fs.hfsplus.HFSPlusParams;
@@ -35,17 +35,11 @@ public class Extent {
         btnd.setHeight(0);
         btnd.setRecordCount(3);
         //
-        bthr = new BTHeaderRecord();
-        bthr.setTreeDepth(0);
-        bthr.setRootNode(0);
-        bthr.settFirstLeafNode(0);
-        bthr.setLastLeafNode(0);
-        bthr.setLeafRecords(0);
-        bthr.setNodeSize(params.getExtentNodeSize());
-        bthr.setTotalNodes(params.getExtentClumpSize()
-                / params.getExtentNodeSize());
-        bthr.setFreeNodes(bthr.getTotalNodes() - 1);
-        bthr.setClumpSize(params.getExtentClumpSize());
-        bthr.setMaxKeyLength(ExtentKey.KEY_LENGTH);
+        int totalNodes = params.getExtentClumpSize() / params.getExtentNodeSize();
+        int freeNodes = totalNodes - 1;
+        bthr =
+                new BTHeaderRecord(0, 0, 0, 0, 0, params.getExtentNodeSize(), ExtentKey.KEY_LENGTH,
+                        totalNodes, freeNodes, params.getExtentClumpSize(), 0, 0, 0);
+
     }
 }
