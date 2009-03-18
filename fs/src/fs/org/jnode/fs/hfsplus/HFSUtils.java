@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import java.text.SimpleDateFormat;
@@ -35,10 +35,8 @@ public class HFSUtils {
     /**
      * Convert time from/to java time to/from mac time.
      * 
-     * @param time
-     *            in seconds since reference date.
-     * @param encode
-     *            if set to true, convert from java to mac. If set to false,
+     * @param time in seconds since reference date.
+     * @param encode if set to true, convert from java to mac. If set to false,
      *            convert from mac to java.
      * 
      * @return
@@ -60,12 +58,13 @@ public class HFSUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         return sdf.format(cal.getTime());
     }
-    
+
     /**
      * Returns current date and time in mac format.
+     * 
      * @return current date and time.
      */
-    public static int getNow(){
+    public static int getNow() {
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         return (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
