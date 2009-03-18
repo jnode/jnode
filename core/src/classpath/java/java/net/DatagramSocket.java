@@ -317,7 +317,7 @@ public class DatagramSocket
       }
     catch (SecurityException e)
       {
-	localAddr = InetAddress.ANY_IF;
+	localAddr = NativeInetAddress.ANY_IF;
       }
     catch (SocketException e)
       {
@@ -673,7 +673,7 @@ public class DatagramSocket
       s.checkListen(port);
 
     if (addr == null)
-      addr = InetAddress.ANY_IF;
+      addr = NativeInetAddress.ANY_IF;
 
     try
       {

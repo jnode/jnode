@@ -354,7 +354,7 @@ public class Socket
     // XXX: JDK 1.4.1 API documentation says that if bindpoint is null the
     // socket will be bound to an ephemeral port and a valid local address.
     if (bindpoint == null)
-      bindpoint = new InetSocketAddress(InetAddress.ANY_IF, 0);
+      bindpoint = new InetSocketAddress(NativeInetAddress.ANY_IF, 0);
 
     if (! (bindpoint instanceof InetSocketAddress))
 			throw new IllegalArgumentException();
@@ -479,7 +479,7 @@ public class Socket
   public InetAddress getLocalAddress()
   {
     if (! isBound())
-      return InetAddress.ANY_IF;
+      return NativeInetAddress.ANY_IF;
 
 		InetAddress addr = null;
 
