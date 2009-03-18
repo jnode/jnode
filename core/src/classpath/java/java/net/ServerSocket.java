@@ -233,7 +233,7 @@ public class ServerSocket
 
     // Initialize addr with 0.0.0.0.
     if (addr == null)
-      addr = InetAddress.ANY_IF;
+      addr = NativeInetAddress.ANY_IF;
 
     try
       {
