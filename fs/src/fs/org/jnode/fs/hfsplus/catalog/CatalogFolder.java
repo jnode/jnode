@@ -21,10 +21,12 @@
 package org.jnode.fs.hfsplus.catalog;
 
 import org.jnode.fs.hfsplus.HFSUtils;
-import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.util.BigEndian;
 
 public class CatalogFolder {
+    /* Types */
+    public static final int RECORD_TYPE_FOLDER = 0x0001;
+    public static final int RECORD_TYPE_FOLDER_THREAD = 0x0003;
     
     public static final int CATALOG_FOLDER_SIZE = 88;
 
@@ -56,7 +58,7 @@ public class CatalogFolder {
      * @param folderID
      */
     public CatalogFolder(int valence, CatalogNodeId folderID) {
-        this.recordType = HfsPlusConstants.RECORD_TYPE_FOLDER;
+        this.recordType = RECORD_TYPE_FOLDER;
         this.valence = valence;
         this.folderId = folderID;
         this.createDate = HFSUtils.getNow();

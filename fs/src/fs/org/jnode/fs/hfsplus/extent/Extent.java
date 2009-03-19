@@ -21,7 +21,6 @@
 package org.jnode.fs.hfsplus.extent;
 
 import org.jnode.fs.hfsplus.HFSPlusParams;
-import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.fs.hfsplus.tree.BTHeaderRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
@@ -30,10 +29,7 @@ public class Extent {
     private BTHeaderRecord bthr;
 
     public Extent(HFSPlusParams params) {
-        btnd = new NodeDescriptor();
-        btnd.setKind(HfsPlusConstants.BT_HEADER_NODE);
-        btnd.setHeight(0);
-        btnd.setRecordCount(3);
+        btnd = new NodeDescriptor(0, 0, NodeDescriptor.BT_HEADER_NODE, 0, 3);
         //
         int totalNodes = params.getExtentClumpSize() / params.getExtentNodeSize();
         int freeNodes = totalNodes - 1;

@@ -25,7 +25,6 @@ import org.jnode.fs.hfsplus.FileInfo;
 import org.jnode.fs.hfsplus.HFSPlusBSDInfo;
 import org.jnode.fs.hfsplus.HFSPlusForkData;
 import org.jnode.fs.hfsplus.HFSUtils;
-import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.util.BigEndian;
 
 /**
@@ -36,6 +35,9 @@ import org.jnode.util.BigEndian;
  * 
  */
 public class CatalogFile {
+    
+    public static final int RECORD_TYPE_FILE = 0x0002;
+    public static final int RECORD_TYPE_FILE_THREAD = 0x0004;
 
     public static final int CATALOG_FILE_SIZE = 248;
     /** catalog record type, always RECORD_TYPE_FILE */
@@ -95,7 +97,7 @@ public class CatalogFile {
      * @param resources
      */
     public CatalogFile(int flags, CatalogNodeId fileId, HFSPlusForkData datas, HFSPlusForkData resources) {
-        this.recordType = HfsPlusConstants.RECORD_TYPE_FILE;
+        this.recordType = RECORD_TYPE_FILE;
         this.flags = flags;
         this.fileId = fileId;
         this.createDate = HFSUtils.getNow();

@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
+import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
@@ -184,8 +185,8 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         if (fs.getVolumeHeader().getFolderCount() > 0) {
             LeafRecord[] records = fs.getCatalog().getRecords(folder.getFolderId());
             for (LeafRecord rec : records) {
-                if (rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER ||
-                        rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE) {
+                if (rec.getType() == CatalogFolder.RECORD_TYPE_FOLDER ||
+                        rec.getType() == CatalogFile.RECORD_TYPE_FILE) {
                     String name = ((CatalogKey) rec.getKey()).getNodeName().getUnicodeString();
                     HFSPlusEntry e = new HFSPlusEntry(fs, this, name, rec);
                     pathList.add(e);
@@ -213,10 +214,9 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
         HFSUnicodeString dirName = new HFSUnicodeString(name);
         CatalogThread thread =
-                new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD, this.folder
+                new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD, this.folder
                         .getFolderId(), dirName);
-        CatalogFolder newFolder =
-                new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
+        CatalogFolder newFolder = new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
         log.debug("New catalog folder :\n" + newFolder.toString());
 
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);

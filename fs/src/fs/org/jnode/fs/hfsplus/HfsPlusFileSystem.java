@@ -63,18 +63,18 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
     public final void read() throws FileSystemException {
         sb = new Superblock(this, false);
 
-        if (!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)) {
+        if (!sb.isAttribute(Superblock.HFSPLUS_VOL_UNMNT_BIT)) {
             log
             .info(getDevice().getId()
                     + " Filesystem has not been cleanly unmounted, mounting it readonly");
             setReadOnly(true);
         }
-        if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_SOFTLOCK_BIT)) {
+        if (sb.isAttribute(Superblock.HFSPLUS_VOL_SOFTLOCK_BIT)) {
             log.info(getDevice().getId()
                     + " Filesystem is marked locked, mounting it readonly");
             setReadOnly(true);
         }
-        if (sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT)) {
+        if (sb.isAttribute(Superblock.HFSPLUS_VOL_JOURNALED_BIT)) {
             log
             .info(getDevice().getId()
                     + " Filesystem is journaled, write access is not supported. Mounting it readonly");

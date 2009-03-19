@@ -24,24 +24,28 @@ import org.jnode.util.BigEndian;
 
 public class LeafRecord extends AbstractNodeRecord {
 
+    private int type;
+    
     public LeafRecord(final Key key, final byte[] recordData) {
         this.key = key;
         this.recordData = new byte[recordData.length];
         System.arraycopy(recordData, 0, this.recordData, 0, recordData.length);
+        type = BigEndian.getInt16(this.recordData, 0);
     }
 
     public LeafRecord(final Key key, final byte[] nodeData, final int offset, final int recordDataSize) {
         this.key = key;
         this.recordData = new byte[recordDataSize];
         System.arraycopy(nodeData, offset + key.getKeyLength(), this.recordData, 0, recordDataSize);
+        type = BigEndian.getInt16(this.recordData, 0);
     }
 
     public final int getType() {
-        return BigEndian.getInt16(this.recordData, 0);
+        return type;
     }
 
     public final String toString() {
-        return "Type : " + getType() + "\nKey : " + getKey().toString() + "\n";
+        return "Type : " + type + "\nKey : " + getKey().toString() + "\n";
     }
 
 }

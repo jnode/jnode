@@ -20,7 +20,6 @@
  
 package org.jnode.fs.hfsplus.tree;
 
-import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.util.BigEndian;
 
 public abstract class AbstractNode implements Node {
@@ -34,11 +33,11 @@ public abstract class AbstractNode implements Node {
     }
 
     public boolean isIndexNode() {
-        return this.getNodeDescriptor().getKind() == HfsPlusConstants.BT_INDEX_NODE;
+        return this.getNodeDescriptor().getKind() == NodeDescriptor.BT_INDEX_NODE;
     }
 
     public boolean isLeafNode() {
-        return this.getNodeDescriptor().getKind() == HfsPlusConstants.BT_LEAF_NODE;
+        return this.getNodeDescriptor().getKind() == NodeDescriptor.BT_LEAF_NODE;
     }
 
     @Override
