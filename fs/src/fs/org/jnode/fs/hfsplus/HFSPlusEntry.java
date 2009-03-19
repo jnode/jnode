@@ -84,7 +84,7 @@ public class HFSPlusEntry implements FSEntry {
 
     @Override
     public FSDirectory getDirectory() throws IOException {
-        if (!isFile()) {
+        if (!isDirectory()) {
             throw new IOException("It is not a Directory");
         }
         return (HFSPlusDirectory) this;
@@ -123,7 +123,7 @@ public class HFSPlusEntry implements FSEntry {
     public boolean isDirty() throws IOException {
         return dirty;
     }
-    
+
     public void setDirty() {
         dirty = true;
     }
@@ -147,7 +147,7 @@ public class HFSPlusEntry implements FSEntry {
         if (type == AbstractFSEntry.ROOT_ENTRY) {
             throw new IOException("Cannot change name of root directory");
         }
-        if (parent.getTable().rename(name, newName) < 0) {
+        if (parent.rename(name, newName) < 0) {
             throw new IOException("Cannot change name");
         }
 

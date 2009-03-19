@@ -100,7 +100,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
         log.info("Create root entry.");
         LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
         if (record != null) {
-            return new HFSPlusEntry(this, null, "/", record);
+            return new HFSPlusDirectory(this, null, "/", record);
         }
         log.error("Root entry : No record found.");
         return null;
