@@ -68,14 +68,21 @@ public class HFSPlusForkData {
         this.clumpSize = clumpSize;
         this.totalBlock = totalBlock;
         this.extents = new ExtentDescriptor[8];
+        for (int i = 0; i < extents.length; i++) {
+            extents[i] = new ExtentDescriptor();
+        }
     }
-
-    public byte[] getBytes() {
+    
+    public byte[] write(byte[] dest, int destOffSet){
         byte[] data = new byte[FORK_DATA_LENGTH];
         BigEndian.setInt64(data, 0, totalSize);
         BigEndian.setInt32(data, 8, clumpSize);
         BigEndian.setInt32(data, 12, totalBlock);
-        return data;
+        for (int i = 0; i < extents.length; i++) {
+            extents[i].write(data, EXTENT_OFFSET + (i * ExtentDescriptor.EXTENT_DESCRIPTOR_LENGTH));
+        }
+        System.arraycopy(data, 0, dest, destOffSet, FORK_DATA_LENGTH);
+        return dest;
     }
 
     /*

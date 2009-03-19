@@ -284,4 +284,9 @@ public class HFSPlusParams {
     public int getExtentNodeSize() {
         return extentNodeSize;
     }
+    
+    public int getInitializeNumRecords(){
+        return journaled ? 6 : 2;
+    }
+    
 }

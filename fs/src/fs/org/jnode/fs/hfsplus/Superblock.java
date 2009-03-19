@@ -79,6 +79,7 @@ public class Superblock extends HFSPlusObject {
         data = new byte[SUPERBLOCK_LENGTH];
         try {
             if (!create) {
+                log.info("load HFS+ volume header.");
                 // skip the first 1024 bytes (boot sector) and read the volume
                 // header.
                 ByteBuffer b = ByteBuffer.allocate(SUPERBLOCK_LENGTH);
@@ -89,6 +90,7 @@ public class Superblock extends HFSPlusObject {
                     throw new FileSystemException("Not hfs+ volume header (" + getMagic() +
                             ": bad magic)");
                 }
+                log.debug(this.toString());
             }
         } catch (IOException e) {
             throw new FileSystemException(e);
@@ -100,10 +102,13 @@ public class Superblock extends HFSPlusObject {
      * 
      * @param params
      * 
+     * @throws IOException
      * @throws ApiNotFoundException
+     * @throws FileSystemException
      */
     public void create(HFSPlusParams params)
         throws IOException, ApiNotFoundException, FileSystemException {
+        log.info("Create new HFS+ volume header (" + params.getVolumeName() + ") with block size of " + params.getBlockSize() + " bytes.");
         int burnedBlocksBeforeVH = 0;
         int burnedBlocksAfterAltVH = 0;
         /*
@@ -117,7 +122,6 @@ public class Superblock extends HFSPlusObject {
         } else if (blockSize == 1024) {
             burnedBlocksBeforeVH = 1;
         }
-
         // Populate volume header.
         this.setMagic(HFSPLUS_SUPER_MAGIC);
         this.setVersion(HFSPLUS_MIN_VERSION);
@@ -126,7 +130,7 @@ public class Superblock extends HFSPlusObject {
         this.setLastMountedVersion(0x446534a);
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        int macDate = (int) HFSUtils.getDate(now.getTimeInMillis() / 1000, true);
+        int macDate = HFSUtils.getNow();
         this.setCreateDate(macDate);
         this.setModifyDate(macDate);
         this.setBackupDate(0);
@@ -141,51 +145,48 @@ public class Superblock extends HFSPlusObject {
         this.setDataClumpSize(params.getDataClumpSize());
         this.setNextCatalogId(CatalogNodeId.HFSPLUS_FIRSTUSER_CNID.getId());
         // Allocation file creation
+        log.info("Init allocation file.");
         long allocationClumpSize = getClumpSize(params.getBlockCount());
         long bitmapBlocks = allocationClumpSize / blockSize;
         long blockUsed = 2 + burnedBlocksBeforeVH + burnedBlocksAfterAltVH + bitmapBlocks;
-
         int startBlock = 1 + burnedBlocksBeforeVH;
         int blockCount = (int) bitmapBlocks;
-
         HFSPlusForkData forkdata =
                 new HFSPlusForkData(allocationClumpSize, (int) allocationClumpSize,
                         (int) bitmapBlocks);
         ExtentDescriptor desc = new ExtentDescriptor(startBlock, blockCount);
         forkdata.addDescriptor(0, desc);
-        System.arraycopy(forkdata.getBytes(), 0, data, 112, HFSPlusForkData.FORK_DATA_LENGTH);
+        forkdata.write(data, 112);
         // Journal creation
         int nextBlock = 0;
         if (params.isJournaled()) {
             this.setFileCount(2);
             this.setAttribute(HFSPLUS_VOL_JOURNALED_BIT);
             this.setNextCatalogId(this.getNextCatalogId() + 2);
-            this.setJournalInfoBlock(desc.getStartBlock() + desc.getBlockCount());
+            this.setJournalInfoBlock(desc.getNext());
             blockUsed = blockUsed + 1 + (params.getJournalSize() / blockSize);
         } else {
             this.setJournalInfoBlock(0);
-            nextBlock = desc.getStartBlock() + desc.getBlockCount();
+            nextBlock = desc.getNext();
         }
         // Extent B-Tree initialization
+        log.info("Init extent file.");
         forkdata =
                 new HFSPlusForkData(params.getExtentClumpSize(), params.getExtentClumpSize(),
                         (params.getExtentClumpSize() / blockSize));
         desc = new ExtentDescriptor(nextBlock, forkdata.getTotalBlocks());
         forkdata.addDescriptor(0, desc);
-        System.arraycopy(forkdata.getBytes(), 0, data, 192, HFSPlusForkData.FORK_DATA_LENGTH);
+        forkdata.write(data, 192);
         blockUsed += forkdata.getTotalBlocks();
+        nextBlock = desc.getNext(); 
         // Catalog B-Tree initialization
-        forkdata =
-                new HFSPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(),
-                        (params.getCatalogClumpSize() / blockSize));
-        startBlock =
-                this.getExtentsFile().getExtent(0).getStartBlock() +
-                        this.getExtentsFile().getExtent(0).getBlockCount();
-        blockCount = forkdata.getTotalBlocks();
-        desc = new ExtentDescriptor(startBlock, blockCount);
+        log.info("Init catalog file.");
+        int totalBlocks =  params.getCatalogClumpSize() / blockSize;
+        forkdata =  new HFSPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(), totalBlocks);
+        desc = new ExtentDescriptor(nextBlock, totalBlocks);
         forkdata.addDescriptor(0, desc);
-        System.arraycopy(forkdata.getBytes(), 0, data, 272, HFSPlusForkData.FORK_DATA_LENGTH);
-        blockUsed += forkdata.getTotalBlocks();
+        forkdata.write(data, 272);
+        blockUsed += totalBlocks;
 
         this.setFreeBlocks(this.getFreeBlocks() - (int) blockUsed);
         this.setNextAllocation((int) blockUsed - 1 - burnedBlocksAfterAltVH + 10 *

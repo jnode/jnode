@@ -30,6 +30,7 @@ public class ExtentKey extends AbstractKey {
     public static final byte DATA_FORK = (byte) 0x00;
     public static final byte RESOURCE_FORK = (byte) 0xFF;
     public static final int KEY_LENGTH = 12;
+    public static final int MAXIMUM_KEY_LENGTH = 10;
 
     private int forkType;
     private int pad;

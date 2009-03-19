@@ -23,6 +23,17 @@ package org.jnode.fs.hfsplus.tree;
 import org.jnode.util.BigEndian;
 
 public class BTHeaderRecord {
+    
+    public static final int KEY_COMPARE_TYPE_CASE_FOLDING = 0xCF;
+    /** B-Tree was not closed correctly and need check for consistency. */
+    public static final int BT_BAD_CLOSE_MASK = 0x00000001;
+    public static final int BT_BIG_KEYS_MASK = 0x00000002;
+    public static final int BT_VARIABLE_INDEX_KEYS_MASK = 0x00000004;
+    
+    public static final int BT_TYPE_HFS = 0;
+    public static final int BT_TYPE_USER = 128;
+    public static final int BT_TYPE_RESERVED = 256;
+    
     public static final int BT_HEADER_RECORD_LENGTH = 106;
     /** The depth of the current B-Tree. */
     private int treeDepth;
