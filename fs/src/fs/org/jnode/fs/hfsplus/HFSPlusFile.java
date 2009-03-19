@@ -52,7 +52,7 @@ public class HFSPlusFile extends HFSPlusEntry implements FSFile {
         HfsPlusFileSystem fs = (HfsPlusFileSystem) getFileSystem();
         for (ExtentDescriptor d : file.getDatas().getExtents()) {
             if (!d.isEmpty()) {
-                long firstOffset = d.getStartBlock() * fs.getVolumeHeader().getBlockSize();
+                long firstOffset = d.getStartOffset(fs.getVolumeHeader().getBlockSize());
                 fs.getApi().read(firstOffset, dest);
             }
         }

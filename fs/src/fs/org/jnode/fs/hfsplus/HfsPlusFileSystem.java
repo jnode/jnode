@@ -62,7 +62,6 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
      */
     public final void read() throws FileSystemException {
         sb = new Superblock(this, false);
-
         if (!sb.isAttribute(Superblock.HFSPLUS_VOL_UNMNT_BIT)) {
             log
             .info(getDevice().getId()
@@ -100,11 +99,12 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
     @Override
     protected final HFSPlusEntry createRootEntry() throws IOException {
+        log.info("Create root entry.");
         LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
         if (record != null) {
             return new HFSPlusEntry(this, null, "/", record);
         }
-        log.debug("Root entry : No record found.");
+        log.error("Root entry : No record found.");
         return null;
     }
 
@@ -155,6 +155,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             params.initializeDefaultsValues(this.getApi().getLength(), this
                     .getFSApi().getSectorSize());
             sb.create(params);
+            log.debug(sb.toString());
             // ---
             long volumeBlockUsed = sb.getTotalBlocks() - sb.getFreeBlocks()
                 - ((sb.getBlockSize() == 512) ? 2 : 1);
@@ -163,7 +164,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
             writeAllocationFile((int) volumeBlockUsed);
             // ---
             log.debug("Write Catalog to disk.");
-            long offset = sb.getCatalogFile().getExtent(0).getStartBlock() * sb.getBlockSize();
+            long offset = sb.getCatalogFile().getExtent(0).getStartOffset(sb.getBlockSize());
             Catalog catalog = new Catalog(params);
             this.getApi().write(offset,  catalog.getBytes());
             log.debug("Write volume header to disk.");
