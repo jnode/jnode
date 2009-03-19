@@ -68,13 +68,17 @@ public class Catalog {
         catalogHeaderNodeOffset = firstExtent.getStartOffset(sb.getBlockSize());
         if (!firstExtent.isEmpty()) {
             buffer =
-                    ByteBuffer.allocate(NodeDescriptor.BT_HEADER_NODE +
+                    ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH +
                             BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
             fs.getApi().read(catalogHeaderNodeOffset, buffer);
             buffer.rewind();
             byte[] data = ByteBufferUtils.toArray(buffer);
+            log.info("Load catalog node descriptor.");
             btnd = new NodeDescriptor(data, 0);
-            bthr = new BTHeaderRecord(data, NodeDescriptor.BT_HEADER_NODE);
+            log.debug(btnd.toString());
+            log.info("Load catalog header record.");
+            bthr = new BTHeaderRecord(data, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
+            log.debug(bthr.toString());
 
         }
     }
@@ -88,11 +92,14 @@ public class Catalog {
         log.info("Create B-Tree catalog file.");
         int nodeSize = params.getCatalogNodeSize();
         int bufferLength = 0;
+        log.info("Create catalog node descriptor.");
         btnd = new NodeDescriptor(0, 0, NodeDescriptor.BT_HEADER_NODE, 0, 3);
-        bufferLength += NodeDescriptor.BT_HEADER_NODE;
+        log.debug(btnd.toString());
+        bufferLength += NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH;
         //
         int totalNodes = params.getCatalogClumpSize() / params.getCatalogNodeSize();
         int freeNodes = totalNodes - 2;
+        log.info("Create catalog header record.");
         bthr =
                 new BTHeaderRecord(1, 1, params.getInitializeNumRecords(), 1, 1, nodeSize,
                         CatalogKey.MAXIMUM_KEY_LENGTH, totalNodes, freeNodes, params
@@ -100,7 +107,7 @@ public class Catalog {
                         BTHeaderRecord.KEY_COMPARE_TYPE_CASE_FOLDING,
                         BTHeaderRecord.BT_VARIABLE_INDEX_KEYS_MASK +
                                 BTHeaderRecord.BT_BIG_KEYS_MASK);
-
+        log.debug(bthr.toString());
         bufferLength += BTHeaderRecord.BT_HEADER_RECORD_LENGTH;
         // Create root node
         int rootNodePosition = bthr.getRootNode() * nodeSize;
@@ -110,7 +117,7 @@ public class Catalog {
                 new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, params
                         .getInitializeNumRecords());
         CatalogNode rootNode = new CatalogNode(nd, nodeSize);
-        int offset = NodeDescriptor.BT_HEADER_NODE;
+        int offset = NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH;
         // First record (folder)
         HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
         CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
