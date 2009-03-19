@@ -65,7 +65,7 @@ public class Catalog {
         this.fs = fs;
         Superblock sb = fs.getVolumeHeader();
         ExtentDescriptor firstExtent = sb.getCatalogFile().getExtent(0);
-        catalogHeaderNodeOffset = firstExtent.getSize(sb.getBlockSize());
+        catalogHeaderNodeOffset = firstExtent.getStartOffset(sb.getBlockSize());
         if (!firstExtent.isEmpty()) {
             buffer =
                     ByteBuffer.allocate(NodeDescriptor.BT_HEADER_NODE +
@@ -93,26 +93,22 @@ public class Catalog {
         //
         int totalNodes = params.getCatalogClumpSize() / params.getCatalogNodeSize();
         int freeNodes = totalNodes - 2;
-        bthr = new BTHeaderRecord(1, 
-                                  1, 
-                                  params.getInitializeNumRecords(), 
-                                  1, 
-                                  1, 
-                                  nodeSize, 
-                                  CatalogKey.MAXIMUM_KEY_LENGTH, 
-                                  totalNodes, 
-                                  freeNodes,
-                                  params.getCatalogClumpSize(), 
-                                  BTHeaderRecord.BT_TYPE_HFS, 
-                                  BTHeaderRecord.KEY_COMPARE_TYPE_CASE_FOLDING, 
-                                  BTHeaderRecord.BT_VARIABLE_INDEX_KEYS_MASK + BTHeaderRecord.BT_BIG_KEYS_MASK);
+        bthr =
+                new BTHeaderRecord(1, 1, params.getInitializeNumRecords(), 1, 1, nodeSize,
+                        CatalogKey.MAXIMUM_KEY_LENGTH, totalNodes, freeNodes, params
+                                .getCatalogClumpSize(), BTHeaderRecord.BT_TYPE_HFS,
+                        BTHeaderRecord.KEY_COMPARE_TYPE_CASE_FOLDING,
+                        BTHeaderRecord.BT_VARIABLE_INDEX_KEYS_MASK +
+                                BTHeaderRecord.BT_BIG_KEYS_MASK);
 
         bufferLength += BTHeaderRecord.BT_HEADER_RECORD_LENGTH;
         // Create root node
         int rootNodePosition = bthr.getRootNode() * nodeSize;
         bufferLength += (rootNodePosition - bufferLength);
         // Create node descriptor
-        NodeDescriptor nd = new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, params.getInitializeNumRecords());
+        NodeDescriptor nd =
+                new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, params
+                        .getInitializeNumRecords());
         CatalogNode rootNode = new CatalogNode(nd, nodeSize);
         int offset = NodeDescriptor.BT_HEADER_NODE;
         // First record (folder)

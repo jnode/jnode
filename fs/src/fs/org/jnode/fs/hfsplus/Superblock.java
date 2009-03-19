@@ -41,7 +41,7 @@ import org.jnode.util.NumberUtils;
  * 
  */
 public class Superblock extends HFSPlusObject {
-    
+
     public static final int HFSPLUS_SUPER_MAGIC = 0x482b;
 
     public static final int HFSPLUS_MIN_VERSION = 0x0004; /* HFS+ */
@@ -55,7 +55,7 @@ public class Superblock extends HFSPlusObject {
     public static final int HFSPLUS_VOL_NODEID_REUSED_BIT = 12;
     public static final int HFSPLUS_VOL_JOURNALED_BIT = 13;
     public static final int HFSPLUS_VOL_SOFTLOCK_BIT = 15;
-    
+
     private final Logger log = Logger.getLogger(getClass());
 
     /** Volume header data length */
@@ -90,7 +90,7 @@ public class Superblock extends HFSPlusObject {
                     throw new FileSystemException("Not hfs+ volume header (" + getMagic() +
                             ": bad magic)");
                 }
-                log.debug(this.toString());
+
             }
         } catch (IOException e) {
             throw new FileSystemException(e);
@@ -108,7 +108,8 @@ public class Superblock extends HFSPlusObject {
      */
     public void create(HFSPlusParams params)
         throws IOException, ApiNotFoundException, FileSystemException {
-        log.info("Create new HFS+ volume header (" + params.getVolumeName() + ") with block size of " + params.getBlockSize() + " bytes.");
+        log.info("Create new HFS+ volume header (" + params.getVolumeName() +
+                ") with block size of " + params.getBlockSize() + " bytes.");
         int burnedBlocksBeforeVH = 0;
         int burnedBlocksAfterAltVH = 0;
         /*
@@ -178,11 +179,13 @@ public class Superblock extends HFSPlusObject {
         forkdata.addDescriptor(0, desc);
         forkdata.write(data, 192);
         blockUsed += forkdata.getTotalBlocks();
-        nextBlock = desc.getNext(); 
+        nextBlock = desc.getNext();
         // Catalog B-Tree initialization
         log.info("Init catalog file.");
-        int totalBlocks =  params.getCatalogClumpSize() / blockSize;
-        forkdata =  new HFSPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(), totalBlocks);
+        int totalBlocks = params.getCatalogClumpSize() / blockSize;
+        forkdata =
+                new HFSPlusForkData(params.getCatalogClumpSize(), params.getCatalogClumpSize(),
+                        totalBlocks);
         desc = new ExtentDescriptor(nextBlock, totalBlocks);
         forkdata.addDescriptor(0, desc);
         forkdata.write(data, 272);

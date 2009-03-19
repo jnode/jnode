@@ -29,7 +29,7 @@ public class ExtentDescriptor {
     private int startBlock;
     /** The length in allocation blocks of the extent. */
     private int blockCount;
-    
+
     public ExtentDescriptor() {
         this.startBlock = 0;
         this.blockCount = 0;
@@ -69,8 +69,8 @@ public class ExtentDescriptor {
         BigEndian.setInt32(data, 4, blockCount);
         return data;
     }
-    
-    public byte[] write(byte[] dest, int destOffSet){
+
+    public byte[] write(byte[] dest, int destOffSet) {
         byte[] data = new byte[EXTENT_DESCRIPTOR_LENGTH];
         BigEndian.setInt32(data, 0, startBlock);
         BigEndian.setInt32(data, 4, blockCount);
@@ -81,35 +81,39 @@ public class ExtentDescriptor {
     public final String toString() {
         return "Start block : " + startBlock + "\tBlock count : " + blockCount + "\n";
     }
-   
+
     /**
      * Returns start position in bytes of the extent.
+     * 
      * @param nodeSize the size of a node.
      * @return offset of the extent.
      */
-    public int getStartOffset(int nodeSize){
+    public int getStartOffset(int nodeSize) {
         return startBlock * nodeSize;
     }
-    
+
     /**
      * Returns block number of the next extent.
+     * 
      * @return block number of the next extent.
      */
-    public int getNext(){
+    public int getNext() {
         return startBlock + blockCount;
     }
-    
+
     /**
      * Returns size in byte of the extent.
+     * 
      * @param nodeSize the size of a node.
      * @return size of the extent.
      */
-    public int getSize(int nodeSize){
+    public int getSize(int nodeSize) {
         return blockCount * nodeSize;
-    } 
+    }
 
     /**
      * Returns <tt>true</tt> if the extent is empty.
+     * 
      * @return <tt>true</tt> if the extent is empty.
      */
     public boolean isEmpty() {
