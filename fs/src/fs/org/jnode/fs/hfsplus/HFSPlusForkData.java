@@ -72,8 +72,8 @@ public class HFSPlusForkData {
             extents[i] = new ExtentDescriptor();
         }
     }
-    
-    public byte[] write(byte[] dest, int destOffSet){
+
+    public byte[] write(byte[] dest, int destOffSet) {
         byte[] data = new byte[FORK_DATA_LENGTH];
         BigEndian.setInt64(data, 0, totalSize);
         BigEndian.setInt32(data, 8, clumpSize);

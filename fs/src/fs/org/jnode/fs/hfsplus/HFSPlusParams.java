@@ -17,7 +17,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.hfsplus;
 
 import org.jnode.fs.FileSystemException;
@@ -73,7 +73,8 @@ public class HFSPlusParams {
      * @throws FileSystemException
      * 
      */
-    public void initializeDefaultsValues(long blockDeviceSize, long sectorSize) throws FileSystemException {
+    public void initializeDefaultsValues(long blockDeviceSize, long sectorSize)
+        throws FileSystemException {
         long clumpSize = 0;
         this.blockDeviceSize = blockDeviceSize;
         if (resourceClumpBlocks == 0) {
@@ -143,8 +144,9 @@ public class HFSPlusParams {
 
     }
 
-    private int[] extentClumpTable = new int[] {4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32 };
-    private int[] catalogClumpTable = new int[] {4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256 };
+    private int[] extentClumpTable = new int[] {4, 4, 4, 5, 5, 6, 7, 8, 9, 11, 14, 16, 20, 25, 32};
+    private int[] catalogClumpTable =
+            new int[] {4, 6, 8, 11, 14, 19, 25, 34, 45, 60, 80, 107, 144, 192, 256};
 
     /**
      * Get the file clump size for Extent and catalog B-Tree files.
@@ -152,7 +154,8 @@ public class HFSPlusParams {
      * @param blockSize
      * @param nodeSize
      * @param sectors
-     * @param catalog If true, calculate catalog clump size. In the other case, calculate extent clump size.
+     * @param catalog If true, calculate catalog clump size. In the other case,
+     *            calculate extent clump size.
      * 
      * @return
      */
@@ -178,11 +181,11 @@ public class HFSPlusParams {
 
         clumpSize /= size;
         clumpSize *= size;
-        
+
         if (clumpSize == 0) {
             clumpSize = size;
         }
-        
+
         return clumpSize;
     }
 
@@ -195,7 +198,8 @@ public class HFSPlusParams {
     private int clumpSizeCalculation(long clumpBlocks) throws FileSystemException {
         long clumpSize = clumpBlocks * blockSize;
         if ((clumpSize & 0XFFFFFFFF00000000L) == 0) {
-            throw new FileSystemException("Too many blocks (" + clumpBlocks + ") for clump size (" + clumpSize + ").");
+            throw new FileSystemException("Too many blocks (" + clumpBlocks + ") for clump size (" +
+                    clumpSize + ").");
         }
         return (int) clumpSize;
     }
@@ -284,9 +288,9 @@ public class HFSPlusParams {
     public int getExtentNodeSize() {
         return extentNodeSize;
     }
-    
-    public int getInitializeNumRecords(){
+
+    public int getInitializeNumRecords() {
         return journaled ? 6 : 2;
     }
-    
+
 }
