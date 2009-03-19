@@ -51,10 +51,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
             LeafRecord record) {
         super(fs, parent, name, record);
         this.folder = new CatalogFolder(record.getData());
-    }
-
-    public FSEntryTable getTable() {
-        return entries;
+        this.entries = FSEntryTable.EMPTY_TABLE;
     }
 
     @Override
@@ -119,6 +116,10 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
     public Iterator<? extends FSEntry> iterator() throws IOException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public int rename(String oldName, String newName) {
+        return entries.rename(oldName, newName);
     }
 
     @Override
@@ -188,7 +189,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
                 if (rec.getType() == CatalogFolder.RECORD_TYPE_FOLDER ||
                         rec.getType() == CatalogFile.RECORD_TYPE_FILE) {
                     String name = ((CatalogKey) rec.getKey()).getNodeName().getUnicodeString();
-                    HFSPlusEntry e = new HFSPlusEntry(fs, this, name, rec);
+                    HFSPlusEntry e = new HFSPlusDirectory(fs, this, name, rec);
                     pathList.add(e);
                 }
             }
@@ -216,7 +217,8 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         CatalogThread thread =
                 new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD, this.folder
                         .getFolderId(), dirName);
-        CatalogFolder newFolder = new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
+        CatalogFolder newFolder =
+                new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
         log.debug("New catalog folder :\n" + newFolder.toString());
 
         CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);
@@ -225,7 +227,7 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         LeafRecord folderRecord = new LeafRecord(key, newFolder.getBytes());
         log.debug("New record folder :\n" + folderRecord.toString());
 
-        HFSPlusEntry newEntry = new HFSPlusEntry(fs, this, name, folderRecord);
+        HFSPlusEntry newEntry = new HFSPlusDirectory(fs, this, name, folderRecord);
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());
 
