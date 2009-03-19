@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSPlusParams;
 import org.jnode.fs.hfsplus.HFSUnicodeString;
-import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.Superblock;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
@@ -69,13 +68,13 @@ public class Catalog {
         catalogHeaderNodeOffset = firstExtent.getStartBlock() * sb.getBlockSize();
         if (firstExtent.getStartBlock() != 0 && firstExtent.getBlockCount() != 0) {
             buffer =
-                    ByteBuffer.allocate(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH +
+                    ByteBuffer.allocate(NodeDescriptor.BT_HEADER_NODE +
                             BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
             fs.getApi().read(catalogHeaderNodeOffset, buffer);
             buffer.rewind();
             byte[] data = ByteBufferUtils.toArray(buffer);
             btnd = new NodeDescriptor(data, 0);
-            bthr = new BTHeaderRecord(data, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
+            bthr = new BTHeaderRecord(data, BTHeaderRecord.BT_HEADER_RECORD_LENGTH);
 
         }
     }
@@ -91,11 +90,8 @@ public class Catalog {
         int nodeSize = params.getCatalogNodeSize();
 
         int bufferLength = 0;
-        btnd = new NodeDescriptor();
-        btnd.setKind(HfsPlusConstants.BT_HEADER_NODE);
-        btnd.setHeight(0);
-        btnd.setRecordCount(3);
-        bufferLength += NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH;
+        btnd = new NodeDescriptor(0, 0, NodeDescriptor.BT_HEADER_NODE, 0, 3);
+        bufferLength += NodeDescriptor.BT_HEADER_NODE;
         //
         int leafRecords = params.isJournaled() ? 6 : 2;
         int totalNodes = params.getCatalogClumpSize() / params.getCatalogNodeSize();
@@ -109,12 +105,10 @@ public class Catalog {
         int rootNodePosition = bthr.getRootNode() * nodeSize;
         bufferLength += (rootNodePosition - bufferLength);
         // Create node descriptor
-        NodeDescriptor nd = new NodeDescriptor();
-        nd.setKind(HfsPlusConstants.BT_LEAF_NODE);
-        nd.setHeight(1);
-        nd.setRecordCount(params.isJournaled() ? 6 : 2);
+        int numRecords = params.isJournaled() ? 6 : 2;
+        NodeDescriptor nd = new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, numRecords);
         CatalogNode rootNode = new CatalogNode(nd, nodeSize);
-        int offset = NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH;
+        int offset = NodeDescriptor.BT_HEADER_NODE;
         // First record (folder)
         HFSUnicodeString name = new HFSUnicodeString(params.getVolumeName());
         CatalogKey ck = new CatalogKey(CatalogNodeId.HFSPLUS_POR_CNID, name);
@@ -126,7 +120,7 @@ public class Catalog {
         offset = offset + ck.getKeyLength() + CatalogFolder.CATALOG_FOLDER_SIZE;
         CatalogKey tck = new CatalogKey(CatalogNodeId.HFSPLUS_ROOT_CNID, name);
         CatalogThread ct =
-                new CatalogThread(HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD,
+                new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD,
                         CatalogNodeId.HFSPLUS_ROOT_CNID, new HFSUnicodeString(""));
         record = new LeafRecord(tck, ct.getBytes());
         rootNode.addNodeRecord(1, record, offset);

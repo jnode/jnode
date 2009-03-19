@@ -20,11 +20,6 @@
 
 package org.jnode.fs.hfsplus;
 
-import static org.jnode.fs.hfsplus.HfsPlusConstants.HFSPLUS_SUPER_MAGIC;
-import static org.jnode.fs.hfsplus.HfsPlusConstants.HFSPLUS_VOL_INCNSTNT_BIT;
-import static org.jnode.fs.hfsplus.HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT;
-import static org.jnode.fs.hfsplus.HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
@@ -46,6 +41,21 @@ import org.jnode.util.NumberUtils;
  * 
  */
 public class Superblock extends HFSPlusObject {
+    
+    public static final int HFSPLUS_SUPER_MAGIC = 0x482b;
+
+    public static final int HFSPLUS_MIN_VERSION = 0x0004; /* HFS+ */
+    public static final int HFSPLUS_CURRENT_VERSION = 5; /* HFSX */
+
+    /* HFS+ volume attributes */
+    public static final int HFSPLUS_VOL_UNMNT_BIT = 8;
+    public static final int HFSPLUS_VOL_SPARE_BLK_BIT = 9;
+    public static final int HFSPLUS_VOL_NOCACHE_BIT = 10;
+    public static final int HFSPLUS_VOL_INCNSTNT_BIT = 11;
+    public static final int HFSPLUS_VOL_NODEID_REUSED_BIT = 12;
+    public static final int HFSPLUS_VOL_JOURNALED_BIT = 13;
+    public static final int HFSPLUS_VOL_SOFTLOCK_BIT = 15;
+    
     private final Logger log = Logger.getLogger(getClass());
 
     /** Volume header data length */
@@ -109,8 +119,8 @@ public class Superblock extends HFSPlusObject {
         }
 
         // Populate volume header.
-        this.setMagic(HfsPlusConstants.HFSPLUS_SUPER_MAGIC);
-        this.setVersion(HfsPlusConstants.HFSPLUS_MIN_VERSION);
+        this.setMagic(HFSPLUS_SUPER_MAGIC);
+        this.setVersion(HFSPLUS_MIN_VERSION);
         // Set attributes.
         this.setAttribute(HFSPLUS_VOL_UNMNT_BIT);
         this.setLastMountedVersion(0x446534a);
