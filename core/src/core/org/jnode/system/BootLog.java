@@ -169,9 +169,11 @@ public class BootLog {
         } else {
             if (msg != null) {
                 Unsafe.debug(msg);
+                Unsafe.debug("\n");
             }
             if (ex != null) {
                 Unsafe.debug(ex.toString());
+                Unsafe.debug("\n");
             }
         }
     }

@@ -100,7 +100,7 @@ public final class Main {
             }
         } catch (Throwable ex) {
             BootLog.error("Error in bootstrap", ex);
-            ex.printStackTrace();
+            Unsafe.debugStackTrace(ex);
             sleepForever();
             return -2;
         }
