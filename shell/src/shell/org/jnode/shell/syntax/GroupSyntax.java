@@ -27,7 +27,7 @@ import org.jnode.nanoxml.XMLElement;
 
 /**
  * This is the base class for Syntax classes that compose other Syntaxes.  The
- * interesting behavior (e.g. the <code>prepare</code> method) is implemented
+ * interesting behavior (e.g. the {@link Syntax#prepare(ArgumentBundle)} method) is implemented
  * in child classes.
  * 
  * @author crawley@jnode.org
