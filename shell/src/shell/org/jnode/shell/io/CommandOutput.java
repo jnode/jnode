@@ -33,7 +33,8 @@ import java.io.Writer;
 import org.jnode.util.WriterOutputStream;
 
 /**
- * This CommandIO implementation supports output streams.
+ * This CommandIO implementation supports output streams.  The API methods 
+ * for getting input streams and readers are not supported here.
  * 
  * @author crawley@jnode.org
  */

@@ -23,6 +23,12 @@ package org.jnode.shell.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * This class is the equivalent of "/dev/null" for output.  All writes
+ * are silently thrown away.
+ * 
+ * @author crawley@jnode.org
+ */
 public class NullOutputStream extends OutputStream {
 
     @Override
@@ -30,4 +36,15 @@ public class NullOutputStream extends OutputStream {
         // black-hole all output.
     }
 
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        // black-hole all output.
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+        // black-hole all output.
+    }
+
+    
 }

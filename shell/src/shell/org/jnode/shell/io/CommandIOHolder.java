@@ -26,8 +26,7 @@ import org.jnode.shell.ShellFailureException;
 /**
  * This class provides life-cycle management for CommandIO objects,
  * ensuring that 'standard' streams and readers opened by the shells
- * get closed at the appropriate time.  Unfortunately, the current
- * implementation doesn't cope with certain Bjorne shell usage patterns.
+ * get closed at the appropriate time. 
  * 
  * @author crawley@jnode.org
  */
@@ -35,20 +34,42 @@ public class CommandIOHolder {
     CommandIO io;
     private boolean isMine;
 
-    public CommandIOHolder(CommandIO stream, boolean isMine) {
-        this.io = stream;
+    /**
+     * Create a holder object for a CommandIO object. 
+     * @param io the CommandIO object
+     * @param isMine if this parameter is {@code true}, the
+     * holder takes ownership of the CommandIO object and is responsible
+     * for closing it.
+     */
+    public CommandIOHolder(CommandIO io, boolean isMine) {
+        this.io = io;
         this.isMine = isMine;
     }
 
+    /**
+     * Create another holder object for the CommandIO in an existing holder object.
+     * The resulting holder does not assume ownership of the CommandIO.
+     * @param other the holder to be copied.
+     */
     public CommandIOHolder(CommandIOHolder other) {
         this.io = other.io;
         this.isMine = false;
     }
     
+    /**
+     * Get the holder's CommandIO.
+     * @return the holder' current CommandIO.
+     */
     public synchronized CommandIO getIO() {
         return io;
     }
 
+    /**
+     * Replace the CommandIO in the holder with a different one.  If the
+     * holder owns the current CommandIO, it will be closed.
+     * @param io the new CommandIO value for the holder.
+     * @param isMine if {@code true} the holder will 'own' the new CommandIO object.
+     */
     public synchronized void setIO(CommandIO io, boolean isMine) {
         if (this.io != io) {
             close();
@@ -63,10 +84,14 @@ public class CommandIOHolder {
                 close();
                 this.io = holder.io;
             }
+            // FIXME - ought to be false I think ... but check the consequences first.
             this.isMine = holder.isMine;
         }
     }
 
+    /**
+     * If the holder 'owns' the current CommandIO, close it.
+     */
     public synchronized void close() {
         if (isMine) {
             try {
@@ -78,10 +103,16 @@ public class CommandIOHolder {
         }
     }
     
+    /**
+     * @return {@code true} is the holder 'owns' the current CommandIO, and {@code false} otherwise.
+     */
     public synchronized boolean isMine() {
         return isMine;
     }
 
+    /**
+     * Flush the the current CommandIO.
+     */
     public synchronized void flush() {
         try {
             io.flush();
