@@ -628,6 +628,16 @@ Hi mum again
 </output>
     <error>Hello mother again
 </error>
+    </testSpec><testSpec title="here" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                cat &lt;&lt;EOF &gt; @TEMP_DIR@/1 
+Hi mum
+Hi mum again
+EOF
+        </script>
+        <file name="1" input="false">Hi mum
+Hi mum again
+</file>
     </testSpec>
     <testSpec title="pipeline" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne

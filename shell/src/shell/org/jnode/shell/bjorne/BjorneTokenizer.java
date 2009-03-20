@@ -113,6 +113,9 @@ public class BjorneTokenizer {
      * @throws IncompleteCommandException
      */
     private char[] foldContinuations(String text) throws IncompleteCommandException {
+        // FIXME this is wrong ... if we are going to imitate the documented behaviour
+        // of bash.  (In bash, if the the MARKER is quoted, '\<newline>' is apparently
+        // not interpreted as a continuation.)
         if (text.indexOf('\\') == -1) {
             return text.toCharArray();
         }
@@ -247,6 +250,26 @@ public class BjorneTokenizer {
      */
     public void remove() {
         throw new UnsupportedOperationException("remove not supported");
+    }
+    
+    public String readHereLine(boolean trimTabs) {
+        StringBuilder sb = new StringBuilder(40);
+        while (true) {
+            int ch = nextCh();
+            switch (ch) {
+                case '\n': 
+                    return sb.toString();
+                case EOS:
+                    return (sb.length() > 0) ? sb.toString() : null;
+                case '\t':
+                    if (!trimTabs || sb.length() > 0) {
+                        sb.append('\t');
+                    }
+                    break;
+                default:
+                    sb.append((char) ch);
+            }
+        }
     }
 
     /**
