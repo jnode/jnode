@@ -36,4 +36,18 @@ public class NullInputStream extends InputStream {
         // Return the EOF indication
         return -1;
     }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        // Return the EOF indication
+        return -1;
+    }
+
+    @Override
+    public int read(byte[] b) throws IOException {
+        // Return the EOF indication
+        return -1;
+    }
+    
+    
 }
