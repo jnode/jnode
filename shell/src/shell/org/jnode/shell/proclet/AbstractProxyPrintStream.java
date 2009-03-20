@@ -29,6 +29,7 @@ import java.util.Formatter;
 import java.util.Locale;
 
 import org.jnode.util.ProxyStream;
+import org.jnode.shell.io.NullOutputStream;
 
 /**
  * This class provides some infrastructure for PrintStream proxies.
@@ -48,7 +49,7 @@ public abstract class AbstractProxyPrintStream extends PrintStream implements
     private boolean error_occurred = false;
 
     public AbstractProxyPrintStream() {
-        super((OutputStream) null);
+        super(new NullOutputStream());
     }
 
     public boolean checkError() {
