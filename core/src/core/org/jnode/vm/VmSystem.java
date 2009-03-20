@@ -123,12 +123,12 @@ public final class VmSystem {
             // Initialize resource manager
             final ResourceManager rm = ResourceManagerImpl.initialize();
 
-            VmSystem.out = getSystemOut();
-
             /* Initialize the system classloader */
             VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor.current()).getLoader());
             systemLoader = loader;
             loader.initialize();
+
+            VmSystem.out = getSystemOut();
 
             // Initialize VmThread
             VmThread.initialize();
@@ -226,6 +226,8 @@ public final class VmSystem {
             bootOutStream = new PrintStream(bootOut, true);
             VmIOContext.setGlobalOutStream(bootOutStream);
             VmIOContext.setGlobalErrStream(bootOutStream);
+            setOut(bootOutStream);
+            setErr(bootOutStream);
             return bootOutStream;
         } else if (VmIsolate.isRoot()) {
             return bootOutStream;
@@ -278,6 +280,7 @@ public final class VmSystem {
 
         // Standard Java properties
         res.put("file.separator", "/");
+//        res.put("file.encoding", "ISO-8859-1");
         res.put("java.awt.graphicsenv", "org.jnode.awt.JNodeGraphicsEnvironment");
         //todo
 //        res.put("java.awt.printerjob", "");
@@ -944,7 +947,7 @@ public final class VmSystem {
 
     static class SystemOutputStream extends OutputStream {
 
-        private final StringBuffer data = new StringBuffer();
+        private StringBuffer data;
 
         /**
          * @see java.io.OutputStream#write(int)
@@ -952,6 +955,11 @@ public final class VmSystem {
         public void write(int b) throws IOException {
             final char ch = (char) (b & 0xFF);
             Unsafe.debug(ch);
+            if(data == null) {
+                synchronized (this) {
+                    data = new StringBuffer();
+                }
+            }
             data.append(ch);
         }
 
@@ -961,6 +969,8 @@ public final class VmSystem {
          * @return data written to the system output stream
          */
         public String getData() {
+            if(data == null)
+                return "";
             return data.toString();
         }
     }

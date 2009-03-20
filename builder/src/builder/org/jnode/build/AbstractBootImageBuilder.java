@@ -1319,6 +1319,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("java.nio.ByteBuffer*");
         addCompileHighOptLevel("java.nio.DirectByteBuffer*");
         addCompileHighOptLevel("java.nio.ByteOrder");
+        addCompileHighOptLevel("java.nio.Char*");
+        addCompileHighOptLevel("java.nio.charset.spi");
+        addCompileHighOptLevel("java.nio.charset");
 
         addCompileHighOptLevel("java.security.ProtectionDomain");
         addCompileHighOptLevel("java.security.AccessController");
@@ -1404,7 +1407,21 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 //        addCompileHighOptLevel("sun.reflect.generics.tree");
 //        addCompileHighOptLevel("sun.reflect.generics.visitor");
 //        addCompileHighOptLevel("sun.reflect.misc");
+        addCompileHighOptLevel("sun.misc.VM");
         addCompileHighOptLevel("sun.nio");
+        addCompileHighOptLevel("sun.nio.cs.US_ASCII");
+        addCompileHighOptLevel("sun.nio.cs.ISO_8859_1*");
+        addCompileHighOptLevel("sun.nio.cs.Surrogate*");
+        addCompileHighOptLevel("sun.nio.cs.StreamEncoder");
+        addCompileHighOptLevel("sun.nio.cs.SingleByteDecoder");
+        addCompileHighOptLevel("sun.nio.cs.SingleByteEncoder");
+        addCompileHighOptLevel("sun.nio.cs.FastCharsetProvider");
+        addCompileHighOptLevel("sun.nio.cs.StandardCharsets");
+        addCompileHighOptLevel("sun.nio.cs.HistoricallyNamedCharset");
+        addCompileHighOptLevel("sun.nio.cs.StreamDecoder");
+        addCompileHighOptLevel("sun.nio.cs.ThreadLocalCoders");
+        addCompileHighOptLevel("sun.nio.cs.Unicode*");
+        addCompileHighOptLevel("sun.nio.cs.UTF*");
 
         if (false) {
             addCompileHighOptLevel("org.mmtk.plan");
