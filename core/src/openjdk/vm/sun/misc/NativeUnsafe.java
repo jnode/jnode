@@ -530,9 +530,9 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
-
-    public static void throwException(Unsafe instance, Throwable ee) {
-        throw new UnsupportedOperationException();
+    public static void throwException(Unsafe instance, Throwable ee) throws Throwable{
+        //todo review it, when inlined in Unsafe the bytecode would be rejected by a verifier
+        throw ee;
     }
 
     public static boolean compareAndSwapObject(Unsafe instance, Object o, long offset,
