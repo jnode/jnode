@@ -36,6 +36,8 @@ class NativeVM {
      * @see sun.misc.VM#initialize() 
      */
     private static void initialize() {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        //todo what to do here?
+        VM.booted();
     }
 }
