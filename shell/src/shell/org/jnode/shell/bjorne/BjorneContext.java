@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1050,11 +1051,15 @@ public class BjorneContext {
                 }
 
                 CommandIOHolder stream;
+                CommandInput in;
+                CommandOutput out;
                 switch (redir.getRedirectionType()) {
                     case REDIR_DLESS:
-                        throw new UnsupportedOperationException("<<");
                     case REDIR_DLESSDASH:
-                        throw new UnsupportedOperationException("<<-");
+                        // FIXME do expansion
+                        in = new CommandInput(new StringReader(redir.getHereDocument()));
+                        stream = new CommandIOHolder(in, true);
+                        break;
 
                     case REDIR_GREAT:
                         try {
@@ -1062,8 +1067,8 @@ public class BjorneContext {
                             if (isNoClobber() && file.exists()) {
                                 throw new ShellException("File already exists");
                             }
-                            CommandOutput tmp = new CommandOutput(new FileOutputStream(file));
-                            stream = new CommandIOHolder(tmp, true);
+                            out = new CommandOutput(new FileOutputStream(file));
+                            stream = new CommandIOHolder(out, true);
                         } catch (IOException ex) {
                             throw new ShellException("Cannot open output file", ex);
                         }
@@ -1083,8 +1088,8 @@ public class BjorneContext {
                     case REDIR_LESS:
                         try {
                             File file = new File(redir.getArg().getText());
-                            CommandInput tmp = new CommandInput(new FileInputStream(file));
-                            stream = new CommandIOHolder(tmp, true);
+                            in = new CommandInput(new FileInputStream(file));
+                            stream = new CommandIOHolder(in, true);
                         } catch (IOException ex) {
                             throw new ShellException("Cannot open input file", ex);
                         }
@@ -1093,16 +1098,18 @@ public class BjorneContext {
                     case REDIR_LESSAND:
                         try {
                             int fromFd = Integer.parseInt(redir.getArg().getText());
-                            stream = (fromFd >= holders.length) ? null : new CommandIOHolder(holders[fromFd]);
+                            stream = (fromFd >= holders.length) ? null :
+                                    new CommandIOHolder(holders[fromFd]);
                         } catch (NumberFormatException ex) {
-                            throw new ShellException("Invalid fd after >&");
+                            throw new ShellException("Invalid fd after <&");
                         }
                         break;
 
                     case REDIR_GREATAND:
                         try {
                             int fromFd = Integer.parseInt(redir.getArg().getText());
-                            stream = (fromFd >= holders.length) ? null : new CommandIOHolder(holders[fromFd]);
+                            stream = (fromFd >= holders.length) ? null : 
+                                    new CommandIOHolder(holders[fromFd]);
                         } catch (NumberFormatException ex) {
                             throw new ShellException("Invalid fd after >&");
                         }

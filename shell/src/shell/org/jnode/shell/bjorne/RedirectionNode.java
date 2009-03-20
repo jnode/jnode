@@ -21,11 +21,13 @@
 package org.jnode.shell.bjorne;
 
 public class RedirectionNode {
-    public final int redirectionType;
+    private final int redirectionType;
 
-    public final BjorneToken io;
+    private final BjorneToken io;
 
-    public final BjorneToken arg;
+    private final BjorneToken arg;
+    
+    private String hereDocument;
 
     public RedirectionNode(final int redirectionType, BjorneToken io,
             BjorneToken arg) {
@@ -45,6 +47,14 @@ public class RedirectionNode {
 
     public int getRedirectionType() {
         return redirectionType;
+    }
+
+    public void setHereDocument(String hereDocument) {
+        this.hereDocument = hereDocument;
+    }
+
+    public String getHereDocument() {
+        return hereDocument;
     }
 
     public String toString() {
