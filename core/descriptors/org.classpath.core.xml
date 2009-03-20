@@ -49,11 +49,9 @@
 
       <export name="sun.misc.Service"/>
       <export name="sun.misc.ServiceConfigurationError"/>
+      <export name="sun.misc.VM"/>
 
-      <export name="sun.nio.cs.StreamEncoder"/>
-      <export name="sun.nio.cs.StreamDecoder"/>
-      <export name="sun.nio.cs.HistoricallyNamedCharset"/>
-      <export name="sun.nio.cs.ThreadLocalCoders"/>
+      <export name="sun.nio.cs.*"/>
 
       <export name="sun.text.*"/>
       <export name="sun.text.normalizer.*"/>
