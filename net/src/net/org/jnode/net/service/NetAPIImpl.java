@@ -60,17 +60,18 @@ public class NetAPIImpl implements VMNetAPI {
             final NetDeviceImpl netDeviceImpl = (NetDeviceImpl) netDevice;
             final NetDeviceAPI api = netDeviceImpl.getDevice().getAPI(NetDeviceAPI.class);
             final ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
-
-            for (ProtocolAddress ipaddr : info.addresses()) {
-                if (sm != null) {
-                    try {
-                        sm.checkConnect(ipaddr.toString(), 58000);
+            if (info != null) {
+                for (ProtocolAddress ipaddr : info.addresses()) {
+                    if (sm != null) {
+                        try {
+                            sm.checkConnect(ipaddr.toString(), 58000);
+                            list.add(ipaddr.toInetAddress());
+                        } catch (SecurityException ex) {
+                            // Just don't add
+                        }
+                    } else {
                         list.add(ipaddr.toInetAddress());
-                    } catch (SecurityException ex) {
-                        // Just don't add
                     }
-                } else {
-                    list.add(ipaddr.toInetAddress());
                 }
             }
         } catch (ApiNotFoundException ex) {
