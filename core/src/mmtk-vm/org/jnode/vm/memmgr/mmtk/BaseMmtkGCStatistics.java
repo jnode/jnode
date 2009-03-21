@@ -27,9 +27,6 @@ import org.jnode.vm.memmgr.GCStatistics;
  */
 public abstract class BaseMmtkGCStatistics extends GCStatistics {
 
-    /**
-     * @see org.jnode.vm.memmgr.GCStatistics#toString()
-     */
     public String toString() {
         return "";
     }

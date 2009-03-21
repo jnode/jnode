@@ -91,6 +91,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     private boolean initializing;
 
     /**
+     * @param loader
      * @param helper
      */
     public BaseMmtkHeapManager(VmClassLoader loader, HeapHelper helper) {
@@ -102,9 +103,6 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         setWriteBarrier(null);
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.scheduler.VmProcessor)
-     */
     public final Object createProcessorHeapData(VmProcessor cpu) {
         try {
             final Class[] types = { HeapHelper.class };
@@ -126,10 +124,6 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         }
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#allocObject(org.jnode.vm.classmgr.VmClassType,
-     *      int)
-     */
     protected Object allocObject(VmClassType< ? > vmClass, int size) {
         if (false) {
             Unsafe.debug("allocObject: ");
@@ -174,44 +168,26 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         return result;
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#dumpStatistics(java.io.PrintStream)
-     */
     public void dumpStatistics(PrintWriter out) {
         // Default behavior is to do nothing
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#gc()
-     */
     public void gc() {
         // Default behavior is to do nothing
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#getFreeMemory()
-     */
     public long getFreeMemory() {
         return BasePlan.freeMemory().toLong();
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#getHeapStatistics()
-     */
     public HeapStatistics getHeapStatistics() {
         return null;
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#getTotalMemory()
-     */
     public long getTotalMemory() {
         return BasePlan.totalMemory().toLong();
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#initialize()
-     */
     protected void initialize() {
         Unsafe.debug("MmtkHeapManager#initialize\n");
         if (initializing) {
@@ -238,24 +214,15 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         Space.printVMMap();
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#isLowOnMemory()
-     */
     public boolean isLowOnMemory() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#isObject(org.vmmagic.unboxed.Address)
-     */
     public boolean isObject(Address ptr) {
         return Space.isMappedAddress(ptr);
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#start()
-     */
     public void start() {
         Unsafe.debug("MmtkHeapManager#start\n");
 
@@ -274,9 +241,6 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#notifyClassResolved(org.jnode.vm.classmgr.VmType)
-     */
     public void notifyClassResolved(VmType< ? > vmType) {
         final MMType type;
         final boolean acyclic = false; // TODO understand me
@@ -318,18 +282,12 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         return allocator;
     }
 
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#loadClasses(org.jnode.vm.classmgr.VmClassLoader)
-     */
     public void loadClasses(VmClassLoader loader) throws ClassNotFoundException {
         loader.loadClass("org.mmtk.vm.Plan", true);
         loader.loadClass("org.mmtk.vm.PlanConstants", true);
         loader.loadClass(MMType.class.getName(), true);
     }
 
-    /**
-     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
-     */
     public void verifyBeforeEmit() {
         super.verifyBeforeEmit();
         Space.printVMMap();
