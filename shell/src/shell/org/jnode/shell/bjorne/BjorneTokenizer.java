@@ -252,6 +252,14 @@ public class BjorneTokenizer {
         throw new UnsupportedOperationException("remove not supported");
     }
     
+    /**
+     * This method bypasses normal tokenization and reads a raw line of
+     * text up to the next NL (or the end of stream).
+     * 
+     * @param trimTabs if {@code true}, trim any leading TABs from the line
+     * @return the line read without the terminating NL.  If we got an
+     * end of stream immediately, return {@code null}.
+     */
     public String readHereLine(boolean trimTabs) {
         StringBuilder sb = new StringBuilder(40);
         while (true) {

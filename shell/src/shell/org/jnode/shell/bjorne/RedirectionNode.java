@@ -26,8 +26,10 @@ public class RedirectionNode {
     private final BjorneToken io;
 
     private final BjorneToken arg;
-    
+
     private String hereDocument;
+    
+    private boolean expandable = true;
 
     public RedirectionNode(final int redirectionType, BjorneToken io,
             BjorneToken arg) {
@@ -50,6 +52,8 @@ public class RedirectionNode {
     }
 
     public void setHereDocument(String hereDocument) {
+        // FIXME ... should analyze the document and set 'expandable'
+        // if there anything that requires expansion.
         this.hereDocument = hereDocument;
     }
 
@@ -69,5 +73,9 @@ public class RedirectionNode {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    public boolean isHereDocumentExpandable() {
+        return expandable;
     }
 }

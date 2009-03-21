@@ -1056,8 +1056,11 @@ public class BjorneContext {
                 switch (redir.getRedirectionType()) {
                     case REDIR_DLESS:
                     case REDIR_DLESSDASH:
-                        // FIXME do expansion
-                        in = new CommandInput(new StringReader(redir.getHereDocument()));
+                        String here = redir.getHereDocument();
+                        if (redir.isHereDocumentExpandable()) {
+                            here = expand(here).toString();
+                        }
+                        in = new CommandInput(new StringReader(here));
                         stream = new CommandIOHolder(in, true);
                         break;
 
