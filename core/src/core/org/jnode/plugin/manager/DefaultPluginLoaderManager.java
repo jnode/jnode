@@ -34,25 +34,16 @@ public class DefaultPluginLoaderManager extends PluginLoaderManager {
 
     private final List<PluginLoader> loaders = new ArrayList<PluginLoader>();
 
-    /**
-     * @see org.jnode.plugin.PluginLoaderManager#addPluginLoader(org.jnode.plugin.PluginLoader)
-     */
     public synchronized void addPluginLoader(PluginLoader loader) {
         if (!loaders.contains(loader)) {
             loaders.add(loader);
         }
     }
 
-    /**
-     * @see org.jnode.plugin.PluginLoaderManager#removePluginLoader(org.jnode.plugin.PluginLoader)
-     */
     public synchronized void removePluginLoader(PluginLoader loader) {
         loaders.remove(loader);
     }
 
-    /**
-     * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
-     */
     public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
         final List<PluginLoader> loaders;
         synchronized (this) {

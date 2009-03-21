@@ -34,8 +34,8 @@ public class Factory {
     /**
      * Create a new PluginRegistry.
      *
-     * @param pluginFiles
-     * @return
+     * @param pluginFiles URLs for plugin files with which to populate the registry.
+     * @return the plugin model
      * @throws PluginException
      */
     public static PluginRegistryModel createRegistry(URL[] pluginFiles)
@@ -44,10 +44,11 @@ public class Factory {
     }
 
     /**
-     * Parse an xml descriptor into the instantiated PluginDescriptor.
+     * Parse an xml descriptor, returning its contents as a PluginDescriptor.
+     * The descriptor will be created with a {@code null} PluginJar.
      *
-     * @param root
-     * @return
+     * @param root the root element of the descriptor
+     * @return the plugin descriptor
      * @throws PluginException
      */
     public static PluginDescriptor parseDescriptor(XMLElement root) throws PluginException {
@@ -55,10 +56,11 @@ public class Factory {
     }
 
     /**
-     * Parse an xml descriptor into the instantiated PluginDescriptor.
+     * Parse an xml descriptor, returning its contents as a PluginDescriptorModel.
      *
-     * @param root
-     * @return
+     * @param root the root element of the descriptor
+     * @param jar the PluginJar for the descriptor
+     * @return the plugin descriptor
      * @throws PluginException
      */
     static PluginDescriptorModel parseDescriptor(PluginJar jar, XMLElement root) throws PluginException {

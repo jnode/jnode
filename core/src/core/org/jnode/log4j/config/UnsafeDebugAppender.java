@@ -42,9 +42,6 @@ public class UnsafeDebugAppender extends WriterAppender {
     /**
      * Create an appender for a named JNode console.
      * @param layout the appender's initial log message layout.
-     * @param name the target console name.
-     * @param toErr if <code>true</code> output to the console's 'err' stream,
-     *       otherwise to it's 'out' stream.
      */
     public UnsafeDebugAppender(Layout layout) {
         super();

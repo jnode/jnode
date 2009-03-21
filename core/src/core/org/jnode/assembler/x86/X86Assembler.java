@@ -267,13 +267,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract void setResolver(ObjectResolver resolver);
 
     /**
-     * Start a new object and write its header. An ObjectInfo object is
-     * returned, on which the <code>markEnd</code> mehod must be called after
-     * all data has been written into the object.
+     * Start a new object and write its header, returning an 
+     * {@link org.jnode.assembler.NativeStream.ObjectInfo} instance.  
+     * The <code>markEnd</code> method must be called on the ObjectInfo
+     * instance once all data has been written for the object started.
      *
      * @param cls
      * @return The info for the started object
-     * @see ObjectInfo
      */
     public abstract ObjectInfo startObject(VmType cls);
 
