@@ -33,12 +33,12 @@ public interface SystemRepositoryProvider {
      * Does this part of the repository contain an element with the given name.
      *
      * @param elementName
-     * @return
+     * @return {@code true} if it does, {@code false} otherwise.
      */
     public boolean contains(Name elementName);
 
     /**
-     * Gets all elementnames contained in the part of the repository identified
+     * Gets all element names contained in the part of the repository identified
      * by the given element name.
      *
      * @return The set of names, never null
@@ -67,7 +67,7 @@ public interface SystemRepositoryProvider {
      * Put an element into repository.
      *
      * @param elementName
-     * @param dst
+     * @param src
      * @throws IOException
      */
     public void put(Name elementName, ByteBuffer src)

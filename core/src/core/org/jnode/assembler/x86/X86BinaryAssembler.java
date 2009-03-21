@@ -63,7 +63,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     BootImageNativeStream, X86Operation {
 
 
-    public static final class Key {
+    static final class Key {
 
         private final Object key;
 
@@ -72,14 +72,17 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
 
         /**
-         * @param obj
-         * @return True if obj is equal to this, false otherwise
-         * @see java.lang.Object#equals(java.lang.Object)
+         * Test if this Key is equal to the supplied object.  The semantics
+         * of equality depend on what the 'key' is.  If it is a {@link Label}, then two
+         * Keys are equal if the Label values are equal.  Otherwise, two keys are equal if
+         * the 'key' values refer to the same object.
+         * 
+         * @param obj the object to test for equality.
+         * @return Return {@code true} if obj is 'equal to' this, {@code false} otherwise.
          */
         public final boolean equals(Object obj) {
-            /*
-                * if (!(obj instanceof Key)) { return false;
-                */
+            // FIXME ... this method will throw exceptions where a well-behaved implementation 
+            // of 'equals' should return false; i.e. if obj is null or not a Key.
             obj = ((Key) obj).key;
             if (this.key instanceof Label) {
                 return key.equals(obj);
@@ -89,8 +92,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
 
         /**
-         * @return The hashcode
-         * @see java.lang.Object#hashCode()
+         * The hashcode is the hashcode for the Key's 'key' object.
+         * 
+         * @return This Key instance's hashcode.
          */
         public final int hashCode() {
             return key.hashCode();
@@ -844,9 +848,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeADC(int, GPR, int, int)
-     */
     public void writeADC(int operandSize, GPR dstReg, int dstDisp, int imm32) {
         testSize(dstReg, mode.getSize());
         if (isByte(imm32)) {
@@ -933,9 +934,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
     }
 
-    /**
-     * @see @see org.jnode.assembler.x86.X86Assembler#writeADD(int, SR, int, int)
-     */
     public void writeADD(int operandSize, SR dstReg, int dstDisp, int imm32) {
         testOperandSize(operandSize, BITS32);
         writeSegPrefix(dstReg);
@@ -1244,9 +1242,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeObjectRef(tablePtr, offset, rawAddress);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeCALL(GPR)
-     */
     public void writeCALL(GPR reg) {
         testSize(reg, mode.getSize());
         // Since CALL in 64-bit mode always use 64-bit targets, we
@@ -1266,9 +1261,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRM(0xFF, 0, reg, offset, 2);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeCALL(GPR, GPR, int, int)
-     */
     public void writeCALL(GPR regBase, GPR regIndex, int scale, int disp) {
         // Since CALL in 64-bit mode always use 64-bit targets, we
         // specify a 0 operand size, so we won't get a REX prefix
@@ -1621,9 +1613,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRM(0xdc, 0, srcReg, srcDisp, 0);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeFADDP(X86Register)
-     */
     public void writeFADDP(X86Register fpuReg) {
         write8(0xde);
         write8(0xc0 + fpuReg.getNr());
@@ -1657,9 +1646,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRM(0xdc, 0, srcReg, srcDisp, 6);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeFDIVP(X86Register)
-     */
     public void writeFDIVP(X86Register fpuReg) {
         write8(0xde);
         write8(0xf8 + fpuReg.getNr());
@@ -1794,9 +1780,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRM(0xdc, 0, srcReg, srcDisp, 1);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeFMULP(X86Register)
-     */
     public void writeFMULP(X86Register fpuReg) {
         write8(0xde);
         write8(0xc8 + fpuReg.getNr());
@@ -1860,9 +1843,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeModRM(srcReg.getNr() & 7, srcDisp, 7);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeFSTP(X86Register)
-     */
     public void writeFSTP(X86Register fpuReg) {
         write8(0xDD);
         write8(0xD8 + fpuReg.getNr());
@@ -1908,9 +1888,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRM(0xdc, 0, srcReg, srcDisp, 4);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeFSUBP(X86Register)
-     */
     public void writeFSUBP(X86Register fpuReg) {
         write8(0xde);
         write8(0xe8 + fpuReg.getNr());
@@ -1924,9 +1901,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(0xe9);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeFXCH(X86Register)
-     */
     public void writeFXCH(X86Register fpuReg) {
         write8(0xd9);
         write8(0xc8 + fpuReg.getNr());
@@ -1956,16 +1930,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeModRM(srcReg.getNr() & 7, srcDisp, 0);
     }
 
-    /**
-     *
-     */
     public void writeHLT() {
         write8(0xF4);
     }
 
     /**
      * Create an idiv edx:eax, srcReg.
-     * <p/>
      * If srcReg is 64-bit, the idiv rdx:rax, srcReg is created.
      *
      * @param srcReg
@@ -3980,9 +3950,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRM(0x8f, 0, dstReg, dstDisp, 0);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePOPA()
-     */
     public void writePOPA() {
         if (code64) {
             throw new InvalidOpcodeException();
@@ -3990,31 +3957,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(0x61);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePOPF()
-     */
     public void writePOPF() {
         write8(0x9D);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePrefix(int)
-     */
     public void writePrefix(int prefix) {
         write8(prefix);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePSHUFW(MMX,MMX,int)
-     */
     public void writePSHUFW(MMX dstMmx, MMX srcMmx, int imm8) {
         writeModRR_MMX(0x70, dstMmx, srcMmx);
         write8(imm8);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePSRLW(MMX,int)
-     */
     public void writePSRLW(X86Register.MMX mmx, int imm8) {
         write8(0x0F);
         write8(0x71);
@@ -4022,16 +3977,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(imm8);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePSUBW(MMX,MMX)
-     */
     public void writePSUBW(MMX dstMmx, MMX srcMmx) {
         writeModRR_MMX(0xF9, dstMmx, srcMmx);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePUNPCKLBW(MMX,MMX)
-     */
     public void writePUNPCKLBW(MMX dstMmx, MMX srcMmx) {
         writeModRR_MMX(0x60, dstMmx, srcMmx);
     }
@@ -4167,9 +4116,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         return rc;
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePUSHA()
-     */
     public void writePUSHA() {
         if (code64) {
             throw new InvalidOpcodeException();
@@ -4177,16 +4123,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(0x60);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePUSHF()
-     */
     public void writePUSHF() {
         write8(0x9C);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writePXOR(MMX,MMX)
-     */
     public void writePXOR(MMX dstMmx, MMX srcMmx) {
         writeModRR_MMX(0xEF, dstMmx, srcMmx);
     }
@@ -4433,9 +4373,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(imm8);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeSHL(int, GPR, int, int)
-     */
     public void writeSHL(int operandSize, GPR dstReg, int dstDisp, int imm8) {
         testSize(dstReg, mode.getSize());
         write1bOpcodeModRM(0xc1, operandSize, dstReg, dstDisp, 4);
@@ -4452,9 +4389,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRR(0xd3, dstReg.getSize(), dstReg, 4);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeSHL_CL(int, GPR, int)
-     */
     public void writeSHL_CL(int operandSize, GPR dstReg, int dstDisp) {
         testSize(dstReg, mode.getSize());
         write1bOpcodeModRM(0xd3, operandSize, dstReg, dstDisp, 4);
@@ -4826,9 +4760,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeXCHG(SR, int, GPR)
-     */
     public void writeXCHG(SR dstReg, int dstDisp, GPR srcReg) {
         testSize(srcReg, mode.getSize());
         writeSegPrefix(dstReg);
@@ -4837,9 +4768,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write32(dstDisp);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeXCHG(GPR, int, GPR)
-     */
     public void writeXCHG(GPR dstReg, int dstDisp, GPR srcReg) {
         testSize(dstReg, mode.getSize());
         testSize(srcReg, mode.getSize());
@@ -4847,9 +4775,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
             .getNr());
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeXCHG(GPR, GPR)
-     */
     public void writeXCHG(GPR dstReg, GPR srcReg) {
         testSize(dstReg, mode.getSize());
         testSize(srcReg, mode.getSize());
@@ -4938,17 +4863,11 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
             .getNr());
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeRDMSR()
-     */
     public void writeRDMSR() {
         write8(0x0F);
         write8(0x32);
     }
 
-    /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeWRMSR()
-     */
     public void writeWRMSR() {
         write8(0x0F);
         write8(0x30);

@@ -63,7 +63,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
     private final byte[] initBuffer;
 
     /**
-     * Initialize this instance
+     * Initialize this instance, loading the JAR content from a URL.
      *
      * @param registry
      * @param pluginUrl
@@ -74,14 +74,14 @@ public class PluginJar implements BootableObject, ResourceLoader {
     }
 
     /**
-     * Initialize this instance
+     * Initialize this instance using a ByteBuffer to provide the plugin JAR content.
      *
      * @param registry
      * @param pluginIs
+     * @param pluginUrl
      */
     public PluginJar(PluginRegistryModel registry, ByteBuffer pluginIs,
                      URL pluginUrl) throws PluginException {
-
         try {
             //get a reference to the plugin jar data
             if (Vm.isWritingImage()) {
@@ -121,9 +121,6 @@ public class PluginJar implements BootableObject, ResourceLoader {
         this.descriptor = Factory.parseDescriptor(this, root);
     }
 
-    /**
-     * @see org.jnode.vm.ResourceLoader#getResourceAsBuffer(java.lang.String)
-     */
     public ByteBuffer getResourceAsBuffer(String resourceName) {
         final ByteBuffer data = resources.get(resourceName);
         if (data == null) {
@@ -136,8 +133,8 @@ public class PluginJar implements BootableObject, ResourceLoader {
     /**
      * Does this jar-file contain the resource with the given name.
      *
-     * @param resourceName
-     * @return boolean
+     * @param resourceName the purported resource name.
+     * @return {@code true} if the named resource is present, {@code false} otherwise.
      */
     public final boolean containsResource(String resourceName) {
         return resources.containsKey(resourceName);
@@ -146,7 +143,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
     /**
      * Return the names of all resources in this plugin jar.
      *
-     * @return
+     * @return the resource names as a collection.
      */
     public Collection<String> resourceNames() {
         return Collections.unmodifiableCollection(resources.keySet());
@@ -160,12 +157,14 @@ public class PluginJar implements BootableObject, ResourceLoader {
     }
 
     /**
-     * Does this jar-file contain the resource with the given name.
+     * If the PluginJar contains the requested resource, return a URL for the resource
+     * that can be used to read the resource later on.
      *
-     * @param resourceName
-     * @return boolean
+     * @param resourceName the name of the resource we are looking for.
+     * @return a "plugin:" URL for the resource, or {@code null}
      */
     public final URL getResource(String resourceName) {
+        // FIXME - why doesn't the containsResource method also strip a leading '/' ???
         if (resourceName.startsWith("/")) {
             resourceName = resourceName.substring(1);
         }
@@ -176,8 +175,10 @@ public class PluginJar implements BootableObject, ResourceLoader {
                 }
             }
             final String id = descriptor.getId();
+            // FIXME - shouldn't the URL include the plugin version ???
             return new URL("plugin:" + id + "!/" + resourceName);
         } catch (IOException ex) {
+            // FIXME - use logger ???
             System.out.println("ioex: " + ex.getMessage());
             return null;
         }

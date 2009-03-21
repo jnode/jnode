@@ -31,73 +31,57 @@ import java.nio.MappedByteBuffer;
  */
 public interface VMFileHandle {
 
-	/**
-	 * Gets the length (in bytes) of this file
-	 * @return long
-	 */
-	public long getLength();
-	
-	/**
-	 * Sets the length of this file.
-	 * @param length
-	 * @throws IOException
-	 */
-	public void setLength(long length)
-	throws IOException;
+    /**
+     * Gets the length (in bytes) of this file
+     * @return long
+     */
+    public long getLength();
 
-	/**
-	 * Gets the current position in the file
-	 * @return long
-	 */
-	public long getPosition();
-	
-	/**
-	 * Sets the position in the file.
-	 * @param position
-	 * @throws IOException
-	 */
-	public void setPosition(long position)
-	throws IOException;
+    /**
+     * Sets the length of this file.
+     * @param length
+     * @throws IOException
+     */
+    public void setLength(long length) throws IOException;
 
-	/**
-	 * Read <code>len</code> bytes from the given position.
-	 * The read data is read fom this file starting at offset <code>fileOffset</code>
-	 * and stored in <code>dest</code> starting at offset <code>ofs</code>.
-	 * @param dest
-	 * @param off
-	 * @param len
-     * @return
-	 * @throws IOException
-	 */	
-//	public int read(byte[] dest, int off, int len)
-//	throws IOException;
-      public int read(ByteBuffer dest)
-      throws IOException;
-    
-	
-	/**
-	 * Write <code>len</code> bytes to the given position. 
-	 * The data is read from <code>src</code> starting at offset
-	 * <code>ofs</code> and written to this file starting at offset <code>fileOffset</code>.
-	 * @param src
-	 * @param off
-	 * @param len
-	 * @throws IOException
-	 */	
-	//public void write(byte[] src, int off, int len)
-    public void write(ByteBuffer src)
-	throws IOException;
+    /**
+     * Gets the current position in the file
+     * @return long
+     */
+    public long getPosition();
 
-	/**
-	 * Close this file.
-	 */
-	public void close()
-	throws IOException;
-	
-	/**
-	 * Has this handle been closed?
-	 */
-	public boolean isClosed();
+    /**
+     * Sets the position in the file.
+     * @param position
+     * @throws IOException
+     */
+    public void setPosition(long position) throws IOException;
+
+    /**
+     * Read bytes into the {@code dest} buffer.
+     * @param dest
+     * @return the number of bytes read.
+     * @throws IOException
+     */	
+    public int read(ByteBuffer dest) throws IOException;
+
+
+    /**
+     * Write bytes from the {@code src} buffer.
+     * @param src
+     * @throws IOException
+     */	
+    public void write(ByteBuffer src) throws IOException;
+
+    /**
+     * Close this file.
+     */
+    public void close() throws IOException;
+
+    /**
+     * Has this handle been closed?
+     */
+    public boolean isClosed();
 
     public int available();
 

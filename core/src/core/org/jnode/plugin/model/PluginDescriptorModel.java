@@ -113,7 +113,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Create a new instance
      *
-     * @param e
+     * @param e the root XMLElement for the XML plugin descriptor
+     * @param jarFile the PluginJar object to associate with the descriptor.
      */
     PluginDescriptorModel(PluginJar jarFile, XMLElement e)
         throws PluginException {
@@ -201,9 +202,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Load a plugin-descriptor without a registry.
+     * Create a plugin descriptor without a PluginJar object
      *
-     * @param e
+     * @param e the root XMLElement for the XML plugin descriptor
      */
     PluginDescriptorModel(XMLElement e) throws PluginException {
         this(null, e);
@@ -211,7 +212,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Add a fragment to this plugin. This method is called only by
-     * {@link FragmentDescriptorModel#resolve }.
+     * {@link FragmentDescriptorModel#resolve(PluginRegistryModel) }.
      *
      * @param fragment
      */
@@ -237,7 +238,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Create the plugin describe by this descriptor
+     * Create the plugin described by this descriptor
+     * @return the Plugin so created.
      */
     private Plugin createPlugin() throws PluginException {
         if (className == null) {
@@ -330,7 +332,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Gets all fragments attached to this plugin.
      *
-     * @return
+     * @return the fragments.
      */
     public final List<FragmentDescriptorModel> fragments() {
         return fragments;
@@ -339,7 +341,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Gets the name of the custom plugin class of this plugin.
      *
-     * @return Null if no custom plugin class
+     * @return the custom class name or {@code null}
      */
     public String getCustomPluginClassName() {
         return className;
@@ -366,7 +368,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Gets all extension-points provided by this plugin
      *
-     * @return List&lt;ExtensionPointConfig&gt;
+     * @return the extension points as an array.
      */
     public ExtensionPoint[] getExtensionPoints() {
         return extensionPoints;
@@ -375,7 +377,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Gets all extensions provided by this plugin
      *
-     * @return List&lt;ExtensionConfig&gt;
+     * @return the estensions as an array.
      */
     public Extension[] getExtensions() {
         return extensions;
@@ -389,35 +391,31 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      */
 
     /**
-     * Gets the unique identifier of this plugin
+     * Gets the unique identifier of this plugin.
+     * @return the plugin identifier.
      */
     public String getId() {
         return id;
     }
 
     /**
-     * @return Returns the jarFile.
+     * Get the plugin's JAR file as a PluginJar object.
+     * @return the plugin's JAR file or {@code null}
      */
     public final PluginJar getJarFile() {
         return this.jarFile;
     }
 
-    /**
-     * @see org.jnode.plugin.PluginDescriptor#getLicenseName()
-     */
     public String getLicenseName() {
         return licenseName;
     }
 
-    /**
-     * @see org.jnode.plugin.PluginDescriptor#getLicenseUrl()
-     */
     public String getLicenseUrl() {
         return licenseUrl;
     }
 
     /**
-     * Gets the human readable name of this plugin
+     * Gets the human readable name for this plugin
      */
     public String getName() {
         return name;
@@ -495,9 +493,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Gets the required imports
+     * Gets the plugin's prerequisites.
      *
-     * @return List&lt;ImportConfig&gt;
+     * @return the prerequisites as an array.
      */
     public PluginPrerequisite[] getPrerequisites() {
         return requires;
@@ -510,9 +508,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         return providerName;
     }
 
-    /**
-     * @see org.jnode.plugin.PluginDescriptor#getProviderUrl()
-     */
     public String getProviderUrl() {
         return providerUrl;
     }
@@ -533,9 +528,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         return version;
     }
     
-    /**
-     * {@inheritDoc}
-     */
     public PluginReference getPluginReference() {
         if (reference == null) {
             // lazy creation
@@ -547,7 +539,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Does this plugin have a custom plugin class specified?
      *
-     * @return
+     * @return {@code true} if this plugin has a custom plugin class, {@code false} otherwise.
      */
     public boolean hasCustomPluginClass() {
         return (className != null);
@@ -565,7 +557,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * Has this plugin the auto-start flag set. If true, the plugin will be
      * started automatically at boot/load time.
      *
-     * @return
+     * @return the plugin's autostart flag.
      */
     public boolean isAutoStart() {
         return autoStart;
@@ -575,7 +567,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * Gets the priority of this plugin. Plugins are loaded by increasing
      * priority.
      *
-     * @return
+     * @return the plugin's priority.
      */
     public int getPriority() {
         return priority;
@@ -584,7 +576,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Is this a descriptor of a fragment.
      *
-     * @return boolean True for a fragment, false for a plugin
+     * @return {@code true} for a fragment, {@code false} for a plugin.
      */
     public boolean isFragment() {
         return false;
@@ -594,7 +586,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * Is this a descriptor of a system plugin. System plugins are not
      * reloadable.
      *
-     * @return boolean
+     * @return {@code true} if the plugin is reloadable.
      */
     public boolean isSystemPlugin() {
         return system;
@@ -604,7 +596,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * Remove a fragment from this plugin. This method is called only by
      * {@link FragmentDescriptorModel#unresolve(PluginRegistryModel)}.
      *
-     * @param fragment
+     * @param fragment the fagment to be removed
      */
     final void remove(FragmentDescriptorModel fragment) {
         if (isSystemPlugin()) {
@@ -616,7 +608,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Remove a listener from this descriptor.
      *
-     * @param listener
+     * @param listener the listener to be removed.
      */
     public final void removeListener(PluginDescriptorListener listener) {
         synchronized (listenerLock) {
@@ -627,8 +619,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Resolve all references to (elements of) other plugin descriptors
+     * Resolve all references to (elements of) other plugins
      *
+     * @param registry the registry that will be used to resolve references. 
      * @throws PluginException
      */
     public void resolve(PluginRegistryModel registry) throws PluginException {
@@ -658,6 +651,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     /**
      * Start this plugin. This descriptor is resolved. All plugins that this
      * plugin depends on, are started first.
+     * @param registry the registry that will be used to resolve references. 
      */
     final void startPlugin(final PluginRegistryModel registry)
         throws PluginException {
@@ -710,8 +704,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * If the current thread is starting this plugin, then the thread
      * will not be blocked.
      *
-     * @throws InterruptedException
-     * @throws
+     * @throws PluginException if the blocked thread was interrupted.
      */
     private void waitUntilStarted() throws PluginException {
         if (!started) {
@@ -738,7 +731,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     /**
      * Remove all references to (elements of) other plugin descriptors
-     *
+     * 
+     * @param registry the registry that will be used to unresolve references. 
      * @throws PluginException
      */
     protected void unresolve(PluginRegistryModel registry)
