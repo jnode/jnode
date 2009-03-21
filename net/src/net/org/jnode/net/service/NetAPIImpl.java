@@ -105,14 +105,15 @@ public class NetAPIImpl implements VMNetAPI {
             try {
                 final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
                 final ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
-                if (info.contains(addr)) {
+                if (info != null && info.contains(addr)) {
                     return new NetDeviceImpl(dev);
                 }
             } catch (ApiNotFoundException ex) {
                 // Ignore
             }
         }
-        throw new SocketException("no network interface is bound to such an IP address");
+        throw new SocketException(
+                "This IP address has not been bound to any registered network device");
     }
 
     /**
@@ -141,7 +142,8 @@ public class NetAPIImpl implements VMNetAPI {
         for (Device dev : devices) {
             try {
                 final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
-                final ProtocolAddressInfo addrInfo = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+                final ProtocolAddressInfo addrInfo = 
+                    api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
                 if (addrInfo != null) {
                     final ProtocolAddress addr = addrInfo.getDefaultAddress();
                     if (addr != null) {
@@ -152,11 +154,11 @@ public class NetAPIImpl implements VMNetAPI {
                 // Strange, but ignore
             }
         }
-        throw new UnknownHostException("No configured address found");
+        throw new UnknownHostException(
+                "No IP addresses have been configured for any registered network device");
     }
 
     public byte[][] getHostByName(String hostname) throws UnknownHostException {
-
         ArrayList<byte[]> list = null;
         for (NetworkLayer layer : nlm.getNetworkLayers()) {
             final ProtocolAddress[] addrs = layer.getHostByName(hostname);
