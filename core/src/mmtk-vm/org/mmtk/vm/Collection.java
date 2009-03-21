@@ -73,9 +73,6 @@ public final class Collection {
     }
 
     /**
-     * An enumerator used to forward root objects
-     */
-    /**
      * Triggers a collection.
      * 
      * @param why
