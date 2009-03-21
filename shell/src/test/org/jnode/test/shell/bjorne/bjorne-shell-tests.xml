@@ -639,6 +639,32 @@ EOF
 Hi mum again
 </file>
     </testSpec>
+    <testSpec title="here 2" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                for i in 1 2 3 4 5 ; do cat &lt;&lt;EOF ; done 
+Hi mum $i
+EOF
+        </script>
+        <output>Hi mum 1
+Hi mum 2
+Hi mum 3
+Hi mum 4
+Hi mum 5
+</output>
+    </testSpec>
+    <testSpec title="here 3" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                for i in 1 2 3 4 5 ; do cat &lt;&lt;EOF ; done 
+Hi mum `echo $i`
+EOF
+        </script>
+        <output>Hi mum 1
+Hi mum 2
+Hi mum 3
+Hi mum 4
+Hi mum 5
+</output>
+    </testSpec>
     <testSpec title="pipeline" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 echo &gt; @TEMP_DIR@/1 Hi mum
