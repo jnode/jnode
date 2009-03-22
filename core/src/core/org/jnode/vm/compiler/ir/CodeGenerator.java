@@ -49,14 +49,14 @@ public abstract class CodeGenerator<T> {
     public abstract void checkLabel(int address);
 
     /**
-     * @return
+     * @return the register pool
      */
     public abstract RegisterPool<T> getRegisterPool();
 
     /**
      * Returns true of this CPU supports 3 address operands
      *
-     * @return
+     * @return {@code true} if the 3 address operands are supported, otherwise {@code false}.
      */
     public abstract boolean supports3AddrOps();
 

@@ -118,10 +118,6 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         return null;
     }
 
-    /**
-     * @param method
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
-     */
     public void startMethod(VmMethod method) {
         final VmByteCode bc = method.getBytecode();
         byteCode = bc;
@@ -141,9 +137,6 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         }
     }
 
-    /* (non-Javadoc)
-      * @see org.jnode.vm.bytecode.BytecodeVisitor#endMethod()
-      */
     public void endMethod() {
         VmByteCode bc = byteCode;
         // TODO add catch blocks to try successors
@@ -152,143 +145,72 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         }
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifeq(int)
-     */
     public void visit_ifeq(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifne(int)
-     */
     public void visit_ifne(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iflt(int)
-     */
     public void visit_iflt(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifge(int)
-     */
     public void visit_ifge(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifgt(int)
-     */
     public void visit_ifgt(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifle(int)
-     */
     public void visit_ifle(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpeq(int)
-     */
     public void visit_if_icmpeq(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpne(int)
-     */
     public void visit_if_icmpne(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmplt(int)
-     */
     public void visit_if_icmplt(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpge(int)
-     */
     public void visit_if_icmpge(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpgt(int)
-     */
     public void visit_if_icmpgt(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmple(int)
-     */
     public void visit_if_icmple(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpeq(int)
-     */
     public void visit_if_acmpeq(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpne(int)
-     */
     public void visit_if_acmpne(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
-     */
     public void visit_goto(int address) {
         addBranch(address, UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_jsr(int)
-     */
     public void visit_jsr(int address) {
         // TODO Not sure about this, the next block I believe it NOT a
         // direct successor. This will have to be tested.
         //addBranch(address);
     }
 
-    /**
-     * @param defValue
-     * @param lowValue
-     * @param highValue
-     * @param addresses
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_tableswitch(int, int, int, int[])
-     */
     public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
         for (int i = 0; i < addresses.length; i++) {
             // Next block could be successor, e.g. switch could fall through
@@ -298,12 +220,6 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         addBranch(defValue, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param defValue
-     * @param matchValues
-     * @param addresses
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lookupswitch(int, int[], int[])
-     */
     public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
         for (int i = 0; i < addresses.length; i++) {
             // Next block could be successor, e.g. switch could fall through
@@ -313,76 +229,43 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         addBranch(defValue, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnull(int)
-     */
     public void visit_ifnull(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnonnull(int)
-     */
     public void visit_ifnonnull(int address) {
         addBranch(address, CONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_athrow()
-     */
     public void visit_athrow() {
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
-     */
     public void visit_areturn() {
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dreturn()
-     */
     public void visit_dreturn() {
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_freturn()
-     */
     public void visit_freturn() {
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ireturn()
-     */
     public void visit_ireturn() {
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lreturn()
-     */
     public void visit_lreturn() {
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @param index
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ret(int)
-     */
     public void visit_ret(int index) {
         // Not sure about this either, this needs testing
         endBB(UNCONDITIONAL_BRANCH);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
-     */
     public void visit_return() {
         endBB(UNCONDITIONAL_BRANCH);
     }
@@ -430,10 +313,6 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
         branchFlags[address] |= flags;
     }
 
-    /**
-     * @param address
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#startInstruction(int)
-     */
     public void startInstruction(int address) {
         super.startInstruction(address);
         opcodeFlags[address] |= BytecodeFlags.F_START_OF_INSTRUCTION;

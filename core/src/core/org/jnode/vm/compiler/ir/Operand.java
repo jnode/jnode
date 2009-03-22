@@ -69,7 +69,7 @@ public abstract class Operand<T> {
     /**
      * One of AddressingMode constants defined above
      *
-     * @return
+     * @return the addressing mode
      */
     public abstract AddressingMode getAddressingMode();
 }

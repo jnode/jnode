@@ -142,7 +142,7 @@ public final class CompiledMethod {
     /**
      * Gets (creates if needed) a compiled code id.
      *
-     * @return
+     * @return a compiled code id.
      */
     public final int getCompiledCodeId() {
         if (ccId < 0) {

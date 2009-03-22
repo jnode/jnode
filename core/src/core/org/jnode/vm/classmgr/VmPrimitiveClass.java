@@ -22,6 +22,8 @@ package org.jnode.vm.classmgr;
 
 import java.security.ProtectionDomain;
 
+import org.jnode.vm.JvmType;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -68,24 +70,23 @@ public final class VmPrimitiveClass<T> extends VmNormalClass<T> {
     }
 
     /**
-     * Is this a wide primitive type; long or double
+     * Is this a wide primitive type; i.e. a long or double
      */
     public final boolean isWide() {
         return wide;
     }
 
     /**
-     * Is this a floatingpoint primitive type; float or double
+     * Is this a floating point primitive type; i.e. a float or double
      */
     public final boolean isFloatingPoint() {
         return floatingPoint;
     }
 
     /**
-     * Gets the JvmType of this type.
+     * Gets the {@link JvmType} value for this type.
      *
-     * @return
-     * @see org.jnode.vm.JvmType
+     * @return the {@link JvmType} (integer) value
      */
     public int getJvmType() {
         return jvmType;

@@ -61,17 +61,19 @@ public abstract class VmUTF8Convert {
     static final boolean WRITE_PSEUDO_UTF8 = true;
 
     /**
-     * Convert the given sequence of (pseudo-)utf8 formatted bytes into a
-     * String.
-     * <p/>
+     * Convert the given sequence of UTF8 coded bytes into an interned Java String.
+     * <p>
      * The acceptable input formats are controlled by the STRICTLY_CHECK_FORMAT,
      * ALLOW_NORMAL_UTF8, and ALLOW_PSEUDO_UTF8 flags.
      *
-     * @param utf8 (pseudo-)utf8 byte array
-     * @return unicode string
-     * @throws UTFDataFormatException if the (pseudo-)utf8 byte array is not valid (pseudo-)utf8
+     * @param data a buffer containing the UTF8 data.
+     * @param result a temporary character buffer used to build the string.
+     * @param length the number of bytes to pull from the data buffer.
+     * @return the resulting String
+     * @throws UTFDataFormatException if the UTF8 is invalid
      */
-    public static String fromUTF8(ByteBuffer data, char[] result, int length) throws UTFDataFormatException {
+    public static String fromUTF8(ByteBuffer data, char[] result, int length) 
+        throws UTFDataFormatException {
         int result_index = 0;
         for (int i = 0, n = length; i < n;) {
             byte b = data.get();

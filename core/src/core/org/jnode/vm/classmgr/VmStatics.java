@@ -150,7 +150,7 @@ public abstract class VmStatics extends VmStaticsBase {
      * Gets the type at the given index.
      *
      * @param idx
-     * @return
+     * @return the type entry
      */
     final VmType getTypeEntry(int idx) {
         allocator.testType(idx, TYPE_CLASS);
@@ -409,7 +409,7 @@ public abstract class VmStatics extends VmStaticsBase {
     /**
      * Gets my statics allocator.
      *
-     * @return
+     * @return the allocator
      */
     protected final VmStaticsAllocator getAllocator() {
         return allocator;
