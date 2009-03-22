@@ -26,10 +26,11 @@ package org.jnode.util;
 public class BooleanUtils {
 
     /**
-     * Returns true if value equals "true", "on", "yes" or "1".
+     * Returns {@code true} if value equals "true", "on", "yes" or "1".
      *
-     * @param value Can be null
-     * @return
+     * @param value A string value to be interpreted as a boolean, or {@code null} 
+     * which will be mapped to {@code false}.
+     * @return the value's boolean interpretation.
      */
     public static boolean valueOf(String value) {
         if (value == null) {

@@ -59,11 +59,8 @@ abstract class PS2Driver extends Driver implements CharacterDeviceAPI, PS2Consta
      */
     protected synchronized void startDevice() throws DriverException {
         init();
-        getDevice().registerAPI(CharacterDeviceAPI.class, this); // make sure
-                                                                    // it's at
-                                                                    // least a
-                                                                    // character
-                                                                    // device
+        // Make sure it's at least a character device
+        getDevice().registerAPI(CharacterDeviceAPI.class, this); 
     }
 
     /**
@@ -89,7 +86,7 @@ abstract class PS2Driver extends Driver implements CharacterDeviceAPI, PS2Consta
             throw new ClosedChannelException();
         }
 
-        // ToDo: proper exception handling (if end of queue -> IOException)
+        // FIXME: proper exception handling (if end of queue -> IOException)
         int i;
         for (i = 0; i < dst.remaining(); i++) {
             dst.put(queue.pop());

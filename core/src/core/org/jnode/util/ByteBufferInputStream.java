@@ -24,6 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+/**
+ * @author epr
+ * @author Andrei DORE
+ */
 public class ByteBufferInputStream extends InputStream {
     private final ByteBuffer buf;
 
@@ -31,10 +35,7 @@ public class ByteBufferInputStream extends InputStream {
         this.buf = buf;
     }
 
-    /**
-     * @Override
-     * @see java.io.InputStream#read()
-     */
+    @Override
     public int read() throws IOException {
         if (buf.remaining() > 0) {
             return buf.get() & 0xFF;
@@ -44,9 +45,6 @@ public class ByteBufferInputStream extends InputStream {
     }
 
     @Override
-    /**
-     * @author Andrei DORE
-     */
     public int available() throws IOException {
         return buf.remaining();
     }
