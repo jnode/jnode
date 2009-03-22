@@ -126,13 +126,11 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return
+     * @return the variables for the basic block
      */
     public Variable<T>[] getVariables() {
         if (variables == null) {
-            if (variables == null) {
-                variables = idominator.getVariables();
-            }
+            variables = idominator.getVariables();
         }
         if (variables == null) {
             throw new AssertionError("variables are null!");
@@ -141,14 +139,14 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @param variables
+     * @param variables new variables for the basic block
      */
     public void setVariables(Variable<T>[] variables) {
         this.variables = variables;
     }
 
     /**
-     * @return
+     * @return the stack offset for the basic block
      */
     public int getStackOffset() {
         if (stackOffset < 0) {
@@ -197,21 +195,21 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return
+     * @return the successors
      */
     public List<IRBasicBlock<T>> getSuccessors() {
         return successors;
     }
 
     /**
-     * @return
+     * @return the idominator
      */
     public IRBasicBlock<T> getIDominator() {
         return idominator;
     }
 
     /**
-     * @return
+     * @return the block name
      */
     public String getName() {
         return name;
@@ -252,7 +250,7 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return
+     * @return the post-order number
      */
     public int getPostOrderNumber() {
         return postOrderNumber;
@@ -304,42 +302,42 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return
+     * @return the dominance frontier
      */
     public List<IRBasicBlock<T>> getDominanceFrontier() {
         return dominanceFrontier;
     }
 
     /**
-     * @return
+     * @return the dominated blocks
      */
     public List<IRBasicBlock<T>> getDominatedBlocks() {
         return dominatedBlocks;
     }
 
     /**
-     * @return
+     * @return the quads
      */
     public List<Quad<T>> getQuads() {
         return quads;
     }
 
     /**
-     * @return
+     * @return the def list
      */
     public List<Operand> getDefList() {
         return defList;
     }
 
     /**
-     * @return
+     * @return the end PC
      */
     public int getEndPC() {
         return endPC;
     }
 
     /**
-     * @return
+     * @return the start PC
      */
     public int getStartPC() {
         return startPC;
@@ -360,7 +358,7 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return
+     * @return {@code if this block is the start of an exception handler
      */
     public boolean isStartOfExceptionHandler() {
         return startOfExceptionHandler;
@@ -374,8 +372,8 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @param pc
-     * @return
+     * @param pc a PC value
+     * @return {@code true} if the basic block contains the given PC 
      */
     public boolean contains(int pc) {
         return ((pc >= startPC) && (pc < endPC));

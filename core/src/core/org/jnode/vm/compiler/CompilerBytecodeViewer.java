@@ -1192,9 +1192,6 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
         viewer.visit_tableswitch(defValue, lowValue, highValue, addresses);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.InlineBytecodeVisitor#visit_inlinedReturn()
-     */
     public void visit_inlinedReturn(int jvmType) {
         viewer.out("inlinedReturn [type " + jvmType + "]");
     }

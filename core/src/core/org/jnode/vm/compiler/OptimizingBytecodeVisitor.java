@@ -694,7 +694,7 @@ public final class OptimizingBytecodeVisitor extends
     /**
      * Have we visited a return statement?
      *
-     * @return
+     * @return {@code true} if we have visited a return statement, {code false} otherwise.
      */
     public boolean isReturnVisited() {
         return visitedReturn;

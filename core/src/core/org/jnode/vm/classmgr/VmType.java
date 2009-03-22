@@ -252,6 +252,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @param superClassName
      * @param loader
      * @param accessFlags
+     * @param protectionDomain the protection domain of this type.
      */
     protected VmType(String name, String superClassName, VmClassLoader loader,
                      int accessFlags, ProtectionDomain protectionDomain) {
@@ -266,6 +267,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * @param superClass
      * @param loader
      * @param typeSize
+     * @param protectionDomain the protection domain of this type.
      */
     VmType(String name, VmNormalClass<? super T> superClass,
            VmClassLoader loader, int typeSize,
@@ -340,7 +342,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      * Load the system classes during our bootstrap process.
      *
      * @param clc
-     * @return VmClass[]
+     * @return the VmType objects for the system classes
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
@@ -2349,10 +2351,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     /**
-     * Gets the JvmType of this type.
+     * Gets the {@link JvmType} value for this type.
      *
-     * @return
-     * @see org.jnode.vm.JvmType
+     * @return the {@link JvmType} value (integer).
      */
     public int getJvmType() {
         return JvmType.REFERENCE;

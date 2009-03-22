@@ -84,7 +84,7 @@ public class BaseMagicHelper {
          * Gets the MagicClass instance for the given type.
          *
          * @param type
-         * @return
+         * @return a MagicClass instance
          * @throws InternalError When type is no magic type.
          */
         public static MagicClass get(VmType<?> type) {

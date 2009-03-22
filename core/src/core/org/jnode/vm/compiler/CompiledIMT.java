@@ -30,7 +30,7 @@ public abstract class CompiledIMT extends VmSystemObject {
     /**
      * Gets the address of the IMT code table.
      *
-     * @return
+     * @return the address
      */
     public abstract Object getIMTAddress();
 

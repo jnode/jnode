@@ -125,23 +125,14 @@ public class IRGenerator<T> extends BytecodeVisitor {
     private Iterator<IRBasicBlock<T>> basicBlockIterator;
     private IRBasicBlock<T> currentBlock;
 
-    /**
-     *
-     */
     public IRGenerator(IRControlFlowGraph<T> cfg) {
         basicBlockIterator = cfg.iterator();
         currentBlock = basicBlockIterator.next();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#setParser(org.jnode.vm.bytecode.BytecodeParser)
-     */
     public void setParser(BytecodeParser parser) {
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
-     */
     public void startMethod(VmMethod method) {
         VmByteCode code = method.getBytecode();
         nArgs = method.getArgSlotCount();
@@ -165,15 +156,9 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.setVariables(variables);
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#endMethod()
-     */
     public void endMethod() {
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#startInstruction(int)
-     */
     public void startInstruction(int address) {
         this.address = address;
         if (address >= currentBlock.getEndPC()) {
@@ -208,30 +193,18 @@ public class IRGenerator<T> extends BytecodeVisitor {
         }
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#endInstruction()
-     */
     public void endInstruction() {
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_nop()
-     */
     public void visit_nop() {
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aconst_null()
-     */
     public void visit_aconst_null() {
         currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
             NULL_CONSTANT));
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iconst(int)
-     */
     public void visit_iconst(int value) {
         Constant<T> c = Constant.getInstance(value);
         Quad<T> quad = new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
@@ -240,9 +213,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lconst(long)
-     */
     public void visit_lconst(long value) {
         Constant<T> c = Constant.getInstance(value);
         currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
@@ -250,9 +220,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fconst(float)
-     */
     public void visit_fconst(float value) {
         Constant<T> c = Constant.getInstance(value);
         currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
@@ -260,9 +227,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dconst(double)
-     */
     public void visit_dconst(double value) {
         Constant<T> c = Constant.getInstance(value);
         currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
@@ -270,24 +234,14 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
-     */
     public void visit_ldc(VmConstString value) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @param value
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
-     */
     public final void visit_ldc(VmConstClass value) {
         throw new Error("Not implemented yet");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iload(int)
-     */
     public void visit_iload(int index) {
         variables[index].setType(Operand.INT);
         variables[stackOffset].setType(Operand.INT);
@@ -297,9 +251,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lload(int)
-     */
     public void visit_lload(int index) {
         variables[index].setType(Operand.LONG);
         variables[stackOffset].setType(Operand.LONG);
@@ -308,9 +259,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fload(int)
-     */
     public void visit_fload(int index) {
         variables[index].setType(Operand.FLOAT);
         variables[stackOffset].setType(Operand.FLOAT);
@@ -319,9 +267,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dload(int)
-     */
     public void visit_dload(int index) {
         variables[index].setType(Operand.DOUBLE);
         variables[stackOffset].setType(Operand.DOUBLE);
@@ -330,9 +275,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aload(int)
-     */
     public void visit_aload(int index) {
         variables[index].setType(Operand.REFERENCE);
         variables[stackOffset].setType(Operand.REFERENCE);
@@ -340,65 +282,38 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iaload()
-     */
     public void visit_iaload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_laload()
-     */
     public void visit_laload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_faload()
-     */
     public void visit_faload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_daload()
-     */
     public void visit_daload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aaload()
-     */
     public void visit_aaload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_baload()
-     */
     public void visit_baload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_caload()
-     */
     public void visit_caload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_saload()
-     */
     public void visit_saload() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_istore(int)
-     */
     public void visit_istore(int index) {
         stackOffset -= 1;
         variables[index].setType(Operand.INT);
@@ -406,9 +321,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lstore(int)
-     */
     public void visit_lstore(int index) {
         stackOffset -= 2;
         variables[index].setType(Operand.LONG);
@@ -416,9 +328,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fstore(int)
-     */
     public void visit_fstore(int index) {
         stackOffset -= 1;
         variables[index].setType(Operand.FLOAT);
@@ -426,9 +335,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dstore(int)
-     */
     public void visit_dstore(int index) {
         stackOffset -= 2;
         variables[index].setType(Operand.DOUBLE);
@@ -436,9 +342,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_astore(int)
-     */
     public void visit_astore(int index) {
         stackOffset -= 1;
         variables[index].setType(Operand.REFERENCE);
@@ -446,311 +349,182 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iastore()
-     */
     public void visit_iastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lastore()
-     */
     public void visit_lastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fastore()
-     */
     public void visit_fastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dastore()
-     */
     public void visit_dastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aastore()
-     */
     public void visit_aastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_bastore()
-     */
     public void visit_bastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_castore()
-     */
     public void visit_castore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sastore()
-     */
     public void visit_sastore() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop()
-     */
     public void visit_pop() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop2()
-     */
     public void visit_pop2() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup()
-     */
     public void visit_dup() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup_x1()
-     */
     public void visit_dup_x1() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup_x2()
-     */
     public void visit_dup_x2() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2()
-     */
     public void visit_dup2() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x1()
-     */
     public void visit_dup2_x1() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
-     */
     public void visit_dup2_x2() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_swap()
-     */
     public void visit_swap() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iadd()
-     */
     public void visit_iadd() {
         currentBlock.add(doBinaryQuad(IADD, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ladd()
-     */
     public void visit_ladd() {
         currentBlock.add(doBinaryQuad(LADD, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fadd()
-     */
     public void visit_fadd() {
         currentBlock.add(doBinaryQuad(FADD, Operand.FLOAT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dadd()
-     */
     public void visit_dadd() {
         currentBlock.add(doBinaryQuad(DADD, Operand.DOUBLE));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_isub()
-     */
     public void visit_isub() {
         currentBlock.add(doBinaryQuad(ISUB, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lsub()
-     */
     public void visit_lsub() {
         currentBlock.add(doBinaryQuad(LSUB, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fsub()
-     */
     public void visit_fsub() {
         currentBlock.add(doBinaryQuad(FSUB, Operand.FLOAT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dsub()
-     */
     public void visit_dsub() {
         currentBlock.add(doBinaryQuad(DSUB, Operand.DOUBLE));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_imul()
-     */
     public void visit_imul() {
         currentBlock.add(doBinaryQuad(IMUL, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lmul()
-     */
     public void visit_lmul() {
         currentBlock.add(doBinaryQuad(LMUL, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fmul()
-     */
     public void visit_fmul() {
         currentBlock.add(doBinaryQuad(FMUL, Operand.FLOAT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dmul()
-     */
     public void visit_dmul() {
         currentBlock.add(doBinaryQuad(DMUL, Operand.DOUBLE));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_idiv()
-     */
     public void visit_idiv() {
         currentBlock.add(doBinaryQuad(IDIV, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldiv()
-     */
     public void visit_ldiv() {
         currentBlock.add(doBinaryQuad(LDIV, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fdiv()
-     */
     public void visit_fdiv() {
         currentBlock.add(doBinaryQuad(FDIV, Operand.FLOAT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ddiv()
-     */
     public void visit_ddiv() {
         currentBlock.add(doBinaryQuad(DDIV, Operand.DOUBLE));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_irem()
-     */
     public void visit_irem() {
         currentBlock.add(doBinaryQuad(IREM, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lrem()
-     */
     public void visit_lrem() {
         currentBlock.add(doBinaryQuad(LREM, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_frem()
-     */
     public void visit_frem() {
         currentBlock.add(doBinaryQuad(FREM, Operand.FLOAT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_drem()
-     */
     public void visit_drem() {
         currentBlock.add(doBinaryQuad(DREM, Operand.DOUBLE));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ineg()
-     */
     public void visit_ineg() {
         int s1 = stackOffset - 1;
         variables[s1].setType(Operand.INT);
         currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, INEG, s1));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lneg()
-     */
     public void visit_lneg() {
         int s1 = stackOffset - 2;
         variables[s1].setType(Operand.LONG);
         currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, LNEG, s1));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fneg()
-     */
     public void visit_fneg() {
         int s1 = stackOffset - 1;
         variables[s1].setType(Operand.FLOAT);
         currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, FNEG, s1));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dneg()
-     */
     public void visit_dneg() {
         int s1 = stackOffset - 2;
         variables[s1].setType(Operand.DOUBLE);
         currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, DNEG, s1));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishl()
-     */
     public void visit_ishl() {
         currentBlock.add(doBinaryQuad(ISHL, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lshl()
-     */
     public void visit_lshl() {
         stackOffset -= 1;
         int s1 = stackOffset - 2;
@@ -759,16 +533,10 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LSHL, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishr()
-     */
     public void visit_ishr() {
         currentBlock.add(doBinaryQuad(ISHR, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lshr()
-     */
     public void visit_lshr() {
         stackOffset -= 1;
         int s1 = stackOffset - 2;
@@ -777,16 +545,10 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LSHR, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iushr()
-     */
     public void visit_iushr() {
         currentBlock.add(doBinaryQuad(IUSHR, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lushr()
-     */
     public void visit_lushr() {
         stackOffset -= 2;
         int s1 = stackOffset - 1;
@@ -795,51 +557,30 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LUSHR, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iand()
-     */
     public void visit_iand() {
         currentBlock.add(doBinaryQuad(IAND, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_land()
-     */
     public void visit_land() {
         currentBlock.add(doBinaryQuad(LAND, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ior()
-     */
     public void visit_ior() {
         currentBlock.add(doBinaryQuad(IOR, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lor()
-     */
     public void visit_lor() {
         currentBlock.add(doBinaryQuad(LOR, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ixor()
-     */
     public void visit_ixor() {
         currentBlock.add(doBinaryQuad(IXOR, Operand.INT));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lxor()
-     */
     public void visit_lxor() {
         currentBlock.add(doBinaryQuad(LXOR, Operand.LONG));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iinc(int, int)
-     */
     public void visit_iinc(int index, int incValue) {
         variables[index].setType(Operand.INT);
         BinaryQuad<T> binaryQuad =
@@ -847,9 +588,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         currentBlock.add(binaryQuad.foldConstants());
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2l()
-     */
     public void visit_i2l() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.LONG);
@@ -857,9 +595,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2f()
-     */
     public void visit_i2f() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.FLOAT);
@@ -867,9 +602,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2d()
-     */
     public void visit_i2d() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.DOUBLE);
@@ -877,9 +609,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_l2i()
-     */
     public void visit_l2i() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.INT);
@@ -887,9 +616,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_l2f()
-     */
     public void visit_l2f() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.FLOAT);
@@ -897,9 +623,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_l2d()
-     */
     public void visit_l2d() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.DOUBLE);
@@ -907,9 +630,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2i()
-     */
     public void visit_f2i() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.INT);
@@ -917,9 +637,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2l()
-     */
     public void visit_f2l() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.LONG);
@@ -927,9 +644,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2d()
-     */
     public void visit_f2d() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.DOUBLE);
@@ -937,9 +651,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_d2i()
-     */
     public void visit_d2i() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.INT);
@@ -947,9 +658,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_d2l()
-     */
     public void visit_d2l() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.LONG);
@@ -957,16 +665,10 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 2;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_d2f()
-     */
     public void visit_d2f() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2b()
-     */
     public void visit_i2b() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.BYTE);
@@ -974,9 +676,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2c()
-     */
     public void visit_i2c() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.CHAR);
@@ -984,9 +683,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2s()
-     */
     public void visit_i2s() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.SHORT);
@@ -994,44 +690,26 @@ public class IRGenerator<T> extends BytecodeVisitor {
         stackOffset += 1;
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lcmp()
-     */
     public void visit_lcmp() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fcmpl()
-     */
     public void visit_fcmpl() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fcmpg()
-     */
     public void visit_fcmpg() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dcmpl()
-     */
     public void visit_dcmpl() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dcmpg()
-     */
     public void visit_dcmpg() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifeq(int)
-     */
     public void visit_ifeq(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1042,9 +720,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifne(int)
-     */
     public void visit_ifne(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1055,9 +730,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iflt(int)
-     */
     public void visit_iflt(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1068,9 +740,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifge(int)
-     */
     public void visit_ifge(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1081,9 +750,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifgt(int)
-     */
     public void visit_ifgt(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1094,9 +760,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifle(int)
-     */
     public void visit_ifle(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1107,9 +770,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpeq(int)
-     */
     public void visit_if_icmpeq(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1122,9 +782,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpne(int)
-     */
     public void visit_if_icmpne(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1137,9 +794,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmplt(int)
-     */
     public void visit_if_icmplt(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1152,9 +806,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpge(int)
-     */
     public void visit_if_icmpge(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1167,9 +818,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpgt(int)
-     */
     public void visit_if_icmpgt(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1182,9 +830,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmple(int)
-     */
     public void visit_if_icmple(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1197,9 +842,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpeq(int)
-     */
     public void visit_if_acmpeq(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1212,9 +854,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpne(int)
-     */
     public void visit_if_acmpne(int address) {
         int s1 = stackOffset - 2;
         int s2 = stackOffset - 1;
@@ -1227,223 +866,133 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
-     */
     public void visit_goto(int address) {
         currentBlock.add(new UnconditionalBranchQuad<T>(this.address, currentBlock, address));
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_jsr(int)
-     */
     public void visit_jsr(int address) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ret(int)
-     */
     public void visit_ret(int index) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_tableswitch(int, int, int, int[])
-     */
     public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lookupswitch(int, int[], int[])
-     */
     public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ireturn()
-     */
     public void visit_ireturn() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.INT);
         currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lreturn()
-     */
     public void visit_lreturn() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.LONG);
         currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_freturn()
-     */
     public void visit_freturn() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.FLOAT);
         currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dreturn()
-     */
     public void visit_dreturn() {
         stackOffset -= 2;
         variables[stackOffset].setType(Operand.DOUBLE);
         currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
-     */
     public void visit_areturn() {
         stackOffset -= 1;
         variables[stackOffset].setType(Operand.REFERENCE);
         currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
-     */
     public void visit_return() {
         currentBlock.add(new VoidReturnQuad<T>(address, currentBlock));
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_getstatic(org.jnode.vm.classmgr.VmConstFieldRef)
-     */
     public void visit_getstatic(VmConstFieldRef fieldRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_putstatic(org.jnode.vm.classmgr.VmConstFieldRef)
-     */
     public void visit_putstatic(VmConstFieldRef fieldRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_getfield(org.jnode.vm.classmgr.VmConstFieldRef)
-     */
     public void visit_getfield(VmConstFieldRef fieldRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_putfield(org.jnode.vm.classmgr.VmConstFieldRef)
-     */
     public void visit_putfield(VmConstFieldRef fieldRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
-     */
     public void visit_invokevirtual(VmConstMethodRef methodRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
-     */
     public void visit_invokespecial(VmConstMethodRef methodRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
-     */
     public void visit_invokestatic(VmConstMethodRef methodRef) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
-     */
     public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_new(org.jnode.vm.classmgr.VmConstClass)
-     */
     public void visit_new(VmConstClass clazz) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_newarray(int)
-     */
     public void visit_newarray(int type) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_anewarray(org.jnode.vm.classmgr.VmConstClass)
-     */
     public void visit_anewarray(VmConstClass clazz) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_arraylength()
-     */
     public void visit_arraylength() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_athrow()
-     */
     public void visit_athrow() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_checkcast(org.jnode.vm.classmgr.VmConstClass)
-     */
     public void visit_checkcast(VmConstClass clazz) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_instanceof(org.jnode.vm.classmgr.VmConstClass)
-     */
     public void visit_instanceof(VmConstClass clazz) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_monitorenter()
-     */
     public void visit_monitorenter() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_monitorexit()
-     */
     public void visit_monitorexit() {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(org.jnode.vm.classmgr.VmConstClass, int)
-     */
     public void visit_multianewarray(VmConstClass clazz, int dimensions) {
         throw new IllegalArgumentException("byte code not yet supported");
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnull(int)
-     */
     public void visit_ifnull(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1454,9 +1003,6 @@ public class IRGenerator<T> extends BytecodeVisitor {
         setSuccessorStackOffset();
     }
 
-    /**
-     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnonnull(int)
-     */
     public void visit_ifnonnull(int address) {
         int s1 = stackOffset - 1;
         Variable[] variables = currentBlock.getVariables();
@@ -1483,14 +1029,14 @@ public class IRGenerator<T> extends BytecodeVisitor {
     }
 
     /**
-     * @return
+     * @return the variables
      */
     public Variable<T>[] getVariables() {
         return variables;
     }
 
     /**
-     * @return
+     * @return the number of args
      */
     public int getNoArgs() {
         return this.nArgs;

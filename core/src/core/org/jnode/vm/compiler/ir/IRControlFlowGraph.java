@@ -80,7 +80,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
      * Gets the basic block that contains the given address.
      *
      * @param pc
-     * @return
+     * @return the basic block or {@code null}.
      */
     public IRBasicBlock getBasicBlock(int pc) {
         final int max = bblocks.length;
