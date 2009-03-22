@@ -33,8 +33,8 @@ public class AccessControllerUtils {
      * Calls AccessController.doPrivileged and unwraps any exception wrapped
      * in the PrivilegedActionException.
      *
-     * @param action
-     * @return
+     * @param action a typed action 
+     * @return an instance of the action's type.
      * @throws Exception
      */
     public static <T> T doPrivileged(PrivilegedExceptionAction<T> action) throws Exception {

@@ -55,7 +55,7 @@ public class PS2ByteChannel implements ByteChannel {
             throw new ClosedChannelException();
         }
 
-        // ToDo: proper exception handling (if end of queue -> IOException)
+        // FIXME: proper exception handling (if end of queue -> IOException)
         int i;
         for (i = 0; i < dst.remaining(); i++) {
             dst.put(queue.pop());
@@ -116,6 +116,8 @@ public class PS2ByteChannel implements ByteChannel {
      * Remove all data from this channel
      */
     public void clear() {
+        // FIXME ... there is synchronization issues here. The 'isEmpty' method
+        // is not synchronized, so we may not see the real state of the queue. 
         while (!queue.isEmpty()) {
             queue.pop();
         }
