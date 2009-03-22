@@ -23,7 +23,17 @@ package org.jnode.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * The SystemInputStream is a stream wrapped for the system's actual keyboard
+ * input stream.  It deals with the problem that a System.in needs to be set
+ * before we have configured the keyboard.  It also supports thread localization
+ * of the system input, though the CommandInvoker implementations do not use
+ * this anymore.
+ */
 public final class SystemInputStream extends InputStream {
+    // FIXME ... remove the thread localization support.  It is now just a misleading
+    // historical relic.
+    
     private static final InputStream EMPTY = new EmptyInputStream();
 
     private final class ThreadLocalInputStream extends InheritableThreadLocal {
@@ -59,10 +69,8 @@ public final class SystemInputStream extends InputStream {
         }
     }
 
-    /**
-     * TODO must be protected by the SecurityManager
-     */
     public final void claimSystemIn() {
+        // TODO must be protected by the SecurityManager
         setIn(systemIn);
     }
 
@@ -70,13 +78,8 @@ public final class SystemInputStream extends InputStream {
         this.systemIn = EMPTY;
     }
 
-    /**
-     * TODO protect me with SecurityManager !
-     *
-     * @param systemIn
-     * @return
-     */
     public static SystemInputStream getInstance() {
+        // TODO protect me with SecurityManager !
         if (instance == null) {
             instance = new SystemInputStream();
         }
@@ -84,21 +87,19 @@ public final class SystemInputStream extends InputStream {
     }
 
     /**
-     * TODO protect me with SecurityManager !
+     * Set the wrapped stream to the supplied parameter.  This method
+     * only has any effect if the wrapped stream is unset.
      *
      * @param systemIn
-     * @return
      */
     public void initialize(InputStream systemIn) {
-        if (this.systemIn == EMPTY && systemIn != this) // register only the first keyboard
-        {
+        // TODO protect me with SecurityManager !
+        // register only the first keyboard
+        if (this.systemIn == EMPTY && systemIn != this)  {
             this.systemIn = systemIn;
         }
     }
 
-    /**
-     *
-     */
     private SystemInputStream() {
         this.systemIn = EMPTY; // by default, no keyboard
     }

@@ -33,35 +33,35 @@ public abstract class MemoryMapEntry {
     /**
      * Gets the start of this entry.
      *
-     * @return
+     * @return the entry's start address.
      */
     public abstract Address getStart();
 
     /**
      * Gets the size of this entry.
      *
-     * @return
+     * @return the entries size
      */
     public abstract Extent getSize();
 
     /**
-     * Is this a memory region available to the OS.
+     * Test if a memory region is available to the OS.
      *
-     * @return
+     * @return {@code true} if the region is available, otherwise {@code false}.
      */
     public abstract boolean isAvailable();
 
     /**
      * Is this a memory region containing reclaimable ACPI data.
      *
-     * @return
+     * @return {@code true} if the region contains reclaimable ACPI data, otherwise {@code false}.
      */
     public abstract boolean isAcpi();
 
     /**
      * Is this a memory region containing ACPI NVS data.
      *
-     * @return
+     * @return {@code true} if the region contains ACPI NVS data, otherwise {@code false}.
      */
     public abstract boolean isAcpiNVS();
 }

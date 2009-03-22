@@ -106,7 +106,7 @@ public class VmIOContext implements IOContext {
 
     /**
      * Set the 'global' view of {@link System#out}. 
-     * @param in the new output stream.
+     * @param out the new output stream.
      */
     public static void setGlobalOutStream(PrintStream out) {
         globalOutStream = out;
@@ -122,7 +122,7 @@ public class VmIOContext implements IOContext {
 
     /**
      * Set the 'global' view of {@link System#err}. 
-     * @param in the new error stream.
+     * @param err the new error stream.
      */
     public static void setGlobalErrStream(PrintStream err) {
         globalErrStream = err;
@@ -154,7 +154,7 @@ public class VmIOContext implements IOContext {
 
     /**
      * Set the 'global' view of the Properties returned by {@link System#getProperties()}. 
-     * @param env the new 'global' properties.
+     * @param props the new 'global' properties.
      */
     public static void setGlobalProperties(Properties props) {
         globalSysProps = props;

@@ -21,7 +21,7 @@
 package org.jnode.vm;
 
 /**
- * JVM types
+ * This class provides helper methods for dealing with JVM types in various forms.
  */
 public final class JvmType {
 
@@ -53,6 +53,11 @@ public final class JvmType {
         "UNKONWN", "BOOLEAN", "BYTE", "SHORT", "CHAR", "INT", "LONG", "FLOAT", "DOUBLE", "REF", "VOID"
     };
 
+    /**
+     * Categorize a type according to the number of words it occupies.
+     * @param type an type value
+     * @return the number of words required to hold it.
+     */
     public static int getCategory(int type) {
         if ((type == LONG) || (type == DOUBLE)) {
             return 2;
@@ -67,8 +72,9 @@ public final class JvmType {
      * Converts the given type to the smallest type that can contain it. E.g.
      * BYTE to INT FLOAT to FLOAT
      *
-     * @param type
-     * @return
+     * @param type an internal type value
+     * @return the type value for the smallest type that JNode will use to
+     * hold an instance of the type.
      */
     public static int TypeToContainingType(int type) {
         switch (type) {
@@ -84,8 +90,9 @@ public final class JvmType {
     }
 
     /**
-     * @param type
-     * @return the internal type value
+     * Map a JVM type character to the corresponding internal type value
+     * @param type a JVM type character
+     * @return the corresponding internal type value
      */
     public static int SignatureToType(char type) {
         int res;
@@ -129,6 +136,8 @@ public final class JvmType {
     }
 
     /**
+     * Map a JVM type signature string to the corresponding internal type value.
+     * 
      * @param signature
      * @return the internal type value
      */
@@ -137,7 +146,7 @@ public final class JvmType {
     }
 
     /**
-     * Gets the number of arguments of a method signature.
+     * Gets the number of arguments present in a method signature.
      *
      * @param signature
      * @return The number of arguments.
@@ -188,10 +197,10 @@ public final class JvmType {
     }
 
     /**
-     * Gets the argument type of a method signature.
+     * Gets the argument types for a method signature.
      *
      * @param signature
-     * @return
+     * @return the argument types as an array of internal type values
      */
     public static int[] getArgumentTypes(String signature) {
         final int len = signature.length();
@@ -254,7 +263,7 @@ public final class JvmType {
      * Gets the return type of a method signature.
      *
      * @param signature
-     * @return
+     * @return the return type as an internal type value
      */
     public static int getReturnType(String signature) {
         final int endIdx = signature.indexOf(')');
@@ -267,9 +276,9 @@ public final class JvmType {
     }
 
     /**
-     * Is the given type a floating point type.
+     * Test if the given internal type value a floating point type.
      *
-     * @param type
+     * @param type the type value
      * @return True if type is FLOAT or DOUBLE, false otherwise.
      */
     public static final boolean isFloat(int type) {
@@ -277,10 +286,10 @@ public final class JvmType {
     }
 
     /**
-     * Gets a human readable name of the given type.
+     * Gets a human readable name of a given internal type value.
      *
-     * @param type
-     * @return
+     * @param type the type value
+     * @return a human readable rendering of the type value
      */
     public static final String toString(int type) {
         return names[type];

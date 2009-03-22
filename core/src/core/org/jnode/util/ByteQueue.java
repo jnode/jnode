@@ -31,6 +31,8 @@ package org.jnode.util;
 public class ByteQueue {
     // FIXME ... Looking at the way this class is used, I think it may needs an 
     // atomic drain operation and/or a close operation.
+    // FIXME ... The method names are wrong.  'PUSH' and 'POP' is for stacks not queues!!
+    // FIXME ... Make the ByteQueue API and behavior mirror the Queue API and behavior.
     
     /**
      * The default queue size.
@@ -114,8 +116,8 @@ public class ByteQueue {
      * @param timeout the maximum time (in milliseconds) to wait for data to become 
      * available.  If zero, the method will wait as long as necessary.
      * @return the byte removed from the queue.
-     * @throw InterruptedException if the method call is interrupted.
-     * @throw TimeoutException if no data is available within the required time.
+     * @throws InterruptedException if the method call is interrupted.
+     * @throws TimeoutException if no data is available within the required time.
      */
     public synchronized byte pop(long timeout)
         throws TimeoutException, InterruptedException {
@@ -144,8 +146,8 @@ public class ByteQueue {
      * @param timeout the maximum time (in milliseconds) to wait for data to become 
      * available.  If zero, the method will wait as long as necessary.
      * @return the byte removed from the queue.
-     * @throw InterruptedException if the method call is interrupted.
-     * @throw TimeoutException if no data is available within the required time.
+     * @throws InterruptedException if the method call is interrupted.
+     * @throws TimeoutException if no data is available within the required time.
      */
     public synchronized byte peek(long timeout)
         throws TimeoutException, InterruptedException {

@@ -144,7 +144,7 @@ public abstract class VmClassLoader extends VmSystemObject {
     /**
      * Gets the selector map used to create unique method selectors.
      *
-     * @return
+     * @return the selector map.
      */
     protected abstract SelectorMap getSelectorMap();
 }

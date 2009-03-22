@@ -32,7 +32,6 @@ import java.nio.MappedByteBuffer;
  * <p/>
  * This has to give the functionality of the classpath/native/jni/java-nio/gnu_java_nio_VMChannel.c
  *
- * @author
  */
 public final class VmChannel {
 
@@ -62,7 +61,6 @@ public final class VmChannel {
     public static int read(int fd, ByteBuffer dst) throws IOException {
         throw new IOException("Not implemented");
     }
-
 
     public static int read(int fd) throws IOException {
         throw new IOException("Not implemented");

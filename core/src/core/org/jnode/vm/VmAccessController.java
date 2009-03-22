@@ -153,7 +153,7 @@ public final class VmAccessController {
      * @param context the <code>AccessControlContext</code> whose protection
      *                domains should be added to the protection domain of the
      *                calling class.
-     * @returns the result of the <code>action.run()</code> method.
+     * @return the result of the <code>action.run()</code> method.
      */
     @DoPrivileged
     public static Object doPrivileged(PrivilegedAction action,
@@ -185,7 +185,7 @@ public final class VmAccessController {
      *                calling class.
      * @throws PrivilegedActionException wrapped around any exception that is thrown in the
      *                                   <code>run()</code> method.
-     * @returns the result of the <code>action.run()</code> method.
+     * @return the result of the <code>action.run()</code> method.
      */
     @DoPrivileged
     public static Object doPrivileged(PrivilegedExceptionAction action,

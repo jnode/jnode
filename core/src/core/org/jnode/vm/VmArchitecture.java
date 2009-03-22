@@ -64,28 +64,28 @@ public abstract class VmArchitecture extends VmSystemObject {
      * This name is the programmers name used to identify packages,
      * class name extensions etc.
      *
-     * @return Name
+     * @return the architecture's name
      */
     public abstract String getName();
 
     /**
      * Gets the full name of this architecture, including operating mode.
      *
-     * @return Name
+     * @return the architecture's full name
      */
     public abstract String getFullName();
 
     /**
      * Gets the byte ordering of this architecture.
      *
-     * @return ByteOrder
+     * @return the architecture's ByteOrder
      */
     public abstract ByteOrder getByteOrder();
 
     /**
      * Gets the size in bytes of an object reference.
      *
-     * @return Reference size
+     * @return the architecture's reference size in bytes; i.e. 4 or 8.
      */
     @KernelSpace
     public final int getReferenceSize() {
@@ -93,17 +93,19 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Gets the log base two of the size of an OS page
+     * Gets the log base two of the size in bytes of an OS page in a given region
      *
-     * @return
+     * @param a {@link VirtualMemoryRegion} value
+     * @return the log base two page size
      */
     public abstract byte getLogPageSize(int region)
         throws UninterruptiblePragma;
 
     /**
-     * Gets the log base two of the size of an OS page
+     * Gets the size in bytes of an OS page in a given region
      *
-     * @return
+     * @param a {@link VirtualMemoryRegion} value
+     * @return the page size
      */
     public final Extent getPageSize(int region)
         throws UninterruptiblePragma {
@@ -113,14 +115,14 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Gets the type size information of this architecture.
      *
-     * @return
+     * @return the architecture's type size information descriptor
      */
     public abstract TypeSizeInfo getTypeSizeInfo();
 
     /**
      * Gets the stackreader for this architecture.
      *
-     * @return Stack reader
+     * @return the architecture's stack reader
      */
     @KernelSpace
     public final VmStackReader getStackReader() {
@@ -130,8 +132,8 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Gets all compilers for this architecture.
      *
-     * @return The compilers, sorted by optimization level, from least optimizations to most
-     *         optimizations.
+     * @return The architecture's compilers, sorted by optimization level, from 
+     * least optimizing to most optimizing.
      */
     public abstract NativeCodeCompiler[] getCompilers();
 
@@ -139,20 +141,21 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets all test compilers for this architecture.
      * This can be used to test new compilers in a running system.
      *
-     * @return The compilers, sorted by optimization level, from least optimizations to most
-     *         optimizations, or null for no test compilers.
+     * @return The architecture's test compilers, sorted by optimization level, from 
+     * least optimizing to most optimizing.  If there are no configured test compilers,
+     * {@code null} will be returned.
      */
     public abstract NativeCodeCompiler[] getTestCompilers();
 
     /**
      * Gets the compiler of IMT's.
      *
-     * @return
+     * @return the IMT compiler
      */
     public abstract IMTCompiler getIMTCompiler();
 
     /**
-     * Called early on in the boot process (before the initializating of
+     * Called early on in the boot process (before the initialization of
      * the memory manager) to initialize any architecture specific variables.
      * Do not allocate memory here.
      *
@@ -188,15 +191,16 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Create the IRQ manager for this architecture.
      *
-     * @return
+     * @return the IRQManager
      */
     @Internal
     public abstract IRQManager createIRQManager(VmProcessor processor);
 
     /**
      * Gets the start address of the given space.
-     *
-     * @return
+     * 
+     * @param space a {@link VirtualMemoryRegion}.
+     * @return the start address of the region
      */
     public Address getStart(int space) {
         switch (space) {
@@ -210,9 +214,10 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Gets the start address of the given space.
+     * Gets the end address of the given space.
      *
-     * @return
+     * space a {@link VirtualMemoryRegion}.
+     * @return the end address of the region
      */
     public Address getEnd(int space) {
         switch (space) {
@@ -226,21 +231,22 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Gets the physical address of the first page available
-     * for mmap.
+     * Gets the physical address of the first whole page available for use
+     * by the memory manager.
      *
-     * @return
+     * @return a physical address aligned on the appropriate page boundary
      */
     protected final Word getFirstAvailableHeapPage() {
         return pageAlign(VirtualMemoryRegion.HEAP, Unsafe.getMemoryStart().toWord(), true);
     }
 
     /**
-     * Page align a given value.
+     * Page align a given address (represented as a Word) in a given region.
      *
-     * @param v
+     * @param v an address value
+     * @param region a {@link VirtualMemoryRegion}.
      * @param up If true, the value will be rounded up, otherwise rounded down.
-     * @return
+     * @return the corresponding page aligned address represented as a Word. 
      */
     public final Word pageAlign(int region, Word v, boolean up) {
         final int logPageSize = getLogPageSize(region);
@@ -251,11 +257,12 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Page align a given value.
+     * Page align a given address (represented as an Address) in a given region.
      *
-     * @param v
+     * @param v an address value
+     * @param region a {@link VirtualMemoryRegion}.
      * @param up If true, the value will be rounded up, otherwise rounded down.
-     * @return
+     * @return the corresponding page aligned address represented as a Address. 
      */
     public final Address pageAlign(int region, Address v, boolean up) {
         return pageAlign(region, v.toWord(), up).toAddress();
@@ -290,9 +297,10 @@ public abstract class VmArchitecture extends VmSystemObject {
         throws UninterruptiblePragma;
 
     /**
-     * Gets the memory map of the current system.
+     * Gets the memory map of the current system.  If no map has yet been created,
+     * it will be created by calling {@link #createMemoryMap()}.
      *
-     * @return
+     * @return the architecture's memory map.
      */
     public final MemoryMapEntry[] getMemoryMap() {
         final SecurityManager sm = System.getSecurityManager();
@@ -308,15 +316,15 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Create the memory map of the current system.
      *
-     * @return
+     * @return the memory map.
      */
     protected abstract MemoryMapEntry[] createMemoryMap();
 
     /**
-     * Creates a multi media memory resource wrapping the given memory resource.
+     * Create a multi-media memory resource wrapping the given memory resource.
      *
-     * @param res
-     * @return The created instance, which is never null.
+     * @param res a memory resource
+     * @return The created instance, which is never {@code null}.
      */
     final MultiMediaMemoryResourceImpl createMultiMediaMemoryResource(MemoryResourceImpl res) {
         if (multiMediaSupport == null) {
@@ -326,8 +334,10 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
 
     /**
-     * Creates a multi media support instance optimized for this architecture.
-     * Override this to allow architecture optimized implementations.
+     * Creates a multi-media support instance.  The default implementation returns a
+     * generic support instance.  This method may be overriden to provide an architecture 
+     * optimized {@link VmMultiMediaSupport} implementation.
+     * @return a multi-media support instance.
      */
     protected VmMultiMediaSupport createMultiMediaSupport() {
         return new VmJavaMultiMediaSupport();
