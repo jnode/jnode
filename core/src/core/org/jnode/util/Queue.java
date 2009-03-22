@@ -173,7 +173,7 @@ public class Queue<T> {
     
     /**
      * Is this queue closed.
-     * @return
+     * @return {@code true} if the queue is closed, {@code false} otherwise.
      */
     public boolean isClosed() {
         return closed;

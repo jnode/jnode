@@ -40,8 +40,8 @@ public abstract class VmAddress extends VmSystemObject {
      * The length of the string depends of the reference size of
      * the current architecture.
      *
-     * @param addr
-     * @return
+     * @param addr an address
+     * @return a hexadecimal string rendering of the address
      */
     public static String toString(VmAddress addr) {
         final int refsize = VmProcessor.current().getArchitecture().getReferenceSize();

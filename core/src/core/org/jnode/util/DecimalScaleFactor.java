@@ -62,7 +62,7 @@ public enum DecimalScaleFactor implements ScaleFactor {
     /**
      * Convert the given value to a size string like 64K
      *
-     * @param v          the size to convert
+     * @param value the size to convert
      * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all.
      * @return the text for the size
      */

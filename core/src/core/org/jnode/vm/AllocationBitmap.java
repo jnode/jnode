@@ -115,7 +115,7 @@ public class AllocationBitmap {
     /**
      * Gets the size of the memory region occupied by this bitmap.
      *
-     * @return
+     * @return the size as an Extent.
      */
     public final Extent getSize() {
         return size;
@@ -150,7 +150,7 @@ public class AllocationBitmap {
     }
 
     /**
-     * Free a previously allocated new series of bits.
+     * Free a previously allocated series of bits.
      *
      * @param bit    The bit number as returned by allocateBits.
      * @param noBits The size of the bit series as given to allocateBits.
@@ -223,10 +223,10 @@ public class AllocationBitmap {
     }
 
     /**
-     * Is a given set.
+     * Test if a given bit is set.
      *
-     * @param bit
-     * @return boolean
+     * @param bit the bit to be tested
+     * @return {@link true} if the bit is set, {@code false} otherwise.
      */
     private final boolean isSet(Word bit) {
         final Word offset = bit.rshl(3); // we still need a byte offset
@@ -239,7 +239,8 @@ public class AllocationBitmap {
     /**
      * Set/Reset a given bit.
      *
-     * @param bit
+     * @param bit the bit to be set or reset
+     * @param value the new value for the bit
      */
     private final void set(Word bit, boolean value) {
         final Word offset = bit.rshl(3); // we still need a byte offset
@@ -256,7 +257,7 @@ public class AllocationBitmap {
     }
 
     /**
-     * Claim access to my structures. This is done without using java
+     * Claim an exclusive access lock the Bitmap data structures. This is done without using java
      * monitorenter/exit instructions, since they may need a memory allocation.
      */
     private final void lock() {
@@ -267,7 +268,8 @@ public class AllocationBitmap {
     }
 
     /**
-     * Release access to my structures.
+     * Release the exclusive access lock to the Bitmap data structures.  Note that no attempt
+     * is made to check that the lock is owned by the current thread.
      */
     private final void unlock() {
         lock.store((int) 0);
