@@ -36,7 +36,7 @@ public @interface AllowedPackages {
     /**
      * Gets the packages in which it is allowed to use this annotation.
      *
-     * @return
+     * @return the package names.
      */
     String[] value();
 

@@ -136,7 +136,7 @@ public abstract class VmStackReader extends VmSystemObject {
     /**
      * Gets the stacktrace for a given current frame.
      *
-     * @param argFrame
+     * @param frame    The address of the current frame.
      * @param ip       The instruction pointer of the given frame
      * @param limit    Maximum length of returned array.
      * @return VmStackFrame[]

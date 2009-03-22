@@ -36,34 +36,41 @@ public final class VmByteCode extends AbstractCode {
      * The method i'm a part of
      */
     private final VmMethod method;
+    
     /**
      * The constant pool where indexes in my bytecode refer to
      */
     private final VmCP cp;
+    
     /**
-     * #Local variables of this method
+     * Number of local variables for this method
      */
     private char noLocals;
     /**
-     * Max. #slots taken by this method on the stack
+     * Max. number of slots taken by this method on the stack
      */
     private char maxStack;
+    
     /**
      * Bytecode of this method. This is a ByteBuffer or byte[]
      */
     private Object bytecode;
+    
     /**
      * Exception handler table
      */
     private VmInterpretedExceptionHandler[] eTable;
+    
     /**
      * Line number table
      */
     private VmLineNumberMap lnTable;
+    
     /**
      * Local variable table
      */
     private final VmLocalVariableTable lvTable;
+    
     /**
      * Data used by the native code compilers
      */
@@ -80,7 +87,8 @@ public final class VmByteCode extends AbstractCode {
      * @param lnTable
      */
     public VmByteCode(VmMethod method, ByteBuffer bytecode, int noLocals, int maxStack,
-                      VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable, VmLocalVariableTable lvTable) {
+                      VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable, 
+                      VmLocalVariableTable lvTable) {
         this.method = method;
         this.cp = method.getDeclaringClass().getCP();
         if (Vm.isWritingImage()) {
@@ -188,20 +196,21 @@ public final class VmByteCode extends AbstractCode {
     }
 
     /**
-     * Gets the line number table, or null if no line number table exists
+     * Gets the line number table, or {@code null} if no line number table exists
      * for this bytecode.
      *
-     * @return
+     * @return the line number table
      */
     public VmLineNumberMap getLineNrs() {
         return lnTable;
     }
 
     /**
-     * Gets the linenumber of a given program counter.
+     * Gets the line number corresponding to a given program counter value.
      *
      * @param pc
-     * @return The linenumber for the given pc, or -1 is not found.
+     * @return The line number for the given pc, or {@code -1} if no line
+     * number can be found.
      */
     public int getLineNr(int pc) {
         final VmLineNumberMap lnTable = this.lnTable;
@@ -258,7 +267,7 @@ public final class VmByteCode extends AbstractCode {
      *
      * @param pc
      * @param index
-     * @return The variable or null if not found.
+     * @return The variable or {@code null} if not found.
      */
     public final VmLocalVariable getVariable(int pc, int index) {
         return lvTable.getVariable(pc, index);

@@ -39,12 +39,20 @@ public final class CompiledCodeList extends VmSystemObject {
     private int nextId = 1; // Leave entry 0 open
 
     /**
-     * Create a new compiled method which is added to the internal list of
-     * compiled methods.
-     *
-     * @param optLevel
-     * @param magic
-     * @return
+     * Create a new VmCompiledCode for a compiled method.  The result will be added 
+     * to the internal list of compiled methods.
+     * 
+     * @param cm an existing CompilerMethod or {@code null}.
+     * @param method the system method descriptor
+     * @param compiler the compiler used to compile the method
+     * @param bytecode the method's bytecodes
+     * @param nativeCode the native code address
+     * @param compiledCode
+     * @param size
+     * @param eTable
+     * @param defaultExceptionHandler
+     * @param addressTable
+     * @return the resulting VmCompiledCode object
      */
     public synchronized VmCompiledCode createCompiledCode(CompiledMethod cm,
                                                           VmMethod method, NativeCodeCompiler compiler,
@@ -67,12 +75,10 @@ public final class CompiledCodeList extends VmSystemObject {
     }
 
     /**
-     * Create a new compiled method which is added to the internal list of
-     * compiled methods.
+     * Allocate an id (actually an index for the compiler code list) for a new method.
+     * If necessary the code list is grown to accomadate the method.
      *
-     * @param optLevel
-     * @param magic
-     * @return
+     * @return the method id
      */
     public synchronized int createId() {
         final int cmid = nextId++;
@@ -86,7 +92,7 @@ public final class CompiledCodeList extends VmSystemObject {
      * Gets a compiled method with a given id.
      *
      * @param cmid
-     * @return
+     * @return the compiled method or {@code null}.
      */
     @KernelSpace
     @Uninterruptible
@@ -101,7 +107,7 @@ public final class CompiledCodeList extends VmSystemObject {
     /**
      * Gets the number of method in the list.
      *
-     * @return
+     * @return the number of methods.
      */
     public final int size() {
         return nextId;

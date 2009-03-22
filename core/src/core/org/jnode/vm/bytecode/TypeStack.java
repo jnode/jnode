@@ -20,8 +20,11 @@
  
 package org.jnode.vm.bytecode;
 
+import org.jnode.vm.JvmType;
+
 /**
- * Stack of JvmType's.
+ * A TypeStack is a stack of internal type numbers represented as {@link JvmType} 
+ * values; i.e. integers.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -70,14 +73,16 @@ public final class TypeStack {
     /**
      * Is this stack empty.
      *
-     * @return
+     * @return {@code true} if the stack is empty, otherwise {@code false}.
      */
     public final boolean isEmpty() {
         return (tos == 0);
     }
 
     /**
-     * Is this stack equal to the givn object?
+     * Is this stack equal to the given TypeStack.  Note that this is an
+     * overload for {@link java.lang.Object#equals(java.lang.Object)} not
+     * an override.
      */
     public boolean equals(TypeStack tso) {
         if ((this.tos == 0) && (tso == null)) {
@@ -95,7 +100,7 @@ public final class TypeStack {
     }
 
     /**
-     * Is this stack equal to the givn object?
+     * Is this stack equal to the given object?
      *
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -146,17 +151,19 @@ public final class TypeStack {
     /**
      * Gets the number of elements in this stack.
      *
-     * @return
+     * @return the number of elements.
      */
     public final int size() {
         return tos;
     }
 
     /**
-     * Gets an entry of the stack.
+     * Get the element at a particular stack index.
      *
-     * @param stackIndex 0..size-1; stackIndex == size-1 means top of stack.
-     * @return
+     * @param stackIndex the stack index.  This should be a number in the range
+     * {@code 0 .. size() - 1} inclusive where {@code size() - 1} is the top element 
+     * on the stack.
+     * @return the internal type number at the given offset.
      */
     public final int getType(int stackIndex) {
         return stack[stackIndex];

@@ -70,7 +70,7 @@ public class Signature {
     /**
      * Gets the type of the signature (for field signatures)
      *
-     * @return String
+     * @return the type as a VmType
      */
     public VmType getType() {
         return parts[0];
@@ -79,7 +79,7 @@ public class Signature {
     /**
      * Gets the return type of the signature (for method signatures)
      *
-     * @return String
+     * @return the type as a VmType
      */
     public VmType getReturnType() {
         return parts[parts.length - 1];
@@ -90,27 +90,28 @@ public class Signature {
      * (for method signatures)
      *
      * @param index
-     * @return String
+     * @return the type as a VmType
      */
     public VmType getParamType(int index) {
         return parts[index];
     }
 
     /**
-     * Gets the type of the parameter with the given index in this signature
-     * (for method signatures)
+     * Gets the number of parameters (for method signatures)
      *
-     * @return String
+     * @return the parameter count
      */
     public int getParamCount() {
         return parts.length - 1;
     }
 
     /**
-     * Calculate the number of arguments a method has, based of the signature
+     * Calculate the number of argument slots that a method required, based of 
+     * the method signature supplied as a character array.
      *
-     * @param signature
-     * @return int
+     * @param typeSizeInfo gives the type sizes
+     * @param signature the method signature as a character array
+     * @return the slot count
      */
     public static final int getArgSlotCount(TypeSizeInfo typeSizeInfo,
                                             char[] signature) {
@@ -170,10 +171,12 @@ public class Signature {
     }
 
     /**
-     * Calculate the number of arguments a method has, based of the signature
+     * Calculate the number of argument slots that a method required, based of 
+     * the method signature supplied as a String.
      *
-     * @param signature
-     * @return int
+     * @param typeSizeInfo gives the type sizes
+     * @param signature the method signature as a String
+     * @return the slot count
      */
     public static final int getArgSlotCount(TypeSizeInfo typeSizeInfo,
                                             String signature) {
@@ -188,7 +191,7 @@ public class Signature {
      * @param typeSizeInfo
      * @param method
      * @param javaArgIndex
-     * @return
+     * @return the slot number
      */
     public static final int getStackSlotForJavaArgNumber(
         TypeSizeInfo typeSizeInfo, VmMethod method, int javaArgIndex) {

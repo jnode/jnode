@@ -265,7 +265,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * Gets the full name of this method consisting of
      * its declaring class, its name and its signature.
      *
-     * @return
+     * @return the full name
      */
     public final String getFullName() {
         return declaringClass.getName() + '#' + getName() + '!' + getSignature();
@@ -530,7 +530,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is this method uninterruptible.
      *
-     * @return True | false.
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean isUninterruptible() {
         return ((pragmaFlags & MethodPragmaFlags.UNINTERRUPTIBLE) != 0);
@@ -539,7 +539,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the checkpermission pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasCheckPermissionPragma() {
         return ((pragmaFlags & MethodPragmaFlags.CHECKPERMISSION) != 0);
@@ -548,7 +548,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the doprivileged pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasDoPrivilegedPragma() {
         return ((pragmaFlags & MethodPragmaFlags.DOPRIVILEGED) != 0);
@@ -557,7 +557,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the inline pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasInlinePragma() {
         return ((pragmaFlags & MethodPragmaFlags.INLINE) != 0);
@@ -566,7 +566,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the loadstatics pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasLoadStaticsPragma() {
         return ((pragmaFlags & MethodPragmaFlags.LOADSTATICS) != 0);
@@ -575,7 +575,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the noinline pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasNoInlinePragma() {
         return ((pragmaFlags & MethodPragmaFlags.NOINLINE) != 0);
@@ -584,7 +584,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the noreadbarrier pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasNoReadBarrierPragma() {
         return ((pragmaFlags & MethodPragmaFlags.NOREADBARRIER) != 0);
@@ -593,7 +593,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the nowritebarrier pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasNoWriteBarrierPragma() {
         return ((pragmaFlags & MethodPragmaFlags.NOWRITEBARRIER) != 0);
@@ -602,7 +602,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the privilegedaction pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasPrivilegedActionPragma() {
         return ((pragmaFlags & MethodPragmaFlags.PRIVILEGEDACTION) != 0);
@@ -611,7 +611,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * Is the KernelSpace pragma set for this method.
      *
-     * @return
+     * @return {@code true} if the pragma flag is set, otherwise {@code false}.
      */
     public final boolean hasKernelSpacePragma() {
         return ((pragmaFlags & MethodPragmaFlags.KERNELSPACE) != 0);
@@ -635,7 +635,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     }
 
     /**
-     * Gets the indexe of this field in the shared statics table.
+     * Gets the index of this field in the shared statics table.
      *
      * @return Returns the staticsIndex.
      */

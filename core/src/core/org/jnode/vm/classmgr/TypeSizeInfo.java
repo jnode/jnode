@@ -61,8 +61,8 @@ public class TypeSizeInfo extends VmSystemObject {
      * Gets the number of stack slots an argument of the given type takes.
      * A slot is equal to the address size of the architecture.
      *
-     * @param jvmType
-     * @return
+     * @param jvmType a type expressed as {@link JvmType} code.
+     * @return the size (in slots) of an instance of the supplied type. 
      */
     public final int getStackSlots(int jvmType) {
         switch (jvmType) {

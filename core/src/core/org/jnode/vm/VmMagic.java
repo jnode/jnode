@@ -30,7 +30,8 @@ import org.vmmagic.unboxed.Word;
 
 /**
  * Class containing "magic" methods that are interpreted by the VM itself,
- * instead of being executed as normal java methods.
+ * instead of being executed as normal java methods.  The actual method
+ * bodies are not used.
  * <p/>
  * Methods is this class can also be called from inside JNode.
  *
@@ -63,7 +64,7 @@ public final class VmMagic {
      * Gets all of the flags of the given object.
      *
      * @param object
-     * @return int
+     * @return the object flags
      */
     public static Word getObjectFlags(Object object) {
         return Word.zero();
@@ -73,7 +74,7 @@ public final class VmMagic {
      * Gets the GC color flags of the given object.
      *
      * @param object
-     * @return int
+     * @return the GC color flags (as an int)
      */
     public static int getObjectColor(Object object) {
         return 0;
@@ -82,11 +83,10 @@ public final class VmMagic {
     /**
      * Sets all of the flags of the given object.
      *
-     * @param object
-     * @param flags
+     * @param object the target object
+     * @param flags the new flags value
      */
     public static void setObjectFlags(Object object, Word flags) {
-
     }
 
     /**
@@ -130,32 +130,40 @@ public final class VmMagic {
     }
 
     /**
-     * @param value
-     * @return
+     * Type cast a 32-bit word to a Java float.
+     * 
+     * @param value a 32-bit word
+     * @return the same bit pattern as a float
      */
     public static float intBitsToFloat(int value) {
         return 0;
     }
 
     /**
-     * @param value
-     * @return
+     * Type cast a Java float to a 32-bit word.
+     * 
+     * @param value a float 
+     * @return the same bit pattern as a 32-bit word
      */
     public static int floatToRawIntBits(float value) {
         return 0;
     }
 
     /**
-     * @param value
-     * @return
+     * Type cast a 64-bit word to a Java double.
+     * 
+     * @param value a 64-bit word
+     * @return the same bit pattern as a double
      */
     public static double longBitsToDouble(long value) {
         return 0;
     }
 
     /**
-     * @param value
-     * @return
+     * Type cast a Java double to a 64-bit word.
+     * 
+     * @param value a double 
+     * @return the same bit pattern as a 64-bit word
      */
     public static long doubleToRawLongBits(double value) {
         return 0;

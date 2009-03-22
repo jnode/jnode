@@ -44,7 +44,7 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
     /**
      * Gets the type of this object.
      *
-     * @return
+     * @return the type
      */
     public abstract int getConstType();
 }

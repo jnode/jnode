@@ -55,7 +55,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
     /**
      * Create all determined basic blocks
      *
-     * @return
+     * @return the basic blocks.
      */
     public BasicBlock[] createBasicBlocks() {
         // Create the array

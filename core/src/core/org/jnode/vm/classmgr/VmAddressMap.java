@@ -62,10 +62,13 @@ public final class VmAddressMap extends VmSystemObject {
     }
 
     /**
-     * Add an address-pc mapping
+     * Add an address-pc mapping.  This method cannot be used after {@link #lock()} 
+     * has been called.
      *
      * @param offset Offset from the start of the method
      * @param pc
+     * @param method
+     * @param inlineDepth
      */
     public void add(VmMethod method, int pc, int offset, int inlineDepth) {
         if (offsetTable != null) {
@@ -94,7 +97,7 @@ public final class VmAddressMap extends VmSystemObject {
      * Gets the last known address index that corresponds to the given code offset.
      *
      * @param offset
-     * @return -1 of not found.
+     * @return the index, or {@code -1} if the offset is not found in the offset table.
      */
     public final int getIndexForOffset(int offset) {
         final int[] offsetTable = this.offsetTable;
@@ -113,7 +116,7 @@ public final class VmAddressMap extends VmSystemObject {
      * Gets the method at the given index.
      *
      * @param index
-     * @return
+     * @return the method
      */
     public final VmMethod getMethodAtIndex(int index) {
         if (index < 0) {
@@ -129,7 +132,7 @@ public final class VmAddressMap extends VmSystemObject {
      * Gets the program counter at the given index.
      *
      * @param index
-     * @return
+     * @return the program counter
      */
     public final int getProgramCounterAtIndex(int index) {
         if (index < 0) {
@@ -143,8 +146,8 @@ public final class VmAddressMap extends VmSystemObject {
      * Gets the index that contains the call to the (inlined) method that is
      * identified by the given index.
      *
-     * @param offset
-     * @return The callsite index, or -1 if there is no callsite within this
+     * @param index
+     * @return The call-site index, or {@code -1} if there is no call-site within this
      *         address map.
      */
     public final int getCallSiteIndex(int index) {
@@ -165,8 +168,8 @@ public final class VmAddressMap extends VmSystemObject {
     }
 
     /**
-     * Convert to a final contents. After a call to this method, the add method
-     * cannot be used.
+     * Convert the address map to its final form. After a call to this method, 
+     * the {@link #add(VmMethod, int, int, int)} method cannot be used.
      */
     final void lock() {
         AddressPcEntry p = list;

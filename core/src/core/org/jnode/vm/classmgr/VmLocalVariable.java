@@ -39,18 +39,22 @@ public final class VmLocalVariable extends VmSystemObject {
      * Start of the value value range.
      */
     private final char startPC;
+    
     /**
      * Length of the value value range.
      */
     private final char length;
+    
     /**
      * Name of the variable
      */
     private final char nameIndex;
+    
     /**
      * Type descriptor of the variable
      */
     private final char descriptorIndex;
+    
     /**
      * Local variable index (on the stack) of the variable
      */
@@ -61,8 +65,8 @@ public final class VmLocalVariable extends VmSystemObject {
      *
      * @param startPC
      * @param length
-     * @param name
-     * @param signature
+     * @param nameIndex
+     * @param descriptorIndex
      * @param index
      */
     public VmLocalVariable(char startPC, char length, char nameIndex, char descriptorIndex, char index) {
