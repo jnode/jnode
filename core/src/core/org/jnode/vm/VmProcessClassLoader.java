@@ -28,7 +28,7 @@ import java.util.HashSet;
 public class VmProcessClassLoader extends ClassLoader {
 
     /**
-     * Sets of classname (String) to skip loading via a parent classloader
+     * Set of classname strings to skip loading via a parent classloader
      */
     private final HashSet<String> skipClassNames;
 
@@ -51,11 +51,6 @@ public class VmProcessClassLoader extends ClassLoader {
         this(ClassLoader.getSystemClassLoader());
     }
 
-    /**
-     * @param name
-     * @return
-     * @see java.lang.ClassLoader#skipParentLoader(String)
-     */
     public boolean skipParentLoader(String name) {
         name = name.replace('/', '.');
         return skipClassNames.contains(name);

@@ -152,7 +152,7 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
     /**
      * Gets the parent of this element.
      *
-     * @return
+     * @return the parent element
      */
     protected abstract VmAnnotatedElement getSuperElement();
 }

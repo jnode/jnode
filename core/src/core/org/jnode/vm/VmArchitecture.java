@@ -95,7 +95,7 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Gets the log base two of the size in bytes of an OS page in a given region
      *
-     * @param a {@link VirtualMemoryRegion} value
+     * @param region a {@link VirtualMemoryRegion} value
      * @return the log base two page size
      */
     public abstract byte getLogPageSize(int region)
@@ -104,7 +104,7 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Gets the size in bytes of an OS page in a given region
      *
-     * @param a {@link VirtualMemoryRegion} value
+     * @param region a {@link VirtualMemoryRegion} value
      * @return the page size
      */
     public final Extent getPageSize(int region)
@@ -216,7 +216,7 @@ public abstract class VmArchitecture extends VmSystemObject {
     /**
      * Gets the end address of the given space.
      *
-     * space a {@link VirtualMemoryRegion}.
+     * @param space a {@link VirtualMemoryRegion}.
      * @return the end address of the region
      */
     public Address getEnd(int space) {

@@ -71,7 +71,7 @@ public class ControlFlowGraph implements Iterable<BasicBlock> {
      * Gets the basic block that contains the given address.
      *
      * @param pc
-     * @return
+     * @return the BasicBlock or {@code null}.
      */
     public BasicBlock getBasicBlock(int pc) {
         final int max = bblocks.length;
