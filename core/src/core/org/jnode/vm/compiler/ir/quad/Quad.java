@@ -89,7 +89,7 @@ public abstract class Quad<T> {
     }
 
     /**
-     * @return
+     * @return {@code true} if this is dead code.
      */
     public boolean isDeadCode() {
         return deadCode;
@@ -103,7 +103,7 @@ public abstract class Quad<T> {
     }
 
     /**
-     * @return
+     * @return the basic block
      */
     public IRBasicBlock<T> getBasicBlock() {
         return basicBlock;

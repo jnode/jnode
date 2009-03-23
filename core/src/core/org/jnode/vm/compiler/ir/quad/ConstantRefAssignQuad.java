@@ -56,37 +56,24 @@ public class ConstantRefAssignQuad<T> extends AssignQuad<T> {
     }
 
     /**
-     * @return
+     * @return the RHS of the assignment
      */
     public Constant<T> getRHS() {
         return rhs;
     }
 
-    /**
-     * @param operand
-     * @return
-     */
     public Operand<T> propagate(Variable<T> operand) {
         setDeadCode(true);
         return rhs;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
     public void doPass2() {
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         cg.generateCodeFor(this);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.AssignQuad#getLHSLiveAddress()
-     */
     public int getLHSLiveAddress() {
         return this.getAddress() + 1;
     }

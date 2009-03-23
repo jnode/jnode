@@ -46,14 +46,14 @@ public abstract class Variable<T> extends Operand<T> implements Cloneable {
     }
 
     /**
-     * @return
+     * @return the variable's index
      */
     public int getIndex() {
         return index;
     }
 
     /**
-     * @return
+     * @return the variable's SSA value
      */
     public int getSSAValue() {
         return ssaValue;
@@ -71,14 +71,14 @@ public abstract class Variable<T> extends Operand<T> implements Cloneable {
     /**
      * Returns the AssignQuad where this variable was last assigned.
      *
-     * @return
+     * @return the Quad.
      */
     public AssignQuad<T> getAssignQuad() {
         return assignQuad;
     }
 
     /**
-     * @return
+     * @return the address of the last use of this variable.
      */
     public int getLastUseAddress() {
         return lastUseAddress;
@@ -115,7 +115,7 @@ public abstract class Variable<T> extends Operand<T> implements Cloneable {
     }
 
     /**
-     * @return
+     * @return the assigned variable location
      */
     public Location<T> getLocation() {
         return this.location;

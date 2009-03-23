@@ -346,7 +346,7 @@ public final class VmIsolate {
     /**
      * Gets the current isolate.
      *
-     * @return
+     * @return the current isolate
      */
     public static VmIsolate currentIsolate() {
         VmIsolate result = IsolatedStaticData.current;
@@ -377,7 +377,7 @@ public final class VmIsolate {
     /**
      * Gets the isolate object that this object implements.
      *
-     * @return
+     * @return the exposed Isolate object
      */
     public final Isolate getIsolate() {
         return isolate;
@@ -574,7 +574,7 @@ public final class VmIsolate {
     /**
      * Has this isolate reached the exited state.
      *
-     * @return
+     * @return {@code true} if the isolate has 'exited', otherwise {@code false}
      */
     public final boolean hasExited() {
         switch (state) {
@@ -589,7 +589,7 @@ public final class VmIsolate {
     /**
      * Has this isolate reached the terminated state.
      *
-     * @return
+     * @return {@code true} if the isolate has 'terminated', otherwise {@code false}
      */
     public final boolean hasTerminated() {
         switch (state) {
@@ -603,7 +603,7 @@ public final class VmIsolate {
     /**
      * Has this isolate reached the started state.
      *
-     * @return
+     * @return {@code true} if the isolate has been 'started', otherwise {@code false}
      */
     public final boolean hasStarted() {
         switch (state) {

@@ -45,14 +45,14 @@ public abstract class BranchQuad<T> extends Quad<T> {
     }
 
     /**
-     * @return
+     * @return the start address of the target block
      */
     public int getTargetAddress() {
         return targetBlock.getStartPC();
     }
 
     /**
-     * @return
+     * @return the target block
      */
     public IRBasicBlock<T> getTargetBlock() {
         return targetBlock;

@@ -341,7 +341,7 @@ public class BinaryQuad<T> extends AssignQuad<T> {
      * simplify will combine phi references and propagate copies
      * This method will also update liveness of operands by setting last use addr
      *
-     * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2(org.jnode.util.BootableHashMap)
+     * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2()
      */
     public void doPass2() {
         refs[0] = refs[0].simplify();
