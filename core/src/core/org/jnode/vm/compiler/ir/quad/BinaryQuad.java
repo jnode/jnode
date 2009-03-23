@@ -152,21 +152,21 @@ public class BinaryQuad<T> extends AssignQuad<T> {
     }
 
     /**
-     * @return
+     * @return the first operand
      */
     public Operand getOperand1() {
         return refs[0];
     }
 
     /**
-     * @return
+     * @return the second operand
      */
     public Operand getOperand2() {
         return refs[1];
     }
 
     /**
-     * @return
+     * @return the operation
      */
     public BinaryOperation getOperation() {
         return operation;
