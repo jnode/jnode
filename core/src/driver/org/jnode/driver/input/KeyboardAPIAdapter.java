@@ -38,14 +38,12 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
      * All listeners
      */
     private final ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
+    
     /**
      * The interpreter
      */
     private KeyboardInterpreter interpreter = null/*new KeyboardInterpreter()*/;
 
-    /**
-     * @see org.jnode.driver.input.KeyboardAPI#addKeyboardListener(org.jnode.driver.input.KeyboardListener)
-     */
     public synchronized void addKeyboardListener(KeyboardListener l) {
         listeners.add(l);
     }
@@ -68,23 +66,14 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
         }
     }
 
-    /**
-     * @see org.jnode.driver.input.KeyboardAPI#getKbInterpreter()
-     */
     public KeyboardInterpreter getKbInterpreter() {
         return interpreter;
     }
 
-    /**
-     * @see org.jnode.driver.input.KeyboardAPI#removeKeyboardListener(org.jnode.driver.input.KeyboardListener)
-     */
     public synchronized void removeKeyboardListener(KeyboardListener l) {
         listeners.remove(l);
     }
 
-    /**
-     * @see org.jnode.driver.input.KeyboardAPI#setKbInterpreter(org.jnode.driver.input.AbstractKeyboardInterpreter)
-     */
     public void setKbInterpreter(KeyboardInterpreter kbInterpreter) {
         if (kbInterpreter == null) {
             throw new IllegalArgumentException("kbInterpreter==null");

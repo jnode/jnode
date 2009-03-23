@@ -132,7 +132,7 @@ public class KeyboardLayoutManager implements ExtensionPointListener {
      * Create a new keyboard interpreter object.  Note that keyboard interpreter
      * objects are stateful and therefore cannot be shared by multiple keyboards.
      *
-     * @param a keyboard layout name or identifier.
+     * @param id a keyboard layout name or identifier.
      * @return a KeyboardInterpreter
      * @throws KeyboardInterpreterException 
      */

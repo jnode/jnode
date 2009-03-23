@@ -67,7 +67,7 @@ public abstract class KeyboardHandler {
      * Get the next KeyboardEvent from the internal queue (and wait if none is
      * available).
      * 
-     * @return
+     * @return the next event
      */
     public final KeyboardEvent getEvent() {
         return queue.get();

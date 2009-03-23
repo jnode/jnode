@@ -28,7 +28,7 @@ public interface MouseProtocolHandler {
     /**
      * Gets the name of the protocol of this handler.
      *
-     * @return String
+     * @return the protocol name
      */
     public String getName();
 
@@ -36,22 +36,22 @@ public interface MouseProtocolHandler {
      * Does this protocol handler support a given mouse id.
      *
      * @param id
-     * @return True if this handler supports the given id, false otherwise.
+     * @return {@code true} if this handler supports the given id, {@code false} otherwise.
      */
     public boolean supportsId(int id);
 
     /**
      * Gets the size in bytes of a single packet in this protocol.
      *
-     * @return
+     * @return the size of a packet
      */
     public int getPacketSize();
 
     /**
-     * Create an event based of the given data packet.
+     * Create an event based on the supplied data packet.
      *
-     * @param data
-     * @return
+     * @param data a data packet
+     * @return a PointerEvent
      */
     public PointerEvent buildEvent(byte[] data);
 

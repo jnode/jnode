@@ -32,9 +32,9 @@ public interface Console extends FocusListener, KeyboardListener,
     PointerListener {
 
     /**
-     * Has this control the focus.
+     * Does this console have focus.
      *
-     * @return
+     * @return {@code true} if the console has focus, otherwise {@code false}.
      */
     public boolean isFocused();
 
@@ -108,7 +108,7 @@ public interface Console extends FocusListener, KeyboardListener,
     /**
      * Gets the manager this console is registered with.
      *
-     * @return
+     * @return the {@link ConsoleManager}
      */
     public ConsoleManager getManager();
 

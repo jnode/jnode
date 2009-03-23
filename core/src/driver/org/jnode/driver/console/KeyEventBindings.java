@@ -63,7 +63,7 @@ public abstract class KeyEventBindings<T extends Enum<?>> {
     }
 
     /**
-     * Reset the bindings to the state created by the constructor {@link #KeyEventBindings()}.
+     * Reset the bindings to the state created by the constructor.
      */
     public void clear() {
         charMap = new CodeMap(this.defaultCharAction);
@@ -73,7 +73,7 @@ public abstract class KeyEventBindings<T extends Enum<?>> {
     /**
      * Lookup the action for a given KeyboardEvent.
      * 
-     * @param ch the character
+     * @param event the event
      * @return the corresponding action.
      */
     public T getKeyboardEventAction(KeyboardEvent event) {

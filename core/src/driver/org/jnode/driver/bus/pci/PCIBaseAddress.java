@@ -42,37 +42,44 @@ public final class PCIBaseAddress {
      * Is this base address in IO Space?
      */
     private final boolean isIO;
+    
     /**
      * The base address in the IO space
      */
     private final int ioAddress;
+    
     /**
      * Memory type
      */
     private final byte memType;
+    
     /**
      * The base address in the memory space
      */
     private final long memAddress;
+    
     /**
      * Must a memory address be relocated below 1Mb?
      */
     private final boolean below1Mb;
+    
     /**
      * Is this a 64-bit memory address?
      */
     private final boolean b64;
+    
     /**
      * Size of the address space
      */
     private final int size;
 
     /**
-     * Read a base address at a given index (0..5)
+     * Read a base address at a given index in a Device's config data.
      *
      * @param dev
-     * @param index
-     * @return
+     * @param address0Offset 
+     * @param index an index in the range 0 ... 5 inclusive
+     * @return the base address
      */
     public static PCIBaseAddress read(PCIDevice dev, int address0Offset, int index) {
         if ((index < 0) || (index > 5)) {

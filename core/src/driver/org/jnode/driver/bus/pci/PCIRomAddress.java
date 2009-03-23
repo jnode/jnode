@@ -93,14 +93,16 @@ public final class PCIRomAddress {
     /**
      * Is the ROM base address enabled.
      *
-     * @return
+     * @return {@code true} if the base address is enabled, otherwise {@code false}.
      */
     public final boolean isEnabled() {
         return ((dev.readConfigDword(offset) & PCI_ROM_ADDRESS_ENABLE) != 0);
     }
 
     /**
-     * Enable/disable the ROM
+     * Enable/disable the ROM.
+     * 
+     * @param enabled {@code true} to enable, {@code false} to disable.
      */
     public final void setEnabled(boolean enabled) {
         int v = dev.readConfigDword(offset);
@@ -112,11 +114,6 @@ public final class PCIRomAddress {
         dev.writeConfigDword(offset, v);
     }
 
-    /**
-     * Convert this to a String representation
-     *
-     * @see java.lang.Object#toString()
-     */
     public String toString() {
         final int base = getRomBase();
         return NumberUtils.hex(getRomBase()) + "-" + NumberUtils.hex(base + size - 1) +

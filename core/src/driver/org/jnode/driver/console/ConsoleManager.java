@@ -48,35 +48,35 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
      * Gets the console with the given accelerator keycode.
      *
      * @param keyCode
-     * @return
+     * @return The console
      */
     public Console getConsoleByAccelerator(int keyCode);
 
     /**
-     * Gets the names of all registers consoles.
+     * Gets the names of all consoles currently registered
      *
-     * @return
+     * @return a set of console names.
      */
     public Set<String> getConsoleNames();
 
     /**
-     * Register a new console.
+     * Add a new console.
      *
-     * @param console
+     * @param console the console to be registered.
      */
     public void registerConsole(Console console);
 
     /**
-     * Remove an already registered console.
+     * Remove a currently registered console.
      *
-     * @param console
+     * @param console the console to be unregistered.
      */
     public void unregisterConsole(Console console);
 
     /**
-     * Gets the currently focused console.
+     * Gets the console that currently has focus.
      *
-     * @return Console
+     * @return the focussed console
      */
     public Console getFocus();
 
@@ -97,14 +97,14 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
     /**
      * Return the parent of this console manager.
      *
-     * @return
+     * @return the parent or {@code null}.
      */
     public ConsoleManager getParent();
 
     /**
      * Set the parent of this console manager.
      *
-     * @param parent
+     * @param parent the new parent
      */
     public void setParent(ConsoleManager parent);
 
@@ -135,18 +135,19 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
         public static final int STACKED = 0x08;
 
         /**
-         * Do not create a line-editting input stream for the console.
+         * Do not create a line-editing input stream for the console.
          * The console's input will be whatever System.in currently is.
          */
         public static final int NO_LINE_EDITTING = 0x10;
     }
 
     /**
-     * Create a new console.
+     * Create a new console with given properties and optionally a given name.
      *
-     * @param name    The name of the new console, or null for an automatic name.
-     * @param options The options that determine the type of console to create.
-     * @return
+     * @param name    The name of the new console, or {@code null} for an automatic name.
+     * @param options The options that determine the properties of console to be created; 
+     * see {@link CreateOptions}.
+     * @return the new console.
      */
     public Console createConsole(String name, int options);
 
