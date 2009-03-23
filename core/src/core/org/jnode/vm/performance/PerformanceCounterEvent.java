@@ -35,7 +35,7 @@ public abstract class PerformanceCounterEvent implements
     /**
      * Initialize this instance.
      *
-     * @param id
+     * @param preset
      */
     protected PerformanceCounterEvent(PresetEvent preset) {
         this(preset.name(), preset.getDescription());
@@ -63,15 +63,12 @@ public abstract class PerformanceCounterEvent implements
     /**
      * Gets the language independent identifier of this event.
      *
-     * @return
+     * @return the event id
      */
     public final String getId() {
         return id;
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -81,23 +78,14 @@ public abstract class PerformanceCounterEvent implements
         return false;
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     */
     public int hashCode() {
         return id.hashCode();
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
     public String toString() {
         return id;
     }
 
-    /**
-     * @see java.lang.Comparable#compareTo(T)
-     */
     public int compareTo(PerformanceCounterEvent o) {
         return id.compareTo(o.id);
     }

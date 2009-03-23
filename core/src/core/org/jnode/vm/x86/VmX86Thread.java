@@ -268,7 +268,7 @@ public abstract class VmX86Thread extends VmThread {
     /**
      * Gets the end address of the stack of this thread.
      *
-     * @return
+     * @return the stack end address
      */
     final Address getStackEnd() {
         return stackEnd;

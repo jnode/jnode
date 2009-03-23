@@ -44,9 +44,6 @@ public class X86RegisterPool extends RegisterPool<X86Register> {
         // // not sure what to do with ESI and EDI just yet...
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
-     */
     public X86Register request(int type) {
         if (type == Operand.LONG) {
             return null;
@@ -64,16 +61,10 @@ public class X86RegisterPool extends RegisterPool<X86Register> {
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
-     */
     public void release(X86Register register) {
         registers.add(register);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.RegisterPool#supports3AddrOps()
-     */
     public boolean supports3AddrOps() {
         return false;
     }

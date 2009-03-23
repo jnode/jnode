@@ -129,7 +129,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Create a clone of this item, which must be a constant.
      *
-     * @return
+     * @return the clone
      */
     protected abstract DoubleWordItem cloneConstant(EmitterContext ec);
 
@@ -148,7 +148,7 @@ public abstract class DoubleWordItem extends Item implements
      * Gets the offset from the LSB part of this item to the FramePointer
      * register. This is only valid if this item has a LOCAL kind.
      *
-     * @return
+     * @return the offset
      */
     final int getLsbOffsetToFP(EmitterContext ec) {
         return super.getOffsetToFP(ec);
@@ -157,7 +157,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Gets the register holding the LSB part of this item in 32-bit mode.
      *
-     * @return
+     * @return the register
      */
     final X86Register.GPR getLsbRegister(EmitterContext ec) {
         if (!ec.getStream().isCode32()) {
@@ -174,7 +174,7 @@ public abstract class DoubleWordItem extends Item implements
      * Gets the offset from the MSB part of this item to the FramePointer
      * register. This is only valid if this item has a LOCAL kind.
      *
-     * @return
+     * @return the offset
      */
     final int getMsbOffsetToFP(EmitterContext ec) {
         return super.getOffsetToFP(ec) + 4;
@@ -183,7 +183,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Gets the register holding the MSB part of this item in 32-bit mode.
      *
-     * @return
+     * @return the register
      */
     final X86Register.GPR getMsbRegister(EmitterContext ec) {
         if (!ec.getStream().isCode32()) {
@@ -199,7 +199,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * Gets the register holding this item in 64-bit mode.
      *
-     * @return
+     * @return the register
      */
     final X86Register.GPR64 getRegister(EmitterContext ec) {
         if (!ec.getStream().isCode64()) {
@@ -228,9 +228,6 @@ public abstract class DoubleWordItem extends Item implements
         }
     }
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
-     */
     final void load(EmitterContext ec) {
         if (!isGPR()) {
             final X86RegisterPool pool = ec.getGPRPool();

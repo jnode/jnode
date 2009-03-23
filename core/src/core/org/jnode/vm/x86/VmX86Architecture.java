@@ -192,9 +192,9 @@ public abstract class VmX86Architecture extends VmArchitecture {
     }
 
     /**
-     * Gets the operating mode.
+     * Gets the current operating mode; i.e. 32 or 64 bit mode.
      *
-     * @return
+     * @return mode
      */
     public final X86Constants.Mode getMode() {
         if (getReferenceSize() == 4) {
@@ -348,9 +348,6 @@ public abstract class VmX86Architecture extends VmArchitecture {
                                                 VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
                                                 VmScheduler scheduler);
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#createIRQManager()
-     */
     @Override
     @Internal
     public final IRQManager createIRQManager(VmProcessor processor) {

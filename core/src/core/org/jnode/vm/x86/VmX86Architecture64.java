@@ -104,41 +104,23 @@ public final class VmX86Architecture64 extends VmX86Architecture {
         this.typeSizeInfo = new TypeSizeInfo(1, 1, 2, 2, 1);
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#createProcessor(int,
-     *      org.jnode.vm.classmgr.VmStatics)
-     */
     public final VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
                                              VmScheduler scheduler) {
         return new VmX86Processor64(id, this, sharedStatics, isolatedStatics, scheduler, null);
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getIMTCompiler()
-     */
     public final IMTCompiler getIMTCompiler() {
         return imtCompiler;
     }
 
-    /**
-     * Gets the type size information of this architecture.
-     *
-     * @return
-     */
     public final TypeSizeInfo getTypeSizeInfo() {
         return typeSizeInfo;
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getLogPageSize()
-     */
     public final byte getLogPageSize(int region) {
         return 22; // 4Mb
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
-     */
     public Address getEnd(int space) {
         switch (space) {
             case VirtualMemoryRegion.HEAP:
@@ -154,9 +136,6 @@ public final class VmX86Architecture64 extends VmX86Architecture {
         }
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
-     */
     public Address getStart(int space) {
         switch (space) {
             case VirtualMemoryRegion.HEAP:
@@ -176,7 +155,7 @@ public final class VmX86Architecture64 extends VmX86Architecture {
      * Map a region of the virtual memory space. Note that you cannot allocate
      * memory in this memory, because it is used very early in the boot process.
      *
-     * @param region   Memory region
+     * @param space   Memory region
      * @param start    The start of the virtual memory region to map
      * @param size     The size of the virtual memory region to map
      * @param physAddr The physical address to map the virtual address to. If this is
@@ -185,6 +164,7 @@ public final class VmX86Architecture64 extends VmX86Architecture {
      */
     public final boolean mmap(int space, Address start, Extent size, Address physAddr)
         throws UninterruptiblePragma {
+        // FIXME ... unimplemented
         if (space != VirtualMemoryRegion.HEAP) {
             return false;
         }
@@ -196,21 +176,19 @@ public final class VmX86Architecture64 extends VmX86Architecture {
      * Unmap a region of the virtual memory space. Note that you cannot allocate
      * memory in this memory, because it is used very early in the boot process.
      *
-     * @param region Memory region
+     * @param space Memory region
      * @param start  The start of the virtual memory region to unmap. This value is
      *               aligned down on pagesize.
      * @param size   The size of the virtual memory region to unmap. This value is
      *               aligned up on pagesize.
      * @return true for success, false otherwise.
      */
-    public boolean munmap(int region, Address start, Extent size)
+    public boolean munmap(int space, Address start, Extent size)
         throws UninterruptiblePragma {
+        // FIXME ... unimplemented
         return false;
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#boot()
-     */
     protected void boot(boolean emptyMMap) {
         dumpMultibootMMap();
     }
