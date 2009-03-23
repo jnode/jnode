@@ -36,16 +36,10 @@ public class UnconditionalBranchQuad<T> extends BranchQuad<T> {
         super(address, block, targetAddress);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#getDefinedOp()
-     */
     public Operand<T> getDefinedOp() {
         return null;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#getReferencedOps()
-     */
     public Operand<T>[] getReferencedOps() {
         return null;
     }
@@ -54,15 +48,9 @@ public class UnconditionalBranchQuad<T> extends BranchQuad<T> {
         return getAddress() + ": goto " + getTargetBlock();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
     public void doPass2() {
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         cg.generateCodeFor(this);
     }

@@ -121,21 +121,21 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
     }
 
     /**
-     * @return
+     * @return the first operand
      */
     public Operand<T> getOperand1() {
         return refs[0];
     }
 
     /**
-     * @return
+     * @return the second operand
      */
     public Operand<T> getOperand2() {
         return refs[1];
     }
 
     /**
-     * @return
+     * @return the branch condition
      */
     public BranchCondition getCondition() {
         return condition;
@@ -152,9 +152,6 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
     public void doPass2() {
         refs[0] = refs[0].simplify();
         if (refs.length > 1 && refs[1] != null) {
@@ -162,9 +159,6 @@ public class ConditionalBranchQuad<T> extends BranchQuad<T> {
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         // cg.generateCodeFor(this);
         if (condition.isBinary()) {

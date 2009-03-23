@@ -394,9 +394,9 @@ public abstract class VmHeapManager extends VmSystemObject {
     }
 
     /**
-     * Output a debug message controlled by the heap trace flags.
+     * Output a a number as debug message controlled by the heap trace flags.
      *
-     * @param text
+     * @param number
      */
     protected void debug(int number) {
         if ((heapFlags & TRACE_FLAGS) != 0) {

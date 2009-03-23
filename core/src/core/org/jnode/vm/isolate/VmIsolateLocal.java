@@ -38,7 +38,7 @@ public final class VmIsolateLocal<T> extends VmSystemObject {
     /**
      * Gets the stored object reference.
      *
-     * @return
+     * @return the stored object reference
      */
     public T get() {
         if (VmIsolate.isRoot()) {

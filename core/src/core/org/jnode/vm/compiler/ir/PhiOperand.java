@@ -70,7 +70,7 @@ public class PhiOperand<T> extends Operand<T> {
     }
 
     /**
-     * @return
+     * @return the sources
      */
     public List<Operand<T>> getSources() {
         return sources;

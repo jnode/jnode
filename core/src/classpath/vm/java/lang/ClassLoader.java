@@ -742,7 +742,7 @@ public abstract class ClassLoader {
      * Avoid trying to load the given class via its parent classloader?
      * 
      * @param name
-     * @return
+     * @return {@code true} if the parent classloader should be skipped.
      */
     public boolean skipParentLoader(String name) {
         return false;

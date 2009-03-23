@@ -33,7 +33,7 @@ public final class LinkMessageFactory {
      * Create a LinkMessage containing the given link messages.
      *
      * @param messages
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newCompositeMessage(LinkMessage... messages) {
         throw new UnsupportedOperationException();
@@ -43,7 +43,7 @@ public final class LinkMessageFactory {
      * Create a LinkMessage containing the given data.
      *
      * @param bytes
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newDataMessage(byte[] bytes, int offset, int length) {
         return new DataLinkMessage(bytes, offset, length);
@@ -53,7 +53,7 @@ public final class LinkMessageFactory {
      * Create a LinkMessage containing the given isolate.
      *
      * @param isolate
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newIsolateMessage(VmIsolate isolate) {
         throw new UnsupportedOperationException();
@@ -62,7 +62,7 @@ public final class LinkMessageFactory {
     /**
      * Create a LinkMessage containing the given link.
      *
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newLinkMessage(Link link) {
         return new LinkLinkMessage(((LinkImpl) link).getImpl());
@@ -71,7 +71,7 @@ public final class LinkMessageFactory {
     /**
      * Create a LinkMessage containing the given server socket.
      *
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newServerSocketMessage(ServerSocket socket) {
         throw new UnsupportedOperationException();
@@ -80,7 +80,7 @@ public final class LinkMessageFactory {
     /**
      * Create a LinkMessage containing the given socket.
      *
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newSocketMessage(Socket socket) {
         throw new UnsupportedOperationException();
@@ -90,7 +90,7 @@ public final class LinkMessageFactory {
      * Create a LinkMessage containing the given string.
      *
      * @param string
-     * @return
+     * @return the LinkMessage
      */
     public static LinkMessage newStringMessage(String string) {
         return new StringLinkMessage(string);

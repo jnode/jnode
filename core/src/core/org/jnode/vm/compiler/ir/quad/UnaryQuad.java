@@ -51,22 +51,19 @@ public class UnaryQuad<T> extends AssignQuad<T> {
         refs = new Operand[]{getOperand(varIndex)};
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#getReferencedOps()
-     */
     public Operand<T>[] getReferencedOps() {
         return refs;
     }
 
     /**
-     * @return
+     * @return the operand
      */
     public Operand<T> getOperand() {
         return refs[0];
     }
 
     /**
-     * @return
+     * @return the operation
      */
     public UnaryOperation getOperation() {
         return operation;
@@ -77,11 +74,8 @@ public class UnaryQuad<T> extends AssignQuad<T> {
             operation.name() + " " + refs[0].toString();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.AssignQuad#propagate(org.jnode.vm.compiler.ir.Variable)
-     */
-    // TODO should fold constants, see BinaryQuad::propagate(...)
     public Operand<T> propagate(Variable<T> operand) {
+        // TODO should fold constants, see BinaryQuad::propagate(...)
         Quad<T> quad = foldConstants();
         if (quad instanceof ConstantRefAssignQuad) {
             //setDeadCode(true);
@@ -180,16 +174,10 @@ public class UnaryQuad<T> extends AssignQuad<T> {
     }
 
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
     public void doPass2() {
         refs[0] = refs[0].simplify();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         Variable<T> lhs = getLHS();
         Location<T> lhsLoc = lhs.getLocation();
@@ -241,9 +229,6 @@ public class UnaryQuad<T> extends AssignQuad<T> {
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.AssignQuad#getLHSLiveAddress()
-     */
     public int getLHSLiveAddress() {
         return this.getAddress() + 1;
     }

@@ -51,9 +51,6 @@ public class VariableRefAssignQuad<T> extends AssignQuad<T> {
         refs = new Operand[]{rhs};
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
-     */
     public Operand<T>[] getReferencedOps() {
         return refs;
     }
@@ -63,40 +60,27 @@ public class VariableRefAssignQuad<T> extends AssignQuad<T> {
     }
 
     /**
-     * @return
+     * @return the RHS of the assignment
      */
     public Operand<T> getRHS() {
         return refs[0];
     }
 
-    /**
-     * @param operand
-     * @return
-     */
     public Operand<T> propagate(Variable<T> operand) {
         setDeadCode(true);
         return refs[0];
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
-    // This operation will almost always become dead code, but I wanted to play it
-    // safe and compute liveness assuming it might survive.
     public void doPass2() {
+        // This operation will almost always become dead code, but I wanted to play it
+        // safe and compute liveness assuming it might survive.
         refs[0] = refs[0].simplify();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         cg.generateCodeFor(this);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.AssignQuad#getLHSLiveAddress()
-     */
     public int getLHSLiveAddress() {
         return this.getAddress() + 1;
     }

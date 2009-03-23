@@ -35,16 +35,10 @@ public class VoidReturnQuad<T> extends Quad<T> {
         super(address, block);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
-     */
     public Operand<T> getDefinedOp() {
         return null;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
-     */
     public Operand<T>[] getReferencedOps() {
         return null;
     }
@@ -53,15 +47,9 @@ public class VoidReturnQuad<T> extends Quad<T> {
         return getAddress() + ": return";
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
     public void doPass2() {
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         cg.generateCodeFor(this);
     }

@@ -28,9 +28,6 @@ public class LiveRange<T> implements Comparable<LiveRange<T>> {
     private int assignAddress;
     private int lastUseAddress;
 
-    /**
-     *
-     */
     public LiveRange(Variable<T> v) {
         this.variable = v;
         this.assignAddress = v.getAssignAddress();
@@ -46,9 +43,6 @@ public class LiveRange<T> implements Comparable<LiveRange<T>> {
         return variable;
     }
 
-    /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     public int compareTo(LiveRange<T> other) {
         return assignAddress - other.getVariable().getAssignAddress();
     }
@@ -64,28 +58,28 @@ public class LiveRange<T> implements Comparable<LiveRange<T>> {
     }
 
     /**
-     * @return
+     * @return the address at which the variable is assigned
      */
     public int getAssignAddress() {
         return assignAddress;
     }
 
     /**
-     * @return
+     * @return the address at which the variable is last used
      */
     public int getLastUseAddress() {
         return lastUseAddress;
     }
 
     /**
-     * @return
+     * @return the assigned register location
      */
     public Location<T> getLocation() {
         return variable.getLocation();
     }
 
     /**
-     * @param loc
+     * @param loc the assigned register location
      */
     public void setLocation(Location<T> loc) {
         variable.setLocation(loc);

@@ -52,7 +52,7 @@ public final class VmLink {
      *
      * @param sender
      * @param receiver
-     * @return
+     * @return the new Link
      */
     public static Link newLink(VmIsolate sender, VmIsolate receiver) {
         if (sender == receiver) {
@@ -78,7 +78,7 @@ public final class VmLink {
     /**
      * Gets this shared link as Link instance.
      *
-     * @return
+     * @return the Link instance
      */
     public final Link asLink() {
         final LinkImpl link = linkHolder.get();
@@ -110,7 +110,7 @@ public final class VmLink {
     /**
      * Is this link currently open.
      *
-     * @return
+     * @return {@code true} if the link is open, otherwise {@code false}.
      */
     final boolean isOpen() {
         return !closed;

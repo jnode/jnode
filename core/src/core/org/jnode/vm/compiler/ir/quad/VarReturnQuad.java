@@ -38,20 +38,17 @@ public class VarReturnQuad<T> extends Quad<T> {
         refs = new Operand[]{getOperand(varIndex)};
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
-     */
     public Operand<T> getDefinedOp() {
         return null;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
-     */
     public Operand<T>[] getReferencedOps() {
         return refs;
     }
 
+    /**
+     * @return the operand for the 'return'
+     */
     public Operand<T> getOperand() {
         return refs[0];
     }
@@ -60,16 +57,10 @@ public class VarReturnQuad<T> extends Quad<T> {
         return getAddress() + ": return " + refs[0];
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
-     */
     public void doPass2() {
         refs[0] = refs[0].simplify();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
-     */
     public void generateCode(CodeGenerator<T> cg) {
         cg.generateCodeFor(this);
     }
