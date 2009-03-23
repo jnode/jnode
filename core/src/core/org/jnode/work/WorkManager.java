@@ -42,14 +42,14 @@ public interface WorkManager {
     /**
      * Gets the number of entries in the work queue.
      *
-     * @return
+     * @return the number of entries.
      */
     public int queueSize();
 
     /**
      * Is the work queue empty.
      *
-     * @return
+     * @return {@code true} if the queue is empty, otherwise {@code false}.
      */
     public boolean isEmpty();
 }
