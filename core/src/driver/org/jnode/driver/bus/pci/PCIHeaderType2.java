@@ -96,9 +96,6 @@ public final class PCIHeaderType2 extends PCIDeviceConfig {
         return device.readConfigByte(PCI_CB_SUBORDINATE_BUS);
     }
 
-    /**
-     * @see org.jnode.driver.pci.PCIDeviceConfig#toString()
-     */
     public String toString() {
         return super.toString() + ", " + "primary-bus=" + getPrimaryBus()
             + ", " + "card-bus=" + getCardBus()

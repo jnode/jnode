@@ -472,7 +472,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
     /**
      * Get the options used to create this {@link TextScreenConsole}
-     * @return
+     * @return the options.
      */
     final int getOptions() {
         return options;

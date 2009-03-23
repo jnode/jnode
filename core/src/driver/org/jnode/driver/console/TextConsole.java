@@ -217,7 +217,7 @@ public interface TextConsole extends Console {
     /**
      * Set the console's input completer
      *
-     * @param The new completer or <code>null</code>.
+     * @param completer The new completer or <code>null</code>.
      */
     public void setCompleter(InputCompleter completer);
     

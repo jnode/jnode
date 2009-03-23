@@ -38,7 +38,7 @@ public final class PMCapability extends Capability {
     /**
      * Gets the power management capabilities.
      *
-     * @return
+     * @return the capability word
      */
     public final int getCapabilities() {
         return readConfigWord(0x02);
@@ -47,7 +47,7 @@ public final class PMCapability extends Capability {
     /**
      * Gets the status register.
      *
-     * @return
+     * @return the status register address
      */
     public final int getStatus() {
         return readConfigWord(0x04);
@@ -56,7 +56,7 @@ public final class PMCapability extends Capability {
     /**
      * Gets the data register.
      *
-     * @return
+     * @return the data register address
      */
     public final int getData() {
         return readConfigByte(0x07);
@@ -65,7 +65,7 @@ public final class PMCapability extends Capability {
     /**
      * Gets the bridge support register.
      *
-     * @return
+     * @return the bridge support register address
      */
     public final int getBridgeSupportExtensions() {
         return readConfigByte(0x06);

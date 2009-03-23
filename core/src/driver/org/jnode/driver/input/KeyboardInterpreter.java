@@ -50,15 +50,18 @@ public interface KeyboardInterpreter {
     public static final int XT_EXTENDED = 0xE0;
 
     /**
-     * Interpret a given scancode into a keyevent.
+     * Interpret a given scancode as a KeyboardEvent.
      *
-     * @param scancode
+     * @param scancode a scancode
+     * @return the corresponding KeyboardEvent
      */
     public KeyboardEvent interpretScancode(int scancode);
 
     /**
-     * @param keycode
-     * @return
+     * Interpret a given keycode as a KeyboardEvent.
+     * 
+     * @param keycode a keycode
+     * @return the corresponding KeyboardEvent
      * @throws UnsupportedKeyException
      */
     public KeyboardEvent interpretKeycode(int keycode);

@@ -132,7 +132,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
     /**
      * Gets the number of entries in the work queue.
      *
-     * @return
+     * @return the number entries
      */
     public final int queueSize() {
         return queue.size();
@@ -141,7 +141,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
     /**
      * Is the work queue empty.
      *
-     * @return
+     * @return {@code true} if the queue is empty, otherwise {@code false}.
      */
     public final boolean isEmpty() {
         return queue.isEmpty();

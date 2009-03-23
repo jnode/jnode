@@ -31,10 +31,12 @@ public abstract class Capability {
      * Offset of this capability in the device config space
      */
     private final int offset;
+    
     /**
      * The device this is a capability of
      */
     private final PCIDevice device;
+    
     /**
      * The capability id
      */
@@ -50,22 +52,27 @@ public abstract class Capability {
          * Power Management
          */
         public static final int PM = 0x01;
+        
         /**
          * Accelerated Graphics Port
          */
         public static final int AGP = 0x02;
+        
         /**
          * Vital Product Data
          */
         public static final int VPD = 0x03;
+        
         /**
          * Slot Identification
          */
         public static final int SLOTID = 0x04;
+        
         /**
          * Message Signalled Interrupts
          */
         public static final int MSI = 0x05;
+        
         /**
          * CompactPCI HotSwap
          */
@@ -95,7 +102,7 @@ public abstract class Capability {
      *
      * @param device
      * @param offset
-     * @return
+     * @return the Capability created
      */
     static final Capability createCapability(PCIDevice device, int offset) {
         final int id = device.readConfigByte(offset + PCI_CAP_LIST_ID);
@@ -127,11 +134,6 @@ public abstract class Capability {
         return id;
     }
 
-    /**
-     * Convert to a string representation.
-     *
-     * @see java.lang.Object#toString()
-     */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("id=0x");

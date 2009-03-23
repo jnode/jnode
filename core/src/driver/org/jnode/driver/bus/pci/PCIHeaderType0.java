@@ -60,7 +60,7 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
     /**
      * Gets the resource addresses.
      *
-     * @return
+     * @return the resource addresses
      */
     public final PCIBaseAddress[] getBaseAddresses() {
         PCIBaseAddress[] addresses = new PCIBaseAddress[6];
@@ -116,17 +116,14 @@ public final class PCIHeaderType0 extends PCIDeviceConfig {
     }
 
     /**
-     * Gets the ROM base address, or null is no rom is found.
+     * Gets the ROM base address, or {@code null} if no ROM is found.
      *
-     * @return
+     * @return the ROM addres or {@code null}
      */
     public final PCIRomAddress getRomAddress() {
         return romAddress;
     }
 
-    /**
-     * @see org.jnode.driver.bus.pci.PCIDeviceConfig#toString()
-     */
     public final String toString() {
         final StringBuilder sb = new StringBuilder(super.toString());
         if (getInterruptPin() != 0) {

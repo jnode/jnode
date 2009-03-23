@@ -49,34 +49,42 @@ public abstract class PCIDeviceConfig implements PCIConstants {
      * My device
      */
     protected final PCIDevice device;
+    
     /**
      * My device ID
      */
     private final int deviceID;
+    
     /**
      * The vendor ID
      */
     private final int vendorID;
+    
     /**
      * The major class
      */
     private final int majorClass;
+    
     /**
      * The sub class
      */
     private final int subClass;
+    
     /**
      * The minor class
      */
     private int minorClass;
+    
     /**
      * The revision
      */
     private final int revision;
+    
     /**
      * The header type
      */
     private final int headerTypeRaw;
+    
     /**
      * The list of capabilities
      */
@@ -104,7 +112,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
      * based on the header type of the device configuration settings.
      *
      * @param device
-     * @return
+     * @return the config instance
      */
     static final PCIDeviceConfig createConfig(PCIDevice device) {
         final int headerTypeRaw = device.readConfigByte(PCI_HEADER_TYPE);
@@ -136,7 +144,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
      * @param bus
      * @param unit
      * @param func
-     * @return
+     * @return the ID
      */
     static final int getDeviceID(PCIDriver pci, int bus, int unit, int func) {
         return pci.readConfigWord(bus, unit, func, PCI_DEVICE_ID);
@@ -309,7 +317,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Gets all capabilities.
      *
-     * @return
+     * @return the device capabilities
      */
     public final Collection<Capability> getCapabilities() {
         if (capabilities == null) {
@@ -321,7 +329,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Is this a header type 0 configuration.
      *
-     * @return
+     * @return {@code true} if this is a type 0 configuration.
      */
     public final boolean isHeaderType0() {
         return (getHeaderType() == HEADER_TYPE_NORMAL);
@@ -330,7 +338,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Is this a header type 1 configuration.
      *
-     * @return
+     * @return {@code true} if this is a type 1 configuration.
      */
     public final boolean isHeaderType1() {
         return (getHeaderType() == HEADER_TYPE_BRIDGE);
@@ -339,7 +347,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Is this a header type 2 configuration.
      *
-     * @return
+     * @return {@code true} if this is a type 2 configuration.
      */
     public final boolean isHeaderType2() {
         return (getHeaderType() == HEADER_TYPE_CARDBUS);
@@ -348,7 +356,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Gets this configuration as a header type 0 (normal devices) accessor.
      *
-     * @return
+     * @return the configuration
      * @throws ClassCastException If header type != 0.
      */
     public final PCIHeaderType0 asHeaderType0() {
@@ -358,7 +366,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Gets this configuration as a header type 1 (pci-pci bridge) accessor.
      *
-     * @return
+     * @return the configuration
      * @throws ClassCastException If header type != 1.
      */
     public final PCIHeaderType1 asHeaderType1() {
@@ -368,18 +376,13 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     /**
      * Gets this configuration as a header type 2 (cardbus bridge) accessor.
      *
-     * @return
+     * @return the configuration
      * @throws ClassCastException If header type != 2.
      */
     public final PCIHeaderType2 asHeaderType2() {
         return (PCIHeaderType2) this;
     }
 
-    /**
-     * Convert myself to a String representation.
-     *
-     * @see java.lang.Object#toString()
-     */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("device=0x");
@@ -424,16 +427,16 @@ public abstract class PCIDeviceConfig implements PCIConstants {
      * Gets a 32-bit int from the device's configuration space.
      *
      * @param offset Byte offset of the requested dword.
-     * @return
+     * @return the value fetched.
      */
     public int getDWord(int offset) {
         return device.readConfigDword(offset);
     }
 
     /**
-     * Read the capability list.
+     * Load the capability map from the device's configuration space.
      *
-     * @return
+     * @return the capability map
      */
     private Map<Integer, Capability> readCapabilities() {
         if ((getStatus() & PCI_STATUS_CAP_LIST) == 0) {
