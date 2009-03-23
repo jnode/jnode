@@ -118,9 +118,6 @@ public final class X86StubCompiler extends AbstractX86Compiler {
         return os;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.NativeCodeCompiler#getMagic()
-     */
     public final int getMagic() {
         return STUB_COMPILER_MAGIC;
     }
@@ -128,23 +125,17 @@ public final class X86StubCompiler extends AbstractX86Compiler {
     /**
      * Gets the name of this compiler.
      *
-     * @return
+     * @return the compiler name
      */
     public String getName() {
         return "X86-Stub";
     }
 
-    /**
-     * @see org.jnode.vm.compiler.NativeCodeCompiler#createGCMapIterator()
-     */
     @Override
     public GCMapIterator createGCMapIterator() {
         return new EmptyGCMapIterator();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.NativeCodeCompiler#getCompilerPackages()
-     */
     @Override
     public String[] getCompilerPackages() {
         return new String[]{"org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.stub"};

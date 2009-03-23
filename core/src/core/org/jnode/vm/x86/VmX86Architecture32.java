@@ -143,27 +143,14 @@ public final class VmX86Architecture32 extends VmX86Architecture {
         return new VmX86Processor32(id, this, sharedStatics, isolatedStatics, scheduler, null);
     }
 
-    /**
-     * Gets the compiler of IMT's.
-     *
-     * @return The IMT compiler
-     */
     public final IMTCompiler getIMTCompiler() {
         return imtCompiler;
     }
 
-    /**
-     * Gets the type size information of this architecture.
-     *
-     * @return
-     */
     public final TypeSizeInfo getTypeSizeInfo() {
         return typeSizeInfo;
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getLogPageSize()
-     */
     public final byte getLogPageSize(int region) {
         switch (region) {
             case VirtualMemoryRegion.AVAILABLE:
@@ -179,9 +166,6 @@ public final class VmX86Architecture32 extends VmX86Architecture {
         }
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
-     */
     public Address getEnd(int space) {
         switch (space) {
             case VirtualMemoryRegion.HEAP:
@@ -197,9 +181,6 @@ public final class VmX86Architecture32 extends VmX86Architecture {
         }
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
-     */
     public Address getStart(int space) {
         switch (space) {
             case VirtualMemoryRegion.HEAP:
@@ -344,9 +325,6 @@ public final class VmX86Architecture32 extends VmX86Architecture {
 
     }
 
-    /**
-     * @see org.jnode.vm.VmArchitecture#boot()
-     */
     protected void boot(boolean emptyMMap) {
         Unsafe.debug("VmArchitecture32#boot\n");
         dumpMultibootMMap();

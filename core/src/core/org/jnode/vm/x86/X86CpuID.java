@@ -162,16 +162,16 @@ public class X86CpuID extends CpuID {
     /**
      * Is this the id of an Intel CPU.
      *
-     * @return
+     * @return {@code true} for an Intel CPU, otherwise {@code false}
      */
     public boolean isIntel() {
         return getVendor().equals(X86Vendor.INTEL.getId());
     }
 
     /**
-     * Is this the id of an Intel CPU.
+     * Is this the id of an AMD CPU.
      *
-     * @return
+     * @return {@code true} for an AMD CPU, otherwise {@code false}
      */
     public boolean isAMD() {
         return getVendor().equals(X86Vendor.AMD.getId());
@@ -242,7 +242,7 @@ public class X86CpuID extends CpuID {
      * Calculate the physical package id for the given APIC id.
      *
      * @param apicId
-     * @return
+     * @return the physical package id.
      */
     public final int getPhysicalPackageId(int apicId) {
         int index_lsb = 0;

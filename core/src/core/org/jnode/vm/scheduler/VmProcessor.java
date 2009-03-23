@@ -301,7 +301,7 @@ public abstract class VmProcessor extends VmSystemObject {
      * Create an ID string for the given id
      *
      * @param id
-     * @return
+     * @return the ID string
      */
     protected String formatId(int id) {
         return "0x" + NumberUtils.hex(id, 2);
@@ -643,7 +643,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Gets the processor speed indication.
      *
-     * @return
+     * @return the notional processor speed.
      */
     public final float getJNodeMips() {
         return jnodeMips;
@@ -679,7 +679,7 @@ public abstract class VmProcessor extends VmSystemObject {
      * Gets the GC map iterator for the given native code compiler.
      *
      * @param compiler
-     * @return
+     * @return the iterator
      */
     @Inline
     public final GCMapIterator getGCMapIterator(NativeCodeCompiler compiler) {
@@ -703,7 +703,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Gets the performance counter accessor of this processor.
      *
-     * @return
+     * @return the accessor.
      */
     public abstract PerformanceCounters getPerformanceCounters();
 

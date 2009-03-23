@@ -372,7 +372,7 @@ public abstract class VmX86Processor extends VmProcessor {
     /**
      * Gets the performance counter accessor of this processor.
      *
-     * @return
+     * @return the accessor object
      */
     public final PerformanceCounters getPerformanceCounters() {
         if (perfCounters == null) {

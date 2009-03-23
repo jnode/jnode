@@ -724,7 +724,7 @@ public abstract class VmThread extends VmSystemObject {
     /**
      * Gets the state of this thread.
      *
-     * @return
+     * @return the thread state value
      */
     @KernelSpace
     final int getThreadState() {
@@ -734,7 +734,8 @@ public abstract class VmThread extends VmSystemObject {
     /**
      * Gets the thread this thread is waiting for (or null).
      *
-     * @return
+     * @return the VmThread for the thread that this one is
+     * waiting for, or {@code null}.
      */
     @KernelSpace
     final VmThread getWaitForThread() {
@@ -745,7 +746,7 @@ public abstract class VmThread extends VmSystemObject {
     /**
      * Gets a human readable name for the current thread state.
      *
-     * @return
+     * @return the thread state name
      */
     @KernelSpace
     @Uninterruptible
@@ -869,14 +870,14 @@ public abstract class VmThread extends VmSystemObject {
     }
 
     /**
-     * @return int
+     * @return The thread's priority.
      */
     public final int getPriority() {
         return priority;
     }
 
     /**
-     * Sets the priority.
+     * Sets the thread's priority.
      *
      * @param priority The priority to set
      */
@@ -938,7 +939,7 @@ public abstract class VmThread extends VmSystemObject {
     /**
      * Gets the name of this thread.
      *
-     * @return
+     * @return the name of this thread.
      */
     @KernelSpace
     public final String getName() {
@@ -955,7 +956,7 @@ public abstract class VmThread extends VmSystemObject {
     }
 
     /**
-     * @return
+     * @return {@code true} if the stack has overflowed.
      */
     boolean isStackOverflow() {
         return this.stackOverflow;
@@ -1192,7 +1193,7 @@ public abstract class VmThread extends VmSystemObject {
     }
 
     /**
-     * @param isolate
+     * @param isolatedStatics
      */
     public final void switchToIsolate(VmIsolatedStatics isolatedStatics) {
         final VmProcessor proc = VmMagic.currentProcessor();
@@ -1207,8 +1208,8 @@ public abstract class VmThread extends VmSystemObject {
      *
      * @param visitor
      * @param heapManager
-     * @return true if the last visit returned true or no visit was made, false
-     *         otherwise.
+     * @return {@code true} if the last visit returned {@code true} or no visit was
+     * made, {@code false} otherwise.
      */
     public abstract boolean visit(ObjectVisitor visitor,
                                   VmHeapManager heapManager);

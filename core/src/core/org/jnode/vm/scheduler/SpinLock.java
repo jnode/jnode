@@ -40,6 +40,7 @@ public class SpinLock extends VmSystemObject {
      * Lock counter. THIS FIELD MUST BE AT OFFSET 0!!
      */
     private int lockCount;
+    
     /**
      * Owner used for deadlock detection
      */
@@ -88,7 +89,7 @@ public class SpinLock extends VmSystemObject {
     /**
      * Is this lock locked.
      *
-     * @return
+     * @return {@code true} if the lock is locked, otherwise {@code false}.
      */
     @Inline
     @Uninterruptible

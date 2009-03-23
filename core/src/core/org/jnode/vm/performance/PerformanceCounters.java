@@ -31,23 +31,23 @@ public abstract class PerformanceCounters {
      * Gets all performance counter events that are available on the
      * current processor.
      *
-     * @return
+     * @return a set of events
      */
     public abstract Set<PerformanceCounterEvent> getAvailableEvents();
 
     /**
      * Gets the performance counter event with the given id, if that is
-     * available on thecurrent processor.
+     * available on the current processor.
      *
-     * @return The event, or null if not found.
+     * @return The event, or {@code null} if not found.
      */
     public abstract PerformanceCounterEvent getAvailableEvent(String id);
 
     /**
      * Gets the performance counter event with the given id, if that is
-     * available on thecurrent processor.
+     * available on the current processor.
      *
-     * @return The event, or null if not found.
+     * @return The event, or {@code null} if not found.
      */
     public final PerformanceCounterEvent getAvailableEvent(PresetEvent preset) {
         return getAvailableEvent(preset.name());
@@ -57,7 +57,7 @@ public abstract class PerformanceCounters {
      * Gets the number of performance counters that are available on the
      * current processor.
      *
-     * @return
+     * @return the number of available counters
      */
     public abstract int getMaximumCounters();
 

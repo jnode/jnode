@@ -75,9 +75,6 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.NativeCodeCompiler#createNativeStream(org.jnode.assembler.ObjectResolver)
-     */
     public NativeStream createNativeStream(ObjectResolver resolver) {
         X86BinaryAssembler os;
         os = (X86BinaryAssembler) nativeStreamHolder.get();
@@ -90,10 +87,6 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         return os;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.NativeCodeCompiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod,
-     *      org.jnode.assembler.NativeStream, int, boolean)
-     */
     @PrivilegedActionPragma
     protected final CompiledMethod doCompileAbstract(VmMethod method,
                                                      NativeStream nos, int level, boolean isBootstrap) {
@@ -141,7 +134,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     /**
      * Gets the operating mode.
      *
-     * @return
+     * @return the x86 operating mode that we are compiling for; i.e. 32 or 64 bit.
      */
     protected final X86Constants.Mode getMode() {
         return mode;
@@ -170,16 +163,13 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.NativeCodeCompiler#dumpStatistics()
-     */
     public void dumpStatistics() {
     }
 
     /**
      * Gets the type size information.
      *
-     * @return
+     * @return the type size info descriptor
      */
     public final TypeSizeInfo getTypeSizeInfo() {
         return typeSizeInfo;

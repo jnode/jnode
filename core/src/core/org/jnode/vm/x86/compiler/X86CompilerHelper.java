@@ -183,7 +183,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     /**
      * Sets the current label prefix.
      *
-     * @param method
+     * @param prefix
      */
     public final void setLabelPrefix(String prefix) {
         this.labelPrefix = prefix;
@@ -333,9 +333,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     /**
      * Write class initialization code
      *
-     * @param method
-     * @param methodReg Register that holds the method reference before this method is
-     *                  called.
+     * @param method the method reference
      * @return true if code was written, false otherwise
      */
     public final boolean writeClassInitialize(VmMethod method) {
@@ -491,7 +489,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      *
      * @param method
      */
-    public final void writeStackOverflowTest(VmMethod method_) {
+    public final void writeStackOverflowTest(VmMethod method) {
         // cmp esp,STACKEND
         // jg vm_invoke_testStackOverflowDone
         // vm_invoke_testStackOverflow:

@@ -101,24 +101,14 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         return l;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#getRegisterPool()
-     */
     public RegisterPool<T> getRegisterPool() {
         return registerPool;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#supports3AddrOps()
-     */
     public boolean supports3AddrOps() {
         return false;
     }
 
-    /**
-     * @param vars
-     * @param nArgs
-     */
     public void setArgumentVariables(Variable<T>[] vars, int nArgs) {
         displacement = 0;
         for (int i = 0; i < nArgs; i += 1) {
@@ -130,9 +120,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         displacement += 8;
     }
 
-    /**
-     * @param variables
-     */
     public void setSpilledVariables(Variable<T>[] variables) {
         this.spilledVariables = variables;
         int n = spilledVariables.length;
@@ -157,9 +144,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     *
-     */
     public void emitHeader() {
         os.writePUSH(X86Register.EBP);
         // os.writePUSH(context.getMagic());
@@ -169,16 +153,10 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         os.writeMOV(X86Constants.BITS32, X86Register.EBP, X86Register.ESP);
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad)
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad) {
         throw new IllegalArgumentException("Unknown operation");
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad)
-     */
     public void generateCodeFor(ConstantRefAssignQuad<T> quad) {
         Variable<T> lhs = quad.getLHS();
         if (lhs.getAddressingMode() == REGISTER) {
@@ -208,18 +186,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         prev_addr = address;
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator
-     * #generateCodeFor(org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad)
-     */
     public void generateCodeFor(UnconditionalBranchQuad<T> quad) {
         checkLabel(quad.getAddress());
         os.writeJMP(getInstrLabel(quad.getTargetAddress()));
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad)
-     */
     public void generateCodeFor(VariableRefAssignQuad<T> quad) {
         Variable<T> lhs = quad.getLHS();
         if (lhs.getAddressingMode() == REGISTER) {
@@ -261,9 +232,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VarReturnQuad)
-     */
     public void generateCodeFor(VarReturnQuad<T> quad) {
         checkLabel(quad.getAddress());
         Operand<T> op = quad.getOperand();
@@ -294,9 +262,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         os.writeRET();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VoidReturnQuad)
-     */
     public void generateCodeFor(VoidReturnQuad<T> quad) {
         checkLabel(quad.getAddress());
 
@@ -307,19 +272,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         os.writeRET();
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad,
-     *      java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
-     */
     public void generateCodeFor(UnaryQuad<T> quad, Object lhsReg, UnaryOperation operation,
                                 Constant<T> con) {
         throw new IllegalArgumentException("Constants should be folded");
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad,
-     *      java.lang.Object, int, java.lang.Object)
-     */
     public void generateCodeFor(UnaryQuad<T> quad, Object lhsReg, UnaryOperation operation,
                                 Object rhsReg) {
         checkLabel(quad.getAddress());
@@ -390,10 +347,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad,
-     *      java.lang.Object, int, int)
-     */
     public void generateCodeFor(UnaryQuad<T> quad, Object lhsReg, UnaryOperation operation,
                                 int rhsDisp) {
         checkLabel(quad.getAddress());
@@ -463,10 +416,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad,
-     *      int, int, java.lang.Object)
-     */
     public void generateCodeFor(UnaryQuad<T> quad, int lhsDisp, UnaryOperation operation,
                                 Object rhsReg) {
         checkLabel(quad.getAddress());
@@ -543,10 +492,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad,
-     *      int, int, int)
-     */
     public void generateCodeFor(UnaryQuad<T> quad, int lhsDisp, UnaryOperation operation,
                                 int rhsDisp) {
         checkLabel(quad.getAddress());
@@ -621,29 +566,16 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad,
-     *      int, int, org.jnode.vm.compiler.ir.Constant)
-     */
     public void generateCodeFor(UnaryQuad<T> quad, int lhsDisp, UnaryOperation operation,
                                 Constant<T> con) {
         throw new IllegalArgumentException("Constants should be folded");
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      org.jnode.vm.compiler.ir.Constant, int,
-     *      org.jnode.vm.compiler.ir.Constant)
-     */
     public void generateBinaryOP(T reg1, Constant<T> c2,
                                  BinaryOperation operation, Constant<T> c3) {
         throw new IllegalArgumentException("Constants should be folded");
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
-     */
     public void generateBinaryOP(T reg1, Constant<T> c2,
                                  BinaryOperation operation, T reg3) {
         IntConstant<T> iconst2 = (IntConstant<T>) c2;
@@ -837,10 +769,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      org.jnode.vm.compiler.ir.Constant<T>, int, int)
-     */
     public void generateBinaryOP(T reg1, Constant<T> c2,
                                  BinaryOperation operation, int disp3) {
         IntConstant<T> iconst2 = (IntConstant<T>) c2;
@@ -1010,10 +938,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      java.lang.Object, int, org.jnode.vm.compiler.ir.Constant<T>)
-     */
     public void generateBinaryOP(T reg1, T reg2,
                                  BinaryOperation operation, Constant<T> c3) {
         IntConstant<T> iconst3 = (IntConstant<T>) c3;
@@ -1199,10 +1123,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      java.lang.Object, int, java.lang.Object)
-     */
     public void generateBinaryOP(T reg1, T reg2,
                                  BinaryOperation operation, T reg3) {
 
@@ -1420,10 +1340,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      java.lang.Object, int, int)
-     */
     public void generateBinaryOP(T reg1, T reg2,
                                  BinaryOperation operation, int disp3) {
         switch (operation) {
@@ -1614,10 +1530,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      int, int, org.jnode.vm.compiler.ir.Constant<T>)
-     */
     public void generateBinaryOP(T reg1, int disp2,
                                  BinaryOperation operation, Constant<T> c3) {
         IntConstant<T> iconst3 = (IntConstant<T>) c3;
@@ -1797,10 +1709,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      int, int, java.lang.Object)
-     */
     public void generateBinaryOP(T reg1, int disp2,
                                  BinaryOperation operation, T reg3) {
         switch (operation) {
@@ -2009,10 +1917,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object,
-     *      int, int, int)
-     */
     public void generateBinaryOP(T reg1, int disp2,
                                  BinaryOperation operation, int disp3) {
         switch (operation) {
@@ -2201,20 +2105,11 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     // / WE should not get to this method
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int,
-     *      org.jnode.vm.compiler.ir.Constant<T>, int,
-     *      org.jnode.vm.compiler.ir.Constant<T>)
-     */
     public void generateBinaryOP(int disp1, Constant<T> c2,
                                  BinaryOperation operation, Constant<T> c3) {
         throw new IllegalArgumentException("Constants should be folded");
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int,
-     *      org.jnode.vm.compiler.ir.Constant<T>, int, java.lang.Object)
-     */
     public void generateBinaryOP(int disp1, Constant<T> c2,
                                  BinaryOperation operation, T reg3) {
         IntConstant<T> iconst2 = (IntConstant<T>) c2;
@@ -2413,10 +2308,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int,
-     *      org.jnode.vm.compiler.ir.Constant<T>, int, int)
-     */
     public void generateBinaryOP(int disp1, Constant<T> c2,
                                  BinaryOperation operation, int disp3) {
         IntConstant<T> iconst2 = (IntConstant<T>) c2;
@@ -2587,10 +2478,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int,
-     *      java.lang.Object, int, org.jnode.vm.compiler.ir.Constant<T>)
-     */
     public void generateBinaryOP(int disp1, T reg2,
                                  BinaryOperation operation, Constant<T> c3) {
         IntConstant<T> iconst3 = (IntConstant<T>) c3;
@@ -2773,10 +2660,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int,
-     *      java.lang.Object, int, java.lang.Object)
-     */
     public void generateBinaryOP(int disp1, T reg2,
                                  BinaryOperation operation, T reg3) {
         switch (operation) {
@@ -2991,10 +2874,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int,
-     *      java.lang.Object, int, int)
-     */
     public void generateBinaryOP(int disp1, T reg2,
                                  BinaryOperation operation, int disp3) {
         switch (operation) {
@@ -3183,10 +3062,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int,
-     *      int, org.jnode.vm.compiler.ir.Constant<T>)
-     */
     public void generateBinaryOP(int disp1, int disp2,
                                  BinaryOperation operation, Constant<T> c3) {
         IntConstant<T> iconst3 = (IntConstant<T>) c3;
@@ -3357,10 +3232,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int,
-     *      int, java.lang.Object)
-     */
     public void generateBinaryOP(int disp1, int disp2,
                                  BinaryOperation operation, T reg3) {
         switch (operation) {
@@ -3566,10 +3437,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int,
-     *      int, int)
-     */
     public void generateBinaryOP(int disp1, int disp2,
                                  BinaryOperation operation, int disp3) {
         switch (operation) {
@@ -3764,11 +3631,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
     }
 
     /** ******** BRANCHES ************************************** */
-    /**
-     * @param quad
-     * @param condition
-     * @param reg
-     */
+    
     public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
                                 Object reg) {
         checkLabel(quad.getAddress());
@@ -3776,11 +3639,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForUnaryCondition(quad, condition);
     }
 
-    /**
-     * @param quad
-     * @param condition
-     * @param disp
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
                                 int disp) {
         checkLabel(quad.getAddress());
@@ -3840,11 +3698,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @param quad
-     * @param condition
-     * @param cons
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, BranchCondition condition,
                                 Constant<T> cons) {
         switch (condition) {
@@ -3861,12 +3714,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @param quad
-     * @param c1
-     * @param condition
-     * @param c2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
                                 BranchCondition condition, Constant<T> c2) {
         switch (condition) {
@@ -3883,12 +3730,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @param quad
-     * @param c1
-     * @param condition
-     * @param disp2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
                                 BranchCondition condition, int disp2) {
         switch (condition) {
@@ -3905,12 +3746,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @param quad
-     * @param c1
-     * @param condition
-     * @param reg2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Constant<T> c1,
                                 BranchCondition condition, Object reg2) {
         switch (condition) {
@@ -3927,12 +3762,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @param quad
-     * @param disp1
-     * @param condition
-     * @param c2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
                                 BranchCondition condition, Constant<T> c2) {
         checkLabel(quad.getAddress());
@@ -3941,12 +3770,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    /**
-     * @param quad
-     * @param disp1
-     * @param condition
-     * @param disp2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
                                 BranchCondition condition, int disp2) {
         switch (condition) {
@@ -3963,12 +3786,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         }
     }
 
-    /**
-     * @param quad
-     * @param disp1
-     * @param condition
-     * @param reg2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, int disp1,
                                 BranchCondition condition, Object reg2) {
         checkLabel(quad.getAddress());
@@ -3976,12 +3793,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    /**
-     * @param quad
-     * @param reg1
-     * @param condition
-     * @param c2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
                                 BranchCondition condition, Constant<T> c2) {
         checkLabel(quad.getAddress());
@@ -3989,12 +3800,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    /**
-     * @param quad
-     * @param reg1
-     * @param condition
-     * @param disp2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
                                 BranchCondition condition, int disp2) {
         checkLabel(quad.getAddress());
@@ -4002,12 +3807,6 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         generateJumpForBinaryCondition(quad, condition);
     }
 
-    /**
-     * @param quad
-     * @param reg1
-     * @param condition
-     * @param reg2
-     */
     public void generateCodeFor(ConditionalBranchQuad<T> quad, Object reg1,
                                 BranchCondition condition, Object reg2) {
         checkLabel(quad.getAddress());
@@ -4019,8 +3818,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                                                 BranchCondition condition) {
         switch (condition) {
             case IF_ICMPEQ:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
                         X86Constants.JE);
                 break;
 
@@ -4030,8 +3828,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IF_ICMPGT:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
                         X86Constants.JG);
                 break;
 
@@ -4041,8 +3838,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IF_ICMPLT:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
                         X86Constants.JL);
                 break;
 
@@ -4052,8 +3848,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
                 break;
 
             case IF_ACMPEQ:
-                os
-                    .writeJCC(getInstrLabel(quad.getTargetAddress()),
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()),
                         X86Constants.JE);
                 break;
 

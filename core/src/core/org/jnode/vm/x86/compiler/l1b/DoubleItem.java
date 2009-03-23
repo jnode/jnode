@@ -73,7 +73,7 @@ final class DoubleItem extends DoubleWordItem {
     /**
      * Gets the constant value.
      *
-     * @return
+     * @return the value
      */
     final double getValue() {
         if (Vm.VerifyAssertions) {

@@ -63,10 +63,10 @@ public enum X86Cpu {
     }
 
     /**
-     * Get by CPUID
+     * Get the CPU type for the CPU with the given 'id'.
      *
      * @param id
-     * @return
+     * @return the CPU, or {@link #UNKNOWN} the 'id' is not known.
      */
     public static final X86Cpu find(X86CpuID id) {
         final String vendor = id.getVendor();
