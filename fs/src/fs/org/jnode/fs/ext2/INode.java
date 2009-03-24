@@ -94,7 +94,7 @@ public class INode {
         setMtime(time);
         setDtime(0);
         setLinksCount(0);
-        //TODO: set other pesistent parameters?
+        //TODO: set other persistent parameters?
 
         setDirty(true);
 
@@ -144,7 +144,7 @@ public class INode {
     /**
      * Return the number of the group that contains the inode.
      * 
-     * @return
+     * @return the group number
      */
     protected long getGroup() {
         return desc.getGroup();
@@ -157,7 +157,7 @@ public class INode {
     /**
      * return the number of direct blocks that an indirect block can point to
      * 
-     * @return
+     * @return the count
      */
     private final int getIndirectCount() {
         return fs.getSuperblock().getBlockSize() >> 2; //a block index is 4
@@ -173,8 +173,8 @@ public class INode {
      * direct blocks, getIndirectCount() simple indirect blocks,
      * getIndirectCount()^2 double indirect blocks, 45th triple indirect block).
      * 
-     * @param indirectionLevel:
-     *            0: direct block, 1: indirect block, ...
+     * @param indirectionLevel 0 is a direct block, 1 is a simple indirect block, and
+     * so on.
      */
     private final long indirectRead(long dataBlockNr, long offset, int indirectionLevel)
         throws IOException {
@@ -195,7 +195,7 @@ public class INode {
      * register the address of the <code>offset</code> th block. Also see
      * indirectRead().
      * 
-     * @param allocatedBlocks:
+     * @param allocatedBlocks
      *            (the number of blocks allocated so far)-1
      */
     private final void indirectWrite(long dataBlockNr, long offset, long allocatedBlocks,
@@ -276,8 +276,8 @@ public class INode {
      * a block]
      * 
      * @param i
-     * @return @throws
-     *         IOException
+     * @return the block number
+     * @throws IOException
      */
     private long getDataBlockNr(long i) throws IOException {
         final long blockCount = getAllocatedBlockCount();
@@ -324,8 +324,8 @@ public class INode {
      * beginning of the file, and not an absolute block number)
      * 
      * @param i
-     * @return @throws
-     *         IOException
+     * @return the data block
+     * @throws IOException
      */
     public byte[] getDataBlock(long i) throws IOException {
         return fs.getBlock(getDataBlockNr(i));
@@ -585,7 +585,7 @@ public class INode {
      * case, it is not counted by getSizeInBlocks(), because it returns the size
      * of the file in blocks, counting only written bytes
      * 
-     * @return
+     * @return the count
      */
     protected long getAllocatedBlockCount() {
         if (desc.getLastAllocatedBlockIndex() != -1) {
@@ -598,6 +598,7 @@ public class INode {
     /**
      * Allocate the ith data block of the inode (i is a sequential index from
      * the beginning of the file, and not an absolute block number)
+     * @param i
      */
     public synchronized void allocateDataBlock(long i) throws FileSystemException, IOException {
         if (i < getAllocatedBlockCount()) {
@@ -625,7 +626,7 @@ public class INode {
      * should be the one that follows the last allocated block (that's why the
      * <code>index</code> parameter is needed).
      * 
-     * @param index:
+     * @param index
      *            the block to be found should be around the (index-1)th block
      *            of the inode (which is already allocated, unless index==0)
      */
@@ -772,7 +773,7 @@ public class INode {
      * Return the size in ext2-blocks (getBlocks() returns the size in 512-byte
      * blocks, but an ext2 block can be of different size).
      * 
-     * @return
+     * @return the size
      */
     public long getSizeInBlocks() {
         return Ext2Utils.ceilDiv(getSize(), getExt2FileSystem().getBlockSize());

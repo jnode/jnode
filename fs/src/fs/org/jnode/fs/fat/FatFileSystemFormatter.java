@@ -51,8 +51,8 @@ public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
 
     /**
      * 
-     * @param device
-     * @return
+     * @param device a device that supports the {@link FSBlockDeviceAPI}.
+     * @return the formatted FAT file system.
      * @throws FileSystemException
      */
     public FatFileSystem format(Device device) throws FileSystemException {

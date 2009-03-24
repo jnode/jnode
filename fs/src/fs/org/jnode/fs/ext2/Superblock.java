@@ -693,7 +693,7 @@ public class Superblock {
     }
 
     /**
-     * @return
+     * @return the Superblock's dirty flag
      */
     public boolean isDirty() {
         return dirty;

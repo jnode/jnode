@@ -34,7 +34,7 @@ public class Ext2Utils {
      * 
      * @param a
      * @param b
-     * @return
+     * @return the result of the computation
      */
     public static long ceilDiv(long a, long b) {
         return (int) ((a + b - 1) / b);
@@ -109,9 +109,8 @@ public class Ext2Utils {
     }
 
     /**
-     * 
-     * @param time
-     * @return
+     * @param time the time in seconds since the UNIX epoch
+     * @return the decoded time in a {@link Calendar}
      */
     public static Calendar decodeDate(long time) {
         Calendar ref = Calendar.getInstance();
@@ -122,9 +121,8 @@ public class Ext2Utils {
     }
 
     /**
-     * 
-     * @param time
-     * @return
+     * @param date the time encoded as a {@link Date}
+     * @return the time in seconds since the UNIX epocj
      */
     public static long encodeDate(Date date) {
         Calendar ref = Calendar.getInstance();

@@ -164,9 +164,8 @@ public class Ext2File extends AbstractFSFile {
     }
 
     /**
-     * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
+     * @see org.jnode.fs.FSFile#read(long, ByteBuffer)
      */
-    //public void read(long fileOffset, byte[] dest, int off, int len)
     public void read(long fileOffset, ByteBuffer destBuf) throws IOException {
         final int len = destBuf.remaining();
         final int off = 0;
@@ -234,9 +233,8 @@ public class Ext2File extends AbstractFSFile {
      * methods write(byte[], int, int), setPosition(long), setLength(long) in
      * org.jnode.fs.service.def.FileHandleImpl)
      * 
-     * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
+     * @see org.jnode.fs.FSFile#write(long, ByteBuffer)
      */
-    //public void write(long fileOffset, byte[] src, int off, int len)
     public void write(long fileOffset, ByteBuffer srcBuf) throws IOException {
         final int len = srcBuf.remaining();
         final int off = 0;

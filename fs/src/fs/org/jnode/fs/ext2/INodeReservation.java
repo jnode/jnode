@@ -39,7 +39,7 @@ public class INodeReservation {
      * Results of an attempt to reserve an inode in a block group.
      * 
      * @param successful
-     * @param index: begins at index 0 (shows the index in the inode bitmap and
+     * @param index begins at index 0 (shows the index in the inode bitmap and
      *            inode table). The actual inode number is
      *            <code>INODEX_PER_GROUP*groupNr + index + 1</code>, as
      *            inodes begin at 1 (this is what getInodeNr(groupNr) returns)
@@ -55,7 +55,7 @@ public class INodeReservation {
     }
 
     /**
-     * Returns the successful.
+     * Returns the successful flag.
      * 
      * @return boolean
      */
@@ -64,7 +64,7 @@ public class INodeReservation {
     }
 
     /**
-     * @return
+     * @return the group number
      */
     public int getGroup() {
         return group;
@@ -78,7 +78,7 @@ public class INodeReservation {
     }
 
     /**
-     * @return
+     * @return the index
      */
     public int getIndex() {
         return index;

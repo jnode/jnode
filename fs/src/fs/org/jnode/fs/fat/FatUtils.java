@@ -89,7 +89,7 @@ public class FatUtils {
      * Return the name (without extension) of a full file name
      * 
      * @param nameExt
-     * @return
+     * @return the name part
      */
     public static String splitName(String nameExt) {
         int i = nameExt.indexOf('.');
@@ -104,7 +104,7 @@ public class FatUtils {
      * Return the extension (without name) of a full file name
      * 
      * @param nameExt
-     * @return
+     * @return the extension part
      */
     public static String splitExt(String nameExt) {
         int i = nameExt.indexOf('.');
@@ -118,9 +118,9 @@ public class FatUtils {
     /**
      * Normalize full file name in DOS 8.3 format from the name and the ext
      * 
-     * @param name
-     * @param ext
-     * @return
+     * @param name a DOS 8 name
+     * @param ext a DOS 3 extension
+     * @return the normalized DOS 8.3 name
      */
     public static String normalizeName(String name, String ext) {
         if (ext.length() > 0) {
@@ -133,8 +133,8 @@ public class FatUtils {
     /**
      * Normalize full file name in DOS 8.3 format from the given full name
      * 
-     * @param nameExt
-     * @return
+     * @param nameExt a DOS 8.3 name + extension
+     * @return the normalized DOS 8.3 name
      */
     public static String normalizeName(String nameExt) {
         if (nameExt.equals("."))
