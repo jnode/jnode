@@ -63,30 +63,28 @@ import java.util.Vector;
  * </CODE></UL></DD></DL>
  * <DL><DT><B>Retrieving Attributes</B></DT>
  * <DD>
- * You can enumerate the attributes of an element using the method
- * {@link #enumerateAttributeNames() enumerateAttributeNames}.
+ * You can get the attributes of an element using the method
+ * {@link #attributeNames() attributeNames}.
  * The attribute values can be retrieved using the method
  * {@link #getStringAttribute(String) getStringAttribute}.
  * The following example shows how to list the attributes of an element:
- * <UL><CODE>
- * XMLElement element = ...;<BR>
- * Enumeration enum = element.getAttributeNames();<BR>
- * while (enum.hasMoreElements()) {<BR>
- * &nbsp;&nbsp;&nbsp;&nbsp;String key = (String) enum.nextElement();<BR>
- * &nbsp;&nbsp;&nbsp;&nbsp;String value = element.getStringAttribute(key);<BR>
- * &nbsp;&nbsp;&nbsp;&nbsp;System.out.println(key + " = " + value);<BR>
- * }
- * </CODE></UL></DD></DL>
+ * <UL><pre>
+ *    XMLElement element = ...;
+ *    for (String key : element.getAttributeNames()) {
+ *       String value = element.getStringAttribute(key);
+ *       System.out.println(key + " = " + value);
+ *    }
+ * </pre></UL></DD></DL>
  * <DL><DT><B>Retrieving Child Elements</B></DT>
  * <DD>
  * You can enumerate the children of an element using
- * {@link #enumerateChildren() enumerateChildren}.
+ * {@link #iteratorChildren() iteratorChildren}.
  * The number of child elements can be retrieved using
  * {@link #countChildren() countChildren}.
  * </DD></DL>
  * <DL><DT><B>Elements Containing Character Data</B></DT>
  * <DD>
- * If an elements contains character data, like in the following example:
+ * If an element contains character data, as in the following example:
  * <UL><CODE>
  * &lt;title&gt;The Title&lt;/title&gt;
  * </CODE></UL>
@@ -268,9 +266,9 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => 0
-     *     <li>enumerateChildren() => empty enumeration
-     *     <li>enumeratePropertyNames() => empty enumeration
-     *     <li>getChildren() => empty vector
+     *     <li>iteratorChildren() => empty iteration
+     *     <li>attributeNames() => empty set
+     *     <li>getChildren() => empty list
      *     <li>getContent() => ""
      *     <li>getLineNr() => 0
      *     <li>getName() => null
@@ -303,9 +301,9 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => 0
-     *     <li>enumerateChildren() => empty enumeration
-     *     <li>enumeratePropertyNames() => empty enumeration
-     *     <li>getChildren() => empty vector
+     *     <li>iteratorChildren() => empty iteration
+     *     <li>attributeNames() => empty set
+     *     <li>getChildren() => empty list
      *     <li>getContent() => ""
      *     <li>getLineNr() => 0
      *     <li>getName() => null
@@ -334,9 +332,9 @@ public class XMLElement
      *
      * </dl><dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => 0
-     *     <li>enumerateChildren() => empty enumeration
-     *     <li>enumeratePropertyNames() => empty enumeration
-     *     <li>getChildren() => empty vector
+     *     <li>iteratorChildren() => empty iteration
+     *     <li>attributeNames() => empty set
+     *     <li>getChildren() => empty list
      *     <li>getContent() => ""
      *     <li>getLineNr() => 0
      *     <li>getName() => null
@@ -372,9 +370,9 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => 0
-     *     <li>enumerateChildren() => empty enumeration
-     *     <li>enumeratePropertyNames() => empty enumeration
-     *     <li>getChildren() => empty vector
+     *     <li>iteratorChildren() => empty iteration
+     *     <li>attributeNames() => empty set
+     *     <li>getChildren() => empty list
      *     <li>getContent() => ""
      *     <li>getLineNr() => 0
      *     <li>getName() => null
@@ -410,9 +408,9 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => 0
-     *     <li>enumerateChildren() => empty enumeration
-     *     <li>enumeratePropertyNames() => empty enumeration
-     *     <li>getChildren() => empty vector
+     *     <li>iteratorChildren() => empty iteration
+     *     <li>attributeNames() => empty set
+     *     <li>getChildren() => empty list
      *     <li>getContent() => ""
      *     <li>getLineNr() => 0
      *     <li>getName() => null
@@ -437,7 +435,7 @@ public class XMLElement
      * Creates and initializes a new XML element.
      * <P>
      * This constructor should <I>only</I> be called from
-     * {@link #createAnotherElement() createAnotherElement}
+     * {@link #createAnotherElement()}
      * to create child elements.
      *
      * @param entities
@@ -462,9 +460,9 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => 0
-     *     <li>enumerateChildren() => empty enumeration
-     *     <li>enumeratePropertyNames() => empty enumeration
-     *     <li>getChildren() => empty vector
+     *     <li>iteratorChildren() => empty iteration
+     *     <li>attributeNames() => empty set
+     *     <li>getChildren() => empty list
      *     <li>getContent() => ""
      *     <li>getLineNr() => 0
      *     <li>getName() => null
@@ -518,12 +516,12 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => old.countChildren() + 1
-     *     <li>enumerateChildren() => old.enumerateChildren() + child
-     *     <li>getChildren() => old.enumerateChildren() + child
+     *     <li>iteratorChildren() => old.iteratorChildren() + child
+     *     <li>getChildren() => old.iteratorChildren() + child
      * </ul></dd></dl><dl>
      *
      * @see XMLElement#countChildren()
-     * @see XMLElement#enumerateChildren()
+     * @see XMLElement#iteratorChildren()
      * @see XMLElement#getChildren()
      * @see XMLElement#removeChild(XMLElement)
      *         removeChild(XMLElement)
@@ -549,8 +547,7 @@ public class XMLElement
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>enumerateAttributeNames()
-     *         => old.enumerateAttributeNames() + name
+     * <ul><li>attributeNames() => old.ttributeNames() + name
      *     <li>getAttribute(name) => value
      * </ul></dd></dl><dl>
      *
@@ -558,7 +555,7 @@ public class XMLElement
      *         setDoubleAttribute(String, double)
      * @see XMLElement#setIntAttribute(String, int)
      *         setIntAttribute(String, int)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getAttribute(String)
      *         getAttribute(String)
      * @see XMLElement#getAttribute(String, Object)
@@ -595,8 +592,7 @@ public class XMLElement
      * @param value
      *     The value of the attribute.
      *
-     * @deprecated Use {@link #setAttribute(String, Object)
-     *             setAttribute} instead.
+     * @deprecated Use {@link #setAttribute(String, Object)} instead.
      */
     public void addProperty(String name,
                             Object value)
@@ -619,8 +615,7 @@ public class XMLElement
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>enumerateAttributeNames()
-     *         => old.enumerateAttributeNames() + name
+     * <ul><li>attributeNames() => old.attributeNames() + name
      *     <li>getIntAttribute(name) => value
      * </ul></dd></dl><dl>
      *
@@ -630,7 +625,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getIntAttribute(String)
      *         getIntAttribute(String)
      * @see XMLElement#getIntAttribute(String, int)
@@ -658,13 +653,12 @@ public class XMLElement
      * @param value
      *     The value of the attribute.
      *
-     * @deprecated Use {@link #setIntAttribute(String, int)
-     *             setIntAttribute} instead.
+     * @deprecated Use {@link #setIntAttribute(String, int)} instead.
      */
-    public void addProperty(String key,
+    public void addProperty(String name,
                             int    value)
     {
-        this.setIntAttribute(key, value);
+        this.setIntAttribute(name, value);
     }
 
 
@@ -682,8 +676,7 @@ public class XMLElement
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>enumerateAttributeNames()
-     *         => old.enumerateAttributeNames() + name
+     * <ul><li>attributeNames() => old.attributeNames() + name
      *     <li>getDoubleAttribute(name) => value
      * </ul></dd></dl><dl>
      *
@@ -693,7 +686,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getDoubleAttribute(String)
      *         getDoubleAttribute(String)
      * @see XMLElement#getDoubleAttribute(String, double)
@@ -721,8 +714,7 @@ public class XMLElement
      * @param value
      *     The value of the attribute.
      *
-     * @deprecated Use {@link #setDoubleAttribute(String, double)
-     *             setDoubleAttribute} instead.
+     * @deprecated Use {@link #setDoubleAttribute(String, double)} instead.
      */
     public void addProperty(String name,
                             double value)
@@ -740,7 +732,7 @@ public class XMLElement
      *
      * @see XMLElement#addChild(XMLElement)
      *         addChild(XMLElement)
-     * @see XMLElement#enumerateChildren()
+     * @see XMLElement#iteratorChildren()
      * @see XMLElement#getChildren()
      * @see XMLElement#removeChild(XMLElement)
      *         removeChild(XMLElement)
@@ -841,7 +833,7 @@ public class XMLElement
      * @see XMLElement#addChild(XMLElement)
      *         addChild(XMLElement)
      * @see XMLElement#countChildren()
-     * @see XMLElement#enumerateChildren()
+     * @see XMLElement#iteratorChildren()
      * @see XMLElement#removeChild(XMLElement)
      *         removeChild(XMLElement)
      */
@@ -855,7 +847,7 @@ public class XMLElement
      * Returns the PCDATA content of the object. If there is no such content,
      * <CODE>null</CODE> is returned.
      *
-     * @deprecated Use {@link #getContent() getContent} instead.
+     * @deprecated Use {@link #getContent()} instead.
      */
     public String getContents()
     {
@@ -905,7 +897,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getAttribute(String, Object)
      *         getAttribute(String, Object)
      * @see XMLElement#getAttribute(String,
@@ -935,7 +927,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getAttribute(String)
      *         getAttribute(String)
      * @see XMLElement#getAttribute(String,
@@ -988,7 +980,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getAttribute(String)
      *         getAttribute(String)
      * @see XMLElement#getAttribute(String, Object)
@@ -1034,7 +1026,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getStringAttribute(String,
      *                                            String)
      *         getStringAttribute(String, String)
@@ -1065,7 +1057,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getStringAttribute(String)
      *         getStringAttribute(String)
      * @see XMLElement#getStringAttribute(String,
@@ -1112,7 +1104,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getStringAttribute(String)
      *         getStringAttribute(String)
      * @see XMLElement#getStringAttribute(String,
@@ -1142,7 +1134,7 @@ public class XMLElement
      *
      * @see XMLElement#setIntAttribute(String, int)
      *         setIntAttribute(String, int)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getIntAttribute(String, int)
      *         getIntAttribute(String, int)
      * @see XMLElement#getIntAttribute(String,
@@ -1170,7 +1162,7 @@ public class XMLElement
      *
      * @see XMLElement#setIntAttribute(String, int)
      *         setIntAttribute(String, int)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getIntAttribute(String)
      *         getIntAttribute(String)
      * @see XMLElement#getIntAttribute(String,
@@ -1228,7 +1220,7 @@ public class XMLElement
      *
      * @see XMLElement#setIntAttribute(String, int)
      *         setIntAttribute(String, int)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getIntAttribute(String)
      *         getIntAttribute(String)
      * @see XMLElement#getIntAttribute(String, int)
@@ -1279,7 +1271,7 @@ public class XMLElement
      *
      * @see XMLElement#setDoubleAttribute(String, double)
      *         setDoubleAttribute(String, double)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getDoubleAttribute(String, double)
      *         getDoubleAttribute(String, double)
      * @see XMLElement#getDoubleAttribute(String,
@@ -1307,7 +1299,7 @@ public class XMLElement
      *
      * @see XMLElement#setDoubleAttribute(String, double)
      *         setDoubleAttribute(String, double)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getDoubleAttribute(String)
      *         getDoubleAttribute(String)
      * @see XMLElement#getDoubleAttribute(String,
@@ -1366,7 +1358,7 @@ public class XMLElement
      *
      * @see XMLElement#setDoubleAttribute(String, double)
      *         setDoubleAttribute(String, double)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#getDoubleAttribute(String)
      *         getDoubleAttribute(String)
      * @see XMLElement#getDoubleAttribute(String, double)
@@ -1430,7 +1422,7 @@ public class XMLElement
      *         setAttribute(String, Object)
      * @see XMLElement#removeAttribute(String)
      *         removeAttribute(String)
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      */
     public boolean getBooleanAttribute(String  name,
                                        String  trueValue,
@@ -1457,8 +1449,7 @@ public class XMLElement
      * Returns an attribute by looking up a key in a hashtable.
      *
      * @deprecated Use {@link #getIntAttribute(String,
-     *             java.util.Hashtable, String, boolean)
-     *             getIntAttribute} instead.
+     *             java.util.Hashtable, String, boolean)} instead.
      */
     public int getIntProperty(String    name,
                               Hashtable valueSet,
@@ -1471,8 +1462,7 @@ public class XMLElement
     /**
      * Returns an attribute.
      *
-     * @deprecated Use {@link #getStringAttribute(String)
-     *             getStringAttribute} instead.
+     * @deprecated Use {@link #getStringAttribute(String)} instead.
      */
     public String getProperty(String name)
     {
@@ -1483,8 +1473,7 @@ public class XMLElement
     /**
      * Returns an attribute.
      *
-     * @deprecated Use {@link #getStringAttribute(String,
-     *             String) getStringAttribute} instead.
+     * @deprecated Use {@link #getStringAttribute(String, String)} instead.
      */
     public String getProperty(String name,
                               String defaultValue)
@@ -1496,8 +1485,7 @@ public class XMLElement
     /**
      * Returns an attribute.
      *
-     * @deprecated Use {@link #getIntAttribute(String, int)
-     *             getIntAttribute} instead.
+     * @deprecated Use {@link #getIntAttribute(String, int)} instead.
      */
     public int getProperty(String name,
                            int    defaultValue)
@@ -1509,8 +1497,7 @@ public class XMLElement
     /**
      * Returns an attribute.
      *
-     * @deprecated Use {@link #getDoubleAttribute(String, double)
-     *             getDoubleAttribute} instead.
+     * @deprecated Use {@link #getDoubleAttribute(String, double)} instead.
      */
     public double getProperty(String name,
                               double defaultValue)
@@ -1523,8 +1510,7 @@ public class XMLElement
      * Returns an attribute.
      *
      * @deprecated Use {@link #getBooleanAttribute(String,
-     *             String, String, boolean)
-     *             getBooleanAttribute} instead.
+     *             String, String, boolean)} instead.
      */
     public boolean getProperty(String  key,
                                String  trueValue,
@@ -1540,8 +1526,7 @@ public class XMLElement
      * Returns an attribute by looking up a key in a hashtable.
      *
      * @deprecated Use {@link #getAttribute(String,
-     *             java.util.Hashtable, String, boolean)
-     *             getAttribute} instead.
+     *             java.util.Hashtable, String, boolean)} instead.
      */
     public Object getProperty(String    name,
                               Hashtable valueSet,
@@ -1555,8 +1540,7 @@ public class XMLElement
      * Returns an attribute by looking up a key in a hashtable.
      *
      * @deprecated Use {@link #getStringAttribute(String,
-     *             java.util.Hashtable, String, boolean)
-     *             getStringAttribute} instead.
+     *             java.util.Hashtable, String, boolean)} instead.
      */
     public String getStringProperty(String    name,
                                     Hashtable valueSet,
@@ -1570,8 +1554,7 @@ public class XMLElement
      * Returns an attribute by looking up a key in a hashtable.
      *
      * @deprecated Use {@link #getIntAttribute(String,
-     *             java.util.Hashtable, String, boolean)
-     *             getIntAttribute} instead.
+     *             java.util.Hashtable, String, boolean)} instead.
      */
     public int getSpecialIntProperty(String    name,
                                      Hashtable valueSet,
@@ -1585,8 +1568,7 @@ public class XMLElement
      * Returns an attribute by looking up a key in a hashtable.
      *
      * @deprecated Use {@link #getDoubleAttribute(String,
-     *             java.util.Hashtable, String, boolean)
-     *             getDoubleAttribute} instead.
+     *             java.util.Hashtable, String, boolean)} instead.
      */
     public double getSpecialDoubleProperty(String    name,
                                            Hashtable valueSet,
@@ -1610,7 +1592,7 @@ public class XMLElement
     /**
      * Returns the name of the element.
      *
-     * @deprecated Use {@link #getName() getName} instead.
+     * @deprecated Use {@link #getName()} instead.
      */
     public String getTagName()
     {
@@ -1708,8 +1690,8 @@ public class XMLElement
     /**
      * Reads one XML element from a String and parses it.
      *
-     * @param reader
-     *     The reader from which to retrieve the XML data.
+     * @param string
+     *     The string from which to read the XML data.
      *
      * </dl><dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li><code>string != null</code>
@@ -1739,8 +1721,8 @@ public class XMLElement
     /**
      * Reads one XML element from a String and parses it.
      *
-     * @param reader
-     *     The reader from which to retrieve the XML data.
+     * @param string
+     *     The String from which to read the XML data.
      * @param offset
      *     The first character in <code>string</code> to scan.
      *
@@ -1769,8 +1751,8 @@ public class XMLElement
     /**
      * Reads one XML element from a String and parses it.
      *
-     * @param reader
-     *     The reader from which to retrieve the XML data.
+     * @param string
+     *     The String from which to read the XML data.
      * @param offset
      *     The first character in <code>string</code> to scan.
      * @param end
@@ -1804,8 +1786,8 @@ public class XMLElement
     /**
      * Reads one XML element from a String and parses it.
      *
-     * @param reader
-     *     The reader from which to retrieve the XML data.
+     * @param string
+     *     The String from which to read the XML data.
      * @param offset
      *     The first character in <code>string</code> to scan.
      * @param end
@@ -1847,8 +1829,8 @@ public class XMLElement
     /**
      * Reads one XML element from a char array and parses it.
      *
-     * @param reader
-     *     The reader from which to retrieve the XML data.
+     * @param input
+     *     The array from which to read the XML data.
      * @param offset
      *     The first character in <code>string</code> to scan.
      * @param end
@@ -1882,8 +1864,8 @@ public class XMLElement
     /**
      * Reads one XML element from a char array and parses it.
      *
-     * @param reader
-     *     The reader from which to retrieve the XML data.
+     * @param input
+     *     The array from which to read the XML data.
      * @param offset
      *     The first character in <code>string</code> to scan.
      * @param end
@@ -1935,14 +1917,14 @@ public class XMLElement
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>countChildren() => old.countChildren() - 1
-     *     <li>enumerateChildren() => old.enumerateChildren() - child
-     *     <li>getChildren() => old.enumerateChildren() - child
+     *     <li>iteratorChildren() => old.iteratorChildren() - child
+     *     <li>getChildren() => old.iteratorChildren() - child
      * </ul></dd></dl><dl>
      *
      * @see XMLElement#addChild(XMLElement)
      *         addChild(XMLElement)
      * @see XMLElement#countChildren()
-     * @see XMLElement#enumerateChildren()
+     * @see XMLElement#iteratorChildren()
      * @see XMLElement#getChildren()
      */
     public void removeChild(XMLElement child)
@@ -1963,12 +1945,11 @@ public class XMLElement
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>enumerateAttributeNames()
-     *         => old.enumerateAttributeNames() - name
+     * <ul><li>ttributeNames() => old.attributeNames() - name
      *     <li>getAttribute(name) => <code>null</code>
      * </ul></dd></dl><dl>
      *
-     * @see XMLElement#enumerateAttributeNames()
+     * @see XMLElement#attributeNames()
      * @see XMLElement#setDoubleAttribute(String, double)
      *         setDoubleAttribute(String, double)
      * @see XMLElement#setIntAttribute(String, int)

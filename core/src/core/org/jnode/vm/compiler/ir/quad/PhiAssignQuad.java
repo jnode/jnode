@@ -44,7 +44,7 @@ public class PhiAssignQuad<T> extends AssignQuad<T> {
 
     /**
      * @param dfb
-     * @param def
+     * @param lhsIndex
      */
     public PhiAssignQuad(IRBasicBlock<T> dfb, int lhsIndex) {
         this(dfb.getStartPC(), dfb, lhsIndex);

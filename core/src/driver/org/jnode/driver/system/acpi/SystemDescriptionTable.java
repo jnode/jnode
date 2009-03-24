@@ -45,9 +45,9 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
     }
 
     /**
-     * List of AcpiTable.
+     * List of AcpiTables
      *
-     * @return
+     * @return the tables
      */
     public final List<AcpiTable> getTables() {
         return Collections.unmodifiableList(tables);
@@ -56,7 +56,7 @@ abstract class SystemDescriptionTable extends AcpiSystemTable {
     /**
      * Release all resources.
      *
-     * @see org.jnode.driver.system.acpi.AcpiTable#release()
+     * @see AcpiTable#release()
      */
     public void release() {
         super.release();

@@ -224,81 +224,51 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         return tabSize;
     }
 
-    /**
-     * @param tabSize The tabSize to set.
-     */
     @Override
     public void setTabSize(int tabSize) {
         this.tabSize = tabSize;
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getColor(int, int)
-     */
     @Override
     public int getColor(int x, int y) {
         return screen.getColor(screen.getOffset(x, y));
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getChar(int, int)
-     */
     @Override
     public char getChar(int x, int y) {
         return screen.getChar(screen.getOffset(x, y));
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getCursorX()
-     */
     @Override
     public int getCursorX() {
         return curX;
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getCursorY()
-     */
     @Override
     public int getCursorY() {
         return curY;
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getHeight()
-     */
     @Override
     public int getHeight() {
         return screen.getHeight();
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getWidth()
-     */
     @Override
     public int getWidth() {
         return screen.getWidth();
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getHeight()
-     */
     @Override
     public int getDeviceHeight() {
         return screen.getDeviceHeight();
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getWidth()
-     */
     @Override
     public int getDeviceWidth() {
         return screen.getDeviceWidth();
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#setChar(int, int, char, int)
-     */
     @Override
     public void setChar(int x, int y, char ch, int color) {
         int offset = screen.getOffset(x, y);
@@ -320,9 +290,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         syncScreen(offset, cLength);
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#setCursor(int, int)
-     */
     @Override
     public void setCursor(int x, int y) {
         this.curX = x;
@@ -371,9 +338,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         }
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getIn()
-     */
     @Override
     public Reader getIn() {
         return in;
@@ -383,17 +347,11 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         this.in = in;
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getErr()
-     */
     @Override
     public Writer getErr() {
         return err;
     }
 
-    /**
-     * @see org.jnode.driver.console.TextConsole#getOut()
-     */
     @Override
     public Writer getOut() {
         return out;
@@ -419,9 +377,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         syncScreen(offset, 1);
     }
 
-    /**
-     * @see org.jnode.system.event.FocusListener#focusGained(org.jnode.system.event.FocusEvent)
-     */
     @Override
     public void focusGained(FocusEvent event) {
         super.focusGained(event);
@@ -444,9 +399,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         }
     }
 
-    /**
-     * @see org.jnode.system.event.FocusListener#focusLost(org.jnode.system.event.FocusEvent)
-     */
     @Override
     public void focusLost(FocusEvent event) {
         if (in instanceof FocusListener) {
@@ -478,9 +430,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
         return options;
     }
     
-    /**
-     * @see Console#systemScreenChanged(TextScreen)
-     */
     @Override
     public void systemScreenChanged(TextScreen systemScreen) {
         // ensure that old and new screens are compatible

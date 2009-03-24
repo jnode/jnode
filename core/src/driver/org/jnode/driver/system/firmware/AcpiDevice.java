@@ -45,7 +45,7 @@ public class AcpiDevice extends Device {
     /**
      * Gets the information of the ACPI root descriptor table.
      *
-     * @return
+     * @return the information descriptor
      */
     public final AcpiRSDPInfo getRsdpInfo() {
         return rsdpInfo;
