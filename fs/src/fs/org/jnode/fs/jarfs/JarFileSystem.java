@@ -56,24 +56,15 @@ public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
         return jarFile;
     }
 
-    /**
-     * 
-     */
     protected FSFile createFile(FSEntry entry) {
         return new JarFSFile((JarFSEntry) entry);
     }
 
-    /**
-     * 
-     */
     protected FSDirectory createDirectory(FSEntry entry) {
         Map<String, JarFSEntry> entries = cache.getChildEntries((JarFSEntry) entry);
         return new JarFSDirectory((JarFSEntry) entry, entries);
     }
 
-    /**
-     * 
-     */
     protected JarFSEntry createRootEntry() {
         return rootEntry;
     }

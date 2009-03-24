@@ -39,8 +39,8 @@ public class JIFSFthread extends JIFSFile {
     /**
      * Creates the file, which contains information about the given Thread.
      * 
-     * @param String name Filename.
-     * @param Thread t The Thread, whose information is presented via this file.
+     * @param name file's name
+     * @param t the Thread whose information is presented via this file.
      * @param parent Parent FSEntry, in this case it is an instance of
      *            JIFSDplugins.
      */

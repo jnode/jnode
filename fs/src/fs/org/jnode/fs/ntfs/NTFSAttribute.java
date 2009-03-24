@@ -135,10 +135,6 @@ public abstract class NTFSAttribute extends NTFSStructure {
     }
 
     /**
-     * @return Returns the volume.
-     */
-
-    /**
      * @return Returns the fileRecord.
      */
     public FileRecord getFileRecord() {
@@ -155,7 +151,7 @@ public abstract class NTFSAttribute extends NTFSStructure {
     /**
      * Gets the length of this attribute in bytes.
      * 
-     * @return
+     * @return the length
      */
     public int getSize() {
         return getUInt32AsInt(4);
@@ -166,7 +162,7 @@ public abstract class NTFSAttribute extends NTFSStructure {
      * 
      * @param fileRecord
      * @param offset
-     * @return
+     * @return the attribute
      */
     public static NTFSAttribute getAttribute(FileRecord fileRecord, int offset) {
         final boolean resident = (fileRecord.getUInt8(offset + 0x08) == 0);

@@ -342,8 +342,7 @@ public class BootSector {
     }
 
     /**
-     *
-     * @return
+     * @return the FAT size / type
      */
     public int fatSize() {
         return type;

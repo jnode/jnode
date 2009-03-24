@@ -128,8 +128,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     }
 
     /**
-     * Gets all registered filesystems. All instances of the returned collection
-     * are instanceof FileSystem.
+     * Gets all registered filesystems. 
      */
     public Collection<FileSystem<?>> fileSystems() {
         return fsm.fileSystems();
@@ -158,10 +157,6 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
         return api.getMountPoints();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.jnode.fs.service.FileSystemService#getDeviceMountPoints()
-     */
     public Map<String, String> getDeviceMountPoints() {
         Map<String, FileSystem<?>> mounts = api.getMountPoints();
         Map<String, String> result = new TreeMap<String, String>();
@@ -175,7 +170,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     /**
      * Is the given directory a mount.
      * @param fullPath
-     * @return
+     * @return {@code true} if the director is a mount, otherwise {@code false}.
      */
     public boolean isMount(String fullPath) {
         return api.isMount(VMFile.getNormalizedPath(fullPath));
@@ -224,9 +219,6 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
         }
     }
 
-    /**
-     * @see org.jnode.fs.service.FileSystemService#getFileSystemType(java.lang.String)
-     */
     public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name)
         throws FileSystemException {
         T result = fsTypeManager.getSystemType(name);

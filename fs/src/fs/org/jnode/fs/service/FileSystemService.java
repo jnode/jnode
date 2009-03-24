@@ -74,13 +74,12 @@ public interface FileSystemService {
      * Gets the filesystem registered on the given device.
      * 
      * @param device
-     * @return null if no filesystem was found.
+     * @return {@code null} if no filesystem was found.
      */
     public FileSystem<?> getFileSystem(Device device);
 
     /**
-     * Gets all registered filesystems. All instances of the returned collection
-     * are instanceof FileSystem.
+     * Gets all registered filesystems. 
      */
     public Collection<FileSystem<?>> fileSystems();
 
@@ -104,7 +103,7 @@ public interface FileSystemService {
     /**
      * Return a map of devices and their mount points.
      * 
-     * @return
+     * @return the map
      */
     public Map<String, String> getDeviceMountPoints();
 
@@ -112,7 +111,7 @@ public interface FileSystemService {
      * Is the given directory a mount.
      * 
      * @param fullPath
-     * @return
+     * @return {@code true} if the directory is a mount, otherwise {@code false}
      */
     public boolean isMount(String fullPath);
 
