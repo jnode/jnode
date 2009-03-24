@@ -128,7 +128,7 @@ public abstract class Capability {
     /**
      * Gets the capability ID.
      *
-     * @return
+     * @return the id
      */
     public final int getId() {
         return id;

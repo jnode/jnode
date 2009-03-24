@@ -59,7 +59,7 @@ public abstract class AcpiTable {
     /**
      * Gets the length of this table in bytes.
      *
-     * @return
+     * @return the table size
      */
     public final int getSize() {
         return tableResource.getSize().toInt();
@@ -75,7 +75,7 @@ public abstract class AcpiTable {
     /**
      * Gets the signature of this table.
      *
-     * @return
+     * @return the sigarure
      */
     public String getSignature() {
         return signature;
@@ -85,7 +85,7 @@ public abstract class AcpiTable {
      * Gets a 32-bit address from a given offset in the table.
      *
      * @param offset
-     * @return
+     * @return the address
      */
     protected final Address getAddress32(int offset) {
         return Address.fromIntZeroExtend(tableResource.getInt(offset));
@@ -95,7 +95,7 @@ public abstract class AcpiTable {
      * Gets a 64-bit address from a given offset in the table.
      *
      * @param offset
-     * @return
+     * @return the address
      */
     protected final Address getAddress64(int offset) {
         return Address.fromLong(tableResource.getLong(offset));
@@ -105,7 +105,7 @@ public abstract class AcpiTable {
      * Gets a 32-bit integer from a given offset in the table.
      *
      * @param offset
-     * @return
+     * @return the integer
      */
     protected final int getInt(int offset) {
         return tableResource.getInt(offset);
@@ -115,7 +115,7 @@ public abstract class AcpiTable {
      * Gets a 16-bit integer from a given offset in the table.
      *
      * @param offset
-     * @return
+     * @return the short without sign extension
      */
     protected final int getShort(int offset) {
         return ((tableResource.getByte(offset + 1) & 0xff) << 8)
@@ -127,7 +127,7 @@ public abstract class AcpiTable {
      *
      * @param offset
      * @param length Length in bytes of the string.
-     * @return
+     * @return the string
      */
     protected final String getString(int offset, int length) {
         final char[] arr = new char[length];
@@ -141,7 +141,7 @@ public abstract class AcpiTable {
      * Gets a 8-bit integer from a given offset in the table.
      *
      * @param offset
-     * @return
+     * @return the byte without sign extension
      */
     protected final int getByte(int offset) {
         return tableResource.getByte(offset) & 0xff;
@@ -151,7 +151,6 @@ public abstract class AcpiTable {
      * Gets a series 8-bit integer from a given offset in the table.
      *
      * @param offset
-     * @return
      */
     protected final void getBytes(int offset, byte[] dst, int dstOfs, int length) {
         tableResource.getBytes(offset, dst, dstOfs, length);

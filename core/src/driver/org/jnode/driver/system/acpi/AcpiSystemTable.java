@@ -51,11 +51,6 @@ public abstract class AcpiSystemTable extends AcpiTable {
         this.creatorRevision = getString(32, 4);
     }
 
-    /**
-     * Convert to a String representation.
-     *
-     * @see java.lang.Object#toString()
-     */
     public String toString() {
         return super.toString() + "/{" + oemId + ", " + creatorId + "}";
     }
@@ -63,7 +58,7 @@ public abstract class AcpiSystemTable extends AcpiTable {
     /**
      * Gets the OEM ID.
      *
-     * @return
+     * @return the id
      */
     public final String getOemId() {
         return oemId;
@@ -72,7 +67,7 @@ public abstract class AcpiSystemTable extends AcpiTable {
     /**
      * Gets the OEM table ID.
      *
-     * @return
+     * @return the table id
      */
     public final String getOemTableId() {
         return oemTableId;

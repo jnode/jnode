@@ -31,8 +31,7 @@ public class ProxyTest {
 
     /**
      * @param args
-     * @throws java.io.FileNotFoundException
-     * @throws
+     * @throws IOException;
      */
     public static void main(String[] args) throws IOException {
 

@@ -166,7 +166,7 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @param quad
+     * @param q a quad
      */
     public void add(Quad<T> q) {
         addDef(q);
@@ -216,7 +216,7 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return
+     * @return the predecessors
      */
     public List<IRBasicBlock<T>> getPredecessors() {
         return predecessors;
@@ -358,7 +358,8 @@ public class IRBasicBlock<T> {
     }
 
     /**
-     * @return {@code if this block is the start of an exception handler
+     * @return {@code true} if this block is the start of an exception handler, 
+     * otherwise {@code false}
      */
     public boolean isStartOfExceptionHandler() {
         return startOfExceptionHandler;

@@ -91,7 +91,7 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      *
      * @param x
      * @param y
-     * @return
+     * @return the offset
      */
     @Override
     public final int getOffset(int x, int y) {
@@ -118,7 +118,7 @@ public abstract class AbstractPcTextScreen implements TextScreen {
      * Create an in-memory buffer text screen that is compatible
      * with the system screen, but larges and supports scrolling.
      *
-     * @return
+     * @return the text screen
      */
     @Override
     public final ScrollableTextScreen createCompatibleScrollableBufferScreen(int height) {

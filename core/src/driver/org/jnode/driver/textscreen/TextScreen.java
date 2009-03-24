@@ -96,7 +96,7 @@ public interface TextScreen {
     /**
      * Gets the height of the virtual screen in characters.  For a buffered
      * screen this is the height of the buffer.  The height of the physical
-     * screen is given by {@line #getDeviceHeight()}.
+     * screen is given by {@link #getDeviceHeight()}.
      *
      * @return Returns the virtual screen height.
      */
@@ -105,7 +105,7 @@ public interface TextScreen {
     /**
      * Gets the width of the virtual screen in characters.  For a buffered
      * screen this is the width of the buffer.  The width of the physical
-     * screen is given by {@line #getDeviceWidth()}.
+     * screen is given by {@link #getDeviceWidth()}.
      *
      * @return Returns the virtual screen width.
      */
@@ -130,7 +130,7 @@ public interface TextScreen {
      *
      * @param x
      * @param y
-     * @return
+     * @return the offset
      */
     public int getOffset(int x, int y);
 
@@ -145,7 +145,7 @@ public interface TextScreen {
      * Create an in-memory buffer text screen that is compatible
      * with this screen.
      *
-     * @return
+     * @return the text screen.
      */
     public TextScreen createCompatibleBufferScreen();
 
@@ -153,7 +153,7 @@ public interface TextScreen {
      * Create an in-memory buffer text screen that is compatible
      * with this, but larger and supports scrolling.
      *
-     * @return
+     * @return the buffer screen
      */
     public ScrollableTextScreen createCompatibleScrollableBufferScreen(int height);
 

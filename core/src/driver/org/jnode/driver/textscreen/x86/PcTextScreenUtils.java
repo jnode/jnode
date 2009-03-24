@@ -49,9 +49,9 @@ public class PcTextScreenUtils {
     }
     
     /**
-     * Exchange the background and the foreground colors 
+     * Exchange the background and the foreground colors in a character/color value
      * @param characterAndColor
-     * @return
+     * @return the modified  character/color value
      */
     public static final char exchangeColors(char characterAndColor) {
         int color = PcTextScreenUtils.decodeColor(characterAndColor);

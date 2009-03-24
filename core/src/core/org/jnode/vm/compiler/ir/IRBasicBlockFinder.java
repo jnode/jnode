@@ -52,7 +52,7 @@ public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Com
     /**
      * Create all determined basic blocks
      *
-     * @return
+     * @return the blocks.
      */
     public IRBasicBlock<T>[] createBasicBlocks() {
         // Sort the blocks on start PC

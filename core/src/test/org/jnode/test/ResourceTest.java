@@ -33,7 +33,7 @@ import junit.framework.TestCase;
 import org.jnode.plugin.PluginUtils;
 
 /**
- * Documentation at {@link http://www.javaworld.com/javaworld/javaqa/2003-08/01-qa-0808-property.html}
+ * Documentation at http://www.javaworld.com/javaworld/javaqa/2003-08/01-qa-0808-property.html.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy@jnode.org)

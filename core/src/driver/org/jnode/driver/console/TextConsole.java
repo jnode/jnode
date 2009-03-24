@@ -176,21 +176,21 @@ public interface TextConsole extends Console {
      * characters are the result of processing keyboard events, performing line
      * editing and completion.
      *
-     * @return
+     * @return the Reader
      */
     public Reader getIn();
 
     /**
      * Gets the Writer that receives 'error' output for this console.
      *
-     * @return
+     * @return the error Writer
      */
     public Writer getErr();
 
     /**
      * Gets the Writer that receives 'normal' output for this console.
      *
-     * @return
+     * @return the normal Writer
      */
     public Writer getOut();
 

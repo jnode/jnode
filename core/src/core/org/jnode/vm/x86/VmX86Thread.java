@@ -279,7 +279,7 @@ public abstract class VmX86Thread extends VmThread {
      * Gets the stack pointer of this thread.
      * Valid only when the thread is not running.
      *
-     * @return
+     * @return the stack pointer
      */
     public final Address getStackPointer() {
         return esp;
