@@ -116,7 +116,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
     /**
      * Gets a derived encoding name from the given escape sequences.
      * @param escapeSequences
-     * @return
+     * @return the encoding name
      */
     private String getEncoding(String escapeSequences) throws UnsupportedEncodingException {
         if (escapeSequences.equals("%/@")) {

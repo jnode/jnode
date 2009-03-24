@@ -106,7 +106,7 @@ public class NTFSVolume {
     /**
      * Gets the size of a cluster.
      * 
-     * @return
+     * @return the size
      */
     public int getClusterSize() {
         return clusterSize;
@@ -140,7 +140,7 @@ public class NTFSVolume {
     /**
      * Gets the root directory on this volume.
      * 
-     * @return
+     * @return the root directory record
      * @throws IOException
      */
     public FileRecord getRootDirectory() throws IOException {
