@@ -54,7 +54,7 @@ public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSys
     }
 
     /**
-     * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
+     * @see org.jnode.fs.BlockDeviceFileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
      */
     public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
         if (pte != null) {

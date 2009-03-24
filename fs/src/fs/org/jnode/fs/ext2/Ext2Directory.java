@@ -415,7 +415,7 @@ public class Ext2Directory extends AbstractFSDirectory {
      * Read the entries from the device and return the result in a new
      * FSEntryTable
      * 
-     * @return
+     * @return the FSEntryTable containing the directory's entries.
      */
     protected FSEntryTable readEntries() throws IOException {
         Ext2FSEntryIterator it = new Ext2FSEntryIterator(iNode);

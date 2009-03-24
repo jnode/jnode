@@ -371,9 +371,9 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     /**
      * Update the block in cache, or write the block to disk
      * 
-     * @param nr: block number
-     * @param data: block data
-     * @param forceWrite: if forceWrite is false, the block is only updated in
+     * @param nr block number
+     * @param data block data
+     * @param forceWrite if forceWrite is false, the block is only updated in
      *            the cache (if it was in the cache). If forceWrite is true, or
      *            the block is not in the cache, write it to disk.
      * @throws IOException
@@ -416,7 +416,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
         }
     }
 
-    /**
+    /*
      * Helper class for timedWrite
      * 
      * @author blind
@@ -511,7 +511,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      * allocates it with preallocation.
      * 
      * @param blockNr
-     * @return
+     * @return the block reservation
      * @throws IOException
      */
     public BlockReservation testAndSetBlock(long blockNr) throws IOException {
@@ -557,9 +557,9 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     /**
      * Create a new INode
      * 
-     * @param preferredBlockBroup: first try to allocate the inode in this block
+     * @param preferredBlockBroup first try to allocate the inode in this block
      *            group
-     * @return
+     * @return the INode
      */
     protected INode createINode(int preferredBlockBroup, int fileFormat, int accessRights, int uid, int gid)
         throws FileSystemException, IOException {
@@ -612,7 +612,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      * Find a free INode in the inode bitmap and allocate it
      * 
      * @param blockGroup
-     * @return
+     * @return the INode reservation
      * @throws IOException
      */
     protected INodeReservation findFreeINode(int blockGroup) throws IOException {
@@ -812,7 +812,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      * (S_FEATURE_RO_COMPAT)
      * 
      * @param mask
-     * @return
+     * @return {@code true} if the filesystem uses the feature, otherwise {@code false}.
      */
     protected boolean hasROFeature(long mask) {
         return (mask & superblock.getFeatureROCompat()) != 0;
@@ -823,7 +823,7 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      * (S_FEATURE_INCOMPAT)
      * 
      * @param mask
-     * @return
+     * @return {@code true} if the filesystem uses the feature, otherwise {@code false}.
      */
     protected boolean hasIncompatFeature(long mask) {
         return (mask & superblock.getFeatureIncompat()) != 0;

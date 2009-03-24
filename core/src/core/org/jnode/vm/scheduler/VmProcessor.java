@@ -205,7 +205,7 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Get the processor that the current thread is running on.
      *
-     * @return
+     * @return the current processor
      */
     @Inline
     @org.jnode.vm.annotation.Uninterruptible

@@ -43,10 +43,10 @@ public class Ext2DirectoryRecord {
     private Ext2FileSystem fs;
 
     /**
-     * @param data: the data that makes up the directory block
-     * @param offset: the offset where the current DirectoryRecord begins within
+     * @param data the data that makes up the directory block
+     * @param offset the offset where the current DirectoryRecord begins within
      *            the block
-     * @param fileOffset: the offset from the beginning of the directory file
+     * @param fileOffset the offset from the beginning of the directory file
      */
     public Ext2DirectoryRecord(Ext2FileSystem fs, byte[] data, int offset, int fileOffset) {
         this.fs = fs;
@@ -196,8 +196,8 @@ public class Ext2DirectoryRecord {
      * length. The directoryRecord's <code>fileOffset</code> will be set to
      * <code>beginning</code>.
      * 
-     * @param beginning: the offset where the record begins
-     * @param end: the offset where the record should end (usually the size a
+     * @param beginning the offset where the record begins
+     * @param end the offset where the record should end (usually the size a
      *            filesystem block)
      */
     protected synchronized void expandRecord(long beginning, long end) throws FileSystemException {

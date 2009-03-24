@@ -84,7 +84,7 @@ public class BlockReservation {
     /**
      * Returns how many free blocks are in the block group
      * 
-     * @return
+     * @return the free block count
      */
     public long getFreeBlocksCount() {
         return freeBlocksCount;

@@ -210,7 +210,7 @@ public class GroupDescriptor {
     }
 
     /**
-     * @return
+     * @return the dirty flag for the descriptor
      */
     public boolean isDirty() {
         return dirty;

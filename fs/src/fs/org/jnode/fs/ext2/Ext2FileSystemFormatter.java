@@ -34,8 +34,8 @@ public class Ext2FileSystemFormatter extends Formatter<Ext2FileSystem> {
     private BlockSize blockSize;
 
     /**
-     *
-     * @param blockSizeKb size of blocks in KB
+     * 
+     * @param blockSize size of blocks in KB
      */
     public Ext2FileSystemFormatter(BlockSize blockSize) {
         super(new Ext2FileSystemType());
