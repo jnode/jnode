@@ -84,7 +84,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
      * 
      * @param name
      * @param attrs
-     * @return
+     * @return the font peer
      */
     @Override
     public BDFFontPeer createFontPeer(String name, Map attrs) {
@@ -114,7 +114,7 @@ public class BDFFontProvider extends AbstractFontProvider<BDFFont, BDFFontContai
      * Read an create a Font from the given InputStream
      *
      * @param stream
-     * @return
+     * @return the font
      */
     @Override
     public BDFFont createFont(InputStream stream) throws FontFormatException, IOException {

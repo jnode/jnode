@@ -87,25 +87,25 @@ public interface FontProvider<F extends Font> {
      * Translates the font into a font that is provided by this provider.
      *
      * @param font
-     * @return
+     * @return the translated font
      */
     public F getCompatibleFont(Font font);
     
     /**
-     * Creates a font peer from the given name or return null if not supported/provided.
+     * Creates a font peer from the given name or return {@code null} if not supported/provided.
      * As said in {@link org.jnode.awt.JNodeToolkit#getClasspathFontPeer(String, java.util.Map)} javadoc :
      * "We don't know what kind of "name" the user requested (logical, face, family)".
      * 
      * @param name
      * @param attrs
-     * @return
+     * @return the font peer or {@code null}.
      */
     public JNodeFontPeer<? extends FontProvider<F>, F> createFontPeer(String name, Map attrs);
 
     /**
      * Read and create a Font from the given InputStream
      * @param stream
-     * @return
+     * @return the font
      */
     public F createFont(InputStream stream) throws FontFormatException, IOException;    
 }

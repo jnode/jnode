@@ -90,7 +90,7 @@ public abstract class ClasspathToolkit
    *
    * <p>This method is specific to GNU Classpath. It gets called by
    * the Classpath implementation of {@link
-   * GraphicsEnvironment.getLocalGraphcisEnvironment()}.
+   * GraphicsEnvironment#getLocalGraphicsEnvironment()}.
    */
   public abstract GraphicsEnvironment getLocalGraphicsEnvironment();
 

@@ -53,15 +53,8 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
         this.provider = provider;
     }
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#canDisplay(java.awt.Font, char)
-     */
     public abstract boolean canDisplay(Font font, char c);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#canDisplayUpTo(java.awt.Font,
-     *      java.text.CharacterIterator, int, int)
-     */
     @Override
     public final int canDisplayUpTo(Font font, CharacterIterator i, int start, int limit) {
         int upTo = -1;
@@ -76,93 +69,41 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
         return upTo;
     }
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#createGlyphVector(java.awt.Font,
-     *      java.awt.font.FontRenderContext, java.text.CharacterIterator)
-     */
     @Override
     public final GlyphVector createGlyphVector(Font font, FontRenderContext frc, CharacterIterator ci) {
         return TGlyphVector.create(font, frc, ci);
     }
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#createGlyphVector(java.awt.Font,
-     *      java.awt.font.FontRenderContext, int[])
-     */
     @Override
     public final GlyphVector createGlyphVector(Font font, FontRenderContext ctx,
                                          int[] glyphCodes) {
         return new StandardGlyphVector(font, glyphCodes, ctx);
     }
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getBaselineFor(java.awt.Font,
-     *      char)
-     */
     public abstract byte getBaselineFor(Font font, char c);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getFontMetrics(java.awt.Font)
-     */
     public abstract FontMetrics getFontMetrics(Font font);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getGlyphName(java.awt.Font, int)
-     */
     public abstract String getGlyphName(Font font, int glyphIndex);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getLineMetrics(java.awt.Font,
-     *      java.text.CharacterIterator, int, int,
-     *      java.awt.font.FontRenderContext)
-     */
     public abstract LineMetrics getLineMetrics(Font font, CharacterIterator ci,
                                       int begin, int limit, FontRenderContext rc);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getMaxCharBounds(java.awt.Font,
-     *      java.awt.font.FontRenderContext)
-     */
     public abstract Rectangle2D getMaxCharBounds(Font font, FontRenderContext rc);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getMissingGlyphCode(java.awt.Font)
-     */
     public abstract int getMissingGlyphCode(Font font);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getNumGlyphs(java.awt.Font)
-     */
     public abstract int getNumGlyphs(Font font);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getPostScriptName(java.awt.Font)
-     */
     public abstract String getPostScriptName(Font font);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getStringBounds(java.awt.Font,
-     *      java.text.CharacterIterator, int, int,
-     *      java.awt.font.FontRenderContext)
-     */
     public abstract Rectangle2D getStringBounds(Font font, CharacterIterator ci,
                                        int begin, int limit, FontRenderContext frc);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#getSubFamilyName(java.awt.Font,
-     *      java.util.Locale)
-     */
     public abstract String getSubFamilyName(Font font, Locale locale);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#hasUniformLineMetrics(java.awt.Font)
-     */
     public abstract boolean hasUniformLineMetrics(Font font);
 
-    /**
-     * @see gnu.java.awt.peer.ClasspathFontPeer#layoutGlyphVector(java.awt.Font,
-     *      java.awt.font.FontRenderContext, char[], int, int, int)
-     */
     public abstract GlyphVector layoutGlyphVector(Font font, FontRenderContext frc,
                                          char[] chars, int start, int limit, int flags);
     
@@ -174,7 +115,7 @@ public abstract class JNodeFontPeer<FP extends FontProvider<F>, F extends Font>
      * this peer's provider provides.
      *   
      * @param font any instance of {@link Font} (might not be an instance of F)
-     * @return
+     * @return the Font
      */
     protected final F getCompatibleFont(Font font) {
         return provider.getCompatibleFont(font);
