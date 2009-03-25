@@ -37,7 +37,7 @@ public class MMCUtils {
      * Read the capacity data of a given SCSI device.
      *
      * @param dev
-     * @return
+     * @return the capacity
      */
     public static CapacityData readCapacity(SCSIDevice dev)
         throws SCSIException, TimeoutException, InterruptedException {

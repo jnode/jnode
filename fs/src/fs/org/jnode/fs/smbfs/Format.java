@@ -336,10 +336,9 @@ public class Format {
     /**
      * Formats a character into a string (like sprintf in C)
      *
-     * @param x the value to format
+     * @param c the value to format
      * @return the formatted string
      */
-
     public String form(char c) {
         if (fmt != 'c')
             throw new java.lang.IllegalArgumentException();
@@ -351,10 +350,9 @@ public class Format {
     /**
      * Formats a string into a larger string (like sprintf in C)
      *
-     * @param x the value to format
+     * @param s the value to format
      * @return the formatted string
      */
-
     public String form(String s) {
         if (fmt != 's')
             throw new java.lang.IllegalArgumentException();
@@ -363,11 +361,9 @@ public class Format {
         return pad(s);
     }
 
-
     /**
      * a test stub for the format class
      */
-
     public static void main(String[] a) {
         double x = 1.23456789012;
         double y = 123;

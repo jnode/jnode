@@ -27,6 +27,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**
@@ -39,10 +40,6 @@ public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660F
         return "ISO9660";
     }
 
-    /**
-     * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[],
-     *      FSBlockDeviceAPI)
-     */
     public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
         if (pte != null) {
             // CD-ROM's do not have a partition table.
@@ -67,9 +64,6 @@ public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660F
         }
     }
 
-    /**
-     * @see org.jnode.fs.FileSystemType#create(Device, boolean)
-     */
     public ISO9660FileSystem create(Device device, boolean readOnly) throws FileSystemException {
         return new ISO9660FileSystem(device, readOnly, this);
     }

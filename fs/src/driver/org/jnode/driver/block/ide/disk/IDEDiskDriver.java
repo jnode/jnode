@@ -66,14 +66,18 @@ public class IDEDiskDriver extends Driver
      * My logger
      */
     private static final Logger log = Logger.getLogger(IDEDiskDriver.class);
+    
     /**
      * Number of addressable sectors
      */
     private long maxSector;
+    
     /** Has LBA support? */
     //private boolean lba;
+    
     /** Has DMA support? */
     //private boolean dma;
+    
     /**
      * Support 48-bit addressing?
      */
@@ -81,9 +85,6 @@ public class IDEDiskDriver extends Driver
     private IDEDiskBus diskBus;
     private IBMPartitionTable pt;
 
-    /**
-     * @see org.jnode.driver.Driver#startDevice()
-     */
     protected void startDevice() throws DriverException {
         final IDEDevice dev = (IDEDevice) getDevice();
         diskBus = new IDEDiskBus(dev);
@@ -142,9 +143,6 @@ public class IDEDiskDriver extends Driver
         }
     }
 
-    /**
-     * @see org.jnode.driver.Driver#stopDevice()
-     */
     protected void stopDevice() throws DriverException {
         final IDEDevice dev = (IDEDevice) getDevice();
         // find mounted partitions on this device and unregister them !
@@ -174,23 +172,14 @@ public class IDEDiskDriver extends Driver
         this.pt = null;
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-     */
     public void flush() {
         // Nothing to do yet
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
-     */
     public long getLength() {
         return maxSector * SECTOR_SIZE;
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-     */
     public void read(long devOffset, ByteBuffer destBuf) throws IOException {
         int destOffset = 0;
         int length = destBuf.remaining();
@@ -234,9 +223,6 @@ public class IDEDiskDriver extends Driver
         }
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-     */
     public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
         int srcOffset = 0;
         int length = srcBuf.remaining();
@@ -284,8 +270,8 @@ public class IDEDiskDriver extends Driver
     }
 
     /*
-      * Register the given partition entry (maybe an extended partition entry)
-      */
+     * Register the given partition entry (maybe an extended partition entry)
+     */
     private void registerPartition(DeviceManager devMan, IDEDevice dev,
                                    IBMPartitionTableEntry pte, int partIndex)
         throws DeviceAlreadyRegisteredException, DriverException {
@@ -307,32 +293,28 @@ public class IDEDiskDriver extends Driver
      *
      * @param devMan
      * @param dev
-     * @param partIndex
-     * @return
+     * @param partIndex the first partition index to use
+     * @return the next partition index
      * @throws DeviceAlreadyRegisteredException
-     *
      * @throws DriverException
      */
-    private int registerExtendedPartition(DeviceManager devMan, IDEDevice dev,
-                                          int partIndex) throws DeviceAlreadyRegisteredException, DriverException {
+    private int registerExtendedPartition(DeviceManager devMan, IDEDevice dev, int partIndex) 
+        throws DeviceAlreadyRegisteredException, DriverException {
         //now we should have an filled vector in the pt
         final List<IBMPartitionTableEntry> extendedPartitions = pt.getExtendedPartitions();
         log.info("Have " + extendedPartitions.size() + " Extended partitions found");
 
         for (int iPart = 0; iPart < extendedPartitions.size(); iPart++) {
-            IBMPartitionTableEntry pteExt =
-                extendedPartitions.get(iPart);
+            IBMPartitionTableEntry pteExt = extendedPartitions.get(iPart);
             registerPartition(devMan, dev, pteExt, partIndex);
 
-            if (iPart < (extendedPartitions.size() - 1))
+            if (iPart < (extendedPartitions.size() - 1)) {
                 partIndex++;
+            }
         }
         return partIndex;
     }
 
-    /**
-     * @see org.jnode.driver.block.PartitionableBlockDeviceAPI#getSectorSize()
-     */
     public int getSectorSize() throws IOException {
         return SECTOR_SIZE;
     }
@@ -340,7 +322,7 @@ public class IDEDiskDriver extends Driver
     /**
      * Gets the partition table that this block device contains.
      *
-     * @return Null if no partition table is found.
+     * @return {@code null} if no partition table is found.
      * @throws IOException
      */
     public IBMPartitionTable getPartitionTable() throws IOException {

@@ -29,8 +29,8 @@ public abstract class CDB extends SCSIBuffer {
     /**
      * Initialize this instance.
      *
-     * @param cdbLength Length (in bytes) of this CDB
-     * @param opcode    Opcode of this CDB
+     * @param cdbLength the length (in bytes) of this CDB
+     * @param opcode the opcode of this CDB
      */
     public CDB(int cdbLength, int opcode) {
         super(cdbLength);
@@ -40,7 +40,7 @@ public abstract class CDB extends SCSIBuffer {
     /**
      * Gets the opcode of this CDB.
      *
-     * @return
+     * @return the opcode
      */
     public final int getOpcode() {
         return getUInt8(0);

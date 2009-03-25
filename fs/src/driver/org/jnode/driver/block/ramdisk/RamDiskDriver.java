@@ -34,10 +34,12 @@ import org.jnode.partitions.PartitionTableEntry;
 public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
     private static final String RAMDISK_DEFAULTNAME = "ramdisk";
+    
     /**
      * The device
      */
     private RamDiskDevice device;
+    
     /**
      * The data
      */
@@ -89,7 +91,6 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
     /**
      * @return The partition table entry
-     * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
      */
     public PartitionTableEntry getPartitionTableEntry() {
         return null;
@@ -97,22 +98,17 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
     /**
      * @return The sector size
-     * @see org.jnode.driver.block.FSBlockDeviceAPI#getSectorSize()
      */
     public int getSectorSize() {
         return 512;
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-     */
     public void flush() {
         // Do nothing
     }
 
     /**
      * @return The length
-     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
      */
     public long getLength() {
         return data.length;
@@ -121,24 +117,16 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
     /**
      * @param devOffset
      * @param dest
-     * @param destOffset
-     * @param length
-     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
      */
     public void read(long devOffset, ByteBuffer dest) {
-        //System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
         dest.put(this.data, (int) devOffset, dest.remaining());
     }
 
     /**
      * @param devOffset
      * @param src
-     * @param srcOffset
-     * @param length
-     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
      */
     public void write(long devOffset, ByteBuffer src) {
-        //System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);
         src.get(this.data, (int) devOffset, src.remaining());
     }
 }

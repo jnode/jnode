@@ -73,18 +73,18 @@ public class MasterBootRecord {
     /**
      * Write the contents of this bootsector to the given device.
      * 
-     * @param device
+     * @param api
      */
-    public final synchronized void write(BlockDeviceAPI devApi) throws IOException {
-        devApi.write(0, mbr);
-        devApi.flush();
+    public final synchronized void write(BlockDeviceAPI api) throws IOException {
+        api.write(0, mbr);
+        api.flush();
         dirty = false;
     }
 
     /**
      * Read the contents of this bootsector from the given device.
      * 
-     * @param device
+     * @param api
      */
     public final synchronized void read(BlockDeviceAPI api) throws IOException {
         api.read(0, mbr);
@@ -93,7 +93,7 @@ public class MasterBootRecord {
 
     /**
      * TODO remove the temporary workaround : internal array shouldn't be exposed
-     * @return
+     * @return the MBR array
      */
     public byte[] array() {
         return mbr.array();
