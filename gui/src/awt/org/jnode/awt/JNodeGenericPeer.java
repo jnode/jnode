@@ -36,7 +36,7 @@ public abstract class JNodeGenericPeer<toolkitT extends JNodeToolkit, compT> {
     }
 
     /**
-     * @return
+     * @return the target component
      */
     public final compT getTargetComponent() {
         return this.targetComponent;

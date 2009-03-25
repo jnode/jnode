@@ -619,9 +619,9 @@ public abstract class ClasspathFontPeer
   public abstract boolean canDisplay (Font font, char c);
 
   /** 
-   * Implementation of {@link Font#canDisplay(String)},
-   * {@link Font#canDisplay(char [], int, int)}, and
-   * {@link Font#canDisplay(CharacterIterator, int, int)}.
+   * Implementation of {@link Font#canDisplayUpTo(String)},
+   * {@link Font#canDisplayUpTo(char [], int, int)}, and
+   * {@link Font#canDisplayUpTo(CharacterIterator, int, int)}.
    *
    * @param font the font this peer is being called from. This may be
    * useful if you are sharing peers between Font objects. Otherwise it may
@@ -757,8 +757,7 @@ public abstract class ClasspathFontPeer
   
 
   /** 
-   * Implementation of {@link Font#createGlyphVector(FontRenderContext,
-   * int[])}.
+   * Implementation of {@link Font#createGlyphVector(FontRenderContext, int[])}.
    *
    * @param font the font object that the created GlyphVector will return
    * when it gets asked for its font. This argument is needed because the
@@ -788,8 +787,6 @@ public abstract class ClasspathFontPeer
 
 
   /** 
-   * Implementation of {@link Font#getFontMetrics()}
-   *
    * @param font the font this peer is being called from. This may be
    * useful if you are sharing peers between Font objects. Otherwise it may
    * be ignored.

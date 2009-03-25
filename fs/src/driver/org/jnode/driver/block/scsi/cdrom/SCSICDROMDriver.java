@@ -55,9 +55,6 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
         this.blockAlignment = new FSBlockAlignmentSupport(this, 2048);
     }
 
-    /**
-     * @see org.jnode.driver.Driver#startDevice()
-     */
     protected void startDevice() throws DriverException {
         this.locked = false;
         this.changed = true;
@@ -70,9 +67,6 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
         dev.registerAPI(FSBlockDeviceAPI.class, blockAlignment);
     }
 
-    /**
-     * @see org.jnode.driver.Driver#stopDevice()
-     */
     protected void stopDevice() throws DriverException {
         try {
             unlock();
@@ -86,39 +80,24 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
         }
     }
 
-    /**
-     * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
-     */
     public PartitionTableEntry getPartitionTableEntry() {
         return null;
     }
 
-    /**
-     * @see org.jnode.driver.block.FSBlockDeviceAPI#getSectorSize()
-     */
     public int getSectorSize() throws IOException {
         processChanged();
         return capacity.getBlockLength();
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-     */
     public void flush() throws IOException {
         // Do nothing
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
-     */
     public long getLength() throws IOException {
         processChanged();
         return capacity.getBlockLength() & capacity.getLogicalBlockAddress();
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-     */
     public void read(long devOffset, ByteBuffer destBuf)
         throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level                 
@@ -152,9 +131,6 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
         destBA.refreshByteBuffer();
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-     */
     public void write(long devOffset, ByteBuffer src)
         throws IOException {
         throw new IOException("Readonly device");
@@ -163,7 +139,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
     /**
      * Can this device be locked.
      *
-     * @return
+     * @return {@code true} if the device can be locked, otherwise {@code false}.
      */
     public boolean canLock() {
         return true;
@@ -172,7 +148,7 @@ public class SCSICDROMDriver extends Driver implements FSBlockDeviceAPI,
     /**
      * Can this device be ejected.
      *
-     * @return
+     * @return {@code true} if the device can be ejected, otherwise {@code false}.
      */
     public boolean canEject() {
         return true;

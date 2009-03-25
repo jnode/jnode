@@ -33,14 +33,14 @@ public interface JNodeAwtContext {
     /**
      * Gets the desktop pane that holds all the Frames.
      *
-     * @return
+     * @return the desktop pane
      */
     public JDesktopPane getDesktop();
 
     /**
      * Gets the root container of the screen, that holds the desktop.
      *
-     * @return
+     * @return the root container
      */
     public JComponent getAwtRoot();
 
