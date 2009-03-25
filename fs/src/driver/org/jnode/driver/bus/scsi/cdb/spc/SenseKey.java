@@ -28,7 +28,7 @@ package org.jnode.driver.bus.scsi.cdb.spc;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class SenseKey {
-
+    // FIXME ... should this be an enum now?
     private final int key;
     private final String name;
     private static final SenseKey[] KEYS = {
@@ -59,7 +59,7 @@ public final class SenseKey {
      * Gets the SenseKey wrapper for a given key number.
      *
      * @param key
-     * @return
+     * @return the wrapper
      */
     public static SenseKey valueOf(int key) {
         return KEYS[key];
@@ -121,16 +121,10 @@ public final class SenseKey {
         return (key == 14);
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     */
     public int hashCode() {
         return key;
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
     public final String toString() {
         return name;
     }

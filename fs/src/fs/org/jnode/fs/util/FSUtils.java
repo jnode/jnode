@@ -58,9 +58,9 @@ public class FSUtils {
     }
 
     /**
-     * @param path
-     * @param separator
-     * @return
+     * @param path a pathname
+     * @param separator the pathname separator used in the pathname
+     * @return the parent part of a pathname
      */
     public static String getParentName(String path, char separator) {
         int idx = path.lastIndexOf(separator);
@@ -73,9 +73,9 @@ public class FSUtils {
     }
 
     /**
-     * @param entry
-     * @param deep
-     * @return
+     * @param entry an FSEntry to be rendered
+     * @param deep if {@code true}, include details of the FS object that the entry refers to.
+     * @return a human readable rendering of the FSEntry
      */
     public static String toString(FSEntry entry, boolean deep) {
         if (entry == null)
@@ -122,8 +122,8 @@ public class FSUtils {
     }
 
     /**
-     * @param dir
-     * @return
+     * @param dir an FSDirectory
+     * @return a human readable rendering of the FSDirectory
      * @throws IOException
      */
     public static String toString(FSDirectory dir) throws IOException {
@@ -131,9 +131,9 @@ public class FSUtils {
     }
 
     /**
-     * @param dir
-     * @param deep
-     * @return
+     * @param dir an FSDirectory
+     * @param deep if {@code true} also render the directory's entries
+     * @return a human readable rendering of the FSDirectory
      * @throws IOException
      */
     public static String toString(FSDirectory dir, boolean deep) throws IOException {
@@ -148,8 +148,8 @@ public class FSUtils {
     }
 
     /**
-     * @param file
-     * @return
+     * @param file an FSFile
+     * @return  a human readable rendering of the FSFile
      */
     public static String toString(FSFile file) {
         if (file == null)
@@ -164,36 +164,38 @@ public class FSUtils {
     }
 
     /**
-     * @param str
-     * @param date
-     * @return
+     * @param str a description
+     * @param date a date/time expressed as milliseconds since the UNIX epoch
+     * @return the concatenation of the description and the system default
+     *     rendering of the date.
      */
     public static String toStringDate(String str, long date) {
         return toString(str, new Date(date));
     }
 
     /**
-     * @param str
-     * @param date
-     * @return
+     * @param str a description
+     * @param date a date/time value
+     * @return the concatenation of the description and the system default
+     *     rendering of the date.
      */
     public static String toString(String str, Date date) {
         return str + dateFormat.format(date);
     }
 
     /**
-     * @param data
-     * @return
+     * @param data bytes to be rendered
+     * @return a rendering of the bytes
      */
     public static String toString(byte[] data) {
         return toString(data, 0, data.length);
     }
 
     /**
-     * @param data
-     * @param offset
-     * @param length
-     * @return
+     * @param data an array of bytes
+     * @param offset the start position of the first byte to be rendered
+     * @param length the number of bytes to be rendered 
+     * @return a rendering of the bytes
      */
     public static String toString(byte[] data, int offset, int length) {
         StringBuilder sb = new StringBuilder(1024);
@@ -225,9 +227,9 @@ public class FSUtils {
     }
 
     /**
-     * @param str
-     * @param size
-     * @return
+     * @param str the string to be padded
+     * @param size pad to this size
+     * @return the supplied string padded to the left with spaces.
      */
     public static String lpad(String str, int size) {
         if (str.length() >= size)
@@ -242,10 +244,12 @@ public class FSUtils {
     }
 
     /**
-     * @param data
-     * @param offset
-     * @param length
-     * @return
+     * Render bytes as a String by 'converting' each byte into a character
+     * in the range 0 to 255.
+     * @param data an array of bytes
+     * @param offset the start position of the first byte to be rendered
+     * @param length the number of bytes to be rendered 
+     * @return a rendering of the bytes
      */
     public static String toStringAsChars(byte[] data, int offset, int length) {
         int l = Math.min(offset + length, data.length);

@@ -67,7 +67,7 @@ public class SCSIBuffer extends BigEndian {
      * The byte is returned as 8-bit unsigned integer (0..0xFF).
      *
      * @param offset
-     * @return
+     * @return the byte
      */
     public final int getUInt8(int offset) {
         return getUInt8(buffer, offset);
@@ -85,10 +85,10 @@ public class SCSIBuffer extends BigEndian {
 
     /**
      * Gets a 16-bit integer from a given offset.
-     * The byte is returned as 16-bit unsigned integer (0..0xFFFF).
+     * The data is returned as 16-bit unsigned integer (0..0xFFFF).
      *
      * @param offset
-     * @return
+     * @return the data
      */
     public final int getUInt16(int offset) {
         return getUInt16(buffer, offset);
@@ -106,10 +106,10 @@ public class SCSIBuffer extends BigEndian {
 
     /**
      * Gets a 32-bit integer from a given offset.
-     * The byte is returned as 32-bit signed integer (Integer.MIN_VALUE..Integer.MAX_VALUE).
+     * The data is returned as 32-bit signed integer (Integer.MIN_VALUE..Integer.MAX_VALUE).
      *
      * @param offset
-     * @return
+     * @return the data
      */
     public final int getInt32(int offset) {
         return getInt32(buffer, offset);
@@ -117,11 +117,11 @@ public class SCSIBuffer extends BigEndian {
 
     /**
      * Gets an ASCII string from the given offset with a given length.
-     * The padded 0x20 (space) characters are removed.
+     * The padding 0x20 (space) characters are removed.
      *
      * @param offset
      * @param length
-     * @return
+     * @return the string
      */
     public final String getASCII(int offset, int length) {
         try {
@@ -132,29 +132,29 @@ public class SCSIBuffer extends BigEndian {
     }
 
     /**
-     * Get the bytearray itself.
+     * Get the byte array itself.
      *
-     * @return
+     * @return the byte array
      */
     public final byte[] toByteArray() {
         return buffer;
     }
 
     /**
-     * Convert an integer to a 2-character long hex string.
+     * Convert an integer (containing a byte) to a 2-character long hex string.
      *
      * @param v
-     * @return
+     * @return the hex-coded integer 
      */
     protected static final String hex2(int v) {
         return NumberUtils.hex(v, 2);
     }
 
     /**
-     * Convert an integer to a 4-character long hex string.
+     * Convert an integer (containing a short) to a 4-character long hex string.
      *
      * @param v
-     * @return
+     * @return the hex-coded integer
      */
     protected static final String hex4(int v) {
         return NumberUtils.hex(v, 4);
@@ -164,7 +164,7 @@ public class SCSIBuffer extends BigEndian {
      * Convert an integer to a 8-character long hex string.
      *
      * @param v
-     * @return
+     * @return the hex-coded integer
      */
     protected static final String hex8(int v) {
         return NumberUtils.hex(v, 8);

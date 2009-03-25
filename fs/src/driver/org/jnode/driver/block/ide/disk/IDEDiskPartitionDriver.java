@@ -42,9 +42,6 @@ public class IDEDiskPartitionDriver extends Driver implements FSBlockDeviceAPI, 
     private PartitionTableEntry pte;
     private MappedBlockDeviceSupport mapping;
 
-    /**
-     * @see org.jnode.driver.Driver#startDevice()
-     */
     protected void startDevice() throws DriverException {
         try {
             final IDEDiskPartitionDevice dev = this.device;
@@ -60,17 +57,11 @@ public class IDEDiskPartitionDriver extends Driver implements FSBlockDeviceAPI, 
         }
     }
 
-    /**
-     * @see org.jnode.driver.Driver#stopDevice()
-     */
     protected void stopDevice() {
         /* for now only unregister an API */
         device.unregisterAPI(FSBlockDeviceAPI.class);
     }
 
-    /**
-     * @see org.jnode.driver.Driver#afterConnect(org.jnode.driver.Device)
-     */
     protected void afterConnect(Device device) {
         this.device = (IDEDiskPartitionDevice) device;
         super.afterConnect(device);
@@ -92,30 +83,18 @@ public class IDEDiskPartitionDriver extends Driver implements FSBlockDeviceAPI, 
         return pte;
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-     */
     public void flush() throws IOException {
         mapping.flush();
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
-     */
     public long getLength() {
         return mapping.getLength();
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-     */
     public void read(long devOffset, ByteBuffer dest) throws IOException {
         mapping.read(devOffset, dest);
     }
 
-    /**
-     * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-     */
     public void write(long devOffset, ByteBuffer src) throws IOException {
         mapping.write(devOffset, src);
     }

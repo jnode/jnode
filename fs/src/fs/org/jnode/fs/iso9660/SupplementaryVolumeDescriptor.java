@@ -136,7 +136,7 @@ public class SupplementaryVolumeDescriptor extends VolumeDescriptor {
 
     /**
      * Is the used encoding known to this system.
-     * @return
+     * @return {@code true} if the encoding known, otherwise {@code false}.
      */
     public final boolean isEncodingKnown() {
         return encodingKnown;

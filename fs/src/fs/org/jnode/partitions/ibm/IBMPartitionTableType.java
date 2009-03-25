@@ -33,23 +33,14 @@ import org.jnode.partitions.PartitionTableType;
  */
 public class IBMPartitionTableType implements PartitionTableType {
 
-    /**
-     * @see org.jnode.partitions.PartitionTableType#create(org.jnode.driver.Device)
-     */
     public PartitionTable create(byte[] firstSector, Device device) throws PartitionTableException {
         return new IBMPartitionTable(this, firstSector, device);
     }
 
-    /**
-     * @see org.jnode.partitions.PartitionTableType#getName()
-     */
     public String getName() {
         return "IBM";
     }
 
-    /**
-     * @see org.jnode.partitions.PartitionTableType#supports(org.jnode.driver.block.BlockDeviceAPI)
-     */
     public boolean supports(byte[] firstSector, BlockDeviceAPI devApi) {
         // TODO Make a suitable implementation
         return true;
