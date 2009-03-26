@@ -62,7 +62,6 @@ public interface FrameBufferAPI extends DeviceAPI {
      * The old owner (if any) will receive a request to stop using the underlying FrameBuffer device.
      * 
      * @param owner
-     * @return {@code true} if owner can now start using exclusively the underlying FrameBuffer device.
      */
     public void requestOwnership(FrameBufferAPIOwner owner);
 
@@ -70,7 +69,6 @@ public interface FrameBufferAPI extends DeviceAPI {
      * Request the ownership on the underlying FrameBuffer device.
      * 
      * @param owner
-     * @return {@code true} if owner can now start using exclusively the underlying FrameBuffer device.
      */
     public void releaseOwnership(FrameBufferAPIOwner owner);
     

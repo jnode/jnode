@@ -63,7 +63,7 @@ public class Prism2CommFrame implements Prism2Constants {
      * 
      * @param src
      * @param srcOffset
-     * @return
+     * @return the status
      */
     public static final int getStatus(byte[] src, int srcOffset) {
         return LittleEndian.getUInt16(src, srcOffset);
@@ -74,7 +74,7 @@ public class Prism2CommFrame implements Prism2Constants {
      * 
      * @param src
      * @param srcOffset
-     * @return
+     * @return the data length
      */
     public static final int getDataLength(byte[] src, int srcOffset) {
         return LittleEndian.getUInt16(src, srcOffset + 58);

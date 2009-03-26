@@ -32,7 +32,7 @@ public interface WirelessNetDeviceAPI extends NetDeviceAPI {
     /**
      * Gets the current authentication mode.
      *
-     * @return
+     * @return the authentication mode
      */
     public AuthenticationMode getAuthenticationMode();
 

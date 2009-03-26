@@ -96,7 +96,7 @@ public interface NetworkLayer {
      * Gets the protocol addresses for a given name, or null if not found.
      * 
      * @param hostname
-     * @return
+     * @return the addresses or {@code null}
      */
     public ProtocolAddress[] getHostByName(String hostname);
 }

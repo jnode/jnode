@@ -259,7 +259,7 @@ public class VgaState {
      * Gets the length of the palette.
      * 
      * @param io
-     * @return
+     * @return the palette size
      */
     protected int getPaletteSize(VgaIO io) {
         return 256;
@@ -388,9 +388,6 @@ public class VgaState {
         }
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
     public String toString() {
         return "VGA[SEQ:" + NumberUtils.hex(seq, 2) + ", CRT:" + NumberUtils.hex(crt, 2) +
                 ", GRA:" + NumberUtils.hex(gra, 2) + ", ATT:" + NumberUtils.hex(att, 2) +

@@ -40,22 +40,16 @@ public class DesktopPlugin extends Plugin {
     /**
      * Gets the applications (apps) extensions point
      *
-     * @return
+     * @return the extension point
      */
     public ExtensionPoint getAppsExtensionPoint() {
         return getDescriptor().getExtensionPoint("apps");
     }
 
-    /**
-     * @see org.jnode.plugin.Plugin#startPlugin()
-     */
     protected void startPlugin() throws PluginException {
         System.setProperty("jnode.desktop", "org.jnode.desktop.classic.Desktop");
     }
 
-    /**
-     * @see org.jnode.plugin.Plugin#stopPlugin()
-     */
     protected void stopPlugin() throws PluginException {
         // Nothing to do
     }
