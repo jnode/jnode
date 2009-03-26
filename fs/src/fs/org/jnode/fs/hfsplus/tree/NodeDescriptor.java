@@ -27,16 +27,22 @@ public class NodeDescriptor {
     public static final int BT_INDEX_NODE = 0;
     public static final int BT_HEADER_NODE = 1;
     public static final int BT_MAP_NODE = 2;
+    
     /** The size of the node descriptor. */
     public static final int BT_NODE_DESCRIPTOR_LENGTH = 14;
+    
     /** The number of the next node. */
     private int fLink;
+    
     /** The number of the previous node. */
     private int bLink;
+    
     /** The type of the node. */
     private int kind;
+    
     /** The depth of this node in the B-Tree. */
     private int height;
+    
     /** The number of records in this node. */
     private int numRecords;
 
@@ -75,7 +81,7 @@ public class NodeDescriptor {
 
     /**
      * 
-     * @return
+     * @return the descriptor rendered as bytes
      */
     public byte[] getBytes() {
         byte[] data = new byte[BT_NODE_DESCRIPTOR_LENGTH];

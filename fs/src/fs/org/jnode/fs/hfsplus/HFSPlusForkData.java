@@ -61,7 +61,7 @@ public class HFSPlusForkData {
      * 
      * @param totalSize
      * @param clumpSize
-     * @param totalBock
+     * @param totalBlock
      */
     public HFSPlusForkData(long totalSize, int clumpSize, int totalBlock) {
         this.totalSize = totalSize;
@@ -85,11 +85,6 @@ public class HFSPlusForkData {
         return dest;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     public final String toString() {
         StringBuffer s = new StringBuffer();
         s.append("Total size : ").append(totalSize).append("\n");

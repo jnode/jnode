@@ -90,9 +90,6 @@ public class CatalogFile {
      * 
      * @param flags
      * @param fileId
-     * @param createDate
-     * @param contentModDate
-     * @param attrModDate
      * @param datas
      * @param resources
      */
@@ -109,17 +106,12 @@ public class CatalogFile {
 
     /**
      * 
-     * @return
+     * @return a serious case of nothing much at all
      */
     public byte[] getBytes() {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     public final String toString() {
         StringBuffer s = new StringBuffer();
         s.append("Record type:").append(recordType).append("\t");

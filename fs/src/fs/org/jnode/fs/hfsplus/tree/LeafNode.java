@@ -25,7 +25,6 @@ public class LeafNode extends AbstractNode {
 
     /**
      * 
-     * @param descriptor
      * @param nodeData
      * @param nodeSize
      */
