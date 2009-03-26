@@ -134,11 +134,8 @@ public class Superblock extends HFSPlusObject {
         int macDate = HFSUtils.getNow();
         this.setCreateDate(macDate);
         this.setModifyDate(macDate);
-        this.setBackupDate(0);
         this.setCheckedDate(macDate);
         // ---
-        this.setFileCount(0);
-        this.setFolderCount(0);
         this.setBlockSize(blockSize);
         this.setTotalBlocks((int) params.getBlockCount());
         this.setFreeBlocks((int) params.getBlockCount());

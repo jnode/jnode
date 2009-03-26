@@ -28,5 +28,5 @@ public interface Node {
     public boolean isLeafNode();
     public int getRecordOffset(int index);
     public NodeRecord getNodeRecord(int index);
-    public void addNodeRecord(int index, NodeRecord record, int offset);
+    public void addNodeRecord(NodeRecord record);
 }

@@ -20,16 +20,19 @@
  
 package org.jnode.fs.hfsplus.tree;
 
+import java.util.List;
+
 import org.jnode.util.BigEndian;
 
 public abstract class AbstractNode implements Node {
-
-    protected byte[] datas;
+    protected NodeDescriptor descriptor;
+    protected List<NodeRecord> records;
+    protected List<Integer> offsets;
     protected int size;
 
     @Override
     public NodeDescriptor getNodeDescriptor() {
-        return new NodeDescriptor(datas, 0);
+        return descriptor;
     }
 
     public boolean isIndexNode() {
@@ -42,26 +45,30 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public int getRecordOffset(int index) {
-        return BigEndian.getInt16(datas, size - ((index + 1) * 2));
+        return offsets.get(index);
     }
 
     @Override
     public abstract NodeRecord getNodeRecord(int index);
 
     @Override
-    public void addNodeRecord(int index, NodeRecord record, int offset) {
-        BigEndian.setInt16(datas, size - ((index + 1) * 2), offset);
-        System.arraycopy(record.getBytes(), 0, datas, offset, record.getSize());
+    public void addNodeRecord(NodeRecord record) {
+        Integer lastOffset = offsets.get(offsets.size() - 1);
+        Integer newOffset = lastOffset + record.getSize();
+        offsets.add(newOffset);
+        records.add(record);
     }
 
     public byte[] getBytes() {
+        byte[] datas = new byte[size];
         return datas;
     }
     
     public String toString() {
         StringBuffer b = new StringBuffer();
         b.append((this.isLeafNode()) ? "Leaf node" : "Index node").append("\n");
-        b.append(this.getNodeDescriptor().toString());
+        b.append(this.getNodeDescriptor().toString()).append("\n");
+        b.append("Offsets : ").append(offsets.toString());
         return b.toString();
         
     }
