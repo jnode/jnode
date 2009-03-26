@@ -57,19 +57,24 @@ public abstract class AbstractFontProvider<F extends Font, FD> implements FontPr
      * Cache font renderers
      */
     private final HashMap<Font, TextRenderer> renderers = new HashMap<Font, TextRenderer>();
+    
     /**
      * Cache font metrics
      */
     private final HashMap<Font, FontMetrics> metrics = new HashMap<Font, FontMetrics>();
+    
     /**
      * All loaded fonts (name, Font)
      */
     private final HashMap<String, F> fontsByName = new HashMap<String, F>();
+    
     /**
      * Have the system fonts been loaded yet
      */
     private boolean fontsLoaded = false;
+    
     private final RenderContext context = new RenderContext();
+    
     /**
      * The render cache
      */
@@ -102,7 +107,7 @@ public abstract class AbstractFontProvider<F extends Font, FD> implements FontPr
      * Does this provides provide the given font?
      *
      * @param font
-     * @return True if this provider provides the given font, false otherwise
+     * @return {@code true} if this provider provides the given font, {@code false} otherwise
      */
     public final boolean provides(Font font) {
         if (font == null) return false; // don't provide default (null) fonts
@@ -112,14 +117,17 @@ public abstract class AbstractFontProvider<F extends Font, FD> implements FontPr
     }
 
     /**
-     * Returns a set containing a one-point size instance of all fonts available in this provider.
-     * Typical usage would be to allow a user to select a particular font. Then, the application can size
-     * the font and set various font attributes by calling the deriveFont method on the choosen instance.
-     * This method provides for the application the most precise control over which Font instance is
-     * used to render text. If a font in this provider has multiple programmable variations, only one instance of that
-     * Font is returned in the set, and other variations must be derived by the application. If a font in this provider
-     * has multiple programmable variations, such as Multiple-Master fonts, only one instance of that font is returned
-     * in the Font set. The other variations must be derived by the application.
+     * Returns a set containing a one-point size instance of all fonts available 
+     * in this provider. Typical usage would be to allow a user to select a particular 
+     * font. Then, the application can size the font and set various font attributes 
+     * by calling the deriveFont method on the choosen instance.
+     * This method provides for the application the most precise control over which 
+     * Font instance is used to render text. If a font in this provider has multiple 
+     * programmable variations, only one instance of that Font is returned in the set, 
+     * and other variations must be derived by the application. If a font in this provider
+     * has multiple programmable variations, such as Multiple-Master fonts, only 
+     * one instance of that font is returned in the Font set. The other variations 
+     * must be derived by the application.
      *
      * @return The set containing all fonts provides by this provider.
      */
@@ -188,7 +196,7 @@ public abstract class AbstractFontProvider<F extends Font, FD> implements FontPr
      * Translates the font into a font that is provided by this provider.
      *
      * @param font
-     * @return
+     * @return the compatible font
      */
     @Override
     public final F getCompatibleFont(Font font) {

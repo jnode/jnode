@@ -35,8 +35,10 @@ public abstract class Glyph {
     /**
      * Initialize this instance;
      *
-     * @param in
-     * @throws java.io.IOException
+     * @param xMin
+     * @param yMin
+     * @param xMax
+     * @param yMax
      */
     protected Glyph(int xMin, int yMin, int xMax, int yMax) {
         this.xMin = xMin;

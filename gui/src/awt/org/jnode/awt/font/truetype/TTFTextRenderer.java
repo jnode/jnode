@@ -42,6 +42,7 @@ import org.jnode.driver.video.Surface;
  * @author epr
  */
 public class TTFTextRenderer extends AbstractTextRenderer {
+    
     /**
      * Create a new instance
      *
@@ -54,14 +55,6 @@ public class TTFTextRenderer extends AbstractTextRenderer {
         super(renderCache, fontMetrics, fontData);
     }
 
-    /**
-     * Render a given text to the given graphics at the given location.
-     *
-     * @param g
-     * @param text
-     * @param x
-     * @param y
-     */
     public void render(Surface surface, Shape clip, AffineTransform tx,
                        CharSequence text, int x, int y, Color color) {
         try {

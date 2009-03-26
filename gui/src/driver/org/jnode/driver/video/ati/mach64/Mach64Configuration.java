@@ -67,7 +67,7 @@ public class Mach64Configuration extends FrameBufferConfiguration {
      * Create a color model for a given bits per pixel.
      * 
      * @param bpp
-     * @return
+     * @return the color model
      */
     private static ColorModel createColorModel(int bpp) {
         return new DirectColorModel(bpp, 0xff0000, 0x00ff00, 0x0000ff);
@@ -83,7 +83,7 @@ public class Mach64Configuration extends FrameBufferConfiguration {
     /**
      * Gets the number of bytes per line
      * 
-     * @return
+     * @return the number of bytes per line
      */
     public final int getBytesPerLine() {
         return (displayMode.getWidth() * bitsPerPixel) >> 3;

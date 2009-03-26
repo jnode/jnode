@@ -61,7 +61,7 @@ public final class RenderCache {
     /**
      * Gets the current rendering context.
      *
-     * @return
+     * @return the RenderContext
      */
     public final RenderContext getContext() {
         return ctx;

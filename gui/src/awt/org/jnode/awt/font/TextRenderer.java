@@ -33,11 +33,15 @@ public interface TextRenderer {
     /**
      * Render a given text to the given graphics at the given location.
      *
-     * @param g
+     * @param surface
+     * @param clip
+     * @param tx
      * @param text
      * @param x
      * @param y
+     * @param color
      */
-    public void render(Surface g, Shape clip, AffineTransform tx, CharSequence text, int x, int y, Color color);
+    public void render(Surface surface, Shape clip, AffineTransform tx, CharSequence text, 
+            int x, int y, Color color);
 
 }

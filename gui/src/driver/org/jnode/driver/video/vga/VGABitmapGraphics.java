@@ -54,18 +54,10 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
         }
     }
 
-    /**
-     * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
-     *      int, int)
-     */
     protected void doCopyArea(int x, int y, int width, int height, int dx, int dy) {
         // TODO Implement me
     }
 
-    /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster,
-     *      int, int, int, int, int, int)
-     */
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width,
             int height) {
         vgaIO.setGRAF(1, 0);
@@ -127,19 +119,11 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
         vgaIO.setGRAF(1, 0x0F);
     }
 
-    /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster,
-     *      int, int, int, int, int, int, int)
-     */
     protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width,
             int height, int bgColor) {
         doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
     }
 
-    /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawLine(int, int, int, int,
-     *      int)
-     */
     protected void doDrawLine(int x, int y, int lineWidth, int color, int mode) {
         final int ofsY = y * 80;
         lineWidth = Math.min(this.width - x, lineWidth);
@@ -163,10 +147,6 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
         }
     }
 
-    /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawPixels(int, int, int, int,
-     *      int)
-     */
     protected void doDrawPixels(int x, int y, int count, int color, int mode) {
         for (int i = 0; i < count; i++) {
             final int bit = 0x80 >> (x & 7);
@@ -177,10 +157,6 @@ public class VGABitmapGraphics extends AbstractBitmapGraphics {
         }
     }
 
-    /**
-     * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
-     *      int, int, int, int, int, int, int)
-     */
     protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY, int dstX, int dstY,
             int width, int height, int color) {
         // TODO Implement me

@@ -114,7 +114,7 @@ public final class OS2Table extends VersionTable {
     }
 
     /**
-     * @return
+     * @return the fsSelection
      */
     public final int getFsSelection() {
         return this.fsSelection;

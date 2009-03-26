@@ -60,15 +60,8 @@ public class TTFSimpleTextRenderer implements TextRenderer {
         this.fontSize = fontSize;
     }
 
-    /**
-     * Render a given text to the given graphics at the given location.
-     *
-     * @param g
-     * @param text
-     * @param x
-     * @param y
-     */
-    public void render(Surface sf, Shape clip, AffineTransform tx2, CharSequence text, int x, int y, Color c) {
+    public void render(Surface surface, Shape clip, AffineTransform tx, CharSequence text, 
+            int x, int y, Color c) {
         try {
             final GeneralPath gp = new GeneralPath();
             gp.moveTo(x, y);
@@ -90,12 +83,12 @@ public class TTFSimpleTextRenderer implements TextRenderer {
             }
             final double ascent = hheadTable.getAscent();
 
-            final AffineTransform tx = new AffineTransform();            
+            final AffineTransform tx2 = new AffineTransform();            
             final double scale = fontSize / (-hheadTable.getDescent() + ascent);
             
-            tx.translate(x, y + fontSize);
-            tx.scale(scale, -scale);
-            tx.translate(0, ascent);
+            tx2.translate(x, y + fontSize);
+            tx2.scale(scale, -scale);
+            tx2.translate(0, ascent);
             
             for (int i = 0; i < text.length(); i++) {
                 // get the index for the needed glyph
@@ -103,11 +96,11 @@ public class TTFSimpleTextRenderer implements TextRenderer {
                 final int index = encTable.getTableFormat().getGlyphIndex(character);
                 if (character != ' ') {
                     Shape shape = ((ShapedGlyph) glyphTable.getGlyph(index)).getShape();
-                    gp.append(shape.getPathIterator(tx), false);
+                    gp.append(shape.getPathIterator(tx2), false);
                 }
-                tx.translate(hmTable.getAdvanceWidth(index), 0);
+                tx2.translate(hmTable.getAdvanceWidth(index), 0);
             }
-            sf.draw(gp, clip, tx2, c, Surface.PAINT_MODE);
+            surface.draw(gp, clip, tx, c, Surface.PAINT_MODE);
         } catch (IOException ex) {
             log.error("Error drawing text", ex);
         }
