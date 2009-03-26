@@ -60,7 +60,7 @@ public class CatalogNode extends AbstractNode {
 
     /**
      * @param parentId
-     * @return
+     * @return a NodeRecord or {@code null}
      */
     public final NodeRecord find(final CatalogNodeId parentId) {
         for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
@@ -77,7 +77,7 @@ public class CatalogNode extends AbstractNode {
 
     /**
      * @param key
-     * @return
+     * @return a NodeRecord or {@code null}
      */
     public NodeRecord find(final CatalogKey key) {
         NodeRecord largestMatchingRecord = null;
@@ -93,9 +93,9 @@ public class CatalogNode extends AbstractNode {
 
     /**
      * @param parentId
-     * @return
+     * @return an array of NodeRecords
      */
-    public final NodeRecord[] findChilds(final CatalogNodeId parentId) {
+    public final NodeRecord[] findChildren(final CatalogNodeId parentId) {
         LinkedList<NodeRecord> result = new LinkedList<NodeRecord>();
         NodeRecord largestMatchingRecord = null;
         CatalogKey largestMatchingKey = null;
@@ -119,7 +119,7 @@ public class CatalogNode extends AbstractNode {
 
     /**
      * @param parentId
-     * @return
+     * @return an array of NodeRecords
      */
     public final NodeRecord[] findAll(final CatalogNodeId parentId) {
         List<NodeRecord> list = new LinkedList<NodeRecord>();

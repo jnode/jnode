@@ -24,7 +24,6 @@ public class IndexNode extends AbstractNode {
 
     /**
      * 
-     * @param descriptor
      * @param nodeData
      * @param nodeSize
      */

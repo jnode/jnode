@@ -41,17 +41,19 @@ public class Catalog {
 
     private final Logger log = Logger.getLogger(getClass());
     private HfsPlusFileSystem fs;
+    
     /**
      * B-Tree node descriptor
      */
     private NodeDescriptor btnd;
+    
     /**
      * B-Tree Header record
      */
     private BTHeaderRecord bthr;
-    /** */
+    
     private int catalogHeaderNodeOffset;
-    /** */
+    
     private ByteBuffer buffer;
 
     /**
@@ -143,7 +145,7 @@ public class Catalog {
 
     /**
      * @param parentID
-     * @return
+     * @return the leaf record, or possibly {code null}.
      * @throws IOException
      */
     public final LeafRecord getRecord(final CatalogNodeId parentID) throws IOException {
@@ -186,7 +188,7 @@ public class Catalog {
 
     /**
      * Find leaf records corresponding to parentID. The search begin at the node
-     * correspding to the index passed as parameter.
+     * corresponding to the index passed as parameter.
      * 
      * @param parentID Parent node id
      * @param nodeNumber Index of node where the search begin.
@@ -202,7 +204,7 @@ public class Catalog {
             fs.getApi().read(catalogHeaderNodeOffset + (currentNodeNumber * nodeSize), nodeData);
             CatalogNode node = new CatalogNode(nodeData.array(), nodeSize);
             if (node.isIndexNode()) {
-                IndexRecord[] records = (IndexRecord[]) node.findChilds(parentID);
+                IndexRecord[] records = (IndexRecord[]) node.findChildren(parentID);
                 List<LeafRecord> lfList = new LinkedList<LeafRecord>();
                 for (IndexRecord rec : records) {
                     LeafRecord[] lfr = getRecords(parentID, rec.getIndex());
@@ -226,7 +228,7 @@ public class Catalog {
     /**
      * @param parentID
      * @param nodeName
-     * @return
+     * @return the leaf node or {@code null}
      * @throws IOException
      */
     public final LeafRecord getRecord(final CatalogNodeId parentID, final HFSUnicodeString nodeName)

@@ -26,13 +26,16 @@ import org.jnode.util.BigEndian;
 public class CatalogThread {
 
     public static final int CATALOG_THREAD_SIZE = 512;
+    
     /** The catalog thread record type. Can be a file or a folder. */
     private int recordType;
+    
     /**
      * the catalog node id of the file or folder referenced by the thread
      * record.
      */
     private CatalogNodeId parentId;
+    
     /** the name of the file or folder reference by the thread record. */
     private HFSUnicodeString nodeName;
 
@@ -66,7 +69,7 @@ public class CatalogThread {
 
     /**
      * 
-     * @return
+     * @return the thread encoded as data
      */
     public byte[] getBytes() {
         byte[] data = new byte[512];

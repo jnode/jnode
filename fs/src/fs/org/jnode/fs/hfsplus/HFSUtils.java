@@ -30,27 +30,27 @@ public class HFSUtils {
      * Difference in second between 01/01/1970 00:00:00 (java reference time)
      * and 01/01/1904 00:00:00 (HFS reference time).
      */
-    public static final long MAC_DATE_CONVERTION = 2082844800L;
+    public static final long MAC_DATE_CONVERSION = 2082844800L;
 
     /**
      * Convert time from/to java time to/from mac time.
      * 
      * @param time in seconds since reference date.
-     * @param encode if set to true, convert from java to mac. If set to false,
-     *            convert from mac to java.
+     * @param encode if {code true}, convert from java to mac, otherwise
+     * convert from mac to java.
      * 
-     * @return
+     * @return the converted time
      */
     public static long getDate(long time, boolean encode) {
-        time = (encode) ? time + MAC_DATE_CONVERTION : time - MAC_DATE_CONVERTION;
+        time = (encode) ? time + MAC_DATE_CONVERSION : time - MAC_DATE_CONVERSION;
         return time;
     }
 
     /**
      * 
-     * @param time
-     * @param dateFormat
-     * @return
+     * @param time a date/time in seconds since the UNIX epoch.
+     * @param dateFormat the date/time format string
+     * @return the date/time formatted as a String
      */
     public static String printDate(final long time, final String dateFormat) {
         Calendar cal = Calendar.getInstance();

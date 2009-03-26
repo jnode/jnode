@@ -200,9 +200,7 @@ public class Superblock extends HFSPlusObject {
      * Calculate the number of blocks needed for bitmap.
      * 
      * @param totalBlocks Total of blocks found in the device.
-     * 
-     * @return long - Number of blocks.
-     * 
+     * @return the number of blocks.
      * @throws IOException
      */
     private long getClumpSize(long totalBlocks) throws IOException {
@@ -418,7 +416,7 @@ public class Superblock extends HFSPlusObject {
     /**
      * Get string representation of attribute.
      * 
-     * @return
+     * @return the string representation
      */
     public final String getAttributesAsString() {
         return ((isAttribute(HFSPLUS_VOL_UNMNT_BIT)) ? " kHFSVolumeUnmountedBit" : "") +
@@ -431,7 +429,7 @@ public class Superblock extends HFSPlusObject {
      * 
      * @param maskBit Bit position of the attribute. See constants.
      * 
-     * @return true if attribute is set.
+     * @return {@code true} if attribute is set.
      */
     public final boolean isAttribute(final int maskBit) {
         return (((getAttributes() >> maskBit) & 0x1) != 0);
@@ -441,11 +439,6 @@ public class Superblock extends HFSPlusObject {
         return data;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     public final String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("Magic: 0x").append(NumberUtils.hex(getMagic(), 4)).append("\n");
