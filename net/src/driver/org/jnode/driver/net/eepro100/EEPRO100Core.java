@@ -342,7 +342,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @param owner
      * @param low
      * @param length
-     * @return
+     * @return the IOResource for the ports
      */
     private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner,
             final int low, final int length) throws ResourceNotFreeException, DriverException {
@@ -380,7 +380,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     /**
      * @param cmd
      * @param cmdLength
-     * @return
+     * @return the return value
      */
     final int doEepromCmd(int cmd, int cmdLength) {
         int retVal = 0;
@@ -421,7 +421,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     /**
      * @param phy_id
      * @param location
-     * @return
+     * @return the 16-bit word read
      */
     public final int mdioRead(int phy_id, int location) {
         int val;
@@ -443,7 +443,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @param phy_id
      * @param location
      * @param value
-     * @return
+     * @return the control word
      */
     public final int mdioWrite(int phy_id, int location, int value) {
         int val;

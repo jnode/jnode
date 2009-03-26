@@ -384,7 +384,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants, IPv4Servic
      * Gets the protocol addresses for a given name, or null if not found.
      * 
      * @param hostname
-     * @return
+     * @return the addresses or {@code null}
      */
     public ProtocolAddress[] getHostByName(String hostname) {
         try {

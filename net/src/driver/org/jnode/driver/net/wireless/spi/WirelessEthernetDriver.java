@@ -78,7 +78,7 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
     /**
      * Gets the wireless device core.
      *
-     * @return
+     * @return the WirelessDeviceCore
      */
     protected final WirelessDeviceCore getWirelessCore() {
         return (WirelessDeviceCore) getDeviceCore();

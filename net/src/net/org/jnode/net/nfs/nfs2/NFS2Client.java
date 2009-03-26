@@ -514,17 +514,14 @@ public class NFS2Client {
     /**
      * Set the attributes for file.
      * 
-     * 
-     * @param fileHandle
-     *                file handle.
-     * @param mode
-     *                mode.
+     * @param fileHandle file handle.
+     * @param mode mode.
      * @param uid
      * @param gid
      * @param size
      * @param lastAccessed
      * @param lastModified
-     * @return
+     * @return the FileAttribute set
      * @throws NFS2Exception
      * @throws IOException
      */

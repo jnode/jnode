@@ -47,7 +47,7 @@ public abstract class NetDeviceEvent extends EventObject {
     /**
      * Gets the device that it the source of this event.
      *
-     * @return
+     * @return the Device
      */
     public final Device getDevice() {
         return (Device) getSource();

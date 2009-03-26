@@ -38,7 +38,7 @@ public abstract class WirelessDeviceCore extends AbstractDeviceCore {
     /**
      * Gets the current authentication mode.
      *
-     * @return
+     * @return the authentication mode
      */
     protected abstract AuthenticationMode getAuthenticationMode()
         throws DriverException;

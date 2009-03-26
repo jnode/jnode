@@ -45,14 +45,17 @@ public class EEPRO100RxFD {
      * Offset within mem of first UDP
      */
     private final int firstUPDOffset;
+    
     /**
      * Offset within mem of first ethernet frame
      */
     private final int firstFrameOffset;
+    
     /**
      * 32-bit address first UDP
      */
     private final Address firstUPDAddress;
+    
     /**
      * 32-bit address of first ethernet frame
      */
@@ -168,7 +171,7 @@ public class EEPRO100RxFD {
     }
 
     /**
-     * @return
+     * @return data read from the device
      */
     public byte[] getDataBuffer() {
         byte[] buf = new byte[DataBufferSize];
@@ -177,7 +180,7 @@ public class EEPRO100RxFD {
     }
 
     /**
-     * @return
+     * @return a packet read from the device in a SocketBuffer
      */
     public SocketBuffer getPacket() {
         int pktLen = this.getCount() & 0x3fff;

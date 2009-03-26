@@ -54,7 +54,6 @@ public class p80211Header {
      * @param address3
      * @param sequenceControl
      * @param address4
-     * @param dataLength
      */
     public p80211Header(int frameControl, int durationId, EthernetAddress address1,
             EthernetAddress address2, EthernetAddress address3, int sequenceControl,
@@ -111,10 +110,8 @@ public class p80211Header {
      * layers have set their header data and can be used e.g. to update checksum
      * values.
      * 
-     * @param skbuf
-     *            The buffer
-     * @param offset
-     *            The offset to the first byte (in the buffer) of this header
+     * @param skbuf The buffer
+     * @param offset The offset to the first byte (in the buffer) of this header
      *            (since low layer headers are already prefixed)
      */
     public void finalizeHeader(SocketBuffer skbuf, int offset) {

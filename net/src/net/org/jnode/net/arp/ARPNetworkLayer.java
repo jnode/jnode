@@ -53,10 +53,12 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
      * My logger
      */
     private static final Logger log = Logger.getLogger(ARPNetworkLayer.class);
+    
     /**
      * My statistics
      */
     private final ARPStatistics stat = new ARPStatistics();
+    
     /**
      * ARP cache
      */
@@ -294,7 +296,7 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
      * Gets the protocol addresses for a given name, or null if not found.
      *
      * @param hostname
-     * @return
+     * @return the addresses or {@code null}
      */
     public ProtocolAddress[] getHostByName(String hostname) {
         return null;

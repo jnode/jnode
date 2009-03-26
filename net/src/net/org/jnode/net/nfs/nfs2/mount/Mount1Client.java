@@ -188,8 +188,7 @@ public class Mount1Client {
     /**
      * Call remote procedure mount.
      * 
-     * @param dirPath
-     *                parameter (of type DirPath) to the remote procedure call.
+     * @param path parameter (of type DirPath) to the remote procedure call.
      * @return Result from remote procedure call (of type MountResult).
      * @throws OncRpcException
      *                 if an ONC/RPC error occurs.

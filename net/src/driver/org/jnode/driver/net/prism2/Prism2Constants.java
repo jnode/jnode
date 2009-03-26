@@ -190,17 +190,17 @@ public interface Prism2Constants {
         /**
          * Gets the code value.
          *
-         * @return
+         * @return the code value
          */
         public final int getCode() {
             return code;
         }
 
         /**
-         * Gets the result value by its code.
+         * Gets the Result value by its code.
          *
          * @param code
-         * @return
+         * @return the Result value
          */
         public static final Result getByCode(int code) {
             for (Result r : Result.values()) {
@@ -611,10 +611,10 @@ public interface Prism2Constants {
         }
 
         /**
-         * Get the enum by its value.
+         * Get an InformationType by its value.
          *
          * @param value
-         * @return
+         * @return the InformationType
          */
         public static InformationType getByValue(int value) {
             for (InformationType it : values()) {
@@ -647,10 +647,10 @@ public interface Prism2Constants {
         }
 
         /**
-         * Get the enum by its value.
+         * Get the LinkStatus by its value.
          *
          * @param value
-         * @return
+         * @return the LinkStatus
          */
         public static LinkStatus getByValue(int value) {
             for (LinkStatus ls : values()) {

@@ -32,7 +32,7 @@ public interface VMNetAPI {
      * Gets a network device by its name, or null if not found.
      * 
      * @param name
-     * @return
+     * @return the device or {@code null}
      */
     public VMNetDevice getByName(String name);
 
@@ -47,13 +47,9 @@ public interface VMNetAPI {
     /**
      * Return a network device by its address
      * 
-     * @param addr
-     *            The address of the interface to return
-     * 
-     * @exception SocketException
-     *                If an error occurs
-     * @exception NullPointerException
-     *                If the specified addess is null
+     * @param addr The address of the interface to return
+     * @exception SocketException If an error occurs
+     * @exception NullPointerException If the specified address is {@code null}
      */
     public VMNetDevice getByInetAddress(InetAddress addr)
             throws SocketException;
@@ -75,7 +71,7 @@ public interface VMNetAPI {
     /**
      * Gets the address of a host by its name.
      * @param hostname
-     * @return
+     * @return the address 
      * @throws UnknownHostException
      */
     public byte[][] getHostByName(String hostname)
@@ -84,7 +80,7 @@ public interface VMNetAPI {
     /**
      * Gets the name of a host by its address.
      * @param ip The host address.
-     * @return
+     * @return the host name
      * @throws UnknownHostException
      */
     public String getHostByAddr(byte[] ip)
