@@ -53,7 +53,7 @@ public interface FrameBufferAPI extends DeviceAPI {
     /**
      * Is there an open framebuffer configuration.
      * 
-     * @return
+     * @return {@code true} if there is, otherwise {@code false}
      */
     public boolean isOpen();
     
@@ -62,7 +62,7 @@ public interface FrameBufferAPI extends DeviceAPI {
      * The old owner (if any) will receive a request to stop using the underlying FrameBuffer device.
      * 
      * @param owner
-     * @return true if owner can now start using exclusively the underlying FrameBuffer device.
+     * @return {@code true} if owner can now start using exclusively the underlying FrameBuffer device.
      */
     public void requestOwnership(FrameBufferAPIOwner owner);
 
@@ -70,14 +70,15 @@ public interface FrameBufferAPI extends DeviceAPI {
      * Request the ownership on the underlying FrameBuffer device.
      * 
      * @param owner
-     * @return true if owner can now start using exclusively the underlying FrameBuffer device.
+     * @return {@code true} if owner can now start using exclusively the underlying FrameBuffer device.
      */
     public void releaseOwnership(FrameBufferAPIOwner owner);
     
     /**
      * Gets the currently opened framebuffer configuration.
      * 
-     * @return
+     * @return the configuration
      */
     public Surface getCurrentSurface() throws NotOpenException;
+    // FIXME ... we do we refer to the Surface as a 'configuration'???
 }

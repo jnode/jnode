@@ -20,6 +20,8 @@
  
 package org.jnode.awt.image;
 
+import gnu.java.awt.java2d.AbstractGraphics2D;
+
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.image.BufferedImage;
@@ -81,7 +83,7 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
      * Returns a WritableRaster that is used by this class to perform the
      * rendering in. It is not necessary that the target surface immediately
      * reflects changes in the raster. Updates to the raster are notified via
-     * {@link #updateRaster}.
+     * {@link AbstractGraphics2D#updateRaster}.
      *
      * @return the destination raster
      */

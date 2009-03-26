@@ -36,7 +36,8 @@ public abstract class SummedAreaTable {
     /**
      * Initialize this instance from a given 1 banded raster.
      *
-     * @param src
+     * @param width
+     * @param height
      */
     protected SummedAreaTable(int width, int height) {
         this.width = width;
@@ -47,7 +48,9 @@ public abstract class SummedAreaTable {
     /**
      * Initialize this instance from a given 1 banded raster.
      *
-     * @param src
+     * @param master
+     * @param width
+     * @param height
      */
     public static SummedAreaTable create(BitSet master, int width, int height) {
         final int size = width * height;
@@ -79,7 +82,7 @@ public abstract class SummedAreaTable {
      * Gets a value out of the table at a given offset.
      *
      * @param offset
-     * @return
+     * @return the retrieved value
      */
     protected abstract int get(int offset);
 
@@ -95,7 +98,7 @@ public abstract class SummedAreaTable {
      *
      * @param x
      * @param y
-     * @return
+     * @return the sum
      */
     @Inline
     public final int getSum(int x, int y) {
@@ -117,7 +120,7 @@ public abstract class SummedAreaTable {
      * @param y
      * @param w
      * @param h
-     * @return
+     * @return the intensity
      */
     public final float getIntensity(int x, int y, int w, int h) {
         if (x < 0) {

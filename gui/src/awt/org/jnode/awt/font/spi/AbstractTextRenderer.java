@@ -61,7 +61,8 @@ public abstract class AbstractTextRenderer implements TextRenderer {
      * Create a new instance
      *
      * @param fontData
-     * @param fontSize
+     * @param fontMetrics
+     * @param renderCache
      */
     public AbstractTextRenderer(RenderCache renderCache, FontMetrics fontMetrics,
                                 FontData fontData) {
@@ -73,7 +74,7 @@ public abstract class AbstractTextRenderer implements TextRenderer {
     /**
      * Create/get the alpha raster used for rendering.
      *
-     * @return
+     * @return the alpha raster
      */
     protected final WritableRaster createAlphaRaster() {
         final RenderContext ctx = renderCache.getContext();
@@ -87,14 +88,6 @@ public abstract class AbstractTextRenderer implements TextRenderer {
         return r;
     }
 
-    /**
-     * Render a given text to the given graphics at the given location.
-     *
-     * @param g
-     * @param text
-     * @param x
-     * @param y
-     */
     public void render(Surface surface, Shape clip, AffineTransform tx,
                        CharSequence text, int x, int y, Color color) {
         try {

@@ -1,25 +1,23 @@
 package org.jnode.driver.video.util;
 
 /**
- * This is a implementation of Vesa's General Timing Formular base on the code
+ * This is a implementation of Vesa's General Timing Formula base on the code
  * of the Linux gtf tool
- * 
+ * <p>
  * Timing description I'm accustomed to:
- * 
- * 
- * 
+ * <pre>
  * <--------1--------> <--2--> <--3--> <--4--> _________
  * |-------------------|_______| |_______
  * 
  * R SS SE FL
- * 
+ * </pre>
  * 1: visible image 2: blank before sync (aka front porch) 3: sync pulse 4:
  * blank after sync (aka back porch) R: Resolution SS: Sync Start SE: Sync End
  * FL: Frame Length
  */
 public class VesaGTF {
 
-    /* asumed character width in pixels */
+    /* assumed character width in pixels */
     private static final double CELL_GRAN = 8.0;
 
     /* minimum front porch */
@@ -82,27 +80,27 @@ public class VesaGTF {
     /**
      * calculate the modelines for the given screen resolution and refresh rate.
      * 
-     * @param width
-     * @param height
+     * @param hPixels
+     * @param vLines
      * @param frequency
-     * @return
+     * @return the modelines
      */
-    public static VesaGTF calculate(int h_pixels, int v_lines, double freq) {
+    public static VesaGTF calculate(int hPixels, int vLines, double frequency) {
 
-        double total_active_pixels = Math.round(h_pixels / CELL_GRAN)
+        double total_active_pixels = Math.round(hPixels / CELL_GRAN)
                 * CELL_GRAN;
 
-        double h_period_est = ((1.0 / freq) - (MIN_VSYNC_PLUS_BP / 1000000.0))
-                / (v_lines + MIN_PORCH) * 1000000.0;
+        double h_period_est = ((1.0 / frequency) - (MIN_VSYNC_PLUS_BP / 1000000.0))
+                / (vLines + MIN_PORCH) * 1000000.0;
 
         double vsync_plus_bp = Math.round(MIN_VSYNC_PLUS_BP / h_period_est);
 
-        double total_v_lines = v_lines + vsync_plus_bp + MIN_PORCH;
+        double total_v_lines = vLines + vsync_plus_bp + MIN_PORCH;
 
         double v_field_rate_est = 1.0 / h_period_est / total_v_lines
                 * 1000000.0;
 
-        double h_period = h_period_est / (freq / v_field_rate_est);
+        double h_period = h_period_est / (frequency / v_field_rate_est);
 
         double ideal_duty_cycle = C_PRIME - (M_PRIME * h_period / 1000.0);
 
@@ -125,9 +123,9 @@ public class VesaGTF {
         return new VesaGTF((int) total_active_pixels,
                 (int) (total_active_pixels + h_front_porch),
                 (int) (total_active_pixels + h_front_porch + h_sync),
-                (int) total_pixels, v_lines, (int) (v_lines + MIN_PORCH),
-                (int) (v_lines + MIN_PORCH + V_SYNC_RQD), (int) total_v_lines,
-                pixel_freq, h_freq, freq);
+                (int) total_pixels, vLines, (int) (vLines + MIN_PORCH),
+                (int) (vLines + MIN_PORCH + V_SYNC_RQD), (int) total_v_lines,
+                pixel_freq, h_freq, frequency);
     }
 
     public int getHFrameLength() {

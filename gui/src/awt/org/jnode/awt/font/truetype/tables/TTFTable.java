@@ -68,7 +68,7 @@ public abstract class TTFTable {
     /**
      * Gets the input handler for this table.
      *
-     * @return
+     * @return the TTF input handler
      */
     protected final TTFInput getInput() {
         return input;
@@ -84,7 +84,7 @@ public abstract class TTFTable {
     /**
      * Gets the tag of this table.
      *
-     * @return
+     * @return the tag
      */
     public abstract String getTag();
 

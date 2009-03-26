@@ -57,6 +57,7 @@ public class Curves {
      * @param x3
      * @param y3
      * @param points The resulting points
+     * @return the number of points updated in points array
      */
     public static int calculateCubicCurve(double x0, double y0, double x1, double y1, double x2,
             double y2, double x3, double y3, double points[]) {
@@ -96,7 +97,7 @@ public class Curves {
      * @param x3
      * @param y3
      * @param points The resulting points
-     * @return int number of points in points array
+     * @return the number of points updated in points array
      */
     public static int calculateCubicCurveOpt2(double x0, double y0, double x1, double y1,
             double x2, double y2, double x3, double y3, double[] points) {
@@ -163,6 +164,7 @@ public class Curves {
      * @param x2
      * @param y2
      * @param points The resulting points
+     * @return the number of points updated in points array
      */
     public static int calculateQuadCurve(double x0, double y0, double x1, double y1, double x2,
             double y2, double points[]) {
@@ -198,9 +200,8 @@ public class Curves {
      * @param y1
      * @param x2
      * @param y2
-     * @param points
      * @param points The resulting points
-     * @return int number of points in points array
+     * @return the number of points updated in points array
      */
     public static int calculateQuadCurveOpt2(double x0, double y0, double x1, double y1, double x2,
             double y2, double points[]) {

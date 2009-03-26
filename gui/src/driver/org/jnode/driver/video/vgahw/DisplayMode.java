@@ -32,19 +32,25 @@ public class DisplayMode {
 
     /** Visible display width in pixels */
     private final int width;
+    
     /** h-sync pulse start */
     private final int hsyncStart;
+    
     /** h-sync pulse end */
     private final int hsyncEnd;
+    
     /** Total pixels per line */
     private final int hTotal;
 
     /** Visible display height in lines */
     private final int height;
+    
     /** v-sync pulse start */
     private final int vsyncStart;
+    
     /** v-sync pulse end */
     private final int vsyncEnd;
+    
     /** Total lines per frame */
     private final int vTotal;
 
@@ -72,11 +78,11 @@ public class DisplayMode {
      * @param width
      * @param hsyncStart
      * @param hsyncEnd
-     * @param total
+     * @param hTotal
      * @param height
      * @param vsyncStart
      * @param vsyncEnd
-     * @param total2
+     * @param vTotal
      */
     public DisplayMode(int freq, int width, int hsyncStart, int hsyncEnd, int hTotal, int height,
             int vsyncStart, int vsyncEnd, int vTotal) {

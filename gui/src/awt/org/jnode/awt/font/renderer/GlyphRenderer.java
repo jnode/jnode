@@ -62,11 +62,11 @@ public class GlyphRenderer {
     }
 
     /**
-     * Create a raster that can be used in {@link #createGlyphRaster(double)}.
+     * Create a raster that can be used in {@link #createGlyphRaster(WritableRaster, double)}.
      *
      * @param width
      * @param height
-     * @return
+     * @return the raster
      */
     public static final WritableRaster createRaster(int width, int height) {
         final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
@@ -113,7 +113,7 @@ public class GlyphRenderer {
      * into the raster.
      *
      * @param fontSize
-     * @return
+     * @return the location as a Point2D
      */
     public Point2D getMinLocation(double fontSize) {
         final double scale = MASTER_HEIGHT / fontSize;
@@ -124,7 +124,7 @@ public class GlyphRenderer {
      * Creates a master shape of the letter.
      *
      * @param shape
-     * @return
+     * @return the master shape
      */
     private final Master createMaster(RenderContext ctx, Shape shape,
                                       double ascent) {

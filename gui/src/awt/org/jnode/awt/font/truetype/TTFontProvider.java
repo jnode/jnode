@@ -78,7 +78,7 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontData> {
      * 
      * @param name
      * @param attrs
-     * @return
+     * @return the font peer created
      */
     @Override
     public TTFFontPeer createFontPeer(String name, Map attrs) {
@@ -110,7 +110,7 @@ public class TTFontProvider extends AbstractFontProvider<TTFFont, TTFFontData> {
      * Read an create a Font from the given InputStream
      *
      * @param stream
-     * @return
+     * @return the font created
      */
     @Override
     public TTFFont createFont(InputStream stream) throws FontFormatException, IOException {

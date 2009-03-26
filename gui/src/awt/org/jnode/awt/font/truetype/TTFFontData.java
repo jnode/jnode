@@ -52,8 +52,6 @@ public abstract class TTFFontData implements FontData {
 
     /**
      * Initialize this instance.
-     *
-     * @param input
      */
     protected TTFFontData() {
     }
@@ -79,7 +77,7 @@ public abstract class TTFFontData implements FontData {
     /**
      * Gets the version of this font data.
      *
-     * @return
+     * @return the version number
      */
     public abstract int getFontVersion();
 
@@ -87,7 +85,7 @@ public abstract class TTFFontData implements FontData {
     /**
      * Create a new table with a given table.
      *
-     * @param tag
+     * @param tc
      * @param input
      * @throws IOException
      */
@@ -100,6 +98,7 @@ public abstract class TTFFontData implements FontData {
      * Show the contents of this font data.
      */
     public void show() {
+        // FIXME ... ick ... pass an OutputStream parameter or return a String
         System.out.println("Tables:");
         for (Object v : tables.values()) {
             System.out.println(v);

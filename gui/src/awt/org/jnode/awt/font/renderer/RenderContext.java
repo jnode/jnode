@@ -36,8 +36,8 @@ public class RenderContext {
     /**
      * Gets an object out of this context with a given key.
      *
-     * @param key
-     * @return
+     * @param key the key
+     * @return the cached object or {code null}
      */
     public Object getObject(Object key) {
         final WeakReference<?> ref = objects.get(key);
@@ -49,10 +49,10 @@ public class RenderContext {
     }
 
     /**
-     * Gets an object out of this context with a given key.
+     * Stores an object in this context with a given key.
      *
-     * @param key
-     * @return
+     * @param key the key
+     * @param value the object
      */
     public void setObject(Object key, Object value) {
         final WeakReference<?> ref = objects.get(key);
