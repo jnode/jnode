@@ -35,9 +35,7 @@ import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
-import org.jnode.fs.hfsplus.catalog.CatalogThread;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
-import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 import org.jnode.fs.spi.FSEntryTable;
 
 public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {

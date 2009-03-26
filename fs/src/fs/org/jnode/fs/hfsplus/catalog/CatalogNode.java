@@ -25,9 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jnode.fs.hfsplus.tree.AbstractNode;
-import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.Key;
-import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 import org.jnode.fs.hfsplus.tree.NodeRecord;
 import org.jnode.util.BigEndian;
