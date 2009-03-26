@@ -205,53 +205,78 @@ public abstract class AbstractCommand implements Command {
     
     /**
      * Get the CommandLine object representing the command name and arguments
-     * in String form.
+     * in String form.  This method should not be called from a Command constructor.
      * 
      * @return the CommandLine object.
      */
     public final CommandLine getCommandLine() {
+        if (commandLine == null) {
+            throw new IllegalStateException("this.initialize(...) has not been called yet");
+        }
         return commandLine;
     }
 
     /**
      * Get the CommandIO object representing the 'error' stream; i.e. fd '2'.
+     * This method should not be called from a Command constructor.
      * 
      * @return the CommandIO for the command's error stream.
      */
     public final CommandOutput getError() {
+        if (ios == null) {
+            throw new IllegalStateException("this.initialize(...) has not been called yet");
+        }
         return (CommandOutput) ios[2];
     }
 
     /**
      * Get the CommandIO object representing the 'input' stream; i.e. fd '0'.
+     * This method should not be called from a Command constructor.
      * 
      * @return the CommandIO for the command's input stream.
      */
     public final CommandInput getInput() {
+        if (ios == null) {
+            throw new IllegalStateException("this.initialize(...) has not been called yet");
+        }
         return (CommandInput) ios[0];
     }
     
     /**
      * Get the Command's stream indexed by the 'fd' number.
+     * This method should not be called from a Command constructor.
      * 
      * @param fd a non-negative 'file descriptor' number.
      * @return the requested CommandIO object.
      */
     public final CommandIO getIO(int fd) {
+        if (ios == null) {
+            throw new IllegalStateException("this.initialize(...) has not been called yet");
+        }
         return ios[fd];
     }
     
     /**
      * Get the CommandIO object representing the 'output' stream; i.e. fd '1'.
+     * This method should not be called from a Command constructor.
      * 
      * @return the CommandIO for the command's output stream.
      */
     public final CommandOutput getOutput() {
+        if (ios == null) {
+            throw new IllegalStateException("this.initialize(...) has not been called yet");
+        }
         return (CommandOutput) ios[1];
     }
 
     @Override
     public final void initialize(CommandLine commandLine, CommandIO[] ios) {
+        // Check the init parameters ...
+        commandLine.getLength();
+        if (ios.length < 3) {
+            throw new IllegalArgumentException("'ios' must have at least 3 elements");
+        }
+        
         this.commandLine = commandLine;
         this.ios = ios;
     }
