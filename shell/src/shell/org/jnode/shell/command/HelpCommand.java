@@ -76,7 +76,7 @@ public class HelpCommand extends AbstractCommand {
         try {
             shell = (CommandShell) ShellUtils.getShellManager().getCurrentShell();
             CommandInfo cmdInfo =  shell.getCommandInfo(alias);
-            Help cmdHelp = HelpFactory.getHelpFactory().getHelp(alias, shell.getCommandInfo(alias));
+            Help cmdHelp = HelpFactory.getHelpFactory().getHelp(alias, cmdInfo);
             if (cmdHelp == null) {
                 err.println("No help information is available for alias / class '" + alias + "'");
                 exit(1);
