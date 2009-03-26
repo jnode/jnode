@@ -22,8 +22,6 @@ package org.jnode.fs.hfsplus.tree;
 
 import java.util.List;
 
-import org.jnode.util.BigEndian;
-
 public abstract class AbstractNode implements Node {
     protected NodeDescriptor descriptor;
     protected List<NodeRecord> records;
