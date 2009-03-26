@@ -30,12 +30,14 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.ReadOnlyFileSystemException;
+import org.jnode.fs.hfsplus.catalog.Catalog;
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.catalog.CatalogThread;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
+import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 import org.jnode.fs.spi.FSEntryTable;
 
 public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
@@ -211,22 +213,11 @@ public class HFSPlusDirectory extends HFSPlusEntry implements FSDirectory {
         if (fs.isReadOnly()) {
             throw new ReadOnlyFileSystemException();
         }
-
+        Catalog catalog = fs.getCatalog();
         Superblock volumeHeader = ((HfsPlusFileSystem) getFileSystem()).getVolumeHeader();
-        HFSUnicodeString dirName = new HFSUnicodeString(name);
-        CatalogThread thread =
-                new CatalogThread(CatalogFolder.RECORD_TYPE_FOLDER_THREAD, this.folder
-                        .getFolderId(), dirName);
-        CatalogFolder newFolder =
-                new CatalogFolder(0, new CatalogNodeId(volumeHeader.getNextCatalogId()));
-        log.debug("New catalog folder :\n" + newFolder.toString());
-
-        CatalogKey key = new CatalogKey(this.folder.getFolderId(), dirName);
-        log.debug("New catalog key :\n" + key.toString());
-
-        LeafRecord folderRecord = new LeafRecord(key, newFolder.getBytes());
-        log.debug("New record folder :\n" + folderRecord.toString());
-
+        LeafRecord folderRecord = catalog.createNode(name, this.folder
+                        .getFolderId(), new CatalogNodeId(volumeHeader.getNextCatalogId()), CatalogFolder.RECORD_TYPE_FOLDER_THREAD);
+        
         HFSPlusEntry newEntry = new HFSPlusDirectory(fs, this, name, folderRecord);
         volumeHeader.setFolderCount(volumeHeader.getFolderCount() + 1);
         log.debug("New volume header :\n" + volumeHeader.toString());

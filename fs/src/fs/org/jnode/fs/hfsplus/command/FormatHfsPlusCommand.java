@@ -47,9 +47,9 @@ public class FormatHfsPlusCommand extends AbstractFormatCommand<HfsPlusFileSyste
     protected Formatter<HfsPlusFileSystem> getFormatter() {
         HFSPlusParams params = new HFSPlusParams();
         params.setVolumeName((ARG_VOLUME_NAME.isSet()) ? ARG_VOLUME_NAME.getValue() : "untitled");
-        params.setBlockSize(params.OPTIMAL_BLOCK_SIZE);
+        params.setBlockSize(HFSPlusParams.OPTIMAL_BLOCK_SIZE);
         params.setJournaled(false);
-        params.setJournalSize(params.DEFAULT_JOURNAL_SIZE);
+        params.setJournalSize(HFSPlusParams.DEFAULT_JOURNAL_SIZE);
         return new HfsPlusFileSystemFormatter(params);
     }
 }

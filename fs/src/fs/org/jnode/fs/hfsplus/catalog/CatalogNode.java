@@ -20,6 +20,7 @@
  
 package org.jnode.fs.hfsplus.catalog;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,33 +30,43 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 import org.jnode.fs.hfsplus.tree.NodeRecord;
+import org.jnode.util.BigEndian;
 
 public class CatalogNode extends AbstractNode {
-
+    
+    /**
+     * Create a new node.
+     * @param descriptor
+     * @param nodeSize
+     */
     public CatalogNode(NodeDescriptor descriptor, final int nodeSize) {
+        this.descriptor = descriptor;
         this.size = nodeSize;
-        this.datas = new byte[nodeSize];
-        System.arraycopy(descriptor.getBytes(), 0, datas, 0, NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH);
+        this.records = new ArrayList<NodeRecord>(this.descriptor.getNumRecords());
+        this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
+        this.offsets.add(Integer.valueOf(NodeDescriptor.BT_NODE_DESCRIPTOR_LENGTH));
     }
 
+    /**
+     * Create node from existing data.
+     * @param nodeData
+     * @param nodeSize
+     */
     public CatalogNode(final byte[] nodeData, final int nodeSize) {
+        this.descriptor = new NodeDescriptor(nodeData, 0);
         this.size = nodeSize;
-        this.datas = nodeData;
+        this.records = new ArrayList<NodeRecord>(this.descriptor.getNumRecords());
+        this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
+        for(int i = 0; i < this.descriptor.getNumRecords(); i++){
+            offsets.add(BigEndian.getInt16(nodeData, size - ((i + 1) * 2)));
+            //TODO Get record data.
+        }
+        
     }
 
     @Override
     public NodeRecord getNodeRecord(int index) {
-        int offset = this.getRecordOffset(index);
-        int offset2 = this.getRecordOffset(index + 1);
-        int recordSize = offset2 - offset;
-        NodeRecord record = null;
-        Key key = new CatalogKey(datas, offset);
-        if (isIndexNode()) {
-            record = new IndexRecord(key, datas, offset);
-        } else {
-            record = new LeafRecord(key, datas, offset, recordSize);
-        }
-        return record;
+        return records.get(index);
     }
 
     /**
@@ -63,8 +74,7 @@ public class CatalogNode extends AbstractNode {
      * @return a NodeRecord or {@code null}
      */
     public final NodeRecord find(final CatalogNodeId parentId) {
-        for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
-            NodeRecord record = this.getNodeRecord(index);
+        for (NodeRecord record : records) {
             Key key = record.getKey();
             if (key instanceof CatalogKey) {
                 if (((CatalogKey) key).getParentId().getId() == parentId.getId()) {
