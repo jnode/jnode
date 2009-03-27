@@ -25,7 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jnode.fs.hfsplus.tree.AbstractNode;
+import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.Key;
+import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 import org.jnode.fs.hfsplus.tree.NodeRecord;
 import org.jnode.util.BigEndian;
@@ -55,9 +57,21 @@ public class CatalogNode extends AbstractNode {
         this.size = nodeSize;
         this.records = new ArrayList<NodeRecord>(this.descriptor.getNumRecords());
         this.offsets = new ArrayList<Integer>(this.descriptor.getNumRecords() + 1);
+        int offset;
+        for(int i = 0; i < this.descriptor.getNumRecords() + 1; i++){
+            offset = BigEndian.getInt16(nodeData, size - ((i + 1) * 2));
+            offsets.add(Integer.valueOf(offset));
+        }
+        CatalogKey key;
         for(int i = 0; i < this.descriptor.getNumRecords(); i++){
-            offsets.add(BigEndian.getInt16(nodeData, size - ((i + 1) * 2)));
-            //TODO Get record data.
+            offset = offsets.get(i);
+            key = new CatalogKey(nodeData, offset);
+            if(isIndexNode()){
+                records.add(new IndexRecord(key,nodeData, offset));
+            } else {
+                int recordSize = offsets.get(i+1) - offset;
+                records.add(new LeafRecord(key,nodeData, offset, recordSize));
+            }
         }
         
     }
@@ -107,8 +121,7 @@ public class CatalogNode extends AbstractNode {
         LinkedList<NodeRecord> result = new LinkedList<NodeRecord>();
         NodeRecord largestMatchingRecord = null;
         CatalogKey largestMatchingKey = null;
-        for (int index = 0; index < this.getNodeDescriptor().getNumRecords(); index++) {
-            NodeRecord record = this.getNodeRecord(index);
+        for (NodeRecord record : records) {
             CatalogKey key = (CatalogKey) record.getKey();
             if (key.getParentId().getId() < parentId.getId()
                 && (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {

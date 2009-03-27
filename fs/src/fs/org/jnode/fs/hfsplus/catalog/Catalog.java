@@ -143,6 +143,7 @@ public class Catalog {
     }
 
     /**
+     * Create a new node in the catalog B-Tree.
      * 
      * @param filename
      * @param parentId
@@ -150,26 +151,26 @@ public class Catalog {
      * @param nodeType
      * @return
      */
-    public LeafRecord createNode(String filename,  CatalogNodeId parentId, CatalogNodeId nodeId, int nodeType) throws IOException {
+    public LeafRecord createNode(String filename, CatalogNodeId parentId, CatalogNodeId nodeId,
+            int nodeType) throws IOException {
         HFSUnicodeString name = new HFSUnicodeString(filename);
         LeafRecord record = this.getRecord(parentId, name);
-        if(record == null){
+        if (record == null) {
             NodeDescriptor nd = new NodeDescriptor(0, 0, NodeDescriptor.BT_LEAF_NODE, 1, 2);
-            CatalogNode node = new CatalogNode(nd, 4096);
+            CatalogNode node = new CatalogNode(nd, 8192);
             CatalogKey key = new CatalogKey(parentId, name);
-            CatalogThread thread =
-                new CatalogThread(nodeType, parentId, name);
+            CatalogThread thread = new CatalogThread(nodeType, parentId, name);
             record = new LeafRecord(key, thread.getBytes());
             node.addNodeRecord(record);
-            if(nodeType == CatalogFolder.RECORD_TYPE_FOLDER_THREAD){
-            CatalogFolder newFolder = new CatalogFolder(0, nodeId);
-            key = new CatalogKey(parentId, name);
-            record = new LeafRecord(key, newFolder.getBytes());
+            if (nodeType == CatalogFolder.RECORD_TYPE_FOLDER) {
+                CatalogFolder folder = new CatalogFolder(0, nodeId);
+                key = new CatalogKey(parentId, name);
+                record = new LeafRecord(key, folder.getBytes());
             } else {
-                //TODO
+                // TODO
             }
         } else {
-            //TODO
+            // TODO
         }
         return record;
     }
