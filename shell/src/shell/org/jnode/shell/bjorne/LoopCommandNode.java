@@ -26,21 +26,40 @@ import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.ShellException;
 
+/**
+ * LoopCommandNode is the parse tree node class for 'until' and 'while' loop statements.
+ * 
+ * @author crawley@jnode.org
+ */
 public class LoopCommandNode extends CommandNode {
     private final CommandNode cond;
 
     private final CommandNode body;
 
+    /**
+     * Construct the LoopCommandNode
+     * @param nodeType either {@link BjorneInterpreter#CMD_WHILE} or {@link BjorneInterpreter#CMD_UNTIL}.
+     * @param cond the loop's condition CommandNode
+     * @param body the loop's body CommandNode
+     */
     public LoopCommandNode(int nodeType, CommandNode cond, CommandNode body) {
         super(nodeType);
         this.body = body;
         this.cond = cond;
     }
 
+    /**
+     * Get the loop's 'body' node.
+     * @return the 'body' node.
+     */
     public CommandNode getBody() {
         return body;
     }
 
+    /**
+     * Get the loop's 'condition' node
+     * @return the 'condition' node.
+     */
     public CommandNode getCond() {
         return cond;
     }

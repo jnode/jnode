@@ -24,6 +24,12 @@ import org.jnode.shell.CommandShell;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.ShellException;
 
+/**
+ * This is the base class for parse tree nodes that represent simple
+ * and compound bjorne commands.
+ * 
+ * @author crawley@jnode.org
+ */
 public abstract class CommandNode {
     private RedirectionNode[] redirects;
 
@@ -31,36 +37,79 @@ public abstract class CommandNode {
 
     private int flags;
 
+    /**
+     * Construct with its initial parse tree node type
+     * @param nodeType the parse tree node type
+     */
     public CommandNode(int nodeType) {
         this.nodeType = nodeType;
     }
 
+    /**
+     * Get the redirection parse tree nodes for this command node
+     * @return the redirection nodes or {@code null}
+     */
     public RedirectionNode[] getRedirects() {
         return redirects;
     }
 
+    /**
+     * Set the redirection parse tree nodes for this command node
+     * @param redirects the redirection nodes or {@code null}
+     */
     public void setRedirects(RedirectionNode[] redirects) {
         this.redirects = redirects;
     }
 
+    /** 
+     * Get the parse tree node type
+     * @return the node type
+     */
     public int getNodeType() {
         return nodeType;
     }
 
+    /**
+     * Get the node's flags.  The meaning is specific to each CommandNode subclass.
+     * @return the flags
+     */
     public int getFlags() {
         return flags;
     }
 
+    /**
+     * Set (OR) one or more flags
+     * @param flag
+     */
     public void setFlag(int flag) {
         flags |= flag;
     }
 
+    /**
+     * Update the node type.
+     * @param nodeType
+     */
     public void setNodeType(int nodeType) {
         this.nodeType = nodeType;
     }
 
+    /**
+     * Execute this command node with the given bjorne shell context
+     * @param context the bjorne context
+     * @return the return code from executing the command node
+     * @throws ShellException
+     */
     public abstract int execute(BjorneContext context) throws ShellException;
 
+    /**
+     * Create a CommandThread that will run this command node with the given 
+     * bjorne shell context.
+     * @param shell our parent CommandShell instance
+     * @param context the bjorne context
+     * @return a CommandThread that will run the command node when 
+     *        {@link Thread#start()} is called.
+     * @throws ShellException
+     */
     public abstract CommandThread fork(CommandShell shell, BjorneContext context)
         throws ShellException;
 
@@ -77,6 +126,12 @@ public abstract class CommandNode {
         return sb.toString();
     }
 
+    /**
+     * A helper method for toString() implementations that renders an
+     * array in a human readable form.
+     * @param sb the destination for rendering
+     * @param array the object array to be rendered.
+     */
     protected static void appendArray(StringBuffer sb, Object[] array) {
         sb.append('[');
         for (int i = 0; i < array.length; i++) {
@@ -88,7 +143,15 @@ public abstract class CommandNode {
         sb.append(']');
     }
 
+    /**
+     * Build a pipeline descriptor for this node.
+     * 
+     * @param context the bjorne shell context supplying variables, etc
+     * @return the assembled descriptor or {@code null} if none is needed.
+     * @throws ShellException
+     */
     public BjornePipeline buildPipeline(BjorneContext context) throws ShellException {
+        // FIXME ... I think I need to implement this for all CommandNode subtypes ...
         return null;
     }
 

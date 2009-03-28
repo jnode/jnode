@@ -25,6 +25,12 @@ import java.util.Iterator;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 
+/**
+ * This class implements the 'continue' built-in.  This is done by throwing a 
+ * BjorneControlException with code 'BRANCH_CONTINUE'.
+ * 
+ * @author crawley@jnode.org
+ */
 final class ContinueBuiltin extends BjorneBuiltin {
     @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
