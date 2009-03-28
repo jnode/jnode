@@ -26,6 +26,11 @@ import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.ShellException;
 
+/**
+ * ForCommandNode is the parse tree node class for 'for' statements.
+ * 
+ * @author crawley@jnode.org
+ */
 public class ForCommandNode extends CommandNode {
     private final CommandNode body;
 
@@ -33,6 +38,12 @@ public class ForCommandNode extends CommandNode {
 
     private final BjorneToken[] words;
 
+    /**
+     * Construct a ForCommandNode
+     * @param var the variable
+     * @param words the words
+     * @param body the loop body
+     */
     public ForCommandNode(BjorneToken var, BjorneToken[] words, CommandNode body) {
         super(BjorneInterpreter.CMD_FOR);
         this.body = body;
@@ -40,14 +51,26 @@ public class ForCommandNode extends CommandNode {
         this.words = words;
     }
 
+    /**
+     * Get the body of the for loop
+     * @return the 'body' CommandNode
+     */
     public CommandNode getBody() {
         return body;
     }
 
+    /**
+     * The for loop's variable.
+     * @return the token for the variable.
+     */
     public BjorneToken getVar() {
         return var;
     }
 
+    /**
+     * The words that are used to supply values for the loop variable.
+     * @return the words.
+     */
     public BjorneToken[] getWords() {
         return words;
     }
@@ -68,6 +91,7 @@ public class ForCommandNode extends CommandNode {
     @Override
     public int execute(BjorneContext context) throws ShellException {
         int rc = 0;
+        // FIXME ... BUG ... the words need to be expanded.
         for (BjorneToken word : words) {
             context.setVariable(var.getText(), word.getText());
             rc = body.execute(context);

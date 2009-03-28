@@ -24,6 +24,12 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellSyntaxException;
 
+/**
+ * This class implements the 'set' built-in.  It works by updating the state
+ * of the shell's context object. 
+ * 
+ * @author crawley@jnode.org
+ */
 final class ShiftBuiltin extends BjorneBuiltin {
     
     public int invoke(CommandLine command, BjorneInterpreter interpreter,

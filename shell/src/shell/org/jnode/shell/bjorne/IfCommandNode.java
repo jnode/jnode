@@ -26,6 +26,11 @@ import org.jnode.shell.CommandThread;
 import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.ShellException;
 
+/**
+ * IfCommandNode is the parse tree node class for 'if' statements and 'elif' sub-statements.
+ * 
+ * @author crawley@jnode.org
+ */
 public class IfCommandNode extends CommandNode {
 
     private final CommandNode cond;
@@ -34,6 +39,15 @@ public class IfCommandNode extends CommandNode {
 
     private final CommandNode elsePart;
 
+    /**
+     * Construct an IfCommandNode.
+     * 
+     * @param commandType this should be {@link BjorneInterpreter#CMD_IF} 
+     *     or {@link BjorneInterpreter#CMD_ELIF}.
+     * @param cond the CommandNode providing the 'condition' for the statement.
+     * @param thenPart the statement's 'then' CommandNode or {code null}
+     * @param elsePart the statement's 'else' CommandNode or {code null}
+     */
     public IfCommandNode(int commandType, CommandNode cond,
             CommandNode thenPart, CommandNode elsePart) {
         super(commandType);
@@ -42,14 +56,30 @@ public class IfCommandNode extends CommandNode {
         this.elsePart = elsePart;
     }
 
+    /**
+     * The command node that provides the 'condition' for the 'if' statement.
+     * @return the 'condition' node.
+     */
     public CommandNode getCond() {
         return cond;
     }
 
+    /**
+     * The command node that provides the 'else' part of the 'if' statement.  In
+     * the case of an 'elif', this will be another IfCommandNode.  If there is no
+     * 'else' part, this will be or {@code null}.
+     * 
+     * @return the 'else' node, or {@code null}.
+     */
     public CommandNode getElsePart() {
         return elsePart;
     }
 
+    /**
+     * The command node that provides the 'then' part of the 'if' statement.
+     * 
+     * @return the 'then' node, or {@code null}.
+     */
     public CommandNode getThenPart() {
         return thenPart;
     }
@@ -98,6 +128,4 @@ public class IfCommandNode extends CommandNode {
         };
         return new CommandThreadImpl(cr, context.getName());
     }
-
-    
 }
