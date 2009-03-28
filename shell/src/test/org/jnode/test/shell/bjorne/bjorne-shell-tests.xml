@@ -131,6 +131,17 @@ A is 2
 A is 1
 </output>
     </testSpec>
+    <testSpec title="for in `...` do ... done" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+for A in `echo 5 4 3 2 1` ; do echo A is $A ; done
+        </script>
+        <output>A is 5
+A is 4
+A is 3
+A is 2
+A is 1
+</output>
+    </testSpec>
     <testSpec title="for ... do ... done multi-line" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
 for A in 5 4 3 2 1 ; 
