@@ -247,10 +247,6 @@ public class BjorneInterpreter implements CommandInterpreter {
         if (DEBUG) {
             System.err.println(tree);
         }
-        if (capture == null) {
-            // FIXME ... this may add an empty line to the command history
-            shell.addCommandToHistory(command);
-        }
         return tree.execute((BjorneContext) myContext);
     }
     

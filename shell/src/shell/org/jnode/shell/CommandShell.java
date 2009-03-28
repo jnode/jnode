@@ -337,14 +337,14 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         });
 
         while (!isExited()) {
+            String input = null;
             try {
                 refreshFromProperties();
-
                 clearEof();
                 outPW.print(prompt());
                 readingCommand = true;
-                String line = readInputLine();
-                if (line.length() > 0) {
+                input = readInputLine();
+                if (input.length() > 0) {
                     // This hairy bit of code deals with shell commands that span multiple
                     // input lines.  If an interpreter encounters the end of the line that
                     // we have given it and it requires more input to get a complete command,
@@ -358,10 +358,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     boolean done = false;
                     do {
                         try {
-                            runCommand(line, true, this.interpreter);
+                            runCommand(input, true, this.interpreter);
                             done = true;
                         } catch (IncompleteCommandException ex) {
                             String continuation = null;
+                            // (Tell completer to use command history not app. history)
+                            readingCommand = true;
                             if (this.interpreter.supportsMultilineCommands()) {
                                 String prompt = ex.getPrompt();
                                 if (prompt != null) {
@@ -373,7 +375,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                                 diagnose(ex);
                                 break;
                             } else {
-                                line = line + "\n" + continuation;
+                                input = input + "\n" + continuation;
                             }
                         } catch (ShellException ex) {
                             diagnose(ex);
@@ -389,6 +391,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 errPW.println("Uncaught exception while processing command(s): "
                         + ex.getMessage());
                 stackTrace(ex);
+            } finally {
+                if (input != null && input.trim().length() > 0) {
+                    String lines[] = input.split("\\n");
+                    for (String line : lines) {
+                        addToCommandHistory(line);
+                    }
+                }
             }
         }
     }
@@ -549,19 +558,20 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         
     private int runCommand(String cmdLineStr, boolean interactive,
             CommandInterpreter interpreter) throws ShellException {
-        if (interactive) {
-            clearEof();
-            readingCommand = false;
-            // Each interactive command is launched with a fresh history
-            // for input completion
-            applicationHistory.set(new InputHistory());
+        try {
+            if (interactive) {
+                clearEof();
+                readingCommand = false;
+                // Each interactive command is launched with a fresh history
+                // for input completion
+                applicationHistory.set(new InputHistory());
+            }
+            return interpreter.interpret(this, cmdLineStr);
+        } finally {
+            if (interactive) {
+                applicationHistory.set(null);
+            }
         }
-        int rc = interpreter.interpret(this, cmdLineStr);
-
-        if (interactive) {
-            applicationHistory.set(null);
-        }
-        return rc;
     }
 
     /**
@@ -779,21 +789,21 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         } 
     }
 
-    public void addCommandToHistory(String cmdLineStr) {
-        // Add this command to the command history.
-        if (isHistoryEnabled() && !cmdLineStr.equals(lastCommandLine)) {
-            commandHistory.addLine(cmdLineStr);
-            lastCommandLine = cmdLineStr;
+    private void addToCommandHistory(String line) {
+        // Add this line to the command history.
+        if (isHistoryEnabled() && !line.equals(lastCommandLine)) {
+            commandHistory.addLine(line);
+            lastCommandLine = line;
         }
     }
 
-    public void addInputToHistory(String inputLine) {
-        // Add this input to the application input history.
-        if (isHistoryEnabled() && !inputLine.equals(lastInputLine)) {
+    private void addToInputHistory(String line) {
+        // Add this line to the application input history.
+        if (isHistoryEnabled() && !line.equals(lastInputLine)) {
             InputHistory history = applicationHistory.get();
             if (history != null) {
-                history.addLine(inputLine);
-                lastInputLine = inputLine;
+                history.addLine(line);
+                lastInputLine = line;
             }
         }
     }
@@ -851,7 +861,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         private void filter(byte b) {
             if (b == '\n') {
-                addInputToHistory(line.toString());
+                addToInputHistory(line.toString());
                 line.setLength(0);
             } else {
                 line.append((char) b);
