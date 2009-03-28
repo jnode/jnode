@@ -784,7 +784,7 @@ public final class VmIsolate {
         if (executor == null) {
             executor = AccessController.doPrivileged(new PrivilegedAction<ExecutorService>() {
                 public ExecutorService run() {
-                    return Executors.newSingleThreadExecutor(new IsolateThreadFactory(VmIsolate.this));
+                    return Executors.newSingleThreadExecutor(new IsolateThreadFactory2(VmIsolate.this));
                 }
             });
         }
