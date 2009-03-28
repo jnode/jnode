@@ -758,5 +758,22 @@ Hi mum again
 Hi mum again
 </file>
     </testSpec>
+    <testSpec title="if to pipe" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+               if test $A ; then echo set ; else echo unset ; fi | cat &gt; @TEMP_DIR@/1
+               ( if test $A ; then echo set ; else echo unset ; fi ) | cat &gt; @TEMP_DIR@/2
+               A=1
+               if test $A ; then echo set ; else echo unset ; fi | cat &gt; @TEMP_DIR@/3
+               ( if test $A ; then echo set ; else echo unset ; fi ) | cat &gt; @TEMP_DIR@/4
+        </script>
+        <file name="1" input="false">unset
+</file>
+        <file name="2" input="false">unset
+</file>
+        <file name="3" input="false">set
+</file>
+        <file name="4" input="false">set
+</file>
+    </testSpec>
     
 </testSet>
