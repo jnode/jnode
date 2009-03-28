@@ -301,7 +301,7 @@ public class BjorneContext {
     }
 
     /**
-     * Perform expand-and-split processing on an array of word tokens. The resulting
+     * Perform expand-and-split processing on a list of word tokens. The resulting
      * wordTokens are assembled into a CommandLine.  
      * 
      * @param tokens the tokens to be expanded and split into words
@@ -310,23 +310,66 @@ public class BjorneContext {
      */
     public CommandLine expandAndSplit(Iterable<BjorneToken> tokens) throws ShellException {
         List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
-        for (BjorneToken token : tokens) {
-            String word = token.getText();
-            CharSequence expanded = expand(word);
-            if (expanded == word) {
-                splitAndAppend(token, wordTokens);
-            } else {
-                BjorneToken newToken = token.remake(expanded);
-                if (newToken != null) {
-                    splitAndAppend(newToken, wordTokens);
-                }
-            }
-        }
+        expandAndSplit(tokens, wordTokens);
         return makeCommandLine(wordTokens);
     }
     
+    /**
+     * Perform expand-and-split processing on an array of word tokens. The resulting
+     * wordTokens are assembled into a CommandLine.  
+     * 
+     * @param tokens the tokens to be expanded and split into words
+     * @return the command line
+     * @throws ShellException
+     */
     public CommandLine expandAndSplit(BjorneToken[] tokens) throws ShellException {
-        return expandAndSplit(Arrays.asList(tokens));
+        List<BjorneToken> wordTokens = new LinkedList<BjorneToken>();
+        expandAndSplit(tokens, wordTokens);
+        return makeCommandLine(wordTokens);
+    }
+    
+    /**
+     * Perform expand-and-split processing on a list of word tokens. The resulting
+     * tokens are appended to wordTokens.  
+     * 
+     * @param tokens the tokens to be expanded and split into words
+     * @param wordTokens append expanded/split tokens to this list
+     * @throws ShellException
+     */
+    public void expandAndSplit(Iterable<BjorneToken> tokens, List<BjorneToken> wordTokens) 
+        throws ShellException {
+        for (BjorneToken token : tokens) {
+            expandSplitAndAppend(token, wordTokens);
+        }
+    }
+    
+    /**
+     * Perform expand-and-split processing on an array of word tokens. The resulting
+     * tokens are appended to wordTokens.  
+     * 
+     * @param tokens the tokens to be expanded and split into words
+     * @param wordTokens append expanded/split tokens to this list
+     * @throws ShellException
+     */
+    public void expandAndSplit(BjorneToken[] tokens, List<BjorneToken> wordTokens) 
+        throws ShellException {
+        for (BjorneToken token : tokens) {
+            expandSplitAndAppend(token, wordTokens);
+        }
+    }
+    
+    private void expandSplitAndAppend(BjorneToken token, List<BjorneToken> wordTokens) 
+        throws ShellException {
+        String word = token.getText();
+        CharSequence expanded = expand(word);
+        if (expanded == word) {
+            splitAndAppend(token, wordTokens);
+        } else {
+            BjorneToken newToken = token.remake(expanded);
+            if (newToken != null) {
+                splitAndAppend(newToken, wordTokens);
+            }
+        }
     }
 
     /**
