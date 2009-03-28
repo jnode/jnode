@@ -100,7 +100,6 @@ public class DefaultInterpreter implements CommandInterpreter {
         if (cmd == null) {
             return 0;
         }
-        shell.addCommandToHistory(line);
         try {
             CommandInfo cmdInfo = cmd.parseCommandLine(shell);
             return shell.invoke(cmd, cmdInfo, null, null);

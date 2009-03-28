@@ -76,9 +76,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         int len = commands.size();
         if (len == 0) {
             return 0; // empty command line.
-        }
-        shell.addCommandToHistory(line);
-        if (len == 1) {
+        } else if (len == 1) {
             return runCommand(shell, commands.get(0));
         } else {
             return runPipeline(shell, commands);
