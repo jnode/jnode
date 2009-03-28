@@ -45,8 +45,6 @@ final class FileHandleImpl implements VMFileHandle {
     private boolean closed;
     /** Position within this file */
     private long fileOffset;
-    /** Buffer for reading/writing single bytes */
-    private ByteBuffer tmpBuffer;
 
     /**
      * Create a new instance
@@ -61,7 +59,6 @@ final class FileHandleImpl implements VMFileHandle {
         this.readOnly = (mode == VMOpenMode.READ);
         this.fhm = fhm;
         this.closed = false;
-        tmpBuffer = ByteBuffer.allocate(1);
 
         // WRITE only mode, i.e. NOT APPEND mode. Thus we have to set the
         // filesize to 0
@@ -252,7 +249,6 @@ final class FileHandleImpl implements VMFileHandle {
     public int read() throws IOException {
         // TODO very inefficient, optimize it
         ByteBuffer tmpBuffer = ByteBuffer.allocate(1);
-        //tmpBuffer.position(0);
         int nbRead = -1;
         nbRead = read(tmpBuffer);
         if (nbRead < 1) {
@@ -264,8 +260,6 @@ final class FileHandleImpl implements VMFileHandle {
     public void write(int b) throws IOException {
         // TODO very inefficient, optimize it
         ByteBuffer tmpBuffer = ByteBuffer.wrap(new byte[] {(byte) b});
-        //tmpBuffer.position(0);
-        //tmpBuffer.put(0,(byte)b);
         write(tmpBuffer);
     }
 
