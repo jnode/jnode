@@ -45,6 +45,8 @@
       <export name="sun.security.jca.*"/>
       <export name="sun.security.pkcs.ParsingException"/>
       <export name="sun.security.provider.SecureRandom"/>
+      <export name="sun.security.provider.PolicyFile"/>
+      <export name="sun.security.provider.PolicyParser"/>
       <export name="sun.security.util.*"/>
 
       <export name="sun.misc.Service"/>

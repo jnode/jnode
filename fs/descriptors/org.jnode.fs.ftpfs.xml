@@ -25,6 +25,7 @@
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
-  </extension> 
+    <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers"/>
+  </extension>
         
 </plugin>
