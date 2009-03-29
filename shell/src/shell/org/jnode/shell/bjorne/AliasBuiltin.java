@@ -40,10 +40,11 @@ final class AliasBuiltin extends BjorneBuiltin {
             BjorneContext context) throws ShellException {
         Iterator<String> args = command.iterator();
         context = context.getParent();
-        PrintStream ps = context.resolvePrintStream(context.getIO(Command.STD_ERR));
+        PrintStream out = context.resolvePrintStream(context.getIO(Command.STD_OUT));
+        PrintStream err = context.resolvePrintStream(context.getIO(Command.STD_ERR));
         int rc = 0;
         if (!args.hasNext()) {
-            printAliases(ps, context.getAliases());
+            printAliases(out, context.getAliases());
         } else {
             while (args.hasNext()) {
                 String arg = args.next();
@@ -60,14 +61,14 @@ final class AliasBuiltin extends BjorneBuiltin {
                 if (alias == null) {
                     alias = context.getAlias(aliasName);
                     if (alias == null) {
-                        error("alias: " + aliasName + " not found", context);
+                        err.println("alias: " + aliasName + " not found");
                         rc = 1;
                     } else {
-                        printAlias(ps, aliasName, alias);
+                        printAlias(out, aliasName, alias);
                     }
                 } else {
                     if (!BjorneToken.isName(aliasName)) {
-                        error("alias: " + aliasName + ": not a valid alias name", context);
+                        err.println("alias: " + aliasName + ": not a valid alias name");
                     }
                     context.defineAlias(aliasName, alias);
                 }
@@ -83,7 +84,7 @@ final class AliasBuiltin extends BjorneBuiltin {
     }
 
     private void printAlias(PrintStream ps, String aliasName, String alias) {
-        ps.println(aliasName + "=" + alias);
+        ps.println(aliasName + "='" + alias + "'");
     }
    
     
