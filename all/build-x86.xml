@@ -275,10 +275,36 @@
             <copy file="${my-lib.dir}/grub.s1" todir="@{dir}/boot/grub" />
             <copy file="${my-lib.dir}/grub.s2" todir="@{dir}/boot/grub" />
             <copy file="${grub.menu.cdrom}" tofile="@{dir}/boot/grub/menu.lst" />
-            <exec executable="mkisofs">
-				<arg line="-o @{destfile} -R -b boot/grub/eltorito.s2 -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}" />
-			</exec>
-		</sequential>
+            <if>
+                <equals arg1="${jnode.enable.mkisofs}" arg2="true" />
+                <then>
+                    <!-- Fail on a Windows platform if there are spaces in the root dir's pathname.  It will
+            	     lead to mkisofs dying with a misleading error message.  bluebit / crawley 2008-05-03 -->
+    	            <fail message="Cannot build JNode from a directory with spaces in the pathname.">
+                	  <condition>
+    	                <and>
+                	      <contains string="${os.name}" substring="windows" casesensitive="false" />
+    	                  <contains string="${root.dir}" substring=" " casesensitive="false" />
+                	    </and>
+                	  </condition>
+                	</fail>
+                    <exec executable="mkisofs">
+				        <arg line="-o @{destfile} -R -b boot/grub/eltorito.s2 -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}" />
+			        </exec>
+                </then>
+                <else>
+                    <taskdef name="jiic-iso" classname="de.tu_darmstadt.informatik.rbg.hatlak.iso9660.ISOTask" classpathref="cp-x86" />                   
+                    <jiic-iso basedir="@{dir}"
+        				destfile="@{destfile}"
+		        		enableRockRidge="true"
+				        mkisofsCompatibility="true"
+        				bootImage="@{dir}/boot/grub/eltorito.s2"
+		        		bootImageSectorCount="4"
+				        genBootInfoTable="true"
+        			/>
+                </else>
+            </if>
+        </sequential>
 	</macrodef>
 
 	<!-- Create a full distributable bootable CDROM image -->
