@@ -140,7 +140,8 @@ final class JNodePolicy extends Policy {
         final String id = ext.getDeclaringPluginDescriptor().getId();
         final URL url;
         try {
-            url = new URL("plugin:" + id + "!/");
+            //note: ".../-" match everything starting with "plugin:" + id + "!/" 
+            url = new URL("plugin:" + id + "!/-");
             final ClassLoader cl = ext.getDeclaringPluginDescriptor()
                 .getPluginClassLoader();
             final CodeSource cs = new CodeSource(url, (Certificate[]) null);
