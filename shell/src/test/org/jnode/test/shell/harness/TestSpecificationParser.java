@@ -30,9 +30,28 @@ import net.n3.nanoxml.XMLParserFactory;
 
 import org.jnode.test.shell.harness.TestSpecification.RunMode;
 
+/**
+ * This class is the parser for XML test specifications.
+ * 
+ * @author crawley@jnode.org
+ */
 public class TestSpecificationParser {
+    // TODO ... this code would be more robust if we replaced the element and
+    // attribute name strings with an enum.
 
-    public TestSetSpecification parse(TestHarness harness, InputStream in, String base) throws Exception {
+    /**
+     * Parse a test specification read from the supplied input stream.  It copes with a
+     * XML consisting of a single 'testSpec' or a 'testSet' comprising multiple 'testSpec'
+     * and 'include' elements.
+     * @param harness the harness reference is used for callbacks to (for example) load
+     *     included testSets
+     * @param in the input stream containing the specification
+     * @param base the base gives the 'directory' context for this stream
+     * @return a TestSetSpecification holding everything parsed.
+     * @throws Exception
+     */
+    public TestSetSpecification parse(TestHarness harness, InputStream in, String base) 
+        throws Exception {
         StdXMLReader xr = new StdXMLReader(in);
         IXMLParser parser = XMLParserFactory.createDefaultXMLParser();
         parser.setReader(xr);
@@ -49,11 +68,13 @@ public class TestSpecificationParser {
                     IXMLElement argChild = (IXMLElement) obj;
                     String name = argChild.getName();
                     if (name.equals("testSpec")) {
+                        // (directly recursive)
                         res.addTestSpec(parseTestSpecification(argChild));
                     } else if (name.equals("plugin")) {
                         res.addPluginSpec(parsePluginSpecification(argChild));
                     } else if (name.equals("include")) {
                         String specName = extractAttribute(argChild, "setName");
+                        // (indirectly recursive)
                         TestSetSpecification included = harness.loadTestSetSpecification(specName, base);
                         if (included != null) {
                             res.addTestSetSpecification(included);
@@ -68,10 +89,12 @@ public class TestSpecificationParser {
         return res;
     }
     
-    private TestSpecification parseTestSpecification(IXMLElement elem) throws TestSpecificationException {
-        RunMode runMode = RunMode.valueOf(extractAttribute(elem, "runMode", "AS_CLASS"));
+    private TestSpecification parseTestSpecification(IXMLElement elem) 
+        throws TestSpecificationException {
+        RunMode runMode = RunMode.valueOf(
+                extractAttribute(elem, "runMode", RunMode.AS_CLASS.name()));
         String title = extractAttribute(elem, "title");
-        String command = extractAttribute(elem, "command");
+        String command = extractAttribute(elem, "command", null);
         String scriptContent = extractElementValue(elem, "script", "");
         String inputContent = extractElementValue(elem, "input", "");
         String outputContent = extractElementValue(elem, "output", "");
@@ -81,6 +104,14 @@ public class TestSpecificationParser {
             rc = Integer.parseInt(extractAttribute(elem, "rc", "0").trim());
         } catch (NumberFormatException ex) {
             throw new TestSpecificationException("'rc' is not an integer");
+        }
+        if (command == null) {
+            if (runMode != RunMode.AS_SCRIPT) {
+                throw new TestSpecificationException(
+                        "An '" + runMode + "' test requires a 'command' attribute");
+            } else {
+                command = "test";
+            }
         }
         TestSpecification res = new TestSpecification(
                 runMode, command, scriptContent, inputContent, outputContent, errorContent,
@@ -124,7 +155,8 @@ public class TestSpecificationParser {
     }
     
     @SuppressWarnings("unused")
-    private String extractElementValue(IXMLElement parent, String name) throws TestSpecificationException {
+    private String extractElementValue(IXMLElement parent, String name) 
+        throws TestSpecificationException {
         IXMLElement elem = name == null ? parent : parent.getFirstChildNamed(name);
         if (elem == null) {
             throw new TestSpecificationException(
@@ -137,10 +169,12 @@ public class TestSpecificationParser {
 
     private String extractElementValue(IXMLElement parent, String name, String dflt) {
         IXMLElement elem = name == null ? parent : parent.getFirstChildNamed(name);
-        return elem == null ? dflt : elem.getContent();
+        String content = elem == null ? null : elem.getContent();
+        return content == null ? dflt : content;
     }
     
-    private String extractAttribute(IXMLElement elem, String name) throws TestSpecificationException {
+    private String extractAttribute(IXMLElement elem, String name) 
+        throws TestSpecificationException {
         String attr = elem.getAttribute(name, null);
         if (attr == null) {
             throw new TestSpecificationException(
