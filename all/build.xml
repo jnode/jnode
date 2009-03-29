@@ -1,5 +1,6 @@
 <project name="JNode" default="help" basedir=".">
-
+    <!-- if task is used from this -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	<!-- before including jnode.xml, we must set this property -->
     <condition property="memoryMaximumSize" value="1512m" else="768m">
       <os arch="amd64"/>      
@@ -68,6 +69,9 @@
     <property name="derbytools.jar" value="${root.dir}/distr/lib/derbytools.jar" />
     <property name="nanoxml-java.jar" value="${root.dir}/shell/lib/nanoxml-2.2.3.jar" />
 
+    <property name="iso9660.jar" value="${root.dir}/builder/lib/iso9660.jar" />
+    <property name="sabre.jar" value="${root.dir}/builder/lib/sabre.jar" />
+
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
     <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
@@ -128,6 +132,8 @@
         <pathelement location="${derby.jar}"/>
         <pathelement location="${derbynet.jar}"/>
         <pathelement location="${derbytools.jar}"/>
+        <pathelement location="${iso9660.jar}"/>
+        <pathelement location="${sabre.jar}"/>
     </path>
 
     <path id="cp-jnode">
@@ -158,17 +164,6 @@
     </patternset>
 
     <target name="prepare">
-    	<!-- Fail on a Windows platform if there are spaces in the root dir's pathname.  It will
-    	     lead to mkisofs dying with a misleading error message.  bluebit / crawley 2008-05-03 -->
-    	<fail message="Cannot build JNode from a directory with spaces in the pathname.">
-    	  <condition>
-    	    <and>
-    	      <contains string="${os.name}" substring="windows" casesensitive="false" />
-    	      <contains string="${root.dir}" substring=" " casesensitive="false" />
-    	    </and>
-    	  </condition>
-    	</fail>
-
         <fail message="Java Runtime version 1.6 needed. Your version is: ${java.runtime.version}">
             <condition>
                 <not>

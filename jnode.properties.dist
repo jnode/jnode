@@ -103,3 +103,8 @@ jnode.user.home=/jnode/home
 # -----------------------------------------------
 
 #jnode.security.enabled=true
+
+# -----------------------------------------------
+# Custom build tools
+# -----------------------------------------------
+# jnode.enable.mkisofs=true
