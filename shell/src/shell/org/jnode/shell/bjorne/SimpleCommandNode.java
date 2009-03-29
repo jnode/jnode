@@ -83,6 +83,9 @@ public class SimpleCommandNode extends CommandNode implements BjorneCompletable 
                 childContext.evaluateRedirections(getRedirects());
                 rc = 0;
             } else {
+                // FIXME ... strictly speaking, alias substitution should be performed
+                // before "applying the grammatical rules" (i.e. parsing).
+                words = context.substituteAliases(words);
                 CommandLine command = context.expandAndSplit(words);
                 // Assignments and redirections are done in the command's context
                 BjorneContext childContext = new BjorneContext(context);

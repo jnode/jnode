@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
+import org.jnode.shell.IncompleteCommandException;
 import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
@@ -159,6 +160,7 @@ public class BjorneContext {
         this.interpreter = parent.interpreter;
         this.holders = copyStreamHolders(parent.holders);
         this.variables = copyVariables(parent.variables);
+        this.aliases = new TreeMap<String, String>(parent.aliases);
         this.globbing = parent.globbing;
         this.tildeExpansion = parent.tildeExpansion;
         this.echoExpansions = parent.echoExpansions;
@@ -1238,4 +1240,39 @@ public class BjorneContext {
         return interpreter.getUniqueName();
     }
 
+    public BjorneToken[] substituteAliases(BjorneToken[] words) 
+        throws IncompleteCommandException {
+        String alias = aliases.get(words[0].getText());
+        if (alias == null) {
+            return words;
+        }
+        List<BjorneToken> list = new LinkedList<BjorneToken>(Arrays.asList(words));
+        substituteAliases(list, 0, 0);
+        return list.toArray(new BjorneToken[list.size()]);
+    }
+        
+    private void substituteAliases(List<BjorneToken> list, int pos, int depth) 
+        throws IncompleteCommandException {
+        if (depth > 10) {
+            throw new ShellFailureException("probable cycle detected in alias expansion");
+        }
+        String aliasName = list.get(pos).getText();
+        String alias = aliases.get(aliasName);
+        if (alias == null) {
+            return;
+        }
+        BjorneTokenizer tokens = new BjorneTokenizer(alias);
+        list.remove(pos);
+        int i = 0;
+        while (tokens.hasNext()) {
+            list.add(pos + i, tokens.next());
+            if (i == 0 && !aliasName.equals(list.get(pos + i).getText())) {
+                substituteAliases(list, pos + i, depth + 1);
+            }
+            i++;
+        }
+        if (alias.endsWith(" ") && pos + i < list.size()) {
+            substituteAliases(list, pos + i, depth + 1);
+        }
+    }
 }
