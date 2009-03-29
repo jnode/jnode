@@ -24,4 +24,30 @@
         <error>alias: fred not found
 </error>
     </testSpec>
+    <testSpec title="alias 3" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                alias fred=ls
+                alias fred
+                alias jim="echo hi"
+                alias jim
+                alias
+        </script>
+        <output>fred='ls'
+jim='echo hi'
+fred='ls'
+jim='echo hi'
+</output>
+    </testSpec>
+    <testSpec title="unalias" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                alias fred=ls
+                alias jim="echo hi"
+                unalias jim
+                alias
+                unalias -a
+                alias
+        </script>
+        <output>fred='ls'
+</output>
+    </testSpec>
 </testSet>
