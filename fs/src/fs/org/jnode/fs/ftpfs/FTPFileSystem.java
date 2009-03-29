@@ -48,7 +48,12 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
 
     FTPFileSystem(final FTPFSDevice device, final FTPFileSystemType type) {
         this.type = type;
-        this.client = new FTPClient();
+        this.client = AccessController.doPrivileged(new PrivilegedAction<FTPClient>(){
+            @Override
+            public FTPClient run() {
+                return new FTPClient();
+            }
+        });
         this.device = device;
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {

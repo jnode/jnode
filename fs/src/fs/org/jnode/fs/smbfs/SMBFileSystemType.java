@@ -23,6 +23,8 @@ package org.jnode.fs.smbfs;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * @author Levente S\u00e1ntha
@@ -31,8 +33,14 @@ public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
     public static final Class<SMBFileSystemType> ID = SMBFileSystemType.class;
 
     static {
-        System.setProperty("jcifs.smb.client.attrExpirationPeriod", "10");
-        System.setProperty("jcifs.smb.client.responseTimeout", "10000");
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
+            public Object run() {
+                System.setProperty("jcifs.smb.client.attrExpirationPeriod", "10");
+                System.setProperty("jcifs.smb.client.responseTimeout", "10000");
+                return null;
+            }
+        });
     }
 
     /**
