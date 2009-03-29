@@ -3,12 +3,25 @@
     <plugin id="org.jnode.shell.command.posix"/>
     <testSpec title="exit 0" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
-exit 0
+                exit 0
         </script>
     </testSpec>
-    <testSpec title="exit 99" command="test" runMode="AS_SCRIPT" rc="99">
+    <testSpec title="exit 99" runMode="AS_SCRIPT" rc="99">
         <script>#!bjorne
-exit 99
+                exit 99
         </script>
+    </testSpec>
+    <testSpec title="alias" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                alias &gt; @TEMP_DIR@/1
+        </script>
+        <file name="1" input="false"></file>
+    </testSpec>
+    <testSpec title="alias 2" command="test" runMode="AS_SCRIPT" rc="1">
+        <script>#!bjorne
+                alias fred
+        </script>
+        <error>alias: fred not found
+</error>
     </testSpec>
 </testSet>

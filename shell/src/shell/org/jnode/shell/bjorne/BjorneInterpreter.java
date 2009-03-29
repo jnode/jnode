@@ -140,6 +140,7 @@ public class BjorneInterpreter implements CommandInterpreter {
     private static long subshellCount;
 
     static {
+        BUILTINS.put("alias", new AliasBuiltin());
         BUILTINS.put("break", new BreakBuiltin());
         BUILTINS.put("continue", new ContinueBuiltin());
         BUILTINS.put("exit", new ExitBuiltin());
@@ -242,7 +243,7 @@ public class BjorneInterpreter implements CommandInterpreter {
         CommandNode tree = new BjorneParser(tokens, "> ").parse();
         if (tree == null) {
             // An empty command line
-            return 0;
+            return myContext.getLastReturnCode();
         }
         if (DEBUG) {
             System.err.println(tree);

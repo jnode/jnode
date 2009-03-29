@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,6 +103,8 @@ public class BjorneContext {
     private final BjorneInterpreter interpreter;
 
     private Map<String, VariableSlot> variables;
+    
+    private TreeMap<String, String> aliases;
 
     private String command = "";
 
@@ -129,6 +132,7 @@ public class BjorneContext {
         this.interpreter = interpreter;
         this.holders = holders;
         this.variables = new HashMap<String, VariableSlot>();
+        this.aliases = new TreeMap<String, String>();
     }
 
     public BjorneContext(BjorneInterpreter interpreter) {
@@ -298,6 +302,40 @@ public class BjorneContext {
         } else {
             var.exported = exported;
         }
+    }
+    
+    /**
+     * Get the complete alias map.
+     * @return the alias map
+     */
+    TreeMap<String, String> getAliases() {
+        return aliases;
+    }
+    
+    /**
+     * Lookup an alias
+     * @param aliasName the (possible) alias name
+     * @return the alias string or {@code null}
+     */
+    String getAlias(String aliasName) {
+        return aliases.get(aliasName);
+    }
+    
+    /**
+     * Define an alias
+     * @param aliasName the alias name
+     * @param alias the alias.
+     */
+    void defineAlias(String aliasName, String alias) {
+        aliases.put(aliasName, alias);
+    }
+
+    /**
+     * Undefine an alias
+     * @param aliasName the alias name
+     */
+    void undefineAlias(String aliasName) {
+        aliases.remove(aliasName);
     }
 
     /**
