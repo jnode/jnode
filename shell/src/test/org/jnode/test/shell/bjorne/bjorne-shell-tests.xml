@@ -22,8 +22,16 @@ true
 echo $?
 false
 echo $?
+false
+
+echo $?
+false
+# no comment
+echo $?
 </script>
         <output>0
+1
+1
 1
 </output>
     </testSpec>
@@ -164,7 +172,7 @@ A is 2
 A is 1
 </output>
     </testSpec>
-    <testSpec title="while ... do ... done" command="test" runMode="AS_SCRIPT" rc="0">
+    <testSpec title="while ... do ... done" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
 A=5
 while expr $A != 0 ; do echo A is $A ; A=`expr $A - 1`; done
@@ -182,7 +190,7 @@ A is 1
 0
 </output>
     </testSpec>
-    <testSpec title="while ... do ... done multi-line" command="test" runMode="AS_SCRIPT" rc="0">
+    <testSpec title="while ... do ... done multi-line" command="test" runMode="AS_SCRIPT" rc="1">
         <script>#!bjorne
 A=5
 while expr $A != 0 ;
