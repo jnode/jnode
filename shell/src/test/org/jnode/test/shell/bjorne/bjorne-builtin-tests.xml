@@ -38,6 +38,30 @@ fred='ls'
 jim='echo hi'
 </output>
     </testSpec>
+    <testSpec title="alias 4" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                alias fred="echo hi"
+                fred
+                fred ho
+                fred fred
+        </script>
+        <output>hi
+hi ho
+hi fred
+</output>
+    </testSpec>
+    <testSpec title="alias 5" command="test" runMode="AS_SCRIPT" rc="0">
+        <script>#!bjorne
+                alias fred="echo hi "
+                fred
+                fred ho
+                fred fred
+        </script>
+        <output>hi
+hi ho
+hi echo hi
+</output>
+    </testSpec>
     <testSpec title="unalias" command="test" runMode="AS_SCRIPT" rc="0">
         <script>#!bjorne
                 alias fred=ls
