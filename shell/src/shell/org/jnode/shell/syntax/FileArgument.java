@@ -26,6 +26,7 @@ import java.security.PrivilegedAction;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
+import org.jnode.vm.annotation.DoPrivileged;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -46,6 +47,7 @@ public class FileArgument extends Argument<File> {
     }
 
     @Override
+    @DoPrivileged
     protected File doAccept(Token token) throws CommandSyntaxException {
         if (token.text.length() > 0) {
             File file = new File(token.text);
