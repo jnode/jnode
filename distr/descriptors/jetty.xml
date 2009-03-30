@@ -69,7 +69,7 @@
     <permission class="java.lang.RuntimePermission" name="modifyThread"/>
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
     <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
     <permission class="java.net.SocketPermission" name="*:1-" actions="resolve,listen"/>
     <permission class="java.security.SecurityPermission" name="getPolicy"/>

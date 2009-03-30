@@ -112,7 +112,7 @@
   </extension>
 
   <extension point="org.jnode.security.permissions">
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>

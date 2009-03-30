@@ -50,7 +50,7 @@
     <permission class="java.util.PropertyPermission" name="dns.search" actions="read,write"/>
     
     <!-- TFTP !?! -->
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
     <permission class="java.net.SocketPermission" name="*:69" actions="connect,resolve"/>
     

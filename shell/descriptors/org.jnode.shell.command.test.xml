@@ -47,7 +47,7 @@
     <permission class="java.util.PropertyPermission" name="os.name" actions="read"/>
     <permission class="java.util.PropertyPermission" name="java.io.tmpdir" actions="read"/>
     
-	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
+	<permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
 	
 	<permission class="java.lang.reflect.ReflectPermission" name="*" actions="suppressAccessChecks"/>	    
   </extension>

@@ -55,8 +55,8 @@
   
   <extension point="org.jnode.security.permissions">
       <permission class="java.lang.RuntimePermission" name="exitVM"/>
-      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
-      <permission class="java.util.PropertyPermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+      <permission class="java.util.PropertyPermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
       <permission class="java.util.PropertyPermission" name="*" actions="read"/>
 
       
