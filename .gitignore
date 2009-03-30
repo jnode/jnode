@@ -1,0 +1,28 @@
+
+# /
+/build
+/bak
+/build
+/docs
+/lib
+/.classpath
+/.project
+/src.jpx
+/*.patch
+/jnode.properties
+/local
+/bin
+
+# /all/
+/all/build
+/all/save
+
+# /builder/
+/builder/build
+
+# /core/
+/core/build
+
+# /core/src/classpath/gnu/gnu/java/security/provider/
+/core/src/classpath/gnu/gnu/java/security/provider/Makefile
+/core/src/classpath/gnu/gnu/java/security/provider/Makefile.in
