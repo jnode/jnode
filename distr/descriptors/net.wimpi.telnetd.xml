@@ -29,7 +29,7 @@
 	<permission class="java.lang.RuntimePermission" name="exitVM"/>
 
 	<!-- do we need them all like in org.jnode.shell ? only "jnode.prompt" has been checked -->
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="modifyThread"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>

@@ -18,7 +18,7 @@
   </runtime>
         
   <extension point="org.jnode.security.permissions">
-  	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
+  	<permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
   </extension>        
 </plugin>

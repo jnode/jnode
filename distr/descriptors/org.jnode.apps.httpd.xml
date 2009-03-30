@@ -31,7 +31,7 @@
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
     <permission class="java.util.PropertyPermission" name="file.encoding" actions="read"/>      
     <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
     <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen"/>
   </extension>
 </plugin>

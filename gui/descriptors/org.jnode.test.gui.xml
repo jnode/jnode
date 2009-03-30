@@ -40,7 +40,7 @@
     <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
     <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
     <permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
   </extension>
 
   <extension point="org.jnode.shell.aliases">

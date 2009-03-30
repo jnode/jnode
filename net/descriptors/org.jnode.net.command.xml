@@ -137,6 +137,6 @@
         <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
         <permission class="org.jnode.net.NetPermission" name="dhcpClient"/>
         <permission class="org.jnode.net.NetPermission" name="wget"/>
-        <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+        <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
     </extension>
 </plugin>
