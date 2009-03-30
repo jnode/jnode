@@ -37,9 +37,6 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 package java.security;
 
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmAccessController;
-
 /**
  * Access control context and permission checker.
  * Can check permissions in the access control context of the current thread
@@ -59,9 +56,7 @@ public final class AccessController
     /**
      * This class only has static methods so there is no public contructor.
      */
-  private AccessController()
-  {
-    }
+  private AccessController() { }
 
     /**
      * Checks wether the access control context of the current thread allows
@@ -73,11 +68,7 @@ public final class AccessController
    * @exception AccessControlException thrown if the current context does not
    * allow the given permission.
      */
-    public static void checkPermission(Permission perm)
-    throws AccessControlException
-  {
-        VmAccessController.checkPermission(perm);
-    }
+    public static native void checkPermission(Permission perm) throws AccessControlException;
 
     /**
      * Calls the <code>run()</code> method of the given action with as
@@ -91,13 +82,7 @@ public final class AccessController
    * should be be called.
    * @return the result of the <code>action.run()</code> method.
      */
-    public static <T> T doPrivileged(PrivilegedAction<T> action)
-    {
-        if (action == null) {
-            Unsafe.debug("action == null!! ");
-        }
-        return (T) VmAccessController.doPrivileged(action, null);
-    }
+    public static native <T> T doPrivileged(PrivilegedAction<T> action);
 
     /**
      * Calls the <code>run()</code> method of the given action with as
@@ -113,11 +98,7 @@ public final class AccessController
    * domains should be added to the protection domain of the calling class.
    * @return the result of the <code>action.run()</code> method.
      */
-    public static <T> T doPrivileged(PrivilegedAction<T> action,
-                                    AccessControlContext context)
-  {
-        return (T) VmAccessController.doPrivileged(action, context.getVmContext());
-    }
+    public static native <T> T doPrivileged(PrivilegedAction<T> action, AccessControlContext context);
 
     /**
      * Calls the <code>run()</code> method of the given action with as
@@ -135,11 +116,7 @@ public final class AccessController
    * @exception PrivilegedActionException wrapped around any exception that
    * is thrown in the <code>run()</code> method.
      */
-    public static <T> T doPrivileged(PrivilegedExceptionAction<T> action)
-    throws PrivilegedActionException
-  {
-        return (T) VmAccessController.doPrivileged(action, null);
-    }
+    public static native <T> T doPrivileged(PrivilegedExceptionAction<T> action) throws PrivilegedActionException;
 
     /**
      * Calls the <code>run()</code> method of the given action with as
@@ -159,12 +136,8 @@ public final class AccessController
    * @exception PrivilegedActionException wrapped around any exception that
    * is thrown in the <code>run()</code> method.
      */
-    public static <T> T doPrivileged(PrivilegedExceptionAction<T> action,
-                                    AccessControlContext context)
-    throws PrivilegedActionException
-  {
-        return (T)VmAccessController.doPrivileged(action, context.getVmContext());
-    }
+    public static native <T> T doPrivileged(PrivilegedExceptionAction<T> action, AccessControlContext context)
+        throws PrivilegedActionException;
 
     /**
      * Returns the complete access control context of the current thread.
@@ -180,11 +153,7 @@ public final class AccessController
    *
    * @return The context.
      */
-    public static AccessControlContext getContext() 
-    {
-        return new AccessControlContext(VmAccessController.getContext());
-    	//return VMAccessController.getContext();
-    }
+    public static native AccessControlContext getContext();
 
 
     //jnode + openjdk
@@ -240,8 +209,7 @@ public final class AccessController
      *
      * @since 1.6
      */
-    public static <T> T doPrivilegedWithCombiner(PrivilegedExceptionAction<T> action) 
-            throws PrivilegedActionException {
+    public static <T> T doPrivilegedWithCombiner(PrivilegedExceptionAction<T> action) throws PrivilegedActionException {
         //todo implement it
         throw new UnsupportedOperationException();
     }

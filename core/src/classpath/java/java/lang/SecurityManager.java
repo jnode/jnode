@@ -38,8 +38,6 @@ exception statement from your version. */
 
 package java.lang;
 
-import gnu.classpath.VMStackWalker;
-
 import java.awt.AWTPermission;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -192,13 +190,7 @@ public class SecurityManager
      * 
      * @return an array of classes on the Java execution stack
      */
-  protected Class[] getClassContext()
-  {
-    Class[] stack1 = VMStackWalker.getClassContext();
-    Class[] stack2 = new Class[stack1.length - 1];
-    System.arraycopy(stack1, 1, stack2, 0, stack1.length - 1);
-    return stack2;
-    }
+  protected native Class[] getClassContext();
 
     /**
      * Find the ClassLoader of the first non-system class on the execution
